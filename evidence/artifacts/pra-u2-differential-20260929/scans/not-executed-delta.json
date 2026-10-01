@@ -1,0 +1,23 @@
+{
+ "transcript_files": 5161,
+ "calls": 228531,
+ "calls_with_result": 228510,
+ "u1_not_executed": 1228,
+ "u2_not_executed": 1228,
+ "only_u2": {},
+ "only_u1": {},
+ "causes": {
+  "Bash config": 24,
+  "Bash hook": 801,
+  "Bash invalid": 152,
+  "Bash other": 1,
+  "Bash user": 33,
+  "mcp hook": 11,
+  "mcp invalid": 11,
+  "mcp user": 9,
+  "other_builtin cancelled": 1,
+  "other_builtin hook": 3,
+  "other_builtin invalid": 174,
+  "other_builtin user": 8
+ }
+}

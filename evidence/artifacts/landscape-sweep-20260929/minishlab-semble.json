@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-minishlab-semble",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/MinishLab/semble",
+ "reviewed_commit": "24497845460960db1839c8485319df189a889225",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "semantic-rag"
+ ],
+ "claim": "Source and documentation review of MinishLab/semble at commit 24497845460960db1839c8485319df189a889225 (license MIT), read from README.md at that commit. Repository description: \"Fast and Accurate Code Search for Agents. Uses 99% fewer tokens than grep+read\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 6159,
+  "pushed_at": "2026-09-25T07:16:03Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@24497845460960db1839c8485319df189a889225",
+   "text": "[Quickstart](#quickstart) • [CLI](#cli) • [MCP Server](#mcp-server) • [Installation](docs/installation.md) • [Benchmarks](#benchmarks)"
+  },
+  {
+   "source": "README.md@24497845460960db1839c8485319df189a889225",
+   "text": "Semble is a code search library built for agents. It returns the exact code snippets they need instantly, using ~99% fewer tokens than grep+read. Indexing and searching a full codebase end-to-end takes under a second for most repos, matching the retrieval quality of a code-specialized transformer while indexing ~380x faster and querying ~17x faster (see [benchmarks](#benchmarks)). Everything runs on CPU with no API keys, GPU, or external services. Use it as an MCP server, a CLI tool via AGENTS.m"
+  },
+  {
+   "source": "README.md@24497845460960db1839c8485319df189a889225",
+   "text": "Your agent queries Semble in natural language (e.g. `\"How is authentication handled?\"`) and gets back only the relevant code snippets, without grepping or reading full files."
+  }
+ ]
+}

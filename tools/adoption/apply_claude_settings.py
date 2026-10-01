@@ -5,7 +5,9 @@ one host) into a live ~/.claude/settings.json, in place.
 Never touches ~/.claude.json or any credential store. Backs up the current
 settings file (never overwriting an earlier backup) before writing, refuses
 to operate through a symlink, deep-merges nested objects (template scalars
-win; host-only keys, permission rules and plugins are kept), combines hooks
+win; host-only keys, permission rules and plugins are kept; a list gains a
+missing template entry next to its template neighbours, so a deny rule stays
+ahead of a `!` carve-out), combines hooks
 per event de-duplicated by command, writes atomically, and preserves the
 original file's mode bits. Supports --dry-run (prints the would-be result and exits
 without touching anything).
@@ -111,10 +113,36 @@ def merge_hooks(base: dict, incoming: dict) -> dict:
     return merged
 
 
+def union_in_template_order(current: list, incoming: list) -> list:
+    """Union of two lists that keeps every base entry in its order and puts each
+    template entry the base lacks next to its template neighbours: right after
+    the nearest earlier template entry already in the result, else right before
+    the nearest later one, else at the end (so a list with no template entry in
+    it gets the template entries after its own, as a plain union would).
+
+    Order carries meaning in permission lists: a `!` gitignore negation in a
+    Read/Edit deny or ask list carves paths out of only the rules listed before
+    it in the same settings file (code.claude.com/docs/en/permissions). A plain
+    append would put a new template rule after a host's existing carve-outs."""
+    merged = list(current)
+    for position, item in enumerate(incoming):
+        if item in merged:
+            continue
+        earlier = next((prior for prior in reversed(incoming[:position]) if prior in merged), None)
+        if earlier is not None:
+            index = merged.index(earlier) + 1
+        else:
+            later = next((following for following in incoming[position + 1:] if following in merged), None)
+            index = merged.index(later) if later is not None else len(merged)
+        merged.insert(index, copy.deepcopy(item))
+    return merged
+
+
 def deep_merge_dict(base: dict, incoming: dict) -> dict:
     """Recursive merge: nested dicts merge key by key, lists union (base
-    entries first, template entries appended when absent), other template
-    values win; base keys the template does not mention are kept."""
+    entries keep their order; an absent template entry joins next to its
+    template neighbours, see union_in_template_order), other template values
+    win; base keys the template does not mention are kept."""
     merged = copy.deepcopy(base) if isinstance(base, dict) else {}
     if not isinstance(incoming, dict):
         return merged
@@ -123,7 +151,7 @@ def deep_merge_dict(base: dict, incoming: dict) -> dict:
         if isinstance(value, dict) and isinstance(current, dict):
             merged[key] = deep_merge_dict(current, value)
         elif isinstance(value, list) and isinstance(current, list):
-            merged[key] = current + [copy.deepcopy(item) for item in value if item not in current]
+            merged[key] = union_in_template_order(current, value)
         else:
             merged[key] = copy.deepcopy(value)
     return merged
@@ -136,7 +164,8 @@ def merge_settings(base: dict, template: dict) -> dict:
       - nested objects (modelSettings, env, permissions, statusLine,
         enabledPlugins, ...): deep-merged, so host-only keys such as extra
         permission rules, plugins or per-model levels are kept
-      - lists: union, host entries first
+      - lists: union; host entries keep their order and a missing template
+        entry joins next to its template neighbours (union_in_template_order)
       - scalars: template wins
       - keys the template does not mention: kept from base
     """

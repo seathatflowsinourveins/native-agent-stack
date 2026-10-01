@@ -76,6 +76,23 @@ class GrandDashboardTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, '^duplicate dashboard entities$'):
                 progress.snapshot(ROOT)
 
+    def test_evidence_manifest_has_its_own_size_bound(self):
+        # The evidence manifest passed the general bound on 2026-09-28; every other source keeps it.
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            (root/'manifests').mkdir()
+            manifest = root/'manifests/evidence.json'
+            manifest.write_text(json.dumps({'receipts': [], 'files': ['x' * 1000] * (progress.MAX_BYTES // 1000 + 1)}))
+            self.assertGreater(manifest.stat().st_size, progress.MAX_BYTES)
+            self.assertEqual(progress.read(root, 'manifests/evidence.json')['receipts'], [])
+            (root/'other.json').write_bytes(manifest.read_bytes())
+            with self.assertRaisesRegex(ValueError, '^source exceeds size limit$'):
+                progress.read(root, 'other.json')
+            with manifest.open('r+b') as f:
+                f.truncate(progress.SOURCE_MAX_BYTES['manifests/evidence.json'] + 1)
+            with self.assertRaisesRegex(ValueError, '^source exceeds size limit$'):
+                progress.read(root, 'manifests/evidence.json')
+
     def test_absolute_and_symlink_evidence_rejected(self):
         original = progress.read
         for ref in ['/etc/passwd', '../outside', 'does-not-exist']:
@@ -225,6 +242,14 @@ class GrandDashboardTests(unittest.TestCase):
             # changes the written path; compare against the same resolved form.
             self.assertIn(f'--dagu-bin {binary.resolve()} --dagu-home {root.resolve()}', service)
             with self.assertRaises(ValueError):installer.install(ROOT, root/'c', root/'u', root/'d', binary, None)
+
+    def test_activity_panel_includes_codex_exec_workers(self):
+        # codex exec workers log as service_name="codex_exec"; the regex once listed only the Desktop/App Server names.
+        expr = next(p for p in render.dashboard()['panels'] if p['id'] == 14)['targets'][0]['expr']
+        services = expr.split('"')[1].split('|')
+        for service in ('codex_exec', 'codex_cli_rs', 'codex-app-server', 'claude-code', 'claude-code-desktop'):
+            with self.subTest(service=service):
+                self.assertIn(service, services)
 
 
 if __name__=='__main__':unittest.main()

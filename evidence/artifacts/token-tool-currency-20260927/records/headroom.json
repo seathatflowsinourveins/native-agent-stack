@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "tool": "headroom",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:10.076Z",
+  "upstream_repository": "https://github.com/headroomlabs-ai/headroom/",
+  "pin": {
+    "version": "0.37.0",
+    "source_pin": null,
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:513",
+      "adoption/pins-linux-x86_64.json:279"
+    ],
+    "verified_against_worktree_on": "2026-09-27"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/headroom/gpt6.md"
+    ],
+    "latest_release": {
+      "version": "0.39.0",
+      "tag": "v0.39.0",
+      "published_at": "2026-09-25T19:29:55Z"
+    },
+    "behind_by": {
+      "stable_releases": 2,
+      "release_tags": [
+        "v0.38.0",
+        "v0.39.0"
+      ]
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.39.1",
+    "published_at": "2026-09-26T20:31:39Z",
+    "html_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/headroomlabs-ai/headroom/releases/latest"
+  },
+  "behind_by": {
+    "count": 3,
+    "unit": "stable releases",
+    "basis": "The releases API contains the v0.37.0 pin and three newer non-draft, non-prerelease releases.",
+    "release_tags": [
+      "v0.38.0",
+      "v0.39.0",
+      "v0.39.1"
+    ],
+    "source_url": "https://api.github.com/repos/headroomlabs-ai/headroom/releases?per_page=100"
+  },
+  "changes_since_scratch": [
+    {
+      "field": "latest_stable",
+      "previous": "0.39.0",
+      "current": "0.39.1",
+      "source_url": "https://api.github.com/repos/headroomlabs-ai/headroom/releases/latest"
+    },
+    {
+      "field": "stable_releases_behind",
+      "previous": 2,
+      "current": 3,
+      "source_url": "https://api.github.com/repos/headroomlabs-ai/headroom/releases?per_page=100"
+    },
+    {
+      "field": "PR_3806_status",
+      "previous": "unreleased main fix",
+      "current": "included in v0.39.1 release notes",
+      "source_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "The v0.39.1 release notes include the proxy TPM-limiter correction for large-context requests. Scratch described the same change as unreleased; it is now in a stable release.",
+      "source_urls": [
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+      ],
+      "revision": "v0.39.1 / 7968122658c31c06ef3e5b1fe7911c8cb0a79ade",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "PR #3748 rejects timestamp-shaped rows before grep-shaped search matching. It appears in v0.39.0; changing that router path does not by itself establish lossless output for logs.",
+      "source_urls": [
+        "https://github.com/headroomlabs-ai/headroom/pull/3748"
+      ],
+      "revision": "d971f7c3983b05653ef1eb88539bbbbc3667eb67",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "The v0.39.0 release notes distinguish new-input savings from whole-wire savings and add exact cache-read costs to historical rollups. These are counter semantics, not measured savings for this repository.",
+      "source_urls": [
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.0"
+      ],
+      "revision": "v0.39.0",
+      "channel": "released",
+      "verification": "primary source retrieved on 2026-09-27; no executable or provider acceptance claimed",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "package_channels": [
+    {
+      "package": "headroom-ai",
+      "latest": "0.39.1",
+      "published_at": "2026-09-26T20:47:37.726860Z",
+      "source_url": "https://pypi.org/pypi/headroom-ai/json",
+      "channel": "PyPI info.version; earliest upload",
+      "retrieved_on": "2026-09-27"
+    },
+    {
+      "package": "headroom-ai",
+      "latest": "0.39.1",
+      "published_at": "2026-09-26T20:34:03.124Z",
+      "source_url": "https://registry.npmjs.org/headroom-ai",
+      "channel": "npm dist-tags.latest; separate TypeScript SDK",
+      "retrieved_on": "2026-09-27"
+    }
+  ],
+  "limitations": [
+    "Source/documentation review only; this record does not establish installed behavior, native tests, model execution, savings or upgrade acceptance.",
+    "Scratch host measurements and executable probes were not rerun or promoted into this evidence class."
+  ]
+}

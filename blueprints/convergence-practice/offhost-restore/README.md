@@ -17,6 +17,10 @@ The active hosted plan includes later reviewed workflow logging and Action-pin
 updates for a future dispatch. The accepted run keeps its original execution
 revision and plan digest; neither the original preparation plan nor historical
 receipts are rewritten, and this binding refresh claims no new recovery run.
+A second binding refresh on 2026-09-26 adds `step-security/harden-runner` in audit
+mode as the job's first step and an exact-release Action comment; the next dispatch
+is the first run with that step
+([decision](../../../docs/decisions/2026-09-26-token-workflow-hardening.md)).
 
 The manual-only workflow first runs **seven unchanged upstream restic tests**,
 then attempts an independent-host restore of the separately retained synthetic

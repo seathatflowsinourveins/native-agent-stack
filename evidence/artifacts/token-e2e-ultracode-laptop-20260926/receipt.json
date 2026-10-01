@@ -72,6 +72,15 @@
      "What does hold: the hook rewrites plain git/ls/grep; git log, find and diff pass through; the excluded git log output is byte-identical; the measured savings are real; and fidelity holds for CMD1 and CMD3-6. A narrower claim limited to those points would stand. My upstream issue search found no report of the '+' marker problem; #2137 is a different branch -a bug.",
      "Side effects: every explicit rtk run I made used RTK_DB_PATH and RTK_RECALL_DB (supported upstream) pointed into verify/. The harness's live rtk hook still writes rtk's own ~/.local/share/rtk store for every hooked Bash call, including mine. That is rtk's own state and cannot be avoided."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "retracted_later",
+    "bad_input_control_recorded": false,
+    "basis": "The verifier reproduced the worker's 13/13 check and the size reduction but refuted 'no fact lost': git branch -a's 'remote-only (31)' held 6 true remote-only branches, and 599 recall pointers are shortened excerpts. The size change stays a measured size change only.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json#/tools/0/verifier/verdict"
+    ]
    }
   },
   {
@@ -121,6 +130,12 @@
      "Counter delta not measured. The ctx_stats/ctx_doctor calls are real (transcript shows 00:42:37Z, v1.0.169, hooks PASS). No before snapshot was taken, so the task's delta on context-mode's own counters remains unmeasured, as the subagent stated. ctx_stats figures are the tool's self-reported aggregates, not task evidence.",
      "Evidence class and scope. This is a local integration E2E of the installed upstream plugin (context-mode 1.0.169) through its native MCP channel, on a real repo file under the bound project root. It is not an upstream test-suite run. I changed nothing in the pair dir outside verify/: the four original files keep their hashes and mtimes, and verify/SHA256SUMS lists the new evidence. Side effects: context-mode's own session state from my single sanctioned ctx_execute_file call, and RTK hook history from Bash calls."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "No failing run of the byte-equality check is recorded. Its target file is in another repository, so no Git oracle here reproduces it; the verifier also found the worker saw the target's heading count before the tool call."
    }
   },
   {
@@ -169,6 +184,12 @@
      "My own deviations: I ran `headroom --version` directly without the guard env, and `headroom mcp --help` / `mcp serve --help` with HEADROOM_WORKSPACE_DIR set to a nonexistent path that was never created. Neither changed anything in ~/.headroom. Every verification tool call went through MCPorter. The private workspace verify/ws.8vljib is kept as evidence and contains a stored copy of the baseline. Nothing was written outside pairs/headroom/verify/.",
      "Evidence class: this is a local integration check, meaning actual tool execution on this host through the MCPorter bridge. It is not upstream's own test suite and not a provider-level E2E. The 127.0.0.1:8787 ConnectTimeout (a timeout rather than a refusal) comes from this environment and appeared in both runs. The stats call took about 21 s because of the proxy probes."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "basis": "The verifier's one-byte negative control breaks both checks. The complete native output is retained only by hash in the private ledger. The lifetime ledger read 0 on both sides because the call ran in a private workspace: that zero is the ledger's own scope, not a measurement of this call."
    }
   },
   {
@@ -215,6 +236,15 @@
      "Deviations the subagent did not disclose: (1) Before any jcodemunch call, its Bash grep (transcript call #3) printed 'host_receipts.py:643:def register_file(root: Path, relative_path: str) -> None:' and the call sites from the raw source. So the signature and line number entered its context outside the tool channel. baseline.txt itself was never read, and answer.txt was built mechanically from tool-output.txt fields, so the answer still follows from the tool output. (2) It made an unlisted read-only menu(limit=60) call. Disclosed deviation: its helper scripts were written to the session scratchpad, outside the prompt's pairs/<tool>/ write scope.",
      "Session stats cover the whole shared server process (up 7130 s), not only the subagent. Its search_symbols=2 includes a 'parse_codex' search from another caller. Crediting all 23575 session tokens to the single get_symbol_source call is still correct.",
      "Nothing changed outside verify/. Snapshots verify/pre-state.json and verify/post-state.json show zero differences across ~/.code-index (66 files), ~/.mcporter, the pair files outside verify/, R's git index, HEAD and status, and R/scripts. I redirected HOME for the re-run because upstream token_tracker._savings_path writes to Path.home()/.code-index when no base_path is passed. The E2E itself changed ~/.code-index state (indexing, then invalidating the scratch repo, plus the ledger and session files), which its prompt allowed."
+    ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "No failing run is recorded in this run. A 2026-09-27 reproduction rebuilds the answer check from the pinned Git content at 9a8257cd and rejects wrong answers; it is new local integration evidence and supplies no control for this run, so the acceptance stays partial. The verifier also found the worker had seen the signature and line number in an earlier grep.",
+    "evidence": [
+     "tests/test_token_e2e_receipt_checks.py::JCodeMunchLocationOracle"
     ]
    }
   },
@@ -264,6 +294,12 @@
      "I cannot verify from the files the claim that baseline.txt was not read before the answer was written (answer.txt mtime 20:45:13 is after baseline.txt 20:43:58). It does not affect the verdict: the qmd get block and the baseline are byte-identical, so checking the answer against either gives the same result. qmd has no savings counter; 'counter_expected_to_move: none' is consistent with status being unchanged.",
      "I wrote only under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/qmd/verify/ (verify.sh, reconstruct.py, verify-log.txt, rerun-search.txt, rerun-get.txt, ref-index-search.txt, ref-index-and-source.txt, grounding-extra.txt, indexes.txt, status-before.txt, status-after.txt, post-state.txt and others). post-state.txt confirms that every ~/.cache/qmd index mtime, the four pair files and the git state of the source doc are unchanged."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "No failing run of the fidelity and substring checks is recorded; the verifier's own first comparison failed on its split point, a checker construction mistake, not a control. The answered document is in another repository's index, so no Git oracle here reproduces it, and parity with the E1 catalog corpus is not claimed."
    }
   },
   {
@@ -311,6 +347,12 @@
      "Minor protocol points, not refuting: answer.txt (mtime 1790383768) was written after baseline.txt (1790383706) and check.txt (1790383759). It also includes one fact from outside the tool output ('even though that file imports summarizeRun'), which is true (line 5). The core answer (definition at line 241 1-based, 2 references in the same file) follows from tool-output.txt alone. tool-output.txt was written at 1790383740, after the baseline, but it equals the transcript's tool_result.",
      "Side effects: my three MCP calls wrote nothing (no file under agent-lab/.serena is newer than verify/state-before.txt). The probe ran with solidlsp_dir, project_data_path and TMPDIR all inside verify/; no file in serena-home, the serena venv or agent-lab/.serena is newer than the probe's start marker. agent-lab git status is identical to the 15-line initial snapshot. All evidence is in ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/serena/verify/ (412K). The probe's symlink to the TS install and its temp files were removed afterwards; re-running lsp_probe.py recreates them."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": null,
+    "basis": "find_symbol's definition check passed. find_referencing_symbols missed 6 of 8 project-wide call sites, and the recorded FAIL is accurate: the TypeScript server's default project inclusion skips .claude/ (verifier-confirmed)."
    }
   },
   {
@@ -361,6 +403,13 @@
      "No side effects. SocratiCode status was identical before and after my calls (green, 1974 chunks, graph 145 files/89 edges, same last incremental update; only the elapsed seconds changed). The pair files' hashes are unchanged. In agent-lab, tools/ and .claude/ show only the two untracked files that were already there. nas-e2e-R is clean. Everything I wrote is under pairs/socraticode/verify/.",
      "The report's counter_expected_to_move is about how a future manifest will count tools; I did not verify it. No bytes-saved counter applies to SocratiCode here."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "tool_output_provenance": "abridged_transcription",
+    "basis": "Four wrong answers fail the check (verifier). tool-output.txt was typed with the Write tool and silently abridges three lower-ranked hits, so exact_comparison.tool_output_tokens counts that abridged transcription, not the original native response."
    }
   },
   {
@@ -409,6 +458,12 @@
      "Disclosed deviations were verified as stated. The scope agent-lab/agent-lab was explicitly ordered in the subagent's computed task. The reference query was replaced, and the second query was picked after seeing CALL 2's top hit. The baseline is non-empty although the reference said to leave it empty; it is anchored on upstream SQL. The ai-memory-retrieval skill was not loaded. Minor narrative error: the report says '+325 in roughly a minute', but the actual tool→baseline gap was about 4 minutes (00:48:45Z → 00:52:44Z).",
      "Side effects: my single sanctioned memory_query triggers upstream spawn_access_bump (access counters on the 3 returned pages), as the subagent's calls did. The host's hooks automatically capture my tool calls as observations. All SQLite reads were mode=ro and the gh api calls were read-only. Writes went only to ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/ai-memory/verify/ (sealed in verify/SHA256SUMS, 42 files). The four pair files are unchanged (mtimes 00:51:07–00:53:33Z)."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "basis": "Three negative controls fail as expected, with SQL corroboration. The worker read baseline.txt before writing its check (verifier note)."
    }
   },
   {
@@ -456,6 +511,12 @@
      "Not re-measured: the rtk session counters (a shared session row that keeps moving, and not about repomix itself), and the claim that pairs/repomix did not exist before the run. My verification did not change the pair files; their sha256 values still start with 9397dc34 (answer), 35624936 (baseline), 6e95b584 (check) and 439c67e8 (tool-output).",
      "All verifier files are under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/repomix/verify/: check_verify.py, check.verify.txt, check.original-rerun.txt, baseline.regen.txt, tool-output.rerun.txt, rerun.log, fixture/mod.py, fixture-output.txt, fixture-run.log, upstream/PythonParseStrategy.v1.18.1.ts, upstream/PythonParseStrategy.main.ts, upstream/parseFile.python.test.ts, and tmp/ (the contained repomix cache)."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "unsupported",
+    "bad_input_control_recorded": null,
+    "basis": "The recorded FAIL is accurate: --compress dropped status_body, a three-line signature, with no sign of loss (47 of 48 top-level functions)."
    }
   },
   {
@@ -505,6 +566,12 @@
      "Process observation: answer.txt was modified 31.3 s after check.txt, although it describes check.txt as a later confirmation. The answer contains no figure derived from the baseline and defers the byte comparison to check.txt, so no leak of the baseline into the answer is visible. Every figure answer.txt quotes appears in tool-output.txt.",
      "Nothing changed outside verify/. The sha256 of answer.txt, baseline.txt, check.txt and tool-output.txt is unchanged, and nas-e2e-R is still clean. I read the original toon-check.sh but did not run it, because it rewrites check.txt; I re-derived its check independently instead. The only network access was read-only: npm registry metadata and tarball (saved in verify/) and the GitHub API."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "basis": "Strict decode rejects wrong row-count headers (negative controls). The captured artifact bundles the encoded body and the decoded JSON, so tokens_removed is not a compressed-size figure."
    }
   },
   {
@@ -555,6 +622,15 @@
      "Evidence class: actual tool execution on real repository content, plus an upstream registry provenance check. No synthetic fixture was used.",
      "Side effects. I wrote only under ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/ast-grep/verify/. The sha256 of answer.txt, baseline.txt, check.txt and tool-output.txt is unchanged from the start. Creating verify/ bumped the pair directory's mtime, my rtk proxy calls were added to RTK's host-wide usage ledger, and the npm tarball was downloaded into memory only."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": false,
+    "basis": "No failing run is recorded in this run. A 2026-09-27 reproduction rebuilds the answer check from the pinned Git content at 9a8257cd and rejects wrong answers; it is new local integration evidence and supplies no control for this run, so the acceptance stays partial. The baseline's 489,320 bytes match the eleven pinned files, but its grep -rl concatenation order, and so its hash, is not reproducible from Git.",
+    "evidence": [
+     "tests/test_token_e2e_receipt_checks.py::AstGrepCallOracle"
+    ]
    }
   },
   {
@@ -603,6 +679,12 @@
      "Blindness caveat. File mtimes show baseline.txt (20:54:34) was written 30 s before answer.txt (20:55:04). check.txt says the baseline was only touched with grep -c before the answer was written. That cannot be proven from the artifacts, but it does not matter here because every answer element is verbatim in tool-output.txt. The rejected first-candidate README claim reproduces (1146 B, 55 lines, 0 hits for max_retries/408/429/Retries/Timeouts), so switching the baseline was justified, not baseline shopping.",
      "Isolation: ~/.chub snapshots before and after are identical (verify/real-chub-before.lst == real-chub-after.lst). All writes are confined to ~/codex-ecosystem/state/token-e2e-laptop-20260926/pairs/context-hub/verify/ (commands.log, check.py, check-result*.txt, negative-control-*, rerun-*, chub-home/, upstream-sdk/, SHA256SUMS). The only other home-dir change was ~/.claude.json, which is Claude Code's own client state. Scope: one doc and one question, not a token-savings measurement."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "basis": "A mutated baseline produces three FAILs (verifier). The baseline is a live page's raw HTML, so the size comparison is not a provider saving."
    }
   },
   {
@@ -654,6 +736,12 @@
      "Counter: before-refresh.json does say native_scopes=7 and unique_comparisons=47. The ledger (agent-lab docs/token-savings-lifetime-results.json) holds 47 comparisons with 47 unique hash ids, two of them earlier markitdown entries from 2026-09-20. The predicted move from 47 to 48 is still unverified: the regenerator has not been run, and I did not run it because it writes outside verify/.",
      "Side effects: the four pair files still have their original hashes, and agent-lab's git status matches the session-start snapshot. My one write outside verify/ was to onnxruntime's existing cache file ~/.cache/Microsoft/DeveloperTools/.onnxruntime/onnxruntime.db (created 2026-09-18). markitdown's file-type detector runs on onnxruntime, which updates that file on every markitdown conversion, the subagent's own included. I removed my temporary caches from verify/, and verify/SHA256SUMS lists hashes for 19 evidence files."
     ]
+   },
+   "adjudication": {
+    "as_of": "2026-09-27",
+    "task_acceptance": "partial",
+    "bad_input_control_recorded": true,
+    "basis": "Four mutated inputs fail the independent check (verifier); the scope is one selected HTML page."
    }
   }
  ],
@@ -971,5 +1059,69 @@
  ],
  "codex_probe": [
   "Codex was not run in this evidence pass: the account's configured usage limit runs until 2026-09-30 23:50, per this host's own token-evidence record. This is a carried fact from that record, not a fresh `codex exec` probe captured during this workflow run."
- ]
+ ],
+ "errata": {
+  "written_at": "2026-09-27T08:09:36Z",
+  "receipt_sha256_before_errata": "f186f4a192efafb3182185093abf87a7bb7d5b157bfe0d783dfe5df83f38c9f8",
+  "rule": "Append-only: every field recorded on 2026-09-26 is unchanged. tools[].adjudication holds the current task acceptance; the recorded quality_check, verifier and exact_comparison values stay as historical results.",
+  "review": "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md",
+  "task_acceptance_vocabulary": {
+   "partial": "Evidence exists, but it lacks a complete publicly reviewable result or baseline, or the failing run of the check that the discriminating-controls rule requires.",
+   "retracted_later": "A later check (the run's own verifier, a later receipt or this erratum) refuted or retracted the recorded pass; the recorded outcome stays as a historical result.",
+   "untested": "The recorded check was vacuous, so correctness is untested; observed invocation can remain.",
+   "unsupported": "The tool did not complete the task, and the recorded failure is accurate."
+  },
+  "items": [
+   {
+    "tools": [
+     "context-mode",
+     "jcodemunch",
+     "qmd",
+     "ast-grep"
+    ],
+    "finding": "These four passing checks have no recorded failing run, so under the discriminating-controls rule their task acceptance stays partial. The 2026-09-27 Git reproductions for jcodemunch and ast-grep are new local evidence and do not change that.",
+    "evidence": [
+     "docs/acceptance-evidence-policy.md",
+     "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md",
+     "tests/test_token_e2e_receipt_checks.py::JCodeMunchLocationOracle",
+     "tests/test_token_e2e_receipt_checks.py::AstGrepCallOracle"
+    ]
+   },
+   {
+    "tools": [
+     "socraticode"
+    ],
+    "finding": "The exact comparison counts an abridged transcription, not the native response.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md"
+    ]
+   },
+   {
+    "tools": [
+     "rtk"
+    ],
+    "finding": "The verifier's refutation retracts the worker's 'no fact lost' pass; the README already reports it.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/receipt.json#/tools/0/verifier/verdict"
+    ]
+   },
+   {
+    "tools": [
+     "headroom"
+    ],
+    "finding": "Headroom's lifetime ledger zeros are its own scope's actual return, not a measurement of the private-workspace call.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md"
+    ]
+   },
+   {
+    "scope": "aggregate",
+    "finding": "Thirteen tools were exercised. RTK's pass was refuted by the verifier, and Repomix's recorded FAIL is accurate. The other eleven are partial, for three different reasons. Context Mode, jCodeMunch, QMD and ast-grep have no recorded failing run of their passing checks. Serena's definition check passed, and the recorded FAIL of its reference check is accurate: find_referencing_symbols missed 6 of 8 project-wide call sites (verifier-confirmed). The six whose verifiers recorded failing controls (Headroom, SocratiCode, ai-memory, TOON, Context Hub and MarkItDown) are partial because their complete native outputs are retained only by hash in the private ledger.",
+    "evidence": [
+     "evidence/artifacts/token-e2e-ultracode-laptop-20260926/README.md",
+     "evidence/artifacts/token-e2e-ultracode-20260925/review-e1e2-20260927.md"
+    ]
+   }
+  ]
+ }
 }

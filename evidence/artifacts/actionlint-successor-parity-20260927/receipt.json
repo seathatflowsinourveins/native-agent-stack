@@ -1,0 +1,732 @@
+{
+ "schema_version": 1,
+ "kind": "actionlint_successor_parity_trial",
+ "plan_move": "M2, actionlint successor parity trial (integrity-gate wave, 2026-09-27)",
+ "date_local": "2026-09-27 (America/New_York, EDT)",
+ "window_utc": {
+  "start": "2026-09-28T02:03:12Z",
+  "parity_end": "2026-09-28T02:16:03Z",
+  "note": "the branch checks, mutation controls, attestation-count query and commit-author query followed parity_end in the same session"
+ },
+ "catalog_revision": "ba1700adc6557b03d3c9336c4d3a951791fc8de5",
+ "catalog_revision_note": "main's tip during the run (gh api compare ba1700ad...main returned status identical, ahead_by 0, behind_by 0); the trial branch claude/actionlint-successor-parity-20260927 starts there, and the base parity run used its unmodified .github/workflows (18 files).",
+ "host": {
+  "os": "Ubuntu 24.04.5 LTS under WSL2",
+  "arch": "linux/amd64",
+  "gh": "gh version 2.101.0 (2026-09-15)",
+  "zizmor": "zizmor 1.30.1"
+ },
+ "evidence_class_legend": {
+  "upstream-unchanged": "An upstream tool or verifier run unchanged (sha256sum against published digests, gh attestation/release verify, gh api, apt/gpgv, the actionlint and zizmor binaries' own output).",
+  "our-integration": "This repository's driver, fixtures, mutations and tests composing those tools; never an upstream test.",
+  "live-run-pending": "Needs the hosted GitHub Actions run of this branch; not observed here."
+ },
+ "upstream_status": {
+  "evidence_class": "upstream-unchanged",
+  "observed_at_utc": "2026-09-28T02:03:12Z",
+  "method": "gh api (repos/rhysd/actionlint, commits?per_page=5, commits?since=2026-06-29T00:00:00Z, issues/719, releases/latest; repos/kjanat/actionlint, releases?per_page=50)",
+  "rhysd/actionlint": {
+   "latest_main_commits": [
+    {
+     "sha": "011a6d15e749",
+     "committed": "2026-04-19T14:46:58Z"
+    },
+    {
+     "sha": "575dc0658351",
+     "committed": "2026-04-19T14:03:02Z"
+    }
+   ],
+   "commits_on_main_since_2026_06_29": 0,
+   "latest_release": {
+    "tag": "v1.7.12",
+    "published": "2026-03-30T17:49:21Z"
+   },
+   "repository_pushed_at": "2026-07-16T06:05:57Z",
+   "pushed_at_note": "pushed_at counts a push to any ref; the default-branch commit list above has no commit after 2026-04-19, so the 2026-07-16 push was not to main.",
+   "archived": false,
+   "issue_719": {
+    "title": "rhysd (the author) inactive. Any active forks?",
+    "state": "open",
+    "created": "2026-08-06T05:02:48Z",
+    "updated": "2026-09-18T02:41:20Z",
+    "comments": 6
+   }
+  },
+  "kjanat/actionlint": {
+   "fork_of": "rhysd/actionlint",
+   "created": "2026-08-07T03:31:46Z",
+   "pushed_at": "2026-09-26T19:41:06Z",
+   "releases": 12,
+   "first_release": {
+    "tag": "v1.8.0",
+    "published": "2026-08-18T23:55:50Z"
+   },
+   "latest_release": {
+    "tag": "v1.17.0",
+    "published": "2026-09-13T16:07:47Z"
+   },
+   "all_releases_immutable": true,
+   "default_branch_commits_2026_08_07_to_2026_09_27": {
+    "total": 253,
+    "first": "2026-08-18T20:13:44Z",
+    "last": "2026-09-25T14:28:28Z",
+    "authors": {
+     "kjanat": 242,
+     "dependabot[bot]": 4,
+     "github-actions[bot]": 3,
+     "johnament": 2,
+     "muzimuzhi": 1,
+     "autofix-ci[bot]": 1
+    },
+    "method": "gh api --paginate repos/kjanat/actionlint/commits?since=2026-08-07T00:00:00Z",
+    "observed_at_utc": "2026-09-28T02:21:31Z"
+   },
+   "ai_assisted_signal": "commit fa049a7162 (2026-08-22) turns off the race detector when CLAUDECODE is set, and fc3cee3c1a (2026-08-21) excludes .claude/ paths: the maintainer develops with Claude Code"
+  }
+ },
+ "verification": {
+  "evidence_class": "upstream-unchanged",
+  "window_utc": {
+   "start": "2026-09-28T02:03:55Z",
+   "end_of_first_pass": "2026-09-28T02:04:07Z"
+  },
+  "order": "Completed before either binary was executed (extraction at 02:05:48Z, first -version output at 02:05:54Z): the first pass in window_utc (sha256sum_check, checksums_txt_line and gh_attestation_verify for both archives; gh_release_verify and gh_release_verify_asset for 1.17.0), then, from 02:04:35Z to 02:05:29Z, tag_ref and tag, release_workflow_at_signer_digest, the identity-pinned re-verifies (after the first attempt in retained_failures) and the four negative_controls. Nothing else below is claimed as preceding execution: the 1.17.0 attestations_for_digest query followed parity_end (top-level window_utc.note; its output is dated 02:17:41Z), and gh release view's isImmutable, the 1.7.12 attestations_for_digest value and shellcheck_0.9.0_for_parity left no timestamped output. window_utc gives the first-pass times; the other times are modification times of the retained raw outputs in <scratch>.",
+  "rhysd_actionlint_1.7.12": {
+   "archive_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz (the URL validate.yml builds)",
+   "archive_bytes": 2353908,
+   "pinned_sha256_validate_yml": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+   "release_asset_digest": "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+   "sha256sum_check": {
+    "argv": "printf '%s  %s\\n' <pinned sha256> archive.tar.gz | sha256sum --check",
+    "exit": 0,
+    "stdout": "archive.tar.gz: OK"
+   },
+   "checksums_txt_line": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  actionlint_1.7.12_linux_amd64.tar.gz",
+   "gh_attestation_verify": {
+    "argv": "gh attestation verify archive.tar.gz --repo rhysd/actionlint --format json",
+    "exit": 0,
+    "results": 1,
+    "predicate_type": "https://slsa.dev/provenance/v1",
+    "subjects": 11,
+    "subject_alternative_name": "https://github.com/rhysd/actionlint/.github/workflows/release.yaml@refs/tags/v1.7.12",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "build_signer_uri": "https://github.com/rhysd/actionlint/.github/workflows/release.yaml@refs/tags/v1.7.12",
+    "build_signer_digest": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "source_repository_uri": "https://github.com/rhysd/actionlint",
+    "source_repository_ref": "refs/tags/v1.7.12",
+    "source_repository_digest": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "workflow_trigger": "push",
+    "runner_environment": "github-hosted",
+    "run_invocation_uri": "https://github.com/rhysd/actionlint/actions/runs/23759174226/attempts/1"
+   },
+   "gh_attestation_verify_identity_pinned": {
+    "argv": "gh attestation verify archive.tar.gz --repo rhysd/actionlint --cert-identity https://github.com/rhysd/actionlint/.github/workflows/release.yaml@refs/tags/v1.7.12 --source-ref refs/tags/v1.7.12 --source-digest 914e7df21a07ef503a81201c76d2b11c789d3fca --deny-self-hosted-runners",
+    "exit": 0,
+    "stdout_stderr_bytes": 0
+   },
+   "attestations_for_digest": 1,
+   "tag_ref": {
+    "sha": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+    "type": "commit",
+    "url": "https://api.github.com/repos/rhysd/actionlint/git/commits/914e7df21a07ef503a81201c76d2b11c789d3fca"
+   },
+   "release_immutable": false,
+   "extracted_binary_sha256": "c872d6db8c6bf83a8eaa704fc93999f027d55dffbc63b8a6abdccb47df5f4cd4",
+   "version_output": [
+    "1.7.12",
+    "installed by downloading from release page",
+    "built with go1.26.1 compiler for linux/amd64"
+   ]
+  },
+  "kjanat_actionlint_1.17.0": {
+   "archive_url": "https://github.com/kjanat/actionlint/releases/download/v1.17.0/actionlint_1.17.0_linux_amd64.tar.gz",
+   "archive_bytes": 3067604,
+   "brief_sha256": "620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+   "release_asset_digest": "sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+   "sha256sum_check": {
+    "argv": "printf '%s  %s\\n' <brief sha256> archive.tar.gz | sha256sum --check",
+    "exit": 0,
+    "stdout": "archive.tar.gz: OK"
+   },
+   "checksums_txt_line": "620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a  actionlint_1.17.0_linux_amd64.tar.gz",
+   "gh_attestation_verify": {
+    "argv": "gh attestation verify archive.tar.gz --repo kjanat/actionlint --format json",
+    "exit": 0,
+    "results": 1,
+    "predicate_type": "https://slsa.dev/provenance/v1",
+    "subjects": 23,
+    "subject_alternative_name": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "build_signer_uri": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+    "build_signer_digest": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+    "source_repository_uri": "https://github.com/kjanat/actionlint",
+    "source_repository_ref": "refs/tags/v1.17.0",
+    "source_repository_digest": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+    "workflow_trigger": "push",
+    "runner_environment": "github-hosted",
+    "run_invocation_uri": "https://github.com/kjanat/actionlint/actions/runs/34767392704/attempts/1"
+   },
+   "gh_attestation_verify_identity_pinned": [
+    {
+     "argv": "gh attestation verify archive.tar.gz --repo kjanat/actionlint --cert-identity https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0 --source-ref refs/tags/v1.17.0 --source-digest 08bb2c4f0d039744455b87aef1c647fb8b66d37b --deny-self-hosted-runners",
+     "exit": 0,
+     "stdout_stderr_bytes": 0
+    },
+    {
+     "argv": "same with --format json",
+     "exit": 0,
+     "stderr_bytes": 0,
+     "certificate": {
+      "subject_alternative_name": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+      "build_signer_uri": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0",
+      "source_repository_ref": "refs/tags/v1.17.0",
+      "source_repository_digest": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "runner_environment": "github-hosted"
+     }
+    },
+    {
+     "argv": "gh attestation verify archive.tar.gz --repo kjanat/actionlint --signer-workflow kjanat/actionlint/.github/workflows/release.yml --source-ref refs/tags/v1.17.0 --source-digest 08bb2c4f0d039744455b87aef1c647fb8b66d37b --signer-digest 08bb2c4f0d039744455b87aef1c647fb8b66d37b --deny-self-hosted-runners",
+     "exit": 0,
+     "stdout_stderr_bytes": 0
+    }
+   ],
+   "signer_workflow_identity": "https://github.com/kjanat/actionlint/.github/workflows/release.yml@refs/tags/v1.17.0 (kjanat/actionlint's own release workflow at the release tag; github-hosted runner; trigger push)",
+   "attestations_for_digest": {
+    "count": 2,
+    "predicate_types": [
+     "https://slsa.dev/provenance/v1",
+     "https://in-toto.io/attestation/release/v0.2"
+    ],
+    "method": "gh api repos/kjanat/actionlint/attestations/sha256:620abd48..."
+   },
+   "release_immutable": {
+    "gh_api_immutable": true,
+    "gh_release_view_isImmutable": true,
+    "published": "2026-09-13T16:07:47Z",
+    "author": "github-actions[bot]"
+   },
+   "gh_release_verify": {
+    "argv": "gh release verify v1.17.0 -R kjanat/actionlint --format json",
+    "exit": 0,
+    "predicate_type": "https://in-toto.io/attestation/release/v0.2"
+   },
+   "gh_release_verify_asset": {
+    "argv": "gh release verify-asset v1.17.0 actionlint_1.17.0_linux_amd64.tar.gz -R kjanat/actionlint",
+    "exit": 0,
+    "output": [
+     "Calculated digest for actionlint_1.17.0_linux_amd64.tar.gz: sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+     "Resolved tag v1.17.0 to sha1:2da2ceb4af2c7ecc48f5b9311d85080c3971b5f0",
+     "Loaded attestation from GitHub API",
+     "✓ Verification succeeded! actionlint_1.17.0_linux_amd64.tar.gz is present in release v1.17.0"
+    ]
+   },
+   "tag": {
+    "annotated_tag_object": "2da2ceb4af2c7ecc48f5b9311d85080c3971b5f0",
+    "points_to_commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+    "tagger_date": "2026-09-13T16:02:41Z",
+    "signature_verified": true,
+    "note": "verify-asset prints the annotated tag object 2da2ceb4; the provenance source digest 08bb2c4f is the commit it points to."
+   },
+   "release_workflow_at_signer_digest": "gh api contents/.github/workflows/release.yml?ref=08bb2c4f: on push tags v*.*.*; goreleaser/goreleaser-action and actions/attest-build-provenance pinned by commit SHA; the release job holds contents: write, id-token: write, attestations: write.",
+   "extracted_binary_sha256": "6e0e370a627682be87b2f20e4b4e9bed0d675cec3f7feac206baed7873e8e5fd",
+   "version_output": [
+    "actionlint.kjanat.dev 1.17.0",
+    "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+    "built with go1.27.1 compiler for linux/amd64"
+   ]
+  },
+  "shellcheck_0.9.0_for_parity": {
+   "why": "The ubuntu-24.04 runner image lists shellcheck 0.9.0-1 and no pyflakes (actions/runner-images images/ubuntu/Ubuntu2404-Readme.md at c9dd57c6b6333892b46abcc439ba0676fd03867a, image 20260920.314.1); this host had neither, so the runner's exact package was fetched to exercise actionlint's shellcheck integration for both binaries.",
+   "source": "Ubuntu noble/universe shellcheck 0.9.0-1 via apt-get download (downloaded, never installed; extracted with dpkg-deb -x into scratch)",
+   "deb_sha256_check": {
+    "expected_from_signed_packages_index": "eadf78f4dfcb1a271f47a9be5e38d124dffe9d4fea74956fab34e8c3e322a854",
+    "exit": 0,
+    "stdout": "shellcheck_0.9.0-1_amd64.deb: OK"
+   },
+   "packages_index_sha256_matches_inrelease": "687ffc969e7700137677b9cfe2f614ee2d638052a91a7c9bf31f3f6a3040a99a (73379142 bytes), the SHA256 entry for universe/binary-amd64/Packages",
+   "inrelease_signature": "gpgv --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg: exit 0, Good signature from \"Ubuntu Archive Automatic Signing Key (2018) <ftpmaster@ubuntu.com>\", RSA key F6ECB3762474EDA9D21B7022871920D1991BC93C",
+   "extracted_binary_sha256": "54dc63164186ad21fb909f5194fb5291f4035c2d2cae04b5680385b8d8fbb73c",
+   "version": "0.9.0"
+  },
+  "negative_controls": [
+   {
+    "what": "the 1.7.12 digest checked against the 1.17.0 archive",
+    "exit": 1,
+    "output": [
+     "archive.tar.gz: FAILED",
+     "sha256sum: WARNING: 1 computed checksum did NOT match"
+    ]
+   },
+   {
+    "what": "gh attestation verify --repo kjanat/actionlint --source-ref refs/tags/v1.16.1",
+    "exit": 1,
+    "output": "Error: expected SourceRepositoryRef to be refs/tags/v1.16.1, got refs/tags/v1.17.0"
+   },
+   {
+    "what": "gh attestation verify the 1.17.0 archive --repo rhysd/actionlint",
+    "exit": 1,
+    "output": "Error: HTTP 404: Not Found (https://api.github.com/repos/rhysd/actionlint/attestations/sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a?per_page=30&predicate_type=https%3A%2F%2Fslsa.dev%2Fprovenance%2Fv1)"
+   },
+   {
+    "what": "gh attestation verify --repo kjanat/actionlint --cert-identity ...release.yml@refs/tags/v1.16.1",
+    "exit": 1,
+    "output": "Error: verifying with issuer \"sigstore.dev\""
+   }
+  ]
+ },
+ "flags": {
+  "evidence_class": "upstream-unchanged",
+  "validate_yml_passes": [
+   "-version",
+   "-color"
+  ],
+  "present_in_1.17.0_help": {
+   "-version": true,
+   "-color": true
+  },
+  "help_differences": [
+   "1.17.0 adds -completion shell",
+   "-pyflakes and -shellcheck take a command line (for example \"shellcheck -e SC2086\") instead of a command name or path; the default values stay \"pyflakes\" and \"shellcheck\", and validate.yml passes neither flag",
+   "the documentation links point at kjanat/actionlint v1.17.0"
+  ]
+ },
+ "parity": {
+  "evidence_class": "our-integration",
+  "driver": "parity_driver.sh and compare.py in this directory",
+  "argv": [
+   [
+    "<bin>",
+    "-version"
+   ],
+   [
+    "<bin>",
+    "-color"
+   ],
+   [
+    "<bin>",
+    "-format",
+    "{{json .}}"
+   ],
+   [
+    "<bin>",
+    "-verbose",
+    "-color"
+   ]
+  ],
+  "cwd": "<checkout root> (no file arguments: actionlint discovers .github/workflows)",
+  "environment": "env -i PATH=<config PATH> HOME=<empty scratch directory> LANG=C.UTF-8; no .github/actionlint.yaml exists, so both binaries use their defaults",
+  "configs": {
+   "no-tools": {
+    "PATH": "/usr/bin:/bin"
+   },
+   "shellcheck-0.9.0": {
+    "PATH": "<scratch>/sc-bin:/usr/bin:/bin",
+    "note": "the runner's tool set: shellcheck 0.9.0 present, pyflakes absent"
+   }
+  },
+  "base_workflows": {
+   "tree": "ba1700ad .github/workflows (18 files, unmodified)",
+   "window_utc": [
+    "2026-09-28T02:15:19Z",
+    "2026-09-28T02:15:20Z"
+   ],
+   "results": {
+    "no-tools": {
+     "tools": {
+      "shellcheck": "absent",
+      "pyflakes": "absent"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 10 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 24 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 26 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 10312 B, 42 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 18; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 8 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 38 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 29 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 10299 B, 23 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 18; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      }
+     },
+     "pairing_counts": {
+      "identical": 0,
+      "only_new": 0,
+      "only_old": 0,
+      "relocated": 0,
+      "reworded": 0
+     }
+    },
+    "shellcheck-0.9.0": {
+     "tools": {
+      "shellcheck": "present",
+      "pyflakes": "absent",
+      "shellcheck_version": "0.9.0"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 7 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 202 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 207 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 8608 B, 229 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 8 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 248 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 254 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 8608 B, 184 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      }
+     },
+     "pairing_counts": {
+      "identical": 0,
+      "only_new": 0,
+      "only_old": 0,
+      "relocated": 0,
+      "reworded": 0
+     }
+    }
+   }
+  },
+  "changed_workflows": {
+   "tree": "this branch's .github/workflows with the actionlint-successor job added to validate.yml",
+   "validate_yml_sha256": "e01263517f7ea07c70b6a7c45e3eb902457a7226b5a92b6d61c852d7382341f7",
+   "window_utc": [
+    "2026-09-28T02:16:02Z",
+    "2026-09-28T02:16:03Z"
+   ],
+   "results": {
+    "no-tools": {
+     "tools": {
+      "shellcheck": "absent",
+      "pyflakes": "absent"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 7 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 17 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 18 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 10294 B, 16 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 18; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 6 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 17 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 17 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 10294 B, 18 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 18; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      }
+     },
+     "pairing_counts": {
+      "identical": 0,
+      "only_new": 0,
+      "only_old": 0,
+      "relocated": 0,
+      "reworded": 0
+     }
+    },
+    "shellcheck-0.9.0": {
+     "tools": {
+      "shellcheck": "present",
+      "pyflakes": "absent",
+      "shellcheck_version": "0.9.0"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 6 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 94 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 98 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 8589 B, 105 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 7 ms",
+       "color": "exit 0, stdout 0 B, stderr 0 B, 103 ms",
+       "json": "exit 0, stdout 3 B, stderr 0 B, 140 ms",
+       "verbose": "exit 0, stdout 0 B, stderr 8593 B, 148 ms",
+       "verbose_summary": "Collected 18 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 18",
+       "json_diagnostics": 0
+      }
+     },
+     "pairing_counts": {
+      "identical": 0,
+      "only_new": 0,
+      "only_old": 0,
+      "relocated": 0,
+      "reworded": 0
+     }
+    }
+   }
+  },
+  "fixture_controls": {
+   "tree": "a git-initialized scratch repository holding fixtures/*.yml.txt as .github/workflows/*.yml (10 files)",
+   "window_utc": [
+    "2026-09-28T02:15:20Z",
+    "2026-09-28T02:15:21Z"
+   ],
+   "results": {
+    "no-tools": {
+     "tools": {
+      "shellcheck": "absent",
+      "pyflakes": "absent"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 9 ms",
+       "color": "exit 1, stdout 3829 B, stderr 0 B, 11 ms",
+       "json": "exit 1, stdout 3732 B, stderr 0 B, 8 ms",
+       "verbose": "exit 1, stdout 3829 B, stderr 6141 B, 9 ms",
+       "verbose_summary": "Collected 10 YAML files; 'Rule \"shellcheck\" was disabled' lines 10; 'Rule \"pyflakes\" was disabled' lines 10",
+       "json_diagnostics": 11
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 9 ms",
+       "color": "exit 1, stdout 2357 B, stderr 0 B, 10 ms",
+       "json": "exit 1, stdout 2220 B, stderr 0 B, 9 ms",
+       "verbose": "exit 1, stdout 2357 B, stderr 6140 B, 10 ms",
+       "verbose_summary": "Collected 10 YAML files; 'Rule \"shellcheck\" was disabled' lines 10; 'Rule \"pyflakes\" was disabled' lines 10",
+       "json_diagnostics": 7
+      }
+     },
+     "pairing_counts": {
+      "identical": 3,
+      "only_new": 4,
+      "only_old": 8,
+      "relocated": 0,
+      "reworded": 0
+     }
+    },
+    "shellcheck-0.9.0": {
+     "tools": {
+      "shellcheck": "present",
+      "pyflakes": "absent",
+      "shellcheck_version": "0.9.0"
+     },
+     "binaries": {
+      "1.7.12": {
+       "version": "exit 0, stdout 95 B, stderr 0 B, 11 ms",
+       "color": "exit 1, stdout 4449 B, stderr 0 B, 33 ms",
+       "json": "exit 1, stdout 4303 B, stderr 0 B, 35 ms",
+       "verbose": "exit 1, stdout 4449 B, stderr 5188 B, 29 ms",
+       "verbose_summary": "Collected 10 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 10",
+       "json_diagnostics": 13
+      },
+      "1.17.0": {
+       "version": "exit 0, stdout 132 B, stderr 0 B, 15 ms",
+       "color": "exit 1, stdout 2999 B, stderr 0 B, 39 ms",
+       "json": "exit 1, stdout 2813 B, stderr 0 B, 33 ms",
+       "verbose": "exit 1, stdout 2999 B, stderr 5189 B, 32 ms",
+       "verbose_summary": "Collected 10 YAML files; 'Rule \"shellcheck\" was disabled' lines 0; 'Rule \"pyflakes\" was disabled' lines 10",
+       "json_diagnostics": 9
+      }
+     },
+     "pairing_counts": {
+      "identical": 3,
+      "only_new": 4,
+      "only_old": 8,
+      "relocated": 2,
+      "reworded": 0
+     }
+    }
+   },
+   "pairings": {
+    "no-tools": "fixture-compare-no-tools.json",
+    "shellcheck-0.9.0": "fixture-compare-shellcheck-0.9.0.json"
+   }
+  },
+  "compare_rerun": {
+   "evidence_class": "our-integration",
+   "at_utc": "2026-09-28T07:16:23Z",
+   "why": "the cross-family review of pull request #449 found that compare.py matched messages by membership, so a duplicated diagnostic could vanish from the pairing; compare.py now pairs messages as collections.Counter multisets. The pairing_counts above and fixture-compare-*.json came from the membership revision.",
+   "inputs": "the retained 1.7.12.json.stdout and 1.17.0.json.stdout of the six runs above (base_workflows, changed_workflows and fixture_controls, each under no-tools and shellcheck-0.9.0), kept in <scratch>; the membership revision, re-run over them, reproduces each run's recorded compare.json and both fixture-compare-*.json files byte for byte",
+   "pairing_counts": {
+    "base_workflows": "no-tools and shellcheck-0.9.0: identical 0, only_new 0, only_old 0, relocated 0, reworded 0",
+    "changed_workflows": "no-tools and shellcheck-0.9.0: identical 0, only_new 0, only_old 0, relocated 0, reworded 0",
+    "fixture_controls": "no-tools: identical 3, only_new 4, only_old 8, relocated 0, reworded 0; shellcheck-0.9.0: identical 3, only_new 4, only_old 8, relocated 2, reworded 0"
+   },
+   "byte_identical": "each of the six outputs equals that run's recorded compare.json, and the two fixture outputs equal fixture-compare-no-tools.json and fixture-compare-shellcheck-0.9.0.json",
+   "classification_figures_changed": false
+  }
+ },
+ "classification": {
+  "evidence_class": "our-integration (reviewed judgment over upstream-unchanged binary output)",
+  "scope_note": "Counts per class: repository = the 18 workflows at ba1700ad and on this branch (identical results for both trees and both tool configurations); fixtures = the controls in fixtures/ under shellcheck-0.9.0 (no-tools differs only in class relocated).",
+  "rows": [
+   {
+    "class": "identical",
+    "repository": 0,
+    "fixtures": 3,
+    "examples": [
+     "c2-step-outputs.yml:10:24 and :22:24 [expression] property \"get_value\" is not defined in object type {}",
+     "c10-max-parallel-zero.yml:5:21 [syntax-check] value at \"max-parallel\" must be greater than zero: 0"
+    ],
+    "source": "unchanged behaviour; c2 is rhysd/actionlint v1.7.12 docs/checks.md lines 497-518 (#check-contextual-step-object)"
+   },
+   {
+    "class": "relocated (same finding, new column)",
+    "repository": 0,
+    "fixtures": 2,
+    "examples": [
+     "c1-shellcheck-integ.yml:6 and :14 [shellcheck] SC2086:info:1:6, column 9 (the run: key) in 1.7.12, column 19 (the $FOO in the script) in 1.17.0; present only with shellcheck on PATH, for both binaries"
+    ],
+    "source": "kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 203 (v1.11.0): \"Report ShellCheck findings at their exact YAML source locations for literal block and plain run: scripts ... Scalar forms that cannot be mapped safely continue to report at the run: key.\""
+   },
+   {
+    "class": "removed (1.7.12 only: rejects syntax GitHub accepts)",
+    "repository": 0,
+    "fixtures": 8,
+    "examples": [
+     "c3-fromjson-matrix.yml:4:15 \"strategy\" section is scalar node but mapping node is expected, and :5:18 property \"os\" is not defined",
+     "c4-description-cancel-timeout.yml:1:1 unexpected key \"description\", :6:5 unexpected key \"cancel-timeout-minutes\"",
+     "c5-queue-max.yml:4:3 and c6-queue-conflict.yml:4:3 unexpected key \"queue\" for \"concurrency\" section",
+     "c7-cache-operation.yml:5:5 and c8-cache-write-untrusted.yml:2:1 unexpected key \"cache-mode\""
+    ],
+    "source": "kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 238 (v1.8.0, queue with the documented values single and max), line 15 (v1.17.0, workflow descriptions and cancellation timeouts), line 25 (v1.17.0, workflow- and job-level cache-mode); kjanat/actionlint v1.17.0 release notes (gh api releases/tags/v1.17.0 body), \"Give expression-built workflows the checks they deserve\" and \"Use newer workflow fields without fighting the linter\""
+   },
+   {
+    "class": "new true positive",
+    "repository": 0,
+    "fixtures": 2,
+    "examples": [
+     "c9-schedule-missing-cron.yml:4:7 [syntax-check] \"cron\" is missing in element of \"schedule\" section (1.7.12 silent)",
+     "c6-queue-conflict.yml:4:10 [expression] \"queue: max\" cannot be combined with \"cancel-in-progress: true\" (1.7.12 fails the same file for the unknown key instead)"
+    ],
+    "source": "kjanat/actionlint v1.17.0 release notes (gh api releases/tags/v1.17.0 body), \"Catch missing checks before GitHub does\"; kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 17 (schedule entries) and line 238 (queue: max with cancel-in-progress: true reported as an error)"
+   },
+   {
+    "class": "default-config change (cache policies)",
+    "repository": 0,
+    "fixtures": 2,
+    "examples": [
+     "c7-cache-operation.yml:7:15 [cache-operation] \"actions/cache/save\" cannot save caches with effective cache-mode \"read\"",
+     "c8-cache-write-untrusted.yml:2:13 [cache-write-untrusted] cache-mode \"write\" grants cache writes for low-trust trigger(s) \"pull_request_target\""
+    ],
+    "source": "kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 13 (upgrade note: the three cache policies are enabled without a configuration file and can turn clean workflows into exit 1) and line 21; kjanat/actionlint v1.17.0 release notes (gh api releases/tags/v1.17.0 body), \"Catch unsafe grants and ineffective cache steps\"; each policy can be disabled under policy: in .github/actionlint.yaml (kjanat/actionlint v1.17.0 docs/config.md#policy-checks)",
+    "why_zero_here": "no workflow here declares cache-mode or runs on pull_request_target, issue_comment or workflow_run (grep over .github/workflows)"
+   },
+   {
+    "class": "reworded (same position and kind, new message)",
+    "repository": 0,
+    "fixtures": 0,
+    "examples": [],
+    "source": "none observed"
+   },
+   {
+    "class": "new false positive",
+    "repository": 0,
+    "fixtures": 0,
+    "examples": [],
+    "source": "none observed; no fixture was built for this class"
+   }
+  ],
+  "unexplained_differences": 0,
+  "not_exercised": [
+   "the v1.8.0 runner-label alias remaps (macos-latest to macos-26, windows-latest to windows-2025-vs2026) and new labels; kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 240",
+   "the v1.17.0 action-manifest and composite-step audit (no local action in this repository was linted as a fixture)",
+   "snapshot and matrix include expression checks, function arity and expression-depth limits",
+   "the cache-call-unrestricted policy (reusable calls on low-trust triggers without an explicit cache-mode)"
+  ]
+ },
+ "fixture_provenance": {
+  "evidence_class": "our-integration (synthetic fixture)",
+  "files": {
+   "c1-shellcheck-integ.yml.txt": "verbatim rhysd/actionlint v1.7.12 docs/checks.md lines 864-878 (#check-shellcheck-integ), from the release archive (docs/checks.md sha256 569344b90aebd15681f0605a985a95cd7ee2dea0be73d1958c6884d295ce62b3)",
+   "c2-step-outputs.yml.txt": "verbatim rhysd/actionlint v1.7.12 docs/checks.md lines 497-518 (#check-contextual-step-object)",
+   "c3-fromjson-matrix.yml.txt": "verbatim complete workflow from kjanat/actionlint v1.17.0 release notes (gh api releases/tags/v1.17.0 body), \"Give expression-built workflows the checks they deserve\"",
+   "c4-description-cancel-timeout.yml.txt": "verbatim complete workflow from kjanat/actionlint v1.17.0 release notes (gh api releases/tags/v1.17.0 body), \"Use newer workflow fields without fighting the linter\"",
+   "c5-queue-max.yml.txt": "constructed: the documented literal queue: max (kjanat/actionlint CHANGELOG.md at v1.17.0 (sha256 f32b978b6206d7000a08be94f879b85eb51283c5d1799749d38721f8d194875b) line 238) with on: push and the release notes' minimal job",
+   "c6-queue-conflict.yml.txt": "the release notes' concurrency snippet (queue: ${{ 'max' }} with cancel-in-progress: true), plus on: push and the minimal job",
+   "c7-cache-operation.yml.txt": "the release notes' cache-operation example (\"Catch unsafe grants and ineffective cache steps\"), plus on: push",
+   "c8-cache-write-untrusted.yml.txt": "constructed from the release notes' cache-write-untrusted description (an explicit write grant on the low-trust pull_request_target trigger), plus the minimal job",
+   "c9-schedule-missing-cron.yml.txt": "the release notes' schedule snippet (\"Catch missing checks before GitHub does\"), plus the minimal job",
+   "c10-max-parallel-zero.yml.txt": "constructed from the release notes' mention of nonpositive max-parallel values; 1.7.12 already reports it, so it serves as an identical control"
+  },
+  "minimal_job": "jobs: test: runs-on: ubuntu-latest, steps: - run: echo test (the release notes' own complete workflows use it)",
+  "stored_as": ".yml.txt so neither actionlint, zizmor nor the workflow tests collect them from this repository"
+ },
+ "checks_on_this_branch": {
+  "evidence_class": "our-integration, except where a row says upstream-unchanged",
+  "rows": [
+   {
+    "argv": "python3 -m unittest tests.test_workflow_hardening -v",
+    "exit": 0,
+    "result": "Ran 61 tests, OK (skipped=2: no hash-frozen workflow; PyYAML not installed, so test_job_parser_matches_yaml_when_available did not run)"
+   },
+   {
+    "argv": "python3 -m unittest tests.test_zizmor_negative_control -v",
+    "exit": 0,
+    "result": "Ran 4 tests, OK (the existing zizmor discriminating control)"
+   },
+   {
+    "argv": "zizmor --no-config --no-ignores --persona regular --strict-collection . (validate.yml's command, run from the checkout root without a token)",
+    "evidence_class": "upstream-unchanged, by version string only: the zizmor on PATH reports 1.30.1 but was not checked against .github/requirements-ci.txt's wheel hashes",
+    "exit": 0,
+    "result": "No findings to report. Good job! (43 suppressed); zizmor warned it ran in offline mode, so the online audits did not run"
+   },
+   {
+    "argv": "the same command over git archive HEAD .github (the base tree)",
+    "evidence_class": "upstream-unchanged",
+    "exit": 0,
+    "result": "No findings to report. Good job! (42 suppressed); the one extra suppressed finding is the pedantic info-level anonymous-definition for the new unnamed job, which --persona pedantic also reports for the four existing unnamed jobs in validate.yml"
+   },
+   {
+    "argv": "actionlint 1.7.12 -color over the changed tree (parity.changed_workflows)",
+    "evidence_class": "upstream-unchanged",
+    "exit": 0,
+    "result": "no diagnostics, with and without shellcheck 0.9.0"
+   }
+  ],
+  "mutation_controls": [
+   {
+    "mutation": "harden-runner step removed from the new job (scratch copy of .github)",
+    "check": "HardenRunnerTests.test_every_ubuntu_and_macos_job_starts_with_harden_runner_in_audit_mode, WORKFLOWS pointed at the copy",
+    "unmutated_exit": 0,
+    "mutated_exit": 1,
+    "mutated_output": "AssertionError: Lists differ: ['validate.yml:actionlint-successor'] != []"
+   },
+   {
+    "mutation": "persist-credentials: false removed from the new job's checkout (scratch copy)",
+    "check": "zizmor --no-config --no-ignores --persona regular --strict-collection .",
+    "unmutated_exit": 0,
+    "mutated_exit": 13,
+    "mutated_output": "warning[artipacked]: credential persistence through GitHub Actions artifacts --> ./.github/workflows/validate.yml:164:9"
+   }
+  ],
+  "reported_in_handoff": "python3 scripts/validate.py, the catalog checks and the whole unittest suite ran after this receipt was registered in manifests/evidence.json, so their exit codes are in the handoff rather than here."
+ },
+ "live_run_pending": [
+  "The first hosted run of validate.yml's actionlint-successor job on ubuntu-24.04 (its checksum step, -version and -color with the runner's shellcheck), and the pull request's checks turning green.",
+  "The required validate job's zizmor online audits (impostor-commit, known-vulnerable-actions, ref-confusion, ref-version-mismatch) over the changed validate.yml with the read-only github.token.",
+  "tests.test_workflow_hardening's test_job_parser_matches_yaml_when_available, which needs PyYAML (skipped on this host).",
+  "Swapping the required gate: out of scope until the hosted job agrees with this local result."
+ ],
+ "retained_failures": [
+  {
+   "what": "first identity-pinned gh attestation verify for 1.17.0 passed both --cert-identity and --signer-workflow",
+   "exit": 1,
+   "output": "if any flags in the group [cert-identity cert-identity-regex signer-repo signer-workflow] are set none of the others can be; [cert-identity signer-workflow] were all set",
+   "resolution": "gh treats the identity flags as mutually exclusive; each was then run on its own, and both returned exit 0"
+  },
+  {
+   "what": "superseded parity runs",
+   "detail": "a base run at 2026-09-28T02:08:08Z with the first driver revision returned the same result (both binaries exit 0, no diagnostics, both configurations) and was replaced when the driver gained the -verbose summary; the first fixture pairing counted the two SC2086 findings as one removed and one new each, and compare.py then gained the relocated pass. The superseded raw outputs were overwritten in scratch and are not retained."
+  }
+ ],
+ "sanitization": [
+  "Scratch and checkout paths are replaced by <scratch> and <checkout root>; -verbose logs, which print absolute project paths, are reduced to counts.",
+  "Raw gh api and attestation JSON stayed in scratch; only the fields quoted here were extracted.",
+  "No credential value was read or passed: zizmor ran without GH_TOKEN (this repository's secret_path_guard hook blocks printing the native token), so its online audits are live-run-pending."
+ ],
+ "claim_boundary": "On this host, rhysd/actionlint 1.7.12 and kjanat/actionlint 1.17.0 each return exit 0 and no diagnostic for the 18 workflows at ba1700ad and on this branch, with and without the runner's shellcheck 0.9.0. The fixtures give at least one recorded example of five classes in classification (identical, relocated, removed, new true positive and default-config change); reworded and new false positive have none (fixtures 0), so the fixtures do not demonstrate those two, and the release's other changes were not exercised (classification.not_exercised). That is local evidence for the files and configurations named here; it is not the hosted run of the new job, not a swap of the required gate and not a statement about other repositories. The selection risk stays open: kjanat/actionlint is a fork whose default-branch commits since 2026-08-07 are 242 of 253 by one maintainer who develops with Claude Code, it shipped 12 releases between 2026-08-18 and 2026-09-13, and 1.17.0 turned three cache policies on by default."
+}

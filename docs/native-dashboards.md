@@ -166,7 +166,7 @@ import scope merely to open its interface:
 env AGENTSVIEW_DATA_DIR="$EXISTING_SCOPED_ARCHIVE" \
   AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
   agentsview serve --host 127.0.0.1 --port 17384 --no-sync \
-  --no-browser --no-update-check --background
+  --no-browser --no-update-check --require-auth --background
 ```
 
 The archive is historical, not live accounting for this task. Both native
@@ -185,11 +185,110 @@ systemctl --user enable --now agentsview-archive.service
 systemctl --user restart agentsview-archive.service
 systemctl --user is-enabled agentsview-archive.service
 curl --fail http://127.0.0.1:17384/
+curl -s -o /dev/null -w '%{http_code}\n' http://127.0.0.1:17384/api/ping  # 401 without a token
 ```
 
-Do not run a second background daemon beside this unit. It retains the same
-archive and `--no-sync` scope. This is native process supervision, not a new
-session importer or proof of physical-PC reboot recovery.
+Do not run a second background daemon beside this unit. It serves the same
+archive, in live mode since 2026-09-27 ([live mode](#live-mode-on-the-workstation-2026-09-27)).
+This is native process supervision, not proof of physical-PC reboot recovery.
+
+### Token on the archive API (2026-09-27)
+
+The unit runs with upstream `--require-auth`. Without it, v0.43.0 checks no
+token on the dashboard's own `/api/` routes; only the machine-to-machine
+remote-sync, raw-sync and artifact-exchange routes keep their own authentication
+([auth middleware](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/auth.go#L110-L161)).
+Those dashboard routes include session
+[resume and open](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/huma_routes_sessions.go)
+actions that start programs
+([openers](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/openers.go)),
+and a [terminal setting](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/server/huma_routes_config.go)
+that chooses what they start. Host and Origin checks stop browser pages, not local
+programs that set those headers, and with WSL mirrored networking, Windows
+processes share this loopback address.
+
+- The interface still loads, because static pages are not gated. Unlike the
+  passwordless first check above, it now asks once for the bearer token stored
+  as `auth_token` in the archive's `config.toml`. Serve logs only that a token
+  is configured.
+- The CLI with `AGENTSVIEW_DATA_DIR` set and no `--server` sends its reads to
+  the archive's running daemon, with the archive's token
+  ([transport](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/transport.go#L275-L303)).
+  An explicit `--server` request needs `--server-token-file`; without it, it
+  returns 401.
+- Set `require_auth = true` in the archive's `config.toml` as well, as the
+  [archive config example](../examples/agentsview.toml.example) does.
+  - When no daemon is running, a read without `--server` starts one itself. That
+    daemon takes its settings from the config, not from the unit's flags.
+  - It also syncs, because `--no-sync` is a runtime option with no config key
+    ([config](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L711)).
+    The live-mode unit syncs too. For a frozen `--no-sync` archive, keep its
+    unit running while you read in the data-dir form.
+- While the unit runs, a direct write such as `AGENTSVIEW_NO_DAEMON=1 agentsview sync`
+  on the same archive is refused
+  ([write guard](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1421-L1427)).
+  Refresh a selected file with `agentsview session sync FILE` through the unit.
+- Telemetry and the update check are off, but the pricing refresh still fetches
+  from raw.githubusercontent.com and openrouter.ai at start and every 24 hours
+  ([pricing schedule](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/pricing_schedule.go)).
+- On the workstation, the unit serves the default directory `~/.agentsview`. The
+  2026-09-25 host receipt filled it by default discovery, with no allowlist, and
+  live mode keeps importing from every default and configured home. So the token
+  protects it, not scoping.
+- Measured on the workstation:
+  - without a token, `/` returned 200, and `/api/ping`, `/api/v1/sessions` and
+    `/api/v1/projects` returned 401;
+  - with the unit running, the data-dir form of `agentsview projects --json`,
+    `session list` and `session search` returned archive rows.
+
+Alternatives were no token (rejected because of the routes above) and a reverse
+proxy with its own login (another layer for a gap the upstream flag already
+closes). An upstream release that removes or separately guards the
+program-starting routes would overturn this.
+
+### Live mode on the workstation (2026-09-27)
+
+The user chose AgentsView as the live view of all jobs, so the unit no longer
+passes `--no-sync`. At v0.43.0
+([9be7745a](https://github.com/kenn-io/agentsview/tree/9be7745ad1906ee24e04eb05bb86c872ef0939a1)),
+`serve` without it does the following:
+
+- runs an initial sync
+  ([main.go#L206](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L206));
+- builds the sync engine
+  ([main.go#L306-L325](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L306-L325));
+- watches session files
+  ([startFileWatcher](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L1969));
+- polls directories it cannot watch every 2 minutes
+  ([intervals](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L43-L45));
+- runs a scheduled reconciliation every 15 minutes
+  ([periodic sync](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2726)).
+  That pass covers only providers that declare `PeriodicReconcile`
+  ([scheduledReconcileTargets](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/main.go#L2910-L2955)).
+  Codex and Claude Code do not declare it, so their sessions arrive through the
+  watcher and the 2-minute poll.
+
+A worker lane that runs Codex with its own `CODEX_HOME` is outside the default
+Codex directories. The workstation makes such homes visible by listing them
+under `[agents.codex] homes` in the archive's `config.toml`. Listed homes add to
+the default ones; `dirs`, the directory environment overrides and
+`[[session_sources]]` are the supported alternatives
+([alternate agent homes](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/docs/configuration.md#L988-L1013)).
+The GPT-6 lane homes listed there are host-private paths.
+
+Local observation (not a receipt): the unit restarted in live mode at
+18:37Z. A later probe ran 14 `codex exec` sessions between 18:58Z and 19:04Z.
+All 14 thread ids were listed without a manual sync, by:
+
+```sh
+agentsview session list --agent codex --active-since <start> \
+  --include-automated --include-one-shot --include-children --json
+```
+
+Return to `--no-sync` for an archive that must stay frozen, such as one a
+receipt cites, or if continuous sync's load or a parser regression harms the
+host. The alternative was the frozen archive plus on-demand `agentsview session sync`
+runs, which does not show jobs as they run.
 
 [Context Mode Insight](https://context-mode.com/insight) is a separate hosted,
 opt-in account. Opening its landing page does not connect local telemetry or

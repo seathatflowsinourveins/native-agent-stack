@@ -1,0 +1,17 @@
+{
+ "note": "The GPT-6 review: one ad-hoc codex exec call (read-only, gpt-6-astra, model_reasoning_effort=max, web_search=live, --json) on the unpushed head. Usage is the turn.completed event's usage; Codex counts cached input inside input_tokens and reasoning output inside output_tokens.",
+ "head": "b44729983b2b2f8d91e271e2ab13954fdf347398",
+ "started": "2026-09-28T10:48:11Z",
+ "finished": "2026-09-28T11:02:59Z",
+ "exit": "0",
+ "codex_version": "codex-cli 0.157.1",
+ "turn_usage": [
+  {
+   "input_tokens": 2263283,
+   "cached_input_tokens": 2113024,
+   "cache_write_input_tokens": 0,
+   "output_tokens": 26513,
+   "reasoning_output_tokens": 12036
+  }
+ ]
+}

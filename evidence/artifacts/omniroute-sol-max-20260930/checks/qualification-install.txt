@@ -1,0 +1,5 @@
+[2026-09-30T05:50:33Z] tarball 5d31e2489d7e239c2a12b77693df7bd7992233a105381ba5930fbf3fdb00273c  <B3>/.tmp/ns-rebuild/pack/B3/omniroute-3.8.51.tgz
+[2026-09-30T05:53:20Z] npm install rc=0
+[2026-09-30T05:53:24Z] npm rebuild rc=0
+[2026-09-30T05:53:24Z] shim sha256=b12c64614c54bc86bad8b5cd2778e04c50ae624f47b2d2d525d1a9edc00c8f56 mode=755 match=yes
+[2026-09-30T05:53:24Z] installed BUILD_SHA=cf6748d04 version=3.8.51

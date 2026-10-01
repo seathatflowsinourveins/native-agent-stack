@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-apify-mcpc",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/apify/mcpc",
+ "reviewed_commit": "a8c34fc1af1f89626218712d940b673206a69ed6",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "mcp-surfaces"
+ ],
+ "claim": "Source and documentation review of apify/mcpc at commit a8c34fc1af1f89626218712d940b673206a69ed6 (license Apache-2.0), read from README.md at that commit. Repository description: \"A universal CLI client for MCP. mcpc supports persistent sessions, stdio/HTTP, OAuth 2.1, tasks, JSON output for code mode, proxy for AI sandboxes, x402, and more.\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 915,
+  "pushed_at": "2026-09-24T14:05:34Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@a8c34fc1af1f89626218712d940b673206a69ed6",
+   "text": "`mcpc` is a command-line client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) that maps every MCP operation to an intuitive shell command."
+  },
+  {
+   "source": "README.md@a8c34fc1af1f89626218712d940b673206a69ed6",
+   "text": "Use it to manually inspect and debug MCP servers, to script repeatable MCP workflows in plain shell, or to give AI agents the full MCP protocol through a single `Bash()` tool call, so they can interact with any MCP server and its latest capabilities using the most universal programming interface there is: the UNIX shell."
+  },
+  {
+   "source": "README.md@a8c34fc1af1f89626218712d940b673206a69ed6",
+   "text": "- 🔧 [**Full MCP support**](#mcp-support) - Tools, prompts, resources, async tasks, skills, notifications, and logging over stdio and Streamable HTTP. - 🔄 **Persistent sessions** - Keep connections to multiple servers alive in parallel, whether the server protocol is stateful or stateless. - 🗺️ **Progressive tool discovery** - Find relevant MCP tools on the fly to save tokens and increase accuracy. - 🔌 **Code mode** - JSON output composes with `jq`, `xargs`, and shell pipelines for MCP workflows "
+  }
+ ]
+}

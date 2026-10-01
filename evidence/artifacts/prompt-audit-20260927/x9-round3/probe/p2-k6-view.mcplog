@@ -1,0 +1,5 @@
+{"event": "start", "ts": 1790582877.781, "pid": 314032}
+{"event": "tools/list", "ts": 1790582877.799}
+{"event": "exit", "ts": 1790582878.799, "reason": "timer"}
+{"event": "start", "ts": 1790582883.353, "pid": 314704}
+{"event": "tools/call", "ts": 1790582883.369, "name": "list_open_tickets"}

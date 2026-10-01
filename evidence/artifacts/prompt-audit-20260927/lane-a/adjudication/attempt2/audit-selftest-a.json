@@ -1,0 +1,73 @@
+{
+ "patterns_sha256": "8a3c81a5136e71614a248487f839d1d0c06a0c3cf08af7b78fcc3d95730162a5",
+ "judgments": {
+  "gpt6-AB": {
+   "void": true,
+   "hits": [
+    {
+     "pattern": "MAPPING",
+     "scope": "command",
+     "match": "lane-a/",
+     "window": "/bin/bash -lc 'cat /s/.hold3/convergence-r3/lane-a/gpt6.json'"
+    },
+    {
+     "pattern": "ACCESS",
+     "scope": "command",
+     "match": "/.hold3",
+     "window": "/bin/bash -lc 'cat /s/.hold3/convergence-r3/lane-a/gpt6.json'"
+    }
+   ],
+   "info": [],
+   "items": {
+    "command_execution": 1
+   }
+  },
+  "gpt6-BA": {
+   "void": false,
+   "hits": [],
+   "info": [],
+   "items": {
+    "command_execution": 1
+   }
+  },
+  "claude-AB": {
+   "void": true,
+   "hits": [
+    {
+     "pattern": "ACCESS",
+     "scope": "tool call Read",
+     "match": "<session-id>/tasks/",
+     "window": "{\"name\": \"Read\", \"input\": {\"file_path\": \"/tmp/c/<session-id>/tasks/abc.output\"}}"
+    }
+   ],
+   "info": [],
+   "items": {
+    "user text": 1,
+    "tool_use": 1
+   }
+  },
+  "claude-BA": {
+   "void": true,
+   "hits": [
+    {
+     "pattern": "PHRASES",
+     "scope": "attachment hook_additional_context",
+     "match": "So never self-write without a SOTA source",
+     "window": "{\"attachment\": {\"type\": \"hook_additional_context\", \"content\": \"So never self-write without a SOTA source.\"}, \"rendered\": null}"
+    },
+    {
+     "pattern": "ACCESS",
+     "scope": "tool call Read",
+     "match": "/j5/",
+     "window": "{\"name\": \"Read\", \"input\": {\"file_path\": \"/s/j5/x5/root/AGENTS.md\"}}"
+    }
+   ],
+   "info": [],
+   "items": {
+    "attachment hook_additional_context": 1,
+    "user text": 1,
+    "tool_use": 1
+   }
+  }
+ }
+}

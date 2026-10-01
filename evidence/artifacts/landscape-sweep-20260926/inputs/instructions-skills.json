@@ -1,0 +1,309 @@
+{
+ "catalog": "foundation",
+ "layer_id": "instructions-skills",
+ "title": "Instructions and skills",
+ "requirement": "Give each task concise canonical rules and useful upstream procedures without activating whole instruction or plugin catalogs.",
+ "research_status": "on_requirement_change",
+ "next_action": "Use a selected pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+ "requirement_sha256": "1a095568d89a07d2d08bacd559f0cd5e5e2a13f39247e09977d5a30b0b294137",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "affaan-m/ECC",
+   "repository": "https://github.com/affaan-m/ECC",
+   "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "candidate:typesafe-ai-skills",
+   "repository": "https://github.com/typesafe-ai/skills",
+   "pin": "unpinned",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "candidate:openai-skills",
+   "repository": "https://github.com/openai/skills",
+   "pin": "unpinned",
+   "evidence_class": "local_integration",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Agent Skills reference tools",
+   "repository": "https://github.com/agentskills/agentskills",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Shan Claude best practice",
+   "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Trail of Bits security skills",
+   "repository": "https://github.com/trailofbits/skills",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Vercel frontend skills",
+   "repository": "https://github.com/vercel-labs/agent-skills",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Claude Code Templates",
+   "repository": "https://github.com/davila7/claude-code-templates",
+   "disposition": "unqualified"
+  },
+  {
+   "name": "VoltAgent subagent collection",
+   "repository": "https://github.com/voltagent/awesome-claude-code-subagents",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Anthropic webapp-testing skill",
+   "repository": "https://github.com/anthropics/skills",
+   "disposition": "overlap"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "affaan-m/ECC",
+   "repository": "https://github.com/affaan-m/ECC",
+   "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+   "upstream": {
+    "latest": "v2.2.1",
+    "released_at": "2026-09-08",
+    "prerelease": false,
+    "pushed_at": "2026-09-24",
+    "stars": 267510,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.1",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8428,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "context-mode",
+   "repository": "https://github.com/mksglu/context-mode",
+   "pin": "1.0.169",
+   "upstream": {
+    "latest": "v1.0.169",
+    "released_at": "2026-06-29",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 24069,
+    "license": "NOASSERTION",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "davila7/claude-code-templates",
+   "repository": "https://github.com/davila7/claude-code-templates",
+   "pin": "c840d6f626be7ba418da60aeb0f2080413562451",
+   "upstream": {
+    "latest": "v1.29.6",
+    "released_at": "2026-09-17",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 31832,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "qmd",
+   "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+   "pin": "2.8.3",
+   "upstream": {
+    "latest": "v2.8.3",
+    "released_at": "2026-08-16",
+    "prerelease": false,
+    "pushed_at": "2026-09-09",
+    "stars": 30039,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "rtk",
+   "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+   "pin": "0.50.0",
+   "upstream": {
+    "latest": "v0.50.0",
+    "released_at": "2026-09-24",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 81724,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "shanraisshan/claude-code-best-practice",
+   "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+   "pin": "15969ed2471a177d938c889255d2f23f07e4742a",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-25",
+    "stars": 66359,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "skills-ref",
+   "repository": "https://github.com/agentskills/agentskills",
+   "pin": "0.1.0",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-08-09",
+    "stars": 25692,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  },
+  {
+   "id": "tavily-cli",
+   "repository": "https://github.com/tavily-ai/tavily-cli",
+   "pin": "0.1.8",
+   "upstream": {
+    "latest": null,
+    "released_at": null,
+    "prerelease": null,
+    "pushed_at": "2026-09-21",
+    "stars": 18,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  }
+ ],
+ "open_gaps": [
+  "No retained fixture measures skill-arm task performance. catalog-cases.json covers claim classification, and test-contract.cjs checks only the gate and parser contract on cases.json, so the overturn trial needs a new frozen case set.",
+  "No winner has a measured improvement in task quality or provider cost. community-practice-20260920.json records none, and native-practice.json lines 53, 93 and 149 say the same.",
+  "Record conflict: the foundation closure's layer row (docs/foundation-closure-20260921.md line 53) names ECC, Anthropic skills and Agent Skills, not TypeSafe or the OpenAI skills. Line 26 says the Claude sync already exposes selected official Anthropic skills, but no receipt for that sync (pins, hash",
+  "ECC: the canonical on-demand-guidance decision still records selection 'optional', review_status 'source_review' and use stage 'not_applicable' (decisions.json lines 246-247 and 276-279). Only installation, hash and Claude discovery are established (native-claude-profile-20260920.json lines 27-41). ",
+  "Discovery is client-level, not worker-level. Claude's initialization listed all three native-practice skills (native-receipt.json lines 199-203), but the worker context did not list them and read TypeSafe from disk (lines 277-284). Full body preload is not established (line 205)."
+ ],
+ "overturn_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/agentplugins/agent-plugins-spec",
+   "https://github.com/agentsmd/agents.md",
+   "https://github.com/obra/superpowers",
+   "https://github.com/vercel-labs/skills",
+   "https://github.com/intellectronica/ruler"
+  ]
+ },
+ "known_repositories": [
+  "affaan-m/ecc",
+  "agentplugins/agent-plugins-spec",
+  "agentskills/agentskills",
+  "agentsmd/agents.md",
+  "anthropics/skills",
+  "davila7/claude-code-templates",
+  "huggingface/skills",
+  "intellectronica/ruler",
+  "obra/superpowers",
+  "openai/skills",
+  "shanraisshan/claude-code-best-practice",
+  "trailofbits/skills",
+  "typesafe-ai/skills",
+  "vercel-labs/agent-skills",
+  "vercel-labs/skills",
+  "voltagent/awesome-claude-code-subagents"
+ ],
+ "seeded_candidates_20260926": [
+  "skills.sh leaderboard (all-time, read 2026-09-26): find-skills (vercel-labs/skills, 3.6M installs), grill-me / teach / domain-modeling / codebase-design / setup-matt-pocock-skills (mattpocock/skills), agent-browser (vercel-labs/agent-browser), frontend-design (anthropics/skills), vercel-react-best-practices (vercel-labs/agent-skills), lark-* (open.feishu.cn), hyperframes-cli (heygen-com/hyperframes). Installs are not evidence; judge each on merit for this repository.",
+  "This repository's pinned 30-day skills trial: adoption/skills/manifest.json (26 skills: 5 kept verdict winners + 21 trial, 13 excluded groups with reasons), installed via the pinned skills CLI 1.7.0 (vercel-labs/skills; commands add/update/check/remove/init), invoke rate measured with native /skill-doctor and tools/skill-usage. Assess whether the kept winners (ECC search-first/iterative-retrieval, typesafe-ai, openai gh-fix-ci/security-best-practices) still earn it and whether any excluded or trial skill should change status.",
+  "obra/superpowers, trailofbits/skills, anthropics/skills, openai/skills curated, vercel-labs/agent-skills: evaluate the strongest skills of each on merit."
+ ]
+}

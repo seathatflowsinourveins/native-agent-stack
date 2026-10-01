@@ -1,0 +1,296 @@
+{
+ "evidence_class": "The single repair round on e45c3cd1. Offline unit checks of the recipe with Docker mocked (our integration checks, not upstream tests), source reads at pinned upstream revisions, and an audit-hook run showing that the suite opened no file or sqlite store under the live OmniRoute data directories. No container or network was created and no gateway or model request was made. The G5 tests read synthetic sqlite stores only.",
+ "sanitization": "The worktree prefix is shown as <worktree>, the scratch directory as <scratch>, the unit TMPDIR as <tmpdir> and the local OmniRoute source checkout as <omniroute-source>. The module prefix `tests.test_runtime_worker_openhands.` is dropped from test names. Red outputs are excerpts: the summary lines, each non-ok test with its count of non-ok lines (subtests) when above one, and each distinct first exception line with its count, cut at 220 characters. Tracebacks are omitted; rerunning a command on its tree reproduces them. Green outputs keep the summary lines. Full outputs stay private.",
+ "base": "e45c3cd1c274aff47b82129bf8d22ed374bd577b",
+ "reviews": {
+  "headless_claude": "changes-needed on e45c3cd1: R1 blocker (grading on the default bridge), R2 medium (the probe refused its own server), R3 high (G5 unenforced), R4 low (P2 weak), R5 low (correlation unused in the receipt), R6 low (holds only in documents), C9 medium (the decision record overclaimed); eight confirms.",
+  "gpt6": "changes-needed on e45c3cd1: containment-grader high (same as R1), session-key-logging low, probe-receipt-trust low, gw-8080 info, nginx-headers info; six confirms."
+ },
+ "commits": {
+  "R1": "9302ec2319037af60f70155cbdf60691ee2de6c1",
+  "R2_R4_addendum_b": "92de42e8f252c5fda3808e36f8850b7a94d8c18b",
+  "R6_probe_receipt_trust": "185de7181ba02db8079c7f06b3a0888e7d685d03",
+  "R3_G5": "726849b352f23889d7d08f5ea221eb136db241d1",
+  "R5_gw8080_log_addendum_a": "5a0b0a54a19a65ae1ecea4950a09b40dd9e27cbf",
+  "docs": "the commit that adds this file"
+ },
+ "decisions": "Coordinator repair round of 2026-09-28: new commits on e45c3cd1, a failing test first for every code item, and no push, rebase, manifests/evidence.json change, container, network or gateway request. R5 was not applied as written. At OmniRoute 045aa81f3 and dd6e9607e the recipe's /v1/responses path stores a gateway-generated correlation ID (entry 15), so passing correlation_ids={run_id} would drop every row. Entry 11 shows that change turning the fixture's usage into an empty window. Receipts keep time-window attribution and say why, and the P3 steps move the correlation check to a /v1/chat/completions call.",
+ "item_runs": {
+  "R1": ["01-R1-red", "02-R1-green"],
+  "R2_R4_addendum_b": ["03-R2-R4-b-red", "04-R2-R4-b-green"],
+  "R6_probe_receipt_trust": ["05-R6-trust-red", "06-R6-trust-green"],
+  "R3_G5": ["07-R3-G5-red", "08-R3-G5-green"],
+  "R5_gw8080_log": ["10-R5-gw8080-red", "12-R5-gw8080-green"]
+ },
+ "item_tests": {
+  "R1": [
+   "OpenHandsUpstreamAdapterTests.test_grader_container_is_created_with_network_none_and_inspected",
+   "OpenHandsUpstreamAdapterTests.test_grader_sdk_create_body_requires_network_none",
+   "OpenHandsUpstreamAdapterTests.test_grader_main_installs_the_network_none_transport",
+   "OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings",
+   "OpenHandsUpstreamAdapterTests.test_grader_refuses_unpinned_images_and_does_not_pull_mutable_tags"
+  ],
+  "R2_R4_addendum_b": [
+   "OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks",
+   "OpenHandsProbeTests.test_probe_excludes_and_records_its_own_attempt_containers",
+   "OpenHandsProbeTests.test_netprobe_reads_routes_sends_one_udp_query_and_runs_the_positive_control",
+   "OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused",
+   "OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate",
+   "OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses"
+  ],
+  "R6_probe_receipt_trust": [
+   "OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates",
+   "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts"
+  ],
+  "R3_G5": [
+   "OpenHandsGatewaySurfaceTests.test_provider_lists_are_the_omniroute_source_lists",
+   "OpenHandsGatewaySurfaceTests.test_surface_reads_only_the_provider_column_combo_count_and_two_settings_keys",
+   "OpenHandsGatewaySurfaceTests.test_provider_allowlist_refuses_every_other_served_provider",
+   "OpenHandsGatewaySurfaceTests.test_engines_on_also_checks_the_control_store_it_forwards_to",
+   "OpenHandsGatewaySurfaceTests.test_host_file_allowlists_are_exact_arms_and_bounded_patterns",
+   "OpenHandsProbeTests.test_gate_runs_the_g5_provider_preflight_on_fixture_stores"
+  ],
+  "R5_gw8080_log": [
+   "OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids",
+   "OpenHandsIsolationTests.test_host_side_access_log_records_no_request_line"
+  ]
+ },
+ "item_notes": {
+  "R1": "Grader containers are created with network mode none, the SDK create body is checked, and the created container's inspect must show only the network none; otherwise it is removed and not graded.",
+  "R2_R4_addendum_b": "After the red run one test changed: on this host a closed loopback UDP port times out rather than answering ECONNREFUSED, so the real-socket case accepts either and a mocked recv covers ECONNREFUSED.",
+  "R6_probe_receipt_trust": "After the red run one assertion changed: a per-file count of stage-gates mentions became a check that no recipe file writes, opens, replaces, renames or touches the stage-gates file.",
+  "R3_G5": "The red tree had no config/host.example.json change. Entries 09 and 13 show the suite touching no live store, and entry 14 shows the audit hook detecting planted live-store events.",
+  "R5_gw8080_log": "R5 is the source-checked deviation in `decisions`. The same commit rewords check_server_env's docstring (addendum a) and the P3 skeleton; wording has no red run."
+ },
+ "commands": [
+  {
+   "id": "01-R1-red",
+   "tree": "e45c3cd1 with the R1 test edits only; recipe files unchanged.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": ["Ran 110 tests in 2.133s", "FAILED (failures=2, errors=3)"],
+   "non_ok_tests": [
+    "OpenHandsUpstreamAdapterTests.test_grader_container_is_created_with_network_none_and_inspected",
+    "OpenHandsUpstreamAdapterTests.test_grader_refuses_unpinned_images_and_does_not_pull_mutable_tags",
+    "OpenHandsUpstreamAdapterTests.test_grader_sdk_create_body_requires_network_none",
+    "OpenHandsUpstreamAdapterTests.test_grader_main_installs_the_network_none_transport",
+    "OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsUpstreamAdapterTests.test_grader_container_is_created_with_network_none_and_inspected => AttributeError: module 'openhands_recipe_test_e2e_docker_grader' has no attribute 'owned_create'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_grader_refuses_unpinned_images_and_does_not_pull_mutable_tags => AttributeError: module 'openhands_recipe_test_e2e_docker_grader' has no attribute 'install_transport'",
+    "ERROR OpenHandsUpstreamAdapterTests.test_grader_sdk_create_body_requires_network_none => AttributeError: module 'openhands_recipe_test_e2e_docker_grader' has no attribute 'checked_create_config'",
+    "FAIL OpenHandsUpstreamAdapterTests.test_grader_main_installs_the_network_none_transport => AssertionError: ValueError not raised",
+    "FAIL OpenHandsUpstreamAdapterTests.test_official_grader_container_transport_preserves_upstream_settings => AssertionError: Items in the second set but not the first:"
+   ]
+  },
+  {
+   "id": "02-R1-green",
+   "tree": "Commit 9302ec2319037af60f70155cbdf60691ee2de6c1, extracted with git archive.",
+   "command": "git archive 9302ec23 | tar -x -C <tmpdir>/trees/9302ec23; in that tree: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": ["Ran 110 tests in 2.220s", "OK"]
+  },
+  {
+   "id": "03-R2-R4-b-red",
+   "tree": "9302ec23 with the R2, R4 and addendum-b test edits only; recipe files unchanged.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": ["Ran 111 tests in 1.966s", "FAILED (failures=1, errors=38)"],
+   "non_ok_tests": [
+    "OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate x18",
+    "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts",
+    "OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused x12",
+    "OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work",
+    "OpenHandsProbeTests.test_netprobe_reads_routes_sends_one_udp_query_and_runs_the_positive_control",
+    "OpenHandsProbeTests.test_netprobe_stops_at_the_first_unexpected_result",
+    "OpenHandsProbeTests.test_probe_excludes_and_records_its_own_attempt_containers",
+    "OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate",
+    "OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks",
+    "OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks",
+    "OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate => ValueError: probe_target_is_attempt_container (x18)",
+    "ERROR OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts => ValueError: probe_target_is_attempt_container",
+    "ERROR OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused => AttributeError: <module 'openhands_recipe_test_e2e_netprobe' from '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.p (x11)",
+    "ERROR OpenHandsProbeTests.test_netprobe_int_mode_passes_only_when_everything_is_refused => TypeError: evaluate_p2() takes 4 positional arguments but 5 were given",
+    "ERROR OpenHandsProbeTests.test_netprobe_lists_are_the_plan_lists_and_import_does_no_work => AttributeError: module 'openhands_recipe_test_e2e_netprobe' has no attribute 'UNREACHABLE'. Did you mean: 'UNRESOLVABLE'?",
+    "ERROR OpenHandsProbeTests.test_netprobe_reads_routes_sends_one_udp_query_and_runs_the_positive_control => AttributeError: module 'openhands_recipe_test_e2e_netprobe' has no attribute 'route_summary'",
+    "ERROR OpenHandsProbeTests.test_netprobe_stops_at_the_first_unexpected_result => AttributeError: <module 'openhands_recipe_test_e2e_netprobe' from '<worktree>/blueprints/runtime-workers/openhands/e2e/netprobe.py'> does no",
+    "ERROR OpenHandsProbeTests.test_probe_excludes_and_records_its_own_attempt_containers => ValueError: probe_target_is_attempt_container",
+    "ERROR OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate => ValueError: probe_target_is_attempt_container",
+    "ERROR OpenHandsProbeTests.test_probe_requires_each_attempt_container_on_its_own_networks => ValueError: probe_target_is_attempt_container",
+    "ERROR OpenHandsProbeTests.test_probe_targets_come_from_ss_ip_and_the_attempt_networks => TypeError: probe_targets() takes 3 positional arguments but 4 were given",
+    "FAIL OpenHandsReceiptTests.test_receipt_summarizes_the_isolation_probe_without_ids_or_addresses => AssertionError: {'sta[310 chars]{'connects': 16, 'observed': 16, 'connected': [203 chars] 16}} != {'sta[310 chars]{'contr"
+   ]
+  },
+  {
+   "id": "04-R2-R4-b-green",
+   "tree": "Commit 92de42e8f252c5fda3808e36f8850b7a94d8c18b, extracted with git archive.",
+   "command": "git archive 92de42e8 | tar -x -C <tmpdir>/trees/92de42e8; in that tree: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": ["Ran 111 tests in 2.983s", "OK"]
+  },
+  {
+   "id": "05-R6-trust-red",
+   "tree": "92de42e8 with the R6 and probe-receipt-trust test edits only; recipe files unchanged.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": ["Ran 112 tests in 2.984s", "FAILED (failures=30, errors=1)"],
+   "non_ok_tests": [
+    "OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates x13",
+    "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts x18"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates => AttributeError: module 'openhands_recipe_test_host' has no attribute 'verify_stage_gates'",
+    "FAIL OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts => AssertionError: ValueError not raised (x18)",
+    "FAIL OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates => AssertionError: ValueError not raised (x12)"
+   ]
+  },
+  {
+   "id": "06-R6-trust-green",
+   "tree": "Commit 185de7181ba02db8079c7f06b3a0888e7d685d03, extracted with git archive.",
+   "command": "git archive 185de718 | tar -x -C <tmpdir>/trees/185de718; in that tree: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": ["Ran 112 tests in 3.112s", "OK"]
+  },
+  {
+   "id": "07-R3-G5-red",
+   "tree": "185de718 with the R3 test edits only; recipe files, including config/host.example.json, unchanged.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands -v",
+   "exit_code": 1,
+   "summary": ["Ran 118 tests in 4.675s", "FAILED (errors=26)"],
+   "non_ok_tests": [
+    "OpenHandsGatewaySurfaceTests.test_engines_on_also_checks_the_control_store_it_forwards_to",
+    "OpenHandsGatewaySurfaceTests.test_host_file_allowlists_are_exact_arms_and_bounded_patterns",
+    "OpenHandsGatewaySurfaceTests.test_provider_allowlist_refuses_every_other_served_provider",
+    "OpenHandsGatewaySurfaceTests.test_provider_lists_are_the_omniroute_source_lists",
+    "OpenHandsGatewaySurfaceTests.test_surface_reads_only_the_provider_column_combo_count_and_two_settings_keys",
+    "OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate x17",
+    "OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts",
+    "OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates",
+    "OpenHandsProbeTests.test_gate_runs_the_g5_provider_preflight_on_fixture_stores",
+    "OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate"
+   ],
+   "first_exception_lines": [
+    "ERROR OpenHandsGatewaySurfaceTests.test_engines_on_also_checks_the_control_store_it_forwards_to => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does",
+    "ERROR OpenHandsGatewaySurfaceTests.test_host_file_allowlists_are_exact_arms_and_bounded_patterns => AttributeError: module 'openhands_recipe_test_host' has no attribute 'gateway_allowlists'",
+    "ERROR OpenHandsGatewaySurfaceTests.test_provider_allowlist_refuses_every_other_served_provider => AttributeError: module 'openhands_recipe_test_host' has no attribute 'check_gateway_surface'",
+    "ERROR OpenHandsGatewaySurfaceTests.test_provider_lists_are_the_omniroute_source_lists => AttributeError: module 'openhands_recipe_test_host' has no attribute 'NO_AUTH_PROVIDERS'",
+    "ERROR OpenHandsGatewaySurfaceTests.test_surface_reads_only_the_provider_column_combo_count_and_two_settings_keys => AttributeError: module 'openhands_recipe_test_host' has no attribute 'sqlite3'",
+    "ERROR OpenHandsProbeTests.test_any_unexpected_observation_fails_the_probe_and_the_gate => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have (x17)",
+    "ERROR OpenHandsProbeTests.test_gate_refuses_stale_future_mismatched_or_rebound_receipts => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not hav",
+    "ERROR OpenHandsProbeTests.test_gate_requires_the_host_recorded_stage_gates => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribu",
+    "ERROR OpenHandsProbeTests.test_gate_runs_the_g5_provider_preflight_on_fixture_stores => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have t",
+    "ERROR OpenHandsProbeTests.test_probe_receipt_is_bound_owner_only_and_accepted_by_the_gate => AttributeError: <module 'openhands_recipe_test_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not h"
+   ]
+  },
+  {
+   "id": "08-R3-G5-green",
+   "tree": "Commit 726849b352f23889d7d08f5ea221eb136db241d1, extracted with git archive.",
+   "command": "git archive 726849b3 | tar -x -C <tmpdir>/trees/726849b3; in that tree: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": ["Ran 118 tests in 9.031s", "OK"]
+  },
+  {
+   "id": "09-R3-G5-audit",
+   "tree": "726849b3's code and tests, before that commit's README, decision-record and research.md edits.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 <scratch>/p3/audit_run.py (the module's suite under sys.addaudithook, recording every sqlite3.connect and every open event under the two live OmniRoute data directories)",
+   "exit_code": 0,
+   "output": "{'tests': 118, 'failures': 0, 'errors': 0, 'sqlite_connects': 92, 'live_store_accesses': []}"
+  },
+  {
+   "id": "10-R5-gw8080-red",
+   "tree": "726849b3 with the R5 and gw:8080 test edits only; recipe files unchanged.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 1,
+   "summary": ["Ran 120 tests in 7.662s", "FAILED (failures=2)"],
+   "non_ok_tests": [
+    "OpenHandsIsolationTests.test_host_side_access_log_records_no_request_line",
+    "OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids"
+   ],
+   "first_exception_lines": [
+    "FAIL OpenHandsIsolationTests.test_host_side_access_log_records_no_request_line => AssertionError: Lists differ: [] != ['ingress']",
+    "FAIL OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids => AssertionError: '/v1/responses' not found in 'Time window + model + path at the arm entry gateway; concurr"
+   ]
+  },
+  {
+   "id": "11-R5-literal-negative-control",
+   "tree": "5a0b0a54's content, before it was committed, with receipt.py temporarily changed to pass correlation_ids={window.get(\"run_id\")} to gateway_rows, the brief's literal R5. The file was restored afterwards: the same SHA-256 prefix before and after, and commit 5a0b0a54 holds the restored file.",
+   "command": "TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands.OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids",
+   "exit_code": 1,
+   "summary": ["Ran 1 test in 0.090s", "FAILED (failures=1)"],
+   "non_ok_tests": [
+    "OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids"
+   ],
+   "first_exception_lines": [
+    "FAIL OpenHandsReceiptTests.test_responses_rows_keep_window_attribution_because_the_gateway_replaces_caller_ids => AssertionError: 'empty_window' != 'observed'"
+   ]
+  },
+  {
+   "id": "12-R5-gw8080-green",
+   "tree": "Commit 5a0b0a54a19a65ae1ecea4950a09b40dd9e27cbf, extracted with git archive.",
+   "command": "git archive 5a0b0a54 | tar -x -C <tmpdir>/trees/5a0b0a54; in that tree: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_runtime_worker_openhands",
+   "exit_code": 0,
+   "summary": ["Ran 120 tests in 7.421s", "OK"]
+  },
+  {
+   "id": "13-audit-5a0b0a54",
+   "tree": "Commit 5a0b0a54, extracted with git archive.",
+   "command": "in <tmpdir>/trees/5a0b0a54: TMPDIR=<tmpdir> PYTHONDONTWRITEBYTECODE=1 python3 <scratch>/p3/audit_run.py",
+   "exit_code": 0,
+   "output": "{'tests': 120, 'failures': 0, 'errors': 0, 'sqlite_connects': 94, 'live_store_accesses': []}"
+  },
+  {
+   "id": "14-audit-negative-control",
+   "tree": "Not a repository tree; <scratch>/p3/audit_control.py.",
+   "command": "python3 <scratch>/p3/audit_control.py (the same matching conditions as audit_run.py; sys.audit raises two planted events naming each live store's storage.sqlite and one naming a fixture path, and nothing is connected or opened)",
+   "exit_code": 0,
+   "output": "{'planted_live_events': 2, 'detected': 2, 'fixture_events_detected': 0}"
+  },
+  {
+   "id": "15-omniroute-correlation-source",
+   "tree": "<omniroute-source> at 045aa81f3 (the 20128 build) and dd6e9607e (the 20129 build).",
+   "command": "git show <commit>:<file> | sha256sum for each file below at both commits; git show 045aa81f3:<file> | sed -n <lines>p",
+   "exit_code": 0,
+   "output": {
+    "sha256_prefix_equal_at_both_builds": {
+     "src/app/api/v1/responses/route.ts": "50d42226d52e",
+     "src/shared/utils/requestId.ts": "a64a84272495",
+     "src/sse/handlers/chat.ts": "6d76396caec9",
+     "src/app/api/v1/chat/completions/route.ts": "4a9a591e6ac8",
+     "src/shared/utils/correlationPreserve.ts": "bbeecb755cf9",
+     "open-sse/handlers/chatCore/attemptLogging.ts": "c3f112d92b2f",
+     "src/lib/usage/callLogs.ts": "64269db02cb0"
+    },
+    "lines": {
+     "src/app/api/v1/responses/route.ts:193": "const correlationId = generateRequestId();",
+     "src/app/api/v1/responses/route.ts:213": "return finishAdmission(await handleChat(resolved, null, resolvedBody));",
+     "src/shared/utils/requestId.ts:100-102": "export function generateRequestId() { return randomUUID(); }",
+     "src/sse/handlers/chat.ts:436": "const reqId = correlationId || generateRequestId();",
+     "src/app/api/v1/chat/completions/route.ts:292-295": "#11739: preserve caller-provided X-Correlation-Id when present; generate only when absent.",
+     "open-sse/handlers/chatCore/attemptLogging.ts:611": "correlationId: correlationId || traceId,",
+     "src/lib/usage/callLogs.ts:713,786,801": "correlationId: entry.correlationId || null; the INSERT's correlation_id column takes @correlationId"
+    }
+   }
+  },
+  {
+   "id": "16-nginx-release-1.30.5-bytes",
+   "tree": "Not a repository tree.",
+   "command": "curl -fsSL https://raw.githubusercontent.com/nginx/nginx/release-1.30.5/<file> | sha256sum for the four files below; cmp with the copies read earlier in the round; gh api repos/nginx/nginx/git/ref/tags/release-1.30.5 --jq .object.sha",
+   "exit_code": 0,
+   "output": {
+    "sha256_prefix": {
+     "src/http/modules/ngx_http_proxy_module.c": "3bd280886adfbd22",
+     "src/http/ngx_http_request.c": "6aa0cff0840047d8",
+     "src/http/modules/ngx_http_log_module.c": "26c731d6762ae2a3",
+     "src/http/modules/ngx_http_chunked_filter_module.c": "85274f1d726e40ee"
+    },
+    "earlier_copies_identical": "the proxy, request and log module files; the chunked filter had no earlier copy",
+    "tag_object": "9afafb84841376ee288f19b66302e7883aaa16b5",
+    "lines_cited": "ngx_http_proxy_module.c:747-757 (default proxy headers: Connection empty at :749; Content-Length and Transfer-Encoding generated at :750-751), :1301-1303,1417-1418 (empty values skipped), :4210-4228 (defaults merged only for names the configuration leaves unset); ngx_http_log_module.c:170-171 (log_format at http level only), :230-232 (combined logs $request); ngx_http_request.c:2034-2064 (framing refusals), :4103-4107 (request-bound error entries carry the request line)"
+   }
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# What in the installed recipe venv (the new lock) imports PyJWT, what uses the JWKS client whose behavior 2.15.0 changed, and where oauthlib imports jwt.
+# usage: pyjwt_surface.sh <site-packages of the scratch venv> <blobless clone of https://github.com/jpadilla/pyjwt with tag 2.15.0>
+set +e -u
+SP=$1; SRC=$2
+echo "--- installed: $(ls -d $SP/pyjwt-*.dist-info $SP/urllib3-*.dist-info | sed "s#$SP/##" | tr '\n' ' ')"
+echo "--- top-level packages that import jwt (import jwt / from jwt), file counts:"
+grep -rl -E '^\s*(import jwt|from jwt)' "$SP" --include=*.py 2>/dev/null | sed "s#$SP/##" | grep -v '^jwt/' | cut -d/ -f1 | sort | uniq -c | sort -rn
+echo "--- uses of the JWKS client API changed in 2.15.0 (PyJWKClient, get_signing_key_from_jwt, JWKSetCache, fetch_data) outside jwt itself:"
+grep -rn -E 'PyJWKClient|get_signing_key_from_jwt|JWKSetCache|get_jwk_set' "$SP" --include=*.py 2>/dev/null | sed "s#$SP/##" | grep -v '^jwt/' | cut -c1-150 | head -20
+echo "--- importers of google.oauth2.id_token (the module that calls the JWKS client) outside the google package:"
+grep -rln -E "google\.oauth2\.id_token|from google\.oauth2 import .*id_token|from google\.oauth2 import \(" "$SP" --include=*.py 2>/dev/null | sed "s#$SP/##" | grep -v "^google/" | head -10
+echo "(end of list)"
+echo "--- oauthlib lines that import jwt:"
+grep -rn -E '^\s*(import jwt|from jwt)' "$SP/oauthlib" --include=*.py 2>/dev/null | sed "s#$SP/##"
+echo "--- PyJWT 2.15.0 changelog, the whole section (git show 2.15.0:CHANGELOG.rst, tag commit $(git -C $SRC rev-parse 2.15.0^{commit})):"
+git -C $SRC show 2.15.0:CHANGELOG.rst | awk '/^`v2\.15\.0/{p=1} /^`v2\.14\.0/{p=0} p' | cut -c1-170
+echo "--- the four oauthlib source files the advisory reviews name, against the sha256 recorded by the review of the previous lock (evidence/artifacts/openhands-oauthlib-review-535-head6a7b16-20260930/checks/independent-scan.txt, lines 30-33):"
+python3 - "$SP" <<'PY'
+import hashlib, sys
+from pathlib import Path
+site = Path(sys.argv[1])
+recorded = {
+    "oauthlib/oauth2/rfc6749/endpoints/revocation.py": "ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c",
+    "oauthlib/oauth2/rfc6749/grant_types/authorization_code.py": "0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6",
+    "oauthlib/oauth2/rfc6749/endpoints/pre_configured.py": "6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316",
+    "oauthlib/openid/connect/core/endpoints/pre_configured.py": "bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee",
+}
+for rel, expected in recorded.items():
+    actual = hashlib.sha256((site / rel).read_bytes()).hexdigest()
+    print(f"   {rel} {actual} {'matches' if actual == expected else 'MISMATCH'}")
+PY
+echo "--- the four advisory-related oauthlib files: references to jwt or signed tokens (grep -n -E 'jwt|signed_token|ServiceApplication'):"
+for f in oauthlib/oauth2/rfc6749/endpoints/revocation.py oauthlib/oauth2/rfc6749/grant_types/authorization_code.py oauthlib/oauth2/rfc6749/endpoints/pre_configured.py oauthlib/openid/connect/core/endpoints/pre_configured.py; do
+  printf '%s: ' "$f"; grep -c -E 'jwt|signed_token|ServiceApplication' "$SP/$f"
+  grep -n -E 'jwt|signed_token|ServiceApplication' "$SP/$f" | sed 's/^/    /' | cut -c1-150
+done
+echo "--- the oauthlib function that contains each lazy jwt import (the nearest def above the import line):"
+python3 - "$SP" <<'PY'
+import re, sys
+from pathlib import Path
+site = Path(sys.argv[1])
+for rel in ("oauthlib/common.py", "oauthlib/oauth2/rfc6749/clients/service_application.py", "oauthlib/oauth1/rfc5849/signature.py"):
+    lines = (site / rel).read_text(encoding="utf-8").splitlines()
+    for number, line in enumerate(lines, 1):
+        if re.match(r"\s+import jwt", line):
+            definition = next((lines[i] for i in range(number - 2, -1, -1) if re.match(r"\s*def ", lines[i])), "?")
+            print(f"   {rel}:{number} inside {definition.strip()[:90]}")
+PY

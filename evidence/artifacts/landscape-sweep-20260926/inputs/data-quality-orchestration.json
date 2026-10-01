@@ -1,0 +1,90 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "data-quality-orchestration",
+ "title": "Data quality and orchestration",
+ "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
+ "research_status": "on_requirement_change",
+ "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+ "requirement_sha256": "bd85b01972ad3ff392207528f43ed236828a6fec151396d786b3849936e801e8",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "pin": "v2.16.6",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "data-pandera",
+   "repository": "https://github.com/unionai-oss/pandera",
+   "pin": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal",
+   "disposition": "conditional"
+  },
+  {
+   "name": "modal",
+   "repository": "https://github.com/modal-labs/modal-client",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "Dagu: completed-history restart is not recovery of in-flight work (blueprints/us-equities/hosting/receipt.json limitations). No model-worker queue, continuous off-host hosting, VM boundary or trading host is established.",
+  "Dagu: the paired Astra-to-Claude model workflow was not executed (paired_model_workflow_executed false) because the Codex allowance was exhausted (usedPercent 100). The Claude Opus 5 report ran standalone, outside the Dagu graph, so complete returned results from a model worker running inside the or",
+  "The two Dagu records disagree on dashboard authentication. The hosting receipt (2026-09-19) records basic auth with anonymous 401 and authenticated 200 after restart. The current hosting README says the dashboard now uses upstream auth.mode none, with anonymous API reads returning 200. No retained r",
+  "Dagu pin v2.16.6 is behind upstream v2.17.0 (pin_behind_upstream true). The newer release is untested; that means unknown, not failed.",
+  "pandera: evidence covers synthetic CSV fixtures only. It does not establish provider completeness, correct corporate actions, accurate prices, absence of leakage or a production bars/universe ingest. The data README states that no such ingest ships yet."
+ ],
+ "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/dbos-inc/dbos-transact-py",
+   "https://github.com/fivetran/great_expectations",
+   "https://github.com/hatchet-dev/hatchet"
+  ]
+ },
+ "known_repositories": [
+  "anthropics/claude-code",
+  "bytedance/deer-flow",
+  "dagster-io/dagster",
+  "dagucloud/dagu",
+  "dbos-inc/dbos-transact-py",
+  "diegosouzapw/omniroute",
+  "fivetran/great_expectations",
+  "grafana/grafana",
+  "grafana/lok",
+  "hatchet-dev/hatche",
+  "langchain-ai/deepagents",
+  "langchain-ai/langgraph",
+  "microsoft/agent-framework",
+  "modal-labs/modal-clien",
+  "open-telemetry/opentelemetry-collector-contrib",
+  "openai/codex",
+  "openai/openai-agents-python",
+  "openhands/openhands",
+  "openhands/software-agent-sdk",
+  "prefecthq/prefec",
+  "prometheus/prometheus",
+  "restic/restic",
+  "tashfeenahmed/freellmap",
+  "temporalio/temporal",
+  "unionai-oss/pandera",
+  "vllm-project/vllm"
+ ],
+ "seeded_candidates_20260926": []
+}

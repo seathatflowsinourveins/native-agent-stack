@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "native_catalog_scope_observation",
+  "evidence_class": "native_cli_execution",
+  "source": {
+    "repository": "tobi/qmd",
+    "revision": "facd35e01359e59d938bc9418e93fb9318addee3",
+    "tag": "v2.8.3"
+  },
+  "native_version": {
+    "exit_code": 0,
+    "returned": "qmd 2.8.3 (facd35e)"
+  },
+  "installed_version_release": {
+    "exit_code": 0,
+    "tag_name": "v2.8.3",
+    "published_at": "2026-08-16T22:30:34Z",
+    "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+  },
+  "named_index": "native-agent-stack-catalog",
+  "status": {
+    "exit_code": 0,
+    "documents": 299,
+    "vectors": 4056,
+    "pending_embedding_documents": 2,
+    "collections": 4,
+    "scope": "Existing index snapshot; no savings or new semantic acceptance claim."
+  },
+  "native_collection_show": {
+    "exit_code": 0,
+    "collection": "foundation-docs",
+    "source_checkout": "separate maintained live clone",
+    "pattern": "**/*.md",
+    "current_working_checkout_enrolled": false
+  },
+  "action": "No refresh of unrelated enrolled roots or new collection/model loading. Current checkout changes use bounded original-source reads; no current-checkout QMD freshness is claimed.",
+  "limits": [
+    "Native collection inspection establishes enrolled path scope, not live clone sync or model/GPU qualification.",
+    "Dated component cards remain historical snapshots; native scope observation supersedes their host collection assumptions for this task."
+  ]
+}

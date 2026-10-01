@@ -11,6 +11,7 @@ other published workflow -- the same offline zizmor pass/fail assertion in
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -60,6 +61,10 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "hardware-profile-smoke.yml",
             "receipt-staleness.yml",
             "saturation-tracking.yml",
+            "practice-references-freshness.yml",
+            "runtime-worker-skills-freshness.yml",
+            # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
+            "sota-sources-gate.yml",
         }
         self.assertEqual(
             actual, expected,
@@ -109,6 +114,70 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
                       f"{result.stderr[:2000]}")
         self.assertEqual(result.returncode, 0, result.stderr[:2000])
         self.assertEqual(findings, [])
+
+
+FRESHNESS_WORKFLOW = WORKFLOWS_DIR / "runtime-worker-skills-freshness.yml"
+READ_ONLY_PERMISSIONS = "permissions:\n  contents: read\n\n"
+CHECKOUT_WITHOUT_CREDENTIALS = "        with:\n          persist-credentials: false\n"
+USES_LINE = r"(?m)^[ \t]+(?:- )?uses:"
+PINNED_ACTION = re.compile(USES_LINE + r" ([\w.-]+/[\w./-]+)@([0-9a-f]{40})(?=\s)")
+
+
+@unittest.skipUnless(ZIZMOR, "native zizmor unavailable; CI installs the pinned analyzer")
+class RuntimeWorkerSkillsFreshnessWorkflowTests(unittest.TestCase):
+    """The report-only freshness workflow gets the same offline pass/fail assertion. Each property it
+    relies on -- actions pinned to a full commit SHA, a checkout that does not persist credentials and a
+    read-only token -- is shown to be a finding once it is dropped from a copy of the file."""
+
+    def analyze_copy(self, text):
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            workflow = directory / FRESHNESS_WORKFLOW.name
+            workflow.write_text(text, encoding="utf-8")
+            result = _analyze(workflow, directory)
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        return result, {finding["ident"] for finding in findings}
+
+    def test_runtime_worker_skills_freshness_workflow_has_no_offline_findings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            result = _analyze(FRESHNESS_WORKFLOW, Path(temporary))
+        try:
+            findings = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            self.fail(f"zizmor did not return JSON (exit {result.returncode}): "
+                      f"{result.stderr[:2000]}")
+        self.assertEqual(result.returncode, 0, result.stderr[:2000])
+        self.assertEqual(findings, [])
+
+    def test_a_floating_tag_persisted_credentials_or_default_permissions_are_findings(self):
+        text = FRESHNESS_WORKFLOW.read_text(encoding="utf-8")
+        pins = PINNED_ACTION.findall(text)
+        self.assertTrue(pins)
+        self.assertEqual(len(pins), len(re.findall(USES_LINE, text)), "an action is not SHA-pinned")
+        for action, sha in pins:
+            with self.subTest(floating=action):
+                result, idents = self.analyze_copy(text.replace(f"{action}@{sha}", f"{action}@v1"))
+                self.assertNotEqual(result.returncode, 0, result.stderr[:2000])
+                self.assertIn("unpinned-uses", idents)
+        for label, block, ident in (("persist-credentials", CHECKOUT_WITHOUT_CREDENTIALS, "artipacked"),
+                                    ("permissions", READ_ONLY_PERMISSIONS, "excessive-permissions")):
+            with self.subTest(dropped=label):
+                self.assertEqual(text.count(block), 1, f"the workflow's {label} block moved")
+                result, idents = self.analyze_copy(text.replace(block, ""))
+                self.assertNotEqual(result.returncode, 0, result.stderr[:2000])
+                self.assertIn(ident, idents)
+
+    def test_its_only_token_grant_is_contents_read(self):
+        # zizmor's regular persona reports nothing for a workflow-level `contents: write` or
+        # `write-all` (measured with zizmor 1.30.1 on 2026-09-28), so the grant is asserted on the text.
+        text = FRESHNESS_WORKFLOW.read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r"(?m)^[ \t]*permissions:.*$", text), ["permissions:"])
+        self.assertEqual(text.count(READ_ONLY_PERMISSIONS), 1)
+        self.assertNotRegex(text, r"(?m)^[ \t]*[\w-]+:[ \t]*write(?:-all)?[ \t]*(?:#.*)?$")
 
 
 DEPENDABOT = ROOT / ".github/dependabot.yml"

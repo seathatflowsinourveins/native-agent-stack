@@ -1,0 +1,83 @@
+Review one unpushed pull-request head, read-only, in the current directory (a git worktree). Do not edit, commit,
+install or push anything; the sandbox is read-only. Base: origin/main at `3058b237`. The branch has two commits:
+`a82e5e79` (the decision record, the evidence package and one anti-pattern row) and `31ab17f7` (the
+evidence-manifest registration). Review `git diff origin/main...HEAD`.
+
+What the change claims:
+- `docs/decisions/2026-09-28-an13-m4-m5.md` records a two-family convergence on two findings of an earlier
+  prompt-audit run (AN-13):
+  - M4: the report's rewrite of the vendored skill `verification-before-completion` (hunks D1-D3). Both lanes
+    rejected it, so there is no edit.
+  - M5: `blueprints/convergence-practice/application-delivery/AGENTS.md:15-18`. Both lanes amended it with different
+    texts. One blind adjudication, in both orders by both families, split, so the lines are unchanged and both texts
+    are recorded.
+  - The rule (`docs/convergence-architecture.md`): both lanes agree, apply; both reject, keep; otherwise one blind
+    adjudication, applied only when all four judgments are valid and choose the same text.
+- `evidence/artifacts/prompt-audit-an13-m45-20260928/` (README first) holds:
+  - the frozen packet with its hash, the sources, prompts, schemas and both lanes' returns;
+  - the runner records, the adjudication inputs, packets, prompts, the four judgments, the order mapping, the void
+    audit, its control and the tally;
+  - the scripts as run, the frozen script hashes and the usage.
+- `docs/harness-defaults.md` gains one dated anti-pattern row: "Dispatching judges before running the void-pattern
+  control".
+- `manifests/evidence.json` registers the 48 new or changed files.
+
+Test behavior, do not only read. Where the sandbox blocks a command (for example a test that needs a writable temp
+directory), say so and use an equivalent read-only computation instead (python3 -B, `sys.dont_write_bytecode`).
+
+1. Record against evidence.
+   - For each factual claim in the decision record and the package README, find the retained file that supports it,
+     and report any claim the evidence does not support or contradicts. Claims include verdicts, confidences, the two
+     M5 texts, the tally, audit hits, control results, usage figures, times, versions and agent types.
+   - Recompute M5's outcome from `adjudication/{gpt6,claude}.{AB,BA}.json`, `adjudication/m45-mapping.json` and
+     `adjudication/audit-m45.json`.
+2. Repository citations. Read each cited line on HEAD and say whether it says what the record says. The cited lines
+   are:
+   - `scripts/skills_status.py:12, 262, 431-511`;
+   - `tools/adoption/install_skills.py:127`;
+   - `examples/claude-native/workflows/test-envelope.mjs:505` and `test-contract-mutations.mjs:70-73`;
+   - `adoption/bootstrap.md:346-347`;
+   - `docs/decisions/2026-09-25-skills-trial-and-usage.md:832-840`;
+   - `docs/decisions/2026-09-27-token-lanes-subagent-start.md:585-587`;
+   - `evidence/artifacts/token-adoption-e2e-20260926/README.md:655-663`;
+   - `blueprints/convergence-practice/application-delivery/receipt.json:88` and `AGENTS.md:15-18`;
+   - `.claude/agents/isolated-builder.md:9`;
+   - `.claude/agents/blind-adjudicator.md`, for the phrase the audit matched.
+3. Upstream. Check the M4 sources against upstream with live web search:
+   - that `obra/superpowers` at `8ca22dba` and on `main` serves the skill file with sha256 `2befe7fc…`, or at least
+     the same blob;
+   - that commit `3be5aad3dd24` is the latest change to that file and says what the record quotes;
+   - that the Opus 5 prompting guide's "Task scope and over-verification" section says what the record quotes.
+4. Hashes. Run these from the package directory:
+   - `sha256sum -c round1/packet.sha256`;
+   - `sha256sum -c frozen-sha256.txt` in `scripts/`;
+   - a comparison of `adjudication/sent-sha256.json` with the published files. The README says the four prompts
+     differ only by host-path placeholders; check that this is plausible.
+5. Reasoning.
+   - Does "no edit" for M4 follow from its sources?
+   - Is "split, no edit" the correct application of the rule for M5?
+   - Is anything in the record or README overstated, for example what the audit's control shows, or the claim that
+     the outcome does not depend on the two voided judgments?
+6. The anti-pattern row.
+   - Check it against the log's rules: the "Record a correction the same turn" paragraph in `docs/harness-defaults.md`
+     and `tests/test_adoption_docs_consistency.py`.
+   - Check it against `adjudication/audit-m45.json` and `adjudication/audit-control-m45.json`.
+   - Run `python3 -B -m unittest tests.test_adoption_docs_consistency` if the sandbox allows it.
+7. Private content. Search the new files for:
+   - host paths, a user name, session or thread ids, UUIDs, email addresses, tokens or keys;
+   - an installed plugin or skill inventory, and quotations of client configuration or settings values.
+
+   Placeholders such as `<work>`, `<base>`, `<adj>`, `<runs>`, `<scratch>`, `<user>`, `<uuid>` and `~/` are intended.
+   Pattern text inside `scripts/package_m45.py` and `scripts/void_patterns_m45.py` is expected.
+8. Registration.
+   - Run `python3 -B scripts/validate.py` if the sandbox allows it.
+   - Check that every new or changed file is registered.
+   - Check that no unrelated manifest entry changed (`git diff origin/main...HEAD -- manifests/evidence.json`).
+
+Return Markdown:
+- The first line is `VERDICT: agree` or `VERDICT: changes-needed`.
+- Then numbered findings, each with severity (blocker / should-fix / nit), file:line, the evidence (command and
+  output, or quoted lines), and the fix.
+- Then a short list of the commands you ran with their exit codes.
+
+Report only what you verified, and mark anything you could not check as unchecked.

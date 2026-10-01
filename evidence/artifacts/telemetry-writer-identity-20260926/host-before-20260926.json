@@ -1,0 +1,360 @@
+{
+  "schema": "telemetry-writer-identity-measurement/1",
+  "kind": "host_measurement_before_change",
+  "evidence_class": "native read-only query results from the loopback Prometheus 3.15.0 and Loki 3.7.8 HTTP APIs, taken by a local-integration checker; no model call, no configuration change",
+  "host": "nativestack-5975wx-20260925",
+  "generated_at_utc": "2026-09-26T15:53:36Z",
+  "window_utc": [
+    "2026-09-26T14:51:36Z",
+    "2026-09-26T15:51:36Z"
+  ],
+  "client_state": "Claude Code 2.1.283 sessions with OTEL_METRICS_INCLUDE_SESSION_ID=false and cumulative temporality; codex-cli 0.157.1 exec workers without service.instance.id; the collector profile before the writer-identity change (keep_keys only, no session identity). 8 claude processes were running when the query ran.",
+  "verdict_of_checker": "FAIL",
+  "integrity": {
+    "claude_counter_resets": {
+      "ok": false,
+      "scoped": 0,
+      "unscoped": 7216.0
+    },
+    "delta_to_cumulative_errors": {
+      "accepted": 4642.343096234309,
+      "by_error": {
+        "delta.ErrOlderStart": 0.0,
+        "delta.ErrOutOfOrder": 3517.65690376569
+      },
+      "ok": false
+    },
+    "unscoped_token_writers": {
+      "ok": false,
+      "series_by_job": {
+        "claude-code": 104.0,
+        "codex_exec": 6.0
+      }
+    }
+  },
+  "claude_legacy_unscoped": {
+    "cacheCreation": {
+      "loki_without_session_id": 29000770.0,
+      "prometheus_increase_unscoped": 3285515090.285919,
+      "ratio": 113.29061574178614
+    },
+    "cacheRead": {
+      "loki_without_session_id": 914972684.0,
+      "prometheus_increase_unscoped": 112293951940.19994,
+      "ratio": 122.72929444110042
+    },
+    "input": {
+      "loki_without_session_id": 1401238.0,
+      "prometheus_increase_unscoped": 270888395.66063774,
+      "ratio": 193.3207603994737
+    },
+    "output": {
+      "loki_without_session_id": 7049127.0,
+      "prometheus_increase_unscoped": 517650913.53847116,
+      "ratio": 73.43475490489406
+    }
+  },
+  "codex_legacy_unscoped": {
+    "cached_input": {
+      "deviation_pct": 37.603112493747375,
+      "loki_without_instance": 15817216.0,
+      "prometheus_increase_unscoped": 21764981.52585901
+    },
+    "input": {
+      "deviation_pct": 37.09881793000597,
+      "loki_without_instance": 16588406.0,
+      "prometheus_increase_unscoped": 22742508.539430186
+    },
+    "output": {
+      "deviation_pct": 43.67278190617628,
+      "loki_without_instance": 125350.0,
+      "prometheus_increase_unscoped": 180093.83211939197
+    },
+    "reasoning_output": {
+      "deviation_pct": 42.74961418508333,
+      "loki_without_instance": 57021.0,
+      "prometheus_increase_unscoped": 81397.25750447637
+    }
+  },
+  "setup": {
+    "claude_session_ids": {
+      "ok": false
+    },
+    "codex_launcher": {
+      "ok": false
+    },
+    "collector_profile": {
+      "ok": false
+    },
+    "firing_integrity_alerts": {
+      "ok": true
+    },
+    "integrity_rules": {
+      "ok": false
+    },
+    "prometheus_features": {
+      "ok": false
+    }
+  },
+  "queries": [
+    {
+      "api": "prometheus",
+      "query": "sum(resets({__name__=~\"ecosystem_claude_code_token_usage_tokens_total|ecosystem_claude_code_cost_usage_USD_total\", instance!=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum(resets({__name__=~\"ecosystem_claude_code_token_usage_tokens_total|ecosystem_claude_code_cost_usage_USD_total\", instance=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (error) (increase(otelcol_deltatocumulative_datapoints{error!=\"\"}[3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum(increase(otelcol_deltatocumulative_datapoints{error=\"\"}[3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "count by (job) (last_over_time({__name__=~\"ecosystem_claude_code_token_usage_tokens_total|ecosystem_codex_turn_token_usage_count\", instance=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (type) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[3600s anchored]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (type) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id!=\"\" | unwrap input_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | unwrap input_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id!=\"\" | unwrap output_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | unwrap output_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id!=\"\" | unwrap cache_read_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | unwrap cache_read_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id!=\"\" | unwrap cache_creation_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | unwrap cache_creation_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (type) (increase(ecosystem_claude_code_token_usage_tokens_total{instance=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id=\"\" | unwrap input_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id=\"\" | unwrap output_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id=\"\" | unwrap cache_read_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=~\"claude-code|claude-code-desktop\"} | event_name=\"api_request\" | session_id=\"\" | unwrap cache_creation_tokens | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (count_over_time({service_name=\"codex_exec\"} | event_name=\"codex.conversation_starts\" | service_instance_id!=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (count_over_time({service_name=\"codex_exec\"} | service_instance_id!=\"\" [90s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id!=\"\" | unwrap input_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id!=\"\" | unwrap output_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id!=\"\" | unwrap cached_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum by (service_instance_id) (sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id!=\"\" | unwrap reasoning_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (instance, token_type) (increase(ecosystem_codex_turn_token_usage_sum{job=\"codex_exec\", instance!=\"unscoped\"}[3690s anchored]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (instance, token_type) (increase(ecosystem_codex_turn_token_usage_sum{job=\"codex_exec\", instance!=\"unscoped\"}[3690s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (instance) (increase(ecosystem_codex_turn_token_usage_count{job=\"codex_exec\", instance!=\"unscoped\", token_type=\"input\"}[3690s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (token_type) (increase(ecosystem_codex_turn_token_usage_sum{job=\"codex_exec\", instance=\"unscoped\"}[3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id=\"\" | unwrap input_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id=\"\" | unwrap output_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id=\"\" | unwrap cached_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "loki",
+      "query": "sum(sum_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" | service_instance_id=\"\" | unwrap reasoning_token_count | __error__=\"\" [3600s]))"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum by (instance) (increase(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[3600s])) > 0"
+    },
+    {
+      "api": "prometheus",
+      "query": "sum(increase(ecosystem_claude_code_token_usage_tokens_total{instance!=\"unscoped\", query_source=\"subagent\"}[3600s]))"
+    }
+  ],
+  "reading": [
+    "integrity.claude_counter_resets.unscoped: resets() of the Claude token and cost counters over the hour; every series was instance=\"unscoped\".",
+    "claude_legacy_unscoped[*].ratio: Prometheus increase() of the unscoped Claude token counter over the Loki api_request unwrap sum for events without session_id (all events in this window).",
+    "integrity.delta_to_cumulative_errors: increase() of the Collector self-metric otelcol_deltatocumulative_datapoints by error over the hour; accepted is the error-free series.",
+    "codex_legacy_unscoped: a window comparison, informational only. Codex records a turn when it ends, so a window cuts turns; only a per-process comparison sizes Codex accuracy."
+  ],
+  "prewarm_observation": {
+    "observed_at_utc": "2026-09-26T17:35:22Z",
+    "evidence_class": "native read-only Loki 3.7.8 metric queries run during the review repair of this change; no model call, no configuration change",
+    "window_end_utc": "2026-09-26T15:51:36Z",
+    "counts": {
+      "3600s": {
+        "codex_conversation_starts": 10,
+        "response_completed_output_token_count_0": 10,
+        "response_completed_output_token_count_nonzero": 216
+      },
+      "21600s": {
+        "codex_conversation_starts": 58,
+        "response_completed_output_token_count_0": 58,
+        "response_completed_output_token_count_nonzero": 1082
+      }
+    },
+    "queries": [
+      "sum(count_over_time({service_name=\"codex_exec\"} | event_name=\"codex.conversation_starts\" [<span>]))",
+      "sum(count_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count=\"0\" [<span>]))",
+      "sum(count_over_time({service_name=\"codex_exec\"} | event_name=\"codex.sse_event\" | event_kind=\"response.completed\" | output_token_count!=\"0\" [<span>]))"
+    ],
+    "reading": "One response.completed event with output_token_count=0 per codex_exec conversation start in both spans ending at this receipt's window end: the startup prewarm response. The per-process comparison in host/prove.py leaves these events out."
+  },
+  "capacity_observation": {
+    "observed_at_utc": "2026-09-26T17:35:13Z",
+    "evidence_class": "native read-only Prometheus 3.15.0 instant queries run during the review repair; the previous profile was still in place",
+    "codex_exec_series": 1512,
+    "codex_exec_instances": [
+      "unscoped"
+    ],
+    "codex_exec_bucket_series": 1388,
+    "codex_exec_bucket_series_outside_turn_token_usage": 1292,
+    "prometheus_head_series": 10343,
+    "prometheus_blocks_bytes": 83741613,
+    "prometheus_wal_bytes": 48790187,
+    "prometheus_retention_limit_bytes": 536870912,
+    "oldest_sample_age_s": 222809,
+    "size_based_block_deletions_7d": 0,
+    "queries": [
+      "count({job=\"codex_exec\", __name__=~\"ecosystem_codex_.+\"})",
+      "count({job=\"codex_exec\", __name__=~\"ecosystem_codex_.+_bucket\"})",
+      "count({job=\"codex_exec\", __name__=~\"ecosystem_codex_.+_bucket\", __name__!=\"ecosystem_codex_turn_token_usage_bucket\"})",
+      "count by (instance) ({job=\"codex_exec\", __name__=~\"ecosystem_codex_.+\"})",
+      "prometheus_tsdb_head_series{job=\"prometheus\"}",
+      "prometheus_tsdb_storage_blocks_bytes{job=\"prometheus\"}",
+      "prometheus_tsdb_wal_storage_size_bytes{job=\"prometheus\"}",
+      "prometheus_tsdb_retention_limit_bytes{job=\"prometheus\"}",
+      "time() - prometheus_tsdb_lowest_timestamp_seconds{job=\"prometheus\"}",
+      "increase(prometheus_tsdb_size_retentions_total{job=\"prometheus\"}[7d])"
+    ],
+    "reading": "Under the one shared identity, bucket series are 92 percent of the codex_exec series. Per-process identity multiplies these per process; the collector-native scrape now drops the buckets outside turn_token_usage. Storage (blocks + WAL) is 25 percent of the size limit, and no block has been deleted for size."
+  },
+  "checker_note": "The anchored queries in the list above put the modifier inside the brackets ([3600s anchored]), which Prometheus 3.15.0 rejects as a parse error; the feature was also off on this host, so no number in this receipt comes from them. The committed checker, host/prove.py, writes [3600s] anchored; all 20 of its PromQL queries parse on the pinned binary with both features on.",
+  "backend_api_observation": {
+    "observed_at_utc": "2026-09-26T19:17:10Z",
+    "evidence_class": "native read-only HTTP GETs to the loopback Prometheus 3.15.0 and Loki 3.7.8 during review repair 2; the previous profile was still in place; no configuration change",
+    "prometheus_runtimeinfo_format": {
+      "startTime": "2026-09-26T04:56:49.909987988Z",
+      "lastConfigTime": "2026-09-26T04:56:50Z",
+      "reloadConfigSuccess": true
+    },
+    "collector_health_target": [
+      {
+        "scrapePool": "collector-health",
+        "scrapeInterval": "15s",
+        "scrapeTimeout": "10s",
+        "health": "up"
+      }
+    ],
+    "collector_health_up_last_hour": {
+      "query": "up{job=\"collector-health\"}[3600s]",
+      "result_type": "matrix",
+      "series": 1,
+      "samples": 240,
+      "values": [
+        "1"
+      ],
+      "longest_gap_between_samples_s": 15.016,
+      "first_after_window_start_s": 4.031,
+      "last_before_window_end_s": 10.969
+    },
+    "loki_query_range_at_1s_step": [
+      {
+        "query": "sum by (service_instance_id) (count_over_time({service_name=\"codex_exec\"} | service_instance_id!=\"\" [1s]))",
+        "hours": 3,
+        "status": "success",
+        "series": 0,
+        "points_per_series": []
+      },
+      {
+        "query": "sum by (service_instance_id) (count_over_time({service_name=\"codex_exec\"} [1s]))",
+        "hours": 3,
+        "status": "success",
+        "series": 1,
+        "points_per_series": [
+          3262
+        ]
+      },
+      {
+        "query": "sum by (service_instance_id) (count_over_time({service_name=\"codex_exec\"} [1s]))",
+        "hours": 4,
+        "status": "error",
+        "series": 0,
+        "points_per_series": [],
+        "refusal": "exceeded maximum resolution of 11,000 points per time series. Try increasing the value of the step parameter"
+      }
+    ],
+    "reading": "Inputs of the repaired host recipe. apply.sh compares startTime (nanoseconds) with the installed unit and lastConfigTime (whole seconds) with the second in which the config and rules changed. prove.py takes the collector-health scrape interval from /api/v1/targets and reads the raw up samples of the window (a matrix), and asks Loki for 1-second activity spans only up to a 10,000 s window, because Loki refuses more than 11,000 points per series. No codex_exec event carried a service_instance_id yet: the launcher is not installed."
+  }
+}

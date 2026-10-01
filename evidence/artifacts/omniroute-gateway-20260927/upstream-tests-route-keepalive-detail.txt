@@ -1,0 +1,25 @@
+# Detail of the 26-file route/keepalive run on a58000c7 + #14904, extracted by the record's author 2026-09-27T08:29:11Z
+# from its private TAP ($SCRATCH/omniroute-lane/build3/route-tests.tap, 6228 lines, file mtime 2026-09-27T06:46:43Z; it holds local
+# temporary paths, so it is not published). The TAP names tests, not files: the exact command line and the list of
+# the 26 selected upstream test files are NOT retained (reported by the coordinator only).
+
+## Runner totals (grep '^# (tests|suites|pass|fail|cancelled|skipped|todo)')
+# tests 186
+# suites 0
+# pass 184
+# fail 0
+# cancelled 0
+# skipped 2
+# todo 0
+# duration_ms 60337.03218
+
+## The two skipped tests, verbatim (upstream's own skip reason)
+ok 120 - upstream error with 0 bytes forwarded emits error frame # SKIP ReadableStream error simulation hangs in Node.js test runner
+ok 121 - upstream error after partial content does NOT emit error frame # SKIP ReadableStream error simulation hangs in Node.js test runner
+
+## not ok lines (count)
+0
+
+## #14904's cases in this run (grep 'Proxy-wrapped\|proxyNextRequest\|withDeadlineSignal', ok/not ok lines only)
+ok 116 - withDeadlineSignal accepts a Proxy-wrapped request (Next.js proxyNextRequest)
+ok 117 - withDeadlineSignal keeps a body-less GET request valid

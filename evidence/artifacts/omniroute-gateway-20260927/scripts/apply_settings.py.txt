@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Apply the Codex-pool routing and compression settings to the loopback OmniRoute, then read them back.
+
+Sources (release/v3.8.51 a58000c7):
+- docs/guides/CODEX-CLI-CONFIGURATION.md "Session affinity": sessionAffinityTtlMs defaults to 0, so each turn of a
+  Codex conversation can land on a different pooled account and lose prompt-cache continuity; set it above the
+  task length (14400000 = 4 h). Validated range 0..86400000 (src/shared/validation/settingsSchemas.ts:265).
+- src/sse/services/auth.ts:1952-1957: direct provider calls pick an account by providerStrategies[<provider>]
+  .fallbackStrategy, else fallbackStrategy, else "fill-first"; affinity runs first when the TTL is above 0.
+  docs/routing/AUTO-COMBO.md: for multi-account rotation on one model use round-robin with sticky limit 1.
+  promptCacheAffinityEnabled stays true (default).
+- open-sse/handlers/chatCore.ts:1429-1449 and services/compression/exclusions.ts: a58000c7 no longer bypasses
+  compression for native Codex passthrough; upstream's remedy is the "codex/*" exclusion. The stored list is
+  replaced on write, so read, merge and write. Compression itself stays disabled (the seeded default).
+Prints setting names and values only.
+"""
+import json
+import urllib.request
+
+BASE = "http://127.0.0.1:20128"
+
+
+def call(method, path, body=None):
+    data = json.dumps(body).encode() if body is not None else None
+    request = urllib.request.Request(BASE + path, data=data, method=method,
+                                     headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return response.status, json.load(response)
+
+
+status, _ = call("PATCH", "/api/settings", {
+    "sessionAffinityTtlMs": 14_400_000,
+    "providerStrategies": {"codex": {"fallbackStrategy": "round-robin", "stickyRoundRobinLimit": 1}},
+})
+print("PATCH /api/settings ->", status)
+_, compression = call("GET", "/api/settings/compression")
+exclusions = list(compression.get("exclusions") or [])
+if "codex/*" not in exclusions:
+    exclusions.append("codex/*")
+    status, _ = call("PUT", "/api/settings/compression", {"exclusions": exclusions})
+    print("PUT /api/settings/compression ->", status)
+
+_, settings = call("GET", "/api/settings")
+_, compression = call("GET", "/api/settings/compression")
+_, thinking = call("GET", "/api/settings/thinking-budget")
+print("read-back:", json.dumps({
+    "sessionAffinityTtlMs": settings.get("sessionAffinityTtlMs"),
+    "providerStrategies": settings.get("providerStrategies"),
+    "fallbackStrategy": settings.get("fallbackStrategy"),
+    "promptCacheAffinityEnabled": settings.get("promptCacheAffinityEnabled"),
+    "requireLogin": settings.get("requireLogin"),
+    "mcpEnabled": settings.get("mcpEnabled"),
+    "a2aEnabled": settings.get("a2aEnabled"),
+    "compression": {k: compression.get(k) for k in ("enabled", "defaultMode", "exclusions")},
+    "thinkingBudgetMode": thinking.get("mode"),
+}))

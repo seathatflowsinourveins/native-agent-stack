@@ -1,0 +1,106 @@
+# codex app-server config/read and config/batchWrite probes, codex-cli 0.157.1, scratch CODEX_HOME, bwrap
+# --unshare-net; 2026-09-26T22:39:49Z to 2026-09-26T22:40:00Z
+# 1. scripts/probe_as.py.txt: a stale expectedVersion, the lane's two edits, an unknown key, a wrong type, a
+#    delete of an absent key
+init {"id": 1, "result": {"userAgent": "nas_probe/0.157.1 (Ubuntu 24.4.0; x86_64) unknown (nas_probe; 0.0.1)", "codexHome": "$SCRATCH/pd/probe/home-w1/.codex", "platformFamily": "unix", "platformOs": "linux"}}
+layer {"type": "user", "file": "$SCRATCH/pd/probe/home-w1/.codex/config.to version sha256:452a65d3043ff95360630736be2babfdbc87c0add6b6911740f1e disabled None
+layer {"type": "system", "file": "/etc/codex/config.toml"} version sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c06 disabled None
+origins sample [('plugins.context-mode@context-mode.enabled', {'name': {'type': 'user', 'file': '$SCRATCH/pd/probe/home-w1/.codex/config.toml', 'profile': None}, 'version': 'sha256:452a65d3043ff95360630736be2babfdbc87c0add6b6911740f1e8363fb56b5c'}), ('model', {'name': {'type': 'user', 'file': '$SCRATCH/pd/probe/home-w1/.codex/config.toml', 'profile': None}, 'version': 'sha256:452a65d3043ff95360630736be2babfdbc87c0add6b6911740f1e8363fb56b5c'}), ('features.daemon_auto_start', {'name': {'type': 'user', 'file': '$SCRATCH/pd/probe/home-w1/.codex/config.toml', 'profile': None}, 'version': 'sha256:452a65d3043ff95360630736be2babfdbc87c0add6b6911740f1e8363fb56b5c'})]
+user version sha256:452a65d3043ff95360630736be2babfdbc87c0add6b6911740f1e8363fb56b5c
+stale-version write {"error": {"code": -32600, "data": {"config_write_error_code": "configVersionConflict"}, "message": "Configuration was modified since last read. Fetch latest version and retry."}, "id": 3}
+write {"id": 4, "result": {"status": "ok", "version": "sha256:12daf0bb87ce975ecb82dc485c985418667453fda885677ded7370519c00dfb7", "filePath": "$SCRATCH/pd/probe/home-w1/.codex/config.toml", "overriddenMetadata": null}}
+unknown key write {"id": 5, "result": {"status": "ok", "version": "sha256:cb3dec2db7137f9547c15804c514b98c5e5bc1ccac3c7ca302a793457b040afe", "filePath": "$SCRATCH/pd/probe/home-w1/.codex/config.toml", "overriddenMetadata": null}}
+bad type write {"error": {"code": -32600, "data": {"config_write_error_code": "configValidationError"}, "message": "Invalid configuration: invalid type: string \"sixty\", expected f64\nin `mcp_servers.context-mode.startup_timeout_sec`\n"}, "id": 6}
+delete absent {"id": 7, "result": {"status": "ok", "version": "sha256:cb3dec2db7137f9547c15804c514b98c5e5bc1ccac3c7ca302a793457b040afe", "filePath": "$SCRATCH/pd/probe/home-w1/.codex/config.toml", "overriddenMetadata": null}}
+rc 0 stderr tail: WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir "/tmp" (codex_home: AbsolutePathBuf("$SCRATCH/pd/probe/home-w1/.codex"))
+
+rc=0
+# config.toml before -> after (diff)
+11a12,21
+> [mcp_servers.context-mode]
+> command = "/x/bin/node"
+> args = ["/x/start.mjs"]
+> startup_timeout_sec = 60
+> default_tools_approval_mode = "approve"
+> bogus_key = 1
+>
+> [mcp_servers.context-mode.env]
+> CONTEXT_MODE_PLATFORM = "codex"
+>
+13a24,26
+>
+> [plugins."context-mode@context-mode".mcp_servers.context-mode]
+> enabled = false
+
+# 2. scripts/probe_delete.py.txt: write two nested keys, delete the leaves, then delete the table the write created
+== before
+model = "gpt-6-astra"
+
+[mcp_servers.headroom]
+command = "/x/headroom"
+
+[mcp_servers.headroom.env]
+HEADROOM_OFFLINE = "1"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[features]
+hooks = true
+
+write {"id": 2, "result": {"status": "ok", "version": "sha256:a2272bf3cb6d6cf683d975a307d81c3783d8b3062b3a33199123a656dcc3ce34", "filePath": "$SCRATCH/...
+== after write
+model = "gpt-6-astra"
+
+[mcp_servers.headroom]
+command = "/x/headroom"
+
+[mcp_servers.headroom.env]
+HEADROOM_OFFLINE = "1"
+HF_HUB_OFFLINE = "1"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+enabled = false
+
+[features]
+hooks = true
+
+delete leaves {"id": 3, "result": {"status": "ok", "version": "sha256:29c9e7524e5889a8c45ffb0446cd9cbf5f0997b5a1e430ab021c655e1edc059b", "filePath": "$SCRATCH/...
+== after leaf delete
+model = "gpt-6-astra"
+
+[mcp_servers.headroom]
+command = "/x/headroom"
+
+[mcp_servers.headroom.env]
+HEADROOM_OFFLINE = "1"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+
+[features]
+hooks = true
+
+delete parent {"id": 4, "result": {"status": "ok", "version": "sha256:9358697d2b43fef3e6368857adc5adc75fa38b60fb573c874f0af0fc56ea9cff", "filePath": "$SCRATCH/...
+== after parent delete
+model = "gpt-6-astra"
+
+[mcp_servers.headroom]
+command = "/x/headroom"
+
+[mcp_servers.headroom.env]
+HEADROOM_OFFLINE = "1"
+
+[plugins."context-mode@context-mode"]
+enabled = true
+
+[features]
+hooks = true
+
+rc=0
+BYTE-IDENTICAL after deleting the created table

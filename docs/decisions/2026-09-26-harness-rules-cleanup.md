@@ -158,3 +158,64 @@ These count artifacts, not Claude's tokenizer or billed usage. Words are whitesp
 - This workstation's `~/.claude/CLAUDE.md` predates #196, #272 and #294: it still says "Keep routine tasks at ordinary
   effort" and has no top rule, `effort: 'max'`, StructuredOutput or refusal sentence (grep counts, 2026-09-26). The
   post-merge sync replaces the merged copy whole, as the profile recipe now says.
+
+## Addendum (2026-09-28): `CLAUDE.md` gains a Compact Instructions section
+
+This amends the scope sentence under **Decision** without reversing it. The project `CLAUDE.md` now keeps its
+`@AGENTS.md` import, the one Claude-specific rule and a `## Compact Instructions` section, which is Claude-specific
+too: it names what a compaction summary preserves (each modified file's branch or worktree, test and acceptance
+commands with exit codes, each open claim's provenance, failed attempts, open review findings, unresolved gaps and
+workflow run IDs). Item AN-02 of the [2026-09-27 review](2026-09-28-community-sweep.md#applied-in-this-change).
+
+- **Source.** [How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works): "To control what's
+  preserved during compaction, add a "Compact Instructions" section to CLAUDE.md or run `/compact` with a focus".
+  [Memory](https://code.claude.com/docs/en/memory#instructions-seem-lost-after-compact): project-root CLAUDE.md is
+  re-read from disk after `/compact`. The installed 2.1.283 summarizer prompt contains the `## Compact Instructions`
+  heading (static read of the binary). Both pages fetched 2026-09-28.
+- **Wording.** Checked against the installed writing-for-agents skill (its no-op, negation and leading-word tests):
+  the section states positive targets and names only what the built-in summary lacks. The 2.1.283 summarizer prompt
+  already asks for the files "examined, modified, or created" (static read of the binary), so the section asks for
+  each modified file's branch or worktree rather than the file list.
+- **Scope of the claim.** This section is the only web-documented way to steer automatic compaction: a `/compact`
+  focus applies to a manual compaction, and the web [hooks page](https://code.claude.com/docs/en/hooks#precompact)
+  documents PreCompact blocking but not its stdout. The 2.1.283 in-product `/hooks` text does document one: for
+  PreCompact, "Exit code 0 - stdout appended as custom compact instructions".
+- **PreCompact audit (precondition, 2026-09-28).** Run once each with scratch state, both installed PreCompact hooks
+  printed a JSON object on stdout. ai-memory 2.4.1 `hook --event pre-compact`, run with a scratch data directory and
+  an unreachable server URL, exited 0 with 3 bytes of stdout (`{}` and a newline) and no stderr. context-mode 1.0.169
+  `hooks/precompact.mjs` (line 99, `console.log(JSON.stringify({}))`), run with a scratch `CLAUDE_CONFIG_DIR`, exited
+  0 with the same 3 bytes and no stderr. ai-memory's output with the host's live server was not observed; because the
+  in-product `/hooks` text appends PreCompact exit-0 stdout as custom compact instructions, that case bears on M17 of
+  the [2026-09-27 review](2026-09-28-community-sweep.md#keep-but-compare). Transcripts hold no PreCompact hook
+  records, so whether an empty JSON object reaches the summarizer as custom instructions is not established. The
+  section is added either way.
+- **Timing.** A session already running keeps the `CLAUDE.md` it loaded at start: its next summarization request
+  reuses the conversation's system prompt, tools and history, and the new file loads on the next `/clear`, `/compact`
+  or restart, when the project context layer misses the cache once
+  ([prompt caching](https://code.claude.com/docs/en/prompt-caching)). Land the change before or after a #381 E2E
+  execution, never during one, because `CLAUDE.md` loads into every child whose agent does not set
+  `omitClaudeMd: true` (ORCH-05 of the [harness rules convergence](../harness-rules-convergence-20260922.md); among
+  the shipped agents the three `blind-*` roles, `source-scout` and `stack-verifier` set it).
+- **Check and overturn.** In a session started after the edit, `/memory` or `/context` lists the section, and after
+  one `/compact` the summary keeps the listed items. Remove the section if a recorded compaction pair shows it adds
+  nothing.
+
+## Addendum (2026-09-29): the trading wave rules move to `blueprints/us-equities/AGENTS.md`
+
+This amends the scope sentence under **Decision** ("`AGENTS.md` keeps trading-only rules under **Trading north star**") without reversing
+it. The root `AGENTS.md` keeps the Trading north star paragraph with the paper-lane authorization, and gains one pointer line. The
+wave-specific paragraphs (architecture and research waves, the simulation-research wave, data readiness, authenticated data and the
+catalyst-convergence wave; 2,647 bytes) moved unchanged to `blueprints/us-equities/AGENTS.md`, whose sibling `CLAUDE.md` imports it, the same
+pattern as `blueprints/convergence-practice/application-delivery/`. The reason is the size tax the `claude-api` prompt-audit guide names in its
+Group 2: the block loaded into every session and every child that reads the project `AGENTS.md`, whether or not the work touched the trading lane.
+
+- **Loading.** Claude Code loads a nested `CLAUDE.md` when it reads files in that directory
+  ([memory](https://code.claude.com/docs/en/memory)). Codex reads the Codex-home file and the root-to-working-directory chain (line 42 above),
+  so a Codex session started at the repository root sees the pointer line, not the moved text. The pointer says to read the file before a
+  trading research wave, experiment, data acquisition, strategy-gate change or decision-array registration.
+- **Acknowledgement.** The trading lane (`ecosystem-roadmap-2026`, which holds it per
+  [the roadmap record](2026-09-28-ecosystem-roadmap.md)) acknowledged the move on PR #499 at head `715e043c`. The later pointer wording and the
+  restored scope of one sentence in `examples/claude-native/CLAUDE.md` follow an independent review of that head.
+- **Check and overturn.** A trading session, review or receipt that shows a moved rule was missed at the point of use moves the paragraph back
+  to the root; so does a Claude Code or Codex release that changes how nested instruction files load. Agents that set `omitClaudeMd` never
+  loaded the root `AGENTS.md`, and whether that setting also suppresses a nested load was not established here.

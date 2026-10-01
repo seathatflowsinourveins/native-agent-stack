@@ -19,9 +19,13 @@ from urllib.parse import quote, urlsplit
 
 try:
     from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from .component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
+                                   OUTPUT_JSON as COMPONENT_MATRIX)
     from .landscape import build_landscape
 except ImportError:
     from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from component_matrix import (CONVERGENCE_FACTOR_VALUES, CONVERGENCE_FACTORS, CONVERGENCE_LAYER_STATES,
+                                  OUTPUT_JSON as COMPONENT_MATRIX)
     from landscape import build_landscape
 
 
@@ -36,6 +40,11 @@ REVIEW = "catalogs/convergence-practice/source-review.json"
 ADOPTION = "adoption/manifest.json"
 SATURATION = "blueprints/token-native-focus/saturation-audit.json"
 TOKEN_TOPIC = "docs/token-efficiency-stack.json"
+# A dated topic edition gives every row a per-tool card or an explicit marker. Each
+# card block keeps its own evidence class; pins always come from manifests/stack.json.
+TOKEN_TOPIC_CARD_BLOCKS = ("upstream", "native_adaptation", "e2e_returned_results",
+                           "adapted_performance", "invoke_rates", "gpt6_review")
+TOKEN_TOPIC_NO_CARD = "no card in this edition"
 FOUNDATION_SURFACES = "catalogs/foundation/surfaces.json"
 SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
 TOKEN_RECEIPTS = (
@@ -104,6 +113,13 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "blueprints/token-native-focus/saturation-audit.json",
                     "blueprints/us-equities/north-star.md"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
+# The convergence-by-layer fields the page shows; per-component detail stays in the linked matrix.
+CONVERGENCE_LAYER_FIELDS = ("layer_state", "verdict_checked_at", "reopened_by", "in_use", "converged", "all_rows",
+                            "recorded_winner_rows", "factors", "unresolved", "manifest_layer_found",
+                            "winners_without_manifest_row", "invoke", "invoke_reason")
+CONVERGENCE_SUMMARY_FIELDS = ("frozen_at", "definitions", "sources", "layer_states", "catalogs", "overall",
+                              "newest_manifest", "newest_verdict_checked_at", "manifest_layers_without_matrix_row")
+CONVERGENCE_SCOPE_COUNTS = ("layers", "in_use", "converged", "unresolved")
 
 
 def require(condition, message):
@@ -321,6 +337,154 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, r
         if target.get(key):
             trading[key + "_source"] = sources([target[key]])[0]
     return {"foundation": foundation, "trading": trading}
+
+
+def build_convergence(root, read, file_url):
+    """The convergence-by-layer block of the generated component evidence matrix
+    (scripts/component_matrix.py), or None without that matrix. The page renders only these counts,
+    definitions and dates; a block that disagrees with its own layer rows fails the build."""
+    if not safe_file(root, COMPONENT_MATRIX).is_file():
+        return None
+    matrix = read(COMPONENT_MATRIX)
+    block = (matrix.get("summary") or {}).get("convergence") if isinstance(matrix, dict) else None
+    require(isinstance(block, dict) and all(key in block for key in CONVERGENCE_SUMMARY_FIELDS),
+            "the component matrix has no convergence block; run python3 scripts/component_matrix.py --write")
+    rows = matrix.get("rows")
+    require(isinstance(rows, list) and all(isinstance(row, dict) for row in rows),
+            "component matrix rows must be a list of objects")
+
+    def count(value):
+        return type(value) is int and value >= 0
+
+    layers, states, scopes = [], dict.fromkeys(CONVERGENCE_LAYER_STATES, 0), {}
+    for row in rows:
+        layer = row.get("convergence")
+        require(isinstance(layer, dict), "every component matrix row needs a convergence object")
+        require(isinstance(row.get("catalog"), str) and isinstance(row.get("layer_id"), str),
+                "a convergence row needs its catalog and layer_id")
+        require(layer.get("layer_state") in CONVERGENCE_LAYER_STATES, "unknown convergence layer_state")
+        require(all(count(layer.get(key)) for key in ("in_use", "converged", "all_rows", "recorded_winner_rows")),
+                "convergence counts must be nonnegative integers")
+        factors = layer.get("factors")
+        require(isinstance(factors, dict) and set(factors) == set(CONVERGENCE_FACTORS)
+                and all(isinstance(values, dict) and set(values) == set(CONVERGENCE_FACTOR_VALUES)
+                        and all(count(value) for value in values.values()) for values in factors.values()),
+                "convergence factors need true/false/unknown integer counts")
+        require(all(sum(values.values()) == layer["in_use"] for values in factors.values()),
+                "convergence factor counts must add up to in_use")
+        unresolved, reopened = layer.get("unresolved"), layer.get("reopened_by")
+        require(isinstance(unresolved, list) and all(isinstance(item, dict) and isinstance(item.get("reason"), str)
+                                                     for item in unresolved),
+                "every unresolved convergence row needs its reason")
+        require(isinstance(reopened, list) and all(isinstance(item, dict) and isinstance(item.get("date"), str)
+                                                   for item in reopened),
+                "convergence reopened_by needs dated sweeps")
+        require(layer["converged"] <= min(values["true"] for values in factors.values())
+                and layer["in_use"] + len(unresolved) <= layer["all_rows"]
+                and layer["recorded_winner_rows"] <= layer["all_rows"], "convergence counts are inconsistent")
+        require(layer["converged"] == 0 or layer["layer_state"] == "confirmed_current",
+                "only a confirmed_current layer can have converged components")
+        found, orphans = layer.get("manifest_layer_found"), layer.get("winners_without_manifest_row")
+        require(isinstance(found, bool) and (found or layer["all_rows"] == 0),
+                "convergence manifest_layer_found must be true or false, and false only for a layer without "
+                "manifest rows")
+        require(isinstance(orphans, list) and all(isinstance(item, str) and bool(item) for item in orphans),
+                "convergence winners_without_manifest_row must list component ids")
+        require(layer.get("invoke") is not None
+                or (isinstance(layer.get("invoke_reason"), str) and bool(layer["invoke_reason"].strip())),
+                "a null invoke needs its reason")
+        states[layer["layer_state"]] += 1
+        scope = scopes.setdefault(row["catalog"], dict.fromkeys(CONVERGENCE_SCOPE_COUNTS, 0))
+        for key, value in (("layers", 1), ("in_use", layer["in_use"]), ("converged", layer["converged"]),
+                           ("unresolved", len(unresolved))):
+            scope[key] += value
+        layers.append({"catalog": row["catalog"], "layer_id": row["layer_id"], "title": text(row.get("title")),
+                       **{key: layer.get(key) for key in CONVERGENCE_LAYER_FIELDS}})
+    overall = {key: sum(scope[key] for scope in scopes.values()) for key in CONVERGENCE_SCOPE_COUNTS}
+    for scope in (*scopes.values(), overall):
+        scope["share"] = round(scope["converged"] / scope["in_use"], 4) if scope["in_use"] else None
+    catalogs = block["catalogs"]
+    empty = {**dict.fromkeys(CONVERGENCE_SCOPE_COUNTS, 0), "share": None}
+    require(block["layer_states"] == states and block["overall"] == overall and isinstance(catalogs, dict)
+            and set(scopes) <= set(catalogs)
+            and all(catalogs[catalog] == scopes.get(catalog, empty) for catalog in catalogs),
+            "the convergence summary differs from its layer rows")
+    definitions = block["definitions"]
+    require(isinstance(definitions, list) and bool(definitions)
+            and all(isinstance(item, dict) and all(isinstance(item.get(key), str) and item[key].strip()
+                                                   for key in ("term", "definition")) for item in definitions),
+            "convergence definitions must be a nonempty list of terms and definitions")
+    unmatched = block["manifest_layers_without_matrix_row"]
+    require(isinstance(unmatched, list)
+            and all(isinstance(item, dict) and isinstance(item.get("catalog"), str)
+                    and isinstance(item.get("layer_id"), str) for item in unmatched)
+            and not ({(item["catalog"], item["layer_id"]) for item in unmatched}
+                     & {(layer["catalog"], layer["layer_id"]) for layer in layers}),
+            "convergence manifest_layers_without_matrix_row must list manifest layers that have no matrix row")
+    manifest, sources = block["newest_manifest"], block["sources"]
+    require(manifest is None or (isinstance(manifest, dict) and isinstance(manifest.get("path"), str)
+                                 and isinstance(manifest.get("checked_at"), str)),
+            "the newest convergence sweep manifest needs its path and checked_at")
+    require(isinstance(sources, dict) and isinstance(sources.get("completed_sweeps"), list)
+            and isinstance(sources.get("host_e2e_platform"), str)
+            and isinstance(block["newest_verdict_checked_at"], dict) and isinstance(block["frozen_at"], str),
+            "convergence sources need their sweeps, platform and dates")
+    return {"url": file_url(COMPONENT_MATRIX), **{key: block[key] for key in CONVERGENCE_SUMMARY_FIELDS},
+            "layers": layers}
+
+
+def token_topic_card(card, edition_date, stack_version, root):
+    """Validate one topic row's dated tool card. Returns (card, pin drift note, missing-card marker)."""
+    require(edition_date is not None and isinstance(card, dict) and card.get("edition") == edition_date,
+            "token topic row needs a card of this edition")
+    if card.get("status") == TOKEN_TOPIC_NO_CARD:
+        require(set(card) == {"status", "edition"}, "a row without a card carries only the edition marker")
+        return dict(card), None, f"No card in this edition ({edition_date})"
+    require(card.get("status") == "present", "unknown token topic card status")
+    recorded = card.get("recorded_pin")
+    require(isinstance(recorded, str) and bool(recorded.strip()), "token topic card needs its recorded pin")
+    source = card.get("source")
+    require(isinstance(source, dict) and isinstance(source.get("path"), str)
+            and source["path"].startswith("evidence/artifacts/"),
+            "token topic card source must be a public evidence artifact")
+    raw = safe_file(root, source["path"]).read_bytes()
+    require(type(source.get("bytes")) is int and source["bytes"] == len(raw) and source.get("sha256") == digest(raw),
+            "token topic card source hash or size mismatch")
+    for block in TOKEN_TOPIC_CARD_BLOCKS:
+        value = card.get(block)
+        require(isinstance(value, dict) and isinstance(value.get("evidence_class"), str)
+                and bool(value["evidence_class"].strip()),
+                "token topic card needs " + block + " with its evidence class")
+    # The page renders these upstream fields as links, so each passes the same public_url gate as every other
+    # external source link; a field without a URL renders as plain text.
+    upstream = card["upstream"]
+    install = upstream.get("recommended_install")
+    links = [("upstream.recommended_install.url", install.get("url") if isinstance(install, dict) else None)]
+    for field in ("recommended_wiring", "new_since_pin", "limitations"):
+        items = upstream.get(field, [])
+        require(isinstance(items, list), f"token topic card {source['path']}: upstream.{field} must be a list")
+        links.extend((f"upstream.{field}[{index}].url", item.get("url") if isinstance(item, dict) else None)
+                     for index, item in enumerate(items))
+    for field, url in links:
+        require(url is None or bool(public_url(url)),
+                f"token topic card {source['path']}: {field} must be a public HTTPS URL")
+    comparisons = card["adapted_performance"].get("per_payload_and_lane", [])
+    require(isinstance(comparisons, list), "token topic card comparisons must be a list")
+    for entry in comparisons:
+        # Each figure stays in its own lane, payload and evidence class; nothing is summed across them.
+        require(isinstance(entry, dict) and all(isinstance(entry.get(key), str) and entry[key].strip()
+                                                for key in ("lane", "payload", "evidence_class")),
+                "token topic card comparison needs its lane, payload and evidence class")
+        before, after, change = (entry.get(key) for key in ("before_tokens", "after_tokens", "change_pct"))
+        require(type(before) is int and type(after) is int and before > 0 and after >= 0
+                and type(change) in (int, float) and abs((after - before) * 100 / before - change) <= 0.05 + 1e-9,
+                "token topic card comparison counts are inconsistent")
+    drift = None
+    if recorded != stack_version:
+        drift = (f"Pin drift: this card recorded {recorded}; {STACK} now pins {stack_version}. The card's "
+                 f"upstream, E2E, performance and review facts describe {recorded} until a newer card edition "
+                 "is recorded.")
+    return dict(card), drift, None
 
 
 def build_data(root):
@@ -635,13 +799,31 @@ def build_data(root):
         topic_source = read(TOKEN_TOPIC)
         require(topic_source.get("schema_version") == 1, "unsupported token topic schema")
         require(isinstance(topic_source.get("rows"), list), "token topic rows must be a list")
+        edition = topic_source.get("edition")
+        require(edition is None or (isinstance(edition, dict) and isinstance(edition.get("date_utc"), str)
+                                    and bool(re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", edition["date_utc"]))
+                                    and isinstance(edition.get("source_paths", []), list)),
+                "token topic edition needs its date and evidence paths")
+        edition_date = edition["date_utc"] if edition else None
+        if edition:
+            # A dated edition and its card artifacts are newer than the immutable base:
+            # resolve them at the publication ref, with exact input hashes retained.
+            current_public_paths.add(TOKEN_TOPIC)
+            current_public_paths.update(edition.get("source_paths", []))
+            current_public_paths.update(row["card"]["source"]["path"] for row in topic_source["rows"]
+                                        if isinstance(row.get("card"), dict)
+                                        and isinstance(row["card"].get("source"), dict)
+                                        and isinstance(row["card"]["source"].get("path"), str))
         selected_by_id = {row["id"]: row for row in selected}
+        stack_by_id = {component["id"]: component for component in stack["components"]}
         topic_ids = set()
         topic_rows = []
         for row in topic_source["rows"]:
             identifier = row.get("component_id")
             require(identifier in selected_by_id and identifier not in topic_ids,
                     "token topic component must be selected and unique")
+            require(not {"version", "pin", "repository"} & set(row),
+                    "token topic pins come from manifests/stack.json, not the row")
             require(row.get("group") in {"core", "observation", "runtime"},
                     "unknown token topic group")
             require(isinstance(row.get("source_paths"), list) and row["source_paths"],
@@ -657,19 +839,39 @@ def build_data(root):
                     "token topic needs an upstream use command")
             topic_ids.add(identifier)
             component = selected_by_id[identifier]
+            pinned = stack_by_id[identifier]
             item = dict(row)
             item.update(repository=component["repository"], version=component["version"],
-                        recipe_path=component["recipe_path"], sources=[])
+                        recipe_path=component["recipe_path"], sources=[],
+                        pin={"version": component["version"], "repository": pinned.get("repository", ""),
+                             "source": STACK},
+                        pin_drift=None, card_marker=None)
             for path in item.pop("source_paths"):
                 track(path)
                 item["sources"].append({"path": path, "url": file_url(path)})
+            if edition or "card" in row:
+                card, item["pin_drift"], item["card_marker"] = token_topic_card(
+                    row.get("card"), edition_date, component["version"], root)
+                if "source" in card:
+                    track(card["source"]["path"])
+                    card["source"] = {**card["source"], "url": file_url(card["source"]["path"])}
+                item["card"] = card
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
+        if edition:
+            sources = []
+            for path in edition.get("source_paths", []):
+                require(isinstance(path, str), "token topic edition evidence path must be text")
+                track(path)
+                sources.append({"path": path, "url": file_url(path)})
+            token_topic["edition"] = {**{key: value for key, value in edition.items() if key != "source_paths"},
+                                      "sources": sources}
     grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
     landscape = None
     if config.get("landscape_manifest"):
         landscape = build_landscape(root, config["landscape_manifest"], read=read,
                                     track=track, file_url=file_url)
+    convergence = build_convergence(root, read, file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
@@ -679,7 +881,7 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs, "landscape": landscape,
+            "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),

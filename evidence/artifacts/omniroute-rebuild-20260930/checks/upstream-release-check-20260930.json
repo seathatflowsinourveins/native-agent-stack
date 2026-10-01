@@ -1,0 +1,41 @@
+{
+ "observed_utc": "2026-09-30T04:53:59Z",
+ "ls_remote": {
+  "refs/heads/main": "fc5e2bccd4f70fecf5aab94dfb8136c74ab5a21b",
+  "refs/heads/release/v3.8.51": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+  "refs/heads/release/v3.8.52": "a1a2dce1a64a4b123f80ec899fc88bb2aa34d1a4",
+  "refs/tags/v3.8.51": "770faa7144f58ada625afc6efe572c8335484ec4",
+  "refs/tags/v3.8.51^{}": "c1e30b7676975feb298b49eff6ff58923c04b89e"
+ },
+ "tag": {
+  "object": "770faa7144f58ada625afc6efe572c8335484ec4",
+  "commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+  "tagger_time_utc": "2026-09-30T01:41:23Z",
+  "subject": "Release v3.8.51",
+  "author_time_utc": "2026-09-29T19:58:13-03:00",
+  "parents": [
+   "443d66996d69d7ecf887fd61158404a3cca1b192"
+  ]
+ },
+ "trees": {
+  "release_v3.8.51_tip": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+  "tag_commit": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+  "equal": true
+ },
+ "release_tip_is_ancestor_of_tag_commit": false,
+ "npm": {
+  "dist_tags": {
+   "latest": "3.8.51"
+  },
+  "published_3.8.51": "2026-09-30T02:54:04.736Z",
+  "published_3.8.50": "2026-08-28T16:19:48.276Z",
+  "has_3.8.52": false
+ },
+ "pr_13788": {
+  "headRefOid": "6c7990058c4ce9677de79452c8cefb10b4bf1b3d",
+  "state": "OPEN",
+  "title": "[defer] feat(search): implement /v1/alpha/search endpoint for Codex native web search (fixes #8674)",
+  "updatedAt": "2026-09-29T11:25:00Z"
+ },
+ "finished_utc": "2026-09-30T04:54:00Z"
+}

@@ -1,0 +1,539 @@
+{
+ "tool": "repomix",
+ "group": "g5-conversion-packing",
+ "repo": "https://github.com/yamadashy/repomix",
+ "pin": "1.18.1 (npm; source 80b4280a)",
+ "installed_version": "1.18.1 (native `repomix --version`)",
+ "role": "Packs explicitly chosen files for handoff; --compress gives a lossy structural outline. Lanes: CLI (Claude/Codex handoffs). Counter: its own pack summary (o200k). Landscape: token-efficiency alternative.",
+ "lanes": [
+  "CLI: repomix --include ... --style xml [--compress]"
+ ],
+ "upstream": {
+  "latest_release": "v1.18.1",
+  "latest_date": "2026-09-21",
+  "our_pin": "1.18.1; source 80b4280a9196feace092fc672dfe2b5fac62ef08 in manifests/stack.json:789; upstream release identity: https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+  "behind_by": "0 published releases, confirmed against https://github.com/yamadashy/repomix/releases/latest and the live release list. Unreleased main is 28 commits ahead at 75f9f860548c10f955e4730f7961947780104443: https://github.com/yamadashy/repomix/compare/v1.18.1...75f9f860548c10f955e4730f7961947780104443",
+  "recommended_install": {
+   "command": "npm install -g repomix",
+   "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#quick-start"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "Upstream publishes `claude mcp add repomix -- npx -y repomix --mcp`. Its official plugin route is `/plugin marketplace add yamadashy/repomix`, then `/plugin install repomix-mcp@repomix`; repomix-commands@repomix and repomix-explorer@repomix are additional published plugins.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#claude-code-plugins"
+   },
+   "codex": {
+    "how": "Upstream explicitly documents `npx skills add yamadashy/repomix --skill repomix-explorer --agent codex` for its standalone Explorer skill. This is published skill guidance, not evidence that this stack installed the skill or registered an MCP server.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#repomix-explorer-skill-agent-skills"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Live GitHub release metadata identifies v1.18.1, published 2026-09-21, as the latest release; its tagged source is 80b4280a9196feace092fc672dfe2b5fac62ef08.",
+    "url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+   },
+   {
+    "claim": "The README offers `npx repomix@latest` for a one-off run and an npm global installation for repeat use (https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#quick-start); the pinned package requires Node.js >=22.0.0.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/package.json"
+   },
+   {
+    "claim": "Repomix packages repository content for AI consumption, with explicit include/ignore selection and XML, Markdown, JSON or plain output. Its counters describe the packed representation.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md"
+   },
+   {
+    "claim": "Tree-sitter compression is advertised as preserving function/method signatures, classes and types while removing implementation details; the compression guide labels this feature experimental.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/website/client/src/en/guide/code-compress.md"
+   },
+   {
+    "claim": "The MCP surface supports packing followed by selective searching and reading. Its README recommends incremental retrieval and says compression is generally unnecessary for that workflow.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#mcp-server-integration"
+   },
+   {
+    "claim": "The current release already contains the repository-local Git-helper execution fix and fixes for Windows ignore handling, comment removal and split-output directory trees; these are benefits already present in the pin.",
+    "url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Compression intentionally removes implementation detail, so it is lossy. The checked compression guide and README do not warn specifically that Python multiline signatures can disappear; the guide instead lists function and method signatures among preserved structures.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/website/client/src/en/guide/code-compress.md"
+   },
+   {
+    "text": "Confirmed source defect at the pinned commit: PythonParseStrategy.getFunctionSignature reads only lines[startRow] and requires the closing parenthesis and colon on that same line (lines 81-85). parseFunctionDefinition returns a null result when that match fails (lines 100-106), causing multiline Python function and method definitions to be omitted.",
+    "url": "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81"
+   },
+   {
+    "text": "Open issue #1876 documents wildcard-ending built-in ignore patterns failing to exclude previous packs and logs. The report was made against an earlier release; the current main comparison contains no source fix for this path (https://github.com/yamadashy/repomix/compare/v1.18.1...75f9f860548c10f955e4730f7961947780104443).",
+    "url": "https://github.com/yamadashy/repomix/issues/1876"
+   },
+   {
+    "text": "Open issue #1874 reports failed packs with empty diagnostics under --quiet or stdout output. Empty output is not a success signal; consumers need the actual exit status and a fresh artifact.",
+    "url": "https://github.com/yamadashy/repomix/issues/1874"
+   },
+   {
+    "text": "The MCP server can normally access paths available to its process. Upstream's optional --sandbox confines its tool surface to a workspace and disables remote packing and other escaping operations; this is application-level confinement, not an operating-system sandbox.",
+    "url": "https://github.com/yamadashy/repomix/blob/v1.18.1/website/client/src/en/guide/mcp-server.md"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "No newer published release was present in the live release list; v1.18.1 remains latest.",
+    "url": "https://github.com/yamadashy/repomix/releases"
+   },
+   {
+    "text": "The exact comparison to main at 75f9f860548c10f955e4730f7961947780104443 contains dependency, workflow, release-note and generated-schema changes, with no changes under src/ or tests/. In particular, it contains no fix for the pinned Python signature-extraction defect.",
+    "url": "https://github.com/yamadashy/repomix/compare/v1.18.1...75f9f860548c10f955e4730f7961947780104443"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "repomix",
+   "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "version": "1.18.1",
+   "license": "MIT",
+   "profile": "supporting",
+   "role": "Explicit repository packing and structural compression",
+   "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "Pinned npm repomix@1.18.1 in an owned isolated prefix, with the documented command `npm install --prefix \"$NATIVE_TOOLS/repomix-1.18.1\" --save-exact --no-audit --no-fund repomix@1.18.1` and an explicit candidate executable (recipes/native-upgrades-20260921.md:25; recipes/README.md:106). manifests/stack.json:789 records the version and source commit; token-cards/cards/repomix.json records the installed CLI identity.",
+  "claude_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Claude invokes the plain CLI through Bash for a selected-file handoff (docs/token-session-handbook.md:136). The card's separately configured MCP exercise is local integration evidence, not a persistent Claude registration.",
+  "codex_wiring": "The case-insensitive search of adoption/templates/claude.settings.template.json, adoption/templates/codex.config.template.toml, adoption/templates/project.codex.config.template.toml, .codex/config.toml and every file under examples/claude-native/agents/ found no tool-name matches. In these maintained surfaces there is no MCP server registration, no settings.json permission entry and no dedicated example-agent persona. Codex invokes the plain CLI through CommandExecution according to docs/token-session-handbook.md:136; no Repomix-specific Codex skill installation is established by the checked wiring.",
+  "lane_rule": "Choose one useful context method per artifact; use Repomix for explicit-file handoffs and treat compressed output as a lossy outline (docs/token-session-handbook.md:106, docs/token-session-handbook.md:113, docs/token-session-handbook.md:136). Recover original source before correctness decisions or edits (recipes/README.md:106; recipes/README.md:611).",
+  "deviations_from_upstream": [
+   {
+    "what": "The adaptation retains a pinned CLI lane instead of installing upstream's MCP/plugin/Explorer integrations, whose published examples may resolve the latest package.",
+    "why": "The maintained handbook selects on-demand file handoffs, and the checked templates and example agents contain no Repomix integration. CLI packaging is itself an upstream-supported surface.",
+    "fix": "Keep the CLI claim scoped to the actual wiring. If an upstream skill or plugin is adopted later, qualify its resolved executable, retrieval behavior and native-client registration separately.",
+    "pr": null
+   },
+   {
+    "what": "The --compress examples inherit a real upstream Python defect: multiline function/method signatures can vanish entirely. This exceeds the examples' generic warning about omitted implementation detail. Source: https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81",
+    "why": "The extractor tests only the first source line, then discards the function capture on regex failure; this wording describes runtime extraction, not merely unit-test coverage. The retained card shows the full pack finding def status_body and the compressed pack missing it. A fresh in-memory run of the installed parseFile implementation retained single-line function/method controls and omitted their multiline equivalents. The named t1874bad/t1876/out repro artifacts cover separate quiet/ignore defects, not this signature case.",
+    "fix": "Add the explicit multiline-signature caveat beside docs/token-session-handbook.md:136 and recipes/README.md:106. Use uncompressed source for definition lookup; make future fidelity checks assert named definitions and parameters against original syntax, and qualify any eventual upstream fix. Upstream's checked compression documentation calls implementation removal intentional but does not document this specific omission.",
+    "pr": null
+   },
+   {
+    "what": "The card's older function-count PASS is contradicted by the retained missing-definition result; the returned-results status is partial.",
+    "why": "A name/count assertion did not establish that definitions and complete signatures survived. Calls can still mention status_body after its definition is omitted (token-cards/cards/repomix.json).",
+    "fix": "Preserve the partial verdict and the failing named-definition evidence; do not interpret the retained size comparison as faithful structural coverage or provider savings.",
+    "pr": null
+   },
+   {
+    "what": "Retained local ignore/quiet repro artifacts show older packs entering a new pack and failed quiet operations producing no diagnostics.",
+    "why": "These reproduce separate upstream selection/error-reporting limitations described in #1876 and #1874; successful packing alone does not prove the selected manifest is correct.",
+    "fix": "Document explicit file selection, inspect the packed manifest and reject unsuccessful or stale output beside the handoff recipe.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Add a specific warning that Python multiline signatures can be omitted beside the --compress examples in docs/token-session-handbook.md:136 and recipes/README.md:106, with original-source recovery linked to recipes/README.md:611.",
+   "Replace name-count-only compression acceptance with named-definition and complete-signature assertions, including multiline functions and methods; retain the existing partial outcome until the upstream behavior is corrected and qualified.",
+   "Document packed-manifest validation and exit-status/fresh-output checks for the retained upstream ignore and quiet-mode failures.",
+   "Adoption observation only: token-cards/invoke_by_tool.json populations.workflow_children_with_lanes_block.repomix records cli_calls=0 and mcp_calls=0 with agents=22. The token MCP-server list in codex-lanes-block.txt does not name repomix; that list is not a CLI inventory. Add an explicit task-matched CLI example to the worker guidance and retain a subsequent observation; this population does not establish why the tool was unused."
+  ],
+  "assessment": "The installed release and explicit-file CLI lane align with current upstream, but the compressed artifact is not a faithful symbol inventory. token-cards/cards/repomix.json records partial returned-results evidence and a missing status_body definition that invalidates its older apparent fidelity pass. Its retained size comparison describes artifact reduction, not successful definition retrieval or provider savings. Original-source recovery remains necessary, and the latest upstream release and inspected main comparison do not resolve the signature defect."
+ },
+ "e2e_returned_results": {
+  "status": "partial",
+  "reason": "partial",
+  "run_utc": "2026-09-26T17:52:36.356Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " all 47 function names verified (PASS); verifier: disagree, 5 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 180 repomix --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 180 repomix <scratch> --config <scratch>/rr/repomix/empty.json --include scripts/host_requests.py,scripts/credential_status.py --style xml --parsable-style --token-count-encoding o200k_base --no-file-summary --no-directory-structure --output <scratch>/rr/repomix/base.xml",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 180 repomix <scratch> --config <scratch>/rr/repomix/empty.json --include scripts/host_requests.py,scripts/credential_status.py --style xml --parsable-style --token-count-encoding o200k_base --no-file-summary --no-directory-structure --compress --output <scratch>/rr/repomix/tool.xml",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 180 mcporter --version",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 180 mcporter --config <scratch>/rr/repomix/mcp/mcporter.json list repomix --json",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 180 mcporter --config <scratch>/rr/repomix/mcp/mcporter.json call repomix.pack_codebase --args {\"directory\":\".\",\"compress\":false,\"includePatterns\":\"scripts/host_requests.py,scripts/credential_status.py\",\"style\":\"xml\",\"topFilesLength\":5} --output json",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 22,
+  "records_shown": [
+   {
+    "id": "repomix-00-harness",
+    "status": "passed",
+    "kind": "local_integration capture harness",
+    "command": "bash run.sh",
+    "observation": "Evidence class: local_integration. `bash run.sh` exited 0 after capturing 17 commands in order (14 native, all exit 0; 3 local_integration: the def-name check exit 1 as predicted, both compares exit 0). Times are the bounds of the captured commands. Uncaptured glue: `echo '{}' > empty.json`, `git -C <fixture> rev-parse HEAD` (803bc3514ef05129c57118d8cbad0c61dd4ab141), the two scratch configs written by heredoc, and t",
+    "attachments": 6
+   },
+   {
+    "id": "repomix-01-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 repomix --version",
+    "observation": "Evidence class: native execution. `repomix --version` returned `1.18.1` (exit 0, stderr 0 bytes), matching the pin 1.18.1 (npm; source 80b4280a). Installed package read from files: $HOME/.local/share/codex-ecosystem/tools/repomix-1.18.1 (package.json 1.18.1) bundling gpt-tokenizer 4.0.0, @modelcontextprotocol/sdk 1.30.1, web-tree-sitter 0.27.0 and @repomix/tree-sitter-wasms 0.1.17.\n\nassembly_review: {\"step\": \"returne",
+    "attachments": 2
+   },
+   {
+    "id": "repomix-02-cli-pack-full",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 repomix $WT --config $RR/repomix/empty.json --include scripts/host_requests.py,scripts/credential_status.py --style xml --parsable-style --token-count-encoding o200k_base --no-file-summary --no-directory",
+    "observation": "Evidence class: native execution. Plan step 1 on fixture wt-rr at 803bc351 (read-only, detached origin/main); exit 0, stderr 0 bytes. Printed pack summary (repomix's own counter, o200k_base): Total Files 2, Total Tokens 23,638, Total Chars 89,329; scripts/host_requests.py 12,751 tokens / 52,708 chars (53.9% of total); scripts/credential_status.py 5,482 tokens / 22,911 chars (23.2% of total); Security: ✔ No suspicious",
+    "attachments": 3
+   },
+   {
+    "id": "repomix-03-cli-pack-compress",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 repomix $WT --config $RR/repomix/empty.json --include scripts/host_requests.py,scripts/credential_status.py --style xml --parsable-style --token-count-encoding o200k_base --no-file-summary --no-directory",
+    "observation": "Evidence class: native execution. Plan step 2 (same command plus --compress); exit 0, stderr 0 bytes. Printed pack summary: Total Files 2, Total Tokens 10,565, Total Chars 36,912; scripts/host_requests.py 5,857 tokens / 21,868 chars (55.4% of total); scripts/credential_status.py 2,679 tokens / 9,973 chars (25.4% of total); Security: ✔ No suspicious files detected; Output: tool.xml. tool.xml is 37,454 bytes (bytes exc",
+    "attachments": 3
+   },
+   {
+    "id": "repomix-04-mcporter-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --version",
+    "observation": "Evidence class: native execution. `mcporter --version` returned `0.14.1` (exit 0), the upstream MCP client used for every repomix MCP call below.\n\nassembly_review: {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: record fixed, evidence bytes unchanged except sanitized copies\", \"verifier\": \"disagree\", \"record_text_replacements\": {\"scratchpad path -> $RR\": 2}}",
+    "attachments": 2
+   },
+   {
+    "id": "repomix-05-mcp-tools-list",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --config $RR/repomix/mcp/mcporter.json list repomix --json",
+    "observation": "Evidence class: native execution. mcporter with an explicit scratch config (imports: [], so no editor configs were read; lifecycle keep-alive; server `repomix --mcp --sandbox <fixture>`, env TMPDIR=<rr>/repomix/mcp/tmp) returned status `ok` with 5 tools: pack_codebase, read_repomix_output, grep_repomix_output, file_system_read_file, file_system_read_directory. Sandbox mode confines paths to the fixture and disables r",
+    "attachments": 3
+   },
+   {
+    "id": "repomix-06-mcp-pack-full",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --config $RR/repomix/mcp/mcporter.json call repomix.pack_codebase --args {\"directory\":\".\",\"compress\":false,\"includePatterns\":\"scripts/host_requests.py,scripts/credential_status.py\",\"style\":\"xml\"",
+    "observation": "Evidence class: native execution. pack_codebase with directory \".\", includePatterns for the same two files, style xml, compress false (before) returned outputId befd94eee2771753 and metrics: totalFiles 2, totalCharacters 77,583, totalTokens 18,641, totalLines 1,564; scripts/host_requests.py 12,751 tokens / 52,708 chars; scripts/credential_status.py 5,482 tokens / 22,911 chars. outputFilePath is empty (sandbox mode re",
+    "attachments": 2
+   },
+   {
+    "id": "repomix-07-mcp-pack-compress",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --config $RR/repomix/mcp/mcporter.json call repomix.pack_codebase --args {\"directory\":\".\",\"compress\":true,\"includePatterns\":\"scripts/host_requests.py,scripts/credential_status.py\",\"style\":\"xml\",",
+    "observation": "Evidence class: native execution. pack_codebase with directory \".\", includePatterns for the same two files, style xml, compress true (after) returned outputId 1014c8f31fb8e6fb and metrics: totalFiles 2, totalCharacters 33,995, totalTokens 8,981, totalLines 832; scripts/host_requests.py 5,857 tokens / 21,868 chars; scripts/credential_status.py 2,679 tokens / 9,973 chars. outputFilePath is empty (sandbox mode returns n",
+    "attachments": 2
+   },
+   {
+    "id": "repomix-08-mcp-grep-full",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --config $RR/repomix/mcp/mcporter.json call repomix.grep_repomix_output --args {\"outputId\": \"befd94eee2771753\", \"pattern\": \"^(async\\\\s+)?def status_body\\\\b\", \"afterLines\": 2} --output json",
+    "observation": "Evidence class: native execution. Lookup task \"where is status_body defined?\" on the full pack: grep_repomix_output pattern ^(async\\s+)?def status_body\\b (afterLines 2) returned totalMatches 1; matches: line 969: def status_body(role: str, host_id: str, state: str, session: str, when: dt.datetime, *,. formattedOutput: 969:def status_body(role: str, host_id: str, state: str, session: str, when: dt.datetime, *, | 970- ",
+    "attachments": 2
+   },
+   {
+    "id": "repomix-09-mcp-grep-compress",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 180 mcporter --config $RR/repomix/mcp/mcporter.json call repomix.grep_repomix_output --args {\"outputId\": \"1014c8f31fb8e6fb\", \"pattern\": \"^(async\\\\s+)?def status_body\\\\b\", \"afterLines\": 2} --output json",
+    "observation": "Evidence class: native execution. Lookup task \"where is status_body defined?\" on the compressed pack: grep_repomix_output pattern ^(async\\s+)?def status_body\\b (afterLines 2) returned totalMatches 0; matches: none. The compressed MCP text still holds 2 `body = status_body(` call lines, so an agent sees references without the definition.\n\nassembly_review: {\"step\": \"returned-results assembly 2026-09-26T21:31:33Z: recor",
+    "attachments": 2
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Two scripts raw vs repomix --compress XML; all 47 function names verified (PASS)",
+    "before_tokens": 17935,
+    "after_tokens": 8799,
+    "change_pct": -50.9,
+    "encoding": "o200k_base",
+    "eligibility": "retracted: the pack silently dropped a multi-line signature, so the 47-name check was a false pass",
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:55.978224+00:00",
+    "last_seen": "2026-09-25T21:07:55.978224+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": "--compress dropped a multi-line signature, so the recorded '47 names verified' pass is retracted; use repomix without --compress when exact signatures matter.",
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 0,
+    "cli_calls": 345,
+    "agents_using": 55,
+    "agents": 1010,
+    "pct_agents_using": 0.0545
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 0,
+    "agents_using": 0,
+    "agents": 22,
+    "pct_agents_using": 0.0
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 345,
+    "agents_using": 55,
+    "agents": 988,
+    "pct_agents_using": 0.0557
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 18,
+    "agents_using": 3,
+    "agents": 71,
+    "pct_agents_using": 0.0423
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 24,
+    "agents_using": 3,
+    "agents": 15,
+    "pct_agents_using": 0.2
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 0,
+    "cli_calls": 7,
+    "agents_using": 2,
+    "agents": 301,
+    "pct_agents_using": 0.0066
+   }
+  },
+  "live_otel": null,
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "defects",
+  "findings": [
+   {
+    "severity": "medium",
+    "field": "adapted_performance.exact_comparisons[0].payload",
+    "issue": "This assembler-computed field still presents 'all 47 function names verified (PASS)' without identifying it as a superseded false pass. The same card's prior_evidence explicitly calls the original #296 pass false, its returned-results status is partial, and records repomix-08-mcp-grep-full and repomix-09-mcp-grep-compress report one versus zero matches for the status_body definition. The size comparison remains measurable, but its payload currently implies successful fidelity. This defect originates in the retained comparison boundary copied by the assembler, not in repomix.upstream.json; native_adaptation.assessment correctly explains the failure.",
+    "fix": "Route this to the retained-evidence/assembler owner. Preserve the historical counts and original report with provenance, but have the generated comparison explicitly mark its fidelity PASS as superseded or invalidated by the missing-definition evidence. Regenerate the card; do not hand-edit the computed field.",
+    "source": "token-cards/cards/repomix.json"
+   }
+  ],
+  "checked": [
+   "token-cards/cards/repomix.json",
+   "token-cards/groups/g5-conversion-packing/repomix.upstream.json",
+   "token-cards/invoke_by_tool.json",
+   "manifests/stack.json",
+   "recipes/README.md",
+   "docs/token-session-handbook.md",
+   "adoption/templates/claude.settings.template.json",
+   "adoption/templates/codex.config.template.toml",
+   "adoption/templates/project.codex.config.template.toml",
+   ".codex/config.toml",
+   "examples/claude-native/agents/source-scout.md",
+   "examples/claude-native/agents/isolated-builder.md",
+   "examples/claude-native/agents/blind-lane-reviewer.md",
+   "examples/claude-native/agents/evidence-reviewer.md",
+   "examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "examples/claude-native/agents/blind-adjudicator.md",
+   "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+   "https://github.com/yamadashy/repomix/releases",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#quick-start",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#claude-code-plugins",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#repomix-explorer-skill-agent-skills",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md#mcp-server-integration",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/package.json",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/website/client/src/en/guide/code-compress.md",
+   "https://github.com/yamadashy/repomix/blob/v1.18.1/website/client/src/en/guide/mcp-server.md",
+   "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81",
+   "https://github.com/yamadashy/repomix/compare/v1.18.1...75f9f860548c10f955e4730f7961947780104443",
+   "https://github.com/yamadashy/repomix/issues/1874",
+   "https://github.com/yamadashy/repomix/issues/1876",
+   "https://github.com/yamadashy/repomix/releases/latest",
+   "token-cards/assemble.py",
+   "html-report/savings.json",
+   "recipes/native-upgrades-20260921.md",
+   "https://github.com/yamadashy/repomix/tree/main",
+   "https://github.com/yamadashy/repomix/compare/v1.18.1...75f9f860548c10f955e4730f7961947780104443.diff",
+   "https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts",
+   "https://raw.githubusercontent.com/yamadashy/repomix/v1.18.1/website/client/src/en/guide/code-compress.md",
+   "https://raw.githubusercontent.com/yamadashy/repomix/v1.18.1/README.md",
+   "Compared all six invoke_rates.populations objects, their method and window exactly against token-cards/invoke_by_tool.json; checked native_adaptation.pending_fixes and assessment against the same populations. cli_calls was treated as command-text matching, which can include path mentions, not verified executable invocations.",
+   "Compared upstream and native_adaptation with the prior upstream file; both match verbatim apart from the assembler-added stack_entry.",
+   "Checked native_adaptation.assessment against e2e_returned_results, adapted_performance.exact_comparisons, invoke_rates and prior_evidence; found no numeric blending across evidence classes in the prior-run prose.",
+   "Ran a case-insensitive grep and recursive JSON field scan of the card and prior upstream file for the prohibited home path, username, temporary paths and UUIDs; no matches."
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "repomix",
+   "verdict": "adapted-with-gaps",
+   "summary": "The installed 1.18.1 CLI matches the latest release and explicit-file packing is upstream-supported, but our use of compressed Python packs for complete definition lookup exceeds the verified fidelity (groups/g5-conversion-packing/repomix.upstream.json). The historical 17935→8799 o200k_base comparison (50.94%) is explicitly retracted for eligibility, and the newer CLI 23638→10565 (55.31%) and MCP 18641→8981 (51.82%) reductions are also ineligible for the complete-definition task because status_body and inspect definitions are missing (cards/repomix.json; ../rr/repomix/out/16-compare-cli.stdout; ../rr/repomix/out/17-compare-mcp.stdout; ../rr/repomix/check/def_names.json). The upstream pinned Python parser matches a signature only on its first line, which explains the multiline omission and calls for a local routing and acceptance fix (https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 55/1010 Ultracode workflow children (5.45%, 345 CLI detections), 2/301 Codex workers (0.66%, 7), and 0/22 children given the lanes block (invoke_by_tool.json). Next, use uncompressed selected files or explicit original-source recovery for exact definitions, replace the superseded PASS wording, and remeasure the complete workflow; native counters and attributable provider savings remain unverified.",
+   "gaps": [
+    {
+     "gap": "Both compressed paths fail complete top-level definition preservation, including status_body and inspect.",
+     "evidence": "../rr/repomix/check/def_names.json",
+     "action": "Route exact-definition tasks to an uncompressed pack or original source, then compare every required definition and signature and include recovery cost; the pinned parser explains the limit at https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The historical payload still says all 47 function names verified (PASS), even though the eligibility field correctly retracts it.",
+     "evidence": "cards/repomix.json#adapted_performance/exact_comparisons/0",
+     "action": "Have the retained-evidence/assembler owner label the historical PASS as superseded while preserving its counts and provenance; do not restore eligibility from name counts.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The selected-file recipe warns about omitted implementations but does not explicitly cover missing signatures or measured recovery cost.",
+     "evidence": "docs/token-session-handbook.md:136",
+     "action": "Document the multiline-signature limitation, verify the packed file manifest and fresh exit/output status, and measure success on eligible handoff tasks.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Fresh repomix --version returned 1.18.1; the latest published release is v1.18.1 dated 2026-09-21.",
+     "evidence": "groups/g5-g6-verification.json#versions/repomix",
+     "result": "holds"
+    },
+    {
+     "claim": "The pinned upstream README supports the CLI installation; optional MCP/skills are additional integrations, not prerequisites for CLI packing.",
+     "evidence": "https://github.com/yamadashy/repomix/blob/v1.18.1/README.md",
+     "result": "holds"
+    },
+    {
+     "claim": "The historical 17935→8799 token counts reproduce, but the recorded eligibility retracts the apparent fidelity pass.",
+     "evidence": "cards/repomix.json#adapted_performance/exact_comparisons/0",
+     "result": "holds"
+    },
+    {
+     "claim": "The retained CLI and MCP comparisons reproduce 23638→10565 and 18641→8981 tokens respectively; these are size reductions only.",
+     "evidence": "groups/g5-g6-verification.json#retained_comparisons",
+     "result": "holds"
+    },
+    {
+     "claim": "The compressed packs preserve all required top-level definitions for the retained lookup task.",
+     "evidence": "../rr/repomix/check/def_names.json",
+     "result": "does-not-hold"
+    },
+    {
+     "claim": "The pinned Python signature parser reads lines[startRow] and returns null when that single line does not match its complete-signature expression.",
+     "evidence": "https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81",
+     "result": "holds"
+    },
+    {
+     "claim": "The review's stale-PASS finding is still visible in the payload; the merged card separately supplies an explicit retraction.",
+     "evidence": "groups/g5-conversion-packing/repomix.review.json#findings",
+     "result": "holds"
+    },
+    {
+     "claim": "Reported invoke detections are 55/1010 workflow children, 0/22 with lanes, and 2/301 Codex workers; they do not establish faithful handoffs.",
+     "evidence": "invoke_by_tool.json#populations",
+     "result": "holds"
+    },
+    {
+     "claim": "Eligible net savings after original-source recovery, native saved-token counters, or attributable provider savings have been measured.",
+     "evidence": "cards/repomix.json#adapted_performance",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "qmd (lookup returned no matching handbook entry)",
+    "serena (symbol lookup unavailable)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 42
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-c.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 57,
+     "qmd": 1,
+     "serena": 2
+    },
+    "shell_commands": 5,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.out.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "diagnosing-bugs",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 35
+    },
+    "shell_commands": 5,
+    "shell_commands_rtk_prefixed": 4,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296 recorded count=47 PASS, later shown to be a false pass. #316 and #343: --compress silently dropped `def status_body` (multi-line signature; upstream getFunctionSignature tests only the first lin…"
+}

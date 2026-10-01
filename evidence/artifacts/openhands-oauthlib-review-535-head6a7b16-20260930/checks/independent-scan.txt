@@ -1,0 +1,33 @@
+observed_utc=2026-09-30T09:26:05Z
+== versions: {'oauthlib': '3.3.1', 'PyJWT': '2.14.0', 'requests-oauthlib': '2.0.0', 'google-auth-oauthlib': '1.2.2', 'authlib': '1.6.12', 'openhands-sdk': '1.50.0', 'openhands-tools': '1.50.0'}
+== reverse dependencies (Requires-Dist names oauthlib):
+   requests-oauthlib 2.0.0 <- oauthlib >=3.0.0
+   requests-oauthlib 2.0.0 <- oauthlib[signedtoken] >=3.0.0 ; extra == 'rsa'
+== raw-text sweep: 14618 files outside oauthlib; files mentioning 'oauthlib': 22 in 6 top-level entries
+  browser_use: 1 files {'.py': 1}
+  browser_use-0.11.9.dist-info: 1 files {'(none)': 1}
+  google_auth_oauthlib: 5 files {'.py': 5}
+  google_auth_oauthlib-1.2.2.dist-info: 4 files {'.txt': 2, '(none)': 2}
+  requests_oauthlib: 8 files {'.py': 8}
+  requests_oauthlib-2.0.0.dist-info: 3 files {'.txt': 1, '(none)': 2}
+== import-shaped and dynamic lines (text files), outside requests_oauthlib's plain client imports:
+  browser_use/integrations/gmail/service.py:16: from google_auth_oauthlib.flow import InstalledAppFlow
+  [binary or other] browser_use-0.11.9.dist-info/METADATA
+  google_auth_oauthlib/helpers.py:29: import requests_oauthlib
+  google_auth_oauthlib/flow.py:24: from google_auth_oauthlib.flow import InstalledAppFlow
+  google_auth_oauthlib/flow.py:68: import google_auth_oauthlib.helpers
+  google_auth_oauthlib/flow.py:331: from google_auth_oauthlib.flow import InstalledAppFlow
+  google_auth_oauthlib/interactive.py:27: import google_auth_oauthlib.flow
+  google_auth_oauthlib/interactive.py:129: import google_auth_oauthlib
+  google_auth_oauthlib/tool/__main__.py:39: import google_auth_oauthlib.flow
+  [binary or other] google_auth_oauthlib-1.2.2.dist-info/RECORD
+  [binary or other] google_auth_oauthlib-1.2.2.dist-info/METADATA
+  [binary or other] requests_oauthlib-2.0.0.dist-info/RECORD
+  [binary or other] requests_oauthlib-2.0.0.dist-info/METADATA
+== server-side or advisory names in files that mention oauthlib (outside oauthlib):
+   (0 lines)
+== advisory source files:
+   oauthlib/oauth2/rfc6749/endpoints/revocation.py ebc5248a9cfb50e75e04298ee4a4d1a34bf06d415df2d4c6db60a4d21165ba6c
+   oauthlib/oauth2/rfc6749/grant_types/authorization_code.py 0d6931601c4e88a078fb3ccf5f052c035ad6a4bb2171efb9c218e088a7272dc6
+   oauthlib/oauth2/rfc6749/endpoints/pre_configured.py 6fe072e29e94f0bb6fa65bf8a223893b2702e8d77c52494b389f75bb3ebc6316
+   oauthlib/openid/connect/core/endpoints/pre_configured.py bc6ff1a5fa23c2dcc3a782125e13d93355e73abf2e4fadc406b86ebce121e7ee

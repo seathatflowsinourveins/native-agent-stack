@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "tool": "codebase-memory-mcp",
+  "evidence_class": "upstream-source-review",
+  "retrieved_at": "2026-09-27T12:40:31.670Z",
+  "upstream_repository": "https://github.com/DeusData/codebase-memory-mcp",
+  "pin": {
+    "version": "0.11.0",
+    "metadata_revision": "1c32ad22d76479fdc0385f2bbbada15b3f9f6a5f",
+    "metadata_sources": [
+      "manifests/stack.json:274",
+      "recipes/README.md:88"
+    ],
+    "scope": "Repository metadata; not an installed-client observation"
+  },
+  "scratch_record": {
+    "reviewed_on": "2026-09-26",
+    "input_sources": [
+      "full-save/synth/currency-records.json",
+      "full-save/cur/codebase-memory-mcp/gpt6.md",
+      "full-save/cur/codebase-memory-mcp/record.json"
+    ],
+    "latest_release": {
+      "version": "v0.11.0",
+      "published_at": "2026-09-15T23:40:39Z",
+      "source_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+    },
+    "behind_by": {
+      "stable_release_count": 0,
+      "main_commits_after_latest": 135,
+      "scope": "Stable releases and main commits are separate channels"
+    }
+  },
+  "latest_release": {
+    "tag_name": "v0.11.0",
+    "published_at": "2026-09-15T23:40:39Z",
+    "html_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+    "prerelease": false,
+    "draft": false,
+    "source_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest",
+    "resolved_tag_commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798"
+  },
+  "behind_by": {
+    "count": 0,
+    "unit": "stable GitHub releases",
+    "reference_pin": "0.11.0",
+    "latest": "0.11.0",
+    "method": "The repository pin equals the latest stable GitHub release version.",
+    "source_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/latest",
+    "excludes": "Unreleased main commits, prereleases, and other platform pins"
+  },
+  "changes_since_scratch": [
+    {
+      "date": "2026-09-27",
+      "field": "latest_stable_release",
+      "change": "No change to the scratch latest stable version or publication timestamp."
+    },
+    {
+      "date": "2026-09-27",
+      "field": "unreleased_main",
+      "change": "Main advanced from 135 to 150 commits after v0.11.0; the observed head changed from the scratch abbreviated 64c23fab6c3e to 11b662f9f7fba92012b872dd4fcaef7ee0c1300d. Stable release currency is unchanged."
+    }
+  ],
+  "key_new_findings": [
+    {
+      "finding": "An unreleased memory-budget change sizes the budget from free memory and responds to real scarcity.",
+      "source_urls": [
+        "https://github.com/DeusData/codebase-memory-mcp/commit/c3714f11339e7c312c5c313a065624e92c2eec56"
+      ],
+      "revision": "c3714f11339e7c312c5c313a065624e92c2eec56",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/compare/v0.11.0...c3714f11339e7c312c5c313a065624e92c2eec56",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "An unreleased pipeline change fixes spilling changing the resulting graph; the commit's source diff documents and changes the affected spill path.",
+      "source_urls": [
+        "https://github.com/DeusData/codebase-memory-mcp/commit/9a2bdc8c1dfedd124db0076ebde7d2590ce78382"
+      ],
+      "revision": "9a2bdc8c1dfedd124db0076ebde7d2590ce78382",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "comparison_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/compare/v0.11.0...9a2bdc8c1dfedd124db0076ebde7d2590ce78382",
+      "evidence_class": "upstream-source-review"
+    },
+    {
+      "finding": "Merged PR #2227 contains a graph-quality round covering resolution, findability, coverage, and names after the v0.11.0 probe.",
+      "source_urls": [
+        "https://github.com/DeusData/codebase-memory-mcp/pull/2227"
+      ],
+      "revision": "bf4c476d5e18621d4424bc3eff322b1c7a678eeb",
+      "release_status": "unreleased-main",
+      "verification": "Primary upstream release notes or source diff reviewed live on 2026-09-27",
+      "evidence_class": "upstream-source-review"
+    }
+  ],
+  "unreleased_main": {
+    "observed_on": "2026-09-27",
+    "latest_release_commit": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798",
+    "head_commit": "11b662f9f7fba92012b872dd4fcaef7ee0c1300d",
+    "commits_after_latest_release": 150,
+    "github_behind_by": 0,
+    "status": "ahead",
+    "source_url": "https://api.github.com/repos/DeusData/codebase-memory-mcp/compare/v0.11.0...main"
+  },
+  "residuals": [
+    "No package installation, provider execution, benchmark, or upstream test was run for this record.",
+    "The additional fifteen main commits were not individually reviewed; memory-pressure and graph-invariance behavior were not executed."
+  ]
+}

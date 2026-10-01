@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-slsa-framework-slsa-verifier",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/slsa-framework/slsa-verifier",
+ "reviewed_commit": "30d0be3bbab553fc51557377baba2f7572dfc212",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "security-supply-chain"
+ ],
+ "claim": "Source and documentation review of slsa-framework/slsa-verifier at commit 30d0be3bbab553fc51557377baba2f7572dfc212 (license Apache-2.0), read from README.md at that commit. Repository description: \"Verify provenance from SLSA compliant builders\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 346,
+  "pushed_at": "2026-08-07T04:23:20Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@30d0be3bbab553fc51557377baba2f7572dfc212",
+   "text": "> This project is **no longer actively maintained**. > We are working on guidance and simpler tooling to replace it."
+  },
+  {
+   "source": "README.md@30d0be3bbab553fc51557377baba2f7572dfc212",
+   "text": "> If you are verifying attestations for GitHub Actions, we suggest generating them with > [GitHub artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations), > a built-in solution for generating SLSA provenance on GitHub, and verifying them > with [`gh attestation verify`](https://cli.github.com/manual/gh_attestation_verify)."
+  },
+  {
+   "source": "README.md@30d0be3bbab553fc51557377baba2f7572dfc212",
+   "text": "- [Overview](#overview) - [What is SLSA?](#what-is-slsa) - [What is provenance?](#what-is-provenance) - [What is slsa-verifier?](#what-is-slsa-verifier) - [Installation](#installation) - [Compilation from source](#compilation-from-source) - [Option 1: Install via go](#option-1-install-via-go) - [Option 2: Compile manually](#option-2-compile-manually) - [Use the installer Action on GitHub Actions](#use-the-installer-action-on-github-actions) - [Download the binary](#download-the-binary) - [Use Ho"
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+
+> @parcel/watcher@2.6.0 install
+> node scripts/build-from-source.js
+
+
+> keytar@7.9.0 install
+> prebuild-install || npm run build
+
+(node:373764) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+> omniroute@3.8.51 postinstall
+> node scripts/build/postinstall.mjs
+
+  ✅ sql.js copied to standalone dist/node_modules.
+  ✅ node-machine-id copied to standalone dist/node_modules.
+[sync-env] ✅ .env is up to date (0 keys added)
+
+> @swc/core@1.16.12 postinstall
+> node postinstall.js
+
+
+> esbuild@0.28.2 postinstall
+> node install.js
+
+
+> onnxruntime-node@1.30.0 postinstall
+> node ./script/install
+
+
+> protobufjs@7.6.6 postinstall
+> node scripts/postinstall
+
+rebuilt dependencies successfully

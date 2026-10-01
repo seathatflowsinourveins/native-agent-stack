@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-langchain-ai-langmem",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/langchain-ai/langmem",
+ "reviewed_commit": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of langchain-ai/langmem at commit 9d033b47d9ce53e37e92c92241b0496c0278932e (license MIT), read from README.md at that commit. Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1684,
+  "pushed_at": "2026-09-09T06:44:43Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9d033b47d9ce53e37e92c92241b0496c0278932e",
+   "text": "LangMem helps agents learn and adapt from their interactions over time."
+  },
+  {
+   "source": "README.md@9d033b47d9ce53e37e92c92241b0496c0278932e",
+   "text": "It provides tooling to extract important information from conversations, optimize agent behavior through prompt refinement, and maintain long-term memory."
+  },
+  {
+   "source": "README.md@9d033b47d9ce53e37e92c92241b0496c0278932e",
+   "text": "It offers both functional primitives you can use with any storage system and native integration with LangGraph's storage layer."
+  }
+ ]
+}

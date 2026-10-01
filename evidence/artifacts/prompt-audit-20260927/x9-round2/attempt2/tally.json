@@ -1,0 +1,35 @@
+{
+ "attempt": 2,
+ "votes": {
+  "gpt6-AB": "g",
+  "gpt6-BA": "g",
+  "claude-AB": "c",
+  "claude-BA": "c"
+ },
+ "labels": {
+  "gpt6-AB": {
+   "choice_label": "B",
+   "confidence": 0.86
+  },
+  "gpt6-BA": {
+   "choice_label": "A",
+   "confidence": 0.88
+  },
+  "claude-AB": {
+   "choice_label": "A",
+   "confidence": 0.58
+  },
+  "claude-BA": {
+   "choice_label": "B",
+   "confidence": 0.6
+  }
+ },
+ "void": {},
+ "counted": [
+  "claude-AB",
+  "claude-BA",
+  "gpt6-AB",
+  "gpt6-BA"
+ ],
+ "outcome": "split: no edit"
+}

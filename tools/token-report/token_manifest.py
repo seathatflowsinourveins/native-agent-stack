@@ -158,8 +158,8 @@ def capture(argv,cwd,root,label,timeout=60):
 
 def count_files(config,paths):
     if not config.get("tokenizer_module"):
-        raise ValueError("Exact comparisons require an explicit gpt-tokenizer 3.4.0 o200k_base module path")
-    code="const fs=require('fs'),path=require('path');const pkg=JSON.parse(fs.readFileSync(path.resolve(path.dirname(process.argv[1]),'../../package.json'),'utf8'));if(pkg.version!=='3.4.0')throw Error('Pinned tokenizer version mismatch');const {encode}=require(process.argv[1]);process.stdout.write(JSON.stringify(process.argv.slice(2).map(p=>encode(new TextDecoder('utf-8',{fatal:true}).decode(fs.readFileSync(p))).length)));"
+        raise ValueError("Exact comparisons require an explicit gpt-tokenizer 4.0.0 o200k_base module path")
+    code="const fs=require('fs'),path=require('path');const pkg=JSON.parse(fs.readFileSync(path.resolve(path.dirname(process.argv[1]),'../../package.json'),'utf8'));if(pkg.version!=='4.0.0')throw Error('Pinned tokenizer version mismatch');const {encode}=require(process.argv[1]);process.stdout.write(JSON.stringify(process.argv.slice(2).map(p=>encode(new TextDecoder('utf-8',{fatal:true}).decode(fs.readFileSync(p))).length)));"
     out=subprocess.run([config["node"],"-e",code,config["tokenizer_module"]]+[str(p) for p in paths],capture_output=True,text=True,timeout=30,check=True)
     values=json.loads(out.stdout)
     return [artifact(p,n) for p,n in zip(paths,values)]
@@ -252,7 +252,7 @@ def capture_context(entry,ledger,run,issues):
                       source_updated_at=d.get("updated_at"),schema=d["schemaVersion"],version=d.get("version"),
                       access="Read upstream-generated stats JSON; no fresh MCP invocation implied.")
         metrics=dict(saved=d["tokens_saved_lifetime"],session_estimated_saved=d.get("tokens_saved"),kind="upstream event/byte estimate",
-                     boundary="Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage.",
+                     boundary="Latest persisted upstream file in this runtime root, not a sum of sessions. Session = persisted tokens_saved = (bytes_indexed + bytes_sandboxed + cache_bytes_saved) ÷ 4 from this server's counters (server.ts:1032-1041); excludes hook redirect rows and is not the rendered kept-out figure. Lifetime = retained events × 256 (server.ts:1047-1052). Neither is provider usage.",
                      raw=d)
         ledger.snapshot("context-mode",entry["name"],metrics,True,now(),evidence)
     except (OSError,ValueError,TypeError) as exc:
@@ -508,6 +508,106 @@ def capture_jcodemunch(config,ledger,run,commands,issues):
         issues.append("jcodemunch: native counter refresh failed; last successful snapshot remains separate")
     ledger.snapshot("jcodemunch","Linux / upstream default index",metrics,success,r["completed_at"],r)
 
+REPORT_KINDS=("usage report","status report","cache report","savings report")
+# Report snapshots own this scope prefix; counter and Context Mode scopes are rejected when they start with it.
+REPORT_SCOPE_PREFIX="Report / "
+# Each report name becomes a capture folder; a folder name past the file system limit fails mkdir (ENAMETOOLONG).
+REPORT_LABEL_LIMIT=100
+
+def report_label(name):
+    return "report-"+re.sub(r"[^A-Za-z0-9._-]+","-",name).strip("-")
+
+def validate_report_sources(entries):
+    """Upstream report commands retained as evidence; they never carry a savings value."""
+    if not isinstance(entries,list):
+        raise ValueError("report_sources must be a list")
+    names=set();labels=set()
+    for entry in entries:
+        if not isinstance(entry,dict) or set(entry)-{"name","tool","kind","argv","boundary","format","timeout"}:
+            raise ValueError("report_sources entries take name, tool, kind, argv, boundary, format and timeout only")
+        if any(not isinstance(entry.get(k),str) or not entry[k].strip() for k in ("name","tool","boundary")):
+            raise ValueError("report_sources entries need nonempty name, tool and boundary strings")
+        if entry.get("kind") not in REPORT_KINDS:
+            raise ValueError("report_sources kind must be one of "+", ".join(REPORT_KINDS))
+        if not isinstance(entry.get("argv"),list) or not entry["argv"] or any(not isinstance(a,str) or not a for a in entry["argv"]):
+            raise ValueError("report_sources argv must be a nonempty list of strings")
+        # subprocess raises ValueError ("embedded null byte") for such an argument; reject it before any refresh.
+        if any("\0" in a for a in entry["argv"]):
+            raise ValueError("report_sources argv elements must not contain a NUL character")
+        # JSON can carry a lone surrogate ("\ud800"); the UTF-8 manifest write would raise for it and abort the refresh.
+        for text in [entry["name"],entry["tool"],entry["boundary"]]+entry["argv"]:
+            try:
+                text.encode("utf-8")
+            except UnicodeEncodeError:
+                raise ValueError("report_sources name, tool, boundary and argv elements must be encodable as UTF-8 (no lone surrogates)") from None
+        if entry.get("format","json") not in ("json","text"):
+            raise ValueError("report_sources format must be json or text")
+        if "timeout" in entry and (type(entry["timeout"]) is not int or not 1<=entry["timeout"]<=600):
+            raise ValueError("report_sources timeout must be an integer from 1 to 600 seconds")
+        label=report_label(entry["name"])
+        if len(label)>REPORT_LABEL_LIMIT:
+            raise ValueError("report_sources name folds to a "+str(len(label))+"-character capture folder label; at most "+
+                             str(REPORT_LABEL_LIMIT)+" characters are allowed")
+        # Names map to capture folders; two names that differ only in punctuation would share one folder.
+        if entry["name"] in names or report_label(entry["name"]) in labels:
+            raise ValueError("report_sources names must be unique, also after punctuation is folded into '-'")
+        names.add(entry["name"]);labels.add(report_label(entry["name"]))
+    return entries
+
+def validate_reserved_report_scopes(config):
+    """A counter or Context Mode scope that started with REPORT_SCOPE_PREFIX could share a report's (tool, scope)
+    group, where a successful report (saved null) would hide the counter's last good value."""
+    scopes=config.get("counter_scopes")
+    for key,value in (scopes.items() if isinstance(scopes,dict) else ()):
+        if isinstance(value,str) and value.startswith(REPORT_SCOPE_PREFIX):
+            raise ValueError("counter_scopes "+str(key)+" must not start with "+repr(REPORT_SCOPE_PREFIX)+
+                             ", the scope prefix reserved for report_sources")
+    roots=config.get("context_roots")
+    for entry in (roots if isinstance(roots,list) else ()):
+        name=entry.get("name") if isinstance(entry,dict) else None
+        if isinstance(name,str) and name.startswith(REPORT_SCOPE_PREFIX):
+            raise ValueError("context_roots name "+repr(name)+" must not start with "+repr(REPORT_SCOPE_PREFIX)+
+                             ", the scope prefix reserved for report_sources")
+
+def stack_component_ids(config):
+    """Component ids in the stack manifest, or None when it is missing, unreadable or lists no component, so the caller
+    skips its check."""
+    try:
+        return {c["id"] for c in json.loads(Path(config["stack_manifest"]).read_text())["components"]} or None
+    except (KeyError,TypeError,OSError,ValueError):
+        return None
+
+def capture_report_sources(config,ledger,run,commands,issues):
+    """Retain each selected upstream report; a report is evidence, never a counter to add."""
+    components=stack_component_ids(config)
+    for entry in config.get("report_sources",[]):
+        # Entries name stack component ids (jcodemunch-mcp, not its native identity jcodemunch); any other tool is
+        # flagged, and its report is still captured and recorded.
+        if components is not None and entry["tool"] not in components:
+            issues.append(entry["name"]+": report tool "+entry["tool"]+" is not a component id in the stack manifest")
+        # Validation keeps counter and Context Mode scopes off this prefix, so a report cannot replace a counter's last good value.
+        tool,scope=native_tool_identity(entry["tool"]),REPORT_SCOPE_PREFIX+entry["name"]
+        metrics={"saved":None,"kind":entry["kind"],"boundary":entry["boundary"]}
+        try:
+            r=capture(entry["argv"],config["project"],run,report_label(entry["name"]),timeout=entry.get("timeout",60))
+        except (OSError,ValueError) as exc:
+            # One entry that cannot be captured (an argv NUL, an overlong folder name) must not abort the refresh.
+            # capture() returned no receipt, so the evidence holds the command and the error, never output.
+            metrics["error"]="Report capture failed: "+str(exc)
+            issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
+            ledger.snapshot(tool,scope,metrics,False,now(),dict(argv=entry["argv"],cwd=str(config["project"]),error=str(exc)))
+            continue
+        commands.append(r)
+        success=r["exit_code"]==0
+        if success and entry.get("format","json")=="json":
+            try:
+                metrics["raw"]=json.loads(r["stdout_text"])
+            except ValueError as exc:
+                success=False;metrics["error"]="Report is not JSON: "+str(exc)
+        if not success:
+            issues.append(entry["name"]+": upstream report failed; last successful report remains separate")
+        ledger.snapshot(tool,scope,metrics,success,r["completed_at"],r)
+
 def native_tool_identity(component_id):
     return {"jcodemunch-mcp":"jcodemunch"}.get(component_id,component_id)
 
@@ -600,6 +700,8 @@ def load_config(path):
     config.setdefault("node",shutil.which("node") or "node")
     config.setdefault("context_roots",[])
     config.setdefault("supporting_inventory",[])
+    validate_report_sources(config.setdefault("report_sources",[]))
+    validate_reserved_report_scopes(config)
     fields=("state_dir","project","publication","catalog_index","stack_manifest","practice_guide",
             "output_html","output_json","tokenizer_module","rtk_database","headroom_events",
             "context_capture","audit_json","gap_summary","hook_evidence","fresh_e2e","native_study",
@@ -673,6 +775,8 @@ def refresh(config,context_file=None):
     if not isinstance(scopes,dict) or set(scopes)-{"rtk_global","rtk_project","headroom"} or any(
             not isinstance(value,str) or not value.strip() for value in scopes.values()):
         raise ValueError("counter_scopes must map selected counter keys to nonempty scope strings")
+    # Configurations built as dicts skip load_config, so refresh enforces the reserved report prefix itself.
+    validate_reserved_report_scopes(config)
     root=Path(config["state_dir"])
     root.mkdir(parents=True,exist_ok=True,mode=0o700)
     run=root/"captures"/(datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")+"-"+uuid.uuid4().hex[:8])
@@ -723,6 +827,7 @@ def refresh(config,context_file=None):
                 issues.append(label+": native counter refresh failed; last successful snapshot remains separate")
             ledger.snapshot(tool,scope,metrics,success,r["completed_at"],r)
         capture_jcodemunch(config,ledger,run,commands,issues)
+        capture_report_sources(config,ledger,run,commands,issues)
         archive_native_events(config,ledger,issues)
         projects=retained_projects(config,run,commands,issues) if config.get("inspect_project_history") else []
         for entry in config.get("context_roots",[]):
@@ -790,6 +895,11 @@ def refresh(config,context_file=None):
             runtimes=[],prior_scope="Hook and session-database inspection was not selected.")
         for component in matrix:
             component["native_reports"]=[r for r in ledger.native_views() if r["tool"]==native_tool_identity(component["id"])]
+            sources=[s for s in config.get("report_sources",[]) if native_tool_identity(s["tool"])==native_tool_identity(component["id"])]
+            if sources and component["native_lifetime_kind"] in ("usage only","no verified native savings counter"):
+                component.update(native_lifetime_kind="; ".join(dict.fromkeys(s["kind"] for s in sources)),
+                                 native_command="; ".join(shlex.join(s["argv"]) for s in sources),
+                                 lifetime_boundary="; ".join(s["boundary"] for s in sources))
         try:
             registry=capture_json_source(Path(config["publication"])/"manifests/evidence.json",run,"publication-receipt-registry")
             extra["publication_registry"]=registry

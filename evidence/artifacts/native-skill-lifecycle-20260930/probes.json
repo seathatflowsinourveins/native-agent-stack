@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "native_skill_activation_cases",
+  "source": "https://developers.openai.com/blog/eval-skills",
+  "scope": "current-host-selected-skill-lifecycle-20260930",
+  "cases": [
+    {
+      "id": "explicit-search-first",
+      "prompt": "Use $search-first to recommend an existing maintained TOML parser for Python 3.13. Return a recommendation with its primary source. Follow the skill's research workflow. Do not edit files or install packages.",
+      "expected_skill_read": "search-first",
+      "expected_outcome": "A source-cited existing parser recommendation without repository changes."
+    },
+    {
+      "id": "implicit-agent-writing",
+      "prompt": "Review this proposed AGENTS.md rule for agent instruction clarity: 'For every edit, load the entire docs folder and run every test ten times.' Suggest a concise replacement as prose and explain when supporting references should be loaded. Do not edit files.",
+      "expected_skill_read": "writing-for-agents",
+      "expected_outcome": "Task-scoped guidance and references loaded on demand without repository changes."
+    },
+    {
+      "id": "adjacent-negative",
+      "prompt": "Correct the spelling in this sentence and return only the corrected sentence: 'The cat sat on teh mat.'",
+      "expected_skill_read": null,
+      "expected_outcome": "The cat sat on the mat."
+    }
+  ],
+  "evaluation_rule": "Inspect native JSONL tool events for the expected SKILL.md read and inspect the actual task result. A name mention alone is insufficient. The negative should not read a skill. Keep failures, unknown usage and client visibility limits explicit.",
+  "limitations": [
+    "Representative single-run activation checks, not a broad quality benchmark.",
+    "Codex activation does not establish Claude activation.",
+    "No before/after efficiency or superiority claim."
+  ]
+}

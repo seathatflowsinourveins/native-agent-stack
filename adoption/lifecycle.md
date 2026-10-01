@@ -225,6 +225,26 @@ retain that expected outcome explicitly. For final retirement use
 that unit. Keep its data directories. The shared MCPorter daemon is not an
 owned disposable service; do not stop it to clean up another component.
 
+Added after `v2026.09.26.2`: a daily user timer keeps the next session's
+currency notice current without a check at startup.
+[`stack-currency.service`](templates/systemd/stack-currency.service) runs
+`python3 scripts/currency_due.py`, which runs the receipt, pin and saturation
+checks and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
+(mode 0600) only while something is due; a SessionStart hook prints its one
+line ([decision](../docs/decisions/2026-09-30-session-currency-notice.md)).
+Render the service from the live clone, verify both units, enable
+[the timer](templates/systemd/stack-currency.timer) and read the current report;
+the service file's header covers `PATH` on another host:
+
+```sh
+sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/stack-currency.service > ~/.config/systemd/user/stack-currency.service
+cp adoption/templates/systemd/stack-currency.timer ~/.config/systemd/user/
+systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+systemctl --user daemon-reload
+systemctl --user enable --now stack-currency.timer
+python3 scripts/currency_due.py --dry-run
+```
+
 Foreground tools should close through their native exit path. For a child
 started by the qualification shell, record its PID, verify its identity, send
 SIGTERM if needed and `wait` for that same child. Record its exit status and

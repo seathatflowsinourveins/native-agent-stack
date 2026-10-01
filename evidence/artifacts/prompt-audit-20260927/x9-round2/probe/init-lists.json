@@ -1,0 +1,48 @@
+{
+ "note": "C4's facts from the init event of a headless session of the base: counts and the built-in commands in question, not the host's full command and skill lists.",
+ "version": "2.1.283",
+ "model": "claude-opus-5-5[1m]",
+ "permission_mode": "bypassPermissions",
+ "checked": [
+  "mcp",
+  "context",
+  "plugin",
+  "plugins",
+  "reload-plugins"
+ ],
+ "mcp_servers": {
+  "plugin:context-mode:context-mode": "connected",
+  "ai-memory": "connected",
+  "serena": "connected",
+  "jcodemunch": "connected",
+  "codebase-memory": "connected",
+  "qmd": "connected",
+  "headroom": "connected",
+  "socraticode": "connected"
+ },
+ "plugins": [
+  "agents-md",
+  "claude-hud",
+  "codex",
+  "context-mode",
+  "telemetry"
+ ],
+ "slash_commands": {
+  "count": 107,
+  "present": [
+   "mcp",
+   "context",
+   "reload-plugins"
+  ]
+ },
+ "terminal_slash_commands": [
+  "color",
+  "doctor",
+  "focus",
+  "reload-plugins"
+ ],
+ "skills": {
+  "count": 60,
+  "present": []
+ }
+}

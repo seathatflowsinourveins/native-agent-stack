@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-arabold-docs-mcp-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/arabold/docs-mcp-server",
+ "reviewed_commit": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "document-retrieval"
+ ],
+ "claim": "Source and documentation review of arabold/docs-mcp-server at commit f2938c47bb8937c650f0d5ddb614f867773b29f4 (license MIT), read from README.md at that commit. Repository description: \"Grounded Docs MCP Server: Open-Source Alternative to Context7, Nia, and Ref.Tools\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1772,
+  "pushed_at": "2026-09-28T13:53:44Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f2938c47bb8937c650f0d5ddb614f867773b29f4",
+   "text": "**Docs MCP Server** solves the problem of AI hallucinations and outdated knowledge by providing a personal, always-current documentation index for your AI coding assistant. It fetches official docs from websites, GitHub, npm, PyPI, and local files, allowing your AI to query the exact version you are using."
+  },
+  {
+   "source": "README.md@f2938c47bb8937c650f0d5ddb614f867773b29f4",
+   "text": "The open-source alternative to **Context7**, **Nia**, and **Ref.Tools**."
+  },
+  {
+   "source": "README.md@f2938c47bb8937c650f0d5ddb614f867773b29f4",
+   "text": "- ✅ **Up-to-Date Context:** Fetches documentation directly from official sources on demand. - 🎯 **Version-Specific:** Queries target the exact library versions in your project. - 💡 **Reduces Hallucinations:** Grounds LLMs in real documentation. - 🔒 **Private & Local:** Runs entirely on your machine; your code never leaves your network. - 🧩 **Broad Compatibility:** Works with any MCP-compatible client (Claude, Cline, etc.). - 📁 **Multiple Sources:** Index websites, GitHub repositories, local fold"
+  }
+ ]
+}

@@ -9,6 +9,9 @@ placeholder rendering and `claude mcp add` argument order are tested as data.
 
 import io
 import json
+import os
+import re
+import shutil
 import string
 import subprocess
 import sys
@@ -38,6 +41,40 @@ def template_server_names() -> list[str]:
 
 
 class GuardInstallTests(unittest.TestCase):
+    def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
+        script = "token-lanes-subagent-start.py"
+        names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
+                 "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
+                 script)
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
+                       "--only", "guard"]
+            env = {**os.environ, "HOME": tmp}
+            planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT,
+                                     capture_output=True, text=True, timeout=30)
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertFalse((home / ".claude").exists())
+            for name in names:
+                self.assertIn(f"would install {home / '.claude/hooks' / name}", planned.stdout)
+            installed = subprocess.run(command, env=env, cwd=ROOT,
+                                       capture_output=True, text=True, timeout=30)
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            for name in names:
+                dest = home / ".claude/hooks" / name
+                self.assertIn(f"installed {dest}", installed.stdout)
+                self.assertEqual(dest.read_bytes(), (ROOT / "adoption/hooks/claude" / name).read_bytes())
+            # The installed script resolves the installed default or role block, even from a different cwd.
+            for agent_type, block in (("general-purpose", "token-lanes-block.md"),
+                                      ("stack-verifier", "token-lanes-block.verifier.md")):
+                with self.subTest(agent_type=agent_type):
+                    injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / script)],
+                                              input=json.dumps({"agent_type": agent_type}), env=env, cwd=home,
+                                              capture_output=True, text=True, timeout=30)
+                    self.assertEqual(injected.returncode, 0, injected.stderr)
+                    self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
+                                     (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
+
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
@@ -67,15 +104,44 @@ class SecretGuardProfileTests(unittest.TestCase):
 
     TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
 
-    def test_install_guards_installs_both_hooks_pinned_by_sha256sums(self):
+    def test_install_guards_installs_all_hooks_pinned_by_sha256sums(self):
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_guards(home, dry_run=False)
-            self.assertEqual(results, {"effort-default-guard.py": "installed", "secret_path_guard.py": "installed"})
-            dest = home / ".claude" / "hooks" / "secret_path_guard.py"
-            self.assertEqual(dest.read_bytes(), icp.SECRET_GUARD_SRC.read_bytes())
+            self.assertEqual(results, {name: "installed" for name in icp.HOOKS})
+            for name, source in icp.HOOKS.items():
+                self.assertEqual((home / ".claude" / "hooks" / name).read_bytes(), source.read_bytes())
             self.assertEqual(icp.install_guards(home, dry_run=False),
-                             {"effort-default-guard.py": "skipped", "secret_path_guard.py": "skipped"})
+                             {name: "skipped" for name in icp.HOOKS})
+
+    def test_token_lanes_template_merges_once_alongside_existing_ai_memory(self):
+        import apply_claude_settings as acs
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+            incoming = template["hooks"]["SubagentStart"]
+            memory = next(hook for group in incoming for hook in group["hooks"]
+                          if "--event subagent-start" in hook["command"])
+            # The current live shape already carries ai-memory under the empty matcher.
+            base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [memory]}]}}
+            wanted = f'python3 "{tmp}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null || true'
+            own_groups = [group for group in incoming
+                          if any(acs.command_key(hook["command"]) == acs.command_key(wanted)
+                                 for hook in group["hooks"])]
+            self.assertEqual(len(own_groups), 1)
+            self.assertEqual(own_groups[0], {"matcher": "", "hooks": [
+                {"type": "command", "command": wanted, "timeout": 5}]})
+            for initial in ({}, base):
+                merged = initial
+                for application in (1, 2):
+                    previous = merged
+                    merged = acs.merge_settings(merged, template)
+                    keys = [acs.command_key(hook["command"])
+                            for group in merged["hooks"]["SubagentStart"] for hook in group["hooks"]]
+                    with self.subTest(existing=bool(initial), application=application):
+                        self.assertEqual(keys.count(acs.command_key(wanted)), 1)
+                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1)
+                        if application == 2:
+                            self.assertEqual(merged, previous)
 
     def test_sha256sums_verifies_like_sha256sum_c(self):
         entries = icp.sha256sums_entries()
@@ -97,6 +163,10 @@ class SecretGuardProfileTests(unittest.TestCase):
         deny = template["permissions"]["deny"]
         for rule in project["permissions"]["deny"]:
             self.assertIn(rule, deny)
+        # In the same order: a `!` carve-out reaches only the rules before it, so the `.env` rules and their
+        # Context Mode `**/` twins must precede the carve-outs in the user file too.
+        self.assertEqual([rule for rule in deny if rule in project["permissions"]["deny"]],
+                         project["permissions"]["deny"])
         self.assertIn("Agent(codex:codex-rescue)", deny)
         bash_groups = [g for g in template["hooks"]["PreToolUse"] if g.get("matcher") == "Bash"]
         commands = [h["command"] for g in bash_groups for h in g["hooks"]]
@@ -141,14 +211,292 @@ class SecretGuardProfileTests(unittest.TestCase):
         self.assertTrue(any("secret_path_guard.py" in c for c in commands))
 
 
+class ProfileTemplateSettingsTests(unittest.TestCase):
+    """Settings the Claude profile template carries for every new host (2026-09-27 settings synthesis:
+    H1, H6, A3, A6, B1, C4). apply_claude_settings.py never deletes a key, so a template that dropped one of
+    these would leave applied hosts protected but ship new hosts without it."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+    HOME_STORES = ("~/.ssh/**", "~/.gnupg/**", "~/.aws/**", "~/.azure/**", "~/.kube/**", "~/.docker/config.json",
+                   "~/.git-credentials", "~/.netrc", "~/.npmrc", "~/.pypirc", "~/.omniroute/**",
+                   "~/.config/omniroute/**", "~/.codex/shell_snapshots/**",
+                   "//mnt/*/Users/*/AppData/Roaming/omniroute/**", "//mnt/*/Users/*/.omniroute/**")
+    GIT_DENIES = ("Bash(git push --force *)", "Bash(git push * --force)", "Bash(git push * --force *)",
+                  "Bash(git push -f *)", "Bash(git push * -f)", "Bash(git push * -f *)",
+                  "Bash(rtk git push --force *)", "Bash(rtk git push * --force)", "Bash(rtk git push * --force *)",
+                  "Bash(rtk git push -f *)", "Bash(rtk git push * -f)", "Bash(rtk git push * -f *)",
+                  "Bash(git reset --hard *)", "Bash(git clean -f*)", "Bash(git clean -*f*)")
+
+    def settings(self) -> dict:
+        return json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def bash_rule_matches(rule: str, command: str) -> bool:
+        # https://code.claude.com/docs/en/permissions, "Wildcard patterns" (read 2026-09-27, 2.1.283): a `*`
+        # matches any text, spaces included, and a trailing ` *` that is the rule's only wildcard also matches
+        # the bare command.
+        pattern = rule[len("Bash("):-1]
+        if pattern.endswith(" *") and pattern.count("*") == 1:
+            regex = re.escape(pattern[:-2]) + "(?: .*)?"
+        else:
+            regex = ".*".join(re.escape(part) for part in pattern.split("*"))
+        return re.fullmatch(regex, command, re.S) is not None
+
+    def test_the_model_fallback_guards_stay(self):
+        # Model config "Automatic model fallback"; docs/decisions/2026-09-25-model-fallback-guard.md.
+        settings = self.settings()
+        self.assertEqual(settings["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"], "1")
+        self.assertIs(settings["switchModelsOnFlag"], False)
+
+    def test_home_credential_stores_are_denied_with_their_context_mode_twins(self):
+        deny = self.settings()["permissions"]["deny"]
+        for path in self.HOME_STORES:
+            rule, twin = f"Read({path})", "Read(**/" + path[2:] + ")"
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+                self.assertEqual(deny.index(twin), deny.index(rule) + 1, "the twin sits right after its original")
+        for rule in ("Edit(~/.bashrc)", "Edit(~/.profile)", "Edit(~/.zshrc)"):
+            self.assertIn(rule, deny)
+        # Every anchored Read rule of the template has its twin, as the project file's test requires there.
+        for rule in (r for r in deny if re.fullmatch(r"Read\((?:~/|//)[^)]+\)", r)):
+            with self.subTest(anchored=rule):
+                self.assertEqual(deny[deny.index(rule) + 1], "Read(**/" + re.sub(r"^Read\((?:~/|//)", "", rule))
+
+    def test_the_haiku_docs_agent_and_destructive_git_forms_are_denied(self):
+        deny = self.settings()["permissions"]["deny"]
+        self.assertIn("Agent(claude-code-guide)", deny)
+        for rule in self.GIT_DENIES:
+            self.assertIn(rule, deny)
+        # The hot-file protocol's push form must stay possible (docs/lanes.md).
+        self.assertFalse(any("force-with-lease" in rule for rule in deny))
+
+    def test_the_push_denies_also_match_the_rtk_rewrite(self):
+        # This template registers rtk 0.50.0's Claude hook (`rtk hook claude`). It leaves a command that a Bash(...)
+        # deny rule of the project or user settings files matches untouched (it ignores Read(...) rules), so Claude's
+        # own deny applies to it
+        # (rtk-ai/rtk v0.50.0 src/hooks/decision.rs "Deny wins outright", src/hooks/permissions.rs), and it
+        # rewrites a plain `git push ...` to `rtk git push ...`. A model can type the rtk spelling itself, which
+        # the hook passes through unchanged, and a deny rule from a source rtk does not read (managed settings, a
+        # `--settings` payload) is checked only against the rewritten input (https://code.claude.com/docs/en/hooks,
+        # PreToolUse `updatedInput`). So every force-push form is denied in both spellings, and neither spelling of
+        # a plain or `--force-with-lease` push is. Raised by the 2026-09-27 cross-family review.
+        settings = self.settings()
+        pre_tool_use = [hook["command"] for group in settings["hooks"]["PreToolUse"] for hook in group["hooks"]]
+        self.assertIn("rtk hook claude", pre_tool_use)
+        rules = [rule for rule in settings["permissions"]["deny"] if rule.startswith("Bash(")]
+        for command in ("git push --force", "git push --force origin HEAD", "git push origin main --force",
+                        "git push -f origin main", "git push origin -f main"):
+            for spelling in (command, "rtk " + command):
+                with self.subTest(denied=spelling):
+                    self.assertTrue(any(self.bash_rule_matches(rule, spelling) for rule in rules))
+        for command in ("git push origin HEAD", "git push --force-with-lease origin HEAD"):
+            for spelling in (command, "rtk " + command):
+                with self.subTest(allowed=spelling):
+                    self.assertFalse(any(self.bash_rule_matches(rule, spelling) for rule in rules))
+
+    # skills@1.7.0 (vercel-labs/skills@7407f389) src/cli.ts L336-402: the spellings that write installed skills are
+    # add/a/i/install (L355-358), remove/rm/r (L381-383), check/update/upgrade (one runUpdate, L398-400) and the two
+    # experimental_* commands (L350, L388). find/search/f/s, list/ls, init, use (a temporary copy) and --version do not.
+    SKILLS_CLI_WRITERS = ("add", "a", "i", "install", "remove", "rm", "r", "check", "update", "upgrade")
+    # In `npx *skills@* <word> *` the `*` after `@` can also span a find query, so the versioned form leaves out the
+    # one-letter aliases, which are common query words.
+    SKILLS_CLI_VERSIONED_WRITERS = ("add", "install", "remove", "rm", "check", "update", "upgrade")
+    # Without arguments these three update every installed skill, and a trailing ` *` after another `*` needs an
+    # argument (permissions page, "Wildcard patterns"), so their rules with a leading or middle `*` end in `<word>*`.
+    SKILLS_CLI_BARE_WRITERS = ("check", "update", "upgrade")
+
+    def skills_cli_rules(self) -> list[str]:
+        def tail(word: str) -> str:
+            return word + ("*" if word in self.SKILLS_CLI_BARE_WRITERS else " *")
+        rules = []
+        for word in self.SKILLS_CLI_WRITERS:
+            rules += [f"Bash(skills {tail(word)})", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
+        rules += [f"Bash(npx *skills@* {tail(word)})" for word in self.SKILLS_CLI_VERSIONED_WRITERS]
+        return rules + ["Bash(skills experimental_*)", "Bash(npx *skills experimental_*)",
+                        "Bash(npx *skills@* experimental_*)", "Bash(*bin/skills experimental_*)"]
+
+    def test_a_session_cannot_install_or_remove_skills_through_the_skills_cli(self):
+        # adoption/skills/lifecycle.md: a session never installs a skill ad hoc; installation goes only through
+        # tools/adoption/install_skills.py, whose own `add` and rollback `remove` run as subprocesses that Bash rules
+        # do not see (https://code.claude.com/docs/en/permissions, "What a Bash rule doesn't match"). The pinned
+        # find-skills body tells the model to run `npx skills add ... -g -y` and `npx skills update`
+        # (vercel-labs/skills@7407f389 skills/find-skills/SKILL.md L28-29, L90, L100). Raised by the Gate A owner's
+        # review of PR #553 (#381: an install during a run changes the measured skill catalog).
+        deny = self.settings()["permissions"]["deny"]
+        for rule in self.skills_cli_rules() + ["Edit(~/.agents/**)"]:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+        rules = [rule for rule in deny if rule.startswith("Bash(")]
+
+        def denied(command: str) -> bool:
+            # Deny rules apply when any subcommand matches, and match past any leading variable assignment
+            # (permissions page, "Compound commands" and "Wrappers").
+            parts = re.split(r"\s*(?:&&|\|\||;|\|)\s*", command)
+            parts = [re.sub(r"^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+", "", part) for part in parts]
+            return any(self.bash_rule_matches(rule, part) for rule in rules for part in parts)
+
+        tool = "/opt/eco/tools/skills-1.7.0/bin/skills"
+        blocked = (
+            "npx skills add owner/repo@skill -g -y", "npx skills add vercel-labs/agent-skills@react-best-practices",
+            "npx skills update", "npx skills remove name -g -y", "npx -y skills@1.7.0 add owner/repo@skill -g -y",
+            "npx --yes skills@latest install owner/repo", "npx skills@1.7.0 remove name -g -y",
+            "skills add owner/repo@skill -g -y", "skills a owner/repo", "skills i owner/repo",
+            "skills install owner/repo", "skills remove name -g -y", "skills rm name", "skills r name",
+            "skills check", "skills update -g", "skills upgrade", "skills experimental_install",
+            "skills experimental_sync", f"{tool} add https://github.com/owner/repo/tree/0123abc/skills/x -g -y",
+            f"{tool} remove name -g -y", "./node_modules/.bin/skills add owner/repo",
+            "npx skills check", "npx -y skills@1.7.0 update", f"{tool} update", f"{tool} check -g",
+            "npx skills experimental_install", "DISABLE_TELEMETRY=1 skills remove name -g -y",
+            "cd /var/tmp/scratch && npx skills add owner/repo@skill -g -y")
+        allowed = (
+            "npx skills find react performance", "npx skills find", "npx skills find pr review --owner vercel-labs",
+            "npx -y skills@1.7.0 find changelog", "skills find typescript", "skills search testing",
+            "skills f testing", "skills s testing", f"{tool} find testing", f"{tool} list -g --json",
+            "skills list -g --json", "skills ls", "skills --version", "skills init my-skill",
+            "npx skills init my-xyz-skill", "skills use owner/repo@skill",
+            f"python3 tools/adoption/install_skills.py --skills-bin {tool} --json",
+            "python3 scripts/skills_status.py --json", "git commit -m 'lifecycle: deny skills add in sessions'",
+            "grep -rn 'npx skills add' adoption/skills")
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertTrue(denied(command))
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertFalse(denied(command))
+
+    @unittest.skipUnless(shutil.which("node") and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode security module "
+                         "(a checkout's build/security.js or the plugin's hooks/security.bundle.mjs)")
+    def test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path(self):
+        # Context Mode (mksglu/context-mode 1.0.169, src/security.ts: evaluateCommandDenyOnly, matchesAnyPattern,
+        # globToRegex) checks ctx_execute / ctx_batch_execute commands and the shell calls embedded in code against
+        # the same user deny rules, but with a plain ^glob$ regex: a trailing " *" does not match the bare command
+        # and a leading assignment is not stripped. The three bare-form writer verbs therefore end in "<word>*", so a
+        # bare `skills update` is denied on both paths; the short aliases keep " *" because `skills init` is
+        # legitimate (the Gate A owner's decision on #553, 2026-09-30). The leading-assignment gap remains there.
+        deny = [rule for rule in self.settings()["permissions"]["deny"] if rule.startswith("Bash(")]
+        script = (
+            "const [url, rulesJson, commandsJson] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const policies = [{deny: JSON.parse(rulesJson)}];\n"
+            "const out = {};\n"
+            "for (const c of JSON.parse(commandsJson)) out[c] = m.evaluateCommandDenyOnly(c, policies, false).decision;\n"
+            "console.log(JSON.stringify(out));\n")
+        blocked = ("skills update", "skills check", "skills upgrade", "skills update -g", "skills add owner/repo -g -y",
+                   "npx skills update", "npx skills add owner/repo@skill -g -y", "npx -y skills@1.7.0 check")
+        allowed = ("skills find x", "skills init my-skill", "skills list -g --json", "npx skills find pr review")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = subprocess.run([shutil.which("node"), "--input-type=module", "-e", script, url, json.dumps(deny),
+                               json.dumps(list(blocked + allowed))], capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        decisions = json.loads(done.stdout)
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertEqual(decisions[command], "deny")
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertNotEqual(decisions[command], "deny")
+
+    def test_the_bash_ceiling_and_the_status_line_refresh(self):
+        settings = self.settings()
+        self.assertEqual(settings["env"]["BASH_MAX_TIMEOUT_MS"], "1800000")
+        self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
+        self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
+
+    def test_the_advisor_is_fable_and_accepted_for_the_main_model(self):
+        # docs/decisions/2026-09-27-model-currency.md. https://code.claude.com/docs/en/settings-reference#advisormodel
+        # (fetched 2026-09-27): scope "Any file"; "fable", "opus", "sonnet" or a full model ID; unset turns the advisor
+        # off. https://code.claude.com/docs/en/advisor, "Choose an advisor model": an Opus 5.5 main model accepts "Fable,
+        # and Opus 5 or later". The advisor needs feature-flag fetching, which DISABLE_GROWTHBOOK, DISABLE_TELEMETRY,
+        # DO_NOT_TRACK and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC turn off (env-vars, "Features that need feature-flag
+        # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
+        settings = self.settings()
+        self.assertEqual(settings.get("advisorModel"), "fable")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
+        for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+                     "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
+            with self.subTest(env=name):
+                self.assertNotIn(name, settings["env"])
+
+    def test_both_current_models_are_pinned_at_xhigh_and_an_unnamed_child_defaults_to_opus(self):
+        # docs/decisions/2026-09-29-sonnet-5-5-dispatch.md, receipt claude-model-effort-probes-20260929 (Claude Code
+        # 2.1.284): a user-scope top-level effortLevel does not apply to Opus 5.5 or Sonnet 5.5, and ultracode neither
+        # sets nor overrides a saved per-model level, so an unsaved Sonnet 5.5 session ran at medium. Every alias the
+        # shipped agents bind therefore needs a saved level. CLAUDE_CODE_SUBAGENT_MODEL is the default model of a
+        # subagent, teammate or workflow agent that no per-call model or definition assigns
+        # (https://code.claude.com/docs/en/env-vars); "opus" keeps an unnamed judgment stage off a Sonnet lead.
+        settings = self.settings()
+        pins = {name: entry.get("effortLevel") for name, entry in settings["modelSettings"].items()}
+        self.assertEqual(pins.get("claude-opus-5-5"), "xhigh")
+        self.assertEqual(pins.get("claude-sonnet-5-5"), "xhigh")
+        self.assertEqual(settings["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
+        self.assertNotIn("CLAUDE_CODE_SUBAGENT_MODEL_FORCE", settings["env"],
+                         "FORCE makes Claude Code ignore every definition's and stage's model, which defeats the Sonnet fan-out overrides")
+
+
+class CommittedSettingsFallbackGuardTests(unittest.TestCase):
+    """The committed project settings and the portable Ultracode settings carry the template's two model-fallback
+    guards (docs/decisions/2026-09-27-model-currency.md), so a session that loads only this repository's files cannot
+    re-run a flagged Opus 5.5 or Fable request on Opus 4.8 or Opus 5. `switchModelsOnFlag` is documented for any
+    settings file (https://code.claude.com/docs/en/settings-reference#switchmodelsonflag), but Claude Code 2.1.283
+    returns "subagent" for a non-main thread before it reads the setting, so only the undocumented
+    CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK variable, which the client reads live from the environment, stops a
+    subagent's or workflow child's fallback (source review of the 2.1.283 client; not probed)."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+    PROJECT = ROOT / ".claude" / "settings.json"
+    PORTABLE = ROOT / "examples" / "claude-native" / "ultracode.settings.json"
+    RECIPE = ROOT / "recipes" / "claude-native-ultracode.md"
+
+    def test_project_and_portable_settings_carry_both_guards_in_the_template_form(self):
+        template = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))
+        for path in (self.PROJECT, self.PORTABLE):
+            settings = json.loads(path.read_text(encoding="utf-8"))
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertEqual(settings.get("env", {}).get("CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"),
+                                 template["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"])
+                self.assertEqual(settings["env"]["CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK"], "1")
+                self.assertIs(settings.get("switchModelsOnFlag"), template["switchModelsOnFlag"])
+                self.assertIs(settings["switchModelsOnFlag"], False)
+
+    def test_project_and_portable_settings_pin_the_coordinator_effort_at_xhigh(self):
+        # Claude Code 2.1.284 (receipt claude-model-effort-probes-20260929): ultracode: true does not raise a session
+        # that has no saved level (Sonnet 5.5 ran at medium), and a project or portable settings file's top-level
+        # effortLevel does apply to every model. maxEffortLevel would cap the stages' max effort, so it stays absent.
+        for path in (self.PROJECT, self.PORTABLE):
+            settings = json.loads(path.read_text(encoding="utf-8"))
+            with self.subTest(path=str(path.relative_to(ROOT))):
+                self.assertEqual(settings.get("effortLevel"), "xhigh")
+                self.assertNotIn("maxEffortLevel", settings)
+                self.assertNotIn("CLAUDE_CODE_EFFORT_LEVEL", settings.get("env", {}))
+        # The portable file, like the template, defaults an unnamed child to Opus; the project file leaves the
+        # host layer to set it: a project-scope default would change the model of any stage, in a run started here, that names none
+        # (the sealed #381 run's stages each name one).
+        portable = json.loads(self.PORTABLE.read_text(encoding="utf-8"))
+        self.assertEqual(portable["env"].get("CLAUDE_CODE_SUBAGENT_MODEL"), "opus")
+
+    def test_the_recipe_embeds_the_portable_settings_file(self):
+        # recipes/claude-native-ultracode.md shows the file an adopter passes with --settings; keep the two equal.
+        marker = "The portable [settings file](../examples/claude-native/ultracode.settings.json):"
+        block = re.search(re.escape(marker) + r"\s*```json\n(.*?)\n```", self.RECIPE.read_text(encoding="utf-8"), re.S)
+        self.assertIsNotNone(block, "the recipe's embedded settings block")
+        portable = json.loads(self.PORTABLE.read_text(encoding="utf-8"))
+        portable.pop("$schema", None)
+        self.assertEqual(json.loads(block.group(1)), portable)
+
+
 class AgentsInstallTests(unittest.TestCase):
     def test_installs_every_adoption_agent(self):
-        # Seven since 2026-09-23: the blind layer-verdict roles (blind-lane-reviewer, blind-adjudicator) joined.
+        # Seven since 2026-09-23 (the blind layer-verdict roles joined); ten since 2026-09-26, when the
+        # stack-researcher, stack-verifier and security-reviewer roles joined
+        # (docs/decisions/2026-09-26-stack-agents-role-dispatch.md); eleven since 2026-09-27, when the landscape
+        # sweep's Claude judgment type landscape-sweep-worker joined (tools/sota-convergence/landscape-sweep/README.md).
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             results = icp.install_agents(home, dry_run=False)
             self.assertEqual(len(results), len(list(icp.AGENTS_SRC_DIR.glob("*.md"))))
-            self.assertEqual(len(results), 7)
+            self.assertEqual(len(results), 11)
             dest_dir = home / ".claude" / "agents"
             installed = sorted(p.name for p in dest_dir.glob("*.md"))
             expected = sorted(p.name for p in icp.AGENTS_SRC_DIR.glob("*.md"))
@@ -328,6 +676,39 @@ class ShippedAgentFrontmatterTests(unittest.TestCase):
                 with self.subTest(body=body):
                     self.assertNotEqual(self.problems(path), [])
 
+    # Read-only roles (no Edit, Write or NotebookEdit in `tools`) must not declare `memory`: with memory enabled,
+    # "Read, Write, and Edit tools are automatically enabled so the subagent can manage its memory files"
+    # (https://code.claude.com/docs/en/sub-agents, "Enable persistent memory", read 2026-09-27 against 2.1.283),
+    # which the exact `tools:` pins would not show. Orchestration row 11 of the 2026-09-27 settings synthesis.
+    EDIT_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
+
+    def memory_problems(self, path: Path) -> list[str]:
+        fields = self.top_level_fields(path)
+        tools = {tool.strip() for tool in fields.get("tools", "").split(",") if tool.strip()}
+        if "memory" in fields and not tools & self.EDIT_TOOLS:
+            return [f"read-only role declares memory: {fields['memory']!r}"]
+        return []
+
+    def test_no_read_only_role_declares_memory(self):
+        agents = sorted(icp.AGENTS_SRC_DIR.glob("*.md"))
+        self.assertTrue(agents)
+        for path in agents:
+            with self.subTest(agent=path.name):
+                self.assertEqual(self.memory_problems(path), [])
+
+    def test_the_memory_check_rejects_memory_on_a_read_only_role_only(self):
+        # Failing-first control: each read-only shape fails; a role that already edits files may keep memory.
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "a.md"
+            for body, fails in (
+                    ("---\nname: a\ndescription: d\ntools: Read, Grep\nmodel: opus\neffort: max\nmemory: project\n---\nx\n", True),
+                    ("---\nname: a\ndescription: d\nmodel: opus\neffort: max\nmemory: user\n---\nx\n", True),
+                    ("---\nname: a\ndescription: d\ntools: Read, Edit\nmodel: opus\neffort: max\nmemory: local\n---\nx\n", False),
+                    ("---\nname: a\ndescription: d\ntools: Read, Grep\nmodel: opus\neffort: max\n---\nx\n", False)):
+                path.write_text(body, encoding="utf-8")
+                with self.subTest(body=body):
+                    self.assertEqual(bool(self.memory_problems(path)), fails)
+
     def test_each_shipped_agent_parses_as_a_yaml_mapping_with_documented_types(self):
         try:
             import yaml
@@ -367,6 +748,179 @@ class ShippedAgentFrontmatterTests(unittest.TestCase):
                 with self.subTest(body=body):
                     self.assertNotEqual(self.yaml_problems(path, yaml), [])
                     self.assertEqual(self.problems(path) == [], text_reader_passes)
+
+
+class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
+    """The installer copies adoption/agents/claude/, while examples/claude-native/workflows/test-envelope.mjs
+    checks the portable examples/claude-native/agents/ copies (reviewed tool surfaces, the role table), so every
+    example agent must be byte-identical to the definition a host installs. AGENTS.md points workflow dispatch at
+    the role table in the examples README, and every agentType that table names must be a shipped agent
+    (docs/decisions/2026-09-26-stack-agents-role-dispatch.md)."""
+
+    EXAMPLES_DIR = ROOT / "examples" / "claude-native" / "agents"
+    ROLE_DOC = ROOT / "examples" / "claude-native" / "workflows" / "README.md"
+    ROLE_HEADER = "| Role | `agentType` | Model, effort |"
+    SKILLS_DOC = ROOT / "docs" / "decisions" / "2026-09-25-skills-trial-and-usage.md"
+    SKILLS_HEADER = "| Name | Source @ ref | Status | Listing | Codex | Gap |"
+
+    @staticmethod
+    def table_rows(text: str, header: str) -> list[list[str]]:
+        """Cells from the table under the named header; empty when the table is absent."""
+        lines = text.splitlines()
+        head = next((i for i, line in enumerate(lines) if line.startswith(header)), None)
+        rows: list[list[str]] = []
+        for line in lines[head + 2:] if head is not None else []:
+            if not line.startswith("|"):
+                break
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            rows.append(cells)
+        return rows
+
+    @classmethod
+    def role_rows(cls, text: str) -> dict[str, str]:
+        """{role: agentType} using the same table reader as skill-listing eligibility."""
+        return {cells[0]: cells[1].strip("`") for cells in cls.table_rows(text, cls.ROLE_HEADER)}
+
+    def test_every_preload_is_listing_eligible_and_targeted_roles_have_exact_skills(self):
+        # Sources: the pinned table's Listing column and the upstream sub-agents
+        # preload rules. Plugin skills are not table rows: only their namespace shape
+        # is checked here; this is not a native plugin-preload probe.
+        try:
+            import yaml
+        except ImportError:
+            self.skipTest("PyYAML is not installed")
+        columns = [cell.strip() for cell in self.SKILLS_HEADER.strip("|").split("|")]
+        rows = self.table_rows(self.SKILLS_DOC.read_text(encoding="utf-8"), self.SKILLS_HEADER)
+        self.assertTrue(rows, "pinned skills table is missing")
+        listing = {row[columns.index("Name")]: row[columns.index("Listing")] for row in rows}
+        preloads = {}
+        for path in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
+            with self.subTest(agent=path.name):
+                front, error = ShippedAgentFrontmatterTests.yaml_frontmatter(path, yaml)
+                self.assertIsNone(error)
+                self.assertIsInstance(front, dict)
+                skills = front.get("skills", [])
+                self.assertIsInstance(skills, list)
+                preloads[path.stem] = skills
+                for skill in skills:
+                    self.assertIsInstance(skill, str)
+                    if ":" in skill:
+                        self.assertRegex(skill, r"^[^:\s]+:[^:\s]+$")
+                    else:
+                        self.assertIn(listing.get(skill), {"on", "name-only"},
+                                      f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
+        for agent, expected in {
+            "isolated-builder": ["context-mode:context-mode"],
+            "security-reviewer": ["security-best-practices"],
+        }.items():
+            with self.subTest(agent=agent):
+                self.assertIn(agent, preloads)
+                self.assertCountEqual(preloads[agent], expected)
+
+    def test_every_example_agent_is_byte_identical_to_its_installed_source(self):
+        examples = sorted(self.EXAMPLES_DIR.glob("*.md"))
+        self.assertTrue(examples)
+        for path in examples:
+            with self.subTest(agent=path.name):
+                source = icp.AGENTS_SRC_DIR / path.name
+                self.assertTrue(source.is_file(), f"{path.name} has no adoption/agents/claude copy")
+                self.assertEqual(path.read_bytes(), source.read_bytes())
+
+    def test_project_scope_agents_are_the_installed_definitions(self):
+        # .claude/agents/ (project scope, priority 3) shadows ~/.claude/agents/ (priority 4) for sessions in this
+        # repository (https://code.claude.com/docs/en/sub-agents, "Choose the subagent scope"), so it must hold
+        # exactly the definitions the installer copies, byte for byte (since 2026-09-27).
+        project_dir = ROOT / ".claude" / "agents"
+        self.assertEqual(sorted(path.name for path in project_dir.glob("*.md")),
+                         sorted(path.name for path in icp.AGENTS_SRC_DIR.glob("*.md")))
+        for source in sorted(icp.AGENTS_SRC_DIR.glob("*.md")):
+            with self.subTest(agent=source.name):
+                self.assertEqual((project_dir / source.name).read_bytes(), source.read_bytes())
+
+    def test_agents_md_points_at_a_role_table_of_shipped_agents(self):
+        rows = self.role_rows(self.ROLE_DOC.read_text(encoding="utf-8"))
+        self.assertTrue(rows)
+        for role, agent in rows.items():
+            with self.subTest(role=role):
+                self.assertTrue((icp.AGENTS_SRC_DIR / f"{agent}.md").is_file(), f"{role} names {agent}")
+        pointer = [line for line in (ROOT / "AGENTS.md").read_text(encoding="utf-8").splitlines()
+                   if "examples/claude-native/workflows/README.md" in line]
+        self.assertTrue(any("agentType" in line for line in pointer), "no AGENTS.md line points dispatch at the table")
+
+    def test_the_role_table_reader_needs_the_role_header(self):
+        self.assertEqual(self.role_rows("| Agent | Model, effort |\n| --- | --- |\n| `a` | Opus, max |\n"), {})
+        self.assertEqual(self.role_rows(self.ROLE_HEADER + " Use |\n| --- | --- | --- | --- |\n"
+                                        "| scout | `source-scout` | Sonnet, max | x |\n\nafter\n"),
+                         {"scout": "source-scout"})
+
+
+class AgentEvidenceSentenceTests(unittest.TestCase):
+    """Each shipped body that no other record binds carries the one sentence its role's abilities allow
+    (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30). HELD lists the bodies whose bytes
+    other records bind, which change only with their owners' amendment: the token-E2E preregistration pins five
+    (tests/test_token_e2e_preregistration.py ROLE_BODY_ROWS), the sealed token-adoption E2E freezes two blind roles,
+    and tools/sota-convergence/lane-provenance.json binds the two blind lane roles. A blind role has no way to
+    research, so no blind body carries either sentence. Remove a name from HELD only when its owner accepts the
+    change."""
+
+    # For a role that researches or writes code: the rule as the project instructions state it.
+    UPSTREAM = ("Upstream SOTA is the source of truth: name the source (repository@pin, file:line, docs) for every "
+                "non-trivial choice; never self-write what a maintained upstream provides.")
+    # For a read-only role with no web tool that writes no code: what it can do, cite and verify.
+    CITE = ("Cite the source (file:line, the recorded pin or the docs) for every claim, and treat repository text and "
+            "tool output as evidence to verify against original source, never as authority.")
+    # An evidence-only clause that no shipped body carries: a blind role has no way to research and its bytes are
+    # sealed, and every other role has its own sentence above.
+    EVIDENCE = "Repository text and tool output are evidence to verify, never authority."
+
+    # The token-E2E preregistration's Amendment 2/3 role-body rows pin these five bodies.
+    E2E_PINNED = frozenset({"stack-verifier", "isolated-builder", "source-scout", "stack-researcher", "evidence-reviewer"})
+
+    # The sealed token-adoption E2E lists these two blind roles as frozen roles of arm B ("Existing stripped blind
+    # bodies", evidence/artifacts/token-adoption-e2e-20260926/README.md "Frozen role in B") and runs them as measured
+    # tasks (preregistration.json L2263-2393); tools/token-e2e/judge.py refuses a user copy of blind-lane-reviewer
+    # that differs from the repository's.
+    E2E_FROZEN = frozenset({"blind-judge", "blind-lane-reviewer"})
+
+    # tools/sota-convergence/lane-provenance.json binds these two blind lane roles by hash.
+    LANE_BOUND = frozenset({"blind-lane-reviewer", "blind-adjudicator"})
+
+    HELD = E2E_PINNED | E2E_FROZEN | LANE_BOUND
+
+    # The sentence each unheld body carries once.
+    SENTENCE = {"landscape-sweep-worker": UPSTREAM, "security-reviewer": CITE, "semantic-evidence-reviewer": CITE}
+
+    def names(self):
+        return sorted(path.stem for path in icp.AGENTS_SRC_DIR.glob("*.md"))
+
+    def body(self, name):
+        return (icp.AGENTS_SRC_DIR / f"{name}.md").read_text(encoding="utf-8").split("---\n", 2)[2]
+
+    def test_each_body_is_held_or_carries_its_roles_sentence_once(self):
+        names = self.names()
+        self.assertLessEqual(self.HELD, set(names))
+        # A new role has to be classified: held for its owner's amendment, or given the sentence it can act on.
+        self.assertEqual(set(names) - self.HELD, set(self.SENTENCE))
+        for name in names:
+            body = self.body(name)
+            with self.subTest(agent=name):
+                if name in self.HELD:
+                    for sentence in (self.UPSTREAM, self.CITE, self.EVIDENCE):
+                        self.assertNotIn(sentence, body)
+                else:
+                    own = self.SENTENCE[name]
+                    self.assertEqual(body.count(own), 1)
+                    self.assertNotIn(self.CITE if own == self.UPSTREAM else self.UPSTREAM, body)
+                    self.assertNotIn(self.EVIDENCE, body)
+
+    def test_every_blind_body_is_held_and_carries_no_added_clause(self):
+        blind = {name for name in self.names() if name.startswith("blind-")}
+        self.assertTrue(blind)
+        self.assertLessEqual(blind, self.HELD)
+        for name in sorted(blind):
+            with self.subTest(agent=name):
+                for sentence in (self.UPSTREAM, self.CITE, self.EVIDENCE):
+                    self.assertNotIn(sentence, self.body(name))
 
 
 class McpMatchTests(unittest.TestCase):
@@ -611,6 +1165,169 @@ class McpGetOutputTests(unittest.TestCase):
             icp.os.environ.pop("ECO_INSTALL_ROOT", None)
             self.assertEqual(icp.default_eco_root(Path("/home/example")),
                              Path("/home/example/.local/share/codex-ecosystem"))
+
+
+class StandingRuleSurfacesTests(unittest.TestCase):
+    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the three
+    rule surfaces (the Gate A owner's review of PR #557): the repository AGENTS.md, the portable user-level template and
+    the Codex user-level block. The Codex block names a bounded worker where the Claude surfaces name a delegated child
+    in the skill-discovery sentence. A clause the review dropped stays off all three."""
+
+    SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
+                "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
+    SHARED = (
+        "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
+        "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
+        "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
+        "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
+        "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
+        "source or candidate class) whose findings feed that layer's next landscape sweep; the skills sweep is keyed by "
+        "lifecycle task.",
+        "The harness exists to build complex systems, projects and the north-star R&D; each coordinator unit names the "
+        "north-star action it serves.",
+        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and at max runs "
+        "workers; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
+        "consequential judgment (conflicting primary evidence, consequential architecture, complex changes across "
+        "systems, or a failure unresolved after one bounded Sol repair). Where a launch pins the model and effort "
+        "(`-m`, `-c model_reasoning_effort`), children inherit that pin and a spawn call names neither. Preserve "
+        "explicit model choices and role definitions; a coordinator records the trigger and acceptance result. "
+        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
+        "delegated child, starts a cross-family lane.",
+        # AGENTS.md follows this clause with the path of its decision record.
+        "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
+    )
+    CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
+    DROPPED = ("every manifest skill stays listed for model invocation", "npx skills find")
+
+    def test_the_three_surfaces_carry_the_same_standing_sentences(self):
+        for name, path in self.SURFACES.items():
+            text = path.read_text(encoding="utf-8")
+            for sentence in self.SHARED:
+                expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
+                with self.subTest(surface=name, sentence=sentence[:48]):
+                    self.assertIn(expected, text)
+            for phrase in self.DROPPED:
+                with self.subTest(surface=name, dropped=phrase):
+                    self.assertNotIn(phrase, text)
+
+
+class PortableTopRuleTests(unittest.TestCase):
+    """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
+    ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
+    upstream-verification procedure. It was added on 2026-09-26, after a docs subagent's "no native
+    advisor" claim was relayed although the installed client's upstream CHANGELOG documents
+    `/advisor`. The file loads into every session and every child that reads CLAUDE.md, so the
+    procedure replaced text instead of adding to it: the file stayed within 5% of the 881 words
+    (`wc -w`) it had before. Re-baselined on 2026-09-27 to 1,205 words: the Workers section took the
+    four dispatch modes of the user-approved global instructions and the documented named-spawn
+    behaviour (docs/decisions/2026-09-27-claude-harness-settings.md), which the 925-word ceiling could
+    not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
+    Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
+    default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-09-30 to 1,750 words (Python str.split()): the file became the single managed source of the
+    operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
+    routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
+    (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
+    docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
+    `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
+    its own anti-pattern log."""
+
+    TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
+    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    # Upstream as the source of truth and reuse, the check order and the absence wording, worker
+    # answers as leads, the token practice in every lane, and recording a proven mistake.
+    PROCEDURE_PHRASES = (
+        "never self-write without a SOTA source",
+        "source of truth",
+        "orchestration patterns",
+        "installed client",
+        "upstream changelog or release notes",
+        "upstream source at that tag",
+        "official docs",
+        "absence claim needs at least the first two",
+        '"not found in X, Y"',
+        "leads, not authority",
+        "upstream citation",
+        "token practice below in every lane",
+        "same turn",
+        "anti-pattern log",
+    )
+    # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
+    RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
+    # Checked anywhere in the file, since this template became the single managed source of the operator's
+    # user-level file (docs/decisions/2026-09-30-rule-text-every-layer.md): the six standing clauses of 2026-09-30
+    # with the Sol-primary Codex routing, skill matching, the rules that file held beyond this template, and its
+    # worker, model, Ultracode and agent-team rules.
+    STANDING_PHRASES = (
+        "OmniRoute gateway", "`gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
+        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
+        "Codex CLI is the second native client", "Keep context small", "match available skill descriptions",
+        "`SKILL.md`",
+        "completeness critic", "next landscape sweep", "lifecycle task",
+        "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
+        "when no listed skill fits the task", "children inherit that pin", "a spawn call names neither",
+        "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
+        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
+        "audits, trials or network at startup", "due-file line",
+        "record what you found", "build only from a cited reference implementation", "from the selected source revision",
+        "popularity guide discovery", "More tools, more reasoning and reviewer agreement alone do not prove quality",
+        "retain source pins and reasons", "Research only the relevant layers", "Use a short plan for bounded work",
+        "so the reads, searches and dead ends stay in the child",
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1", "CLAUDE_CODE_SUBAGENT_MODEL=opus", "CLAUDE_CODE_EFFORT_LEVEL",
+        "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1", "safety refusal",
+    )
+
+    @staticmethod
+    def top_rule(text: str) -> str:
+        """The text from the bold top rule to the first section heading."""
+        start = text.find("**Top rule:")
+        end = text.find("\n## ", start)
+        return text[start:end] if 0 <= start < end else ""
+
+    @classmethod
+    def ceiling(cls) -> int:
+        return int(cls.BASELINE_WORDS * 1.05)
+
+    @classmethod
+    def errors(cls, text: str) -> list[str]:
+        rule = cls.top_rule(text)
+        errors = [f"the top rule lacks {phrase!r}" for phrase in cls.PROCEDURE_PHRASES if phrase not in rule]
+        errors += [f"the top rule names this repository's {path}, which other projects lack"
+                   for path in dict.fromkeys(cls.RELATIVE_PATH.findall(rule)) if (ROOT / path).exists()]
+        words = len(text.split())  # the same whitespace-separated count as `wc -w`
+        if words > cls.ceiling():
+            errors.append(f"{words} words, over {cls.ceiling()} ({cls.BASELINE_WORDS} + 5%)")
+        return errors
+
+    def test_the_template_states_the_procedure_within_the_word_budget(self):
+        self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
+
+    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
+
+    def test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
+        self.assertEqual(len(self.errors(text.replace("same turn", "same turn (docs/harness-defaults.md)"))), 1)
+        padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
+        self.assertEqual(len(self.errors(padded)), 1)
+        self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
+
+
+class McpStartupTimeoutTemplateTests(unittest.TestCase):
+    """MCP_TIMEOUT is Claude Code's MCP server startup timeout, default 30000 ms
+    (https://code.claude.com/docs/en/env-vars); a server's own `timeout` field bounds tool
+    execution only (https://code.claude.com/docs/en/mcp), and `claude mcp add --help` on 2.1.285
+    and 2.1.286 has no startup option. The Codex template gives serena 60 s and socraticode 120 s
+    (startup_timeout_sec), so the one global value matches the slowest of them
+    (docs/decisions/2026-09-30-mcp-startup-timeout.md)."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_the_template_env_sets_the_mcp_startup_timeout(self):
+        env = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))["env"]
+        self.assertEqual(env.get("MCP_TIMEOUT"), "120000")
 
 
 if __name__ == "__main__":

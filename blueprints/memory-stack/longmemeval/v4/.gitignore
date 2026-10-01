@@ -1,0 +1,11 @@
+data
+models
+cache
+logs
+official-logs
+official-logs-velanext
+results*
+report*.md
+report*.json
+.venv-official
+.venv-embed

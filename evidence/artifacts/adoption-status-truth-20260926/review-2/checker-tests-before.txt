@@ -1,0 +1,37 @@
+# The two tests added for the second review, each run before its repair (checker and evidence as of b1df549f),
+# with the CI venv's Python 3.13: python -m unittest <test id>
+
+## tests.test_adoption_status.ClientWiringTests.test_a_non_blank_agents_override_replaces_agents_md (finding 5)
+FF
+======================================================================
+FAIL: test_a_non_blank_agents_override_replaces_agents_md (tests.test_adoption_status.ClientWiringTests.test_a_non_blank_agents_override_replaces_agents_md) (override='\x1c\n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$CHECKOUT/tests/test_adoption_status.py", line 1415, in test_a_non_blank_agents_override_replaces_agents_md
+    self.assertIs(self.wiring()["codex"]["rtk_instructions"], expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not False
+
+======================================================================
+FAIL: test_a_non_blank_agents_override_replaces_agents_md (tests.test_adoption_status.ClientWiringTests.test_a_non_blank_agents_override_replaces_agents_md) (override='\n\x1c\x1d\x1e\x1f \n')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$CHECKOUT/tests/test_adoption_status.py", line 1415, in test_a_non_blank_agents_override_replaces_agents_md
+    self.assertIs(self.wiring()["codex"]["rtk_instructions"], expected)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not False
+
+----------------------------------------------------------------------
+Ran 1 test in 0.032s
+
+FAILED (failures=2)
+
+## tests.test_adoption_status.RetainedEvidenceTests (finding 2), before the .gitignore exception and registration
+FAIL: test_every_file_the_evidence_readme_links_is_registered_and_not_ignored (tests.test_adoption_status.RetainedEvidenceTests.test_every_file_the_evidence_readme_links_is_registered_and_not_ignored) (target='evidence/artifacts/adoption-status-truth-20260926/codex-matcher-oracle.jsonl')
+AssertionError: False is not true : not registered in manifests/evidence.json
+FAIL: test_every_file_the_evidence_readme_links_is_registered_and_not_ignored (tests.test_adoption_status.RetainedEvidenceTests.test_every_file_the_evidence_readme_links_is_registered_and_not_ignored) (target='evidence/artifacts/adoption-status-truth-20260926/codex-parse-oracle.jsonl')
+AssertionError: False is not true : not registered in manifests/evidence.json
+FAIL: test_every_file_the_evidence_readme_links_is_registered_and_not_ignored (tests.test_adoption_status.RetainedEvidenceTests.test_every_file_the_evidence_readme_links_is_registered_and_not_ignored) (target='evidence/artifacts/adoption-status-truth-20260926/codex-trust-oracle.jsonl')
+AssertionError: False is not true : not registered in manifests/evidence.json
+Ran 1 test in 0.226s
+FAILED (failures=3)

@@ -1,0 +1,112 @@
+"""relock-2026-09-30.jwt-callers.py.txt: which packages of the relocked OpenHands recipe venv import PyJWT (in any import form, aliases
+included), where they call its decode API, and whether anything outside the importing package reaches that code. A static text
+search of the installed .py files: a name assembled at run time would not match, and it says where PyJWT's decode is called, not
+what any run executed.
+Usage: python3 relock-2026-09-30.jwt-callers.py.txt <venv site-packages> <recipe directory>"""
+import collections
+import re
+import sys
+from pathlib import Path
+
+SITE = Path(sys.argv[1])
+RECIPE = Path(sys.argv[2])
+SKIP = ("jwt", "pip", "setuptools", "pkg_resources", "_distutils_hack")  # PyJWT's own files and installer tooling
+# import jwt | import jwt.x | import jwt as X | import jwt.x as X | from jwt import a, b as c | from jwt.x import a (a trailing comment may follow)
+IMPORT = re.compile(
+    r"^[ \t]*(?:import[ \t]+(jwt(?:\.\w+)*)(?:[ \t]+as[ \t]+(\w+))?|from[ \t]+jwt(?:\.\w+)*[ \t]+import[ \t]+([^\n#]+))", re.M)
+PYJWT_INSTANCE = r"PyJWT\(\)\.(?:decode|decode_complete)[ \t]*\("
+
+
+def package_of(path):
+    return path.relative_to(SITE).parts[0].split("-")[0]
+
+
+def rel(path):
+    return "/".join(path.relative_to(SITE).parts[1:])
+
+
+def line_of(text, index):
+    return text.count("\n", 0, index) + 1
+
+
+def bindings(text):
+    """(names that refer to the jwt module itself in this file, names imported by `from jwt import`, aliases of jwt submodules)."""
+    names, direct, submodules = set(), set(), set()
+    for match in IMPORT.finditer(text):
+        module, alias, imported = match.group(1), match.group(2), match.group(3)
+        if module and not alias:
+            names.add("jwt")             # `import jwt` and `import jwt.x` both bind the name jwt
+        elif module and alias and "." not in module:
+            names.add(alias)             # `import jwt as X`
+        elif module and alias:
+            submodules.add(alias)        # `import jwt.x as X` names a submodule, which has no decode
+        if imported:
+            for part in imported.split(","):
+                bits = part.strip().split()
+                if bits:
+                    direct.add(bits[2] if len(bits) == 3 and bits[1] == "as" else bits[0])
+    return names, direct, submodules
+
+
+files = []
+for path in SITE.rglob("*.py"):
+    if package_of(path) not in SKIP:
+        files.append((path, path.read_text(encoding="utf-8", errors="replace")))
+print("python files searched (all installed packages except PyJWT's own files and installer tooling):", len(files))
+
+print("\n# PyJWT importers: the names bound to it, and decode-style calls through those names")
+importers = collections.defaultdict(list)
+for path, text in files:
+    if IMPORT.search(text):
+        importers[package_of(path)].append((path, text))
+for package, entries in sorted(importers.items()):
+    print(f"{package}: {len(entries)} file(s) import PyJWT")
+    for path, text in entries:
+        names, direct, submodules = bindings(text)
+        call = PYJWT_INSTANCE
+        if names:
+            call = r"\b(?:%s)\.(?:decode|decode_complete)[ \t]*\(|" % "|".join(sorted(names)) + call
+        lines = text.splitlines()
+        hits = [f"{line_of(text, m.start())}: {lines[line_of(text, m.start()) - 1].strip()[:72]}" for m in re.finditer(call, text)]
+        bound = f"jwt bound as {sorted(names)}" if names else "jwt module not bound (from-imports only)"
+        if submodules:
+            bound += f"; submodule aliases {sorted(submodules)}"
+        if direct:
+            bound += f"; from jwt import {sorted(direct)}"
+        print(f"    {rel(path)}: {bound}: {len(hits)} decode-style line(s) {hits[:3]}")
+
+print("\n# references from outside the importing package to the code that holds a decode")
+CALLEES = {
+    "oauthlib (verify_signed_token)": ("oauthlib", (), r"\bverify_signed_token\b"),
+    "redis (auth.token, JWToken)": ("redis", (), r"\bJWToken\b|redis\.auth\.token"),
+    "google-auth (google.oauth2.id_token)": (
+        "google", ("google/auth", "google/oauth2"),
+        r"google\.oauth2\.id_token|from google\.oauth2 import [^\n]*\bid_token\b|from google\.oauth2\.id_token import"),
+    "litellm (litellm.proxy)": ("litellm", (), r"\blitellm\.proxy\b|from litellm import [^\n]*\bproxy\b"),
+}
+for label, (package, own_dirs, pattern) in CALLEES.items():
+    outside = collections.defaultdict(list)
+    for path, text in files:
+        relative = "/".join(path.relative_to(SITE).parts)
+        if own_dirs:
+            if any(relative.startswith(d + "/") for d in own_dirs):
+                continue
+        elif package_of(path) == package:
+            continue
+        for match in re.finditer(pattern, text):
+            outside[package_of(path)].append(f"{rel(path)[:60]}:{line_of(text, match.start())}")
+    scope = " and ".join(own_dirs) if own_dirs else package
+    print(f"{label}: {dict((k, v[:3]) for k, v in outside.items()) or 'no reference outside ' + scope}")
+
+print("\n# redis's decode")
+token = SITE / "redis/auth/token.py"
+for number, line in enumerate(token.read_text(encoding="utf-8").splitlines(), 1):
+    if re.search(r"import jwt|jwt\.decode|verify_signature", line):
+        print(f"redis/auth/token.py:{number}: {line.strip()[:110]}")
+
+print("\n# the recipe's own code (recursive)")
+recipe_files = sorted(RECIPE.rglob("*.py"))
+print("recipe .py files searched:", len(recipe_files))
+for label, pattern in (("redis", r"^[ \t]*(?:import[ \t]+redis|from[ \t]+redis)\b"), ("jwt", IMPORT.pattern)):
+    found = [str(p.relative_to(RECIPE)) for p in recipe_files if re.search(pattern, p.read_text(encoding="utf-8"), re.M)]
+    print(f"recipe .py files importing {label}:", found or "none")

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Published copy of the script as it ran on 2026-09-30. Host paths are placeholders (<scratch>, <worktree>, <scratch-relock>); it needs the SDK archive
+# sdk-fcc102a.tar.gz of pins.json, uv 0.12.17 and network access, and is documentation of what ran, not a supported tool.
+# The recipe's install-container.sh sequence run on the host in a scratch venv (UV_NO_CONFIG=1 as there), on the new lock.
+set -uo pipefail
+R=<scratch-relock>; OH=<worktree>/blueprints/runtime-workers/openhands; V=$R/u3/venv
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never UV_NO_CONFIG=1
+rm -rf $V
+echo "[$(date -u +%FT%TZ)] uv venv"; uv venv --python 3.13 $V 2>&1 | tail -1; echo "venv exit: ${PIPESTATUS[0]}"
+uv pip install --python $V/bin/python --require-hashes --no-deps --only-binary :all: --index-url https://pypi.org/simple -r $OH/build-requirements.lock 2>&1 | tail -2; echo "build-requirements install exit: ${PIPESTATUS[0]}"
+uv pip install --python $V/bin/python --require-hashes --no-deps --no-build-isolation --index-url https://pypi.org/simple -r $OH/requirements.lock 2>&1 | tail -2; echo "runtime lock install exit: ${PIPESTATUS[0]}"
+uv pip check --python $V/bin/python 2>&1 | tail -2; echo "uv pip check exit: ${PIPESTATUS[0]}"
+$V/bin/python -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.49.6"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; print("openhands-sdk/tools", m.version("openhands-sdk"), "imports ok")'; echo "sdk import exit: $?"
+$V/bin/python -c 'import importlib.metadata as m; print("urllib3", m.version("urllib3"), "| requests", m.version("requests"), "| httpx", m.version("httpx"), "| pyjwt", m.version("pyjwt"), "| oauthlib", m.version("oauthlib"))'
+echo "[$(date -u +%FT%TZ)] done"

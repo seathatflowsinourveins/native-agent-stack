@@ -1,0 +1,17 @@
+# Codex profile "omniroute" (`codex -p omniroute`): GPT-6 through the local OmniRoute account pool at max effort.
+# Overlays ~/.codex/config.toml, which defines [model_providers.omniroute]. OmniRoute's Codex models use the cx/ prefix.
+# Max effort reaches upstream only with OmniRoute Settings > AI > Thinking Budget = passthrough, and only on
+# release/v3.8.51 or later: gpt-6-astra is in CODEX_ULTRA_ALIAS_MODELS, so the wire effort is max (verified
+# 2026-09-27 from the gateway's call_logs reasoning_effort_upstream column).
+model = "cx/gpt-6-astra"
+model_provider = "omniroute"
+model_reasoning_effort = "max"
+# Search: Codex's standalone web.run -> OmniRoute /v1/alpha/search (keyless duckduckgo-free unless a search provider is
+# configured; `site:` queries returned no results in the 2026-09-27 probe). Same keys as the landscape-sweep lane (#387).
+web_search = "live"
+
+[features]
+standalone_web_search = true
+# Codex's shell snapshot writes the exported environment, a provider key included, to 0644 files under
+# $CODEX_HOME/shell_snapshots; off for the gateway lane, as in #387.
+shell_snapshot = false

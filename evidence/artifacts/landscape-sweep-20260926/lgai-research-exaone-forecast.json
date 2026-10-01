@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-lgai-research-exaone-forecast",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/LGAI-Research/EXAONE-Forecast",
+ "reviewed_commit": "1d39bf8ac301d6f35670ad4eac13ed59a9cdce4f",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of LGAI-Research/EXAONE-Forecast at commit 1d39bf8ac301d6f35670ad4eac13ed59a9cdce4f (license NOASSERTION), read from README.md at that commit. Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 6,
+  "pushed_at": "2026-09-07T07:00:27Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@1d39bf8ac301d6f35670ad4eac13ed59a9cdce4f",
+   "text": "**EXAONE Forecast** is LG AI Research's **family of time series foundation models**. Each member targets its own domain and carries its own architecture, training recipe, and released weights. Two members may share a design or may not, so those details are **documented per model** rather than assumed family-wide."
+  },
+  {
+   "source": "README.md@1d39bf8ac301d6f35670ad4eac13ed59a9cdce4f",
+   "text": "This repository is the **`exaone-forecast` inference runtime** — a self-contained package that loads a released checkpoint and serves probabilistic forecasts through a small, uniform API. Every model in the family exposes the same `from_pretrained()` / `predict()` surface, so the code you write does not change when you switch models."
+  },
+  {
+   "source": "README.md@1d39bf8ac301d6f35670ad4eac13ed59a9cdce4f",
+   "text": "The code here is permissively licensed; the released **weights are non-commercial** — see [License](#license)."
+  }
+ ]
+}

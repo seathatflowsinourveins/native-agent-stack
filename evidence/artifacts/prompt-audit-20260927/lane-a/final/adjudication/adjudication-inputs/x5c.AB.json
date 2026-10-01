@@ -1,0 +1,254 @@
+{
+ "unit": "X5c",
+ "items_in_unit": [
+  "X5c"
+ ],
+ "question": "Two independent reviews judged the same frozen packet (the packet file, sha256 31c496f8d079ce0f9499527c432ea9948ab6f13b28fd3083af596c8d889a7133) and disagreed on item X5c. Choose the return whose effective resolution the evidence supports better, or neither.",
+ "repository_root": "Under the repository root: base/ is main at 8315274f, a plain export without git history; proposed/ is base/ with the packet's complete proposal (X5a and X5c with their co-changes); amended/ is base/ with X5a as proposed and X5c as the amending return's line 3, with the co-changes that return names, recomputed and applied by the coordinator; proposal.diff and amendment.diff are those two trees' diffs against base/; packet.md is the packet text of the packet file, so a return's packet.md:N locator resolves there. Withheld from all three trees: docs/decisions/2026-09-27-prompt-audit-resolution.md and evidence/artifacts/prompt-audit-20260927/, which record earlier review rounds of this audit by reviewer. Because of that, scripts/validate.py run in proposed/ or amended/ reports 44 manifest entries as 'file missing', all under those two paths and nothing else (measured in copies of both trees); the test modules in the measured checks pass in both copies (Ran 353 tests, OK (skipped=18)), with 3 more tests skipped than in a git worktree because the trees have no git history. The coordinator's measured checks were run in a full git worktree.",
+ "context": [
+  "X5a, the packet's other item, is not in dispute: both reviews agreed with its proposed text, so it is applied as proposed, and proposed/ and amended/ both include it.",
+  "Each return's coordinator_measurements were run by the coordinator, not by that return's reviewer; they are listed the same way for both returns."
+ ],
+ "choices": {
+  "A": "apply Return A's effective resolution exactly as written",
+  "B": "apply Return B's effective resolution exactly as written",
+  "neither": "the current text stays unchanged"
+ },
+ "rules": [
+  "The returns are anonymous (Return A and Return B). Do not try to identify who wrote them; judge the evidence only. Model and product names inside quoted sources or repository files are subject matter, not authorship.",
+  "Verify, do not trust: excerpts here are copies. The original files are under the repository root the task names.",
+  "Choose A, B or neither per item. neither means the current text stays unchanged. Do not write new text: only a return's resolution can be applied, exactly as written, and nothing is merged across returns.",
+  "A return's effective resolution includes any co-change its reasons name as required in the same commit; judge the resolution together with those co-changes.",
+  "A resolution that another file, test or fixture would contradict or break, or that states something the repository or sources do not support, loses to one that does not. If both would, choose neither.",
+  "Keep the operator's standing rules: licenses and incumbency are never selection criteria.",
+  "Judge wording on whether the target models (Claude Code and Codex sessions that load these files) will follow it as intended, not on style.",
+  "The packet's own rules and verdict meanings are quoted in packet_rules_verbatim; the returns' verdicts use them. Your answer is a choice among the returns, not a new verdict.",
+  "Every sources entry names a file:line or URL and quotes the text that supports your choice.",
+  "An item is applied only when every adjudication of it chooses the same resolution; otherwise it stays unchanged and both positions are recorded."
+ ],
+ "packet_rules_verbatim": "You are an independent reviewer. Two proposed changes to this repository's instruction templates are below, each\nwith every co-change it needs. Judge each on its merits: verify the evidence against the original files, check the\nprimary sources provided, research further where a claim depends on current official documentation, and decide\nwhether the proposed change is right.\n\nWhere things are (all read-only):\n- `base/`: the repository at main 8315274f, a plain copy without git history (each line's last change is given\n  below);\n- `proposed/`: the same copy with this packet's complete proposal applied; it differs from `base/` in exactly four\n  files: `adoption/templates/codex.AGENTS.template.md`, `examples/claude-native/CLAUDE.md`, `manifests/evidence.json`, `tests/test_codex_worker_lane.py`;\n- `proposal.diff`: the unified diff between them.\n\nRules:\n- Verify, do not trust: excerpts below are copies; the files under `base/` and `proposed/` are the original source.\n- A proposal that another file, test or fixture would contradict or break is wrong; say which, with file:line.\n- Licenses and incumbency are never selection criteria.\n- Judge wording on whether the target models (Claude Code and Codex sessions that load these files) will follow it as\n  intended, not on style.\n- These items carry the operator's own 2026-09-28 wording of the top rule into the repository's two templates of it.\n  The operator's rule itself is not under review. Judge whether each proposed text carries that wording correctly and\n  keeps the file's tested obligations and its existing meaning, and whether the co-changes are complete and correct.\n- Every `sources` entry names a file:line or URL and quotes the text that supports your verdict.\n\nVerdicts per item: `agree` = apply the proposed change exactly (line 3 and its co-changes); `amend` = apply your\n`resolution_text` as line 3 instead, with the same co-changes recomputed for it by the same procedure; `reject` = keep\nthe current text and make no change. `resolution_text` is empty unless you amend. `confidence` is 0..1.\n\nConvergence rule, fixed before either lane runs: an item is applied when both lanes agree, or when both give the same\namendment. Both reject: the current text stays. Anything else goes to one blind adjudication in both presentation\norders by two adjudicators, and a text is applied only when all four adjudications choose it. This is the final\nround for both items: if it does not converge, the current text stays and both positions are recorded.\n\nThe operator's own user-level instruction file (`~/.claude/CLAUDE.md`, not in this repository; last modified\n2026-09-28 07:34Z) opens with this top rule, verbatim:\n\n```text\n**Top rule: research convergence first; current upstream SOTA is the source of truth.** Before any action, research maintained SOTA repositories, installable skills and published references with the installed research and skill-discovery skills, and record what you found. Then install the best-evidenced source directly, or build only from a cited reference implementation, and name that source (repository, pin, file or paper) for every action. With no SOTA source, stop and report instead of writing one. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one. Stars, installs and popularity guide discovery; they are not evidence.\n```\n\nThe operator's direction for this pass (2026-09-28, verbatim): \"please resolute cleanly with the sota repos\nconvergence,resolute all in your end and state the jobs that only beable to run by end,decide with your evidances and\nsota repos evidances convergence\".",
+ "items": [
+  {
+   "id": "X5c",
+   "packet_item": "## X5c: the Codex user-instructions template's top rule\n\nLocation: `adoption/templates/codex.AGENTS.template.md:3` (last changed by:\n50b9579f 2026-09-27 PR-D: Codex worker lane: Codex's own config writer, RTK text inline with exceptions, max-effort stack-worker profile (#389)).\n\nCurrent text: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.\n\nProposed text: Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.\n\nCo-changes, all in `proposal.diff`:\n- `tests/test_codex_worker_lane.py`: `TOP_RULE_SHA256` (:47) set to the sha256 of the proposed top-rule block, the\n  word count at :210 from 120 to 144 and the :45 comment to match. Both values were computed with the test module's\n  own `template_segments()` on the proposed template, not copied from elsewhere.\n- `manifests/evidence.json`: the template and the test file re-registered (docs/lanes.md:96-128).\n- Host step, outside the repository: a Codex home that installed the lane block keeps the old line until\n  `tools/adoption/apply_codex_lane.py` is re-run there (dry run, then `--apply`) after the change merges.\n\nWhy the co-changes: `tests/test_codex_worker_lane.py:209-210` pin the staged top-rule block's sha256 and word count,\nreproducing the 2026-09-26 staged block. Replacing line 3 alone fails that test (measured below).\n\n### Evidence\n`adoption/templates/codex.AGENTS.template.md:1-9`\n```\n   1: <!-- native-agent-stack:codex-user-instructions:begin (adoption/templates/codex.AGENTS.template.md) -->\n   2: <!-- native-agent-stack:top-rule -->\n   3: Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth.\n   4: Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.\n   5: Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say \"not found in X, Y\".\n   6: Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.\n   7: Process large output outside the model.\n   8: When a claim proves wrong, record the correction and its verification path that turn.\n   9: \n```\n\n`tests/test_codex_worker_lane.py:40-50`\n```\n  40: import prove_codex_lane as prove  # noqa: E402\n  41: from scripts import adoption_status  # noqa: E402\n  42: \n  43: TEMPLATES = ROOT / \"adoption\" / \"templates\"\n  44: FIXTURES = ROOT / \"tests\" / \"fixtures\" / \"codex-worker-lane\"\n  45: # The staged top-rule block (120 words by `wc -w`, marker line included) and rtk-ai/rtk v0.50.0\n  46: # hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.\n  47: TOP_RULE_SHA256 = \"476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311\"\n  48: RTK_AWARENESS_SHA256 = \"278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc\"\n  49: UPSTREAM_MARKER = \"<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\\n\"\n  50: \n```\n\n`tests/test_codex_worker_lane.py:183-212`\n```\n 183: \n 184: \n 185: def template_segments() -> tuple[str, str, str]:\n 186:     \"\"\"(top-rule block, upstream awareness text, exceptions block) of the AGENTS template.\"\"\"\n 187:     text = (TEMPLATES / \"codex.AGENTS.template.md\").read_text(encoding=\"utf-8\")\n 188:     body = text.split(\"\\n\", 1)[1]  # after the begin marker line\n 189:     top, rest = body.split(\"\\n\" + UPSTREAM_MARKER, 1)\n 190:     upstream, exceptions = rest.split(\"\\n<!-- native-agent-stack:rtk-exceptions -->\\n\", 1)\n 191:     return top, upstream, exceptions\n 192: \n 193: \n 194: class TemplateTests(unittest.TestCase):\n 195:     def test_agents_template_is_one_managed_block(self):\n 196:         text = (TEMPLATES / \"codex.AGENTS.template.md\").read_text(encoding=\"utf-8\")\n 197:         self.assertTrue(text.startswith(lane.BLOCK_BEGIN))\n 198:         self.assertTrue(text.endswith(lane.BLOCK_END + \"\\n\"))\n 199:         self.assertEqual(text.count(lane.BLOCK_BEGIN), 1)\n 200:         self.assertEqual(text.count(lane.TOP_RULE_MARKER), 1)\n 201:         self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 1)\n 202:         self.assertEqual(lane.agents_block(), text)\n 203:         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.\n 204:         self.assertFalse([line for line in text.splitlines() if line.startswith(\"@\")])\n 205:         self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes\n 206: \n 207:     def test_top_rule_and_upstream_text_are_verbatim(self):\n 208:         top, upstream, _ = template_segments()\n 209:         self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n 210:         self.assertEqual(len(top.split()), 120)\n 211:         self.assertEqual(hashlib.sha256(upstream.encode(\"utf-8\")).hexdigest(), RTK_AWARENESS_SHA256)\n 212: \n```\n\n`tools/adoption/apply_codex_lane.py:12-15`\n```\n  12:                 timeout option, so a server it registered has none). No other key is sent.\n  13:   AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk\n  14:                 v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its\n  15:                 begin and end markers; every other line is kept. Hash-guarded atomic write.\n```\n\n`evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt:1-6`\n```\n   1: # As run on 2026-09-26 (paths masked); a record, not a maintained tool.\n   2: \"\"\"Assemble adoption/templates/codex.AGENTS.template.md from its three verified sources (scratch build step).\n   3: \n   4: 1. the staged top-rule block (120 words by wc -w, marker line included), byte for byte;\n   5: 2. rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, fetched with gh api at the tag, byte for byte;\n   6: 3. this catalog's exceptions block.\n```\n\n`docs/decisions/2026-09-26-codex-worker-lane.md:57-60`\n```\n  57: 3. **`AGENTS.md` carries the text itself.** Codex reads one global file: `AGENTS.override.md` when it has text,\n  58:    else `AGENTS.md` (the Codex AGENTS.md guide, read 2026-09-26). The block has three parts:\n  59:    - the top rule (120 words, marker `native-agent-stack:top-rule`);\n  60:    - rtk-ai/rtk v0.50.0's `hooks/rtk-awareness-full.md`, verbatim (tag commit `1d87b8e7`, sha256 `278274ef…`,\n```",
+   "return_A": {
+    "verdict": "amend",
+    "effective_resolution": {
+     "summary": "Replacement (verbatim) of line 3, applied with the co-changes its reasons name, recomputed by the packet's procedure.",
+     "line_3": "Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+     "tree": "amended/",
+     "diff": "amendment.diff",
+     "co_changes": "tests/test_codex_worker_lane.py: TOP_RULE_SHA256 (:47) set to ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d, the word count at :210 and the :45 comment set to 153, both computed with the test module's own template_segments(); manifests/evidence.json: the template and the test re-registered (docs/lanes.md:96-128); host step, outside the repository: re-run tools/adoption/apply_codex_lane.py (dry run, then --apply) where the lane block is installed.",
+     "line_3_words": 51,
+     "template_bytes": 3371,
+     "top_rule_block_words": 153,
+     "coordinator_measurements": [
+      {
+       "check": "line 3 set to this text, tests/test_codex_worker_lane.py at the other text's pin (no re-pin)",
+       "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+       "exit_code": 1,
+       "output_lines": [
+        "FAIL: test_top_rule_and_upstream_text_are_verbatim (tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim)",
+        "AssertionError: 'ce957fd86d5457f0e0a83fa726afa5aa4fbfd94d49471835dc83526ce3aa3b9d' != '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f'",
+        "Ran 1 test in 0.001s",
+        "FAILED (failures=1)"
+       ]
+      },
+      {
+       "check": "the same with the re-pinned test",
+       "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+       "exit_code": 0,
+       "output_lines": [
+        "Ran 1 test in 0.000s",
+        "OK"
+       ]
+      },
+      {
+       "check": "template and test changed, manifest not yet re-registered",
+       "command": "python3 scripts/validate.py",
+       "exit_code": 1,
+       "output_lines": [
+        "Publication validation failed:",
+        "adoption/templates/codex.AGENTS.template.md: SHA-256 mismatch",
+        "adoption/templates/codex.AGENTS.template.md: byte count mismatch",
+        "tests/test_codex_worker_lane.py: SHA-256 mismatch"
+       ]
+      },
+      {
+       "check": "after registering the changed files (X5a's already registered)",
+       "command": "python3 scripts/validate.py",
+       "exit_code": 0,
+       "output_lines": [
+        "{\"components\": 69, \"hashed_files\": 7478, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+        "Integrity and scope checks only; no live provider or GPU execution."
+       ]
+      },
+      {
+       "check": "the complete change (amended/): the test modules that read either template or the pin",
+       "command": "python3 -B -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency",
+       "exit_code": 0,
+       "output_lines": [
+        "Ran 353 tests in 55.195s",
+        "OK (skipped=15)"
+       ]
+      }
+     ]
+    },
+    "reasons": "The mechanics of the proposal are right. Line 3 grows from 18 to 42 words, so the block grows from 120 to 144 words (test :210). Line 3 grows from 108 to 280 bytes (+172), which matches the manifest change from 3151 to 3323. The new pin equals the actual hash printed by the failing control (packet.md:362). No fixture or other maintained file copies the line; outside the two templates, the only copy is in a dated evidence artifact. with_block() replaces everything between the block markers (apply_codex_lane.py:291-292), so the host step of re-running the installer is correct. The text itself fails the packet's 'keeps its existing meaning' test. It drops the base clause that makes the installed client a source of truth (base :3). The proposer kept that same clause in X5a because of docs/harness-defaults.md:58 (packet.md:61). That long form covers Codex too: harness-defaults.md:62 lists `codex --version` and `codex debug prompt-input` under Installed client. The check order in line 5 softens the loss but does not restate that status. Next to a heading that makes current upstream SOTA the source of truth, a Codex worker could trust upstream over what its installed version actually does. The two templates of the same rule would also disagree. The counterargument is that the operator's paragraph does not mention the installed client. The packet, however, asks for both: carry the operator's wording and keep the file's meaning. A separate sentence restores the clause without altering the operator's text. The amendment mirrors X5a without the bold. It keeps the operator's heading sentence with its own period, in line with harness-rules-cleanup.md:15 ('Decided wording stays verbatim wherever it appears'). It keeps the compounds sentence verbatim and keeps 'never self-write without a SOTA source'. It also makes line 3 identical in both templates apart from markup. Co-changes, recomputed by the same procedure: line 3 becomes 51 words and 328 bytes, so the block becomes 153 words (set test :210 and the :45 comment to 153). The template becomes 3371 bytes, still under the 8192-byte assertion at :205. TOP_RULE_SHA256 must be recomputed with template_segments(). I cannot hash here, so the value stays unknown until the coordinator runs the same failing-then-passing control. Re-register the template and the test file (docs/lanes.md:96-128). The 'Top rule:' replacement at :404 still matches exactly once. The host step is unchanged: a dry run of apply_codex_lane.py, then --apply. Two non-blocking notes: the 'staged' wording in the :45 comment and the '120 words' in docs/decisions/2026-09-26-codex-worker-lane.md:59 are a comment and a dated record.",
+    "sources": [
+     {
+      "locator": "base/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: never self-write without a SOTA source; upstream and the installed client are the source of truth."
+     },
+     {
+      "locator": "proposed/adoption/templates/codex.AGENTS.template.md:3",
+      "quote": "Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "base/docs/harness-defaults.md:58",
+      "quote": "Upstream repositories, their changelogs and release notes, and the installed client are the source of truth."
+     },
+     {
+      "locator": "base/docs/harness-defaults.md:62",
+      "quote": "1. **Installed client.** Its version, commands, `--help` and the settings it reads: `claude --version`, `codex --version`, `/help` and `/config` in a session."
+     },
+     {
+      "locator": "base/adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "packet.md:61",
+      "quote": "It also keeps the installed client as a source of"
+     },
+     {
+      "locator": "proposed/examples/claude-native/CLAUDE.md:3",
+      "quote": "The installed client is also a source of truth; never self-write without a SOTA source."
+     },
+     {
+      "locator": "base/docs/decisions/2026-09-26-harness-rules-cleanup.md:15",
+      "quote": "- Decided wording stays verbatim wherever it appears: the top rule"
+     },
+     {
+      "locator": "base/tests/test_codex_worker_lane.py:210",
+      "quote": "self.assertEqual(len(top.split()), 120)"
+     },
+     {
+      "locator": "base/tests/test_codex_worker_lane.py:205",
+      "quote": "self.assertLess(len(text.encode(\"utf-8\")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes"
+     },
+     {
+      "locator": "base/tests/test_codex_worker_lane.py:404",
+      "quote": "old = block.replace(\"Top rule:\", \"Old rule:\")"
+     },
+     {
+      "locator": "base/tools/adoption/apply_codex_lane.py:291-292",
+      "quote": "return text[:span[0]] + block + text[span[1]:]"
+     },
+     {
+      "locator": "packet.md:362",
+      "quote": "AssertionError: '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f' != '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311'"
+     },
+     {
+      "locator": "base/docs/decisions/2026-09-26-codex-worker-lane.md:59",
+      "quote": "- the top rule (120 words, marker `native-agent-stack:top-rule`);"
+     }
+    ]
+   },
+   "return_B": {
+    "verdict": "agree",
+    "effective_resolution": {
+     "summary": "Agrees with the packet's proposed text for this item, exactly as written in the item, applied with the co-changes the packet lists.",
+     "line_3": "Top rule: research convergence first; current upstream SOTA is the source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.",
+     "tree": "proposed/",
+     "diff": "proposal.diff",
+     "co_changes": "tests/test_codex_worker_lane.py: TOP_RULE_SHA256 (:47) set to 71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f, the word count at :210 and the :45 comment set to 144, both computed with the test module's own template_segments(); manifests/evidence.json: the template and the test re-registered (docs/lanes.md:96-128); host step, outside the repository: re-run tools/adoption/apply_codex_lane.py (dry run, then --apply) where the lane block is installed.",
+     "line_3_words": 42,
+     "template_bytes": 3323,
+     "top_rule_block_words": 144,
+     "coordinator_measurements": [
+      {
+       "check": "line 3 set to this text, tests/test_codex_worker_lane.py at the base pin (no re-pin)",
+       "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+       "exit_code": 1,
+       "output_lines": [
+        "FAIL: test_top_rule_and_upstream_text_are_verbatim (tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim)",
+        "AssertionError: '71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f' != '476b73c52ecc64bdf5152fe4b5188aef8d22db6f3f8816789a0842abe2841311'",
+        "Ran 1 test in 0.001s",
+        "FAILED (failures=1)"
+       ]
+      },
+      {
+       "check": "the same with the re-pinned test",
+       "command": "python3 -B -m unittest tests.test_codex_worker_lane.TemplateTests.test_top_rule_and_upstream_text_are_verbatim",
+       "exit_code": 0,
+       "output_lines": [
+        "Ran 1 test in 0.000s",
+        "OK"
+       ]
+      },
+      {
+       "check": "template and test changed, manifest not yet re-registered",
+       "command": "python3 scripts/validate.py",
+       "exit_code": 1,
+       "output_lines": [
+        "Publication validation failed:",
+        "adoption/templates/codex.AGENTS.template.md: SHA-256 mismatch",
+        "adoption/templates/codex.AGENTS.template.md: byte count mismatch",
+        "tests/test_codex_worker_lane.py: SHA-256 mismatch"
+       ]
+      },
+      {
+       "check": "after registering the changed files (with X5a's)",
+       "command": "python3 scripts/validate.py",
+       "exit_code": 0,
+       "output_lines": [
+        "{\"components\": 69, \"hashed_files\": 7478, \"profiles\": 4, \"receipts\": 159, \"status\": \"passed\"}",
+        "Integrity and scope checks only; no live provider or GPU execution."
+       ]
+      },
+      {
+       "check": "the complete change (proposed/): the test modules that read either template or the pin",
+       "command": "python3 -B -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_codex_agents tests.test_codex_lane tests.test_landscape_sweep_harness tests.test_adoption_docs_consistency",
+       "exit_code": 0,
+       "output_lines": [
+        "Ran 353 tests in 55.314s",
+        "OK (skipped=15)"
+       ]
+      }
+     ]
+    },
+    "reasons": "Read together with unchanged lines 4–8, the proposed opening preserves the operational meaning: installed-client-first, version-specific verification remains mandatory. The operator’s convergence and compounding wording is carried correctly. Independently reproduced the 144-word count and new hash; the three focused template tests and custom-agent consistency test pass. Both registrations match the original registration procedure exactly. The dated 120-word assembly record is historical. Existing host installations still require the stated reapplication step.",
+    "sources": [
+     {
+      "locator": "proposed/adoption/templates/codex.AGENTS.template.md:5",
+      "quote": "Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs."
+     },
+     {
+      "locator": "proposed/tests/test_codex_worker_lane.py:47",
+      "quote": "TOP_RULE_SHA256 = \"71a852be0b5ebd2c3610e2d9952e01f4009939c49a9ac691d0f1e4e3f798ca7f\""
+     },
+     {
+      "locator": "proposed/tests/test_codex_worker_lane.py:209",
+      "quote": "self.assertEqual(hashlib.sha256(top.encode(\"utf-8\")).hexdigest(), TOP_RULE_SHA256)\n        self.assertEqual(len(top.split()), 144)\n        self.assertEqual(hashlib.sha256(upstream.encode(\"utf-8\")).hexdigest(), RTK_AWARENESS_SHA256)"
+     },
+     {
+      "locator": "proposed/scripts/host_receipts.py:717",
+      "quote": "raw = target.read_bytes()\n    record = {\"path\": relative_path, \"sha256\": hashlib.sha256(raw).hexdigest(), \"bytes\": len(raw)}"
+     },
+     {
+      "locator": "proposed/evidence/artifacts/codex-worker-lane-20260926/scripts/assemble_agents.py.txt:1",
+      "quote": "# As run on 2026-09-26 (paths masked); a record, not a maintained tool."
+     },
+     {
+      "locator": "proposed/tools/adoption/apply_codex_lane.py:13",
+      "quote": "AGENTS.md     the managed block of adoption/templates/codex.AGENTS.template.md (the top rule, rtk-ai/rtk\n                v0.50.0's awareness text verbatim, this catalog's exceptions), inserted or replaced between its\n                begin and end markers; every other line is kept."
+     },
+     {
+      "locator": "[Official Codex instruction guide](https://learn.chatgpt.com/docs/agent-configuration/agents-md)",
+      "quote": "Codex reads `AGENTS.md` files before doing any work."
+     }
+    ]
+   }
+  }
+ ]
+}

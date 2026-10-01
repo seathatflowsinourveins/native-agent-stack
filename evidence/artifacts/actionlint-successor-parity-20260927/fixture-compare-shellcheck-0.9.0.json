@@ -1,0 +1,139 @@
+{
+ "counts": {
+  "identical": 3,
+  "only_new": 4,
+  "only_old": 8,
+  "relocated": 2,
+  "reworded": 0
+ },
+ "identical": [
+  {
+   "column": 21,
+   "filepath": ".github/workflows/c10-max-parallel-zero.yml",
+   "kind": "syntax-check",
+   "line": 5,
+   "message": "value at \"max-parallel\" must be greater than zero: 0"
+  },
+  {
+   "column": 24,
+   "filepath": ".github/workflows/c2-step-outputs.yml",
+   "kind": "expression",
+   "line": 10,
+   "message": "property \"get_value\" is not defined in object type {}"
+  },
+  {
+   "column": 24,
+   "filepath": ".github/workflows/c2-step-outputs.yml",
+   "kind": "expression",
+   "line": 22,
+   "message": "property \"get_value\" is not defined in object type {}"
+  }
+ ],
+ "only_new": [
+  {
+   "column": 10,
+   "filepath": ".github/workflows/c6-queue-conflict.yml",
+   "kind": "expression",
+   "line": 4,
+   "message": "\"queue: max\" cannot be combined with \"cancel-in-progress: true\" in \"concurrency\" section"
+  },
+  {
+   "column": 15,
+   "filepath": ".github/workflows/c7-cache-operation.yml",
+   "kind": "cache-operation",
+   "line": 7,
+   "message": "\"actions/cache/save\" cannot save caches with effective cache-mode \"read\". GitHub skips the operation; remove this cache step or select an action and mode that match the job's intended cache access"
+  },
+  {
+   "column": 13,
+   "filepath": ".github/workflows/c8-cache-write-untrusted.yml",
+   "kind": "cache-write-untrusted",
+   "line": 2,
+   "message": "cache-mode \"write\" grants cache writes for low-trust trigger(s) \"pull_request_target\". untrusted code or input can poison caches consumed by privileged workflows. use \"read\" or \"none\", or document a reviewed exception with an inline suppression"
+  },
+  {
+   "column": 7,
+   "filepath": ".github/workflows/c9-schedule-missing-cron.yml",
+   "kind": "syntax-check",
+   "line": 4,
+   "message": "\"cron\" is missing in element of \"schedule\" section"
+  }
+ ],
+ "only_old": [
+  {
+   "column": 15,
+   "filepath": ".github/workflows/c3-fromjson-matrix.yml",
+   "kind": "syntax-check",
+   "line": 4,
+   "message": "\"strategy\" section is scalar node but mapping node is expected"
+  },
+  {
+   "column": 18,
+   "filepath": ".github/workflows/c3-fromjson-matrix.yml",
+   "kind": "expression",
+   "line": 5,
+   "message": "property \"os\" is not defined in object type {}"
+  },
+  {
+   "column": 1,
+   "filepath": ".github/workflows/c4-description-cancel-timeout.yml",
+   "kind": "syntax-check",
+   "line": 1,
+   "message": "unexpected key \"description\" for \"workflow\" section. expected one of \"concurrency\", \"defaults\", \"env\", \"jobs\", \"name\", \"on\", \"permissions\", \"run-name\""
+  },
+  {
+   "column": 5,
+   "filepath": ".github/workflows/c4-description-cancel-timeout.yml",
+   "kind": "syntax-check",
+   "line": 6,
+   "message": "unexpected key \"cancel-timeout-minutes\" for \"job\" section. expected one of \"concurrency\", \"container\", \"continue-on-error\", \"defaults\", \"env\", \"environment\", \"if\", \"name\", \"needs\", \"outputs\", \"permissions\", \"runs-on\", \"secrets\", \"services\", \"snapshot\", \"steps\", \"strategy\", \"timeout-minutes\", \"uses\", \"with\""
+  },
+  {
+   "column": 3,
+   "filepath": ".github/workflows/c5-queue-max.yml",
+   "kind": "syntax-check",
+   "line": 4,
+   "message": "unexpected key \"queue\" for \"concurrency\" section. expected one of \"cancel-in-progress\", \"group\""
+  },
+  {
+   "column": 3,
+   "filepath": ".github/workflows/c6-queue-conflict.yml",
+   "kind": "syntax-check",
+   "line": 4,
+   "message": "unexpected key \"queue\" for \"concurrency\" section. expected one of \"cancel-in-progress\", \"group\""
+  },
+  {
+   "column": 5,
+   "filepath": ".github/workflows/c7-cache-operation.yml",
+   "kind": "syntax-check",
+   "line": 5,
+   "message": "unexpected key \"cache-mode\" for \"job\" section. expected one of \"concurrency\", \"container\", \"continue-on-error\", \"defaults\", \"env\", \"environment\", \"if\", \"name\", \"needs\", \"outputs\", \"permissions\", \"runs-on\", \"secrets\", \"services\", \"snapshot\", \"steps\", \"strategy\", \"timeout-minutes\", \"uses\", \"with\""
+  },
+  {
+   "column": 1,
+   "filepath": ".github/workflows/c8-cache-write-untrusted.yml",
+   "kind": "syntax-check",
+   "line": 2,
+   "message": "unexpected key \"cache-mode\" for \"workflow\" section. expected one of \"concurrency\", \"defaults\", \"env\", \"jobs\", \"name\", \"on\", \"permissions\", \"run-name\""
+  }
+ ],
+ "relocated": [
+  {
+   "filepath": ".github/workflows/c1-shellcheck-integ.yml",
+   "kind": "shellcheck",
+   "line": 6,
+   "message": "shellcheck reported issue in this script: SC2086:info:1:6: Double quote to prevent globbing and word splitting",
+   "new_column": 19,
+   "old_column": 9
+  },
+  {
+   "filepath": ".github/workflows/c1-shellcheck-integ.yml",
+   "kind": "shellcheck",
+   "line": 14,
+   "message": "shellcheck reported issue in this script: SC2086:info:1:6: Double quote to prevent globbing and word splitting",
+   "new_column": 19,
+   "old_column": 9
+  }
+ ],
+ "reworded": []
+}

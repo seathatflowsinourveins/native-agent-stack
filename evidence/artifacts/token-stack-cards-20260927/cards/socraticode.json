@@ -1,0 +1,582 @@
+{
+ "tool": "socraticode",
+ "group": "g4-retrieval-memory",
+ "repo": "https://github.com/giancarloerra/SocratiCode",
+ "pin": "1.14.0 (npm, --ignore-scripts; source 2218f25153d0; 1.15.0 staged but deferred, #345)",
+ "installed_version": "1.14.0 (`npm ls --global --prefix .../socraticode-1.14.0`, never --version: every invocation starts the server)",
+ "role": "Semantic code retrieval over Qdrant plus vLLM Nemotron embeddings (:18231), returning ranked chunks instead of files. Lanes: Claude project-scoped MCP (native-agent-stack); Codex user-scope MCP. Indexed here: $HOME/code/native-agent-stack-live (collection codebase_9c518b2ee5c8, 5,898 files) and $HOME/code/native-agent-stack/fixtures. Landscape: semantic-rag winner.",
+ "lanes": [
+  "Claude project MCP",
+  "Codex user-scope MCP",
+  "mcporter with explicit env (examples/mcporter.json.example)"
+ ],
+ "upstream": {
+  "latest_release": "v1.15.0; live rechecked 2026-09-27T01:11:26Z (2026-09-26 local), unchanged since the earlier research; tag commit f6191f076a42405f0d5508139f3a8b505cfef93a. Sources: https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest ; https://api.github.com/repos/giancarloerra/SocratiCode/tags?per_page=5 ; https://registry.npmjs.org/socraticode/latest . The browser-cached releases/latest page returned stale v1.14.0, so the fresh API and registry responses determine this finding.",
+  "latest_date": "2026-09-24; GitHub published_at 2026-09-24T10:58:58Z, npm publication 2026-09-24T11:01:27.714Z. Sources: https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest ; https://registry.npmjs.org/socraticode .",
+  "our_pin": "1.14.0; source_pin 2218f25153d0f3f4a76ee240a5643dbc873e80be; repository https://github.com/giancarloerra/SocratiCode; license AGPL-3.0-only with an upstream commercial alternative, as recorded in manifests/stack.json#/components[id=socraticode] and recipes/README.md, component catalog. GitHub's v1.14.0 tag resolves to the same commit: https://api.github.com/repos/giancarloerra/SocratiCode/tags?per_page=5 ; npm independently identifies the package's license as AGPL-3.0-only: https://registry.npmjs.org/socraticode/latest .",
+  "behind_by": "1 published release and 41 commits from the exact source pin to v1.15.0; unchanged since the earlier check. Fresh compare response: status=ahead, ahead_by=41, behind_by=0, total_commits=41. Sources: https://api.github.com/repos/giancarloerra/SocratiCode/compare/2218f25153d0f3f4a76ee240a5643dbc873e80be...v1.15.0 ; https://github.com/giancarloerra/SocratiCode/compare/v1.14.0...v1.15.0 .",
+  "recommended_install": {
+   "command": "npx -y --prefer-online socraticode@latest (upstream MCP-server launcher, launched by the host); for a reproducible candidate use socraticode@1.15.0 in the same launcher. Upstream requires Node.js 18.17+ with npx and, for its default Qdrant/Ollama setup, Docker; an externally configured service profile is also supported.",
+   "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#quick-start"
+  },
+  "recommended_wiring": {
+   "claude_code": {
+    "how": "MCP-only: claude mcp add --scope user socraticode -- npx -y --prefer-online socraticode@latest. Plugin alternative: claude plugin marketplace add giancarloerra/socraticode, then claude plugin install --scope user socraticode@socraticode; open a new session and index, check status, then search. Use one registration route. The plugin adds exploration/management skills and an explorer agent; v1.15.0 allows its engine to be pinned with SOCRATICODE_SPEC=socraticode@1.15.0, while its default still floats.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#claude-code"
+   },
+   "codex": {
+    "how": "MCP-only: codex mcp add socraticode -- npx -y --prefer-online socraticode@latest. Plugin alternative: codex plugin marketplace add giancarloerra/socraticode --ref main, then codex plugin add socraticode@socraticode; start a new task. The Codex plugin uses the shared .mcp.json launcher, which still specifies socraticode@latest; SOCRATICODE_SPEC is a Claude-plugin feature, so pin a standalone Codex launcher explicitly when reproducibility is required.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#openai-codex"
+   }
+  },
+  "official_baseline_claims": [
+   {
+    "claim": "Upstream advertises 61% less context, 84% fewer tool calls and 37x faster exploration than grep-based exploration in its VS Code benchmark, using Claude Opus 4.6 on a 2.45-million-line codebase. These are upstream task/benchmark claims, not a 1.14.0-to-1.15.0 comparison, our stack's results, or provider-billing savings.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#real-world-benchmark-vs-code-245m-lines-of-code-with-claude-opus-46"
+   },
+   {
+    "claim": "Search combines dense semantic retrieval and BM25 with reciprocal-rank fusion, and the default auto watcher refreshes an indexed project. The server also exposes dependency/symbol graphs and searchable context artifacts; these are retrieval capabilities rather than a native token-savings counter.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/DEVELOPER.md#architecture-overview"
+   }
+  ],
+  "limitations": [
+   {
+    "text": "Indexing is asynchronous; check codebase_status and search after indexing completes. codebase_status reports index progress/state and chunk counts, not saved tokens; search results still need checking against the original source.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#example-workflow"
+   },
+   {
+    "text": "Coverage depends on indexing scope and ignore rules. Dot-files and dot-directories are excluded by default, so a search miss is not evidence that a hidden configuration or agent definition does not exist.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#ignore-rules"
+   },
+   {
+    "text": "Watcher/manual/off settings determine freshness: disabling the watcher and startup recovery deliberately leaves a snapshot requiring explicit codebase_update. Branch indexes are shared by default; branch-aware indexing is opt-in and an explicit project ID overrides branch separation.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#environment-variables"
+   },
+   {
+    "text": "Embedding and vector-storage services are prerequisites, not provided by a bare MCP registration. The default uses local Ollama and Qdrant; alternate endpoints require compatible embedding dimensions/model configuration. This does not route Claude/Codex generation traffic or prove prompt-cache savings.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#configuration"
+   },
+   {
+    "text": "The Claude plugin's duplicate-registration notice is a SessionStart hook; it does not intercept arbitrary reads or compress every tool result. MCP-only adoption does not automatically install the plugin's agent/skill instructions.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/hooks/hooks.json"
+   }
+  ],
+  "new_since_pin": [
+   {
+    "text": "v1.15.0 adds SOCRATICODE_SPEC expansion to .claude-plugin/mcp.json so the Claude plugin's engine can be pinned. The shared .mcp.json used by Codex/Cursor remains unchanged and floating.",
+    "url": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/tests/unit/distribution-launchers.test.ts"
+   },
+   {
+    "text": "v1.15.0 waits for collection creation already in progress in the same process before reading it, addressing the initial-index/status Qdrant race tracked in issue #176.",
+    "url": "https://github.com/giancarloerra/SocratiCode/commit/5b8eb16e739eafe871c695e23dcc23a6de5448d5"
+   },
+   {
+    "text": "v1.15.0 retains the underlying Qdrant error reason and delivers MCP logging notifications, addressing issue #178; clients must tolerate the new notifications/message stream.",
+    "url": "https://github.com/giancarloerra/SocratiCode/commit/9f65b5063b4928ab6c713665b3660f383511f286"
+   },
+   {
+    "text": "v1.15.0 expands and corrects PHP graph extraction/resolution, including scoped aliases, qualified/static calls, inheritance, typed properties, structural/type edges and non-ASCII identifiers, while reducing repeated parser traversal. The release does not claim a new measured model-token reduction.",
+    "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0"
+   }
+  ]
+ },
+ "native_adaptation": {
+  "stack_entry": {
+   "id": "socraticode",
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "version": "1.14.0",
+   "license": "AGPL-3.0-only; upstream commercial alternative",
+   "profile": "core",
+   "role": "Automatically refreshed semantic code retrieval and native code graph",
+   "source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+   "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+  },
+  "how_we_install": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0; launch its versioned lib/node_modules/socraticode/dist/index.js through the owned Node executable. Sources: recipes/README.md, component catalog; adoption/pins-linux-x86_64.json, tools[id=socraticode] (ignore_scripts=true and npm-metadata version probe); manifests/stack.json, component socraticode. The pins file now drives bootstrap installation, superseding the older decision text that said no pin entry existed. Every executable invocation starts the MCP server, so use npm metadata rather than --version. The qualified 1.15.0 prefix remains staged while 1.14.0 is production: docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150.",
+  "claude_wiring": "Standalone stdio MCP scoped to the main project: live $HOME/.claude.json stores the socraticode entry under projects for $HOME/code/native-agent-stack, with no user-global socraticode entry; technically this is private project/local configuration, not a committed .mcp.json registration. The portable server definition is examples/claude-mcp.json.example; adoption/templates/claude.settings.template.json contains no socraticode MCP registration. It launches the pinned 1.14.0 dist/index.js with external Qdrant and the lmstudio-compatible embedding adapter. examples/claude-native/agents/isolated-builder.md and evidence-reviewer.md explicitly allow SocratiCode tools and direct conceptual-code retrieval; those definitions still require an available server in their actual project.",
+  "codex_wiring": "Codex USER scope, moved by docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1, and documented in docs/token-session-handbook.md, Codex user-scope MCP servers. adoption/templates/codex.config.template.toml [mcp_servers.socraticode] pins the 1.14.0 dist/index.js path, startup_timeout_sec=120, external Qdrant, lmstudio-compatible vLLM/Nemotron embeddings (2048 dimensions, 4096 context, query/passage prefixes), SOCRATICODE_WATCHER=auto, INCLUDE_DOT_FILES=false and SEARCH_DEFAULT_LIMIT=3. Live $HOME/.codex/config.toml matches that engine/environment but omits startup_timeout_sec; the host's untracked .codex/config.toml also contains a project entry and includes 120. git ls-files .codex returned no tracked files, so that host copy is not portable repository configuration.",
+  "lane_rule": "Use SocratiCode for conceptual code with an explicit projectPath and no implicit linked projects; check health/index completeness and open the original source before judging. Use bounded original reads/rg for known paths and Serena for symbols/references; choose one context method per artifact. Sources: docs/token-session-handbook.md, Choose one useful context method per artifact and per-tool table; recipes/README.md#local-semantic-code-search. User-scope Codex availability follows docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1; the routing rationale keeping jCodeMunch project-scoped is in docs/decisions/2026-09-23-claude-user-profile.md, 2026-09-25 addendum.",
+  "deviations_from_upstream": [
+   {
+    "what": "Production remains on 1.14.0 while upstream publishes 1.15.0. Contrary to the earlier full-save/cur/socraticode/gpt6.md recommendation to qualify it, the newer native decision says qualification already passed; cutover is deferred. Sources: manifests/stack.json; docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150; https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0 .",
+    "why": "The retained decision requires coordinated client restarts and observes a cooldown through 2026-10-01T11:01Z; its 2026-09-26 update says Codex is available again. Mixing builders can cause repeated graph rebuilds, and the source review identifies a possible startup-cleanup race that was not reproduced. Source: docs/decisions/2026-09-25-workstation-sota-refresh.md, mixed-version source review.",
+    "fix": "Follow that recorded cutover procedure after its gate: update every launcher and the templates together, retire old sessions normally, keep the shared lock-directory convention, restart one 1.15.0 owner, verify graph builder identity and native Claude/Codex handling of log notifications, then add other clients. Do not use codebase_stop to terminate another session's owner. Source: the same decision, cutover procedure.",
+    "pr": "#345"
+   },
+   {
+    "what": "Our standalone launcher pins an installed engine, while the upstream 1.14.0 Claude plugin and shared .mcp.json launch socraticode@latest; v1.15.0 only adds a pin override to the Claude-specific launcher. Sources: rr/socraticode/records.json, socraticode-00b-package-surfaces; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.claude-plugin/mcp.json ; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.mcp.json .",
+    "why": "The stack deliberately promotes qualified versions through an owned versioned prefix, avoiding plugin metadata being mistaken for an engine pin. Sources: manifests/stack.json; adoption/templates/codex.config.template.toml; docs/decisions/2026-09-25-workstation-sota-refresh.md.",
+    "fix": "Retain the single pinned standalone registration; if adopting the Claude plugin later, set SOCRATICODE_SPEC to the qualified version and remove the duplicate standalone entry. For Codex keep the explicit versioned standalone launcher because the Claude override does not control its shared launcher. Source: https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/tests/unit/distribution-launchers.test.ts .",
+    "pr": null
+   },
+   {
+    "what": "The recipe skips npm lifecycle scripts and substitutes native external Qdrant plus vLLM/Nemotron embeddings for upstream's default Docker/Ollama stack. Sources: recipes/README.md, component catalog and Local semantic code search; adoption/pins-linux-x86_64.json; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#configuration .",
+    "why": "This is the stack's explicit native-service profile; upstream's lmstudio adapter accepts the compatible local endpoint, and LM Studio itself is not installed for this recipe. It leaves host generation models unchanged. Source: recipes/README.md#local-semantic-code-search.",
+    "fix": "Keep the supported adapter/profile and qualify its actual health, indexing, graph/symbol tools and returned chunks after package or embedding changes; verify the model width/prefixes and native dependency behavior instead of assuming --ignore-scripts proves functional acceptance. Sources: recipes/README.md#local-semantic-code-search; docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150.",
+    "pr": null
+   },
+   {
+    "what": "Our adopted search profile excludes dot-directories, so it cannot satisfy queries whose needed source is in .claude/. This agrees with upstream defaults but is a concrete native coverage limitation, recorded in token-cards/cards/socraticode.json, prior_evidence (#316), and INCLUDE_DOT_FILES=false in adoption/templates/codex.config.template.toml.",
+    "why": "The index intentionally respects gitignore and excludes hidden paths; semantic similarity cannot retrieve files never indexed. Sources: adoption/templates/codex.config.template.toml; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#ignore-rules .",
+    "fix": "For a known hidden file, use the original bounded read/rg lane. If recurring tasks require hidden content, explicitly review the allowed scope, enable dot-file coverage only for that adopted index, refresh it and verify a known hidden-path result. Sources: docs/token-session-handbook.md, context-method rules; upstream ignore-rules documentation.",
+    "pr": "#316"
+   },
+   {
+    "what": "Live Codex USER scope omits startup_timeout_sec=120 even though the portable template and the main checkout's untracked project copy include it; this difference is visible only outside that project override. Sources: $HOME/.codex/config.toml [mcp_servers.socraticode]; .codex/config.toml; adoption/templates/codex.config.template.toml.",
+    "why": "The two rendered scopes have drifted after the user-scope migration; the concrete mismatch is verified, but a startup failure caused by it is UNVERIFIED. Source: direct comparison of those three configuration blocks.",
+    "fix": "Apply the template's startup_timeout_sec=120 to the user registration and verify MCP startup from a fresh worktree; reconcile the host-only project duplicate when rendering the current project template. Sources: docs/token-session-handbook.md, Codex user-scope MCP servers; docs/decisions/2026-09-25-codex-mcp-scope.md, Decision 1 and host verification.",
+    "pr": null
+   }
+  ],
+  "pending_fixes": [
+   "Complete the documented coordinated 1.15.0 cutover after its recorded gate; the package is already qualified, while production-client restart and notification handling remain cutover checks (docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150; git log commit ca6d347f, #345).",
+   "Synchronize the live Codex user startup timeout with the portable template and check fresh-worktree startup, avoiding reliance on the host-only project override (adoption/templates/codex.config.template.toml; $HOME/.codex/config.toml; docs/decisions/2026-09-25-codex-mcp-scope.md).",
+   "Keep hidden-file queries on bounded original reads unless hidden-path indexing is explicitly adopted and verified (docs/token-session-handbook.md; token-cards/cards/socraticode.json, prior_evidence).",
+   "Arm-B remains pending and capacity-gated; do not turn the existing artifact comparisons or the small lanes-block population into a causal/provider-savings result (token-cards/cards/socraticode.json#/invoke_rates/arm_b_native)."
+  ],
+  "assessment": "The adaptation follows supported native MCP/external-embedding interfaces, but production is deliberately one release behind the already qualified candidate (recipes/README.md; docs/decisions/2026-09-25-workstation-sota-refresh.md), and the card reports status=pass with records_total=34 under evidence_class='local integration (upstream commands on this host, returned data retained)' (token-cards/cards/socraticode.json#/e2e_returned_results; rr/socraticode/records.json; rr/returned-results.json). Its separate evidence_class='exact artifact comparison' rows are before_tokens=16096, after_tokens=4832, change_pct=-70.0 for claude_subagent and before_tokens=16096, after_tokens=1505, change_pct=-90.6 for codex_worker, both o200k_base and answer-verified; html-report/savings.json agrees, and the later retained run explicitly identifies those as prior references with different query limits, so these are not interchangeable experiments or billing savings (token-cards/cards/socraticode.json#/adapted_performance; rr/socraticode/records.json, socraticode-30-exact-o200k-comparisons). Invocation evidence_class='local_integration' separately reports workflow_children agents_using=96, agents=1010 and codex_exec_workers agents_using=11, agents=301; workflow_children_with_lanes_block agents_using=2, agents=22 is too small for a causal conclusion (token-cards/invoke_by_tool.json; token-cards/cards/socraticode.json#/invoke_rates). There were no MCP calls observed in that OTel window, and arm_b_native is 'pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window'; neither an empty OTel series nor registration proves general non-use or a completed Arm-B result, and these evidence classes must not be combined (token-cards/cards/socraticode.json#/invoke_rates)."
+ },
+ "e2e_returned_results": {
+  "status": "pass",
+  "reason": "passed",
+  "run_utc": "2026-09-26T18:00:27.370Z",
+  "fidelity": {
+   "what": "exact artifact comparison predicate",
+   "result": " answer verified (PASS); verifier: agree, 2 defects"
+  },
+  "upstream_commands": [
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/socraticode/mcporter.json list socraticode --brief --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/socraticode/mcporter.json call socraticode.codebase_health --output json --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/socraticode/mcporter.json call socraticode.codebase_status --args {\"projectPath\": \"$HOME/code/native-agent-stack-live\"} --output json --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/socraticode/mcporter.json call socraticode.codebase_search --args {\"projectPath\": \"$HOME/code/native-agent-stack-live\", \"query\": \"how does the host request lane decide whether a GitHub issue or comment is trusted (author_association, user.type)\", \"limit\": 5, \"includeLinked\": false} --output json --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config <scratch>/rr/socraticode/mcporter.json call socraticode.codebase_list_projects --output json --no-oauth",
+    "exit": null,
+    "returned": "passed"
+   },
+   {
+    "cmd": "timeout -k 5 60 bash -c \"$0\" mcp get socraticode --json \"${@:2}\" | python3 \"$1\" $HOME/.local/share/codex-ecosystem/bin/codex <scratch>/rr/socraticode/env_keys.py -c mcp_servers.socraticode.env.SOCRATICODE_WATCHER=\"off\" -c mcp_servers.socraticode.env.SOCRATICODE_AUTO_RESUME=\"off\"",
+    "exit": null,
+    "returned": "passed"
+   }
+  ],
+  "evidence_class": "local integration (upstream commands on this host, returned data retained)",
+  "records_total": 34,
+  "records_shown": [
+   {
+    "id": "socraticode-00a-npm-ls-version",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: npm metadata version probe)",
+    "command": "timeout -k 5 60 $HOME/.local/share/codex-ecosystem/bin/npm ls --global --prefix $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0 --depth=0 --json",
+    "observation": "evidence_class: native execution\nexit_code: 0\nstreams: published unchanged, so the attachment hashes are the raw stream hashes\nreturned: socraticode 1.14.0 (overridden False) in the owned prefix tools/socraticode-1.14.0; pin 1.14.0 (source 2218f25153d0) -> match. socraticode --version is never run because every invocation starts the MCP server; 1.15.0 is staged in its own prefix and deferred (#345).",
+    "attachments": 2
+   },
+   {
+    "id": "socraticode-00b-package-surfaces",
+    "status": "passed",
+    "kind": "package inspection (native execution of cat on the installed package's hook, plugin and MCP manifests)",
+    "command": "timeout -k 5 10 cat $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/hooks/hooks.json $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/.clau",
+    "observation": "evidence_class: native execution of cat (package files as installed)\nexit_code: 0\nstreams: raw hashes and the sanitized copies' hashes are listed below\nhooks/hooks.json defines one SessionStart command that only echoes a duplicate-configuration notice; it saves no tokens. It belongs to the Claude plugin form, whose .mcp.json launches `npx -y --prefer-online socraticode@latest` (unpinned). This host registers the pinn",
+    "attachments": 2
+   },
+   {
+    "id": "socraticode-01-claude-health",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_health\", \"arguments\": {}}",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_01WUyDTMYBEFVPnacswukrxJ); times are that transcript's tool_use and tool_result record timestamps\nbracketing `date -u` marks around the call: 2026-09-26T18:00:25.828Z .. 2026-09-26T18:00:30.478",
+    "attachments": 1
+   },
+   {
+    "id": "socraticode-02-claude-status-during-owner-update",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_status\", \"arguments\": {\"projectPath\": \"$HOME/code/native-agent-stack-live\"}}",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_01Km7dzJb3Kz4RNrkMvUdrKj); times are that transcript's tool_use and tool_result record timestamps\nbracketing `date -u` marks around the call: 2026-09-26T18:00:30.480Z .. 2026-09-26T18:00:42.259",
+    "attachments": 1
+   },
+   {
+    "id": "socraticode-03-claude-status-before-search",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_status\", \"arguments\": {\"projectPath\": \"$HOME/code/native-agent-stack-live\"}}",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_01W5gnwdXv8w8saHZ2wkTCo3); times are that transcript's tool_use and tool_result record timestamps\nbracketing `date -u` marks around the call: 2026-09-26T18:01:26.426Z .. 2026-09-26T18:01:31.507",
+    "attachments": 1
+   },
+   {
+    "id": "socraticode-04-claude-search",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_search\", \"arguments\": {\"projectPath\": \"$HOME/code/native-agent-stack-live\", \"query\": \"how does the host request lane decide whether a GitHub issue or comment is trusted (author_associ",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_0142qzoZLrFitoMZ3dc6zpq1); times are that transcript's tool_use and tool_result record timestamps\nbracketing `date -u` marks around the call: 2026-09-26T18:01:31.509Z .. 2026-09-26T18:01:38.570",
+    "attachments": 2
+   },
+   {
+    "id": "socraticode-05-claude-status-after",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_status\", \"arguments\": {\"projectPath\": \"$HOME/code/native-agent-stack-live\"}}",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_01DayvVowtEZGWbZ5MLe7BV7); times are that transcript's tool_use and tool_result record timestamps\nis_error: absent (not an error); returned 228 B (sanitized copy attached; both hashes below)\nre",
+    "attachments": 1
+   },
+   {
+    "id": "socraticode-06-claude-projects-after",
+    "status": "passed",
+    "kind": "upstream native operation (native execution: MCP tool call)",
+    "command": "{\"tool\": \"mcp__socraticode__codebase_list_projects\", \"arguments\": {}}",
+    "observation": "evidence_class: native execution (the upstream MCP server's own returned content through the native client on this host)\nreturned text copied byte-exact out of the native client's own transcript (tool_result for tool_use toolu_01LWSQfhkGaeiw3XtomutVDZ); times are that transcript's tool_use and tool_result record timestamps\nis_error: absent (not an error); returned 442 B (sanitized copy attached; both hashes below)\nre",
+    "attachments": 1
+   },
+   {
+    "id": "socraticode-07-baseline-cat",
+    "status": "passed",
+    "kind": "baseline capture (native execution of cat; no reducer)",
+    "command": "timeout -k 5 30 cat $WT/scripts/host_requests.py $WT/recipes/host-request-lane.md",
+    "observation": "evidence_class: native execution of cat (baseline preparation)\nexit_code: 0\nstreams: published unchanged, so the attachment hashes are the raw stream hashes\nstdout is base.txt: scripts/host_requests.py + recipes/host-request-lane.md at fixture 803bc351, 66,308 B (the same bytes as #296/#343's baseline, 16,096 o200k tokens, record socraticode-30)\n\nassembly_review: {\"step\": \"returned-results assembly 2026-09-26T21:31:3",
+    "attachments": 2
+   },
+   {
+    "id": "socraticode-08-mcporter-list",
+    "status": "passed",
+    "kind": "upstream native operation (native execution)",
+    "command": "timeout -k 5 120 $HOME/.local/share/codex-ecosystem/bin/mcporter --config $RR/socraticode/mcporter.json list socraticode --brief --no-oauth",
+    "observation": "evidence_class: native execution\nexit_code: 0\nstreams: raw hashes and the sanitized copies' hashes are listed below\nreturned 26 tool signatures; footer: 26 tools · 356ms · STDIO $HOME/.local/share/codex-ecosystem/bin/node $HOME/.local/share/codex-ecosystem/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js\nconfig: explicit mcporter.json with imports [] (no editor imports) built from examples/mcporter",
+    "attachments": 3
+   }
+  ]
+ },
+ "adapted_performance": {
+  "exact_comparisons": [
+   {
+    "lane": "claude_subagent",
+    "payload": "Explain host-request trust rule: host_requests.py + recipe vs SocratiCode codebase_search chunks; answer verified (PASS)",
+    "before_tokens": 16096,
+    "after_tokens": 4832,
+    "change_pct": -70.0,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-25T21:07:54.952051+00:00",
+    "last_seen": "2026-09-25T21:07:54.952051+00:00"
+   },
+   {
+    "lane": "codex_worker",
+    "payload": "Codex gpt-6-astra worker (effort max) in a native codex exec session, 2026-09-26: same information need as #296's socraticode task; answer verified against the baseline (PASS)",
+    "before_tokens": 16096,
+    "after_tokens": 1505,
+    "change_pct": -90.6,
+    "encoding": "o200k_base",
+    "eligibility": null,
+    "evidence_class": "exact artifact comparison",
+    "first_seen": "2026-09-26T13:51:52.959568+00:00",
+    "last_seen": "2026-09-26T13:51:52.959568+00:00"
+   }
+  ],
+  "native_counter": null,
+  "native_snapshot": [],
+  "shortfall_cause": null,
+  "q3_fixture": null
+ },
+ "invoke_rates": {
+  "window": {
+   "now": "2026-09-26T23:37:28Z",
+   "last_36h_start": "2026-09-25T11:37:28Z",
+   "baseline_since": "2026-09-25T17:18:00Z",
+   "baseline_until": "2026-09-26T15:05:00Z",
+   "otel_name_only_start": "2026-09-26T22:46:00Z",
+   "otel_tool_details_start": "2026-09-26T22:50:00Z"
+  },
+  "method": "Transcripts are the per-child truth. MCP calls by server name; CLI tools by command text in Bash (Claude) or CommandExecution (Codex); RTK hook rewrites from the RTK history DB. A command can count for several tools. Codex sessions without the injected context-mode block are negative controls and excluded.",
+  "populations": {
+   "workflow_children": {
+    "mcp_calls": 21,
+    "cli_calls": 755,
+    "agents_using": 96,
+    "agents": 1010,
+    "pct_agents_using": 0.095
+   },
+   "workflow_children_with_lanes_block": {
+    "mcp_calls": 0,
+    "cli_calls": 2,
+    "agents_using": 2,
+    "agents": 22,
+    "pct_agents_using": 0.0909
+   },
+   "workflow_children_without_lanes_block": {
+    "mcp_calls": 21,
+    "cli_calls": 753,
+    "agents_using": 94,
+    "agents": 988,
+    "pct_agents_using": 0.0951
+   },
+   "agent_subagents": {
+    "mcp_calls": 0,
+    "cli_calls": 70,
+    "agents_using": 10,
+    "agents": 71,
+    "pct_agents_using": 0.1408
+   },
+   "main_sessions": {
+    "mcp_calls": 0,
+    "cli_calls": 76,
+    "agents_using": 5,
+    "agents": 15,
+    "pct_agents_using": 0.3333
+   },
+   "codex_exec_workers": {
+    "mcp_calls": 8,
+    "cli_calls": 9,
+    "agents_using": 11,
+    "agents": 301,
+    "pct_agents_using": 0.0365
+   }
+  },
+  "live_otel": {
+   "window": {
+    "since": "2026-09-26T22:50:00Z",
+    "until": "2026-09-26T23:37:28Z",
+    "duration": "2848s"
+   },
+   "panel": "U6 panel 31: MCP calls by client and server",
+   "series": []
+  },
+  "arm_b_native": "pending: preregistered arm-B E2E (adoption-audit PLAN section 8); capacity-gated on the Claude 7-day window"
+ },
+ "gpt6_review": {
+  "verdict": "accurate",
+  "findings": [],
+  "checked": [
+   "<scratch>/token-cards/cards/socraticode.json",
+   "<scratch>/token-cards/groups/g4-retrieval-memory/socraticode.upstream.json",
+   "https://api.github.com/repos/giancarloerra/SocratiCode/compare/2218f25153d0f3f4a76ee240a5643dbc873e80be...v1.15.0",
+   "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+   "https://api.github.com/repos/giancarloerra/SocratiCode/tags?per_page=5",
+   "https://github.com/giancarloerra/SocratiCode",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.claude-plugin/mcp.json",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.mcp.json",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/DEVELOPER.md#architecture-overview",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#claude-code",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#configuration",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#environment-variables",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#example-workflow",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#ignore-rules",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#openai-codex",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#quick-start",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#real-world-benchmark-vs-code-245m-lines-of-code-with-claude-opus-46",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/hooks/hooks.json",
+   "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/tests/unit/distribution-launchers.test.ts",
+   "https://github.com/giancarloerra/SocratiCode/commit/5b8eb16e739eafe871c695e23dcc23a6de5448d5",
+   "https://github.com/giancarloerra/SocratiCode/commit/9f65b5063b4928ab6c713665b3660f383511f286",
+   "https://github.com/giancarloerra/SocratiCode/compare/v1.14.0...v1.15.0",
+   "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+   "https://registry.npmjs.org/socraticode",
+   "https://registry.npmjs.org/socraticode/latest",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/README.md",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/DEVELOPER.md",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/.claude-plugin/mcp.json",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/.mcp.json",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/hooks/hooks.json",
+   "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.15.0/tests/unit/distribution-launchers.test.ts",
+   "$HOME/code/native-agent-stack/manifests/stack.json",
+   "$HOME/code/native-agent-stack/docs/token-session-handbook.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-25-codex-mcp-scope.md",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-23-claude-user-profile.md",
+   "$HOME/code/native-agent-stack/recipes/README.md",
+   "$HOME/code/native-agent-stack/adoption/templates/codex.config.template.toml",
+   "$HOME/code/native-agent-stack/adoption/templates/claude.settings.template.json",
+   "$HOME/code/native-agent-stack/.codex/config.toml",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-adjudicator.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/blind-lane-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/isolated-builder.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/semantic-evidence-reviewer.md",
+   "$HOME/code/native-agent-stack/examples/claude-native/agents/source-scout.md",
+   "$HOME/code/native-agent-stack/adoption/pins-linux-x86_64.json",
+   "$HOME/code/native-agent-stack/examples/claude-mcp.json.example",
+   "$HOME/code/native-agent-stack/docs/decisions/2026-09-25-workstation-sota-refresh.md",
+   "$HOME/.codex/config.toml (socraticode registration only)",
+   "$HOME/.claude.json (socraticode registrations only)",
+   "<scratch>/full-save/cur/socraticode/gpt6.md",
+   "<scratch>/token-cards/invoke_by_tool.json (socraticode in all six populations)",
+   "<scratch>/html-report/savings.json (tools[id=socraticode]; report_comparisons for socraticode and codex:socraticode)",
+   "<scratch>/rr/returned-results.json (records filtered by component_ids containing socraticode; socraticode component summary)",
+   "<scratch>/rr/socraticode/records.json",
+   "<scratch>/rr/socraticode/out/cmp-claude.stdout",
+   "<scratch>/rr/socraticode/out/cmp-codex.stdout",
+   "<scratch>/rr/socraticode/out/chk-xsurface.stdout",
+   "<scratch>/rr/socraticode/out/version-npm-ls.stdout",
+   "<scratch>/rr/socraticode/out/pkg-hooks.stdout"
+  ],
+  "resolutions": [],
+  "final_verdict": {
+   "tool": "socraticode",
+   "verdict": "adapted-with-gaps",
+   "summary": "The pinned standalone 1.14.0 engine uses supported external Qdrant and an OpenAI-compatible embedding adapter; upstream's latest release is 1.15.0, already locally qualified but held for a coordinated cutover no earlier than 2026-10-01T11:01Z. The newer eligible source-verified native comparisons are 16,096→2,352 o200k_base tokens for Claude (85.4%) and 16,096→2,396 for Codex (85.1%), using five unfiltered hits for the host-request trust task (../rr/socraticode/records.json#socraticode-30-exact-o200k-comparisons; #socraticode-29-quality-checks). The historical 70.0% Claude and 90.6% Codex results use different result limits or file filtering and remain separate task-local artifact measurements, not provider savings (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The fixed scan found invocations in 96/1,010 Ultracode children (9.50%) and 11/301 Codex workers (3.65%), including 2/22 TOKEN LANES children (9.09%); this restricted worker's health/status probe was denied and adds no successful native observation (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, follow the recorded cutover gate, reconcile user-scope startup timeout and intended Claude project registration, and verify explicit projectPath, index coverage, and native-client retrieval after the coordinated restart.",
+   "gaps": [
+    {
+     "gap": "Production remains on 1.14.0 although 1.15.0 is qualified; the recorded cooldown and coordinated client restart still gate cutover.",
+     "evidence": "docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150; https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+     "action": "After the recorded gate, update every launcher/template together, retire old sessions normally, start one qualified owner, and verify graph builder identity and both clients before adding other sessions.",
+     "owner_pr": "#345"
+    },
+    {
+     "gap": "The user-scope Codex entry omits startup_timeout_sec=120 from the template; the project override masks this difference, while Claude registration remains project-local.",
+     "evidence": "adoption/templates/codex.config.template.toml; groups/g4-retrieval-memory/socraticode.upstream.json; groups/final-verdict-evidence.json#wiring",
+     "action": "Reconcile the user timeout and register the pinned server in each intended Claude project; verify from a fresh worktree and do not claim that the mismatch has already caused a startup failure.",
+     "owner_pr": null
+    },
+    {
+     "gap": "INCLUDE_DOT_FILES=false excludes hidden source paths, and this worker's restricted policy prevented even the status probe.",
+     "evidence": "adoption/templates/codex.config.template.toml; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md#ignore-rules; groups/final-verdict-evidence.json#live_probes",
+     "action": "Use original bounded reads for known excluded files; qualify any expanded indexing scope and the intended restricted-worker access separately, keeping projectPath explicit and avoiding implicit linked-project search.",
+     "owner_pr": null
+    },
+    {
+     "gap": "The merged comparison list omits the newer five-hit native measurements, so its historical 90.6% Codex figure should not be presented as a universal adapted reduction.",
+     "evidence": "cards/socraticode.json; ../rr/socraticode/records.json#socraticode-30-exact-o200k-comparisons",
+     "action": "Publish each retained comparison with its limit, fileFilter, client, source check, and artifact boundary; keep bridge and isolated-index results separate.",
+     "owner_pr": null
+    }
+   ],
+   "claims_verified": [
+    {
+     "claim": "Latest official release is v1.15.0, published 2026-09-24; retained production metadata reports 1.14.0.",
+     "evidence": "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest; ../rr/socraticode/records.json#socraticode-00a-npm-ls-version",
+     "result": "holds"
+    },
+    {
+     "claim": "Local 1.15.0 qualification is complete; production cutover, not qualification, is deferred.",
+     "evidence": "docs/decisions/2026-09-25-workstation-sota-refresh.md#socraticode-1150",
+     "result": "holds"
+    },
+    {
+     "claim": "External Qdrant and the lmstudio-compatible local embedding profile are supported choices; plugin packaging is not required for this standalone adaptation.",
+     "evidence": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md; adoption/templates/codex.config.template.toml",
+     "result": "holds"
+    },
+    {
+     "claim": "SOCRATICODE_SPEC pins only the v1.15.0 Claude plugin launcher; the shared launcher still uses socraticode@latest, so the explicit pinned standalone Codex launcher remains appropriate.",
+     "evidence": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.claude-plugin/mcp.json; https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/.mcp.json",
+     "result": "holds"
+    },
+    {
+     "claim": "The newer native Claude and Codex counts are 16,096→2,352 and 16,096→2,396 with five hits and no fileFilter; source checks pass for the bounded host-request trust question.",
+     "evidence": "../rr/socraticode/records.json#socraticode-30-exact-o200k-comparisons; ../rr/socraticode/out/chk-codex.stdout; groups/final-verdict-evidence.json#recounts",
+     "result": "holds"
+    },
+    {
+     "claim": "The separate MCPorter result is 16,096→2,396 and the isolated-index result is 16,096→2,196; these are not additive to native-client savings.",
+     "evidence": "../rr/socraticode/records.json#socraticode-30-exact-o200k-comparisons",
+     "result": "holds"
+    },
+    {
+     "claim": "All 34 retained command records and 91 attachment references were opened with matching attachment hashes and sizes.",
+     "evidence": "../rr/socraticode/records.json; groups/final-verdict-evidence.json#attachments",
+     "result": "holds"
+    },
+    {
+     "claim": "The fixed scan records 21 MCP and 755 CLI invocations across 96/1,010 workflow children and 8 MCP plus 9 CLI invocations across 11/301 Codex workers; TOKEN LANES children were 2/22.",
+     "evidence": "invoke_by_tool.json; invoke_by_tool.py",
+     "result": "holds"
+    },
+    {
+     "claim": "The missing user startup timeout is proven to cause a native startup failure.",
+     "evidence": "groups/final-verdict-evidence.json#wiring",
+     "result": "unverified"
+    },
+    {
+     "claim": "Restricted-worker retrieval in this pass, task-matched arm-B performance, and causal provider savings are established.",
+     "evidence": "groups/final-verdict-evidence.json#live_probes; cards/socraticode.json#invoke_rates/arm_b_native",
+     "result": "unverified"
+    }
+   ],
+   "skills_used": [
+    "search-first",
+    "iterative-retrieval",
+    "verification-before-completion",
+    "context-mode:context-mode"
+   ],
+   "token_tools_used": [
+    "context-mode",
+    "rtk",
+    "gpt-tokenizer",
+    "socraticode (codebase_status attempted; approval denied)"
+   ]
+  },
+  "harness": {
+   "review_runs": {
+    "log": "review.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 62,
+     "qmd": 1
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 0,
+    "web_searches": 0
+   },
+   "verdict_run": {
+    "log": "verdict-b.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "iterative-retrieval",
+     "search-first",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 37,
+     "qmd": 4,
+     "ai-memory": 1,
+     "socraticode": 1,
+     "serena": 2
+    },
+    "shell_commands": 2,
+    "shell_commands_rtk_prefixed": 2,
+    "web_searches": 0
+   },
+   "deep_dive_run": {
+    "log": "deep.err",
+    "rollout_found": true,
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "skills_loaded": [
+     "context-mode",
+     "verification-before-completion"
+    ],
+    "mcp_calls_by_server": {
+     "context-mode": 49,
+     "qmd": 3,
+     "ai-memory": 1
+    },
+    "shell_commands": 4,
+    "shell_commands_rtk_prefixed": 1,
+    "web_searches": 0
+   }
+  }
+ },
+ "prior_evidence": "#296: 16,096->4,832 (70%). #343: 16,096->1,505 (90.6%) native MCP. #316: codebase_search skipped .claude/ because INCLUDE_DOT_FILES=false. Not in #338 CI."
+}

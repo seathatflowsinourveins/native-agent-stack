@@ -952,6 +952,7 @@ class PerExecutionLedger(unittest.TestCase):
 
     def record(self, row, *, with_execution=True, status=None):
         return self.ledger.record_order("sell-1", "b-sell", status or row["status"], row["cum"], row["average"],
+                                        timestamp=row.get("at"),
                                         execution=row["execution"] if with_execution else None)
 
     def events(self, kind):
@@ -1028,6 +1029,203 @@ class PerExecutionLedger(unittest.TestCase):
                     self.assertEqual(self.ledger.positions(), {})
                 else:
                     self.assertEqual(self.ledger.positions()["APUS"].cost_basis_usd, D("162.95"))
+
+    def test_mixed_profit_gross_loss_is_exact_across_delivery_sequences(self):
+        # Review oracle: two shares at $100, sold at $110 and $90, realize
+        # zero net P&L but $10 gross loss. Gains must not refund the loss cap.
+        # Reference: QuantConnect/Lean 985ef30, SecurityPortfolioModel.cs
+        # (per-fill closing P&L) and TradeStatistics.cs (separate losing P&L).
+        from live_manifest import read_ledger
+
+        sequences = {
+            "stream_first": [(0, True), (1, True), (1, False)],
+            "rest_first": [(1, False), (0, True), (1, True)],
+            "duplicates": [(1, False), (1, True), (0, True), (0, True), (1, True), (1, False)],
+            "restart": [(1, False), (1, True), "restart", (0, True), "restart", (1, True)],
+        }
+        rows = [
+            {"cum": "1", "average": "110.00", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110.00"}},
+            {"cum": "2", "average": "100.00", "status": "filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90.00"}},
+        ]
+        limits = replace(self.limits, max_gross_loss_usd=D("5"), max_drawdown_usd=D("100"))
+        quote = s.Quote("APUS", "100.00", "100.01", self.now)
+        admission = dict(quote=quote, now=self.now, market_open=True,
+                         session_close=self.now + 3600, stop_file=self.root / "STOP")
+        for name, sequence in sequences.items():
+            with self.subTest(delivery=name):
+                self.ledger.close()
+                self.db = self.root / ("mixed-profit-" + name + ".sqlite3")
+                self.ledger = s.Ledger(self.db, limits)
+                self.ledger.start_trial(self.now)
+                self.ledger.reserve_intent("buy-1", "APUS", "buy", "2", "100.00", **admission)
+                self.ledger.record_order("buy-1", "b-buy", "filled", "2", "100.00",
+                                         execution={"execution_id": "basis", "qty": "2", "price": "100.00"})
+                self.ledger.reserve_intent("sell-1", "APUS", "sell", "2", "90.00", **admission)
+                self.ledger.reserve_intent("pending-buy", "APUS", "buy", "1", "100.00", **admission)
+                for observation in sequence:
+                    if observation == "restart":
+                        self.ledger.close()
+                        self.ledger = s.Ledger(self.db, limits)
+                    else:
+                        index, exact = observation
+                        self.record(rows[index], with_execution=exact)
+                state = self.ledger.accounting()
+                amounts = (state.cash_delta_usd, state.realized_pnl_usd,
+                           state.cumulative_realized_loss_usd, state.gross_loss_usd)
+                self.assertTrue(all(isinstance(value, D) for value in amounts))
+                self.assertEqual(amounts, (D("0.00"), D("0.00"), D("10.00"), D("10.00")))
+                self.assertEqual(self.ledger.positions(), {})
+                self.assertEqual(state.halted_reason, "gross_loss_cap_reached")
+                # Reopening and redelivering either source cannot add another loss
+                # or erase the corrected accounting/halt.
+                self.ledger.close()
+                self.ledger = s.Ledger(self.db, limits)
+                for row in rows + rows:
+                    self.assertFalse(self.record(row))
+                self.assertFalse(self.record(rows[-1], with_execution=False))
+                self.assertEqual(self.ledger.accounting(), state)
+                self.assertEqual(self.ledger.mark_to_market([], self.now), state)
+                self.assertEqual(self.ledger.halted_reason(), "gross_loss_cap_reached")
+                report = read_ledger(self.db)
+                self.assertEqual(D(report["realized_loss_usd"]), D("10.00"))
+                self.assertEqual(report["halted_reason"], "gross_loss_cap_reached")
+                with self.assertRaisesRegex(s.SafetyError, "^gross_loss_cap_reached$"):
+                    self.ledger.reserve_intent("blocked-buy", "APUS", "buy", "1", "100.00", **admission)
+                with self.assertRaisesRegex(s.SafetyError, "^gross_loss_cap_reached$"):
+                    self.ledger.validate_pending("pending-buy", **admission)
+                self.ledger.mark_not_sent("pending-buy", "test_finished")
+                for begin in (self.ledger.begin_next_trial, self.ledger.resume_held_trial):
+                    with self.assertRaisesRegex(s.SafetyError, "^next_trial_cannot_clear_risk_halt$"):
+                        begin(self.now + 1, "next-trial")
+
+    def test_mixed_profit_replay_preserves_basis_at_each_booking(self):
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "3", "avg_entry_price": "100.00"}]}, self.now)
+        admission = dict(quote=s.Quote("APUS", "100.00", "100.01", self.now), now=self.now,
+                         market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
+        self.ledger.reserve_intent("sell-1", "APUS", "sell", "3", "90.00", **admission)
+        # The first two executions use the adopted $100 basis. A later buy
+        # changes only the third execution's basis to $110.
+        self.ledger.record_order("sell-1", "b-sell", "partially_filled", "2", "100.00")
+        self.ledger.reserve_intent("buy-1", "APUS", "buy", "1", "120.00", **admission)
+        self.ledger.record_order("buy-1", "b-buy", "filled", "1", "120.00",
+                                 execution={"execution_id": "new-basis", "qty": "1", "price": "120.00"})
+        self.ledger.record_order("sell-1", "b-sell", "filled", "3", "100.00")
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        rows = [
+            {"cum": "1", "average": "110.00", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110.00"}},
+            {"cum": "2", "average": "100.00", "status": "partially_filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90.00"}},
+            {"cum": "3", "average": "100.00", "status": "filled",
+             "execution": {"execution_id": "later-loss", "qty": "1", "price": "100.00"}},
+        ]
+        for row in reversed(rows):
+            self.record(row)
+        state = self.ledger.accounting()
+        # +$10, -$10, -$10, with one share still held at $110. Adopted
+        # holdings predate the cash ledger: $300 sales less the $120 buy.
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd, state.cumulative_realized_loss_usd),
+                         (D("180.00"), D("-10.00"), D("20.00")))
+        position = self.ledger.positions()["APUS"]
+        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("110.00")))
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        for row in rows:
+            self.assertFalse(self.record(row))
+        self.assertEqual(self.ledger.accounting(), state)
+
+    def test_pre_fix_execution_accounting_marker_rederives_loss_once(self):
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "2", "avg_entry_price": "100"}]}, self.now)
+        self.ledger.reserve_intent("sell-1", "APUS", "sell", "2", "90",
+                                   quote=s.Quote("APUS", "100", "100.01", self.now), now=self.now,
+                                   market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
+        rows = [
+            {"cum": "1", "average": "110", "status": "partially_filled",
+             "execution": {"execution_id": "profit", "qty": "1", "price": "110"}},
+            {"cum": "2", "average": "100", "status": "filled",
+             "execution": {"execution_id": "loss", "qty": "1", "price": "90"}},
+        ]
+        self.record(rows[-1], with_execution=False)
+        for row in rows:
+            self.record(row)
+        # Persist the pre-fix checkpoint with the old netted-loss result.
+        self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%'")
+        self.ledger.db.execute("INSERT INTO meta VALUES ('execution_accounting:sell-1', '2')")
+        self.ledger.db.execute("UPDATE meta SET value='0' WHERE key='realized_loss'")
+        reconciliations = len(self.events("execution_accounting_reconciled"))
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        # The upgrade now repairs loss at open, before any new execution can
+        # arrive or _begin_trial can admit against the old netted loss.
+        state = self.ledger.accounting()
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd, state.cumulative_realized_loss_usd),
+                         (D("200"), D("0"), D("10")))
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(len(self.events("execution_accounting_reconciled")), reconciliations + 1)
+        self.assertFalse(self.record(rows[-1]))
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, self.limits)
+        before = tuple(self.ledger.db.iterdump())
+        for row in rows + rows:
+            self.assertFalse(self.record(row))
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+        self.assertEqual(self.ledger.accounting(), state)
+
+
+    def test_uncovered_rest_booking_survives_another_orders_execution_replay(self):
+        self.ledger.close()
+        limits = replace(self.limits, max_gross_loss_usd=D("100"), max_drawdown_usd=D("100"))
+        self.db = self.root / "uncovered.sqlite3"
+        self.ledger = s.Ledger(self.db, limits)
+        self.ledger.start_trial(self.now)
+        self.ledger.adopt_broker_snapshot(
+            {"positions": [{"symbol": "APUS", "qty": "4", "avg_entry_price": "100"}]}, self.now)
+        admission = dict(now=self.now, market_open=True, session_close=self.now + 3600,
+                         stop_file=self.root / "STOP")
+        self.ledger.reserve_intent("X", "APUS", "sell", "2", "80",
+                                   quote=s.Quote("APUS", "130", "130.01", self.now), **admission)
+        for cid, side, qty, price in (("sell-1", "sell", "2", "90"), ("B", "buy", "1", "130")):
+            self.ledger.reserve_intent(cid, "APUS", side, qty, price,
+                                       quote=s.Quote("APUS", "130", "130.01", self.now), **admission)
+        # X is REST-only: a mixed +10/-20 pair is known only as 2 @ 95.
+        # Its provisional -10 realized / 10 loss must survive Y's replay (#355 review F4).
+        self.ledger.record_order("X", "b-X", "filled", "2", "95", timestamp=self.now + 10)
+        x_state = self.ledger.accounting()
+        self.assertEqual((x_state.cash_delta_usd, x_state.realized_pnl_usd, x_state.cumulative_realized_loss_usd),
+                         (D("190"), D("-10"), D("10")))
+        self.assertEqual(self.ledger.positions()["APUS"].qty, D("2"))
+        x_intent = next(i for i in self.ledger.intents() if i.client_id == "X")
+        x_bookings = [e for e in self.events("order_observed") if e["broker_id"] == "b-X"]
+        self.ledger.record_order("B", "b-B", "filled", "1", "130", timestamp=self.now + 2,
+                                 execution={"execution_id": "B", "qty": "1", "price": "130"})
+        rows = [
+            {"cum": "1", "average": "110", "status": "partially_filled", "at": self.now + 1,
+             "execution": {"execution_id": "A", "qty": "1", "price": "110"}},
+            {"cum": "2", "average": "100", "status": "filled", "at": self.now + 3,
+             "execution": {"execution_id": "C", "qty": "1", "price": "90"}},
+        ]
+        self.record(rows[-1], with_execution=False)
+        self.ledger.close()
+        self.ledger = s.Ledger(self.db, limits)
+        for row in reversed(rows):
+            self.record(row)
+        state = self.ledger.accounting()
+        self.assertEqual(next(i for i in self.ledger.intents() if i.client_id == "X"), x_intent)
+        self.assertEqual([e for e in self.events("order_observed") if e["broker_id"] == "b-X"], x_bookings)
+        # Subtract Y's oracle under observation-order replay: B (observed first) raises the basis to
+        # 330/3 = 110 before sell-1's A @ 110 (0) and C @ 90 (-20): 70 cash, -20 P&L, 20 loss, 1 @ 110.
+        # These legacy executions have no execution timestamp. Their observation
+        # order remains authoritative; timestamp= above is only order.updated_at.
+        self.assertEqual((state.cash_delta_usd - D("70"), state.realized_pnl_usd + D("20"),
+                          state.cumulative_realized_loss_usd - D("20")), (D("190"), D("-10"), D("10")))
+        position = self.ledger.positions()["APUS"]
+        self.assertEqual((position.qty, position.cost_basis_usd), (D("1"), D("110")))
+
 
     def test_accounting_replay_quantity_mismatch_rolls_back_late_execution(self):
         self.reserve("buy-1", "buy", "29", "5.64")
@@ -1153,6 +1351,324 @@ class PerExecutionLedger(unittest.TestCase):
             with self.subTest(changes=changes):
                 self.assertIsNone(s.execution_from_observation({**row, **changes}))
         self.assertIsNone(s.execution_from_observation({"filled_qty": "2"}))
+
+
+class ExecutionOrderLedger(unittest.TestCase):
+    """Synthetic journal oracles, using LEAN 985ef30 SecurityPortfolioModel.cs's
+    per-fill average-cost closing P&L; no broker, credentials or wall clock."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.now = 1_800_000_000
+        self.limits = replace(s.RiskLimits(), max_order_qty=D(100),
+                              max_gross_loss_usd=D(100), max_drawdown_usd=D(100))
+        self.ledger = None
+        self.new_ledger("initial")
+        self.addCleanup(lambda: self.ledger.close())
+
+    def new_ledger(self, name):
+        if self.ledger is not None:
+            self.ledger.close()
+        self.path = self.root / (name + ".sqlite3")
+        self.ledger = s.Ledger(self.path, self.limits)
+        self.ledger.start_trial(self.now)
+
+    def reopen(self):
+        self.ledger.close()
+        self.ledger = s.Ledger(self.path, self.limits)
+
+    def hold(self, symbol="SPY", qty="2"):
+        self.ledger.adopt_broker_snapshot({"positions": [
+            {"symbol": symbol, "qty": qty, "avg_entry_price": "100"}]}, self.now)
+
+    def reserve(self, cid, side, qty, price, symbol="SPY"):
+        self.ledger.reserve_intent(cid, symbol, side, qty, price,
+            quote=s.Quote(symbol, "130", "130.01", self.now), now=self.now,
+            market_open=True, session_close=self.now + 3600, stop_file=self.root / "STOP")
+
+    def fill(self, cid, cum, average, *, eid=None, price=None, ns=None, status="filled"):
+        execution = None if eid is None else {"execution_id": eid, "qty": "1", "price": price,
+                                              "timestamp_ns": ns}
+        return self.ledger.record_order(cid, "broker-" + cid, status, cum, average,
+            timestamp=self.now + 20, execution=execution)
+
+    def abc(self, delivery):
+        self.hold()
+        self.reserve("sell", "sell", "2", "90")
+        self.reserve("buy", "buy", "1", "130")
+        # A and C belong to one sell. Distinct ns in the SAME microsecond
+        # discriminate exact integer storage from a float/datetime round trip.
+        a = lambda: self.fill("sell", "1", "110", eid="A", price="110",
+                              ns=self.now * 10**9 + 1, status="partially_filled")
+        b = lambda: self.fill("buy", "1", "130", eid="B", price="130", ns=self.now * 10**9 + 2)
+        c = lambda: self.fill("sell", "2", "100", eid="C", price="90", ns=self.now * 10**9 + 3)
+        rest = lambda: self.fill("sell", "2", "100")
+        late_buy = lambda: self.fill("buy", "1", "130")
+        sequences = {"stream": (a, b, c), "late_sell_stream": (b, a, c),
+                     "late_buy_stream": (a, c, b), "rest_ahead": (b, rest, a, c),
+                     "recovered_late": (rest, b, self.reopen, c, a),
+                     "late_buy": (a, c, late_buy, self.reopen, b)}
+        for action in sequences[delivery]:
+            action()
+
+    def test_abc_execution_order_across_deliveries(self):
+        for delivery in ("stream", "late_sell_stream", "late_buy_stream",
+                         "rest_ahead", "recovered_late", "late_buy"):
+            with self.subTest(delivery=delivery):
+                self.new_ledger(delivery)
+                self.abc(delivery)
+                state = self.ledger.accounting()
+                # Adopted shares cost $200 outside the cash ledger. A realizes
+                # +10; B leaves 2 @ 115; C realizes -25. Cash = 110-130+90.
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd), (D(70), D(-15), D(25)))
+                position = self.ledger.positions()["SPY"]
+                self.assertEqual((position.qty, position.average_cost), (D(1), D(115)))
+                self.reopen()
+                before = tuple(self.ledger.db.iterdump())
+                self.fill("sell", "2", "100", eid="C", price="90", ns=self.now * 10**9 + 3)
+                self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
+    def untimed_ab(self, *, migrate=False):
+        # Reviewer probe_backfill.py / probe_migration_backfill2.py: B was
+        # observed before A, without execution times. Journal order is fixed.
+        self.hold()
+        self.reserve("buy", "buy", "1", "130")
+        self.reserve("sell", "sell", "1", "90")
+        self.fill("buy", "1", "130", eid="B", price="130")
+        self.fill("sell", "1", "110", eid="A", price="110")
+        if migrate:
+            # Reconstruct 460034e0's execution layout and accounting markers.
+            self.ledger.db.execute("ALTER TABLE executions DROP COLUMN execution_time_ns")
+            self.ledger.db.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+            self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%' "
+                                   "OR key LIKE 'symbol_accounting:%'")
+            self.reopen()
+
+    def redeliver_ab(self, order):
+        stamps = {"A": ("sell", "110", 1), "B": ("buy", "130", 2)}
+        results = []
+        for eid in order:
+            cid, price, offset = stamps[eid]
+            results.append(self.fill(cid, "1", price, eid=eid, price=price,
+                                     ns=self.now * 10**9 + offset))
+        return results
+
+    def test_untimed_redelivery_preserves_journal_order_across_restart(self):
+        for migrate in (False, True):
+            for order in (("A", "B"), ("B", "A")):
+                with self.subTest(migrate=migrate, order=order):
+                    self.new_ledger(f"untimed-{migrate}-{''.join(order)}")
+                    self.untimed_ab(migrate=migrate)
+                    self.redeliver_ab(order)
+                    self.reserve("sell2", "sell", "1", "90")
+                    self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+                    # LEAN average cost, B,A,C: B leaves 3 @ 110, A realizes
+                    # zero, C loses 20. Cash 110 - 130 + 90 = 70; 1 @ 110.
+                    for phase in ("live", "reopened", "rederived"):
+                        if phase == "rederived":
+                            self.ledger.db.execute("DELETE FROM meta WHERE key='execution_accounting:rule'")
+                        if phase != "live":
+                            self.reopen()
+                        state = self.ledger.accounting()
+                        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                          state.cumulative_realized_loss_usd),
+                                         (D(70), D(-20), D(20)), phase)
+                        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(110), phase)
+                    times = [r[0] for r in self.ledger.db.execute(
+                        "SELECT execution_time_ns FROM executions WHERE execution_id IN ('A','B')")]
+                    self.assertEqual(times, [None, None])
+
+    def test_untimed_redelivery_loss_cap_is_order_independent(self):
+        self.limits = replace(self.limits, max_gross_loss_usd=D(25))
+        for order in (("A", "B"), ("B", "A")):
+            with self.subTest(order=order):
+                self.new_ledger("loss-cap-" + "".join(order))
+                self.untimed_ab()
+                self.redeliver_ab(order)
+                self.reserve("sell2", "sell", "1", "90")
+                self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+                self.assertIsNone(self.ledger.halted_reason())
+                self.assertEqual(self.ledger.accounting().cumulative_realized_loss_usd, D(20))
+
+    def test_later_replay_cannot_reprice_untimed_history(self):
+        # probe_backfill_organic.py: D's own late execution must not change
+        # the already-booked loss on C, even though D triggers a symbol replay.
+        self.untimed_ab()
+        self.redeliver_ab(("A", "B"))
+        self.reserve("sell2", "sell", "1", "90")
+        self.fill("sell2", "1", "90", eid="C", price="90", ns=self.now * 10**9 + 3)
+        self.reserve("late", "buy", "1", "100")
+        self.fill("late", "1", "100")
+        before = self.ledger.accounting()
+        self.assertEqual(before.cumulative_realized_loss_usd, D(20))
+        self.fill("late", "1", "100", eid="D", price="100", ns=self.now * 10**9 + 4)
+        self.assertEqual(self.ledger.accounting(), before)
+        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(105))
+
+    def test_timestamped_redelivery_of_untimed_executions_is_noop(self):
+        self.untimed_ab()
+        before = tuple(self.ledger.db.iterdump())
+        self.assertEqual(self.redeliver_ab(("B", "A")), [False, False])
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
+    def test_uncovered_booking_anchors_timed_replay(self):
+        self.hold(qty="4")
+        self.reserve("X", "sell", "2", "80")
+        self.fill("X", "2", "95")
+        self.abc("rest_ahead")
+        state = self.ledger.accounting()
+        # X stays at its journal position: $190 cash, -$10 P&L, $10 loss.
+        # Timed Y is A,B,C: $70 cash, -$15 P&L, $25 loss, 1 @ $115.
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                          state.cumulative_realized_loss_usd), (D(260), D(-25), D(35)))
+        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(115))
+
+    def test_partial_execution_coverage_reorders_only_covered_bookings(self):
+        self.hold()
+        self.reserve("sell", "sell", "2", "90")
+        self.reserve("buy", "buy", "1", "130")
+        self.fill("buy", "1", "130", eid="B", price="130", ns=self.now * 10**9 + 2)
+        self.fill("sell", "1", "110", status="partially_filled")
+        self.fill("sell", "2", "100")
+        self.fill("sell", "1", "110", eid="A", price="110",
+                  ns=self.now * 10**9 + 1, status="partially_filled")
+        # A now tiles its own booking even though C is still REST-only. A,B
+        # exchange timed slots, C stays anchored, and loss is corrected NOW.
+        # Waiting for coverage of the entire sell leaves the wrong loss budget.
+        state = self.ledger.accounting()
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                          state.cumulative_realized_loss_usd), (D(70), D(-15), D(25)))
+        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(115))
+        self.fill("sell", "2", "100", eid="C", price="90", ns=self.now * 10**9 + 3)
+        self.assertEqual(self.ledger.accounting(), state)
+
+    def test_other_symbols_unreplayable_journal_cannot_block_a_fill(self):
+        self.hold("APUS", "1")
+        self.reserve("bad-sell", "sell", "1", "90", "APUS")
+        self.fill("bad-sell", "1", "100")
+        # Deliberate journal corruption: APUS cannot replay even in observation
+        # order. It must not be consulted when SPY needs a provisional correction.
+        self.ledger.db.execute("UPDATE events SET payload=json_set(payload,'$.qty','0') "
+                               "WHERE kind='position_adopted'")
+        self.abc("rest_ahead")
+        state = self.ledger.accounting()
+        self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                          state.cumulative_realized_loss_usd), (D(170), D(-15), D(25)))
+        self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(115))
+        # A subsequent monotone execution also succeeds without replaying APUS.
+        self.reserve("next", "buy", "1", "130")
+        self.fill("next", "1", "130", eid="next", price="130", ns=self.now * 10**9 + 4)
+        self.assertEqual(self.ledger.positions()["SPY"].qty, D(2))
+
+    def test_schema_migration_is_rejected_by_previous_open_check(self):
+        self.hold()
+        self.reserve("buy", "buy", "1", "130")
+        self.fill("buy", "1", "130", eid="old", price="130")
+        # Reconstruct the schema-1 execution layout, retaining its REAL at as
+        # observation time. Migration must not invent a fill timestamp from it.
+        columns = {r[1] for r in self.ledger.db.execute("PRAGMA table_info(executions)")}
+        if "execution_time_ns" in columns:
+            self.ledger.db.execute("ALTER TABLE executions DROP COLUMN execution_time_ns")
+        self.ledger.db.execute("UPDATE meta SET value='1' WHERE key='schema_version'")
+        self.reopen()
+        with sqlite3.connect(self.path) as previous:
+            # Exact read/check from 460034e0 Ledger.__init__, before any insert.
+            def previous_release_open_check():
+                version = previous.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()[0]
+                if version not in (None, "1"):
+                    raise s.SafetyError("unsupported_ledger_schema")
+            with self.assertRaisesRegex(s.SafetyError, "^unsupported_ledger_schema$"):
+                previous_release_open_check()
+        row = self.ledger.db.execute("SELECT execution_time_ns FROM executions").fetchone()
+        self.assertIsNone(row[0])
+        self.assertEqual(self.ledger.positions()["SPY"].qty, D(3))
+
+    def test_rule_change_isolates_unreplayable_symbols_at_open(self):
+        for adopted_qty, reason in (("0", "accounting_replay_would_make_short_position"),
+                                    ("3", "accounting_replay_quantity_mismatch")):
+            with self.subTest(reason=reason):
+                self.new_ledger(reason)
+                self.hold("APUS", "2")
+                self.reserve("bad-sell", "sell", "1", "90", "APUS")
+                self.fill("bad-sell", "1", "90")
+                apus = self.ledger.positions()["APUS"]
+                # probe_open_block.py's corruption, retaining a position and
+                # nonzero P&L/loss so preserving booked APUS money is observable.
+                self.ledger.db.execute("UPDATE events SET payload=json_set(payload,'$.qty',?) "
+                                       "WHERE kind='position_adopted'", (adopted_qty,))
+                self.abc("rest_ahead")
+                # Stale SPY derivation: opening must correct this healthy symbol
+                # even when APUS (first alphabetically) cannot be replayed.
+                self.ledger.db.execute("UPDATE positions SET cost_basis='110' WHERE symbol='SPY'")
+                self.ledger.db.execute("UPDATE meta SET value='[\"70\",\"-20\",\"20\"]' "
+                                       "WHERE key='symbol_accounting:SPY'")
+                self.ledger.db.execute("UPDATE meta SET value='-30' WHERE key='realized'")
+                self.ledger.db.execute("UPDATE meta SET value='30' WHERE key='realized_loss'")
+                self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key='execution_accounting:rule'")
+                self.reopen()
+                self.assertEqual(self.ledger.positions()["APUS"], apus)
+                self.assertEqual(self.ledger.positions()["SPY"].average_cost, D(115))
+                state = self.ledger.accounting()
+                self.assertEqual((state.cash_delta_usd, state.realized_pnl_usd,
+                                  state.cumulative_realized_loss_usd), (D(160), D(-25), D(35)))
+                failures = [json.loads(r[0]) for r in self.ledger.db.execute(
+                    "SELECT payload FROM events WHERE kind='execution_accounting_replay_failed'")]
+                self.assertEqual([(e["symbol"], e["reason"]) for e in failures], [("APUS", reason)])
+                before = tuple(self.ledger.db.iterdump())
+                self.reopen()
+                self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+                self.reserve("next", "buy", "1", "130")
+                self.fill("next", "1", "130", eid="next", price="130", ns=self.now * 10**9 + 4)
+                self.assertEqual(self.ledger.positions()["SPY"].qty, D(2))
+
+    def test_unreplayable_legacy_symbol_without_money_checkpoint_fails_atomically(self):
+        self.hold("APUS", "2")
+        self.reserve("bad-sell", "sell", "1", "90", "APUS")
+        self.fill("bad-sell", "1", "90")
+        self.ledger.db.execute("UPDATE events SET payload=json_set(payload,'$.qty','0') "
+                               "WHERE kind='position_adopted'")
+        self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'symbol_accounting:%'")
+        self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key='execution_accounting:rule'")
+        before = tuple(self.ledger.db.iterdump())
+        with self.assertRaisesRegex(s.SafetyError, "^accounting_replay_would_make_short_position$"):
+            s.Ledger(self.path, self.limits)
+        # Missing attribution is not evidence of zero cash/P&L/loss. Keep the
+        # old ledger intact when corruption prevents reconstructing that money.
+        self.assertEqual(tuple(self.ledger.db.iterdump()), before)
+
+    def test_old_accounting_markers_rederive_before_any_new_fill(self):
+        self.limits = replace(self.limits, max_gross_loss_usd=D(5))
+        for marker in ("execution_accounting:sell", "execution_accounting:v1:sell",
+                       "execution_accounting:v2:sell", "execution_accounting:v3:sell",
+                       "execution_accounting:rule"):
+            with self.subTest(marker=marker):
+                self.new_ledger(marker.replace(":", "-"))
+                self.hold()
+                self.reserve("sell", "sell", "2", "90")
+                self.fill("sell", "2", "100")
+                self.fill("sell", "1", "110", eid="A", price="110", status="partially_filled")
+                self.fill("sell", "2", "100", eid="C", price="90")
+                if marker == "execution_accounting:rule":
+                    # A present but obsolete rule must upgrade too. The other
+                    # four cases all exercise an absent rule key.
+                    self.ledger.db.execute("UPDATE meta SET value='v3-old-rule' WHERE key=?", (marker,))
+                    self.ledger.db.execute("DELETE FROM meta WHERE key='halted_reason'")
+                else:
+                    self.ledger.db.execute("DELETE FROM meta WHERE key LIKE 'execution_accounting:%' "
+                                           "OR key='halted_reason'")
+                    self.ledger.db.execute("INSERT INTO meta VALUES (?, '2')", (marker,))
+                self.ledger.db.execute("UPDATE meta SET value='0' WHERE key='realized_loss'")
+                self.reopen()
+                state = self.ledger.accounting()
+                self.assertEqual((state.realized_pnl_usd, state.cumulative_realized_loss_usd), (D(0), D(10)))
+                with self.assertRaisesRegex(s.SafetyError, "^next_trial_(risk_budget_exhausted|cannot_clear_risk_halt)$"):
+                    self.ledger.begin_next_trial(self.now + 1, "must-refuse")
+                before = tuple(self.ledger.db.iterdump())
+                self.reopen()
+                self.assertEqual(tuple(self.ledger.db.iterdump()), before)
 
 
 if __name__ == "__main__":

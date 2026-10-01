@@ -4,7 +4,7 @@ export const meta = {
   whenToUse: 'recipes/saturation-sweep.md, run as tools/sota-convergence/landscape-sweep/README.md describes: launch the embedded-args copy build_args.py writes (or this file with its args.json), then convert the run with convert.py',
   phases: [
     { title: 'Discover', detail: 'discover:<layer> (Claude Opus max) + gpt6-discover:<layer> (gpt-6-astra max, web search)' },
-    { title: 'Refute', detail: 'refute-facts:<layer> (Sonnet max), refute-fit:<layer> (Opus max), gpt6-refute-fit:<layer>' },
+    { title: 'Refute', detail: 'refute-facts:<layer> (Opus max), refute-fit:<layer> (Opus max), gpt6-refute-fit:<layer>' },
     { title: 'Critic', detail: 'completeness critic (Opus max), at most 8 follow-up layers' },
     { title: 'Follow-up', detail: 'bounded follow-up round with the same roles' },
   ],
@@ -35,6 +35,12 @@ const WRAP_SCHEMA = { type: 'object', additionalProperties: false, required: ['r
 const LABEL_RANK = { targeted_candidate: 0, keep_but_compare: 1, not_adopted: 2 }
 // Layer ids become GPT-6 job ids (codex_job.py JOB_ID, at most 128 characters with their prefix and suffix).
 const LAYER_ID = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}$/
+// The Claude judgment stages (discover, refute-facts, refute-fit, critic) run as this agent type
+// (adoption/agents/claude/landscape-sweep-worker.md): Opus at effort max with WebFetch disallowed, so pages come in
+// through context-mode's ctx_fetch_and_index and ctx_search as the page's own text, while Skill and the ctx_* tools
+// stay available. The GPT-6 wrappers keep the default type: they only run commands and return the raw result.
+const WORKER = 'landscape-sweep-worker'
+const PAGES = 'find docs and changelogs with WebSearch, fetch each page with ctx_fetch_and_index and read it with ctx_search (load them via ToolSearch)'
 
 const nonblank = (v) => typeof v === 'string' && v.length > 0
 const issues = []
@@ -73,7 +79,7 @@ function shq(s) {
 function inputPath(lid) { return `${S}/inputs/${lid}.json` }
 
 function claudeDiscoverPrompt(L, fu) {
-  const stars = A.stars ? `Also scan the user's GitHub stars, classified in ${A.stars} (star_candidates[] with repository, role, decision, layers; beyond_stars[]), for anything relevant to this layer. Use gh api (Bash) for GitHub facts and WebSearch/WebFetch (load them via ToolSearch) for docs and changelogs.` : ''
+  const stars = A.stars ? `Also scan the user's GitHub stars, classified in ${A.stars} (star_candidates[] with repository, role, decision, layers; beyond_stars[]), for anything relevant to this layer. Use gh api (Bash) for GitHub facts; ${PAGES}.` : ''
   let body = fill(T.discover, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, STARS_NOTE: stars, LAYER_ID: L.layer_id })
   if (fu) body += '\n' + fill(T.followup, { CRITIC_REASON: fu.reason, DIRECTIONS: fu.search_directions.join('; '), ALREADY: fu.already.join(', ') })
   return T.common + '\n\n' + body
@@ -154,7 +160,7 @@ async function runLayer(L, fu, phaseD, phaseR) {
   const suffix = fu ? '-followup' : ''
   const lsuf = fu ? ':followup' : ''
   const [cd, gd] = await parallel([
-    () => agent(claudeDiscoverPrompt(L, fu), { label: `discover:${L.layer_id}${lsuf}`, phase: phaseD, model: 'opus', effort: 'max', schema: A.schemas.discover }),
+    () => agent(claudeDiscoverPrompt(L, fu), { label: `discover:${L.layer_id}${lsuf}`, phase: phaseD, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.discover }),
     () => gpt6Discover(L, suffix, fu, phaseD),
   ])
   const { kept, dropped } = mergeProposals(cd, gd && gd.output)
@@ -163,10 +169,10 @@ async function runLayer(L, fu, phaseD, phaseR) {
   if (kept.length) {
     const props = JSON.stringify(forRefuters(kept), null, 1)
     ;[facts, fitC, fitG] = await parallel([
-      () => agent(T.common + '\n\n' + fill(T.facts, { LAYER_ID: L.layer_id, REQUIREMENT: `see ${inputPath(L.layer_id)} (Read tool)`, PROPOSALS: props }) + '\nUse gh api (Bash) for GitHub facts and WebFetch/WebSearch (via ToolSearch) for docs.',
-        { label: `refute-facts:${L.layer_id}${lsuf}`, phase: phaseR, model: 'sonnet', effort: 'max', schema: A.schemas.votes }),
-      () => agent(T.common + '\n\n' + fill(T.fit, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, PROPOSALS: props, LAYER_ID: L.layer_id }) + '\nUse gh api (Bash) and WebFetch/WebSearch (via ToolSearch) as needed.',
-        { label: `refute-fit:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', schema: A.schemas.votes }),
+      () => agent(T.common + '\n\n' + fill(T.facts, { LAYER_ID: L.layer_id, REQUIREMENT: `see ${inputPath(L.layer_id)} (Read tool)`, PROPOSALS: props }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
+        { label: `refute-facts:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
+      () => agent(T.common + '\n\n' + fill(T.fit, { LAYER_INPUT: `Read the layer input JSON file with the Read tool: ${inputPath(L.layer_id)}`, PROPOSALS: props, LAYER_ID: L.layer_id }) + `\nUse gh api (Bash) for GitHub facts; ${PAGES}.`,
+        { label: `refute-fit:${L.layer_id}${lsuf}`, phase: phaseR, model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.votes }),
       () => gpt6Fit(L, suffix, forRefuters(kept), phaseR),
     ])
   }
@@ -189,7 +195,7 @@ const summary = firstOk.map((r) => ({ layer_id: r.layer_id, catalog: r.catalog, 
   fit_refuted_gpt6: ((r.fit_gpt6 && r.fit_gpt6.output && r.fit_gpt6.output.votes) || []).filter((v) => v.refuted).map((v) => v.repository),
   gpt6_discover_status: r.gpt6_discover ? r.gpt6_discover.status : 'none' }))
 const critic = await agent(T.common + '\n\n' + fill(T.critic, { SUMMARY: `Layer inputs are files ${S}/inputs/<layer_id>.json (Read tool). Summary JSON:\n` + JSON.stringify(summary, null, 1) }),
-  { label: 'critic', phase: 'Critic', model: 'opus', effort: 'max', schema: A.schemas.critic })
+  { label: 'critic', phase: 'Critic', model: 'opus', effort: 'max', agentType: WORKER, schema: A.schemas.critic })
 const named = (critic && critic.followup_layers) || []
 const unknown = named.filter((f) => !A.layers.some((x) => x.layer_id === f.layer_id)).map((f) => String(f.layer_id))
 if (unknown.length) log(`critic named layers outside this sweep, ignored: ${unknown.join(', ')}`)

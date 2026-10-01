@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nautechsystems-nautilus-ibapi",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/nautechsystems/nautilus_ibapi",
+ "reviewed_commit": "0496bf2b66b65661f39e085e4c5c28b6e5ef87a3",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "execution-broker"
+ ],
+ "claim": "Source and documentation review of nautechsystems/nautilus_ibapi at commit 0496bf2b66b65661f39e085e4c5c28b6e5ef87a3 (license NOASSERTION), read from README.md at that commit. Repository description: \"Mirror of ibapi for usage with NautilusTrader\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 35,
+  "pushed_at": "2026-08-05T08:51:10Z",
+  "archived": true,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0496bf2b66b65661f39e085e4c5c28b6e5ef87a3",
+   "text": "This guide provides step-by-step instructions for setting up the TWS API library, including creating virtual environments using both Anaconda and standard Python, building distributions, and testing the installation."
+  },
+  {
+   "source": "README.md@0496bf2b66b65661f39e085e4c5c28b6e5ef87a3",
+   "text": "*Please see Understanding Code Organization and Functionality section at the bottom for an explanation of the key terms, conventions, and code organization used.*"
+  },
+  {
+   "source": "README.md@0496bf2b66b65661f39e085e4c5c28b6e5ef87a3",
+   "text": "Step 1: Clone the TWS API repository and set up a virtual environment:"
+  }
+ ]
+}

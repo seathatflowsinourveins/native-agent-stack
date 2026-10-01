@@ -1054,10 +1054,10 @@ EOF
 # The pin is a floor, not a ceiling (2026-09-24): `"$bin" install <pin>`
 # moves the installer's own launcher back to the pin, dropping a newer
 # auto-updated release's fixes. A launcher at $HOME/.local/bin/<bin> whose
-# `--version` first word ("2.1.281" of "2.1.281 (Claude Code)") is a dotted
+# `--version` first word ("2.1.284" of "2.1.284 (Claude Code)") is a dotted
 # numeric version at or above the pin is kept: nothing is downloaded or
 # installed, and install_pin logs "Kept" instead of "Installed". Fields are
-# compared as base-10 numbers (2.1.99 is older than 2.1.281). No launcher, a
+# compared as base-10 numbers (2.1.99 is older than 2.1.284). No launcher, a
 # failing --version, a non-numeric version or an older one takes the
 # unchanged checksum-verified install. Self-contained on purpose:
 # tests/test_adoption_bootstrap.py runs install_native extracted alone.
@@ -1101,6 +1101,41 @@ install_native() {
   {
     printf '#!/usr/bin/env bash\n'
     printf '# Native auto-updating launcher (installed by %s install); the ecosystem no longer pins a snapshot.\n' "$id"
+    if [[ "$bin_name" == claude ]]; then
+      # Interactive default effort max (docs/decisions/2026-09-29-max-default-effort.md): the client cannot save max, so the
+      # documented --effort flag is added, and only when nothing has chosen an effort. The quoted heredoc keeps $HOME and $@ literal.
+      cat <<'LAUNCHER_EFFORT'
+# Interactive default effort: max. Claude Code cannot save max in settings (effortLevel and modelSettings take low to
+# xhigh) and CLAUDE_CODE_EFFORT_LEVEL would override every --effort, /effort and child effort, so the documented --effort
+# flag is added here, and only when nothing has chosen an effort: stdin and stdout are a terminal, no -p/--print (also as
+# a short-flag cluster such as -pc), no --effort, no CLAUDE_CODE_EFFORT_LEVEL, nothing after a "--", and a client at
+# 2.1.284 or newer (on 2.1.281 a max session turned Ultracode's orchestration off). An operand that merely equals one of
+# these flags, such as the value of --system-prompt, also suppresses the default. To bypass, pass --effort <level> or run
+# ~/.local/bin/claude directly.
+if [ -t 0 ] && [ -t 1 ] && [ -z "${CLAUDE_CODE_EFFORT_LEVEL+x}" ]; then
+  for arg in "$@"; do
+    case "$arg" in
+      --) break ;;
+      -p* | -[!-]*p* | --print | --print=* | --effort | --effort=*) exec "$HOME/.local/bin/claude" "$@" ;;
+    esac
+  done
+  version="$("$HOME/.local/bin/claude" --version 2>/dev/null < /dev/null)"
+  version="${version%%[[:space:]]*}"
+  case "$version" in
+    [0-9]*.[0-9]*.[0-9]*)
+      major="${version%%.*}"; rest="${version#*.}"; minor="${rest%%.*}"; patch="${rest#*.}"; patch="${patch%%.*}"
+      case "$major$minor$patch" in
+        *[!0-9]*) ;;
+        *)
+          if [ "$((10#$major))" -gt 2 ] || { [ "$((10#$major))" -eq 2 ] && { [ "$((10#$minor))" -gt 1 ] ||
+            { [ "$((10#$minor))" -eq 1 ] && [ "$((10#$patch))" -ge 284 ]; }; }; }; then
+            exec "$HOME/.local/bin/claude" --effort max "$@"
+          fi ;;
+      esac ;;
+  esac
+fi
+LAUNCHER_EFFORT
+    fi
     # shellcheck disable=SC2016
     printf 'exec "$HOME/.local/bin/%s" "$@"\n' "$bin_name"
   } > "$bin_dir/$bin_name"
@@ -1110,7 +1145,7 @@ install_native() {
 # install_uv_tool and install_uv_tool_from_git below (with the comments
 # between them) are copied verbatim from adoption/bootstrap-linux.sh, and
 # rtk_config_reminder's config-file check is the Linux reminder's own
-# four-entry text check, applied to the file rtk reads on macOS (not the
+# five-entry text check, applied to the file rtk reads on macOS (not the
 # Linux path); all three were added here 2026-09-26 for the macOS
 # headroom/markitdown (uv-tool), serena (uv-tool-from-git) and rtk pins.
 # tests/test_adoption_bootstrap_macos.py asserts the two install functions
@@ -1206,7 +1241,8 @@ install_uv_tool_from_git() {
 # show/branch -- the same global options rtk's own discovery strips before
 # dispatch), so an ordinary command that merely mentions "show" or "branch"
 # as an argument is not misclassified.
-# recipes/README.md#native-context-mode-and-hooks excludes all four through
+# recipes/README.md#native-context-mode-and-hooks excludes all four, and plain
+# jq (F2 in docs/decisions/2026-09-26-token-practice-f1-f9.md), through
 # rtk's own config (evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt).
 # A duplicate key or table is invalid TOML and rtk silently falls back to
 # defaults, so the reminder says to replace the whole value inside the existing
@@ -1224,12 +1260,12 @@ rtk_config_reminder() {
   local config="$HOME/Library/Application Support/rtk/config.toml"
   if [[ -f "$config" ]] \
     && [[ $(grep -Ec '^[[:space:]]*exclude_commands[[:space:]]*=' "$config") -eq 1 ]] \
-    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" \
+    && grep -Fq '"^git show [^ ]*:"' "$config" && grep -Fq '"diff"' "$config" && grep -Fq '"jq"' "$config" \
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\n]*\s)?[^\s]*:'" "$config" \
     && grep -Fq "'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|\$)'" "$config"; then
     return 0
   fi
-  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"'] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
+  printf 'Reminder: for the Claude hook, in %s, inside the existing [hooks] table replace the whole exclude_commands value (from "exclude_commands =" through its closing "]"), or add the key if the table lacks it. Add the [hooks] header line only when the file has no [hooks] table. Use: exclude_commands = ["^git show [^ ]*:", "diff", '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*show\s+(?:[^\\n]*\s)?[^\s]*:'"'"', '"'"'^git\s+(?:(?:-C|-c|--git-dir|--work-tree)\s+\S+\s+|--\S+\s+)*branch(?:\s|$)'"'"', "jq"] (a duplicate key or table is invalid TOML and rtk silently loads defaults; recipes/README.md#native-context-mode-and-hooks); this script does not write it.\n' "$config"
 }
 
 install_pin() {

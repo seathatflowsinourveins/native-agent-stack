@@ -1,0 +1,4603 @@
+{
+  "schema_version": 1,
+  "kind": "skills_trial_manifest",
+  "scope": "project",
+  "checked_at": "2026-09-27",
+  "decision_record": "blueprints/runtime-workers/skills/research.md",
+  "cli": {
+    "package": "skills",
+    "version": "1.7.0",
+    "source": "https://github.com/vercel-labs/skills/tree/v1.7.0",
+    "tarball": "https://registry.npmjs.org/skills/-/skills-1.7.0.tgz",
+    "integrity": "sha512-OfePnDft+Xt9/tCoHdCUe5fkM8i+Q3QOSQO53hm7mKtsXyvc+CKOAAliVWZ484HS3cWx+6r+ob0AArixs3jYXw==",
+    "sha256": "8d1466f792baaee945dae88e05ee403d6f9e78a3ae8dcbf61496035ca274418d",
+    "install": "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0",
+    "env": {
+      "DISABLE_TELEMETRY": "1"
+    },
+    "lock_path": "$XDG_STATE_HOME/skills/.skill-lock.json when XDG_STATE_HOME is set, else ~/.agents/.skill-lock.json",
+    "notes": [
+      "`check` runs the same code path as `update` and can write; always pass -g for global scope.",
+      "The global lock's skillFolderHash is the upstream git tree SHA of the skill folder; a tree-URL install at a 40-hex ref stays at that ref on update.",
+      "DISABLE_TELEMETRY=1 (or DO_NOT_TRACK=1) disables both the telemetry event and the add-time audit call.",
+      "skills.sh's documented /api/v1 requires a Vercel OIDC token (https://skills.sh/docs/api, read 2026-09-26); discovery uses `skills find <query>` (the CLI's unauthenticated /api/search) and the site pages, and the raw audit risks behind the page labels come from https://add-skill.vercel.sh/audit?source=<owner/repo>&skills=<names>, the endpoint the CLI calls at add time when telemetry is on."
+    ],
+    "ref": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+    "project_lock_path": "<project-dir>/skills-lock.json",
+    "project_verification": "SKILL.md sha256, source/ref/skillPath identity and gh api pinned source tree_sha; computedHash is a distinct native SHA-256 field."
+  },
+  "trial": {
+    "status": "trial",
+    "install_policy": "Broad role-applicable trial through tools/adoption/install_skills.py; no host installation by this build.",
+    "prune_rule": "Zero proven activations across the completed, instrumented E2E run set => status pruned, retain run IDs/counters/evidence and remove through skills CLI. Incomplete or uninstrumented runs are unknown, never zero.",
+    "invoke_evidence": "README.md#invocation-and-pruning",
+    "native_acceptance": "pending"
+  },
+  "roles": [
+    "coding",
+    "orchestration",
+    "research",
+    "extraction-caller"
+  ],
+  "scenarios": [
+    "planning-and-specs",
+    "tdd",
+    "e2e-testing",
+    "ab-testing-and-evaluation",
+    "debugging",
+    "code-review",
+    "security",
+    "github-issue-to-pr",
+    "github-pr-review",
+    "github-ci-fix",
+    "github-actions",
+    "release-notes",
+    "docs-and-citations",
+    "research",
+    "deployment-uv-docker",
+    "memory"
+  ],
+  "skills": [
+    {
+      "name": "add-javadoc",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/add-javadoc",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/add-javadoc",
+      "tree_sha": "4fab124ceaaa67a393a674384015158e3f50b100",
+      "skill_md_sha256": "93422a18b7d6a98ed4800c800c9d2a4842dc465454253038d9cc091bd5bd45e1",
+      "skill_md_bytes": 1166,
+      "description_chars": 159,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/add-javadoc/SKILL.md:1"
+    },
+    {
+      "name": "agent-browser",
+      "source": "vercel-labs/agent-browser",
+      "url": "https://github.com/vercel-labs/agent-browser/tree/d01253d9db28d75080e36da3c1c31ef89454731e/skills/agent-browser",
+      "ref": "d01253d9db28d75080e36da3c1c31ef89454731e",
+      "path": "skills/agent-browser",
+      "tree_sha": "82def67855a0d2aad7794207951820fa5422fdb0",
+      "skill_md_sha256": "3a7520e64de2dfaa516b6721c001e84e06e3c06a187b82af029ae721540ebfac",
+      "skill_md_bytes": 3457,
+      "description_chars": 925,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "e2e-testing"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: vercel-labs/agent-browser@d01253d9db28d75080e36da3c1c31ef89454731e skills/agent-browser/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "agent-canvas-environment",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-canvas-environment",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/agent-canvas-environment",
+      "tree_sha": "f86b5b739f7a97afbf53f343beb63824942bcb4d",
+      "skill_md_sha256": "40562401fb3e07a921f4a1451cc44a4ed6441239c18a4f334791fa6a953f103c",
+      "skill_md_bytes": 9959,
+      "description_chars": 230,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers the optional Agent Canvas application environment; useful only on workers given that environment. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-canvas-environment/SKILL.md:1"
+    },
+    {
+      "name": "agent-creator",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-creator",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/agent-creator",
+      "tree_sha": "1dd69a47d0bfecf45a52add4cf4081f2afd9bef4",
+      "skill_md_sha256": "c7321d4a60420cefe8f06b8946d4501f0a6a18352f1f79e9526354266cf0109f",
+      "skill_md_bytes": 7254,
+      "description_chars": 330,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-creator/SKILL.md:1"
+    },
+    {
+      "name": "agent-memory",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-memory",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/agent-memory",
+      "tree_sha": "7ae7fc4e3658214947c683162df6dce3a910d813",
+      "skill_md_sha256": "f91fb602088b14732037b54c72de8648dd6c14b4261265eb0e4c87ac43b442bd",
+      "skill_md_bytes": 2051,
+      "description_chars": 199,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "memory",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-memory/SKILL.md:1"
+    },
+    {
+      "name": "agent-readiness-report",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/agent-readiness-report",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/onboarding/skills/agent-readiness-report",
+      "tree_sha": "77d14adb7d8da1ff94707b5119800ff32643cab4",
+      "skill_md_sha256": "e11eafa6fa0be079680bf49d7376dddff7261ec353e35a1a070d8d3c9f10b3b1",
+      "skill_md_bytes": 4477,
+      "description_chars": 307,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/agent-readiness-report/SKILL.md:1"
+    },
+    {
+      "name": "agent-sdk-builder",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/agent-sdk-builder",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/agent-sdk-builder",
+      "tree_sha": "7c2ce2de2c2e607e53a4cb9980a2dde6a2a49f9a",
+      "skill_md_sha256": "0085981836b18cd815079936ea7784e575a1def0d77ba41f72d9b2abe7589cab",
+      "skill_md_bytes": 2849,
+      "description_chars": 228,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/agent-sdk-builder/SKILL.md:1"
+    },
+    {
+      "name": "agentic-actions-auditor",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/agentic-actions-auditor/skills/agentic-actions-auditor",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/agentic-actions-auditor/skills/agentic-actions-auditor",
+      "tree_sha": "3c07fa0b66ec665df1b17f5e09ab3e735f627029",
+      "skill_md_sha256": "b2bdb88d559bc37e6c2c8314e28e7a2eb47e7cdd9da51e77da347d3517326dc0",
+      "skill_md_bytes": 21743,
+      "description_chars": 571,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security",
+        "github-actions"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Checks attacker-controlled workflow inputs reaching AI agents and their credentials. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/agentic-actions-auditor/skills/agentic-actions-auditor/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "azure-devops",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/azure-devops",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/azure-devops",
+      "tree_sha": "dee8b13d0bd7e0a49f6ae17d78fd8f1fc4d1c356",
+      "skill_md_sha256": "df602c5dc300b53b5163806ee6b573dab3126db64b4e7c237ba4ddfbb0c2d5fc",
+      "skill_md_bytes": 3552,
+      "description_chars": 201,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/azure-devops/SKILL.md:1"
+    },
+    {
+      "name": "bitbucket",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/bitbucket",
+      "tree_sha": "459944c2558e7d82bc70f367c6ba084a276de343",
+      "skill_md_sha256": "b9c7fb63cef358d8a21e8348c8c5290d60acc91c536774b88b7121bee6ff0bd1",
+      "skill_md_bytes": 2551,
+      "description_chars": 250,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket/SKILL.md:1"
+    },
+    {
+      "name": "bitbucket-cloud",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket-cloud",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/bitbucket-cloud",
+      "tree_sha": "a54aed17547b26848f508043b2ea24e14339d77a",
+      "skill_md_sha256": "05fa500943fea4940408098e2411cabaa2d316dabb7a56ceeacad3cd2e59057a",
+      "skill_md_bytes": 3878,
+      "description_chars": 245,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket-cloud/SKILL.md:1"
+    },
+    {
+      "name": "bitbucket-data-center",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/bitbucket-data-center",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/bitbucket-data-center",
+      "tree_sha": "6c5d58d993ee9e27e5d5c8db0b51c225535d16f5",
+      "skill_md_sha256": "912dd5497f8bd3608b1dea6913732239f6cc1ca7996340884688c46a6c56193f",
+      "skill_md_bytes": 3634,
+      "description_chars": 313,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/bitbucket-data-center/SKILL.md:1"
+    },
+    {
+      "name": "brainstorming",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/brainstorming",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/brainstorming",
+      "tree_sha": "03d4c6657cd20ba0fce9d270fc688150bd191c3b",
+      "skill_md_sha256": "a32d2255354775aa124855aa7100cf276bea096fff4ebb3a0edf57be216e6c72",
+      "skill_md_bytes": 17548,
+      "description_chars": 198,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/brainstorming/SKILL.md:1"
+    },
+    {
+      "name": "build-setup",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/build-setup",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/cobol-modernization/skills/build-setup",
+      "tree_sha": "a20c5d119b1b4ba8a0391c9276196b2d0faaad0a",
+      "skill_md_sha256": "922b0812ba608d51cf760372293f498818544695fe02c61ce7db593d187b8572",
+      "skill_md_bytes": 2499,
+      "description_chars": 158,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/build-setup/SKILL.md:1"
+    },
+    {
+      "name": "canvas-extension-api",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/canvas-extension-api",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/canvas-extension-api",
+      "tree_sha": "d801371678229dcbb20d642ec95c5a74fce4ef83",
+      "skill_md_sha256": "a36bcb91071425b5095b90503f51336951767aec5770873a5c784d57980b6157",
+      "skill_md_bytes": 17452,
+      "description_chars": 499,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers the optional Agent Canvas application environment; useful only on workers given that environment. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/canvas-extension-api/SKILL.md:1"
+    },
+    {
+      "name": "cobol-modernization",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/cobol-modernization",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/cobol-modernization/skills/cobol-modernization",
+      "tree_sha": "d86574828d9f3e5aea2b7066105eb44d9e97715c",
+      "skill_md_sha256": "551452a767707ba2827fc654475e29d5c3735a6eef152e579decaa52b4e3759d",
+      "skill_md_bytes": 3363,
+      "description_chars": 136,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/cobol-modernization/SKILL.md:1"
+    },
+    {
+      "name": "code-review",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/code-review",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/code-review",
+      "tree_sha": "bd04e3765993619aae24ccabbd84b94121464334",
+      "skill_md_sha256": "f4a3bf947db539fbb0467598c7bfed0ef25164278b5a22ad760eff5f78057dee",
+      "skill_md_bytes": 8455,
+      "description_chars": 157,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/code-review/SKILL.md:1"
+    },
+    {
+      "name": "code-simplifier",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/code-simplifier",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/code-simplifier",
+      "tree_sha": "6da51b9d5dee02ec26954c3961cb64bc21b69215",
+      "skill_md_sha256": "ba5cfc2908e5d7e4a896a88c87294a348f356222e5f7118753ed443c0c3a1116",
+      "skill_md_bytes": 5033,
+      "description_chars": 435,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/code-simplifier/SKILL.md:1"
+    },
+    {
+      "name": "codebase-design",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/codebase-design",
+      "tree_sha": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a",
+      "skill_md_sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+      "skill_md_bytes": 6446,
+      "description_chars": 265,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/codebase-design/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "codeql",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/static-analysis/skills/codeql",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/static-analysis/skills/codeql",
+      "tree_sha": "1490253d767cc2c5e48f1245a681ee59cc52eb4f",
+      "skill_md_sha256": "1a6d919ff80f83b262daf650552af6eb6d2c32b19d0c529b70efe0c116b675cf",
+      "skill_md_bytes": 18600,
+      "description_chars": 751,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/codeql/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "datadog",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/datadog",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/datadog",
+      "tree_sha": "9fcb3bd5ed49971a98224e69d9d7d92fa49d7727",
+      "skill_md_sha256": "c67db102d293d21ee9318d51e5da8e86ed2d5ed1d92635a6830552b83c457c7f",
+      "skill_md_bytes": 2864,
+      "description_chars": 187,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "debugging"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/datadog/SKILL.md:1"
+    },
+    {
+      "name": "deno",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/deno",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/deno",
+      "tree_sha": "521248e905142109eedf85ed8b05d12d7f95c099",
+      "skill_md_sha256": "6704eb29264daea9cf63af19c216a9d1c0970a094830efedd02e0545feaa65c1",
+      "skill_md_bytes": 2266,
+      "description_chars": 232,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/deno/SKILL.md:1"
+    },
+    {
+      "name": "diagnosing-bugs",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/diagnosing-bugs",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/diagnosing-bugs",
+      "tree_sha": "de4236cf34757c4e9ea7afe78d46c023213ff254",
+      "skill_md_sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+      "skill_md_bytes": 8530,
+      "description_chars": 156,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "debugging"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Uses hypothesis-driven diagnosis and root-cause evidence before proposing fixes. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/diagnosing-bugs/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "diagnosing-superpowers",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/diagnosing-superpowers",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/diagnosing-superpowers",
+      "tree_sha": "9a975225f7a42de50cd2d43483701b6348f99fd5",
+      "skill_md_sha256": "5a652f8132cc901eb5ca61f89157839f87a2f20aed037fc7a2b51051bc37cd19",
+      "skill_md_bytes": 6904,
+      "description_chars": 375,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "debugging",
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Diagnoses skill routing and workflow failures; metrics must come from actual worker histories. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/diagnosing-superpowers/SKILL.md:1"
+    },
+    {
+      "name": "discord",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/discord",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/discord",
+      "tree_sha": "0759b6e8fa2e5910a180d499939128f2baa108a3",
+      "skill_md_sha256": "ff1cc68562cddeb1f51289e0f5fe13dd272aa89d2b156624ceb8bc65b01ac23f",
+      "skill_md_bytes": 4352,
+      "description_chars": 253,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "memory"
+      ],
+      "roles": [
+        "orchestration",
+        "research"
+      ],
+      "status": "trial",
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/discord/SKILL.md:1"
+    },
+    {
+      "name": "dispatching-parallel-agents",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/dispatching-parallel-agents",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/dispatching-parallel-agents",
+      "tree_sha": "15697cb0726c26a66bff737494e8b5266667ba0c",
+      "skill_md_sha256": "1968923066f3b707eb01d1992cdf4c42284c3855f70253b9cd5000ff45fca13c",
+      "skill_md_bytes": 6078,
+      "description_chars": 106,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/dispatching-parallel-agents/SKILL.md:1"
+    },
+    {
+      "name": "doc-coauthoring",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/doc-coauthoring",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/doc-coauthoring",
+      "tree_sha": "d9df960e61fe2bafe9183e37de6f9f6b73b74087",
+      "skill_md_sha256": "2e47d78846faeea4a56e9809c52700087a15a2155a3f293a3efbaded81398ef4",
+      "skill_md_bytes": 15815,
+      "description_chars": 428,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/doc-coauthoring/SKILL.md:1"
+    },
+    {
+      "name": "docker",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/docker",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/docker",
+      "tree_sha": "7e742029273a6cd801c5fd1610bc052e467479b4",
+      "skill_md_sha256": "d4c69e41982982cf1b71e265fbcaec478030bee0bf627285a48bea3a84373a3a",
+      "skill_md_bytes": 922,
+      "description_chars": 183,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/docker/SKILL.md:1"
+    },
+    {
+      "name": "docx",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/docx",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/docx",
+      "tree_sha": "6e6f5b95c1de6e803cc07b214f5059b074d64e0c",
+      "skill_md_sha256": "8017469ea95fb7d28225c62daf8e2f3492a7b516fc64c18c28977cbf8980b7fe",
+      "skill_md_bytes": 6911,
+      "description_chars": 835,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/docx/SKILL.md:1"
+    },
+    {
+      "name": "domain-modeling",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/domain-modeling",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/engineering/domain-modeling",
+      "tree_sha": "388c9822641805ca2dcd5038e68a1d5282437ee5",
+      "skill_md_sha256": "327a2b50620e2fd70abc6893cd6965e76b20f8d0adb0dc2c8d5eb3845efb643e",
+      "skill_md_bytes": 3331,
+      "description_chars": 150,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/domain-modeling/SKILL.md:1"
+    },
+    {
+      "name": "evidence-based-citations",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/evidence-based-citations",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/evidence-based-citations",
+      "tree_sha": "8b146bdfaa2c21074edf3f3f89e6c322d79d0a56",
+      "skill_md_sha256": "ebd2645e8e3651218d356c534ebcc453fafbd8b0ca36d9d9e7e7d60790ee7021",
+      "skill_md_bytes": 3182,
+      "description_chars": 206,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/evidence-based-citations/SKILL.md:1"
+    },
+    {
+      "name": "executing-plans",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/executing-plans",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/executing-plans",
+      "tree_sha": "899ffeab92be3de6cd9ed0078b32737b18b8c135",
+      "skill_md_sha256": "f38e8f2ddcf079f65493adc713c1fed78421dfaf5f4dbf6b3a6b2b1d95466e71",
+      "skill_md_bytes": 20405,
+      "description_chars": 170,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/executing-plans/SKILL.md:1"
+    },
+    {
+      "name": "find-skills",
+      "source": "vercel-labs/skills",
+      "url": "https://github.com/vercel-labs/skills/tree/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills",
+      "ref": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "path": "skills/find-skills",
+      "tree_sha": "76a98a285cb0434f3d39e1a873823556330e398b",
+      "skill_md_sha256": "c00eeea0e13e74fe4a9d84ba0a8542205a1b736d65f13134fe1a6647eb14976f",
+      "skill_md_bytes": 5472,
+      "description_chars": 303,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Uses the upstream skills directory and CLI to discover installable sources before selecting a capability. Source: vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73 skills/find-skills/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "finishing-a-development-branch",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/finishing-a-development-branch",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/finishing-a-development-branch",
+      "tree_sha": "3b1205aa5038c71946077dd63b9e71b447729e70",
+      "skill_md_sha256": "8db5a922b242dd4e1bf824cb91c13b3e8d8e8a86d6ceaf7f0774eb9cce909d65",
+      "skill_md_bytes": 7781,
+      "description_chars": 101,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/finishing-a-development-branch/SKILL.md:1"
+    },
+    {
+      "name": "fp-check",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/fp-check/skills/fp-check",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/fp-check/skills/fp-check",
+      "tree_sha": "f3f830417667dc3a202b1cb40948bc26ce26ddbf",
+      "skill_md_sha256": "129223b79b8cb1e7c289c90cbe4ba288d9b210e318a0d1464f319e30329481b3",
+      "skill_md_bytes": 6747,
+      "description_chars": 343,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/fp-check/skills/fp-check/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "frontend-design",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/frontend-design",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/frontend-design",
+      "tree_sha": "d79e2a5bb4df4a386c2adcdd9ab8709bba28c3f6",
+      "skill_md_sha256": "d91970639e9f5c37682ac7ab60094d35f1c7c1f38d731bd56396563aee10c1d3",
+      "skill_md_bytes": 9390,
+      "description_chars": 204,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "code-review"
+      ],
+      "roles": [
+        "coding"
+      ],
+      "status": "trial",
+      "merit_note": "Adds intentional UI design or reusable component-interface criteria to coding work. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/frontend-design/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "gh-address-comments",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-address-comments",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/gh-address-comments",
+      "tree_sha": "042316bece4a9f832145dcff7d5506e99fe3ecf1",
+      "skill_md_sha256": "77389eefd3fb6584210668ca8e43f4b8de87e7722ddd953474bc9e24cdfaaedd",
+      "skill_md_bytes": 1278,
+      "description_chars": 168,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-pr-review",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Resolves concrete review feedback using GitHub CLI and authenticated repository state. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/gh-address-comments/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "gh-fix-ci",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/gh-fix-ci",
+      "tree_sha": "3f99938c9464393f27cc4cc00e4ba17387517803",
+      "skill_md_sha256": "7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26",
+      "skill_md_bytes": 3651,
+      "description_chars": 313,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-ci-fix"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/gh-fix-ci/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "github",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github",
+      "tree_sha": "02cea5f01bd171145824a074ee680881fcfdc08f",
+      "skill_md_sha256": "c618546605a8461dfa7d2939c97de409ce7455c262aac4513b2b1b8dd15020e8",
+      "skill_md_bytes": 4880,
+      "description_chars": 205,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github/SKILL.md:1"
+    },
+    {
+      "name": "github-actions",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-actions",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-actions",
+      "tree_sha": "1c2cde4572e3fdf3c3196846dba86a4ebd456121",
+      "skill_md_sha256": "3bc931615299740031ec21eef92a3c1cc1acd91d88d6579c67e8e6021a0c83f0",
+      "skill_md_bytes": 1888,
+      "description_chars": 160,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-actions"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-actions/SKILL.md:1"
+    },
+    {
+      "name": "github-agents-md-maintainer",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-agents-md-maintainer",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-agents-md-maintainer",
+      "tree_sha": "6eeab0e65e71aeeaf21e69d3583c4aab8adf45ce",
+      "skill_md_sha256": "a117d2f599af00a8b1f890b1cecda2a144cc1e59ae1a0370f5798b97377ec206",
+      "skill_md_bytes": 11745,
+      "description_chars": 286,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "memory",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-agents-md-maintainer/SKILL.md:1"
+    },
+    {
+      "name": "github-delivery-watchdog",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-delivery-watchdog",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-delivery-watchdog",
+      "tree_sha": "c90ad6ae786552737e7ab2a011310627c5f0acae",
+      "skill_md_sha256": "536cb76358c784e882c02d0040fe33fe19038fdf2b9050a94739ec07f760bce9",
+      "skill_md_bytes": 1952,
+      "description_chars": 109,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-delivery-watchdog/SKILL.md:1"
+    },
+    {
+      "name": "github-issue-to-pr",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-issue-to-pr",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-issue-to-pr",
+      "tree_sha": "a8d0921bfb255e12d6f97754c54d79ac72d9b83d",
+      "skill_md_sha256": "602425d9c99c774e2b4a31ac816313f3e64171a72ff34dcc6aa50a1c6b14ba6a",
+      "skill_md_bytes": 17616,
+      "description_chars": 281,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-issue-to-pr/SKILL.md:1"
+    },
+    {
+      "name": "github-issue-triage",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-issue-triage",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-issue-triage",
+      "tree_sha": "9df1430bf1402390fa7070105b589a87861254ed",
+      "skill_md_sha256": "eec8e8f6d1c9f41f898f438f037c082476ae3a08f70e609a4458c12c196861e3",
+      "skill_md_bytes": 3141,
+      "description_chars": 99,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-issue-triage/SKILL.md:1"
+    },
+    {
+      "name": "github-pr-review",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-pr-review",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-pr-review",
+      "tree_sha": "f4e742826b7154635c79820a1cb015906b260a6d",
+      "skill_md_sha256": "8b1c2f74dede90bbb7a524b66e991f9eb8ab3068b349ad343ca986668567652c",
+      "skill_md_bytes": 9137,
+      "description_chars": 100,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-pr-review/SKILL.md:1"
+    },
+    {
+      "name": "github-pr-reviewer",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-pr-reviewer",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-pr-reviewer",
+      "tree_sha": "1f4525915d9d62128ef99f6d646ea02984c4c4d4",
+      "skill_md_sha256": "d599fc3002a7c97ed946e48b4d7c59c2d3f04d982f9a6460ff0884b9cad8224d",
+      "skill_md_bytes": 26720,
+      "description_chars": 262,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-pr-reviewer/SKILL.md:1"
+    },
+    {
+      "name": "github-repo-monitor",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-repo-monitor",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-repo-monitor",
+      "tree_sha": "e779e4edf79c281f7c9a35cf586eb6084b5046db",
+      "skill_md_sha256": "8a51a228f4a372162d0f3545ac44a1ce7a7d6616fab0b00fbdcd19789a85e52c",
+      "skill_md_bytes": 12247,
+      "description_chars": 484,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-repo-monitor/SKILL.md:1"
+    },
+    {
+      "name": "github-stale-ci-pr-closer",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-stale-ci-pr-closer",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/github-stale-ci-pr-closer",
+      "tree_sha": "0c4596fbf016454fb1b78e1b79f826ade2a26249",
+      "skill_md_sha256": "060b136307daf00b908567e2a22e84cd3d8acec3f387668af3b9a82a3fb82aa3",
+      "skill_md_bytes": 1210,
+      "description_chars": 73,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-ci-fix"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/github-stale-ci-pr-closer/SKILL.md:1"
+    },
+    {
+      "name": "gitlab",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/gitlab",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/gitlab",
+      "tree_sha": "29879a030a0dd27de75c2674a242492c9d90a5a6",
+      "skill_md_sha256": "214c4db1a10ec41b81549e5625312b7d686772fba1258379e30013e3789f7fd7",
+      "skill_md_bytes": 2164,
+      "description_chars": 178,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/gitlab/SKILL.md:1"
+    },
+    {
+      "name": "gitlab-issue-to-mr",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/gitlab-issue-to-mr",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/gitlab-issue-to-mr",
+      "tree_sha": "42357f9cfc48574ac142cec1f488ed6bb06ce4db",
+      "skill_md_sha256": "95b4390e73cc3ba60be239a403a50f08c64185a804aeb58589c17806609e6738",
+      "skill_md_bytes": 18988,
+      "description_chars": 278,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/gitlab-issue-to-mr/SKILL.md:1"
+    },
+    {
+      "name": "gpt-researcher",
+      "source": "assafelovic/gpt-researcher",
+      "url": "https://github.com/assafelovic/gpt-researcher/tree/0957c301ed06c2a5857b834358c7227c739041d4/skills/gpt-researcher",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "path": "skills/gpt-researcher",
+      "tree_sha": "0de06325b127246093bf5addc15cdf8ae51d1feb",
+      "skill_md_sha256": "d6f8d0c19f5c898f4e80a8865da0b0c0f23950394a71f1aa52388ee1e4340d67",
+      "skill_md_bytes": 317,
+      "description_chars": 43,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Official minimal MCP caller entrypoint for GPT Researcher; closes tool discovery only, with research quality and tool setup verified separately. Source: assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4 skills/gpt-researcher/SKILL.md:1"
+    },
+    {
+      "name": "grill-me",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/grill-me",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/productivity/grill-me",
+      "tree_sha": "3df14e2d3a89459bf300614be9247e3ce74798f8",
+      "skill_md_sha256": "caaf8b8de1684f96e26b28f3c29189db5c89cce4b73e1c93d86164f66ef88637",
+      "skill_md_bytes": 157,
+      "description_chars": 51,
+      "upstream_disable_model_invocation": true,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/grill-me/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "handoff",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/handoff",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/productivity/handoff",
+      "tree_sha": "2242e8f05424b8c2ae94194a90d97b88d16108ec",
+      "skill_md_sha256": "7c62de979fdc7ac32fb5ddb2146156c917f80ee070d30fadc9d40343c4b6ed25",
+      "skill_md_bytes": 894,
+      "description_chars": 86,
+      "upstream_disable_model_invocation": true,
+      "scenarios": [
+        "memory",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/handoff/SKILL.md:1"
+    },
+    {
+      "name": "improve-agent-readiness",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/improve-agent-readiness",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/onboarding/skills/improve-agent-readiness",
+      "tree_sha": "6b8dcd8f430d8faefbee3cc3bcc4450dea68f65f",
+      "skill_md_sha256": "e34bcd869080b07ac7de88172013562b151d2b74506994b6192765f735ed499c",
+      "skill_md_bytes": 6657,
+      "description_chars": 290,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/improve-agent-readiness/SKILL.md:1"
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/improve-codebase-architecture",
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
+      "description_chars": 125,
+      "upstream_disable_model_invocation": true,
+      "scenarios": [
+        "planning-and-specs",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/improve-codebase-architecture/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "incident-retrospective",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/incident-retrospective",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/incident-retrospective",
+      "tree_sha": "f12d464f1cdc9584f5fe9677f2c75119226a09c5",
+      "skill_md_sha256": "bf99ca3938e3245be78cbb4638cbdea9d38f1f42ad051750a3a52bba92e953dc",
+      "skill_md_bytes": 3554,
+      "description_chars": 275,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "memory"
+      ],
+      "roles": [
+        "orchestration",
+        "research"
+      ],
+      "status": "trial",
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/incident-retrospective/SKILL.md:1"
+    },
+    {
+      "name": "iterate",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/iterate",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/iterate",
+      "tree_sha": "7152a93b2b9f725f52c5252d988819fe0030661a",
+      "skill_md_sha256": "58249391292da7a903f0e91483d959b78d405b77956c13f020df5eab7789495a",
+      "skill_md_bytes": 15153,
+      "description_chars": 276,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-ci-fix"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Diagnoses failing checks or manages stalled CI work; explicit authorization still controls external mutations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/iterate/SKILL.md:1"
+    },
+    {
+      "name": "iterative-retrieval",
+      "source": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC/tree/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval",
+      "ref": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "path": "skills/iterative-retrieval",
+      "tree_sha": "1f1e8d67cf41d72acf2315dc7e6edeac0fc231a6",
+      "skill_md_sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+      "skill_md_bytes": 6786,
+      "description_chars": 183,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Refines retrieval in bounded passes so workers obtain the context needed for an implementation or research question. Source: affaan-m/ECC@2b6e839771e53096d8451a213d40dc64ec8acac0 skills/iterative-retrieval/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "jira-issue-to-pr",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/jira-issue-to-pr",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/jira-issue-to-pr",
+      "tree_sha": "e216374c7bc95f6705707e11a1cc65dda9267964",
+      "skill_md_sha256": "e5c143d6c0256e7cc1786716d358534701154ff86ea26495c8fa5eacf168ce26",
+      "skill_md_bytes": 10124,
+      "description_chars": 679,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/jira-issue-to-pr/SKILL.md:1"
+    },
+    {
+      "name": "jupyter",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/jupyter",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/jupyter",
+      "tree_sha": "ae3ccf3f0bc3ec470f740d9cebed4dfb1b1628b8",
+      "skill_md_sha256": "11f5663bd9bc329844217cb6d3bacc8f475169080f3d859a36d4d0973bd7128e",
+      "skill_md_bytes": 1540,
+      "description_chars": 208,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Supports reproducible notebook execution and inspection for research and extraction evaluation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/jupyter/SKILL.md:1"
+    },
+    {
+      "name": "jupyter-notebook",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/jupyter-notebook",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/jupyter-notebook",
+      "tree_sha": "ed23a98404260af659ef6bae9cb734bcfb0ca6c2",
+      "skill_md_sha256": "62f102e8554b25716dccef0ffab4572d4e3eaf05ccc76562d33a065bc9c521fb",
+      "skill_md_bytes": 4154,
+      "description_chars": 237,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Supports reproducible notebook execution and inspection for research and extraction evaluation. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/jupyter-notebook/SKILL.md:1"
+    },
+    {
+      "name": "kubernetes",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/kubernetes",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/kubernetes",
+      "tree_sha": "68d887ccaf357723985bae1130706a7145e4d38d",
+      "skill_md_sha256": "e1c28130b212211c33138e0977e64dc57f368c42d6588e2bd173092cc9d4a96d",
+      "skill_md_bytes": 1303,
+      "description_chars": 165,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/kubernetes/SKILL.md:1"
+    },
+    {
+      "name": "learn-from-code-review",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/learn-from-code-review",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/learn-from-code-review",
+      "tree_sha": "28da28ac893f281737349c3867b5640ae348b0b4",
+      "skill_md_sha256": "146a6ec99296501601c2918644cbca54a337cca3290d173ac5ce64a5c62db497",
+      "skill_md_bytes": 6300,
+      "description_chars": 308,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "memory",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Persists reusable repository knowledge or a bounded handoff with a reviewable source artifact. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/learn-from-code-review/SKILL.md:1"
+    },
+    {
+      "name": "linear",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/linear",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/linear",
+      "tree_sha": "3419cdad4edd8d23c9eb5cdafa834ac50be9ef3d",
+      "skill_md_sha256": "f0a509cc3268de2d716dce1b66de027c91b71d26ca330ab1a59363b169d2ae03",
+      "skill_md_bytes": 7151,
+      "description_chars": 205,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/linear/SKILL.md:1"
+    },
+    {
+      "name": "linear-triage",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/linear-triage",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/linear-triage",
+      "tree_sha": "8a87f4b44d8fe3f1a78159a64639f68268ef4eec",
+      "skill_md_sha256": "4a6dfb4a604c995879039bcffa65e38b18083faee57c08d9a8ab876ed5993e87",
+      "skill_md_bytes": 3045,
+      "description_chars": 244,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers alternate source-control or ticket systems encountered during planning; not counted as GitHub-specific coverage. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/linear-triage/SKILL.md:1"
+    },
+    {
+      "name": "mainframe-planning",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/mainframe-planning",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/cobol-modernization/skills/mainframe-planning",
+      "tree_sha": "03983adeb00274f278921eb04bc8d3b4ed3ac1a4",
+      "skill_md_sha256": "a6e64ed015955951520b69e5e87e0aea6ec2693bacc6af60ba488a0a59c61c96",
+      "skill_md_bytes": 3057,
+      "description_chars": 176,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/mainframe-planning/SKILL.md:1"
+    },
+    {
+      "name": "mainframe-removal",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/mainframe-removal",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/cobol-modernization/skills/mainframe-removal",
+      "tree_sha": "5fa438fb84c8a8208993b094fdcb0ee2bbb8e625",
+      "skill_md_sha256": "bf0c95e28074dd27c4c2facb31783ef079e9dcb551eec8f84a554e845556f2f3",
+      "skill_md_bytes": 2082,
+      "description_chars": 149,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/mainframe-removal/SKILL.md:1"
+    },
+    {
+      "name": "mcp-builder",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/mcp-builder",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/mcp-builder",
+      "tree_sha": "b866bcfb57b780c10b587c7b543e871a91661ce0",
+      "skill_md_sha256": "0f4592dcb53cf2b5d6b7febee6b4152018b565551a1c29e3c612f57b218ab295",
+      "skill_md_bytes": 9092,
+      "description_chars": 277,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/mcp-builder/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "migration-mapping",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-mapping",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/migration-scoring/skills/migration-mapping",
+      "tree_sha": "01541663c7d326717eb97454e8cff37bd907d1af",
+      "skill_md_sha256": "6b65c7e6b15576bd97506ae0ee10e0a6bbb24ed1b2d5946232b2b9b9a540bca1",
+      "skill_md_bytes": 2284,
+      "description_chars": 145,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-mapping/SKILL.md:1"
+    },
+    {
+      "name": "migration-report",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-report",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/migration-scoring/skills/migration-report",
+      "tree_sha": "7080394b2efd3de63a5251d95a1a6d6ac7b1e943",
+      "skill_md_sha256": "0e61fd550879bd54f25f7c970aaab4f66e9b970142c5d761674e4e8b3e7ed827",
+      "skill_md_bytes": 3089,
+      "description_chars": 138,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-report/SKILL.md:1"
+    },
+    {
+      "name": "migration-scoring",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/migration-scoring",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/migration-scoring/skills/migration-scoring",
+      "tree_sha": "d7bb843a85e64349b97add0947677273f79c36ce",
+      "skill_md_sha256": "46764ec6b66b3d1ebdfcc25c771235b45a4b88fa4467fcb002208996665be0ee",
+      "skill_md_bytes": 3411,
+      "description_chars": 139,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/migration-scoring/SKILL.md:1"
+    },
+    {
+      "name": "modern-python",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/modern-python/skills/modern-python",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/modern-python/skills/modern-python",
+      "tree_sha": "e84fa2b3a076b4333e4cc6187510f2b180eed427",
+      "skill_md_sha256": "ef774b925eb1d1fc12e4f5ddc3f5ad925ecd795315827447228c70cc44c6170c",
+      "skill_md_bytes": 10015,
+      "description_chars": 159,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/modern-python/skills/modern-python/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "news-digest",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/news-digest",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/news-digest",
+      "tree_sha": "0992f4bc12fbc02444662a3870abe0a755ad1b5f",
+      "skill_md_sha256": "833aace23ab5b4a5fc44aec71962d1cc0ae88172c4c7659052b3c7f1ada9cf5c",
+      "skill_md_bytes": 12278,
+      "description_chars": 319,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research"
+      ],
+      "roles": [
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Defines deduplicated feed collection and dated source summaries for recurring research. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/news-digest/SKILL.md:1"
+    },
+    {
+      "name": "notion",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/notion",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/notion",
+      "tree_sha": "f9d670bf2279e7da84fc7da6276cb3854ac9d64e",
+      "skill_md_sha256": "2ae4b3833a31781501c64e50ecfdda7c1abff34cc33687b039737a2731ab7ac7",
+      "skill_md_bytes": 3786,
+      "description_chars": 157,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "memory"
+      ],
+      "roles": [
+        "orchestration",
+        "research"
+      ],
+      "status": "trial",
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/notion/SKILL.md:1"
+    },
+    {
+      "name": "npm",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/npm",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/npm",
+      "tree_sha": "34c1b85200cd6c5629b9c3b997a928aaa8a9e307",
+      "skill_md_sha256": "f29251d112f6ba935eed0b36ccae2696f9080bdeb7fd852846f729161f7e30f2",
+      "skill_md_bytes": 440,
+      "description_chars": 165,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/npm/SKILL.md:1"
+    },
+    {
+      "name": "openhands-api",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-api",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/openhands-api",
+      "tree_sha": "eaec51032ac36cf864f0079bd67698bf41adec04",
+      "skill_md_sha256": "f0124b4e04066b3b575d7d11c93aaac16014df7e1eeaaff03383b1b26613259e",
+      "skill_md_bytes": 18282,
+      "description_chars": 184,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-api/SKILL.md:1"
+    },
+    {
+      "name": "openhands-automation",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-automation",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/openhands-automation",
+      "tree_sha": "7c5f5a3d5317e187eb9b95d407570a6e93ce989b",
+      "skill_md_sha256": "b6201e8cd9900476cb14ccc60f92bcb3c3a61847a6bad3cb259d95f385e09a28",
+      "skill_md_bytes": 40915,
+      "description_chars": 261,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-automation/SKILL.md:1"
+    },
+    {
+      "name": "openhands-enterprise-troubleshooting",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-enterprise-troubleshooting",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/openhands-enterprise-troubleshooting",
+      "tree_sha": "bbe40867eeaa2d890a57df32331003d35ea0635a",
+      "skill_md_sha256": "b7baa048b8fbcbb971dd0be8d96104689091b58304ffea276819ad0fabd51382",
+      "skill_md_bytes": 15206,
+      "description_chars": 510,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "debugging"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Uses native logs, metrics or deployment state for operational diagnosis when the required service is present. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-enterprise-troubleshooting/SKILL.md:1"
+    },
+    {
+      "name": "openhands-sdk",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/openhands-sdk",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/openhands-sdk",
+      "tree_sha": "65f0af3cda9aa9df67f7e65b7276408cb457d531",
+      "skill_md_sha256": "033b9e64ec7639f4b793dc1fbf856757ac35dad096e0efc795f27872aa920a97",
+      "skill_md_bytes": 27349,
+      "description_chars": 288,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Documents native OpenHands agent construction or orchestration APIs instead of a replacement runtime. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/openhands-sdk/SKILL.md:1"
+    },
+    {
+      "name": "pdf",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/pdf",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/pdf",
+      "tree_sha": "6369f4649de69bd6857c9bc3b058a77206009238",
+      "skill_md_sha256": "9f78b8359fbd4943ad260a7a1e436e5a96503406d6c34e99f69223d647d85b9c",
+      "skill_md_bytes": 8072,
+      "description_chars": 437,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/pdf/SKILL.md:1"
+    },
+    {
+      "name": "pdflatex",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/pdflatex",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/pdflatex",
+      "tree_sha": "67c755b61c4ae488a59a98d34a160305fd2bb747",
+      "skill_md_sha256": "cf92e9e088dffea0c4849d85fa1d50697e1285f77896a3b03eec026ce61ff889",
+      "skill_md_bytes": 1278,
+      "description_chars": 166,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/pdflatex/SKILL.md:1"
+    },
+    {
+      "name": "plain-english-content",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/plain-english-content",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/plain-english-content",
+      "tree_sha": "67903279d5ec4d43eb69f16fcbc964a3bde22862",
+      "skill_md_sha256": "2ef939ec154a2555a1018233ab818a4b0c92b16668c747b1ad9886a567c04ca2",
+      "skill_md_bytes": 6023,
+      "description_chars": 330,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/plain-english-content/SKILL.md:1"
+    },
+    {
+      "name": "playwright",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/playwright",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/playwright",
+      "tree_sha": "74888f3c1d5581aea6415e78d5fbd760a8ab2a41",
+      "skill_md_sha256": "0ffaabcc8e0990627c4725f18bf1c7955534a796c1c199e872909de2013ce6a8",
+      "skill_md_bytes": 3771,
+      "description_chars": 209,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "e2e-testing"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/playwright/SKILL.md:1"
+    },
+    {
+      "name": "pptx",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/pptx",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/pptx",
+      "tree_sha": "64529c8b3f35fe632b7256bd2f6d46e4b40160ce",
+      "skill_md_sha256": "a7ff03e2c85b636f55232a6b1555f5dd90216b7a1a359ab289d8364e6acbc6a0",
+      "skill_md_bytes": 20796,
+      "description_chars": 732,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/pptx/SKILL.md:1"
+    },
+    {
+      "name": "prd",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/prd",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/prd",
+      "tree_sha": "d009702520f9617ffea98984b75f176a7d9535e9",
+      "skill_md_sha256": "5de2431f9ceb205f76978940b7c1c65e503bb9603410088b8af75bdf2749eb61",
+      "skill_md_bytes": 6897,
+      "description_chars": 149,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/prd/SKILL.md:1"
+    },
+    {
+      "name": "property-based-testing",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/property-based-testing/skills/property-based-testing",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/property-based-testing/skills/property-based-testing",
+      "tree_sha": "cf5e77d684180c80a2f3aa228c53d04b1fa1ba77",
+      "skill_md_sha256": "9448cacb65c6237a7c22dc59602667177ecae405524079ae9ff92240590b995a",
+      "skill_md_bytes": 4306,
+      "description_chars": 845,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "tdd",
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Covers whole parser and numeric input domains with shrinking rather than selected examples alone. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/property-based-testing/skills/property-based-testing/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "qa-changes",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/qa-changes",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/qa-changes",
+      "tree_sha": "350f5d613a6d9d05ab6a4fc0adfaf9a62249e21e",
+      "skill_md_sha256": "e4819ced02fce8f19436d2314eb8426e4b4d2519cefa41c000908b53c45ff971",
+      "skill_md_bytes": 14712,
+      "description_chars": 325,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "e2e-testing"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/qa-changes/SKILL.md:1"
+    },
+    {
+      "name": "receiving-code-review",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/receiving-code-review",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/receiving-code-review",
+      "tree_sha": "b5e154fc3ec7a6a0b1e710eebacc2168620cc428",
+      "skill_md_sha256": "091df1629510af1b92fc4abd6f96732ebedb4cb2c0f3457e8f2740b0504a2438",
+      "skill_md_bytes": 6203,
+      "description_chars": 234,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/receiving-code-review/SKILL.md:1"
+    },
+    {
+      "name": "release-notes",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/release-notes",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/release-notes",
+      "tree_sha": "1494e93e3459d395907a4c00b815f93858bca20b",
+      "skill_md_sha256": "5250f2d1aa52272a91f0b0469f6b52079d4931b8bf32784b559706c87b8aeffb",
+      "skill_md_bytes": 854,
+      "description_chars": 191,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "release-notes",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Derives categorized release notes from repository history rather than model recollection. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/release-notes/SKILL.md:1"
+    },
+    {
+      "name": "requesting-code-review",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/requesting-code-review",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/requesting-code-review",
+      "tree_sha": "5fcdadfccd8c90987a11969d2f8c844820fee6e1",
+      "skill_md_sha256": "cfcee1b06774e7c0517f1e09be1a11f2d5680257072723e709ddbcf7e08b795a",
+      "skill_md_bytes": 2977,
+      "description_chars": 107,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides evidence-grounded change review and feedback handling as explicit lifecycle stages. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/requesting-code-review/SKILL.md:1"
+    },
+    {
+      "name": "research",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/research",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/engineering/research",
+      "tree_sha": "0a6796c5667e95ed2301ba7381c123b4acb2ae1a",
+      "skill_md_sha256": "985569f15739c713d6784887c3d186d4ef9ac85bec5ad9c068d25bf0739928e4",
+      "skill_md_bytes": 794,
+      "description_chars": 238,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Collects high-trust primary-source findings into a cited repository artifact for coding decisions and research tasks. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/research/SKILL.md:1"
+    },
+    {
+      "name": "research-brief",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/research-brief",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/research-brief",
+      "tree_sha": "96203abcbcdf42313e48380d51b5785e8d2a823b",
+      "skill_md_sha256": "662a6bf42ec9964bfe9d7f996ffe0fb388fec3e7c955df473d4bd729cd8309e6",
+      "skill_md_bytes": 3186,
+      "description_chars": 195,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Defines recurring source-led research briefs with verifiable sources; Tavily/Notion integrations require native setup and publishing authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/research-brief/SKILL.md:1"
+    },
+    {
+      "name": "sarif-parsing",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/static-analysis/skills/sarif-parsing",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/static-analysis/skills/sarif-parsing",
+      "tree_sha": "4fe407da56e118c68fd9bcc16603a38cf6116562",
+      "skill_md_sha256": "cc5f008f40ffb8a1ae03ebd32d7234de43e828293955a0bc251b76ba249554fa",
+      "skill_md_bytes": 17925,
+      "description_chars": 373,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/sarif-parsing/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "score-quality",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/score-quality",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/migration-scoring/skills/score-quality",
+      "tree_sha": "15e66548eca0b7a0fc52d2f6ba528b9cd028d525",
+      "skill_md_sha256": "c0a0955e32eff9c6671b9d2d68eae9d55134d78c5193bd3fda506b50e020fd8a",
+      "skill_md_bytes": 1512,
+      "description_chars": 127,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/score-quality/SKILL.md:1"
+    },
+    {
+      "name": "score-style",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/migration-scoring/skills/score-style",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/migration-scoring/skills/score-style",
+      "tree_sha": "5ea273ae511d5fc02eedeb0afe55c11c0712d65a",
+      "skill_md_sha256": "7c461adc030dda47100f26f8acea6c3098975789c7646b17eec8549985f30702",
+      "skill_md_bytes": 2885,
+      "description_chars": 126,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds rubric-driven migration evaluation and reports; plugin hooks are not installed by the skills CLI. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/migration-scoring/skills/score-style/SKILL.md:1"
+    },
+    {
+      "name": "search-first",
+      "source": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC/tree/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first",
+      "ref": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+      "path": "skills/search-first",
+      "tree_sha": "3ac0daf42ee5c7d0cbe28c399f02ff057283b889",
+      "skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+      "skill_md_bytes": 8210,
+      "description_chars": 328,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "research",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Compares existing repositories, packages and skills before writing integration code, directly supporting coding and orchestration work. Source: affaan-m/ECC@c70874fae9eb0e5ad0365beb7e2955899fd1d30f skills/search-first/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "security",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/security",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/security",
+      "tree_sha": "17f0062e8f675bce2b5c4d3d6ffb30a6e94017d6",
+      "skill_md_sha256": "887a8c46466e388665d4b6679a6d1fe02c6a79b527c38aed6a5a6291b6831fa3",
+      "skill_md_bytes": 1367,
+      "description_chars": 200,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/security/SKILL.md:1"
+    },
+    {
+      "name": "security-audit",
+      "source": "cloudflare/security-audit-skill",
+      "url": "https://github.com/cloudflare/security-audit-skill/tree/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8/skills/security-audit",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "path": "skills/security-audit",
+      "tree_sha": "ccbc33ed119b28c3ef7b44a7e2081ab191ad63af",
+      "skill_md_sha256": "5e3e96a1e438d8f35fef0a1e38f02d4f00e2bdf910401b7dfe00e6779c6dac85",
+      "skill_md_bytes": 22026,
+      "description_chars": 359,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Audits a whole repository into a coverage ledger with confirmed, needs_validation or rejected records that its own validators check, through a parent that delegates hunters and verifiers; loading it is guidance only until a prompt asks for the full audit. Source: cloudflare/security-audit-skill@c1c8a8c1471069fb0e188eeaff69b8e8db6564a8 skills/security-audit/SKILL.md:12 and L172-175",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "security-best-practices",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/security-best-practices",
+      "tree_sha": "349d45885fd3e432e7d0e5c6e21a2a712db158ef",
+      "skill_md_sha256": "7b3dae1ffc5434d890f3c65c8f552af52d0307fab3b35dec13013c9ca3844c4f",
+      "skill_md_bytes": 8612,
+      "description_chars": 385,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/security-best-practices/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "security-threat-model",
+      "source": "openai/skills",
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-threat-model",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "path": "skills/.curated/security-threat-model",
+      "tree_sha": "455ed2d898ef7d1e8836898f07be3a7d2c3f38d2",
+      "skill_md_sha256": "1283c0dd62a8104d9edda4583569b5d8510b4ddaa45120687c999250fd96bad2",
+      "skill_md_bytes": 5561,
+      "description_chars": 412,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Adds secure design and trust-boundary review for runtime tools and untrusted extracted inputs. Source: openai/skills@49f948faa9258a0c61caceaf225e179651397431 skills/.curated/security-threat-model/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "semgrep",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
+      "path": "plugins/static-analysis/skills/semgrep",
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
+      "description_chars": 707,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@82fe8226252622fa807643bdca1710901198553a plugins/static-analysis/skills/semgrep/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "setup-agents-md",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-agents-md",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/onboarding/skills/setup-agents-md",
+      "tree_sha": "4699322855418d8df34d0c8e0d61042d267ff026",
+      "skill_md_sha256": "33abece9c9e2726377e39d4adb0569ed46c6336e8bfc41e290462940e008a613",
+      "skill_md_bytes": 6035,
+      "description_chars": 369,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Checks and improves repository instructions and feedback loops for autonomous workers. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-agents-md/SKILL.md:1"
+    },
+    {
+      "name": "setup-openhands",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-openhands",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/onboarding/skills/setup-openhands",
+      "tree_sha": "160dd94a55fb88d883a3f7b576378a0140e26a7a",
+      "skill_md_sha256": "1c2381e0c1547d3c5efe675f3ae0a6e863fefb5e6867178162772770522f9629",
+      "skill_md_bytes": 2222,
+      "description_chars": 251,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-actions"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies native workflow setup and debugging procedures instead of generated CI guesses. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-openhands/SKILL.md:1"
+    },
+    {
+      "name": "setup-pr-review",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/onboarding/skills/setup-pr-review",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/onboarding/skills/setup-pr-review",
+      "tree_sha": "fa20714069063b154a9afc08c21bbb6acbc2817c",
+      "skill_md_sha256": "70b8d5fb44619412ff7b9bc7794a94ab4a6ab9f14198218c85739463026b1513",
+      "skill_md_bytes": 2939,
+      "description_chars": 209,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides review dispatch or review API procedures; installation grants no permission to post or merge. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/onboarding/skills/setup-pr-review/SKILL.md:1"
+    },
+    {
+      "name": "skill-creator",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator",
+      "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "path": "skills/skill-creator",
+      "tree_sha": "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6",
+      "skill_md_sha256": "dcd4803e61e913e6fc27294184cd3a71f09f5e924ff20c8a9a20173e7b3c2bcf",
+      "skill_md_bytes": 33168,
+      "description_chars": 319,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Includes baseline runs, grader rubrics, repeated benchmarks and blind A/B comparison for skill quality; this does not cover product traffic experiments. Source: anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4 skills/skill-creator/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "slack-channel-monitor",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/slack-channel-monitor",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/slack-channel-monitor",
+      "tree_sha": "d3dfabd9f8790f45e6a15274510050817dd6d0da",
+      "skill_md_sha256": "2699798becdf629b7a837bca297c91fe26fa486fdf2a3a80ca628c56463f3f40",
+      "skill_md_bytes": 12730,
+      "description_chars": 481,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "memory"
+      ],
+      "roles": [
+        "orchestration",
+        "research"
+      ],
+      "status": "trial",
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/slack-channel-monitor/SKILL.md:1"
+    },
+    {
+      "name": "slack-standup-digest",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/slack-standup-digest",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/slack-standup-digest",
+      "tree_sha": "9e7ff432df4f3610aaf5628503b8e69122fe119e",
+      "skill_md_sha256": "58e779cdde7f0029d31df290f0d3a93600fa902ba077393b392a51cbd7e5e699",
+      "skill_md_bytes": 3208,
+      "description_chars": 242,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "memory"
+      ],
+      "roles": [
+        "orchestration",
+        "research"
+      ],
+      "status": "trial",
+      "merit_note": "Structures authorized team context, incident evidence or knowledge records; external messages require session authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/slack-standup-digest/SKILL.md:1"
+    },
+    {
+      "name": "spark-version-upgrade",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/spark-version-upgrade",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/spark-version-upgrade",
+      "tree_sha": "1fade147a86861825148668e9157b8078a45b32b",
+      "skill_md_sha256": "4351d37aec3b7b19cc52bba87aaa8c48c67c0ee4a50e73afcb175aeca4fe4762",
+      "skill_md_bytes": 7777,
+      "description_chars": 180,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/spark-version-upgrade/SKILL.md:1"
+    },
+    {
+      "name": "ssh",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/ssh",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/ssh",
+      "tree_sha": "3faad5282472c8b5ccb6ecdef8ef3c5e0f64251d",
+      "skill_md_sha256": "ca7cca10ed32ca284afafecff35fa3218aa9baee1ed62ab415393adfe9817324",
+      "skill_md_bytes": 3371,
+      "description_chars": 214,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/ssh/SKILL.md:1"
+    },
+    {
+      "name": "subagent-driven-development",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/subagent-driven-development",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/subagent-driven-development",
+      "tree_sha": "5d44ced88725298e847c62c67a726dcc29e20d00",
+      "skill_md_sha256": "8dde5589ee083fb4999106d116f01c8fdaf3116a8a9813fdedeb80329de49046",
+      "skill_md_bytes": 32577,
+      "description_chars": 85,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/subagent-driven-development/SKILL.md:1"
+    },
+    {
+      "name": "supply-chain-risk-auditor",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor",
+      "tree_sha": "954cc68e05e24a2a14447b60d1e8946b53323b1b",
+      "skill_md_sha256": "a1254b7f8d3a1731a9a7e1f9cd6c67b59cf84ed6ef7c7fb455db9a14c528ceb4",
+      "skill_md_bytes": 6991,
+      "description_chars": 367,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/supply-chain-risk-auditor/skills/supply-chain-risk-auditor/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "swift-linux",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/swift-linux",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/swift-linux",
+      "tree_sha": "60790b9ebdbbf4794cc5614e999f08b8b90bce88",
+      "skill_md_sha256": "e4c39d4cfd04335df7e6d6d799470143ac7e805d7a98ca9366f2867a65c80ccc",
+      "skill_md_bytes": 2637,
+      "description_chars": 186,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/swift-linux/SKILL.md:1"
+    },
+    {
+      "name": "systematic-debugging",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/systematic-debugging",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/systematic-debugging",
+      "tree_sha": "9a48dfda84bf339cba4b03fd803ba0dca2e158e3",
+      "skill_md_sha256": "808fc5717aa88ad65efff312b11c186294d3e6ee301afb584e2f86599b137787",
+      "skill_md_bytes": 9465,
+      "description_chars": 91,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "debugging"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Uses hypothesis-driven diagnosis and root-cause evidence before proposing fixes. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/systematic-debugging/SKILL.md:1"
+    },
+    {
+      "name": "tdd",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/tdd",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "path": "skills/engineering/tdd",
+      "tree_sha": "bf1bf5ffcd63aa8abce830f2955a853c121fb463",
+      "skill_md_sha256": "93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc",
+      "skill_md_bytes": 3550,
+      "description_chars": 149,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Defines a red/green loop and behavior-level tests; callers can test deterministic extraction contracts. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/tdd/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "technical-writing",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/technical-writing",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/technical-writing",
+      "tree_sha": "c3d06b8ed68fbdff5c19d8e03ffba2de2530b081",
+      "skill_md_sha256": "ddd627776d70161f3296dbbbb79c9592a9d89e4eab0622b9217eed648dae7b05",
+      "skill_md_bytes": 4888,
+      "description_chars": 282,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides verifiable citations or reader-oriented documentation procedures for worker outputs. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/technical-writing/SKILL.md:1"
+    },
+    {
+      "name": "test-driven-development",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/test-driven-development",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/test-driven-development",
+      "tree_sha": "847144cf0824095922c0d4875648b9fa74877e1a",
+      "skill_md_sha256": "64b03fce4aee5a97a93160cea8111f3ba13a17b7c001db4bd5836d67fd10705d",
+      "skill_md_bytes": 9578,
+      "description_chars": 79,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Defines a red/green loop and behavior-level tests; callers can test deterministic extraction contracts. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/test-driven-development/SKILL.md:1"
+    },
+    {
+      "name": "theme-factory",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/theme-factory",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/theme-factory",
+      "tree_sha": "8942a4f915c681dbc62047d4bfa11f998738ecb0",
+      "skill_md_sha256": "c35893e221e28895c52143cc11bf30e41a44817796b39d4b15727dadc9796552",
+      "skill_md_bytes": 3124,
+      "description_chars": 262,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/theme-factory/SKILL.md:1"
+    },
+    {
+      "name": "ticket-to-code-change",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/ticket-to-code-change",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/ticket-to-code-change",
+      "tree_sha": "062c50c64ebe0b86de3adda752208dd8b3539d49",
+      "skill_md_sha256": "1d063f120e1238dadea3b1a59531373e249b815b772e1970e99fa0fea3cffcc2",
+      "skill_md_bytes": 2278,
+      "description_chars": 330,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Provides issue intake, implementation or dispatch procedures tied to observable repository state. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/ticket-to-code-change/SKILL.md:1"
+    },
+    {
+      "name": "to-java-migration",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/cobol-modernization/skills/to-java-migration",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/cobol-modernization/skills/to-java-migration",
+      "tree_sha": "e5bc7457ba29e05f0abdedb957f6121dd15e795e",
+      "skill_md_sha256": "59e8581f49351e9fa6e89ae76faa8a3c59bc014797f26cfa54769de4cd4c1970",
+      "skill_md_bytes": 2089,
+      "description_chars": 138,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "tdd"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers specialized language migrations with test fixtures and explicit transformation steps. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 plugins/cobol-modernization/skills/to-java-migration/SKILL.md:1"
+    },
+    {
+      "name": "to-spec",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/to-spec",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/engineering/to-spec",
+      "tree_sha": "136b9651747cfccbfbb7c50a6b0dfb757e7547d2",
+      "skill_md_sha256": "43ad9cf318e5e7d3d1fa360253a37021796dc87a0c2e595ad262661a10f85088",
+      "skill_md_bytes": 3043,
+      "description_chars": 149,
+      "upstream_disable_model_invocation": true,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/to-spec/SKILL.md:1"
+    },
+    {
+      "name": "to-tickets",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/to-tickets",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/engineering/to-tickets",
+      "tree_sha": "b32c94e5a51c24ee9c41fcb7fe9ea9fff9af6369",
+      "skill_md_sha256": "5c9fba69845c2519b9b35b9af42ae5142c21f8ca15ac2123dc2722002c8058ae",
+      "skill_md_bytes": 5671,
+      "description_chars": 247,
+      "upstream_disable_model_invocation": true,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/to-tickets/SKILL.md:1"
+    },
+    {
+      "name": "typesafe-ai",
+      "source": "typesafe-ai/skills",
+      "url": "https://github.com/typesafe-ai/skills/tree/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai",
+      "ref": "65a39f393687675ce170e6094757de20370365b9",
+      "path": "skills/typesafe-ai",
+      "tree_sha": "678c375b883794bf4292715a43acbba5c84681aa",
+      "skill_md_sha256": "71ea90d7906c6554c4f4c460ef7361b2d26f59116ccdae986dc6d997b9389f52",
+      "skill_md_bytes": 10040,
+      "description_chars": 660,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides typed judgments for routing and verification; trial requires task-specific quality evaluation. Source: typesafe-ai/skills@65a39f393687675ce170e6094757de20370365b9 skills/typesafe-ai/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "upstream-fork-sync",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/upstream-fork-sync",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/upstream-fork-sync",
+      "tree_sha": "2dbfcf26ede4df1236f2d5882defc39b639d2574",
+      "skill_md_sha256": "c53faa66ce41f0846116b4463313e4a985024eccd6e6ec6d0603a869aee0186d",
+      "skill_md_bytes": 4606,
+      "description_chars": 388,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "github-issue-to-pr",
+        "github-pr-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/upstream-fork-sync/SKILL.md:1"
+    },
+    {
+      "name": "using-git-worktrees",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/using-git-worktrees",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/using-git-worktrees",
+      "tree_sha": "d2b8357b922667a091bfe967840abf5ae84ce99c",
+      "skill_md_sha256": "8cfb86f121269e8f7f12361e6795c4f6738828340e28964c9229d365666c9edd",
+      "skill_md_bytes": 6813,
+      "description_chars": 196,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/using-git-worktrees/SKILL.md:1"
+    },
+    {
+      "name": "using-superpowers",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/using-superpowers",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/using-superpowers",
+      "tree_sha": "4c777432715fe58984d212a36aedc6a18472e512",
+      "skill_md_sha256": "82c5c8866ad7f5dd4440ce66bd7806ba48a2f13771beae5cf112e53f08fe36ba",
+      "skill_md_bytes": 3192,
+      "description_chars": 154,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies an execution, isolation or delegation step in the development lifecycle; native worker tool availability remains a gate. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/using-superpowers/SKILL.md:1"
+    },
+    {
+      "name": "uv",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/uv",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/uv",
+      "tree_sha": "35be5b0352ad8f5cba3b92b3fbb6162b260e9a24",
+      "skill_md_sha256": "e321822ec05752b5fd8b967f6bec30f0e9fd5d7d042aaf5a5d7002829d788315",
+      "skill_md_bytes": 2639,
+      "description_chars": 216,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/uv/SKILL.md:1"
+    },
+    {
+      "name": "variant-analysis",
+      "source": "trailofbits/skills",
+      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/variant-analysis/skills/variant-analysis",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "path": "plugins/variant-analysis/skills/variant-analysis",
+      "tree_sha": "583d7addbf5e04108cc5fece9c99a4d9c6db5ce9",
+      "skill_md_sha256": "7b6b78e499bcb88d05c68254ffc91ebc28edabf4e9808adcc40e2628ebb9407e",
+      "skill_md_bytes": 3903,
+      "description_chars": 566,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "security"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/variant-analysis/skills/variant-analysis/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "vercel",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/vercel",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/vercel",
+      "tree_sha": "a1a03f2db71aea8b1a1f8cedea6cfd57963de76b",
+      "skill_md_sha256": "4060634017206b72caca6ad05195cd015a5309569d336cbc5b04dab263769b12",
+      "skill_md_bytes": 3240,
+      "description_chars": 178,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Provides native environment, package or deployment procedures; actual deployment credentials and runtime acceptance remain separate. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/vercel/SKILL.md:1"
+    },
+    {
+      "name": "vercel-composition-patterns",
+      "source": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/composition-patterns",
+      "ref": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "skills/composition-patterns",
+      "tree_sha": "bf90d0a4b83ea054653350f9c67f6de235d3a368",
+      "skill_md_sha256": "e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3",
+      "skill_md_bytes": 2886,
+      "description_chars": 310,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs",
+        "code-review"
+      ],
+      "roles": [
+        "coding"
+      ],
+      "status": "trial",
+      "merit_note": "Adds intentional UI design or reusable component-interface criteria to coding work. Source: vercel-labs/agent-skills@063bee94c3f4df8453406c830b0a7df0f2860278 skills/composition-patterns/SKILL.md:1"
+    },
+    {
+      "name": "vercel-optimize",
+      "source": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/vercel-optimize",
+      "ref": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "skills/vercel-optimize",
+      "tree_sha": "0901aa3667db7a6e5cc40b213327290bf6556373",
+      "skill_md_sha256": "95ae2683b30d892d165af92a350c5628b68106f395a59b448857b654e306ed91",
+      "skill_md_bytes": 17311,
+      "description_chars": 566,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "deployment-uv-docker"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Grounds deployment optimization in observed performance and cost measurements. Source: vercel-labs/agent-skills@063bee94c3f4df8453406c830b0a7df0f2860278 skills/vercel-optimize/SKILL.md:1"
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "source": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices",
+      "ref": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "skills/react-best-practices",
+      "tree_sha": "343db72180d05814949fef7d46be96b5c6ee86b3",
+      "skill_md_sha256": "71ed7794962fa6e803ee83030517b5b93a9f70fbfeb431ec4535c5480a8d8355",
+      "skill_md_bytes": 7251,
+      "description_chars": 329,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds framework-specific performance or accessibility criteria to review. Source: vercel-labs/agent-skills@063bee94c3f4df8453406c830b0a7df0f2860278 skills/react-best-practices/SKILL.md:1"
+    },
+    {
+      "name": "web-design-guidelines",
+      "source": "vercel-labs/agent-skills",
+      "url": "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines",
+      "ref": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "path": "skills/web-design-guidelines",
+      "tree_sha": "3116f3e62dbd02b44a598b1aa690d2a8938e8f89",
+      "skill_md_sha256": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f",
+      "skill_md_bytes": 1231,
+      "description_chars": 184,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "code-review"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Adds framework-specific performance or accessibility criteria to review. Source: vercel-labs/agent-skills@063bee94c3f4df8453406c830b0a7df0f2860278 skills/web-design-guidelines/SKILL.md:1"
+    },
+    {
+      "name": "webapp-testing",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/webapp-testing",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/webapp-testing",
+      "tree_sha": "5ffb7dc66b9fd4c25c3e400a4c00da99a349b714",
+      "skill_md_sha256": "51b7349e77ec63b7744a6f63647e7566a0b4d2e301121cc10e8c2113af6556a2",
+      "skill_md_bytes": 3913,
+      "description_chars": 204,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "e2e-testing"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Exercises browser-visible behavior and retains observable QA artifacts for applications and extraction callers. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/webapp-testing/SKILL.md:1"
+    },
+    {
+      "name": "writing-for-agents",
+      "source": "mattpocock/skills",
+      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "path": "skills/productivity/writing-for-agents",
+      "tree_sha": "ad2925850efb8973a72d2e666f7a975f9a2d4a9b",
+      "skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "skill_md_bytes": 10886,
+      "description_chars": 103,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations",
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration"
+      ],
+      "status": "trial",
+      "merit_note": "Supplies domain-specific documentation or integration design guidance backed by the upstream implementation. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/productivity/writing-for-agents/SKILL.md:1",
+      "reuse_ref": "adoption/skills/manifest.json"
+    },
+    {
+      "name": "writing-plans",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/writing-plans",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/writing-plans",
+      "tree_sha": "cc97fa00eb2ccd4f283e34eb2ba06a48e1e679f7",
+      "skill_md_sha256": "a6c67c1900064347c2a329990dd3c555657c51c3ec53b259a08aa01a2c26139a",
+      "skill_md_bytes": 10335,
+      "description_chars": 84,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "planning-and-specs"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Turns requirements into bounded designs or specifications before implementation. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/writing-plans/SKILL.md:1"
+    },
+    {
+      "name": "writing-skills",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/writing-skills",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/writing-skills",
+      "tree_sha": "f761162236b19330da62b22ad0da20f5dac7c6ab",
+      "skill_md_sha256": "bbdfe742f853562e643a3d40d64476359d47881e39cef80a189283fa26d11ab9",
+      "skill_md_bytes": 26623,
+      "description_chars": 97,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "ab-testing-and-evaluation",
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Uses test scenarios to exercise skill instructions and their triggering behavior before publication. Source: obra/superpowers@8ca22dba9a94f28898bbce59f2537ff4d87c747d skills/writing-skills/SKILL.md:1"
+    },
+    {
+      "name": "xlsx",
+      "source": "anthropics/skills",
+      "url": "https://github.com/anthropics/skills/tree/33375500bcea98d610eb30ce10ac4e59b89c390d/skills/xlsx",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "path": "skills/xlsx",
+      "tree_sha": "fe6471cc9b5b97aae0b576ccb92ffd9b0207589d",
+      "skill_md_sha256": "6712b39718fe815054abca9c3ee72f989613e6f771c8a5c58f30a65a6c905622",
+      "skill_md_bytes": 8598,
+      "description_chars": 948,
+      "upstream_disable_model_invocation": false,
+      "scenarios": [
+        "docs-and-citations"
+      ],
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "status": "trial",
+      "merit_note": "Handles document or research-report artifacts through the format-specific upstream workflow. Source: anthropics/skills@33375500bcea98d610eb30ce10ac4e59b89c390d skills/xlsx/SKILL.md:1"
+    }
+  ],
+  "coverage": {
+    "planning-and-specs": {
+      "coding": [
+        "add-javadoc",
+        "agent-canvas-environment",
+        "agent-creator",
+        "agent-readiness-report",
+        "agent-sdk-builder",
+        "azure-devops",
+        "bitbucket",
+        "bitbucket-cloud",
+        "bitbucket-data-center",
+        "brainstorming",
+        "build-setup",
+        "canvas-extension-api",
+        "cobol-modernization",
+        "codebase-design",
+        "dispatching-parallel-agents",
+        "domain-modeling",
+        "executing-plans",
+        "frontend-design",
+        "gitlab",
+        "gitlab-issue-to-mr",
+        "grill-me",
+        "improve-agent-readiness",
+        "improve-codebase-architecture",
+        "linear",
+        "linear-triage",
+        "mainframe-planning",
+        "mainframe-removal",
+        "mcp-builder",
+        "openhands-api",
+        "openhands-automation",
+        "openhands-sdk",
+        "prd",
+        "setup-agents-md",
+        "spark-version-upgrade",
+        "subagent-driven-development",
+        "to-java-migration",
+        "to-spec",
+        "to-tickets",
+        "using-git-worktrees",
+        "using-superpowers",
+        "vercel-composition-patterns",
+        "writing-for-agents",
+        "writing-plans"
+      ],
+      "orchestration": [
+        "add-javadoc",
+        "agent-canvas-environment",
+        "agent-creator",
+        "agent-readiness-report",
+        "agent-sdk-builder",
+        "azure-devops",
+        "bitbucket",
+        "bitbucket-cloud",
+        "bitbucket-data-center",
+        "brainstorming",
+        "build-setup",
+        "canvas-extension-api",
+        "cobol-modernization",
+        "codebase-design",
+        "dispatching-parallel-agents",
+        "domain-modeling",
+        "executing-plans",
+        "gitlab",
+        "gitlab-issue-to-mr",
+        "grill-me",
+        "improve-agent-readiness",
+        "improve-codebase-architecture",
+        "linear",
+        "linear-triage",
+        "mainframe-planning",
+        "mainframe-removal",
+        "mcp-builder",
+        "openhands-api",
+        "openhands-automation",
+        "openhands-sdk",
+        "prd",
+        "setup-agents-md",
+        "spark-version-upgrade",
+        "subagent-driven-development",
+        "to-java-migration",
+        "to-spec",
+        "to-tickets",
+        "using-git-worktrees",
+        "using-superpowers",
+        "writing-for-agents",
+        "writing-plans"
+      ],
+      "research": [
+        "brainstorming",
+        "domain-modeling",
+        "grill-me",
+        "prd",
+        "to-spec",
+        "writing-plans"
+      ],
+      "extraction-caller": [
+        "brainstorming",
+        "codebase-design",
+        "domain-modeling",
+        "grill-me",
+        "improve-codebase-architecture",
+        "prd",
+        "to-spec",
+        "writing-plans"
+      ]
+    },
+    "tdd": {
+      "coding": [
+        "build-setup",
+        "cobol-modernization",
+        "mainframe-planning",
+        "mainframe-removal",
+        "property-based-testing",
+        "spark-version-upgrade",
+        "tdd",
+        "test-driven-development",
+        "to-java-migration"
+      ],
+      "orchestration": [
+        "build-setup",
+        "cobol-modernization",
+        "mainframe-planning",
+        "mainframe-removal",
+        "property-based-testing",
+        "spark-version-upgrade",
+        "tdd",
+        "test-driven-development",
+        "to-java-migration"
+      ],
+      "research": [],
+      "extraction-caller": [
+        "property-based-testing",
+        "tdd",
+        "test-driven-development"
+      ]
+    },
+    "e2e-testing": {
+      "coding": [
+        "agent-browser",
+        "playwright",
+        "qa-changes",
+        "webapp-testing"
+      ],
+      "orchestration": [
+        "agent-browser",
+        "playwright",
+        "qa-changes",
+        "webapp-testing"
+      ],
+      "research": [],
+      "extraction-caller": [
+        "agent-browser",
+        "playwright",
+        "qa-changes",
+        "webapp-testing"
+      ]
+    },
+    "ab-testing-and-evaluation": {
+      "coding": [
+        "diagnosing-superpowers",
+        "jupyter",
+        "jupyter-notebook",
+        "migration-mapping",
+        "migration-report",
+        "migration-scoring",
+        "property-based-testing",
+        "score-quality",
+        "score-style",
+        "skill-creator",
+        "typesafe-ai",
+        "vercel-optimize",
+        "writing-skills"
+      ],
+      "orchestration": [
+        "diagnosing-superpowers",
+        "migration-mapping",
+        "migration-report",
+        "migration-scoring",
+        "property-based-testing",
+        "score-quality",
+        "score-style",
+        "skill-creator",
+        "typesafe-ai",
+        "vercel-optimize",
+        "writing-skills"
+      ],
+      "research": [
+        "jupyter",
+        "jupyter-notebook",
+        "skill-creator",
+        "writing-skills"
+      ],
+      "extraction-caller": [
+        "jupyter",
+        "jupyter-notebook",
+        "property-based-testing",
+        "skill-creator",
+        "typesafe-ai",
+        "writing-skills"
+      ]
+    },
+    "debugging": {
+      "coding": [
+        "datadog",
+        "diagnosing-bugs",
+        "diagnosing-superpowers",
+        "openhands-enterprise-troubleshooting",
+        "systematic-debugging"
+      ],
+      "orchestration": [
+        "datadog",
+        "diagnosing-bugs",
+        "diagnosing-superpowers",
+        "openhands-enterprise-troubleshooting",
+        "systematic-debugging"
+      ],
+      "research": [
+        "diagnosing-bugs",
+        "systematic-debugging"
+      ],
+      "extraction-caller": [
+        "diagnosing-bugs",
+        "systematic-debugging"
+      ]
+    },
+    "code-review": {
+      "coding": [
+        "code-review",
+        "code-simplifier",
+        "codebase-design",
+        "frontend-design",
+        "gh-address-comments",
+        "improve-codebase-architecture",
+        "migration-mapping",
+        "migration-report",
+        "migration-scoring",
+        "receiving-code-review",
+        "requesting-code-review",
+        "score-quality",
+        "score-style",
+        "vercel-composition-patterns",
+        "vercel-react-best-practices",
+        "web-design-guidelines"
+      ],
+      "orchestration": [
+        "code-review",
+        "code-simplifier",
+        "codebase-design",
+        "gh-address-comments",
+        "improve-codebase-architecture",
+        "migration-mapping",
+        "migration-report",
+        "migration-scoring",
+        "receiving-code-review",
+        "requesting-code-review",
+        "score-quality",
+        "score-style",
+        "vercel-react-best-practices",
+        "web-design-guidelines"
+      ],
+      "research": [],
+      "extraction-caller": [
+        "codebase-design",
+        "improve-codebase-architecture"
+      ]
+    },
+    "security": {
+      "coding": [
+        "agentic-actions-auditor",
+        "codeql",
+        "fp-check",
+        "sarif-parsing",
+        "security",
+        "security-audit",
+        "security-best-practices",
+        "security-threat-model",
+        "semgrep",
+        "supply-chain-risk-auditor",
+        "variant-analysis"
+      ],
+      "orchestration": [
+        "agentic-actions-auditor",
+        "codeql",
+        "fp-check",
+        "sarif-parsing",
+        "security",
+        "security-audit",
+        "security-best-practices",
+        "security-threat-model",
+        "semgrep",
+        "supply-chain-risk-auditor",
+        "variant-analysis"
+      ],
+      "research": [],
+      "extraction-caller": [
+        "security",
+        "security-best-practices",
+        "security-threat-model"
+      ]
+    },
+    "github-issue-to-pr": {
+      "coding": [
+        "finishing-a-development-branch",
+        "github",
+        "github-issue-to-pr",
+        "github-issue-triage",
+        "github-repo-monitor",
+        "jira-issue-to-pr",
+        "ticket-to-code-change",
+        "upstream-fork-sync"
+      ],
+      "orchestration": [
+        "finishing-a-development-branch",
+        "github",
+        "github-issue-to-pr",
+        "github-issue-triage",
+        "github-repo-monitor",
+        "jira-issue-to-pr",
+        "ticket-to-code-change",
+        "upstream-fork-sync"
+      ],
+      "research": [],
+      "extraction-caller": []
+    },
+    "github-pr-review": {
+      "coding": [
+        "code-review",
+        "code-simplifier",
+        "finishing-a-development-branch",
+        "gh-address-comments",
+        "github",
+        "github-delivery-watchdog",
+        "github-pr-review",
+        "github-pr-reviewer",
+        "receiving-code-review",
+        "requesting-code-review",
+        "setup-pr-review",
+        "upstream-fork-sync"
+      ],
+      "orchestration": [
+        "code-review",
+        "code-simplifier",
+        "finishing-a-development-branch",
+        "gh-address-comments",
+        "github",
+        "github-delivery-watchdog",
+        "github-pr-review",
+        "github-pr-reviewer",
+        "receiving-code-review",
+        "requesting-code-review",
+        "setup-pr-review",
+        "upstream-fork-sync"
+      ],
+      "research": [],
+      "extraction-caller": []
+    },
+    "github-ci-fix": {
+      "coding": [
+        "gh-fix-ci",
+        "github-stale-ci-pr-closer",
+        "iterate"
+      ],
+      "orchestration": [
+        "gh-fix-ci",
+        "github-stale-ci-pr-closer",
+        "iterate"
+      ],
+      "research": [],
+      "extraction-caller": []
+    },
+    "github-actions": {
+      "coding": [
+        "agentic-actions-auditor",
+        "github-actions",
+        "setup-openhands"
+      ],
+      "orchestration": [
+        "agentic-actions-auditor",
+        "github-actions",
+        "setup-openhands"
+      ],
+      "research": [],
+      "extraction-caller": []
+    },
+    "release-notes": {
+      "coding": [
+        "release-notes"
+      ],
+      "orchestration": [
+        "release-notes"
+      ],
+      "research": [],
+      "extraction-caller": []
+    },
+    "docs-and-citations": {
+      "coding": [
+        "add-javadoc",
+        "agent-memory",
+        "agent-readiness-report",
+        "doc-coauthoring",
+        "docx",
+        "evidence-based-citations",
+        "find-skills",
+        "github-agents-md-maintainer",
+        "handoff",
+        "improve-agent-readiness",
+        "iterative-retrieval",
+        "learn-from-code-review",
+        "mcp-builder",
+        "pdf",
+        "pdflatex",
+        "plain-english-content",
+        "pptx",
+        "release-notes",
+        "research",
+        "search-first",
+        "setup-agents-md",
+        "technical-writing",
+        "theme-factory",
+        "writing-for-agents",
+        "writing-skills",
+        "xlsx"
+      ],
+      "orchestration": [
+        "add-javadoc",
+        "agent-memory",
+        "agent-readiness-report",
+        "discord",
+        "doc-coauthoring",
+        "docx",
+        "evidence-based-citations",
+        "find-skills",
+        "github-agents-md-maintainer",
+        "gpt-researcher",
+        "handoff",
+        "improve-agent-readiness",
+        "incident-retrospective",
+        "iterative-retrieval",
+        "learn-from-code-review",
+        "mcp-builder",
+        "notion",
+        "pdf",
+        "pdflatex",
+        "plain-english-content",
+        "pptx",
+        "release-notes",
+        "research",
+        "research-brief",
+        "search-first",
+        "setup-agents-md",
+        "slack-channel-monitor",
+        "slack-standup-digest",
+        "technical-writing",
+        "theme-factory",
+        "writing-for-agents",
+        "writing-skills",
+        "xlsx"
+      ],
+      "research": [
+        "agent-memory",
+        "discord",
+        "doc-coauthoring",
+        "docx",
+        "evidence-based-citations",
+        "find-skills",
+        "github-agents-md-maintainer",
+        "gpt-researcher",
+        "handoff",
+        "incident-retrospective",
+        "iterative-retrieval",
+        "learn-from-code-review",
+        "notion",
+        "pdf",
+        "pdflatex",
+        "plain-english-content",
+        "pptx",
+        "research",
+        "research-brief",
+        "search-first",
+        "slack-channel-monitor",
+        "slack-standup-digest",
+        "technical-writing",
+        "theme-factory",
+        "writing-skills",
+        "xlsx"
+      ],
+      "extraction-caller": [
+        "agent-memory",
+        "doc-coauthoring",
+        "docx",
+        "evidence-based-citations",
+        "find-skills",
+        "github-agents-md-maintainer",
+        "gpt-researcher",
+        "handoff",
+        "iterative-retrieval",
+        "learn-from-code-review",
+        "pdf",
+        "pdflatex",
+        "plain-english-content",
+        "pptx",
+        "research",
+        "research-brief",
+        "search-first",
+        "technical-writing",
+        "theme-factory",
+        "writing-skills",
+        "xlsx"
+      ]
+    },
+    "research": {
+      "coding": [
+        "find-skills",
+        "iterative-retrieval",
+        "jupyter",
+        "jupyter-notebook",
+        "research",
+        "search-first"
+      ],
+      "orchestration": [
+        "find-skills",
+        "gpt-researcher",
+        "iterative-retrieval",
+        "news-digest",
+        "research",
+        "research-brief",
+        "search-first"
+      ],
+      "research": [
+        "find-skills",
+        "gpt-researcher",
+        "iterative-retrieval",
+        "jupyter",
+        "jupyter-notebook",
+        "news-digest",
+        "research",
+        "research-brief",
+        "search-first"
+      ],
+      "extraction-caller": [
+        "find-skills",
+        "gpt-researcher",
+        "iterative-retrieval",
+        "jupyter",
+        "jupyter-notebook",
+        "news-digest",
+        "research",
+        "research-brief",
+        "search-first"
+      ]
+    },
+    "deployment-uv-docker": {
+      "coding": [
+        "agent-canvas-environment",
+        "canvas-extension-api",
+        "deno",
+        "docker",
+        "kubernetes",
+        "modern-python",
+        "npm",
+        "ssh",
+        "swift-linux",
+        "uv",
+        "vercel",
+        "vercel-optimize"
+      ],
+      "orchestration": [
+        "agent-canvas-environment",
+        "canvas-extension-api",
+        "deno",
+        "docker",
+        "kubernetes",
+        "modern-python",
+        "npm",
+        "ssh",
+        "swift-linux",
+        "uv",
+        "vercel",
+        "vercel-optimize"
+      ],
+      "research": [],
+      "extraction-caller": [
+        "deno",
+        "docker",
+        "kubernetes",
+        "modern-python",
+        "npm",
+        "ssh",
+        "swift-linux",
+        "uv",
+        "vercel"
+      ]
+    },
+    "memory": {
+      "coding": [
+        "agent-memory",
+        "github-agents-md-maintainer",
+        "handoff",
+        "learn-from-code-review"
+      ],
+      "orchestration": [
+        "agent-memory",
+        "discord",
+        "github-agents-md-maintainer",
+        "handoff",
+        "incident-retrospective",
+        "learn-from-code-review",
+        "notion",
+        "slack-channel-monitor",
+        "slack-standup-digest"
+      ],
+      "research": [
+        "agent-memory",
+        "discord",
+        "github-agents-md-maintainer",
+        "handoff",
+        "incident-retrospective",
+        "learn-from-code-review",
+        "notion",
+        "slack-channel-monitor",
+        "slack-standup-digest"
+      ],
+      "extraction-caller": [
+        "agent-memory",
+        "github-agents-md-maintainer",
+        "handoff",
+        "learn-from-code-review"
+      ]
+    }
+  },
+  "gaps": [
+    {
+      "scenario": "tdd",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "e2e-testing",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "code-review",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "security",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-issue-to-pr",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-issue-to-pr",
+      "role": "extraction-caller",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-pr-review",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-pr-review",
+      "role": "extraction-caller",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-ci-fix",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-ci-fix",
+      "role": "extraction-caller",
+      "reason": "The cell's only selection, verification-before-completion, is excluded since main removed it under M4 (#464); no other selected skill has a substantiated direct extraction-caller fit for CI repair. Route CI repair to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-actions",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "github-actions",
+      "role": "extraction-caller",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "release-notes",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "release-notes",
+      "role": "extraction-caller",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    },
+    {
+      "scenario": "deployment-uv-docker",
+      "role": "research",
+      "reason": "No selected skill has a substantiated direct role fit for this scenario; route implementation work to a coding worker and measure that handoff."
+    }
+  ],
+  "capability_gaps": [
+    {
+      "scenario": "ab-testing-and-evaluation",
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "detail": "Skill-output A/B evaluation is covered by skill-creator. Product traffic allocation, power analysis and sequential testing have no qualified selected skill; do not equate these with blind output comparisons."
+    },
+    {
+      "scenario": "research",
+      "roles": [
+        "extraction-caller"
+      ],
+      "detail": "crawl4ai has a downloadable skill ZIP but no CLI-discoverable SKILL.md at inspected e5d2e786d1a101225f3f6a3e6fd344d76eeb13af. Caller research/citation skills do not certify crawler API correctness."
+    },
+    {
+      "scenario": "memory",
+      "roles": [
+        "coding",
+        "orchestration",
+        "research",
+        "extraction-caller"
+      ],
+      "detail": "Repository/document memory is covered. Automatic durable vector-memory services are not established by these skill installations."
+    }
+  ],
+  "collisions": [
+    {
+      "name": "frontend-design",
+      "selected": {
+        "source": "anthropics/skills",
+        "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+        "path": "skills/frontend-design"
+      },
+      "alternatives": [
+        {
+          "source": "OpenHands/extensions",
+          "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+          "path": "skills/frontend-design"
+        }
+      ],
+      "reason": "Reuse the existing Anthropic pin by reference; do not replace it merely because another pack duplicates the name."
+    },
+    {
+      "name": "code-review",
+      "selected": {
+        "source": "OpenHands/extensions",
+        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "path": "skills/code-review"
+      },
+      "alternatives": [
+        {
+          "source": "mattpocock/skills",
+          "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+          "path": "skills/engineering/code-review"
+        }
+      ],
+      "reason": "OpenHands supplies native repository/acceptance-grounded risk review without requiring Matt-specific tracker setup; superpowers requesting/receiving stages remain separate names."
+    },
+    {
+      "name": "linear",
+      "selected": {
+        "source": "OpenHands/extensions",
+        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "path": "skills/linear"
+      },
+      "alternatives": [
+        {
+          "source": "openai/skills",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "path": "skills/.curated/linear"
+        }
+      ],
+      "reason": "OpenHands entry matches the automation and ticket-to-code skills in the same registry."
+    },
+    {
+      "name": "release-notes",
+      "selected": {
+        "source": "OpenHands/extensions",
+        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "path": "skills/release-notes"
+      },
+      "alternatives": [
+        {
+          "source": "OpenHands/extensions",
+          "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+          "path": "plugins/release-notes"
+        }
+      ],
+      "reason": "Standalone OpenHands skill is usable without installing a plugin hook registry."
+    },
+    {
+      "name": "theme-factory",
+      "selected": {
+        "source": "OpenHands/extensions",
+        "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+        "path": "skills/theme-factory"
+      },
+      "alternatives": [
+        {
+          "source": "anthropics/skills",
+          "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+          "path": "skills/theme-factory"
+        }
+      ],
+      "reason": "Keep the OpenHands registry entry for worker-native discovery; the Anthropic name would shadow it."
+    },
+    {
+      "name": "skill-creator",
+      "selected": {
+        "source": "anthropics/skills",
+        "ref": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+        "path": "skills/skill-creator"
+      },
+      "alternatives": [
+        {
+          "source": "OpenHands/extensions",
+          "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+          "path": "skills/skill-creator"
+        },
+        {
+          "source": "openai/skills",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "path": "skills/.system/skill-creator"
+        }
+      ],
+      "reason": "Anthropic adds with/without-skill baselines, repeated benchmark statistics and blind A/B comparison needed for this trial."
+    },
+    {
+      "name": "pdf",
+      "selected": {
+        "source": "anthropics/skills",
+        "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+        "path": "skills/pdf"
+      },
+      "alternatives": [
+        {
+          "source": "openai/skills",
+          "ref": "49f948faa9258a0c61caceaf225e179651397431",
+          "path": "skills/.curated/pdf"
+        }
+      ],
+      "reason": "Anthropic includes document-processing support resources suited to research/extraction artifacts; OpenAI is a same-name alternative."
+    }
+  ],
+  "excluded": [
+    {
+      "name": "magic-word",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/magic-test/skills/magic-word",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/magic-test/skills/magic-word",
+      "tree_sha": "c3ece392a98726151242f57327fe0bfd643bfe77",
+      "skill_md_sha256": "4e57df560848c0061bc6b855f7cc82c94031eb7436d1fb2052d0655f49e3ffdb",
+      "skill_md_bytes": 910,
+      "description_chars": 78,
+      "upstream_disable_model_invocation": false,
+      "reason": "Magic-word activation fixture, not a production workflow."
+    },
+    {
+      "name": "openhands",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/openhands",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/openhands",
+      "tree_sha": "8806d3fa278fcc60f35eaba7aff3df1fb1cd48dc",
+      "skill_md_sha256": "82e08c6108bc07c2b7996fd0b70282154fd23256eb45ced1e7e9dab947b22749",
+      "skill_md_bytes": 2899,
+      "description_chars": 284,
+      "upstream_disable_model_invocation": false,
+      "reason": "Plugin bundle entrypoint with CLI/MCP/plugin wiring; select its individual SDK/API/automation skills instead. A SKILL.md installation does not activate the plugin."
+    },
+    {
+      "name": "release-notes",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/plugins/release-notes",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "plugins/release-notes",
+      "tree_sha": "db732a58a016444fd45339c2a15188f44a61f87a",
+      "skill_md_sha256": "bf3b595334efcf2674d47e358aedc7c43af3085dd6d715ac64dd6ce56ce12abd",
+      "skill_md_bytes": 3868,
+      "description_chars": 231,
+      "upstream_disable_model_invocation": false,
+      "reason": "Name collision: choose skills/release-notes, the standalone history-to-changelog procedure; plugin hooks are not installed by this CLI."
+    },
+    {
+      "name": "add-skill",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/add-skill",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/add-skill",
+      "tree_sha": "c4eeeeb4bc0a3e008aca42472f01bac6f2bb4523",
+      "skill_md_sha256": "dfe7467e03adfcbca1cb2dd6db40d552a57584ad13c0abed311f82d25e5bd88c",
+      "skill_md_bytes": 2243,
+      "description_chars": 518,
+      "upstream_disable_model_invocation": false,
+      "reason": "Fetches and writes skills with its own Python copier; incompatible with the required upstream skills CLI lifecycle. find-skills plus the extended installer own this operation."
+    },
+    {
+      "name": "flarglebargle",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/flarglebargle",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/flarglebargle",
+      "tree_sha": "e334839d21ac8575062a6703e9de7771a06e6e0d",
+      "skill_md_sha256": "4abf0757e97eeb1163d8864a8955223430f5d977fe5b40c682d3640659cc7832",
+      "skill_md_bytes": 337,
+      "description_chars": 139,
+      "upstream_disable_model_invocation": false,
+      "reason": "Compliment-only activation fixture; no production role/scenario. Retain upstream as an optional smoke-test reference, not a worker instruction."
+    },
+    {
+      "name": "frontend-design",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/frontend-design",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/frontend-design",
+      "tree_sha": "b0a4c7e2bfe269096dade735b9b0ea83bcb17373",
+      "skill_md_sha256": "982cecaaf2a95a76d0bbebe8ff5570ea9e23088535fee54f90417f7b562545ad",
+      "skill_md_bytes": 4443,
+      "description_chars": 399,
+      "upstream_disable_model_invocation": false,
+      "reason": "Name collision: keep the already pinned anthropics/skills source by reference; same design domain, avoids shadowing the adopted entry."
+    },
+    {
+      "name": "skill-creator",
+      "source": "OpenHands/extensions",
+      "url": "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/skill-creator",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "path": "skills/skill-creator",
+      "tree_sha": "9e4ffbdc8c0db2c16b223144a8716f9d8c9f6c08",
+      "skill_md_sha256": "651c6a4db39a16d3a58ee4559ec52209aefc097f58bfa32dd4a24ba4f285fbb2",
+      "skill_md_bytes": 20969,
+      "description_chars": 386,
+      "upstream_disable_model_invocation": false,
+      "reason": "Name collision: choose anthropics/skills skill-creator for baseline runs, benchmarks and blind comparison, closing the skill-evaluation gap."
+    },
+    {
+      "name": "verification-before-completion",
+      "source": "obra/superpowers",
+      "url": "https://github.com/obra/superpowers/tree/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/verification-before-completion",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "path": "skills/verification-before-completion",
+      "tree_sha": "a4cb0b69aaefeab540947a7f1642bdaad810e37a",
+      "skill_md_sha256": "2befe7fc55bcadaa3d97dd9e8efeb633d2561c0ebe74c5a8b17c4d9e7e4520b3",
+      "skill_md_bytes": 3646,
+      "description_chars": 225,
+      "upstream_disable_model_invocation": false,
+      "reason": "Main removed it from its skills trial under the conflict rule M4 (#464, c0966da2; decision docs/decisions/2026-09-28-delegated-decisions.md, #462) and lists it under its own excluded. Its SKILL.md at this pin requires a fresh run of the verification command before any completion claim and rates a previous run as not sufficient (L17-20, L42), which conflicts with AGENTS.md:16, \"Reuse passing evidence when its inputs still match\". A worker whose work directory is a checkout of this repository loads that AGENTS.md too: OpenHands with project loading on reads it from the work directory and the Git root (skill.py:1084-1106 at fcc102a6), and Claude Code imports it through CLAUDE.md's first line, @AGENTS.md. Main no longer lists it among its skills, so this exclusion carries no adoption_ref; the pin fields record the revision main read.",
+      "overturn": "Main re-admits it, that is adoption/skills/manifest.json lists verification-before-completion under skills again (main's own overturn: an upstream revision drops the absolute freshness requirement, is re-read in full and is re-pinned there). Then replace this exclusion with a reuse_ref entry at main's pin and restore its scenarios (tdd, github-ci-fix, code-review) and roles (coding, orchestration, extraction-caller). test_verification_before_completion_stays_excluded_until_main_readmits_it and the coverage contract both fail as soon as main re-admits it."
+    }
+  ],
+  "openhands_inventory": [
+    {
+      "name": "build-setup",
+      "path": "plugins/cobol-modernization/skills/build-setup",
+      "selected": true
+    },
+    {
+      "name": "cobol-modernization",
+      "path": "plugins/cobol-modernization/skills/cobol-modernization",
+      "selected": true
+    },
+    {
+      "name": "mainframe-planning",
+      "path": "plugins/cobol-modernization/skills/mainframe-planning",
+      "selected": true
+    },
+    {
+      "name": "mainframe-removal",
+      "path": "plugins/cobol-modernization/skills/mainframe-removal",
+      "selected": true
+    },
+    {
+      "name": "to-java-migration",
+      "path": "plugins/cobol-modernization/skills/to-java-migration",
+      "selected": true
+    },
+    {
+      "name": "magic-word",
+      "path": "plugins/magic-test/skills/magic-word",
+      "selected": false
+    },
+    {
+      "name": "migration-mapping",
+      "path": "plugins/migration-scoring/skills/migration-mapping",
+      "selected": true
+    },
+    {
+      "name": "migration-report",
+      "path": "plugins/migration-scoring/skills/migration-report",
+      "selected": true
+    },
+    {
+      "name": "migration-scoring",
+      "path": "plugins/migration-scoring/skills/migration-scoring",
+      "selected": true
+    },
+    {
+      "name": "score-quality",
+      "path": "plugins/migration-scoring/skills/score-quality",
+      "selected": true
+    },
+    {
+      "name": "score-style",
+      "path": "plugins/migration-scoring/skills/score-style",
+      "selected": true
+    },
+    {
+      "name": "agent-readiness-report",
+      "path": "plugins/onboarding/skills/agent-readiness-report",
+      "selected": true
+    },
+    {
+      "name": "improve-agent-readiness",
+      "path": "plugins/onboarding/skills/improve-agent-readiness",
+      "selected": true
+    },
+    {
+      "name": "setup-agents-md",
+      "path": "plugins/onboarding/skills/setup-agents-md",
+      "selected": true
+    },
+    {
+      "name": "setup-openhands",
+      "path": "plugins/onboarding/skills/setup-openhands",
+      "selected": true
+    },
+    {
+      "name": "setup-pr-review",
+      "path": "plugins/onboarding/skills/setup-pr-review",
+      "selected": true
+    },
+    {
+      "name": "openhands",
+      "path": "plugins/openhands",
+      "selected": false
+    },
+    {
+      "name": "release-notes",
+      "path": "plugins/release-notes",
+      "selected": false
+    },
+    {
+      "name": "add-javadoc",
+      "path": "skills/add-javadoc",
+      "selected": true
+    },
+    {
+      "name": "add-skill",
+      "path": "skills/add-skill",
+      "selected": false
+    },
+    {
+      "name": "agent-canvas-environment",
+      "path": "skills/agent-canvas-environment",
+      "selected": true
+    },
+    {
+      "name": "agent-creator",
+      "path": "skills/agent-creator",
+      "selected": true
+    },
+    {
+      "name": "agent-memory",
+      "path": "skills/agent-memory",
+      "selected": true
+    },
+    {
+      "name": "agent-sdk-builder",
+      "path": "skills/agent-sdk-builder",
+      "selected": true
+    },
+    {
+      "name": "azure-devops",
+      "path": "skills/azure-devops",
+      "selected": true
+    },
+    {
+      "name": "bitbucket",
+      "path": "skills/bitbucket",
+      "selected": true
+    },
+    {
+      "name": "bitbucket-cloud",
+      "path": "skills/bitbucket-cloud",
+      "selected": true
+    },
+    {
+      "name": "bitbucket-data-center",
+      "path": "skills/bitbucket-data-center",
+      "selected": true
+    },
+    {
+      "name": "canvas-extension-api",
+      "path": "skills/canvas-extension-api",
+      "selected": true
+    },
+    {
+      "name": "code-review",
+      "path": "skills/code-review",
+      "selected": true
+    },
+    {
+      "name": "code-simplifier",
+      "path": "skills/code-simplifier",
+      "selected": true
+    },
+    {
+      "name": "datadog",
+      "path": "skills/datadog",
+      "selected": true
+    },
+    {
+      "name": "deno",
+      "path": "skills/deno",
+      "selected": true
+    },
+    {
+      "name": "discord",
+      "path": "skills/discord",
+      "selected": true
+    },
+    {
+      "name": "docker",
+      "path": "skills/docker",
+      "selected": true
+    },
+    {
+      "name": "evidence-based-citations",
+      "path": "skills/evidence-based-citations",
+      "selected": true
+    },
+    {
+      "name": "flarglebargle",
+      "path": "skills/flarglebargle",
+      "selected": false
+    },
+    {
+      "name": "frontend-design",
+      "path": "skills/frontend-design",
+      "selected": false
+    },
+    {
+      "name": "github",
+      "path": "skills/github",
+      "selected": true
+    },
+    {
+      "name": "github-actions",
+      "path": "skills/github-actions",
+      "selected": true
+    },
+    {
+      "name": "github-agents-md-maintainer",
+      "path": "skills/github-agents-md-maintainer",
+      "selected": true
+    },
+    {
+      "name": "github-delivery-watchdog",
+      "path": "skills/github-delivery-watchdog",
+      "selected": true
+    },
+    {
+      "name": "github-issue-to-pr",
+      "path": "skills/github-issue-to-pr",
+      "selected": true
+    },
+    {
+      "name": "github-issue-triage",
+      "path": "skills/github-issue-triage",
+      "selected": true
+    },
+    {
+      "name": "github-pr-review",
+      "path": "skills/github-pr-review",
+      "selected": true
+    },
+    {
+      "name": "github-pr-reviewer",
+      "path": "skills/github-pr-reviewer",
+      "selected": true
+    },
+    {
+      "name": "github-repo-monitor",
+      "path": "skills/github-repo-monitor",
+      "selected": true
+    },
+    {
+      "name": "github-stale-ci-pr-closer",
+      "path": "skills/github-stale-ci-pr-closer",
+      "selected": true
+    },
+    {
+      "name": "gitlab",
+      "path": "skills/gitlab",
+      "selected": true
+    },
+    {
+      "name": "gitlab-issue-to-mr",
+      "path": "skills/gitlab-issue-to-mr",
+      "selected": true
+    },
+    {
+      "name": "incident-retrospective",
+      "path": "skills/incident-retrospective",
+      "selected": true
+    },
+    {
+      "name": "iterate",
+      "path": "skills/iterate",
+      "selected": true
+    },
+    {
+      "name": "jira-issue-to-pr",
+      "path": "skills/jira-issue-to-pr",
+      "selected": true
+    },
+    {
+      "name": "jupyter",
+      "path": "skills/jupyter",
+      "selected": true
+    },
+    {
+      "name": "kubernetes",
+      "path": "skills/kubernetes",
+      "selected": true
+    },
+    {
+      "name": "learn-from-code-review",
+      "path": "skills/learn-from-code-review",
+      "selected": true
+    },
+    {
+      "name": "linear",
+      "path": "skills/linear",
+      "selected": true
+    },
+    {
+      "name": "linear-triage",
+      "path": "skills/linear-triage",
+      "selected": true
+    },
+    {
+      "name": "news-digest",
+      "path": "skills/news-digest",
+      "selected": true
+    },
+    {
+      "name": "notion",
+      "path": "skills/notion",
+      "selected": true
+    },
+    {
+      "name": "npm",
+      "path": "skills/npm",
+      "selected": true
+    },
+    {
+      "name": "openhands-api",
+      "path": "skills/openhands-api",
+      "selected": true
+    },
+    {
+      "name": "openhands-automation",
+      "path": "skills/openhands-automation",
+      "selected": true
+    },
+    {
+      "name": "openhands-enterprise-troubleshooting",
+      "path": "skills/openhands-enterprise-troubleshooting",
+      "selected": true
+    },
+    {
+      "name": "openhands-sdk",
+      "path": "skills/openhands-sdk",
+      "selected": true
+    },
+    {
+      "name": "pdflatex",
+      "path": "skills/pdflatex",
+      "selected": true
+    },
+    {
+      "name": "plain-english-content",
+      "path": "skills/plain-english-content",
+      "selected": true
+    },
+    {
+      "name": "prd",
+      "path": "skills/prd",
+      "selected": true
+    },
+    {
+      "name": "qa-changes",
+      "path": "skills/qa-changes",
+      "selected": true
+    },
+    {
+      "name": "release-notes",
+      "path": "skills/release-notes",
+      "selected": true
+    },
+    {
+      "name": "research-brief",
+      "path": "skills/research-brief",
+      "selected": true
+    },
+    {
+      "name": "security",
+      "path": "skills/security",
+      "selected": true
+    },
+    {
+      "name": "skill-creator",
+      "path": "skills/skill-creator",
+      "selected": false
+    },
+    {
+      "name": "slack-channel-monitor",
+      "path": "skills/slack-channel-monitor",
+      "selected": true
+    },
+    {
+      "name": "slack-standup-digest",
+      "path": "skills/slack-standup-digest",
+      "selected": true
+    },
+    {
+      "name": "spark-version-upgrade",
+      "path": "skills/spark-version-upgrade",
+      "selected": true
+    },
+    {
+      "name": "ssh",
+      "path": "skills/ssh",
+      "selected": true
+    },
+    {
+      "name": "swift-linux",
+      "path": "skills/swift-linux",
+      "selected": true
+    },
+    {
+      "name": "technical-writing",
+      "path": "skills/technical-writing",
+      "selected": true
+    },
+    {
+      "name": "theme-factory",
+      "path": "skills/theme-factory",
+      "selected": true
+    },
+    {
+      "name": "ticket-to-code-change",
+      "path": "skills/ticket-to-code-change",
+      "selected": true
+    },
+    {
+      "name": "upstream-fork-sync",
+      "path": "skills/upstream-fork-sync",
+      "selected": true
+    },
+    {
+      "name": "uv",
+      "path": "skills/uv",
+      "selected": true
+    },
+    {
+      "name": "vercel",
+      "path": "skills/vercel",
+      "selected": true
+    }
+  ],
+  "sources": [
+    {
+      "source": "OpenHands/extensions",
+      "ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "resolved_via": "gh api repos/OpenHands/extensions/commits/bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "commit_date": "2026-09-27T12:29:58Z",
+      "selected_skills": 77,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "affaan-m/ECC",
+      "ref": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "resolved_via": "gh api repos/affaan-m/ECC/commits/2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "commit_date": "2026-09-20T19:37:57Z",
+      "selected_skills": 2,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "anthropics/skills",
+      "ref": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "resolved_via": "gh api repos/anthropics/skills/commits/33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "commit_date": "2026-09-24T16:20:35Z",
+      "selected_skills": 9,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "assafelovic/gpt-researcher",
+      "ref": "0957c301ed06c2a5857b834358c7227c739041d4",
+      "resolved_via": "gh api repos/assafelovic/gpt-researcher/commits/0957c301ed06c2a5857b834358c7227c739041d4",
+      "commit_date": "2026-09-26T16:56:07Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "cloudflare/security-audit-skill",
+      "ref": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "resolved_via": "gh api repos/cloudflare/security-audit-skill/commits/c1c8a8c1471069fb0e188eeaff69b8e8db6564a8",
+      "commit_date": "2026-09-14T19:28:54Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "mattpocock/skills",
+      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "resolved_via": "gh api repos/mattpocock/skills/commits/c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "commit_date": "2026-09-18T10:12:29Z",
+      "selected_skills": 11,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "obra/superpowers",
+      "ref": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "resolved_via": "gh api repos/obra/superpowers/commits/8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "commit_date": "2026-09-25T18:06:27Z",
+      "selected_skills": 14,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "openai/skills",
+      "ref": "49f948faa9258a0c61caceaf225e179651397431",
+      "resolved_via": "gh api repos/openai/skills/commits/49f948faa9258a0c61caceaf225e179651397431",
+      "commit_date": "2026-06-24T02:36:12Z",
+      "selected_skills": 6,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "trailofbits/skills",
+      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "resolved_via": "gh api repos/trailofbits/skills/commits/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "commit_date": "2026-09-24T18:57:03Z",
+      "selected_skills": 9,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "typesafe-ai/skills",
+      "ref": "65a39f393687675ce170e6094757de20370365b9",
+      "resolved_via": "gh api repos/typesafe-ai/skills/commits/65a39f393687675ce170e6094757de20370365b9",
+      "commit_date": "2026-09-12T05:42:05Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "vercel-labs/agent-browser",
+      "ref": "d01253d9db28d75080e36da3c1c31ef89454731e",
+      "resolved_via": "gh api repos/vercel-labs/agent-browser/commits/d01253d9db28d75080e36da3c1c31ef89454731e",
+      "commit_date": "2026-09-22T13:50:02Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "vercel-labs/agent-skills",
+      "ref": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "resolved_via": "gh api repos/vercel-labs/agent-skills/commits/063bee94c3f4df8453406c830b0a7df0f2860278",
+      "commit_date": "2026-08-28T13:36:07Z",
+      "selected_skills": 4,
+      "tree_response_truncated": false
+    },
+    {
+      "source": "vercel-labs/skills",
+      "ref": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "resolved_via": "gh api repos/vercel-labs/skills/commits/7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "commit_date": "2026-09-17T15:00:17Z",
+      "selected_skills": 1,
+      "tree_response_truncated": false
+    }
+  ],
+  "budget": {
+    "selected_count": 137,
+    "skill_md_bytes": 1042408,
+    "description_chars": 37215,
+    "provider_input_tokens_before": null,
+    "provider_input_tokens_after": null,
+    "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."
+  }
+}

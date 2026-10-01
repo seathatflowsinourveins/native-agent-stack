@@ -1,0 +1,1503 @@
+{
+ "schema_version": 1,
+ "kind": "gpt6_review_index",
+ "edition": "2026-09-27",
+ "evidence_class": "model review (GPT-6 astra at effort max over each card's retained sources): judgment, not execution; findings are claims to verify, not acceptance",
+ "reviews": [
+  {
+   "tool": "agentsview",
+   "card": "cards/agentsview.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The native scoped archive/CLI lane is supported and runnable, but installed 0.43.0 trails the published 0.44.0 successor and default worker-history coverage remains incomplete (groups/g6-docs-accounting/agentsview.upstream.json; https://github.com/kenn-io/agentsview/releases/tag/v0.44.0). There is no exact token-efficiency comparison or native saved-token counter, so comparison eligibility and attributable savings are unverified; the retained benefit is successful post-start project reads and one selected Claude plus one selected Codex session returned with inclusive flags (cards/agentsview.json; ../rr/returned-results.json#agentsview-11-projects-daemon; ../rr/returned-results.json#agentsview-15-session-list-claude-inclusive; ../rr/returned-results.json#agentsview-16-session-list-codex-inclusive). The pre-start refusals are explained by disabled daemon autostart, while later empty lists are explained by default one-shot exclusion, and all four historical verifier findings were already dispositioned at assembly (../rr/returned-results.json#components/agentsview). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 32/1010 Ultracode workflow children (3.17%, 238 CLI detections), 1/301 Codex workers (0.33%, 11), and 1/22 children given the lanes block (4.55%, 1) (invoke_by_tool.json). Next, preserve the successful recovered records, document intended one-shot/automated/child coverage, and qualify the successor on a scoped archive copy before upgrading or claiming complete worker-history coverage.",
+   "findings": 2,
+   "resolutions": 2,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 53
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 30
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "ai-memory",
+   "card": "cards/ai-memory.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed v2.4.1 matches the latest release, and explicit-scoped HTTP MCP plus allowlisted native hooks are supported upstream choices, but restricted-worker recall and portable hook wiring still have gaps. The retained Claude and host-policy Codex queries returned the same ten hits, but the baseline was deliberately empty and no exact savings comparison exists, so adapted token performance is unverified rather than zero or a pass (../rr/ai-memory/records.json#ai-memory-e2-codex-exec; evidence/artifacts/token-e2e-codex-20260926/receipt.json). Real Codex lifecycle capture after hook trust is proven separately, while PreCompact remains unverified and this restricted worker's recall probe was denied (evidence/artifacts/ai-memory-241-codex-capture-20260926/README.md; groups/final-verdict-evidence.json#live_probes). The fixed scan found invocations in 105/1,010 Ultracode children (10.40%) and 3/301 Codex workers (1.00%), including 4/22 TOKEN LANES children (18.18%); lifecycle capture is not added to these invocation counts (invoke_by_tool.json). Next, qualify recall under the intended restricted worker policy, render hook paths from each platform's installed version, correct stale trust/count summaries, and retain an actual PreCompact observation and a task-matched savings baseline.",
+   "findings": 4,
+   "resolutions": 4,
+   "claims_verified": 10,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 49,
+      "qmd": 3,
+      "ai-memory": 1
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 62,
+      "qmd": 1
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "ast-grep",
+   "card": "cards/ast-grep.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed 0.45.3 CLI matches the latest published upstream release and the explicit structural-search lane is supported, but configuration guidance still needs the released-pin limitations recorded in groups/g5-conversion-packing/ast-grep.upstream.json. The card's historical Claude comparison is 105877→10293 tokens (90.28%) and its Codex comparison is 112899→11508 (89.81%); both eligibility fields are null, so these totals alone do not establish an eligible fidelity pass (cards/ast-grep.json). The separately retained call-extraction comparison is 133697→10903 o200k_base tokens (91.84%), eligible only for the checked subprocess-call task because all 19 call ranges and source slices agree with the Python AST oracle (../rr/ast-grep/out/17-compare.stdout; ../rr/ast-grep/check/check.json). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 44/1010 Ultracode workflow children (4.36%, 243 CLI detections), 2/301 Codex workers (0.66%, 7), and 0/22 children given the lanes block (invoke_by_tool.json). Next, document trusted configuration and original-source recovery, qualify the first release containing the existing opt-in fix, and measure successful use on eligible tasks; native saved-token counters and attributable provider savings remain unverified.",
+   "findings": 1,
+   "resolutions": 1,
+   "claims_verified": 9,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 35
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 42
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "ccusage",
+   "card": "cards/ccusage.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed 20.0.24 CLI matches the latest published release and the explicit native-history accounting lane is supported, including the intentional offline/no-cost Codex recipe (groups/g6-docs-accounting/ccusage.upstream.json; https://github.com/ccusage/ccusage/releases/tag/v20.0.24). No exact token-savings comparison or native saved-token counter is present, so savings eligibility remains unverified; the actual retained result is correct synthetic token accounting across 34 checks, with a deliberately changed input rejected by two checks (cards/ccusage.json; ../rr/ccusage/out/check-fixture.stdout; ../rr/ccusage/out/check-fixture-negative-control.stdout). The retained Claude report leaves claude-opus-5-5 unpriced and the Codex report flags gpt-6-luna while omitting cost fields under --no-cost, which is an offline-pricing coverage limit explained by upstream's embedded snapshot and configurable overrides (../rr/ccusage/out/claude-daily-before.stdout; ../rr/ccusage/out/codex-daily-before.stdout; https://github.com/ccusage/ccusage/blob/v20.0.24/docs/guide/config-files.md#pricing-overrides). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 63/1010 Ultracode workflow children (6.24%, 430 CLI detections), 1/301 Codex workers (0.33%, 1), and 1/22 children given the lanes block (4.55%, 9) (invoke_by_tool.json). Next, retain the token-only lane and qualify a separate pricing configuration when complete cost reporting is required; the five historical verifier findings already have assembly dispositions and are not unresolved savings defects.",
+   "findings": 1,
+   "resolutions": 1,
+   "claims_verified": 10,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 53
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 30
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "codebase-memory-mcp",
+   "card": "cards/codebase-memory-mcp.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed v0.11.0 matches the latest release and supports the chosen explicit-index graph workflow, but portable installation and Claude agent access remain incomplete. The historical verified task artifacts were 22,445→19,635 tokens for Claude (12.5%) and 22,445→16,109 for Codex (28.2%), eligible only for those checked caller-retrieval tasks, not provider savings (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The newer MCPorter comparisons of 56,274→865 (98.5%) and 56,274→1,410 (97.5%) are not clean complete-answer savings: graph-only recall is 4/7, while search_code restores 7/7 recall but includes one false positive (../rr/codebase-memory-mcp/records.json#codebase-memory-mcp:compare-mcp-plan; #codebase-memory-mcp:compare-mcp-plan-plus-search-code). In the fixed 36-hour scan, 9/1,010 Ultracode workflow children (0.89%) and 1/301 Codex workers (0.33%) invoked it, with 0/22 children carrying TOKEN LANES invoking it; these are invocation observations, not success rates (invoke_by_tool.json). Next, qualify explicit indexing, source-validated fallback and narrow Claude grants, preserve low-confidence candidates for verification, and measure the intended native worker path without combining artifact counts with counters or provider usage.",
+   "findings": 2,
+   "resolutions": 1,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 60
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "context-hub",
+   "card": "cards/context-hub.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed 0.1.4 CLI matches the latest published release and upstream's search-then-get workflow, but current CLI version does not guarantee current curated content (groups/g6-docs-accounting/context-hub.upstream.json). The historical Uvicorn fact comparison is 70903→2073 tokens (97.08%) with null card eligibility; separately, retained FastAPI CLI and MCP comparisons each reproduce 503515→3094 o200k_base tokens (99.39%), eligible only for the checked strict_content_type introduction fact and not for complete release coverage (cards/context-hub.json; ../rr/context-hub/out/23-o200k-compare-cli.stdout; ../rr/context-hub/out/24-o200k-compare-mcp.stdout; ../rr/context-hub/out/10-quality-check.stdout). The freshly fetched FastAPI document still declares version 0.136.3, while the retained stack target is 0.141.1 and that target is absent from the retrieved document (https://github.com/andrewyng/context-hub/blob/main/content/fastapi/docs/package/python/DOC.md; ../rr/context-hub/out/10-quality-check.stdout). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 8/1010 Ultracode workflow children (0.79%, 28 CLI detections), 1/301 Codex workers (0.33%, 6), and 0/22 children given the lanes block (invoke_by_tool.json). Next, gate retrieved documentation on the needed version and fact coverage, refresh cache when appropriate and fall back to current primary documentation; native saved-token counters and attributable provider savings remain unverified.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 11,
+   "claims_holding": 9,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 53
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 30
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "context-mode",
+   "card": "cards/context-mode.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed npm version matches latest stable 1.0.169, but the source-justified session-bound Codex template is still unapplied on this host and npm version equality does not identify the separately installed plugin source (docs/decisions/2026-09-25-codex-mcp-scope.md:216; groups/verdict-evidence.json; https://github.com/mksglu/context-mode/releases/tag/v1.0.169). Both historical lane comparisons are 97952→204 tokens (99.8%), eligible for the requested heading/count summary only; the separate returned-results top-ten-heading extraction is 97952→165 with its own passing check (../html-report/savings.json#report_comparisons; ../rr/context-mode/out/18-compare-execute-file.stdout; ../rr/context-mode/out/16-check-execute-file.stdout). The retained Claude 3244032 and Codex 6311424 saved-token snapshots are separately scoped event/byte estimates, not additional exact savings or avoided provider usage (../html-report/savings.json#native_snapshot). The scan labels 162/1010 Ultracode workflow children (16.04%, 2233 MCP and 125 CLI matches), 265/301 eligible Codex workers (88.04%, 5293 MCP and 2 CLI matches), and 21/22 workflow_children_with_lanes_block (95.45%) as users; the subgroup association is not causal evidence (invoke_by_tool.json). Next, adopt the reviewed launch binding, explicitly resolve the main-checkout exception, and verify real concurrent native sessions and worker access before declaring the host adaptation complete.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 6,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 28
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "gpt-tokenizer",
+   "card": "cards/gpt-tokenizer.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The fixed 3.4.0 o200k_base library is an appropriate native measurement dependency, but upstream latest is 4.0.0 and compatibility still needs qualification (tools/token-report/token_manifest.py:159; https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0). No eligible reduction comparison measures savings produced by the tokenizer itself; the 22 freshly recounted artifacts support other tools' comparisons, with provider savings unverified (groups/verdict-evidence.json; cards/gpt-tokenizer.json#adapted_performance). The retained local cross-check reports 26/27 checks, and its follow-up finds ordinary-text agreement but special-token discrepancies in both 3.4.0 and 4.0.0, so upgrading alone does not resolve that boundary (../rr/gpt-tokenizer/out/36-crosscheck.stdout; ../rr/gpt-tokenizer/out/44-special-report.stdout). The retained invoke scan labels 45/1010 Ultracode workflow children (4.46%, 189 CLI matches), 1/301 eligible Codex workers (0.33%, 4 CLI matches), and 0/22 workflow_children_with_lanes_block as users; these are command-text observations, not successful-call or opportunity rates (invoke_by_tool.json). Next, qualify the actual callers against 4.0.0 and make ordinary-text versus special-token acceptance explicit while preserving reproducible measurement provenance.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 6,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "ai-memory": 1,
+      "serena": 2,
+      "socraticode": 1
+     },
+     "shell_commands": 11,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "headroom",
+   "card": "cards/headroom.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "On-demand MCP compression and retrieval are upstream-supported, but this host retains 0.37.0 while latest is 0.39.1 and lacks two offline guards already present in its template (https://github.com/headroomlabs-ai/headroom/blob/v0.39.1/docs/content/docs/mcp.mdx; groups/verdict-evidence.json). Historical Claude 237691→56939 (76.0%) and Codex 210316→14611 (93.1%) comparisons measure selected compression responses with their recorded answer/recovery checks, not recovery-inclusive provider savings (../html-report/savings.json#report_comparisons). The separate retained fixture compresses body text 181298→13827 (92.4%) but compression plus full retrieval is 181298→195125 (+7.6%), so eligibility depends on the required information and recovery cost; the native counter remains a separate estimate (../rr/headroom/out/13-compare-compressed.stdout; ../rr/headroom/out/14-compare-recovery.stdout). The scan labels 58/1010 Ultracode workflow children (5.74%, 6 MCP and 135 CLI matches), 1/301 eligible Codex workers (0.33%, 3 MCP and 2 CLI matches), and 0/22 workflow_children_with_lanes_block as users (invoke_by_tool.json). Next, qualify 0.39.1 against the retained omission-count and recovery cases, reconcile the host guards and complete target selection, and measure useful compression including any retrieval.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 11,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 28
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "jcodemunch-mcp",
+   "card": "cards/jcodemunch-mcp.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed v1.108.319 matches the latest release, and the pinned executable with selected indexing fits upstream guidance; project-only registration is an intentional local routing choice that still leaves fresh worktrees without the server. The newer source-verified comparison is 25,440→570 o200k_base tokens (97.8%), eligible for MCPorter-rendered search_symbols plus get_symbol_source against a whole-file baseline, with the one-time index response excluded and native-client rendering unmeasured (../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-74-compare-retrieval). The historical native Claude result is separately 22,043→443 (98.0%), while the newer +27,267 native ledger delta is an estimate rather than the exact 24,870-token artifact reduction; no successful fresh-worktree Codex comparison is available (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json; ../rr/jcodemunch-mcp/records.json#jcodemunch-mcp-14-counter-after). The fixed scan found invocations in 64/1,010 Ultracode children (6.34%) and 3/301 Codex workers (1.00%), including 1/22 TOKEN LANES children (4.55%); invocation does not establish successful retrieval (invoke_by_tool.json). Next, render and verify the project entry in each opted-in worktree, correct the conflicting copyable recipe, and retain a successful native Codex task before claiming equivalent worker performance.",
+   "findings": 1,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 60
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "markitdown",
+   "card": "cards/markitdown.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed 0.1.8 base CLI matches the latest release and upstream permits selecting format dependencies, so the native HTML lane is aligned while fresh-bootstrap equivalence remains unqualified (groups/g5-conversion-packing/markitdown.upstream.json). The historical card comparisons are 503230→28934 tokens (94.25%) for Claude and 505768→29471 (94.17%) for Codex, with null eligibility fields rather than an explicit acceptance decision (cards/markitdown.json). The separately retained HTML comparison is 33177→2556 o200k_base tokens (92.30%), eligible for recovering the checked market-hours fact and 14 additional visible facts, not arbitrary document fidelity (../rr/markitdown/out/10-o200k-compare.stdout; ../rr/markitdown/out/7-quality-check.stdout). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 67/1010 Ultracode workflow children (6.63%, 517 CLI detections), 1/301 Codex workers (0.33%, 4), and 0/22 children given the lanes block (invoke_by_tool.json). Next, run the unperformed clean-install promotion gate and enforce input-format and required-content checks; PDF/Office/OCR coverage, native savings counters and attributable provider savings remain unverified.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 35
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 42
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "mcporter",
+   "card": "cards/mcporter.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-sota",
+   "summary": "For its selected Linux CLI-bridge role, installed MCPorter 0.14.1 matches latest stable and the supported upstream architecture; the retained qualification reports 37/37 checks on both candidate and baseline (https://github.com/openclaw/mcporter/releases/tag/v0.14.1; evidence/receipts/mcporter-0141-qualification-20260925.json). There is no eligible standalone token-reduction comparison or native savings counter: returned-results demonstrate transport and exact cross-process recovery, while attributable token savings remain unverified (cards/mcporter.json#adapted_performance; ../rr/returned-results.json#components/mcporter). The failed shared Headroom call omitted --server, and its corrected invocation succeeds with file-backed content, matching upstream selector parsing and key=@path support (../rr/returned-results.json#headroom-e2e-06-compress-attempt1-failed; #headroom-e2e-06-compress; https://github.com/openclaw/mcporter/blob/v0.14.1/docs/cli-reference.md). The scan labels 111/1010 Ultracode workflow children (10.99%, 1111 CLI matches), 2/301 eligible Codex workers (0.66%, 2 CLI matches), and 0/22 workflow_children_with_lanes_block as users; zero MCP calls is consistent with the selected CLI bridge and direct native server registrations (invoke_by_tool.json; docs/token-session-handbook.md:142). Next, standardize complete selectors for recurring workflows, preserve Node/ps and daemon-version checks, and measure successful useful calls without assigning downstream compression savings to the bridge.",
+   "findings": 1,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 28
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "qmd",
+   "card": "cards/qmd.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed v2.8.3 matches the latest release, and standalone named-index MCP is supported, but the native catalog covers selected US-equities documents rather than the repository's adoption instructions. The true eligible isolated CLI comparison is 4,373→1,850 o200k_base tokens (57.7%) for search plus a source-verified window; the separate native Claude positive control is 5,756→3,367 (41.5%), while whole-document retrieval and search-plus-whole expand output by 0.3% and 16.9% respectively (../rr/qmd/records.json#qmd-compare-B-search-plus-window; #qmd-compare-D-claude-control; #qmd-compare-A-get-whole; #qmd-compare-C-search-plus-whole). The historical 5,756→901 claim (84.3%) is ineligible because it answered from the wrong document, and neither later valid comparison repairs that task failure or proves provider savings (evidence/artifacts/token-e2e-codex-20260926/receipt.json#corrections_to_296). The fixed scan found invocations in 64/1,010 Ultracode children (6.34%) and 11/301 Codex workers (3.65%), including 2/22 TOKEN LANES children (9.09%); this pass also confirmed a 122-document lexical catalog and used query then bounded get (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, check collection coverage before routing, use typed lex queries with rerank:false and bounded get, add refresh guards, and repair the card's stale PASS/count fields while retaining the named-index registration.",
+   "findings": 4,
+   "resolutions": 4,
+   "claims_verified": 10,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 49,
+      "qmd": 3,
+      "ai-memory": 1
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 62,
+      "qmd": 1
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "repomix",
+   "card": "cards/repomix.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The installed 1.18.1 CLI matches the latest release and explicit-file packing is upstream-supported, but our use of compressed Python packs for complete definition lookup exceeds the verified fidelity (groups/g5-conversion-packing/repomix.upstream.json). The historical 17935→8799 o200k_base comparison (50.94%) is explicitly retracted for eligibility, and the newer CLI 23638→10565 (55.31%) and MCP 18641→8981 (51.82%) reductions are also ineligible for the complete-definition task because status_body and inspect definitions are missing (cards/repomix.json; ../rr/repomix/out/16-compare-cli.stdout; ../rr/repomix/out/17-compare-mcp.stdout; ../rr/repomix/check/def_names.json). The upstream pinned Python parser matches a signature only on its first line, which explains the multiline omission and calls for a local routing and acceptance fix (https://github.com/yamadashy/repomix/blob/v1.18.1/src/core/treeSitter/parseStrategies/PythonParseStrategy.ts#L81). The 36-hour scan ending 2026-09-26T23:37:28Z detects use by 55/1010 Ultracode workflow children (5.45%, 345 CLI detections), 2/301 Codex workers (0.66%, 7), and 0/22 children given the lanes block (invoke_by_tool.json). Next, use uncompressed selected files or explicit original-source recovery for exact definitions, replace the superseded PASS wording, and remeasure the complete workflow; native counters and attributable provider savings remain unverified.",
+   "findings": 1,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 35
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 42
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 57,
+      "qmd": 1,
+      "serena": 2
+     },
+     "shell_commands": 5,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "rtk",
+   "card": "cards/rtk.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed RTK 0.50.0 matches latest stable; Claude's hook with exactness exclusions and deliberate manual Codex use are supported adaptations, but upstream 0.50.0 also offers a Codex hook that this stack has not qualified (recipes/README.md:143; https://github.com/rtk-ai/rtk/blob/v0.50.0/hooks/codex/README.md). Historical answer-checked fixtures reduce Claude output 29986→3786 tokens (87.4%) and Codex output 25386→4278 (83.1%), eligible only for their selected information contracts (../html-report/savings.json#report_comparisons). The newer primary pair is 52009→50063 (3.7%) with recall needed for complete filenames and metadata still absent, while supplementary 44522→7130 (84.0%) excludes recall and truncates content; the separate native Codex pair 356→341 (4.2%) is explicitly lossy at 7/10 commit subjects (../rr/returned-results.json#rtk-L02-compare-primary; #rtk-L03-compare-supplementary; #codex-34-o200k-compare). The retained scan labels 192/1010 Ultracode workflow children (19.01%, 1454 CLI matches), 150/301 eligible Codex workers (49.83%, 1129 CLI matches), and 10/22 workflow_children_with_lanes_block (45.45%) as users (invoke_by_tool.json). Next, make exactness-aware guidance explicit, preserve raw recovery, qualify the Codex hook locally if selected, and remove unsupported causal explanations rather than treating fixture reductions or native counters as provider savings.",
+   "findings": 3,
+   "resolutions": 0,
+   "claims_verified": 10,
+   "claims_holding": 6,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "ai-memory": 1,
+      "serena": 2,
+      "socraticode": 1
+     },
+     "shell_commands": 11,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "serena",
+   "card": "cards/serena.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The immutable 2.0.0.dev0 development pin uses upstream's client-specific contexts and project binding; v1.7.0 remains the latest stable release, so replacing the development pin with it would not be a straightforward upgrade. The newer verified comparison is 25,942→2,168 o200k_base tokens (91.6%), eligible for the retained Python definition-and-reference fixture through MCPorter, with byte-identical Claude-context and Codex-context output and all 16 calls plus two import references preserved (../rr/serena/records.json#serena-20-o200k-compare; #serena-19-quality-check). Historical native-client comparisons remain separate at 17,723→1,752 for Claude (90.1%) and 22,445→7,810 for Codex (65.2%), and none proves provider savings or general language coverage (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The fixed scan found 37/1,010 Ultracode children (3.66%) and 21/301 Codex workers (6.98%) invoking Serena, with 1/22 TOKEN LANES children (4.55%); this pass's initialization and targeted find_symbol both timed out and supply no new successful retrieval (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, investigate that live timeout without assuming its cause, reconcile user-scope startup settings, and qualify upstream's optional Claude and Codex reminder hooks against the existing retrieval lanes.",
+   "findings": 1,
+   "resolutions": 0,
+   "claims_verified": 9,
+   "claims_holding": 7,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 60
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 29
+     },
+     "shell_commands": 3,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "socraticode",
+   "card": "cards/socraticode.json#/gpt6_review",
+   "review_verdict": "accurate",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "The pinned standalone 1.14.0 engine uses supported external Qdrant and an OpenAI-compatible embedding adapter; upstream's latest release is 1.15.0, already locally qualified but held for a coordinated cutover no earlier than 2026-10-01T11:01Z. The newer eligible source-verified native comparisons are 16,096→2,352 o200k_base tokens for Claude (85.4%) and 16,096→2,396 for Codex (85.1%), using five unfiltered hits for the host-request trust task (../rr/socraticode/records.json#socraticode-30-exact-o200k-comparisons; #socraticode-29-quality-checks). The historical 70.0% Claude and 90.6% Codex results use different result limits or file filtering and remain separate task-local artifact measurements, not provider savings (evidence/artifacts/token-e2e-ultracode-20260925/receipt.json; evidence/artifacts/token-e2e-codex-20260926/receipt.json). The fixed scan found invocations in 96/1,010 Ultracode children (9.50%) and 11/301 Codex workers (3.65%), including 2/22 TOKEN LANES children (9.09%); this restricted worker's health/status probe was denied and adds no successful native observation (invoke_by_tool.json; groups/final-verdict-evidence.json#live_probes). Next, follow the recorded cutover gate, reconcile user-scope startup timeout and intended Claude project registration, and verify explicit projectPath, index coverage, and native-client retrieval after the coordinated restart.",
+   "findings": 0,
+   "resolutions": 0,
+   "claims_verified": 10,
+   "claims_holding": 8,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 49,
+      "qmd": 3,
+      "ai-memory": 1
+     },
+     "shell_commands": 4,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 62,
+      "qmd": 1
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "qmd": 4,
+      "ai-memory": 1,
+      "socraticode": 1,
+      "serena": 2
+     },
+     "shell_commands": 2,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  },
+  {
+   "tool": "toon",
+   "card": "cards/toon.json#/gpt6_review",
+   "review_verdict": "defects",
+   "final_verdict": "adapted-with-gaps",
+   "summary": "Installed TOON 4.1.1 is current and the selective CLI conversion with compact-JSON fallback matches upstream practice, but strict decoding alone does not guarantee value preservation (https://github.com/toon-format/toon/releases/tag/v4.1.1; https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md). The eligible 60-row uniform-table comparisons are 1642→907 o200k_base tokens (44.8%) in both Claude and Codex, whereas the nested catalog is 121472→132861 (+9.4%) and is ineligible as a saving, so compact JSON should be retained (../html-report/savings.json#report_comparisons). A separate two-row comparison saves 29→22 (24.1%), refuting an upstream five-row minimum, while a fresh installed-version check strictly decodes a BOM-prefixed string into a boolean (../rr/toon/out/12-stack-compare-o200k.sanitized.stdout; groups/verdict-evidence.json#toon_bom_check). The retained scan labels 62/1010 Ultracode workflow children (6.14%, 308 CLI matches), 3/301 eligible Codex workers (1.00%, 10 CLI matches), and 0/22 workflow_children_with_lanes_block as users; it does not count suitable conversion opportunities (invoke_by_tool.json). Next, replace the unqualified size heuristic with measured compact-JSON comparison and semantic round-trip checks, including the BOM case, before expanding use.",
+   "findings": 2,
+   "resolutions": 1,
+   "claims_verified": 9,
+   "claims_holding": 6,
+   "runs": {
+    "deep_dive_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37,
+      "ai-memory": 1,
+      "serena": 2,
+      "socraticode": 1
+     },
+     "shell_commands": 11,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "review_runs": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 37
+     },
+     "shell_commands": 7,
+     "web_searches": 0,
+     "rollout_found": true
+    },
+    "verdict_run": {
+     "model": "gpt-6-astra",
+     "effort": "max",
+     "mcp_calls_by_server": {
+      "context-mode": 47,
+      "qmd": 3
+     },
+     "shell_commands": 1,
+     "web_searches": 0,
+     "rollout_found": true
+    }
+   }
+  }
+ ],
+ "verification_receipts": {
+  "final-verdict-evidence": {
+   "verified_at_utc": "2026-09-27T02:55:29Z",
+   "scope": "Final verdict verification; scratch paths are relative to the token-cards directory, and adoption/docs/evidence paths are relative to the native stack repository. No installation or upstream issue changes were made.",
+   "attachments": [
+    {
+     "tool": "codebase-memory-mcp",
+     "records": 31,
+     "attachment_references_opened": 83,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    },
+    {
+     "tool": "jcodemunch-mcp",
+     "records": 48,
+     "attachment_references_opened": 164,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    },
+    {
+     "tool": "serena",
+     "records": 25,
+     "attachment_references_opened": 112,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    },
+    {
+     "tool": "ai-memory",
+     "records": 48,
+     "attachment_references_opened": 110,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    },
+    {
+     "tool": "qmd",
+     "records": 30,
+     "attachment_references_opened": 92,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    },
+    {
+     "tool": "socraticode",
+     "records": 34,
+     "attachment_references_opened": 91,
+     "missing": 0,
+     "hash_or_size_mismatches": 0
+    }
+   ],
+   "recounts": {
+    "method": "Read the exact content-addressed baseline and candidate files referenced by retained comparison outputs; recompute SHA-256, byte size, and o200k_base tokens using the installed gpt-tokenizer module. Counts do not establish semantic eligibility.",
+    "comparisons": 15,
+    "artifact_checks": 30,
+    "failures": 0,
+    "results": [
+     {
+      "evidence": "../rr/codebase-memory-mcp/out/c20-compare-cli-plan.stdout",
+      "before": 56274,
+      "after": 1844
+     },
+     {
+      "evidence": "../rr/codebase-memory-mcp/out/c21-compare-cli-plan-fallback.stdout",
+      "before": 56274,
+      "after": 2975
+     },
+     {
+      "evidence": "../rr/codebase-memory-mcp/out/c22-compare-mcp-plan.stdout",
+      "before": 56274,
+      "after": 865
+     },
+     {
+      "evidence": "../rr/codebase-memory-mcp/out/c23-compare-mcp-plan-fallback.stdout",
+      "before": 56274,
+      "after": 1410
+     },
+     {
+      "evidence": "../rr/jcodemunch-mcp/out/raw/74-compare-retrieval.stdout",
+      "before": 25440,
+      "after": 570
+     },
+     {
+      "evidence": "../rr/jcodemunch-mcp/out/raw/75-compare-schema-surface.stdout",
+      "before": 24189,
+      "after": 1090
+     },
+     {
+      "evidence": "../rr/serena/out/80-compare-serena.stdout",
+      "before": 25942,
+      "after": 2168
+     },
+     {
+      "evidence": "../rr/qmd/out/27-compare-A.stdout",
+      "before": 4373,
+      "after": 4388
+     },
+     {
+      "evidence": "../rr/qmd/out/28-compare-B.stdout",
+      "before": 4373,
+      "after": 1850
+     },
+     {
+      "evidence": "../rr/qmd/out/29-compare-C.stdout",
+      "before": 4373,
+      "after": 5111
+     },
+     {
+      "evidence": "../rr/qmd/out/30-compare-D.stdout",
+      "before": 5756,
+      "after": 3367
+     },
+     {
+      "evidence": "../rr/socraticode/out/cmp-claude.stdout",
+      "before": 16096,
+      "after": 2352
+     },
+     {
+      "evidence": "../rr/socraticode/out/cmp-mcporter.stdout",
+      "before": 16096,
+      "after": 2396
+     },
+     {
+      "evidence": "../rr/socraticode/out/cmp-codex.stdout",
+      "before": 16096,
+      "after": 2396
+     },
+     {
+      "evidence": "../rr/socraticode/out/cmp-iso.stdout",
+      "before": 16096,
+      "after": 2196
+     }
+    ]
+   },
+   "q3": {
+    "method": "Opened the matching retained codebase-memory SQLite graph read-only, joined inbound CALLS edges to scripts/host_receipts.py register_file, and compared (file,name) pairs with ../cbm-q3/truth.json; opened original clone source to confirm the two low-confidence calls.",
+    "known_direct_callers": 12,
+    "true_callers_returned": 9,
+    "true_callers_at_confidence_at_least_0_5": 7,
+    "low_confidence_true_callers": [
+     {
+      "file": "scripts/freshness_propose.py",
+      "name": "rebuild_explorer",
+      "call_line": 598,
+      "confidence": 0.38
+     },
+     {
+      "file": "scripts/freshness_propose.py",
+      "name": "apply",
+      "call_line": 649,
+      "confidence": 0.38
+     }
+    ],
+    "evidence": [
+     "../cbm-q3/truth.json",
+     "../cbm-q3/clone/scripts/freshness_propose.py",
+     "groups/g3-code-navigation/codebase-memory-mcp.review.json"
+    ]
+   },
+   "live_probes": {
+    "qmd": {
+     "status": "completed",
+     "documents": 122,
+     "pending_embedding": 122,
+     "has_vector_index": false,
+     "collections": [
+      "us-equities-foundation",
+      "us-equities-catalog"
+     ],
+     "query_then_get": "Completed typed lexical query with rerank:false and an eight-line get; returned document was a US-equities catalog, not the token-session handbook. No new savings measurement."
+    },
+    "serena": {
+     "tool": "initial_instructions",
+     "status": "timed_out",
+     "timeout_seconds": 240,
+     "useful_retrieval_completed": false,
+     "find_symbol": {
+      "name_path_pattern": "register_file",
+      "relative_path": "scripts/host_receipts.py",
+      "status": "timed_out",
+      "timeout_seconds": 240
+     }
+    },
+    "ai-memory": {
+     "tool": "memory_query",
+     "status": "denied",
+     "error": "MCP tool call requires approval, but approval policy is never",
+     "useful_retrieval_completed": false
+    },
+    "socraticode": {
+     "tool": "codebase_status",
+     "status": "denied",
+     "error": "MCP tool call requires approval, but approval policy is never",
+     "useful_retrieval_completed": false
+    }
+   },
+   "wiring": {
+    "claude_portable_mcp_servers": [
+     "ai-memory",
+     "serena"
+    ],
+    "claude_agents_checked": 6,
+    "claude_agents_with_direct_cbm_namespace_grant": 0,
+    "claude_template_serena_hooks": false,
+    "live_codex_serena_hooks": false,
+    "serena_startup_timeout_seconds": {
+     "user": null,
+     "project": 60,
+     "template": 60
+    },
+    "socraticode_startup_timeout_seconds": {
+     "user": null,
+     "project": 120,
+     "template": 120
+    },
+    "jcodemunch_registration": {
+     "user": false,
+     "project": true
+    },
+    "cbm_platform_pins": {
+     "linux": false,
+     "macos": false
+    },
+    "ai_memory_versions": {
+     "linux_pin": "2.4.1",
+     "macos_pin": "2.3.2",
+     "claude_hook_template": "2.4.1"
+    },
+    "cause_of_serena_timeout": "unverified"
+   },
+   "invoke_scan": {
+    "source": "invoke_by_tool.json",
+    "scanner": "invoke_by_tool.py",
+    "since": "2026-09-25T11:37:28Z",
+    "until": "2026-09-26T23:37:28Z",
+    "card_population_rows_match_source": true,
+    "codex_negative_control_sessions_excluded": 139,
+    "interpretation": "Counts of detected invocation attempts and agents invoking; not tool-success rates, not causal savings, and not added to the separate OTel window."
+   }
+  },
+  "g5-g6-verification": {
+   "verified_at_utc": "2026-09-27T03:20:30Z",
+   "scope": "Read-only final-verdict verification for g5-conversion-packing and g6-docs-accounting. Local evidence references are relative to token-cards, except docs/, recipes/ and evidence/ references, which are relative to the native stack repository. No installation, configuration, source card or upstream issue was changed.",
+   "versions": {
+    "ast-grep": {
+     "command": "ast-grep --version",
+     "exit": 0,
+     "installed": "0.45.3",
+     "latest": "0.45.3",
+     "published_at": "2026-08-31T01:42:23Z",
+     "release": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+    },
+    "markitdown": {
+     "command": "markitdown --version",
+     "exit": 0,
+     "installed": "0.1.8",
+     "latest": "v0.1.8",
+     "published_at": "2026-09-21T21:22:51Z",
+     "release": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+    },
+    "repomix": {
+     "command": "repomix --version",
+     "exit": 0,
+     "installed": "1.18.1",
+     "latest": "v1.18.1",
+     "published_at": "2026-09-21T08:34:49Z",
+     "release": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    },
+    "agentsview": {
+     "command": "agentsview --version",
+     "exit": 0,
+     "installed": "0.43.0",
+     "latest": "v0.44.0",
+     "published_at": "2026-09-21T13:56:12Z",
+     "release": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+    },
+    "ccusage": {
+     "command": "ccusage --version",
+     "exit": 0,
+     "installed": "20.0.24",
+     "latest": "v20.0.24",
+     "published_at": "2026-09-21T11:23:53Z",
+     "release": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
+    },
+    "context-hub": {
+     "command": "chub --cli-version",
+     "exit": 0,
+     "installed": "0.1.4",
+     "latest": "v0.1.4",
+     "published_at": "2026-04-27T22:10:03Z",
+     "release": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4"
+    }
+   },
+   "release_method": "Fresh official /repos/<repository>/releases/latest API reads, corroborated by official release-page and documentation research; all reported releases are non-prereleases. Search-engine snippets were not used to override fresh release evidence.",
+   "attachment_check": {
+    "source": "../rr/returned-results.json",
+    "method": "Opened every attachment on every record naming the component and checked retained byte size and SHA-256. Counts are attachment references and may include the same file more than once; record status is not inferred from attachment integrity.",
+    "results": [
+     {
+      "tool": "ast-grep",
+      "records": 27,
+      "attachments_opened": 56,
+      "mismatches": 0
+     },
+     {
+      "tool": "markitdown",
+      "records": 10,
+      "attachments_opened": 37,
+      "mismatches": 0
+     },
+     {
+      "tool": "repomix",
+      "records": 22,
+      "attachments_opened": 58,
+      "mismatches": 0
+     },
+     {
+      "tool": "agentsview",
+      "records": 26,
+      "attachments_opened": 53,
+      "mismatches": 0
+     },
+     {
+      "tool": "ccusage",
+      "records": 19,
+      "attachments_opened": 54,
+      "mismatches": 0
+     },
+     {
+      "tool": "context-hub",
+      "records": 31,
+      "attachments_opened": 75,
+      "mismatches": 0
+     }
+    ]
+   },
+   "recount_method": "Opened the exact baseline and candidate files referenced by the native report ledger and retained comparison outputs, verified size and SHA-256, and recomputed o200k_base with the configured gpt-tokenizer module. Thirteen comparisons and 26 artifact checks reproduced with zero mismatches. Numeric reproduction alone does not establish semantic eligibility.",
+   "historical_comparisons": [
+    {
+     "tool": "ast-grep",
+     "lane": "claude_subagent",
+     "before": 105877,
+     "after": 10293,
+     "reduction_pct": 90.28,
+     "eligibility": null,
+     "evidence": "cards/ast-grep.json"
+    },
+    {
+     "tool": "ast-grep",
+     "lane": "codex_worker",
+     "before": 112899,
+     "after": 11508,
+     "reduction_pct": 89.81,
+     "eligibility": null,
+     "evidence": "cards/ast-grep.json"
+    },
+    {
+     "tool": "markitdown",
+     "lane": "claude_subagent",
+     "before": 503230,
+     "after": 28934,
+     "reduction_pct": 94.25,
+     "eligibility": null,
+     "evidence": "cards/markitdown.json"
+    },
+    {
+     "tool": "markitdown",
+     "lane": "codex_worker",
+     "before": 505768,
+     "after": 29471,
+     "reduction_pct": 94.17,
+     "eligibility": null,
+     "evidence": "cards/markitdown.json"
+    },
+    {
+     "tool": "repomix",
+     "lane": "claude_subagent",
+     "before": 17935,
+     "after": 8799,
+     "reduction_pct": 50.94,
+     "eligibility": "retracted",
+     "evidence": "cards/repomix.json"
+    },
+    {
+     "tool": "context-hub",
+     "lane": "claude_subagent",
+     "before": 70903,
+     "after": 2073,
+     "reduction_pct": 97.08,
+     "eligibility": null,
+     "evidence": "cards/context-hub.json"
+    }
+   ],
+   "retained_comparisons": {
+    "ast-grep-calls": {
+     "before": 133697,
+     "after": 10903,
+     "reduction_pct": 91.84,
+     "evidence": "../rr/ast-grep/out/17-compare.stdout",
+     "acceptance": "../rr/ast-grep/check/check.json",
+     "eligibility": "bounded subprocess-call extraction; 19 ranges match Python AST; all 15 checks pass"
+    },
+    "ast-grep-outline": {
+     "before": 18233,
+     "after": 2245,
+     "reduction_pct": 87.69,
+     "evidence": "../rr/ast-grep/out/25-outline-compare.stdout",
+     "acceptance": "../rr/ast-grep/check/check_outline.json",
+     "eligibility": "two-file top-level outline only; all six checks pass"
+    },
+    "repomix-cli": {
+     "before": 23638,
+     "after": 10565,
+     "reduction_pct": 55.31,
+     "evidence": "../rr/repomix/out/16-compare-cli.stdout",
+     "acceptance": "../rr/repomix/check/def_names.json",
+     "eligibility": "ineligible for complete-definition lookup"
+    },
+    "repomix-mcp": {
+     "before": 18641,
+     "after": 8981,
+     "reduction_pct": 51.82,
+     "evidence": "../rr/repomix/out/17-compare-mcp.stdout",
+     "acceptance": "../rr/repomix/check/def_names.json",
+     "eligibility": "ineligible for complete-definition lookup"
+    },
+    "markitdown-html": {
+     "before": 33177,
+     "after": 2556,
+     "reduction_pct": 92.3,
+     "evidence": "../rr/markitdown/out/10-o200k-compare.stdout",
+     "acceptance": "../rr/markitdown/out/7-quality-check.stdout",
+     "eligibility": "bounded market-hours fact; required checks and 14 informative visible facts pass"
+    },
+    "context-hub-cli": {
+     "before": 503515,
+     "after": 3094,
+     "reduction_pct": 99.39,
+     "evidence": "../rr/context-hub/out/23-o200k-compare-cli.stdout",
+     "acceptance": "../rr/context-hub/out/10-quality-check.stdout",
+     "eligibility": "strict_content_type introduction fact only; primary check and discrimination control pass"
+    },
+    "context-hub-mcp": {
+     "before": 503515,
+     "after": 3094,
+     "reduction_pct": 99.39,
+     "evidence": "../rr/context-hub/out/24-o200k-compare-mcp.stdout",
+     "acceptance": "../rr/context-hub/out/20-mcp-check-json.stdout",
+     "eligibility": "same bounded fact and CLI-document parity; not additional savings"
+    }
+   },
+   "invoke_scan": {
+    "source": "invoke_by_tool.json",
+    "scanner": "invoke_by_tool.py",
+    "since": "2026-09-25T11:37:28Z",
+    "until": "2026-09-26T23:37:28Z",
+    "population_rows_compared": 36,
+    "mismatches": 0,
+    "codex_negative_controls_excluded": 139,
+    "interpretation": "Reported command-text/MCP-name detections and agents detected, not successful execution or task-eligible adoption rates. Regex matches can include tool-name mentions inside command text. Existing frozen-window scan was inspected and cross-checked, not rerun over private transcripts. No sums across populations, OTel, native counters or provider usage."
+   },
+   "review_resolutions": {
+    "ast_grep": "Corrected before/after-full-parsing wording read with the cited merged upstream sources.",
+    "repomix": "Stale historical PASS remains in payload; explicit eligibility retraction is present.",
+    "agentsview": "All four historical raw-record findings dispositioned; successful post-start projects and inclusive lists retained.",
+    "ccusage": "All five historical raw-record findings dispositioned; pricing gap remains.",
+    "markitdown": "Review accurate with no findings.",
+    "context_hub": "Review accurate with no findings."
+   },
+   "measurement_limits": "No card provides a native saved-token counter; AgentsView and ccusage have no exact comparison. No attributable provider-savings measurement is established for any of the six. The retained fidelity checks were opened and assessed, not rerun as fresh application tests.",
+   "tool_limits": [
+    "GitHub CLI authentication unavailable; public official web/API sources were used.",
+    "QMD query found no matching handbook entry in its active collections; original local handbook was opened.",
+    "Serena find_symbol failed because its language-server manager was uninitialized; the scanner source was opened directly and Serena configuration was not changed."
+   ]
+  },
+  "verdict-evidence": {
+   "evidence_class": "local_integration",
+   "checked_on": "2026-09-26 (America/New_York)",
+   "scope": "Final-verdict read-only verification; locally authored summary of actual returned checks, not a new provider run or an unchanged upstream test suite.",
+   "path_convention": "cards/, groups/, invoke_by_tool.json and ../rr or ../html-report paths are relative to token-cards; docs/, recipes/, tools/, adoption/ and evidence/ paths are relative to the main repository. Record names after # identify retained entries, not personal identifiers.",
+   "installed_versions": {
+    "gpt-tokenizer": "3.4.0",
+    "rtk": "0.50.0",
+    "toon": "4.1.1",
+    "context-mode": "1.0.169",
+    "headroom": "0.37.0",
+    "mcporter": "0.14.1"
+   },
+   "version_checks": "Native --version for rtk, toon, headroom and mcporter; installed package.json for gpt-tokenizer and context-mode.",
+   "latest_releases": [
+    {
+     "tool": "gpt-tokenizer",
+     "tag": "4.0.0",
+     "published_at": "2026-08-16T02:29:41Z",
+     "url": "https://github.com/niieani/gpt-tokenizer/releases/tag/4.0.0"
+    },
+    {
+     "tool": "rtk",
+     "tag": "v0.50.0",
+     "published_at": "2026-09-24T10:02:31Z",
+     "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+    },
+    {
+     "tool": "toon",
+     "tag": "v4.1.1",
+     "published_at": "2026-08-05T11:49:55Z",
+     "url": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+    },
+    {
+     "tool": "context-mode",
+     "tag": "v1.0.169",
+     "published_at": "2026-06-29T18:18:53Z",
+     "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+    },
+    {
+     "tool": "headroom",
+     "tag": "v0.39.1",
+     "published_at": "2026-09-26T20:31:39Z",
+     "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+    },
+    {
+     "tool": "mcporter",
+     "tag": "v0.14.1",
+     "published_at": "2026-09-24T13:16:08Z",
+     "url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1"
+    }
+   ],
+   "release_method": "Fresh official GitHub releases/latest API responses (all HTTP 200), followed by opened official release pages and release/current upstream documentation; search-index snippets were not used as freshness authority.",
+   "retained_attachment_check": {
+    "source": "../rr/returned-results.json",
+    "selection": "All records whose component_ids include one of the six verdict tools, unique attachment paths.",
+    "attachments_opened": 775,
+    "byte_or_sha256_mismatches": 0,
+    "missing": 0
+   },
+   "historical_comparison_recount": {
+    "source": "../html-report/savings.json#report_comparisons",
+    "method": "Opened the private ledger's retained baseline/candidate paths, checked bytes and SHA256, then re-encoded fatal UTF-8 with installed gpt-tokenizer 3.4.0 cjs/encoding/o200k_base.js; private paths and ledger IDs omitted.",
+    "artifact_count": 22,
+    "comparisons": [
+     {
+      "tool": "toon",
+      "before": 119390,
+      "after": 130681
+     },
+     {
+      "tool": "rtk",
+      "before": 29986,
+      "after": 3786
+     },
+     {
+      "tool": "headroom",
+      "before": 237691,
+      "after": 56939
+     },
+     {
+      "tool": "toon",
+      "before": 1642,
+      "after": 907
+     },
+     {
+      "tool": "context-mode",
+      "before": 97952,
+      "after": 204
+     },
+     {
+      "tool": "toon",
+      "before": 120961,
+      "after": 132322
+     },
+     {
+      "tool": "codex:rtk",
+      "before": 25386,
+      "after": 4278
+     },
+     {
+      "tool": "codex:context-mode",
+      "before": 97952,
+      "after": 204
+     },
+     {
+      "tool": "codex:headroom",
+      "before": 210316,
+      "after": 14611
+     },
+     {
+      "tool": "codex:toon",
+      "before": 1642,
+      "after": 907
+     },
+     {
+      "tool": "toon",
+      "before": 121472,
+      "after": 132861
+     }
+    ],
+    "all_counts_match": true,
+    "all_byte_counts_and_hashes_match": true,
+    "provider_tokens_saved": null,
+    "limit": "A matching count and hash does not independently establish semantic acceptance; eligibility comes from each retained boundary and check."
+   },
+   "invoke_check": {
+    "source": "invoke_by_tool.json",
+    "generator": "invoke_by_tool.py",
+    "all_six_cards_match_population_objects": true,
+    "window_start_utc": "2026-09-25T11:37:28Z",
+    "window_end_utc": "2026-09-26T23:37:28Z",
+    "workflow_children": 1010,
+    "codex_exec_workers": 301,
+    "workflow_children_with_lanes_block": 22,
+    "excluded_codex_negative_controls": 139,
+    "limits": [
+     "CLI command-text matches can include mentions rather than successful useful execution; MCP matches identify servers.",
+     "The 22-child lane-block population is a subset, not an additional population.",
+     "Eligible-task opportunity counts and causal provider savings are absent.",
+     "The cards retain the preregistered arm-B run as pending."
+    ]
+   },
+   "host_wiring_readback": {
+    "method": "Parsed selected current user/project TOML fields and the portable Codex template; emitted only booleans, command basenames and the named offline guards.",
+    "context_mode": {
+     "user_registered": false,
+     "project_registered": true,
+     "project_command_basename": "node",
+     "project_launches_start_mjs": true,
+     "project_cwd_set": true,
+     "project_fixed_project_env": true,
+     "template_user_registered": true,
+     "template_launches_start_mjs": true,
+     "template_cwd_set": false,
+     "template_fixed_project_env": false
+    },
+    "headroom": {
+     "user_registered": true,
+     "user_guards": {
+      "HEADROOM_OFFLINE": "1",
+      "DO_NOT_TRACK": "1"
+     },
+     "template_guards": {
+      "HEADROOM_OFFLINE": "1",
+      "DO_NOT_TRACK": "1",
+      "HF_HUB_OFFLINE": "1",
+      "TRANSFORMERS_OFFLINE": "1"
+     }
+    },
+    "limit": "Read-back establishes selected configuration state, not hook execution, concurrent native-session isolation or blanket offline behavior."
+   },
+   "toon_bom_check": {
+    "version": "4.1.1",
+    "method": "Pass JSON.stringify of the root string U+FEFF followed by true to toon --encode; pass stdout to toon --decode --strict; JSON.parse the decoded stdout and compare types and values.",
+    "input_type": "string",
+    "output_type": "boolean",
+    "encode_exit": 0,
+    "decode_exit": 0,
+    "value_preserved": false,
+    "upstream": "https://github.com/toon-format/toon/issues/339"
+   },
+   "retrieval_limits": {
+    "qmd": "Query/get returned an indexed historical foundation document; the requested handbook was inspected at its original known repository path.",
+    "serena": "Initialization was attempted but did not return before the call was terminated; no symbol-service success is claimed."
+   }
+  }
+ }
+}

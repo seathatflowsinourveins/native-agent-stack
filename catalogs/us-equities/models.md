@@ -80,11 +80,24 @@ Revision: `None`. No execution proposed while excluded.
 
 ### Qwen/Qwen3.8-27B
 
-Practical local generation baseline: historical Ollama quant at 8192 context; research summaries and bounded extraction candidates.
+Local generation baseline for research summaries and bounded extraction.
 
-Revision: `1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0`. Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.
+**Updated September 26, 2026 (native_proven on one host and task).** The preregistered li26 comparison
+([results](../../blueprints/convergence-practice/local-inference-latest-20260926/results/results.md),
+[receipt](../../evidence/receipts/local-inference-c2-serving-switch-20260926.json)) ran the
+[unsloth/Qwen3.8-27B-GGUF](https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/tree/4ca720788d1e01f1bff70c033e0d0028fd02e502)
+UD-Q4_K_M quant under llama.cpp b11146 at 8192 context on host `nativestack-5975wx-20260925`. On the frozen
+360-filing 8-K item-extraction task (2020-03-02 cohort) it scored micro-F1 0.9909 against the filer-declared header
+items, with every reply valid JSON. Production now serves the C2 profile (`--gpu-layers 99 --n-cpu-ffn 20
+--spec-type draft-mtp --spec-draft-n-max 3`): median decode 26.28 tokens/s and median TTFT 4,355 ms, against the
+C0 control's 5.25 tokens/s and 11,378 ms at the same F1.
 
-- 27B dense BF16 is larger than the demonstrated quant. Financial extraction accuracy is unmeasured. Card maximum context is not the installed GPU capacity.
+Revision: `1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0` (base); quant revision `4ca720788d1e01f1bff70c033e0d0028fd02e502`. Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. The inference recipe is proven only on that host by the receipt; another host needs its own.
+
+- 27B dense BF16 is larger than the demonstrated quant. Card maximum context is not the installed GPU capacity.
+- Extraction accuracy is measured only against filer-declared header ITEMS on one cohort, greedy with thinking disabled and about 17 output tokens per filing, one run per arm. It establishes no hand-checked accuracy, catalyst or trading value, long-context or thinking-mode quality, and run-to-run variance is unmeasured.
+- C2's decode gain and MTP draft acceptance (4,735 of 4,737 drafted tokens) hold only for that protocol; production keeps its own sampling and reasoning defaults. C2's peak whole-device use was 20,314 MiB (3,829 MiB free) with Windows-side GPU applications closed, production has no free-memory guard, and the rollback to C0 was not exercised.
+- Challengers in that comparison: MiMo-V2.6-Distill-Qwen-9B Q8_0 decoded faster (80.16 tokens/s) but failed non-inferiority (bootstrap lower bound −0.0560). PrismML Ternary Bonsai 2 27B and Xing4.0-29B-A4B are `runtime_unsupported` on b11146 and were not run.
 
 ```bash
 hf models info Qwen/Qwen3.8-27B --expand sha,createdAt,lastModified,cardData,safetensors --format json

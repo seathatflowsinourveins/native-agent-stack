@@ -158,7 +158,7 @@ python3 tools/sota-convergence/claude_lane.py --result "$WORK_DIR/claude-result.
 # 4. Codex lane on the same export (a separate account/quota, resumable; codex_lane.py refuses a --repo below
 #    any .git). A deliberately non-blind run passes --allow-git-history --repo . instead.
 python3 tools/sota-convergence/codex_lane.py --work-dir "$WORK_DIR" --repo "$BLIND_DIR/export" \
-  --model <openai model> --effort high --jobs 2
+  --model <openai model> --effort max --jobs 2
 
 # 5. Two-family adjudication of the layers whose lanes disagree (README "Two-family adjudication"). inputs exits
 #    1 whenever it skips a layer (listed on stderr, for example a missing lane return); when it indexes no

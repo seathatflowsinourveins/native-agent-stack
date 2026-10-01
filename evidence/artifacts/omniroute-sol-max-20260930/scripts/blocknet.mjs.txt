@@ -1,0 +1,27 @@
+// S1 screen preload: deny every network egress from the harness process and its worker
+// threads (workers inherit execArgv, so this module loads in each). Unix-socket paths are
+// allowed; TCP/TLS connects and fetch throw. Each denial is logged to stderr with a tag so
+// the run log proves no model call, no gateway request and no model download happened.
+import net from "node:net";
+import { isMainThread, threadId } from "node:worker_threads";
+
+function deny(what) {
+  process.stderr.write(`S1-NETBLOCK thread=${isMainThread ? "main" : threadId} ${what}\n`);
+  const err = new Error(`S1 screen: network egress blocked (${what})`);
+  err.code = "ES1NETBLOCK";
+  return err;
+}
+
+globalThis.fetch = async (input) => {
+  throw deny(`fetch ${String(input && input.url ? input.url : input).slice(0, 120)}`);
+};
+
+const originalConnect = net.Socket.prototype.connect;
+net.Socket.prototype.connect = function patchedConnect(...args) {
+  const a0 = args[0];
+  const isPath =
+    (typeof a0 === "string" && Number.isNaN(Number(a0))) ||
+    (a0 && typeof a0 === "object" && !Array.isArray(a0) && typeof a0.path === "string");
+  if (isPath) return originalConnect.apply(this, args);
+  throw deny(`tcp ${JSON.stringify(a0 && typeof a0 === "object" ? { host: a0.host, port: a0.port } : a0)}`);
+};

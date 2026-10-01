@@ -1,0 +1,16 @@
+(node:1135175) ExperimentalWarning: DecompressInterceptor is experimental and subject to change
+(Use `node --trace-warnings ...` to show where the warning was created)
+Cache is disabled.
+Starting evaluation eval-xmG-2026-09-28T02:23:58
+Running 27 test cases (up to 1 at a time)...
+✓ Eval complete
+
+
+Results:
+  0 passed (0%)
+  ✗ 27 failed (100%)
+  0 errors (0%)
+Duration: 12m 44s (concurrency: 1)
+
+Writing output to results.json
+exit 100

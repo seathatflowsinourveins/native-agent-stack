@@ -1,0 +1,32 @@
+isolated unmutated fragment -> passes
+isolated unmutated fragment, Media folder holds the sound -> passes
+isolated fragment: the sound file is absent from a readable Media folder -> bellSound must name a file that exists i
+isolated unmutated fragment, Media folder not readable (skipped) -> passes
+isolated fragment without guid -> passes
+isolated unmutated synthetic settings -> passes
+isolated fragment without guid, with settings -> passes
+isolated guid-less fragment, override under its derived guid: suppresses Claude titles -> AI-client profiles must let program titl
+isolated guid-less fragment, override under its derived guid: rings audible only -> expected the reviewed bellStyle
+isolated guid-less fragment, override under its derived guid: loud sound -> bellSound must be one of the measured qu
+isolated fragment: title suppression on Claude -> AI-client profiles must let program titl
+isolated fragment: loud sound on both AI profiles -> bellSound must be one of the measured qu
+isolated fragment: sound in a missing subdirectory -> bellSound must be one of the measured qu
+isolated fragment: sound reached through .. -> bellSound must be one of the measured qu
+isolated fragment: relative bellSound on Codex -> bellSound must be an absolute local Wind, bellSound must be one of the measured qu
+isolated fragment: AI bellStyle without taskbar -> expected the reviewed bellStyle
+isolated fragment: bellStyle all on a static profile -> bellStyle must list flags explicitly, ne
+isolated fragment: bellStyle notification on a static profile -> bellStyle must list flags explicitly, ne
+isolated fragment: audible static profile -> static profiles stay silent (taskbar onl
+isolated fragment: no COLORTERM key -> the profile environment must set COLORTE
+isolated fragment: COLORTERM in the command line -> use the profile environment key, not a s
+isolated settings: project profile suppresses titles -> AI-client profiles must let program titl
+isolated settings: project profile bell all -> bellStyle must list flags explicitly, ne, expected the reviewed bellStyle
+isolated settings: project profile without bellStyle -> expected the reviewed bellStyle
+isolated settings: project profile loud sound -> bellSound must be one of the measured qu
+isolated settings: defaults suppress titles -> must not suppress program titles for eve
+isolated settings: defaults bell all -> bellStyle must list flags explicitly, ne
+isolated settings: PowerShell bell all -> bellStyle must list flags explicitly, ne
+isolated settings: fragment override suppresses Claude titles -> AI-client profiles must let program titl
+isolated settings: fragment override rings audible only -> expected the reviewed bellStyle
+isolated settings: fragment override loud sound -> bellSound must be one of the measured qu
+11 fragment, 10 settings, 3 derived-guid override and 3 Media-folder cases (4 unmutated inputs), 0 problems

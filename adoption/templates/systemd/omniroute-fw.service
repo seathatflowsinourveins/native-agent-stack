@@ -1,0 +1,77 @@
+# OmniRoute framework instance (port 20129): a values-free systemd --user unit template.
+#
+# It mirrors the unit installed on the NativeStack WSL2 workstation since the 2026-09-30 rebuild,
+# evidence/artifacts/omniroute-rebuild-20260930/omniroute-fw.service; tests/test_omniroute_gateway_unit.py renders it
+# with the host's values and compares. It is not installed as it is. Decision: docs/decisions/2026-09-30-omniroute-rebuild.md.
+#
+# It is a second OmniRoute on the host that also runs omniroute.service (20128): its own data directory
+# (%h/.local/share/omniroute-fw), its own environment file and port 20129. A provider node inside it forwards to the
+# gateway on 20128. Apart from Description= and the comments, one directive differs from the installed unit: the
+# explicit OMNIROUTE_SERVER_HOST below. The workstation's service log names OMNIROUTE_SERVER_HOST among the keys its
+# process environment already sets, and 20129 listens on 127.0.0.1 only, so the process environment is the same.
+#
+# Substitute these before installing, following this directory's @NAME@ convention (codex-broker-reaper.service):
+#   @OMNIROUTE_PREFIX@      the owned npm prefix of the build this instance runs (docs/foundation-stack.md, "Source
+#                           build of release/v3.8.51"); it holds bin/omniroute and shim/.
+#   @NODE_PREFIX@           a Node 24 installation whose bin/ holds node (upstream engines: >=22.22.2 <23 or >=24 <27).
+#   @CODEX_CLIENT_VERSION@  the Codex version announced to the ChatGPT backend, as in omniroute.service (0.159.1 on the
+#                           workstation since 2026-09-30). This instance forwards GPT-6 calls to 20128 through a provider
+#                           node and has no Codex provider of its own, so the value matters here only for callers that
+#                           report no version and for symmetry with omniroute.service.
+# %h is systemd's own specifier for the invoking user's home directory and needs no substitution.
+#
+# The environment file follows omniroute.service's rules: mode 0600 inside the 0700 data directory, plain NAME=value
+# lines, the four server secrets, and DATA_DIR (this instance's own directory), PORT=20129, OMNIROUTE_SERVER_HOST=127.0.0.1
+# and REQUIRE_API_KEY. A second instance on the same host also sets there:
+#   LIVE_WS_PORT and EMBED_WS_PROXY_PORT to ports of its own. The defaults, 20132 and 20131, belong to the gateway
+#     (src/server/ws/liveServer.ts L54; src/lib/services/embedWsProxy.ts L36). The workstation's are 20133 and 20134.
+#   LIVE_WS_HOST and EMBED_WS_PROXY_HOST, if set at all, to 127.0.0.1 (liveServer.ts L58); all four WebSocket
+#     listeners on the workstation bind 127.0.0.1.
+#   OMNIROUTE_CLI_SKIP_REPO_ENV=1, so serve loads no .env from inside the installed package (bin/omniroute.mjs L155-156).
+#   OMNIROUTE_ALLOW_LOCAL_PROVIDER_URLS, which admits the loopback provider node; upstream enables it by default
+#     (src/shared/constants/featureFlagDefinitions.ts L373-380).
+# The workstation's service log names each of these among the keys its process environment already sets; their values
+# were not read. Values in that file override the Environment= lines below (systemd.exec(5), EnvironmentFile=).
+#
+# WorkingDirectory= is the data directory, carried from the installed unit. In source, its effect is that serve's
+# <cwd>/.env candidate is the data directory's own .env (bin/omniroute.mjs L152); the server child runs from the
+# package's dist/ either way, and reads its BUILD_SHA there (src/lib/monitoring/buildSha.ts L29-51).
+#
+# The lsof shim, the posture, the deliberately unused flags and the rule that no secret belongs in this unit are as in
+# omniroute.service (including the note that the shim is redundant at 2f42a9ac1). Each Environment= line below has a
+# one-line reason. Cited line numbers were read at release/v3.8.51 a58000c7 and hold at 2f42a9ac1 except in the files
+# omniroute.service lists as changed there.
+[Unit]
+Description=OmniRoute framework instance (own data directory, loopback 20129)
+Documentation=https://github.com/diegosouzapw/OmniRoute
+After=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.local/share/omniroute-fw/server.env
+WorkingDirectory=%h/.local/share/omniroute-fw
+# shim/ first, so serve's port preflight finds the lsof no-match adaptation (see "The lsof shim" in omniroute.service).
+Environment=PATH=@OMNIROUTE_PREFIX@/shim:@NODE_PREFIX@/bin:/usr/local/bin:/usr/bin:/bin
+# serve binds 0.0.0.0 when this is unset (bin/cli/utils/serverHost.mjs L16-26); the keyless posture needs loopback.
+Environment=OMNIROUTE_SERVER_HOST=127.0.0.1
+# V8 heap for this instance; upstream accepts 64..16384 inclusive (scripts/build/runtime-env.mjs L19).
+Environment=OMNIROUTE_MEMORY_MB=16384
+# Fallback when a request carries no usable Codex version; unset, it is the built-in 0.156.1 (open-sse/config/codexClient.ts L29-49; src/shared/constants/codexClient.ts L6).
+Environment=CODEX_CLIENT_VERSION=@CODEX_CLIENT_VERSION@
+# Readiness budget (default 80 s), which the content-stall watchdog reuses (open-sse/handlers/chatCore.ts L6401); Astra at max can reason longer.
+Environment=STREAM_READINESS_TIMEOUT_MS=600000
+# Its cap (default 180 s), raised to match, because the budget never exceeds the larger of it and the cascade timeout (open-sse/utils/streamReadinessPolicy.ts L135-138 and L227).
+Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
+# Hard stream cap (default 21 min) that upstream bytes never reset (open-sse/config/constants.ts L31-34); 1 h here, never 0.
+Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
+# Templates stay the single writer for Codex/Claude configs (src/shared/services/cliRuntime.ts L1077-1078).
+Environment=CLI_ALLOW_CONFIG_WRITES=false
+ExecStart=@OMNIROUTE_PREFIX@/bin/omniroute serve --port 20129 --no-open --no-tray
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

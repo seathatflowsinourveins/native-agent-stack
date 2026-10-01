@@ -1,0 +1,726 @@
+{
+  "budget": {
+    "claude_on_cap": 8000,
+    "claude_on_description_chars": {
+      "computed": 7114,
+      "manifest": 7114,
+      "matches_manifest": true
+    },
+    "claude_within_cap": true,
+    "codex_default_budget_chars": 8000,
+    "codex_enabled_description_chars": {
+      "computed": 3016,
+      "manifest": 3016,
+      "matches_manifest": true
+    },
+    "codex_within_cap": true
+  },
+  "claude_settings": {
+    "state": "ok"
+  },
+  "cli_version": {
+    "exit_code": 0,
+    "invoked": true,
+    "matches_manifest": true,
+    "output": "1.7.0"
+  },
+  "codex_config": {
+    "state": "ok"
+  },
+  "extra_skills": [],
+  "folder_trees": {
+    "drift": [
+      "supply-chain-risk-auditor"
+    ],
+    "missing": [],
+    "ok": 26,
+    "runtime_artifacts": [],
+    "unreadable": []
+  },
+  "lock": {
+    "source": "default",
+    "state": "ok",
+    "version": 3,
+    "version_matches": true
+  },
+  "result": "ok",
+  "schema_version": 1,
+  "skills": [
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "name-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "typesafe-ai",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "gh-fix-ci",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "security-best-practices",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "absolute",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "name-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "iterative-retrieval",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "absolute",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "name-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "search-first",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "diagnosing-bugs",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "tdd",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "codebase-design",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "user-invocable-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "grill-me",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "user-invocable-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "improve-codebase-architecture",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "security-threat-model",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "gh-address-comments",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "semgrep",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "codeql",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "drift"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "supply-chain-risk-auditor",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "agentic-actions-auditor",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "property-based-testing",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "modern-python",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "sarif-parsing",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "fp-check",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "mcp-builder",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "frontend-design",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "name-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "agent-browser",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "user-invocable-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "find-skills",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "variant-analysis",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "on",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": false,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "writing-for-agents",
+      "pass": true
+    },
+    {
+      "canonical": {
+        "state": "ok"
+      },
+      "claude_link": {
+        "kind": "relative",
+        "state": "ok"
+      },
+      "claude_listing": {
+        "actual": "name-only",
+        "state": "ok"
+      },
+      "codex_disable": {
+        "disable_entry_present": true,
+        "state": "ok"
+      },
+      "folder_tree": {
+        "state": "ok"
+      },
+      "lock": {
+        "state": "ok"
+      },
+      "name": "security-audit",
+      "pass": true
+    }
+  ],
+  "unlocked_folders": []
+}

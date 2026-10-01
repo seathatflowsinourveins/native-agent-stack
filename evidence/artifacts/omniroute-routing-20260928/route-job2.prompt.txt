@@ -1,0 +1,477 @@
+Date: 2026-09-28 (UTC). You are an adversarial refuter. Another researcher produced the CATALOG below as its answer to a frozen question. Assume every entry may contain a false, stale or unsupported claim, and try to REFUTE it from primary sources you open yourself.
+
+FROZEN QUESTION the catalog answers (verbatim):
+For a single-host local LLM gateway pooling several ChatGPT/Codex and Claude subscription accounts behind one endpoint, serving agentic CLI lanes (Codex CLI /v1/responses, long multi-turn sessions, ~90% of input tokens are upstream prompt-cache reads), with the hard constraint of no quality loss (never downgrade model or reasoning effort; no lossy rewriting without a passed quality gate): what is current SOTA routing practice?
+
+CATALOG (route-landscape's JSON; the only change is that one addendum entry its author withdrew, live_finding_20128_WITHDRAWN, was removed):
+{
+ "method": "Shallow clone --depth 1 --branch TAG into session scratch, HEAD verified equal to the gh-api tag commit. dynamo, the SDKs and otel-genai were read via gh api contents at ref. Docs were fetched with ctx_fetch_and_index on 2026-09-27; pages without a stated version are marked undated.",
+ "practices": [
+  {
+   "id": "P1",
+   "name": "Session->account affinity with TTL",
+   "does": "Bind a session to one upstream credential and reuse it until TTL expires or the credential becomes unavailable; write the binding on success, drop it on failure.",
+   "impl": [
+    "litellm deployment_affinity_check.py:2-12,473-500; router.py:759 (ttl 3600),2211-2213 (flags deployment_affinity/session_affinity)",
+    "cpa config.example.yaml:133-150 (session-affinity, ttl 1h); selector.go:912,959-972",
+    "bifrost core/sessionaffinity.go:15-20,45-51",
+    "newapi setting/operation_setting/channel_affinity_setting.go:115-152 (ttl 3600, max 100k entries)",
+    "smg policies/manual.rs:1-16; consistent_hashing.rs:1-17 (X-SMG-Routing-Key)",
+    "llmd .../util/sessionaffinity/header.go:36 (x-session-token)",
+    "prodstack routers/routing_logic.py:198",
+    "D-or-pc (provider sticky routing)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "why": "Caches are per org/workspace (D-openai-pc: 'Caches are not shared across organizations'; D-ant-pc: workspace isolation), so every account switch forfeits the cache. About 90% of our input is cache reads, which makes this the dominant cost lever. The TTL should cover the upstream cache life: OpenAI GPT-5.6+ at least 30 min; Anthropic 5 min or 1 h.",
+   "quality_risk": "none",
+   "metric": "account switches per session; cache_read_tokens/input_tokens per session; cache-miss rate on the first request after a switch"
+  },
+  {
+   "id": "P2",
+   "name": "Session-key extraction precedence",
+   "does": "Take explicit client session headers first, then prompt_cache_key or conversation id, then a derived hash. Scope the key by caller identity so two callers cannot steer each other.",
+   "impl": [
+    "cpa selector.go:1587-1602 (12-step order: X-Claude-Code-Session-Id ... Session-Id ... prompt_cache_key ... first-message hash)",
+    "bifrost core/schemas/useragents.go:84-92 (x-claude-code-session-id, x-session-affinity, x-session-id, session-id, session_id, thread-id, conversation_id)",
+    "newapi channel_affinity_setting.go:125-134 (Codex: body prompt_cache_key on /v1/responses),140-149 (Claude: metadata.user_id)",
+    "litellm deployment_affinity_check.py:249-255 (key scoped by hashed user key)",
+    "codex codex-api/src/requests/headers.rs:5-14 (session-id, thread-id); endpoint/responses.rs:88 (x-client-request-id); core/src/client.rs:571-592 (prompt_cache_key = session id)",
+    "D-cc-gw: x-claude-code-session-id/-agent-id/-parent-agent-id are consumable"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "share of requests resolved from an explicit key rather than the hash fallback; cross-caller key collisions (target 0)"
+  },
+  {
+   "id": "P3",
+   "name": "Pass cache keys through unchanged; affinity key includes the cache partition",
+   "does": "Never rewrite prompt_cache_key or session headers. Include partition fields in the routing key so the router never claims a hit the upstream cannot serve.",
+   "impl": [
+    "smg policies/cache_namespace.rs:1-21",
+    "codex core/src/client.rs:571-592",
+    "bifrost core/schemas/trace.go:803 (records gen_ai.request.prompt_cache_key)",
+    "D-openai-pc model table: GPT-5.6+ prompt_cache_key is 'Optional for separate cache accounting'; earlier models use it for routing, at about 15 rpm per key"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "why": "Treating GPT-6 as 'GPT-5.6 and later' is my inference; the doc covers API orgs, not the ChatGPT subscription backend.",
+   "quality_risk": "none",
+   "metric": "outbound prompt_cache_key == inbound (target 100%)"
+  },
+  {
+   "id": "P4",
+   "name": "Prefix/prompt-cache-aware placement",
+   "does": "Route to the credential or replica that already served the prefix, including forks and compactions that carry no session key.",
+   "impl": [
+    "litellm prompt_caching_deployment_check.py:4,50-120 (records model_id per cacheable prefix on success)",
+    "cpa selector.go:959-962,1114 (Merkle LCP fork/compaction matcher)",
+    "smg policies/cache_aware.rs:98-108; prefix_hash.rs:1-19",
+    "llmd .../scorer/prefix/plugin.go",
+    "prodstack routing_logic.py:431",
+    "dynamo docs/fern/pages/developer-guide/knowledge-base/modular-components/router/configuration-and-tuning.md:441"
+   ],
+   "evidence": "source-reviewed",
+   "applies": "conditional",
+   "why": "For hosted upstreams the cache owner is the account, and the upstream routes machines itself. Engine KV routers (smg, llm-d, dynamo, prodstack) apply only to locally served models, such as the memory services. The LCP matcher helps requests with no session key.",
+   "quality_risk": "none",
+   "metric": "cache-hit ratio on requests with no session key"
+  },
+  {
+   "id": "P5",
+   "name": "Stateful-continuation pinning (encrypted reasoning, previous_response_id)",
+   "does": "Send a request that carries replayed encrypted reasoning or a previous_response_id to the account that minted it. While that account is cooled down, fail fast with 429 + Retry-After instead of re-routing.",
+   "impl": [
+    "codex core/src/client.rs:955 (include reasoning.encrypted_content),993 (store:false) -- always sent at this pin",
+    "litellm encrypted_content_affinity_check.py:1-13,374-400 (fail fast with Retry-After); deployment_affinity_check.py:441-455 (previous_response_id has highest priority)",
+    "bifrost core/encryptedreasoning.go:120-136 (content is bound to the minting identity)"
+   ],
+   "evidence": "source-reviewed",
+   "applies": "yes",
+   "quality_risk": "The strip fallbacks are lossy: litellm encrypted_content_affinity_check.py:351 and bifrost encryptedreasoning.go:220 stripUnverifiableReasoning. They are forbidden without a passed quality gate.",
+   "metric": "invalid_encrypted_content 400s (target 0); strip events (target 0); fail-fast 429s while the origin is cooled"
+  },
+  {
+   "id": "P6",
+   "name": "Subagent/fork credential inheritance",
+   "does": "Child sessions reuse the parent's credential.",
+   "impl": [
+    "cpa config.example.yaml:144-150 (inherit, default true)",
+    "bifrost core/schemas/useragents.go:81-83 (deliberately omits parent-session headers so sub-agents are not collapsed onto the parent key)",
+    "codex client.rs:571-592 (internal sessions use cache key {source}:{parent_thread_id}; non-root agents send their own session id)"
+   ],
+   "evidence": "source-reviewed",
+   "applies": "conditional (contested upstream)",
+   "why": "The trade-off is cache reuse against spreading quota.",
+   "quality_risk": "none",
+   "metric": "subagent cache_read share vs per-account window-utilization spread"
+  },
+  {
+   "id": "P7",
+   "name": "Bounded stickiness (break threshold)",
+   "does": "Keep affinity until a load, latency or availability penalty exceeds a threshold.",
+   "impl": [
+    "llmd .../filter/prefixcacheaffinity/plugin.go:18-21,67-78 (AffinityThreshold 0.80, MaxTTFTPenaltyMs 18000, ExplorationProbability 0)",
+    "smg cache_aware.rs:98-101; config/types.rs:706-717 (cache_threshold, balance_abs/rel_threshold)",
+    "cpa selector.go:965-969 (an established binding outranks priority; rebind only on unavailability)"
+   ],
+   "evidence": "source-reviewed",
+   "applies": "conditional",
+   "why": "Our break trigger should be quota or availability, not latency. Breaking costs a cache re-write (1.25x on GPT-5.6+ per D-openai-pc) and conflicts with P5.",
+   "quality_risk": "none for plain sessions; see P5 for reasoning sessions",
+   "metric": "rebinding rate; p95 latency sticky vs non-sticky"
+  },
+  {
+   "id": "P8",
+   "name": "Quota-aware credential selection from passive headers",
+   "does": "Use upstream window headers to choose cold bindings and to avoid accounts that are near their limit.",
+   "impl": [
+    "codex codex-api/src/rate_limits.rs:57-80 (x-codex-primary/secondary-used-percent, -window-minutes, -reset-at)",
+    "cpa sdk/cliproxy/auth/quota_signals.go:26-36,149-163 (captures retry-after, anthropic-ratelimit-unified-*, x-codex-*; observation only, does not drive scheduling)",
+    "litellm router.py:744-752 usage-based-routing-v2 (tpm/rpm)",
+    "aigw site/docs/capabilities/traffic/quota-policy.md:9-10,36 (token budgets; 429 when all buckets are exceeded)",
+    "D-cc-gw: forward anthropic-ratelimit-unified-* unchanged"
+   ],
+   "evidence": "source-reviewed (header semantics are client-source only; server semantics not verified)",
+   "applies": "yes",
+   "why": "Subscription windows are the binding constraint. None of the reviewed upstreams drives selection from x-codex-* headers (cpa only observes them), so this wiring has no reference implementation.",
+   "quality_risk": "none",
+   "metric": "429 rate per account; spread of window utilization across accounts"
+  },
+  {
+   "id": "P9",
+   "name": "Per-account 429 cooldown honoring Retry-After/reset",
+   "does": "Cool down only the failing credential, for the upstream-stated duration.",
+   "impl": [
+    "litellm router.py:8301-8320 (priority: deployment config > response header > default); constants.py:75 (default 5 s); cooldown_handlers.py:387 (a 429 cools only when alternatives exist)",
+    "cpa config.example.yaml:179-190 (transient 5xx cooldown, 60 s legacy default, separate from quota)",
+    "portkey src/globals.ts:7-11; handlers/retryHandler.ts:122 (retry-after-ms, x-ms-retry-after-ms, retry-after; 60 s cap)",
+    "oai-py _base_client.py:821; ant-py _base_client.py:801-804",
+    "D-cc-gw: return retry-after as integer seconds; a value above 60 stops Claude Code's retries"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "requests sent to a cooled account (target 0); 429s immediately after cooldown expiry"
+  },
+  {
+   "id": "P10",
+   "name": "Same-model credential failover",
+   "does": "On a retryable failure, re-pick another credential for the same model and effort. Never fall back to another model.",
+   "impl": [
+    "litellm router.py:804 (enable_weighted_failover: re-pick within the group before cross-group fallback)",
+    "cpa config.example.yaml:153-177 (request-retry rounds across credentials on 403/408/429/5xx)",
+    "aigw site/docs/capabilities/traffic/provider-fallback.md:91-107 (priority backends, numAttemptsPerPriority 1)",
+    "bifrost core/sessionaffinity.go:99-102 (a binding names provider+model; never follows a provider onto an older model)",
+    "D-or-pr (allow_fallbacks across providers of the same model)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "conditional",
+   "why": "Applies to cold sessions and to requests without replayed reasoning. For bound reasoning sessions, P5 fail-fast wins.",
+   "quality_risk": "Cross-model fallback is a downgrade: litellm cross-group fallbacks, cpa legacy switch-preview-model.",
+   "metric": "failover success rate; requested-model != served-model count (target 0)"
+  },
+  {
+   "id": "P11",
+   "name": "Circuit breaker / outlier ejection per account",
+   "does": "Eject a credential after consecutive or rate-based failures, with half-open recovery. Keep auth-dead (401), quota (429) and transient (5xx) failures separate.",
+   "impl": [
+    "smg model_gateway/src/config/types.rs:1098-1114 (failure 10, success 3, open 60 s, window 120 s)",
+    "litellm cooldown_handlers.py:318-395 (failure-rate cooldown with a minimum-request threshold)",
+    "D-envoy outlier detection (consecutive 5xx, ejection)",
+    "D-or-pr (deprioritize providers with outages in the last 30 s)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "time to eject; false-ejection rate"
+  },
+  {
+   "id": "P12",
+   "name": "Retry budget, exponential backoff with jitter, one retry owner",
+   "does": "Cap retries per request and per client, and retry at exactly one layer.",
+   "impl": [
+    "smg crates/external_router/src/retry_config.rs:8-28 (5 retries, 50 ms->30 s, x1.5, jitter 0.2); retry.rs:10-20 (408/429/500/502/503/504)",
+    "D-envoy RetryBudget budget_percent (default 20% of active+pending)",
+    "D-sre ch.21 (per-request budget of 3 attempts; per-client retry ratio below 10%; retry only at the layer immediately above)",
+    "oai-py _constants.py:8-13 (2 retries, 0.5 s->8 s)",
+    "litellm constants.py:63 (2)",
+    "bifrost core/schemas/provider.go:13-15 (0 retries, 500 ms->5 s)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "why": "The clients (Codex, Claude Code, the SDKs) already retry, so gateway retries multiply on top of theirs.",
+   "quality_risk": "none",
+   "metric": "retries/requests (target 10% or less); upstream attempts per client request"
+  },
+  {
+   "id": "P13",
+   "name": "Request hedging",
+   "does": "Race a duplicate request after the per-try timeout.",
+   "impl": [
+    "D-envoy http_routing#request-hedging"
+   ],
+   "evidence": "documented",
+   "applies": "no",
+   "why": "It doubles subscription quota, the duplicate lands without a warm cache, and output is non-deterministic.",
+   "quality_risk": "none (cost only)",
+   "metric": "n/a"
+  },
+  {
+   "id": "P14",
+   "name": "Idempotency/dedup",
+   "does": "Collapse duplicate requests by Idempotency-Key.",
+   "impl": [
+    "oai-py _base_client.py:472 and ant-py _base_client.py:435 (_idempotency_header=None); oai-py :546-547 (sends x-stainless-retry-count)",
+    "D-ietf-idem draft-07 (expired)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "no",
+   "why": "Generation is non-deterministic and the official SDKs send no idempotency key. The practice that actually applies is P21.",
+   "quality_risk": "n/a",
+   "metric": "n/a"
+  },
+  {
+   "id": "P15",
+   "name": "Semantic/model routing",
+   "does": "Classify the request and choose a model or tier.",
+   "impl": [
+    "semrouter README.md:34",
+    "plano docs/routing-api.md:5,11",
+    "litellm router_strategy/complexity_router/complexity_router.py:123 (SIMPLE/MEDIUM/COMPLEX/REASONING); auto_router/",
+    "D-or-pc (auto router may select a different model on a later turn)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "no",
+   "why": "It can downgrade model or effort, which violates the hard constraint. The only exception is a candidate set of identical model+effort targets.",
+   "quality_risk": "HIGH",
+   "metric": "n/a"
+  },
+  {
+   "id": "P16",
+   "name": "Routing-decision observability",
+   "does": "Keep one correlation id end to end, and emit served-by credential, routing reason, attempt count and cache usage on every request.",
+   "impl": [
+    "litellm proxy/common_request_processing.py:1598-1607 (x-litellm-call-id, -model-id, -model-api-base),1232-1244 (attempted fallbacks)",
+    "smg model_gateway/src/server.rs:1513-1520 (x-request-id, x-correlation-id, x-trace-id, request-id)",
+    "bifrost core/schemas/trace.go:32-34,803",
+    "otel-genai docs/registry/attributes/gen-ai.md:15 (gen_ai.conversation.id),70 (gen_ai.usage.cache_read.input_tokens)",
+    "D-w3c-tc traceparent",
+    "D-envoy router_filter x-envoy-attempt-count",
+    "cpa selector.go:1087-1221 (affinity hit/miss/fork log lines)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "share of requests with the same correlation id at every hop; served-by, reason and attempts present (target 100%)"
+  },
+  {
+   "id": "P17",
+   "name": "Multi-instance chaining",
+   "does": "Exactly one hop owns account selection, affinity and retries. Other hops forward session, cache and sticky headers byte for byte, propagate deadlines (inner timeout below outer) and keep the trace id.",
+   "impl": [
+    "D-sre ch.21 (retry at one layer)",
+    "D-envoy router_filter x-envoy-expected-rq-timeout-ms and x-envoy-attempt-count",
+    "aigw README.md:5-10 (two-tier gateway)",
+    "cpa internal/home/{requests.go}:15; client.go:1318-1323 (retry_round propagated to the remote node)",
+    "litellm deployment_affinity_check.py:63-73 (Redis claim-pin, first writer wins across instances)",
+    "smg cache_aware.rs:103-104 (mesh sync)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "why": "This is the 20129->20128 topology.",
+   "quality_risk": "see P22 for the compression hop",
+   "metric": "upstream attempts per client request across both hops; hops making affinity decisions (target 1)"
+  },
+  {
+   "id": "P18",
+   "name": "Per-credential concurrency cap",
+   "does": "Admission control for in-flight requests per credential, with a typed busy error plus Retry-After.",
+   "impl": [
+    "cpa config.example.yaml:92-118; sdk/cliproxy/auth/home_concurrency.go:23-29,326",
+    "smg policies/least_load.rs:34-49 (in-flight token accounting)",
+    "D-envoy circuit_breaker max_requests (default 1024)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "conditional",
+   "why": "Unknown whether the ChatGPT or Claude subscriptions enforce per-account concurrency.",
+   "quality_risk": "none",
+   "metric": "concurrent streams per account; 429s correlated with concurrency"
+  },
+  {
+   "id": "P19",
+   "name": "Upstream sticky-token round trip",
+   "does": "Pass x-codex-turn-state through unchanged in both directions, and keep one account for the whole turn.",
+   "impl": [
+    "codex core/src/client.rs:13,159,278-283 (a sticky-routing token that must be replayed for all requests within the turn),585 ('ChatGPT derives cache affinity from the Responses session-id header')",
+    "newapi channel_affinity_setting.go:52-71 (Codex pass-through header set)"
+   ],
+   "evidence": "client-source-reviewed; server behavior not verified",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "turns with a turn-state mismatch or an account change (target 0)"
+  },
+  {
+   "id": "P20",
+   "name": "Claude Code gateway contract",
+   "does": "Forward anthropic-beta, anthropic-version and the system array unchanged, with the attribution block kept first. Return retry-after as integer seconds. Pass x-should-retry, anthropic-ratelimit-unified-* and error bodies through unchanged.",
+   "impl": [
+    "D-cc-gw"
+   ],
+   "evidence": "documented",
+   "applies": "yes (Claude lanes)",
+   "quality_risk": "Reshaping the system array changes the prompt-cache key and defeats the attribution strip.",
+   "metric": "contract header pass-through rate (target 100%)"
+  },
+  {
+   "id": "P21",
+   "name": "Stream-safe retry",
+   "does": "Never retry or fall back after the first content chunk reaches the client.",
+   "impl": [
+    "litellm router.py:490-497 (_anthropic_stream_should_decline_fallback)",
+    "D-envoy (hedging and retry apply before the response is returned)"
+   ],
+   "evidence": "source-reviewed + documented",
+   "applies": "yes",
+   "quality_risk": "Violating it splices two generations into one response.",
+   "metric": "duplicated or spliced streams (target 0)"
+  },
+  {
+   "id": "P22",
+   "name": "Prefix byte-stability",
+   "does": "The gateway never mutates any byte of the cached prefix: tools, then system/instructions, then earlier messages.",
+   "impl": [
+    "D-ant-pc 'What invalidates the cache' (100% identical segments required; tools, system and thinking changes invalidate everything downstream)",
+    "codex core/src/client.rs:330-385 (incremental reuse only when all request properties match)"
+   ],
+   "evidence": "documented + source-reviewed",
+   "applies": "yes",
+   "why": "This applies directly to the 20129 full-compression hop. Rewriting earlier turns invalidates the cache from the edit point and is a lossy rewrite.",
+   "quality_risk": "HIGH unless the compression passes a quality gate",
+   "metric": "per-session cache_read/input_tokens with vs without the 20129 hop on identical traffic"
+  }
+ ],
+ "quality_risk_register": [
+  "litellm encrypted_content_affinity_check.py:351 strip",
+  "bifrost encryptedreasoning.go:220 strip",
+  "cpa legacy quota-exceeded switch-preview-model (config.example.yaml:1171-1176)",
+  "litellm cross-group fallbacks",
+  "OpenRouter auto/pareto router model change on a later turn (D-or-pc)",
+  "any normalization of thinking or effort (also a cache invalidator per D-ant-pc)",
+  "semrouter, plano, litellm complexity/auto routers",
+  "lossy prefix rewriting at the compression hop (P22)"
+ ],
+ "upstream_pins": {
+  "litellm": "BerriAI/litellm v1.102.1 d09bbae1c6df463e425558f60d460437193635da",
+  "smg": "smg-project/smg v1.11.0 3be823a700fabaff3add8a390cf78f163479d686 (SGLang model gateway; redirect from lightseekorg/smg)",
+  "llmd": "llm-d/llm-d-router v0.11.0 a5cbe600ebade00cf3e9885beaf2bfacddeabce1 (redirect from llm-d-inference-scheduler; path prefix pkg/epp/framework/plugins/scheduling)",
+  "prodstack": "vllm-project/production-stack vllm-stack-0.1.12 66b60661aa3052810859a417559e9e830772a091 (src/vllm_router)",
+  "semrouter": "vllm-project/semantic-router v0.4.0 6573123715e214a9eaa3ad23372ee5157411e519",
+  "aigw": "theagentrouter/agent-router v1.1.0 c217da8a539570ba3f6014a60c2687c29a945f1f (observed GitHub redirect from envoyproxy/ai-gateway; README still titled Envoy AI Gateway)",
+  "bifrost": "maximhq/bifrost core/v1.10.4 8e99cf8341b60e342a4a6044387290ac5939d2bd",
+  "cpa": "router-for-me/CLIProxyAPI v8.0.2 4a2c81864f31f39308e946c4c65e72147855da6e",
+  "newapi": "QuantumNous/new-api v1.0.0-rc.40 0aec08fee811ec6136828fda790551b49e410301",
+  "plano": "katanemo/plano 0.4.36 003c36aea896ce6fa98567329588baa582e41f9c",
+  "dynamo": "ai-dynamo/dynamo v1.5.0 b83b1d9304ebfc624709ac46db32b1b6f1ff1615",
+  "codex": "openai/codex rust-v0.157.1 36650394c5b38c2990ccf2a3457165ca3e9d9726 (codex-rs/)",
+  "oai-py": "openai/openai-python v3.19.2 d9f7b7a085d4f2173756590abeffeb7a8c7641dd (src/openai/)",
+  "ant-py": "anthropics/anthropic-sdk-python v1.8.0 4421d56a4dd23550c7097c9b7ab5668bd11e09c4 (src/anthropic/)",
+  "otel-genai": "open-telemetry/semantic-conventions-genai main e57c543b4889619eb2a05702471937db5119165d (untagged; semconv v1.44.0 e10a9308 marks gen_ai.* as moved there)",
+  "portkey": "Portkey-AI/gateway v1.15.2 ca7712947ec8c0887803990b746740d36011c697 (reference only)",
+  "docs": {
+   "D-openai-pc": "https://platform.openai.com/docs/guides/prompt-caching (undated)",
+   "D-ant-pc": "https://docs.claude.com/en/docs/build-with-claude/prompt-caching -> platform.claude.com (undated)",
+   "D-cc-gw": "https://code.claude.com/docs/en/llm-gateway-protocol (undated)",
+   "D-or-pc": "https://openrouter.ai/docs/features/prompt-caching (undated)",
+   "D-or-pr": "https://openrouter.ai/docs/features/provider-routing (undated)",
+   "D-sre": "https://sre.google/sre-book/handling-overload/ (SRE book ch.21)",
+   "D-envoy": "envoyproxy.io docs 1.40.0-dev-1542ad: api-v3/config/cluster/v3/circuit_breaker.proto, intro/arch_overview/http/http_routing, upstream/outlier, configuration/http/http_filters/router_filter",
+   "D-w3c-tc": "https://www.w3.org/TR/trace-context/ (REC 2021-11-23)",
+   "D-ietf-idem": "draft-ietf-httpapi-idempotency-key-header-07 (expired)"
+  }
+ },
+ "excluded_candidates": [
+  {
+   "repo": "tensorzero/tensorzero",
+   "reason": "archived=true (last push 2026-06-11)"
+  },
+  {
+   "repo": "lm-sys/RouteLLM",
+   "reason": "stale: last push 2024-08-10, no releases; it is also a model-downgrade router"
+  },
+  {
+   "repo": "Helicone/ai-gateway",
+   "reason": "stale: last push 2025-11-21, no releases"
+  },
+  {
+   "repo": "vllm-project/router",
+   "reason": "live (push 2026-09-24) but has no releases; not reviewed, prodstack router reviewed instead"
+  },
+  {
+   "repo": "Portkey-AI/gateway",
+   "reason": "low activity (push 2026-05-25, release 2026-01-12); cited for retry-after handling only, not a SOTA source"
+  },
+  {
+   "repo": "musistudio/claude-code-router v3.1.1",
+   "reason": "model-substitution router; scenario routing not located at this tag, so not cited"
+  },
+  {
+   "repo": "kubernetes-sigs/gateway-api-inference-extension v1.6.2",
+   "reason": "live; not separately reviewed, llm-d-router covers the same EPP scorers; engine-level only"
+  },
+  {
+   "repo": "sgl-project/sglang v0.5.20",
+   "reason": "gateway code moved to smg-project/smg; reviewed there"
+  },
+  {
+   "repo": "semrouter / plano / litellm complexity+auto",
+   "reason": "reviewed, live; excluded from adoption as quality-risk (P15)"
+  }
+ ],
+ "unknowns": [
+  "ChatGPT subscription backend cache scope, TTL, and whether cached tokens count less against the subscription window",
+  "whether GPT-6 falls in OpenAI's 'GPT-5.6 and later' column (inference)",
+  "Claude subscription (OAuth) cache isolation (docs cover API workspaces)",
+  "per-account concurrency limits on either subscription"
+ ],
+ "addendum_2026_09_28": {
+  "P23": {
+   "id": "P23",
+   "name": "Client-disconnect (499) handling",
+   "does": "On a client disconnect, including before the first chunk: cancel the upstream request, release any concurrency or occupancy slot, never retry or hedge, and do not count the event against the account's health.",
+   "impl": [
+    "litellm v1.102.1 litellm/proxy/common_request_processing.py:757-800,828 (cancels the upstream while waiting for the first chunk; records 499; comment :792 cites LIT-3568)",
+    "smg v1.11.0 model_gateway/src/routers/http/request_stream.rs:74-76 (client-caused abort, never worker-attributed)",
+    "smg model_gateway/src/middleware/concurrency.rs:455 (test only: a mid-stream disconnect returns the concurrency token)"
+   ],
+   "evidence": "source-reviewed",
+   "applies": "yes",
+   "quality_risk": "none",
+   "metric": "seconds the upstream keeps running after a 499 (target ~0); slots still held after a 499 (target 0); 499s counted as account failures (target 0)"
+  },
+  "P1_P7_clarification": "Reviewed upstreams never let a post-affinity step move a bound session (cpa selector.go:965-969; litellm deployment_affinity_check.py:473-500; bifrost core/sessionaffinity.go:45-48). P7 break conditions are explicit bounds (llm-d MaxTTFTPenaltyMs plugin.go:75-78; smg cache_aware.rs:98-101, prefix_hash.rs:16-19; smg manual.rs:3-8 remaps only when unhealthy). Occupancy belongs in P18 admission control on the pinned credential (cpa home_concurrency.go:23-29,326).",
+  "live_finding_20128_recomputed": "route-mapper recomputed after finding call_logs.timestamp is the request END time. Over the last 24h on 20128, 201 Codex conversations with a unique pin match had 4,461 turns. 460 of them (10.3%, in 64 conversations) were served off-pin. All 460 had served priority <= pinned priority + 1, where a uniform null predicts 0.77. The occupancy condition held on 334 of the 460 overrides, against 166 of the 4,001 on-pin turns. Cache-read share was 73.8% off-pin vs 92.1% on-pin, about 5.4M extra uncached input tokens per 24h. route-mapper's claim, unverified by route-landscape: upstream PR #8940 meant affinity to outrank occupancy, but auth.ts:2159-2177 applies the override after the pin, so this is an ordering defect. P19 and P5 checks pending."
+ }
+}
+
+ITEM IDS: practices P1-P23 (P23 is under addendum_2026_09_28); ADD-P1P7 = addendum P1_P7_clarification; ADD-LIVE = addendum live_finding_20128_recomputed; quality_risk_register entries by position R1, R2, R3, R4, R5, R6, R7, R8; excluded_candidates by position E1, E2, E3, E4, E5, E6, E7, E8, E9; unknowns by position U1, U2, U3, U4.
+
+TASK, one verdict per item id above:
+- Practices P1-P23 and ADD-P1P7: check that each cited file:line at the stated pin (tag and commit in upstream_pins) actually implements what the entry claims; that the upstream is not stale (rule below); that the quality_risk level is right under the frozen question's no-quality-loss constraint; and that applicability to this setting is right. verdict "confirm" only when you opened the cited source at the pin and it supports the claim; "refute" when a material claim is false (wrong file, wrong lines, code does something else, stale upstream, risk clearly misjudged); "amend" when the practice stands but a citation, pin, risk level or applicability needs correcting (say exactly what). reason must name what you checked; source must list the URLs you opened (commit-pinned permalinks https://github.com/<owner>/<repo>/blob/<40-char sha>/<path>#L<a>-L<b> where possible).
+- ADD-LIVE: its local measurements (counts, shares) come from a private gateway log you cannot see; do not confirm or refute them. Judge only its upstream-code claim: the gateway is diegosouzapw/OmniRoute (our harness records release/v3.8.51 at commit a58000c7, with cherry-picked PRs); check whether upstream PR #8940 intended affinity to outrank occupancy and whether src auth.ts around lines 2159-2177 applies an occupancy override after the session pin.
+- Quality-risk register R*: confirm, refute or amend each risk statement against its cited source.
+- Excluded candidates E*: refute an exclusion whose stated reason is false (for example the repository is not archived or is active on its default branch); confirm it when the reason holds.
+- Unknowns U*: try to resolve each from primary sources. verdict "amend" when you resolved it (the answer and its source in reason/source), "confirm" when it remains genuinely unknown after checking (say what you checked), "refute" when the unknown is misframed. In particular establish: the ChatGPT-subscription (Codex backend) prompt-cache scope and TTL, and whether cached tokens count less against the subscription window; and whether GPT-6 falls in OpenAI's "GPT-5.6 and later" prompt-caching column (quote the exact doc text and its date or say undated).
+- missed_practices: routing practices this setting needs that the catalog omits, each with a maintained upstream implementation (repository, tag/commit, file:line) or "none found", the reason it matters here, and its source. Never invent a repository, tag, commit or line.
+- maintenance: for EVERY upstream in upstream_pins (litellm, smg, llmd, prodstack, semrouter, aigw, bifrost, cpa, newapi, plano, dynamo, codex, oai-py, ant-py, otel-genai, portkey), establish maintenance from default-branch commit dates and confirm the pinned tag resolves to the pinned commit.
+Use "not_checked" for any item you could not check within the budget. Never "confirm" an item you did not check: a missing check is not agreement. Unknown maintenance is never grounds to refute.
+
+MAINTENANCE RULE (derived from the OpenSSF Scorecard Maintained check, https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained): a repository is stale, and excluded whatever its stars, when it is archived or has no commit on its default branch in the last 90 days (establish this with gh api repos/<owner>/<repo>/commits?since=<date 90 days ago>&per_page=1 or the same https://api.github.com REST URL, not from pushed_at, which counts any branch; a lane that cannot reach either source, such as a web-only lane, records the commit fact as unknown and never excludes or refutes a repository on unknown maintenance, because a missing result is pending, never refuted); this rule excludes only the zero-activity end, so record lower activity as a maintenance fact without excluding. The 90-day cutoff is 2026-06-30T00:00:00Z. A repository created less than 90 days ago is too new to assess: status "too_new". An old release tag on an actively committed branch is not stale. Popularity is not evidence: stars and install counts are never evidence of fit.
+How to reach the commit facts with your web tool (a previous run found the ?since= REST URL inaccessible): try https://api.github.com/repos/<owner>/<repo>/commits?since=2026-06-30T00:00:00Z&per_page=1; if that fails, open https://api.github.com/repos/<owner>/<repo> (default_branch, archived, created_at) and then https://api.github.com/repos/<owner>/<repo>/commits/<default_branch> (head commit and its committer date, no query string), or https://github.com/<owner>/<repo>/commits/<default_branch>.atom; for a tag, https://api.github.com/repos/<owner>/<repo>/git/ref/tags/<tag> or the release page's commit link. Record in source which URL gave the fact. If none answers, status "unknown".
+
+TOOLS: your shell has no network (read-only sandbox). Use your web search/open tool for everything. Read-only: never install or execute candidate code; never read or print credentials.
+Skills: if the installed skills verification-before-completion, fp-check or supply-chain-risk-auditor fit, use them and list every skill you actually used in skills_used; otherwise leave it empty.
+
+BUDGET (hard): at most 20 web searches and 90 page opens/API calls in total. Priority order: (1) maintenance and tag-commit for every upstream; (2) at least one cited file:line per practice P1-P23 and ADD-P1P7; (3) unknowns U*, the two named ones first; (4) ADD-LIVE upstream claim; (5) risk register, exclusions and missed practices. Stop when the budget is spent and answer with what you verified; mark the rest "not_checked". Record your counts in calls.
+Answer only in the required JSON.

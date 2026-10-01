@@ -1,0 +1,69 @@
+# Codex profile for primary Sol/Max worker lanes. Start a worker with the profile and the same three values
+# pinned on its command line:
+#   codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max" -c web_search="live" -s <sandbox> ...
+# For difficult judgment or escalation, substitute -m gpt-6-astra and keep max effort and live web search.
+# A project .codex/config.toml outranks a profile file, and `-c` outranks both (codex-rs/config/src/
+# config_layer_source.rs at rust-v0.159.2: profile 21, project 25, session flags 30). So the profile alone cannot
+# guarantee the model, effort or web search in a checkout that sets them; it carries the tool settings below.
+# Codex 0.134.0 and later layer $CODEX_HOME/<name>.config.toml over config.toml for --profile <name> (profile-v2),
+# so this file holds only what a worker changes; the token-stack MCP servers themselves come from the user config
+# (codex.config.template.toml). tools/adoption/apply_codex_lane.py installs it as $CODEX_HOME/stack-worker.config.toml.
+# Decision record: docs/decisions/2026-09-26-codex-worker-lane.md.
+
+model = "gpt-6.1-sol"
+# Max sends API max and delegates only when asked. Sol/Ultra sends xhigh (its catalog multi-agent effort) and
+# enables proactive delegation: openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs and
+# models-manager/models.json. The worker pins max independently of the coordinator's ultra setting.
+model_reasoning_effort = "max"
+# Live retrieval: the default cached mode searches an OpenAI-maintained index only, and a read-only or
+# workspace-write sandbox keeps that default. A lane that must not browse passes -c web_search="disabled".
+web_search = "live"
+
+# Workers may have a different HOME or CHUB_DIR and miss the user's ~/.chub/config.yaml opt-outs.
+# Context Hub v0.1.4: https://github.com/andrewyng/context-hub/blob/v0.1.4/cli/src/lib/telemetry.js
+# (isTelemetryEnabled/isFeedbackEnabled); cli/src/lib/config.js (getChubDir).
+# Profile-v2 honours this table: openai/codex rust-v0.157.1 config/src/loader/mod.rs loads the profile
+# as a full second user layer; protocol/src/shell_environment.rs applies `set` to shell commands.
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/loader/mod.rs
+# This explicit worker profile opts out even when HOME is shared. Base user settings stay home-scoped.
+[shell_environment_policy.set]
+CHUB_TELEMETRY = "0"
+CHUB_FEEDBACK = "0"
+
+# Allow user-scope servers the same startup window in separate worktrees.
+# RawMcpServerConfig.startup_timeout_sec:
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/config.schema.json
+# Default is 30 s (codex-mcp/src/rmcp_client.rs:103); connection_manager.rs consumes it.
+# https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/codex-mcp/src/rmcp_client.rs#L103
+# Partial tables retain user commands; profile 21 < project 25 < -c 30 (source in header).
+[mcp_servers.serena]
+startup_timeout_sec = 60
+
+[mcp_servers.codebase-memory]
+startup_timeout_sec = 60
+
+# These three servers declare no MCP tool annotations, so under approval_policy = "never" Codex refuses every call
+# to them ("MCP tool call requires approval, but approval policy is never"). Workers get their read tools, approved.
+[mcp_servers.ai-memory]
+default_tools_approval_mode = "approve"
+enabled_tools = ["memory_query", "memory_read_page", "memory_recent", "memory_status", "memory_briefing"]
+
+# SocratiCode 1.15.0 starts a file watcher, which then updates the shared index, on any search or status call
+# while SOCRATICODE_WATCHER is "auto" (the user config's value): dist/tools/query-tools.js handleQueryTool and
+# dist/services/watcher.js ensureWatcherStarted. "manual" starts none. Graph and symbol tools are left out as
+# well, since under "auto" they build a missing graph. A project config that sets the variable outranks this.
+[mcp_servers.socraticode]
+default_tools_approval_mode = "approve"
+enabled_tools = ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"]
+
+[mcp_servers.socraticode.env]
+SOCRATICODE_WATCHER = "manual"
+
+[mcp_servers.headroom]
+default_tools_approval_mode = "approve"
+enabled_tools = ["headroom_compress", "headroom_retrieve", "headroom_stats"]
+
+# ctx_upgrade leads to `context-mode upgrade`, which deletes [mcp_servers.context-mode] from config.toml;
+# ctx_purge deletes indexed content.
+[mcp_servers.context-mode]
+disabled_tools = ["ctx_upgrade", "ctx_purge"]

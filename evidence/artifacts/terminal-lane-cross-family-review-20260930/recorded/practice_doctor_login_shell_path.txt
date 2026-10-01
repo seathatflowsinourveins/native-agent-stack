@@ -1,0 +1,1 @@
+{"name": "login-shell-path", "pass": true, "missing_in_login_shell": [], "empty_files_shadowing_profile": [], "probe_completed": true, "exit": 0}

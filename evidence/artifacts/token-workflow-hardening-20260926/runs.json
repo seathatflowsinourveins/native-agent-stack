@@ -1,0 +1,529 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e_run_index",
+  "evidence_class": "local_integration",
+  "host": "nativestack-5975wx-20260925",
+  "base_commit": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+  "harness": {
+    "path": "scripts/native_token_ci.py",
+    "sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c"
+  },
+  "workflow": {
+    "path": ".github/workflows/native-token-e2e.yml",
+    "sha256": "fb06cf92b2397f074db62961109883f12f5acf530d7e324382e1dce84e3b4adf",
+    "previous_sha256": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f"
+  },
+  "new_fixtures": [
+    {
+      "path": "fixtures/ast_grep_shell_calls.py",
+      "sha256": "771a9150dc8ebc65f8612beb5940490222e0e83148fcf19cdbfaa2b673800cdb"
+    },
+    {
+      "path": "fixtures/markitdown-multi-element.html",
+      "sha256": "0c18c5ed5a130ce5f346f4ece8a5afb11685e698d6496051e6164696fabb625a"
+    }
+  ],
+  "wrapper": {
+    "path": "evidence/artifacts/native-token-ci-extension-20260926/clean_env_run.sh",
+    "sha256": "78bffc9742e41ab8e3ec1da19ca3d77260e5fddda5bca56d83e5b3294e2bd660",
+    "python": "CPython 3.13.15 from a scratch virtual environment"
+  },
+  "final_runs": {
+    "command": "clean_env_run.sh <checkout> <python> <scratch> <name> scripts/native_token_ci.py --install --output @OUT@",
+    "expected_failure": "codebase-memory-mcp refused by the harness's own require_cbm_socket_fits: this round could write only in a long scratch directory, so TMPDIR could not fit that tool's socket address (see native-token-ci-extension-20260926/README.md); the hosted runner's /tmp is short",
+    "runs": [
+      {
+        "run": "run-3",
+        "harness_sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
+        "captured_at": "2026-09-26T16:40:11.572985+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 108,
+        "checks": 42,
+        "checks_passed": 42,
+        "failures": [
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+          }
+        ],
+        "receipt_sha256": "ccc125365240468704c09263b62627760bdc78d6431128e39a6b13ec07b173b4",
+        "receipt": "final-harness-run-1.receipt.json",
+        "commands_added_by_this_change": 25,
+        "elapsed_seconds_of_added_commands": 0.51,
+        "elapsed_seconds_all_commands": 82.443,
+        "rtk_long_log": {
+          "commits": 12,
+          "raw_bytes": 6599,
+          "rtk_bytes": 2880,
+          "default_bytes": 2400,
+          "ledger_filter_delta": {
+            "total_commands": 1,
+            "total_input": 1284,
+            "total_output": 720,
+            "total_saved": 564
+          },
+          "ledger_proxy_delta": {
+            "total_commands": 1,
+            "total_input": 1650,
+            "total_output": 1650,
+            "total_saved": 0
+          }
+        },
+        "markitdown_multi_element": {
+          "converted": {
+            "headings": true,
+            "table": true,
+            "ordered_list": true,
+            "nested_list": true,
+            "link": true,
+            "emphasis": true,
+            "blockquote": true,
+            "code_block": true,
+            "inline_code_and_entity": true,
+            "image": true
+          },
+          "raw_html": {
+            "headings": false,
+            "table": false,
+            "ordered_list": false,
+            "nested_list": false,
+            "link": false,
+            "emphasis": false,
+            "blockquote": false,
+            "code_block": false,
+            "inline_code_and_entity": false,
+            "image": false
+          },
+          "tag_stripped_text": {
+            "headings": false,
+            "table": false,
+            "ordered_list": false,
+            "nested_list": false,
+            "link": false,
+            "emphasis": false,
+            "blockquote": false,
+            "code_block": false,
+            "inline_code_and_entity": false,
+            "image": false
+          }
+        },
+        "wrapper_observations": {
+          "started": "2026-09-26T16:40:11Z",
+          "finished": "2026-09-26T16:41:37Z",
+          "exit_code": 1,
+          "throwaway_home_empty_after": true,
+          "throwaway_tmpdir_empty_after": true,
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entries_unchanged": true
+        }
+      },
+      {
+        "run": "run-4",
+        "harness_sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
+        "captured_at": "2026-09-26T16:41:38.921435+00:00",
+        "installation": "fresh-upstream-prefix",
+        "status": "failed",
+        "commands": 108,
+        "checks": 42,
+        "checks_passed": 42,
+        "failures": [
+          {
+            "component": "codebase-memory-mcp",
+            "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+          }
+        ],
+        "receipt_sha256": "c89cee287c63801b687e123bc8cb091b4a444f8271c9b5ec14619fd239fb779b",
+        "receipt": "final-harness-run-2.receipt.json",
+        "commands_added_by_this_change": 25,
+        "elapsed_seconds_of_added_commands": 0.539,
+        "elapsed_seconds_all_commands": 82.861,
+        "rtk_long_log": {
+          "commits": 12,
+          "raw_bytes": 6599,
+          "rtk_bytes": 2880,
+          "default_bytes": 2400,
+          "ledger_filter_delta": {
+            "total_commands": 1,
+            "total_input": 1284,
+            "total_output": 720,
+            "total_saved": 564
+          },
+          "ledger_proxy_delta": {
+            "total_commands": 1,
+            "total_input": 1650,
+            "total_output": 1650,
+            "total_saved": 0
+          }
+        },
+        "markitdown_multi_element": {
+          "converted": {
+            "headings": true,
+            "table": true,
+            "ordered_list": true,
+            "nested_list": true,
+            "link": true,
+            "emphasis": true,
+            "blockquote": true,
+            "code_block": true,
+            "inline_code_and_entity": true,
+            "image": true
+          },
+          "raw_html": {
+            "headings": false,
+            "table": false,
+            "ordered_list": false,
+            "nested_list": false,
+            "link": false,
+            "emphasis": false,
+            "blockquote": false,
+            "code_block": false,
+            "inline_code_and_entity": false,
+            "image": false
+          },
+          "tag_stripped_text": {
+            "headings": false,
+            "table": false,
+            "ordered_list": false,
+            "nested_list": false,
+            "link": false,
+            "emphasis": false,
+            "blockquote": false,
+            "code_block": false,
+            "inline_code_and_entity": false,
+            "image": false
+          }
+        },
+        "wrapper_observations": {
+          "started": "2026-09-26T16:41:38Z",
+          "finished": "2026-09-26T16:43:04Z",
+          "exit_code": 1,
+          "throwaway_home_empty_after": true,
+          "throwaway_tmpdir_empty_after": true,
+          "processes_left_from_run_directory": [],
+          "checkout_git_status_unchanged": true,
+          "account_default_cbm_rendezvous_entries_unchanged": true
+        }
+      }
+    ]
+  },
+  "superseded_runs": [
+    {
+      "run": "run-1",
+      "harness_sha256": "57df17e5a9eb14aefd2e560cbda3916fff858a98bbf61a03ec97866a13c2e819",
+      "captured_at": "2026-09-26T16:27:35.873569+00:00",
+      "installation": "fresh-upstream-prefix",
+      "status": "failed",
+      "commands": 108,
+      "checks": 42,
+      "checks_passed": 42,
+      "failures": [
+        {
+          "component": "codebase-memory-mcp",
+          "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+        }
+      ],
+      "receipt_sha256": "7e378dda8360e49c24daf7fdbc2dfe5827ef9cc4341120a2401a764bc32faa5d",
+      "wrapper_observations": {
+        "started": "2026-09-26T16:27:35Z",
+        "finished": "2026-09-26T16:28:59Z",
+        "exit_code": 1,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "superseded_because": "Same outcome on harness 57df17e5, which differs from the final harness only in one comment in toon_fixture; that comment wrongly said a copied JSON file would also round-trip (TOON 4.1.1 decodes it as one key and a string). Receipt not retained."
+    },
+    {
+      "run": "run-2",
+      "harness_sha256": "57df17e5a9eb14aefd2e560cbda3916fff858a98bbf61a03ec97866a13c2e819",
+      "captured_at": "2026-09-26T16:29:00.209123+00:00",
+      "installation": "fresh-upstream-prefix",
+      "status": "failed",
+      "commands": 108,
+      "checks": 42,
+      "checks_passed": 42,
+      "failures": [
+        {
+          "component": "codebase-memory-mcp",
+          "error": "codebase-memory-mcp rendezvous socket path exceeds the Unix socket address limit; set TMPDIR to a shorter directory"
+        }
+      ],
+      "receipt_sha256": "f7c950c50ee2f098112da46e44b1d2de370f575d5e297d1ece84fefe75dc00cb",
+      "wrapper_observations": {
+        "started": "2026-09-26T16:29:00Z",
+        "finished": "2026-09-26T16:30:26Z",
+        "exit_code": 1,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "superseded_because": "Same outcome on harness 57df17e5, which differs from the final harness only in one comment in toon_fixture; that comment wrongly said a copied JSON file would also round-trip (TOON 4.1.1 decodes it as one key and a string). Receipt not retained."
+    }
+  ],
+  "controls": [
+    {
+      "run": "controls-1",
+      "harness_sha256": "e80c972e1d4aa11f11cb09a1f275fc563f5ed3980690dcaf87b88ec751cfea06",
+      "driver_sha256": "4d3b6a7154d637d256706a8b8d60093eef1aac31b9a64707f6a3c53755c924d7",
+      "status": "not_as_expected",
+      "arms_as_expected": 12,
+      "arms": 13,
+      "wrapper_observations": {
+        "started": "2026-09-26T16:25:11Z",
+        "finished": "2026-09-26T16:25:31Z",
+        "exit_code": 1,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "superseded_because": "12 of 13 arms as expected: the arm that copies the script's text into a paragraph passed markitdown-script-style-and-comment-text-dropped, because MarkItDown (markdownify, escape_underscores true by default) wrote NATIVE_CI_SCRIPT_BODY as NATIVE\\_CI\\_SCRIPT\\_BODY and the check searched the literal text. The markers became letters only and the check also searches the unescaped output."
+    },
+    {
+      "run": "controls-2",
+      "harness_sha256": "8930dae15cba5c831172bffaf0a239af1de63c4c9e2834169bd1f07cd7e7826d",
+      "driver_sha256": "486af8d7b55ab91efdeb6d607597566e570ae33f6e95cc4fa340ac7458bc242c",
+      "status": "as_expected",
+      "arms_as_expected": 13,
+      "arms": 13,
+      "wrapper_observations": {
+        "started": "2026-09-26T16:26:33Z",
+        "finished": "2026-09-26T16:26:56Z",
+        "exit_code": 0,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "superseded_because": "13 of 13 as expected, on the harness before its docstring edit."
+    },
+    {
+      "run": "controls-3",
+      "harness_sha256": "57df17e5a9eb14aefd2e560cbda3916fff858a98bbf61a03ec97866a13c2e819",
+      "driver_sha256": "486af8d7b55ab91efdeb6d607597566e570ae33f6e95cc4fa340ac7458bc242c",
+      "status": "as_expected",
+      "arms_as_expected": 13,
+      "arms": 13,
+      "wrapper_observations": {
+        "started": "2026-09-26T16:30:50Z",
+        "finished": "2026-09-26T16:31:15Z",
+        "exit_code": 0,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "superseded_because": "13 of 13 as expected, on harness 57df17e5 (one comment differs from the final harness)."
+    },
+    {
+      "run": "controls-4",
+      "harness_sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
+      "driver_sha256": "486af8d7b55ab91efdeb6d607597566e570ae33f6e95cc4fa340ac7458bc242c",
+      "status": "as_expected",
+      "arms_as_expected": 13,
+      "arms": 13,
+      "wrapper_observations": {
+        "started": "2026-09-26T16:43:06Z",
+        "finished": "2026-09-26T16:43:26Z",
+        "exit_code": 0,
+        "throwaway_home_empty_after": true,
+        "throwaway_tmpdir_empty_after": true,
+        "processes_left_from_run_directory": [],
+        "checkout_git_status_unchanged": true,
+        "account_default_cbm_rendezvous_entries_unchanged": true
+      },
+      "report": "controls.json",
+      "report_sha256": "5955dfaefed36b762b676544acab67685d1708db1ff3f7922fe19a109ee149c5",
+      "summary": [
+        {
+          "tool": "rtk",
+          "arm": "as-harness",
+          "change": null,
+          "failed_checks": [],
+          "as_expected": true
+        },
+        {
+          "tool": "rtk",
+          "arm": "control",
+          "change": "`rtk proxy git log -12`, RTK's own passthrough, in place of the filtered `rtk git log -12`",
+          "failed_checks": [
+            "rtk-long-log-compacts-every-commit"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "rtk",
+          "arm": "control",
+          "change": "the filtered `rtk git log -12` records into another run-owned ledger (RTK_DB_PATH)",
+          "failed_checks": [
+            "rtk-long-log-ledger-records-the-filter-saving"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "rtk",
+          "arm": "control",
+          "change": "the default-window call `rtk git log` given `-12`",
+          "failed_checks": [
+            "rtk-long-log-default-window-ten-newest-commits"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "markitdown",
+          "arm": "as-harness",
+          "change": null,
+          "failed_checks": [],
+          "as_expected": true
+        },
+        {
+          "tool": "markitdown",
+          "arm": "control",
+          "change": "the same HTML bytes given to MarkItDown as a .txt file",
+          "failed_checks": [
+            "markitdown-multi-element-structure-converted"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "markitdown",
+          "arm": "control",
+          "change": "the script's text copied into a paragraph in a copy of the input",
+          "failed_checks": [
+            "markitdown-script-style-and-comment-text-dropped"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "ast-grep",
+          "arm": "as-harness",
+          "change": null,
+          "failed_checks": [],
+          "as_expected": true
+        },
+        {
+          "tool": "ast-grep",
+          "arm": "control",
+          "change": "the pattern without its shell=True constraint: `subprocess.run($$$ARGS)`",
+          "failed_checks": [
+            "ast-grep-shell-true-calls-match-across-lines"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "repomix",
+          "arm": "as-harness",
+          "change": null,
+          "failed_checks": [],
+          "as_expected": true
+        },
+        {
+          "tool": "repomix",
+          "arm": "control",
+          "change": "the structure pack run without --compress",
+          "failed_checks": [
+            "repomix-compress-keeps-signatures-drops-bodies"
+          ],
+          "as_expected": true
+        },
+        {
+          "tool": "toon",
+          "arm": "as-harness",
+          "change": null,
+          "failed_checks": [],
+          "as_expected": true
+        },
+        {
+          "tool": "toon",
+          "arm": "control",
+          "change": "the records encoded with `--delimiter |`",
+          "failed_checks": [
+            "toon-tabular-encoding-smaller-than-json"
+          ],
+          "as_expected": true
+        }
+      ]
+    }
+  ],
+  "unit_tests": {
+    "command": "python -m unittest tests.test_native_token_ci",
+    "python": "3.13.15",
+    "before_change": "26 tests, OK",
+    "after_change": "32 tests, OK",
+    "added": [
+      "test_rtk_long_log_checks_need_compaction_a_default_window_and_a_filter_only_saving",
+      "test_markitdown_element_checks_accept_markdownify_spellings_and_reject_html",
+      "test_markitdown_multi_element_fixture_rejects_passthrough_and_leaked_script_text",
+      "test_ast_grep_shell_outcome_is_frozen_and_structural",
+      "test_repomix_compress_check_rejects_an_uncompressed_pack",
+      "test_toon_tabular_check_rejects_copied_json_and_another_delimiter"
+    ]
+  },
+  "mutation_check": {
+    "script": "mutation_check.py",
+    "script_sha256": "ddf8eb6e04a29b321eb59bb5abaa15f8c2e49b0b76e58eeacba0297b2a99f471",
+    "harness_sha256": "3021918c18544962e36aa90a8e572c7adb715104be85ab0788e2f4a966f11e6c",
+    "result": "6 of 6 mutants of the new checks fail the unit tests, each only the test written for it; the unmutated copy passes",
+    "mutants": {
+      "rtk-compaction-always-true": "test_rtk_long_log_checks_need_compaction_a_default_window_and_a_filter_only_saving",
+      "rtk-ledger-filter-unchecked": "test_rtk_long_log_checks_need_compaction_a_default_window_and_a_filter_only_saving",
+      "markitdown-literal-only": "test_markitdown_multi_element_fixture_rejects_passthrough_and_leaked_script_text",
+      "ast-grep-ranges-ignored": "test_ast_grep_shell_outcome_is_frozen_and_structural",
+      "repomix-bodies-unchecked": "test_repomix_compress_check_rejects_an_uncompressed_pack",
+      "toon-tabular-unchecked": "test_toon_tabular_check_rejects_copied_json_and_another_delimiter"
+    }
+  },
+  "toon_copied_json_probe": {
+    "command": "toon <copy of fixtures/records.json named .toon> --decode --strict",
+    "exit_code": 0,
+    "result": "decoded as one key '{\"items\"' with the rest of the line as a string; not the records"
+  },
+  "static_analysis": {
+    "evidence_class": "local_static_analysis",
+    "zizmor": {
+      "version": "1.30.1",
+      "command": "zizmor --offline --no-config --no-ignores --persona regular --strict-collection .",
+      "result": "No findings to report (42 suppressed), exit 0",
+      "pedantic_native_token_e2e": "anonymous-definition (informational) and concurrency-limits (low), identical before and after the edit",
+      "pedantic_offhost_workflows": "native-offhost-app-state.yml: anonymous-definition x2 (informational), concurrency-limits (low); native-offhost-restore.yml: anonymous-definition (informational), concurrency-limits (low); identical before and after the edit",
+      "rerun_after_all_workflow_edits": "same regular-persona result: no findings (42 suppressed), exit 0",
+      "online_audits": "not run locally (they need a token this round does not read); their inputs were checked through gh api, see action_pins"
+    },
+    "actionlint": {
+      "version": "1.7.12",
+      "archive_sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+      "result": "exit 0, no output, before and after the off-host workflow edits"
+    }
+  },
+  "workflow_tests": {
+    "command": "python -m unittest tests.test_workflow_hardening tests.test_workflow_security tests.test_workflow_security_coverage tests.test_zizmor_negative_control tests.test_active_recovery_plans tests.test_native_token_ci",
+    "result": "109 tests, OK (zizmor 1.30.1 on PATH, PyYAML 6.0.3 present, so no test skipped)",
+    "note": "tests.test_active_recovery_plans runs both plans' own dispatch source guards (run.py verify_frozen, verify.py verify_sources) against the refreshed prospective bindings"
+  },
+  "action_pins": {
+    "evidence_class": "documented_api_check",
+    "script": "actions_latest.py",
+    "report": "actions-latest.json",
+    "report_sha256": "18e4876d3499c9a0a1504e37ae5b4f87e9ef452930b32d9aa48c75473406047d",
+    "checked_at_utc": "2026-09-26T16:02:49+00:00",
+    "gh_api_calls": 50,
+    "result": "13 actions in 15 action/comment combinations; every comment's tag resolves to its pinned SHA; 12 of the 13 actions are at their latest release",
+    "exception": {
+      "action": "github/codeql-action/upload-sarif",
+      "pinned": "v4.38.1 (1c5b675653bb5c22dbe9b12b556ec555138e09fd)",
+      "latest_action_release": "v4.38.2 (2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2), published 2026-09-24T10:27:53Z; it only moves the default CodeQL bundle to 2.27.1",
+      "note": "releases/latest for this repository returns a CodeQL bundle release (codeql-bundle-v2.27.1), not an action version; the v4.* releases were listed instead"
+    },
+    "advisories": "GET /advisories?ecosystem=actions&affects=<action>@<version>: 0 for every pinned version"
+  },
+  "hosted_run": "None yet. The pull request that carries this change runs the workflow on a hosted runner; that run is a separate record."
+}

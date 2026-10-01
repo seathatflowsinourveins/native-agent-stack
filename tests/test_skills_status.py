@@ -9,6 +9,7 @@ independently-typed expectation.
 """
 
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -102,15 +103,27 @@ class SkillsStatusTests(unittest.TestCase):
             settings["env"] = {"SOME_OTHER_SETTING": extra_env_sentinel}
         (claude_dir / "settings.json").write_text(json.dumps(settings))
 
-    def write_codex_config(self, disable_names, extra_sentinel=None) -> None:
+    def write_codex_config(self, disable_names, extra_sentinel=None, disable_paths=()) -> None:
+        """Name-keyed tables for disable_names, then path-keyed tables for disable_paths."""
+        self.write_codex_entries([{"name": name, "enabled": False} for name in disable_names]
+                                 + [{"path": str(path), "enabled": False} for path in disable_paths],
+                                 extra_sentinel=extra_sentinel)
+
+    def write_codex_entries(self, entries, extra_sentinel=None) -> None:
         codex_dir = self.home / ".codex"
         codex_dir.mkdir(parents=True, exist_ok=True)
         lines = []
-        for name in disable_names:
-            lines += ["[[skills.config]]", f'name = "{name}"', "enabled = false", ""]
+        for entry in entries:
+            lines.append("[[skills.config]]")
+            lines += [f"{key} = {json.dumps(value)}" for key, value in entry.items()]  # a JSON string or bool is TOML
+            lines.append("")
         if extra_sentinel is not None:
             lines.append(f"# {extra_sentinel}")
         (codex_dir / "config.toml").write_text("\n".join(lines) + "\n")
+
+    def skill_md_path(self, name: str) -> Path:
+        """Where skills 1.7.0 installs a global skill's SKILL.md and Codex loads it from ($HOME/.agents/skills)."""
+        return self.home / ".agents" / "skills" / name / "SKILL.md"
 
     def setup_pair(self):
         """Two fully-wired, passing skills: alpha (on/codex-enabled), beta (name-only/codex-disabled)."""
@@ -138,12 +151,14 @@ class SkillsStatusTests(unittest.TestCase):
     def skill_result(self, report, name: str) -> dict:
         return next(s for s in report["skills"] if s["name"] == name)
 
-    def run_cli(self, manifest, *extra_args, env=None):
+    def run_cli(self, manifest, *extra_args, env=None, home_args=None):
+        """home_args replaces ["--home", <fixture home>]; [] leaves --home at its default, Path.home()."""
         manifest_path = self.tmp / "manifest.json"
         manifest_path.write_text(json.dumps(manifest))
         cli_env = {"PATH": os.environ.get("PATH", ""), **(env if env is not None else self.env)}
+        home_args = ["--home", str(self.home)] if home_args is None else home_args
         return subprocess.run(
-            [sys.executable, str(SCRIPT), "--manifest", str(manifest_path), "--home", str(self.home), *extra_args],
+            [sys.executable, str(SCRIPT), "--manifest", str(manifest_path), *home_args, *extra_args],
             cwd=str(ROOT), env=cli_env, capture_output=True, text=True, timeout=60)
 
     # -- all-pass -------------------------------------------------------------
@@ -400,6 +415,123 @@ class SkillsStatusTests(unittest.TestCase):
                                                                                     "disable_entry_present": False})
         self.assertEqual(report["result"], "ok")
 
+    # -- codex path selector ------------------------------------------------------
+    # Codex applies a [[skills.config]] name rule to every loaded skill of that name and a path rule to the one skill
+    # whose canonical path_to_skills_md it names (openai/codex rust-v0.159.2 codex-rs/config/src/skills_config.rs
+    # L94-125, codex-rs/ext/skills/src/host_service.rs L366-371, host_outcome.rs L52-54).
+
+    def setup_disabled(self, name="gated-skill"):
+        skill = self.make_skill(name, codex_enabled=False)
+        manifest = self.build_manifest([skill])
+        self.write_lock(self.lock_entries_for([skill]))
+        self.write_claude_link(name)
+        self.write_claude_settings({})
+        return manifest, skill
+
+    def codex_disable_of(self, manifest, name):
+        return self.skill_result(self.report(manifest), name)["codex_disable"]
+
+    def test_path_keyed_disable_entry_passes(self):
+        manifest, skill = self.setup_disabled()
+        self.write_codex_config([], disable_paths=[self.skill_md_path("gated-skill")])
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "gated-skill")["codex_disable"],
+                         {"state": "ok", "disable_entry_present": True})
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli(manifest)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertNotIn(str(self.home), result.stdout)  # the entry's path is read, never echoed
+
+    def test_path_keyed_entry_is_resolved_as_codex_resolves_it(self):
+        # A leading ~ expands against the home (codex-rs/utils/absolute-path/src/lib.rs L28-44 at rust-v0.159.2), a
+        # relative path against config.toml's folder (config/src/loader/mod.rs L573-582 and L1424-1431), and both
+        # the rule's path and the loaded skill's are canonicalized (skills_config.rs L188-192;
+        # ext/skills/src/loader/host.rs L192-196), so a path through a symlink to the home names the same skill.
+        manifest, skill = self.setup_disabled()
+        link = self.tmp / "home-link"
+        link.symlink_to(self.home, target_is_directory=True)
+        for value in ("~/.agents/skills/gated-skill/SKILL.md", "../.agents/skills/gated-skill/SKILL.md",
+                      str(link / ".agents" / "skills" / "gated-skill" / "SKILL.md"),
+                      str(self.home / ".agents" / "x" / ".." / "skills" / "gated-skill" / "SKILL.md")):
+            with self.subTest(path=value):
+                self.write_codex_config([], disable_paths=[value])
+                self.assertEqual(self.codex_disable_of(manifest, "gated-skill"),
+                                 {"state": "ok", "disable_entry_present": True})
+
+    def test_path_keyed_entry_for_another_copy_is_not_the_match(self):
+        # Another home's copy, or the skill folder instead of its SKILL.md, leaves the installed copy enabled.
+        manifest, skill = self.setup_disabled()
+        elsewhere = self.tmp / "other-home" / ".agents" / "skills" / "gated-skill" / "SKILL.md"
+        for value in (elsewhere, self.skill_md_path("gated-skill").parent, "~other/.agents/skills/gated-skill/SKILL.md"):
+            with self.subTest(path=str(value)):
+                self.write_codex_config([], disable_paths=[value])
+                self.assertEqual(self.codex_disable_of(manifest, "gated-skill"),
+                                 {"state": "missing_disable_entry", "disable_entry_present": False})
+
+    def test_without_a_known_path_a_path_entry_matches_by_its_skill_folder_name(self):
+        skill = self.make_skill("gated-skill", codex_enabled=False)
+        entry = {"path": "/srv/example-home/.agents/skills/gated-skill/SKILL.md", "enabled": False}
+        config = {"skills": {"config": [entry]}}
+        self.assertEqual(ss.check_codex_disable(config, "ok", skill), {"state": "ok", "disable_entry_present": True})
+        for other in ("/srv/example-home/.agents/skills/other-skill/SKILL.md",
+                      "/srv/example-home/.agents/skills/gated-skill"):
+            with self.subTest(path=other):
+                entry["path"] = other
+                self.assertEqual(ss.check_codex_disable(config, "ok", skill),
+                                 {"state": "missing_disable_entry", "disable_entry_present": False})
+
+    def test_a_name_keyed_disable_of_skill_creator_is_reported_as_hiding_the_bundled_skill(self):
+        # Codex installs its own skill-creator into CODEX_HOME/skills/.system (codex-rs/skills/src/lib.rs L55-67,
+        # src/assets/samples/skill-creator/SKILL.md L2 at rust-v0.159.2), so a name rule for it disables that
+        # bundled copy along with the pinned one; only the path rule leaves the bundled copy enabled.
+        manifest, skill = self.setup_disabled("skill-creator")
+        hidden = {"state": "name_entry_hides_bundled_skill", "disable_entry_present": True}
+        for paths in ([], [self.skill_md_path("skill-creator")]):
+            with self.subTest(with_path_entry=bool(paths)):
+                self.write_codex_config(["skill-creator"], disable_paths=paths)
+                report = self.report(manifest)
+                self.assertEqual(self.skill_result(report, "skill-creator")["codex_disable"], hidden)
+                self.assertFalse(self.skill_result(report, "skill-creator")["pass"])
+                self.assertEqual(report["result"], "fail")
+        self.write_codex_config([], disable_paths=[self.skill_md_path("skill-creator")])
+        report = self.report(manifest)
+        self.assertEqual(self.skill_result(report, "skill-creator")["codex_disable"],
+                         {"state": "ok", "disable_entry_present": True})
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli(manifest)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_path_keyed_disable_of_a_codex_enabled_skill_is_unexpected(self):
+        skill = self.make_skill("open-skill", codex_enabled=True)
+        manifest = self.build_manifest([skill])
+        self.write_lock(self.lock_entries_for([skill]))
+        self.write_claude_link("open-skill")
+        self.write_claude_settings({})
+        self.write_codex_config([], disable_paths=[self.skill_md_path("open-skill")])
+        self.assertEqual(self.codex_disable_of(manifest, "open-skill"),
+                         {"state": "unexpected_disable_entry", "disable_entry_present": True})
+
+    def test_entries_codex_ignores_disable_nothing_and_a_name_is_trimmed(self):
+        # skills_config.rs L188-210: an entry with both selectors or neither is ignored, and so is a blank name; a
+        # name is trimmed before it is compared.
+        manifest, skill = self.setup_disabled()
+        path = str(self.skill_md_path("gated-skill"))
+        for entry in ({"name": "gated-skill", "path": path, "enabled": False}, {"enabled": False},
+                      {"name": "   ", "enabled": False}):
+            with self.subTest(entry=sorted(entry)):
+                self.write_codex_entries([entry])
+                self.assertEqual(self.codex_disable_of(manifest, "gated-skill"),
+                                 {"state": "missing_disable_entry", "disable_entry_present": False})
+        self.write_codex_entries([{"name": " gated-skill ", "enabled": False}])
+        self.assertEqual(self.codex_disable_of(manifest, "gated-skill"), {"state": "ok", "disable_entry_present": True})
+
+    def test_a_path_no_file_can_have_selects_nothing_instead_of_crashing(self):
+        # TOML allows an escaped NUL in a string, which no path can hold (os.path.realpath raises ValueError on it).
+        manifest, skill = self.setup_disabled()
+        self.write_codex_entries([{"path": str(self.skill_md_path("gated-skill")) + "\u0000", "enabled": False}])
+        self.assertEqual(self.codex_disable_of(manifest, "gated-skill"),
+                         {"state": "missing_disable_entry", "disable_entry_present": False})
+
     # -- XDG lock path ----------------------------------------------------------
 
     def test_xdg_lock_path(self):
@@ -420,6 +552,156 @@ class SkillsStatusTests(unittest.TestCase):
         default_report = self.report(manifest)
         self.assertEqual(default_report["lock"]["state"], "missing")
         self.assertEqual(default_report["result"], "fail")
+
+    def test_lock_path_is_joined_as_the_cli_path_join_joins_it(self):
+        # skills 1.7.0 builds the lock path with path.join (vercel-labs/skills@7407f389 src/skill-lock.ts:67-72),
+        # which collapses ".." and a leading //, from HOME or XDG_STATE_HOME verbatim. pathlib keeps the "..",
+        # and a path through the missing folder does not exist, so the lock the CLI wrote read as missing.
+        manifest, alpha, beta = self.setup_pair()
+        missing, xdg_state = self.tmp / "missing", self.tmp / "xdg-state"
+        xdg_lock = xdg_state / "skills" / ".skill-lock.json"
+        env = {**self.env, "XDG_STATE_HOME": str(missing / ".." / "xdg-state")}
+        self.assertEqual(ss.resolve_lock_path(self.home, env), (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(self.home, {"XDG_STATE_HOME": "/" + str(xdg_state)}),
+                         (xdg_lock, "xdg_state_home"))
+        self.assertEqual(ss.resolve_lock_path(missing / ".." / "home", {}),
+                         (self.home / ".agents" / ".skill-lock.json", "default"))
+        (self.home / ".agents" / ".skill-lock.json").unlink()  # only the CLI's XDG lock holds the entries now
+        self.write_lock(self.lock_entries_for([alpha, beta]), path=xdg_lock)
+        report = self.report(manifest, env=env)
+        self.assertEqual(report["lock"], {"source": "xdg_state_home", "state": "ok", "version": 3,
+                                          "version_matches": True})
+        self.assertEqual(report["result"], "ok")
+        result = self.run_cli(manifest, env=env)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def make_link_dotdot(self) -> Path:
+        """tmp/link -> deep/er, so tmp/link/.. is tmp/deep on disk and tmp lexically."""
+        (self.tmp / "deep" / "er").mkdir(parents=True)
+        (self.tmp / "link").symlink_to("deep/er", target_is_directory=True)
+        return self.tmp / "link" / ".."
+
+    def test_report_reads_every_path_through_a_dotdot_in_home_as_the_cli_joins_it(self):
+        # skills 1.7.0 joins the canonical folder, the lock and the claude-code link folder with path.join from HOME
+        # verbatim (os.homedir(); npm dist/cli.mjs L2208-2210, L3746-3750, L1398 and L1511), which collapses a ".."
+        # lexically, and so do Claude Code for its settings and Codex for its default config (claude_settings_path,
+        # codex_config_path). pathlib keeps the "..": after a missing folder that path does not exist, and after a
+        # symlink it names the link target's parent. The fixture is installed at the lexical tmp/home.
+        manifest, alpha, beta = self.setup_pair()
+        for label, parent in (("missing", self.tmp / "missing" / ".."), ("symlink", self.make_link_dotdot())):
+            home = parent / "home"
+            with self.subTest(case=label, home=str(home)):
+                report = ss.inspect(manifest, home, {"HOME": str(home)})
+                self.assertEqual(report["lock"], {"source": "default", "state": "ok", "version": 3,
+                                                  "version_matches": True})
+                self.assertEqual([{check: skill[check]["state"] for check in ("canonical", "lock", "claude_link")}
+                                  for skill in report["skills"]],
+                                 [{"canonical": "ok", "lock": "ok", "claude_link": "ok"}] * 2)
+                self.assertEqual(report["result"], "ok")
+                # Through main() without --home, whose default is Path.home(): HOME verbatim.
+                result = self.run_cli(manifest, "--json", env={"HOME": str(home)}, home_args=[])
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(json.loads(result.stdout)["skills"], report["skills"])
+
+    def test_claude_config_dir_moves_the_link_folder_as_the_cli_does(self):
+        # skills 1.7.0 links claude-code skills in path.join(CLAUDE_CONFIG_DIR.trim(), "skills") when that is not
+        # blank, else in path.join(HOME, ".claude", "skills") (dist/cli.mjs L1398, L1511). JavaScript's trim() also
+        # removes U+FEFF and U+3000, and path.join collapses the "..".
+        manifest, alpha, beta = self.setup_pair()
+        links = {"alpha-skill": {"state": "ok", "kind": "relative"}, "beta-skill": {"state": "ok", "kind": "relative"}}
+        missing = {name: {"state": "missing", "kind": "missing"} for name in links}
+
+        def link_states(value: str) -> dict:
+            report = self.report(manifest, env={**self.env, "CLAUDE_CONFIG_DIR": value})
+            return {skill["name"]: skill["claude_link"] for skill in report["skills"]}
+
+        # While it is set, the correct links under ~/.claude are not the CLI's; a blank value is unset.
+        (self.tmp / "claude-config").mkdir()
+        self.assertEqual(link_states(str(self.tmp / "claude-config")), missing)
+        self.assertEqual(link_states(" 　\t"), links)
+        link_dir = self.tmp / "claude-config" / "skills"
+        link_dir.mkdir()
+        for name in links:
+            canonical = self.home / ".agents" / "skills" / name
+            (link_dir / name).symlink_to(os.path.relpath(canonical, link_dir), target_is_directory=True)
+            default_link = self.home / ".claude" / "skills" / name
+            default_link.unlink()
+            default_link.symlink_to(self.tmp, target_is_directory=True)  # only the moved link can pass now
+        padded = "﻿" + str(self.tmp / "missing" / ".." / "claude-config") + "　"
+        self.assertEqual(link_states(padded), links)
+
+    def test_claude_config_dir_moves_the_settings_file_as_claude_code_does(self):
+        # Claude Code keeps settings under CLAUDE_CONFIG_DIR when set (code.claude.com/docs/en/env-vars, settings).
+        # Its installed 2.1.284 bundle reads path.join(path.resolve(dir), "settings.json") with
+        # dir = (CLAUDE_CONFIG_DIR ?? path.join(os.homedir(), ".claude")).normalize("NFC"): not trimmed, unlike the
+        # skills CLI's link folder, and set even when empty.
+        manifest, alpha, beta = self.setup_pair()
+        self.write_claude_settings({"beta-skill": "off"})  # the default file now disagrees with the manifest
+        config_dir = self.tmp / "café"
+        config_dir.mkdir()
+        (config_dir / "settings.json").write_text(json.dumps({"skillOverrides": {"beta-skill": "name-only"}}))
+
+        def beta_listing(env: dict) -> dict:
+            report = self.report(manifest, env=env)
+            self.assertEqual(report["claude_settings"], {"state": "ok"})
+            return self.skill_result(report, "beta-skill")["claude_listing"]
+
+        for label, value in (("dotdot", str(self.tmp / "missing" / ".." / "café")),
+                             ("nfd", str(self.tmp / "café"))):
+            with self.subTest(case=label):
+                self.assertEqual(beta_listing({**self.env, "CLAUDE_CONFIG_DIR": value}),
+                                 {"state": "ok", "actual": "name-only"})
+        # Untrimmed, a padded value names no settings file, so beta falls back to the default "on".
+        self.assertEqual(beta_listing({**self.env, "CLAUDE_CONFIG_DIR": "　" + str(config_dir)}),
+                         {"state": "mismatch", "actual": "on"})
+        self.assertEqual(beta_listing(self.env), {"state": "mismatch", "actual": "off"})
+        self.assertEqual(ss.claude_settings_path(self.home, {"CLAUDE_CONFIG_DIR": ""}),
+                         Path(os.getcwd()) / "settings.json")  # path.resolve("") is the working directory
+        self.assertEqual(ss.claude_settings_path(self.home, {}), self.home / ".claude" / "settings.json")
+
+    def test_codex_home_moves_the_config_file_as_codex_does(self):
+        # Codex reads config.toml under CODEX_HOME (developers.openai.com/codex/config-advanced). rust-v0.157.1
+        # canonicalizes a non-empty CODEX_HOME (codex-rs/utils/home-dir/src/lib.rs find_codex_home), so a ".." after
+        # a symlink is resolved on disk: link/../codex is deep/codex, not the tmp/codex that path.join would name.
+        manifest, alpha, beta = self.setup_pair()
+        self.write_codex_config([])  # the default config now lacks beta's disable entry
+        parent = self.make_link_dotdot()
+        for folder, names in ((self.tmp / "deep" / "codex", ["beta-skill"]), (self.tmp / "codex", [])):
+            folder.mkdir()
+            (folder / "config.toml").write_text(
+                "".join(f'[[skills.config]]\nname = "{name}"\nenabled = false\n\n' for name in names))
+
+        def beta_disable(value: str) -> dict:
+            report = self.report(manifest, env={**self.env, "CODEX_HOME": value})
+            return self.skill_result(report, "beta-skill")["codex_disable"]
+
+        self.assertEqual(beta_disable(str(parent / "codex")), {"state": "ok", "disable_entry_present": True})
+        self.assertEqual(beta_disable(str(self.tmp / "codex")),
+                         {"state": "missing_disable_entry", "disable_entry_present": False})
+        # An empty CODEX_HOME is unset (find_codex_home filters it): the default config is read again.
+        self.assertEqual(beta_disable(""), {"state": "missing_disable_entry", "disable_entry_present": False})
+
+    def test_global_paths_agree_with_install_skills(self):
+        # This checker keeps copies of install_skills.py's join and trim (node_path_join, JS_TRIM_CHARS); the global
+        # paths both build from them must agree, for a "..", // or relative HOME and a blank, padded or ".."
+        # CLAUDE_CONFIG_DIR or XDG_STATE_HOME.
+        spec = importlib.util.spec_from_file_location("install_skills_for_status_tests",
+                                                      ROOT / "tools" / "adoption" / "install_skills.py")
+        installer = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(installer)
+        self.assertEqual(ss.JS_TRIM_CHARS, installer.JS_TRIM_CHARS)
+        homes = (Path("/h/missing/../base"), Path("//h/./base"), Path("rel/../../x"))
+        values = (None, " 　", "﻿/c/missing/../config ", "//c//config/", "\u0085/c", "rel/../c")
+        for home in homes:
+            for value in values:
+                env = {} if value is None else {"CLAUDE_CONFIG_DIR": value, "XDG_STATE_HOME": value}
+                with self.subTest(home=str(home), value=value), mock.patch.dict(os.environ, env):
+                    for name in ("CLAUDE_CONFIG_DIR", "XDG_STATE_HOME"):
+                        if value is None:
+                            os.environ.pop(name, None)
+                    self.assertEqual(ss.agents_skills_dir(home) / "x", installer.canonical_skill_dir(home, "x"))
+                    self.assertEqual(ss.claude_skills_dir(home, env), installer.claude_skills_dir(home))
+                    self.assertEqual(ss.resolve_lock_path(home, env)[0], installer.lock_file_path(home))
 
     # -- extra skill warning ----------------------------------------------------
 
@@ -696,7 +978,8 @@ class SkillsStatusTests(unittest.TestCase):
         manifest = self.build_manifest(
             [on1, on2, off1],
             budget={"claude_on_description_chars": 500, "claude_on_cap": 8000,
-                   "codex_enabled_description_chars": 500, "codex_default_budget_chars": 8000})
+                   "codex_enabled_description_chars": 500, "codex_catalog_description_chars": 500,
+                   "codex_configured_budget_tokens": 6000, "codex_fallback_budget_chars": 8000})
         self.write_lock(self.lock_entries_for([on1, on2, off1]))
         for skill in (on1, on2, off1):
             self.write_claude_link(skill["name"])
@@ -707,26 +990,97 @@ class SkillsStatusTests(unittest.TestCase):
         self.assertEqual(budget["claude_on_description_chars"],
                          {"manifest": 500, "computed": 500, "matches_manifest": True})
         self.assertTrue(budget["claude_within_cap"])
+        self.assertEqual(budget["codex_catalog_description_chars"],
+                         {"manifest": 500, "computed": 500, "matches_manifest": True})
         self.assertEqual(report["result"], "ok")
 
         manifest["budget"]["claude_on_description_chars"] = 999  # drift the recorded sum only
+        manifest["budget"]["codex_catalog_description_chars"] = 999
         drifted = self.report(manifest)
         self.assertFalse(drifted["budget"]["claude_on_description_chars"]["matches_manifest"])
+        self.assertFalse(drifted["budget"]["codex_catalog_description_chars"]["matches_manifest"])
         self.assertEqual(drifted["result"], "ok")  # still informational only
 
     def test_budget_over_cap_is_reported_but_not_a_failure(self):
         big = self.make_skill("big-on", claude_listing="on", description_chars=9000)
         manifest = self.build_manifest([big], budget={"claude_on_description_chars": 9000, "claude_on_cap": 8000,
                                                        "codex_enabled_description_chars": 9000,
-                                                       "codex_default_budget_chars": 8000})
+                                                       "codex_configured_budget_tokens": 100,
+                                                       "codex_fallback_budget_chars": 8000})
         self.write_lock(self.lock_entries_for([big]))
         self.write_claude_link("big-on")
         self.write_claude_settings({})
         self.write_codex_config([])
         report = self.report(manifest)
         self.assertFalse(report["budget"]["claude_within_cap"])
-        self.assertFalse(report["budget"]["codex_within_cap"])
+        self.assertFalse(report["budget"]["codex_within_budget"])
         self.assertEqual(report["result"], "ok")
+
+    def test_codex_catalog_is_estimated_as_render_rs_estimates_it_against_the_configured_token_budget(self):
+        # openai/codex rust-v0.159.2 codex-rs/ext/skills/src/render.rs: each shown skill is the line
+        # "- {name}: {description} (file: {path})" (L258-267), its description cut at 1,024 characters (L23), and a
+        # token budget charges each line plus its newline at 4 bytes per token, rounded up (L154-160, L25;
+        # utils/string/src/truncate.rs L71-74). A skill whose agents/openai.yaml sets allow_implicit_invocation:
+        # false is left out of the catalog (ext/skills/src/provider/host.rs L147-148), and so is a disabled one.
+        shown = self.make_skill("shown", description_chars=100)
+        explicit_only = dict(self.make_skill("explicit-only", description_chars=40),
+                             upstream_allow_implicit_invocation=False)
+        disabled = self.make_skill("disabled", codex_enabled=False, description_chars=70)
+        long_one = self.make_skill("long-one", description_chars=1500)
+        skills = [shown, explicit_only, disabled, long_one]
+        manifest = self.build_manifest(skills, budget={
+            "claude_on_description_chars": 1710, "claude_on_cap": 10500, "codex_enabled_description_chars": 1640,
+            "codex_catalog_description_chars": 1600, "codex_configured_budget_tokens": 6000,
+            "codex_fallback_budget_chars": 8000})
+        self.write_lock(self.lock_entries_for(skills))
+        for skill in skills:
+            self.write_claude_link(skill["name"])
+        self.write_claude_settings({})
+        self.write_codex_config([], disable_paths=[self.skill_md_path("disabled")])
+        root = os.path.realpath(self.home / ".agents" / "skills")
+
+        def line_tokens(name: str, chars: int) -> int:
+            line = f"- {name}: {'d' * min(chars, 1024)} (file: {root}/{name}/SKILL.md)\n"
+            return -(-len(line.encode("utf-8")) // 4)
+
+        expected = line_tokens("shown", 100) + line_tokens("long-one", 1500)
+        report = self.report(manifest)
+        budget = report["budget"]
+        self.assertEqual(budget["codex_catalog_skills"], 2)
+        self.assertEqual(budget["codex_catalog_description_chars"],
+                         {"manifest": 1600, "computed": 1600, "matches_manifest": True})
+        self.assertEqual(budget["codex_catalog_estimated_tokens"], expected)
+        self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
+        self.assertTrue(budget["codex_within_budget"])
+        self.assertEqual(budget["codex_fallback_budget_chars"], 8000)  # metadata only, never the comparison
+        self.assertNotIn("codex_within_cap", budget)
+        self.assertEqual(report["result"], "ok")
+        text = ss.render_text(report)
+        self.assertIn(f"estimated_tokens={expected} configured_budget_tokens=6000 within_budget=True", text)
+        manifest["budget"]["codex_configured_budget_tokens"] = expected - 1
+        tight = self.report(manifest)
+        self.assertFalse(tight["budget"]["codex_within_budget"])
+        self.assertEqual(tight["result"], "ok")  # informational only
+
+    def test_real_manifest_codex_catalog_fits_the_configured_token_budget(self):
+        # The Codex template configures [skills] max_context_tokens = 6000; its 8,000-character fallback applies
+        # only when the context window is unknown (render.rs L19-22 and L126-152 at rust-v0.159.2), so the
+        # 10,048 Codex-enabled description characters are not measured against it.
+        real = ss.load_manifest(ROOT / "adoption" / "skills" / "manifest.json")
+        budget = ss.inspect(real, self.home, self.env)["budget"]
+        self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
+        self.assertEqual(budget["codex_catalog_skills"], 25)
+        self.assertTrue(budget["codex_catalog_description_chars"]["matches_manifest"])
+        self.assertLess(budget["codex_catalog_estimated_tokens"], 6000)
+        self.assertTrue(budget["codex_within_budget"])
+
+    def test_a_non_boolean_implicit_invocation_flag_is_a_manifest_error(self):
+        manifest, alpha, beta = self.setup_pair()
+        manifest["skills"][0]["upstream_allow_implicit_invocation"] = "false"
+        path = self.tmp / "manifest.json"
+        path.write_text(json.dumps(manifest))
+        with self.assertRaises(ss.ManifestError):
+            ss.load_manifest(path)
 
 
 if __name__ == "__main__":

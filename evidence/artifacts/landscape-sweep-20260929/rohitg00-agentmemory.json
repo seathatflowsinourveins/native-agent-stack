@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-rohitg00-agentmemory",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/rohitg00/agentmemory",
+ "reviewed_commit": "ab3e4efd282659b87d31b36c8514c6bc6b871f0b",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "durable-memory"
+ ],
+ "claim": "Source and documentation review of rohitg00/agentmemory at commit ab3e4efd282659b87d31b36c8514c6bc6b871f0b (license Apache-2.0), read from README.md at that commit. Repository description: \"#1 Persistent memory for AI coding agents based on real-world benchmarks\". Survived the landscape-sweep-20260929 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 29013,
+  "pushed_at": "2026-09-28T15:48:45Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@ab3e4efd282659b87d31b36c8514c6bc6b871f0b",
+   "text": "- Node.js 20 or newer with npm and npx (`node -v`, `npm -v`, and `npx -v`). - macOS/Linux automatic iii-engine installation also needs `curl`, a POSIX `sh`, and `tar`. Minimal images such as `node:20-slim` may not include them. - Native Windows requires the pinned iii-engine v0.22.1 `iii.exe` to be installed manually. WSL2 or Docker Desktop are the other supported paths."
+  },
+  {
+   "source": "README.md@ab3e4efd282659b87d31b36c8514c6bc6b871f0b",
+   "text": "The first run is an interactive setup: pick the agents to wire (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, ...), pick an LLM provider or stay keyless, and it seeds the config, starts the memory server and its pinned iii engine, and offers to install globally so the bare `agentmemory` command works everywhere afterward. `-y` accepts npx's package prompt and `@latest` avoids a stale cached release. A provider makes LLM features available, but LLM-written observation compression starts only "
+  },
+  {
+   "source": "README.md@ab3e4efd282659b87d31b36c8514c6bc6b871f0b",
+   "text": "Keyless mode disables vector embeddings. `memory_recall` (the `mem::search` path) uses BM25, while `memory_smart_search` can also fuse structural graph matches when graph data already exists. For free on-device semantic recall, set `EMBEDDING_PROVIDER=local` in `~/.agentmemory/.env` and restart. The first embedding request downloads `Xenova/all-MiniLM-L6-v2`; inference runs locally after that initial model download."
+  }
+ ]
+}

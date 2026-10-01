@@ -1,0 +1,31 @@
+observed_utc=2026-09-30T19:28:31Z
+== candidate versus the previously reviewed lock (383ccc5b, #537's subject): package closure
+old: 176 packages, new: 176; added 0, removed 0, changed 2
+ADDED:    -
+REMOVED:  -
+CHANGED:  pyjwt 2.14.0 -> 2.15.0, urllib3 2.7.0 -> 2.8.0
+  oauthlib: old 3.3.1, new 3.3.1
+  pyjwt: old 2.14.0, new 2.15.0
+  requests-oauthlib: old 2.0.0, new 2.0.0
+  google-auth-oauthlib: old 1.2.2, new 1.2.2
+  authlib: old 1.6.12, new 1.6.12
+  mcp: old 1.28.1, new 1.28.1
+  litellm: old 1.93.0, new 1.93.0
+  google-auth: old 2.53.0, new 2.53.0
+  openhands-sdk: old @openhands_sdk-1.50.0-py3-none-any.whl, new @openhands_sdk-1.50.0-py3-none-any.whl
+  openhands-tools: old @openhands_tools-1.50.0-py3-none-any.whl, new @openhands_tools-1.50.0-py3-none-any.whl
+
+== the same two locks, line level (hashes abbreviated to 8 hex): every changed line
+< pyjwt==2.14.0 \
+<     --hash=sha256:77283c83... \
+<     --hash=sha256:ad0cef71...
+> pyjwt==2.15.0 \
+>     --hash=sha256:7a3742de... \
+>     --hash=sha256:b11c5f97...
+< urllib3==2.7.0 \
+<     --hash=sha256:231e0ec3... \
+<     --hash=sha256:9fb4c81e...
+> urllib3==2.8.0 \
+>     --hash=sha256:0cf3cae5... \
+>     --hash=sha256:63bf2ead...
+(line counts: reviewed 3054, candidate 3054)

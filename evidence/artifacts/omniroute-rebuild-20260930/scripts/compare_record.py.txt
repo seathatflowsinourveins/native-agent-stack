@@ -1,0 +1,39 @@
+"""Compare a fresh owner record (gateway_record.py output) with the after_delta record published in host-readback-20260930.json.
+The published copy differs from the raw record in one way: exec_main_start is shown in UTC, converted from the host's local time
+string (EDT, UTC-4); the same conversion is applied to the fresh record here, and everything else, digests included, is compared as is."""
+import datetime
+import json
+import re
+import sys
+
+fresh = json.load(open(sys.argv[1]))
+published = json.load(open(sys.argv[2]))["after_delta"]
+
+
+def to_utc(local):
+    match = re.match(r"^\w{3} (\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) EDT$", local or "")
+    if not match:
+        return local
+    year, month, day, hour, minute, second = (int(x) for x in match.groups())
+    return (datetime.datetime(year, month, day, hour, minute, second) + datetime.timedelta(hours=4)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+for unit in fresh["units"].values():
+    unit["exec_main_start"] = to_utc(unit.get("exec_main_start"))
+
+
+def flat(value, path=""):
+    if isinstance(value, dict):
+        for key, item in value.items():
+            yield from flat(item, path + "/" + key)
+    else:
+        yield path, json.dumps(value, sort_keys=True)
+
+
+a, b = dict(flat(fresh)), dict(flat(published))
+shared = [k for k in a if k in b]
+different = [k for k in shared if a[k] != b[k]]
+print(f"paths in the fresh record: {len(a)}; in the published after_delta record: {len(b)}; shared: {len(shared)}")
+print(f"equal: {len(shared) - len(different)}; different: {different}  (exec_main_start compared after converting the host's local EDT string to UTC; digests compared in full)")
+print("only in the fresh record:", [k for k in a if k not in b], "| only in the published record:", [k for k in b if k not in a])
+print("schema:", fresh.get("schema"), "| fresh taken_utc:", fresh.get("taken_utc"), "| published taken_utc:", published.get("taken_utc"))

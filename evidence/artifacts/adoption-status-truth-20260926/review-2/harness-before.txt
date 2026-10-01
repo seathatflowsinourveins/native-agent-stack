@@ -1,0 +1,27 @@
+under test: as-reviewed/prove.py sha256 438b02a28372a87b
+under test: as-reviewed/codex_known_answers.py sha256 1c531380bb65cb54
+pins read from $CHECKOUT: codex 0.157.1, claude-code floor 2.1.281
+--- V1 no --version observation
+PASS  G9 a pin mismatch surfaces at the top: --version: codex None (pin 0.157.1), claude None (floor 2.1.281); checker mismatched [], pinned_versions_match True
+EXPECT V1 the pin check reads UNTESTED: NOT MET
+--- V2 both at their pins
+PASS  G9 a pin mismatch surfaces at the top: --version: codex 0.157.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched [], pinned_versions_match True
+EXPECT V2 the pin check reads UNTESTED: NOT MET
+--- V3 codex off its pin, surfaced
+PASS  G9 a pin mismatch surfaces at the top: --version: codex 0.0.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched ['codex'], pinned_versions_match False
+EXPECT V3 the pin check reads PASS: ok
+--- V4 codex off its pin, not surfaced
+FAIL  G9 a pin mismatch surfaces at the top: --version: codex 0.0.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched [], pinned_versions_match True
+EXPECT V4 the pin check reads FAIL: ok
+--- V5 codex at its pin, reported mismatched
+FAIL  G9 a pin mismatch surfaces at the top: --version: codex 0.157.1 (pin 0.157.1), claude 2.1.281 (floor 2.1.281); checker mismatched ['codex'], pinned_versions_match False
+EXPECT V5 the pin check reads FAIL: ok
+--- R1 prove.py codex_hooks_list, app-server never answers: had not finished after 120 s; still running after 120 s, stopped by this harness
+EXPECT R1 returns inside 120 s (raised RuntimeError): NOT MET
+--- R2 prove.py codex_hooks_list, app-server lingers after answering: had not finished after 120 s; still running after 120 s, stopped by this harness
+EXPECT R2 returns inside 120 s (returned 1): NOT MET
+--- R3 codex_known_answers.py, app-server never answers: had not finished after 120 s; still running after 120 s, stopped by this harness
+EXPECT R3 returns inside 120 s (RuntimeError): NOT MET
+--- O1 as-reviewed/codex_oracle.py sha256 ce04513ce0ada13b trust --base <a directory holding trust/keep.txt>: finished; exit 1; last line: RuntimeError: app-server closed its output
+EXPECT O1 the existing trust/keep.txt survives: NOT MET
+=== summary: 6 expectation(s) not met

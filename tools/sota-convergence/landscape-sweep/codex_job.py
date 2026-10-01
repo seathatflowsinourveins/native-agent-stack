@@ -12,8 +12,23 @@
 <lock dir>/slot-<n>, held by the runner and by codex itself, so a killed runner never frees a slot early), then runs
 this, in the empty directory <work-dir>/empty, bounded to 3000 s (exit 124 on timeout):
 
-  codex --search exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
-    -c model_reasoning_effort="max" --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
+  codex exec --ignore-user-config --skip-git-repo-check -s read-only -m gpt-6-astra \
+    -c model_reasoning_effort="max" -c web_search="live" --output-schema <job>/schema.json -o <job>/last.json --json "<prompt>" </dev/null
+
+Gateway provider (staged.json codex.provider "omniroute", build_args.py --gpt6-provider omniroute): the runner sets
+CODEX_HOME to the staged lane-local home <work-dir>/codex-home instead, drops --ignore-user-config (that home IS the
+configuration: the OmniRoute provider block plus the token MCP servers) and adds `-p <profile>` (the stack-worker
+profile layered over it), so the command becomes `codex exec -p stack-worker --skip-git-repo-check -s read-only
+-m cx/gpt-6-astra ...`. The provider key comes from the variable codex.api_key_env (OMNIROUTE_API_KEY) in the
+operator's environment. For a keyless loopback gateway, codex.api_key_placeholder ("local-loopback") fills an
+unset variable, because Codex's env_key only needs it to exist. Without either, a job ends with exit 6 before codex
+starts. The quota gate reads the native login only, so it is refused for a gateway lane. A lane staged on a chained
+OmniRoute instance, such as the framework instance at http://127.0.0.1:20129/v1, names its model with a node alias in
+front (`-m sharedgw/gpt-6-astra-max`), and its static provider headers (codex.http_headers, OmniRoute's per-request
+switches only, for example x-omniroute-compression = allow-lossy; build_args.py --omniroute-header) sit in the lane
+home's [model_providers.omniroute] http_headers. The runner refuses to start when that table differs from
+codex.http_headers, and records the headers in each job's inputs.json. The comparison needs tomllib (Python 3.11+):
+older interpreters refuse a lane with staged headers and skip it for a header-less lane.
 
 --ignore-user-config keeps the host's Codex config out of the lane, the sandbox is read-only, stdin is /dev/null
 (background `codex exec` otherwise waits on stdin), and the effort is max. Never ultra: ultra lets Codex delegate to
@@ -23,10 +38,15 @@ trace level Codex logs model response data (codex-rs/codex-api/src/sse/responses
 --gpt6-model / --slots / --lock-dir); defaults gpt-6-astra, 3 slots, <work-dir>/locks. The codex binary is the one
 on PATH.
 
-Usage limit: when Codex reports "hit your usage limit" the job ends with exit 3 and writes <work-dir>/LIMIT; while
-that file exists no job starts and jobs still waiting for a slot end with exit 3, so the coordinator can stop and
-notify. Only Codex's own error reports count: the `error` / `turn.failed` events that `codex exec --json` prints on
-stdout (openai/codex rust-v0.155.1, codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
+Usage limit: when Codex reports "hit your usage limit", or an HTTP 429 that carries no usage-limit body ("exceeded
+retry limit, last status: 429 Too Many Requests"; Codex retries no 429, so it prints that for the first one:
+codex-rs/model-provider-info/src/lib.rs, codex-api/src/api_bridge.rs and protocol/src/error.rs at rust-v0.157.1), the
+job ends with exit 3 and writes <work-dir>/LIMIT. A pooled gateway answers 429 when its accounts are exhausted, as it
+did for nine jobs on 2026-09-29 while the workflow went on spending Claude stages; the report cannot tell that from a
+brief rate limit, so the marker holds a reason and no reset time. While that file exists no job starts and jobs still
+waiting for a slot end with exit 3, so the coordinator can stop and notify. Only Codex's own error reports count: the
+`error` / `turn.failed` events that `codex exec --json` prints on stdout (openai/codex rust-v0.155.1,
+codex-rs/exec/src/exec_events.rs and event_processor_with_jsonl_output.rs), and,
 only when no turn completed, an ERROR/Error line on stderr. Model content (item.* events: messages, web results,
 cited pages) never counts: on 2026-09-26 a grep of the whole event stream matched a cited README's "Usage
 limitation" and set the marker falsely.
@@ -78,16 +98,38 @@ DEFAULTS = {"slots": 3, "timeout_s": 3000.0, "wait_poll_s": 10.0, "slot_poll_s":
 QUOTA_SCRIPT = "codex_quota.py"
 QUOTA_BACKSTOP_S = 30.0  # beyond the probe's own deadline, for a probe that itself hangs
 LIMIT_PHRASE = re.compile(r"hit your usage limit", re.IGNORECASE)
+# Codex's report of an HTTP 429 whose body is not a usage-limit body: RetryLimitReachedError's Display ("exceeded retry
+# limit, last status: {status}, request id: {id}", codex-rs/protocol/src/error.rs at rust-v0.157.1). Codex retries no
+# 429 (retry_429 is false for every provider, codex-rs/model-provider-info/src/lib.rs) and codex-api/src/api_bridge.rs
+# builds this error in its 429 arm, so the report appears at the first 429, whether the route is exhausted or briefly
+# rate limited. A gateway that answers 429 carries no usage-limit body, so this is the report a pooled route gives when
+# its accounts are exhausted. The pattern names the status, so a report for any other status stays a fault.
+RETRY_LIMIT_429 = re.compile(r"exceeded retry limit, last status: 429\b", re.IGNORECASE)
+LIMIT_PATTERNS = (("usage", LIMIT_PHRASE), ("http_429", RETRY_LIMIT_429))
 # Codex's own error lines: "ERROR: ...", "Error: ..." (eprintln) or a tracing record "<timestamp> ERROR <target>: ...".
 STDERR_ERROR_LINE = re.compile(r"^(?:\S+\s+)?(?:ERROR|Error)\b")
 # The prompt is one argv string, as in the 2026-09-26 runner; Linux caps one argument at 131072 bytes.
 MAX_PROMPT_BYTES = 120_000
 JOB_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}")
-MODEL_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# Kept equal to build_args.MODEL_NAME: at most one provider segment, e.g. "cx/gpt-6-astra" or the framework
+# instance's "sharedgw/gpt-6-astra-max". Codex strips one namespace for metadata lookup, and only one of letters,
+# digits, '_' and '-'; another slug gets fallback metadata (openai/codex rust-v0.157.1,
+# codex-rs/models-manager/src/manager.rs L763-780).
+MODEL_NAME = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9_-]{0,31}/)?[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
+# Kept equal to build_args.py, which cites their sources: a gateway lane's static provider headers (staged.json
+# codex.http_headers, rendered as model_providers.<provider>.http_headers in the lane home) are OmniRoute's per-request
+# switches only, since other x-omniroute-* headers carry secrets, with printable ASCII values.
+OMNIROUTE_REQUEST_HEADERS = ("x-omniroute-compression", "x-omniroute-no-cache", "x-omniroute-no-memory",
+                             "x-omniroute-strip-reasoning")
+HEADER_VALUE = re.compile(r"[!#-\[\]-~](?:[ !#-\[\]-~]{0,126}[!#-\[\]-~])?")
+PROVIDERS = ("native", "omniroute")
+ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
+PROFILE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}")
 # Everything one attempt writes; an earlier attempt's files move together to attempts/<n>/.
 ATTEMPT_FILES = ("events.jsonl", "stderr.txt", "last.json", "started", "finished", "exit", "slot", "model",
                  "codex_version", "done", "prompt.txt", "schema.json", "inputs.json", "runner.log", "quota.json")
 EXIT_LIMIT, EXIT_TIMEOUT, EXIT_NO_CODEX, EXIT_REFUSED = 3, 124, 127, 2
+EXIT_NO_KEY = 6  # a gateway lane whose API key variable is unset in the runner's environment
 
 
 class UsageError(Exception):
@@ -99,9 +141,20 @@ def utc_now() -> str:
 
 
 def inside_repository(path: Path) -> Path | None:
+    """The nearest directory at or above path that holds a git repository marker: a .git directory with a HEAD entry
+    (a file, or a symlink, which git allows to point at an unborn branch), or a non-empty .git file (a worktree's or
+    submodule's gitdir pointer). An empty .git is not one. Codex's Linux
+    sandbox creates empty .git mount targets under its writable roots, /tmp included, while a sandboxed command runs,
+    and removes them afterwards (codex-rs/linux-sandbox/src/bwrap.rs at rust-v0.157.1, SyntheticMountTarget). A work
+    directory under /tmp would otherwise be refused at random whenever another Codex job writes on the same host."""
     for candidate in (path, *path.parents):
-        if (candidate / ".git").exists():
-            return candidate
+        marker = candidate / ".git"
+        try:
+            head = marker / "HEAD"
+            if head.is_file() or head.is_symlink() or (marker.is_file() and marker.stat().st_size > 0):
+                return candidate
+        except OSError:  # the marker vanished between the checks: a synthetic target being removed
+            continue
     return None
 
 
@@ -136,6 +189,11 @@ def settings(base: Path) -> dict:
     lock_dir = Path(staged.get("lock_dir") or "locks").expanduser()
     out["lock_dir"] = lock_dir if lock_dir.is_absolute() else base / lock_dir
     out["model"] = str(staged.get("model") or DEFAULT_MODEL)
+    namespace, slash, rest = out["model"].partition("/")
+    if slash and ("/" in rest or not re.fullmatch(r"[A-Za-z0-9_-]+", namespace)):
+        raise UsageError("codex.model may have one provider segment, of letters, digits, '_' and '-' only: Codex "
+                         "strips only such a namespace, and any other slug gets fallback metadata "
+                         "(openai/codex rust-v0.157.1, codex-rs/models-manager/src/manager.rs L763-780)")
     if not MODEL_NAME.fullmatch(out["model"]):
         raise UsageError(f"codex.model {out['model']!r} is not a model name")
     stop = staged.get("quota_stop_percent")
@@ -144,7 +202,83 @@ def settings(base: Path) -> dict:
     out["quota_stop_percent"] = None if stop is None else float(stop)
     if not 0 < out["quota_timeout_s"] <= 600:
         raise UsageError("codex.quota_timeout_s must be above 0 and at most 600")
+    out.update(lane_settings(base, staged))
+    if out["codex_home"] is not None and out["quota_stop_percent"] is not None:
+        raise UsageError("codex.quota_stop_percent reads the native Codex login's usage; it cannot gate a gateway "
+                         "provider's account pool, so it must be absent when codex.provider is not native")
     return out
+
+
+def lane_settings(base: Path, staged: dict) -> dict:
+    """The GPT-6 lane's provider. native (the default) runs Codex with --ignore-user-config against the caller's
+    login. A gateway provider (omniroute) runs Codex with CODEX_HOME set to the staged lane-local home
+    <work-dir>/<codex_home>: its config.toml (the provider block and the token MCP servers) and its profile file are
+    the lane's whole configuration, and the provider's API key comes from the named environment variable. Its static
+    provider headers (codex.http_headers) must be the ones that config.toml carries."""
+    provider = str(staged.get("provider") or "native")
+    if provider not in PROVIDERS:
+        raise UsageError(f"codex.provider {provider!r} must be one of {', '.join(PROVIDERS)}")
+    headers = staged.get("http_headers")
+    if headers is not None and not isinstance(headers, dict):
+        raise UsageError("codex.http_headers must be a table of header names and values; restage with build_args.py")
+    for name, value in (headers or {}).items():
+        if name not in OMNIROUTE_REQUEST_HEADERS:  # never echoed: a refused name may be anything
+            raise UsageError(f"codex.http_headers may hold only OmniRoute's per-request switches "
+                             f"({', '.join(OMNIROUTE_REQUEST_HEADERS)}): other headers can carry a secret; restage "
+                             "with build_args.py")
+        if not (isinstance(value, str) and HEADER_VALUE.fullmatch(value)):
+            raise UsageError(f"codex.http_headers {name}: the value must be 1-128 printable ASCII characters without "
+                             "'\"' or '\\' and without a space at either end; restage with build_args.py")
+    headers = dict(sorted((headers or {}).items()))
+    lane = {"provider": provider, "codex_home": None, "profile": None, "api_key_env": None,
+            "api_key_placeholder": None, "http_headers": headers}
+    if provider == "native":
+        if headers:
+            raise UsageError("codex.http_headers needs a gateway provider: the native lane has no provider block")
+        return lane
+    home = staged.get("codex_home")
+    if not isinstance(home, str) or not home or Path(home).is_absolute() or ".." in Path(home).parts:
+        raise UsageError("codex.codex_home must name a directory inside the work directory")
+    if not (base / home / "config.toml").is_file():
+        raise UsageError(f"codex.codex_home {home!r} holds no config.toml; restage with build_args.py")
+    profile = staged.get("profile")
+    if profile is not None and not (isinstance(profile, str) and PROFILE_NAME.fullmatch(profile)):
+        raise UsageError(f"codex.profile {profile!r} is not a profile name")
+    if profile is not None and not (base / home / f"{profile}.config.toml").is_file():
+        raise UsageError(f"codex.profile {profile!r} has no {profile}.config.toml in the lane home; restage")
+    key = staged.get("api_key_env")
+    if not isinstance(key, str) or not ENV_NAME.fullmatch(key):
+        raise UsageError("codex.api_key_env must name the environment variable that holds the provider key")
+    placeholder = staged.get("api_key_placeholder")
+    if placeholder is not None and not (isinstance(placeholder, str) and PROFILE_NAME.fullmatch(placeholder)):
+        raise UsageError("codex.api_key_placeholder must be a short plain token (a keyless loopback gateway's value)")
+    carried = lane_home_headers(base / home / "config.toml", provider)
+    if carried is None and headers:
+        raise UsageError("comparing codex.http_headers with the lane home config.toml needs Python 3.11+ (tomllib); "
+                         "run the harness with a newer python3, or restage without --omniroute-header")
+    if carried is not None and carried != headers:
+        raise UsageError(f"the lane home config.toml does not carry the staged provider headers (codex.http_headers "
+                         f"{sorted(headers)}, model_providers.{provider}.http_headers "
+                         f"{sorted(carried) if isinstance(carried, dict) else carried!r}); restage with build_args.py")
+    lane.update(codex_home=base / home, profile=profile, api_key_env=key, api_key_placeholder=placeholder)
+    return lane
+
+
+def lane_home_headers(config: Path, provider: str):
+    """model_providers.<provider>.http_headers in the lane home's config.toml, {} when absent. None without tomllib
+    (Python 3.9 and 3.10): lane_settings then refuses staged headers and skips the check for a header-less lane."""
+    try:
+        import tomllib
+    except ImportError:
+        return None
+    try:
+        parsed = tomllib.loads(config.read_text(encoding="utf-8"))
+    except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+        raise UsageError(f"the lane home config.toml is not valid TOML ({error}); restage with build_args.py") from None
+    providers = parsed.get("model_providers")
+    table = providers.get(provider) if isinstance(providers, dict) else None
+    headers = table.get("http_headers") if isinstance(table, dict) else None
+    return {} if headers is None else headers
 
 
 def job_dir(base: Path, job: str) -> Path:
@@ -232,10 +366,13 @@ def turn_usage(directory: Path) -> dict | None:
     return usage if reported else None
 
 
-def limit_error(directory: Path) -> bool:
-    """Codex itself reported the usage limit: in an `error` / `turn.failed` event, or, when no turn completed, in one
-    of its own error lines on stderr. A completed turn was not limited, whatever a diagnostic line quotes."""
+def limit_kind(directory: Path) -> str | None:
+    """"usage" when Codex itself reported the usage limit, "http_429" when it reported an HTTP 429 without one: in an
+    `error` / `turn.failed` event, or, when none matched and no turn completed, in one of its own error lines on stderr.
+    A completed turn was not limited, whatever a diagnostic line quotes. Within one source (events, else stderr) a
+    usage-limit report wins over a 429 report."""
     parsed = events(directory)
+    kinds = set()
     for event in parsed:
         if event.get("type") == "error":
             message = event.get("message")
@@ -243,26 +380,45 @@ def limit_error(directory: Path) -> bool:
             message = event["error"].get("message")
         else:
             continue  # item.* events carry model content: never evidence of a limit
-        if isinstance(message, str) and LIMIT_PHRASE.search(message):
-            return True
-    if any(event.get("type") == "turn.completed" for event in parsed):
-        return False
-    return any(STDERR_ERROR_LINE.match(line) and LIMIT_PHRASE.search(line)
-               for line in (read(directory / "stderr.txt") or "").splitlines())
+        if isinstance(message, str):
+            kinds.update(kind for kind, pattern in LIMIT_PATTERNS if pattern.search(message))
+    if not kinds and not any(event.get("type") == "turn.completed" for event in parsed):
+        for line in (read(directory / "stderr.txt") or "").splitlines():
+            if STDERR_ERROR_LINE.match(line):
+                kinds.update(kind for kind, pattern in LIMIT_PATTERNS if pattern.search(line))
+    return "usage" if "usage" in kinds else ("http_429" if kinds else None)
 
 
-def codex_env() -> dict:
-    """The caller's environment without Rust tracing settings (see the module docstring)."""
-    return {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+def limit_error(directory: Path) -> bool:
+    """Codex itself reported a limit (see limit_kind)."""
+    return limit_kind(directory) is not None
+
+
+def codex_env(lane: dict | None = None) -> dict:
+    """The caller's environment without Rust tracing settings (see the module docstring). For a gateway lane,
+    CODEX_HOME points at the staged lane-local home, never at the caller's; the key variable passes through as it is
+    and is never written anywhere."""
+    env = {key: value for key, value in os.environ.items() if not key.startswith("RUST_LOG")}
+    if lane is not None and lane.get("codex_home") is not None:
+        env["CODEX_HOME"] = str(lane["codex_home"])
+        if not (env.get(lane["api_key_env"]) or "").strip() and lane.get("api_key_placeholder"):
+            env[lane["api_key_env"]] = lane["api_key_placeholder"]  # keyless loopback gateway; a real key wins
+    return env
 
 
 def sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def job_inputs(prompt: bytes, schema: bytes, model: str) -> dict:
-    return {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
-            "effort": EFFORT}
+def job_inputs(prompt: bytes, schema: bytes, model: str, provider: str = "native",
+               http_headers: dict | None = None) -> dict:
+    inputs = {"prompt_sha256": sha256_hex(prompt), "schema_sha256": sha256_hex(schema), "model": model,
+              "effort": EFFORT}
+    if provider != "native":  # a gateway run never reuses a native job's result, or the other way round
+        inputs["provider"] = provider
+    if http_headers:  # other provider headers (another compression plan, say) make another run
+        inputs["http_headers"] = dict(sorted(http_headers.items()))
+    return inputs
 
 
 def read_json(path: Path):
@@ -288,9 +444,17 @@ def archive_attempt(directory: Path) -> int | None:
     return number
 
 
-def codex_argv(codex: str, directory: Path, model: str, prompt: str) -> list[str]:
-    return [codex, "--search", "exec", "--ignore-user-config", "--skip-git-repo-check", "-s", "read-only",
-            "-m", model, "-c", f'model_reasoning_effort="{EFFORT}"',
+def codex_argv(codex: str, directory: Path, model: str, prompt: str, lane: dict | None = None) -> list[str]:
+    # Live web search: `--search` before exec (and no flag) sends external_web_access false, a cached index;
+    # only web_search="live" sends true (evidence/artifacts/sota-refresh-20260926/codex/results/websearch-*.json).
+    if lane is not None and lane.get("codex_home") is not None:
+        # The lane-local CODEX_HOME is the whole configuration, so --ignore-user-config (which drops
+        # $CODEX_HOME/config.toml) must not be passed; the profile layers <profile>.config.toml over it (profile-v2).
+        head = [codex, "exec", *(["-p", lane["profile"]] if lane.get("profile") else [])]
+    else:
+        head = [codex, "exec", "--ignore-user-config"]
+    return [*head, "--skip-git-repo-check", "-s", "read-only",
+            "-m", model, "-c", f'model_reasoning_effort="{EFFORT}"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json", prompt]
 
 
@@ -309,7 +473,8 @@ def start(base: Path, job: str, prompt_file: str, schema_file: str) -> int:
     directory = job_dir(base, job)
     prompt_bytes = Path(prompt_file).read_bytes()
     schema_bytes = Path(schema_file).read_bytes()
-    inputs = job_inputs(prompt_bytes, schema_bytes, settings(base)["model"])  # also refuses a broken staged.json
+    config = settings(base)  # also refuses a broken staged.json
+    inputs = job_inputs(prompt_bytes, schema_bytes, config["model"], config["provider"], config["http_headers"])
     changed = False
     if (directory / "done").exists() and exit_code(directory) == 0:
         if read_json(directory / "inputs.json") == inputs:
@@ -528,6 +693,12 @@ def run(base: Path, job: str) -> int:
         write_atomic(directory / "stderr.txt", "codex is not on PATH\n")
         finish(directory, EXIT_NO_CODEX)
         return EXIT_NO_CODEX
+    lane = config if config["codex_home"] is not None else None
+    if lane is not None and not (os.environ.get(lane["api_key_env"]) or "").strip() and not lane["api_key_placeholder"]:
+        write_atomic(directory / "stderr.txt", f"{lane['api_key_env']} is not set in the runner's environment; start "
+                     "the harness with the gateway key loaded from its store by pointer (docs/secret-storage.md)\n")
+        finish(directory, EXIT_NO_KEY)
+        return EXIT_NO_KEY
     version = codex_version(codex)
     if version:
         write_atomic(directory / "codex_version", version + "\n")
@@ -535,15 +706,21 @@ def run(base: Path, job: str) -> int:
     prompt = (directory / "prompt.txt").read_text(encoding="utf-8").rstrip("\n")
     (base / "empty").mkdir(exist_ok=True)
     with open(directory / "events.jsonl", "wb") as events, open(directory / "stderr.txt", "wb") as errors:
-        process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt), cwd=str(base / "empty"),
-                                   stdin=subprocess.DEVNULL, stdout=events, stderr=errors,
-                                   pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env())
+        process = subprocess.Popen(codex_argv(codex, directory, config["model"], prompt, lane),
+                                   cwd=str(base / "empty"), stdin=subprocess.DEVNULL, stdout=events, stderr=errors,
+                                   pass_fds=(slot_fd, lock_fd), start_new_session=True, env=codex_env(lane))
         try:
             code = process.wait(timeout=config["timeout_s"])
         except subprocess.TimeoutExpired:
             stop_group(process, config["kill_grace_s"])
             code = EXIT_TIMEOUT
-    if limit_error(directory):
+    kind = limit_kind(directory)
+    if kind == "http_429":
+        mark_limit(base, f"HTTP 429 from the route (Codex retries no 429), first seen {utc_now()} in {job}; the report "
+                   "carries no reset time and cannot tell an exhausted pool from a brief rate limit: read the account "
+                   "pool (scripts/codex_quota.py for a native login, the gateway for a pooled route) and remove this "
+                   "file when it has capacity")
+    if kind is not None:
         (base / "LIMIT").touch()
         code = EXIT_LIMIT
     finish(directory, code)

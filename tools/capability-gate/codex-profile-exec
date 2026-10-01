@@ -1,0 +1,9 @@
+#!/bin/sh
+# promptfoo 0.123.1's openai:codex-sdk (its bundled @openai/codex-sdk 0.153.4) starts
+# `<codex_path_override> exec --experimental-json ...` with no profile argument, and codex-cli 0.157.1 rejects
+# `-c profile=...` ("no longer supported; use --profile"). This launcher only inserts `--profile "$CODEX_PROFILE"`
+# after `exec`; every other argument reaches the host's codex (CAPABILITY_GATE_CODEX, else `codex` on PATH) unchanged.
+CODEX=${CAPABILITY_GATE_CODEX:-codex}
+[ "$1" = exec ] || exec "$CODEX" "$@"
+shift
+exec "$CODEX" exec --profile "${CODEX_PROFILE:?CODEX_PROFILE must name the Codex profile}" "$@"

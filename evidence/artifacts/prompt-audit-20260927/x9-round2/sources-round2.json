@@ -1,0 +1,430 @@
+{
+ "round": "X9 round 2",
+ "compiled": "2026-09-27 (host local date; UTC times below)",
+ "sources": [
+  {
+   "id": "C1",
+   "kind": "installed-client",
+   "retrieved": "2026-09-28T02:18Z, Claude Code 2.1.283",
+   "what": "Tool result when a headless session of the base called the Skill tool with skill \"context\" (verbatim)",
+   "quote": "context is a built-in CLI command, not a skill. Ask the user to run /context themselves — it cannot be invoked via the Skill tool."
+  },
+  {
+   "id": "C2",
+   "kind": "installed-client",
+   "retrieved": "2026-09-28T02:18Z, Claude Code 2.1.283",
+   "what": "Tool result in the same session for the Skill tool with skill \"mcp\" (verbatim)",
+   "quote": "mcp is a UI command, not a skill. Ask the user to run /mcp themselves — it cannot be invoked via the Skill tool."
+  },
+  {
+   "id": "C3",
+   "kind": "installed-client",
+   "retrieved": "2026-09-27, Claude Code 2.1.283",
+   "what": "The Skill tool's own description, as the client gives it to the session model",
+   "quote": "Only names from the listing (or that the user typed explicitly) are valid. Built-in CLI commands (`/help`, `/clear`, …) aren't skills."
+  },
+  {
+   "id": "C4",
+   "kind": "installed-client",
+   "retrieved": "2026-09-28T02:11Z, Claude Code 2.1.283",
+   "what": "The init event of a headless session of the base (its command lists; a headless session's lists, not the interactive command set)",
+   "quote": "slash_commands (107 entries) includes \"mcp\", \"context\" and \"reload-plugins\" and no \"plugin\"; terminal_slash_commands is [\"doctor\", \"color\", \"focus\", \"reload-plugins\"]; skills (60 entries) includes neither \"mcp\" nor \"context\"."
+  },
+  {
+   "id": "R1",
+   "question": 1,
+   "url": "cmd: claude --version",
+   "fetched": "2026-09-28 UTC",
+   "revision": "local install, observed now",
+   "quote": "2.1.283 (Claude Code)",
+   "settles": "Observed now: the installed client is 2.1.283, the newest heading in the CHANGELOG.",
+   "kind": "installed-client"
+  },
+  {
+   "id": "R2",
+   "question": 1,
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 13",
+   "quote": "A command is only recognized at the start of your message. Text that follows the command name becomes its arguments. As of v2.1.199, [skills](/docs/en/skills#pass-arguments-to-skills) are the exception: a skill invocation followed by more skills, such as `/skill-a /skill-b do XYZ`, loads every skill named at the start and passes the trailing text to each as arguments.",
+   "settles": "Documented: a command runs only when it opens the message, with one exception since v2.1.199 for chained skills at the start.",
+   "kind": "published"
+  },
+  {
+   "id": "R5",
+   "question": 1,
+   "url": "https://code.claude.com/docs/en/skills.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 766",
+   "quote": "A few built-in commands are also available through the Skill tool, including `/init` and `/security-review`. Other built-in commands such as `/compact` are not.",
+   "settles": "Documented: the only built-in commands the page names as model-invocable through the Skill tool are /init and /security-review, the list is not exhaustive (\"including\"), and /mcp, /context and /plugin are named neither way.",
+   "kind": "published"
+  },
+  {
+   "id": "R7",
+   "question": 1,
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 107 (/mcp row, not marked Skill)",
+   "quote": "Manage MCP server connections and OAuth authentication. Run with no argument to open the interactive list, pass `reconnect <server>` to reconnect one disconnected server, or pass `enable`/`disable` with a server name or `all` to change connection state without opening the dialog. Also available in non-interactive mode (`-p`), where running it with no argument prints a text summary of server status instead of opening the list; requires Claude Code v2.1.205 or later",
+   "settles": "Documented: /mcp is a built-in command, not a Skill, and has a text-summary form under -p; its row says nothing about model invocation.",
+   "kind": "published"
+  },
+  {
+   "id": "R8",
+   "question": 1,
+   "url": "https://code.claude.com/docs/en/commands.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 72 (/context) and 115 (/plugin), neither marked Skill",
+   "quote": "Visualize current context usage as a colored grid.\nManage Claude Code [plugins](/docs/en/plugins/overview). Run with no argument to open the plugin menu, or pass a subcommand such as `list`, `install`, `enable`, or `disable` to act directly.",
+   "settles": "Documented: /context and /plugin are built-in commands, and neither row mentions the Skill tool or model invocation.",
+   "kind": "published"
+  },
+  {
+   "id": "R10",
+   "question": 1,
+   "url": "https://code.claude.com/docs/en/plugins/troubleshooting.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 26",
+   "quote": "`/plugin` is a command you type inside a running Claude Code terminal session, and it opens an interactive panel.",
+   "settles": "Documented: /plugin is described as a command the user types, and it opens an interactive panel.",
+   "kind": "published"
+  },
+  {
+   "id": "R15",
+   "question": 1,
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "## 2.1.222; same commit",
+   "quote": "Improved the refusal when Claude tries to invoke a skill with `disable-model-invocation`: Claude is now told to ask you to run the skill instead of replicating its workflow",
+   "settles": "Documented: when the model cannot invoke a skill, the client's own pattern is to tell it to ask the user to run the skill.",
+   "kind": "published"
+  },
+  {
+   "id": "R18",
+   "question": 1,
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "## 2.1.283; same commit",
+   "quote": "Improved the Skill tool's reply when a skill belongs to a plugin that failed to load, so Claude tells you the plugin could not be loaded instead of calling the skill uninstalled",
+   "settles": "Documented: in 2.1.283 the Skill tool's reply is also in-session evidence that a plugin failed to load (bears on question 2).",
+   "kind": "published"
+  },
+  {
+   "id": "R19",
+   "question": 1,
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "## 2.1.108 (outside the requested 2.1.200-2.1.283 range); same commit",
+   "quote": "The model can now discover and invoke built-in slash commands like `/init`, `/review`, and `/security-review` via the Skill tool",
+   "settles": "Documented: this is the origin of the round-1 S7 claim, and it names no /mcp, /context or /plugin.",
+   "kind": "published"
+  },
+  {
+   "id": "R20",
+   "question": 2,
+   "url": "cmd: claude mcp list --help",
+   "fetched": "2026-09-28 UTC",
+   "revision": "Claude Code 2.1.283, observed now (terminal line wraps joined)",
+   "quote": "List configured MCP servers. Unapproved .mcp.json servers are shown as ⏸ Pending approval and not connected to; approved servers are health-checked unless disabled for this project.",
+   "settles": "Observed now: `claude mcp list` health-checks approved servers itself.",
+   "kind": "installed-client"
+  },
+  {
+   "id": "R21",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 242",
+   "quote": "`claude mcp list` then shows a health status next to each server it lists, such as `✔ Connected`, `! Needs authentication`, or `✘ Failed to connect`. A failure status means Claude Code couldn't connect to that server, not that the list command failed.",
+   "settles": "Documented: `claude mcp list` reports a connection or health status for each server.",
+   "kind": "published"
+  },
+  {
+   "id": "R22",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 244",
+   "quote": "The statuses in this list report a configuration decision rather than a connection attempt, so Claude Code prints them without connecting to the server:",
+   "settles": "Documented that the list command makes its own connection attempts; that its output therefore does not show the connections of an already-running session is inference, not verified.",
+   "kind": "published"
+  },
+  {
+   "id": "R24",
+   "question": 2,
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "## 2.1.238; same commit",
+   "quote": "Changed `claude mcp list` and `claude mcp get` to show disabled servers as `⊘ Disabled` instead of connecting to them for a health check",
+   "settles": "Documented: the health check in `claude mcp list` is a live connection made by that command.",
+   "kind": "published"
+  },
+  {
+   "id": "R25",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 1423",
+   "quote": "Tool search keeps MCP context usage low by deferring tool definitions until Claude needs them. Only tool names and server instructions load at session start, so adding more MCP servers has minimal impact on your context window.",
+   "settles": "Documented: the model sees deferred tool names and server instructions at session start.",
+   "kind": "published"
+  },
+  {
+   "id": "R26",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 308",
+   "quote": "With tool search enabled, when a server finishes connecting while Claude is working, Claude Code lists the server's tool names to Claude on its next request in the same turn. Claude can then search for and call those tools without waiting for your next message.",
+   "settles": "Documented: tool names arriving mid-turn signal that a server has finished connecting.",
+   "kind": "published"
+  },
+  {
+   "id": "R27",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 268, 270",
+   "quote": "Claude Code loaded the server's tool list from its discovery cache, saved in a previous session, instead of connecting at startup, and Claude Code connects the server the first time Claude calls one of the server's tools.\nThe discovery cache is off by default unless a gradual rollout has enabled it for your account.",
+   "settles": "Documented: with the discovery cache on, tool names can be present before any connection, so names alone do not prove a live server; that a result returned by one of the server's own tools does prove it is inference.",
+   "kind": "published"
+  },
+  {
+   "id": "R28",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 389-390",
+   "quote": "With tool search, Claude Code tells Claude which server failed and its connection error, so Claude reports the connection failure in its response. Claude Code includes the same information in `ToolSearch` results that find no matching tool.\nIn any [configuration without tool search](#configure-tool-search), Claude Code doesn't report failed server connections to Claude.",
+   "settles": "Documented: with tool search on, ToolSearch is an in-session failure signal and the client's pattern is to report the failure; without tool search there is no such signal.",
+   "kind": "published"
+  },
+  {
+   "id": "R29",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 755",
+   "quote": "As of v2.1.196, when a configured server needs authentication during a `claude -p` or Agent SDK run with [tool search](#scale-with-mcp-tool-search) enabled, which is the default, Claude Code tells Claude that the server's tools are unavailable until you authorize it. Claude can then name the server that needs sign-in instead of responding as if the server weren't configured.",
+   "settles": "Documented: in headless runs the model learns needs-auth status and names the server.",
+   "kind": "published"
+  },
+  {
+   "id": "R31",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/agent-sdk/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 631",
+   "quote": "If the status is `failed` or `needs-auth`, see [Error handling](#error-handling) before trusting the result, since Claude can fall back to built-in tools when the server is unavailable.",
+   "settles": "Documented: a plausible final answer does not show the MCP server was used.",
+   "kind": "published"
+  },
+  {
+   "id": "R42",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/debug-your-config.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 15, 50",
+   "quote": "The `/context` command shows everything occupying the context window for the current session, broken down by category: system prompt, system tools, MCP tools, custom subagents with the source each loaded from, memory files, skills, and conversation messages.\nRun `/mcp` to see every configured server, its connection status, and whether you have approved it for the current project.",
+   "settles": "Documented: /context and /mcp are the documented user-run checks of what the current session actually loaded.",
+   "kind": "published"
+  },
+  {
+   "id": "R43",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/plugins/troubleshooting.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 591",
+   "quote": "Run `/plugin` and open **Installed**. Confirm the plugin is listed and enabled. `claude plugin list` in your shell prints the same list with each plugin's version, scope, and `Status: ✔ enabled`.",
+   "settles": "Documented: `claude plugin list` is a shell alternative to /plugin that the model could run through Bash.",
+   "kind": "published"
+  },
+  {
+   "id": "R44",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/plugins/cli-reference.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 299, 305 (plugin list --json fields)",
+   "quote": "Whether the plugin is enabled in your merged settings\nLoad errors, when the plugin failed to load",
+   "settles": "Documented: plugin list reports enablement in settings plus load errors, not what the running session loaded.",
+   "kind": "published"
+  },
+  {
+   "id": "R45",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/plugins/troubleshooting.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 612, 614",
+   "quote": "The install summary in `/plugin` ended with `Run /reload-plugins to activate.` instead of `Plugin is now active.`\nClaude Code didn't activate the plugin during the install, either because activating it would [invalidate the prompt cache](/docs/en/prompt-caching#enabling-or-disabling-a-plugin) or because the activation attempt failed.",
+   "settles": "Documented: a plugin can be installed and enabled without being active in the current session.",
+   "kind": "published"
+  },
+  {
+   "id": "R46",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/mcp.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 500",
+   "quote": "Tools from a plugin-bundled MCP server include both the plugin name and the server key in their callable name. The full form is `mcp__plugin_<plugin-name>_<server-name>__<tool-name>`, where any character outside `A-Z`, `a-z`, `0-9`, `_`, and `-` is replaced with `_`.",
+   "settles": "Documented: a plugin's MCP tools are identifiable by name in the deferred tool list.",
+   "kind": "published"
+  },
+  {
+   "id": "R47",
+   "question": 2,
+   "url": "https://code.claude.com/docs/en/skills.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 124",
+   "quote": "Wherever the [plugin](/docs/en/plugins/overview) is enabled, as `/plugin-name:skill-name`",
+   "settles": "Documented: a plugin's skills appear under its namespace, which the model can see in its skill listing.",
+   "kind": "published"
+  },
+  {
+   "id": "R48",
+   "question": 2,
+   "url": "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "## 2.1.275; same commit",
+   "quote": "Improved the `ListPlugins` tool description so Claude knows it lists plugins enabled on your claude.ai account, not plugins installed locally with `/plugin`",
+   "settles": "Documented: the model's ListPlugins tool does not report locally installed plugins.",
+   "kind": "published"
+  },
+  {
+   "id": "R49",
+   "question": 2,
+   "url": "in-session observation (this subagent, 2026-09-28)",
+   "fetched": "2026-09-28 UTC",
+   "revision": "Claude Code 2.1.283, observed now",
+   "quote": "The following deferred tools are now available via ToolSearch. Their schemas are NOT loaded — calling them directly will fail with InputValidationError.",
+   "settles": "Observed now: this session got deferred names such as mcp__plugin_context-mode_context-mode__ctx_fetch_and_index, and calls to that tool returned pages, which shows the plugin's MCP server was live.",
+   "kind": "installed-client"
+  },
+  {
+   "id": "R50",
+   "question": 3,
+   "url": "https://code.claude.com/docs/en/best-practices.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 52",
+   "quote": "Have Claude show evidence rather than asserting success: the test output, the command it ran and what it returned, or a screenshot of the result. Reviewing evidence is faster than re-running the verification yourself, and it works for sessions you weren't watching.",
+   "settles": "Documented: Claude Code guidance prefers reported evidence over asserted success.",
+   "kind": "published"
+  },
+  {
+   "id": "R53",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; lines 471-473, sample prompt (code-block line breaks joined)",
+   "quote": "By default, implement changes rather than only suggesting them. If the user's intent is unclear, infer the most useful likely action and proceed, using tools to discover any missing details instead of guessing.",
+   "settles": "Documented sample prompt: use tools to discover missing details before guessing or asking.",
+   "kind": "published"
+  },
+  {
+   "id": "R56",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 66, sample prompt",
+   "quote": "Deliver what was asked, at the scope intended. Make routine judgment calls yourself, and check in only when different readings of the request would lead to materially different work.",
+   "settles": "Documented for Opus 5: check in only on materially divergent readings.",
+   "kind": "published"
+  },
+  {
+   "id": "R59",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 71",
+   "quote": "With this addition the model carries on where it would otherwise have stopped to check in, so keep your own confirmation step for risky or irreversible actions, and leave the addition out of human-in-the-loop applications, where someone is there to answer.",
+   "settles": "Documented for Opus 5.5: the keep-going guidance targets unattended runs, not human-in-the-loop sessions.",
+   "kind": "published"
+  },
+  {
+   "id": "R60",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 74, sample system-prompt addition",
+   "quote": "The stops the user does want are the ones where nothing can move without them, or where the thing blocking you is deliberately protected from you. This does not override the need for confirmation on risky or destructive actions.",
+   "settles": "Documented for Opus 5.5: legitimate stops are those where nothing can proceed without the user, or where the blocker is deliberately protected.",
+   "kind": "published"
+  },
+  {
+   "id": "R61",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 64, sample prompt",
+   "quote": "Pause for the user only when the work genuinely requires them: a destructive or irreversible action, a real scope change, or input that only they can provide. If you hit one of these, ask and end the turn, rather than ending on a promise.",
+   "settles": "Documented for Fable 5: ask only for input that only the user can provide, or for irreversible actions or scope changes.",
+   "kind": "published"
+  },
+  {
+   "id": "R63",
+   "question": 3,
+   "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md",
+   "fetched": "2026-09-28 UTC",
+   "revision": "none stated; line 826, sample prompt",
+   "quote": "If a question comes up partway, first do everything that doesn't depend on the answer; then state the assumption you made, or — when going ahead on a wrong guess would be unsafe or would make the work useless — put the question at the end of a turn that also delivers that progress. If one part turns out to be blocked, complete every other part in full and say exactly what you left out and why — the whole task is the deliverable, and scaling it down is the user's call, not yours.",
+   "settles": "Documented for Fable 5.1: state the assumption or report the blocked part; ask only when a wrong guess is unsafe or useless, and then at the end of a productive turn.",
+   "kind": "published"
+  },
+  {
+   "id": "NF1",
+   "question": 1,
+   "not_found": "Any CHANGELOG entry from 2.1.200 through 2.1.283 that changes model access to /mcp, /context or /plugin",
+   "queries": [
+    "CHANGELOG.md @7779afb, 72 version headings 2.1.200-2.1.283: bullets matching Skill tool | model-invo | Claude...(invoke|run|call|trigger|start)...(command|skill|/x) | on its own | typed directly | user-invocable | SlashCommand -> 15 lines, none about /mcp, /context or /plugin",
+    "same range: all 7 bullets containing `/context` -> UI or token-counting fixes only",
+    "same range: bullets containing `/mcp` or `/plugin` plus invok|Skill|model|on its own|typed|Claude can -> 2.1.280, 2.1.277, 2.1.247, all dialog or VS Code fixes"
+   ],
+   "kind": "not-found record"
+  },
+  {
+   "id": "NF2",
+   "question": 2,
+   "not_found": "A hook event or hook input that reports MCP connection status or plugin load status",
+   "queries": [
+    "hooks.md event headings SessionStart...ElicitationResult (33 events): none for MCP connection or plugin load",
+    "hooks.md regex mcp_servers|plugin_errors|server status|McpServer|connection status|plugins that loaded|loaded plugins -> 1 hit (line 1587, PreToolUse mcp_server provenance)"
+   ],
+   "kind": "not-found record"
+  },
+  {
+   "id": "NF3",
+   "question": 2,
+   "not_found": "A statement that the model can read its own session's system/init message, or that `claude mcp list` run from inside a session reports that session's connections",
+   "queries": [
+    "headless.md lines 218-250, agent-sdk/mcp.md, agent-sdk/typescript.md SDKSystemMessage: init is described as stream or SDK output for the caller, with no sentence saying Claude receives it",
+    "mcp.md regex mcp list|health|Connected|Failed|needs-auth|Pending|status (40 hits) and claude mcp list --help: the command health-checks servers itself, with no sentence tying it to a running session"
+   ],
+   "kind": "not-found record"
+  },
+  {
+   "id": "NF4",
+   "question": 3,
+   "not_found": "An explicit Claude Code best-practices rule on stopping to ask versus proceeding and reporting what could not be verified",
+   "queries": [
+    "best-practices.md regex clarif|ask (you|the user|questions)|interview|AskUserQuestion|check in|without asking|autonom|couldn't verify|could not verify|unverified|report (back|what)|guess|assum -> only the interview, autonomy-intro, permissions and auto-mode passages (lines 9, 13, 195, 319-350, 519)"
+   ],
+   "kind": "not-found record"
+  },
+  {
+   "id": "NF7",
+   "question": 4,
+   "not_found": "Any statement on whether the model can invoke /mcp or /context (or /plugin), through the Skill tool or any other tool",
+   "queries": [
+    "code.claude.com/docs/llms-full.txt, sentences matching (through|via|with) the Skill tool | Skill tool...(built-in|/init|/compact|/mcp|/context|command) -> 13 hits, none naming /mcp, /context or /plugin",
+    "same corpus, (Claude|model)...(run|invoke|call|use|type|trigger)...`/(mcp|context|plugin)` or `/(mcp|context|plugin)`...(Claude can|Claude can't|only you|you type|typed) -> 12 hits, all user-facing 'run /mcp' or 'run /plugin' instructions",
+    "same corpus, Claude (can't|cannot|doesn't|won't) (run|invoke|type|execute|trigger|see)...(command|/x) -> 3 hits, none about these commands",
+    "commands.md: 'Skill tool' -> 0 occurrences",
+    "WebSearch: Claude Code Skill tool built-in commands model invoke \"/mcp\" OR \"/context\" -> no primary statement"
+   ],
+   "kind": "not-found record"
+  }
+ ],
+ "researcher": "stack-researcher agent (read-only), 2026-09-28 UTC; each page fetched and kept as a raw copy; the coordinator re-checked every published quote in this file against those copies",
+ "fields": "`quote` is verbatim from the source; `settles` is the researcher's one-line reading of it, not part of the source; `not_found` records name what was searched for and not found, with the queries used",
+ "scope": "sources on the commands the texts name, on in-session verification of plugins and MCP servers, and on when Claude models should ask the user versus report and continue; CLAUDE.md is read by Claude Code sessions, so other vendors' prompting guides are left out"
+}

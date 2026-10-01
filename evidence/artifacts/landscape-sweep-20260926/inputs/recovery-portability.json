@@ -1,0 +1,213 @@
+{
+ "catalog": "foundation",
+ "layer_id": "recovery-portability",
+ "title": "Recovery and portability",
+ "requirement": "Reproduce selected tools and recover actual application state on an explicitly adopted host without copying authentication stores or treating old receipts as new acceptance.",
+ "research_status": "new_host_required",
+ "next_action": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore selected application state and keys.",
+ "requirement_sha256": "a8f3f5c054ca28031260c8188b78970dc87250f0b4a94ac36658e286c4be333c",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "restic",
+   "repository": "https://github.com/restic/restic",
+   "pin": "0.19.1",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "candidate:astral-sh-uv",
+   "repository": "https://github.com/astral-sh/uv",
+   "pin": "unpinned",
+   "evidence_class": "synthetic",
+   "platform_status": {
+    "linux-wsl2-x86_64": "conditional",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "mise",
+   "repository": "https://github.com/jdx/mise",
+   "disposition": "conditional"
+  },
+  {
+   "name": "chezmoi",
+   "repository": "https://github.com/twpayne/chezmoi",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Litestream",
+   "repository": "https://github.com/benbjohnson/litestream",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Determinate Nix installer",
+   "repository": "https://github.com/DeterminateSystems/nix-installer",
+   "disposition": "out_of_scope"
+  },
+  {
+   "name": "Devbox",
+   "repository": "https://github.com/jetify-com/devbox",
+   "disposition": "out_of_scope"
+  }
+ ],
+ "components_vs_upstream_20260926": [
+  {
+   "id": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "pin": "2.3.2",
+   "upstream": {
+    "latest": "v2.4.1",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 8428,
+    "license": "MIT",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "claude-code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "pin": "2.1.278",
+   "upstream": {
+    "latest": "v2.1.283",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 148105,
+    "license": null,
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "codex",
+   "repository": "https://github.com/openai/codex",
+   "pin": "0.155.1",
+   "upstream": {
+    "latest": "rust-v0.157.0",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-26",
+    "stars": 126487,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "pin": "2.16.6",
+   "upstream": {
+    "latest": "v2.17.2",
+    "released_at": "2026-09-25",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 4085,
+    "license": "GPL-3.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": true,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "qdrant",
+   "repository": "https://github.com/qdrant/qdrant",
+   "pin": "1.19.1",
+   "upstream": {
+    "latest": "v1.19.1",
+    "released_at": "2026-09-04",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 34827,
+    "license": "Apache-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "restic",
+   "repository": "https://github.com/restic/restic",
+   "pin": "0.19.1",
+   "upstream": {
+    "latest": "v0.19.1",
+    "released_at": "2026-07-05",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 36256,
+    "license": "BSD-2-Clause",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": false,
+   "pin_comparison": "compared"
+  },
+  {
+   "id": "systemd",
+   "repository": "https://github.com/systemd/systemd",
+   "pin": "255.4-1ubuntu8.17",
+   "upstream": {
+    "latest": "v262",
+    "released_at": "2026-09-22",
+    "prerelease": false,
+    "pushed_at": "2026-09-25",
+    "stars": 16747,
+    "license": "GPL-2.0",
+    "archived": false,
+    "renamed_to": null
+   },
+   "pin_behind_upstream": null,
+   "pin_comparison": "not_compared"
+  }
+ ],
+ "open_gaps": [
+  "uv's hash-locked sync has been executed only in fresh prefixes on the existing WSL host (adoption/receipt.json line 146; blueprints/catalog-clean-install/README.md lines 3-6). Its uv tool installs also ran on the same host with the package cache reused (native-token-clean-prefix-20260920.json lines ",
+  "The uv lock covers only the 36-distribution Python SDK graph. Native client archives, npm tools, the OS/interpreter, the GPU stack, services and models keep separate recipes and acceptance (adoption/receipt.json line 147; AUDIT.md line 38). The clean-install audit did not qualify Context Mode, ai-me",
+  "The packet's second evidence_ref for uv, docs/portable-userspace-install-20260921.md, contains no occurrence of 'uv' (grep count 0). The uv evidence comes from adoption/receipt.json and the catalog-clean-install artifacts instead.",
+  "All Restic recovery evidence uses synthetic state. No existing private application archive or production data has been restored (decisions.json synthetic-offhost-application-restore limitations; packet lines 74 and 88).",
+  "Lost-account and lost-password recovery are unqualified: ciphertext and password delivery share one GitHub administrative account (packet lines 76 and 89)."
+ ],
+ "overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/borgbackup/borg",
+   "https://github.com/checkpoint-restore/criu",
+   "https://github.com/getsops/sops"
+  ]
+ },
+ "known_repositories": [
+  "astral-sh/uv",
+  "benbjohnson/litestream",
+  "borgbackup/bor",
+  "casey/jus",
+  "checkpoint-restore/criu",
+  "determinatesystems/nix-installer",
+  "filosottile/age",
+  "getsops/sops",
+  "jdx/mise",
+  "jetify-com/devbox",
+  "kopia/kopia",
+  "rclone/rclone",
+  "restic/restic",
+  "twpayne/chezmo"
+ ],
+ "seeded_candidates_20260926": []
+}

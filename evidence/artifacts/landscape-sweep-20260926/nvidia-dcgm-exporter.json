@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-nvidia-dcgm-exporter",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/NVIDIA/dcgm-exporter",
+ "reviewed_commit": "fafd151148052628061a80450b4ee037a5fa0c3c",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of NVIDIA/dcgm-exporter at commit fafd151148052628061a80450b4ee037a5fa0c3c (license Apache-2.0), read from README.md at that commit. Repository description: \"NVIDIA GPU metrics exporter for Prometheus leveraging DCGM\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 1882,
+  "pushed_at": "2026-09-18T21:23:51Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@fafd151148052628061a80450b4ee037a5fa0c3c",
+   "text": "DCGM Exporter exposes NVIDIA GPU telemetry from [NVIDIA Data Center GPU Manager (DCGM)](https://developer.nvidia.com/dcgm) in the Prometheus text format. This repository contains the exporter source, container and package builds, Helm chart, tests, and dashboards."
+  },
+  {
+   "source": "README.md@fafd151148052628061a80450b4ee037a5fa0c3c",
+   "text": "- [Install DCGM Exporter](https://docs.nvidia.com/datacenter/dcgm/latest/installation/install-dcgm-exporter.html) - [Configure Prometheus for DCGM Exporter](https://docs.nvidia.com/datacenter/dcgm/latest/learn/getting-started-for-system-administrators/configure-prometheus-for-dcgm-exporter.html) - [`dcgm-exporter` command reference](https://docs.nvidia.com/datacenter/dcgm/latest/reference/command-line-reference/dcgm-exporter.html) - [DCGM Exporter Metrics](https://docs.nvidia.com/datacenter/dcgm"
+  },
+  {
+   "source": "README.md@fafd151148052628061a80450b4ee037a5fa0c3c",
+   "text": "The installation guide covers deployment, configuration, verification, administration, and troubleshooting."
+  }
+ ]
+}

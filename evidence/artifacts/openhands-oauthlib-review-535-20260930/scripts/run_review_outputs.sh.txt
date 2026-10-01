@@ -1,0 +1,80 @@
+#!/bin/bash
+# run_review_outputs.sh -- regenerate, from the immutable PR 535 head (git objects) and the scratch install of its lock, the read-only outputs of the independent
+# OAuthlib reachability review that were first printed in a session: identity of the head and the lock, the closure difference against the PR base's lock, the
+# advisory-file hash comparison, the three OSV-Scanner scans (CI config, empty-config control, base lock) with their exit codes, the pin-source check, and
+# the osv-scanner binary identity. Every output carries its observed time. Nothing here touches a gateway, a store or a credential.
+set -u
+C=<REPO>
+W=<REVIEW-SCRATCH>
+OUT=$W/out
+P=refs/remotes/pr/535
+BASE=f03f41c7f3601532b8635f8f112a3d2731454375
+O=blueprints/runtime-workers/openhands
+L=$O/requirements.lock
+OSV=<OSV-BIN>/osv-scanner
+SP=$W/venv/lib/python3.13/site-packages
+WT=<PR535-WORKTREE>
+mkdir -p "$OUT"
+stamp() { date -u +%FT%TZ; }
+
+{
+  echo "observed_utc=$(stamp)"
+  echo "pr head:                          $(git -C $C rev-parse $P)"
+  echo "pr base (main when the PR was made): $BASE"
+  echo "merge base of head and origin/main:  $(git -C $C merge-base $P origin/main)"
+  echo "candidate lock sha256 at the head:   $(git -C $C show $P:$L | sha256sum | cut -d' ' -f1)"
+  echo "lock sha256 at the PR base:          $(git -C $C show $BASE:$L | sha256sum | cut -d' ' -f1)"
+  echo "pins.json requirements_sha256:       $(git -C $C show $P:$O/pins.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["requirements_sha256"])')"
+  echo "pins.json version:                   $(git -C $C show $P:$O/pins.json | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])')"
+  echo "--- the OpenHands entry of IGNORE_ALLOWED_LOCKS in tests/test_osv_lockfile_coverage.py at the head:"
+  git -C $C show $P:tests/test_osv_lockfile_coverage.py | grep -n -A3 '"blueprints/runtime-workers/openhands/requirements.lock": {' | sed 's/^/  /'
+  echo "--- lines the PR adds or removes in .github/osv-scanner.toml (changed lines only):"
+  git -C $C diff -U0 $BASE $P -- .github/osv-scanner.toml | grep '^[-+]' | grep -v '^+++\|^---' | sed 's/^/  /'
+  echo "--- the evidence file the entry names exists at the head: $(git -C $C cat-file -t $P:$O/evidence/wheel-relock-20260930.json 2>&1)"
+} > "$OUT/pr535-identity.txt" 2>&1
+
+git -C $C show $BASE:$L > "$OUT/lock-at-pr-base.copy"
+git -C $C show $P:$L > "$OUT/lock-at-pr-head.copy"
+{
+  echo "observed_utc=$(stamp)"
+  echo "sha256 of the two inputs: base $(sha256sum "$OUT/lock-at-pr-base.copy" | cut -c1-64) | head $(sha256sum "$OUT/lock-at-pr-head.copy" | cut -c1-64)"
+  python3 $W/lock_closure_diff.py "$OUT/lock-at-pr-base.copy" "$OUT/lock-at-pr-head.copy"
+} > "$OUT/closure-diff-base-vs-head.txt" 2>&1
+
+git -C $C show $P:$O/evidence/wheel-relock-20260930-oauthlib-callers.txt > "$OUT/candidate-callers-output.copy"
+{
+  echo "observed_utc=$(stamp)"
+  echo "hashes in the reproduced install versus the hashes printed in the candidate's own callers output (evidence/wheel-relock-20260930-oauthlib-callers.txt at the head):"
+  for f in oauth2/rfc6749/endpoints/revocation.py oauth2/rfc6749/grant_types/authorization_code.py oauth2/rfc6749/endpoints/pre_configured.py openid/connect/core/endpoints/pre_configured.py; do
+    theirs=$(grep -E "^oauthlib/$f sha256" "$OUT/candidate-callers-output.copy" | head -1 | awk '{print $3}'); mine=$(sha256sum "$SP/oauthlib/$f" | cut -d' ' -f1)
+    echo "  oauthlib/$f: reproduced $mine | candidate's $theirs | $([ "$theirs" = "$mine" ] && echo IDENTICAL || echo DIFFERENT)"
+  done
+  echo "func_timeout/py2_raise.py: reproduced $(sha256sum "$SP/func_timeout/py2_raise.py" | cut -d' ' -f1) | pinned by the candidate 19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77"
+  echo "func_timeout/dafunc.py lines 20-26 (which raise helper is selected on Python 3):"; sed -n 20,26p "$SP/func_timeout/dafunc.py" | sed 's/^/  /'
+} > "$OUT/advisory-files-and-helper.txt" 2>&1
+
+{
+  echo "observed_utc=$(stamp)"
+  $W/venv/bin/python $W/constraint_sources.py "$SP"
+} > "$OUT/pin-sources.txt" 2>&1
+
+{
+  echo "observed_utc=$(stamp)"
+  echo "osv-scanner binary sha256: $(sha256sum $OSV | cut -d' ' -f1)"
+  echo "CI pin (.github/workflows/security-scan.yml): ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108"
+  $OSV --version 2>&1 | head -2
+} > "$OUT/osv-scanner-identity.txt" 2>&1
+
+rm -rf "$WT"; git -C $C worktree add --detach "$WT" $P > /dev/null 2>&1 || { echo "worktree add failed" > "$OUT/osv-exit-codes.txt"; exit 3; }
+: > "$W/empty-osv.toml"
+mkdir -p "$W/basescan" && cp "$OUT/lock-at-pr-base.copy" "$W/basescan/requirements.lock"
+{
+  echo "observed_utc=$(stamp)"
+  cd "$WT" && "$OSV" scan source --config .github/osv-scanner.toml --no-resolve --lockfile="requirements.txt:$L" --format json > "$OUT/osv-head-lock-with-ci-config.json" 2> "$OUT/osv-head-lock-with-ci-config.err"; echo "PR-head lock, the head's own .github/osv-scanner.toml (the CI form): exit $?"
+  "$OSV" scan source --config "$W/empty-osv.toml" --no-resolve --lockfile="requirements.txt:$L" --format json > "$OUT/osv-head-lock-empty-config-control.json" 2> "$OUT/osv-head-lock-empty-config-control.err"; echo "PR-head lock, EMPTY config (the control; must find the two OAuthlib ids): exit $?"
+  cd "$W/basescan" && "$OSV" scan source --config "$W/empty-osv.toml" --no-resolve --lockfile="requirements.txt:requirements.lock" --format json > "$OUT/osv-base-lock-empty-config.json" 2> "$OUT/osv-base-lock-empty-config.err"; echo "PR-base lock (main's), EMPTY config: exit $?"
+  cd /tmp && python3 $W/osv_summary.py "$OUT/osv-head-lock-with-ci-config.json" "$OUT/osv-head-lock-empty-config-control.json" "$OUT/osv-base-lock-empty-config.json"
+  grep -h "found [0-9]* packages" "$OUT/osv-head-lock-with-ci-config.err" | sed 's/^/stderr: /'
+} > "$OUT/osv-exit-codes-and-findings.txt" 2>&1
+git -C $C worktree remove --force "$WT" > /dev/null 2>&1; git -C $C worktree prune
+echo "[$(stamp)] outputs regenerated in $OUT"

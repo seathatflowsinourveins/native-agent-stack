@@ -1,0 +1,60 @@
+namespace wrapper rc=0
+start=2026-09-30T05:53:24Z uid=1000 cwd=<throwaway>/ns-omni-smoke-B3-20260929b/cwd
+netns listeners before start: 0
+serve pid=2171991
+health=200 after 3 polls, 4s after start
+last health code=200
+health body (first 400 bytes): {"status":"ok","timestamp":"2026-09-30T05:53:28.099Z"}
+--- listeners while running (ss -Hltnp)
+LISTEN 0      511    127.0.0.1:20198 0.0.0.0:* users:(("omniroute (v16.",pid=2172233,fd=36))
+LISTEN 0      511    127.0.0.1:20199 0.0.0.0:* users:(("omniroute (v16.",pid=2172233,fd=37))
+LISTEN 0      511    127.0.0.1:20197 0.0.0.0:* users:(("omniroute (v16.",pid=2172233,fd=21))
+--- process tree of serve (pstree -p)
+MainThread(2171991)-+-esbuild(2172040)-+-{esbuild}(2172041)
+                    |                  |-{esbuild}(2172042)
+                    |                  |-{esbuild}(2172043)
+                    |                  |-{esbuild}(2172044)
+                    |                  |-{esbuild}(2172045)
+                    |                  |-{esbuild}(2172141)
+                    |                  |-{esbuild}(2172142)
+                    |                  `-{esbuild}(2172143)
+                    |-omniroute (v16.(2172233)-+-{omniroute (v16.}(2172235)
+                    |                          |-{omniroute (v16.}(2172236)
+                    |                          |-{omniroute (v16.}(2172237)
+                    |                          |-{omniroute (v16.}(2172238)
+                    |                          |-{omniroute (v16.}(2172239)
+                    |                          |-{omniroute (v16.}(2172242)
+                    |                          |-{omniroute (v16.}(2172327)
+                    |                          |-{omniroute (v16.}(2172328)
+                    |                          |-{omniroute (v16.}(2172329)
+                    |                          |-{omniroute (v16.}(2172330)
+                    |                          `-{omniroute (v16.}(2172462)
+                    |-{MainThread}(2171995)
+                    |-{MainThread}(2171996)
+                    |-{MainThread}(2171997)
+                    |-{MainThread}(2171998)
+                    |-{MainThread}(2171999)
+                    |-{MainThread}(2172007)
+                    |-{MainThread}(2172029)
+                    |-{MainThread}(2172046)
+                    |-{MainThread}(2172047)
+                    |-{MainThread}(2172048)
+                    `-{MainThread}(2172049)
+tree+listener pids: 2171991 2171995 2171996 2171997 2171998 2171999 2172007 2172029 2172040 2172041 2172042 2172043 2172044 2172045 2172046 2172047 2172048 2172049 2172141 2172142 2172143 2172233 2172235 2172236 2172237 2172238 2172239 2172242 2172327 2172328 2172329 2172330 2172462 
+SIGTERM sent to pid 2171991; serve exit code=143 after 0s
+--- listeners after exit (ss -Hltn)
+listener count after exit: 0
+tree/listener pids still alive after exit: none
+end=2026-09-30T05:53:34Z
+data dir entries after run (names and modes only):
+total 5732
+drwxr-x--- .
+drwxr-xr-x ..
+-rw------- .env
+drwxr-xr-x logs
+drwxr-xr-x server
+-rw-r--r-- storage.sqlite
+-rw-r--r-- storage.sqlite-shm
+-rw-r--r-- storage.sqlite-wal
+drwxr-xr-x supervisor
+data dir mode 750

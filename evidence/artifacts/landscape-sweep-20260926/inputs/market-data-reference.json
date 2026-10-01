@@ -1,0 +1,138 @@
+{
+ "catalog": "us-equities",
+ "layer_id": "market-data-reference",
+ "title": "Market data and reference",
+ "requirement": "Acquire licensed, source-identifiable US-equity observations; preserve feed, timestamps, identity and corporate actions; produce exact reproducible analytical snapshots and reject data whose historical availability or eligibility is unknown.",
+ "research_status": "comparison_required",
+ "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+ "requirement_sha256": "470a282980e83bf48422965f735db212330fe93bc511cd48149830d494029184",
+ "platform_profiles_sha256": "8b0a136c3c0c8c99e727bb84244b9eba789b03d607d06ff1de5fb7aee0b3fece",
+ "winners": [
+  {
+   "component_id": "data-alpaca-py",
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "pin": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "data-edgartools",
+   "repository": "https://github.com/dgunning/edgartools",
+   "pin": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  },
+  {
+   "component_id": "data-exchange-calendars",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "pin": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+   "evidence_class": "native_proven",
+   "platform_status": {
+    "linux-wsl2-x86_64": "accepted",
+    "macos-arm64": "untested"
+   }
+  }
+ ],
+ "alternatives": [
+  {
+   "name": "Databento",
+   "repository": "https://github.com/databento/databento-python",
+   "disposition": "conditional"
+  },
+  {
+   "name": "Massive Python client",
+   "repository": "https://github.com/massive-com/client-python",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-feast",
+   "repository": "https://github.com/feast-dev/feast",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-dlt",
+   "repository": "https://github.com/dlt-hub/dlt",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-gdeltdoc",
+   "repository": "https://github.com/alex9smith/gdelt-doc-api",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-fredapi",
+   "repository": "https://github.com/mortada/fredapi",
+   "disposition": "conditional"
+  },
+  {
+   "name": "data-kafka",
+   "repository": "https://github.com/apache/kafka",
+   "disposition": "conditional"
+  },
+  {
+   "name": "QuestDB",
+   "repository": "https://github.com/questdb/questdb",
+   "disposition": "conditional"
+  },
+  {
+   "name": "atilaahmettaner/tradingview-mcp",
+   "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+   "disposition": "unqualified"
+  }
+ ],
+ "components_vs_upstream_20260926": [],
+ "open_gaps": [
+  "No survivorship-free universe. The Alpaca receipt covers one retrospective AAPL sample of 25 daily bars and 2 corporate actions (native-receipt.json limitations, line 221), and plan.json's continuation defers an entitled universe.",
+  "Corporate-action reconciliation is incomplete: dividend currency is missing, so cash units cannot be fully reconciled (native-receipt.json lines 118-130).",
+  "Original historical point-in-time availability is not established for Alpaca bars or corporate actions (native-receipt.json line 107), so the winner set does not meet the requirement's reject-unknown-availability clause for prices and corporate actions.",
+  "The availability gate that rejected all 5 SEC headers at the 2020-03-03 cutoff is custom repository code (catalyst.py), not EdgarTools. The SEC sample covers one day's index (371 rows / 360 unique accessions) and 5 headers, and no historical as-known filing set is established (access-resolution.json",
+  "The c9 native path relies on custom pagination/provenance code and pinned private _session/_retry seams of alpaca-py (native-receipt.json lines 215-218). An SDK upgrade could break those seams."
+ ],
+ "overturn_when": "Freeze required universe/history/latency, rights, correction and availability semantics; compare selected providers on representative securities including delistings, ticker reuse and corporate actions, then change the feed/store only when a candidate closes those gaps with auditable records and acceptable measured cost. Add a server or lake only after local throughput/concurrency measurements justify it.",
+ "sweep_20260923": {
+  "survived": [],
+  "refuted": [
+   "https://github.com/Nasdaq/data-link-python",
+   "https://github.com/wharton/wrds"
+  ]
+ },
+ "known_repositories": [
+  "alex9smith/gdelt-doc-ap",
+  "alpacahq/alpaca-py",
+  "apache/kafka",
+  "atilaahmettaner/tradingview-mcp",
+  "clickhouse/clickhouse",
+  "databento/databento-python",
+  "dgunning/edgartools",
+  "dlt-hub/dl",
+  "duckdb/duckdb",
+  "feast-dev/feas",
+  "gerrymanoim/exchange_calendars",
+  "jadchaar/sec-edgar-downloader",
+  "jerbouma/financedatabase",
+  "john-friedman/datamule-python",
+  "massive-com/client-python",
+  "mortada/fredap",
+  "nasdaq/data-link-python",
+  "openbb-finance/openbb",
+  "pandas-dev/pandas",
+  "pola-rs/polars",
+  "questdb/questdb",
+  "ranaroussi/yfinance",
+  "treeverse/dvc",
+  "treeverse/lakefs",
+  "tylerjforstrom/stock-data",
+  "unionai-oss/pandera",
+  "wharton/wrds",
+  "zdong104/fnspid_financial_news_datase"
+ ],
+ "seeded_candidates_20260926": [
+  "databento-python v0.87.0 (2026-09-22): not adopted by the trading lane (e7, 2026-09-26); appears only in gap-wave2 comparison evidence"
+ ]
+}

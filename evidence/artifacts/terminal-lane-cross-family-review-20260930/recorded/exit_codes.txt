@@ -1,0 +1,35 @@
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.284 binary> <checkout>
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.285 binary> <checkout>
+exit 0 <- python3 -B replace_bell_group_controls.py <checkout>
+exit 0 <- python3 -B replace_bell_group_mutants.py <checkout>
+exit 0 <- python3 -B tmux_bell_probe.py --selftest
+exit 0 <- python3 -B tmux_bell_probe.py (tmux 3.4, private server)
+exit 0 <- python3 -B tmux_sync_probe.py (tmux 3.4, private server)
+exit 0 <- python3 -B tmux_sync_probe.py --selftest (shutdown-failure control)
+exit 0 <- python3 -B push_notification_probe.py --selftest
+exit 0 <- python3 -B alert_probe.py --selftest
+exit 0 <- python3 -B color_capture.py --selftest
+exit 0 <- python3 -B color_capture.py (native claude --bare in a pty, dummy key)
+exit 0 <- python3 -B login_shell_check_controls.py --real-host
+exit 0 <- python3 -B login_path_digest.py --selftest
+exit 0 <- python3 -B scrub_placeholder_probe.py --selftest
+exit 0 <- python3 -B scrub_placeholder_probe.py (native claude in throwaway homes with a dummy key; the real home is only lstat-compared)
+exit 0 <- python3 -B login_path_digest.py (this host's login shell: entry count and digest prefix only)
+exit 0 <- python3 -B landscape_refresh.py --selftest
+exit 0 <- python3 -B codex_tui_strict_check.py --selftest
+exit 0 <- python3 -B codex_tui_strict_check.py <checkout> (installed Codex, throwaway CODEX_HOME)
+exit 0 <- python3 -B login_shell_bash_truth.py <checkout>
+exit 0 <- python3 -B overlay_noop_check.py <checkout> (this host's user settings, booleans only)
+exit 0 <- python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings
+exit 0 <- python3 -B shell_loop_control.py (a bash loop, SIGINT to its process group)
+exit 0 <- python3 -B signal_order_probe.py
+exit 0 <- python3 -B tmux_identity_mutant.py <checkout> bell
+exit 0 <- python3 -B tmux_identity_mutant.py <checkout> sync
+exit 0 <- python3 -V, tmux -V, claude --version and the base commit of the worktree
+exit 0 <- python3 -B checks/check-terminal-profiles.py (practice repository)
+exit 0 <- python3 -B checks/check-terminal-profiles-controls.py (practice repository)
+exit 0 <- nativestack.login_shell_check() (practice repository)
+exit 0 <- python3 -B notification_types_scan.py <release 2.1.286 binary> <checkout>
+exit 0 <- python3 -B scan_reader_mutants.py <checkout> <the three installed release binaries>
+exit 0 <- python3 -B pty_probe_mutants.py <checkout> alert
+exit 0 <- python3 -B pty_probe_mutants.py <checkout> push

@@ -100,11 +100,13 @@ and treat the projection as superseded guidance rather than looking for it to ha
 The 24 GB Mac is being replaced (see the upgrade table below). On the replacement:
 
 0. Sign in natively to Claude, Codex and `gh`; never copy another host's credential stores or memory
-   database. The shared foundation services (ai-memory, Ollama, Qdrant, the user-scope MCP servers,
-   the QMD and SocratiCode indexes, mise tools) come from agent-ecosystem through its single writer
-   ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)). Where
-   those services exist, skip the launchd agents of `adoption/bootstrap-macos.sh` in step 1: they
-   would start a second Qdrant and a second ai-memory store.
+   database. Since 2026-09-27 this repository is the Mac's single writer, in two stages
+   ([decision](decisions/2026-09-27-mac-single-writer-staged.md)); it supersedes the earlier
+   agent-ecosystem rule ([agent-ecosystem#28](https://github.com/seathatflowsinourveins/agent-ecosystem/issues/28)).
+   Stage 1 installs the client layer only (#382). Where agent-ecosystem's services (ai-memory,
+   Ollama, Qdrant) still run, keep them and skip the launchd agents of `adoption/bootstrap-macos.sh`
+   in step 1: they would start a second Qdrant and a second ai-memory store. Stage 2 moves those
+   services only after #379's measurements and the memory-layer head-to-head.
 1. Pinned clone, then `adoption/bootstrap-macos.sh`. The pinned release contains #94 (the Homebrew
    prerequisite install, the `socraticode`, darwin-binary and embedding-model pins, the launchd
    agents and the embedding acceptance script), so every step on the

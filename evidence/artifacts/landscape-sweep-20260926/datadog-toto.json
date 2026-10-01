@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-datadog-toto",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/DataDog/toto",
+ "reviewed_commit": "9813a2e6d57f9d73bbf50cbe02d7d1e9d7029717",
+ "readme_path": "README.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "research-factors-ml"
+ ],
+ "claim": "Source and documentation review of DataDog/toto at commit 9813a2e6d57f9d73bbf50cbe02d7d1e9d7029717 (license Apache-2.0), read from README.md at that commit. Repository description: \"Time-Series-Optimized Transformer for Observability\". Survived the landscape-sweep-20260926 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 546,
+  "pushed_at": "2026-09-21T19:33:33Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@9813a2e6d57f9d73bbf50cbe02d7d1e9d7029717",
+   "text": "**Toto 2.0**: [Technical Report](https://arxiv.org/abs/2605.20119) | [Blog](https://www.datadoghq.com/blog/ai/toto-2/) | [Model Weights](https://huggingface.co/collections/Datadog/toto-20)"
+  },
+  {
+   "source": "README.md@9813a2e6d57f9d73bbf50cbe02d7d1e9d7029717",
+   "text": "**Toto 1.0**: [Paper](https://arxiv.org/abs/2505.14766) | [Blog](https://www.datadoghq.com/blog/ai/toto-boom-unleashed/) | [Model Card](https://huggingface.co/Datadog/Toto-Open-Base-1.0)"
+  },
+  {
+   "source": "README.md@9813a2e6d57f9d73bbf50cbe02d7d1e9d7029717",
+   "text": "Toto is a foundation model for multivariate time series forecasting with a focus on observability metrics. **Toto 2.0** is the current recommended release, featuring a family of u-μP-scaled models ranging from 4m to 2.5B parameters."
+  }
+ ]
+}

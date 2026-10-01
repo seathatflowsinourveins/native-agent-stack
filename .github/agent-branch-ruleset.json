@@ -1,0 +1,15 @@
+{
+  "name": "Agent branches: no history rewrite",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/openhands/*", "refs/heads/openhands/**/*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {"type": "non_fast_forward"}
+  ]
+}

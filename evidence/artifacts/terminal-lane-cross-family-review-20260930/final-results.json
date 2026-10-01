@@ -1,0 +1,1713 @@
+{
+ "jobs": [
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:56:43Z",
+   "finished": "2026-09-30T15:32:50Z",
+   "usage": {
+    "input_tokens": 5375077,
+    "cached_input_tokens": 5198080,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 59231,
+    "reasoning_output_tokens": 36721
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "F1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Both repaired PTY probes still have signal windows that leave a client running or retain raw payloads. Their spawn bookkeeping can discard termination requests, and the new spawn-boundary control accepts a zombie as evidence of a running client. The supplied controls and mutant suites passed; additional deterministic interleavings reproduced these defects. The checkout was left unchanged, the scratch copy was deleted, and no running review-owned stand-ins remained.",
+    "claims_checked": [
+     {
+      "claim": "The original review's nine jobs, finding counts, verification counts and token totals agree across the published records.",
+      "result": "confirmed",
+      "source": "Aggregated results.json, findings.json, verification.json and the cross-family-review receipt: nine exit-0 max-effort jobs; 46 findings, comprising 3 high, 34 medium and 9 low; 41 tested; 24,470,302 input, 23,242,624 cached and 360,897 output tokens; 71.12 minutes. Verification records contain 17 confirmed, four partly and two refuted findings, with 11 duplicates and 12 coordinator checks."
+     },
+     {
+      "claim": "The re-check's four jobs, finding counts, verifier counts and usage totals agree across the published records.",
+      "result": "confirmed",
+      "source": "Aggregated recheck-results.json, recheck-findings.json, recheck-verification.json and receipt data.recheck: four exit-0 jobs; 33 findings, comprising 1 high, 24 medium and 8 low; 19 verifier grades, comprising 16 confirmed and three partly; 12 duplicates and two coordinator checks; 17,472,984 input, 16,766,336 cached and 179,794 output tokens; 46.73 minutes."
+     },
+     {
+      "claim": "All signal-handling guarantees marked repaired in the re-check are now satisfied.",
+      "result": "contradicted",
+      "source": "The three reproduced findings contradict the repaired dispositions and the decision record's statement at docs/decisions/2026-09-28-terminal-experience.md:385: \"The first signal now wins, the cleanups run with SIGINT, SIGTERM and SIGHUP deferred\"."
+     },
+     {
+      "claim": "The historical native model executions and gateway pool consumption are independently established by this review.",
+      "result": "unverifiable",
+      "source": "Published record arithmetic is consistent, including pool differences of four and eleven points. Private runner streams and original gateway snapshots were outside the permitted reads. Independently checking provenance would require an authorized, sanitized export of those records."
+     },
+     {
+      "claim": "The two earlier hook/permission-notification refutations have been independently revalidated against the installed client and primary upstream sources.",
+      "result": "unverifiable",
+      "source": "The recorded refutations were read and were not reopened. This F1 review did not inspect version-matched Claude Code implementation evidence or fetch the relevant hooks reference. Those sources would be needed for independent revalidation."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs with xterm*:sync and none without it.",
+      "result": "confirmed",
+      "source": "Reran tmux_sync_probe.py with a synthetic HOME and its private server: tmux 3.4; declared counts (3, 3); negative-control counts (0, 0); exit 0."
+     },
+     {
+      "claim": "The settings-swap suite passes 27 controls, including execution under ambient umask 077 and a read-only ambient HOME.",
+      "result": "confirmed",
+      "source": "Stable-TMPDIR reruns returned `27 cases, 0 problems` for ordinary execution, ambient umask 077 and a mode-0500 ambient HOME. The controls explicitly force each tool subprocess to umask 022, so the ambient-077 run does not test the tool itself under 077. Two initial background launches failed because context-mode removed their temporary root; both were rerun successfully with a persistent scratch TMPDIR."
+     },
+     {
+      "claim": "All 15 supplied settings mutants fail exactly their expected case sets.",
+      "result": "confirmed",
+      "source": "replace_bell_group_mutants.py returned `16 runs, 0 problems`, including the unmutated baseline. Separately removing the backup comparison showed that its sole failing case was a missing diagnostic phrase; the remaining final comparison still refused the save and preserved it."
+     },
+     {
+      "claim": "The five concurrent-writer cases exercise the documented byte-preservation outcomes.",
+      "result": "confirmed",
+      "source": "The supplied controls and mutants passed for after-merge, at-backup, during-backup, after-backup and at-replace. The first four preserved the injected save and refused installation; at-replace demonstrated the explicitly documented lost-save residual."
+     },
+     {
+      "claim": "The tested settings edge inputs avoid losing the original settings bytes.",
+      "result": "confirmed",
+      "source": "Synthetic tests covered a hard link, mode 0444, a six-megabyte settings value, invalid UTF-8, non-object hooks, non-list Notification and duplicate bell groups including malformed shapes. Successful writes retained byte-identical backups; the hard-link alias retained the original bytes. Refusals left the live bytes unchanged. A read-only destination directory and injected ENOSPC during backup or staging also preserved the live original; the backup-copy failure left a partial backup, and staging failure left no staging file."
+     },
+     {
+      "claim": "Additional settings metadata and symlink edge behavior was characterized.",
+      "result": "confirmed",
+      "source": "A 0640 source under an actual tool umask of 077 retained live mode 0640 but produced a 0600 backup. A POSIX access ACL was dropped on replacement. A symlink substituted after the merge was refused; one substituted after backup was replaced without modifying its target. The write helper was verified byte-identical to baseline 9e55a103, so these observations are not reported as new round-5 defects."
+     },
+     {
+      "claim": "A settings file owned by another user was exercised.",
+      "result": "unverifiable",
+      "source": "Creating the isolated ownership fixture with os.chown returned PermissionError. This check needs a disposable privileged fixture or a separately provisioned readable file owned by another account."
+     },
+     {
+      "claim": "Both supplied PTY selftests and all twelve supplied probe mutants pass as recorded.",
+      "result": "confirmed",
+      "source": "Each selftest produced 44 passes on Python 3.13 and Python 3.12.3. Full pty_probe_mutants.py runs for both alert and push each returned `7 runs, 0 problems`: the baseline and six mutants with exactly the expected failing sets. Baseline stand-ins had zero blocked-signal masks."
+     },
+     {
+      "claim": "Signal coverage establishes cleanup from allocation through final shutdown.",
+      "result": "contradicted",
+      "source": "The phase audit found: before allocation there are no owned resources; after mkdtemp but before handlers, injected SIGINT left the directory; during handler installation, SIGTERM also left it. PTY allocation/ioctl precede measure's try. A spawn-boundary signal cleaned the client but left one slave descriptor open in the importing test process until explicitly closed. Observation-loop and already-masked cleanup cases passed the supplied tests. Entry to either cleanup bypassed its mask, as finding 1 demonstrates. Only the private PTY is configured; the code does not change the outer terminal's termios."
+     },
+     {
+      "claim": "Signals after handler restoration and during main's final print were exhaustively exercised.",
+      "result": "unverifiable",
+      "source": "These late points were inspected in source but not directly injected. with_private_dir restores handlers after rmtree, and main prints in its outer finally. A separate traced late-signal or closed-output test would settle exact exit/output behavior there; successful earlier cleanup must not be inferred merely from the final directory-removal message."
+     },
+     {
+      "claim": "The first-signal-wins and spawn-boundary controls reject the demonstrated wrong implementations.",
+      "result": "contradicted",
+      "source": "Removing only the ignore-later-signals loop passed all six supplied signal cases in both probes. The PID-publishing immediate-exit client passed client_boundary_case even with the spawn guard disabled and with sampled process state Z. Mixed signals and the initialization-boundary injection exposed the production bookkeeping defects."
+     },
+     {
+      "claim": "The push probe carries the origin probe's repaired counter and lifecycle implementation.",
+      "result": "confirmed",
+      "source": "AST comparisons found identical BelCounter, leave, deferred_signals, with_private_dir, signal_case, client_boundary_case and cleanup_phase_case implementations. Both probes therefore share the reported lifecycle defects. Their exit-status selftests passed."
+     },
+     {
+      "claim": "The supplied settings controls reject removal of every safety check.",
+      "result": "contradicted",
+      "source": "Additional scratch mutations removed the unexpected-difference guard, read-back failure guard or final symlink recheck individually. Each still returned `27 cases, 0 problems`. These are coverage observations beyond the fifteen supplied mutants, not newly introduced settings-write defects."
+     },
+     {
+      "claim": "The reader's nine tests and eight supplied mutants pass.",
+      "result": "confirmed",
+      "source": "The unit suite exercised ScanReaderTests, and scan_reader_mutants.py returned `8 mutants, 0 problems`, reporting nine tests per mutant and the expected failing sets. Installed release binaries were not rescanned."
+     },
+     {
+      "claim": "The five affected unit-test modules pass.",
+      "result": "confirmed",
+      "source": "Reran the recorded unittest command: `Ran 238 tests in 31.788s`, `OK (skipped=2)`, exit 0. The historical output records `OK (skipped=1)`; this review confirms a passing suite, not 238 executed-and-passed test bodies."
+     },
+     {
+      "claim": "The colour, scrub-placeholder and PATH native reruns were independently reproduced.",
+      "result": "unverifiable",
+      "source": "Their recorded outputs exist, including the colour counts, the scrub receipt's 19 unchanged real-home names and 27/26 empty-file counts, and the PATH output's 13 entries. No native Claude session or live-home comparison was run. Reproduction would require the pinned client and an authorized isolated/native environment with independently captured outputs."
+     },
+     {
+      "claim": "The Windows Terminal, sound and login-shell source claims were independently verified.",
+      "result": "unverifiable",
+      "source": "The F1 review did not complete the vendor-source audit for those statements. Verification requires the decision's cited tagged Windows Terminal sources and relevant vendor documentation. Live bell and focus observations remain the already documented unobserved residuals."
+     },
+     {
+      "claim": "Python 3.9 through 3.13 portability is fully established.",
+      "result": "unverifiable",
+      "source": "All seven F1 files parsed with Python 3.9 syntax rules. Controls and both selftests passed on Linux Python 3.12.3 and 3.13.15; cleanup failures and mixed-signal failures reproduced on both. The opcode-level lost-signal injection succeeded on 3.13; the 3.12 attempt did not inject and is not counted as a reproduction. No Python 3.9 interpreter or macOS runtime was available."
+     },
+     {
+      "claim": "Python permits the asynchronous exception behavior underlying the cleanup-entry failures.",
+      "result": "confirmed",
+      "source": "Python 3.13 signal documentation, fetched 2026-09-30, states that a handler exception \"may be raised after any bytecode instruction\". Primary source: https://docs.python.org/3.13/library/signal.html#note-on-signal-handlers-and-exceptions . The boundary injections reproduced the consequence in the reviewed code."
+     },
+     {
+      "claim": "Registered lane artifact hashes and review scope match the checkout.",
+      "result": "confirmed",
+      "source": "Recomputed byte lengths and SHA-256 values for 91 matching lane registrations in manifests/evidence.json: no mismatches. HEAD was 11227bfdf25b55b0481a9e78985c3fed26052472. The F1 paths had no changes between merged f03f41c7 and HEAD, and the original scratch source files remained identical to CHECKOUT."
+     },
+     {
+      "claim": "Review execution left no running owned stand-ins or scratch checkout.",
+      "result": "confirmed",
+      "source": "Final /proc inspection matched sleep stand-ins to this review's scratch working directory and found none running. Deliberately leaked clients were killed and reaped using their recorded exact PIDs. Scratch deletion returned `scratch copy removed: True`."
+     }
+    ],
+    "commands_run": [
+     "rtk git -C CHECKOUT rev-parse HEAD",
+     "rtk git -C CHECKOUT diff f03f41c7 HEAD -- <F1 paths>",
+     "rtk sed -n '<windows>' round5-F1.diff: 1–240, 240–430, 525–620 and 630–895",
+     "rtk sed / rg / awk reads of CHECKOUT/AGENTS.md, the seven F1 scripts, tools/adoption/apply_claude_settings.py, artifact READMEs and the terminal decision",
+     "Web search for the Python signal documentation; the search route returned empty output",
+     "ctx_fetch_and_index https://docs.python.org/3.13/library/signal.html; ctx_search for asynchronous exceptions and signal masks",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>); rtk cp -r CHECKOUT/. \"$D\"/",
+     "ctx_execute: rtk python3 -B - — scratch runner with synthetic HOME; stable TMPDIR used for reruns and subsequent checks",
+     "python3 -B notification-types-20260929/replace_bell_group_controls.py D — ordinary, ambient umask 077 and read-only ambient HOME",
+     "python3 -B notification-types-20260929/replace_bell_group_mutants.py D",
+     "python3 -B terminal-experience-20260928/alert_probe.py --selftest",
+     "python3 -B notification-types-20260929/push_notification_probe.py --selftest",
+     "python3 -B terminal-experience-20260928/pty_probe_mutants.py D alert",
+     "python3 -B terminal-experience-20260928/pty_probe_mutants.py D push",
+     "python3 -B review-signals.py <alert|push> <dir_entry|client_entry|two_in_spawn|spawn_then_signal|spawn_slave|spawn_init> <signal>",
+     "python3 -B review-full-cli-boundary.py <probe> <client|directory> <pidfile>",
+     "ctx_execute: rtk python3 -B - — remove only the first-signal-wins loop and run the six supplied cases for each probe",
+     "ctx_execute: rtk python3 -B - — client_boundary_case with sleep 0 and sleep 0.2, with and without the spawn guard; inspect sampled /proc states",
+     "ctx_execute: rtk python3 -B - — allocation and handler-installation signal injections",
+     "ctx_execute: rtk python3 -B - — synthetic settings edge cases and additional guard-removal mutations",
+     "rtk sed -n '1,140p' /usr/include/linux/posix_acl_xattr.h",
+     "rtk sed -n '1,90p' /usr/include/linux/posix_acl.h",
+     "python3 -B review-settings-faults.py D <symlink-after-merge|symlink-after-backup|enospc-backup|enospc-atomic|acl>",
+     "python3 -B notification-types-20260929/scan_reader_mutants.py D",
+     "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "python3 -B terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+     "python3.12 -B — settings controls, both probe selftests, cleanup-boundary and mixed-signal reproductions",
+     "ctx_execute: rtk python3 -B - — aggregate review records, compare ASTs, parse Python 3.9 syntax, verify 91 hashes and compare the write helper with git show 9e55a103",
+     "ctx_execute: rtk python3 -B - — test isolated ownership-fixture capability, inspect review-owned processes and delete D"
+    ],
+    "finding_count": 3
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:56:58Z",
+   "finished": "2026-09-30T15:26:58Z",
+   "usage": {
+    "input_tokens": 3736382,
+    "cached_input_tokens": 3552768,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 51238,
+    "reasoning_output_tokens": 28037
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "F2",
+   "stderr_tail": "0T15:08:05.112803Z ERROR codex_core::tools::router: error=exec_command failed: CreateProcess { message: \"Rejected(\\\"Failed to create unified exec process: No such file or directory (os error 2)\\\")\" }\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "The existing checks pass, but adversarial fixtures expose false-success paths in the scanner, landscape comparison, documentation control and probe measurements. I found nine medium defects or overstated guarantees and one low documentation inconsistency. The five-module suite ran 238 tests with one skip; all eight reader mutants behaved as recorded; the three release binaries and normal tmux probes passed. Tests ran in a private scratch copy, which was deleted. The checkout remains unchanged.",
+    "claims_checked": [
+     {
+      "claim": "The first-round record contains nine max-effort jobs, 46 findings, the stated severity totals, 41 tested findings and the stated token totals.",
+      "result": "confirmed",
+      "source": "Computed from results.json and findings.json: nine exit-0 jobs; 3 high, 34 medium, 9 low; tested=41; 24,470,302 input, 23,242,624 cached input and 360,897 output tokens. Recorded timestamp span is 71.12 minutes."
+     },
+     {
+      "claim": "The first-round verification counts are 23 graded findings, with 17 confirmed, four partly and two refuted, plus 11 duplicates and 12 coordinator checks.",
+      "result": "confirmed",
+      "source": "Aggregated verification.json and findings.json; counts and dispositions reconcile."
+     },
+     {
+      "claim": "The re-check record contains four successful jobs, 33 findings and the stated grading and usage totals.",
+      "result": "confirmed",
+      "source": "Aggregated recheck-results.json, recheck-findings.json and recheck-verification.json: three Sol jobs and one astra-ultra job recorded, all exit 0; 1 high, 24 medium, 8 low; 19 verifier verdicts comprising 16 confirmed and three partly; 12 duplicates and two coordinator checks; 17,472,984 input, 16,766,336 cached input and 179,794 output tokens."
+     },
+     {
+      "claim": "The native model executions, verifier independence and gateway pool consumption can be independently established from the allowed material.",
+      "result": "unverifiable",
+      "source": "The published records reconcile internally, but private execution streams, verifier transcripts and underlying gateway observations were not inspected. Sanitized primary execution and pool snapshots would settle the provenance claims."
+     },
+     {
+      "claim": "The two earlier refutations are established independently by this F2 review.",
+      "result": "unverifiable",
+      "source": "Their refuted dispositions were confirmed in findings.json. Hook deduplication and the terminal-versus-SDK notification call paths were not independently retraced; neither refutation was reopened."
+     },
+     {
+      "claim": "The five requested unit-test modules pass.",
+      "result": "confirmed",
+      "source": "Scratch execution of python3 -B -m unittest ran 238 tests in 34.888 seconds: OK, skipped=1."
+     },
+     {
+      "claim": "The F2 selftests and login-shell controls pass as recorded.",
+      "result": "confirmed",
+      "source": "Fresh runs: login_path_digest 10 cases; landscape_refresh 20 checks; color_capture 14 cases; tmux_bell_probe eight checks; scrub_placeholder_probe all reported checks true; login_shell_check_controls all 11 homes as expected."
+     },
+     {
+      "claim": "The reader's nine tests and eight mutants behave as recorded, and the three release binaries resolve to 17 known matcher values.",
+      "result": "confirmed",
+      "source": "scan_reader_mutants.py ran against versions 2.1.283, 2.1.284 and 2.1.285: eight mutants, zero problems. Separate scan CLI runs on all three returned exit 0, 17 types, 17 matcher values, no unknown types and no overlay disagreements."
+     },
+     {
+      "claim": "The repaired reader fails closed on unsupported assignment and catalog syntax.",
+      "result": "contradicted",
+      "source": "Executed assignment-prefix, whitespace-member-access and mixed-catalog fixtures; scanner success and the installed-client oracle's false success are documented in the first two findings."
+     },
+     {
+      "claim": "The scrub selftest detects implementations that omit each touched name.",
+      "result": "confirmed",
+      "source": "Mutating real_home_state to omit .bash_profile, .bashrc, .profile or .zshrc made selftest return 1 with the corresponding creation, truncation/touch, append or replacement check failing."
+     },
+     {
+      "claim": "The scrub isolation comparison distinguishes an unchanged entry from an entry it could not inspect.",
+      "result": "contradicted",
+      "source": "Temporary-home permission-error reproduction returned equal states and no changed names after .config/git was created."
+     },
+     {
+      "claim": "The login-shell check handles executable symlinks, directories, relative PATH entries, shell functions and valid hashed paths correctly.",
+      "result": "confirmed",
+      "source": "Additional temporary-home cases passed for an executable symlink, relative PATH and hash -p /bin/true; rejected a directory named claude and a function-only command."
+     },
+     {
+      "claim": "Nonce framing handles ordinary noisy startup output and rejects ordinary early termination.",
+      "result": "confirmed",
+      "source": "Temporary-home tests preserved percent/newline PATH content and tolerated non-UTF-8 startup output; closing stdout, exec /bin/true and set -e followed by false were unmeasured. The existing logged-PATH selftests also passed."
+     },
+     {
+      "claim": "Startup files cannot obtain or replay the nonce-framed command.",
+      "result": "contradicted",
+      "source": "Installed Bash documentation and the two BASH_EXECUTION_STRING replay fixtures described in the nonce finding."
+     },
+     {
+      "claim": "The Bash startup-file oracle and strict-config verdict selftest pass.",
+      "result": "confirmed",
+      "source": "login_shell_bash_truth.py checked 512 combinations with zero mismatches; its negative control disagreed in 26 combinations. FIFO and filesystem-error cases passed. codex_tui_strict_check.py --selftest reported five checks and no problems."
+     },
+     {
+      "claim": "The selected notification definitions are found and identical in the two requested Codex tags.",
+      "result": "confirmed",
+      "source": "Fetched types.rs at rust-v0.157.1 and rust-v0.159.2 through ctx_fetch_and_index and ran definitions() on both: all eight extraction keys present (definitions_identical=True). Real-source wrapped-attribute changes were detected; formatting-only wrapping remained identical, and reordering complete fields was detected."
+     },
+     {
+      "claim": "The repaired landscape comparison detects all relevant changes to defaults, Tui fields and complete field types.",
+      "result": "contradicted",
+      "source": "Executed mutations of the tagged source: conditional Default implementations, removed flatten, an added notification-related Tui field and a changed multiline terminal_title type all produced false identical results."
+     },
+     {
+      "claim": "The colour counter matches the pinned terminal parser for the tested complete-group edge cases.",
+      "result": "contradicted",
+      "source": "Compared sgr_counts results with Microsoft Terminal v1.24.11911.0 graphics dispatch, DispatchTypes.hpp and parameter parsing. Range, trailing-subparameter, leading-zero and overlong-number discrepancies remain. The documented incomplete-group behavior was not reported as a new finding."
+     },
+     {
+      "claim": "tmux 3.4 emits the recorded synchronized-output and bell results under normal conditions.",
+      "result": "confirmed",
+      "source": "Fresh private-server runs produced synchronized-output pairs (3,3) with xterm*:sync and (0,0) without it, and bell counts (1,1,0,0,0). Runs with inherited TMUX and long TMUX_TMPDIR/TMPDIR also passed. Normal runs created no new entries under /tmp/tmux-<uid>/."
+     },
+     {
+      "claim": "The tmux probes complete resource cleanup when shutdown or executable launch fails.",
+      "result": "contradicted",
+      "source": "Real-server shutdown fault injection left a live server after its socket was removed; missing-executable injection left the temporary directory. All resources created by these review injections were subsequently cleaned up."
+     },
+     {
+      "claim": "The documentation test always observes the operative matcher.",
+      "result": "contradicted",
+      "source": "All four temporary-recipe mutations passed the documentation test while the wrong operative matcher was absent from quoted_matchers output."
+     },
+     {
+      "claim": "The retained native outputs contain the claimed colour totals, 19-home-name comparison, 27/26 scrub-arm empty-file counts and 13 PATH entries.",
+      "result": "confirmed",
+      "source": "Parsed recorded/color_capture.txt, scrub_placeholder_probe.txt and login_path_digest.txt. Their stored values match those counts; this is a record-consistency check."
+     },
+     {
+      "claim": "The historical digest was not recorded.",
+      "result": "contradicted",
+      "source": "The 2026-09-29 receipt contains before/after digest prefixes; both equal the prefix in the newly retained digest output."
+     },
+     {
+      "claim": "The historical native colour, scrub and real-home PATH measurements were independently rerun here.",
+      "result": "unverifiable",
+      "source": "Skipped runs involving the user's real home or a live Claude session. An authorized rerun with retained sanitized outputs and script hashes would settle fresh native behavior; the published outputs were checked only for consistency."
+     },
+     {
+      "claim": "The 27 settings-swap controls, 15 settings mutants and 12 pty-probe mutants establish the remaining F1 claims.",
+      "result": "unverifiable",
+      "source": "These F1 executions were outside this F2 review and were not rerun. They require a separate review of their controls, injected interleavings and returned outputs."
+     },
+     {
+      "claim": "The complete Windows Terminal sound, focus, bell-timer and settings-inheritance claims were independently verified.",
+      "result": "unverifiable",
+      "source": "This review verified the pinned SGR parser and local Bash behavior, not the complete desktop source paths or a live Windows Terminal session. The cited tagged implementations would settle source claims; permitted interactive observations would be needed for the documented native residuals."
+     },
+     {
+      "claim": "The selected lane's manifest hashes match the checkout.",
+      "result": "confirmed",
+      "source": "Recomputed 90 registered SHA-256 values under the four selected artifact/receipt families: zero mismatches."
+     },
+     {
+      "claim": "The review left the checkout unchanged and removed its private scratch copy.",
+      "result": "confirmed",
+      "source": "Final git status --short was empty; post-cleanup check printed 'private scratch removed: True'."
+     }
+    ],
+    "commands_run": [
+     "rtk pwd; rtk cat CHECKOUT/AGENTS.md; rtk rg --files for applicable instruction files and lane scripts",
+     "rtk sed -n '1,240p', '241,510p' and '511,800p' round5-F2.diff",
+     "rtk cat / sed / rg on the F2 scripts, tests, lane READMEs, decision record and receipts",
+     "rtk proxy git diff 9e55a103 HEAD -- the reviewed lane paths",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>), then rtk cp -r CHECKOUT/. \"$D\"/",
+     "rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/login_path_digest.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py --selftest",
+     "rtk python3 -B evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+     "rtk python3 -B evidence/artifacts/terminal-experience-20260928/color_capture.py --selftest",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py --selftest",
+     "rtk python3 -B evidence/artifacts/notification-types-20260929/scan_reader_mutants.py SCRATCH CLAUDE_VERSIONS/2.1.283 CLAUDE_VERSIONS/2.1.284 CLAUDE_VERSIONS/2.1.285",
+     "python3 -B evidence/artifacts/notification-types-20260929/notification_types_scan.py CLAUDE_VERSIONS/<version> SCRATCH, for all three releases, through a ctx_execute Python driver",
+     "python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py and python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py, through ctx_execute drivers",
+     "rtk python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py SCRATCH",
+     "rtk python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py --selftest",
+     "ctx_execute: rtk python3 -B - with scanner syntax fixtures, scan CLI calls and node -e execution of the synthetic catalogs",
+     "ctx_execute: rtk python3 -B - with four temporary-recipe mutations and the documentation test",
+     "ctx_execute: rtk python3 -B - with tagged Rust-source extraction and semantic mutations",
+     "ctx_execute: rtk python3 -B - with complete, incomplete, mixed, empty, leading-zero and overlong SGR inputs",
+     "ctx_execute: rtk python3 -B - with temporary-home PATH, executable-resolution and BASH_EXECUTION_STRING replay cases",
+     "ctx_execute: rtk python3 -B - with scrub-state omission mutants and the inaccessible-parent creation case",
+     "ctx_execute: rtk python3 -B - with inherited tmux environment cases, shutdown/launch fault injection and owned-resource cleanup",
+     "ctx_execute: rtk python3 -B - to aggregate review records, compare recorded digest values and verify 90 manifest hashes",
+     "rtk bash --version; ctx_execute Python read of the installed bash(1) BASH_EXECUTION_STRING definition",
+     "Web searches followed by ctx_fetch_and_index for the two Codex tags, Microsoft Terminal v1.24.11911.0 sources and Serde flatten documentation; ctx_search for relevant primary-source passages",
+     "rtk nl -ba reviewed files to confirm finding line numbers; rtk git status --short",
+     "ctx_execute: rtk rm -rf SCRATCH, followed by python3 -B verification that the scratch directory no longer existed"
+    ],
+    "finding_count": 10
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:57:13Z",
+   "finished": "2026-09-30T15:36:30Z",
+   "usage": {
+    "input_tokens": 5665599,
+    "cached_input_tokens": 5445504,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 64789,
+    "reasoning_output_tokens": 35749
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "F3",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Seven round-5 findings remain: four medium defects in the repaired comparison, signal-handling and colour-counter guarantees, plus three evidence or publication issues. The existing controls and mutants pass, the five test modules run 238 tests successfully with one skipped, and scripts/validate.py passes. Targeted counterexamples expose gaps those checks miss. The checkout remained unchanged and the private scratch copy was deleted.",
+    "claims_checked": [
+     {
+      "claim": "The first wave contains nine completed jobs at declared effort max, all exit 0, with 46 findings: 3 high, 34 medium, 9 low, and 41 reviewer-tested findings.",
+      "result": "confirmed",
+      "source": "Computed from results.json and findings.json. Per-job finding counts and verdicts match the receipt; every job records codex-cli 0.159.2."
+     },
+     {
+      "claim": "First-wave token totals and elapsed time support the published aggregate figures.",
+      "result": "confirmed",
+      "source": "Summed runner records: 24,470,302 input tokens, 23,242,624 cached input tokens, 360,897 output tokens; cache share 94.98299%; earliest start to latest finish 71.1167 minutes."
+     },
+     {
+      "claim": "The initial verification and disposition totals agree across the records.",
+      "result": "confirmed",
+      "source": "verification.json and findings.json contain 23 verifier grades, 11 duplicates and 12 coordinator checks; verdicts are 17 confirmed, 4 partly and 2 refuted; dispositions are 39 repaired, 2 refuted, 3 removed and 2 kept."
+     },
+     {
+      "claim": "The re-check contains three Sol jobs and one astra-ultra job, all exit 0, returning 33 findings with the stated grading totals.",
+      "result": "confirmed",
+      "source": "Recomputed from recheck-results.json, recheck-findings.json and recheck-verification.json: 1 high, 24 medium, 8 low; all 33 marked tested; 12 duplicates, 2 coordinator checks, 19 verifier grades; 16 confirmed and 3 partly. The record marks all 33 repaired."
+     },
+     {
+      "claim": "Re-check usage supports the published token and time figures.",
+      "result": "confirmed",
+      "source": "Summed records: 17,472,984 input tokens, 16,766,336 cached input tokens, 179,794 output tokens; cache share 95.95577%; elapsed time 46.7333 minutes. The receipt retains whole-minute values."
+     },
+     {
+      "claim": "The reviewers and verifiers had the stated independence, workflow settings and chronology, and the gateway delivered the requested effort.",
+      "result": "unverifiable",
+      "source": "Published records establish declared models, effort and results, but private workflow journals, submitted prompts and outbound gateway requests are not retained. Sanitized contemporaneous workflow and request metadata would settle these historical assertions."
+     },
+     {
+      "claim": "The pool moved from 7 to 11 to 22 points during the two waves.",
+      "result": "unverifiable",
+      "source": "Those numbers agree across the receipt and documentation, and their arithmetic is consistent. The underlying provider-limit snapshots are not retained; the receipt also allows consumption by concurrent sessions."
+     },
+     {
+      "claim": "All new-receipt provenance hashes and lane manifest registrations match CHECKOUT.",
+      "result": "confirmed",
+      "source": "Recomputed all 48 provenance hashes: 9 scripts, 8 record files and 31 recorded outputs, with no mismatch. Checked hashes and byte sizes of 59 registered lane files, with no mismatch. All five receipt registrations preserve their common fields, including claim and limitations."
+     },
+     {
+      "claim": "The repository's integrity validator passes.",
+      "result": "confirmed",
+      "source": "Scratch-copy python3 -B scripts/validate.py printed {\"components\":69,\"hashed_files\":8515,\"profiles\":4,\"receipts\":176,\"status\":\"passed\"}, followed by \"Integrity and scope checks only; no live provider or GPU execution.\""
+     },
+     {
+      "claim": "The prompt hash maps match the retained hash-list files.",
+      "result": "confirmed",
+      "source": "Compared all 11 initial entries and all 4 re-check entries with their corresponding receipt maps; both comparisons were equal."
+     },
+     {
+      "claim": "The retained prompt hashes independently establish the original submitted prompt contents.",
+      "result": "unverifiable",
+      "source": "The original prompts are intentionally not retained. An authorized comparison against their original bytes, or suitably sanitized originals with an authenticated mapping, would be needed."
+     },
+     {
+      "claim": "The five affected unit-test modules run 238 tests successfully.",
+      "result": "confirmed",
+      "source": "Independent scratch execution exited 0: \"Ran 238 tests in 34.158s\" and \"OK (skipped=1)\"."
+     },
+     {
+      "claim": "The settings-swap tool passes 27 controls, including under umask 077, and its 15 mutants fail the intended cases.",
+      "result": "confirmed",
+      "source": "Independent runs returned \"27 cases, 0 problems\" under both masks and \"16 runs, 0 problems\" for one baseline plus 15 mutants. The documented last-comparison-to-rename residual remains an explicitly expected case."
+     },
+     {
+      "claim": "The reader has nine tests and eight effective mutants, and the three native releases expose the recorded catalogs.",
+      "result": "confirmed",
+      "source": "scan_reader_mutants.py exited 0 with nine tests per mutant and \"8 mutants, 0 problems\". Fresh static scans of installed 2.1.283, 2.1.284 and 2.1.285 each exited 0 with base size 15, resolved catalogs, 17 matcher values and no unknown types. Retained reports agree on 12 documented types, 8 ring decisions and 9 quiet decisions."
+     },
+     {
+      "claim": "Both probe selftests and all 12 signal mutants pass their existing acceptance criteria.",
+      "result": "confirmed",
+      "source": "Both independent selftests returned 44 PASS lines. pty_probe_mutants.py <scratch> alert push exited 0 with \"14 runs, 0 problems\": two baselines and twelve mutants, each with the expected failing-case set."
+     },
+     {
+      "claim": "The probe repairs enforce first-signal-wins during client creation.",
+      "result": "contradicted",
+      "source": "The mixed SIGTERM/SIGINT boundary injections produced exit 130 instead of 143 in both probes, while still cleaning the client and private directory."
+     },
+     {
+      "claim": "Each probe's seven reported signal scenarios are all end-to-end subprocess cases.",
+      "result": "contradicted",
+      "source": "cleanup_phase_case is an in-process helper test and passes without calling measure. Six scenarios launch a probe subprocess; one does not."
+     },
+     {
+      "claim": "A blocked signal mask survives exec and explains the rejected spawn-mask mechanism.",
+      "result": "confirmed",
+      "source": "A directly spawned /bin/sleep inherited SigBlk 0000000000004003. signal(7) says \"the signal mask is preserved across execve(2)\"; Python documents pthread_sigmask as changing the calling thread's mask. [signal(7), fetched 2026-09-30](https://man7.org/linux/man-pages/man7/signal.7.html), [Python signal documentation, fetched 2026-09-30](https://docs.python.org/3/library/signal.html#signal.pthread_sigmask)."
+     },
+     {
+      "claim": "The login-shell repair rejects stale hashed paths and non-executable files, and the eleven fixture homes behave as recorded.",
+      "result": "confirmed",
+      "source": "The controls returned eleven expected homes. Independent stale-hash and mode-0644 fixtures made type -P print a path while exec exited 127 and 126 respectively; the revised checker rejected both. Installed Bash help for type and hash was also inspected."
+     },
+     {
+      "claim": "The static login-shell oracle agrees with Bash across 512 combinations.",
+      "result": "confirmed",
+      "source": "Independent login_shell_bash_truth.py execution exited 0 with 512 combinations, zero mismatches, 26 negative-control disagreements, and the expected FIFO/stat-error behavior under Bash 5.2.21."
+     },
+     {
+      "claim": "The revised PATH, scrub and landscape selftests pass their published counts.",
+      "result": "confirmed",
+      "source": "Independent runs returned ten PATH checks, all fifteen scrub-selftest booleans true, and twenty landscape checks with no problems. The Codex strict-check selftest also passed all five checks."
+     },
+     {
+      "claim": "The strengthened scrub and PATH native-rerun outputs are now retained and contain the advertised principal counts.",
+      "result": "confirmed",
+      "source": "recorded/scrub_placeholder_probe.txt identifies client 2.1.285, 19 monitored real-home names, no changed names, and 0/27/26 empty files across the three arms. recorded/login_path_digest.txt records 13 entries and a digest prefix. No comparison against an unrecorded 2026-09-29 digest was asserted."
+     },
+     {
+      "claim": "The decision's revised scrub-rerun description agrees with the retained real-/tmp observation.",
+      "result": "contradicted",
+      "source": "The decision says two new entries; the cited output and new receipt both say zero."
+     },
+     {
+      "claim": "The actual pinned Codex notification/title definitions match between rust-v0.157.1 and rust-v0.159.2.",
+      "result": "confirmed",
+      "source": "Fetched both primary-source files and found all eight compared parts, with identical extracted definitions. [rust-v0.157.1 types.rs](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/config/src/types.rs), [rust-v0.159.2 types.rs](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/config/src/types.rs)."
+     },
+     {
+      "claim": "The strengthened landscape comparator detects every changed token and compares the complete terminal_title field.",
+      "result": "contradicted",
+      "source": "The string-literal normalization and multiline-field counterexamples both returned identical=true for semantically different inputs; the former returned false at the baseline."
+     },
+     {
+      "claim": "The retained colour rerun matches the earlier foreground/background counts.",
+      "result": "confirmed",
+      "source": "recorded/color_capture.txt matches the old receipt: indexed foreground/background 37/4 with COLORTERM unset, versus truecolor foreground/background 39/6 with truecolor set. The independent colour selftest passed all fourteen existing cases."
+     },
+     {
+      "claim": "The repaired colour counter agrees with the pinned parser beyond its declared incomplete-group residual.",
+      "result": "contradicted",
+      "source": "Complete zero-padded colon groups are applied by the pinned numeric parser but classified as unknown by the repaired counter. Additional numeric and extra-subparameter inputs were also exercised; the finding identifies a round-5 colon-parser gap."
+     },
+     {
+      "claim": "The retained colour aggregates prove that the native stream contained no colon-form SGR sequences.",
+      "result": "unverifiable",
+      "source": "The output does not separately count colon syntax, and valid colon groups can contribute to the same colour totals. A sanitized syntax-count summary from the original capture would settle this without publishing screen contents."
+     },
+     {
+      "claim": "tmux 3.4 emits synchronized updates with the declared sync feature and forwards BEL under the recorded conditions.",
+      "result": "confirmed",
+      "source": "Independent runs reproduced (3,3) synchronization markers with xterm*:sync and (0,0) without; BEL arms returned 1,1,0,0,0. The pinned source declares \"Terminal supports synchronized updates.\" [tmux 3.4 tty-features.c](https://github.com/tmux/tmux/blob/3.4/tty-features.c)."
+     },
+     {
+      "claim": "The corrected Windows Terminal inheritance order and focused-tab timer are supported by pinned source.",
+      "result": "confirmed",
+      "source": "v1.24.11911.0 places user defaults at the front of the parent list and fragments at the back; the getter checks own values before parents. Tab.cpp sets the bell timer to 2000 ms. [Settings layering](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp#L491), [inheritance getters](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/cascadia/TerminalSettingsModel/IInheritable.h#L117), [tab implementation](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/cascadia/TerminalApp/Tab.cpp)."
+     },
+     {
+      "claim": "The two previous refutations remain supported.",
+      "result": "confirmed",
+      "source": "The vendor hooks reference states that the same handler across settings files runs once and that terminal permission timing is deferred by typing. The installed 2.1.285 source contains the inactivity predicate Date.now()-Math.max(Xm(),v)>=h. A first name-only match found an unrelated bundled tye function; inspecting both definitions located the timer implementation. [Hooks reference, fetched 2026-09-30](https://code.claude.com/docs/en/hooks.md)."
+     },
+     {
+      "claim": "The installed push-notification suppression checks are restricted to local sessions.",
+      "result": "confirmed",
+      "source": "Bounded reads of the installed 2.1.285 ELF found r=a.CLAUDE_CODE_REMOTE||Fn(), both suppression branches guarded by !r, the remote-workspace predicate, terminalFocus-based presence and KWt=60000. The PATH-resolved entry was not the native ELF; checks were corrected to use the explicitly versioned installed release file."
+     },
+     {
+      "claim": "The round-5 publication repair removes the private project labels from the published bundle.",
+      "result": "contradicted",
+      "source": "The rebuilt JSON is scrubbed, but six literal occurrences remain in three changed Python files. Value-free scans of the scoped changed files found no additional non-example home paths, Windows user-home paths, UUIDs or credential-prefix matches."
+     },
+     {
+      "claim": "The practice-repository control receipt's 29-case figure matches its retained output.",
+      "result": "contradicted",
+      "source": "The retained output contains 31 isolated scenario rows: six passing outcomes and 25 refusal outcomes. Its summary lists 11 fragment, 10 settings, 3 derived-GUID and 3 Media-folder cases plus four unmutated inputs. This discrepancy and the output already existed at 9e55a103, so it is not included among the round-5 findings."
+     },
+     {
+      "claim": "The user's live settings, native interactive probes, real-home measurements and private practice checks still pass today.",
+      "result": "unverifiable",
+      "source": "Skipped overlay_noop_check.py, --real-host checks, native interactive colour/scrub/push/alert reruns and private practice-repository execution as required. Sanitized authorized host-side reruns identifying the binaries and inputs would settle current behavior."
+     },
+     {
+      "claim": "Windows Terminal's audible bell, actual focus reports, live profile behavior and remote/team notification delivery were observed.",
+      "result": "unverifiable",
+      "source": "No live Windows Terminal, remote workspace or team session was run. The repository also records these limits. Direct authorized observations with sanitized event counts would be required; the historical WAV RMS difference is arithmetically consistent at approximately 16 dB, but the original audio measurements were not replayed."
+     },
+     {
+      "claim": "The review left CHECKOUT unchanged and removed its scratch copy.",
+      "result": "confirmed",
+      "source": "All reviewed scratch files remained byte-identical to CHECKOUT, git status --short was empty, and cleanup printed \"private scratch copy removed: True\"."
+     }
+    ],
+    "commands_run": [
+     "rtk pwd; rtk ls -a <CHECKOUT>; rtk cat <CHECKOUT>/AGENTS.md",
+     "rtk rg --files -g AGENTS.md -g '!\\.claude/**' docs evidence recipes scripts tests manifests adoption",
+     "rtk sed -n '1,200p' <PACKETS>/round5-all.diff; rtk sed -n '3000,3150p' <PACKETS>/round5-all.diff",
+     "rtk rg -n '^diff --git|^@@' <PACKETS>/round5-all.diff",
+     "rtk cat / rtk sed / rtk rg focused reads of the five lane READMEs, decision record, recipe, platform guide, harness-defaults rows, repaired scripts and recorded outputs",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>), followed by rtk cp -r <CHECKOUT>/. \"$D\"/",
+     "ctx_execute: rtk python3 -B scripts/validate.py",
+     "ctx_execute: rtk python3 -B - — receipt/job totals, disposition joins, prompt-map comparisons, 48 provenance hashes, 59 manifest file hashes and five receipt mirrors",
+     "ctx_execute: rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute: python3 -B <notification-artifacts>/replace_bell_group_controls.py <SCRATCH>, including a run under umask 077",
+     "ctx_execute: python3 -B <notification-artifacts>/replace_bell_group_mutants.py <SCRATCH>",
+     "ctx_execute: python3 -B <notification-artifacts>/scan_reader_mutants.py <SCRATCH>",
+     "ctx_execute: python3 -B <notification-artifacts>/notification_types_scan.py <installed-release> <SCRATCH> for 2.1.283, 2.1.284 and 2.1.285",
+     "ctx_execute: python3 -B <terminal-artifacts>/alert_probe.py --selftest",
+     "ctx_execute: python3 -B <notification-artifacts>/push_notification_probe.py --selftest",
+     "ctx_execute: python3 -B <terminal-artifacts>/pty_probe_mutants.py <SCRATCH> alert push",
+     "ctx_execute: python3 -B <terminal-artifacts>/color_capture.py --selftest",
+     "ctx_execute: python3 -B <login-artifacts>/login_shell_check_controls.py",
+     "ctx_execute: python3 -B <login-artifacts>/login_path_digest.py --selftest",
+     "ctx_execute: python3 -B <login-artifacts>/scrub_placeholder_probe.py --selftest",
+     "ctx_execute: python3 -B <login-artifacts>/landscape_refresh.py --selftest",
+     "ctx_execute: python3 -B <defaults-artifacts>/codex_tui_strict_check.py --selftest",
+     "ctx_execute: python3 -B <notification-artifacts>/tmux_bell_probe.py --selftest",
+     "ctx_execute: python3 -B <notification-artifacts>/tmux_bell_probe.py",
+     "ctx_execute: python3 -B <review-artifacts>/tmux_sync_probe.py",
+     "ctx_execute: python3 -B <defaults-artifacts>/login_shell_bash_truth.py <SCRATCH>",
+     "rtk bash --noprofile --norc -c 'help type; help hash'",
+     "ctx_execute: rtk python3 -B - — stale-hash and non-executable Bash fixtures; blocked-mask /bin/sleep exec experiment",
+     "ctx_execute: rtk python3 -B - — mixed SIGTERM/SIGINT boundary drivers for both probes; cleanup_phase_case with measure replaced by a failing function",
+     "ctx_execute: rtk python3 -B - — pinned Codex definition comparison, multiline terminal_title counterexample and serde-literal normalization counterexample",
+     "ctx_execute: rtk python3 -B - — canonical, zero-padded, extra-subparameter and out-of-range SGR inputs",
+     "ctx_execute: rtk python3 -B - — value-free privacy scans, recorded-output count audits and baseline scope checks",
+     "ctx_execute: rtk python3 -B - — bounded static source reads of installed Claude Code 2.1.285",
+     "web.search_query attempts; ctx_fetch_and_index of signal(7), Python signal documentation, GNU Bash documentation, Serde field attributes, Claude hooks reference, tmux 3.4, both pinned Codex types.rs files and Windows Terminal v1.24.11911.0 sources",
+     "rtk git diff 9e55a103 HEAD -- <lane paths>; Python subprocess git show 9e55a103:<selected files> for unfiltered baseline comparisons",
+     "ctx_execute: rtk python3 -B - — verified reviewed files unchanged, then deleted the private scratch copy",
+     "rtk git status --short"
+    ],
+    "finding_count": 7
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:57:32Z",
+   "finished": "2026-09-30T15:45:54Z",
+   "usage": {
+    "input_tokens": 4264633,
+    "cached_input_tokens": 4070272,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 48989,
+    "reasoning_output_tokens": 27374
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "F1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found five medium defects in the round-5 signal handling and controls. The packaged checks pass, but deterministic injections show that cleanup can still be skipped, a termination signal can be discarded, and the first signal does not always win. Two strengthened controls also accept implementations that violate their stated guarantees. Tests ran in a private scratch copy with synthetic homes and stand-in clients. No owned stand-in clients remained afterward; the copy was deleted and the checkout stayed unchanged.",
+    "claims_checked": [
+     {
+      "claim": "The first review's packaged records contain nine max-effort jobs, 46 findings, the stated severity counts, 41 tested findings, and the reported usage totals.",
+      "result": "confirmed",
+      "source": "Derived from results.json, findings.json and receipt data.jobs/data.totals: nine exit-0 cx/gpt-6.1-sol jobs; 3 high, 34 medium, 9 low; 41 tested=true; 24,470,302 input, 23,242,624 cached input and 360,897 output tokens. Cache share is 94.983%; timestamp span is 71.117 minutes. This confirms recorded consistency, not a fresh provider run."
+     },
+     {
+      "claim": "The recorded verifier and coordinator disposition counts match the first review's receipt.",
+      "result": "confirmed",
+      "source": "verification.json contains 23 verdicts: 17 confirmed, 4 partly and 2 refuted. findings.json and the receipt agree on 11 duplicates, 12 coordinator checks, and dispositions of 39 repaired, 2 kept, 2 refuted and 3 removed."
+     },
+     {
+      "claim": "The re-check records contain four exit-0 jobs, 33 findings and the stated verifier and usage totals.",
+      "result": "confirmed",
+      "source": "recheck-results.json contains three cx/gpt-6.1-sol jobs and one cx/gpt-6-astra-ultra job, all max and exit 0. Counts are 1 high, 24 medium and 8 low. recheck-verification.json contains 16 confirmed and 3 partly verdicts. Usage sums to 17,472,984 input, 16,766,336 cached input and 179,794 output tokens. All 33 disposition entries say repaired; the new findings show that this does not establish the broader round-5 guarantees."
+     },
+     {
+      "claim": "The two recorded refutations agree with the current official hooks reference.",
+      "result": "confirmed",
+      "source": "The fetched primary reference says `If you define the same handler in more than one settings file, it runs once.` Its terminal permission-notification description says `each keystroke defers it.` It separately describes the Agent SDK timer. [Claude hooks reference, fetched 2026-09-30](https://code.claude.com/docs/en/hooks). Historical installed-client 2.1.285 source was not independently reread."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs with xterm*:sync and none without it.",
+      "result": "confirmed",
+      "source": "Ran tmux_sync_probe.py in the scratch copy with a synthetic HOME and private server: tmux 3.4, declared counts (3, 3), negative-control counts (0, 0), exit 0."
+     },
+     {
+      "claim": "The settings-swap tool passes 27 controls and its 15 packaged mutants fail exactly their expected cases.",
+      "result": "confirmed",
+      "source": "Fresh executions returned `27 cases, 0 problems` and `16 runs, 0 problems`. Controls also passed with caller umask 077 and a read-only HOME. invoke explicitly resets the tool's umask to 022; those runs do not prove backup-mode preservation under an actual tool umask of 077."
+     },
+     {
+      "claim": "The five packaged concurrent-writer cases exercise their named interleavings.",
+      "result": "confirmed",
+      "source": "Fresh controls required the injection marker in each case. After-merge, at-backup, during-backup and after-backup refused and retained the save. At-replace reproduced the documented residual: exit 0, newer save in neither file. The corresponding packaged mutants produced their exact expected failing sets."
+     },
+     {
+      "claim": "The reader's nine tests and eight packaged mutants pass their stated checks.",
+      "result": "confirmed",
+      "source": "The affected unittest suite passed. A separate scan_reader_mutants.py execution ran nine tests per mutant and returned `8 mutants, 0 problems`. This execution used fixtures, without scanning the three release binaries."
+     },
+     {
+      "claim": "Both probe selftests and all twelve packaged probe mutants pass.",
+      "result": "confirmed",
+      "source": "Both --selftest runs returned exit 0 and 44 PASS lines. Full alert and push mutant runs each returned `7 runs, 0 problems`. A separate ordinary-observation SIGHUP case passed for each probe with exit 129, zero blocked mask, no directory remaining and no live stand-in."
+     },
+     {
+      "claim": "The packaged passing checks establish interruption cleanup, preservation of pending signals and first-signal-wins behavior at every transition.",
+      "result": "contradicted",
+      "source": "Deterministic line and opcode injections reproduced skipped client cleanup, retained payload directories, discarded SIGTERM requests and second-signal exit statuses in both unmutated probes. Independent guard and exit-status call-site mutations survived the supplied checks."
+     },
+     {
+      "claim": "Signal lifecycle audit: allocation, setup, spawn and observation phases.",
+      "result": "confirmed",
+      "source": "Source audit of both main(), with_private_dir() and measure(): before allocation there are no probe assets; between mkdtemp and handler installation, and during installation before the try, the private directory lacks a cleanup guard. openpty/ioctl precede measure's try, so early interruption can bypass explicit descriptor cleanup, although CLI exit closes descriptors. Before the spawn flag, no client exists. Flag initialization can discard a signal; during Popen, one signal is deferred until recording but multiple signals overwrite it. After recording and before os.close(slave), the client cleanup guard exists, but an early exit bypasses explicit slave closure. Ordinary observation signals passed the subprocess checks. Allocation/setup gaps and descriptor retention in a caller that catches SystemExit were source-reviewed rather than fault-injected."
+     },
+     {
+      "claim": "Signal lifecycle audit: cleanup entry, deferred blocks, handler restoration and final output.",
+      "result": "confirmed",
+      "source": "At entry to either cleanup or deferred_signals before pthread_sigmask, a raising handler can skip cleanup; this was reproduced with SIGTERM and SIGHUP. Once masking is established, the supplied during-cleanup and rmtree injections complete cleanup before delivery. Handler restoration occurs after directory removal; a later signal during restoration/unmasking or main's final print can terminate or truncate reporting after resources were cleaned. Executed process cleanup calls proc.wait; the entry-race case leaves a live client instead. Reproduction leaks were killed by exact PID and reaped. No live-terminal state test was performed; the probes drive a separate pty."
+     },
+     {
+      "claim": "Synthetic malformed and constrained settings inputs preserve the original file when refused.",
+      "result": "confirmed",
+      "source": "Fresh cases for non-UTF-8 JSON, hooks as list/null, Notification as an object or containing non-object groups all exited 1, changed no bytes and made no backup. A read-only settings directory exited 1 with PermissionError and preserved the file. A five-MB settings value survived a successful apply and byte-identical backup. Applying to a hard-linked file replaced only the named entry and retained the original bytes in the other link."
+     },
+     {
+      "claim": "Additional settings edge behavior discovered during probing belongs to the round-5 delta.",
+      "result": "contradicted",
+      "source": "A same-byte symlink installed after backup was replaced by a regular file, and loose command comparison classified a hook producing U+0061 as the bell producing U+0007. The relevant symlink checks, normalizer and holder logic are unchanged from 9e55a103; these observations are excluded from the round-5 findings. Direct umask-077 execution produced installed mode 0640 and backup mode 0600, the already answered F-sol-R1-6 behavior."
+     },
+     {
+      "claim": "The five affected unittest modules complete successfully with 238 test entries.",
+      "result": "confirmed",
+      "source": "Fresh scratch execution returned `Ran 238 tests in 38.395s` and `OK (skipped=2)`. The recorded author run has one skip; the isolated synthetic-home run had two. This confirms successful completion, not that every entry executed."
+     },
+     {
+      "claim": "Lane manifest registrations match their files, and added text contains no matches for the checked private-path and credential patterns.",
+      "result": "confirmed",
+      "source": "Computed SHA-256 and byte lengths for 90 registered lane files: zero mismatches. A scoped 9e55a103..HEAD added-line scan found zero matches for the tested home-path and credential patterns. This is a bounded pattern check, not proof that every possible private label is absent."
+     },
+     {
+      "claim": "The recorded native colour, scrub and PATH reruns are independently reproduced.",
+      "result": "unverifiable",
+      "source": "Recorded output agrees with 41 palette versus 45 truecolor sequences, 19 checked home names with none changed, scrub arms creating 27 and 26 empty files, and 13 PATH entries. Native client/home executions were not repeated under the restrictions. Independent sanitized capture evidence, client provenance and the original colour stream would settle the execution and no-colon/no-incomplete-group claims."
+     },
+     {
+      "claim": "All Windows Terminal, sound and login-shell source-review statements in the final decision section are verified.",
+      "result": "unverifiable",
+      "source": "The remaining tagged Windows Terminal source and sound/login-shell statements were not exhaustively checked within this F1 review. Exact primary-source excerpts at the named tags would settle source claims; live bell/focus observations require the prohibited interactive sessions. The two explicitly refuted hook claims were checked separately against the official reference."
+     },
+     {
+      "claim": "Foreign-owner files, ACL preservation, a genuinely full filesystem and Python 3.9 runtime behavior are validated.",
+      "result": "unverifiable",
+      "source": "These executions remain undone. Tests used Python 3.13.15 and the current user's scratch files. All eight F1 modules parsed with Python 3.9 grammar, which does not establish 3.9 runtime compatibility. A disposable multi-user/ACL fixture, quota-limited filesystem and actual Python 3.9 run would settle the remaining cases."
+     },
+     {
+      "claim": "Live settings no-op checks and historical authenticated provider provenance are independently verified.",
+      "result": "unverifiable",
+      "source": "overlay_noop_check.py and real-user settings/session checks were intentionally skipped. Historical job counts and usage were checked for internal consistency only. Sanitized owner-run no-op output and independent provider/runner records would settle these claims."
+     }
+    ],
+    "commands_run": [
+     "rtk git -C $CHECKOUT status --short",
+     "rtk proxy git -C $CHECKOUT log -3 --oneline",
+     "rtk sed -n '<successive windows>p' packets/round5-F1.diff",
+     "rtk sed -n '<source windows>p' $CHECKOUT/{AGENTS.md,F1 scripts,READMEs,decision record,recorded outputs}",
+     "rtk rg -n '<signal,cleanup,status,control patterns>' $CHECKOUT/<lane files>",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>); rtk cp -r \"$CHECKOUT\"/. \"$D\"/",
+     "ctx_execute: rtk python3 -B $D/review_runs.py — synthetic HOME/TMPDIR; controls, caller-077 controls, settings mutants, both probe selftests and both full probe mutant suites",
+     "ctx_execute: rtk python3 -B $D/probe_races.py — Popen-boundary and cleanup-entry signal injections in both probes",
+     "ctx_execute: rtk python3 -B $D/probe_signal_reset.py — corrected Python 3.13 opcode trace between spawn-state stores",
+     "ctx_execute: rtk python3 -B $D/probe_hangup_races.py — SIGHUP at both cleanup entries",
+     "ctx_execute: rtk python3 -B $D/first_signal_mutants.py — remove only the signal-suppression loop; run all six existing cases",
+     "ctx_execute: rtk python3 -B - — compare original and suppression-loop mutants with SIGTERM followed by SIGINT during observation",
+     "ctx_execute: rtk python3 -B $D/status_mutants.py — disconnect measure's exit_status call sites and run both selftests",
+     "ctx_execute: rtk python3 -B - — original versus status-mutant CLI exits with trust-dialog stand-ins",
+     "ctx_execute: rtk python3 -B $D/swap_edges.py — synthetic hard-link, mode, read-only, malformed, large-file and race cases",
+     "ctx_execute: rtk python3 -B - — controls under read-only HOME; separate SIGHUP signal_case runs",
+     "ctx_execute: rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute: rtk python3 -B evidence/artifacts/notification-types-20260929/scan_reader_mutants.py $D",
+     "ctx_execute: rtk python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+     "ctx_execute: rtk python3 -B - — aggregate review records, verify 90 manifest hashes/sizes, inspect scoped added-line patterns and parse F1 modules with Python 3.9 grammar",
+     "ctx_fetch_and_index: Python 3.9 and 3.13 signal documentation, Python 3.9 subprocess documentation, official Claude hooks reference",
+     "ctx_execute: rtk python3 -B - — verify no owned stand-in clients remain; rtk rm -rf $D",
+     "rtk git -C $CHECKOUT status --short — final result empty"
+    ],
+    "finding_count": 5
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:58:02Z",
+   "finished": "2026-09-30T15:45:59Z",
+   "usage": {
+    "input_tokens": 4757587,
+    "cached_input_tokens": 4559872,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 51910,
+    "reasoning_output_tokens": 29207
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "F3",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found three medium defects in the repaired guarantees and two low publication defects. The advertised test suites pass, including 238 unit tests with one skip, the settings controls and mutants, and both pty mutant suites. All 48 provenance hashes and 97 lane manifest registrations match. Passing those checks still permits a scan to miss an unknown notification type, a comparison to overlook a changed notification default, and the probes to violate their first-signal-wins guarantee.",
+    "claims_checked": [
+     {
+      "claim": "Nine initial jobs exited 0 and returned 46 findings: 3 high, 34 medium, 9 low, with 41 reviewer-tested findings.",
+      "result": "confirmed",
+      "source": "Computed from results.json and findings.json; matched the new receipt, README and decision record."
+     },
+     {
+      "claim": "Initial usage was 24.47M input, 95.0% cache reads, 0.36M output and approximately 71 minutes.",
+      "result": "confirmed",
+      "source": "Summed job records: 24,470,302 input, 23,242,624 cached, 360,897 output; cache share 94.98299%; timestamp span 71.1167 minutes. Receipt totals match."
+     },
+     {
+      "claim": "Initial verification comprised 23 grades, 11 duplicates and 12 coordinator checks, with grades 17 confirmed, 4 partly and 2 refuted.",
+      "result": "confirmed",
+      "source": "Counted verification.json and findings.json. Dispositions also match: 39 repaired, 2 refuted, 3 removed and 2 kept."
+     },
+     {
+      "claim": "Four re-check jobs exited 0 and returned 33 findings: 1 high, 24 medium and 8 low; 19 verifier grades, 12 duplicates and 2 coordinator checks.",
+      "result": "confirmed",
+      "source": "Computed from recheck-results.json, recheck-findings.json and recheck-verification.json. Grades are 16 confirmed and 3 partly; all 33 rows are marked repaired."
+     },
+     {
+      "claim": "Re-check usage was 17.47M input, 96.0% cache reads, 0.18M output and approximately 46 minutes.",
+      "result": "confirmed",
+      "source": "Summed records: 17,472,984 input, 16,766,336 cached, 179,794 output; cache share 95.95577%; timestamp span 46.7333 minutes."
+     },
+     {
+      "claim": "The recorded pool figures imply four points for the initial wave and eleven for the re-check.",
+      "result": "confirmed",
+      "source": "Receipt data.totals records 7 to 11; data.recheck.totals records 11 to 22. Arithmetic and repeated prose agree. Attribution remains subject to the receipt's concurrent-session limitation."
+     },
+     {
+      "claim": "The two earlier refutations are supported by the vendor's hooks reference.",
+      "result": "confirmed",
+      "source": "[Claude hooks reference](https://code.claude.com/docs/en/hooks), fetched 2026-09-30: \"If you define the same handler in more than one settings file, it runs once.\" For terminal permission notifications, \"each keystroke defers it.\" The page separately describes SDK timing without typing deferral."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs with xterm*:sync and none without it.",
+      "result": "confirmed",
+      "source": "Fresh scratch run of tmux_sync_probe.py: (3,3) versus (0,0), exit 0. [tmux 3.4 tty-features.c](https://raw.githubusercontent.com/tmux/tmux/3.4/tty-features.c) declares the sync feature and DEC mode 2026 capability."
+     },
+     {
+      "claim": "The five tmux bell arms discriminate forwarding from suppression.",
+      "result": "confirmed",
+      "source": "Fresh tmux_bell_probe.py run produced 1,1,0,0,0 and exit 0; its selftest produced 8 checks, 0 problems."
+     },
+     {
+      "claim": "The settings tool passes 27 controls, including under umask 077, and 15 mutants fail their expected cases.",
+      "result": "confirmed",
+      "source": "Fresh default and restrictive-umask control runs: 27 cases, 0 problems. Mutant run: baseline plus 15 mutants, 16 runs, 0 problems. The five writer interleavings are exercised, including the documented rename residual."
+     },
+     {
+      "claim": "The reader's nine tests and eight mutants pass their advertised checks.",
+      "result": "confirmed",
+      "source": "Fresh scan_reader_mutants.py run: each mutant ran 9 tests and failed its named set; 8 mutants, 0 problems."
+     },
+     {
+      "claim": "The repaired reader excludes member assignments and fails closed when it cannot resolve the catalog variable.",
+      "result": "contradicted",
+      "source": "Executed same-scope JavaScript fixtures: whitespace and comment-separated member assignments were accepted; Node reported 18 actual matcher values including new_notice, while the scanner passed and omitted it."
+     },
+     {
+      "claim": "Both pty selftests produce 44 passes, and their twelve mutants fail exactly the advertised case sets.",
+      "result": "confirmed",
+      "source": "Fresh alert and push selftests: 44 passes each. Fresh mutant suites: 7 runs each, 0 problems; failing-case counts 5,1,3,1,5,1 for the six mutants."
+     },
+     {
+      "claim": "The first signal wins during client creation.",
+      "result": "contradicted",
+      "source": "Mixed SIGTERM-then-SIGINT spawn-boundary executions for both probes exited 130 rather than 143. Both still removed their private directories and stopped their stand-ins."
+     },
+     {
+      "claim": "A blocked signal mask survives exec, so masking client creation is unsafe.",
+      "result": "confirmed",
+      "source": "[signal(7)](https://man7.org/linux/man-pages/man7/signal.7.html), fetched 2026-09-30: \"A child created via fork(2) inherits a copy of its parent's signal mask; the signal mask is preserved across execve(2).\" Current probe cases observed zero masks; mask mutants failed five cases each."
+     },
+     {
+      "claim": "The digest, scrub and landscape selftests pass their strengthened controls.",
+      "result": "confirmed",
+      "source": "Fresh runs: digest 10 checks, no problems; scrub all 15 reported predicates true; landscape 20 checks, no problems."
+     },
+     {
+      "claim": "The login check rejects stale hashed and non-executable command paths.",
+      "result": "confirmed",
+      "source": "Fresh 11-home controls all passed. Direct bash 5.2.21 fixtures showed type -P returning both paths; exec exited 127 for the stale hash and 126 for the mode-0644 file. The direct fixture was rerun successfully after correcting an initial clean-PATH invocation that could not locate rtk."
+     },
+     {
+      "claim": "The eight compared Codex definitions are identical at rust-v0.157.1 and rust-v0.159.2.",
+      "result": "confirmed",
+      "source": "Fetched both [rust-v0.157.1 types.rs](https://raw.githubusercontent.com/openai/codex/rust-v0.157.1/codex-rs/config/src/types.rs) and [rust-v0.159.2 types.rs](https://raw.githubusercontent.com/openai/codex/rust-v0.159.2/codex-rs/config/src/types.rs). All eight extracted hashes match; no part is missing; whole-file diff contains 70 changed lines."
+     },
+     {
+      "claim": "The comparison includes implementation attributes and reliably detects changes to notification defaults.",
+      "result": "contradicted",
+      "source": "A conditional-default modification of the real rust-v0.159.2 source still compared identical. Default and Display extraction omit leading attributes and select only the first matching implementation."
+     },
+     {
+      "claim": "The colour selftest has 14 cases, and the recorded native rerun matches the older colour counts.",
+      "result": "confirmed",
+      "source": "Fresh selftest: 14 cases, 0 problems. Compared recorded/color_capture.txt with the older receipt: unset gives 0 truecolor and 37+4=41 indexed sequences; truecolor gives 39+6=45 truecolor and 0 indexed."
+     },
+     {
+      "claim": "The recorded strengthened scrub rerun and PATH digest provide the stated values.",
+      "result": "confirmed",
+      "source": "Recorded scrub output identifies client 2.1.285, 19 checked names, no changed names and empty-file counts 0/27/26. Recorded digest reports 13 entries. These outputs now exist and their provenance hashes match."
+     },
+     {
+      "claim": "The decision's recorded scrub rerun observed two additional real /tmp entries.",
+      "result": "contradicted",
+      "source": "Decision line 225 says two; the referenced output and new receipt report zero in every category outside the separately tracked shared file."
+     },
+     {
+      "claim": "238 unit tests in the five affected modules complete successfully.",
+      "result": "confirmed",
+      "source": "Fresh scratch run: Ran 238 tests in 35.228s; OK (skipped=1). The recorded run also reports 238 and one skip."
+     },
+     {
+      "claim": "New-receipt provenance and lane manifest hashes match the tree, and registration text is unchanged.",
+      "result": "confirmed",
+      "source": "Independently checked all 48 provenance hashes and 97 lane file registrations: zero mismatches. Claims and limitations match for all five receipts. scripts/validate.py printed status=passed, components=69, hashed_files=8515, profiles=4, receipts=176, followed by 'Integrity and scope checks only; no live provider or GPU execution.'"
+     },
+     {
+      "claim": "The published prompt-hash copies agree.",
+      "result": "confirmed",
+      "source": "Compared prompts_sha256.txt's 11 entries and recheck_prompts_sha256.txt's 4 entries with the corresponding receipt maps: exact equality."
+     },
+     {
+      "claim": "The prompt hashes can be recomputed from the original dispatched prompts.",
+      "result": "unverifiable",
+      "source": "Original prompts are intentionally not retained. Their original bytes, supplied through an authorized sanitized verification process, would settle this; agreement between hash copies does not authenticate those bytes."
+     },
+     {
+      "claim": "The round-5 privacy repair removes the private project labels from publication.",
+      "result": "contradicted",
+      "source": "Value-free scan of all 58 changed lane files found six newly introduced occurrences in three sanitizer-related source files. No disallowed home-path, supplied-user-name, UUID or common credential-pattern matches were found by that scan."
+     },
+     {
+      "claim": "Windows Terminal's corrected profile precedence and focused-tab indicator timer agree with the pinned source.",
+      "result": "confirmed",
+      "source": "[CascadiaSettingsSerialization.cpp at v1.24.11911.0](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp) adds user profile defaults as the most important parent. [Tab.cpp at that tag](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/cascadia/TerminalApp/Tab.cpp) contains '_bellIndicatorTimer.Interval(std::chrono::milliseconds(2000));' and activates it for a focused tab."
+     },
+     {
+      "claim": "Fresh native colour, real-home scrub, real-host PATH and live-settings acceptance can be repeated here.",
+      "result": "unverifiable",
+      "source": "Skipped native runs that require the user's state or installed client session. Settling them requires authorized isolated native runs with sanitized returned output. overlay_noop_check.py was not run against live settings."
+     },
+     {
+      "claim": "The native capture contained no colon groups, and the remote-workspace PushNotification branch behaves as described.",
+      "result": "unverifiable",
+      "source": "The colour counters do not distinguish valid colon groups, and the raw capture is not retained. The remote branch requires a verified pinned-client call path or an authorized isolated remote-session observation; neither was executed."
+     },
+     {
+      "claim": "Live Windows Terminal bell, focus, sound and WSL environment behavior were independently observed.",
+      "result": "unverifiable",
+      "source": "Skipped the prohibited live Windows Terminal and interactive Claude Code checks. An authorized Windows session recording sanitized counts and timings would settle these observations. The change already lists their lack of observation as a limitation."
+     },
+     {
+      "claim": "The private practice repository's 29 controls can be independently rerun from this checkout.",
+      "result": "unverifiable",
+      "source": "Its recorded output is retained, but the full current checker is outside the supplied checkout. Publishing the pinned checker and its controls, or providing an authorized isolated run, would settle reproducibility."
+     },
+     {
+      "claim": "The review model's relative recency and lower cost are established by the cited release notes.",
+      "result": "unverifiable",
+      "source": "A primary release/pricing page establishing this comparison was not retrieved within the review budget."
+     },
+     {
+      "claim": "The two README count leftovers were introduced in round 5.",
+      "result": "contradicted",
+      "source": "The terminal README's 22-counter-case wording and the review README's 'three earlier artifact directories' wording already exist at 9e55a103. They were excluded from findings as pre-existing count errors."
+     }
+    ],
+    "commands_run": [
+     "rtk pwd",
+     "rtk ls <checkout>",
+     "rtk sed -n '1,220p' <checkout>/AGENTS.md",
+     "rtk sed -n '1,160p' <packets>/round5-all.diff",
+     "rtk sed -n '1,85p' <packets>/round5-F1.diff",
+     "rtk sed -n '1,95p' <packets>/round5-F2.diff",
+     "rtk sed -n <windows> <checkout>/docs/decisions/2026-09-28-terminal-experience.md",
+     "rtk sed -n <windows> <checkout>/evidence/receipts/cross-family-review-terminal-lane-20260930.json",
+     "rtk sed -n <windows> <checkout>/evidence/artifacts/<lane>/README.md",
+     "rtk sed -n <windows> <checkout>/evidence/artifacts/<lane>/<reviewed-script>.py",
+     "rtk rg -n <claim-and-count-patterns> <checkout>/docs <checkout>/recipes <checkout>/adoption/platforms/linux-wsl2.md <lane READMEs>",
+     "ctx_execute: create copies with rtk mktemp -d <scratch> and rtk cp -r <checkout>/. <scratch>/; remove each copy using an EXIT trap",
+     "rtk python3 -B scripts/validate.py",
+     "rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py <scratch>",
+     "umask 077; rtk python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_controls.py <scratch>",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/replace_bell_group_mutants.py <scratch>",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/scan_reader_mutants.py <scratch>",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+     "rtk proxy python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+     "rtk proxy python3 -B evidence/artifacts/terminal-experience-20260928/alert_probe.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/notification-types-20260929/push_notification_probe.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py <scratch> alert",
+     "rtk proxy python3 -B evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py <scratch> push",
+     "rtk proxy python3 -B evidence/artifacts/terminal-experience-20260928/color_capture.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/login-shell-contract-20260929/login_shell_check_controls.py",
+     "rtk proxy python3 -B evidence/artifacts/login-shell-contract-20260929/login_path_digest.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/codex_tui_strict_check.py --selftest",
+     "rtk proxy python3 -B evidence/artifacts/wsl-terminal-defaults-20260929/login_shell_bash_truth.py <scratch>",
+     "rtk python3 -B -: aggregate job counts, grades, usage, timestamps and recorded-output metrics",
+     "rtk python3 -B -: verify 48 provenance hashes, 97 lane registrations, five receipt text copies and both prompt-hash maps",
+     "rtk python3 -B -: scan changed files without printing sensitive values and compare private-label occurrence counts with baseline blobs",
+     "rtk proxy git -C <checkout> diff --name-only 9e55a103 HEAD -- <lane paths>",
+     "rtk proxy git -C <checkout> show 9e55a103:<reviewed path>",
+     "rtk proxy python3 -B notification_types_scan.py <scratch JavaScript fixture> <scratch>",
+     "rtk proxy node <scratch JavaScript fixture>",
+     "rtk python3 -B -: compare pinned Codex definitions and replay conditional Default implementations",
+     "rtk python3 -B -: replay both client-boundary cases with SIGTERM followed by SIGINT",
+     "rtk bash --version",
+     "rtk bash -c 'help type; help hash'",
+     "rtk tmux -V",
+     "rtk python3 -B -: execute clean-environment bash stale-hash and non-executable-file fixtures",
+     "web search attempts for signal, bash, Codex and Windows Terminal primary sources",
+     "ctx_fetch_and_index: pinned Codex, Windows Terminal and tmux sources; signal(7), Python signal, Rust Reference and Claude hooks documentation",
+     "rtk git status --short"
+    ],
+    "finding_count": 5
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-09-30T14:57:47Z",
+   "finished": "2026-09-30T15:46:53Z",
+   "usage": {
+    "input_tokens": 2461529,
+    "cached_input_tokens": 2302848,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 53977,
+    "reasoning_output_tokens": 31542
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.2",
+   "attempts": [],
+   "lane": "sol",
+   "job": "F2",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Seven medium findings remain in the round-5 repairs. The scan can approve binaries containing unknown notification types, the nonce framing can accept startup-generated records, the landscape comparison can miss configuration changes, the documentation control can pass contradictory instructions, and the colour counter can misclassify input or crash. The baseline checks passed: the 238-test suite, F2 selftests, eight reader mutants, scans of all three installed releases, and the tmux probes. All execution and mutations used a private scratch copy, which was deleted; CHECKOUT remained clean.",
+    "claims_checked": [
+     {
+      "claim": "Round 1 records contain nine max-effort jobs, 46 findings, the stated severity split, 41 tested findings and the reported token totals.",
+      "result": "confirmed",
+      "source": "Computed from results.json and the cross-family receipt: nine exit-0 jobs; 3 high, 34 medium, 9 low; 41 tested; 24,470,302 input, 23,242,624 cached, 360,897 output; 94.983% cache share; 71.117 elapsed minutes. Receipt arithmetic matches, including pool snapshots 7 and 11."
+     },
+     {
+      "claim": "The first verification record contains 23 grades, 11 duplicates and 12 coordinator checks.",
+      "result": "confirmed",
+      "source": "Parsed verification.json and findings.json: 17 confirmed, 4 partly, 2 refuted; disposition routing counts 23 verifier, 11 duplicate, 12 coordinator."
+     },
+     {
+      "claim": "Re-check records contain four exit-0 jobs, 33 findings, the stated verification split and token totals.",
+      "result": "confirmed",
+      "source": "Computed from recheck-results.json, recheck-verification.json, recheck-findings.json and receipt data.recheck: 1 high, 24 medium, 8 low; 19 grades comprising 16 confirmed and 3 partly; 12 duplicates and 2 coordinator checks; 17,472,984 input, 16,766,336 cached, 179,794 output; 95.956% cache share; 46.733 elapsed minutes. Receipt token arithmetic matches."
+     },
+     {
+      "claim": "The historical runner, Workflow and pool records independently establish their native execution provenance.",
+      "result": "unverifiable",
+      "source": "Verified committed records and their arithmetic, not live gateway or Workflow state. Independent provenance would require sanitized native runner/transcript exports and pool snapshots; private state and real sign-in were excluded."
+     },
+     {
+      "claim": "Identical command hooks run once, and terminal permission notifications are inactivity-timed.",
+      "result": "unverifiable",
+      "source": "The two refutations are recorded in findings.json and verification.json. Their underlying client behavior was not independently re-tested in this F2 review; no finding reopens them."
+     },
+     {
+      "claim": "tmux 3.4 emits three synchronized-output pairs with xterm*:sync and none without it.",
+      "result": "confirmed",
+      "source": "Fresh scratch execution of tmux_sync_probe.py: declared (3, 3), negative control (0, 0), exit 0."
+     },
+     {
+      "claim": "The reader's nine tests and eight mutants pass against the three installed release binaries.",
+      "result": "confirmed",
+      "source": "Fresh scan_reader_mutants.py execution with resolved 2.1.283, 2.1.284 and 2.1.285 binaries: 8 mutants, 0 problems; nine tests per mutant. Each release resolved one 15-item base and 17 matcher values. Full scans exited 0 with no unknown type or decision mismatch."
+     },
+     {
+      "claim": "The scan fails closed for member assignments and every unresolved catalog.",
+      "result": "contradicted",
+      "source": "Executed JavaScript and scanner fixtures in findings 1 and 2: unknown runtime matcher values were omitted while the scanner exited 0."
+     },
+     {
+      "claim": "The settings-swap controls and PTY signal mutants were independently rerun in this review.",
+      "result": "unverifiable",
+      "source": "These F1 executions were outside the assigned F2 lens. Inspected recorded output: 27 controls, 16 replacement runs including baseline, and seven runs per PTY mutant suite including baseline. Fresh F1 controls under umask 077 and both signal suites would settle execution claims."
+     },
+     {
+      "claim": "The native colour, scrub and real-home PATH reruns reproduce the reported measurements.",
+      "result": "unverifiable",
+      "source": "Recorded files contain 41 versus 45 colour counts, 19 names compared by lstat, 27/26 empty scrub-arm files, and 13 PATH entries. Native reruns involving the user's HOME or an interactive client were skipped. Sanitized fresh captures and before/after observations would settle these measurements."
+     },
+     {
+      "claim": "The 238-test suite passes.",
+      "result": "confirmed",
+      "source": "Fresh scratch unittest execution of the five specified modules exited 0. Discovered suite count is 238; the recorded output and decision record explicitly identify one skipped test."
+     },
+     {
+      "claim": "The login check handles executable symlinks, directories, relative PATH entries, functions and valid hashes correctly.",
+      "result": "confirmed",
+      "source": "Eleven built-in controls passed. Six additional temporary-home cases agreed with direct exec claude: symlink, relative PATH and valid hash succeeded; directory, function-only and directory hash were refused."
+     },
+     {
+      "claim": "Ordinary PATH noise and startup failures are handled by the repaired framing.",
+      "result": "confirmed",
+      "source": "login_path_digest.py --selftest passed ten checks. Additional percent, newline, binary-output and set -e homes measured; closed stdout and exec /bin/true were refused. Both PATH helpers were exercised."
+     },
+     {
+      "claim": "A startup file cannot know or reproduce the nonce-marked record.",
+      "result": "contradicted",
+      "source": "BASH_EXECUTION_STRING replay experiments in finding 3 returned identical early-path digests for different final PATHs."
+     },
+     {
+      "claim": "The scrub selftest detects append and replacement independently, including implementations that skip the affected name.",
+      "result": "confirmed",
+      "source": "Fresh --selftest passed. Mutants skipping .profile and .zshrc exited 1, failing precisely the append and replacement checks respectively."
+     },
+     {
+      "claim": "The landscape comparison recognizes the two pinned releases as identical and detects the repaired ordinary changes.",
+      "result": "confirmed",
+      "source": "Ran definitions() on official rust-v0.157.1 and rust-v0.159.2 sources: eight extracted parts matched. A changed default returned False, missing Default/title returned None, changed wrapped NotificationMethod rename returned False, and reordered notification fields returned False. Corrected an initial unscoped replacement that had changed an unrelated enum."
+     },
+     {
+      "claim": "The landscape comparison cannot certify compatibility after notification defaults or Tui serialization change.",
+      "result": "contradicted",
+      "source": "Conditional Default, removed flatten and added Tui notification-field experiments in finding 4 all returned True."
+     },
+     {
+      "claim": "The documentation comparison detects a wrong operative matcher beside a correct quote.",
+      "result": "contradicted",
+      "source": "Six scratch document mutations passed the focused DocumentationTests control despite supplying a wrong operative matcher; finding 5."
+     },
+     {
+      "claim": "The colour counter follows the pinned parser for complete groups and safely handles overlong numbers.",
+      "result": "contradicted",
+      "source": "Runtime counter outputs and Microsoft Terminal v1.24.11911.0 source comparison in findings 6 and 7. The documented missing-component residual was excluded."
+     },
+     {
+      "claim": "The tmux bell probe discriminates all five arms and its private socket survives inherited environment constraints safely.",
+      "result": "confirmed",
+      "source": "Fresh counts were 1,1,0,0,0 and its eight-check selftest passed. Long TMPDIR/TMUX_TMPDIR and an inherited synthetic TMUX value retained expected bell/sync results. An invalid option raised an error and left zero live owned servers. Normal probes added no shared tmux socket."
+     },
+     {
+      "claim": "Cleanup succeeds when kill-server itself fails or the server survives it.",
+      "result": "unverifiable",
+      "source": "Verified normal shutdown and failure after server creation. A deliberately surviving-server or failed-kill fault injection was not completed within the review budget."
+     },
+     {
+      "claim": "Windows Terminal title suppression, bell-style values and bellSound selection match vendor documentation.",
+      "result": "confirmed",
+      "source": "Microsoft profile documentation fetched 2026-09-30 supports these settings; the pinned v1.24.11911.0 schema returned bellstyle_has_notification=False. Sources: https://learn.microsoft.com/en-us/windows/terminal/customize-settings/profile-advanced and https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/doc/cascadia/profiles.schema.json."
+     },
+     {
+      "claim": "Live Windows Terminal bell/focus behavior, sound RMS values and the complete upstream landscape refresh were independently reproduced.",
+      "result": "unverifiable",
+      "source": "No live Windows Terminal or interactive Claude Code session was run; sound samples were not measured; landscape_refresh.py's authenticated main path was skipped. Live observations, sound-input bytes and a sanitized fresh upstream refresh would settle these checks."
+     },
+     {
+      "claim": "The bash startup-selection oracle agrees with real bash and has a functioning negative control.",
+      "result": "confirmed",
+      "source": "Fresh login_shell_bash_truth.py: 512 combinations, zero mismatches, negative control disagreed in 26 combinations; FIFO and ELOOP/ENOTDIR/EACCES cases passed."
+     },
+     {
+      "claim": "Registered lane artifact hashes match CHECKOUT, and the bounded home-path hygiene scan found no actual home path.",
+      "result": "confirmed",
+      "source": "Computed all 90 registered hashes for the four lane artifact directories: no mismatch. Home-path scan of 89 relevant text files found only two explicitly synthetic /home/example/private-project examples in earlier review evidence. Other private-label or credential patterns were not comprehensively audited."
+     }
+    ],
+    "commands_run": [
+     "rtk pwd; rtk git rev-parse HEAD; rtk git status --short",
+     "rtk sed -n '<window>p' <packets>/round5-F2.diff, covering windows 1-220, 220-440, 440-660 and 660-880",
+     "rtk rg --files -g AGENTS.md -g '*login_shell*' -g '*wsl-terminal*' -g '*tmux*' in <checkout>",
+     "rtk sed -n '<window>p' <checkout>/AGENTS.md and the F2 source, test, README and decision-record files",
+     "rtk nl -ba <F2 source> | rtk sed -n '<window>p' to verify finding line numbers",
+     "rtk rg -n '^class|^    def test' tests/test_windows_terminal_defaults.py",
+     "rtk rg -n '^##|^###|re-check|238|27 controls|nonce|identical|sound|RMS' docs/decisions/2026-09-28-terminal-experience.md",
+     "rtk tail -n 12 docs/harness-defaults.md",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>); rtk cp -r <checkout>/. \"$D\"/",
+     "ctx_execute: rtk python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute Python subprocesses: landscape_refresh.py --selftest; login_path_digest.py --selftest; login_shell_check_controls.py; scrub_placeholder_probe.py --selftest; color_capture.py --selftest",
+     "ctx_execute Python subprocess: scan_reader_mutants.py <scratch> <versions>/2.1.283 <versions>/2.1.284 <versions>/2.1.285; corrected an initial invocation missing the required checkout argument",
+     "ctx_execute Python subprocesses: notification_types_scan.py <each installed release binary> <scratch>",
+     "ctx_execute Python subprocesses: tmux_bell_probe.py --selftest; tmux_bell_probe.py; tmux_sync_probe.py",
+     "ctx_execute: rtk python3 -B - for executable Node/scanner fixtures, documentation mutations, PATH framing/replay fixtures, login resolution cases and scrub mutants",
+     "ctx_execute: rtk python3 -B - for pinned-source definitions(), upstream mutation cases and SGR classification/overflow cases",
+     "ctx_execute: rtk python3 -B - for tmux environment and early-failure fixtures; corrected an initial quoting SyntaxError before executing the cases",
+     "ctx_execute Python subprocess: login_shell_bash_truth.py <scratch>",
+     "ctx_execute: rtk python3 -B - for runner-record arithmetic, verifier counts, receipt comparisons, artifact hashes and bounded publication-path scanning",
+     "rtk bash --version",
+     "web search queries for pinned Codex/Terminal sources and Bash/Serde references; search route returned empty results",
+     "ctx_fetch_and_index: official Codex types.rs at rust-v0.157.1 and rust-v0.159.2; Terminal graphics/parser/schema at v1.24.11911.0; Serde flatten and Microsoft profile documentation",
+     "ctx_fetch_and_index: GNU Bash variable documentation attempt timed out; inspected the installed Bash manual instead",
+     "ctx_execute: rtk rm -rf <review-scratch>; rtk python3 -B - confirmed REVIEW_SCRATCH_REMOVED True"
+    ],
+    "finding_count": 7
+   }
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-ultra-F1-1",
+   "lane": "ultra",
+   "job": "F1",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 556,
+   "claim": "A signal can bypass either cleanup before deferred_signals installs its mask, leaving the client running or the raw payload directory behind.",
+   "evidence": "Ran `python3 -B review-full-cli-boundary.py <probe> client <pidfile>` in the scratch copy. The driver used sys.settrace to deliver SIGHUP at alert_probe.py:556 or push_notification_probe.py:579, immediately before entering the cleanup context. Both returned `\"actual_process_exit\": 129, \"client_alive_after_parent_exit\": true` while printing `raw payload directory removed: True`. Delivering SIGTERM at the corresponding directory-cleanup entry, alert_probe.py:435 or push_notification_probe.py:441, produced `\"actual_process_exit\": 143, \"private_payload_files_after_exit\": 1` and `raw payload directory removed: False`. The process failures were observed after the probe process exited; leaked stand-ins were then killed and reaped by their recorded PIDs. The cleanup-entry failures also reproduced on Python 3.12.",
+   "failure_scenario": "A stand-in client prints the trust-dialog text, causing the normal observation loop to finish. SIGHUP arrives after measure has entered its finally block but before pthread_sigmask blocks signals. leave raises SystemExit from inside that finally, skipping killpg, wait and descriptor cleanup. The analogous window in with_private_dir skips rmtree and retains events.log. These are gaps in the repaired cleanup mechanism, separate from the documented timing dependence of the existing 6.5-second test.",
+   "fix": "Make signal handlers latch cancellation without raising asynchronously during resource acquisition or cleanup, and act on cancellation at explicit safe points. Ensure process-group termination, reaping, PTY closure and directory removal complete before producing the final signal exit. Apply the repair to both probes. Add deterministic tests at the entry to each finally block and before pthread_sigmask, rather than injecting only after the mask is already active.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F1-2",
+   "lane": "ultra",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 472,
+   "claim": "The spawn flag can erase a termination request or replace it with a later signal, contradicting the first-signal-wins guarantee.",
+   "evidence": "Ran `python3 -B review-signals.py <alert|push> spawn_init SIGTERM`. On Python 3.13, an opcode trace delivered SIGTERM between the two stores in `SPAWN[\"active\"], SPAWN[\"signal\"] = True, None`. Both probes subsequently spawned the client and finished with `\"exit\": 2, \"remembered_signal\": null`, rather than exiting 143. With SIGTERM followed by SIGINT inside the Popen wrapper, both reported `\"exit\": 130, \"remembered_signal\": 2`; this also reproduced on Python 3.12. A SIGTERM inside the spawn followed by SIGHUP immediately after the flag was cleared produced exit 129 despite the stored SIGTERM. Removing only the first-signal-wins ignore loop still passed all six supplied signal cases for each probe.",
+   "failure_scenario": "A signal lands after active becomes true but before the assignment clears signal to None: leave records it, then initialization overwrites it, so cancellation is lost and the client starts. Alternatively, two different signals arrive during creation, or a second arrives between clearing active and replaying the first. The unconditional assignment in leave, or the new immediate exit, makes the later signal win. push_notification_probe.py has the same defects at lines 414 and 483–491.",
+   "fix": "Initialize pending state before enabling the spawn window, latch only the first handled signal, and consult that same latch when leaving the spawn window or handling a subsequent signal. Prefer a single cancellation state shared with the cleanup repair. Add mixed-signal tests and an initialization-boundary test; repeated signals of the same number cannot establish which signal won.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F1-3",
+   "lane": "ultra",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 252,
+   "claim": "The new client-creation boundary control passes without a live long-running client, even when the spawn guard is disabled.",
+   "evidence": "In scratch copies, changed the stand-in's final command from `exec sleep {unique}` to `exec sleep 0`, then ran client_boundary_case with and without `SPAWN[\"active\"]` enabled. All four combinations across the two probes returned true. Instrumenting blocked_mask showed, for both probes and both guard settings, `\"ok\": true, \"sampled_states\": [\"Z\"]`, followed by `stand-in client ran True with signal mask 0000000000000000, probe exit 143 (expected 143), private directory left False, stand-in client still alive False`. The success predicate is literally `client is not None and mask == \"0\" * 16 ...`; it never requires a live, correctly identified client before the signal. The corresponding predicate is push_notification_probe.py:254.",
+   "failure_scenario": "The stand-in publishes its PID and exits before the boundary signal. /proc still supplies the zombie's zero signal mask. Because the control treats a PID file as proof that the client ran and checks identity/liveness only after shutdown, it passes even though the removed spawn guard protected no live client. This is a new instance in client_boundary_case of the vacuous-control class that the earlier repair addressed in signal_case.",
+   "fix": "Before injecting the signal, require the recorded PID to be non-zombie and executing exactly the expected `sleep <unique>` command, and sample its mask in that verified state. Fail if that readiness condition is never reached. Add a negative control that publishes a PID and then exits immediately, and require its rejection with both the original and spawn-guard-disabled implementations.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-1",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 51,
+   "claim": "The repaired assignment matcher still accepts expressions that are not the catalog's complete array initializer.",
+   "evidence": "A scratch Python driver ran notification_types_scan.py on two valid JavaScript fixtures: Ojo=[\"permission_prompt\",\"idle_prompt\"].concat([\"brand_new_type\"]), and Ojo=getTypes() beside obj. Ojo=[\"permission_prompt\",\"idle_prompt\"]. Both returned exit 0, catalogs_resolved=true and unknown=[]. Running each fixture with node -e showed that the actual catalog contained brand_new_type.",
+   "failure_scenario": "A later bundle constructs its catalog with a chained expression, or contains whitespace between a member-access dot and the property name. The regex accepts an initializer prefix or the unrelated property, omits a real notification type, and reports successful classification. Both reproductions use one scope, so the documented scope-resolution residual does not explain them.",
+   "fix": "Recognize complete identifier assignments and complete supported right-hand sides. Reject member access through intervening whitespace/comments, and treat a suffix such as .concat(...) as unresolved rather than accepting the preceding array literal. Add both fixtures to ScanReaderTests and the reader controls.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-2",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 65,
+   "claim": "An unsupported second catalog is silently ignored, allowing both the scan and its installed-client oracle to pass.",
+   "evidence": "A scratch fixture contained a supported catalog with all 17 known values and a second catalog using values:[...getTypes(),\"elicitation_complete\",\"elicitation_response\"], where getTypes() includes brand_new_type. The scan reported only the first catalog and exited 0. Calling the assertion body of test_the_installed_client_knows_no_notification_type_without_a_decision on that fixture printed 'PASS' and 'scan detected matcher values: 17'. A second catalog with whitespace after fieldToMatch: also passed unnoticed.",
+   "failure_scenario": "One catalog retains the recognized minified spelling while another changes its expression or formatting. CATALOG.finditer never reports the unsupported catalog, so catalogs_resolved tests only the recognized subset and incorrectly certifies the binary.",
+   "fix": "Discover notification-catalog candidates independently of the narrow supported value grammar. Require every candidate to resolve, and exit nonzero when any candidate cannot be parsed. Add a mixed supported/unsupported two-catalog fixture to the installed-client oracle and mutation tests.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-3",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 83,
+   "claim": "The new Notifications default comparison ignores conditional attributes and additional Default implementations.",
+   "evidence": "Using the fetched rust-v0.159.2 types.rs, I replaced the unconditional Default implementation with two implementations: the original under #[cfg(not(target_os = \"windows\"))] and Self::Enabled(false) under #[cfg(target_os = \"windows\")]. The Python driver printed {\"impl_count\":2,\"reported_identical\":true,\"windows_enabled_false\":true}. The baseline is [upstream types.rs at rust-v0.159.2](https://raw.githubusercontent.com/openai/codex/rust-v0.159.2/codex-rs/config/src/types.rs).",
+   "failure_scenario": "Upstream introduces a platform-dependent notification default. re.search selects the first implementation, excludes its attributes, and ignores the second implementation, so the refresh reports identical definitions despite the changed Windows default.",
+   "fix": "Include attributes attached to Default implementations and account for every relevant implementation. Return unknown for conditional or ambiguous implementations unless their applicability is evaluated. Add the two-implementation fixture as a regression control.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-4",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 85,
+   "claim": "The comparison still omits configuration-relevant parts of Tui and truncates a multiline terminal_title declaration.",
+   "evidence": "On fetched rust-v0.159.2 source, removing flatten from Tui.notification_settings or adding a notification-related Tui field returned reported_identical=true. After wrapping terminal_title's type onto the following line, changing Option<Vec<String>> to Option<String> also returned true. The regex ends at the first newline. Serde's primary documentation states: 'The flatten attribute inlines keys from a field into the parent struct.' [Serde documentation, fetched 2026-09-30](https://serde.rs/attr-flatten.html).",
+   "failure_scenario": "Upstream changes how notification settings are nested, adds a notification control to Tui, or changes a wrapped title-field type. The refresh continues to report identical definitions because those tokens are outside the extracted fragments.",
+   "fix": "Compare the complete Tui declaration, including field attributes and multiline types, or explicitly extract all relevant complete fields and their enclosing serialization attributes. Treat incomplete extraction as unknown. Add these mutations alongside the existing single-line fixtures.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-5",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 75,
+   "claim": "Complete SGR groups still disagree with the pinned Windows Terminal parser.",
+   "evidence": "The scratch sgr_counts driver classified ESC[38;2;300;1;1m as truecolor and ESC[38;5;256m as indexed colour. The pinned helper applies colours only under 'if (red <= 255 && green <= 255 && blue <= 255)' and 'if (tableIndex <= 255)'. Conversely, ESC[38:2::31:32:33:0m was classified as unclassified, although the helper consumes the RGB positions without rejecting trailing subparameters. A 5,000-digit colon index raised ValueError. Sources: [graphics dispatch at v1.24.11911.0](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp) and [parameter parser at that tag](https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/parser/stateMachine.cpp).",
+   "failure_scenario": "A complete colour sequence contains an out-of-range semicolon component, supported trailing colon subparameters, or an overlong numeric parameter. The counter invents a colour, misses an applied colour, or crashes. These inputs are separate from the documented incomplete-group residual.",
+   "fix": "Apply the pinned parser's numeric bounds to semicolon forms, accept its supported colon suffix behavior, normalize numeric selectors, and bound numeric parsing before converting arbitrarily long strings. Add these complete-group cases to the selftest.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-6",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "tests/test_windows_terminal_defaults.py",
+   "line": 50,
+   "claim": "The documentation control still passes when a wrong operative matcher is hidden by an unrelated correct historical quote.",
+   "evidence": "In temporary recipe copies, I replaced the operative matcher with four forms: 'whose matcher is `permission_prompt`', a matcher table cell, a pipe list split over a newline, and a list with escaped pipes. I retained the correct full matcher only in a historical sentence. For all four, quoted_matchers returned [] for the operative replacement and test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays passed.",
+   "failure_scenario": "An ordinary documentation edit changes the wording or Markdown representation of the operative matcher. The test stops observing that instruction and accepts the correct historical quotation as sufficient evidence.",
+   "fix": "Identify and validate the operative matcher independently of historical prose, preferably through an explicitly marked or generated configuration block. Normalize supported Markdown wrapping and escaping, require that operative block to be present, and add the four bypass fixtures.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-7",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 51,
+   "claim": "The new private-socket cleanup removes the recovery socket even when shutdown failed and the server is still running.",
+   "evidence": "A scratch fault-injection driver ran a real private tmux server with a pane that emitted one BEL and then slept. Only kill-server calls were intercepted to return exit 1. bells() returned 1, while the driver reported kill_requests=2, server_still_alive=true, socket_still_exists=false and temporary_directory_still_exists=false. The driver then terminated its own server. A separate missing-executable injection also left the newly created directory behind because the shutdown call raised before rmtree. tmux_sync_probe.py has the same unchecked shutdown/cleanup structure.",
+   "failure_scenario": "A shutdown connection or executable failure occurs while a pane remains alive. The probe returns its measurement and deletes the socket directory, leaving a server running without its original control socket; an exception during shutdown can instead prevent directory cleanup.",
+   "fix": "Verify termination of the owned server before removing its socket. If it remains alive, fail the measurement and preserve a recovery path. Structure cleanup so a shutdown exception cannot skip cleanup for resources that are safe to remove, and add shutdown-failure controls to both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-8",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/scrub_placeholder_probe.py",
+   "line": 87,
+   "claim": "Two failed metadata reads are treated as proof that a home entry was unchanged.",
+   "evidence": "In a temporary home, I made .config unsearchable, took real_home_state(), temporarily restored access and created .config/git, then restored the unsearchable mode and took another snapshot. The driver printed before_git=[\"unreadable\",\"PermissionError\"], after_git=[\"unreadable\",\"PermissionError\"], states_equal=true and changed_names=[]. Lines 293–295 use this equality to report unchanged and count all 19 names as checked.",
+   "failure_scenario": "A tracked path cannot be inspected in both snapshots. Creation or replacement beneath that inaccessible parent remains invisible, yet the published result asserts that the names were unchanged rather than that their state was unknown.",
+   "fix": "Distinguish successful absence/stat observations from measurement errors. If either snapshot contains an unreadable entry, report the isolation comparison as unknown or failed and identify the unmeasured names. Capture one final snapshot for both summary fields and add this permission-error control.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-9",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+   "line": 39,
+   "claim": "The nonce is available to startup files, contradicting the claimed protection against startup output impersonating the probe.",
+   "evidence": "Bash 5.2.21's installed bash(1) defines BASH_EXECUTION_STRING as 'The command argument to the -c invocation option.' Two temporary .bash_profile files ran PATH=/fabricated; eval \"$BASH_EXECUTION_STRING\"; PATH=/actual/first-or-second; exit 0. Both measure() calls accepted the record and returned c5638de85df2e1ec, the digest of /fabricated. scrub_placeholder_probe.login_path() likewise returned /fabricated for both.",
+   "failure_scenario": "Startup code replays the command string before changing PATH and exiting. The nonce-bearing printf executes during startup, while the intended post-startup command never runs. Different final startup PATH values therefore receive the same successful measurement despite the docstring's unconditional claim.",
+   "fix": "Remove the claim that startup files cannot know the nonce and explicitly scope framing to accidental output collisions. Document the replay limitation in both helpers and the README, with this counterexample. If stronger completion evidence is required, obtain an independent parent-side observation rather than treating shell stdout as authenticated.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F2-10",
+   "lane": "ultra",
+   "job": "F2",
+   "severity": "low",
+   "file": "evidence/receipts/login-shell-contract-20260929.json",
+   "line": 20,
+   "claim": "The new correction incorrectly says the 2026-09-29 digest value was not recorded.",
+   "evidence": "Line 20 says 'the digest value of 2026-09-29 was not recorded'. The same receipt's lines 106–107 record login_path_sha256_prefix_before and login_path_sha256_prefix_after as 2ba67e81743edc71, and line 109 describes the before-value command. A Python comparison with recorded/login_path_digest.txt printed 'stored historic prefixes equal new prefix: True'.",
+   "failure_scenario": "A reader follows the new correction and concludes that no historical digest is available, although the receipt contains both historical prefixes and the new recorded output matches them.",
+   "fix": "Distinguish a recorded digest prefix from a retained raw command transcript. Correct this statement and its copies in the decision record; if the historical prefixes' provenance is insufficient, label that limitation explicitly instead of saying the values were not recorded.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-1",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 69,
+   "claim": "The new whitespace normalization erases meaningful changes inside Rust string literals and can falsely report unchanged configuration names.",
+   "evidence": "A python3 -B comparison using the fetched rust-v0.159.2 types.rs changed one serde rename from \"notification:method\" to \"notification : method\". Output: \"serde rename changed: baseline definitions_identical = False round5 definitions_identical = True\". Both normalized definitions contain rename=\"notification:method\". Serde specifies: \"Serialize and deserialize this field with the given name instead of its Rust name.\" [Serde field attributes, fetched 2026-09-30](https://serde.rs/field-attrs.html#rename).",
+   "failure_scenario": "Two source versions differ in a quoted configuration key or Display string containing punctuation and adjacent spaces. The round-5 comparator removes those spaces inside the literal and returns true, hiding a semantic change. This is a regression from 9e55a103 for the demonstrated input.",
+   "fix": "Preserve string-literal contents during normalization. Normalize only whitespace outside literals, or compare conservatively and return unknown for unsupported syntax. Add a regression case with the two distinct serde rename values.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-2",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 85,
+   "claim": "The newly added terminal_title comparison accepts an incomplete field capture as a complete definition.",
+   "evidence": "A python3 -B test based on the fetched rust-v0.159.2 types.rs compared \"pub terminal_title:\\n        Option<Vec<String>>,\" with \"pub terminal_title:\\n        Option<String>,\". Output: \"wrapped terminal_title: all parts found True\" and \"valid different terminal_title types: comparator identical True\". The captured field ends at \"pub terminal_title:\". The regex explicitly stops at the first newline.",
+   "failure_scenario": "A legal multiline declaration puts the field type after the colon's newline. Changing that type is invisible, and definitions_identical returns true instead of false or unknown. This contradicts the corrected receipt and README's whole-definition and fail-closed claims.",
+   "fix": "Require a complete field declaration before treating terminal_title as found. Capture its entire multiline type, or return None when the declaration cannot be fully recognized. Add a test changing the type after a line break.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-3",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 408,
+   "claim": "During client creation, the last signal wins, contradicting the published first-signal guarantee.",
+   "evidence": "Using each probe's existing client_boundary_case, I changed the driver's injection to SIGTERM followed immediately by SIGINT. Both probes reported: \"stand-in client ran True with signal mask 0000000000000000, probe exit 130 (expected 143), private directory left False, stand-in client still alive False\". leave() assigns SPAWN[\"signal\"] on every signal while spawning. The duplicate assignment is at push_notification_probe.py:414.",
+   "failure_scenario": "SIGTERM arrives while Popen is creating the client, followed by SIGINT before Popen returns. The pending SIGTERM is overwritten, so the probe exits 130 rather than the first signal's 143. Cleanup succeeds, but the documented exit-selection guarantee is false. The existing double-signal tests use two signals of the same kind and cannot distinguish this.",
+   "fix": "Store a deferred signal only when no signal is already pending. Apply the correction to both probes and add mixed-signal boundary cases that verify the first signal determines the exit status.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-4",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 75,
+   "claim": "The repaired colon parser still disagrees with the pinned Windows Terminal parser on complete, valid zero-padded parameters.",
+   "evidence": "Running sgr_counts produced fg_truecolor_38;2=1 for ESC[38:2::1:2:3m, but unclassified_groups=1 and no truecolor count for ESC[038:02::1:2:3m. Windows Terminal v1.24.11911.0 accumulates parameters numerically with \"value = value * 10 + digit;\", so the two forms have identical numeric parameters. Its RGB helper accepts the empty colour-space field and these byte-sized components. [Pinned numeric parser](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/terminal/parser/stateMachine.cpp#L2156), [pinned colour dispatch](https://github.com/microsoft/terminal/blob/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp#L120).",
+   "failure_scenario": "A captured stream uses a zero-padded foreground/background selector or colour-mode subparameter. Windows Terminal applies the colour, while the counter reports it as unclassified. This is a complete group, so the documented incomplete-group residual does not cover it.",
+   "fix": "Interpret nonempty numeric parameters as integers while preserving the distinction between an empty colour-space field and numeric zero. Add equivalent canonical and zero-padded sequences to the selftest.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-5",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/sanitize_results.py",
+   "line": 20,
+   "claim": "The privacy repair republishes the two private project labels in the source code implementing the redaction.",
+   "evidence": "A value-free scan of the changed files found six occurrences of the two private labels: two in sanitize_results.py:20, two in build_findings_record.py:76, and two in build_recheck_record.py:118. The sanitizer comments explicitly identify the literals as private per-project profile names. The rebuilt review JSON no longer contains them, but these three published Python files do.",
+   "failure_scenario": "Publishing the repaired evidence bundle still exposes the labels through the redaction rules and the final redaction assertion.",
+   "fix": "Supply private replacement strings through an uncommitted input or command-line argument, and use that same supplied set for residual checks. Remove the literal labels from all three published scripts and refresh their registered hashes.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-6",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "low",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 225,
+   "claim": "The native-rerun description says two new real-/tmp entries appeared, but its cited output and receipt both record zero.",
+   "evidence": "The new sentence says \"the real `/tmp` gained two top-level entries of no kind the script counts\" and attributes them to a concurrent session. Parsing recorded/scrub_placeholder_probe.txt returned real_temp_top_level_entries_new_during_run.in_tmp_excluding_the_shared_file.other=0; every other category there is also zero. The new receipt's corresponding field at line 345 is 0. The comparison command printed \"doc tmp-count contradiction: True 0 0\".",
+   "failure_scenario": "A reader assessing the strengthened isolation rerun receives a different observation from the one preserved in its evidence, including an attribution that the cited output does not establish.",
+   "fix": "Describe the zero new entries recorded by the cited run and remove the concurrent-session attribution. If a different run with two entries is intended, retain and identify that run separately.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-F3-7",
+   "lane": "ultra",
+   "job": "F3",
+   "severity": "low",
+   "file": "evidence/receipts/cross-family-review-terminal-lane-20260930.json",
+   "line": 316,
+   "claim": "The receipt counts seven end-to-end signal cases per probe, although one is an in-process cleanup test that never starts the probe or client.",
+   "evidence": "cleanup_phase_case() explicitly documents itself as \"In-process\" at alert_probe.py:258 and calls with_private_dir(lambda ...) at line 274. Replacing measure() with a function that cannot run still gave \"cleanup_phase_case with unusable measure True measure calls 0\" for both probes. The seven scenarios comprise six subprocess scenarios, including the no-client negative control, and this one in-process scenario.",
+   "failure_scenario": "Readers interpret the receipt, decision table and README as seven complete probe-process exercises. The final-cleanup scenario actually establishes the helper's cleanup behavior without exercising the probe entry point or client lifecycle.",
+   "fix": "Record six subprocess scenarios and one in-process cleanup scenario, retaining seven total scenarios. Correct the receipt field, claim text, decision table, README wording and selftest label accordingly.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F1-1",
+   "lane": "sol",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 556,
+   "claim": "A signal at cleanup entry can skip the entire cleanup before deferred_signals establishes its mask.",
+   "evidence": "Ran `ctx_execute: rtk python3 -B $D/probe_races.py` with sys.settrace injecting SIGTERM immediately before measure's line 556 or with_private_dir's line 435. Both probes produced `client-cleanup-entry: exit 143, client_alive true` and `dir-cleanup-entry: exit 143, payload_dirs_left 1`. The directory case contained a synthetic payload file. Repeated with SIGHUP using probe_hangup_races.py: both probes exited 129 with the same leaks. The corresponding push-probe entry points are lines 579 and 441. The existing cleanup_phase_case injects from inside rmtree, after the mask is already active. Python's documentation confirms that a handler exception may be raised after any bytecode instruction. [Python 3.13 signal documentation, fetched 2026-09-30](https://docs.python.org/3.13/library/signal.html#note-on-signal-handlers-and-exceptions).",
+   "failure_scenario": "Normal work finishes, then SIGTERM or SIGHUP arrives as the finally block calls deferred_signals, before pthread_sigmask executes. leave raises SystemExit from inside finally, bypassing process-group termination and wait. The equivalent arrival at directory-cleanup entry bypasses rmtree and retains the payload directory. This is an uncovered transition before masking, rather than the documented timing uncertainty of the existing delayed signal case.",
+   "fix": "Use a handler that records termination requests without raising during lifecycle transitions, and act on the request at explicit safe checkpoints. Ensure cleanup cannot raise a signal exception before its protection is established. Add deterministic tests at entry to both finally blocks and deferred_signals, checking the client PID, reaping, and payload deletion in both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F1-2",
+   "lane": "sol",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 472,
+   "claim": "Initializing the spawn flag can erase a termination signal that the handler has already recorded.",
+   "evidence": "Ran `ctx_execute: rtk python3 -B $D/probe_signal_reset.py`. An opcode trace injected SIGTERM between the two STORE_SUBSCR operations of `SPAWN[\"active\"], SPAWN[\"signal\"] = True, None`. Both probes printed `active=True` and `handler recorded 15`, then continued to create the client and exited 2 after the stand-in's trust-dialog abort, rather than 143. The push probe has the same assignment at line 483. The trace used Instruction.positions.lineno on Python 3.13.15; the initial driver using starts_line failed before injection and was corrected before these results were obtained.",
+   "failure_scenario": "SIGTERM arrives after active becomes true but before signal is assigned None. leave stores SIGTERM and returns. The next assignment clears that request, so the probe starts Claude despite the termination request and continues its measurement.",
+   "fix": "Clear the pending signal before enabling the spawn flag, with separate assignments, so an interruption between them follows the ordinary exit path. Add an opcode-boundary test that confirms the recorded signal survives initialization and prevents an ordinary measurement result in both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F1-3",
+   "lane": "sol",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+   "line": 414,
+   "claim": "The spawn path remembers the latest signal, contradicting the new first-signal-wins guarantee.",
+   "evidence": "Ran `ctx_execute: rtk python3 -B $D/probe_races.py`. A Popen wrapper started the real stand-in and delivered SIGTERM followed by SIGINT before returning. Both unmutated probes exited 130 instead of the first signal's 143. A second case delivered SIGTERM during creation and SIGINT at the pending-signal check after active was cleared; both again exited 130. At alert_probe.py:408 and push_notification_probe.py:414, every signal during spawning unconditionally overwrites SPAWN[\"signal\"]. The docstring at push_notification_probe.py:412 says `The first signal wins (later ones are ignored)`.",
+   "failure_scenario": "Two different signals arrive during creation, or the second arrives after the flag is cleared but before the pending first signal is replayed. The second signal determines the exit status. The supplied cases use repeated signals of the same kind, so they cannot distinguish this violation.",
+   "fix": "Latch the first termination request once and preserve it through the spawn-to-normal transition. A later handler invocation must honor an existing request rather than overwrite or bypass it. Add mixed SIGTERM/SIGINT and SIGHUP/SIGTERM cases both during creation and immediately after the flag is cleared.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F1-4",
+   "lane": "sol",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+   "line": 39,
+   "claim": "The combined mutant does not independently validate the first-signal suppression guard; removing that guard alone leaves all six cases passing.",
+   "evidence": "Ran `ctx_execute: rtk python3 -B $D/first_signal_mutants.py`, removing only LEAVE_LOOP while retaining deferred cleanup. Both probes returned an empty failing-case set with no skipped cases. Then ran a subprocess comparison delivering SIGTERM followed 100 ms later by SIGINT during ordinary observation: the unmutated probes exited 143, while the single-guard mutants exited 130. The packaged mutant at line 39 removes CLIENT_CLEANUP and LEAVE_LOOP together, so its three expected failures do not establish that LEAVE_LOOP is tested.",
+   "failure_scenario": "The suppression loop is deleted or broken while deferred cleanup remains. Every packaged signal case still passes because repeated signals have identical exit statuses, although a later signal of another kind replaces the first exit status.",
+   "fix": "Split the combined mutation into independent mutations. Add mixed-signal cases outside the spawn window that assert the first signal's status, and require removal of LEAVE_LOOP alone to fail those cases.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F1-5",
+   "lane": "sol",
+   "job": "F1",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/push_notification_probe.py",
+   "line": 347,
+   "claim": "The new exit-status selftests validate the helper without verifying that the actual measurement uses its result.",
+   "evidence": "Ran `ctx_execute: rtk python3 -B $D/status_mutants.py`. Replaced push measure's `return exit_status(t_open, args.control, total)` with `return 0`, and replaced alert measure's corresponding status assignment with `status = 0`. Both mutated probes still returned selftest exit 0 with 44 PASS lines and zero FAIL lines. A separate normal-exit CLI test using the trust-dialog stand-in showed originals exiting 2 and both mutants exiting 0. The push mutant still printed `measurement failed`, demonstrating the incorrect successful outcome.",
+   "failure_scenario": "A repair leaves exit_status correct but disconnects its return value from measure. The checks continue to pass while a run that never observed its tool call or dialog reports success. The same disconnection also bypasses the hooks-disabled BEL failure status.",
+   "fix": "Add subprocess tests for the actual CLI return code on normal measurement exits: an unobserved dialog/tool call must return 2, and an observed hooks-disabled control containing a BEL must return 1. Include mutants that disconnect the helper at each probe's call site.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F3-1",
+   "lane": "sol",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 51,
+   "claim": "The member-assignment repair still accepts an object's property as the catalog's variable when whitespace or a comment separates the dot from the name.",
+   "evidence": "In a scratch copy, ran the scanner on valid JavaScript fixtures using the 15 known base types, an actual variable x containing an additional new_notice, and an unrelated property assignment. Node reported actual_matcher_size=18 and new_notice=true. For obj.x=[...], the scanner correctly returned catalogs_resolved=false and exit 1. For obj. x=[...] and obj./* separator */x=[...], it returned catalogs_resolved=true, base_array_size=15, new_notice_found=false and exit 0. The command was rtk proxy python3 -B notification_types_scan.py <fixture.js> <scratch>. The lookbehind excludes only an immediately preceding dot.",
+   "failure_scenario": "A client bundle contains x=Array.from(new Set([...knownTypes,\"new_notice\"])), an unrelated obj. x=[...knownTypes], and a Notification catalog spreading x, all in the same scope. The scanner mistakes the property assignment for x's array, reports successful resolution and passes while omitting the unknown type. This does not require the documented ambiguity between variables in different scopes.",
+   "fix": "Distinguish identifier assignments from member assignments after accounting for JavaScript whitespace and comments. When the catalog variable has no supported literal assignment, fail closed. Extend the property-assignment test and mutant checks with whitespace and comment-separated member access.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F3-2",
+   "lane": "sol",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 83,
+   "claim": "The newly added Default comparison can report identical settings after the effective notification default changes because it ignores implementation attributes and additional conditional implementations.",
+   "evidence": "Ran definitions_identical on the fetched rust-v0.159.2 types.rs and a modified copy replacing its Default implementation with two mutually exclusive implementations: feature-enabled returns Enabled(true), feature-disabled returns Enabled(false). Output: REAL_TAG_CONDITIONAL_DEFAULT {\"replacement_happened\": true, \"comparison_still_identical\": true}. The helper captures the first implementation body without its cfg attribute. README.md:19 promises each compared part includes its attributes. The official Rust Reference states: \"The `cfg` attribute conditionally includes the form to which it is attached based on a configuration predicate.\" [Rust Reference](https://doc.rust-lang.org/reference/conditional-compilation.html), fetched 2026-09-30. The comparator result was executed; cfg selection was checked against the Reference because rustc was unavailable.",
+   "failure_scenario": "A subsequent upstream tag introduces conditional notification defaults. Without the optional feature, notifications default to disabled, but the refresh script compares the first, feature-enabled body with the old unconditional body and reports notification_definitions_identical=true.",
+   "fix": "Include attributes and doc comments on Default and Display implementations. Account for every matching implementation, or return unknown when multiple implementations or unsupported conditions make the result ambiguous. Add a conditional-default control requiring false or unknown for this fixture.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F3-3",
+   "lane": "sol",
+   "job": "F3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 408,
+   "claim": "The first signal does not win while the client is being created; each later signal overwrites the pending signal.",
+   "evidence": "Used each probe's existing client_boundary_case, changing only its driver to send SIGTERM and then SIGINT 100 ms later while the spawn flag remained active. Both probes returned: stand-in client ran True, signal mask 0000000000000000, probe exit 130 (expected 143), private directory left False, stand-in client still alive False. Commands ran through rtk python3 -B in private scratch copies. alert_probe.py:406 promises \"The first signal wins (later ones are ignored)\"; push_notification_probe.py has the same unconditional assignment at line 414. The decision record repeats the guarantee at line 385.",
+   "failure_scenario": "SIGTERM arrives during subprocess creation, followed by SIGINT before the child is registered. The pending SIGTERM is replaced by SIGINT, so the probe exits 130 instead of the first signal's 143. The existing repeated-signal tests use the same signal twice and cannot reveal this overwrite.",
+   "fix": "Record a spawn-time signal only when no signal is already pending, in both probes. Add a mixed-signal spawn-boundary case asserting that the first signal determines the exit status, and a mutant that removes that guard.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F3-4",
+   "lane": "sol",
+   "job": "F3",
+   "severity": "low",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/build_findings_record.py",
+   "line": 76,
+   "claim": "The privacy repair republishes the two private project labels in the sanitizer source and its assertion.",
+   "evidence": "A value-free Python scan found six occurrences across three published files: build_findings_record.py:76, build_recheck_record.py:118 and sanitize_results.py:20, two occurrences per file. Comparing each file with git show 9e55a103:<path> found zero occurrences in the baseline and two at CHECKOUT. The source comment explicitly identifies the regex values as private per-project profile names. Sensitive values are withheld here.",
+   "failure_scenario": "A reader of the public repository obtains the private labels from the redaction rules themselves, although the regenerated JSON records replace them with placeholders.",
+   "fix": "Supply private redaction values through private input or explicit arguments instead of committing them. Remove the literals from assertions as well, then regenerate the affected provenance and manifest hashes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F3-5",
+   "lane": "sol",
+   "job": "F3",
+   "severity": "low",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 225,
+   "claim": "The newly recorded scrub-rerun description reports two real /tmp entries, but its referenced output and receipt report zero.",
+   "evidence": "The row says \"the real `/tmp` gained two top-level entries of no kind the script counts\". A Python check of recorded/scrub_placeholder_probe.txt found in_tmp_excluding_the_shared_file.other=0 and the sum of all its categories=0. The new receipt's real_tmp_top_level_entries_of_no_counted_kind_new_during_the_run is also 0. The recorded shared file appeared and was removed separately.",
+   "failure_scenario": "A reader following the dated evidence row concludes that the recorded rerun observed two unrelated entries in real /tmp, although the named output contains no such observation.",
+   "fix": "Change the row to report zero additional top-level entries, matching the recorded output. If two entries belong to another run, retain and identify that run separately.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-1",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 40,
+   "claim": "An unsupported second catalog is silently omitted, so the scanner can report success while missing an unknown matcher type.",
+   "evidence": "In ctx_execute scratch, ran python3 -B notification_types_scan.py <fixture> <scratch> on executable JavaScript containing one supported catalog and a second catalog with values:[...extra()], where extra() returns [\"brand_new_type\"]. Node execution returned [\"permission_prompt\",\"idle_prompt\",\"brand_new_type\"]. Scanner output: scan_exit 0, catalogs_seen 1, unknown []. A second catalog using fieldToMatch: \"notification_type\" with whitespace also produced scan_exit 0 and catalogs_seen 1. The same second catalog in the recognized syntax produced exit 1 and unknown ['brand_new_type'].",
+   "failure_scenario": "A client update retains one recognized Notification catalog but changes another to a call-result spread or different whitespace. The scan approves the update because catalogs_resolved considers only regex matches, leaving the unknown notification type without a decision.",
+   "fix": "Enumerate Notification catalog anchors independently of the supported values syntax. Require every anchor to resolve; return catalogs_resolved=false for an unsupported catalog. Add mixed supported/unsupported catalog fixtures and a mutant that disables this completeness check.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-2",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/notification_types_scan.py",
+   "line": 51,
+   "claim": "The new member-assignment exclusion fails when whitespace separates the dot and identifier.",
+   "evidence": "Ran the scanner against a fixture containing obj. A=[\"permission_prompt\",\"idle_prompt\"];function f(A){return {fieldToMatch:\"notification_type\",values:[...A,\"elicitation_complete\",\"elicitation_response\"]}}var x=f([\"permission_prompt\",\"idle_prompt\",\"brand_new_type\"]);. Node execution confirmed x.values contains brand_new_type. Scanner output: scan_exit 0, catalogs_seen 1, unknown []; its reported names omitted brand_new_type. The preceding character of A is a space, so the new (?<![\\w$.]) guard accepts the property assignment.",
+   "failure_scenario": "An unrelated member array is written as obj. A=[...], while a parameterized catalog receives an array containing an unknown type. The member array is incorrectly selected as the catalog base. This bypass concerns the newly promised member-assignment exclusion, rather than the documented plain-assignment scope residual.",
+   "fix": "Reject an assignment candidate when its preceding syntactic token is member access, including intervening whitespace or comments. Add the spaced-member fixture to ScanReaderTests and require the property-assignment mutant to fail it.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-3",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/login_path_digest.py",
+   "line": 43,
+   "claim": "The nonce is visible to startup files through BASH_EXECUTION_STRING, contradicting the new secrecy and completion guarantees.",
+   "evidence": "The docstring states: \"A startup file cannot know the nonce\". With installed Bash 5.2.21, used temporary .bash_profile files containing PATH=/synthetic/early; eval \"$BASH_EXECUTION_STRING\"; PATH=<different final value>; exit 0. Two different final PATHs, containing two and three entries, both returned reported_entries 1 and reported_digest 455560c2d2ad8fea, with measurement_error False. Their expected final digests were 2f690cf073626fb7 and c83b462d8b999ce9. scrub_placeholder_probe.login_path() also returned the early path. The installed Bash manual identifies BASH_EXECUTION_STRING as the command argument supplied through -c.",
+   "failure_scenario": "A startup file evaluates or otherwise reproduces the visible -c probe before finishing its PATH changes, then exits successfully. Both helpers accept that startup-produced record as the completed measurement and can report identical digests for different final PATHs.",
+   "fix": "Keep the measurement command and nonce out of the startup-visible -c argument, for example by supplying the probe through a separate input channel after initialization. Add this command-replay fixture. Replace the absolute secrecy claims in both helpers and the README with a guarantee limited to the startup behavior the implementation actually supports.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-4",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/login-shell-contract-20260929/landscape_refresh.py",
+   "line": 83,
+   "claim": "The comparison still reports identical notification definitions after upstream changes alter their defaults or configuration layout.",
+   "evidence": "Fetched and indexed openai/codex types.rs at rust-v0.157.1 and rust-v0.159.2; the unchanged extracted definitions compared True. On the rust-v0.159.2 source, replacing the original Default impl with a #[cfg(unix)] true impl followed by a #[cfg(windows)] false impl also compared True: only the first impl is captured, without its cfg attribute. Removing flatten from Tui.notification_settings returned TUI_FLATTEN_REMOVAL_IDENTICAL True, and adding a notification-related Tui field returned True. Primary source: https://raw.githubusercontent.com/openai/codex/rust-v0.159.2/codex-rs/config/src/types.rs. Serde documentation fetched 2026-09-30 states: \"The `flatten` attribute inlines keys from a field into the parent struct.\" https://serde.rs/attr-flatten.html",
+   "failure_scenario": "An upstream release disables notifications by default on Windows through a second conditional impl, or changes the Tui field's flattening. The refresh still emits notification_definitions_identical=true although the effective default or accepted TOML layout changed.",
+   "fix": "Include the notification_settings field and its attributes in the Tui comparison. Collect every relevant Default impl together with its attributes; report unknown when conditional implementations cannot be resolved safely. Add both counterexamples to the selftest.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-5",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "tests/test_windows_terminal_defaults.py",
+   "line": 50,
+   "claim": "The strengthened documentation control still passes contradictory operative matcher instructions in ordinary prose and tables.",
+   "evidence": "In scratch, appended each wrong instruction to the otherwise correct recipe and ran DocumentationTests.test_every_matcher_the_recipe_and_the_decision_record_quote_is_the_overlays. For 'Set the Notification matcher to `permission_prompt`.', 'Notification matcher: `permission_prompt`.', and a table row '| Notification | `permission_prompt` |', quoted_matchers returned [] for the added instruction and the control passed. A line-broken 'Use matcher\\nvalue `permission_prompt`.' and comma-separated or space-padded matcher quotes also passed undetected. Restored the recipe after every experiment.",
+   "failure_scenario": "A document retains one correct matcher quote but adds an operative single-type matcher under a different phrasing or in a table. The test sees only the correct quote and approves instructions that would omit required notifications.",
+   "fix": "Give operative matcher instructions a structured, machine-checked representation and enforce that representation wherever the recipe or decision record supplies a matcher. Add prose, table, line-break and separator fixtures that must fail when their operative matcher differs from the overlay.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-6",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 75,
+   "claim": "The repaired counter disagrees with the pinned Windows Terminal parser on complete colour groups.",
+   "evidence": "Executed sgr_counts('\\u001b[38:2::1:2:3:4m') and sgr_counts('\\u001b[38:5:9:1m'); both returned {'unclassified_groups': 1}. The pinned _SetRgbColorsHelperFromSubParams reads fixed component/index positions without rejecting trailing subparameters, so these groups apply colours. Conversely, '\\u001b[38;2;300;1;1m' returned {'fg_truecolor_38;2': 1} and '\\u001b[48;5;256m' returned {'bg_256_48;5': 1}; the pinned semicolon helper rejects these values, including the exact condition 'if (red <= 255 && green <= 255 && blue <= 255)'. Source: https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/adapter/adaptDispatchGraphics.cpp. These are complete groups, outside the documented incomplete-group residual.",
+   "failure_scenario": "A captured stream contains complete colon groups with trailing subparameters or semicolon colours above the byte range. The report undercounts colours the terminal applies or counts colours the terminal rejects.",
+   "fix": "Match the pinned helper's component selection and acceptance conditions: accept its supported trailing subparameters and apply byte-range validation to semicolon colours too. Add these cases to the selftest and preserve the separately documented incomplete-group limitation.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-F2-7",
+   "lane": "sol",
+   "job": "F2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/color_capture.py",
+   "line": 75,
+   "claim": "The new colon validation crashes on a long numeric parameter instead of classifying it.",
+   "evidence": "Under Python 3.13 with the default integer-string limit of 4300, called sgr_counts on ESC[38:2::<4500 nines>:1:1m and ESC[48:5:<4500 nines>m. Both raised ValueError: 'Exceeds the limit (4300 digits) for integer string conversion: value has 4500 digits'. Windows Terminal's pinned StateMachine::_AccumulateTo bounds numeric accumulation and assigns 'value = MAX_PARAMETER_VALUE;' when the limit is exceeded. Source: https://raw.githubusercontent.com/microsoft/terminal/v1.24.11911.0/src/terminal/parser/stateMachine.cpp.",
+   "failure_scenario": "The PTY stream contains an overlong colon colour component or palette index. int(x) aborts the counter and prevents the capture report, although the terminal processes the parameter with bounded accumulation and rejects the resulting out-of-range colour.",
+   "fix": "Use bounded numeric accumulation or an equivalent safe conversion before validating components. Do not disable Python's process-wide digit limit. Add overlong RGB and palette-index cases that return an unclassified result without raising.",
+   "tested": true
+  }
+ ]
+}

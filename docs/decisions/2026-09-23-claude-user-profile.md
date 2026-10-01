@@ -208,3 +208,16 @@ the user-scope template.
 - The installer only visits the servers the template names. A host registered from an earlier
   template keeps its user-scope `jcodemunch` entry until `claude mcp remove jcodemunch -s user`
   removes it.
+
+## Addendum (2026-09-29): the release manifest's signature now verifies
+
+Decision item 1 recorded that the 2.1.280 manifest's `.sig` sidecar could not be checked because this host had no published Anthropic
+public key or documented verification procedure, and named one becoming available as its overturn condition. The setup page now
+documents both ([Binary integrity and code signing](https://code.claude.com/docs/en/setup#binary-integrity-and-code-signing), read
+2026-09-29; manifest signatures exist for releases from 2.1.89). On this host the key at
+`https://downloads.claude.ai/keys/claude-code.asc` has the documented fingerprint `31DD DE24 DDFA B679 F42D 7BD2 BAA9 29FF 1A7E CACE`,
+and `gpg --verify manifest.json.sig manifest.json` reported a good signature for the 2.1.281 and 2.1.284 manifests, while a copy of the
+2.1.284 manifest with one byte changed failed. The overturn condition is met, and the 2.1.284 pins record the signature check beside the
+byte re-hash of each platform binary. The 2.1.280 manifest was not re-verified, and this record does not say the earlier statement was
+wrong when written, because the page's history was not retained. The key's own certification, expiry and revocation were not checked;
+the fingerprint comes from the same documentation.

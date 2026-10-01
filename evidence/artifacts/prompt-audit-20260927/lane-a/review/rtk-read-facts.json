@@ -1,0 +1,37 @@
+{
+ "note": "Command ordinals of the RTK.md read in each GPT-6 run's event log; attempt 2 was dispatched after both round-1 runs finished. Only command_execution items were parsed; no command text is kept.",
+ "runs": {
+  "round-1 probe": {
+   "started": "2026-09-28T08:16:30Z",
+   "finished": "2026-09-28T08:17:11Z",
+   "commands": 1,
+   "rtk_md_read_at_command": [
+    1
+   ]
+  },
+  "round-1 lane": {
+   "started": "2026-09-28T08:17:25Z",
+   "finished": "2026-09-28T08:25:51Z",
+   "commands": 36,
+   "rtk_md_read_at_command": [
+    2
+   ]
+  },
+  "attempt-2 judge, A/B": {
+   "started": "2026-09-28T09:00:06Z",
+   "finished": "2026-09-28T09:06:17Z",
+   "commands": 37,
+   "rtk_md_read_at_command": [
+    2
+   ]
+  },
+  "attempt-2 judge, B/A": {
+   "started": "2026-09-28T09:00:06Z",
+   "finished": "2026-09-28T09:05:56Z",
+   "commands": 32,
+   "rtk_md_read_at_command": [
+    2
+   ]
+  }
+ }
+}

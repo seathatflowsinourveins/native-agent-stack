@@ -1,0 +1,8 @@
+# What the running build changed after the build the lane probe and the effort rows ran on (read-only git by the record's author, 2026-09-27T10:40:22Z)
+# Repository: the build's source clone (~/.local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904), git version 2.43.0
+# bf0255649 = a58000c7 + #14904 (superseded 07:19:45Z); dd6e9607e = bf0255649 + #13788 (running since 07:19:46Z)
+$ git diff --name-only bf02556494beb99cd6dbd14391266ebbb0d48079 dd6e9607e4884ec75c9bc0d96e60b01e9483d84e
+src/app/api/v1/alpha/search/route.ts
+tests/unit/issue-8674-alpha-search.test.ts
+$ git diff --shortstat bf02556494beb99cd6dbd14391266ebbb0d48079 dd6e9607e4884ec75c9bc0d96e60b01e9483d84e
+ 2 files changed, 415 insertions(+)

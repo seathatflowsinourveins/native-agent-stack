@@ -1,0 +1,18 @@
+fixture under test: host-scripts/host_scripts_fixture.sh sha256 2c030252f65139c9
+=== G1 WORK_DIR already exists and holds a file
+fixture exit 2; first lines:
+  refusing: WORK_DIR $SANDBOX/g1/existing exists; pass a path the fixture can create, e.g. "$(mktemp -d)/fx"
+EXPECT G1 the existing directory's file survives: ok
+=== G2 the caller's GIT_CONFIG_GLOBAL
+fixture exit 1; first lines:
+  === S1 --apply without a reviewed --target (origin/main can move after the dry run)
+  --- dry run: apply.sh --main $WORK/s1/primary 
+caller's user.email now: caller@example.invalid
+EXPECT G2 the caller's configuration file is unchanged: ok
+=== G3 the caller's GIT_DIR
+fixture exit 1; first lines:
+  === S1 --apply without a reviewed --target (origin/main can move after the dry run)
+  --- dry run: apply.sh --main $WORK/s1/primary 
+caller's commits now: 1, core.bare: false
+EXPECT G3 the caller's repository is unchanged: ok
+=== summary: 0 expectation(s) not met

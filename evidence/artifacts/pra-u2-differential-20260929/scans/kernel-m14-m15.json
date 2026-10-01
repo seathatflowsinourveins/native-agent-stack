@@ -1,0 +1,222 @@
+{
+ "transcript_files": 5283,
+ "parse_errors": 2,
+ "actors_with_calls": 4437,
+ "invariant_violations": {
+  "actor": 0,
+  "server": 0,
+  "executed": 0,
+  "rejected_sources": 0
+ },
+ "claude_calls_without_result_equal_cancelled_or_unfinished": {
+  "equal": 4437,
+  "differ": 0
+ },
+ "call_states": {
+  "attempted": 238345,
+  "decided": null,
+  "executed": 237052,
+  "succeeded": 233443,
+  "failed": 3609,
+  "interrupted": 0,
+  "rejected": 918,
+  "invalid": 359,
+  "cancelled_with_result": 1,
+  "cancelled_or_unfinished": 15,
+  "unknown": 0,
+  "rejected_by_source": {
+   "config": 24,
+   "hook": 842,
+   "user": 51,
+   "other": 1,
+   "declined": 0
+  },
+  "background": 1994,
+  "sandbox": 0
+ },
+ "m15_threshold": 0.01,
+ "m15_by_server": {
+  "(other)": {
+   "attempted": 619,
+   "succeeded": 602,
+   "ctx": false,
+   "classes": {
+    "connection": 16,
+    "unmatched": 1
+   },
+   "infrastructure_errors": 16,
+   "new_class_errors": 1,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0.0275,
+   "rate_lower_bound": 0.0275,
+   "rate_upper_bound": 0.0275,
+   "over_threshold": true,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "ai-memory": {
+   "attempted": 141,
+   "succeeded": 139,
+   "ctx": false,
+   "classes": {
+    "unmatched": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 2,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0.0142,
+   "rate_lower_bound": 0.0142,
+   "rate_upper_bound": 0.0142,
+   "over_threshold": true,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "codebase-memory": {
+   "attempted": 28,
+   "succeeded": 27,
+   "ctx": false,
+   "classes": {
+    "connection": 1
+   },
+   "infrastructure_errors": 1,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0.0357,
+   "rate_lower_bound": 0.0357,
+   "rate_upper_bound": 0.0357,
+   "over_threshold": true,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "headroom": {
+   "attempted": 28,
+   "succeeded": 28,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "over_threshold": false,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "jcodemunch": {
+   "attempted": 88,
+   "succeeded": 86,
+   "ctx": false,
+   "classes": {
+    "unmatched": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 2,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0.0227,
+   "rate_lower_bound": 0.0227,
+   "rate_upper_bound": 0.0227,
+   "over_threshold": true,
+   "threshold_sensitive": false,
+   "every_error_classified": false
+  },
+  "plugin_context-mode": {
+   "attempted": 2,
+   "succeeded": 0,
+   "ctx": true,
+   "classes": {
+    "invalid": 2
+   },
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 2,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 1,
+   "over_threshold": true,
+   "threshold_sensitive": true,
+   "every_error_classified": true
+  },
+  "plugin_context-mode_context-mode": {
+   "attempted": 35665,
+   "succeeded": 35307,
+   "ctx": true,
+   "classes": {
+    "boundary": 81,
+    "invalid": 9,
+    "invalid_arguments": 1,
+    "invoked_command_exit": 200,
+    "invoked_command_exit_indexed": 2,
+    "module": 10,
+    "rejected": 21,
+    "remote_fetch": 22,
+    "search_throttle": 4,
+    "timeout": 8
+   },
+   "infrastructure_errors": 99,
+   "new_class_errors": 1,
+   "unknowns": 2,
+   "unassigned_errors": 56,
+   "rate": 0.0029,
+   "rate_lower_bound": 0.0028,
+   "rate_upper_bound": 0.0044,
+   "over_threshold": false,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "qmd": {
+   "attempted": 59,
+   "succeeded": 59,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "over_threshold": false,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "serena": {
+   "attempted": 31,
+   "succeeded": 31,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "over_threshold": false,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  },
+  "socraticode": {
+   "attempted": 69,
+   "succeeded": 69,
+   "ctx": false,
+   "classes": {},
+   "infrastructure_errors": 0,
+   "new_class_errors": 0,
+   "unknowns": 0,
+   "unassigned_errors": 0,
+   "rate": 0,
+   "rate_lower_bound": 0,
+   "rate_upper_bound": 0,
+   "over_threshold": false,
+   "threshold_sensitive": false,
+   "every_error_classified": true
+  }
+ }
+}

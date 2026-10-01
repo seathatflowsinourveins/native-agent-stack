@@ -1,0 +1,812 @@
+{
+  "schema_version": 1,
+  "kind": "codex_exec_isolation_probe",
+  "codex": "codex-cli 0.157.1",
+  "committed_options": [
+    "exec",
+    "--ignore-user-config",
+    "--skip-git-repo-check",
+    "-s",
+    "read-only"
+  ],
+  "isolation_overrides": [
+    "-c",
+    "agents.enabled=false",
+    "-c",
+    "web_search=\"disabled\"",
+    "-c",
+    "features.shell_tool=false",
+    "-c",
+    "features.unified_exec=false",
+    "-c",
+    "features.view_image=false",
+    "-c",
+    "features.goals=false",
+    "-c",
+    "features.sleep_tool=false",
+    "-c",
+    "features.hooks=false",
+    "-c",
+    "features.plugins=false",
+    "-c",
+    "features.apps=false",
+    "-c",
+    "features.unbounded_connection_retries=false",
+    "-c",
+    "cli_auth_credentials_store=\"file\""
+  ],
+  "cases": [
+    {
+      "case": "committed-web",
+      "model": "gpt-6-astra",
+      "overrides": "none",
+      "scripted_calls": [
+        {
+          "namespace": "web",
+          "name": "run",
+          "arguments": {
+            "search_query": [
+              {
+                "q": "codex fake query"
+              }
+            ]
+          }
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.94,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message",
+        "web_search"
+      ],
+      "rollout_response_items": {
+        "message": 6,
+        "function_call": 1,
+        "function_call_output": 1
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "[{\"type\": \"input_text\", \"text\": \"Fake search output.\"}]"
+      ],
+      "search_requests": 1,
+      "responses_requests": 2,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 22,
+          "cached_input_tokens": 6,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14,
+          "reasoning_output_tokens": 4
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        ".tmp/",
+        "goals_1.sqlite",
+        "goals_1.sqlite-shm",
+        "goals_1.sqlite-wal",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "memories_1.sqlite-shm",
+        "memories_1.sqlite-wal",
+        "queue_1.sqlite",
+        "queue_1.sqlite-shm",
+        "queue_1.sqlite-wal",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "thread_history_1.sqlite-shm",
+        "thread_history_1.sqlite-wal",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "committed-code-mode",
+      "model": "gpt-6-astra",
+      "overrides": "none",
+      "scripted_calls": [
+        {
+          "name": "exec",
+          "input": "text(JSON.stringify(Object.keys(tools).sort()))"
+        },
+        {
+          "name": "exec",
+          "input": "const r = await tools.exec_command({cmd: \"pwd\"}); text(JSON.stringify(r).slice(0, 300))"
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.98,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message",
+        "command_execution"
+      ],
+      "rollout_response_items": {
+        "message": 6,
+        "custom_tool_call": 2,
+        "custom_tool_call_output": 2
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "[{\"type\": \"input_text\", \"text\": \"Script completed\\nWall time 0.0 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"[\\\"apply_patch\\\",\\\"clock__curr_time\\\",\\\"create_goal\\\",\\\"exec_command\\\",\\\"get_goal\\\",\\\"update_goal\\\",\\\"view_image\\\",\\\"web__run\\\",\\\"write_stdin\\\"]\"}]",
+        "[{\"type\": \"input_text\", \"text\": \"Script completed\\nWall time 0.1 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"{\\\"chunk_id\\\":\\\"d56b0a\\\",\\\"wall_time_seconds\\\":0.00000618,\\\"exit_code\\\":0,\\\"original_token_count\\\":35,\\\"output\\\":\\\"<case>/cwd\\\\n\\\"}\"}]"
+      ],
+      "search_requests": 0,
+      "responses_requests": 3,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 33,
+          "cached_input_tokens": 9,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21,
+          "reasoning_output_tokens": 6
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        ".tmp/",
+        "goals_1.sqlite",
+        "goals_1.sqlite-shm",
+        "goals_1.sqlite-wal",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "memories_1.sqlite-shm",
+        "memories_1.sqlite-wal",
+        "queue_1.sqlite",
+        "queue_1.sqlite-shm",
+        "queue_1.sqlite-wal",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "thread_history_1.sqlite-shm",
+        "thread_history_1.sqlite-wal",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "multi-agent-feature-off",
+      "model": "gpt-6-astra",
+      "overrides": "multi_agent_feature_off",
+      "scripted_calls": [],
+      "exit": 0,
+      "seconds": 5.79,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 6
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]",
+        "namespace:clock[sleep]",
+        "namespace:collaboration[followup_task,interrupt_agent,list_agents,send_message,spawn_agent,wait_agent]"
+      ],
+      "tool_outputs_returned_to_model": [],
+      "search_requests": 0,
+      "responses_requests": 1,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 11,
+          "cached_input_tokens": 3,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7,
+          "reasoning_output_tokens": 2
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        ".tmp/",
+        "goals_1.sqlite",
+        "goals_1.sqlite-shm",
+        "goals_1.sqlite-wal",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "memories_1.sqlite-shm",
+        "memories_1.sqlite-wal",
+        "queue_1.sqlite",
+        "queue_1.sqlite-shm",
+        "queue_1.sqlite-wal",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "thread_history_1.sqlite-shm",
+        "thread_history_1.sqlite-wal",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "isolated-web",
+      "model": "gpt-6-astra",
+      "overrides": "isolation",
+      "scripted_calls": [
+        {
+          "namespace": "web",
+          "name": "run",
+          "arguments": {
+            "search_query": [
+              {
+                "q": "codex fake query"
+              }
+            ]
+          }
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.68,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4,
+        "function_call": 1,
+        "function_call_output": 1
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "unsupported call: webrun"
+      ],
+      "search_requests": 0,
+      "responses_requests": 2,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 22,
+          "cached_input_tokens": 6,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14,
+          "reasoning_output_tokens": 4
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n2026-09-26T17:58:51.412273Z ERROR codex_core::tools::router: error=unsupported call: webrun\n"
+    },
+    {
+      "case": "isolated-code-mode",
+      "model": "gpt-6-astra",
+      "overrides": "isolation",
+      "scripted_calls": [
+        {
+          "name": "exec",
+          "input": "text(JSON.stringify(Object.keys(tools).sort()))"
+        },
+        {
+          "name": "exec",
+          "input": "const r = await tools.exec_command({cmd: \"pwd\"}); text(JSON.stringify(r).slice(0, 300))"
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.94,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4,
+        "custom_tool_call": 2,
+        "custom_tool_call_output": 2
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "[{\"type\": \"input_text\", \"text\": \"Script completed\\nWall time 0.0 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"[\\\"apply_patch\\\",\\\"clock__curr_time\\\"]\"}]",
+        "[{\"type\": \"input_text\", \"text\": \"Script failed\\nWall time 0.0 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"Script error:\\nTypeError: tools.exec_command is not a function\\n    at exec_main.mjs:1:23\"}]"
+      ],
+      "search_requests": 0,
+      "responses_requests": 3,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 33,
+          "cached_input_tokens": 9,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 21,
+          "reasoning_output_tokens": 6
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "isolated-collaboration",
+      "model": "gpt-6-astra",
+      "overrides": "isolation",
+      "scripted_calls": [
+        {
+          "namespace": "collaboration",
+          "name": "spawn_agent",
+          "arguments": {
+            "message": "list files"
+          }
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.98,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4,
+        "function_call": 1,
+        "function_call_output": 1
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "unsupported call: collaborationspawn_agent"
+      ],
+      "search_requests": 0,
+      "responses_requests": 2,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 22,
+          "cached_input_tokens": 6,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14,
+          "reasoning_output_tokens": 4
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n2026-09-26T17:59:04.915926Z ERROR codex_core::tools::router: error=unsupported call: collaborationspawn_agent\n"
+    },
+    {
+      "case": "isolated-plain-astra",
+      "model": "gpt-6-astra",
+      "overrides": "isolation",
+      "scripted_calls": [],
+      "exit": 0,
+      "seconds": 5.83,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [],
+      "search_requests": 0,
+      "responses_requests": 1,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 11,
+          "cached_input_tokens": 3,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 7,
+          "reasoning_output_tokens": 2
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "isolated-plain-sol",
+      "model": "gpt-6-sol",
+      "overrides": "isolation",
+      "scripted_calls": [
+        {
+          "name": "exec",
+          "input": "text(JSON.stringify(Object.keys(tools).sort()))"
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.98,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4,
+        "custom_tool_call": 1,
+        "custom_tool_call_output": 1
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "[{\"type\": \"input_text\", \"text\": \"Script completed\\nWall time 0.0 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"[\\\"apply_patch\\\",\\\"clock__curr_time\\\"]\"}]"
+      ],
+      "search_requests": 0,
+      "responses_requests": 2,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 22,
+          "cached_input_tokens": 6,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14,
+          "reasoning_output_tokens": 4
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "isolated-plain-luna",
+      "model": "gpt-6-luna",
+      "overrides": "isolation",
+      "scripted_calls": [
+        {
+          "name": "exec",
+          "input": "text(JSON.stringify(Object.keys(tools).sort()))"
+        }
+      ],
+      "exit": 0,
+      "seconds": 5.68,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "turn.completed"
+      ],
+      "json_item_types": [
+        "agent_message"
+      ],
+      "rollout_response_items": {
+        "message": 4,
+        "custom_tool_call": 1,
+        "custom_tool_call_output": 1
+      },
+      "offered_tools_first_request": [
+        "namespace:functions[exec,wait,request_user_input,request_user_input_async]"
+      ],
+      "tool_outputs_returned_to_model": [
+        "[{\"type\": \"input_text\", \"text\": \"Script completed\\nWall time 0.0 seconds\\nOutput:\\n\"}, {\"type\": \"input_text\", \"text\": \"[\\\"apply_patch\\\",\\\"clock__curr_time\\\"]\"}]"
+      ],
+      "search_requests": 0,
+      "responses_requests": 2,
+      "error_messages": [],
+      "turn_completed_usage": [
+        {
+          "input_tokens": 22,
+          "cached_input_tokens": 6,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14,
+          "reasoning_output_tokens": 4
+        }
+      ],
+      "reply_file": "{\"filings\": []}",
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "installation_id",
+        "logs_2.sqlite",
+        "memories_1.sqlite",
+        "queue_1.sqlite",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "committed-provider-unreachable",
+      "model": "gpt-6-astra",
+      "overrides": "none",
+      "scripted_calls": [],
+      "exit": "timeout",
+      "seconds": 60.0,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "error",
+        "error",
+        "error",
+        "error"
+      ],
+      "json_item_types": [],
+      "rollout_response_items": {
+        "message": 5
+      },
+      "offered_tools_first_request": [],
+      "tool_outputs_returned_to_model": [],
+      "search_requests": 0,
+      "responses_requests": 0,
+      "error_messages": [
+        "Reconnecting... waiting for network (Connection failed: error sending request)",
+        "Reconnecting... waiting for network (Connection failed: error sending request)",
+        "Reconnecting... waiting for network (Connection failed: error sending request)",
+        "Reconnecting... waiting for network (Connection failed: error sending request)"
+      ],
+      "turn_completed_usage": [],
+      "reply_file": null,
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        ".tmp/",
+        "goals_1.sqlite",
+        "goals_1.sqlite-shm",
+        "goals_1.sqlite-wal",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "memories_1.sqlite-shm",
+        "memories_1.sqlite-wal",
+        "queue_1.sqlite",
+        "queue_1.sqlite-shm",
+        "queue_1.sqlite-wal",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "thread_history_1.sqlite-shm",
+        "thread_history_1.sqlite-wal",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    },
+    {
+      "case": "isolated-provider-unreachable",
+      "model": "gpt-6-astra",
+      "overrides": "isolation",
+      "scripted_calls": [],
+      "exit": 1,
+      "seconds": 0.52,
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "error",
+        "turn.failed"
+      ],
+      "json_item_types": [],
+      "rollout_response_items": {
+        "message": 3
+      },
+      "offered_tools_first_request": [],
+      "tool_outputs_returned_to_model": [],
+      "search_requests": 0,
+      "responses_requests": 0,
+      "error_messages": [
+        "Connection failed: error sending request",
+        "Connection failed: error sending request"
+      ],
+      "turn_completed_usage": [],
+      "reply_file": null,
+      "created_in_codex_home": [
+        ".sandbox_migration",
+        "goals_1.sqlite",
+        "goals_1.sqlite-shm",
+        "goals_1.sqlite-wal",
+        "installation_id",
+        "logs_2.sqlite",
+        "logs_2.sqlite-shm",
+        "logs_2.sqlite-wal",
+        "memories_1.sqlite",
+        "memories_1.sqlite-shm",
+        "memories_1.sqlite-wal",
+        "queue_1.sqlite",
+        "queue_1.sqlite-shm",
+        "queue_1.sqlite-wal",
+        "sessions/",
+        "shell_snapshots/",
+        "skills/",
+        "state_5.sqlite",
+        "state_5.sqlite-shm",
+        "state_5.sqlite-wal",
+        "thread-writer-locks/",
+        "thread_history_1.sqlite",
+        "thread_history_1.sqlite-shm",
+        "thread_history_1.sqlite-wal",
+        "tmp/"
+      ],
+      "created_in_home": [],
+      "created_in_cwd": [],
+      "daemon_package_present": false,
+      "stderr_tail": "Reading additional input from stdin...\n"
+    }
+  ]
+}

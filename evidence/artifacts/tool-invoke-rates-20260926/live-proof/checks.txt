@@ -1,0 +1,24 @@
+PASS Claude MCP tool_result by server: context-mode plugin >= 1, qmd >= 2 :: {'mcp_server_name': 'plugin_context-mode_context-mode'}=1; {'mcp_server_name': 'qmd'}=2
+PASS Claude skill_activated by name: codebase-design >= 1 :: {'skill_name': 'codebase-design'}=1
+PASS Claude Agent launches (accepted tool_decision) by subagent_type: general-purpose >= 1 :: {'subagent_type': 'general-purpose'}=1
+PASS Claude Workflow launches (accepted tool_decision) >= 1 :: {}=1
+PASS Claude tool_result by actor: workflow >= 1 and main_or_subagent >= 1 :: {'actor': 'main_or_subagent'}=8; {'actor': 'workflow'}=2
+PASS Claude api_request MCP attribution: subagent/qmd >= 1 and workflow/qmd >= 1 :: {'actor': 'main', 'mcp_server_name': 'plugin_context-mode_context-mode'}=1; {'actor': 'subagent', 'mcp_server_name': 'qmd'}=1; {'actor': 'workflow', 'mcp_server_name': 'qmd'}=1
+PASS Claude subagent_completed total_tool_uses for general-purpose >= 1 :: {'agent_type': 'general-purpose'}=3
+PASS Claude Bash tool_result carries shell_rtk :: {'shell_rtk': 'true'}=1
+PASS Codex MCP tool_result by server: context-mode >= 1 :: {'mcp_server_name': 'context-mode'}=1
+PASS Codex tool_result by actor: main >= 1 and subagent >= 1 :: {'actor': 'main'}=7; {'actor': 'subagent'}=2
+PASS Codex agent_communication spawn sends >= 1 :: {}=1
+PASS tool results by client: claude-code >= 1 and codex_exec >= 1 :: {'client': 'claude-code'}=10; {'client': 'codex_exec'}=9
+PASS unparsed tool_parameters == 0 :: no series
+PASS names replaced by the name pattern == 0 :: no series
+PASS agent types outside the built-in agents (custom) == 0 (the proof uses general-purpose only) :: no series
+PASS the proof's records were fetched without truncation :: records=214
+PASS every stream's labels are exactly {service_name} :: label sets=[('service_name',)]
+PASS every key on the proof's records comes from the Collector allowlists or Loki's own fields :: extra=[]
+PASS name fields hold only the names this proof uses (bash and prompt text cannot hide in them) :: unexpected value counts={}
+PASS proof records carry no content or identity key :: records=214 banned=[]
+PASS no Bash command or prompt text of the proof is stored in Loki :: strings checked=25 found=0
+PASS the Collector's events file holds the proof's records without command, prompt or content keys :: lines=29 text hits=0 banned keys=[]
+INFO structured metadata keys on proof records: actor, agent_name, agent_type, app_version, attempt, cache_creation_tokens, cache_read_tokens, cache_write_token_count, cached_token_count, client, conversation_id, decision, detected_level, duration_ms, ecosystem_task_id, effort, event_kind, event_name, event_sequence, event_timestamp, http_response_status_code, input_token_count, input_tokens, invocation_trigger, kind, mcp_server_name, mcp_tool_name, model, model_reasoning_effort, observed_timestamp, originator, output_token_count, output_tokens, provider_name, query_source, reasoning_effort, reasoning_token_count, receiver_thread_id, scope_name, sender_thread_id, service_instance_id, service_name, service_version, session_id, severity_number, shell_rtk, skill_name, state, status, subagent_type, success, tool_family, tool_name, tool_namespace, tool_result_seq, tool_token_count, total_tool_uses, workflow_run_id
+SUMMARY prove: 22 passed, 0 failed

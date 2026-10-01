@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-27",
+  "evidence_class": "unchanged_upstream_tests",
+  "repository": "https://github.com/kenn-io/agentsview",
+  "tag": "v0.44.0",
+  "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+  "tracked_source_unchanged": true,
+  "runtime": {
+    "version": "go1.27.0",
+    "platform": "linux/amd64",
+    "archive": "go1.27.0.linux-amd64.tar.gz",
+    "sha256": "675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685",
+    "checksum_source": "https://go.dev/dl/?mode=json&include=all",
+    "installation_scope": "New unit scratch prefix; explicit executable path and isolated GOPATH/GOCACHE."
+  },
+  "scope": "Selected unchanged MCP, parser and database packages. The original #1855 selector omitted cmd/agentsview/serve_runtime_test.go; the coordinator's five serve-runtime tests below close that omission. This is not upstream's full ./... CI suite; other cmd/agentsview tests, other packages, frontend and cross-platform tests were not selected.",
+  "prerequisite": {
+    "command": "go run ./internal/pricing/cmd/litellm-snapshot -restore",
+    "exit_code": 0,
+    "source": "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L233"
+  },
+  "initial_build_failures": [
+    {
+      "command": "go test -json -tags fts5 ./internal/mcp/... -count=1 -timeout=20m",
+      "exit_code": 1,
+      "tests_executed": 0,
+      "stdout_sha256": "699ad01932ffa4baea94da201b2b283a491dd4d48edc9fa3139ff91d71ac6693"
+    },
+    {
+      "command": "go test -json -tags fts5 ./internal/parser ./internal/db -run 'TestParseCodexSession_(ExecOriginator|RoborevThreadSource)|TestIsAutomatedSessionMetadata|TestCurrentDataVersionCodexExecSessionKind' -count=1 -timeout=20m",
+      "exit_code": 1,
+      "tests_executed": 0,
+      "stdout_sha256": "cd8cb1528ff40f543f5b1bbb63002686e0fc6ef90ea84905c1b6aaed2d4b82c1"
+    }
+  ],
+  "initial_build_diagnostic": "internal/pricing/fallback.go:33:12: pattern snapshot/litellm_snapshot.json.gz: no matching files found",
+  "broad_attempt": {
+    "execution_context": "inside_codex_sandbox_with_default_temporary_directory",
+    "failure_class": "environmental",
+    "stdout_ref": "units/w3/agentsview/upstream-tests-attempt2.jsonl",
+    "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -run 'Test|Example' -count=1 -timeout=20m",
+    "exit_code": 1,
+    "top_level_counts": {
+      "passed": 4549,
+      "failed": 21,
+      "skipped": 32
+    },
+    "test_event_counts": {
+      "passed": 8718,
+      "failed": 25,
+      "skipped": 39
+    },
+    "stdout_sha256": "ebd47a813ccde77f1baa6d9a778fa6f2e8a51804ae061084b7023898f26fd8ca",
+    "packages": [
+      {
+        "name": "internal/mcp",
+        "status": "pass",
+        "test_events_passed": 97,
+        "test_events_failed": 0,
+        "test_events_skipped": 3,
+        "elapsed_seconds": 4.826
+      },
+      {
+        "name": "internal/parser",
+        "status": "fail",
+        "test_events_passed": 5256,
+        "test_events_failed": 25,
+        "test_events_skipped": 19,
+        "elapsed_seconds": 107.392
+      },
+      {
+        "name": "internal/db",
+        "status": "pass",
+        "test_events_passed": 3365,
+        "test_events_failed": 0,
+        "test_events_skipped": 17,
+        "elapsed_seconds": 136.96
+      }
+    ],
+    "failed_test_events": [
+      "TestAntigravityCLIProviderUsesLastConversationsWorkspace",
+      "TestAntigravityCLIDiscoverAndParseDB",
+      "TestAntigravityCLIProjectFallbackPromptAndProximity",
+      "TestCrushProviderParsesTranscriptToolsAndUsage",
+      "TestParseOpenCodeDB_ProjectFromUnavailableProjectWorktree",
+      "TestParseOpenHandsSession",
+      "TestExtractProjectFromCwdNoGitInvocationWhenLocalWalkMisses",
+      "TestExtractProjectFromCwd_SubmoduleSiblingIgnored",
+      "TestExtractProjectFromCwd_UnrelatedSiblingWorktree",
+      "TestExtractProjectFromCwd_RepoSiblingWithWorktree",
+      "TestExtractProjectFromCwd_DeletedSiblingOfNormalRepo",
+      "TestExtractProjectFromCwd_UnrelatedDeletedNextToWorktreeRepo",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/HostingWorktree",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/HostingWorktreeSubdirectory",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/NamespacedHostingWorktree",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts/NamespacedHostingWorktreeSubdirectory",
+      "TestExtractProjectFromCwd_HostingWorktreeLayouts",
+      "TestProjectRootMemoAncestorScanKeepsCwdAssociation",
+      "TestProjectRootMemoAbsentContextValue",
+      "TestRepoRootFromSiblingsSkipsRefusedGitfileTargets",
+      "TestRepoRootFromSiblingsSkipsGuardedSiblings",
+      "TestDeletedChildIsWorktreeSkipsSymlinkedWorktreesDir",
+      "TestTauParsesActiveLeafAndCanonicalFields",
+      "TestParseWorkBuddySession",
+      "TestParseWorkBuddySessionUsesCwdProjectAndFileSessionID"
+    ]
+  },
+  "targeted_classification": {
+    "original_omission": "cmd/agentsview/serve_runtime_test.go from PR #1855; subsequently covered by coordinator_runs.serve_runtime.",
+    "command": "go test -json -tags fts5 ./internal/parser ./internal/db -run 'TestParseCodexSession_(ExecOriginator|RoborevThreadSource)|TestIsAutomatedSessionMetadata|TestCurrentDataVersionCodexExecSessionKind' -count=1 -timeout=20m",
+    "exit_code": 0,
+    "top_level_tests_passed": 4,
+    "test_events_passed": 13,
+    "test_events_failed": 0,
+    "test_events_skipped": 0,
+    "test_names": [
+      "TestParseCodexSession_ExecOriginator",
+      "TestParseCodexSession_RoborevThreadSource",
+      "TestIsAutomatedSessionMetadata",
+      "TestCurrentDataVersionCodexExecSessionKind"
+    ],
+    "packages": [
+      {
+        "name": "internal/parser",
+        "elapsed_seconds": 0.083
+      },
+      {
+        "name": "internal/db",
+        "elapsed_seconds": 0.07
+      }
+    ],
+    "stdout_sha256": "3e343fc71ab8b699d5981df43c2981fafeaf952712af889584761c0bb3a7757c",
+    "source": "https://github.com/kenn-io/agentsview/pull/1855"
+  },
+  "confirming_subprocess_rerun": {
+    "failure_class": "environmental",
+    "raw_bytes_retained": false,
+    "summary_ref": "units/w3/agentsview/gpt6-build-events.jsonl item_131: recorded ctx_execute summary containing fe13acde06521f5178bb90f19186cbf1e7178e96ece7de9652e773e36bb40bf3",
+    "retention_limit": "The stdout/stderr hashes below were printed in-session, but their raw bytes were not retained. They cannot identify an available raw log. Counts and selected lines survive only in that summary and returned-output.txt.",
+    "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -count=1 -timeout=20m",
+    "exit_code": 1,
+    "elapsed_seconds": 150.761,
+    "top_level_counts": {
+      "passed": 4554,
+      "failed": 21,
+      "skipped": 32
+    },
+    "test_event_counts": {
+      "passed": 8885,
+      "failed": 25,
+      "skipped": 39
+    },
+    "stdout_sha256": "fe13acde06521f5178bb90f19186cbf1e7178e96ece7de9652e773e36bb40bf3",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "same_failed_test_events": true,
+    "scope_difference": "Without the -run selector, unchanged fuzz seed tests also execute. Do not sum overlapping attempts or call the differing pass count a model improvement."
+  },
+  "coordinator_runs": {
+    "evidence_class": "unchanged_upstream_tests",
+    "recorded_at": "2026-09-27",
+    "executor": "coordinator",
+    "execution_context": "outside_codex_sandbox",
+    "script_ref": "units/w3/agentsview/coordinator_go_tests.sh",
+    "script_sha256": "27a8d942a5a4f592f2e375e61e66d9ddd074503eae0f1ef2d932bef4e1d1959d",
+    "environment": {
+      "runtime": "go version go1.27.0 linux/amd64",
+      "GOPATH": "<unit>/prefix/gopath",
+      "GOCACHE": "<unit>/prefix/go-cache",
+      "GOTOOLCHAIN": "local",
+      "GOTELEMETRY": "off",
+      "TMPDIR": "/var/tmp/claude-w3-agentsview-go"
+    },
+    "prerequisite": "Each tag ran go run ./internal/pricing/cmd/litellm-snapshot -restore before its tests, following upstream CI.",
+    "tracked_source_clean_before_and_after": true,
+    "source_status_refs": [
+      "units/w3/agentsview/coordinator-go-tests/v0.44.0.dirty.txt",
+      "units/w3/agentsview/coordinator-go-tests/v0.44.0.dirty-after.txt",
+      "units/w3/agentsview/coordinator-go-tests/v0.43.0.dirty.txt",
+      "units/w3/agentsview/coordinator-go-tests/v0.43.0.dirty-after.txt"
+    ],
+    "source_status_files_bytes_each": 0,
+    "broad": [
+      {
+        "tag": "v0.44.0",
+        "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+        "role": "candidate_rerun",
+        "cwd": "<unit>/prefix/source-v0.44.0",
+        "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -count=1 -timeout=20m",
+        "started_at": "2026-09-27T14:04:14.415473893Z",
+        "finished_at": "2026-09-27T14:06:33.007739778Z",
+        "exit_code": 0,
+        "top_level_counts": {"passed": 4575, "failed": 0, "skipped": 32},
+        "test_event_counts": {"passed": 8910, "failed": 0, "skipped": 39},
+        "packages_passed": 3,
+        "stdout_ref": "units/w3/agentsview/coordinator-go-tests/v0.44.0.broad.jsonl",
+        "stdout_sha256": "8529d7daa9b6c60ec2730066330f2e347adbc17a4af64ae2d906708221bb7190",
+        "stderr_ref": "units/w3/agentsview/coordinator-go-tests/v0.44.0.broad.stderr",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "tag": "v0.43.0",
+        "commit": "9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+        "role": "baseline_control_same_environment",
+        "cwd": "<unit>/prefix/source-v0.43.0",
+        "command": "go test -json -tags fts5 ./internal/mcp/... ./internal/parser ./internal/db -count=1 -timeout=20m",
+        "started_at": "2026-09-27T14:06:46.881234354Z",
+        "finished_at": "2026-09-27T14:08:51.811322332Z",
+        "exit_code": 0,
+        "top_level_counts": {"passed": 4387, "failed": 0, "skipped": 32},
+        "test_event_counts": {"passed": 8434, "failed": 0, "skipped": 37},
+        "packages_passed": 3,
+        "stdout_ref": "units/w3/agentsview/coordinator-go-tests/v0.43.0.broad.jsonl",
+        "stdout_sha256": "ace5a04c6183b31924856f9f36ba79cbbe812317ef9d5d813262e6aa892e4ec4",
+        "stderr_ref": "units/w3/agentsview/coordinator-go-tests/v0.43.0.broad.stderr",
+        "stderr_sha256": "2328e4febf1f91442f9a360839dc3107aa4a02ff8477807dc1920a78bf4ba96b"
+      }
+    ],
+    "serve_runtime": {
+      "tag": "v0.44.0",
+      "commit": "413a87f7bfbd67b2815b1119ac51abc1efbeeaba",
+      "cwd": "<unit>/prefix/source-v0.44.0",
+      "command": "go test -json -tags fts5 ./cmd/agentsview -run 'TestPrepareRunServeRuntimeConfig|TestWaitForBackendReady' -count=1 -timeout=20m",
+      "started_at": "2026-09-27T14:09:14.986310334Z",
+      "finished_at": "2026-09-27T14:09:16.069845992Z",
+      "exit_code": 0,
+      "top_level_counts": {"passed": 5, "failed": 0, "skipped": 0},
+      "test_event_counts": {"passed": 5, "failed": 0, "skipped": 0},
+      "packages_passed": 1,
+      "test_names": [
+        "TestPrepareRunServeRuntimeConfigRestartPreservesConfiguredURLRewrite",
+        "TestWaitForBackendReadyRejectsUnrelatedHTTPListener",
+        "TestWaitForBackendReadyRejectsCounterfeitStartupProof",
+        "TestWaitForBackendReadyRejectsRedirectToServingServer",
+        "TestWaitForBackendReadyAcceptsAuthenticatedServerStartupProof"
+      ],
+      "stdout_ref": "units/w3/agentsview/coordinator-go-tests/v0.44.0.serve-runtime.jsonl",
+      "stdout_sha256": "533a163412c06f37a6155d0cc18f4b776d7a4854d4784ae8b3f130553ebbd485",
+      "stderr_ref": "units/w3/agentsview/coordinator-go-tests/v0.44.0.serve-runtime.stderr",
+      "stderr_sha256": "9c8a04902f83b8adaade26eac5a974f01b2693b9b81ad158e59c258a5ff9ec35"
+    },
+    "verification": "Repair recomputed counts and SHA-256 from retained JSONL, inspected empty before/after status files and verified both source commits. Execution context and exit codes are also supplied by the coordinator's run record. Times above come from first and last JSONL events. No provider execution."
+  },
+  "diagnosis": {
+    "status": "environmental_failure_discriminated",
+    "observed_pattern": "Project-inference expectations fail with actual project tmp.",
+    "environment_cause": "All 25 failed events arise from project inference returning tmp. Codex sandbox commands create an empty /tmp/.git; the context-mode interpreter not seeing it did not exclude its effect on native subprocesses.",
+    "control": "The same broad command passes on v0.44.0 and v0.43.0 outside the Codex sandbox with TMPDIR outside /tmp, using unchanged tags and the same Go 1.27.0 environment.",
+    "conclusion": "Classify the preserved in-sandbox parser failures as environmental. The selected upstream-test gate passes; resolving an upstream defect is not a prerequisite. Requalification still requires fresh native lanes, both independent reviews and the unchanged runner."
+  },
+  "retained_output": "returned-output.txt contains selected actual lines. Initial and first runnable logs and all coordinator JSONL/stderr files remain private in units/w3/agentsview. The confirming_subprocess_rerun raw bytes were not retained; only its recorded in-session summary survives, despite its printed hashes. Private references are unit-relative, not public checkout files.",
+  "errata": [
+    {
+      "date": "2026-09-27",
+      "correction": "The earlier unresolved diagnosis and failed qualification gate are superseded by unchanged coordinator candidate and baseline controls. Preserve every original failed result. The original #1855 selection omitted serve_runtime_test.go, now covered. The confirming rerun did not retain raw stdout/stderr; the prior blanket retention statement was incorrect."
+    }
+  ],
+  "sources": [
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/go.mod",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/.github/workflows/ci.yml#L238",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/parser/codex_parser_test.go#L573",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/automated_test.go",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/internal/db/db_test.go",
+    "https://github.com/kenn-io/agentsview/blob/413a87f7bfbd67b2815b1119ac51abc1efbeeaba/cmd/agentsview/serve_runtime_test.go",
+    "https://github.com/kenn-io/agentsview/tree/9be7745ad1906ee24e04eb05bb86c872ef0939a1",
+    "docs/acceptance-evidence-policy.md"
+  ]
+}

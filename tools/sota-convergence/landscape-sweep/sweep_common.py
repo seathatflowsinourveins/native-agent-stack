@@ -58,9 +58,20 @@ def write_json(path: Path, value, indent=1) -> None:
 
 
 def inside_repository(path: Path) -> Path | None:
+    """The nearest directory at or above path that holds a git repository marker: a .git directory with a HEAD entry
+    (a file, or a symlink, which git allows to point at an unborn branch), or a non-empty .git file (a worktree's or
+    submodule's gitdir pointer). An empty .git is not one. Codex's Linux
+    sandbox creates empty .git mount targets under its writable roots, /tmp included, while a sandboxed command runs,
+    and removes them afterwards (codex-rs/linux-sandbox/src/bwrap.rs at rust-v0.157.1, SyntheticMountTarget). A work
+    directory under /tmp would otherwise be refused at random whenever another Codex job writes on the same host."""
     for candidate in (path, *path.parents):
-        if (candidate / ".git").exists():
-            return candidate
+        marker = candidate / ".git"
+        try:
+            head = marker / "HEAD"
+            if head.is_file() or head.is_symlink() or (marker.is_file() and marker.stat().st_size > 0):
+                return candidate
+        except OSError:  # the marker vanished between the checks: a synthetic target being removed
+            continue
     return None
 
 
@@ -89,8 +100,33 @@ def private_content(repo_root: Path = REPO_ROOT):
     return module.PRIVATE_CONTENT
 
 
+def ledger_module(repo_root: Path = REPO_ROOT):
+    """scripts/saturation_ledger.py of the checkout, for the ledger's own rules (refuted_by_absence, ref_resolver)."""
+    spec = importlib.util.spec_from_file_location("landscape_sweep_ledger", Path(repo_root) / "scripts" / "saturation_ledger.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def pointer_token(key) -> str:
     return str(key).replace("~", "~0").replace("/", "~1")
+
+
+def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
+    """(layer_id -> [(round, item)], unmapped items) for per-worker items (effort deviations, capped WebSearch calls):
+    a worker label <role>:<layer>[:followup] belongs to that layer's round, and the completeness critic to every
+    layer. convert.py records each item as a retained failure of those layers; make_result.py checks that it did."""
+    by_layer, unmapped = {}, []
+    for item in deviations:
+        parts = str(item.get("child")).split(":")
+        if parts == ["critic"]:
+            for layer_id in layer_ids:
+                by_layer.setdefault(layer_id, []).append(("critic", item))
+        elif len(parts) >= 2 and parts[1] in layer_ids and parts[2:] in ([], ["followup"]):
+            by_layer.setdefault(parts[1], []).append(("followup" if parts[2:] else "first", item))
+        else:
+            unmapped.append(item)
+    return by_layer, unmapped
 
 
 def private_findings(value, patterns, pointer: str = "") -> list[tuple[str, str]]:

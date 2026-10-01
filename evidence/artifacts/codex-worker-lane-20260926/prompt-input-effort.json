@@ -1,0 +1,7 @@
+{
+  "what": "The multi_agent_mode developer message of `codex debug prompt-input probe` in a scratch CODEX_HOME whose config.toml sets model_reasoning_effort = \"ultra\", without and with a profile file setting \"max\" (scripts/pi_probe.sh.txt); codex-cli 0.157.1, no sign-in, network namespace off.",
+  "multi_agent_mode": {
+    "default (model_reasoning_effort ultra)": "<multi_agent_mode>Proactive multi-agent delegation is active. Any earlier developer instruction requiring an explicit user request before spawning sub-agents no longer applies. This mode remains active until a later multi-agent mode developer message changes it. User requests override this hint.\n\nIf at any point you can parallelize work by delegating tasks to another agent (no matter if you are root or subagent), you should do so using collaboration tools if it could save time or improve quality.</multi_agent_mode>",
+    "-p stack-worker (max)": "<multi_agent_mode>Any earlier instruction enabling proactive multi-agent delegation no longer applies. Do not spawn sub-agents unless the user or applicable AGENTS.md/skill instructions explicitly ask for sub-agents, delegation, or parallel agent work.</multi_agent_mode>"
+  }
+}

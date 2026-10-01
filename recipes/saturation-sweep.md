@@ -8,8 +8,20 @@ Nothing schedules a model run: `research-state.json` keeps `execution_policy.aut
 set to `false`, and changing that is a separate decision for the landscape owners.
 
 **Cost class: high.** The 2026-09-23 completed run used 119 children at effort max. The stopped
-attempt alone used at least 168,052 output tokens. Sweep only the due layers, at most monthly
-([SOTA convergence practice](sota-convergence-practice.md)), or sooner when a reopen trigger fires.
+attempt alone used at least 168,052 output tokens. The 2026-09-29 run (20 foundation layers; 131 Claude children,
+52 of them Sonnet wrappers that each ran one GPT-6 job; 7.1 hours, of which 2.6 were a single idle gap) cost $425 at
+Claude list price: Opus 5.5 $400 and Sonnet 5.5 $25. Of that, $101 (24%) is advisor inference inside the workers,
+which `child-usage.mjs` does not count (its record prices to the other $324), and $19 is the nine superseded attempts
+the record lists. The first round was $337 and the bounded follow-up round $88; the wrappers are $27, and the GPT-6
+tokens themselves are billed to the Codex or gateway accounts and are only in the run record. Per counted child,
+advisor calls included, the discovery workers averaged $5.65, the fit refuters $4.60 and the facts refuters $4.13 (all
+Opus 5.5 at effort max, with a median of 43, 34 and 32 calls), the critic $5.50 and the two wrapper roles $0.37 and
+$0.64. Source: `evidence/artifacts/landscape-sweep-20260929-attempts/spend-scan-wf_08a5b367-311.json` (`ccusage` shows
+$398 for the run: Opus 5.5 only, since it leaves Sonnet 5.5 unpriced). Sweep only the due layers, at most monthly
+([SOTA convergence practice](sota-convergence-practice.md)), or sooner when a reopen trigger fires. Probe the GPT-6
+lane before the run (runbook step 4) and watch for `LIMIT` while it runs: the follow-up round starts by itself after
+the critic and spends Claude stages even when every GPT-6 vote will fail, and a layer with a missing vote stays
+reopened.
 
 ## 1. Scope
 
@@ -57,8 +69,11 @@ two-family:
   only when neither the facts refuter nor either fit refuter refutes it.
 
 A failed part of the lane never leaves a clean layer. A lost round, a discovery family or a vote that did not
-return, and a lost critic each give the layer a `retained_failure` reopen entry pointing at its listed failures in
-the retained returns.
+return, a lost critic, and a Claude worker whose WebSearch call the session's cap refused each give the layer a
+`retained_failure` reopen entry pointing at its listed failures in the retained returns. The critic's failure
+counts for every layer. The lane's search budgets exceed Claude Code's default of 200 WebSearch calls per
+session, so start the coordinator session with `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` raised (harness README,
+Coordination).
 
 The labels that `--check` reconciles are unchanged. The harness also writes what section 3 asks for: the retained
 returns, the sanitized `child-usage.mjs` record and `prompts_sha256`. An agent-lab coordinator session remains an
@@ -128,6 +143,7 @@ Then append and check:
 python3 scripts/saturation_ledger.py --append RESULT.json
 python3 scripts/saturation_ledger.py --check --base origin/main
 python3 -m unittest tests.test_saturation_ledger
+python3 scripts/component_matrix.py --write   # convergence by layer reads the ledger's completed sweeps
 ```
 
 The pull request that adds the record runs the same append-only comparison in `validate.yml`,

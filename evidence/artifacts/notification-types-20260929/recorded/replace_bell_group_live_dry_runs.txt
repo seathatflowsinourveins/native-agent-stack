@@ -1,0 +1,10 @@
+local | read 12605 bytes | sha256 prefix d5ca65aff58c | top-level keys 27
+groups holding the bell command: 1 | their matcher already equals the overlay's: [True]
+nothing to do: the bell group equals the overlay's and merging the overlay would change nothing
+scratch removed: True
+exit code: 0
+polaris | read 7559 bytes | sha256 prefix 6f9931921c14 | top-level keys 36
+groups holding the bell command: 1 | their matcher already equals the overlay's: [True]
+nothing to do: the bell group equals the overlay's and merging the overlay would change nothing
+scratch removed: True
+exit code: 0

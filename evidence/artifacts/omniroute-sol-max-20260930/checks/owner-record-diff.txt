@@ -1,0 +1,14 @@
+paths before: 78, after: 73, different: 13
+  /gateways/20128/build_sha: ae5539a56  ->  cf6748d04
+  /gateways/20128/overrides/5/0: context_length  ->  None
+  /gateways/20128/overrides/5/1: gpt-6.1-sol  ->  None
+  /gateways/20128/overrides/5/2: codex  ->  None
+  /gateways/20128/overrides/5/3: codex/gpt-6.1-sol  ->  None
+  /gateways/20128/overrides/5/4: 872000  ->  None
+  /gateways/20128/overrides_rows: 6  ->  5
+  /gateways/20128/prefix: omniroute-3.8.51-2f42a9ac-pr13788-affinity2  ->  omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15
+  /gateways/20128/routes/model_capability_overrides_stable: aa6a53f4e32582c89ed51629608ad3a264ee93a6d46e7522  ->  2f0e6390f2b04044bc462773ac0e7df990245e630abbf331
+  /taken_utc: 2026-09-30T06:14:30Z  ->  2026-09-30T06:33:02Z
+  /units/omniroute.service/exec_main_start: Tue 2026-09-29 20:02:58 EDT  ->  Wed 2026-09-30 02:32:50 EDT
+  /units/omniroute.service/main_pid: 950031  ->  3262255
+  /units/omniroute.service/unit_file_sha256: 899e4fdb06775216094953815ed2836c2df9be12e26b4595  ->  b7797d7898160c858de7d56695bb97a3ac569c8cfded49af

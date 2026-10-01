@@ -1,0 +1,84 @@
+# As run on 2026-09-26 (paths masked); a record, not a maintained tool.
+"""Scratch probe: codex app-server config/read and config/batchWrite against a scratch CODEX_HOME, network off."""
+import json
+import os
+import select
+import shutil
+import subprocess
+import sys
+import time
+
+home = sys.argv[1]
+codex_home = os.path.join(home, ".codex")
+child_env = {"HOME": home, "CODEX_HOME": codex_home, "PATH": os.defpath + ":" + os.path.dirname(shutil.which("codex")),
+             "LANG": "C.UTF-8"}
+cmd = ["bwrap", "--unshare-net", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc",
+       "--bind", home, home, "--", shutil.which("codex"), "app-server", "--listen", "stdio://"]
+p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=child_env,
+                     text=True, bufsize=1)
+
+
+def send(o):
+    p.stdin.write(json.dumps(o) + "\n")
+    p.stdin.flush()
+
+
+def recv(want_id, timeout=30):
+    end = time.time() + timeout
+    while time.time() < end:
+        r, _, _ = select.select([p.stdout], [], [], 1)
+        if not r:
+            continue
+        line = p.stdout.readline()
+        if not line:
+            break
+        msg = json.loads(line)
+        if msg.get("id") == want_id and ("result" in msg or "error" in msg):
+            return msg
+        print("   (other)", json.dumps(msg)[:200])
+    return None
+
+
+send({"id": 1, "method": "initialize",
+      "params": {"clientInfo": {"name": "nas_probe", "version": "0.0.1"}, "capabilities": {"experimentalApi": True}}})
+print("init", json.dumps(recv(1))[:300])
+send({"method": "initialized"})
+send({"id": 2, "method": "config/read", "params": {"includeLayers": True}})
+r = recv(2)
+layers = r["result"].get("layers") or []
+for layer in layers:
+    print("layer", json.dumps(layer["name"])[:160], "version", layer["version"][:60], "disabled",
+          layer.get("disabledReason"))
+print("origins sample", list(r["result"]["origins"].items())[:3])
+user = [layer for layer in layers if layer["name"].get("type") == "user"]
+ver = user[0]["version"] if user else None
+print("user version", ver)
+edits = [
+    {"keyPath": "mcp_servers.context-mode",
+     "value": {"command": "/x/bin/node", "args": ["/x/start.mjs"], "startup_timeout_sec": 60,
+               "default_tools_approval_mode": "approve", "env": {"CONTEXT_MODE_PLATFORM": "codex"}},
+     "mergeStrategy": "replace"},
+    {"keyPath": 'plugins."context-mode@context-mode".mcp_servers.context-mode.enabled', "value": False,
+     "mergeStrategy": "replace"},
+]
+send({"id": 3, "method": "config/batchWrite", "params": {"edits": edits, "expectedVersion": "sha256:bogus"}})
+print("stale-version write", json.dumps(recv(3))[:400])
+send({"id": 4, "method": "config/batchWrite", "params": {"edits": edits, "expectedVersion": ver}})
+print("write", json.dumps(recv(4))[:500])
+send({"id": 5, "method": "config/batchWrite",
+      "params": {"edits": [{"keyPath": "mcp_servers.context-mode.bogus_key", "value": 1, "mergeStrategy": "replace"}]}})
+print("unknown key write", json.dumps(recv(5))[:400])
+send({"id": 6, "method": "config/batchWrite",
+      "params": {"edits": [{"keyPath": "mcp_servers.context-mode.startup_timeout_sec", "value": "sixty",
+                            "mergeStrategy": "replace"}]}})
+print("bad type write", json.dumps(recv(6))[:400])
+send({"id": 7, "method": "config/batchWrite",
+      "params": {"edits": [{"keyPath": "mcp_servers.nonexistent", "value": None, "mergeStrategy": "replace"}]}})
+print("delete absent", json.dumps(recv(7))[:400])
+p.stdin.close()
+try:
+    p.wait(timeout=10)
+except subprocess.TimeoutExpired:
+    p.kill()
+err = p.stderr.read()
+print("rc", p.returncode, "stderr tail:", err[-600:])
