@@ -38,6 +38,10 @@ FETCH_PREFIX = "blueprints/us-equities/mover-v3/study/fetch"
 NOT_A_SHA256 = ("null", "missing", "number", "list", "short", "trailing_newline", "uppercase", "not_hexadecimal")
 # R2-3: what can stand at a snapshot path in place of a directory
 NOT_A_DIRECTORY = ("regular_file", "dangling_link")
+# F1 (the coordinator's follow-up on R2-3): what a snapshot directory can hold without a ledger, pages or seal record
+STRAY_FILES = ("ledger.jsonl.tmp", "seal.json.tmp", "unrelated.txt")
+# F1: snapshot paths that are unused, and so are still fetched into and sealed
+FRESH_PATHS = ("absent", "absent_under_absent_directories", "empty_directory")
 
 
 def snapshot_bytes(root):
@@ -147,10 +151,22 @@ class RecoveryChecks:
     def replace_with_a_non_directory(self, directory, kind):
         """R2-3: the snapshot path itself stops being a directory (NOT_A_DIRECTORY)."""
         shutil.rmtree(directory)
+        self.put_a_non_directory(directory, kind)
+
+    def put_a_non_directory(self, path, kind):
+        """A regular file or a dangling symbolic link at `path` (NOT_A_DIRECTORY)."""
         if kind == "regular_file":
-            directory.write_bytes(b"not a snapshot directory\n")
+            path.write_bytes(b"not a snapshot directory\n")
         else:
-            directory.symlink_to(directory.parent / "absent-target")
+            path.symlink_to(path.parent / "absent-target")
+
+    def leave_only_a_stray_file(self, directory, name):
+        """F1: the snapshot directory holds one file that is no ledger, pages directory or seal record
+        (STRAY_FILES)."""
+        if directory.exists():
+            shutil.rmtree(directory)
+        directory.mkdir()
+        (directory / name).write_bytes(b"stray\n")
 
     def renumber_attempt(self, directory, key, old, new) -> list:
         """R2-4: one attempt of `key` gets another id, in its page events and in its completion stamp; the seal record
@@ -428,6 +444,48 @@ class DryRunSealRecovery(RecoveryChecks, unittest.TestCase):
                 self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
                                               "^dry-run: the snapshot path exists and is not a directory")
 
+    def test_a_snapshot_root_that_is_not_a_directory_refuses_without_requests(self):
+        """F1, the first shape R2-3's repair left: the snapshot root, one level above the snapshot path, is a regular
+        file or a dangling symbolic link. The path itself does not exist, so at 7acb6944 it counted as unused: the
+        dry run made its 16 calls and Store.write then failed (NotADirectoryError for the file). A path is unused
+        only under a directory."""
+        for kind in NOT_A_DIRECTORY:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / "snapshot-root"
+                self.put_a_non_directory(root, kind)
+                self.assertIn("snapshot-root", snapshot_bytes(tmp))
+                self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(root),
+                                              "^dry-run: the snapshot path lies under a path that is not a directory")
+
+    def test_a_snapshot_directory_that_holds_only_stray_files_refuses_without_requests(self):
+        """F1, the second shape: a snapshot directory with no ledger, pages or seal record that is not empty. At
+        7acb6944 it counted as unused: with a stray ledger.jsonl.tmp or seal.json.tmp the dry run made its 16 calls
+        and Store.write then failed with FileExistsError, leaving pages behind; with any other file it fetched and
+        sealed beside it. A directory is unused only when it is empty."""
+        for stray in STRAY_FILES:
+            with self.subTest(stray=stray), tempfile.TemporaryDirectory() as tmp:
+                self.leave_only_a_stray_file(Path(tmp) / "dry-run", stray)
+                self.assert_refuses_unchanged(tmp, self.market, lambda: self.run_dry(tmp),
+                                              "^dry-run: the snapshot directory is not empty and holds no ledger")
+
+    def test_an_unused_snapshot_path_is_fetched_and_sealed(self):
+        """F1's other side: an unused path is still fetched into and sealed, and the seal is then recovered. Unused
+        means absent under an existing directory (also when several directories above it are absent) or an existing
+        empty directory."""
+        for kind in FRESH_PATHS:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / "not" / "yet" / "made" if kind == "absent_under_absent_directories" else Path(tmp)
+                if kind == "empty_directory":
+                    (root / "dry-run").mkdir()
+                calls = len(self.market.calls)
+                first = self.run_dry(root)
+                self.assertGreater(len(self.market.calls), calls)
+                record = json.loads((root / "dry-run" / SEAL_RECORD).read_bytes())
+                self.assertEqual(record["ledger_sha256"], first["snapshot_sha256"])
+                before, calls = snapshot_bytes(tmp), len(self.market.calls)
+                self.assertEqual(self.run_dry(root), first)
+                self.assertEqual((self.market.calls[calls:], snapshot_bytes(tmp)), ([], before))
+
     def fail_the_last_requests_first_attempt(self) -> dict:
         """The L1 test's setup: the last request in key order fails its first call and its 3 retries, so it is sealed
         incomplete at attempt 0 and complete at attempt 1. Returns that request."""
@@ -643,6 +701,47 @@ class LiveSampleSealRecovery(RecoveryChecks, unittest.TestCase):
                     self.assert_refuses_unchanged(
                         tmp, self.market, lambda: self.seal_samples(tmp),
                         f"^live sample {re.escape(repr(label))}: the snapshot path exists and is not a directory")
+
+    def test_a_live_root_that_is_not_a_directory_refuses_without_requests(self):
+        """F1 for the live samples: the live root, one level above every label's path, is a regular file or a dangling
+        symbolic link. Every label lies under that one root, so the refusal names the first label."""
+        for kind in NOT_A_DIRECTORY:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / "live-root"
+                self.put_a_non_directory(root, kind)
+                self.assertIn("live-root", snapshot_bytes(tmp))
+                self.assert_refuses_unchanged(
+                    tmp, self.market, lambda: self.seal_samples(root),
+                    "^live sample 'stage': the snapshot path lies under a path that is not a directory")
+
+    def test_a_label_directory_that_holds_only_stray_files_refuses_without_requests(self):
+        """F1 for each label, as the dry run's: the label's directory holds one stray file and no ledger, pages or
+        seal record. The other label's seal is adopted, and this one is refused without a request."""
+        for label in self.sources:
+            for stray in STRAY_FILES:
+                with self.subTest(label=label, stray=stray), tempfile.TemporaryDirectory() as tmp:
+                    self.seal_samples(tmp)
+                    self.leave_only_a_stray_file(Path(tmp) / label, stray)
+                    self.assert_refuses_unchanged(
+                        tmp, self.market, lambda: self.seal_samples(tmp),
+                        f"^live sample {re.escape(repr(label))}: the snapshot directory is not empty and holds no "
+                        "ledger")
+
+    def test_an_unused_label_path_is_fetched_and_sealed(self):
+        """F1's other side for the live samples: each label's unused path (absent, absent under absent directories, or
+        an existing empty directory) is fetched into once and sealed, and the seals are then recovered."""
+        for kind in FRESH_PATHS:
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp) / "not" / "yet" / "made" if kind == "absent_under_absent_directories" else Path(tmp)
+                if kind == "empty_directory":
+                    for label in self.sources:
+                        (root / label).mkdir()
+                calls = len(self.market.calls)
+                first = self.seal_samples(root)
+                self.assertEqual((len(self.market.calls) - calls, set(first)), (len(self.sources), set(self.sources)))
+                before, calls = snapshot_bytes(tmp), len(self.market.calls)
+                self.assertEqual(self.seal_samples(root), first)
+                self.assertEqual((self.market.calls[calls:], snapshot_bytes(tmp)), ([], before))
 
     def test_a_resealed_attempt_id_change_refuses(self):
         """R2-4, mutant A, for each label: the sample's one attempt becomes attempt 7 in its page event and its

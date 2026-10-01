@@ -11,8 +11,9 @@ batch inputs, including its original start time, for recovery before the complet
 Every completion stamp's page count equals its attempt's page events. Review round 18 repair (G-H): a recoverable
 seal (the native dry run, a transport-check live sample) also publishes its seal record, seal.json, once and before
 the ledger, and recover_seal adopts such a seal only against that record, never against a digest of the ledger it is
-checking. Second repair (R2-1, R2-3): the record must hold a sha256 of the ledger (a null there turned the
-verification off), and a snapshot path that exists and is not a directory is refused before any fetch.
+checking. Second repair (R2-1, R2-3 and its follow-up F1): the record must hold a sha256 of the ledger (a null there
+turned the verification off), and a snapshot path is fetched into only when it is unused: absent under a directory, or
+an empty directory. Anything else without a ledger is refused before any fetch.
 """
 from __future__ import annotations
 
@@ -86,9 +87,9 @@ def _publish(directory: Path, name: str, data: bytes) -> None:
 
 def recover_seal(directory, identity: dict, what: str, extra: tuple = ()):
     """core.holdout.collect's recover-if-matching pattern for a recoverable seal (count_only.dry_run and
-    transport_check.seal_live_samples; review round 18, R5, and its repairs). None when directory does not exist, or
-    is a directory that holds no ledger, pages directory or seal record: the caller fetches and seals. Otherwise the
-    sealed (store, sha256, binding), only when:
+    transport_check.seal_live_samples; review round 18, R5, and its repairs). None when directory is unused: it does
+    not exist and its nearest existing ancestor is a directory, or it is an empty directory. The caller then fetches
+    and seals. Otherwise the sealed (store, sha256, binding), only when:
       - the seal record exists and holds a sha256 of the ledger (64 lowercase hexadecimal characters; R2-1: a null
         there would turn Store.read's comparison off), the ledger reads under that sha256, recorded at seal time,
         never under a digest of the ledger being checked (G-H), and the snapshot read gives that record back exactly:
@@ -99,12 +100,11 @@ def recover_seal(directory, identity: dict, what: str, extra: tuple = ()):
         running study tree, protocol and runtime lock (H1) and the caller's inputs;
       - the bound request plan equals identity["requests"] (the plan-change check), and the ledger's request records
         are exactly the requests the binding names (G-M), each with its completion stamps.
-    A directory with pages or a seal record but no ledger is partially written, and a path that exists and is not a
-    directory (a regular file, a dangling symbolic link) is not unused (R2-3). Every refusal made here is a SealError
-    naming `what` (L2), and this function neither fetches nor writes. It looks neither above directory nor at any
-    other entry in it: for a path under a regular file, or a directory that holds a stray ledger.jsonl.tmp or
-    seal.json.tmp and none of the three, it returns None, and the caller's Store.write fails after the fetch with an
-    OSError (residuals recorded in the protocol's review_record, round 18)."""
+    A directory with pages or a seal record but no ledger is partially written. Nor is any of these unused: a path
+    that exists and is not a directory (a regular file, a dangling symbolic link; R2-3), a path whose nearest existing
+    ancestor is not a directory, and a directory that holds anything else without a ledger (a stray ledger.jsonl.tmp
+    or seal.json.tmp, any other file; F1, the follow-up on R2-3). Every refusal made here is a SealError naming `what`
+    (L2), made before the caller can fetch; this function neither fetches nor writes."""
     try:
         return _recover_seal(Path(directory), identity, tuple(extra))
     except SealError as exc:
@@ -112,6 +112,13 @@ def recover_seal(directory, identity: dict, what: str, extra: tuple = ()):
     except READ_ERRORS as exc:
         raise SealError(f"{what}: the snapshot is invalid or partially written ({type(exc).__name__}: {exc})") \
             from exc
+
+
+def _nearest_existing(path: Path) -> Path:
+    """path, or its nearest ancestor that exists; a dangling symbolic link exists."""
+    while not os.path.lexists(path) and path != path.parent:
+        path = path.parent
+    return path
 
 
 def _recover_seal(d: Path, identity: dict, extra: tuple):
@@ -123,6 +130,17 @@ def _recover_seal(d: Path, identity: dict, extra: tuple):
     if not (d / "ledger.jsonl").exists():
         if (d / "pages").exists() or (d / SEAL_RECORD).exists():
             raise SealError("the snapshot is partially written: it cannot be overwritten or fetched again")
+        # follow-up F1: without a ledger, pages or seal record the path is unused only if it is an empty directory, or
+        # is absent under a directory. Under a regular file or a dangling link, or beside a stray file (a
+        # ledger.jsonl.tmp, a seal.json.tmp, anything else), Store.write would fail after the fetch, or seal beside a
+        # file it did not write
+        if d.is_dir():
+            held = sorted(entry.name for entry in d.iterdir())
+            if held:
+                raise SealError(f"the snapshot directory is not empty and holds no ledger ({held[:5]}): it cannot be "
+                                "overwritten or fetched again")
+        elif not _nearest_existing(d.parent).is_dir():
+            raise SealError("the snapshot path lies under a path that is not a directory: nothing can be sealed there")
         return None
     if not (d / SEAL_RECORD).is_file():
         raise SealError("the snapshot has no seal record, so it cannot be verified and is not adopted")

@@ -17,6 +17,10 @@ must only have grown across origin/main's first-parent history (check_append_onl
 time comes only from a commit signed by the pinned GitHub web-flow key (verified_merge, M3); a transport deviation
 governs only with the hashed output of a logged run.py transport-check run (check_study_tree, H1); void deviations
 are typed (voids, F4); and every locked package's version and dist-info RECORD digest is checked (check_runtime, L3).
+
+Review round 18, second repair: the running tree is HEAD's only when no index flag hides a tracked file and every
+tracked file's own bytes are its blob (running_tree, R2-2), and every git command this module runs ignores replace
+refs (git_command, follow-up F2), so each guard reads the repository's own commits, trees and blobs.
 """
 from __future__ import annotations
 
@@ -45,12 +49,21 @@ class Refused(Exception):
     pass
 
 
+def git_command(repo, *args) -> list:
+    """The argument list of every git command this module runs (git, git_ok, committed_bytes, verified_merge and the
+    running-tree checks). Review round 18, second repair, follow-up F2: --no-replace-objects (git(1)) makes git ignore
+    replace refs (git-replace(1)), with which a local refs/replace entry puts another commit, tree or blob in place of
+    the one a guard names. So a guard reads the repository's own objects: the tree a run names, the protocol and logs
+    at a commit, the tree diff behind a transport deviation, the commits whose times and signatures it uses."""
+    return ["git", "--no-replace-objects", "-C", str(repo), *args]
+
+
 def git(repo, *args) -> str:
-    return subprocess.check_output(["git", "-C", str(repo), *args], text=True).strip()
+    return subprocess.check_output(git_command(repo, *args), text=True).strip()
 
 
 def git_ok(repo, *args) -> bool:
-    return subprocess.run(["git", "-C", str(repo), *args], stdout=subprocess.DEVNULL,
+    return subprocess.run(git_command(repo, *args), stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL).returncode == 0
 
 
@@ -58,7 +71,7 @@ def committed_bytes(repo, ref: str, path: str):
     """The bytes of path at ref, or None if the path does not exist there."""
     if not git_ok(repo, "cat-file", "-e", f"{ref}:{path}"):
         return None
-    return subprocess.check_output(["git", "-C", str(repo), "show", f"{ref}:{path}"])
+    return subprocess.check_output(git_command(repo, "show", f"{ref}:{path}"))
 
 
 # ---------------------------------------------------------------- the running tree
@@ -72,9 +85,9 @@ def running_tree(repo, study_path: str = STUDY_PATH) -> str:
     no change to a tracked file whose index entry is marked assume-unchanged or skip-worktree (git-update-index(1)),
     nor one that a clean filter maps back to the committed bytes, nor files that match a tree which a replace ref puts
     in place of HEAD's (git-replace(1)). So an index entry with either flag is refused, and every file of the tree
-    returned must be a regular file whose own bytes hash to its blob: the tree is read without replace refs, and the
-    files without the index and without filters. Both checks run here, once, when a run builds its context: a file
-    changed later in the same run is not seen."""
+    returned must be a regular file whose own bytes hash to its blob: the tree is read without replace refs
+    (git_command), and the files without the index and without filters. Both checks run here, once, when a run builds
+    its context: a file changed later in the same run is not seen."""
     dirty = git(repo, "status", "--porcelain", "--untracked-files=all", "--", study_path)
     if dirty:
         raise Refused("the study tree has uncommitted changes; a run executes a committed tree only")
@@ -87,7 +100,7 @@ def running_tree(repo, study_path: str = STUDY_PATH) -> str:
     if masked:
         raise Refused(f"the study tree holds index entries that hide a file's changes from git status: {masked[:5]}; "
                       "a run executes a committed tree only")
-    tree = git(repo, "--no-replace-objects", "rev-parse", f"HEAD:{study_path}")
+    tree = git(repo, "rev-parse", f"HEAD:{study_path}")
     unverified = _unverified_files(repo, tree, study_path)
     if unverified:
         raise Refused(f"the study tree's files are not all regular files that hold the committed bytes, although git "
@@ -99,7 +112,7 @@ def _masked_index_entries(repo, study_path: str) -> list:
     """Every index entry under study_path that is marked assume-unchanged or skip-worktree, as '<path> (<flags>)'.
     git-ls-files(1) -v prints the tag of an assume-unchanged entry in lowercase and that of a skip-worktree entry as S
     (s with both flags)."""
-    out = subprocess.check_output(["git", "-C", str(repo), "ls-files", "-v", "-z", "--", study_path])
+    out = subprocess.check_output(git_command(repo, "ls-files", "-v", "-z", "--", study_path))
     masked = []
     for row in out.split(b"\0"):
         if row:
@@ -116,9 +129,10 @@ def _unverified_files(repo, tree: str, study_path: str) -> list:
     problem. An entry must be a regular-file blob: a symbolic link or submodule entry is refused, because the tree hash
     covers a link's text and not the file it names. Its working file must be a regular file, and its bytes must hash to
     the entry's blob. One git hash-object --no-filters --stdin-paths call hashes the files themselves, so the result
-    depends on no index entry (its flags or its cached stat data) and on no clean filter. The tree is listed with git
-    --no-replace-objects, so the blobs are its own and not those of a tree that a replace ref puts in its place."""
-    out = subprocess.check_output(["git", "-C", str(repo), "--no-replace-objects", "ls-tree", "-r", "-z", tree])
+    depends on no index entry (its flags or its cached stat data) and on no clean filter. The tree is listed without
+    replace refs (git_command), so the blobs are its own and not those of a tree that a replace ref puts in its
+    place."""
+    out = subprocess.check_output(git_command(repo, "ls-tree", "-r", "-z", tree))
     problems, paths, blobs = [], [], []
     for row in out.split(b"\0"):
         if not row:
@@ -143,7 +157,7 @@ def _unverified_files(repo, tree: str, study_path: str) -> list:
                     problems.append(f"{path} is not a regular file")
     if paths:
         base = Path(repo).resolve()
-        hashed = subprocess.run(["git", "-C", str(repo), "hash-object", "--no-filters", "--stdin-paths"],
+        hashed = subprocess.run(git_command(repo, "hash-object", "--no-filters", "--stdin-paths"),
                                 input=b"".join(os.fsencode(str(base / p)) + b"\n" for p in paths),
                                 capture_output=True)
         got = hashed.stdout.decode("ascii", "replace").split()
@@ -196,7 +210,7 @@ def verified_merge(repo, commit: str, key: dict | None = None) -> bool:
     email = git(repo, "show", "-s", "--format=%ce", commit)
     if email == key["committer_email"]:
         env = {"GNUPGHOME": _gnupg_home(key), "PATH": __import__("os").environ.get("PATH", "/usr/bin:/bin")}
-        res = subprocess.run(["git", "-C", str(repo), "-c", "gpg.program=gpg", "verify-commit", "--raw", commit],
+        res = subprocess.run(git_command(repo, "-c", "gpg.program=gpg", "verify-commit", "--raw", commit),
                              capture_output=True, text=True, env=env)
         for line in res.stderr.splitlines():
             parts = line.split()

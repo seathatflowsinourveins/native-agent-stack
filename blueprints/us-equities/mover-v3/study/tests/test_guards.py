@@ -124,11 +124,13 @@ class RunningTreeContent(unittest.TestCase):
                 guards.running_tree(repo)
 
     def test_running_tree_refuses_files_that_match_a_replacement_of_heads_tree(self):
-        """The blobs compared are those of the tree returned, read without replace refs (git-replace(1); git
-        --no-replace-objects). With a replace ref on HEAD's study tree object, git reads another tree in its place:
-        git status reports nothing for files that match that other tree, no index flag is set, and git ls-tree lists
-        its blobs under the id of HEAD's tree. At 28fafe84 the content check compared the files with those blobs and
-        running_tree returned HEAD's tree."""
+        """running_tree reads HEAD's own tree, without replace refs (git-replace(1); git --no-replace-objects). With a
+        replace ref on HEAD's study tree object, git reads another tree in its place: plain git status reports nothing
+        for files that match that other tree, no index flag is set, and git ls-tree lists its blobs under the id of
+        HEAD's tree. At 28fafe84 the content check compared the files with those blobs and running_tree returned
+        HEAD's tree. At ba106834 the content check listed the tree without replace refs and refused the file. Since
+        follow-up F2 every git command of core.guards ignores replace refs (git_command), so its git status already
+        reports the files as changed."""
         from tests import fixture_repo as FR
         with self.study_repo() as (repo, _):
             head, tree = sh(repo, "rev-parse", "HEAD"), sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
@@ -139,7 +141,9 @@ class RunningTreeContent(unittest.TestCase):
             self.assertEqual(sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
             self.assertEqual((status(repo), (repo / TRANSPORT).read_text()), ("", "HOST = 'changed'\n"))
             self.assertEqual(sh(repo, "ls-files", "-v", "--", TRANSPORT), f"H {TRANSPORT}")
-            with self.assertRaisesRegex(guards.Refused, re.escape(f"{TRANSPORT} differs from HEAD's blob")):
+            self.assertEqual(guards.git(repo, "rev-parse", f"HEAD:{STUDY_PATH}"), tree)
+            self.assertIn(TRANSPORT, guards.git(repo, "status", "--porcelain", "--", STUDY_PATH))
+            with self.assertRaisesRegex(guards.Refused, "^the study tree has uncommitted changes"):
                 guards.running_tree(repo)
 
     def test_running_tree_refuses_a_file_name_that_one_line_cannot_carry(self):
@@ -171,6 +175,54 @@ class RunningTreeContent(unittest.TestCase):
                 with mock.patch.object(guards.subprocess, "run", altered(change)), \
                         self.assertRaisesRegex(guards.Refused, "git hash-object could not read every tracked file"):
                     guards.running_tree(repo)
+
+
+class RealObjects(unittest.TestCase):
+    """Review round 18, second repair, follow-up F2: every git command core.guards runs is built by
+    core.guards.git_command with --no-replace-objects (git(1); git-replace(1)), so a guard reads the repository's own
+    commit, tree or blob and not an object that a local replace ref puts in its place. The running-tree case is
+    RunningTreeContent.test_running_tree_refuses_files_that_match_a_replacement_of_heads_tree; these are two other
+    guards. In each, git without the option gives the replacement, which the test shows first."""
+
+    def test_committed_bytes_returns_the_real_blob_under_a_replace_ref(self):
+        """committed_bytes reads the protocol, the logs and the deviations at a commit (frozen_protocol, void_records,
+        first_reach). With a replace ref on the committed blob, git show prints the replacement."""
+        from tests import fixture_repo as FR
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.init_repo(Path(tmp) / "repo")
+            committed = FR.write(repo / PROTOCOL_PATH, json.dumps({"status": "frozen"})).read_bytes()
+            first = FR.commit_push(repo, "2026-10-01T21:30:00+00:00", "the protocol")
+            FR.write(repo / PROTOCOL_PATH, json.dumps({"status": "edited"}))
+            FR.commit_push(repo, "2026-10-01T22:00:00+00:00", "another protocol")
+            sh(repo, "replace", sh(repo, "rev-parse", f"{first}:{PROTOCOL_PATH}"),
+               sh(repo, "rev-parse", f"HEAD:{PROTOCOL_PATH}"))
+            self.assertEqual(json.loads(sh(repo, "show", f"{first}:{PROTOCOL_PATH}")), {"status": "edited"})
+            self.assertEqual(guards.committed_bytes(repo, first, PROTOCOL_PATH), committed)
+
+    def test_the_transport_deviation_diff_compares_the_real_trees_under_a_replace_ref(self):
+        """fetch_only_diff decides whether a running tree differs from the pinned tree only under fetch/ (the
+        transport-deviation rule, check_study_tree; run.py transport-check lists the changed paths the same way).
+        Here the trees also differ in core/a.py. With a replace ref that puts the pinned tree's core/ in place of the
+        other tree's, git diff-tree lists the transport alone."""
+        from tests import fixture_repo as FR
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.init_repo(Path(tmp) / "repo")
+            FR.write(repo / STUDY_PATH / "core" / "a.py", "x = 1\n")
+            FR.write(repo / TRANSPORT, "HOST = 'fixture'\n")
+            first = FR.commit_push(repo, "2026-10-01T21:30:00+00:00", "the pinned tree")
+            FR.write(repo / STUDY_PATH / "core" / "a.py", "x = 2\n")
+            FR.write(repo / TRANSPORT, "HOST = 'changed'\n")
+            FR.commit_push(repo, "2026-10-01T22:00:00+00:00", "a tree that also changes core/")
+            pinned, tree = (sh(repo, "rev-parse", f"{commit}:{STUDY_PATH}") for commit in (first, "HEAD"))
+            self.assertEqual(sh(repo, "diff-tree", "-r", "--name-only", pinned, tree).splitlines(),
+                             ["core/a.py", "fetch/transport.py"])
+            sh(repo, "replace", sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}/core"),
+               sh(repo, "rev-parse", f"{first}:{STUDY_PATH}/core"))
+            self.assertEqual(sh(repo, "diff-tree", "-r", "--name-only", pinned, tree).splitlines(),
+                             ["fetch/transport.py"])
+            self.assertFalse(guards.fetch_only_diff(repo, pinned, tree))
+            self.assertEqual(guards.git(repo, "diff-tree", "-r", "--name-only", pinned, tree).splitlines(),
+                             ["core/a.py", "fetch/transport.py"])
 
 
 class Guards(unittest.TestCase):
