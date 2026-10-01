@@ -1,6 +1,6 @@
 # DeepAgents persisted research-worker trial
 
-This candidate prepares a research worker with task-selected skills, one explicit
+This candidate exercises a research worker with task-selected skills, one explicit
 specialist and native SQLite continuation. Retain native Codex/Claude coordination,
 the accepted Codex worker and Dagu. Installation and offline checks do not qualify
 provider execution or promote this candidate to a default.
@@ -82,9 +82,9 @@ the graph and emits `get_state` without a model call. A continuation supplies
 only the new prompt; SQLite restores the prior message state. This tests
 cross-process continuation, not arbitrary interruption during a tool effect.
 
-## Task-selected skill and proposed acceptance
+## Task-selected skill and acceptance
 
-The proposed fixture selects only the upstream
+The frozen fixture selects only the upstream
 [`research` skill at `c55ee460`](https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/research)
 from the existing worker skill catalog. Copy the unchanged selected directory
 into the owned workspace as `/skills/research`; record its original tree/file
@@ -153,6 +153,11 @@ exit **0**. These checks establish discovery and configuration only. The earlier
 hardcoded endpoint and incorrect skill root are retained as failed review
 conditions rather than passed provider evidence.
 
+The original broad API metadata probe was condensed by RTK; its complete stdout
+is not valid machine JSON. Preserve that limitation and use only its intact
+fields. Configuration descriptions and all model-event captures use
+`rtk proxy` to retain complete native JSON.
+
 The initial frozen model trial used a recursion override of **24** and failed
 with native `GraphRecursionError`, exit **1**, after approximately **325 seconds**.
 It produced both artifacts and one returned specialist task. The unchanged
@@ -168,6 +173,45 @@ and an unchanged
 The repaired process uses the existing SQLite/thread and one new coordinator
 instruction, with no new specialist task or marker read. Keep the same source
 fixture and oracle, record the changed prompt/configuration before execution,
-and retain the 600-second deadline and all other bounds. Trial acceptance awaits
-the repair and independent continuation controls; no comparative efficiency or
-complete provider-billing claim follows from these checks.
+and retain the 600-second deadline and all other bounds.
+
+The saved-context repair exited **0** in **30.88 seconds**. Exact concatenation
+of original and repair event bytes passed every check in the unchanged initial
+oracle, exit **0**, including one total returned specialist task and the actual
+native completion checkpoint. The corrected SQLite quote is **13 characters**
+and remains an exact source substring. The original failed attempt retains its
+failed status.
+
+After the marker input was removed, a fresh process reconstructed the graph
+and observed the saved marker with no pending nodes. A separate continuation
+process exited **0** in **13.59 seconds** and wrote the exact remembered marker.
+The unchanged resume oracle passed all three checks using only the new native
+events, including no `read_file` or `task` call. The initial missing-artifact,
+different-thread marker-presence, missing-resume-artifact and wrong-resume-marker
+controls each exited **2** under their respective unchanged oracle phase.
+The native continuation artifact was restored byte for byte, and the same
+resume oracle passed again. All source and selected-skill hashes still matched.
+
+The integrating revisions preserve the example's exact worker bytes:
+
+| Worker commit | Integration commit | Worker SHA-256 |
+| --- | --- | --- |
+| `2b4a534b` | [`37cb7cc7`](https://github.com/seathatflowsinourveins/native-agent-stack/commit/37cb7cc7b225c39ab5ac53bba8ec8a661ad7f940) | `31cf9ede2a8f248d20fa18a8ca8abb51b616620caa4f37730c2025f30e8bb90f` |
+| `94876f26` | [`d626e03d`](https://github.com/seathatflowsinourveins/native-agent-stack/commit/d626e03d51d4cc3e9e290ada8b87224b7a234a1d) | `66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec` |
+
+Native usage below includes only `graph_update` AI messages, deduplicated by
+stable ID across all three attempts. Checkpoint snapshots and previously seen
+message IDs are excluded. All **27** distinct AI messages returned usage.
+
+| Attempt | AI messages | Input tokens | Output tokens | Cache-read subset | Reasoning subset |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Failed initial | 22 | 300,536 | 7,422 | 254,592 | 4,130 |
+| Saved-context repair | 3 | 33,483 | 556 | 13,696 | 337 |
+| Continuation | 2 | 23,330 | 170 | 22,656 | 98 |
+
+Cache and reasoning are subsets; do not add them to token totals. Count wire
+request attempts separately from the coordinator's independent observer, and
+do not add observer usage to these native counters. Complete provider usage and
+billing remain unknown. This qualifies the named repaired research task and
+cross-process continuation; it does not establish arbitrary interrupted-tool
+replay, OS confinement, a comparative winner or a global default.

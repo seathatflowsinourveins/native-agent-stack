@@ -9,16 +9,16 @@ from pathlib import Path
 
 os.environ["LANGGRAPH_STRICT_MSGPACK"] = "true"
 
-from deepagents import (
+from deepagents import (  # noqa: E402
     GeneralPurposeSubagentProfile,
     HarnessProfile,
     create_deep_agent,
     register_harness_profile,
 )
-from deepagents.backends import FilesystemBackend
-from langchain.agents.middleware import ToolCallLimitMiddleware
-from langchain_openai import ChatOpenAI
-from langgraph.checkpoint.sqlite import SqliteSaver
+from deepagents.backends import FilesystemBackend  # noqa: E402
+from langchain.agents.middleware import ToolCallLimitMiddleware  # noqa: E402
+from langchain_openai import ChatOpenAI  # noqa: E402
+from langgraph.checkpoint.sqlite import SqliteSaver  # noqa: E402
 
 BASE_URL = "http://127.0.0.1:20128/v1"
 MODEL = "cx/gpt-6.1-sol-max"
