@@ -32319,6 +32319,26 @@
       "bytes": 2160
     },
     {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
+      "sha256": "6a7ea176983a1b4097a39e5755d9dbb45cec876d185228bd6d99b559d3f1390c",
+      "bytes": 5114
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation-run-variance.json",
+      "sha256": "47b15cb05e262f5dd3f809e0e496f39f0c263e3ff3d236b800a7121d0e98bb45",
+      "bytes": 3083
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation-synthesis.md",
+      "sha256": "06bf86f0e1f0c178a1db41b7f1ea7e5bf14f70c740c66f6c630aaac28cc21c58",
+      "bytes": 26653
+    },
+    {
+      "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json",
+      "sha256": "2aa377dd0ae8bbab78d3821c15c235cf3fca726496566c60446cb611cea00c22",
+      "bytes": 615461
+    },
+    {
       "path": "evidence/artifacts/layer-verdicts-20260922/adjudication-inputs/adjudication-key.json",
       "sha256": "ea63e60442960a996b29432e74465859bd25fe381b54ca66cbc2bf61856de178",
       "bytes": 879
