@@ -2942,6 +2942,34 @@ class RepairTests(unittest.TestCase):
                 result = host.scan()
                 self.assertNotEqual(result.returncode, 0, "REPAIR-GIT-no-false-clean")
                 self.assertEqual(host.finished()["status"], "incomplete", "REPAIR-GIT-incomplete")
+                if kind in ("missing-head", "missing-refs"):  # its own oracle: the objects-only refusal is a 2nd layer
+                    self.assertEqual(host.finished()["sinks"]["A1"]["counters"]["git_stores"], 1,
+                                     "REPAIR-GIT-damaged-store-recognized")
+
+    def test_objects_only_store_reached_directly_refuses(self):
+        """A store the walk reaches directly with objects/ but no HEAD, refs, *.git name or gitfile (re-check G01)."""
+        import zlib
+        for kind in ("loose", "index", "packed"):
+            with self.subTest(kind=kind):
+                host = self.host()
+                canary = host.canary()
+                repo_path = host.home / ".claude/p"
+                repo = git_repo(repo_path, {"file": canary.encode()}, pack=kind != "loose")
+                (repo_path / "file").unlink()  # only compressed Git objects retain the canary
+                store = repo.rename(repo_path / "objects-only")
+                (store / "HEAD").unlink(); shutil.rmtree(store / "refs")
+                if kind == "loose":  # real zlib loose objects: the canary is inside one and in no raw form
+                    objects = list(store.glob("objects/??/*"))
+                    self.assertTrue(any(canary.encode() in zlib.decompress(path.read_bytes()) for path in objects),
+                                    "REPAIR-GIT-objects-only-fixture")
+                    self.assertFalse(any(forms_in(path.read_bytes(), canary) for path in objects),
+                                     "REPAIR-GIT-objects-only-compressed")
+                elif kind == "index":  # objects/pack with an index file alone (its pack removed)
+                    next(store.glob("objects/pack/*.pack")).unlink()
+                result = host.scan()
+                self.assertNotEqual(result.returncode, 0, "REPAIR-GIT-objects-only-refused")
+                self.assertEqual(host.finished()["status"], "incomplete", "REPAIR-GIT-objects-only-incomplete")
+                self.assertIn("git_indirection_unplanned", sink_reasons(host), "REPAIR-GIT-objects-only-reason")
 
     def test_wal_requires_a_valid_scanned_sqlite_main(self):
         for kind in ("plain", "directory", "symlink", "missing"):
@@ -3229,6 +3257,9 @@ print(json.dumps(checks))
                     # retrying away that hard error, but the inventory change must still be recorded.
                     self.assertEqual(result.returncode, 3, "REPAIR-S5-inventory-change")
                     self.assertIn("file_set_changed", sink_reasons(host), "REPAIR-S5-change-reason")
+                    # The row can keep inventory_unreconciled beside the hard error; the request's reasons repeat
+                    # it, and a later status reads the record through the real validator: incomplete, not invalid.
+                    self.assertEqual(host.verdict()[0], 3, "REPAIR-S5-status-incomplete")
                 else:
                     self.assertEqual([e["subpass"] for e in inventories], [0, 1], "REPAIR-S5-inventory-retry")
 
@@ -3321,6 +3352,17 @@ print(json.dumps(checks))
             (host.home / ".claude/sample.gz").write_bytes(gzip.compress(b"plain"))
             self.assertEqual(host.scan(taint_negative=mode).returncode, 3, "REPAIR-NEGATIVE-refuses " + mode)
             self.assertIn("negative_control_matched", sink_reasons(host), "REPAIR-NEGATIVE-matched " + mode)
+
+    def test_m2_negative_count_stays_unsigned_without_inband_control(self):
+        """A decoded view that lost its in-band control counts zero negatives, never -1 (re-check W:709): the worker
+        reports control_missing and finishes instead of failing to pack an unsigned count (a sequence gap)."""
+        import gzip
+        host = self.host()
+        (host.home / ".claude/sample.data").write_bytes(gzip.compress(b"plain"))
+        self.assertEqual(host.scan(worker={"drop_inband": "m2raw"}).returncode, 3, "REPAIR-M2-inband-refuses")
+        reasons = host.finished()["reasons"]
+        self.assertIn("control_missing", reasons, "REPAIR-M2-inband-missing")
+        self.assertNotIn("protocol_error", reasons, "REPAIR-M2-negative-unsigned")
 
     def test_stream_roots_and_failed_requests_are_described_truthfully(self):
         host = self.host("A11")

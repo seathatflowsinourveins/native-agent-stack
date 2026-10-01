@@ -706,7 +706,7 @@ class Decoded(Relay):
         if self.control_expect is not None:
             ident, view, expected = self.control_expect
             target = views.get(view)
-            found = (sum(check.matches - 1 for check in views.values()) if view == "negative" else
+            found = (sum(max(0, check.matches - 1) for check in views.values()) if view == "negative" else
                      target.counts.pop((CLASSES["control"], 0, 0, ident), 0) if target else 0)
             self.scan.control(target or self.check, ident, found, expected,
                               "negative" if view == "negative" else "control")
@@ -1252,6 +1252,18 @@ def git_directory(candidate: bytes) -> bytes:
         os.close(fd)
 
 
+def object_shaped(path: bytes) -> bool:
+    """Git object-store shape from a file's own path (git v2.43.0 gitrepository-layout): a loose object
+    objects/<2 hex>/<rest of its name>, the same names Store.payload counts, or a pack or index file in objects/pack."""
+    parts = path.split(b"/")[-3:]
+    if len(parts) < 3 or parts[0] != b"objects":
+        return False
+    if parts[1] == b"pack":
+        match = PACK_FILE.fullmatch(parts[2])
+        return match is not None and match.group(2) in (b"pack", b"idx")
+    return re.fullmatch(rb"[0-9a-f]{2}", parts[1]) is not None and OID.fullmatch(parts[1] + parts[2]) is not None
+
+
 class Walk:
     """One root. `pre` records identities and complete entry lists and checks every name, target and full path (M6);
     `scan` hands selected files to their views at their validated parents; `post` re-walks and re-sniffs (contract 9)."""
@@ -1484,6 +1496,11 @@ class Walk:
                         raise Stop("git_indirection_unplanned")
                 except (OSError, Stop):
                     self.scan.reasons.append("git_indirection_unplanned")
+            # The same refusal for a store reached directly: object-store shape (objects/<2 hex>/<name> or a pack or
+            # index file) where no logical store was recognized (no HEAD, refs or *.git name). Its zlib loose objects
+            # have no Git view, and the plain view cannot read them; selection does not matter (the layout refuses).
+            if store is None and self.mode == "scan" and object_shaped(path):
+                self.scan.reasons.append("git_indirection_unplanned")
             payload = store.payload(path) if store is not None else False
             chosen = rel in self.selected or (store is not None and not payload)
             if self.mode == "pre":

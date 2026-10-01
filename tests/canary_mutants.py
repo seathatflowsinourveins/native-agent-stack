@@ -459,7 +459,8 @@ MUTANTS += [
     mutant("R-02", "Damaged Git layout ignored", WORKER,
            [('if (os.path.basename(path).endswith(b".git") or\n                b"objects" in stats and ({b"HEAD", b"refs"} & stats.keys())):',
              'if {b"HEAD", b"objects", b"refs"} <= stats.keys():')],
-           "RepairTests.test_discovered_git_indirections_and_damaged_stores", "REPAIR-GIT-no-false-clean"),
+           # The objects-only refusal (R-OBJONLY) also stops this false clean, so the layer has its own oracle.
+           "RepairTests.test_discovered_git_indirections_and_damaged_stores", "REPAIR-GIT-damaged-store-recognized"),
     mutant("R-03", "Any directory entry satisfies WAL main", WORKER,
            [('"main": self.routes.get(rel + b"/" + name[:-4] if rel else name[:-4]) == ("sqlite", "sqlite"),',
              '"main": name[:-4] in stats,'),
@@ -518,7 +519,8 @@ MUTANTS += [
            [('if pointer_seal(self.scan.key, child).hex() in plan["pointers"]["bound"]:', 'if False:')],
            "RepairTests.test_bound_pointer_stays_excluded_when_variable_unset", "REPAIR-POINTER-unset"),
     mutant("R-19", "M2 negative hardwired to zero", WORKER,
-           [('sum(check.matches - 1 for check in views.values()) if view == "negative"', '0 if view == "negative"')],
+           [('sum(max(0, check.matches - 1) for check in views.values()) if view == "negative"',
+             '0 if view == "negative"')],
            "RepairTests.test_negative_m2_and_m6_controls_detect_union_matches", "REPAIR-NEGATIVE-refuses m2"),
     mutant("R-20", "M6 negative hardwired to zero", WORKER,
            [('len(self.patterns.find(os.fsencode(spec["negative"]))) if klass == "negative"', '0 if klass == "negative"')],
@@ -579,6 +581,18 @@ MUTANTS += [
     mutant("R-STREAM", "Stream roots incorrectly statted as absent", WORKER,
            [('if root["kind"] in ("journal", "environment"):', 'if False:')],
            "RepairTests.test_stream_roots_and_failed_requests_are_described_truthfully", "REPAIR-STREAM-presence"),
+    # ---- Re-check repairs (2026-10-01) -----------------------------------------------------------------------------
+    mutant("R-OBJONLY", "Objects-only Git store reached directly is not refused", WORKER,
+           [('if store is None and self.mode == "scan" and object_shaped(path):', 'if False:')],
+           "RepairTests.test_objects_only_store_reached_directly_refuses", "REPAIR-GIT-objects-only-refused"),
+    mutant("R-S5-VALID", "Request-level inventory_unreconciled rejected by the record validator", PROOF,
+           [('reason in wire.R or reason in CODES or reason == "inventory_unreconciled"\n',
+             'reason in wire.R or reason in CODES\n')],
+           "RepairTests.test_st5_removal_link_parent_pack_wal_shm_changes", "REPAIR-S5-status-incomplete"),
+    mutant("R-M2-UNSIGNED", "M2 negative count goes below zero when a view lost its in-band control", WORKER,
+           [('sum(max(0, check.matches - 1) for check in views.values())',
+             'sum(check.matches - 1 for check in views.values())')],
+           "RepairTests.test_m2_negative_count_stays_unsigned_without_inband_control", "REPAIR-M2-negative-unsigned"),
 ]
 for ident, original, test, assertion in (
         ("R-S4", "G6-03", "RepairTests.test_equal_count_replacement_and_unselected_retry", "REPAIR-S4-retry-hit"),

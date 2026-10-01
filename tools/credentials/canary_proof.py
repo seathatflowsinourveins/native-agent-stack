@@ -373,7 +373,9 @@ def valid_fields(event: dict) -> bool:
                     and event["path"] in wire.PATHS.values() and natural(event["check"]))
         if kind == "scan_finished":
             return (event["status"] in ("complete", "incomplete")
-                    and all(reason in wire.R or reason in CODES for reason in event["reasons"])
+                    # The union of its rows' reasons, or one fixed code: the row-only reason is valid here too.
+                    and all(reason in wire.R or reason in CODES or reason == "inventory_unreconciled"
+                            for reason in event["reasons"])
                     and all(sink in wire.SINKS and set(row) == {"status", "reasons", "checks", "completed", "hits",
                                 "counters", "absent", "roots", "ledger", "observations", "controls", "subpass",
                                 "absent_only", "exits"} and row["status"] in ("complete", "incomplete")

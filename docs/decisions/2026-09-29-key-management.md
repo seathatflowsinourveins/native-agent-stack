@@ -948,8 +948,10 @@ bytes behind a known label/NUL; its stats count completed file searches.
 failure/count/encoding assumptions. Quiet mode has a documented match/error
 exception, so this tool never uses quiet mode. Installed `/usr/bin/rg` is
 14.1.0; the PATH scanner can be newer, so resolve/hash absolute executables.
-Reviewed 15.2.0 (`e89fff89ac9af12e8d4ce9d5fd07beb408ca730f`) has its own stats
-terminator. A release lookup is currency evidence, not scanner acceptance.
+15.2.0 (`e89fff89ac9af12e8d4ce9d5fd07beb408ca730f`) is a source-reviewed output
+grammar, not executed: the runtime accepts it with its own stats terminator, and
+its only test is a hand-written stats fixture. The executed version is 14.1.0.
+A release lookup is currency evidence, not scanner acceptance.
 
 Compression uses GNU gzip 1.12, bzip2 1.0.8 and xz 5.4.5 producers reading
 held descriptors through their supported `-d -c` interfaces; lzma uses xz's
@@ -1028,15 +1030,23 @@ repository until a future evidence PR.
 Evidence classes remain distinct: installed help/version, fresh pinned source
 retrieval, synthetic local integration, independent kernel process observation,
 workstation scope enforcement and live consumer/provider execution. The repair
-uses the first four. Workstation scope enforcement on the final repaired tree
-is pending the coordinator's outside-sandbox run and retained output. Earlier
-fixture repairs and partial runs do not establish that acceptance. The final
-synthetic unit run completed 141 tests: 128 passed and 13 skipped (12 native-scope cases and the
-uninstalled K4 guard rule). Separate FIFO and boundary runs passed 9 and 12 tests.
-All 135 mutants were killed by their named assertions after 88 passing pristine
-runs; the mutation runner confirmed its repository inputs stayed unchanged.
-Credential suites and the whole repository suite remain with the coordinator.
-This repair runs no upstream test suite and does not relabel these local fixtures as upstream
+round used the first four inside its sandbox: 141 tests ran there, 128 passed
+and 13 skipped (12 native-scope cases and the then-uninstalled K4 guard rule),
+separate FIFO and boundary runs passed 9 and 12 tests, and all 135 mutants were
+killed by their named assertions after 88 passing pristine runs. Earlier fixture
+repairs and partial runs establish no scope acceptance. The coordinator's
+outside-sandbox runs on the workstation supply it. At `4d8404d5`,
+`python3 -I tests/test_canary_proof.py -v ContainmentRealScopeTests` ran 12
+tests in 79.171 s, OK, exit 0. At `a07b7a24` (every canary-named file
+byte-identical to `4d8404d5`, the tree stacked on the K4 guard and other merged
+changes) the full unit file ran 141 tests in 1059.136 s, OK, 0 skipped, and
+`python3 -I tests/canary_mutants.py --json` reported 135/135 killed after 88/88
+passing pristine runs, with the repository inputs unchanged. The credential and
+guard suites had one failure, by design: `test_host_profile_copy_is_verbatim`
+compares the installed host copy, which differs until reinstall. The whole
+repository suite remains with the coordinator. The 2026-10-01 re-check round's
+own run is recorded at the end of this part. This repair runs no upstream test
+suite and does not relabel these local fixtures as upstream
 acceptance. Network retrieval worked through the installed public context-mode
 channel despite shell-network failure. Returned source pins and hashes are
 retained with the build handoff; no credentials or host paths enter public
@@ -1045,19 +1055,31 @@ limits worktree ancestry checking to its owned fixture, without a production
 environment override or credential-runner edit.
 
 Draft 3 estimates 650 coordinator lines, 1,150 worker lines, 1,800 aggregate
-and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). The
-repaired implementation has 1,832 coordinator lines and 2,097 worker lines,
-3,929 combined. The coordinator accepted that deviation for the required
-coverage and containment logic in the one repair round. The 3,590-line permanent
-test file also exceeds its original ceiling because the reviews require the
-missing cases, independent observations and paired mutants; that test-size
-deviation remains reported for coordinator disposition. The 768-line mutation
-runner is allowed separately and excluded from the test-line ceiling.
+and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). After the
+2026-10-01 re-check repairs the implementation has 1,834 coordinator lines and
+2,114 worker lines, 3,948 combined. The coordinator accepted that deviation for
+the required coverage and containment logic in the one repair round. The
+3,632-line permanent test file also exceeds its original ceiling because the
+reviews require the missing cases, independent observations and paired mutants;
+that test-size deviation remains reported for coordinator disposition. The
+782-line mutation runner is allowed separately and excluded from the test-line
+ceiling.
 
 The repair corrects seven reviewed false-clean paths: discovered Git indirections
-and damaged layouts, WAL families without a logical main scan, incomplete END,
+and damaged Git layouts, WAL families without a logical main scan, incomplete END,
 selection-aware symlink coverage, the prepared cursor seal, final journal entry
-termination, and virtual shadow ownership. SQLite shadow ownership follows
+termination, and virtual shadow ownership. The damaged Git layouts corrected are
+exactly these, each refused as incomplete in `RepairTests`: a `.git` directory
+missing HEAD or missing refs stays a logical store by its name (as does a
+directory with `objects/` and one of HEAD or refs), so Git's own validation
+refuses it (`producer_stderr` in the fixtures); a discovered gitfile whose target
+is outside every covered root, or is not a logical store by those rules, refuses
+as `git_indirection_unplanned`; and, since the 2026-10-01 re-check, a directory
+the walk reaches directly with object-store shape but no logical store (a loose
+object `objects/<2 hex>/<38 or 62 hex>`, or a pack or index file in
+`objects/pack`, with no HEAD, refs, `*.git` name or gitfile) refuses the same
+way, whether or not its files are selected. Zlib data outside a Git store and
+outside that shape stays a stated residual. SQLite shadow ownership follows
 `sqlite/sqlite@version-3.45.1` `ext/fts5/fts5_main.c` (`fts5ShadowName`),
 `ext/fts3/fts3.c` (`fts3ShadowName`) and `ext/rtree/rtree.c` (`rtreeShadowName`).
 Unknown virtual modules refuse logical completeness.
@@ -1072,7 +1094,10 @@ the numeric native scope suffix. The coordinator validates membership against
 its own runner PID and reads containment metadata only. This follows
 [systemd v255.4 cg_is_empty_recursive](https://github.com/systemd/systemd-stable/blob/v255.4/src/basic/cgroup-util.c#L927):
 `cgroup.events` populated 0 or disappearance is empty; all other failures refuse.
-Synthetic acceptance is distinct from the pending native scope acceptance.
+Synthetic acceptance is distinct from native scope acceptance, which the
+coordinator's outside-sandbox runs supply on the workstation: 12
+`ContainmentRealScopeTests` OK at `4d8404d5`, and the full unit file (141 tests,
+0 skipped) OK at `a07b7a24`.
 
 Correction log for this round: the reviewed prior claims of complete acceptance
 were too broad. Header sentinels now plant exactly what the oracle checks; FIFO
@@ -1124,3 +1149,79 @@ removes the narrowly authorized synthetic production-store exception; or when
 P5 reveals a new required encoding/container. Installing zstd is a separately
 announced post-W host change plus a decoder contract/fixture update. Replacing
 the scanner based on popularity or a newer release alone is insufficient.
+
+### Re-check round (2026-10-01)
+
+An independent read-only Opus re-check of the repair round (code at `a07b7a24`)
+confirmed 37 of 42 dispositions. It found one remaining false-clean path, one
+record-validation defect and documents that claimed more than the code. This
+round repairs them:
+
+- Objects-only Git store reached directly (high). A directory with Git
+  object-store shape but no HEAD, refs, `*.git` name or gitfile got no Git
+  handling: its zlib loose objects went to the plain view, so a canary inside
+  them read as clean. `Walk.entry` now refuses that layout with the gitfile
+  refusal's reason, `git_indirection_unplanned` (`object_shaped` uses the names
+  `Store.payload` counts, so a 62-hex SHA-256 loose name qualifies too).
+  `RepairTests.test_objects_only_store_reached_directly_refuses` walks Git-made
+  loose objects (the run's canary inside one zlib object, in no raw form), an
+  index-only `objects/pack` and a packed store; mutant R-OBJONLY removes only
+  the check. The refusal is a second layer for damaged `.git` directories, so
+  R-02 (store recognition narrowed to HEAD, objects and refs together) survived
+  its first run. The damaged-store fixture now also asserts that such a
+  directory is still counted as a store (`git_stores` 1), and R-02 is killed by
+  that assertion.
+- Request-level `inventory_unreconciled` (medium). Sink rows accepted it, but
+  the request's reasons did not: when a busy root left it beside a hard error,
+  every later status, verdict and cleanup read the record as invalid (exit 4)
+  and cleanup kept all runtime files. The request's reasons now accept that one
+  row reason and nothing else. The S5 test asserts that `status` returns 3
+  after the pack hard-error branch; mutant R-S5-VALID reverts the acceptance.
+- M2 negative count (low). A decoded view that lost its in-band control
+  counted -1 negatives, which the unsigned field cannot carry; the worker failed
+  with a sequence gap (`protocol_error`). Each view now counts at least zero
+  (`max(0, matches - 1)`).
+  `test_m2_negative_count_stays_unsigned_without_inband_control` and mutant
+  R-M2-UNSIGNED cover it, and R-19's edit text follows the changed line.
+
+This round's own run was outside any sandbox on the workstation, with a fresh
+`TMPDIR` under `/var/tmp`, on `a07b7a24` plus this change. All three repairs
+were first reproduced on unmodified `a07b7a24`: the objects-only scan exited 0
+as complete, the S5 pack case's `status` returned 4, and the lost in-band M2
+control left `protocol_error`. `python3 -I tests/test_canary_proof.py -v` (PATH
+`python3` 3.13.15; the fixtures start workers with `/usr/bin/python3` 3.12.3)
+ran 143 tests in 1015.455 s, OK, 0 skipped. `python3 -I tests/canary_mutants.py
+--check --json` found all 138 mutants applying exactly once and compiling, and
+`python3 -I tests/canary_mutants.py --json` (artifacts kept under `--keep`)
+reported 138/138 killed after 90/90 passing pristine runs, with the repository
+inputs unchanged. The credential, guard and repository suites were not rerun;
+none of them imports the changed modules.
+
+Residuals from the re-check that this round does not fix:
+
+- `not_covered` labels a final that completed but is unusable (`final_too_early`
+  or `final_stale`) as `requested_incomplete`.
+  `test_stream_roots_and_failed_requests_are_described_truthfully` asserts that
+  label right after a complete A11 final; no mutant covers the
+  requested/not_requested split.
+- The `Walk.directory` guard for selected WAL/SHM files without a valid scanned
+  main (`sqlite_uri_identity`) has no test of its own: every fixture writes WAL
+  magic, so `Scan.file` refuses first, and R-03 removes both checks together.
+- `Walk.covered` has no regression test for its exclusion, time-selection,
+  special-file-type or symlinked-parent branches; only the tasks-depth branch
+  is tested.
+- O12: no test asserts the decoded cap in the plan, the shared Git deadline,
+  the SQLite family-bytes budget, the new claim fields, the 15-second shutdown
+  or the rows' `exits` field.
+- G03: the END count/aux check in `Session.outcome` has no mutant; R-04 covers
+  only the END status check.
+- G13: no mutant deletes `--text` from the scanner argv; D2-49 drops
+  `--encoding` and was only relabeled.
+- O07: no mutant replaces the set-based physical/logical Git reconcile with a
+  count-based one.
+- `Session.bind_scope`'s refusal paths and the real `Session.scope_populated`
+  parser are untested (`test_scope_stop_failure_cannot_complete` mocks the
+  parser); only the native success path ran.
+- The scan's own exit code comes from in-memory events that `Run.append` never
+  validates (`scan` returns `report(..., exit_only=True)`). This round removes
+  the one known disagreement (`inventory_unreconciled`), not the mechanism.

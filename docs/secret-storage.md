@@ -2264,9 +2264,11 @@ Reuse sources are [ripgrep 14.1.0](https://github.com/BurntSushi/ripgrep/tree/e5
 GNU gzip/bzip2/xz's installed `-d -c` interfaces; Git v2.43.0 cat-file/fsck/
 verify-pack; SQLite URI/WAL/schema interfaces; and the unchanged repository
 `ecosystem-bounded-run`, credential runner, writer and boot-receipt publisher.
-The reviewed alternative ripgrep 15.2.0 is accepted with its separate stats
-grammar. Resolve, hash and invoke absolute executables; a new version requires
-review and the corresponding fixtures. No ripgrep compression switch, quiet
+ripgrep 15.2.0 (`e89fff89`) is a source-reviewed output grammar, not executed:
+the runtime accepts that version with its separate stats terminator, but its
+only test is a hand-written stats fixture. The executed version is 14.1.0.
+Resolve, hash and invoke absolute executables; a new version requires review
+and the corresponding fixtures. No ripgrep compression switch, quiet
 mode, recursive sink-path argv or raw fallback is used.
 
 The runtime root must be an absolute, owned 0700 `XDG_RUNTIME_DIR`; records
@@ -2334,19 +2336,19 @@ precondition refusal and 75 on contention. `record_invalid` maps to 4.
 Every other code below maps to 3; a validated sticky hit takes precedence
 over incompleteness and yields 5.
 
-| Code family (closed suffixes are consumer, sink, opaque id or fixed reason) | Exit |
+| Code family (closed suffixes: CONSUMER, SINK, opaque ROOT id, CHECK number, the fixed `agentsview`, or a fixed REASON) | Exit |
 | --- | --- |
 | boot_changed, tool_changed, pattern_file_mismatch, clock_stepped, guard_not_pinned | 3 |
 | no_baseline, baseline_unfinished, baseline_incomplete, baseline_after_arm, baseline_scope_missing | 3 |
-| baseline_sink_not_scanned, baseline_sink_incomplete, baseline_control_missing | 3 |
-| not_armed, not_disarmed, disarm_unverified, guard_not_pinned_at_arm, recording_missing | 3 |
+| baseline_sink_not_scanned:SINK, baseline_check_not_scanned:ROOT:CHECK, baseline_sink_incomplete:SINK, baseline_control_missing | 3 |
+| not_armed:CONSUMER, not_disarmed:CONSUMER, disarm_unverified:CONSUMER, guard_not_pinned_at_arm:CONSUMER, recording_missing:CONSUMER | 3 |
 | no_final, final_unfinished, final_incomplete, final_stale, final_too_early | 3 |
 | sink_not_scanned:SINK, check_not_scanned:ROOT:CHECK, sink_incomplete:SINK:REASON, inventory_unreconciled | 3 |
 | control_missing:SINK, masking_markers_mismatch | 3 |
 | user_run_unfinished, user_run_incomplete, user_run_stale, user_run_too_early | 3 |
-| user_run_sink_not_scanned, user_run_sink_incomplete, user_run_control_missing, user_arrival_missing | 3 |
+| user_run_sink_not_scanned:SINK, user_run_check_not_scanned:ROOT:CHECK, user_run_sink_incomplete:SINK, user_run_control_missing, user_arrival_missing:agentsview | 3 |
 | comparison_unfinished, comparison_incomplete, comparison_stale, comparison_too_early | 3 |
-| comparison_sink_not_scanned, comparison_sink_incomplete, comparison_control_missing | 3 |
+| comparison_sink_not_scanned:SINK, comparison_check_not_scanned:ROOT:CHECK, comparison_sink_incomplete:SINK, comparison_control_missing | 3 |
 | store_armed, arming_unresolved, store_absence_unverified | 3 |
 
 `protocol_error` and `negative_control_matched` are fixed REASON suffixes of
@@ -2396,20 +2398,26 @@ M1 raw always runs; BOM, compression, Git and SQLite logical views are additive.
 Every compressed UTF-16 stream fans one decoder into raw and BOM-first readers.
 Git reconciles physical loose/packs against verified enumeration and scans
 metadata such as .keep. The .keep control exists only in the synthetic control
-repository. SQLite covers schema SQL/names and ordinary/shadow-table values,
-checks escaped read-only URIs and the actual main fd, and never creates missing
-WAL/SHM to rescue a read. Virtual tables require real shadow tables. Special
-entries are name-checked but never opened for content. Each request/control
-kind gets a fresh control value. Unrelated sentinels exist only in test fixtures.
+repository. A gitfile whose target is uncovered or not a logical store, and a
+directory reached directly with Git object-store shape (a loose object
+`objects/<2 hex>/<rest of an object name>`, or a pack or index file in
+`objects/pack`) but no HEAD, refs or `*.git` name, refuse as incomplete with
+`git_indirection_unplanned`. SQLite covers schema SQL/names and
+ordinary/shadow-table values, checks escaped read-only URIs and the actual main
+fd, and never creates missing WAL/SHM to rescue a read. Virtual tables require
+real shadow tables. Special entries are name-checked but never opened for
+content. Each request/control kind gets a fresh control value. Unrelated
+sentinels exist only in test fixtures.
 
 Recognized unsupported zstd/lz4/compress/lzip/lzop/Snappy/brotli and containers
 make selected content incomplete. Container signatures at offset zero include
 zip local/empty/spanned, 7z, RAR, PDF, cpio newc/crc/odc, ar, cabinet, xar and
 PACK outside a reconciled Git store; tar's ustar signature is at offset 257.
-Zlib without recognized magic, nameless lzma, UTF-16 without BOM, application-
-compressed cells, arbitrary transformations and paths split across Git objects
-are explicit residuals. Freed SQLite pages/superseded WAL frames have raw coverage
-only. Indexes, API-fed stores, unrelated scratch/state, privileged journals,
+Zlib without recognized magic (outside a Git store and outside object-store
+shape), nameless lzma, UTF-16 without BOM, application-compressed cells,
+arbitrary transformations and paths split across Git objects are explicit
+residuals. Freed SQLite pages/superseded WAL frames have raw coverage only.
+Indexes, API-fed stores, unrelated scratch/state, privileged journals,
 process/unit memory, terminal scrollback, remote/provider and Windows copies
 remain outside scope. Receipts always say `not_covered:proxy_unverified` for Loki;
 collector/Loki equality belongs only to the external window record.
