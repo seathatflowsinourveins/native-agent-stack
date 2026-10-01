@@ -4,7 +4,9 @@
 2026-10-01. Unit W2 of that wave wrote the recipe, the templates and the test, and re-read the sources the same day.
 A follow-up unit added F11 and the F5 range rule later that day, on the coordinator's brief. A second follow-up unit
 then added the completeness critic's pre-stage-1 checks (R1, P1 to P3, W7, W5's schema check and F2's idle observation)
-and corrected three facts, on the coordinator's brief and a research packet of the same day.
+and corrected three facts, on the coordinator's brief and a research packet of the same day. The coordinator then set
+P3's rule: the count is a baseline, an error line less than one hour old stops the run, and W5 counts again after the
+first launch.
 This record changes nothing on a host. No `wsl.exe` command, import, `.wslconfig` edit or first launch ran for it. The
 second follow-up's artifact checks ran P1 to P3's commands in the workstation distribution and changed nothing on the
 host (Evidence classes).
@@ -280,6 +282,13 @@ SHA-256, so a change to any of them needs a re-pin.
    - Apply settings with `wsl --shutdown`: it stops every distribution.
    - Set `swap=0` for microsoft/WSL#41482, or change an idle key: both change the global WSL configuration, and the
      first takes effect only after a WSL shutdown; that is the user's decision, not this recipe's.
+   - P3 as a bare count that stops on any error line, the second follow-up's first form: rejected by the coordinator.
+     A count over the current boot cannot tell errors that are happening now from an old burst, and on this host one
+     burst seven days earlier would have blocked stage 1 for good. P3's count is now a baseline; the newest line's age
+     and W5's second count decide.
+   - Judge that age by the journal's wall-clock stamp (`-o short-iso`): rejected, because journald stamps a kernel
+     line when it reads it, and after a restart of the workstation distribution it reads the ring buffer again and
+     stamps old lines anew. The kernel time against `/proc/uptime` does not move.
    - Make the new distribution the default now: the workstation stays the default until a separate decision.
 
 ## Decision
@@ -301,8 +310,12 @@ SHA-256, so a change to any of them needs a re-pin.
    - **Pre-checks (P1 to P3)**, in the workstation distribution before W1. P1 verifies `SHA256SUMS` with `gpgv`
      against the installed archive keyring (key `843938DF228D22F7B3742BC0D94AA3F0EFE21092`) and prints the image's
      signed line. P2 runs `cloud-init schema -c` on the render and prints its SHA-256, which W3's file must match. P3
-     counts the current boot's `hv_storvsc` kernel journal lines without the registration line and stops the run on
-     any (microsoft/WSL#41482).
+     records the current boot's `hv_storvsc` kernel journal count, without the registration line, as a baseline and
+     prints the newest error line's kernel time beside `/proc/uptime`. An error line less than one hour old stops the
+     run (microsoft/WSL#41482); the threshold is this recipe's choice, not an upstream figure.
+   - **Second storage reading (W5).** On both paths, right after the first launch, the same count again in the
+     workstation distribution. Equal to the baseline passes. A larger count is recorded with the new lines, a failed
+     W5 counts as exposure to microsoft/WSL#41482, and nothing continues to stage 2 until that is decided.
    - **Preflight (W1).** Neither Ubuntu Pro file exists, or `agent.yaml`'s top-level keys are recorded and include
      neither `users` nor `write_files`. W1 also reads `instanceIdleTimeout` and `vmIdleTimeout` of the global WSL
      configuration, without writing it.
@@ -379,8 +392,8 @@ SHA-256, so a change to any of them needs a re-pin.
    Drop `libatomic1` when the coordinator accepts the `readelf` measurement.
 4. **Host-wide.** Revisit when the keys lane updates WSL (re-verify install, import and first run at that tag; from
    2.9.8 or 3.0.1 on, the fix for microsoft/WSL#40941 is present and W7 becomes a check) or when a separate decision
-   makes the new distribution the default. Revisit P3 when microsoft/WSL#41482 names a fixed release, or when the user
-   decides on the storage errors P3 counted on this host (Evidence classes).
+   makes the new distribution the default. Revisit P3 when microsoft/WSL#41482 names a fixed release, or when a run
+   shows storage errors that the one-hour threshold, this recipe's choice, misjudges.
 
 ## Command table
 
@@ -415,7 +428,9 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | P2 | sh | `cloud-init --version` | the workstation's cloud-init version, recorded |
 | P2 | sh | `cloud-init schema -c "$RENDER_DIR/<Name>.user-data"` | `Valid schema` and exit 0; `Invalid user-data` (exit 1) stops the run |
 | P2 | sh | `sha256sum "$RENDER_DIR/<Name>.user-data"` | the render's SHA-256, equal to W3's |
-| P3 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | `0`, with the last `grep` exiting 1; a nonzero count stops the run (microsoft/WSL#41482) |
+| P3 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | the count, recorded as the baseline (a count of `0` makes the last `grep` exit 1) |
+| P3 | sh | `sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname \| grep hv_storvsc \| grep -v 'registering driver hv_storvsc' \| tail -n 1` | the newest error line with its kernel time in brackets, or nothing |
+| P3 | sh | `cat /proc/uptime` | the seconds since boot as the first number; minus the line's kernel time, an age under 3600 s stops the run (microsoft/WSL#41482) |
 | P3 | sh | `swapon --show` | recorded; active swap is the issue's condition, not a failure by itself |
 | W1 | powershell | `New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'` | the folder for the transcript and the image exists |
 | W1 | powershell | `$env:WSL_UTF8 = '1'` | wsl.exe writes UTF-8 instead of UTF-16 |
@@ -461,6 +476,7 @@ the recipe. P1 to P3's commands ran as artifact checks in the workstation distri
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
 | W5 | powershell | `wsl.exe --list --verbose` | the starred line equals W1's |
+| W5 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | both paths: equal to P3's baseline; a larger count is exposure to microsoft/WSL#41482, recorded with the new lines, and holds the run before stage 2 |
 | W6 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
 | W6 | powershell | `wsl.exe --list --quiet` | read before unregistering: `<Name>` is the new distribution |
 | W6 | powershell | `wsl.exe --terminate '<Name>'` | `<Name>` stopped before the export; no other distribution stops |
@@ -551,10 +567,11 @@ Each one stays open until a host run records the observation named here.
    termination", the issue's reproduction says it lasts "until the next wsl --shutdown", and no one has observed a
    terminate. W7's probe after its terminate records it, first in the rehearsal.
 7. **Kernel storage errors on this host (microsoft/WSL#41482).** Whether `hv_storvsc` errors break a first launch on
-   this kernel. On 2026-10-01 P3 counted 21 lines in the workstation's journal of the current boot (Evidence classes):
-   one burst of `cmd 0x2a` errors (`WRITE_10`) about seven days earlier and none since, where the issue shows `cmd 0x28`
-   (`READ_10`). By the recipe's rule P3 stops stage 1 on this host as it stands. Continuing needs the user's decision:
-   accept the burst after review, start a fresh kernel boot (a WSL shutdown, outside the recipe) or change P3's rule.
+   this kernel. On 2026-10-01 P3's count in the workstation's journal of the current boot was 21 (Evidence classes):
+   one burst of `cmd 0x2a` write errors (`WRITE_10`) on 2026-09-24 around 03:20Z and none since, where the issue shows
+   `cmd 0x28` read errors (`READ_10`). Under the coordinator's rule that count is P3's baseline, and its newest line,
+   about 7.4 days old, does not stop the run. W5's second count, first in the rehearsal, shows whether a first launch on
+   this kernel meets new errors; the question stays open until a run records it.
 
 ## Completeness critic (2026-10-01)
 
@@ -568,7 +585,7 @@ the recipe (last column); do not run stage 1 without the checks of items 1 to 5.
 | --- | --- | --- | --- | --- |
 | 1 | No dry run. Stage 1 and first boot have never run anywhere; a rehearsal on a throwaway name and location stays inside this record's host-wide rules | this record, "Evidence classes" | Queued before stage 1: a rehearsal that also collects items 2, 3 and 4 | R1: the page runs first on a throwaway name through F3, with W5's schema check, W7's probe and F2's idle observation in the receipt's `rehearsal` block; R1 then removes only that name |
 | 2 | The claim that WSL 2.7.14 and 3.0.1 "change nothing about install, import or first run" is broader than what was checked. `2.7.13...3.0.1` is 677 commits ahead, and listed commits touch first run, import and termination. One of them fixes microsoft/WSL#40941: after the first-run setup, a file created from Windows is owned by 0:0 until the next `wsl --shutdown`, which this recipe forbids. That 2.7.13 lacks the fix is now established from source: the fix's function, `ConnectionTargetManager::UpdateUid`, is absent from `src/windows/common/Redirector.h` at tags 2.7.13 and 2.7.14 | https://github.com/microsoft/WSL/compare/2.7.13...3.0.1 ; https://github.com/microsoft/WSL/issues/40941 | Open question; measured in the rehearsal (create a file from Windows under the user's home, read its owner, terminate the distribution, relaunch, read it again) | Context and the recipe's host-wide rules corrected; W7 terminates `<Name>` once after the first launch, relaunches it and requires `1000:1000` for a file created from Windows; open question 6 |
-| 3 | The issue tracker was not searched for the selected path. microsoft/WSL#41482 reports continuous `hv_storvsc` read errors and systemd boot timeouts on Ubuntu 24.04 with kernel 6.18.33.2, this host's kernel; the maintainer's workaround needs `swap=0` and `wsl --shutdown`, both ruled out here | https://github.com/microsoft/WSL/issues/41482 | Open question; a read-only pre-check in the current distribution (`journalctl -k` for `hv_storvsc`) before stage 1, since both share the kernel | P3 counts the current boot's `hv_storvsc` journal lines without the registration line, records `swapon --show` and stops on any count; on this host it counted 21 (Evidence classes, open question 7) |
+| 3 | The issue tracker was not searched for the selected path. microsoft/WSL#41482 reports continuous `hv_storvsc` read errors and systemd boot timeouts on Ubuntu 24.04 with kernel 6.18.33.2, this host's kernel; the maintainer's workaround needs `swap=0` and `wsl --shutdown`, both ruled out here | https://github.com/microsoft/WSL/issues/41482 | Open question; a read-only pre-check in the current distribution (`journalctl -k` for `hv_storvsc`) before stage 1, since both share the kernel | P3 records the current boot's `hv_storvsc` journal count without the registration line as a baseline, stops on an error line less than one hour old by its kernel time and records `swapon --show`; W5 counts again after the first launch. On this host the baseline is 21, from one burst seven days old (Evidence classes, open question 7) |
 | 4 | Whether linger keeps the distribution running. microsoft/WSL#13416 (open: WSL shuts down despite an active systemd service, still reproduced on 2.7.3) and #9968 (open) bear on open question 2 | https://github.com/microsoft/WSL/issues/13416 ; https://github.com/microsoft/WSL/issues/9968 | Open question; observed in the rehearsal with no client attached, because stage 2's user services depend on it | W1 reads the two idle keys; F2 lists the running distributions for two minutes with no client attached; open question 2 rewritten with the setting, the source and the issues |
 | 5 | Two upstream verification steps are skipped: Canonical's how-to validates the user data with `sudo cloud-init schema --system`, and `SHA256SUMS.gpg` exists and is never verified (the repository's 2026-09-21 precedent verified Ubuntu's signed sums) | https://documentation.ubuntu.com/wsl/stable/howto/cloud-init/ ; https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg | Queued before stage 1: both become recipe steps in the follow-up | P1 verifies the signed sums with `gpgv`; P2 runs `cloud-init schema -c` before any boot, its hash compared with W3's; W5 runs `cloud-init schema --system` on path A |
 | 6 | Other base images were not weighed. Microsoft's distribution list also carries Debian, Fedora, Arch, AlmaLinux, openSUSE, SLE and Kali; stage 2 accepts only `ID=ubuntu` or `debian` (`adoption/bootstrap-linux.sh:175-178`) | https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json | Debian feeds the layer's next landscape sweep; the others are out of scope while stage 2 rejects their `ID` | Alternatives 1 states both |
@@ -597,8 +614,9 @@ searches were samples of eight results per query, not sweeps.
   - the Node 24.21.0 tarball's sha256 and its binary's `NEEDED` list.
 - **Artifact checks of the second follow-up unit, 2026-10-01**, in the workstation distribution (Ubuntu 24.04.5 LTS,
   kernel 6.18.33.2): not runs of the recipe on a new distribution, and they changed nothing on the host. The unit ran
-  P1 to P3 verbatim from 11:50:17Z to 11:50:19Z, extracted from the page with `<WSL_USER>` as `example` and `<Name>` as
-  `rehearsal-example`, `TMPDIR` in its scratch area and `sudo` without a prompt, each command followed by its exit code:
+  P1 to P3 verbatim from 11:50:17Z to 11:50:19Z, and P3 again in its final form at 12:19:29Z, extracted from the page
+  with `<WSL_USER>` as `example` and `<Name>` as `rehearsal-example`, `TMPDIR` in its scratch area and `sudo` without
+  a prompt, each command followed by its exit code:
   - P1: both `curl` lines exited 0. The `gpgv` line exited 0:
     `gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" "$SUMS_DIR/SHA256SUMS"`
     printed `Signature made Tue Sep 15 15:11:12 2026 EDT`, `using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092` and
@@ -619,16 +637,32 @@ searches were samples of eight results per query, not sweeps.
     `Error: Cloud config schema errors: users.0.lock_passwd: 'maybe' is not of type 'boolean'`,
     `Error: Invalid schema: user-data` and `Invalid user-data <file>`, exit 1. An earlier run at 11:26Z also found the
     render equal to the template with a literal replace, without CR bytes and with `#cloud-config` first.
-  - P3: `sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'` printed
-    `21` (exit codes 0, 0 and 0), and `swapon --show` printed one 24G swap partition with 4.2G used (exit 0). By the
-    page's rule this stops stage 1 on this host (open question 7). At 11:26:38Z the form the brief gave,
-    `grep -c hv_storvsc` over the same journal, printed 24 (exit 0). The unit then split those lines (`sudo -n`, ids
-    masked): 3 were `hv_vmbus: registering driver hv_storvsc`, one kernel message with one monotonic stamp that
-    journald stored again after the workstation distribution restarted within this kernel boot. Every boot logs that
-    line, so the page leaves it out. The other 21 were
+  - P3 under the coordinator's rule, its four lines run verbatim from the page at 12:19:29Z (and the same commands
+    at 12:13:46Z with the same count and newest line). The count line,
+    `sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'`, printed `21`
+    (exit codes 0, 0 and 0): the baseline. The newest-line command,
+    `sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1`,
+    printed `[52879.587119] kernel: hv_storvsc <device>: tag#2687 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1`
+    (exit codes 0, 0, 0 and 0; the device id is masked here). `cat /proc/uptime` printed `690053.56` as its first
+    number, so the newest error line was about 637,174 s, 7.4 days, old: older than one hour, so P3 does not stop the
+    run, and 21 is a baseline. `swapon --show` printed one 24G swap partition with 4.2G used (exit 0). W5's count line,
+    the same command, also printed `21`, but no first launch had run, so that only checks the command: no second reading
+    exists yet.
+  - The first form of P3, the count alone with a stop on any count, printed `21` at 11:37:00Z and 11:50:19Z, and the
+    form the brief first gave, `grep -c hv_storvsc`, printed 24 at 11:26:38Z (exit 0). The unit then split those lines
+    (`sudo -n`, ids masked): 3 were `hv_vmbus: registering driver hv_storvsc`, one kernel message with one monotonic
+    stamp that journald stored again after the workstation distribution restarted within this kernel boot. Every boot
+    logs that line, so the page leaves it out. The other 21 were
     `hv_storvsc <device>: tag#<n> cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1`: 14 distinct monotonic stamps
-    within 47 ms, about 52,880 s after the kernel booted (about 2026-09-24 03:20Z), and none in the seven days since.
+    within 47 ms, about 52,880 s after the kernel booted (2026-09-24 around 03:20Z), and none in the seven days since.
     `cmd 0x2a` is `WRITE_10`, where the issue's `cmd 0x28` is `READ_10` (`/usr/include/scsi/scsi.h:59-60`, libc6-dev).
+    Under a stop on any count, that one old burst would have blocked stage 1 on this host for good; this is why the
+    coordinator rejected the bare count as the rule (Alternatives 4).
+  - Why the kernel time decides the age: the registration message, one kernel time, carries three journal reception
+    stamps from 2026-09-24 03:20:59Z to 04:23:09Z, and the burst's error lines were received at 03:20:59Z and again at
+    04:23:09Z (`-o short-iso --no-hostname`, 12:13:46Z). On this host the kernel clock and `/proc/uptime` agree within
+    37 s over about 8 days: the newest kernel line's kernel time, 689,242.966 s, against its reception time at 12:13Z.
+    The one-hour threshold is this recipe's choice, not an upstream figure; microsoft/WSL#41482 names no age.
 - **Local integration.** `tests/test_wsl_new_distro_recipe.py`, checks over repository text and an in-memory render; it
   runs nothing on a host.
 - **Not run.** Stage 1 and the first boot: nothing in stage 1 has run on a host, the rehearsal included. The first host

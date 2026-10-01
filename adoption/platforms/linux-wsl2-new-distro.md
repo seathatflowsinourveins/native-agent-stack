@@ -66,9 +66,11 @@ shell instead, as their sections say.
 
 Run the page once on a throwaway distribution before the real one. For that run `<Name>` is a throwaway name that no
 other distribution uses, never the real `<Name>` and never the workstation's, and `Z:\WSL\<Name>` is its own new folder.
-Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, with the three observations no host
-has made yet: W5's `cloud-init schema --system` (path A), W7's file-ownership probe and F2's idle observation. Record
-the rehearsal's name, result, creation path and those three observations in the receipt's `rehearsal` block. Every
+Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, with the observations no host has
+made yet: P3's baseline and W5's second count of storage errors, W5's `cloud-init schema --system` (path A), W7's
+file-ownership probe and F2's idle observation. The first real reading of the storage rule thus comes from the throwaway
+distribution. Record the rehearsal's name, result, creation path and those observations in the receipt's `rehearsal`
+block. Every
 host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and unregisters only that literal
 name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
 
@@ -162,17 +164,30 @@ would meet. microsoft/WSL#41482 (https://github.com/microsoft/WSL/issues/41482, 
 (`/sbin/init failed to start within 10000ms`). Its workaround, `swap=0` in the global WSL configuration and a WSL
 shutdown, is outside this page. Without `sudo` the user cannot read the kernel journal, and `dmesg` holds only the
 recent ring buffer, so this reads the journal of the current boot. It searches for the driver's name, not a device id,
-and leaves out the driver's registration line, `hv_vmbus: registering driver hv_storvsc`, which every boot logs.
+and leaves out the driver's registration line, `hv_vmbus: registering driver hv_storvsc`, which every boot logs. A count
+over the whole boot cannot tell errors that are happening now from an old burst, so the count is
+a baseline, not a verdict: the newest error line's age decides here, and W5 counts again after the first launch.
 
 ```sh
 sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
+sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1
+cat /proc/uptime
 swapon --show
 ```
 
-Proof: the count is `0`; the last `grep` then exits 1, which is the pass. Record `swapon --show`: active swap is the
-issue's condition, not a failure by itself. A nonzero count stops the run: record the count and the lines' shape without
-device ids, name microsoft/WSL#41482, and leave the next step to the user, because the workaround changes the global WSL
-configuration and shuts WSL down.
+Proof:
+
+- The first line prints the count: record it as the baseline (`storage_errors`). A count of `0` makes the last `grep`
+  exit 1, which is not a failure.
+- The second line prints the newest error line, with its kernel time in seconds since boot in brackets, or nothing.
+  `cat /proc/uptime` prints the seconds since boot now as its first number, and the difference is the line's age.
+  An age of less than one hour (3600 seconds) means errors are happening now, and this stops the run before anything is
+  installed: record the count, the line's time and its shape without device ids, name microsoft/WSL#41482 and leave the
+  next step to the user, because the workaround changes the global WSL configuration and shuts WSL down. An older line,
+  or none, lets the run continue. The one-hour threshold is this recipe's choice, not an upstream figure.
+- The kernel time decides, not the journal's wall-clock stamp: journald stamps a kernel line when it reads it, and a
+  restart of the workstation distribution reads the kernel's ring buffer again and stamps old lines anew.
+- Record `swapon --show`: active swap is the issue's condition, not a failure by itself.
 
 ## Stage 1 on the Windows host
 
@@ -337,6 +352,19 @@ Proof (path A, cloud-init provisioned the instance):
 - `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
+
+On both paths, right after the launch and before W6 or W7, count the storage errors again in the workstation
+distribution, where P3 ran:
+
+```sh
+sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
+```
+
+Proof: the count equals P3's baseline; record it as `second_count`. A larger count means storage errors during W4 to
+W5. Record both counts and the new lines (P3's second line with `tail -n` set to the difference, without device ids),
+treat a failed W5 as exposure to microsoft/WSL#41482 rather than a cloud-init failure, and do not continue to stage 2
+(F9) until that is decided: its workaround changes the global WSL configuration and shuts WSL down, both outside this
+page.
 
 How to tell that cloud-init did not provision the instance: the launch output contains
 `Create a default Unix user account:` and `OOBE command "/usr/lib/wsl/wsl-setup" failed, exiting`, and the exit code is
@@ -684,8 +712,8 @@ transcript and the F outputs:
   - `creation_path` (`A` or `B`), with the W5 markers when B was taken;
   - on path B, `failed_attempt_export`: the file name, SHA-256 and size of W6's export of the failed attempt;
   - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
-  - the `rehearsal` block of R1, the `pre_checks` of P1 to P3, W1's `idle_keys`, W5's `schema_system`, W7's
-    `ownership_probe` and F2's `idle_observation`.
+  - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
+    W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
   `limitations` and its `path`. Its claim quotes only that run's output. Follow
@@ -703,7 +731,8 @@ Kept open in the record, each with the observation that would settle it:
 - whether binfmt registrations survive `wsl --terminate` (WSL's `protectBinfmt`);
 - whether `useradd` allocated the subordinate ids on 24.04.5 (F5 records it);
 - whether a terminate clears the 0:0 file owner of microsoft/WSL#40941 (W7 records it);
-- whether the storage errors P3 counts break a first launch on this kernel (microsoft/WSL#41482; P3 stops on any);
+- whether `hv_storvsc` errors break a first launch on this kernel (microsoft/WSL#41482; P3 records a baseline and
+  stops on an error line less than one hour old, and W5 counts again after the first launch);
 - the bounded comparison against Ubuntu 26.04.1 LTS, WSL's current default `Ubuntu`.
 
 ## Boundaries

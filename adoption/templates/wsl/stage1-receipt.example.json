@@ -26,6 +26,7 @@
     "schema_system": "<R1: the rehearsal's W5 schema --system line and exit code, or skipped (path B)>",
     "ownership_probe": "<R1: the rehearsal's W7 stat -c %u:%g output after the terminate>",
     "idle_observation": "<R1: whether the throwaway name stayed in every F2 poll, or the time it left>",
+    "storage_readings": "<R1: the rehearsal's P3 baseline and newest error line time, and its W5 second count>",
     "export": {
       "file": "<R1, failed rehearsal only: Z:\\WSL\\downloads\\<Name>-rehearsal.tar; null when it passed>",
       "sha256": "<R1: the Get-FileHash line's lower-case hash of that file; null when it passed>",
@@ -34,8 +35,14 @@
   },
   "pre_checks": {
     "signed_sums": "<P1: gpgv's exit code, its using RSA key and Good signature lines, and the signed SHA256SUMS line of the image>",
-    "user_data_schema": "<P2: cloud-init --version, the Valid schema line and its exit code, and the render's sha256sum, equal to W3's>",
-    "kernel_storage_errors": "<P3: the hv_storvsc count without the registration line (0 passes) and the swapon --show lines>"
+    "user_data_schema": "<P2: cloud-init --version, the Valid schema line and its exit code, and the render's sha256sum, equal to W3's>"
+  },
+  "storage_errors": {
+    "baseline": "<P3: the hv_storvsc count without the registration line, before anything is installed>",
+    "newest_line_time": "<P3: the newest error line's kernel time in seconds, the first number of /proc/uptime and the age they give; none when no line; an age under 3600 s stopped the run>",
+    "swap": "<P3: the swapon --show lines>",
+    "second_count": "<W5, both paths: the same count after the first launch; equal to the baseline passes>",
+    "new_lines": "<W5, only when the count grew: the new lines without device ids, and the decision on microsoft/WSL#41482; null otherwise>"
   },
   "host": {
     "wsl_version": [
@@ -222,8 +229,20 @@
     {
       "step": "P3",
       "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
-      "exit": 1,
-      "output_excerpt": "0"
+      "exit": "<0, or 1 when the count is 0>",
+      "output_excerpt": "<the count: the baseline>"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1",
+      "exit": "<exit code>",
+      "output_excerpt": "<the newest error line's kernel time and shape without device ids, or nothing>"
+    },
+    {
+      "step": "P3",
+      "cmd": "cat /proc/uptime",
+      "exit": "<exit code>",
+      "output_excerpt": "<the two numbers; the first is the seconds since boot>"
     },
     {
       "step": "P3",
@@ -494,6 +513,12 @@
       "cmd": "wsl.exe --list --verbose",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "exit": "<0, or 1 when the count is 0>",
+      "output_excerpt": "<the second count, both paths>"
     },
     {
       "step": "W6",
