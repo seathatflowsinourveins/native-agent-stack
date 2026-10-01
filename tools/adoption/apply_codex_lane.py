@@ -121,7 +121,7 @@ EXCEPTIONS_MARKER = "native-agent-stack:rtk-exceptions"
 # adoption/pins-linux-x86_64.json "codex" (tests/test_codex_worker_lane.py keeps the two equal). The writer's
 # behaviour below was read and probed at 0.157.1; at 0.159.2 the source it cites is unchanged (compared at the two tag
 # commits on 2026-09-30) and CodexIntegrationTests ran again against the real binary.
-CODEX_VERSION = "0.159.2"
+CODEX_VERSION = "0.159.3"
 CONTEXT_MODE_VERSION = "1.0.169"
 # start.mjs of context-mode 1.0.169: the npm install and the plugin pin 6f0cc684 carry the same file.
 START_MJS_SHA256 = "0324441841b2aef98db606194ec779c014fba3c8031c725f1be273c65f26e57b"
