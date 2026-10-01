@@ -3,7 +3,7 @@
 Evidence for [`catalogs/us-equities/convergence-20260926.json`](../../../catalogs/us-equities/convergence-20260926.json).
 Host paths are rewritten repository-relative; `<session-scratch>` replaces private session paths and
 `<private-memory>` private memory paths, and `<email>` email addresses. Claim checks that cite private host memory
-keep their name and verdict with their text withheld. In mapper reasoning, layer summaries and packet prose, a
+keep their verdict and a name that does not cite it, with their text withheld. In mapper reasoning, layer summaries and packet prose, a
 sentence or clause that cites it is replaced by `[A sentence citing private host memory is withheld.]` or
 `[A clause citing private host memory is withheld.]`; the three clause markers were set by hand on 2026-10-01 after
 an independent landing review, because the builder is not retained. UUIDs, including those inside source URLs, are replaced by `<uuid>`

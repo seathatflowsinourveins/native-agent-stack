@@ -18,7 +18,7 @@ verdict wave, not a selection. Each GPT-6 vote is one refutation attempt, not a 
 | Layer | GPT-6 live | GPT-6 cached | Winners disputed | Candidates (survive / refuted / unverified) | Missed candidates | Corrections |
 |---|---|---|---|---|---|---|
 | agents-models-workers | needs_changes | needs_changes | foundation-ai-memory, foundation-socraticode | 5 / 7 / 0 | 12 | 18 |
-| backtesting-engine | needs_changes | needs_changes | none | 5 / 1 / 9 | 5 | 13 |
+| backtesting-engine | needs_changes | needs_changes | nautilustrader | 5 / 1 / 9 | 5 | 13 |
 | data-quality-orchestration | needs_changes | — | none | 8 / 0 / 8 | 2 | 13 |
 | evaluation-experiments | needs_changes | needs_changes | none | 8 / 4 / 0 | 6 | 27 |
 | execution-broker | needs_changes | — | nautilus-ibkr-adapter | 5 / 1 / 8 | 2 | 8 |

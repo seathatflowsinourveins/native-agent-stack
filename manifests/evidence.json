@@ -14525,13 +14525,13 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "252dacc17338cf7510ed19ca5a2b4600fe95b3974ff2de41c0eef24a0a43d36d",
-      "bytes": 881734
+      "sha256": "d4e7d79f9b32c093632ae611bf5cdc13fb654907817137974e2987fd03202c73",
+      "bytes": 882688
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
-      "sha256": "fe8793fbd6b45629d8c5094cd13e764f9a881f5543d493d517f08e0b54de939c",
-      "bytes": 6343
+      "sha256": "62b88000d45bab760f1dc5d973cf2c95cba536783c61be0e5653bc01fc7e4191",
+      "bytes": 6353
     },
     {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
@@ -42755,8 +42755,8 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/README.md",
-      "sha256": "440a52f3cc9b9fa361c54824ed2e56447adcb5ce1c5756b8602e4d2ac600cc7a",
-      "bytes": 1930
+      "sha256": "6a8e358162b0dbbed9b38e7136d6f74c365f0bbade6e272d7b4294c6601a9172",
+      "bytes": 1955
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-cached.md",
@@ -42865,8 +42865,8 @@
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/agents-models-workers.json",
-      "sha256": "236c724670d1a99d2f4f7fd5387e809ec9ebc272900ff5cd3f07ab1f6a6839fa",
-      "bytes": 52823
+      "sha256": "9ab6d1f1f8d7f3c5181f2b06c4b263007689bf54dfa9426b72254a04b378d6fa",
+      "bytes": 52794
     },
     {
       "path": "evidence/artifacts/trading-convergence-20260926/packets/backtesting-engine.json",

@@ -66,7 +66,7 @@
     },
     "review": "Per layer: Claude candidate research, adversarial claim checks (claude-verify) and a proposal (winner status, challengers with trial plans, rejections). Workers ran Claude Sonnet at effort max on 2026-09-26.",
     "cross_family": "GPT-6 (gpt-6-astra, model_reasoning_effort max, codex exec 0.157.1, read-only sandbox) asked to refute each proposal against primary sources. Lens gpt-6-cached ran with the client default search (external_web_access false, per evidence/artifacts/sota-refresh-20260926/codex/results/websearch-0.157.1.json); lens gpt-6-live ran with -c web_search=\"live\". All 13 layers have a live vote; 8 also have a cached vote.",
-    "mapping": "One Claude Opus mapper per layer (effort max, no web) attributed each vote to candidates and winners with a quote. The builder stores each quote as the source's own span (located tolerating only whitespace and typographic punctuation), sanitized exactly as the exported vote texts, and keeps a vote only if that span, whitespace collapsed, occurs in the published text: the vote file for GPT-6 lenses, the decoded claim-check strings of packets/<layer>.json for claude-verify. Claim checks that cite private host memory are redacted, and quotes from them are dropped. In mapper reasoning, layer summaries and packet prose, a sentence or clause that cites it is replaced by a bracketed withheld marker; three clauses were withheld by hand on 2026-10-01 after the landing review, because the builder is not retained.",
+    "mapping": "One Claude Opus mapper per layer (effort max, no web) attributed each vote to candidates and winners with a quote. The builder stores each quote as the source's own span (located tolerating only whitespace and typographic punctuation), sanitized exactly as the exported vote texts, and keeps a vote only if that span, whitespace collapsed, occurs in the published text: the vote file for GPT-6 lenses, the decoded claim-check strings of packets/<layer>.json for claude-verify. Claim checks that cite private host memory are redacted, and quotes from them are dropped. In mapper reasoning, layer summaries and packet prose, a sentence or clause that cites it is replaced by a bracketed withheld marker; three clauses were withheld by hand on 2026-10-01 after the landing review, because the builder is not retained. A cross-family landing review (gpt-6.1-sol, 2026-10-01) then found the two GPT-6 votes on backtesting-engine's nautilustrader winner mapped as corrects although both deny the comparative merit that earns_it asserts; they are now refutes and that winner is cross_family_disputed, as the foundation-ai-memory and foundation-socraticode winners are. Other winner votes that narrow an earns_it rationale without calling the label wrong stay corrects.",
     "survives_rule": "survives=false when any kept vote has position refutes, meaning the vote says the label is wrong (for a rejection, that it should not have been rejected). A vote with position corrects fixes a fact or a claim but leaves the label standing and does not change survival. survives=true when at least one kept GPT-6 vote addresses it and none refutes; null (disposition *_unverified) when no kept GPT-6 vote addresses it. Dispositions follow manifest-20260923's vocabulary."
   },
   "attempts": [
@@ -994,7 +994,7 @@
         {
           "id": "nautilustrader",
           "claude_review_status": "earns_it",
-          "cross_family_disputed": false,
+          "cross_family_disputed": true,
           "votes": [
             {
               "lens": "claude-verify",
@@ -1006,18 +1006,18 @@
             },
             {
               "lens": "gpt-6-cached",
-              "refuted": false,
-              "position": "corrects",
+              "refuted": true,
+              "position": "refutes",
               "confidence": "medium",
-              "reasoning": "The vote corrects the stale parity-blocked claim and the version scope of paper acceptance (1.231.0, not rc5). It calls the earns_it rationale circular but accepts provisional retention.",
+              "reasoning": "The vote corrects the stale parity-blocked claim and the version scope of paper acceptance (1.231.0, not rc5). It calls the earns_it rationale circular but accepts provisional retention. [Position changed from corrects to refutes on 2026-10-01 after the cross-family landing review: the vote denies the comparative merit that earns_it asserts while accepting provisional retention, as the foundation-ai-memory winner votes mapped refutes do.]",
               "quote": "Retention can be provisional; comparative superiority remains unproven."
             },
             {
               "lens": "gpt-6-live",
-              "refuted": false,
-              "position": "corrects",
+              "refuted": true,
+              "position": "refutes",
               "confidence": "medium",
-              "reasoning": "The vote corrects the stale parity finding and calls the comparative rationale circular, but keeps Nautilus provisionally rather than displacing it.",
+              "reasoning": "The vote corrects the stale parity finding and calls the comparative rationale circular, but keeps Nautilus provisionally rather than displacing it. [Position changed from corrects to refutes on 2026-10-01 after the cross-family landing review: the vote denies the comparative merit that earns_it asserts while accepting provisional retention, as the foundation-ai-memory winner votes mapped refutes do.]",
               "quote": "Keep Nautilus provisionally, but replace the empty challenger list with explicit comparisons and overturn conditions."
             }
           ]
