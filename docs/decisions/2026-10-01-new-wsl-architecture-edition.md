@@ -89,11 +89,19 @@ preregistered SIGKILL case.
 
 **Evidence classes.** The six classes of `docs/acceptance-evidence-policy.md:26-33`, plus `source_review` and
 `none_recorded`, two levels below the table: AGENTS.md keeps metadata, pinned source review and native
-execution apart. The six policy classes have no defined order, so the build enforces what can be enforced:
+execution apart. A winner's acceptance class describes a run that the cited source, or one file that source
+links, shows was run on a host and what it returned. A check that is only prescribed, planned, not run or failed
+is `none_recorded`. Schema, pin, hash and contract-test checks are `structural_validation`. A version print is
+metadata, not an acceptance. The `command` names the check the record is about. An independent review on
+2026-10-01 found 32 of the 119 winner acceptance classes overstated, 13 commands that were only version or status
+prints and 6 entries it could not settle; this revision corrects them: 55 of the 119 entries changed (32 classes,
+48 commands and 31 cited sources), 20 entries are now `none_recorded` and 13 `structural_validation`, and 16 row
+classes changed. The six policy classes have no defined order, so the build enforces what can be enforced:
 when any winner's acceptance is `none_recorded`, the row's class is `none_recorded`; otherwise the row's class is
-one that at least one winner's acceptance carries. A row without winners keeps its owner's class. Stronger
-evidence for one winner stays in the reasons. Every class describes source-host history; a new distribution
-collects its own evidence.
+one that at least one winner's acceptance carries, and where the winners carry several, the edition records the
+one listed last in the policy table. A row without winners keeps its owner's class. Stronger evidence for one
+winner stays in the reasons. Every class describes source-host history; a new distribution collects its own
+evidence.
 
 **Validation the build enforces.** Known layer ids or `cross:<name>`, a layer's identity being its
 `(catalog, layer_id)` pair; the row catalog matches its layer; exactly one of `component_id` (a
@@ -150,6 +158,9 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
   `base_commit` line.
 - The cross rows had no closure assessment; their closure items rest on this edition's reading, and items it
   cannot establish are `unknown`.
+- The acceptance review of 2026-10-01 read one hop from each cited file (a receipt or artifact the cited file
+  links directly) and no further, and it rated part of its corrections below high confidence: by entry, 10 of
+  the 32 medium, 9 medium-high and 3 low.
 - Item 4 for the foundation rows: the Codex lane's cross-family review of all 20 layers (PR #575 at `bbee2a8e`,
   gpt-6.1-sol) was performed on 2026-10-01 and names remaining gaps in every layer. Each foundation row cites its
   review; the item cells keep the closure assessment's reading until the layer records are re-recorded. The same

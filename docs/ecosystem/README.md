@@ -158,9 +158,19 @@ edition's base; verdicts and evidence classes come from fixed enums; a row is
 nothing missing and an open row's `missing` names each item that is not met in
 its own `cN:` segment and no met item; a row with a winner whose acceptance is
 `none_recorded` is `none_recorded`, and otherwise its class is one that a
-winner's acceptance carries; and the edition's `close_only_when_sha256` must
-match the research state's five closure texts. A catalog layer without a row is
-listed as a gap rather than failing the build. The record of this edition is
+winner's acceptance carries (where the winners carry several, the edition
+records the one listed last in the policy table); and the edition's
+`close_only_when_sha256` must match the research state's five closure texts. A
+catalog layer without a row is listed as a gap rather than failing the build.
+
+A winner's acceptance class describes a run that the cited source, or one file
+that source links, shows was run on a host and what it returned. A check that is
+only prescribed, planned, not run or failed is `none_recorded`. Schema, pin,
+hash and contract-test checks are `structural_validation`. A version print is
+metadata, not an acceptance. The `command` names the check the record is about.
+The build cannot read prose, so this rule is held by review, not by a validator:
+an independent review on 2026-10-01 found 32 of the 119 winner classes
+overstated, and the edition was corrected. The record of this edition is
 [`docs/decisions/2026-10-01-new-wsl-architecture-edition.md`](../decisions/2026-10-01-new-wsl-architecture-edition.md).
 
 ## Rebuild and check

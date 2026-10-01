@@ -2111,6 +2111,21 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertGreater(len(hashed), 3)
         self.assertEqual(sorted(hashed - tracked), [])
 
+    def test_the_repository_architecture_record_keeps_the_acceptance_invariant(self):
+        """The record states the rule every winner's acceptance class follows and the dated review that corrected
+        the edition. The build cannot read prose, so this test keeps a later edit from dropping either silently."""
+        record = (ROOT / "docs/decisions/2026-10-01-new-wsl-architecture-edition.md").read_text(encoding="utf-8")
+        record = " ".join(record.split())
+        for sentence in (
+                "A winner's acceptance class describes a run that the cited source, or one file that source links, "
+                "shows was run on a host and what it returned.",
+                "A check that is only prescribed, planned, not run or failed is `none_recorded`.",
+                "A version print is metadata, not an acceptance.",
+                "An independent review on 2026-10-01 found 32 of the 119 winner acceptance classes overstated, 13 "
+                "commands that were only version or status prints and 6 entries it could not settle"):
+            with self.subTest(sentence=sentence[:50]):
+                self.assertIn(sentence, record)
+
 
 if __name__ == "__main__":
     unittest.main()
