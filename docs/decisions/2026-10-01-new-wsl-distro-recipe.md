@@ -209,8 +209,11 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      (`DataSourceWSL`, `"errors": []`) and `/var/lib/cloud/data/status.json` (four stages finished without errors).
    - **How to tell cloud-init did not provision.** The launch prints `Create a default Unix user account:` and
      `OOBE command "/usr/lib/wsl/wsl-setup" failed, exiting` and returns nonzero.
-   - **Fallback, path B (W6).** Re-list, `--unregister` the literal new name, `--import ... --version 2`, then a manual user
-     with the same groups and NOPASSWD drop-in, `[user] default`, the marker and `wsl --terminate <Name>`.
+   - **Fallback, path B (W6).** Re-list, then preserve the failed attempt. `wsl --terminate <Name>` and
+     `wsl --export <Name> Z:\WSL\downloads\<Name>-failed.tar` keep its cloud-init logs, `/var/lib/cloud/instance` and its
+     configuration. Its SHA-256 and size go to the receipt's `failed_attempt_export`. A nonzero export exit throws
+     before any deletion. Then `--unregister` the literal new name, `--import ... --version 2`, then a manual user with
+     the same groups and NOPASSWD drop-in, `[user] default`, the marker and `wsl --terminate <Name>`.
    - **Stage-1 receipt.** The private PowerShell transcript, sanitized into the shape of
      `adoption/templates/wsl/stage1-receipt.example.json`. Its payload keys are those `scripts/validate.py` compares with a
      `receipts[]` row; `kind` is `native_cli_e2e` and `component_ids` is `systemd` (stack row `255.4-1ubuntu8.17`, the
@@ -319,6 +322,12 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | W5 | powershell | `wsl.exe --list --verbose` | the starred line equals W1's |
 | W6 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
 | W6 | powershell | `wsl.exe --list --quiet` | read before unregistering: `<Name>` is the new distribution |
+| W6 | powershell | `wsl.exe --terminate '<Name>'` | `<Name>` stopped before the export; no other distribution stops |
+| W6 | powershell | `wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-failed.tar'` | the failed attempt saved as a tar before `--unregister` deletes its disk |
+| W6 | powershell | `$LASTEXITCODE` | `0` |
+| W6 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }` | no `throw`; a `throw` stops W6 with `<Name>` still registered |
+| W6 | powershell | `(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Hash.ToLowerInvariant()` | the export's SHA-256, recorded in `failed_attempt_export` |
+| W6 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length` | the export's size in bytes, recorded in `failed_attempt_export` |
 | W6 | powershell | `wsl.exe --unregister '<Name>'` | `<Name>` removed, nothing else |
 | W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2` | exit 0 |
 | W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | `done` or `error` when cloud-init ran, `disabled` by `disabled-by-generator` when it found no datasource; recorded (open question 1) |
@@ -504,3 +513,17 @@ Read on 2026-10-01 by the follow-up unit (F11 and the F5 range rule):
   - `adoption/hooks/claude/token-lanes-block.md` and its five role blocks;
   - `tools/adoption/install_claude_profile.py:49-59` (the blocks it copies);
   - `adoption/mcp/claude-user.json`, the `profiles` of `adoption/manifest.json` and `adoption/pins-linux-x86_64.json`.
+
+Read on 2026-10-01 by the review-repair unit (the export before W6's `--unregister`), through Context Mode:
+
+- https://learn.microsoft.com/en-us/windows/wsl/basic-commands (`ms.date` 2025-12-01), with its source
+  `WSL/basic-commands.md` of `MicrosoftDocs/WSL` on `main`. "Export a distribution":
+  `wsl --export <Distribution Name> <FileName>` "Exports a snapshot of the specified distribution as a new distribution
+  file. Defaults to tar format", with `--vhd` for a `.vhdx` file. "Unregister or uninstall a Linux distribution": all
+  data, settings and software of the distribution "will be permanently lost". The page's in-place command,
+  `wsl --import-in-place <Distribution Name> <FileName>`, registers an existing `.vhdx` as a new distribution and
+  repairs nothing.
+- https://documentation.ubuntu.com/wsl/latest/howto/cloud-init/ (redirected to
+  https://ubuntu.com/wsl/docs/latest/howto/cloud-init/, "Last updated on Sep 28, 2026"): no repair of a failed
+  provisioning is documented. The in-place repair of Alternatives 2 stays a reading of WSL's and `wsl-setup`'s source,
+  not a documented procedure.

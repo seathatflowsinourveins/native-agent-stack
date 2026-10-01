@@ -40,6 +40,11 @@
   },
   "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
   "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
+  "failed_attempt_export": {
+    "file": "<W6, path B only: Z:\\WSL\\downloads\\<Name>-failed.tar; null on path A>",
+    "sha256": "<W6: the Get-FileHash line's lower-case hash of that file; null on path A>",
+    "bytes": "<W6: the Get-Item line's Length; null on path A>"
+  },
   "steps": [
     {
       "step": "W4",

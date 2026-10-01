@@ -33,7 +33,10 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   proves it. The checklist and the receipt example record its outcome (registered, not installed or skipped), and the
   record cites Claude Code's MCP page;
 - F5 keeps 65,536 subordinate ids as the stage-1 value and cites Docker's rootless troubleshooting page for the
-  ``lchown <FILE>: invalid argument`` error that says an image needs more; the record lists that page too.
+  ``lchown <FILE>: invalid argument`` error that says an image needs more; the record lists that page too;
+- W6 (review finding 3 of PR #569) stops ``<Name>`` and exports it with Microsoft's ``wsl --export`` into W1's log folder
+  in the same block as ``--unregister`` and before it. A nonzero exit throws before the deletion, the file's SHA-256 and
+  size go to the receipt's ``failed_attempt_export``, and the checklist and the record say so.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell or cloud-init; a pass is not a host run.
@@ -80,6 +83,13 @@ CLAUDE_MCP_PAGE = "https://code.claude.com/docs/en/mcp"
 # F5: Docker says 65,536 entries suffice for most images and names the error an image that needs more produces.
 DOCKER_TROUBLESHOOT = "https://docs.docker.com/engine/security/rootless/troubleshoot/"
 SUBORDINATE_IDS = 65536
+# W6 (review finding 3 of PR #569): the failed attempt is exported before --unregister deletes its disk.
+UNREGISTER = "wsl.exe --unregister '<Name>'"
+TERMINATE = "wsl.exe --terminate '<Name>'"
+EXPORT_RE = re.compile(r"wsl\.exe --export '<Name>' '(?P<file>Z:\\WSL\\downloads\\[^']+\.tar)'")
+EXPORT_GUARD = "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }"
+BASIC_COMMANDS = "https://learn.microsoft.com/en-us/windows/wsl/basic-commands"
+BASIC_COMMANDS_TITLE = '"Basic commands for WSL"'
 
 SHA256_RE = re.compile(r"(?<![0-9a-f])[0-9a-f]{64}(?![0-9a-f])")
 FENCE_RE = re.compile(r"^(?P<indent>[ \t]*)```(?P<lang>[\w-]*)[^\n]*\n(?P<body>.*?)^(?P=indent)```[ \t]*$", re.M | re.S)
@@ -278,7 +288,7 @@ def host_wide_errors(recipe: str) -> list[str]:
             errors.append(f"`{command}` updates WSL, which is the keys lane's decision")
         if re.search(r"(?:--set-default|\s-s)(?:\s|$)", command) and "--set-default-user" not in command:
             errors.append(f"`{command}` changes the default distribution")
-        if re.search(r"--terminate\b|--unregister\b|--manage\b|\s-t(?:\s|$)", command) and "<Name>" not in command:
+        if re.search(r"--terminate\b|--unregister\b|--export\b|--manage\b|\s-t(?:\s|$)", command) and "<Name>" not in command:
             errors.append(f"`{command}` acts on a distribution other than <Name>")
     installs = [command for command in wsl if re.search(r"--install\b", command)]
     if len(installs) != 1:
@@ -418,6 +428,46 @@ def jcodemunch_errors(recipe: str, bootstrap: str, record: str, checklist: str, 
     return errors
 
 
+def failed_attempt_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """Review finding 3 of PR #569 (2026-10-01). ``--unregister`` loses all data of the distribution (Microsoft, "Basic
+    commands for WSL"), so W6 stops ``<Name>`` and exports it with ``wsl --export <Distribution Name> <FileName>`` into
+    W1's log folder. The export comes in the same block as ``--unregister`` and before it, a nonzero exit throws before
+    the deletion, and the file's SHA-256 and size go to the receipt's ``failed_attempt_export``."""
+    blocks = [block for block in step_blocks(recipe, "W6") if UNREGISTER in block]
+    if len(blocks) != 1:
+        return [f"W6 has {len(blocks)} blocks with `{UNREGISTER}`, expected one"]
+    (block,) = blocks
+    before = block[:block.index(UNREGISTER)]
+    exports = [line for line in block if EXPORT_RE.fullmatch(line)]
+    errors = []
+    if len(exports) != 1 or exports[0] not in before:
+        errors.append("W6 does not export '<Name>' into Z:\\WSL\\downloads before `--unregister` in the same block")
+    else:
+        (export,) = exports
+        file = EXPORT_RE.fullmatch(export)["file"]
+        after_export = before[before.index(export) + 1:]
+        if TERMINATE not in before[:before.index(export)]:
+            errors.append("W6 does not stop <Name> with `--terminate` before the export")
+        for needed in (EXPORT_GUARD, f"(Get-FileHash -Algorithm SHA256 -LiteralPath '{file}').Hash.ToLowerInvariant()",
+                       f"(Get-Item -LiteralPath '{file}').Length"):
+            if needed not in after_export:
+                errors.append(f"W6 does not run `{needed}` between the export and `--unregister`")
+    w6 = section(recipe, "W6")
+    for named in ("/var/log/cloud-init*.log", "/var/lib/cloud/instance", "failed_attempt_export", BASIC_COMMANDS_TITLE):
+        if named not in w6:
+            errors.append(f"W6's text does not name {named}")
+    line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **W6**")), "")
+    if ("--export" not in line and "exported" not in line) or "failed_attempt_export" not in line:
+        errors.append("the checklist's W6 line does not require the export and failed_attempt_export")
+    field = receipt.get("failed_attempt_export") if isinstance(receipt, dict) else None
+    if not isinstance(field, dict) or set(field) != {"file", "sha256", "bytes"} or not all(
+            isinstance(value, str) and value.startswith("<W6") for value in field.values()):
+        errors.append("the receipt example has no failed_attempt_export with W6 placeholders for file, sha256 and bytes")
+    if "wsl --export <Distribution Name> <FileName>" not in record or BASIC_COMMANDS not in record:
+        errors.append("the record does not cite Microsoft's `wsl --export` form from Basic commands for WSL")
+    return errors
+
+
 def subordinate_id_errors(recipe: str, record: str) -> list[str]:
     """F5 adds 65,536 subordinate uids and gids, the stage-1 value. A wider range is an image-set need: Docker's rootless
     troubleshooting page gives the error an image that needs more produces, and both the page and the record cite it."""
@@ -551,7 +601,8 @@ class HostWideRuleTests(unittest.TestCase):
     def test_the_check_rejects_shutdown_update_wslconfig_default_and_foreign_targets(self):
         recipe = read(RECIPE)
         for added in ("wsl.exe --shutdown", "wsl.exe --update", "notepad.exe $env:USERPROFILE\\.wslconfig",
-                      "wsl.exe --set-default <Name>", "wsl.exe --terminate Ubuntu", "wsl.exe --unregister Ubuntu"):
+                      "wsl.exe --set-default <Name>", "wsl.exe --terminate Ubuntu", "wsl.exe --unregister Ubuntu",
+                      "wsl.exe --export Ubuntu 'Z:\\WSL\\downloads\\Ubuntu.tar'"):
             with self.subTest(added=added):
                 mutant = recipe.replace("```powershell\n", f"```powershell\n{added}\n", 1)
                 self.assertTrue(host_wide_errors(mutant))
@@ -664,6 +715,41 @@ class JCodeMunchStepTests(unittest.TestCase):
             with self.subTest(mutant=name):
                 self.assertNotEqual(mutant, (recipe, bootstrap, record, checklist, receipt))
                 self.assertTrue(jcodemunch_errors(*mutant))
+
+
+class FailedAttemptExportTests(unittest.TestCase):
+    """Review finding 3 of PR #569: W6 preserves the failed attempt before `--unregister` deletes its disk."""
+
+    def inputs(self):
+        return read(RECIPE), read(RECORD), read(CHECKLIST), json.loads(read(RECEIPT_EXAMPLE))
+
+    def test_w6_exports_the_failed_attempt_before_unregistering(self):
+        self.assertEqual(failed_attempt_errors(*self.inputs()), [])
+
+    def test_the_check_rejects_an_unregister_without_a_preceding_export(self):
+        recipe, record, checklist, receipt = self.inputs()
+        w6 = section(recipe, "W6")
+        (export,) = [line for line in w6.splitlines() if EXPORT_RE.fullmatch(line)]
+        unregister = UNREGISTER + "\n"
+        self.assertEqual(w6.count(unregister), 1)
+        unexported = {key: value for key, value in receipt.items() if key != "failed_attempt_export"}
+        mutants = {
+            "no export": (recipe.replace(w6, w6.replace(export + "\n", "")), record, checklist, receipt),
+            "export after unregister": (recipe.replace(w6, w6.replace(export + "\n", "").replace(
+                unregister, unregister + export + "\n")), record, checklist, receipt),
+            "no guard": (recipe.replace(w6, w6.replace(EXPORT_GUARD + "\n", "")), record, checklist, receipt),
+            "no stop before the export": (recipe.replace(w6, w6.replace(TERMINATE + "\n" + export, export)), record,
+                                          checklist, receipt),
+            "no receipt field": (recipe, record, checklist, unexported),
+            "checklist without the export": (recipe, record, checklist.replace("failed_attempt_export", "the receipt"),
+                                             receipt),
+            "record without the source": (recipe, record.replace(BASIC_COMMANDS, "https://example.invalid"), checklist,
+                                          receipt),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(mutant, (recipe, record, checklist, receipt))
+                self.assertTrue(failed_attempt_errors(*mutant))
 
 
 class SubordinateIdTests(unittest.TestCase):

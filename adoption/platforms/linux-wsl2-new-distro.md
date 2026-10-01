@@ -200,9 +200,25 @@ not 0. WSL keeps the first-run setup pending. Go to W6.
 `--unregister` deletes the distribution's disk. Read the list first and run it only on the literal new name, never on the
 workstation's.
 
+`--unregister` loses all data of the distribution permanently (Microsoft, "Basic commands for WSL"), including the failed
+attempt's cloud-init logs, `/var/log/cloud-init*.log`, the instance directory `/var/lib/cloud/instance` and its
+configuration. The transcript keeps only the console markers. Preserve the attempt first. Stop `<Name>`, then export it
+with Microsoft's `wsl --export <Distribution Name> <FileName>`, which writes a snapshot of the distribution as a tar
+file by default. The export goes into W1's log folder, and its SHA-256 and size go into the receipt's
+`failed_attempt_export`. A nonzero export exit throws before `--unregister`, so `<Name>` stays registered with its disk.
+To diagnose path A, read in the tar the cloud-init logs, the instance directory and, when the run got that far,
+`/var/lib/cloud/data/result.json` and `status.json`. The tar holds the rendered user-data with `<WSL_USER>`, so it stays
+private in `Z:\WSL\downloads` like the transcript; only its name, SHA-256 and size enter the receipt.
+
 ```powershell
 $env:WSL_UTF8 = '1'
 wsl.exe --list --quiet
+wsl.exe --terminate '<Name>'
+wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-failed.tar'
+$LASTEXITCODE
+if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
+(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Hash.ToLowerInvariant()
+(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length
 wsl.exe --unregister '<Name>'
 wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2
 wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long
@@ -473,6 +489,7 @@ transcript and the F outputs:
   - the three hashes and the `wsl.exe --version` lines;
   - the default distribution before and after;
   - `creation_path` (`A` or `B`), with the W5 markers when B was taken;
+  - on path B, `failed_attempt_export`: the file name, SHA-256 and size of W6's export of the failed attempt;
   - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
