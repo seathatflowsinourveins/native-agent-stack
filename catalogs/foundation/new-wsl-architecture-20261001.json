@@ -43,9 +43,11 @@
       {"source_path": "adoption/bootstrap.md"},
       {"source_path": "catalogs/us-equities/runtime-target.json"},
       {"source_path": "catalogs/saturation/ledger.json"},
-      {"pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
-      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
-      {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}}
+      {"pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
+      {"pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+      {"pending_source": {"path": "catalogs/us-equities/convergence-20260926.json", "pull_request": 358, "commit": "b0eb7a11"}},
+      {"pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
+      {"pending_source": {"path": "evidence/artifacts/layer-closure-assessment-20261001/foundation.json", "pull_request": 573, "commit": "5adcc3a4"}}
     ]
   },
   "rows": [
@@ -350,7 +352,7 @@
       "reasons": [
         {"text": "Serena is the layer winner for exact symbols and references; ast-grep, codebase-memory-mcp and jCodeMunch are conditional lanes, and a known-source read with rg comes first.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "The token-efficiency profile carries Serena; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes until each has a reviewed pin on both platforms.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}}
+        {"text": "On the Harbor E2E (36 SWE-bench Verified tasks, one trial per arm), jCodeMunch raised whole-task cost by a geometric-mean 1.387 [1.23, 1.553] and Serena's 1.063 [0.952, 1.159] is inconclusive.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}}
       ],
       "evidence_class": "upstream_example_or_native_operation",
       "alternatives": [
@@ -360,11 +362,13 @@
       ],
       "new_host_steps": [
         "Serena installs with the token-efficiency profile as a uv tool from its pinned git commit into the ecosystem prefix (UV_TOOL_DIR and UV_TOOL_BIN_DIR), where the rendered MCP entries expect ${ECO_ROOT}/bin/serena.",
-        "Install ast-grep, codebase-memory-mcp and jCodeMunch only for a task that needs them, with the recipe commands; register jCodeMunch per project, never at user scope.",
+        "Install ast-grep, codebase-memory-mcp and jCodeMunch only for a task that needs them, with the recipe commands; register jCodeMunch per project, never at user scope (step F11 of the new-distro recipe records the registration state).",
         "For codebase-memory-mcp, write an MCPorter config with CBM_ALLOWED_ROOT and call index_repository explicitly; its database lives outside the repository.",
         "Record a find_referencing_symbols receipt with argv, exit code, returned span and reference set."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "Four of the six SubagentStart carrier blocks name jCodeMunch tools, while no adoption profile installs jcodemunch-mcp, it has no Linux pin and no script registers it: after stage 2 alone the carrier names a server that is not there. Give it a Linux pin and an install step, or stop the carrier naming it.", "kind": "lane", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}}
+      ],
       "owner_lane": "foundation",
       "notes": "Serena's pin is a development commit (upstream declares 2.0.0.dev0); the commit is its identity."
     },
@@ -571,7 +575,10 @@
         "Run `ai-memory init` and edit its config before starting hooks or the service, then run `ai-memory serve` on the chosen port as a user service (no unit is committed; adapt upstream's packaging/systemd/ai-memory-user.service).",
         "Install the hooks for claude-code and codex against the new URL, then record a write and read-back receipt."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "Hindsight 0.10.2, the memory lane's fit target, enters only through this layer's comparison. The production program reports stale and paused pages and a held cold seed for it on the current host; its receipts are not published, and a new distribution fixes neither a provider-route timeout nor an adapter's semantics.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}},
+        {"text": "The operator decision on the 2026-09-23 live-store isolation breach on the workstation (rewrite or collect the live wiki history, compact the database again) is open; the new distribution starts with a fresh store.", "kind": "user_side", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__durable-memory/README.md"}
+      ],
       "owner_lane": "foundation",
       "notes": "Upstream moved to v2.5.2 on 2026-10-01; a pin move needs its own qualification and a forward-only store migration plan."
     },
@@ -713,9 +720,9 @@
       },
       "reasons": [
         {"text": "The token-efficiency adoption profile (14 pinned components) was accepted as the selection on 2026-09-30 in #540; jCodeMunch, codebase-memory-mcp and ast-grep stay outside it as optional, task-appended lanes.", "source_path": "docs/decisions/2026-09-30-task-model-routing.md"},
-        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
-        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
-        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
+        {"text": "On Harbor v0.23.0 (288 trials, 36 SWE-bench Verified tasks, Claude Code 2.1.285, Sonnet 5.5 at medium effort, one trial per arm and task) no tool lowered whole-task cost: context-mode raised it by a geometric-mean 1.34 [1.209, 1.456] and the five-tool stack by 1.301 [1.176, 1.411] (p at most 0.0006), while headroom 0.983, rtk 1.027 and serena 1.063 are inconclusive against the A/A control 1.045 [0.93, 1.20].", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+        {"text": "Context-mode used its MCP tools in 0 of 36 trials and the full stack in 1 of 36, so those rows mostly price the tools' presence; mean wall time rose from 35.1 s to 107.2 s for context-mode and from 32.8 s to 108.9 s for the full stack.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+        {"text": "Resolve rates: the lean base 0.778 (28 of 36) against the full stack 0.667 (24 of 36); no Harbor trial spawned a subagent, so per-subagent attribution is untested there.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
         {"text": "Agent-tool and workflow children carry 81.3% of the list-price-estimated dollars on the source host, so the regime that dominates spend is the one Harbor did not measure.", "source_path": "docs/decisions/2026-09-29-token-spend-attribution.md"}
       ],
       "evidence_class": "local_integration_check",
@@ -767,7 +774,7 @@
           "pin": "v0.23.0",
           "pin_source": "blueprints/runtime-workers/openhands/pins.json:62",
           "install": {"command": "uv tool install harbor==0.23.0", "kind": "upstream_documented", "url": "https://github.com/harbor-framework/harbor"},
-          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
+          "acceptance": {"command": "harbor run on the pilot dataset with subagent use forced, then check that each trial's saved sessions tree carries subagents/agent-*.jsonl", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
           "upstream_currency": {"latest_release": "v0.23.0 (2026-09-12)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/harbor-framework/harbor/releases"}
         }
       ],
@@ -781,7 +788,8 @@
         "missing": "c1: the layer record cites a superseded receipt, its candidate dispositions disagree with the verdict, and the Inspect AI and MLflow entries predate the gap-wave2 receipts; c2: seven of eight unclaimed manifest components carry no omission reason and the sweep candidates are not in the record; c3: no representative comparison of semantic advice on fresh, independently labelled cases, no lifecycle receipt from the new WSL host, and the Harbor pilot that forces subagent use has not run; c4: every layer-level review records open gaps; c5: no current closure record."
       },
       "reasons": [
-        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "20d6c195"}},
+        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
+        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks failed to pull at 65,536 with `lchown <path>: invalid argument` and pulled at 262,144.", "pending_source": {"path": "evidence/receipts/harbor-e2e-token-tools-20260930.json", "pull_request": 570, "commit": "87c74d5d"}},
         {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
         {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
         {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"}
@@ -795,18 +803,18 @@
       ],
       "new_host_steps": [
         "Install promptfoo 0.123.1 into its prefix with npm (it is in no adoption profile) and Playwright from the wsl-application blueprint's lock with its verified Chrome for Testing archive.",
-        "For the Harbor runner, install rootless Docker for the user and widen /etc/subuid and /etc/subgid for that user to 262,144 ids (the new-distro recipe's F5 allocates 65,536), set the egress allowlist and stage the Node v22.23.3 tarball pre-step that the arms use.",
-        "Mint the native Claude OAuth token for Harbor as a user action (`claude setup-token`), kept in the kernel keyring as claude-oauth-token; never copy it from another host.",
+        "For the Harbor runner, install rootless Docker for the user with the 65,536 subordinate ids of the new-distro recipe's F5, set the egress allowlist and stage the Node v22.23.3 tarball pre-step that the arms use. Widen /etc/subuid and /etc/subgid only when a pull fails with `lchown <FILE>: invalid argument`, and record the image, the error and the range chosen.",
+        "Mint the native Claude OAuth token for Harbor as a user action (`claude setup-token`), kept in its 0600 provider file with the kernel keyring as the per-boot cache; never copy it from another host.",
         "Run `uv tool install harbor==0.23.0`, then the pilot first: force subagent use and check that each trial's saved sessions tree carries subagents/agent-*.jsonl.",
         "Record install-and-control host receipts for promptfoo and Playwright, keeping every failed attempt."
       ],
       "gates": [
         {"text": "The native Claude OAuth token for Harbor runs is minted by the user with `claude setup-token`.", "kind": "user_side", "source_path": "docs/decisions/2026-09-29-key-management.md"},
         {"text": "The Gate A Harbor pilot (forced subagent use) runs before any Harbor result supports a multi-agent claim.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"},
-        {"text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.", "kind": "lane", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}}
+        {"text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.", "kind": "lane", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}}
       ],
       "owner_lane": "foundation: Gate A",
-      "notes": "Harbor's prerequisites (rootless Docker with 262,144 subordinate ids, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane and are not yet in the repository; the pilot's record should land them. Inspect AI is the fallback runner."
+      "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner."
     },
     {
       "layer_id": "ci-supply-chain",
@@ -893,11 +901,11 @@
           "pin": "255.4-1ubuntu8.17",
           "pin_source": "manifests/stack.json:1448",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
-          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
+          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version; upstream v255 source is cited for semantics only", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
         }
       ],
-      "verdict": "selection_of_record_open",
+      "verdict": "comparison_required",
       "closure": {
         "c1": "met",
         "c2": "partial",
@@ -909,7 +917,8 @@
       "reasons": [
         {"text": "Dagu gives workflow run history, cancel and checkpointed step retry; the systemd user manager gives deadlines, control-group kill and descendant cleanup.", "source_path": "catalogs/landscape/foundation.json"},
         {"text": "systemd is the Ubuntu 24.04 distribution package; the stack pins the package version and cites upstream v255 source for semantics only.", "source_path": "manifests/stack.json"},
-        {"text": "Dagu 2.16.6 failed its preregistered SIGKILL recovery case: without a scheduler, all retries within the 150 s bound were refused; it recovered (about 182 s) only in a post-hoc variant with a scheduler started after the kill, labelled a deviation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"}
+        {"text": "Dagu 2.16.6 failed its preregistered SIGKILL recovery case: without a scheduler, all retries within the 150 s bound were refused; it recovered (about 182 s) only in a post-hoc variant with a scheduler started after the kill, labelled a deviation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/6-executed-challenger-comparison.json"},
+        {"text": "The program record treats this layer as comparison required after that failure, while the research state still reads on_requirement_change and the layer record keep_but_compare; the re-record pass reconciles the label. The Temporal arm ran the native development server, which is developer evidence only, so the failure reopens the comparison and selects nothing.", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -923,7 +932,9 @@
         "Install Dagu 2.16.6 from its release archive after a gh sign-in; `bash adoption/bootstrap-linux.sh --profile research-runtime` exits 3 because nine of its eleven components lack a Linux pin.",
         "Run `\"$DAGU\" version`, then one owned job with a stop, retry and checkpoint check, and record the host receipts."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "The reopened comparison (Dagu against Temporal and the Restate and Dagster arms on one fixture, within the preregistered bound) decides the layer; the edition installs the selection of record until it runs.", "kind": "lane", "source_path": "catalogs/landscape/foundation.json"}
+      ],
       "owner_lane": "foundation",
       "notes": "The Dagu recipe goes from the checksum check straight to `$DAGU version`; the extraction and placement step is not recorded. With its own preregistered SIGKILL case failed, this layer is a reopen candidate rather than nearly closed."
     },
@@ -971,7 +982,8 @@
       },
       "reasons": [
         {"text": "FastAPI, Next.js and a source-built PostgreSQL are the layer winners; React is an overlap recorded with the UI server.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "The application-delivery blueprint pins every tool and runs `make verify` on synthetic data only.", "source_path": "blueprints/convergence-practice/application-delivery/README.md"}
+        {"text": "The application-delivery blueprint pins every tool and runs `make verify` on synthetic data only.", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
+        {"text": "Next.js 16.3.8 (2026-09-30) fixes a High-severity advisory, server-side request forgery in image optimization (GHSA-cjq9-62q9-8jv4), and five Medium ones; the winner entry (16.3.5) and the lock (16.3.6) are both below it (release page read 2026-10-01).", "url": "https://github.com/vercel/next.js/releases/tag/v16.3.8"}
       ],
       "evidence_class": "local_integration_check",
       "alternatives": [
@@ -985,7 +997,9 @@
         "In a task-owned prefix with a clone of origin/main, run `make setup`, then the PostgreSQL install, init and start targets.",
         "Run `make verify` at Next.js 16.3.6 and record the host receipt, then a database restore check."
       ],
-      "gates": [],
+      "gates": [
+        {"text": "Move the Next.js pin to 16.3.8 or later and repeat `make verify` before this layer hosts anything reachable.", "kind": "lane", "url": "https://github.com/vercel/next.js/releases/tag/v16.3.8"}
+      ],
       "owner_lane": "foundation",
       "notes": "Only needed when the new distribution hosts an application; nothing else depends on this layer."
     },
@@ -1587,7 +1601,7 @@
           "pin": "255.4-1ubuntu8.17",
           "pin_source": "manifests/stack.json:1448",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
-          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
+          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
         },
         {
@@ -1763,12 +1777,12 @@
       ],
       "verdict": "comparison_required",
       "closure": {
-        "c1": "partial",
+        "c1": "met",
         "c2": "partial",
         "c3": "partial",
-        "c4": "partial",
+        "c4": "unmet",
         "c5": "partial",
-        "missing": "c1: three alternatives have empty evidence references and the five omitted sweep entries have no disposition; c2: no reconciled candidate union exists, and ml4t-backtest, the one alternative with a same-input one_zero pass, is in neither set; c3: the alternative comparisons cover only one_zero under the v1 contract, and the other sealed v2 cases stay blocked; c4: findings that touch the layer (the parity corrections, the IBKR 1.231.0 scope, the LEAN payable-date caveat) are not applied; c5: no closure record (the research state still says comparison_required and 'qualify Nautilus parity')."
+        "missing": "c2: no reconciled union exists across the 2026-09-22 layer entry, the four landscape manifests and the 2026-09-26 sweep, their labels conflict, and four omitted challengers and six manifest-only candidates are missing; c3: only one_zero of the six SPY cases passes, the other five wait on the undecided costs-and-rounding and margin-and-adaptive-state mappings, and no alternative has a same-input comparison or a new-host lifecycle receipt; c4: the 2026-09-26 findings stay open (the entry's stale BLOCKED parity text, a circular winner rationale without a challenger comparison, the omitted challengers, the LEAN payable-date caveat); c5: no closure record, and the 2026-09-22 residuals and triggers are stale. Item 1 is met with a caveat: the layer's direct evidence references still cite the v1 verdict, and its text contradicts the recorded pass."
       },
       "reasons": [
         {"text": "NautilusTrader 2.0.0rc5 is the user-selected destination engine; LEAN stays the retained historical comparison engine; the Alpaca path is a separate boundary.", "source_path": "catalogs/us-equities/runtime-target.json"},
@@ -1922,8 +1936,8 @@
         "c2": "partial",
         "c3": "unmet",
         "c4": "unmet",
-        "c5": "unmet",
-        "missing": "c1: the layer entry (checked 2026-09-22) does not cite the 2026-09-23 gap-wave2 receipts that settled or advanced most of its open gaps; c2: the 2026-09-22 packet, the layer card, the convergence record and the sweep differ, and pyhrp, riskkit, the Nautilus RiskEngine, PortfolioAnalytics and ibflex are not folded in; c3: no fresh preregistered matched comparison, no leverage-ladder paper receipts, no broker-fill reconciliation under RiskEngine limits for Alpaca and IBKR, and no financing and liquidity realism; c4: every recorded review reports open material gaps; c5: no closure record."
+        "c5": "partial",
+        "missing": "c1: the selection is inconsistent (skfolio is the verdict winner yet conditional in the same entry, absent from the current choice and from runtime-target.json, and its optimizers are unaccepted in the stack); c2: the layer entry was not re-recorded from the 2026-09-26 convergence record, and 11 of its 16 candidates and both omitted candidates have no disposition; c3: no fresh single-execution preregistered matched comparison, no Alpaca paper RiskEngine checks with fill reconciliation, no leverage-ladder receipts, no IBKR rc5 acceptance and no new-host lifecycle run; c4: no independent review after the GPT-6 corrections and the gap-wave2 results are absorbed; c5: no closure record, and the 2026-09-22 residuals and triggers are stale."
       },
       "reasons": [
         {"text": "The engine destination, LEAN as the comparison oracle and the Alpaca boundary come from runtime-target.json; the 2026-09-22 verdict keeps skfolio for its walk-forward splitter only.", "source_path": "catalogs/us-equities/runtime-target.json"},
@@ -1982,7 +1996,7 @@
           "pin": "255.4-1ubuntu8.17",
           "pin_source": "manifests/stack.json:1448",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/us-equities/worker-supervision/README.md"},
-          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
+          "acceptance": {"command": "systemctl is-system-running --wait; systemctl --user is-system-running --wait", "evidence_class": "upstream_example_or_native_operation", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
           "upstream_currency": {"latest_release": "255.4-1ubuntu8.17 is the published Ubuntu 24.04 (noble) updates and security version", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://launchpad.net/ubuntu/noble/+source/systemd"}
         },
         {
@@ -2296,7 +2310,7 @@
         }
       ],
       "verdict": "selection_of_record_open",
-      "closure": {"c1": "unknown", "c2": "unknown", "c3": "unknown", "c4": "unknown", "c5": "unknown", "missing": "assessment pending"},
+      "closure": {"c1": "partial", "c2": "partial", "c3": "partial", "c4": "unmet", "c5": "unmet", "missing": "c1: no selection of record covers this layer (runtime-target.json has no security entry), and the verdict's own reopening trigger fired on 2026-09-23 without a re-run, so the Grype, Syft and gitleaks winner set is formally open; c2: no newcomer search ran for the 2026-09-22 set, and Trivy and four of the five GPT-6 omissions have no disposition in the layer entry; c3: Grype has no target-host receipt, the challenger arms that fired the trigger were not followed by a re-judged comparison, and no gitleaks comparison against Betterleaks exists for this layer; c4: the latest review returned needs_changes and its corrections are not applied; c5: no closure record."},
       "reasons": [
         {"text": "The verdict retains Grype, Syft and gitleaks; Grype 0.119.0 has no pin of record in the stack, so it is not carried as a winner here.", "source_path": "catalogs/landscape/us-equities.json"},
         {"text": "Syft and gitleaks are the same pins as the foundation rows ci-supply-chain and secrets-credentials.", "source_path": "manifests/stack.json"}
@@ -2312,7 +2326,7 @@
       ],
       "gates": [],
       "owner_lane": "trading",
-      "notes": "provisional_wording: the trading lane owner writes the final wording. The trading closure assessment covers eleven layers and not this one, so every closure item here is unknown."
+      "notes": "provisional_wording: the trading lane owner writes the final wording. Closure items follow the trading closure assessment of 2026-10-01 (read at PR #358's head 4d11709c); winners carry only pins of record from runtime-target.json and the adoption profiles."
     },
     {
       "layer_id": "cross:wsl-distro",
@@ -2329,16 +2343,16 @@
         "missing": "c1: the selection (Canonical's Ubuntu 24.04.5 .wsl image, sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e) lands with PR #569 and is not on main at this edition's base; c2: its alternatives (26.04.1 queued as a comparison; creation path B) are recorded only in #569; c3: no host has executed stage 1 or first boot, and the first run records the stage-1 receipt; c4: no review of a host run exists; c5: no closure record."
       },
       "reasons": [
-        {"text": "PR #569 selects Canonical's Ubuntu 24.04.5 LTS image ubuntu-24.04.5-wsl-amd64.wsl, pinned by sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e and checked against both Canonical's SHA256SUMS and Microsoft's distribution catalog before install.", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "eabe7654"}},
-        {"text": "Creation path: a cloud-init user-data file gives the distribution a passwordless default user (NOPASSWD sudo, locked password, uid 1000), then `wsl --install --from-file ... --no-launch` and a first launch with standard input at end of file; no .wslconfig change, no `wsl --update`, never `wsl --shutdown`.", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
-        {"text": "26.04.1 LTS is queued as a bounded comparison before any switch (the bootstrap under python3 3.14, uutils coreutils and sudo-rs).", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "eabe7654"}},
+        {"text": "PR #569 selects Canonical's Ubuntu 24.04.5 LTS image ubuntu-24.04.5-wsl-amd64.wsl, pinned by sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e and checked against both Canonical's SHA256SUMS and Microsoft's distribution catalog before install.", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "344a69ff"}},
+        {"text": "Creation path: a cloud-init user-data file gives the distribution a passwordless default user (NOPASSWD sudo, locked password, uid 1000), then `wsl --install --from-file ... --no-launch` and a first launch with standard input at end of file; no .wslconfig change, no `wsl --update`, never `wsl --shutdown`.", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
+        {"text": "26.04.1 LTS is queued as a bounded comparison before any switch (the bootstrap under python3 3.14, uutils coreutils and sudo-rs).", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "344a69ff"}},
         {"text": "On main, the linux-wsl2-x86_64 platform profile is accepted while second-machine acceptance is pending; the only fresh-userspace qualification ran in an Ubuntu Base 24.04.5 filesystem on the existing WSL kernel, which is not a booted new PC.", "source_path": "adoption/platforms/linux-wsl2.md"},
         {"text": "The bootstrap's release step 0 checks out tag v2026.09.26.2, which installs older pins (codex 0.155.1, claude-code 2.1.281); the full-profile run refuses any HEAD other than origin/main, so the new distribution starts from a clone of main.", "source_path": "adoption/bootstrap.md"}
       ],
       "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Ubuntu 26.04.1 LTS", "verdict": "queued as a bounded comparison unit before any switch", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "eabe7654"}},
-        {"name": "Path B: `wsl --import` and a manual user", "verdict": "fallback only after the first launch shows that cloud-init did not provision", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}}
+        {"name": "Ubuntu 26.04.1 LTS", "verdict": "queued as a bounded comparison unit before any switch", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "344a69ff"}},
+        {"name": "Path B: `wsl --import` and a manual user", "verdict": "fallback only after the first launch shows that cloud-init did not provision", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}}
       ],
       "new_host_steps": [
         "Stage 1 on Windows (W1 to W6 of the recipe): preflight with no Ubuntu Pro cloud-init files; download ubuntu-24.04.5-wsl-amd64.wsl and verify its sha256 against both publications; render %USERPROFILE%\\.cloud-init\\<Name>.user-data from adoption/templates/wsl/cloud-init.user-data.template; `wsl.exe --install --from-file <image> --name <Name> --location <dir> --no-launch`; first launch with standard input at end of file; confirm cloud-init reports disabled by its marker file.",
@@ -2347,11 +2361,12 @@
         "Credentials next (row cross:credential-practice): native sign-ins and the 0700 store before any keyed tool.",
         "Stage 2: `adoption/bootstrap-linux.sh --profile token-efficiency`, then native sign-in (`codex login`, then `claude`), with the Context Mode plugin started once before `adoption/bootstrap-linux.sh --profile token-efficiency --configure-full-profile --host <host>` applies the settings (row token-efficiency).",
         "Then the layers outside the profile, each from its row: isolation, workers and git tools; documents and web research; semantic retrieval after the GPU check; quality, runtime workers and the Harbor harness after rootless Docker; observability last, after the host file's port map.",
-        "F10: install the Windows Terminal fragment with profile names that carry <Name>, then prove `type -P claude codex` and test each printed path with test -f and test -x."
+        "F10: install the Windows Terminal fragment with profile names that carry <Name>, then prove `type -P claude codex` and test each printed path with test -f and test -x.",
+        "F11: in a login shell, register jCodeMunch for the clone when its binary is installed (the `claude mcp add --scope local jcodemunch` command of adoption/bootstrap.md), and record registered, not installed or skipped in the stage-1 receipt."
       ],
       "gates": [
-        {"text": "Stage 1 runs in the user's own PowerShell on the Windows host; WSL package updates stay the keys lane's decision.", "kind": "user_side", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "eabe7654"}},
-        {"text": "The recipe, its decision record and its templates under adoption/templates/wsl/ land with PR #569.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "eabe7654"}}
+        {"text": "Stage 1 runs in the user's own PowerShell on the Windows host; WSL package updates stay the keys lane's decision.", "kind": "user_side", "pending_source": {"path": "adoption/platforms/linux-wsl2-new-distro.md", "pull_request": 569, "commit": "344a69ff"}},
+        {"text": "The recipe, its decision record and its templates under adoption/templates/wsl/ land with PR #569.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md", "pull_request": 569, "commit": "344a69ff"}}
       ],
       "owner_lane": "foundation",
       "notes": "No selection of record on main at this edition's base: the image, its hash and the creation path land with PR #569 (adoption/platforms/linux-wsl2-new-distro.md, docs/decisions/2026-10-01-new-wsl-distro-recipe.md, adoption/templates/wsl/). The next edition re-rates this row once #569 merges."
@@ -2399,7 +2414,8 @@
         "Run the offline tests (tests.test_runtime_worker_openhands, tests.test_openhands_lock_binding), the P0-P2 isolation probe, then run-e2e.sh on one official task, and record the host receipt."
       ],
       "gates": [
-        {"text": "The runtime-worker roster qualification lands with PR #535; its candidates stay unaccepted until then.", "kind": "lane", "pending_source": {"path": "blueprints/runtime-workers/README.md", "pull_request": 535, "commit": "1195e212"}}
+        {"text": "The runtime-worker roster qualification lands with PR #535; its candidates stay unaccepted until then.", "kind": "lane", "pending_source": {"path": "blueprints/runtime-workers/README.md", "pull_request": 535, "commit": "1195e212"}},
+        {"text": "AgentRelay and Relaycast have no catalog layer: they enter only once a layer or a cross row with its own decision record names them. The production program reports that automatic Codex PTY submission through AgentRelay is held on the current host; its receipts are not published.", "kind": "lane", "pending_source": {"path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md", "pull_request": 573, "commit": "5adcc3a4"}}
       ],
       "owner_lane": "foundation",
       "notes": "AgentRelay and Relaycast commits were confirmed upstream on 2026-10-01 (release commits for v13.0.0 and v8.14.0); a pin of record needs a repository record and its own qualification."

@@ -26,15 +26,19 @@ The inputs already existed in the repository, spread over several records:
 - the acceptance classes of `docs/acceptance-evidence-policy.md:26-33`.
 
 A closure assessment of the 20 foundation layers (2026-10-01, at `3361b342`, each assessment refuted and
-corrected by a second reviewer), a closure assessment of 11 of the 12 us-equities layers (2026-10-01, at PR
+corrected by a second reviewer), a closure assessment of the 12 us-equities layers (2026-10-01, at PR
 #358's head `4d11709c`, same method) and the Gate A owner's draft for three layers fed this edition as working
-input. Neither is a repository record, so the edition carries only the facts that a repository path or a
-URL read on 2026-10-01 supports, each cited where it is used. The core files those assessments cite
+input. The foundation assessment lands as `evidence/artifacts/layer-closure-assessment-20261001/` with PR #573; the
+trading one stays with the trading lane owner. The edition therefore carries only the facts that a repository path
+or a URL read on 2026-10-01 supports, each cited where it is used. Item statuses are one assessor and refuter
+pair's judgment: where a layer ran twice, the border between met and partial or between partial and unmet moved in
+some cells, and no run makes a layer final. The foundation rows use the first complete result per layer and the
+us-equities rows the last, which is the basis of that assessment's synthesis. The core files those assessments cite
 (`catalogs/landscape/foundation.json`, `catalogs/saturation/ledger.json`, `manifests/stack.json`,
 `adoption/pins-linux-x86_64.json`, `catalogs/foundation/manifest.json`) are unchanged between `3361b342` and
-this edition's base. Three sources are not on main yet: the new-distribution recipe (PR #569, head `eabe7654`),
-the Harbor E2E receipt (PR #570, head `20d6c195`) and the trading convergence record (PR #358, head
-`b0eb7a11`).
+this edition's base. Four sources are not on main yet: the new-distribution recipe (PR #569, head `344a69ff`),
+the Harbor E2E receipt (PR #570, head `87c74d5d`), the trading convergence record (PR #358, head `b0eb7a11`) and
+the program record with the foundation assessment (PR #573, head `5adcc3a4`).
 
 ## Alternatives
 
@@ -77,7 +81,9 @@ trials. Upstream and user-side gates are gates.
 install default but marks it contested), `comparison_required` (from the research state or the row's owner),
 `new_host_required` (the remaining evidence needs another host) and `no_selection` (no pin of record exists).
 The research-state status maps directly; `on_requirement_change` becomes `selection_of_record_open`.
-Token efficiency is `provisional` on the Gate A owner's call.
+Token efficiency is `provisional` on the Gate A owner's call. Scheduling and supervision is
+`comparison_required` on the program record's call (PR #573, decision 1): its selected Dagu 2.16.6 failed the
+preregistered SIGKILL case.
 
 **Evidence classes.** The six classes of `docs/acceptance-evidence-policy.md:26-33`, plus `source_review` and
 `none_recorded`, two levels below the table: AGENTS.md keeps metadata, pinned source review and native
@@ -94,15 +100,14 @@ classes, closure states, install kinds and gate kinds; `closed` if and only if a
 non-empty `missing` for every open row; `no_selection` if and only if there are no winners. A catalog layer
 without a row is listed on the page, not a build failure, so adding a layer elsewhere never breaks the page.
 
-**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 21
-`selection_of_record_open`, 13 `comparison_required`, 1 `no_selection`, 1 `provisional`, 1
+**This edition's rows.** 37 rows: 20 foundation, 12 us-equities, 5 cross. Closed: none. 20
+`selection_of_record_open`, 14 `comparison_required`, 1 `no_selection`, 1 `provisional`, 1
 `new_host_required`. Every assessed row has at least one closure item unmet or partial, and no review item
-(c4) is met. Eleven us-equities rows follow the trading closure assessment: their winners are the components
+(c4) is met. The twelve us-equities rows follow the trading closure assessment: their winners are the components
 the layer's current choice names that have a pin of record (runtime-target.json for the engine, the brokers
 and the adaptive paper engine; stack pins for profile components), while the 2026-09-22 verdict winners
-without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow, Grype) stay alternatives. The
-assessment does not cover security-supply-chain, whose closure items stay `unknown` with
-`missing: "assessment pending"`. Every trading row is marked `provisional_wording` in its notes for the
+without such a pin (DVC, pandera, agent-retrieval-bench, Inspect AI, MLflow, Grype) stay alternatives.
+Every trading row is marked `provisional_wording` in its notes for the
 trading lane owner. The backtesting-engine row carries the dispute recorded at PR #358's head `b0eb7a11`.
 Paper results appear only as fills and passed trials (the 2026-09-29 Alpaca series: 11 of 13 trials passed,
 41 entries and 39 exits filled). The cross row for the distribution is `no_selection` on main: its image,
@@ -122,12 +127,16 @@ token-efficiency profile, native sign-in, the Context Mode plugin started once b
   when the edition was written.
 - The cross rows had no closure assessment; their closure items rest on this edition's reading, and items it
   cannot establish are `unknown`.
-- The 262,144 subordinate-id requirement for the Harbor harness comes from the Gate A lane and has no
-  repository record yet; the new-distribution recipe allocates 65,536.
+- Subordinate ids for the Harbor harness: the recipe allocates 65,536, Docker's documented minimum. A wider
+  range is an image-set need, added only when a pull fails with `lchown <FILE>: invalid argument`; the
+  workstation's 262,144 for six matplotlib SWE-bench images is recorded in the Harbor receipt of PR #570.
+- Hindsight's stale and paused pages and held cold seed, and the held automatic Codex PTY submission through
+  AgentRelay, are carried as gates on the word of the production program; its receipts are not published.
 - The token topic's cards still record socraticode 1.14.0 and ccusage 20.0.24 against stack pins 1.15.0 and
   20.0.26; this change does not touch that topic.
 - The research state (5 foundation layers `comparison_required`) and the layer records (9 `keep_but_compare`)
-  disagree on which layers need a comparison; this edition follows the research state.
+  disagree on which layers need a comparison; this edition follows the research state, with the one exception
+  the program record makes for scheduling and supervision.
 - Rows do not carry the themed explorer layer as `theme`; cross-linking the explorer is left out.
 
 ## Overturn condition
@@ -141,8 +150,7 @@ Write a new edition, or update this one in the change that causes it, when any o
 3. **A new upstream release** of a winner, or a qualification that moves a pin (Codex 0.159.3 first).
 4. **A pending source lands.** PR #569, #570 or #358 merges: move its citations to `source_path` and re-rate
    `cross:wsl-distro`.
-5. **The trading lane owner writes the final wording** for the us-equities rows, or an assessment of
-   security-supply-chain arrives.
+5. **The trading lane owner writes the final wording** for the us-equities rows.
 6. **The Gate A multi-agent E2E runs** on the new distribution: it decides the token-efficiency verdict.
 7. **A new catalog layer** appears in the foundation manifest or the research state: the page lists it as a
    gap until a row is added.
@@ -158,9 +166,13 @@ Write a new edition, or update this one in the change that causes it, when any o
 - `docs/acceptance-evidence-policy.md:26-33`; AGENTS.md (evidence levels)
 - `docs/decisions/2026-09-30-task-model-routing.md:9-12` (the accepted token-efficiency profile, #540)
 - `scripts/host_receipts.py` (a receipt binds only to a version that matches a winner pin)
-- PR #569 at `eabe7654`: `adoption/platforms/linux-wsl2-new-distro.md`,
+- PR #569 at `344a69ff`: `adoption/platforms/linux-wsl2-new-distro.md`,
   `docs/decisions/2026-10-01-new-wsl-distro-recipe.md`, `adoption/templates/wsl/`
-- PR #570 at `20d6c195`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
+- PR #570 at `87c74d5d`: `evidence/receipts/harbor-e2e-token-tools-20260930.json`
+- PR #573 at `5adcc3a4`: `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`,
+  `evidence/artifacts/layer-closure-assessment-20261001/`
+- Docker Engine documentation, rootless mode, prerequisites and troubleshooting (read 2026-10-01); the Next.js
+  v16.3.8 release page (read 2026-10-01)
 - PR #358 at `b0eb7a11`: `catalogs/us-equities/convergence-20260926.json`
 - Upstream release pages read on 2026-10-01 (07:41Z to 08:06Z), each cited on its winner; the
   nautilus_trader issue #4983 and pull request #5041 states; the gitleaks README; the Harbor README
