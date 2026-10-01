@@ -605,5 +605,89 @@
       "sha256": "5debdd1c362f2a8e1ce576152c45ea721eed0d55878b33cc9f929a4186fd7d2b",
       "artifact": "ignored local consolidated guide"
     }
+  },
+  "generated_view_correction_20261001": {
+    "head": "3a858f9f638a3f21179dca50a62282fa8aa02afc",
+    "failed_validation": {
+      "run": 36801299192,
+      "job": 110176007400,
+      "native_ci_exit": 1,
+      "failed_command": "python3 scripts/new_host_grand_list.py --check",
+      "returned": "stale or missing: catalogs/landscape/new-host-grand-list.json; run python3 scripts/component_matrix.py --write, then python3 scripts/new_host_grand_list.py --write",
+      "full_test_step": "skipped",
+      "original_log_bytes": 122341,
+      "original_log_sha256": "136ea5507fd834ccf39cd9b5513299f630e5ea960048d31d45b7f5c42869025d",
+      "native_retrieval_exit": 0
+    },
+    "retrieval_attempts": [
+      {
+        "command_family": "gh run view --log",
+        "native_exit": 1,
+        "condition": "sibling jobs still running"
+      },
+      {
+        "command_family": "gh api job logs",
+        "native_exit": 1,
+        "condition": "CLI required --allow-escape-sequences"
+      },
+      {
+        "command_family": "gh api job logs --allow-escape-sequences",
+        "native_exit": 0
+      }
+    ],
+    "source": "scripts/new_host_grand_list.py:504 uses json.dumps(data, indent=2, ensure_ascii=False)",
+    "diagnosis": "JSON semantic comparison showed zero changed fields; generic serialization had escaped Unicode in a generated view.",
+    "native_returns": [
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --write",
+        "native_exit": 0,
+        "returned": {
+          "flip_rule_violations": 0,
+          "rows": 32,
+          "status": "written"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --write",
+        "native_exit": 0,
+        "returned": {
+          "status": "written",
+          "layers": 32,
+          "winners": 66
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/component_matrix.py --check",
+        "native_exit": 0,
+        "returned": {
+          "rows": 32,
+          "status": "checked"
+        }
+      },
+      {
+        "command": "rtk proxy python3 scripts/new_host_grand_list.py --check",
+        "native_exit": 0,
+        "returned": {
+          "status": "passed",
+          "layers": 32,
+          "winners": 66
+        }
+      }
+    ],
+    "native_e2e": {
+      "run": 36801299152,
+      "commands": 259,
+      "checks": 82,
+      "pins": 16,
+      "failures": [],
+      "cleanup_confirmed": true,
+      "native_download_exit": 0,
+      "original_bytes": 729527,
+      "original_sha256": "f7daf2cc4f42003154c521a48bc315f47d8e8defbfb7e829b4398b124087eb8a",
+      "native_source_hashes_matching": 17
+    },
+    "other_observed_jobs": "OSV, dependency review, token report and Linux bootstrap passed; macOS queued at verifier observation.",
+    "scope": "Canonical generated-byte repair only. Native profile/configuration and original provider operations unchanged. Original failed and successful evidence remain separate.",
+    "usage": "unknown; no token savings attributed to the repair"
   }
 }

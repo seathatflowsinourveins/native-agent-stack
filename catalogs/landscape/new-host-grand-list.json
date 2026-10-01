@@ -2282,7 +2282,7 @@
         {
           "component_id": "nautilustrader",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
-          "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json \u2014 commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
+          "pin": "2.0.0rc5 (tag v2.0.0rc5; source pin from evidence/receipts/native-nautilus-v2-20260920.json — commit 1b0a49d2792a9432a3aca3fcb617ce7a630d905e)",
           "evidence_class": "native_proven",
           "upstream_latest": "v1.231.0",
           "pin_behind_upstream": false,

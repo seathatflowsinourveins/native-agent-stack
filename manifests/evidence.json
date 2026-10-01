@@ -14523,8 +14523,8 @@
     },
     {
       "path": "catalogs/landscape/new-host-grand-list.json",
-      "sha256": "8d195061a41acc25d481f642fef21ac769902d9f8ee1f96de4082e73f2e87500",
-      "bytes": 287274
+      "sha256": "ef7a849d69c54487cd8f186581fd1c17b1761326ee4de07ac653ae7ba4d49e98",
+      "bytes": 287271
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -15363,8 +15363,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c6c0a38d4ff49954502181ec6c8968a3515406ef5fa7ec8a77a815b7eb695011",
-      "bytes": 112088
+      "sha256": "8e14c23fca4368b5d0e4ff161626b1ea5749c2ae2d85ad115fe7f0c45e3a261f",
+      "bytes": 112522
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -42788,8 +42788,8 @@
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/ci-repair.json",
-      "sha256": "30806a50d6248c3a8df6327eb5fb2a412175b57caafe2b88f75a826d1cf1c543",
-      "bytes": 27986
+      "sha256": "304e97f286d3275e103a44f1d272132b87e82efa43807c0a637c528976fd5caa",
+      "bytes": 31028
     },
     {
       "path": "evidence/artifacts/token-profile-completion-20260930/claude-native.json",
