@@ -14,12 +14,12 @@
   "tool_uses": 622
  },
  "evidence_class": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
- "meaning": "The clean-install selection for the new WSL distribution, chosen on repository evidence. A layer marked 'compare' installs every listed arm fresh and its preregistered head-to-head on the new distribution picks the winner; a 'selected' layer is confirmed by its own comparison when one runs. It is not a measured merit result (program decision 5).",
+ "meaning": "Recommendations on repository evidence, not merit winners. Under program decision 5 and the accepted U11 design (revision 4, 89424e36), each layer's preregistered comparison on the new distribution selects its winner; a recommendation is one input to that comparison's arm set. The judges flagged 19 of the 21 layers as close calls.",
  "scope": "The 20 foundation layers and the WSL base distribution. The 12 us-equities layers run the same method on the GPT lane after 2026-10-03T17:14Z, owned by the trading lane, with the user-pinned NautilusTrader and IBKR destination as a requirement. The cross rows runtime-workers, gpt6-harnesses, credential-practice and convergence-practice were not judged.",
  "layers": [
   {
    "layer_id": "native-clients",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -45,11 +45,19 @@
    "failed_fact_checks": [
     "letta-ai/letta (C03) is stale or archived under the frozen definition (archived, or no default-branch commit in 90 days)"
    ],
-   "current_use_reasoning_found_by_critic": true
+   "current_use_reasoning_found_by_critic": true,
+   "judge_close_call": false,
+   "fact_corrections": [
+    {
+     "claim": "Letta (letta-ai/letta) was excluded as stale_or_archived.",
+     "correction": "It is not archived; default-branch commit 5bcdd177 on 2026-09-10. The supported basis is outside_requirement: the repository holds the retired V1 server, not a client. It stays excluded on that criterion.",
+     "source": "https://github.com/letta-ai/letta/commit/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a"
+    }
+   ]
   },
   {
    "layer_id": "agent-sdks",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -73,11 +81,13 @@
    ],
    "deciding_comparison": "The judge's comparison is sound. On the WSL2 host, run the same bounded worker task through the Claude Agent SDK, the Codex TypeScript SDK, the Codex Python SDK and the OpenHands SDK (Docker workspace). Measure structured-event completeness, custom-tool round trip, resume after a killed process and container isolation. Add one check on the Python SDK's app-server dependency: re-run after a Codex upgrade. Promote OpenHands, LangGraph or Temporal only after a remote/container, graph-checkpoint or multi-host-state need is qualified.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": false,
+   "fact_corrections": []
   },
   {
    "layer_id": "instructions-skills",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "revised",
    "selection": [
     {
@@ -92,11 +102,13 @@
    ],
    "deciding_comparison": "Start with trailofbits/skills alone. It leads on criteria 2, 6 and 7 and installs per plugin. Add a second pack only after a paired run on the WSL2 host: pin one skill each from anthropics/skills (webapp-testing), mattpocock/skills (for example tdd or diagnosing-bugs) and vercel-labs/agent-skills (react-best-practices). Run each on its matching task with and without the skill in Claude Code and Codex. Record trigger rate, loaded sections, verified findings or pass rate, conflicts with the baseline, tokens and wall time. Adopt only packs that beat the no-skill baseline.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": true
+   "current_use_reasoning_found_by_critic": true,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "mcp-surfaces",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -120,11 +132,13 @@
    ],
    "deciding_comparison": "The 37-check lifecycle run on record, which both tools passed, is the only measured comparison and it covers both selected tools. What would overturn the Inspector: run MCPJam v3.12.8 and Inspector 2.9.0 through the same 37 checks, plus a review of one stdio server and one Streamable HTTP server with OAuth through each CLI's JSON output. Swap only if MCPJam passes every check and finds a defect the Inspector misses. For mcporter: re-run the lifecycle checks on 0.14.2 once it is published (the ps-listing regression) and test importing a project-root .mcp.json.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "workers",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -157,7 +171,9 @@
    ],
    "deciding_comparison": "The judge's four-arm run on the WSL2 host is the right test: single Claude Code session; Claude Code subagents with isolation: worktree and a review gate; Codex subagents in Worktrunk worktrees; Claude Code delegating to Codex via codex-plugin-cc with /codex:review before merge. Measure independent acceptance, cancellation, writes outside the owned worktree, preservation of partial and failed results, and complete usage. Add two items: run arm (b) with and without ultracode to see whether the concurrency cap binds, and record whether codex-plugin-cc still installs and works on 2026-10-06 or later, when it crosses the stale line.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "isolation",
@@ -196,18 +212,22 @@
    "failed_fact_checks": [],
    "current_use_reasoning_found_by_critic": false,
    "comparison_arms": [
-    "sandbox-runtime (selected)",
-    "Worktrunk (edit separation; owned by git-github-automation)",
-    "rootless Podman",
-    "rootless Docker Engine",
-    "Podman or Docker with gVisor runsc",
+    "sandbox-runtime (recommended)",
+    "a rootless container on the hosting-services engine winner",
+    "gVisor runsc on that engine",
     "boxlite with /dev/kvm"
    ],
-   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": [],
+   "comparison_uses": [
+    "Worktrunk (git-github-automation)",
+    "the container engine (hosting-services)"
+   ]
   },
   {
    "layer_id": "code-navigation",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "revised",
    "selection": [
     {
@@ -231,7 +251,9 @@
    ],
    "deciding_comparison": "Use the judge's sealed set of 30-50 target-language questions with exact file:line answers, on WSL2 and once on macOS arm64. (a) Within Claude Code, Serena against the native LSP plugins; Codex uses Serena only. (b) For the structural slot, codebase-memory-mcp (installed with --skip-config and invoked explicitly) against CodeGraph and jCodeMunch, each scored against an rg+Read known-source baseline. Score reference precision and recall, correctness, tokens, tool calls, wall time, cold index build, incremental update after an edit and RSS. Confirm from each transcript that the arm's tools were invoked. Adopt a structural index only for the question class where it beats the baseline.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "semantic-rag",
@@ -270,18 +292,23 @@
    "failed_fact_checks": [],
    "current_use_reasoning_found_by_critic": false,
    "comparison_arms": [
-    "SocratiCode (with Ollama embeddings)",
+    "SocratiCode (embeddings from the local model server; its documented providers are Ollama, LM Studio, LiteLLM, OpenAI and Google)",
     "semble",
     "ColGREP with LateOn-Code-edge",
     "ColGREP with LateOn-Code",
     "BM25 baseline",
     "ripgrep baseline"
    ],
-   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": [],
+   "comparison_uses": [
+    "the local model server (observation-inference)"
+   ]
   },
   {
    "layer_id": "document-retrieval",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -305,11 +332,13 @@
    ],
    "deciding_comparison": "I endorse the judge's two head-to-heads, with additions. (1) Ingestion: current Docling (Heron layout, then the GraniteDocling VLM pipeline) against MinerU 4.0 standard/advanced with mineru[full], on the RTX 4090 under WSL2, using a sealed difficult-layout corpus. Score with OmniDocBench TextEdit, TableTEDS and reading-order edit, and also record parse-failure count and run time. (2) Retrieval: qmd query against docs-mcp-server hybrid search with local embeddings, on the converted corpus. Use sealed relevance judgments in randomized order, report recall@k and MRR, and check that each hit's original body can be read back by path.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "web-research",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -333,7 +362,9 @@
    ],
    "deciding_comparison": "I endorse the judge's comparison. Freeze a set of primary-source tasks with required citation fields (URL, title, date): static articles, JS-rendered docs, a login-gated page, a form or pagination flow, and a PDF link. Run it on the WSL2 host for both Claude Code and Codex. Interaction lane: Playwright CLI against agent-browser. Retrieval lane: trafilatura against agent-browser read and against the clients' native fetch. Use randomized order and the same model and prompts. Measure task success, citation correctness, provider-reported tokens, wall time, and browser processes left after the idle timeout. Add a crawler or hosted search only if the native arm misses a frozen requirement.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "durable-memory",
@@ -386,7 +417,9 @@
     "agentmemory through its Claude Code and Codex hooks",
     "deja-vu"
    ],
-   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "token-efficiency",
@@ -423,11 +456,13 @@
     "Headroom",
     "Context Mode (frozen control)"
    ],
-   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "observation-inference",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -487,11 +522,13 @@
    ],
    "deciding_comparison": "I endorse the judge's comparison and add three checks. (a) Reconcile one Codex task's tokens through Loki codex.sse_event records, because Codex metrics carry no token counts, and one Claude Code task through both Prometheus and Loki. (b) Show that the redaction allowlist removes prompt and tool content, including the codex.tool_result output snippet and map bodies, before anything reaches Loki or Phoenix, with Phoenix analytics disabled. (c) Qualify Claude Code through llama-server /v1/messages with --jinja tool use before treating the route as usable. Then compare llama.cpp (CUDA), vLLM and SGLang at matched quantization on the RTX 4090 under WSL2, measuring task outcome, TTFT, tokens/s at real agent concurrency, VRAM headroom and restart recovery.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "quality-evaluation",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -524,11 +561,13 @@
    ],
    "deciding_comparison": "I endorse the judge's comparison. Build fresh, independently labeled task cases plus a safe negative control, and do not use the existing eight-case diagnostic. Run them through (a) Inspect AI with inspect_swe's claude_code and codex_cli agents, two independent scorers and the collect reducer, and (b) Promptfoo with the claude-agent-sdk and openai:codex-sdk providers and two rubric assertions. Run the same cases as Harbor tasks with verifier tests. Measure agreement with the labels, whether every errored and disagreeing case survives an induced kill or timeout in the retained artifacts, whether the negative control stays negative, and wall time and token cost. The result picks the primary labeled-case runner.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "ci-supply-chain",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -588,11 +627,13 @@
    ],
    "deciding_comparison": "I endorse the judge's two head-to-heads. (1) Run zizmor (current default policy) and poutine on the repository's workflows, have every finding labeled independently, and report precision and recall separately for the permissions clause and the pinning clause. Raw counts do not settle this. (2) Score Syft and Trivy SBOMs of the same install tree and image against package-manager ground truth (dpkg-query, uv/pip lock, npm ls). Add one overlap check: compare kjanat actionlint require-commit-hash with zizmor unpinned-uses to decide whether the fork's pinning policy is redundant, and keep actionlint for its syntax and runner-compatibility checks.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "scheduling-supervision",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -616,7 +657,9 @@
    ],
    "deciding_comparison": "Default pair, on the new WSL2 host: start a Dagu step that spawns a setsid or double-forked child. Run `dagu stop` and a retry twice: once with the step run plainly and once with it under `systemd-run --user --scope` (KillMode=control-group). Count surviving processes each time, and compare DAGU_SIGNAL_PROPAGATION=true against the default false when the server stops. Durable slot, only if jobs must survive host loss or long waits: run the judge's Temporal-against-Restate head-to-head with equal recovery settings. Use one effectful workflow with an idempotency key; kill -9 the server and the worker mid-activity; run `wsl --shutdown` during a durable sleep; cancel during a retry backoff. Measure duplicated effects, recovery time, history visibility, idle RSS/CPU, and the install and upgrade steps.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "hosting-services",
@@ -659,11 +702,13 @@
     "Podman with Quadlet",
     "rootless Docker Engine"
    ],
-   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out",
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "secrets-credentials",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -690,11 +735,24 @@
     "The judge's ggshield reason: 'The two local scanners need no hosted account and send no content off the host'",
     "The judge's reading that the post 'classifies secrets that were already captured; it is not a standalone detection test' (only partly true: the filter runs after capture, but the .892 is reported for running Betterleaks against CredData)"
    ],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge wrote that the two local scanners send no content off the host.",
+     "correction": "TruffleHog verifies credentials through the providers' APIs, so its verification contacts those services; local scanning alone does not establish that nothing leaves the host.",
+     "source": "https://github.com/trufflesecurity/trufflehog/blob/main/README.md"
+    },
+    {
+     "claim": "The judge read Betterleaks' published result as a classification of already captured secrets.",
+     "correction": "Betterleaks' 0.892 figure is an author-run CredData result with a modified configuration.",
+     "source": "https://lookingatcomputer.substack.com/p/rare-not-random"
+    }
+   ]
   },
   {
    "layer_id": "git-github-automation",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -758,11 +816,29 @@
     "The judge's statement that worktrunk's latest main-branch 'ci' run was cancelled (2026-07-23), read as current CI state",
     "sem's default-branch CI runs a Linux test suite (implied by the 'tested' status the selection assumes)"
    ],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge wrote that claude-code-action has no GitHub release in the last 90 days.",
+     "correction": "claude-code-action published v1.0.239 on 2026-10-01; the floating v1 'Latest' object does not show staleness.",
+     "source": "https://api.github.com/repos/anthropics/claude-code-action/releases?per_page=10"
+    },
+    {
+     "claim": "The judge read a cancelled July CI run as Worktrunk's current CI state.",
+     "correction": "Worktrunk commit ca8d3797 has current Linux, macOS and Windows checks.",
+     "source": "https://api.github.com/repos/max-sixty/worktrunk/commits/ca8d3797b245/check-runs?per_page=100"
+    },
+    {
+     "claim": "The selection assumed sem runs a Linux test suite in CI.",
+     "correction": "sem's workflows at dfcb3de6 build and package for Windows; Linux testing is not established.",
+     "source": "https://github.com/Ataraxy-Labs/sem/blob/dfcb3de6c8bb32eda4005b0b3260b2b437f256db/.github/workflows/test-windows.yml"
+    }
+   ]
   },
   {
    "layer_id": "recovery-portability",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -795,11 +871,13 @@
    ],
    "deciding_comparison": "Run the judge's comparison. On the destination WSL2 host and on one macOS arm64 laptop, each from a clean user profile, reproduce the same pinned set three ways: `mise install --locked` from mise.lock, a flake.lock under Determinate Nix, and devbox.lock. Record success, wall time, exact resolved versions and checksums, and whether uninstall is clean. Then restore application state from a restic snapshot whose backup set excludes authentication stores. Apply dotfiles with chezmoi (secrets from the password manager), compare that with mise bootstrap's [dotfiles] and [bootstrap.secrets] path, and drop chezmoi if mise bootstrap covers the same need. Finish with fresh native sign-ins and one scoped, useful task per agent client.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": []
   },
   {
    "layer_id": "cross:wsl-distro",
-   "status": "selected",
+   "status": "recommended",
    "critic_verdict": "upheld",
    "selection": [
     {
@@ -825,9 +903,19 @@
    "failed_fact_checks": [
     "Issue #40593 shows that Ubuntu-24.04 instances avoid the systemd user-session failure (the judge's basis for the fallback)"
    ],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "judge_close_call": true,
+   "fact_corrections": [
+    {
+     "claim": "The judge cited microsoft/WSL#40593 as the reason 24.04.5 is a safe fallback.",
+     "correction": "The issue does not show comparative safety: a 2026-05-19 contributor comment describes shared-cgroup collisions across instances.",
+     "source": "https://github.com/microsoft/WSL/issues/40593#issuecomment-4486165852"
+    }
+   ]
   }
  ],
  "field_coverage": "The packets held every candidate of the landscape catalogs (148), every survivor of the 2026-09-29 sweep (37) and the second-family review's selections. They did not hold 15 of the 25 survivors of the 2026-09-26 sweep, or 266 of the 328 distinct layer and repository pairs that the v1 sweeps refuted (counted by the Gate A owner against the ledger).",
- "install_note": "Ten install commands are upstream quick starts piped to a shell and eleven name @latest. They record upstream's documented path; the install profile pins each release and verifies its checksum before stage 2 runs it."
+ "install_note": "Eleven install commands are upstream quick starts piped to a shell and eleven name @latest. They record upstream's documented path; the install profile pins each release and verifies its checksum before stage 2 runs it.",
+ "cross_family": "One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01 (PR #575) reviewed the source host's record, not these blind packets, so they are not a second blind judgment; a blind GPT-6.1 Sol run on the same packets is requested from the Codex lane. Where both families agree, the recommendation stands as an arm; where they differ, both picks enter the comparison.",
+ "comparison_order": "The code-RAG comparison (semantic-rag) runs before the local-model-server comparison (observation-inference); the server comparison then requires serving the code-RAG winner's embedding provider. The container-engine comparison (hosting-services) runs before isolation's container-boundary comparison."
 }

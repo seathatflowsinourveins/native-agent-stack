@@ -50,7 +50,7 @@
    "layer_id": "isolation",
    "owns": [
     "sandbox-runtime",
-    "compare: the container boundary for untrusted work (a rootless container on the hosting engine, gVisor runsc, boxlite)"
+    "compare: the container boundary for untrusted work (a rootless container on the hosting-services engine winner, gVisor runsc, boxlite)"
    ],
    "uses": [
     "Worktrunk (git-github-automation)",
@@ -206,11 +206,11 @@
   },
   {
    "overlap": "Podman was an arm in isolation and in hosting-services, and Docker in both comparisons.",
-   "resolution": "One container-engine comparison, owned by hosting-services. isolation owns only the boundary question on top of the winning engine: plain rootless container, gVisor runsc or boxlite."
+   "resolution": "One container-engine comparison, owned by hosting-services. isolation owns only the boundary question on top of the winning engine: plain rootless container, gVisor runsc or boxlite. Order: the engine comparison runs first, then isolation's boundary comparison."
   },
   {
    "overlap": "Ollama (semantic-rag, as SocratiCode's embedding service) and llama.cpp (observation-inference, as the local inference route) are two local model servers.",
-   "resolution": "One local model server, owned by observation-inference: Ollama against llama.cpp. It must serve the code-RAG winner's embeddings; SocratiCode documents Ollama, OpenAI, Google, LM Studio and LiteLLM as providers, not llama.cpp directly."
+   "resolution": "One local model server, owned by observation-inference: Ollama against llama.cpp. It must serve the code-RAG winner's embeddings; SocratiCode documents Ollama, OpenAI, Google, LM Studio and LiteLLM as providers, not llama.cpp directly. Order: the code-RAG comparison runs first, then the server comparison."
   },
   {
    "overlap": "Phoenix (observation) also runs experiments and scores evals, the job of Inspect AI (quality-evaluation).",
@@ -240,5 +240,32 @@
  "residual": [
   "QMD runs its own embedding and reranking models in process (node-llama-cpp); it is not a second model server, and it stays inside document-retrieval."
  ],
- "trading_rule": "The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI) is used from the owning foundation layer, not selected again."
+ "trading_rule": "The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI, evaluation) is used from the owning foundation layer, not selected again. The trading lane owner accepted this rule on 2026-10-01 for its run after the GPT pool resets; its earlier trading selections that are now foundation-owned (Inspect AI, gitleaks, Grype, the observability stack) become uses of the foundation layers.",
+ "boundary": [
+  {
+   "capability": "analytical storage (DuckDB with Parquet)",
+   "owner": "us-equities storage-compute",
+   "basis": "its requirement names exact reproducible analytical snapshots; no foundation requirement names analytical storage"
+  },
+  {
+   "capability": "research data versioning and pipeline reproduction (DVC)",
+   "owner": "us-equities identity-provenance",
+   "basis": "the same requirement text; Restic (recovery-portability) backs up and restores host and application state, a different job"
+  },
+  {
+   "capability": "research experiment tracking (MLflow)",
+   "owner": "us-equities evaluation-experiments",
+   "basis": "research runs; evaluations, including model-route qualification, belong to Inspect AI in quality-evaluation"
+  },
+  {
+   "capability": "market-data validation (pandera)",
+   "owner": "us-equities data-quality-orchestration",
+   "basis": "trading-specific on any reading (the trading lane owner)"
+  },
+  {
+   "capability": "retrieval evaluation (agent-retrieval-bench)",
+   "owner": "foundation quality-evaluation (the harness); a candidate task set for the semantic-rag and document-retrieval comparisons",
+   "basis": "evaluation is a foundation job; admitted as a named external benchmark with a recorded reason when those comparisons are preregistered"
+  }
+ ]
 }
