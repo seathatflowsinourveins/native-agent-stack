@@ -1,0 +1,569 @@
+{
+ "layer_id": "evaluation-experiments",
+ "proposal": {
+  "layer_id": "evaluation-experiments",
+  "proposal": "keep",
+  "summary": "All three current winners -- data-mlflow (v3.16.1), inspect-ai (0.3.266), foundation-agent-retrieval-bench (v0.2.1) -- earn their status on freshly re-verified evidence, and this layer's recorded open_gaps/catalog text (conv/layers.json; catalogs/landscape/us-equities.json; catalogs/us-equities/{data-research,foundation-memory,agents-operations}.json) is stale: a pre-registered, hash-verified execution wave dated 2026-09-23 (evidence/artifacts/gap-wave2-20260923/) already ran nearly every check the open_gaps still list as missing, three days before this review -- its own limits sections say updating the catalog text \"is left to the coordinator.\" Most decisive: the exact promptfoo-vs-inspect-ai matched trial the open_gaps called for was run TWICE (an 8-case deterministic mock arm and a separate 30-case real-embedding-scorer arm) and settled both times with 100% cross-harness scoring agreement; inspect-ai edged ahead on frozen-source byte-fidelity (8/8 vs 6/8), self-contained retry-error provenance, and wall-clock. The project's own recorded verdict: \"supports keeping inspect-ai selected... not a model-quality win.\" So promptfoo is not a verified challenger here -- merit, actually checked, favors the incumbent. mlflow was independently re-confirmed current (its README directly refutes comet-ml/opik's demonstrated_gap, matching the project's own 2026-09-23 adversarial verification) and shown bound to a real hash-verified replay of this project's own chronological research evaluation. foundation-agent-retrieval-bench's one recorded weakness (Darwin-arm64-only execution) was independently retired by a byte-identical Linux x86_64 rerun. Checked and correctly non-winning: opik (refuted), phoenix (Elastic-2.0 self-host restriction, narrower scope, already catalogued -- not a blind spot), river (real causality-probe-verified execution, but an honest negative predictive result), and three newly-surfaced small repos (TraderHarness/Lacuna/falsification-ledger) independently confirmed to exist but off-requirement for this layer (they validate trading-strategy backtests, not agent/experiment infrastructure -- fit backtesting-engine/strategy-research instead). Four 2026 papers confirmed real via direct abstract fetch are useful methodology inputs, not installable candidates. No verified challenger survives against any winner. Recommend only two low-cost housekeeping actions: bump the inspect-ai pin past 0.3.266 (already run successfully at 0.3.268 within this same wave; PyPI is now at 0.3.269) and have the coordinator refresh the stale catalog/open_gaps text to cite the 2026-09-23 receipts instead of describing these three winners as unexecuted.",
+  "winner_status": [
+   {
+    "component_id": "data-mlflow",
+    "status": "earns_it",
+    "note": "Pin v3.16.1 = exact current upstream (gh api releases/latest + PyPI json, both checked 2026-09-26). Its README directly confirms 'Built on OpenTelemetry... supporting any LLM provider and agent framework' plus 'Choose from 50+ built-in metrics and LLM judges' -- independently corroborating the project's own 2026-09-23 adversarial verification that refuted comet-ml/opik's demonstrated_gap (disposition refuted_targeted_candidate, survives:false). The catalog's own text calling mlflow's workflow 'Prospective and UNEXECUTED' (catalogs/us-equities/data-research.json) is now stale: evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/{1-five-package-installs,8-research-evaluation-mlflow-binding}.json show it actually installed, health-checked (loopback server, /health OK), and bound to a hash-verified replay of this project's own chronological research evaluation -- 16 params, 19 metrics and 9 dataset digests logged and read back with 0 mismatches, both injected negative probes (ledger_records+1, exit-code 999) correctly caught, replay equal to the 2026-09-19 receipt (same ledger sha256, 21/21 selection hashes). No verified better alternative survives."
+   },
+   {
+    "component_id": "inspect-ai",
+    "status": "earns_it",
+    "note": "Pin 0.3.266 is 3 PyPI patches behind current 0.3.269 (confirmed directly; GitHub itself publishes no Releases object for this repo, 404 confirmed) -- a real but modest recording lag, not neglect: this same wave already ran 0.3.268 successfully (evidence/artifacts/gap-wave2-20260923/foundation__quality-evaluation/9-inspect-mlflow-local-vllm.json -- real local-vLLM inference, hello_world exact 1.000, security_guide model_graded_fact 0.688, logged cleanly to mlflow). The exact matched promptfoo-vs-inspect-ai trial this layer's own open_gaps called for is done, twice, both 'settled' 2026-09-23: an 8-case deterministic mock comparison (.../us-equities__evaluation-experiments/{0,2}-*.json) and a 30-case real-embedding-scorer comparison (.../foundation__quality-evaluation/4-promptfoo-vs-inspect-ai.json). Both show 100% cross-harness scoring agreement (identical predictions on every case); inspect-ai leads on byte-exact frozen-source retention (8/8 vs 6/8 gate-source hashes), self-contained retry-error provenance (kept in the final eval log vs promptfoo's side-channel-only log plus an overwritten primary output), and wall-clock (4.2s vs 12.7s, one observation). The project's own recorded verdict: 'supports keeping inspect-ai selected for the harness properties measured here... not a model-quality win.' Recommend a pin bump to 0.3.268/0.3.269 as housekeeping, not a challenge."
+   },
+   {
+    "component_id": "foundation-agent-retrieval-bench",
+    "status": "earns_it",
+    "note": "Confirmed independently via gh api 8 stars, MIT, v0.2.1 tag exact match, pushed 2026-08-04 -- 53 days quiet as of 2026-09-26, a real slowdown (single maintainer, 1 open issue) but far under the 12-month unmaintained bar. Already the only layer winner with actual executed evidence at the 2026-09-22 claude/codex lane adjudication (2/2 evidence-reviewer votes cited real pytest '15 passed' plus real retrieval-metric runs). Its sole recorded weakness at that adjudication -- 'recorded on Darwin arm64, not this PC' -- was independently retired on 2026-09-23: an unmodified rerun on Linux x86_64 reproduced the Darwin receipt's per-sample detail files byte-identical (sha256-matched) for both lexical and BM25 rankers across all 101 samples, 15/15 upstream tests passing (evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/4-arb-trace2code-host-rerun.json). Residual, real, and correctly un-closed-by-rerun: its proven scope is file-level code retrieval (gin/click = 82/101 samples), not financial-document retrieval -- no better-evidenced alternative fills that specific gap either (mteb overlaps only in evaluating embeddings/STS, a different task, and its own pin is behind upstream)."
+   }
+  ],
+  "challengers": [],
+  "rejected": [
+   {
+    "name": "promptfoo/promptfoo",
+    "reason": "Two real matched trials against inspect-ai, both settled 2026-09-23 (an 8-case deterministic mock arm and a 30-case real-embedding-scorer arm): 100% cross-harness scoring agreement in both, but inspect-ai leads on frozen-source byte-fidelity (8/8 vs 6/8), self-contained retry-error provenance, and wall-clock. Project's own verdict: 'supports keeping inspect-ai selected... not a model-quality win.' Confirmed real/active independently (gh api 25,474 stars, MIT, 0.123.1, pushed 2026-09-26). Measured parity, not a deficiency -- but no evidenced advantage survives to promote it over the incumbent."
+   },
+   {
+    "name": "comet-ml/opik",
+    "reason": "Refuted. The project's own 2026-09-23 adversarial verification found survives:false (catalogs/sota-convergence/manifest-20260923.json, disposition refuted_targeted_candidate): mlflow's actual README already pairs OpenTelemetry-based agent tracing with '50+ built-in metrics and LLM judges' -- independently re-confirmed here by fetching mlflow's README directly, not just trusting the internal note. Opik itself verified real (22,208+ stars, Apache-2.0, v2.2.8x, checked 2026-09-26) but demonstrates no capability gap mlflow doesn't already cover for this project."
+   },
+   {
+    "name": "Arize-ai/phoenix",
+    "reason": "Already catalogued (catalogs/us-equities/agents-operations.json; catalogs/landscape/us-equities.json alternatives) as conditional -- confirmed by reading both files directly, so the researcher's 'unexamined blind spot' framing does not hold. License is Elastic-2.0 (self-host/managed-service restriction; GitHub's NOASSERTION is a detector miss, confirmed by reading the actual LICENSE blob). It is a trace-inspection workspace, narrower than this layer's experiment-tracking-plus-eval requirement; PHOENIX_ALLOWED_PROVIDERS=NONE is not an inference-authorization boundary. Since 2026-09-23 it does have a real minimal execution receipt (loopback serve + OTLP span roundtrip, pin 20.14.0, 2 releases behind current 20.16.0), which doesn't change the license/scope disposition."
+   },
+   {
+    "name": "online-ml/river",
+    "reason": "Executed for real, 2026-09-23, settled: a causality-probe-verified delayed-progressive-validation check on real bundled LEAN SPY daily data (0 causality violations in the delayed run vs 1,797 in the immediate positive control, proving the delay mechanism actually works). But the logistic model showed no predictive edge -- delayed 0.592 / immediate 0.610 accuracy, both beaten by a naive prior-class baseline at 0.612 -- an honest negative result. Remains conditional: applies only if streaming/online updates are independently justified; doesn't address this layer's telemetry/broker-isolation requirement."
+   },
+   {
+    "name": "HephaestLab/TraderHarness",
+    "reason": "Off-requirement for this layer: a contamination-resistant backtesting environment for LLM trading agents (point-in-time masking, China A-share data) fits backtesting-engine/strategy-research, not agent/experiment-tracking infra. Confirmed independently real (gh api 40 stars, pushed 2026-08-22, PyPI traderharness 1.1.0). Flag: GitHub's license detector reports NOASSERTION against the README's claimed Apache-2.0 badge -- a real mismatch, independently reconfirmed, to resolve before any use elsewhere."
+   },
+   {
+    "name": "eyenoticeall/Lacuna",
+    "reason": "Off-requirement for this layer (same backtest-leakage/strategy-validation niche as TraderHarness, engine-agnostic). Confirmed independently real (gh api 3 stars, MIT, created 2026-08-25, v0.14.0 matching PyPI lacuna-quant). Pre-1.0, explicitly alpha, single-digit-star five-week-old adoption -- promising methodology, unproven adoption."
+   },
+   {
+    "name": "holdout-labs/falsification-ledger",
+    "reason": "Off-requirement for this layer (pre-registered kill-condition ledger for strategy claims, not agent-evaluation infra). Confirmed independently real (gh api 1 star, MIT, created 2026-08-18, PyPI 0.1.4). All ~9 repos in the holdout-labs org were independently found last-pushed within the same 42-second window on 2026-09-08 with 0-1 stars each; a sibling repo (lookahead-free) was already found and excluded elsewhere in this project's own research for the identical reason. Treat the whole org as early-stage/unproven, not this one repo in isolation."
+   },
+   {
+    "name": "Backtrader-Bench (arXiv:2608.11232)",
+    "reason": "Not installable (paper only, Zhao & Raissi, submitted 2026-07-31) -- confirmed real via direct abstract fetch: tool-augmented 90.0% vs no-tools 73.0% baseline, a harder 38-question subset near chance for half the models tested. Its independent code-execution checker (re-deriving ground truth rather than trusting model self-report) is the most reusable methodology here for this layer's next fixture, beyond the current deterministic exact-text baseline."
+   },
+   {
+    "name": "Temporal Leakage in LLM Backtesting (arXiv:2608.02985)",
+    "reason": "Not installable (paper only, Zhang & Stadie, submitted 2026-08-04) -- confirmed real via direct abstract fetch and independently cross-referenced against this repo's own catalogs/us-equities/local-model-workloads-20260924.json, which already cites the same paper: known methodology, not a blind spot. Relevant to a future strategy-leakage gate, not to this layer's current agent-evaluation requirement."
+   },
+   {
+    "name": "FinSearchComp (arXiv:2509.13160)",
+    "reason": "Not installable (paper only, submitted 2025-09-16 -- over a year old, the oldest source in this set, flagged per the 2026-dated-evidence preference). Confirmed real via direct abstract fetch (635 questions, 70 professional financial-expert annotators). A held-out task-set candidate for a future financial-research-agent eval, not this layer's current agent/experiment-tracking requirement."
+   },
+   {
+    "name": "FinMCP-Bench (arXiv:2603.24943)",
+    "reason": "Not installable (paper only, Zhu et al., submitted 2026-03-26, accepted ICASSP 2026). Confirmed real via direct abstract fetch (613 samples, 65 real financial MCP servers). Most on-point of the four papers to this layer's actual MCP-heavy agent stack (ai-memory, codebase-memory, qmd, serena, jcodemunch) as a held-out tool-use eval methodology, but there is no software here to install or pin today."
+   },
+   {
+    "name": "CFA-Institute-RPC/skills (bias-detection)",
+    "reason": "Off-requirement: a prompt-level bias-advisory skill (SKILL.md), not evaluation/telemetry infrastructure. Confirmed independently real (gh api 5 stars, Apache-2.0, 2 commits touching the file). Quiet since 2026-03-12 (198 days as of this check) -- the longest quiet period of any candidate reviewed here, though still under the 12-month archived/unmaintained bar."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "winner:data-mlflow:exists+license",
+   "claim": "mlflow/mlflow exists at the stated URL, Apache-2.0, not archived",
+   "verdict": "supported",
+   "note": "gh api repos/mlflow/mlflow returns full_name mlflow/mlflow, license.spdx_id=Apache-2.0, archived=false, fork=false. PyPI mlflow/json license classifier is 'License :: OSI Approved :: Apache Software License' and license text is the Apache-2.0 boilerplate. Matches the claim exactly.",
+   "sources": [
+    "gh api repos/mlflow/mlflow (checked 2026-09-26)",
+    "https://pypi.org/pypi/mlflow/json"
+   ]
+  },
+  {
+   "name": "winner:data-mlflow:version-date-vs-pin",
+   "claim": "v3.16.1 published 2026-09-17T02:40:08Z is upstream's current release and matches this project's pin exactly, repo pushed 2026-09-26, 28,142 stars",
+   "verdict": "supported",
+   "note": "gh api repos/mlflow/mlflow/releases/latest returns tag_name v3.16.1, published_at 2026-09-17T02:40:08Z (exact match). Top 5 tags confirm no newer tag exists. stargazers_count=28142 (exact match), pushed_at=2026-09-26T11:00:30Z (today, matches 'pushed same day'). PyPI mlflow 3.16.1 uploaded 2026-09-16T23:14:16Z (exact match to candidate's cited timestamp). The repo's own file catalogs/landscape/us-equities.json records pin 'v3.16.1; source 32792afe...' for component data-mlflow -- read directly, confirms zero drift from upstream.",
+   "sources": [
+    "gh api repos/mlflow/mlflow/releases/latest",
+    "gh api repos/mlflow/mlflow/tags",
+    "https://pypi.org/pypi/mlflow/json",
+    "catalogs/landscape/us-equities.json (winners block, data-mlflow pin, read directly in the given checkout)"
+   ]
+  },
+  {
+   "name": "winner:data-mlflow:capability-registry-claims",
+   "claim": "MLflow provides self-hosted experiment tracking and a model/prompt registry for ML/LLM pipelines",
+   "verdict": "supported",
+   "note": "README (fetched raw via gh api repos/mlflow/mlflow/readme) lists 'Experiment Tracking -- Track models, parameters, metrics, and evaluation results across experiments', 'Model Registry -- Collaboratively manage the full lifecycle of ML models', and a distinct 'Prompt Registry' feature linked at mlflow.org/docs/latest/genai/prompt-registry ('Version, test, and deploy prompts with full lineage tracking'). All three named capabilities are present verbatim or near-verbatim in the current README.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/mlflow/mlflow/readme (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "winner:inspect-ai:exists+license",
+   "claim": "UKGovernmentBEIS/inspect_ai exists, MIT license, not archived",
+   "verdict": "supported",
+   "note": "gh api repos/UKGovernmentBEIS/inspect_ai returns license.spdx_id=MIT, archived=false. PyPI inspect-ai/json license field is 'MIT License' with matching classifier. Matches exactly.",
+   "sources": [
+    "gh api repos/UKGovernmentBEIS/inspect_ai",
+    "https://pypi.org/pypi/inspect-ai/json"
+   ]
+  },
+  {
+   "name": "winner:inspect-ai:version-date-and-no-releases-object",
+   "claim": "PyPI 0.3.269 uploaded 2026-09-25T16:07:48Z is 3 patches ahead of the pin (0.3.266); GitHub itself has no Releases object (404) and its 5 most-recent tags are non-semver refs (release/2025-11-28, inspect-tool-support-1.2.0/1.1.2/1.1.0, STASH_ANYIO_PASS1)",
+   "verdict": "supported",
+   "note": "PyPI JSON: version=0.3.269, latest upload_time 2026-09-25T16:07:48Z (exact match). gh api repos/.../releases/latest returned HTTP 404 'Not Found', confirming no Releases object exists. gh api repos/.../tags top 5 entries are exactly release/2025-11-28, inspect-tool-support-1.2.0, inspect-tool-support-1.1.2, inspect-tool-support-1.1.0, STASH_ANYIO_PASS1 -- identical list and order to the claim. The repo's own landscape/us-equities.json winners block records pin 'inspect-ai0.3.266; source ec4dfc69...', so 0.3.267/.268/.269 are indeed 3 releases ahead of the recorded pin.",
+   "sources": [
+    "https://pypi.org/pypi/inspect-ai/json",
+    "gh api repos/UKGovernmentBEIS/inspect_ai/releases/latest (404)",
+    "gh api repos/UKGovernmentBEIS/inspect_ai/tags",
+    "catalogs/landscape/us-equities.json (winners block, inspect-ai pin, read directly)"
+   ]
+  },
+  {
+   "name": "winner:inspect-ai:maintenance",
+   "claim": "Repo pushed 2026-09-26T14:50:26Z, 2,860 stars, 336 open issues, MIT, not archived -- active, pin-drift is a tracking gap not abandonment",
+   "verdict": "supported",
+   "note": "gh api confirms stars=2860 (exact), archived=false (exact). pushed_at at my check was 2026-09-26T15:12:53Z, i.e. ~22 minutes later than the candidate's cited 14:50:26Z -- expected on a very high-velocity repo, not a discrepancy in substance (same day, continuously active). open_issues_count at my check was 337 vs the claimed 336, a 1-issue drift consistent with the same high churn. Both minor drifts corroborate the claim's core point (very active repo) rather than undermining it.",
+   "sources": [
+    "gh api repos/UKGovernmentBEIS/inspect_ai (checked 2026-09-26, two separate calls ~22min apart)"
+   ]
+  },
+  {
+   "name": "winner:agent-retrieval-bench:exists+license+version",
+   "claim": "eyuansu62/agent-retrieval-bench exists, MIT, latest v0.2.1 published 2026-07-26T01:08:48Z, matches pin exactly",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT. releases/latest returns tag_name v0.2.1, published_at 2026-07-26T01:08:48Z (exact match). Tags list is exactly [v0.2.1, v0.2.0], no newer tag. landscape/us-equities.json's own winner pin for foundation-agent-retrieval-bench is 'v0.2.1' -- zero drift, confirmed directly.",
+   "sources": [
+    "gh api repos/eyuansu62/agent-retrieval-bench",
+    "gh api repos/eyuansu62/agent-retrieval-bench/releases/latest",
+    "gh api repos/eyuansu62/agent-retrieval-bench/tags",
+    "catalogs/landscape/us-equities.json (winners block, read directly)"
+   ]
+  },
+  {
+   "name": "winner:agent-retrieval-bench:maintenance-quiet-period",
+   "claim": "pushed 2026-08-04T04:01:12Z, 8 stars, single-maintainer, 1 open issue, 53 days quiet as of 2026-09-26 -- under the 12-month bar but a real slowdown",
+   "verdict": "supported",
+   "note": "gh api confirms stargazers_count=8 (exact), pushed_at=2026-08-04T04:01:12Z (exact). Latest commit on default branch is 07014c98... dated 2026-08-04T04:00:58Z, i.e. the push IS the last commit (no silent later activity). open_issues_count=1 (exact match to '1-open-issue'). Aug 4 to Sep 26 is 53 days (27 remaining in Aug + 26 in Sep), arithmetic checks out. Well inside the 12-month unmaintained threshold, so 'maintained: true' is technically correct even though the claim itself flags a slowdown.",
+   "sources": [
+    "gh api repos/eyuansu62/agent-retrieval-bench",
+    "gh api repos/eyuansu62/agent-retrieval-bench/commits"
+   ]
+  },
+  {
+   "name": "winner:agent-retrieval-bench:capability-context-budget",
+   "claim": "Acceptance framework scoring code-context retrieval quality per fixed context budget",
+   "verdict": "supported",
+   "note": "README (fetched directly) defines a named metric 'Budgeted Context Yield (BCY)': 'canonical Budgeted Context Yield (BCY) uses token-based ranked-file packing and is reported over 4k/8k/16k/32k budgets' and 'BCY@B: fraction of gold files exposed after token-based ranked-file packing under budget B.' This is a precise, verbatim match to 'scoring code-context retrieval quality per fixed context budget.'",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/eyuansu62/agent-retrieval-bench/readme (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:opik:exists+license+version",
+   "claim": "comet-ml/opik exists, Apache-2.0, 22,249 stars, pushed 2026-09-26, latest 2.2.81 (2026-09-25), matches PyPI",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=Apache-2.0, stargazers_count=22249 (exact), pushed_at=2026-09-26T13:42:43Z (today, exact-day match), archived=false. releases/latest tag_name=2.2.81, published_at=2026-09-25T15:35:46Z (exact match). PyPI opik 2.2.81 uploaded 2026-09-25T15:28:58Z (exact match).",
+   "sources": [
+    "gh api repos/comet-ml/opik",
+    "gh api repos/comet-ml/opik/releases/latest",
+    "https://pypi.org/pypi/opik/json"
+   ]
+  },
+  {
+   "name": "candidate:opik:capability-quote",
+   "claim": "README states 'Open-Source LLM Observability, Evaluation & AI Agent Tracing... free to self-host the full platform' covering agent tracing, LLM evaluation, prompt management, production monitoring",
+   "verdict": "supported",
+   "note": "Fetched the raw README directly. H1 title is verbatim 'Opik: Open-Source LLM Observability, Evaluation & AI Agent Tracing'. The next paragraph states verbatim: 'Opik is the open-source LLM observability and evaluation platform for AI agent tracing, LLM evaluation, prompt management, and production monitoring... Apache-2.0 licensed, free to self-host the full platform, with 20,000+ GitHub stars.' The quoted claim's ellipsis correctly elides between these two adjacent lines; every named capability is present verbatim.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/comet-ml/opik/readme (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:opik:fit-claim-unexamined-gap",
+   "claim": "'No entry exists yet in coverage.json or repository-index.md -- an unexamined gap, not a considered-and-rejected option'",
+   "verdict": "refuted",
+   "note": "Literal claim is false: catalogs/us-equities/coverage.json line 468 and catalogs/us-equities/repository-index.md line 126 both carry a comet-ml/opik row today (disposition 'no_catalog_card' in coverage.json's structured field, tag 'readme_license_overview - alternative' in the index -- i.e. rows exist, from a generic star-audit sweep). Far more importantly, this is not merely an oversight in the researcher's search: catalogs/sota-convergence/manifest-20260923.json already ran essentially this exact adversarial-verification exercise on opik three days before this check, at path trading[8]/candidates[1]. It records demonstrated_gap comparing Opik to mlflow (the named winner) for LLM-native tracing+eval, an explicit adversarial_verification block with two lens votes, and disposition 'refuted_targeted_candidate' with survives:false. Vote lens 1's reasoning verbatim: 'Gap misreads MLflow: its README pairs OpenTelemetry agent tracing with evals and 50+ judges. data-mlflow won for local experiment tracking... Opik README has 0 replay hits. Overturn relies on the unauthored zero-call c2 arm and names no fixture or command.' Opik is a considered-and-rejected option, not a blind spot.",
+   "sources": [
+    "catalogs/us-equities/coverage.json:468 (read directly)",
+    "catalogs/us-equities/repository-index.md:126 (read directly)",
+    "catalogs/sota-convergence/manifest-20260923.json ~lines 14895-14966, trading[8]/candidates[1] (read directly)",
+    "catalogs/us-equities/decision-index.json ~line 5017 (opik references, read directly)"
+   ]
+  },
+  {
+   "name": "candidate:phoenix:exists+license",
+   "claim": "Arize-ai/phoenix exists, GitHub license-detector reports NOASSERTION, 11,626 stars, pushed 2026-09-26",
+   "verdict": "supported",
+   "note": "gh api confirms license={key:'other',spdx_id:'NOASSERTION'} (exact match), stargazers_count=11626 (exact match), pushed_at=2026-09-26T14:51:55Z (exact match down to the second -- consistent with a genuine gh api pull at the same time this check's underlying research was performed). Independently read the repo's actual LICENSE file: it is the Elastic License 2.0 (ELv2) in full, including the clause 'You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.' PyPI arize-phoenix/json also reports license=Elastic-2.0. So NOASSERTION is a GitHub license-detector miss; the operative license is definitively ELv2 with a no-managed-resale clause, not an open question.",
+   "sources": [
+    "gh api repos/Arize-ai/phoenix",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/Arize-ai/phoenix/contents/LICENSE (checked 2026-09-26)",
+    "https://pypi.org/pypi/arize-phoenix/json"
+   ]
+  },
+  {
+   "name": "candidate:phoenix:version-date",
+   "claim": "latest tagged release arize-phoenix-v20.16.0 published 2026-09-23T15:41:54Z, matching PyPI arize-phoenix 20.16.0 uploaded the same day",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns tag_name arize-phoenix-v20.16.0, published_at 2026-09-23T15:41:54Z (exact match). PyPI arize-phoenix 20.16.0 upload_time 2026-09-23T15:47:37Z (exact match to candidate's cited timestamp).",
+   "sources": [
+    "gh api repos/Arize-ai/phoenix/releases/latest",
+    "https://pypi.org/pypi/arize-phoenix/json"
+   ]
+  },
+  {
+   "name": "candidate:phoenix:fit-claim-blind-spot",
+   "claim": "'The strongest un-investigated candidate... Zero catalog entries reference it -- a genuine blind spot, not a considered-and-rejected option'",
+   "verdict": "refuted",
+   "note": "Directly contradicted by the repository's own files. catalogs/us-equities/agents-operations.json carries a full structured card for phoenix (id 'phoenix', layers ['observability','agent-evaluation'], decision 'conditional', version_or_commit 'arize-phoenix-v20.14.0', license 'Elastic-2.0' -- already recorded, not an open question -- native_workflow commands, a 4-item limitations list including the exact PHOENIX_ALLOWED_PROVIDERS=NONE caveat, and 6 sources including the pinned LICENSE blob URL). catalogs/landscape/us-equities.json's evaluation-experiments layer itself lists phoenix under 'alternatives' with disposition 'conditional' and the same Elastic-2.0/self-host-restriction rationale. catalogs/us-equities/coverage.json and repository-index.md also carry rows for it. This is a previously-considered, explicitly-conditional entry with a detailed paper trail, not a blind spot. (The pin it was evaluated at, v20.14.0, is now 2 releases behind current v20.16.0 -- a legitimate freshness note, but different from 'zero entries.')",
+   "sources": [
+    "catalogs/us-equities/agents-operations.json:1239-1280 (read directly, full phoenix card)",
+    "catalogs/landscape/us-equities.json ~line 3293-3300 (evaluation-experiments layer alternatives, phoenix entry, read directly)",
+    "catalogs/us-equities/coverage.json:2320",
+    "catalogs/us-equities/repository-index.md:81"
+   ]
+  },
+  {
+   "name": "candidate:phoenix:gap-notes-named",
+   "claim": "phoenix is already named in this project's own recorded open_gaps as an unexecuted candidate",
+   "verdict": "supported",
+   "note": "catalogs/landscape/us-equities.json's evaluation-experiments layer open_gaps array contains verbatim: 'No retained evidence shows inspect-ai, mlflow, river, mteb or phoenix installed or executed. Every workflow for them is prospective or marked UNEXECUTED.' Phoenix is explicitly named alongside river, confirming this specific sub-claim (even though the broader 'blind spot' framing above is refuted).",
+   "sources": [
+    "catalogs/landscape/us-equities.json, evaluation-experiments.open_gaps (read directly, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:promptfoo:exists+license+version",
+   "claim": "promptfoo/promptfoo exists, MIT, 25,474 stars, pushed 2026-09-26, 0.123.1 released 2026-09-18",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=MIT, stargazers_count=25474 (exact), pushed_at=2026-09-26T11:18:40Z (exact match to the second), archived=false. releases/latest tag_name=0.123.1, published_at=2026-09-18T01:07:54Z (exact match). npm registry confirms dist-tags.latest=0.123.1, published to npm 2026-09-18T01:27:57Z (20 min after the GitHub release, a normal release-then-publish gap).",
+   "sources": [
+    "gh api repos/promptfoo/promptfoo",
+    "gh api repos/promptfoo/promptfoo/releases/latest",
+    "https://registry.npmjs.org/promptfoo (and /latest)"
+   ]
+  },
+  {
+   "name": "candidate:promptfoo:pypi-stale-package",
+   "claim": "the PyPI package literally named 'promptfoo' is a stale/unrelated 0.2.0 artifact, not this tool",
+   "verdict": "supported",
+   "note": "https://pypi.org/pypi/promptfoo/json returns version 0.2.0, uploaded 2026-09-18T19:52:49Z, and -- more tellingly -- its own project_urls.Repository points to https://github.com/promptfoo/promptfoo-python, a DIFFERENT repository from promptfoo/promptfoo. This independently confirms it is a distinct companion/adjacent package, not the CLI tool the candidate describes; pulling 'promptfoo' from PyPI would indeed give the wrong project.",
+   "sources": [
+    "https://pypi.org/pypi/promptfoo/json (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:promptfoo:capability-claude-agent-sdk",
+   "claim": "promptfoo has a first-class Claude Agent SDK provider (anthropic:claude-agent-sdk) that can run against a local Claude Code session with no ANTHROPIC_API_KEY, and can assert on skill-used",
+   "verdict": "supported",
+   "note": "Fetched promptfoo.dev/docs/providers/claude-agent-sdk/ directly. It documents the provider under names 'anthropic:claude-agent-sdk' (full) / 'anthropic:claude-code' (alias); states 'If Claude Agent SDK will authenticate through an existing local Claude Code session instead of ANTHROPIC_API_KEY, disable Promptfoo's upfront API key check' via apiKeyRequired:false; and documents `assert: - type: skill-used value: ...` for asserting which skill was invoked. All three sub-claims confirmed on the primary docs page.",
+   "sources": [
+    "https://www.promptfoo.dev/docs/providers/claude-agent-sdk/ (fetched 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:promptfoo:fit-claim-next-step-target",
+   "claim": "promptfoo is already the catalog's own next_step target for a frozen agent/skill A/B against inspect-ai",
+   "verdict": "supported",
+   "note": "catalogs/landscape/us-equities.json's evaluation-experiments layer open_gaps contains verbatim: 'lane claude prefers non-adopted promptfoo... requires Run the frozen 8-case pack blueprints/native-skill-practice/catalog-cases.json under two arms. Arm 1 is promptfoo 0.123.1 using only the credential-free echo exact-text-baseline provider... Arm 2 is an inspect-ai 0.3.266 mock-model task with the same deterministic scorer.' The layer's verdict_overturn_when #2 describes the identical A/B as the condition that would demote inspect-ai. The two cited evidence files this claim rests on (evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json, blueprints/native-skill-practice/typesafe-result.json) both exist on disk (5.0K and 16.4K respectively). This is a real, already-planned comparison, not an invented one.",
+   "sources": [
+    "catalogs/landscape/us-equities.json, evaluation-experiments.open_gaps and verdict_overturn_when (read directly)",
+    "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json (existence confirmed)",
+    "blueprints/native-skill-practice/typesafe-result.json (existence confirmed)"
+   ]
+  },
+  {
+   "name": "candidate:traderharness:exists+license",
+   "claim": "HephaestLab/TraderHarness exists; README badge says Apache-2.0 while GitHub's license API returns NOASSERTION (flagged mismatch)",
+   "verdict": "supported",
+   "note": "gh api confirms license.spdx_id=NOASSERTION (matches the flagged mismatch). Read the actual LICENSE file directly: it is the standard Apache License, Version 2.0 text verbatim ('Licensed under the Apache License, Version 2.0...'). README_en.md shows a license badge reading 'license-Apache--2.0-blue'. PyPI traderharness classifier is 'License :: OSI Approved :: Apache Software License'. All three independent primary sources (LICENSE file, README badge, PyPI classifier) agree on Apache-2.0; NOASSERTION is a GitHub detector miss, not a real licensing discrepancy. The candidate's caution to 're-verify' was warranted and is now resolved in Apache-2.0's favor.",
+   "sources": [
+    "gh api repos/HephaestLab/TraderHarness",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/HephaestLab/TraderHarness/contents/LICENSE",
+    "gh api -H 'Accept: application/vnd.github.raw' repos/HephaestLab/TraderHarness/contents/README_en.md",
+    "https://pypi.org/pypi/traderharness/json"
+   ]
+  },
+  {
+   "name": "candidate:traderharness:version-date-precision",
+   "claim": "1.1.0 (PyPI traderharness), latest_release_date 2026-07-28 (uploaded 2026-07-28T16:11:08Z)",
+   "verdict": "refuted",
+   "note": "The PyPI upload timestamp itself is confirmed exactly (2026-07-28T16:11:08Z). But the top-line 'latest_release_date':'2026-07-28' conflates that PyPI-upload event with the GitHub release date: gh api repos/.../releases/latest shows tag v1.1.0 with created_at 2026-07-19T16:57:32Z and published_at 2026-07-19T16:58:00Z -- 9 days earlier, not a draft or backdated artifact (draft:false, prerelease:false). Only one tag exists (v1.1.0), so 'latest_version:1.1.0' itself is correct; only the single date field mislabels which event (GitHub tag vs. PyPI publish) it reports. A minor precision defect, not a fabrication.",
+   "sources": [
+    "gh api repos/HephaestLab/TraderHarness/releases/latest",
+    "https://pypi.org/pypi/traderharness/json",
+    "gh api repos/HephaestLab/TraderHarness/tags"
+   ]
+  },
+  {
+   "name": "candidate:traderharness:capability-masking-replay-trajectory",
+   "claim": "point-in-time masking, entity/date anonymization, fingerprinted replay and full-fidelity trajectory export, built on real China A-share data",
+   "verdict": "supported",
+   "note": "README_en.md states verbatim: 'Real A-share data - strict point-in-time masking - fingerprinted replay -> trajectory export' as its tagline, and body text: 'Strict point-in-time masking at every data boundary, plus deterministic calendar and company anonymization'; 'Full-fidelity trajectory. Each LLM call is persisted with the complete message list, the full tool schema...'; 'Fingerprinted replay. The cassette replays deterministically with no API key, and traderharness audit scans serialized artifacts for leaked entities or dates.' Every element of the claim is directly confirmed in the primary README text.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/HephaestLab/TraderHarness/contents/README_en.md (checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:traderharness:comparison-doc-and-ci",
+   "claim": "Ships a documented comparison against TradingAgents/StockBench/Qlib (docs/comparison.md), a CI workflow, and a docs site; bilingual, Chinese-primary",
+   "verdict": "supported",
+   "note": "docs/comparison.md exists and its content is exactly this comparison: a table with rows for TraderHarness, TradingAgents, StockBench, Qlib (and bonus rows for Backtrader/vn.py). .github/workflows/ contains ci.yml plus dataset-release.yml, docs.yml, gitee-mirror.yml, release.yml. Docs site confirmed live at https://hephaestlab.github.io/TraderHarness/ (also listed as PyPI Documentation URL). Repo root has both README.md (Chinese, default) and a separate README_en.md (English) -- confirming 'bilingual, Chinese-primary'.",
+   "sources": [
+    "gh api -H 'Accept: application/vnd.github.raw' repos/HephaestLab/TraderHarness/contents/docs/comparison.md",
+    "gh api repos/HephaestLab/TraderHarness/contents/.github/workflows",
+    "gh api repos/HephaestLab/TraderHarness/contents (root listing)",
+    "https://pypi.org/pypi/traderharness/json"
+   ]
+  },
+  {
+   "name": "candidate:backtrader-bench:paper-exists-and-metadata",
+   "claim": "arxiv.org/abs/2608.11232, Ruoxi Zhao and Maziar Raissi, submitted 2026-07-31",
+   "verdict": "supported",
+   "note": "Directly curled the abs page (HTTP 200) and parsed the raw citation_* meta tags myself: citation_arxiv_id=2608.11232, citation_date=2026/07/31, citation_author='Zhao, Ruoxi' and 'Raissi, Maziar'. Title tag: '[2608.11232] Backtrader-Bench: Benchmarking LLM Agents on Algorithmic Trading with Self-Generated MCQs'. Exact match on every field.",
+   "sources": [
+    "https://arxiv.org/abs/2608.11232 (curled and parsed directly, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:backtrader-bench:methodology-and-numbers",
+   "claim": "deterministic MCQ pipeline from 5 strategies/33 templates/3 difficulty tiers with a code-execution-based independent checker; tool-augmented agents reach 90.0% vs 73.0% no-tools baseline (GPT-5.5/Opus 4.7); on a harder 38-question subset some models degrade to ~25%",
+   "verdict": "supported",
+   "note": "Extracted the verbatim abstract text myself from the fetched HTML (blockquote.abstract). It reads in relevant part: '...generates questions from backtest configurations across five trading strategies, 33 templates, and three difficulty tiers, with an independent checker that re-derives every answer... Tool-augmented agents reach 90.0% accuracy in a single pass (GPT-5.5 and Opus 4.7), outperforming the best no-tools baselines (73.0%, averaged over 10 runs) by 17 percentage points. On 38 separately mined questions, no-tools accuracy drops further, with half the models falling to roughly random-chance level (25%).' Every specific number and model name in the candidate's claim is verbatim in the primary abstract.",
+   "sources": [
+    "https://arxiv.org/abs/2608.11232 (verbatim abstract extracted from raw HTML, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:temporal-leakage:paper-exists-and-metadata",
+   "claim": "arxiv.org/abs/2608.02985, Zeyu Zhang and Bradly C. Stadie, submitted 2026-08-04",
+   "verdict": "supported",
+   "note": "Directly curled and parsed citation_* meta tags: citation_arxiv_id=2608.02985, citation_date=2026/08/04, citation_author='Zhang, Zeyu' and 'Stadie, Bradly C.'. Title tag matches exactly: 'Temporal Leakage in LLM Backtesting: Measurement, Validation, and Adjusted Scores'.",
+   "sources": [
+    "https://arxiv.org/abs/2608.02985 (curled and parsed directly, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:temporal-leakage:core-claims",
+   "claim": "proves recency effect is mathematically indistinguishable from leakage in a passive backtest alone; proposes reference-point methods (known cutoff or matched control) for an adjusted score; validates via twin-model leakage injection; on frontier models finds 1 real cutoff-leakage signature and clears 5 models whose apparent edge was recency bias",
+   "verdict": "supported",
+   "note": "Fetched abstract confirms near-verbatim: 'we prove no passive backtest can separate the two from genuine skill... A known cutoff identifies leakage at the boundary; a matched clean control identifies it globally and yields a leakage-adjusted score... We validate the estimators against ground truth by planting leakage in twin models, where they recover the injected dose and return null on clean questions. Deployed on frontier models, they detect one cutoff-localized signature and... clear five models whose apparent advantages were recency alone.' Every element of the candidate's claim is directly supported.",
+   "sources": [
+    "https://arxiv.org/abs/2608.02985 (abstract fetched directly, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:finsearchcomp:paper-exists-and-headline-numbers",
+   "claim": "'first fully open-source agent benchmark for realistic, open-domain financial search and reasoning'; 635 questions; 70 professional financial experts; 21 models; Grok 4 and DouBao leading on different market subsets",
+   "verdict": "supported",
+   "note": "Directly curled citation_* meta tags confirming arxiv ID 2509.13160 resolves with title 'FinSearchComp: Towards a Realistic, Expert-Level Evaluation of Financial Search and Reasoning' and 23 listed authors starting 'Hu, Liang'. Fetched abstract independently reports: 'first fully open-source agent benchmark for realistic, open-domain financial search and reasoning' (near-verbatim quote match), '635 questions across global and Greater China markets, with annotation from 70 financial experts. Evaluation of 21 models showed Grok 4 and DouBao leading performance on respective regional subsets.' All specific numbers match.",
+   "sources": [
+    "https://arxiv.org/abs/2509.13160 (meta tags parsed directly + abstract fetched, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:finsearchcomp:recency-flag",
+   "claim": "(implicit in candidate's own latest_release_date field) submission date 2025-09-16",
+   "verdict": "supported",
+   "note": "citation_date meta tag confirms 2025/09/16 exactly, matching the candidate's own stated date. Flagging per task instructions: this paper is dated September 2025, over 12 months before this 2026-09-26 check -- the oldest of the four paper candidates and the only one outside the 'prefer 2026' recency window. The candidate discloses this date plainly but its fit narrative does not itself flag the age; noting it here since the task asks to flag anything not from 2026.",
+   "sources": [
+    "https://arxiv.org/abs/2509.13160 (citation_date meta tag, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "candidate:finmcp-bench:paper-exists-and-details",
+   "claim": "arxiv.org/abs/2603.24943, 613 samples across 10 scenarios/33 sub-scenarios, 65 real financial MCP servers, accepted at ICASSP 2026, submitted 2026-03-26",
+   "verdict": "supported",
+   "note": "Directly curled citation_* meta tags: citation_arxiv_id=2603.24943, citation_date=2026/03/26, 11 authors starting 'Zhu, Jie'. Title matches exactly: 'FinMCP-Bench: Benchmarking LLM Agents for Real-World Financial Tool Use under the Model Context Protocol'. Independently fetched abstract confirms '613 samples across 10 scenarios and 33 sub-scenarios', '65 real financial MCPs', single/multi-tool/multi-turn task types, dedicated tool-invocation-accuracy and reasoning metrics, and 'Accepted by ICASSP 2026'. Every specific figure matches.",
+   "sources": [
+    "https://arxiv.org/abs/2603.24943 (meta tags parsed directly + abstract fetched, checked 2026-09-26)"
+   ]
+  },
+  {
+   "name": "meta:scope-of-this-verification",
+   "claim": "This pass covers the 3 named winners (data-mlflow, inspect-ai, foundation-agent-retrieval-bench) plus the 8 candidates whose own 'fit' text made the strongest on-point claims (opik, phoenix, promptfoo, TraderHarness, Backtrader-Bench, Temporal Leakage in LLM Backtesting, FinSearchComp, FinMCP-Bench); river, Lacuna, falsification-ledger and CFA-Institute-RPC bias-detection were deprioritized as the 4 candidates whose own fit text was most explicitly narrow/hedged ('narrow, methodology-only', '3 stars and 5 weeks old', '1 star, brand-new', 'not agent/experiment-tracking infrastructure')",
+   "verdict": "unverifiable",
+   "note": "This is a documented scoping decision by this reviewer, not a factual claim to adjudicate -- included so the ranking basis for 'top 8 by fit' is auditable. If a different 8 were intended, river/Lacuna/falsification-ledger/CFA-bias-detection remain unchecked in this pass.",
+   "sources": []
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "mlflow/mlflow",
+   "url": "https://github.com/mlflow/mlflow",
+   "modalities": [
+    "star",
+    "incumbent",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Serves the layer's 'retain scoped telemetry/recoverable state' need as a run/metric/artifact store, not agent-trajectory evaluation. Remains current SOTA for this narrow role -- pin is fully up to date -- but the catalog's own gap notes say it is still not installed/executed here, so this is currency evidence, not proven fit."
+  },
+  {
+   "name": "UKGovernmentBEIS/inspect_ai (inspect-ai)",
+   "url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "modalities": [
+    "incumbent",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Best native fit for the layer's core requirement (bounded eval runs with retained failure/telemetry) among all 15 candidates here, but the pin is now measurably stale and the catalog's own open_gaps confirm no execution receipt exists yet -- selection remains source_review/metadata, not native_execution."
+  },
+  {
+   "name": "eyuansu62/agent-retrieval-bench (foundation-agent-retrieval-bench)",
+   "url": "https://github.com/eyuansu62/agent-retrieval-bench",
+   "modalities": [
+    "incumbent",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Targets code-retrieval quality-per-token, not agent/experiment telemetry -- a narrower fit for this layer's stated requirement than inspect-ai or mlflow. The catalog's own gaps say it has 'never been run'; nothing in this check changes that."
+  },
+  {
+   "name": "promptfoo/promptfoo",
+   "url": "https://github.com/promptfoo/promptfoo",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Already the catalog's own next_step target for a frozen agent/skill A/B; strong fit for bounded-research telemetry with retained failure logs. Remains not-adopted for this layer per current_choice; nothing here overturns or weakens that."
+  },
+  {
+   "name": "comet-ml/opik",
+   "url": "https://github.com/comet-ml/opik",
+   "modalities": [
+    "star",
+    "docs",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly on-point new find for this layer: self-hostable agent tracing plus eval with retained traces is closer to 'retain scoped telemetry, failed attempts' than mlflow's generic run-tracking. No entry exists yet in coverage.json or repository-index.md -- an unexamined gap, not a considered-and-rejected option."
+  },
+  {
+   "name": "Arize-ai/phoenix",
+   "url": "https://github.com/Arize-ai/phoenix",
+   "modalities": [
+    "github_search",
+    "docs",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The strongest un-investigated candidate turned up here: already named in this project's own recorded gaps, actively maintained, and squarely in the agent-tracing/telemetry space alongside opik. Zero catalog entries reference it -- a genuine blind spot, not a considered-and-rejected option."
+  },
+  {
+   "name": "online-ml/river",
+   "url": "https://github.com/online-ml/river",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Only candidate here that addresses the specifically named gap 'progressive evaluation with delayed labels (c4)' -- not an agent-eval tool, but a streaming-ML evaluation methodology directly transferable to scoring a research agent's forecasts as labels (e.g. next-day price moves) arrive late. Narrow, methodology-only fit; does not touch telemetry, process supervision or agent tracing."
+  },
+  {
+   "name": "HephaestLab/TraderHarness",
+   "url": "https://github.com/HephaestLab/TraderHarness",
+   "modalities": [
+    "awesome",
+    "docs",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Directly matches this layer's own open_gaps language: no held-out/leakage-safe evaluation exists yet for this project's LLM-driven research. A-share focus means the point-in-time/masking methodology transfers to US equities; the data and calendar adapters would not. 40 stars, small team, no independent execution here."
+  },
+  {
+   "name": "eyenoticeall/Lacuna",
+   "url": "https://github.com/eyenoticeall/Lacuna",
+   "modalities": [
+    "awesome",
+    "docs",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Best single-repo match among the awesome-list finds for this project's own recorded leakage/point-in-time gaps -- engine-agnostic, unlike TraderHarness's A-share/LLM-agent focus. Only 3 stars and 5 weeks old, pre-1.0 and explicitly alpha, so treat any numeric claim from it as provisional until independently re-run."
+  },
+  {
+   "name": "holdout-labs/falsification-ledger",
+   "url": "https://github.com/holdout-labs/falsification-ledger",
+   "modalities": [
+    "awesome",
+    "docs",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Matches this project's own stated need for pre-registered kill-conditions before advancing a strategy gate. Explicitly alpha with a shifting CLI/schema; 1 star, brand-new (created 2026-08-18) -- promising methodology, unproven adoption."
+  },
+  {
+   "name": "Backtrader-Bench",
+   "url": "https://arxiv.org/abs/2608.11232",
+   "modalities": [
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "The most rigorous 2026 answer found to this layer's repeated open_gaps complaint that nothing establishes whether an LLM-generated strategy/backtest claim is actually correct: it re-derives ground truth from code execution instead of trusting model self-report. Directly reusable methodology for grading this project's own LLM research/mover-discovery outputs. Paper-only; no code pulled into this repo yet."
+  },
+  {
+   "name": "Temporal Leakage in LLM Backtesting",
+   "url": "https://arxiv.org/abs/2608.02985",
+   "modalities": [
+    "github_search",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Solves precisely the failure mode this project's own open_gaps keep flagging elsewhere ('original historical point-in-time availability is not established,' 'no as-known historical filing set'): if this project ever backtests an LLM-driven strategy, this adjusted-score method is the closest available primary-source technique for telling genuine edge from recency-bias leakage. Paper-only; not implemented here."
+  },
+  {
+   "name": "FinSearchComp",
+   "url": "https://arxiv.org/abs/2509.13160",
+   "modalities": [
+    "awesome",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Closest paper-form match to this layer's actual requirement -- evaluating a financial research agent's search-and-reasoning quality end-to-end -- and directly reusable as a held-out task set for this project's own research agents. Fully open-source per its own description; no adoption/execution evidence exists in this repo yet."
+  },
+  {
+   "name": "FinMCP-Bench",
+   "url": "https://arxiv.org/abs/2603.24943",
+   "modalities": [
+    "awesome",
+    "paper"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Unusually on-point for this specific stack: this project's own research/agent layer is itself MCP-heavy (ai-memory, codebase-memory, qmd, serena, jcodemunch all run as MCP servers), so a benchmark for financial MCP tool-use quality is a directly transferable evaluation methodology, not a generic LLM benchmark. Paper-only; no harness pulled into this repo."
+  },
+  {
+   "name": "CFA-Institute-RPC/skills (bias-detection)",
+   "url": "https://github.com/CFA-Institute-RPC/skills/tree/main/skills/bias-detection",
+   "modalities": [
+    "awesome",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Not agent/experiment-tracking infrastructure -- it is a prompt-level advisory skill. Useful as a bias-audit overlay on this project's own LLM-driven research (open_gaps repeatedly flag 'no signal established' and rigor concerns), but it does not touch telemetry, process supervision or broker-authority isolation, so it complements rather than competes with inspect-ai/mlflow/opik."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-live.md"
+  }
+ ]
+}

@@ -3779,6 +3779,37 @@
         "Commit identity: the re-check reviewed commit 58dde8ef. Its history was then rewritten so a helper-name tuple no longer reads as a gitleaks generic-api-key match (one test line reordered in four commits), rebased onto main after K3 merged (5597f9fa), and extended by four test-only commits (runner test values drawn from letters outside the hex alphabet, fixing a chance-match flake; the timing criterion and host-scaled bound above); the guard bytes stayed d4d4bef2\u2026 through those steps and changed only with the two review-thread fixes."
       ],
       "path": "evidence/receipts/guard-k4-verification-20261001.json"
+    },
+    {
+      "id": "harbor-e2e-token-tools-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "serena",
+        "jcodemunch-mcp",
+        "headroom"
+      ],
+      "claim": "On an upstream harness (Harbor v0.23.0, built-in claude_code agent), 288 trials on 36 SWE-bench Verified tasks established no cost reduction for any tool: context-mode, jcodemunch and the full stack raised whole-task cost by 30 to 39% (intervals above 1); headroom (0.983), rtk (1.027) and serena (1.063) are inconclusive, their intervals include 1 as the A/A control's does. On the catalog protocol's own metric (complete provider tokens, paired on the tasks both arms solved) headroom used 13% fewer tokens (ratio 0.867, interval 0.775 to 0.971) without an established cost reduction, rtk is inconclusive (0.955, 0.847 to 1.078), context-mode used 18% and jcodemunch 41% more. No trial in the run spawned a subagent.",
+      "limitations": [
+        "short single-session tasks, one repetition per arm and task, Sonnet 5.5 at medium effort: not the host default (Opus at max) and not the multi-agent regime",
+        "arm wrappers and the analysis script are local integration code, labelled as such in the preregistration; the harness itself is upstream",
+        "the cost metric is a list-price estimate, not a bill and not the plan meter",
+        "context-mode and the full stack used their MCP tools in 0 of 36 and 1 of 36 trials, so their rows mostly price the presence of the tools",
+        "the shared prompt cache was neither controlled nor recorded per trial: the arm order is randomized and blocked by task and every arm's usage categories are recorded, but a cache effect on cost cannot be excluded, and the A/A control bounds the cross-phase difference only",
+        "the preregistration freeze is a local record (FREEZE.md and FREEZE.sha256, with the inputs re-hashed today), not an externally timestamped commit; the hash line at the end of PREREGISTRATION.md still holds its placeholder, the freeze hashes are in FREEZE.sha256",
+        "the resolve-rate non-inferiority result is method-sensitive on 36 tasks: headroom's preregistered lower bound is 0.017 above the margin with 2 discordant pairs, and rtk and context-mode meet the margin only under a one-sided bound",
+        "the zero-subagent scan reads the delegation tool and parent links in 308 stream logs and 308 client transcripts; its live positive control was captured at client 2.1.286 while the trials ran 2.1.285",
+        "the catalog protocol's token metric covers four of its five arms (no Repomix outline arm) and is a raw token count, not cost-weighted"
+      ],
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "host_scope": {
+        "profile": "source-host-linux-wsl",
+        "platform": "Linux/WSL",
+        "identity": "Private source-host identity omitted",
+        "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      }
     }
   ],
   "files": [
@@ -12810,8 +12841,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "9efbc9a8e92990810234bb72395c2369e9ee850180b23c6d299fea45c9e5fb11",
-      "bytes": 5955
+      "sha256": "85fe841622a590c7b19a9a4fcb00fe00b537bbd0820bca6aebc9614504173595",
+      "bytes": 6541
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
@@ -12940,8 +12971,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
-      "sha256": "9ccf5b974c79fb94fe28e4968a9278f531ebc4054e67784f04eb58126bc8d5b3",
-      "bytes": 21207
+      "sha256": "1a0d91d7f5db609f654dc8b8329f186a90e0d88cb48cdf7df98a2dcd9f9df178",
+      "bytes": 21648
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS",
@@ -14915,8 +14946,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "69538324ef8fdc613afe05de7a6894da6bacf91c13839e6083e6155578653964",
-      "bytes": 17783
+      "sha256": "f454ef0acbd533a4fff5b3bd780e98d9b10243eed396184911894721b011c3bb",
+      "bytes": 18333
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -14982,6 +15013,16 @@
       "path": "catalogs/us-equities/authenticated-data-review.md",
       "sha256": "ebe7bdcdbd2173ce25a355f74621aa690398fd641d02ffa69971d991ca62006b",
       "bytes": 9134
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "sha256": "d4e7d79f9b32c093632ae611bf5cdc13fb654907817137974e2987fd03202c73",
+      "bytes": 882688
+    },
+    {
+      "path": "catalogs/us-equities/convergence-20260926.md",
+      "sha256": "62b88000d45bab760f1dc5d973cf2c95cba536783c61be0e5653bc01fc7e4191",
+      "bytes": 6353
     },
     {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
@@ -15090,8 +15131,8 @@
     },
     {
       "path": "catalogs/us-equities/gates-20260922.json",
-      "sha256": "1534ffde0c013ee2761f381ce3130d5aefb02709c3ce1696041d1621f9bb5010",
-      "bytes": 67221
+      "sha256": "7369879021c763b3f8b699aafd80cb90f3a31406d21bd98be7a28d6961565c32",
+      "bytes": 67910
     },
     {
       "path": "catalogs/us-equities/hosting-source-review.json",
@@ -15175,8 +15216,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "839b52bccd9d42138e87188465c5c518f84aa6b5cd806f6c1180b4f1426ff6de",
-      "bytes": 21568
+      "sha256": "8224f6aa4a1f4d01707fbd6f106ffb95326446f6c97fc9b92db56037e72c7fbc",
+      "bytes": 21913
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -32320,8 +32361,8 @@
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/README.md",
-      "sha256": "5338d0ff9423033a896cec7d2f759b37de9baaef680b1ba827d24bc20d986afe",
-      "bytes": 6050
+      "sha256": "c6f7e93d22a0239355452c4c228080ce9b38faa438d442b3e310173a5423bf20",
+      "bytes": 6242
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/foundation-run-variance.json",
@@ -32340,8 +32381,8 @@
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-run-variance.json",
-      "sha256": "8e33d0cb417723f45ed1564c292757c1a8ee9308f78b779485e877812ce53b7d",
-      "bytes": 2693
+      "sha256": "26cc8dbd6df4e61459e03258eb30b1f7cef0bef6f7c869553a3c4ed22e682490",
+      "bytes": 2753
     },
     {
       "path": "evidence/artifacts/layer-closure-assessment-20261001/us-equities-synthesis.md",
@@ -43384,6 +43425,186 @@
       "bytes": 8828
     },
     {
+      "path": "evidence/artifacts/trading-convergence-20260926/README.md",
+      "sha256": "6a8e358162b0dbbed9b38e7136d6f74c365f0bbade6e272d7b4294c6601a9172",
+      "bytes": 1955
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-cached.md",
+      "sha256": "f0eddeda4c0d4e0c2eba8e4d7ace863ae433b039cc38bf1fb4a0c7a0e9d55833",
+      "bytes": 7171
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/agents-models-workers--gpt-6-live.md",
+      "sha256": "7efe56e8a7e997db07b29da98c18a7213e25b7fe8db3be2d0acdba5b71850537",
+      "bytes": 6522
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-cached.md",
+      "sha256": "a5cd64063b806b4887bcfd76a3b3b9d08d2a506e209f7e42e2eec695aa3bdaec",
+      "bytes": 5384
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/backtesting-engine--gpt-6-live.md",
+      "sha256": "0d579a8c17cf220ea48dfefdbf7b97765c3ab6c2f02b104d583dd6de393520df",
+      "bytes": 5731
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/data-quality-orchestration--gpt-6-live.md",
+      "sha256": "a7b1ca6728fa8304264e7983cdbb4ba2da3aaa11942fba65567741da5fddeab1",
+      "bytes": 4860
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-cached.md",
+      "sha256": "105861545ba295119a99cd7a5d8a1ade1ba60d45cad3f942dc1703c2c27b6aa2",
+      "bytes": 6314
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/evaluation-experiments--gpt-6-live.md",
+      "sha256": "07ba1a0938868441a6b93027fb0c57114d2e3359a23da86e5afc62207b45473a",
+      "bytes": 7641
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/execution-broker--gpt-6-live.md",
+      "sha256": "ac82cd6c9bba958abda0d18ce0f3c28097742b3f6ac8c4ea3dc8915ddbd60a84",
+      "bytes": 6860
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/identity-provenance--gpt-6-live.md",
+      "sha256": "2de8ed417d66a1c390a237e55a9bd4b804b2a3db8d6bf73f62a3c5b868e9ee41",
+      "bytes": 8385
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-cached.md",
+      "sha256": "4e1dd3e6f8fef2007fd075a7e941a6ea35df86cf083682088526b1752926186c",
+      "bytes": 7312
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-live.md",
+      "sha256": "b97ffb73c02a744c515ed5bae516882bd7a8db5ccea236dbdbc25705b1747768",
+      "bytes": 7873
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-cached.md",
+      "sha256": "756251fb5e8b0e65d6f8244f2af7392db98503ea3b11cf9d6ab773e20f9d8065",
+      "bytes": 5371
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-live.md",
+      "sha256": "f3a49492bae9ecbef4845f1716c6f23a69de70ddaaa21a105b158cbb1062f458",
+      "bytes": 5846
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/portfolio-risk--gpt-6-live.md",
+      "sha256": "667c7a8b0c73ce3f3acd0ea0f4d52e4fab88b8e1eb9bc5a8c47d06a628d32dbf",
+      "bytes": 7169
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-cached.md",
+      "sha256": "1e93200be91cf7c715de85c505bb60fc56b5e450c955b9f74df951083c6b8490",
+      "bytes": 5524
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/research-factors-ml--gpt-6-live.md",
+      "sha256": "9c1856f8391b249b2b5cd61ddb842ed5fb74b73cc8e12759c4df3c3ecaf0c274",
+      "bytes": 5991
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-cached.md",
+      "sha256": "090b3f5c09d5dcf6fc9cb9072a4cf3b70efba6753ed97603b11764250f040845",
+      "bytes": 7290
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/security-supply-chain--gpt-6-live.md",
+      "sha256": "32c02c54fc1faecc73114f26bf75ed197bde3a720d4d1a19c64e901401cd454a",
+      "bytes": 8303
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/storage-compute--gpt-6-live.md",
+      "sha256": "2deeb1ee9bc659a638bca10ac8d4c1724a09863001906f26600778542a71b52c",
+      "bytes": 6689
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-cached.md",
+      "sha256": "d994b4b53bb388da9ae848f153d8e29064ed77e13b722a3e0dd58a81208dc910",
+      "bytes": 7924
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/strategy-research--gpt-6-live.md",
+      "sha256": "8ef6205ecfc6c1fe9293cb33bc43849c480fdca89ceeaf5096c85ab296402b0c",
+      "bytes": 7275
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/agents-models-workers.json",
+      "sha256": "9ab6d1f1f8d7f3c5181f2b06c4b263007689bf54dfa9426b72254a04b378d6fa",
+      "bytes": 52794
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/backtesting-engine.json",
+      "sha256": "80156cbbe487d8b8f0a6a392c05af11da9898de485a6b3219790740a9955bca8",
+      "bytes": 56730
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/data-quality-orchestration.json",
+      "sha256": "71d7064bbb056a37546211c4a2c91db9b63775c91a1e39d47cc29c40dab70233",
+      "bytes": 70422
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/evaluation-experiments.json",
+      "sha256": "eea3e2c2511baa65391ea4762654dc45e76fe94bab34c2739163413bb3311d29",
+      "bytes": 53092
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/execution-broker.json",
+      "sha256": "374336eac7109f6070ba9b064bc90e83497c9aa67e78d5d9294ab5bda719a2b9",
+      "bytes": 59056
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/identity-provenance.json",
+      "sha256": "e03c3ab07f32155f9bdc72989e5f8bf3716ac3f52fb7a5bba3e2e48e5b47b150",
+      "bytes": 68116
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/market-data-reference.json",
+      "sha256": "4b5f0f73cd58683fff6ba1f35bc7c0b9667029aa660da241f664503a20f13406",
+      "bytes": 62733
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/observability-hosting.json",
+      "sha256": "d7caee35e3812263db8e8be8d25cf5b40f40289332cb0a8cee56dff4c7b193a1",
+      "bytes": 66830
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/portfolio-risk.json",
+      "sha256": "2a39483cd16861fdd85590cbd6c885be6e682592001dbdfe71829da9ce185df8",
+      "bytes": 59400
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/research-factors-ml.json",
+      "sha256": "c6e65f2c27893472955984b200845c7e0e831dfe47ed07c8b344847b54b43535",
+      "bytes": 50217
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/security-supply-chain.json",
+      "sha256": "3091aacfdaa6ffe98789f7c67a35d499d1ebfab11f5bbd926bdce47d18e8fccd",
+      "bytes": 70340
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/storage-compute.json",
+      "sha256": "e73193fc27b7c63852866dc6a93b6d6c696a94a45d97fcbb42e6700bc7fdf873",
+      "bytes": 58884
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/packets/strategy-research.json",
+      "sha256": "1f04733b31f06069a2888458d944467e63f9e8ee1e3b50b13e00ee45301d35c9",
+      "bytes": 51850
+    },
+    {
+      "path": "evidence/artifacts/trading-convergence-20260926/papers-strategy.md",
+      "sha256": "189a1b80b559e74fc12d0b7e73f6415e4829041bfe8f03d89ca5a18fb11be4f5",
+      "bytes": 30252
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -44817,6 +45038,11 @@
       "path": "evidence/receipts/guard-k4-verification-20261001.json",
       "sha256": "d852600e72600adf422c8ebd9e7a7dde0c36c39249c8002c8caa10ee701fb9d2",
       "bytes": 11220
+    },
+    {
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6",
+      "bytes": 44466
     },
     {
       "path": "evidence/receipts/headroom-039-qualification-20260925.json",
