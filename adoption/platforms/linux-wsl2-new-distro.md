@@ -65,6 +65,8 @@ wsl.exe --list --verbose
 wsl.exe --list --quiet
 Test-Path -LiteralPath 'Z:\WSL\<Name>'
 Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\<Name>.user-data')
+Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml')
+Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue
 Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free
 ```
 
@@ -74,8 +76,13 @@ Proof, recorded in the receipt's `host` block:
 - The starred line of `--list --verbose` names the workstation's distribution (`default_distribution_before`).
 - `<Name>` is not a line of `--list --quiet`, and the first `Test-Path` prints `False`. WSL refuses a name or an install
   folder another registration already uses and creates the folder itself.
-- The second `Test-Path` prints `False`. A Landscape file at that path takes precedence, and cloud-init then never reads
-  the user-data of W3.
+- The second `Test-Path` prints `False`. A Landscape file at that path replaces the local user-data: cloud-init 26.1 loads
+  it first and then never reads the file of W3 (`cloudinit/sources/DataSourceWSL.py:241-270` and `:465-476`).
+- The third `Test-Path` prints `False`, and the `Select-String` line then prints nothing. When `agent.yaml` exists (Ubuntu
+  Pro for WSL writes it), that line lists its top-level keys: record them, and stop if `users:` or `write_files:` is among
+  them. cloud-init 26.1 merges `agent.yaml` over the user-data one top-level key at a time, and an agent key replaces the
+  user-data key entirely (`DataSourceWSL.py:317-336`, called at `:490`). Either key would replace the user or the
+  `[user] default` of W3.
 - `Free` on `Z:` is recorded. The image unpacks to about 1.3 GB before stage 2 adds its tools.
 
 Stop on any other result.
@@ -152,6 +159,8 @@ $LASTEXITCODE
 wsl.exe -d '<Name>' --exec id -un
 wsl.exe -d '<Name>' --exec id -u
 wsl.exe -d '<Name>' -u root --exec cloud-init status --long
+wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
+wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
 wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf
 wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled
 wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'
@@ -163,8 +172,21 @@ Proof (path A, cloud-init provisioned the instance):
 - The launch prints `Provisioning the new WSL instance <Name>` and `This might take a while...`, and `$LASTEXITCODE`
   prints `0`.
 - `id -un` prints `<WSL_USER>` and `id -u` prints `1000`.
-- `cloud-init status --long` exits 0 and prints `status: done` and `errors: []`. Exit 2 means recoverable errors: record
-  them. Exit 1 means cloud-init crashed: stop.
+- `cloud-init status --long` prints `status: disabled` and `boot_status_code: disabled-by-marker-file`. This line proves
+  only that the marker is in place, because cloud-init 26.1 reports `disabled` once `/etc/cloud/cloud-init.disabled`
+  exists, whatever its run did (`cloudinit/cmd/status.py:284-286` and `:385-386`).
+  - Its `detail:` names `DataSourceWSL` while the provisioning boot is still up, and the marker after a restart.
+  - Its `errors` come only from that boot's `/run/cloud-init/status.json` (`:407-419`, `:471-490`).
+  - Exit 2 means recoverable errors (warnings) on that boot while the line still says `disabled`
+    (`:158-163`, `:254-255`). Record them, as `status.json` below does.
+  - `status: error` or exit 1 means that boot's run failed: stop.
+- `/var/lib/cloud/data/result.json` holds `"datasource": "DataSourceWSL"` and `"errors": []`. cloud-init writes this file
+  only when its final stage ends, and it collects the errors of every stage (`cloudinit/cmd/main.py:1017-1030`). Its
+  presence proves the run completed; its empty list proves the run had no errors.
+- `/var/lib/cloud/data/status.json` gives `init-local`, `init`, `modules-config` and `modules-final` each a `finished` time
+  and empty `errors` (`main.py:915-929` and `:975-1015`). Record any `recoverable_errors` (warnings). Both files sit in
+  cloud-init's persistent data directory, with only symbolic links under `/run` (`main.py:880-888`), so they outlive a
+  restart.
 - `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
@@ -187,9 +209,12 @@ wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long
 ```
 
 An imported distribution starts as root and skips the first-run command. Whether cloud-init provisions it is not
-documented, so the `cloud-init status` result is recorded and the next commands skip what already exists. Run them as
-root inside `<Name>`: in a shell from `wsl.exe -d <Name> -u root`, or from a WSL session through
-`wsl.exe -d <Name> -u root -- bash -s < path-b.sh`.
+documented. The `cloud-init status` line therefore only records the import's first boot:
+- `done` or `error` when cloud-init ran;
+- `disabled` with `boot_status_code: disabled-by-generator` when it found no datasource (`cloudinit/cmd/status.py:298-300`).
+
+The next commands skip what already exists. Run them as root inside `<Name>`: in a shell from
+`wsl.exe -d <Name> -u root`, or from a WSL session through `wsl.exe -d <Name> -u root -- bash -s < path-b.sh`.
 
 ```sh
 id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'
@@ -210,7 +235,12 @@ wsl.exe -d '<Name>' --exec id -un
 ```
 
 Proof: `visudo` prints `parsed OK`; `<Name>` is absent from `--list --running`; `id -un` prints `<WSL_USER>`. Then repeat
-W5's checks from `id -u` on and record `path B` in the receipt.
+W5's checks from `id -u` on, with two differences:
+- `cloud-init status --long` reports `boot_status_code: disabled-by-marker-file` because the root block wrote the marker.
+- `result.json` and `status.json` exist only if cloud-init ran on the import (open question 1). Record their contents, or
+  their absence, instead of treating absence as a failure.
+
+Record `path B` in the receipt.
 
 ## First boot inside the new distribution
 
@@ -358,9 +388,15 @@ launch shape from Windows:
 
 ```powershell
 wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'
+wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'
 ```
 
-Proof: two absolute paths, each an executable regular file.
+Proof: the first line prints two absolute paths, and the second prints `executable:` followed by each of them.
+`type -P` finds files where `command -v` would also accept a shell function. It can still print a stale hashed or a
+non-executable path and exit 0 (step 2 of
+[Windows Terminal profiles and the login shell](linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)). The
+second line therefore tests each printed path as a regular file (`test -f`) that is executable (`test -x`). A missing
+`executable:` line fails the proof.
 
 ## Stage-1 receipt
 

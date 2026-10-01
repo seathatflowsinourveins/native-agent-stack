@@ -88,6 +88,27 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
   automount and systemd. Both pages' examples create the user with `sudo: ALL=(ALL) NOPASSWD:ALL` and append
   `[user] default=` to `/etc/wsl.conf` through `write_files`. Whether cloud-init provisions an imported distribution is
   not documented.
+- **cloud-init 26.1, the image's version, at tag `26.1`** (commit `8bf3567532b07e2cc15aa4c76c36ebed65ccfaec`; source read
+  2026-10-01):
+  - `cloudinit/sources/DataSourceWSL.py` loads the Ubuntu Pro files first: the Landscape instance file and `agent.yaml`,
+    both in `%USERPROFILE%\.ubuntupro\.cloud-init` (`:241-270`, `:465-471`). It reads the local file only when no
+    Landscape file exists (`:474-476`) and merges the result (`:490`). `merge_agent_landscape_data` lets every top-level
+    `agent.yaml` key replace the user-data key entirely (`:317-336`), keeping only the user-data's Landscape tags
+    (`:344-350`). When either side is not cloud-config, both go to cloud-init as an `#include` with the agent first
+    (`:307-315`).
+  - `cloudinit/cmd/status.py`: with systemd, `/etc/cloud/cloud-init.disabled` makes the boot code
+    `disabled-by-marker-file` (`:284-286`) and the status `disabled` whatever the run did (`:385-386`). `detail` is the
+    datasource while the run's `/run/cloud-init/status.json` exists and the marker reason otherwise (`:407-419`,
+    `:471-481`). `errors` come only from that `/run` file (`:490`). With no datasource found, the generator's code is
+    `disabled-by-generator` (`:298-300`). After the first launch, `cloud-init status` therefore proves the marker, not
+    the run.
+  - `cloudinit/cmd/main.py`: `status_wrapper` keeps `status.json` and `result.json` in the persistent data directory
+    `/var/lib/cloud/data`, with only symbolic links in `/run/cloud-init` (`:880-888`, `:960-964`). Each stage's
+    `start`, `finished`, `errors` and `recoverable_errors` go into `status.json` (`:915-929`, `:975-1015`).
+    `result.json`, with the datasource and the errors of every stage, is written only when the final stage ends
+    (`:1017-1030`). Single-process boots go through the same wrapper (`:1312-1368`, `:1400-1404`). The datasource
+    string is the class name, `DataSourceWSL` (`cloudinit/sources/__init__.py:398-399`,
+    `cloudinit/type_utils.py:21-28`).
 - **What stage 2 expects** (`origin/main` 3361b342):
   - `adoption/bootstrap-linux.sh:167-178` requires x86_64, a non-root user and an Ubuntu or Debian `ID`.
   - `:186-200` refuses `--configure-full-profile` unless the checkout's `HEAD` is `origin/main`.
@@ -150,6 +171,11 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      `[user] default` appended to `/etc/wsl.conf`. Then run
      `wsl --install --from-file <dir>\ubuntu-24.04.5-wsl-amd64.wsl --name <Name> --location Z:\WSL\<Name> --no-launch` (W4),
      then a first launch with standard input at end of file (W5).
+   - **Preflight (W1).** Neither Ubuntu Pro file exists, or `agent.yaml`'s top-level keys are recorded and include
+     neither `users` nor `write_files`.
+   - **After the first launch (W5).** `cloud-init status --long` must print `status: disabled` with
+     `boot_status_code: disabled-by-marker-file`. Completion and errors come from `/var/lib/cloud/data/result.json`
+     (`DataSourceWSL`, `"errors": []`) and `/var/lib/cloud/data/status.json` (four stages finished without errors).
    - **How to tell cloud-init did not provision.** The launch prints `Create a default Unix user account:` and
      `OOBE command "/usr/lib/wsl/wsl-setup" failed, exiting` and returns nonzero.
    - **Fallback, path B (W6).** Re-list, `--unregister` the literal new name, `--import ... --version 2`, then a manual user
@@ -173,7 +199,8 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
      probed with `ss`.
    - Native sign-in, then stage 2 with `--profile <id> --configure-full-profile --host <host>`. The brief's command lacked
      `--profile`, which the script requires.
-   - The Windows Terminal fragment with profile names that carry `<Name>`, then `type -P claude codex`.
+   - The Windows Terminal fragment with profile names that carry `<Name>`, then `type -P claude codex`, with each printed
+     path tested by `test -f` and `test -x`.
 4. **Host-wide.**
    - No `.wslconfig` change, no `wsl --update`, never `wsl --shutdown`.
    - `wsl --terminate <Name>` only, and only for the new distribution.
@@ -217,6 +244,8 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | W1 | powershell | `wsl.exe --list --quiet` | `<Name>` is not listed |
 | W1 | powershell | `Test-Path -LiteralPath 'Z:\WSL\<Name>'` | `False` |
 | W1 | powershell | `Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\<Name>.user-data')` | `False` |
+| W1 | powershell | `Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml')` | `False`; when `True`, the next row decides |
+| W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue` | no output, or the top-level keys recorded and neither `users:` nor `write_files:` among them |
 | W1 | powershell | `Get-PSDrive -Name Z \| Select-Object -Property Name, Used, Free` | `Free` recorded |
 | W2 | powershell | `$ProgressPreference = 'SilentlyContinue'` | no progress rendering during the download |
 | W2 | powershell | `Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'` | 388,975,696 bytes saved |
@@ -242,7 +271,9 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | W5 | powershell | `$LASTEXITCODE` | `0`; nonzero with the markers means W6 |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -un` | `<WSL_USER>` |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -u` | `1000` |
-| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --long` | exit 0, `status: done`, `errors: []` |
+| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --long` | `status: disabled` and `boot_status_code: disabled-by-marker-file`; proves the marker, not the run |
+| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json` | `"datasource": "DataSourceWSL"` and `"errors": []`: the run completed without errors |
+| W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json` | each of the four stages `finished` with empty `errors`; `recoverable_errors` recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[user]`, `default=<WSL_USER>`, each once |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
@@ -251,7 +282,7 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | W6 | powershell | `wsl.exe --list --quiet` | read before unregistering: `<Name>` is the new distribution |
 | W6 | powershell | `wsl.exe --unregister '<Name>'` | `<Name>` removed, nothing else |
 | W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2` | exit 0 |
-| W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | recorded (open question 1) |
+| W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | `done` or `error` when cloud-init ran, `disabled` by `disabled-by-generator` when it found no datasource; recorded (open question 1) |
 | W6 | sh | `id -u '<WSL_USER>' \|\| useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'` | uid 1000 exists |
 | W6 | sh | `printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user` | the drop-in written |
 | W6 | sh | `chmod 0440 /etc/sudoers.d/90-wsl-default-user` | mode 0440 |
@@ -288,7 +319,8 @@ when a row and the recipe disagree. The proofs are what the run must print; none
 | F9 | sh | `cd ~/code/native-agent-stack` | the clone |
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>'` | stage 2 (bootstrap step 2) |
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'` | stage 2, after native sign-in |
-| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two executable paths |
+| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two absolute paths |
+| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'` | `executable:` and each path: both are regular executable files |
 
 ## Open questions
 
@@ -318,6 +350,13 @@ Each one stays open until a host run records the observation named here.
 - **Local integration.** `tests/test_wsl_new_distro_recipe.py`, checks over repository text and an in-memory render; it
   runs nothing on a host.
 - **Not run.** Stage 1 and the first boot. The first host run records `native_proven` evidence in the stage-1 receipt.
+- **Cross-family review.** GPT-6.1 Sol, read-only, 2026-10-01, of PR #569, returned `needs_changes` with three findings.
+  All three were fixed against the cloud-init 26.1 source above, and `tests/test_wsl_new_distro_recipe.py`
+  `CrossFamilyReviewTests` keeps them fixed:
+  - W5 expected `status: done` after the marker exists; it now expects `disabled-by-marker-file` and reads
+    `result.json` and `status.json`, and W6 does the same.
+  - W1 did not check `agent.yaml`.
+  - F10 trusted `type -P` alone.
 
 ## Sources
 
@@ -378,8 +417,13 @@ Read on 2026-10-01 by the research unit or by unit W2:
   - https://docs.cloud-init.io/en/latest/reference/modules.html (Users and Groups: `uid`, `lock_passwd` default `true`,
     `sudo`)
   - https://docs.cloud-init.io/en/latest/reference/cli.html (`status --long`, exit codes 0, 1 and 2)
-  - https://github.com/canonical/cloud-init at tag `26.1`: `cloudinit/distros/__init__.py:662-684` (`add_user` runs
-    `useradd`)
+  - https://github.com/canonical/cloud-init at tag `26.1` (`8bf3567532b07e2cc15aa4c76c36ebed65ccfaec`):
+    - `cloudinit/distros/__init__.py:662-684` (`add_user` runs `useradd`)
+    - `cloudinit/cmd/status.py:25-68, 83-88, 232-307, 381-392, 407-419, 459-527` (marker and generator boot codes,
+      `disabled` running status, `detail` and `errors` from the `/run` copy, exit codes)
+    - `cloudinit/cmd/main.py:880-1032, 1312-1368, 1400-1404` (`status.json` and `result.json` in `/var/lib/cloud/data`)
+    - `cloudinit/sources/DataSourceWSL.py:241-355, 435-491` (Ubuntu Pro file loading and the `agent.yaml` merge)
+    - `cloudinit/sources/__init__.py:398-399` and `cloudinit/type_utils.py:21-28` (the datasource's string name)
 - Microsoft WSL, Docker and systemd:
   - https://github.com/microsoft/WSL at tag 2.7.13 (`80697fd42cca3de0c0d5dd1931c36112372a577e`):
     `src/windows/common/WslClient.cpp`, `src/windows/service/exe/LxssUserSession.cpp`,

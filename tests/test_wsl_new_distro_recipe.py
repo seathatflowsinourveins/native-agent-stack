@@ -19,7 +19,14 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
 - no recipe command shuts WSL down, updates it, edits .wslconfig, changes the default distribution,
   or terminates, unregisters or manages any distribution but ``<Name>`` (decision 4), and the one
   install command is ``--install --from-file ... --name <Name> --location ... --no-launch``;
-- the first-boot checklist and the receipt example name exactly the recipe's steps.
+- the first-boot checklist and the receipt example name exactly the recipe's steps;
+- the three findings of the 2026-10-01 cross-family review stay fixed:
+  - after the first launch, W5 expects ``status: disabled`` by ``disabled-by-marker-file`` and reads completion and
+    errors from /var/lib/cloud/data/result.json and status.json (cloud-init 26.1 cloudinit/cmd/status.py:284-286 and
+    cloudinit/cmd/main.py:1017-1030);
+  - W1 tests both Ubuntu Pro files, the Landscape instance file and agent.yaml
+    (cloudinit/sources/DataSourceWSL.py:241-270 and 317-336);
+  - F10 tests every path ``type -P`` prints with ``test -f`` and ``test -x``.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell or cloud-init; a pass is not a host run.
@@ -98,9 +105,9 @@ def recipe_rows(text: str) -> list[tuple[str, str, str]]:
     return rows
 
 
-def command_table(text: str) -> list[tuple[str, str, str]]:
-    """(step, shell, command) for every row of the record's "## Command table" section; a command cell is one code
-    span, with ``\\|`` for a literal pipe."""
+def command_table_rows(text: str) -> list[tuple[str, str, str, str]]:
+    """(step, shell, command, proof) for every row of the record's "## Command table" section; a command cell is one
+    code span, with ``\\|`` for a literal pipe."""
     section = text.split("\n## Command table\n", 1)
     if len(section) != 2:
         return []
@@ -111,11 +118,16 @@ def command_table(text: str) -> list[tuple[str, str, str]]:
         cells = [cell.strip() for cell in re.split(r"(?<!\\)\|", line.strip().strip("|"))]
         if len(cells) < 4 or cells[0] in ("Step", "") or set(cells[0]) <= set("-: "):
             continue
-        step, shell, command = cells[0], cells[1], cells[2]
+        step, shell, command, proof = cells[0], cells[1], cells[2], cells[3]
         if command.startswith("`") and command.endswith("`"):
             command = command[1:-1]
-        rows.append((step, shell, command.replace("\\|", "|")))
+        rows.append((step, shell, command.replace("\\|", "|"), proof))
     return rows
+
+
+def command_table(text: str) -> list[tuple[str, str, str]]:
+    """(step, shell, command) for every row of the record's command table."""
+    return [(step, shell, command) for step, shell, command, _ in command_table_rows(text)]
 
 
 def command_table_errors(recipe: str, record: str) -> list[str]:
@@ -274,6 +286,64 @@ def checklist_errors(checklist: str, recipe: str) -> list[str]:
     return errors
 
 
+def section(text: str, step: str) -> str:
+    """One ``### <step>.`` section of the recipe, up to the next heading."""
+    match = re.search(rf"^### {re.escape(step)}\. .*?(?=^##)", text, re.M | re.S)
+    return match.group(0) if match else ""
+
+
+def cloud_init_status_errors(recipe: str, record: str, checklist: str) -> list[str]:
+    """Review finding 1. Once /etc/cloud/cloud-init.disabled exists, cloud-init 26.1 reports ``disabled`` whatever its
+    run did (cloudinit/cmd/status.py:284-286, 385-386), and ``status`` reads errors only from the boot's /run copy
+    (:471-490). The checks after the first launch must expect that state and read completion and errors from the
+    files kept in /var/lib/cloud/data (cloudinit/cmd/main.py:880-888, 1017-1030)."""
+    errors = []
+    proofs = [proof for step, _, command, proof in command_table_rows(record)
+              if step == "W5" and command.endswith("cloud-init status --long")]
+    if not proofs:
+        errors.append("the record has no W5 `cloud-init status --long` row")
+    for proof in proofs:
+        if "status: disabled" not in proof or "disabled-by-marker-file" not in proof:
+            errors.append("the W5 status row does not expect `status: disabled` by `disabled-by-marker-file`")
+        if "status: done" in proof:
+            errors.append("the W5 status row expects `status: done`, which 26.1 never prints once the marker exists")
+    w5 = [command for step, _, command in recipe_rows(recipe) if step == "W5"]
+    for retained in ("/var/lib/cloud/data/result.json", "/var/lib/cloud/data/status.json"):
+        if not any(command.endswith(f"cat {retained}") for command in w5):
+            errors.append(f"W5 does not read {retained}")
+    if "status: done" in section(recipe, "W5"):
+        errors.append("the recipe's W5 proof still expects `status: done`")
+    line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **W5**")), "")
+    if "disabled-by-marker-file" not in line or "result.json" not in line or "is `done`" in line:
+        errors.append("the checklist's W5 line does not expect the marker state and the retained result")
+    return errors
+
+
+def landscape_preflight_errors(recipe: str) -> list[str]:
+    """Review finding 2. In cloud-init 26.1 the Landscape instance file replaces the local user-data
+    (cloudinit/sources/DataSourceWSL.py:241-270, 465-476), and every top-level key of agent.yaml replaces the
+    user-data's key (:317-336, called at :490). W1 therefore tests both files and lists agent.yaml's top-level keys."""
+    w1 = [command for step, _, command in recipe_rows(recipe) if step == "W1"]
+    errors = [f"W1 does not test for {name}" for name in
+              (r".ubuntupro\.cloud-init\<Name>.user-data", r".ubuntupro\.cloud-init\agent.yaml")
+              if not any(command.startswith("Test-Path") and name in command for command in w1)]
+    if not any(command.startswith("Select-String") and "agent.yaml" in command for command in w1):
+        errors.append("W1 does not list the top-level keys of agent.yaml")
+    if "`users:`" not in section(recipe, "W1") or "`write_files:`" not in section(recipe, "W1"):
+        errors.append("W1's proof does not name the agent.yaml keys that would replace the user-data's")
+    return errors
+
+
+def path_proof_errors(recipe: str) -> list[str]:
+    """Review finding 3. ``type -P`` can print a stale hashed or non-executable path and still exit 0
+    (adoption/platforms/linux-wsl2.md, Windows Terminal step 2), so F10 tests every printed path with ``test -f`` and
+    ``test -x``."""
+    f10 = [command for step, _, command in recipe_rows(recipe) if step == "F10"]
+    if any("type -P claude codex" in command and "test -f" in command and "test -x" in command for command in f10):
+        return []
+    return ["F10 does not test each path `type -P claude codex` prints with `test -f` and `test -x`"]
+
+
 class UserDataTemplateTests(unittest.TestCase):
     def test_the_template_renders_to_the_recipe_user(self):
         self.assertEqual(user_data_errors(read(USER_DATA)), [])
@@ -398,6 +468,48 @@ class ChecklistTests(unittest.TestCase):
         first = CHECKLIST_STEP_RE.search(checklist).group(0)
         self.assertTrue(checklist_errors(checklist.replace(first, "- [ ] **gone**", 1), recipe))
         self.assertTrue(checklist_errors(checklist + f"\n{first} again\n", recipe))
+
+
+class CrossFamilyReviewTests(unittest.TestCase):
+    """The three findings of the 2026-10-01 GPT-6.1 Sol review of PR #569 stay fixed."""
+
+    def test_the_first_launch_checks_expect_the_marker_and_read_the_retained_result(self):
+        self.assertEqual(cloud_init_status_errors(read(RECIPE), read(RECORD), read(CHECKLIST)), [])
+
+    def test_the_status_check_rejects_status_done_and_a_missing_retained_result(self):
+        recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
+        row = next(line for line in record.splitlines()
+                   if line.startswith("| W5 |") and line.split("|")[3].strip().endswith("cloud-init status --long`"))
+        retained = "wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json\n"
+        marker = "prints `status: disabled` with `boot_status_code: disabled-by-marker-file`"
+        self.assertIn(retained, recipe)
+        self.assertIn(marker, checklist)
+        mutants = {
+            "status done": (recipe, record.replace(row, row.replace("`status: disabled`", "`status: done`")), checklist),
+            "no result.json": (recipe.replace(retained, ""), record, checklist),
+            "checklist done": (recipe, record, checklist.replace(marker, "is `done` with no errors")),
+        }
+        for name, (page, table, ticks) in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(page + table + ticks, recipe + record + checklist)
+                self.assertTrue(cloud_init_status_errors(page, table, ticks))
+
+    def test_the_preflight_checks_both_ubuntu_pro_files(self):
+        self.assertEqual(landscape_preflight_errors(read(RECIPE)), [])
+
+    def test_the_preflight_check_rejects_a_missing_agent_yaml_test(self):
+        recipe = read(RECIPE)
+        line = "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')\n"
+        self.assertIn(line, recipe)
+        self.assertTrue(landscape_preflight_errors(recipe.replace(line, "")))
+
+    def test_the_path_proof_tests_each_printed_path(self):
+        self.assertEqual(path_proof_errors(read(RECIPE)), [])
+
+    def test_the_path_proof_check_rejects_type_p_alone(self):
+        recipe = read(RECIPE)
+        self.assertIn("test -x $p && ", recipe)
+        self.assertTrue(path_proof_errors(recipe.replace("test -x $p && ", "")))
 
 
 if __name__ == "__main__":
