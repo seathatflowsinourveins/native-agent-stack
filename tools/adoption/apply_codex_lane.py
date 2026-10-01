@@ -1065,7 +1065,7 @@ def cmd_apply(args: argparse.Namespace, codex: str) -> int:
         record["omniroute_profile"] = {"path": str(plan.omniroute_path), "existed": plan.omniroute_bytes is not None,
                                        "sha256_after": sha256_bytes(plan.omniroute_template), "state": "pending"}
     role_pins_now = codex_roles.sha256sums(ROLES_SOURCE / codex_roles.SHA256SUMS_NAME)
-    if plan.worker_roles:  # a run without the flag never reads the worker roles' folder
+    if plan.worker_roles:  # a run without the flag takes no worker-role pins (it only compares installed copies)
         role_pins_now.update(codex_roles.sha256sums(WORKER_ROLES_SOURCE / codex_roles.SHA256SUMS_NAME))
     role_states = plan.role_states()
     record["agent_roles"] = {  # records of runs of an older tool have none, and rollback then leaves the roles alone

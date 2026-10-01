@@ -36,13 +36,16 @@ CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
 USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
-# A server the carrier names that the user-scope template leaves out, with a file and the phrase in it that keeps it
-# out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md; its
-# user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
+# A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
+# it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
+# its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
 # accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
-# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph).
+# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph). The first phrase is Claude
+# Code's per-project registration command, so the exception holds only while a project can still register the server
+# the carrier names; the second is the Codex user template's statement of the same scope.
 CARRIER_EXCEPTIONS = {
-    "jcodemunch": ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)"),
+    "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
+                   ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
 }
 # Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
 # entry has carried neither since 2026-09-23.
@@ -63,8 +66,9 @@ def carrier_blocks_text(directory: Path) -> str:
 
 
 def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions: dict, read) -> list[str]:
-    """One error per server the carrier names that the template neither registers nor excepts with its phrase present
-    in the named file (read(path) -> text or None), and per exception for a server the template registers anyway."""
+    """One error per server the carrier names that the template neither registers nor excepts, per exception phrase
+    missing from its named file (read(path) -> text or None), and per exception for a server the template registers
+    anyway."""
     errors = []
     for name in sorted(carrier_servers(carrier_text)):
         if name in registered:
@@ -74,9 +78,9 @@ def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions:
         if name not in exceptions:
             errors.append(f"{name}: named by the carrier, not registered at user scope and not an exception")
             continue
-        path, phrase = exceptions[name]
-        if phrase not in (read(path) or ""):
-            errors.append(f"{name}: the exception's phrase is not in {path}")
+        for path, phrase in exceptions[name]:
+            if phrase not in (read(path) or ""):
+                errors.append(f"{name}: the exception's phrase is not in {path}")
     return errors
 
 
@@ -1147,6 +1151,9 @@ class McpCarrierCoverageTests(unittest.TestCase):
             "the exception's reason removed": (carrier, registered, CARRIER_EXCEPTIONS,
                                                lambda path: (self.read(path) or "").replace(
                                                    "jcodemunch stays project-scoped (#240)", "")),
+            "the per-project registration removed": (carrier, registered, CARRIER_EXCEPTIONS,
+                                                     lambda path: (self.read(path) or "").replace(
+                                                         "claude mcp add --scope local jcodemunch", "")),
             "an exception for a registered server": (carrier, registered | {"jcodemunch"}, CARRIER_EXCEPTIONS,
                                                      self.read),
         }

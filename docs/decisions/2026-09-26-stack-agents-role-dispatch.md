@@ -393,15 +393,18 @@ to 50-55 a day later.
    `isolated-builder`) carries neither sentence until that body's owner accepts one.
 2. **Opt-in install.** `tools/adoption/apply_codex_lane.py --worker-roles` installs them exactly like the carriers:
    pinned digest and structural rules before any copy, create-only 0600 files in a 0700 folder, read-back, journal,
-   rollback, and the scratch `codex doctor --json` rehearsal. A run without the flag behaves as before and never reads
-   the worker folder; it counts an installed worker role that equals its source as known, not as an extra role file.
+   rollback, and the scratch `codex doctor --json` rehearsal. A run without the flag installs and validates no worker
+   role; it reads a worker source only to count an installed role that equals it as known, not as an extra role file.
    The flag stays opt-in until the Gate A window closes: `role.rs:294-334` shows every installed role's description
    to every parent in every arm, and `tools/token-e2e/freeze_snapshot.py:108,1244` counts every role file other than
    the two carriers.
 3. **Claude user-scope MCP.** `adoption/mcp/claude-user.json` adds `socraticode`, `headroom`, `codebase-memory` and
    `qmd`, so it registers exactly the servers the carrier blocks name (all six `adoption/hooks/claude/token-lanes-block*.md`,
    whose union is the general block's seven servers) except `jcodemunch` and context-mode, whose plugin supplies
-   it. Each entry runs its Codex template entry's command, arguments and environment, except serena's `claude-code`
+   it. jCodeMunch registers per project, with the `claude mcp add --scope local jcodemunch` command of
+   `adoption/bootstrap.md` ("jCodeMunch, per project"; the 2026-09-25 addendum of the
+   [user-profile record](2026-09-23-claude-user-profile.md)); the coverage test keeps the exception only while that
+   command and the Codex template's scope sentence are present. Each entry runs its Codex template entry's command, arguments and environment, except serena's `claude-code`
    context, SocratiCode's npm bin link (the Claude installer renders only `${HOME}` and `${ECO_ROOT}`, never the Codex
    template's per-platform `${SOCRATICODE_VERSION}`) and the Codex-only `PATH` and `RTK_TELEMETRY_DISABLED`.
    Claude Code has no per-server start-up timeout (`MCP_TIMEOUT` is global), so the Codex template's
@@ -498,6 +501,15 @@ Installing the worker roles by default needs changes outside this unit's paths: 
   `mcp_servers.serena`"), though doctor still reported 0 role warnings for the five files. Usage: no model call.
 - Round 2 tests: `tests/test_task_model_routing.py` passed on the rebased tree before any round-2 edit (10 tests),
   so no worker role, the applier or `tools/adoption/codex_roles.py` binds GPT-6.1 or `${CODEX_MODEL}`.
+- Round 2 cross-family review, 2026-10-01 (`cx/gpt-6.1-sol`, effort max, read-only, whole branch at `112bd68c`):
+  `needs_changes`, one medium and one low finding. Medium: the coverage test excepted `jcodemunch` on a Codex-side
+  phrase alone, while the unit's task text excepted only context-mode. Kept: the per-project scope, which the
+  2026-09-25 addendum decided on a measured comparison and whose overturn is that addendum's. Repaired: the exception
+  now also requires Claude Code's per-project registration command in `adoption/bootstrap.md`, with a mutant control
+  for its removal, and item 3 names the command. Open for the new host: no script runs that command, so a checkout
+  whose carrier names jCodeMunch registers it by hand. Low: item 2 and a comment in
+  `tools/adoption/apply_codex_lane.py` said a run without the flag never reads the worker folder; it reads a worker
+  source to recognise an installed copy. Both sentences are corrected. Usage: 193,602 tokens.
 
 ### Sources
 
