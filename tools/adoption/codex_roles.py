@@ -371,7 +371,10 @@ def _rule_worktree(role, stem, data):
 
 
 # (rule id, roles it applies to, source, check). Sources are openai/codex at rust-v0.157.1 (36650394) unless a
-# repository path is given; a check returns True when the rule is violated. The carriers' rules reach the worker roles
+# repository path or another tag is given. codex-rs/agent-roles/src/agent_role_config.rs and core/src/agent/role.rs,
+# whose lines the role-file rules cite, are byte-identical at rust-v0.159.2, the lane's Codex pin since unit D4 (sha256
+# 70ba8cf41c7339a0... and 0311e6438eda278a..., both tags read 2026-10-01), so those citations hold at the pin; a check
+# returns True when the rule is violated. The carriers' rules reach the worker roles
 # through ALL_ROLES; exact_shapes stays with the carriers, whose E2E measured it, and the worker roles carry the same six
 # exceptions in their F4 block.
 RULES = (
@@ -427,7 +430,7 @@ RULES = (
      "directory) and evidence/artifacts/token-adoption-e2e-20260926/README.md:370 (M13: no explicit cwd)",
      _rule_cwd),
     ("exact_shapes", ROLES,
-     "adoption/templates/codex.AGENTS.template.md:41-46 (six exceptions, jq included) and "
+     "adoption/templates/codex.AGENTS.template.md:49-54 (six exceptions, jq included) and "
      "evidence/artifacts/token-adoption-e2e-20260926/README.md:363 (M6c: 0 exception commands wrapped in rtk)",
      _rule_exact_shapes),
     ("no_web_rule", ("stack-verifier", "evidence-reviewer", "semantic-evidence-reviewer"),

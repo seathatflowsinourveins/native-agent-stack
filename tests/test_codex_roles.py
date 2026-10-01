@@ -11,6 +11,7 @@ tests/test_codex_worker_lane.py, so synthetic) are exercised here.
 """
 
 import hashlib
+import re
 import shlex
 import shutil
 import sys
@@ -414,6 +415,25 @@ class WorkerSentenceTests(unittest.TestCase):
                                ("landscape-sweep-worker.md", UPSTREAM_SENTENCE)):
             with self.subTest(claude=body):
                 self.assertEqual((CLAUDE_AGENTS / body).read_text(encoding="utf-8").count(sentence), 1)
+
+
+class RuleSourceCitationTests(unittest.TestCase):
+    """A repository line range that a rule's source cites holds what the source says it holds. Unit F1 (#557) moved the
+    Codex AGENTS template's six RTK exceptions from lines 41-46 to 49-54 (docs/decisions/2026-09-30-rule-text-every-
+    layer.md, "Stale line citation"), which the exact_shapes source still cited."""
+
+    def test_the_exact_shapes_source_cites_the_templates_six_exceptions(self):
+        module = roles(self)
+        [source] = [source for rule, _roles, source, _check in module.RULES if rule == "exact_shapes"]
+        match = re.search(r"adoption/templates/codex\.AGENTS\.template\.md:(\d+)-(\d+)", source)
+        self.assertTrue(match, source)
+        lines = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_text(encoding="utf-8").splitlines()
+        cited = lines[int(match[1]) - 1:int(match[2])]
+        commands = ("`git show REV:path`", "`diff`", "`git branch`", "`git log`", "`jq`", "`find`")
+        self.assertEqual(len(cited), len(commands), cited)
+        for command, line in zip(commands, cited):
+            with self.subTest(command=command):
+                self.assertTrue(line.startswith("- " + command), line)
 
 
 class WorkerSourceProblemsTests(unittest.TestCase):

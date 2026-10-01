@@ -469,7 +469,11 @@ Installing the worker roles by default needs changes outside this unit's paths: 
 ### Sources
 
 - openai/codex `rust-v0.157.1`: `codex-rs/core/src/agent/role.rs:36-48` and `:294-334`;
-  `codex-rs/agent-roles/src/agent_role_config.rs:20-28`.
+  `codex-rs/agent-roles/src/agent_role_config.rs:20-28`. Both files are byte-identical at `rust-v0.159.2`, the lane's
+  Codex pin since unit D4 (read 2026-10-01 from the raw files of both tags; sha256 `70ba8cf41c7339a0...` and
+  `0311e6438eda278a...`), so these lines hold at the pin. At `rust-v0.159.2`, `codex-rs/core/src/agent/child_config.rs:62-73`
+  and `:204-206` (which changed since `rust-v0.157.1`) apply the spawn's model, else `default_subagent_model`, before
+  the role, and `role.rs:184-186` and `:312-324` give the role's model precedence and show it as fixed.
 - DeusData/codebase-memory-mcp `v0.11.0` `README.md`: "Manual MCP Configuration" and "Session Coordination Daemon".
 - [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) (scopes, `MCP_TIMEOUT`), read 2026-09-30, and
   `claude mcp add --help` of Claude Code 2.1.285.
