@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "kind": "unchanged_upstream_test_execution",
+  "recorded_at_utc": "2026-10-01",
+  "repository": "https://github.com/akitaonrails/ai-memory",
+  "tag": "v2.5.2",
+  "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+  "source": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/tests/hooks/test_lib.sh",
+  "source_sha256": "f5aae7d9056ec9844c46cd6d1c5848c9966a37f3d8a94e12723e66cb7630fee8",
+  "tested_library": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/hooks/_lib.sh",
+  "tested_library_sha256": "050b24ea52e1cc99135467bbeffbc7982adb6bdd2c3b4d2ccb679660a500ed83",
+  "checkout": {
+    "native_clone": "git clone --branch v2.5.2 --depth 1 https://github.com/akitaonrails/ai-memory.git <isolated-private-source-checkout>",
+    "clone_exit_code": 0,
+    "native_git_status_exit_code": 0,
+    "working_tree_clean_after_test": true,
+    "source_changes": "none"
+  },
+  "execution": {
+    "command": "rtk sh tests/hooks/test_lib.sh",
+    "exit_code": 0,
+    "returned_summary": "137 passed, 0 failed",
+    "stdout": "evidence/artifacts/new-wsl-layer-reviews-20261001/ai-memory-252-hook-tests.stdout.txt",
+    "stdout_bytes": 6536,
+    "stdout_sha256": "a2505133bf2d7ba9cabcfb9c9f65374c904d55b3a19c894e890d7581f7c850d7",
+    "stderr_bytes": 0,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scope": "Existing-host execution of the unchanged upstream POSIX hook suite"
+  },
+  "evidence_boundary": {
+    "fixtures": "The upstream suite isolates its temporary state and uses a curl stub to check the shipped hook functions. Its external-capture cases exercise observation suppression, retained synchronous handoff delivery, retained backlog and explicit drain behavior.",
+    "upstream_test_acceptance": "passed for this suite only",
+    "native_client_lifecycle_integration": "not exercised by this suite",
+    "provider_or_model_execution": "none",
+    "semantic_quality": "not measured",
+    "new_host_execution": "none",
+    "production_upgrade": "none",
+    "independent_rerun": "Astra/max reran the exact unchanged suite at the same commit: exit 0, returned 137 passed, 0 failed, empty stderr. Retained in durable-memory-candidate-followup.json#/independent_native_rerun."
+  },
+  "additional_native_check": {
+    "command": "rtk cargo nextest --version",
+    "exit_code": 1,
+    "returned_output": "rtk: Failed to run cargo nextest: Failed to spawn process: No such file or directory (os error 2)",
+    "independent_observation": "The current process PATH lookup found no cargo executable. This bounded observation does not establish anything about other hosts or non-PATH installations.",
+    "consequence": "The Rust external_capture suite and full native cargo tf gate were not executed. Their supported prerequisites remain a target-host step."
+  },
+  "closure_effect": "Reduces the native POSIX hook-contract gap; does not close durable-memory c3 or c4 and does not establish saturation."
+}

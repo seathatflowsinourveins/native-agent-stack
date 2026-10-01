@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "kind": "source_qualified_native_caller_trial",
+  "recorded_at": "2026-10-01",
+  "client": "Claude Code2.1.286",
+  "problem": "A successful headless turn returned while native Workflow continued in the background; its saved runtime was later killed/aborted. A direct persistent TTY invocation then exited before accepting input.",
+  "bounded_diagnosis": {
+    "initial_role": "gpt-6.1-sol/max source diagnosis",
+    "escalation_role": "gpt-6-astra/max stack-researcher",
+    "trigger": "The direct-TTY execution failed after one bounded Sol source repair; native lifetime/topology evidence required independent Astra review.",
+    "acceptance": "Persistent non-TTY pipe topology is source-qualified. End-to-end native Workflow completion has not yet been accepted."
+  },
+  "direct_tty_trial": {
+    "exit_code": 1,
+    "workflow_launched": false,
+    "returned_stderr": "Error: Input must be provided either through stdin or as a prompt argument when using --print\n",
+    "private_original_stdout": {"file": "claude-stream.stdout.jsonl", "bytes": 13348, "sha256": "f454b0566777e982bc0524ea160622c8baab0d0dc7e1ac4a1f2958b4cf4b2bd8"},
+    "private_original_stderr": {"file": "claude-stream.stderr", "bytes": 94, "sha256": "2122456c9827a04aff9792c1149505097ac016d61c330a0df0dd73976358987c"},
+    "interpretation": "The exact native TTY validation predicate was not recovered. A TTY-versus-pipe explanation is an inference; the actual rejection and exit status are observations. Startup-hook provider effects were not totaled."
+  },
+  "qualified_transport": {
+    "command_shape": "rtk proxy stty -echo && rtk proxy cat | rtk proxy claude -p --model opus --effort max --input-format stream-json --output-format stream-json --verbose --no-session-persistence --allowedTools Workflow > owned-stream.jsonl 2> owned-stderr",
+    "input": "Newline-terminated upstream SDK user event; retain stdin until Workflow terminal completion and the resulting parent continuation.",
+    "input_envelope_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/client.py#L288-L296",
+    "pipe_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L873-L881",
+    "lifetime_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/query.py#L1053-L1087",
+    "native_recipe": "tools/sota-convergence/landscape-sweep/README.md:323-358",
+    "script": {"file": "sweep.embedded.js", "bytes": 32530, "sha256": "707597a8d54b6a54e9de656912a9de940e8e6d9b5d68b18fbf65408ad9767011"},
+    "staging": "Fresh owned job directory avoids reusing finished Codex job IDs. Verified483-repository freshness and scope/seeds are reused unchanged; the maintained builder stages a new path-specific embedded copy without vendor edits."
+  },
+  "native_trial_observation": {
+    "request_accepted": true,
+    "native_workflow_run_id": "wf_dea95056-af5",
+    "workflow_launch_tool_error": false,
+    "parent_result_seen": true,
+    "caller_remains_live_after_first_result": true,
+    "owned_codex_discovery_job_observed": "gpt6-discover-durable-memory",
+    "workflow_terminal_completion": "pending",
+    "complete_usage_and_copy_verification": "pending",
+    "caller_final_exit": "pending"
+  },
+  "protocol_corrections": [
+    "A result ends a turn; it does not universally establish completion of background local_workflow tasks.",
+    "The SDK's automatic wait-before-closing path is conditional on bidirectional needs. A finite one-message generator is not a universal lifetime guarantee.",
+    "Workflow resumeFromRunId is same-session only; the original no-persistence session cannot be recovered through a fresh caller.",
+    "TaskOutput was removed in2.1.277 and is not a repair for installed2.1.286.",
+    "CLI session-state frames are SDK opt-in behavior; they are not the sole completion oracle for this unconfigured native stream."
+  ],
+  "sources": [
+    "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+    "https://code.claude.com/docs/en/headless#pipe-data-through-claude",
+    "https://code.claude.com/docs/en/agent-sdk/streaming-vs-single-mode",
+    "https://code.claude.com/docs/en/agent-sdk/typescript#workflow",
+    "https://code.claude.com/docs/en/workflows#resume-after-a-pause",
+    "https://code.claude.com/docs/en/agent-sdk/typescript#taskoutput",
+    "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L853-L861",
+    "https://pubs.opengroup.org/onlinepubs/000095399/utilities/xcu_chap02.html#tag_02_09_02"
+  ],
+  "closure_effect": "None pending actual native completion, usage and copied-output verification. Source-qualified caller lifetime is distinct from semantic-memory quality and target-host acceptance."
+}
