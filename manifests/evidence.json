@@ -3730,7 +3730,7 @@
         "Complete provider billing/backend identity and whole-task token savings remain unknown; cached/reasoning counters are subsets.",
         "Native Claude Opus/Max peer timed out180s exit124 without a verdict; later peer turns reached account usage limits. Completed earlier reviews are preserved; no new acknowledgement/approval is claimed.",
         "Original full output stays private with exact hashes; public excerpts replace private paths and omit raw conversations, marker values, credentials and flow identifiers.",
-        "Exact executed sources are archived; publication removes only redundant comments/blank lines with identical ASTs. No model rerun is claimed for the cleaned current source."
+        "Exact executed sources are archived. Initial whitespace/comment cleanup had identical ASTs; the current worker subsequently adopts native secret-aware serialization after CodeQL, verified by native fixture and fresh saved-state checks. No new provider run is claimed."
       ],
       "path": "evidence/receipts/native-runtime-role-resolution-20260930.json"
     }
@@ -34014,13 +34014,13 @@
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/execution-source-bindings.json",
-      "sha256": "e037c0f8d4587f3281ed102dad8539b780b0dee27c9e8da121ddcf0d9bc0de8a",
-      "bytes": 1517
+      "sha256": "b20c57c51bc06560cfcf427159bfdd25dd89d895be61ca095247123d24b26ee9",
+      "bytes": 1852
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
-      "sha256": "b7636d1500a6792317479d37a4b34e79d5403b934a778933e1a92b218e11387c",
-      "bytes": 36479
+      "sha256": "8f64a8c5ecc9ffdcc77ba74c9c93d026b2bfcffd2e24275618b5b39686820e61",
+      "bytes": 36711
     },
     {
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
@@ -34041,6 +34041,11 @@
       "path": "evidence/artifacts/native-runtime-role-resolution-20260930/root-verification.json",
       "sha256": "7bbe0f411ca1074db4e892d5b57ec60ecffc4f56c91b0233f117d42ce4520473",
       "bytes": 3888
+    },
+    {
+      "path": "evidence/artifacts/native-runtime-role-resolution-20260930/secret-aware-serialization.json",
+      "sha256": "0cfe0327c5babe0251b7b4047f88f69c027d75438c87abd8362b95faa85e7a75",
+      "bytes": 2164
     },
     {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
@@ -44324,8 +44329,8 @@
     },
     {
       "path": "evidence/receipts/native-runtime-role-resolution-20260930.json",
-      "sha256": "776ad19174cdc3acba56aaa80ebdb49598a59295400cd211700f481622964bc7",
-      "bytes": 8141
+      "sha256": "f5ed23084343adf453c10532b5196637139d80f030247b4145e8750e8b11ec96",
+      "bytes": 8337
     },
     {
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
@@ -44819,8 +44824,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/README.md",
-      "sha256": "dc3244de9559a337ea3b3f2180ce568fc46f91e86d1bf9b691bba44f82f56cd4",
-      "bytes": 14122
+      "sha256": "db694d5948539b98a36b62c08b7a641a2b6cc14ad7a9d2ac1829b15e8c29064b",
+      "bytes": 14694
     },
     {
       "path": "examples/deepagents-omniroute/acceptance-plan.json",
@@ -44854,8 +44859,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/worker.py",
-      "sha256": "5691d455518c4e8f3d45fa8a04ad14e2f77d71d1a08cd39c63f1050bfccfe66f",
-      "bytes": 6692
+      "sha256": "cc6ebc1878b4b10f295e59a18cde7afc152a6dd7bd4faf6e7f5eb64ef2ede8cd",
+      "bytes": 6531
     },
     {
       "path": "examples/mcporter.json.example",
