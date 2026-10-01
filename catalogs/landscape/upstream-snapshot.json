@@ -4027,39 +4027,39 @@
       "component_id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
       "selected_repository_url": "https://github.com/vercel/next.js",
-      "selected_version": "16.3.6",
-      "selected_source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+      "selected_version": "16.3.8",
+      "selected_source_pin": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
       "checks": [
         {
           "endpoint": "repos/vercel/next.js",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:09.500324+00:00",
-          "ended_at": "2026-09-25T13:54:09.892223+00:00",
-          "stdout_sha256": "f42503630379a1bcd34701ead37d4fd33ae390a3a775a10ff6027308d4deb068",
+          "started_at": "2026-10-01T16:34:12.630283+00:00",
+          "ended_at": "2026-10-01T16:34:13.080468+00:00",
+          "stdout_sha256": "fed7ea517434fc4da16cdb7dea3a8abf0e0f84eb93f996f2747a45a4bc87dfc6",
           "status": "ok"
         },
         {
           "endpoint": "repos/vercel/next.js/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:09.892693+00:00",
-          "ended_at": "2026-09-25T13:54:10.167807+00:00",
-          "stdout_sha256": "6b8cb55525442a8a0d8e011bb77ee28b953645f86e713dce4d0f38afaff01c16",
+          "started_at": "2026-10-01T16:34:13.080597+00:00",
+          "ended_at": "2026-10-01T16:34:13.378015+00:00",
+          "stdout_sha256": "18ca493ad80926699236cc4fe2e2b447aff1b5d4cd0784c29dda07f8e59dd84f",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/a758ffcf501f6f1ddb03175bd1033508424c261e",
+          "endpoint": "repos/vercel/next.js/commits/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:10.168077+00:00",
-          "ended_at": "2026-09-25T13:54:10.521879+00:00",
-          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
+          "started_at": "2026-10-01T16:34:13.378106+00:00",
+          "ended_at": "2026-10-01T16:34:13.816368+00:00",
+          "stdout_sha256": "5b721c53973a045300ef69f1d57279a7e6f208c0c26ab21de84355de3ec43782",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/v16.3.6",
+          "endpoint": "repos/vercel/next.js/commits/v16.3.8",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:10.522060+00:00",
-          "ended_at": "2026-09-25T13:54:10.849822+00:00",
-          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
+          "started_at": "2026-10-01T16:34:13.816536+00:00",
+          "ended_at": "2026-10-01T16:34:14.198273+00:00",
+          "stdout_sha256": "5b721c53973a045300ef69f1d57279a7e6f208c0c26ab21de84355de3ec43782",
           "status": "ok"
         }
       ],
@@ -4067,27 +4067,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "canary",
-      "pushed_at": "2026-09-25T13:45:22Z",
+      "pushed_at": "2026-10-01T16:33:53Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v16.3.6",
-        "published_at": "2026-09-22T17:15:10Z",
-        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.6",
+        "tag_name": "v16.3.8",
+        "published_at": "2026-09-30T16:13:46Z",
+        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.8",
         "target_commitish": "canary",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "committed_at": "2026-09-22T15:41:35Z"
+        "ref": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "sha": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "html_url": "https://github.com/vercel/next.js/commit/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "committed_at": "2026-09-30T15:25:16Z"
       },
       "latest_release_source": {
-        "ref": "v16.3.6",
-        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "committed_at": "2026-09-22T15:41:35Z"
+        "ref": "v16.3.8",
+        "sha": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "html_url": "https://github.com/vercel/next.js/commit/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "committed_at": "2026-09-30T15:25:16Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
