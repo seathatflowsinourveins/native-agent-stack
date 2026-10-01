@@ -1,0 +1,14 @@
+"""Summarize OSV-Scanner --format json reports: file -> {package==version: [vulnerability ids]}, or "no findings". Usage: osv_summary.py FILE..."""
+import json
+import sys
+
+for path in sys.argv[1:]:
+    doc = json.load(open(path, encoding="utf-8"))
+    found = {}
+    for result in doc.get("results", []):
+        for package in result.get("packages", []):
+            info = package.get("package", {})
+            ids = sorted({v.get("id") for v in package.get("vulnerabilities", [])})
+            if ids:
+                found[f"{info.get('name')}=={info.get('version')}"] = ids
+    print(path.rsplit("/", 1)[-1], "->", json.dumps(found) if found else "no findings")

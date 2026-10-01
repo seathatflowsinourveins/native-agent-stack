@@ -7,7 +7,8 @@
              the same file the project .claude/settings.json runs), plus
              token-lanes-subagent-start.py and its sibling token-lanes-block.md
              plus the five role blocks token-lanes-block.<role>.md from
-             adoption/hooks/claude/ (role-matched non-blind child context)
+             adoption/hooks/claude/ (role-matched non-blind child context),
+             and currency-due-notice.py (SessionStart stack-currency due line)
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   mcp     -- `claude mcp add --scope user` for each server named in
              adoption/mcp/claude-user.json after rendering its ${HOME} and
@@ -47,6 +48,7 @@ TOKEN_LANES_HOOK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-sub
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
 # Installed name under ~/.claude/hooks/ -> checked-in source; includes the carrier's sibling blocks.
 HOOKS = {
+    "currency-due-notice.py": GUARD_SRC.with_name("currency-due-notice.py"),  # SessionStart currency due line
     "effort-default-guard.py": GUARD_SRC,
     "secret_path_guard.py": SECRET_GUARD_SRC,
     "token-lanes-block.md": TOKEN_LANES_BLOCK_SRC,

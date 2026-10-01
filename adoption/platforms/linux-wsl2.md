@@ -71,11 +71,13 @@ Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
-WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure." Do not bump this pin on a new WSL host
-without first re-testing 0.29.0 (or any newer release) startup on that host's
+WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
+host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
+failed real startup with unavailable UVA support. Preserve the accepted
+environment and model/vector data; repeating installation until the version
+number is newer would not resolve such a compatibility failure, so a new
+version is qualified on an owned instance first." Do not bump this pin on a new
+WSL host without first re-testing any newer release's startup on that host's
 actual GPU/driver combination; a newer upstream version number is not by
 itself evidence the WSL UVA gap closed.
 
@@ -104,7 +106,7 @@ itself evidence the WSL UVA gap closed.
    The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all five entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once, and, since #314, unless the installed `rtk hook check` also leaves the recipe's probes unrewritten (rtk can ignore a TOML-valid file, for example one with a `[tracking]` table that lacks `history_days`). The script never writes that file. Its pins file's rtk `install_note` also changed after `v2026.09.26` (`pins-linux-x86_64.json`, text only).
    The script's socraticode and headroom installs changed after `v2026.09.26` too (as did headroom's `install_note`): it now passes `--ignore-scripts` for socraticode's `ignore_scripts: true` pin, a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree, and it now downloads headroom's pinned wheel, verifies its `sha256` and installs that file, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index without reading the wheel or its hash (step 2 of [`adoption/bootstrap.md`](../bootstrap.md)).
    Its pins file also changed after `v2026.09.25.2` in a second way:
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1 on 2026-09-26, then to 0.159.2 on 2026-09-30; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch, which the template keeps for 0.159.2, where the feature is still listed as stable and on) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
    `pins-linux-x86_64.json` now pins `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
    `token-efficiency` profile's Linux coverage (step 2 of
@@ -165,6 +167,16 @@ upstream behavior behind each.
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
 
+## A new distro from the official Ubuntu WSL image
+
+Added after `v2026.09.26.2`. [A new distro from the official Ubuntu WSL image](linux-wsl2-new-distro.md) creates a
+second WSL 2 distribution on this Windows host from Canonical's `ubuntu-24.04.5-wsl-amd64.wsl`, after checking the file
+against both published sha256 values. cloud-init gives it a passwordless default user before its first launch, and the page
+proves systemd, linger and the user bus before the bootstrap runs there. It changes nothing for the other distributions:
+no `.wslconfig` edit, no `wsl --update`, never `wsl --shutdown`, and the default distribution stays as it is. The
+decisions, their alternatives, the command table and the open questions are in
+[the 2026-10-01 record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
+
 ## Windows Terminal profiles and the login shell
 
 Added after `v2026.09.26.2`: `adoption/templates/claude.settings.linux-wsl2.overlay.json`, the profile example
@@ -204,7 +216,7 @@ with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves 
    and watches only `settings.json`, so touch that file after adding or editing one. The example sets no `suppressApplicationTitle` on the Claude and Codex profiles, so each tab shows the title its
    client sends; gives them an explicit `bellStyle` array (never `"all"`) and a quiet `bellSound`; and sets `COLORTERM` through the profile's `environment` key. **Precedence** (microsoft/terminal v1.24.11911.0, `SettingsLoader::FinalizeLayering`, source read, not run here): a profile's own value, then `profiles.defaults`, then the fragment's profile. A profile that only a fragment defines therefore loses to `profiles.defaults` for every key `defaults` sets: if your `defaults` set `suppressApplicationTitle`, `bellStyle`, `bellSound` or `environment`, the example's values for those keys do not apply, and so the titles, the quiet bell or `COLORTERM` are not what the example advertises. Remove those keys from `defaults`, or put the values in the `settings.json` entry for the profile's own (derived) GUID, which does beat `defaults`. A profile's own `environment` also completely replaces `profiles.defaults.environment` instead of merging with it ([profile-advanced](https://github.com/MicrosoftDocs/terminal/blob/main/TerminalDocs/customize-settings/profile-advanced.md), "Environment variables"), so in such an entry copy the variables the defaults set. The practice repository's host check refuses a `defaults` that suppresses titles or rings `all`; it does not compare `defaults.environment`.
 
-Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1). A new host collects its own evidence.
+Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
 
 ## Listeners and ports
 

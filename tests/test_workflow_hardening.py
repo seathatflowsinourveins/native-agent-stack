@@ -274,13 +274,14 @@ class SecurityScanTests(unittest.TestCase):
 
     def test_the_write_token_never_reaches_an_installed_tool(self):
         self.assertIn("GH_TOKEN: ${{ github.token }}", jobs(self.text)["zizmor-online"])
-        for tool_job, upload_job in (("osv-scanner", "osv-sarif-upload"), ("zizmor-online", "zizmor-sarif-upload")):
+        # osv-sarif-upload sends two reports (the ordinary scan and the frozen-artifact scan), each under its own category.
+        for tool_job, upload_job, uploads in (("osv-scanner", "osv-sarif-upload", 2), ("zizmor-online", "zizmor-sarif-upload", 1)):
             upload = jobs(self.text)[upload_job]
             self.assertIn(f"needs: {tool_job}", upload, upload_job)
             self.assertNotRegex(upload, r"(?m)^\s+(- )?run:", f"{upload_job} (write scope) runs no shell step")
             actions = re.findall(r"uses: ([\w.-]+/[\w./-]+)@", upload)
-            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout",
-                                       "actions/download-artifact", "github/codeql-action/upload-sarif"], upload_job)
+            self.assertEqual(actions, ["step-security/harden-runner", "actions/checkout", "actions/download-artifact"]
+                             + ["github/codeql-action/upload-sarif"] * uploads, upload_job)
 
     def test_osv_scanner_fails_on_findings_and_uploads_sarif_off_pull_requests(self):
         job = jobs(self.text)["osv-scanner"]
@@ -295,7 +296,13 @@ class SecurityScanTests(unittest.TestCase):
         upload = jobs(self.text)["osv-sarif-upload"]
         self.assertIn("github.event_name != 'pull_request'", block_if(upload))
         self.assertIn(UPLOAD_SARIF, upload)
-        self.assertIn("category: osv-scanner", upload)
+        self.assertIn("category: osv-scanner\n", upload)
+        self.assertIn("category: osv-scanner-frozen-macos", upload)
+        # Both native scans write a report, and the step fails on the worse of their two statuses.
+        for report in ("osv-scanner.sarif", "osv-scanner-frozen-macos.sarif"):
+            self.assertIn(report, job)
+            self.assertIn(report, upload)
+        self.assertIn("frozen_status", job)
 
     def test_zizmor_online_skips_pull_requests_and_reports_without_failing(self):
         job = jobs(self.text)["zizmor-online"]

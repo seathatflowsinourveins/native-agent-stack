@@ -523,19 +523,54 @@ read offsets and retries downstream refusals with backoff, pausing that receiver
 until acceptance. Malformed JSON is dropped quietly by the native parser so an
 invalid file cannot poison retries or print raw content in diagnostics; its
 private source file remains available. Malformed/spool-overflow recovery was not
-exercised. The SDK helper publishes a complete0600 file atomically;
+exercised. The SDK helper publishes a complete 0600 file atomically;
 `ECOSYSTEM_SDK_OBSERVATION_DIR` or `--observation-dir` selects this existing private
 directory. Its first field is a unique observation ID, so even identical outcomes
-have different file fingerprints. Unknown usage remains absent, never zero.
+have different file fingerprints. Unknown additive usage remains absent, never zero.
+
+This file lane is the Codex helper's receipt spool. Repository producer tracing
+finds `blueprints/us-equities/workers/native_worker.py::write_observation` as its
+native publisher; `research-runtime/run_worker.py` delegates its Codex role to
+that helper, and the other spool writers are synthetic privacy/outage fixtures.
+The template routes only `file_log/sdk_receipts` through `transform/sdk_receipt`.
+Native Claude and other OTLP log producers use `logs`; native metric counters use
+`metrics`. Those pipelines do not apply the receipt usage exclusion. No
+supported additive non-Codex file-receipt schema is defined for this spool.
+
+Codex SDK 0.159.2 returns a native `ThreadTokenUsage`: `total` accumulates across
+the thread and `last` describes only the latest request, which can be one of
+several requests in a turn. The SDK returns that object unchanged. See
+[`_run.py`](https://github.com/openai/codex/blob/rust-v0.159.2/sdk/python/src/openai_codex/_run.py),
+[`ThreadTokenUsage`](https://github.com/openai/codex/blob/rust-v0.159.2/sdk/python/src/openai_codex/generated/v2_all.py)
+and [`TokenUsageInfo::append_last_usage`](https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/protocol/src/protocol.rs).
+The private run result retains the native counters. Published observations keep
+`usage_scope=native_thread_cumulative` and the native `usage_status`, but set
+`usage` to null: this receipt path has no serialized preceding baseline that
+would justify an additive delta. `last` is not substituted for turn usage.
+The Collector preserves the scope and removes all SDK numeric token attributes,
+including legacy receipt totals and prefilled fields, with its native
+[`delete_matching_keys` transform](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/pkg/ottl/ottlfuncs/README.md#delete_matching_keys).
+Consequently these observations do not contribute a value to the SDK token panel.
 
 Per-record `receipt_id` survives as structured metadata. It must not be stored
 on the shared resource: multiple records can share one resource group. The
 Grafana panel excludes historical records lacking `receipt_id` and takes the
 maximum reported total per receipt before summing within the selected dashboard
 time range. This avoids counting a replay of the same receipt twice; it is not a
-permanent financial ledger or a way to merge independent receipts for one turn.
-Reuse the original ID when replaying an observation; assigning a new ID to the
-same turn creates a new accounting record.
+permanent financial ledger or a way to merge cumulative snapshots. The scope
+exclusion happens before that query; a new receipt ID cannot make cumulative
+usage additive. Reuse the original ID when replaying an observation. Already
+stored historical records are not rewritten by this repository template.
+
+The local integration check `tests.test_sdk_usage_scope` publishes constructed
+observations through the real file receiver, repository processors, isolated
+Loki, and the exact dashboard query. It covers cumulative start/resume snapshots,
+replay under the same ID, republication under a new ID, missing/unknown scope,
+and unavailable usage. Run with the documented native binaries and optional
+PyYAML: `uv run --no-project --with PyYAML==6.0.3 python -m unittest tests.test_sdk_usage_scope -v`.
+It performs no model inference; the snapshot values come from the prior native
+qualification receipt. The [correction receipt](../../evidence/artifacts/runtime-sdk-20260930/usage-scope-receipt.json)
+preserves the failing aggregate of 78,331 and the corrected native results.
 
 Acceptance imported bounded summaries of two already-completed native SDK runs
 through the same helper; it made no new inference after adding this publication

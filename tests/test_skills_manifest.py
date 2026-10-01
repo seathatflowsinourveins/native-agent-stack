@@ -9,12 +9,14 @@ or a silently stale settings template.
 
 import json
 import re
+import tomllib
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "adoption" / "skills" / "manifest.json"
 SETTINGS_TEMPLATE_PATH = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+CODEX_TEMPLATE_PATH = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 NATIVE_PRACTICE_PATH = ROOT / "catalogs" / "landscape" / "native-practice.json"
 
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
@@ -159,6 +161,31 @@ class BudgetTests(unittest.TestCase):
         expected = sum(skill["description_chars"] for skill in self.skills if skill["codex_enabled"])
         self.assertEqual(self.budget["codex_enabled_description_chars"], expected)
 
+    def test_codex_catalog_description_chars_counts_only_the_skills_codex_shows_the_model(self):
+        # Codex leaves a skill whose agents/openai.yaml sets allow_implicit_invocation: false out of the model's
+        # catalog (openai/codex rust-v0.159.2 codex-rs/ext/skills/src/provider/host.rs L147-148; the flag defaults
+        # to true, codex-rs/skills/src/model.rs L22-28). At their pins only the two upstream user-only skills set it.
+        for skill in self.skills:
+            if "upstream_allow_implicit_invocation" in skill:
+                with self.subTest(skill=skill["name"]):
+                    self.assertIsInstance(skill["upstream_allow_implicit_invocation"], bool)
+        explicit_only = {s["name"] for s in self.skills if s.get("upstream_allow_implicit_invocation") is False}
+        self.assertEqual(explicit_only, {"grill-me", "improve-codebase-architecture"})
+        shown = [s for s in self.skills if s["codex_enabled"] and s.get("upstream_allow_implicit_invocation", True)]
+        self.assertEqual(self.budget["codex_catalog_description_chars"],
+                         sum(skill["description_chars"] for skill in shown))
+
+    def test_codex_configured_budget_tokens_is_the_codex_template_budget(self):
+        # scripts/skills_status.py compares its catalog estimate with this figure, so it must be what hosts apply.
+        template = tomllib.loads(CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")).get("skills", {})
+        self.assertEqual(self.budget["codex_configured_budget_tokens"], template.get("max_context_tokens"))
+
+    def test_codex_eight_thousand_characters_is_kept_as_the_fallback_not_a_cap(self):
+        # codex-rs/ext/skills/src/render.rs L19 and L138-151 at rust-v0.159.2: 8,000 characters only when the
+        # context window is unknown and no max_context_tokens is set.
+        self.assertEqual(self.budget["codex_fallback_budget_chars"], 8000)
+        self.assertNotIn("codex_default_budget_chars", self.budget)
+
 
 class ExcludedEntryTests(unittest.TestCase):
     @classmethod
@@ -174,10 +201,92 @@ class ExcludedEntryTests(unittest.TestCase):
                     self.assertIsInstance(entry[key], str)
                     self.assertTrue(entry[key].strip(), f"{key} must not be empty")
 
+    def test_a_retired_entry_names_one_unselected_skill_and_its_date(self):
+        retired = {entry["skills"]: entry for entry in self.excluded if "retired" in entry}
+        # mattpocock/skills removed it in daa01d8 (2026-09-24); it is absent at d81f3a18.
+        self.assertIn("resolving-merge-conflicts", retired)
+        selected = {skill["name"] for skill in self.manifest["skills"]}
+        for name, entry in retired.items():
+            with self.subTest(skill=name):
+                # One skillOverrides key per retired entry, never a comma-separated list.
+                self.assertRegex(name, r"^[a-z0-9][a-z0-9-]*$")
+                self.assertNotIn(name, selected)
+                self.assertRegex(entry["retired"], r"^\d{4}-\d{2}-\d{2}$")
+
+
+class LlmNativeListingTests(unittest.TestCase):
+    """The user's 2026-09-30 directive, docs/decisions/2026-09-30-skills-llm-native-listing.md: every skill
+    the model may invoke is listed to Claude with its description and enabled for Codex. Only an upstream
+    disable-model-invocation skill stays user-invocable-only, and only the copy of a skill Codex ships
+    natively stays off for Codex."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.manifest = load_json(MANIFEST_PATH)
+        cls.skills = cls.manifest["skills"]
+
+    def test_every_model_invocable_skill_is_listed_on(self):
+        for skill in self.skills:
+            with self.subTest(skill=skill["name"]):
+                expected = "user-invocable-only" if skill["upstream_disable_model_invocation"] else "on"
+                self.assertEqual(skill["claude_listing"], expected)
+
+    def test_codex_disables_only_the_skill_codex_ships_natively(self):
+        # Codex installs its own skill-creator into CODEX_HOME/skills/.system from
+        # codex-rs/skills/src/assets/samples (codex-rs/skills/src/lib.rs L55-69 at rust-v0.157.1).
+        self.assertEqual({s["name"] for s in self.skills if not s["codex_enabled"]}, {"skill-creator"})
+
+    def test_skill_creator_is_pinned_from_anthropics_and_the_openai_copy_stays_excluded(self):
+        by_name = {skill["name"]: skill for skill in self.skills}
+        self.assertIn("skill-creator", sorted(by_name))
+        self.assertEqual(by_name["skill-creator"]["source"], "anthropics/skills")
+        naming = [entry for entry in self.manifest["excluded"]
+                  if "skill-creator" in [name.strip() for name in entry["skills"].split(",")]]
+        self.assertEqual([entry["source"] for entry in naming], ["openai/skills"])
+
+    def test_zero_use_no_longer_demotes_a_listing(self):
+        prune_rule = self.manifest["trial"]["prune_rule"]
+        self.assertNotIn("on -> name-only", prune_rule)
+        self.assertIn("dated decision record", prune_rule)
+
+
+class ListingBudgetTemplateTests(unittest.TestCase):
+    """The listing budgets the two client templates set (2026-09-30 record)."""
+
+    def test_claude_template_raises_the_listing_budget_fraction_without_a_fixed_char_budget(self):
+        template = load_json(SETTINGS_TEMPLATE_PATH)
+        fraction = template.get("skillListingBudgetFraction")
+        # Settings reference: "a fraction greater than 0 and at most 1", default 0.01.
+        self.assertIsInstance(fraction, float)
+        self.assertTrue(0 < fraction <= 1, fraction)
+        self.assertEqual(fraction, 0.05)
+        # SLASH_COMMAND_TOOL_CHAR_BUDGET would pin a fixed character count instead (skills page).
+        self.assertNotIn("SLASH_COMMAND_TOOL_CHAR_BUDGET", template.get("env", {}))
+
+    def test_codex_template_sets_the_catalog_token_budget_and_no_per_skill_tables(self):
+        skills = tomllib.loads(CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")).get("skills", {})
+        budget = skills.get("max_context_tokens")
+        self.assertIsInstance(budget, int)
+        # codex-rs/ext/skills/src/render.rs L18 and L127-133 at rust-v0.157.1: a set value is capped at 10,000.
+        self.assertTrue(1 <= budget <= 10_000, budget)
+        self.assertEqual(budget, 6000)
+        # Per-skill disables come from tools/adoption/install_skills.py --print-codex-config, never the template.
+        self.assertNotIn("config", skills)
+
+    def test_codex_template_comment_counts_the_skills_the_catalog_shows(self):
+        text = CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")
+        match = re.search(r"manifest's (\d+) catalog-visible skills", text)
+        self.assertIsNotNone(match, "the [skills] comment names the manifest's catalog-visible count")
+        skills = load_json(MANIFEST_PATH)["skills"]
+        shown = [s for s in skills if s["codex_enabled"] and s.get("upstream_allow_implicit_invocation", True)]
+        self.assertEqual(int(match.group(1)), len(shown))
+
 
 class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
     """adoption/templates/claude.settings.template.json's skillOverrides must name every
-    manifest skill exactly once, at its manifest claude_listing (settings_propagation)."""
+    manifest skill exactly once, at its manifest claude_listing (settings_propagation), plus an
+    explicit off for every retired excluded entry: the settings writer deep-merges, so dropping a
+    key would leave a host's earlier on value in place (adoption/skills/lifecycle.md, Retire)."""
 
     @classmethod
     def setUpClass(cls):
@@ -186,6 +295,7 @@ class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
 
     def test_skill_overrides_equals_name_to_claude_listing(self):
         expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"]}
+        expected.update({entry["skills"]: "off" for entry in self.manifest["excluded"] if "retired" in entry})
         self.assertEqual(self.template.get("skillOverrides"), expected)
 
 

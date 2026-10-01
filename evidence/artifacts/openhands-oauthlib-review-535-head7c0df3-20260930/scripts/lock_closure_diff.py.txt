@@ -1,0 +1,28 @@
+"""Closure difference between two hashed pip lock files (name==version lines): added, removed, changed. Usage: lock_closure_diff.py OLD NEW"""
+import re
+import sys
+
+
+def parse(path):
+    out = {}
+    for line in open(path, encoding="utf-8"):
+        m = re.match(r"^([A-Za-z0-9_.\-]+)(?:\[[^\]]*\])?==([^\s;\\]+)", line)
+        if m:
+            out[m.group(1).lower().replace("_", "-")] = m.group(2)
+        else:
+            m = re.match(r"^([A-Za-z0-9_.\-]+)\s*@\s*(\S+)", line)
+            if m:
+                out[m.group(1).lower().replace("_", "-")] = "@" + m.group(2).rsplit("/", 1)[-1][:60]
+    return out
+
+
+old, new = parse(sys.argv[1]), parse(sys.argv[2])
+added = sorted(k for k in new if k not in old)
+removed = sorted(k for k in old if k not in new)
+changed = sorted(k for k in new if k in old and old[k] != new[k])
+print(f"old: {len(old)} packages, new: {len(new)}; added {len(added)}, removed {len(removed)}, changed {len(changed)}")
+print("ADDED:   ", ", ".join(f"{k}=={new[k]}" for k in added) or "-")
+print("REMOVED: ", ", ".join(f"{k}=={old[k]}" for k in removed) or "-")
+print("CHANGED: ", ", ".join(f"{k} {old[k]} -> {new[k]}" for k in changed) or "-")
+for name in ("oauthlib", "pyjwt", "requests-oauthlib", "google-auth-oauthlib", "authlib", "mcp", "litellm", "google-auth", "openhands-sdk", "openhands-tools"):
+    print(f"  {name}: old {old.get(name, '-')}, new {new.get(name, '-')}")

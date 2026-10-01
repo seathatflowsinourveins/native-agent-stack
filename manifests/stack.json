@@ -294,7 +294,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.157.1",
+      "version": "0.159.2",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -335,14 +335,15 @@
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
         "claude-repository-evidence-20260921",
-        "codex-01571-qualification-20260926"
+        "codex-01571-qualification-20260926",
+        "codex-01592-qualification-20260930"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
       ],
       "source_pin": null,
-      "freshness": "0.157.1 serves bin/codex on the NativeStack WSL2 host since 2026-09-26, switched with the qualification receipt's data.switch commands after a matched comparison against 0.155.1 in a loopback sandbox (the landscape-sweep lane argv, the 429 usage-limit mapping, --search and state migration behaved the same); automatic start of the 0.157.x self-updating app-server daemon is off (daemon_auto_start false, also in adoption/templates/codex.config.template.toml). 0.155.1 is kept for rollback, the macOS pin stays 0.155.1 until its own qualification, and the landscape winner pin stays 0.155.1 until a new verdict wave."
+      "freshness": "0.159.2 serves bin/codex on the NativeStack WSL2 host since 2026-09-30T03:22Z, when a peer pointed the launcher at tools/codex-0.159.2; the 2026-09-30 qualification receipt verified that prefix byte for byte against the npm and GitHub release artifacts and compared the CLI surface, the exec --json source and the host's 0.159.2 rollouts with 0.157.1 in a no-network sandbox, with no live model call (the Gate A owner's rehearsals cover live behaviour). Automatic start of the self-updating app-server daemon stays off (daemon_auto_start false in adoption/templates/codex.config.template.toml; the feature is still stable and on by default at 0.159.2). tools/adoption/apply_codex_lane.py pins 0.159.2 with the Linux pin, and its opt-in integration tests passed 10 of 10 against the prefix's native binary. 0.157.1 and 0.155.1 stay installed for rollback, the landscape winner pin stays until a new verdict wave, and the macOS pin stays 0.155.1 until its own qualification, which the shared Codex template's gpt-6.1-sol default now also waits for (that model is not in the bundled catalogs before 0.159.1)."
     },
     {
       "id": "codex-for-claude",

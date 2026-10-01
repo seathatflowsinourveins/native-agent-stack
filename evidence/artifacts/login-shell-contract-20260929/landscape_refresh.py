@@ -62,28 +62,53 @@ def bellstyle_from_schema(data):
 
 
 ATTRIBUTES = r"((?:[ \t]*#\[(?:[^\[\]]|\[[^\]]*\])*\][ \t]*\n|[ \t]*///[^\n]*\n)*)"   # attributes (a bracket group may span lines and hold one nested bracket) and doc comments in front of an item
+STRING = re.compile(r'("(?:[^"\\]|\\.)*")')
 
 
 def normalized(text):
-    """Whitespace runs become one space and the spaces next to punctuation go, so re-wrapping an attribute over several lines is not a change while any changed token is."""
-    return re.sub(r"\s*([(){}\[\],;:=<>])\s*", r"\1", re.sub(r"\s+", " ", text)).strip()
+    """Whitespace runs become one space and the spaces next to punctuation go, so re-wrapping an attribute over several lines is not a change while any changed token is. String literals are kept VERBATIM: a
+    serialized name with a different number of spaces is a different name."""
+    parts = STRING.split(text)
+    for index in range(0, len(parts), 2):
+        parts[index] = re.sub(r"\s*([(){}\[\],;:=<>])\s*", r"\1", re.sub(r"\s+", " ", parts[index]))
+    return "".join(parts).strip()
+
+
+def tui_fields(body):
+    """The complete fields of a struct body (attributes and doc comments included), split where a line ends with a comma outside every bracket, so a type that wraps over lines stays whole."""
+    fields, current, depth = [], [], 0
+    for line in body.splitlines():
+        current.append(line)
+        code = re.sub(r"//.*", "", STRING.sub("", line))
+        depth += sum(code.count(c) for c in "([{<") - sum(code.count(c) for c in ")]}>") - code.count("->")
+        if depth <= 0 and code.rstrip().endswith(","):
+            fields.append("\n".join(current))
+            current, depth = [], 0
+    if any(line.strip() for line in current):
+        fields.append("\n".join(current))
+    return fields
 
 
 def definitions(text):
-    """The parts of codex-rs/config/src/types.rs that define the TUI notification and terminal-title settings, whole (attributes, which may span lines, and doc comments included) with whitespace
-    normalized: the Notifications, NotificationMethod and NotificationCondition enums, the TuiNotificationSettings struct, the Display impls of the two enums, the Default impl of Notifications (what
-    `notifications` is when the key is absent) and the `terminal_title` field of Tui. A part that is not found is None."""
+    """The parts of codex-rs/config/src/types.rs that define the TUI notification and terminal-title settings, whole (attributes, which may span lines, and doc comments included) with whitespace normalized outside
+    string literals: the Notifications, NotificationMethod and NotificationCondition enums, the TuiNotificationSettings struct, the Display impls of the two enums, EVERY `impl Default for Notifications` block with its
+    attributes (what `notifications` is when the key is absent, per platform if upstream gates it), and the fields of `Tui` that concern notifications or the terminal title (`notification_settings` with its `flatten`,
+    `terminal_title`, and any field whose name, doc comment or attribute mentions notifications), each complete. A part that is not found is None."""
     found = {}
     for kind, name in (("enum", "Notifications"), ("enum", "NotificationMethod"), ("enum", "NotificationCondition"), ("struct", "TuiNotificationSettings")):
         match = re.search(ATTRIBUTES + "pub " + kind + " " + name + r" \{.*?\n\}", text, re.S)
         found[name] = normalized(match.group(0)) if match else None
     for name in ("NotificationMethod", "NotificationCondition"):
-        match = re.search(r"impl fmt::Display for " + name + r" \{.*?\n\}", text, re.S)
-        found[name + " Display"] = normalized(match.group(0)) if match else None
-    match = re.search(r"impl Default for Notifications \{.*?\n\}", text, re.S)
-    found["Notifications Default"] = normalized(match.group(0)) if match else None
-    match = re.search(ATTRIBUTES + r"[ \t]*pub terminal_title:[^\n]*\n", text)
-    found["Tui terminal_title"] = normalized(match.group(0)) if match else None
+        shown = [normalized(m.group(0)) for m in re.finditer(ATTRIBUTES + r"impl fmt::Display for " + name + r" \{.*?\n\}", text, re.S)]   # every block, with its attributes (a cfg-gated copy is a change)
+        found[name + " Display"] = " || ".join(shown) if shown else None
+    blocks = [normalized(m.group(0)) for m in re.finditer(ATTRIBUTES + r"impl Default for Notifications \{.*?\n\}", text, re.S)]
+    found["Notifications Default"] = " || ".join(blocks) if blocks else None
+    struct = re.search(ATTRIBUTES + r"pub struct Tui \{\n(.*?)\n\}", text, re.S)
+    if struct:
+        relevant = [normalized(f) for f in tui_fields(struct.group(2)) if re.search(r"pub (?:notification_settings|terminal_title):|notif", f, re.I)]
+        found["Tui notification and title fields"] = " || ".join(relevant) if relevant else None
+    else:
+        found["Tui notification and title fields"] = None
     return found
 
 
@@ -160,6 +185,10 @@ pub struct TuiNotificationSettings {
 pub struct Tui {
     #[serde(default, flatten)]
     pub notification_settings: TuiNotificationSettings,
+    /// Enable animations (welcome screen, shimmer effects, spinners).
+    /// Defaults to `true`.
+    #[serde(default)]
+    pub animations: bool,
     /// Ordered terminal title items.
     /// When unset, the TUI defaults to: `activity`, `thread-name`, and `project-name`.
     #[serde(default)]
@@ -184,7 +213,7 @@ def selftest():
         ("a missing Default impl is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("impl Default for Notifications", "impl Default for Renamed")), None),
         ("a changed terminal_title default in its doc comment is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("and `project-name`", "and `branch`")), False),
         ("a changed terminal_title type is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("Option<Vec<String>>", "Option<String>")), False),
-        ("a missing terminal_title is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub terminal_title", "pub renamed_title")), None),
+        ("a renamed terminal_title is a change (its field is no longer found among the relevant ones)", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub terminal_title", "pub renamed_title")), False),
         ("a changed rename_all in a one-line serde attribute is seen",
          definitions_identical(SYNTHETIC, SYNTHETIC.replace('#[serde(rename_all = "lowercase")]\npub enum NotificationMethod', '#[serde(rename_all = "UPPERCASE")]\npub enum NotificationMethod')), False),
         ("a wrapped derive that loses Default is seen", definitions_identical(WRAPPED_DERIVE, WRAPPED_DERIVE.replace("JsonSchema, Default\n)]\n#[serde(rename_all = \"lowercase\")]\npub enum NotificationMethod",
@@ -192,6 +221,19 @@ def selftest():
         ("a serde attribute re-wrapped over several lines is not a change", definitions_identical(SYNTHETIC, WRAPPED), True),
         ("a changed rename_all inside a multi-line serde attribute is seen",
          definitions_identical(WRAPPED, WRAPPED.replace('rename_all = "lowercase"\n)]\npub enum NotificationMethod', 'rename_all = "UPPERCASE"\n)]\npub enum NotificationMethod')), False),
+        ("a changed serialized name whose difference is a space inside a string literal is seen",
+         definitions_identical(SYNTHETIC.replace("pub enum NotificationMethod", "#[serde(rename = \"a  b\")]\npub enum NotificationMethod"), SYNTHETIC.replace("pub enum NotificationMethod", "#[serde(rename = \"a b\")]\npub enum NotificationMethod")), False),
+        ("a cfg-gated second Default implementation of Notifications is seen",
+         definitions_identical(SYNTHETIC, SYNTHETIC.replace("impl Default for Notifications {", "#[cfg(not(windows))]\nimpl Default for Notifications {") + "\n#[cfg(windows)]\nimpl Default for Notifications {\n    fn default() -> Self {\n        Self::Enabled(false)\n    }\n}\n"), False),
+        ("removing flatten from the notification settings of Tui is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace("#[serde(default, flatten)]", "#[serde(default)]")), False),
+        ("a new notification-related field of Tui is seen",
+         definitions_identical(SYNTHETIC, SYNTHETIC.replace("    /// Enable animations", "    /// Sound played by a desktop notification.\n    pub notification_sound: Option<String>,\n    /// Enable animations")), False),
+        ("a terminal_title type wrapped over lines and changed is seen",
+         definitions_identical(SYNTHETIC.replace("pub terminal_title: Option<Vec<String>>,", "pub terminal_title: Option<\n        Vec<String>,\n    >,"), SYNTHETIC.replace("pub terminal_title: Option<Vec<String>>,", "pub terminal_title: Option<\n        String,\n    >,")), False),
+        ("an unrelated Tui field that changes is not a change of the notification definitions", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub animations: bool,", "pub animations: Option<bool>,")), True),
+        ("a Tui without notification or title fields is unknown", definitions_identical(SYNTHETIC, re.sub(r"pub struct Tui \{.*?\n\}", "pub struct Tui {\n    pub animations: bool,\n}", SYNTHETIC, flags=re.S)), None),
+        ("a cfg-gated second Display implementation is seen",
+         definitions_identical(SYNTHETIC, SYNTHETIC.replace("impl fmt::Display for NotificationMethod {", "#[cfg(unix)]\nimpl fmt::Display for NotificationMethod {") + "\n#[cfg(windows)]\nimpl fmt::Display for NotificationMethod {\n    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {\n        write!(f, \"automatic\")\n    }\n}\n"), False),
         ("a changed Display text is seen", definitions_identical(SYNTHETIC, SYNTHETIC.replace('write!(f, "auto")', 'write!(f, "automatic")')), False),
         ("a missing definition is unknown, not identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("pub enum NotificationCondition", "pub enum RenamedCondition")), None),
         ("the same text with only whitespace changes is identical", definitions_identical(SYNTHETIC, SYNTHETIC.replace("    ", "  ")), True),

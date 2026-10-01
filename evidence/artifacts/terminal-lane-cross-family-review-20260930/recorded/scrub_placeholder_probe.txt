@@ -1,5 +1,5 @@
 {
-  "claude": "2.1.285 (Claude Code)",
+  "claude": "2.1.286 (Claude Code)",
   "bubblewrap": true,
   "bubblewrap_version": "bubblewrap 0.9.0",
   "arms": [
@@ -166,7 +166,7 @@
       "client_temp_entries_in_private_dir": {
         "messaging_socket_dirs": 1,
         "sandbox_multiplexer_sockets": 1,
-        "file_watch_probe_dirs": 1,
+        "file_watch_probe_dirs": 0,
         "client_state_dirs": 1,
         "other": 2
       }
@@ -177,13 +177,14 @@
   "real_home_names_checked": 19,
   "real_home_compared_by": "lstat mode, size, mtime and inode",
   "real_home_names_changed": [],
+  "real_home_names_unmeasured": [],
   "real_temp_top_level_entries_new_during_run": {
     "in_tmp_excluding_the_shared_file": {
       "messaging_socket_dirs": 0,
       "sandbox_multiplexer_sockets": 0,
       "file_watch_probe_dirs": 0,
       "client_state_dirs": 0,
-      "other": 0
+      "other": 1
     },
     "in_tmp_claude_uid": {
       "messaging_socket_dirs": 0,

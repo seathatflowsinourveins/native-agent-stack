@@ -199,6 +199,56 @@ systemctl --user show ai-memory.service qdrant-agent-lab.service nemotron-embed-
 systemctl --user show ecosystem-native-data.timer --property=ActiveState --property=LastTriggerUSec
 ```
 
+### Maintained-decision routing
+
+After native compaction or resume, retrieve the latest maintained decision from
+the verified project scope before describing deployed architecture. Check its
+currency and original sources; a compacted summary can retain stale versions.
+This is task-triggered retrieval, not an added startup hook or audit. Preserve
+native compaction and caching.
+
+For a maintained current decision whose exact path is unknown, use the adopted
+project marker's workspace and project explicitly. Select the installed schema
+before using optional fields; the example needs ai-memory 2.4.0 or later:
+
+```text
+memory_query(query="memory selection",
+             workspace="agent-lab", project="agent-lab",
+             pin_first=true, limit=2, answer=false)
+memory_read_page(path="<exact path returned by memory_query>",
+                 workspace="agent-lab", project="agent-lab")
+```
+
+These are supported MCP arguments, not shell syntax. Substitute the adopted
+scope; never fall back to another project when the requested scope is missing.
+The portable Mac installer still pins 2.3.2, whose schema lacks `pin_first`:
+omit both `pin_first` and `answer`, which that schema also lacks, and use ordinary
+scoped query followed by exact-path read. `answer=false` keeps this lookup
+on the supported retrieval path without LLM answer synthesis. Read the exact page
+when a returned snippet omits a required fact; keep source provenance visible.
+Read a known exact path directly. `pin_first` prioritizes existing pins; it does
+not create or maintain a pin, certify currency or make memory operating authority.
+Check the full page's date, supersession and cited canonical sources before
+acting. Widen the scoped query if the two results do not satisfy the task; retry
+without `pin_first` when unrelated or stale pins crowd out relevant hits. A
+miss in the first two is not evidence of absence. Upstream applies `pin_first`
+only to a single-project query; it ignores it on `scopes`, `global` and `as_of`.
+See [ai-memory v2.5.0's schema and ordering implementation](https://github.com/akitaonrails/ai-memory/blob/v2.5.0/crates/ai-memory-mcp/src/server.rs#L565).
+
+The [Mac owner's report](decisions/2026-09-30-bounded-native-decision-routing.md)
+found the maintained decision at rank three with the default query and first
+with scoped `pin_first=true, limit=2`, followed by exact-path read. This establishes
+reported retrieval ordering only. The official Mac ai-memory 2.5.0 control does
+not inherit the historical local build's measured quality; Hindsight remains
+isolated pending the amended paired comparison and existing promotion gates.
+
+The [separate continuity follow-up](https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5924447784)
+reports failed tool-free recall after compaction, then correct deployed-version
+and zero-savings recall in a distinct turn using exactly two native memory calls
+(bounded scoped query and exact-page read). That is maintained-memory recovery;
+the original compaction semantic gate remains failed. Successful PreCompact
+dispatch does not establish durable attribution to the assigned session.
+
 For another PC, use the chosen [adoption profile](../adoption/manifest.json) and
 upstream recipes, native sign-in, explicit project scope and that host's own
 evidence. Do not copy private client configurations or interpret this host's

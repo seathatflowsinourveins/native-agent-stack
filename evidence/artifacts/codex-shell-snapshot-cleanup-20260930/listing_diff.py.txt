@@ -1,0 +1,20 @@
+"""Names-only diff of two `find -printf '%P\t%y\t%s\t%T@\n'` listings (no file contents are ever read)."""
+import sys
+
+
+def load(path):
+    rows = {}
+    for line in open(path, encoding="utf-8", errors="replace"):
+        parts = line.rstrip("\n").split("\t")
+        rows[parts[0]] = tuple(parts[1:])
+    return rows
+
+
+before, after = load(sys.argv[1]), load(sys.argv[2])
+removed = sorted(k for k in before if k not in after)
+added = sorted(k for k in after if k not in before)
+changed = sorted(k for k in before if k in after and before[k] != after[k] and before[k][0] == "f")
+print("entries before", len(before), "after", len(after))
+print("removed:", removed)
+print("added:", added)
+print("changed files (names only):", changed[:30], "..." if len(changed) > 30 else "")

@@ -116,7 +116,7 @@
    "claim": "The supposedly whole-definition comparison silently excludes multiline attributes and can report identical notification definitions after their serialized names change.",
    "checked_by": "verifier",
    "disposition": "repaired",
-   "repair": "landscape_refresh.py: multi-line attributes are captured whole and formatting is normalized; checks for a changed one-line and multi-line attribute and a wrapped derive; verified on the real 0.157.1 and 0.159.2 files",
+   "repair": "landscape_refresh.py: multi-line attributes are captured whole and formatting is normalized; checks for a changed one-line and multi-line attribute and a wrapped derive (an attribute-dropping mutant fails three of them); the verifier's run and the coordinator's on the real rust-v0.157.1 and rust-v0.159.2 files found the parts identical (ad hoc, not recorded)",
    "verifier_verdict": "confirmed",
    "verifier_severity": "medium"
   },

@@ -1,1 +1,1 @@
-selftest: 14 cases, 0 problems
+selftest: 28 cases, 0 problems

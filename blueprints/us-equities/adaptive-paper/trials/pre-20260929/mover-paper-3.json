@@ -1,0 +1,2225 @@
+{
+  "adapter_errors": [],
+  "average_invariant_mismatches": [],
+  "callback_faults": [],
+  "config_sha256": "da2ce5d2f0890b847b404b59114ed5215a927d04d445ef0b7889348e60f32799",
+  "error_reason": null,
+  "error_type": null,
+  "events": [
+    {
+      "applied": [],
+      "expired_on_arrival": [],
+      "halted": [],
+      "sha256": "ad67d1b0d2dac47adf09f854d8cca2737d54d1af6f8a2f7a675e80e8004a683b",
+      "status": "seeded",
+      "type": "halt_seed"
+    },
+    {
+      "ask": "2.92",
+      "at": 1790687236.6028385,
+      "client_id": "mvr-pre-20260929-3-0000001",
+      "limit_price": "2.93",
+      "qty": 100,
+      "symbol": "BKYI",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "ask": "4.29",
+      "at": 1790687236.6028385,
+      "client_id": "mvr-pre-20260929-3-0000002",
+      "limit_price": "4.31",
+      "qty": 100,
+      "symbol": "MSGY",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000001",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000002",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "MSGY",
+      "type": "intent"
+    },
+    {
+      "ask": "2.12",
+      "at": 1790687243.7351022,
+      "client_id": "mvr-pre-20260929-3-0000003",
+      "limit_price": "2.13",
+      "qty": 100,
+      "symbol": "YMT",
+      "type": "mover_entry_submitted"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000003",
+      "reason": "entry",
+      "side": "buy",
+      "strategy": "MOVER-001-M",
+      "symbol": "YMT",
+      "type": "intent"
+    },
+    {
+      "at": 1790687265.8628645,
+      "reason": "no_fresh_quote",
+      "symbol": "SANG",
+      "type": "mover_entry_skipped"
+    },
+    {
+      "at": 1790688300.0019977,
+      "reason": "hard_flatten",
+      "type": "mover_force"
+    },
+    {
+      "at": 1790688300.0019977,
+      "reason": "hard_flatten",
+      "symbol": "BKYI",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790688300.0019977,
+      "bid": "3.28",
+      "client_id": "mvr-pre-20260929-3-0000004",
+      "limit_price": "3.27",
+      "qty": 100,
+      "reason": "hard_flatten",
+      "symbol": "BKYI",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "at": 1790688300.0019977,
+      "reason": "hard_flatten",
+      "symbol": "YMT",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790688300.0019977,
+      "bid": "2.16",
+      "client_id": "mvr-pre-20260929-3-0000005",
+      "limit_price": "2.15",
+      "qty": 100,
+      "reason": "hard_flatten",
+      "symbol": "YMT",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "at": 1790688300.0019977,
+      "reason": "hard_flatten",
+      "symbol": "MSGY",
+      "type": "mover_exit_triggered"
+    },
+    {
+      "at": 1790688300.0019977,
+      "bid": "4.08",
+      "client_id": "mvr-pre-20260929-3-0000006",
+      "limit_price": "4.06",
+      "qty": 100,
+      "reason": "hard_flatten",
+      "symbol": "MSGY",
+      "type": "mover_exit_submitted"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000004",
+      "reason": "hard_flatten",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "BKYI",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000005",
+      "reason": "hard_flatten",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "YMT",
+      "type": "intent"
+    },
+    {
+      "client_id": "mvr-pre-20260929-3-0000006",
+      "reason": "hard_flatten",
+      "side": "sell",
+      "strategy": "MOVER-001-M",
+      "symbol": "MSGY",
+      "type": "intent"
+    }
+  ],
+  "evidence_class": "PAPER",
+  "execution_stats": {
+    "activity_executions_booked": 0,
+    "activity_fill_reconciliations": 0,
+    "average_invariant_mismatches": 0,
+    "duplicate_executions": 0,
+    "executions_booked": 12,
+    "fill_events_missing_execution_fields": 0,
+    "open_fill_gaps_at_stop": 0,
+    "startup_fill_reports": 0
+  },
+  "exit_parameters": {
+    "rule": "X2",
+    "x1_flatten_at_et": "15:58",
+    "x2_hold_seconds": 3600,
+    "x3_trail_fraction": "0.85",
+    "x4_stop_fraction": "0.85",
+    "x4_target_fraction": "1.50"
+  },
+  "exit_rule": "X2",
+  "flat": true,
+  "force_at": "2026-09-29T13:25:00.001998+00:00",
+  "force_reason": "hard_flatten",
+  "foreign_terminal_orders_ignored": 0,
+  "halts": {
+    "halted_now": [],
+    "last_status": {},
+    "seed": {
+      "applied": [],
+      "bytes": 29473,
+      "expired_on_arrival": [],
+      "expiry": {},
+      "fetched_at_ns": 1790687236141953550,
+      "halted": [],
+      "items": 21,
+      "sha256": "ad67d1b0d2dac47adf09f854d8cca2737d54d1af6f8a2f7a675e80e8004a683b",
+      "source": "nasdaq_trade_halts_rss",
+      "status": "seeded",
+      "symbols": [
+        "BKYI",
+        "MSGY",
+        "SANG",
+        "SPY",
+        "YMT"
+      ],
+      "url": "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts"
+    },
+    "seeded_only": {},
+    "status_messages": 0
+  },
+  "handoff_to_recovery": null,
+  "inter_trial_cash_changed": false,
+  "kind": "mover_trial_receipt",
+  "ledger_risk": {
+    "drawdown_usd": "2.050",
+    "halted_reason": null,
+    "lifetime_gross_loss_usd": "95.00",
+    "lifetime_realized_pnl_usd": "-2.050"
+  },
+  "limitations": [
+    "Alpaca paper fills are simulated by the broker from quotes; they are not exchange executions and do not establish live slippage, queue position or partial-fill behaviour.",
+    "Exits are marketable limit sells re-priced every exit timeout; stops never rest at the broker, and a gap or halt can fill below the protocol's stop level or leave a sell unfilled until the flatten or recovery.",
+    "One paper session is not a strategy evaluation; the historical study, not this receipt, decides the rule and exit."
+  ],
+  "native": {
+    "dropped_quotes": {
+      "by_reason": {
+        "crossed": 54
+      },
+      "by_symbol": {
+        "BKYI": 20,
+        "MSGY": 30,
+        "SPY": 4
+      }
+    },
+    "elapsed_seconds": 1066.800509267021,
+    "engine": "NautilusTrader LiveNode 2.0.0rc5",
+    "native_fill_events": 12,
+    "native_quotes": 43063,
+    "native_rejections": 0,
+    "orders_submitted": 6,
+    "requests": {
+      "read": 148,
+      "submit": 6
+    },
+    "session_policy": {
+      "extended_hours": true,
+      "overnight_holds": false
+    }
+  },
+  "native_assertions": {
+    "fill_events_carry_execution_fields": true,
+    "no_fill_gap_open_at_stop": true,
+    "overturn_signals": []
+  },
+  "preflight": {
+    "account_status": "ACTIVE",
+    "asset_count": 5,
+    "capital_available": true,
+    "clock": {
+      "is_open": false,
+      "next_close_ns": 1790712000000000000,
+      "next_open_ns": 1790688600000000000,
+      "received_at_ns": 1790687235638610567,
+      "timestamp_ns": 1790687235631896574
+    },
+    "config_sha256": "da2ce5d2f0890b847b404b59114ed5215a927d04d445ef0b7889348e60f32799",
+    "endpoint": "https://paper-api.alpaca.markets",
+    "feed": "sip",
+    "http": [
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687235"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "1000",
+          "x-ratelimit-remaining": "999",
+          "x-ratelimit-reset": "1790687235"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687236"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687236"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687236"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "195",
+          "x-ratelimit-reset": "1790687237"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "194",
+          "x-ratelimit-reset": "1790687237"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790687237"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790687238"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "10000",
+          "x-ratelimit-remaining": "9999",
+          "x-ratelimit-reset": "1790687235"
+        },
+        "kind": "data_read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "193",
+          "x-ratelimit-reset": "1790687238"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "192",
+          "x-ratelimit-reset": "1790687238"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "191",
+          "x-ratelimit-reset": "1790687239"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "190",
+          "x-ratelimit-reset": "1790687239"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "189",
+          "x-ratelimit-reset": "1790687239"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "188",
+          "x-ratelimit-reset": "1790687240"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687244"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687266"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687266"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687267"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687267"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687296"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687296"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687297"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687297"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687326"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687327"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687327"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687327"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687356"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687357"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687357"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687357"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687386"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687387"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687387"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687387"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687417"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687417"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687417"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687418"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687447"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687447"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687447"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687448"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687477"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687477"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687478"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687478"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687507"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687507"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687508"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687508"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687537"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687538"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687538"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687538"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687567"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687568"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687568"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687568"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687598"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687598"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687598"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687598"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687628"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687628"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687628"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687629"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687658"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687658"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687658"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687659"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687688"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687688"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687689"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687689"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687718"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687718"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687719"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687719"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687748"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687749"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687749"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687749"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687778"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687779"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687779"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687779"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687808"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687809"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687809"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687809"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687839"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687839"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687839"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687840"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687869"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687869"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687869"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687870"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687899"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687899"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687900"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687900"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687929"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687929"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687930"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687930"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687959"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687960"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687960"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687960"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790687989"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790687990"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790687990"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790687990"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688020"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688020"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688020"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688020"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688050"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688050"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688050"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688051"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688080"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688080"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688080"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688081"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688110"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688110"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688111"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688111"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688140"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688140"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688141"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688141"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688170"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688171"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688171"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688171"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688200"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688201"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688230"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688231"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688231"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688231"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688261"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688262"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688291"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688291"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688291"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688292"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688300"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688300"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688301"
+        },
+        "kind": "submit",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "199",
+          "x-ratelimit-reset": "1790688302"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "198",
+          "x-ratelimit-reset": "1790688303"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "197",
+          "x-ratelimit-reset": "1790688303"
+        },
+        "kind": "read",
+        "status": 200
+      },
+      {
+        "headers": {
+          "x-ratelimit-limit": "200",
+          "x-ratelimit-remaining": "196",
+          "x-ratelimit-reset": "1790688303"
+        },
+        "kind": "read",
+        "status": 200
+      }
+    ],
+    "observed_at": "2026-09-29T13:07:15.845136+00:00",
+    "open_order_count": 0,
+    "orders_submitted": 0,
+    "position_count": 0,
+    "promotion_gate": "not_supplied",
+    "quote_count": 5,
+    "quote_errors": {},
+    "scan_sha256": "7ced3203a47ff0a5c90e64e8a907630b5c60d08d8bb98a8d09b249863061d5c7",
+    "untradable_scan_symbols": []
+  },
+  "protocol": "mover-early-entry-v1-20260924",
+  "reconciliation": {
+    "end": {
+      "cash_delta_usd": "-2.05",
+      "cash_match": true,
+      "open_orders": 0,
+      "positions": 0,
+      "positions_match": true
+    },
+    "recovery": null,
+    "start": {
+      "checked_by": "runner.validate_preflight and the native adapter's startup snapshot",
+      "flat_account_and_no_open_orders": true
+    }
+  },
+  "rule": "07:00|G20|V1000000|any",
+  "scan": {
+    "age_seconds_at_trial_start": 11.85,
+    "regime_inputs": {
+      "spy_prev_close": "765.61",
+      "spy_rv20": "0.006973347",
+      "spy_rv20_median252": "0.008009177",
+      "spy_sma20": "763.9335"
+    },
+    "scan_time": "2026-09-29T13:07:04+00:00",
+    "session_date": "2026-09-29",
+    "symbols": 4
+  },
+  "scan_sha256": "7ced3203a47ff0a5c90e64e8a907630b5c60d08d8bb98a8d09b249863061d5c7",
+  "schema_version": 1,
+  "section": "paper_e2e",
+  "session": {
+    "drawdown_factor": "1",
+    "drawdown_fraction": "0.004909",
+    "equity_peak_usd": "4991.09",
+    "number": 3,
+    "pause_sessions_remaining_after": 0,
+    "paused": false,
+    "reason": null,
+    "rung": "4"
+  },
+  "shared_account_override": false,
+  "sizing": {
+    "appreciation_allowance": "2",
+    "engine_leverage_multiple": "1",
+    "entry_limit_cap_bps": "50",
+    "exit_headroom_factor": "10",
+    "exit_limit_cap_bps": "50",
+    "gross_budget_usd": "4966.59",
+    "gross_guard_usd": "9000.00",
+    "ledger_max_order_notional_usd": "10000",
+    "leverage_L": "4",
+    "max_entry_notional_usd": "1000",
+    "regime_factor": "1",
+    "regime_source": "scan_inputs_recomputed",
+    "sizing_equity_source": "config capital_usd plus the mover ledger's realized P&L",
+    "sizing_equity_usd": "4966.590"
+  },
+  "status": "passed",
+  "symbols": [
+    {
+      "closed_at": "2026-09-29T13:25:00.781348+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T13:07:16.638107+00:00",
+        "average_fill_price": "2.920000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-pre-20260929-3-0000001",
+        "detail": null,
+        "filled_qty": "100",
+        "fills": [
+          {
+            "at": "2026-09-29T13:07:16.987655+00:00",
+            "price": "2.9200",
+            "qty": "100"
+          }
+        ],
+        "ledger_filled_qty": "100",
+        "ledger_status": "filled",
+        "limit_price": "2.93",
+        "pre_wire_refusal": false,
+        "qty": "100",
+        "reason": "entry",
+        "reference_price": "2.92",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T13:07:16.602839+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "hard_flatten",
+      "exit_triggered_at": "2026-09-29T13:25:00.001998+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T13:25:00.057613+00:00",
+          "average_fill_price": "3.299000",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-pre-20260929-3-0000004",
+          "detail": null,
+          "filled_qty": "100",
+          "fills": [
+            {
+              "at": "2026-09-29T13:25:00.417832+00:00",
+              "price": "3.3000",
+              "qty": "90"
+            },
+            {
+              "at": "2026-09-29T13:25:00.707010+00:00",
+              "price": "3.2900",
+              "qty": "10"
+            }
+          ],
+          "ledger_filled_qty": "100",
+          "ledger_status": "filled",
+          "limit_price": "3.27",
+          "pre_wire_refusal": false,
+          "qty": "100",
+          "reason": "hard_flatten",
+          "reference_price": "3.28",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T13:25:00.001998+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "100",
+        "buy_notional_usd": "292.00",
+        "flat": true,
+        "realized_pnl_usd": "37.9000",
+        "sell_notional_usd": "329.900",
+        "sold_qty": "100"
+      },
+      "first_fill_at": "2026-09-29T13:07:16.987655+00:00",
+      "last_wait_reason": null,
+      "rank": 1,
+      "realized_pnl_usd": "37.9000",
+      "recovery_exits": [],
+      "running_high": "3.31",
+      "scan": {
+        "dollar_volume_at_t": "74387706.216897011",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "49.404761905",
+        "news_before_t": null,
+        "price_at_t": "2.51"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "743877.06",
+          "entry_bar_10pct": null,
+          "gross_remaining": "4966.59",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "1",
+        "entry_notional_usd": "993.31",
+        "entry_order_notional_usd": "293.00",
+        "entry_qty_binding": "max_order_qty",
+        "intended_notional_usd": "993.31",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "993.31"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "BKYI"
+    },
+    {
+      "closed_at": "2026-09-29T13:25:02.380139+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T13:07:23.770553+00:00",
+        "average_fill_price": "2.120000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-pre-20260929-3-0000003",
+        "detail": null,
+        "filled_qty": "100",
+        "fills": [
+          {
+            "at": "2026-09-29T13:07:23.817233+00:00",
+            "price": "2.1200",
+            "qty": "100"
+          }
+        ],
+        "ledger_filled_qty": "100",
+        "ledger_status": "filled",
+        "limit_price": "2.13",
+        "pre_wire_refusal": false,
+        "qty": "100",
+        "reason": "entry",
+        "reference_price": "2.12",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T13:07:23.735102+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "hard_flatten",
+      "exit_triggered_at": "2026-09-29T13:25:00.001998+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T13:25:00.092856+00:00",
+          "average_fill_price": "2.175500",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-pre-20260929-3-0000005",
+          "detail": null,
+          "filled_qty": "100",
+          "fills": [
+            {
+              "at": "2026-09-29T13:25:00.448866+00:00",
+              "price": "2.1800",
+              "qty": "51"
+            },
+            {
+              "at": "2026-09-29T13:25:00.740741+00:00",
+              "price": "2.1700",
+              "qty": "31"
+            },
+            {
+              "at": "2026-09-29T13:25:01.281085+00:00",
+              "price": "2.1700",
+              "qty": "12"
+            },
+            {
+              "at": "2026-09-29T13:25:01.450485+00:00",
+              "price": "2.1700",
+              "qty": "2"
+            },
+            {
+              "at": "2026-09-29T13:25:02.050922+00:00",
+              "price": "2.1800",
+              "qty": "3"
+            },
+            {
+              "at": "2026-09-29T13:25:02.327268+00:00",
+              "price": "2.1800",
+              "qty": "1"
+            }
+          ],
+          "ledger_filled_qty": "100",
+          "ledger_status": "filled",
+          "limit_price": "2.15",
+          "pre_wire_refusal": false,
+          "qty": "100",
+          "reason": "hard_flatten",
+          "reference_price": "2.16",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T13:25:00.001998+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "100",
+        "buy_notional_usd": "212.00",
+        "flat": true,
+        "realized_pnl_usd": "5.5500",
+        "sell_notional_usd": "217.5500",
+        "sold_qty": "100"
+      },
+      "first_fill_at": "2026-09-29T13:07:23.817233+00:00",
+      "last_wait_reason": null,
+      "rank": 2,
+      "realized_pnl_usd": "5.5500",
+      "recovery_exits": [],
+      "running_high": "2.18",
+      "scan": {
+        "dollar_volume_at_t": "33533488.591786005",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "46.327683616",
+        "news_before_t": null,
+        "price_at_t": "2.59"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "335334.88",
+          "entry_bar_10pct": null,
+          "gross_remaining": "3973.28",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "1",
+        "entry_notional_usd": "993.31",
+        "entry_order_notional_usd": "213.00",
+        "entry_qty_binding": "max_order_qty",
+        "intended_notional_usd": "993.31",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "993.31"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "YMT"
+    },
+    {
+      "closed_at": "2026-09-29T13:25:00.417822+00:00",
+      "entry": {
+        "accepted_at": "2026-09-29T13:07:16.668183+00:00",
+        "average_fill_price": "4.290000",
+        "broker_order_ref": "withheld",
+        "cancel_reason": null,
+        "cancel_requested": false,
+        "client_order_id": "mvr-pre-20260929-3-0000002",
+        "detail": null,
+        "filled_qty": "100",
+        "fills": [
+          {
+            "at": "2026-09-29T13:07:16.956752+00:00",
+            "price": "4.2900",
+            "qty": "100"
+          }
+        ],
+        "ledger_filled_qty": "100",
+        "ledger_status": "filled",
+        "limit_price": "4.31",
+        "pre_wire_refusal": false,
+        "qty": "100",
+        "reason": "entry",
+        "reference_price": "4.29",
+        "side": "buy",
+        "status": "filled",
+        "submitted_at": "2026-09-29T13:07:16.602839+00:00"
+      },
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": "hard_flatten",
+      "exit_triggered_at": "2026-09-29T13:25:00.001998+00:00",
+      "exit_wait_reason": null,
+      "exits": [
+        {
+          "accepted_at": "2026-09-29T13:25:00.128242+00:00",
+          "average_fill_price": "4.080000",
+          "broker_order_ref": "withheld",
+          "cancel_reason": null,
+          "cancel_requested": false,
+          "client_order_id": "mvr-pre-20260929-3-0000006",
+          "detail": null,
+          "filled_qty": "100",
+          "fills": [
+            {
+              "at": "2026-09-29T13:25:00.392938+00:00",
+              "price": "4.0800",
+              "qty": "100"
+            }
+          ],
+          "ledger_filled_qty": "100",
+          "ledger_status": "filled",
+          "limit_price": "4.06",
+          "pre_wire_refusal": false,
+          "qty": "100",
+          "reason": "hard_flatten",
+          "reference_price": "4.08",
+          "side": "sell",
+          "status": "filled",
+          "submitted_at": "2026-09-29T13:25:00.001998+00:00"
+        }
+      ],
+      "fills_and_pnl": {
+        "bought_qty": "100",
+        "buy_notional_usd": "429.00",
+        "flat": true,
+        "realized_pnl_usd": "-21.0000",
+        "sell_notional_usd": "408.00",
+        "sold_qty": "100"
+      },
+      "first_fill_at": "2026-09-29T13:07:16.956752+00:00",
+      "last_wait_reason": null,
+      "rank": 3,
+      "realized_pnl_usd": "-21.0000",
+      "recovery_exits": [],
+      "running_high": "4.2900",
+      "scan": {
+        "dollar_volume_at_t": "22915108.282141004",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "23.642172524",
+        "news_before_t": null,
+        "price_at_t": "3.87"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "229151.08",
+          "entry_bar_10pct": null,
+          "gross_remaining": "2979.97",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": "1",
+        "entry_notional_usd": "993.31",
+        "entry_order_notional_usd": "431.00",
+        "entry_qty_binding": "max_order_qty",
+        "intended_notional_usd": "993.31",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "993.31"
+      },
+      "skip_reason": null,
+      "state": "closed",
+      "symbol": "MSGY"
+    },
+    {
+      "closed_at": null,
+      "entry": null,
+      "exit_blocked": null,
+      "exit_budget_from": 0,
+      "exit_reason": null,
+      "exit_triggered_at": null,
+      "exit_wait_reason": null,
+      "exits": [],
+      "fills_and_pnl": null,
+      "first_fill_at": null,
+      "last_wait_reason": "no_fresh_quote",
+      "rank": 4,
+      "realized_pnl_usd": "0",
+      "recovery_exits": [],
+      "running_high": null,
+      "scan": {
+        "dollar_volume_at_t": "2026098.028578999",
+        "entry_bar_dollar_volume": null,
+        "gain_pct_at_t": "37.604456825",
+        "news_before_t": null,
+        "price_at_t": "4.94"
+      },
+      "sizing": {
+        "binding": "formula",
+        "caps_usd": {
+          "dollar_volume_1pct": "20260.98",
+          "entry_bar_10pct": null,
+          "gross_remaining": "1986.66",
+          "max_entry_notional": "1000"
+        },
+        "entry_leverage_i": null,
+        "entry_notional_usd": null,
+        "entry_order_notional_usd": null,
+        "entry_qty_binding": null,
+        "intended_notional_usd": "993.31",
+        "leverage_i": "1",
+        "price_decimals": 4,
+        "raw_notional_usd": "993.31"
+      },
+      "skip_reason": "no_fresh_quote",
+      "state": "skipped",
+      "symbol": "SANG"
+    }
+  ],
+  "timing": {
+    "entry_deadline": "2026-09-29T13:07:45.850041+00:00",
+    "entry_timeout_seconds": 60.0,
+    "exit_order_timeout_seconds": 10.0,
+    "hard_flatten_at": "2026-09-29T13:25:00+00:00",
+    "sell_window_end": "2026-09-29T14:17:15.850041+00:00",
+    "trial_start": "2026-09-29T13:07:15.850041+00:00",
+    "x1_flatten_at": null,
+    "x2_hold_seconds": 3600.0
+  },
+  "totals": {
+    "buy_notional_usd": "933.00",
+    "entries_filled": 3,
+    "entries_submitted": 3,
+    "exit_orders_submitted": 3,
+    "ledger_cash_delta_usd": "22.45",
+    "ledger_realized_pnl_delta_usd": "22.450",
+    "native_fill_events": 12,
+    "native_rejections": 0,
+    "pnl_consistent": true,
+    "realized_pnl_usd": "22.4500",
+    "sell_notional_usd": "955.4500",
+    "symbols": 4
+  },
+  "trial_id": "pre-20260929-3",
+  "unsellable_positions": []
+}

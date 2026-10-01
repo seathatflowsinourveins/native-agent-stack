@@ -89,7 +89,7 @@ GitHub-hosted macOS runner; see
 
 2. **Run the platform bootstrap script.** `adoption/bootstrap-linux.sh --profile <id>
    [--skip-system-packages] [--allow-unpinned <id,id,...>]
-   [--configure-claude-user-profile]` on Linux/WSL2, or
+   [--configure-claude-user-profile | --configure-full-profile --host <name> [--skip <step>]...]` on Linux/WSL2, or
    `adoption/bootstrap-macos.sh --profile <id> [--skip-system-packages]
    [--allow-unpinned <id,id,...>] [--plan] [--configure-claude-user-profile]`
    on macOS (`ECO_INSTALL_ROOT` env,
@@ -160,7 +160,7 @@ GitHub-hosted macOS runner; see
    store, 2.4.1 migrates it forward-only at the next service start, so take
    the at-rest copy in [the recipe's upgrade steps](../recipes/README.md#upgrading-an-existing-store) first.
    `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.157.1 (URL, hashes and note), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`). The macOS pin stays at 0.155.1.
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.159.2 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own 0.159.x qualification before the template default applies there.
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
@@ -220,6 +220,63 @@ GitHub-hosted macOS runner; see
    web keep the saved per-model level; bypass with `--effort <level>` or by
    running `~/.local/bin/claude` directly.
 
+   **The whole user profile in one run** (Linux/WSL2; `--configure-full-profile`,
+   `tools/adoption/managed_block.py`, `tools/adoption/codex_home.py` and
+   `scripts/adoption_status.py --launcher-resolution` added after `v2026.09.26.2`, so a
+   checkout at that tag runs steps 4 and 4a by hand).
+   After native sign-in (step 3), `adoption/bootstrap-linux.sh --profile <id>
+   --configure-full-profile --host <name>` replaces the hand steps with the
+   repository's own tools, in this order, each skippable with `--skip <step>`
+   (repeat it, or give a comma-separated list):
+
+   | Step | What runs |
+   | --- | --- |
+   | `claude-profile` | `tools/adoption/install_claude_profile.py` (guard hooks, agents, MCP servers; step 4a) |
+   | `claude-settings` | `tools/adoption/render_config.py --host <name> --out` into the run's staging directory, then `tools/adoption/apply_claude_settings.py` with the rendered `settings.json`, then with `adoption/templates/claude.settings.linux-wsl2.overlay.json` when `WSL_DISTRO_NAME` is set (step 4a; [WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)) |
+   | `claude-md` | `tools/adoption/managed_block.py claude-md`: `examples/claude-native/CLAUDE.md` as a managed block in `~/.claude/CLAUDE.md` |
+   | `skills` | the skills CLI pinned in `adoption/skills/manifest.json` (its npm tarball and sha256, through the script's own checksum-verified npm install) when missing, then `tools/adoption/install_skills.py` ([skills manifest](update.md#apply-the-skills-manifest)) |
+   | `codex-lane` | `tools/adoption/codex_home.py`, which meets the lane's preconditions: a Codex home without `config.toml` gets the rendered `codex.config.toml` (the template's own model, approval and sandbox policy, servers and `features.daemon_auto_start = false`) without the source host's `[projects.*]` trust grants and `[hooks.state.*]` hook approvals, created only when absent, `0600`; an existing `config.toml` is never replaced, and gets `features.daemon_auto_start = false` through `codex features disable daemon_auto_start` when it lacks it, only while no `codex` process runs (as `--apply` requires) and after a backup beside it, the only undo for that key. Then `tools/adoption/apply_codex_lane.py` with `--codex $ECO_INSTALL_ROOT/bin/codex` and the host file's `HOST_PATH` as `--host-path`: its dry run, then `--apply` with the two `--expect-*-sha256` hashes that dry run printed. It installs the two role carriers and never the worker roles, which only `--worker-roles` installs (step 4) |
+   | `path-block` | `tools/adoption/managed_block.py profile-path`: a managed block in `~/.profile` that puts `$ECO_INSTALL_ROOT/bin` first on `PATH` |
+   | `login-shell` | `scripts/adoption_status.py --login-shell --launcher-resolution` under Python 3.13 (step 6's form); the step fails unless `claude` in a login shell is the ecosystem launcher |
+
+   `--host <name>` names `adoption/hosts/<name>.json` (step 4); it is required
+   unless both `claude-settings` and `codex-lane` are skipped. The flag applies
+   what main documents, so it runs only from a clone at `origin/main` (a release
+   checkout follows steps 4 and 4a by hand, as the note above says). Its checks
+   come first, in this order, and the script installs and writes nothing until
+   they pass: the usage checks (exit 2); the platform checks (x86_64 Linux, not
+   root, Ubuntu or Debian; exit 1); `git` on `PATH`; and `git rev-parse HEAD`
+   equal to `git ls-remote origin refs/heads/main`, with both commits printed.
+   Only then does the script install the missing system packages (the `sudo
+   apt-get` step), check the prerequisites, install the pins, write the version
+   report and run the steps above. A checkout that is not at `origin/main`, or
+   whose origin cannot be read, is refused with exit 1 and the host unchanged.
+   So is a host without `git`: the package step that would install it comes
+   after this check, so the refusal names `sudo apt-get install -y git`, and a
+   run of the script without the flag installs it as well. Without the flag the
+   order is unchanged: system packages first, and git is never asked. A failed
+   step is reported and the rest still run; the script then exits 6. Every step
+   is idempotent: fix the cause and re-run, skipping what is done.
+
+   Both managed blocks work alike. The begin and end markers must appear exactly
+   once and in order, or the file is refused; without them the block is appended
+   after the existing text; every line outside them is kept; the file is backed
+   up beside itself first (`<name>.bak.<UTC stamp>`, never overwriting an earlier
+   backup) and replaced atomically with its mode kept; a file already up to date
+   is not touched. In `~/.claude/CLAUDE.md`, rtk's `@RTK.md` import stays outside
+   the block, and a hand-merged copy of the example with no markers is replaced
+   only when it equals the current example ([the recipe's rule](../recipes/claude-native-profile.md#small-persistent-contract-selected-upstream-skills));
+   any other copy is refused, so remove it or wrap it in the markers first. The
+   `~/.profile` block is the only shell startup file this script writes. A login
+   shell reads `~/.profile` only when no `~/.bash_profile` or `~/.bash_login`
+   exists, which is why the last step checks where `claude` resolves. The
+   user-level `codex.config.toml` that `render_config.py` renders is installed
+   only into a Codex home that has none, and never with the source host's trust
+   state (step 4's warning): Codex asks about project trust and hooks on this
+   host instead. A host that already has a `config.toml` keeps it; compare it
+   with the render (`render_config.py --host <name> --check`, step 4) and merge
+   by hand. The run's rendered copies go with its staging directory.
+
 3. **Native sign-in.** Neither client's credentials transfer between machines
    (`adoption/manifest.json` `policy.authentication_transfer: native_login_on_target_only`).
    Use each client's own device flow:
@@ -248,6 +305,10 @@ GitHub-hosted macOS runner; see
    Templates are in [`adoption/templates/`](templates/): `claude.settings.template.json`,
    `codex.config.template.toml` (user-level `~/.codex/config.toml`), and
    `project.codex.config.template.toml` (project-level `.codex/config.toml`).
+   A new repository gets its `.codex/config.toml` from
+   `tools/adoption/scaffold_repo.py` (added after `v2026.09.26.2`), which renders
+   that template with the same renderer for this host instead of a hand copy
+   ([new repositories](#new-repositories)).
    `--check`'s `project.codex.config.toml` comparison targets the project
    being onboarded (`$PROJECT_ROOT`, e.g. `agent-lab`), never this catalog
    checkout, which has no `.codex/config.toml` of its own and will always
@@ -282,9 +343,11 @@ GitHub-hosted macOS runner; see
    every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
    ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
    file is absent the command exits 0 and adds nothing.
+   `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets `MCP_TIMEOUT` to `"120000"`, the startup timeout of every MCP server (default 30 s, [environment variables](https://code.claude.com/docs/en/env-vars)); the value is global because Claude Code 2.1.285 and 2.1.286 have no per-server startup setting (`claude mcp add --help` lists no timeout option, and a server's `timeout` field bounds tool calls only), and 120 s matches the Codex template's slowest `startup_timeout_sec` ([decision](../docs/decisions/2026-09-30-mcp-startup-timeout.md)). It also denies, in every session, the Skills CLI's install, remove and update commands and `Edit(~/.agents/**)`, so skills install only through `tools/adoption/install_skills.py` ([lifecycle](skills/lifecycle.md#install-and-inspect)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
-   `codex.config.template.toml` changed after `v2026.09.26.2` again: it sets `web_search = "live"`, `check_for_update_on_startup = false`, `[features] shell_snapshot = false` and `[agents] default_subagent_reasoning_effort = "max"`, and it no longer trusts four dated validation directories. Its SocratiCode server now runs `${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/`, which `render_config.py` renders from the selected platform's pin like `${AI_MEMORY_BIN}` (1.15.0 on Linux and 1.14.0 on macOS since 2026-09-27); `--set SOCRATICODE_VERSION=<version>` names another install. The opt-in gateway profile `codex.omniroute.config.toml` (added after that tag) is not rendered here; `tools/adoption/apply_codex_lane.py --omniroute-profile` installs it ([recipe](../recipes/README.md#codex-through-omniroute)).
+   `codex.config.template.toml` changed after `v2026.09.26.2` again: it sets `web_search = "live"`, `check_for_update_on_startup = false`, `[features] shell_snapshot = false` and `[agents] default_subagent_reasoning_effort = "max"`, and it no longer trusts four dated validation directories. Its SocratiCode server now runs `${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/`, which `render_config.py` renders from the selected platform's pin like `${AI_MEMORY_BIN}` (1.15.0 on Linux and 1.14.0 on macOS since 2026-09-27); `--set SOCRATICODE_VERSION=<version>` names another install. Since 2026-09-30 its `model` and `[agents] default_subagent_model` are `${CODEX_MODEL}`, which `render_config.py` renders from the selected platform's Codex pin: `gpt-6.1-sol` from Codex 0.159.1, which added it to the bundled catalog (the Linux pin), and `gpt-6-astra` before it (the macOS pin, 0.155.1); `--set CODEX_MODEL=<model>` names another model. The opt-in gateway profile `codex.omniroute.config.toml` (added after that tag) is not rendered here; `tools/adoption/apply_codex_lane.py --omniroute-profile` installs it ([recipe](../recipes/README.md#codex-through-omniroute)).
+   The Codex worker lane's installer, `tools/adoption/apply_codex_lane.py` (added after `v2026.09.26.2`; [recipe](../recipes/README.md#codex-worker-lane)), puts the two role carriers of `adoption/agents/codex/` under `$CODEX_HOME/agents/`. Its `--worker-roles` flag, added after `v2026.09.26.2`, also installs `evidence-reviewer`, `isolated-builder` and `semantic-evidence-reviewer` from `adoption/agents/codex/workers/`: the Codex counterparts of the Claude roles of the same names, the two reviewers pinned at `gpt-6-astra` and `max` and the builder at `max` with the model its spawn names or, without one, the coordinator's `default_subagent_model`, each checked against that folder's `SHA256SUMS` and the rules of `tools/adoption/codex_roles.py` before anything is copied, and rolled back like the carriers ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles)). Every installed role's description enters every Codex parent's `spawn_agent` text, so leave the flag off while the token-adoption E2E's Gate A window is open. Step 2's `--configure-full-profile` never passes the flag: its `codex-lane` step installs the two carriers only, and the worker roles reach a host only through a run of `apply_codex_lane.py --worker-roles` by hand (its dry run, then the `--apply` command that dry run prints). A later run without the flag, the `codex-lane` step's included, keeps a host's installed worker roles and does not count them as extra role files.
    `codex.config.template.toml` changed after `v2026.09.26.2` once more: it sets `[tui] notifications` to the needed-action kinds (`approval-requested`, `plan-mode-prompt`, `async-question`), so Codex asks for a notification on an approval, a plan-mode prompt or a question and not when a turn finishes. Codex keeps its own per-terminal channel, so a macOS host still gets native notifications for those kinds and stops getting the turn-complete one; at the macOS pin a `request_user_input` question already notifies as `plan-mode-prompt` and `async-question` (asynchronous questions added later) is inert, so no notification that release emits is lost ([decision](../docs/decisions/2026-09-28-terminal-experience.md#repository-carried-defaults-and-the-second-distros-profiles-2026-09-29)).
    The rendered `codex.config.toml` keeps the source host's `trusted_hash`
    entries for the ai-memory commands in `~/.codex/hooks.json`, recorded before
@@ -303,7 +366,8 @@ GitHub-hosted macOS runner; see
    project trust and hook execution state that a fresh Codex install would
    otherwise ask about. Review the rendered file's `[projects.*]` and
    `[hooks.state.*]` sections before use on a new host and drop entries that
-   do not apply; `adoption/manifest.json` `policy.historical_acceptance_transfers:
+   do not apply (the `codex-lane` step of step 2's `--configure-full-profile`
+   drops all of them when it installs the file); `adoption/manifest.json` `policy.historical_acceptance_transfers:
    false` means none of that state should be read as re-qualifying the new
    host's own acceptance evidence.
 
@@ -313,7 +377,8 @@ GitHub-hosted macOS runner; see
    Claude Code user-scope assets with
    [`tools/adoption/install_claude_profile.py`](../tools/adoption/install_claude_profile.py).
    Its MCP sub-step registers the template's commands but installs none of
-   them, so first install Serena, the template's one stdio server, and
+   them, so first install Serena (the MCP sub-step below names where the
+   template's other stdio servers come from) and
    jCodeMunch, which the per-project opt-in below uses, at their pins, with the
    uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
    (`python-tools/` and `bin/` under the ecosystem prefix, on either
@@ -373,7 +438,8 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     http and `serena` stdio), renders its `${HOME}` and
+     over http; `serena`, `socraticode`, `headroom`, `codebase-memory` and
+     `qmd` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
@@ -391,6 +457,26 @@ GitHub-hosted macOS runner; see
      exists, so for another port run `claude mcp remove ai-memory -s user`,
      then
      `claude mcp add --scope user --transport http ai-memory http://127.0.0.1:<port>/mcp`.
+     The template changed after `v2026.09.26.2`: `socraticode`, `headroom`,
+     `codebase-memory` and `qmd` joined, so a new host registers every server
+     the SubagentStart token-lanes carrier names except `jcodemunch` (below)
+     and context-mode, which its plugin supplies. Each entry runs the command,
+     arguments and environment of its entry in the Codex user template; the
+     template's `_comment` gives the three Claude-side differences and the
+     repository-default SocratiCode endpoints (`QDRANT_URL` and `EMBED_URL` in
+     `adoption/hosts/example.json`), which a host with other endpoints
+     registers by hand. The sub-step installs none of them: SocratiCode,
+     Headroom and QMD come from the `token-efficiency` profile's pins, and
+     codebase-memory-mcp, which no pins file installs yet, from its v0.11.0
+     release by hand
+     ([catalog row](../recipes/README.md#component-catalog-install-and-check)),
+     never through a bounded runner, because every session's frontend shares
+     one daemon. The record is the 2026-09-30 addendum, added after
+     `v2026.09.26.2`
+     ([F4 Codex roles](../docs/decisions/2026-09-26-stack-agents-role-dispatch.md#addendum-2026-09-30-f4-codex-roles)).
+     A host that registered one of these servers by hand keeps its entry: the
+     installer reports it as matching (same command, arguments and variable
+     names) or as differing, and replaces it only with `--replace-mcp`.
 
    **jCodeMunch, per project.** The template leaves `jcodemunch` out (changed
    after `v2026.09.24.1`). At user scope its server instruction ("Prefer it
@@ -556,6 +642,15 @@ GitHub-hosted macOS runner; see
    (see its own docstring and `adoption/README.md`'s "Native verification
    tiers" table).
 
+   `--login-shell` adds the static check of `~/.bash_profile`, `~/.bash_login` and `~/.profile`
+   (file metadata only; none is opened or run). Where `claude` resolves in a login shell is known only
+   by running one, so that report carries `"launcher_resolution": {"status": "not_run", "flag":
+   "--launcher-resolution"}`. `--launcher-resolution` (added after `v2026.09.26.2`) runs one bounded
+   Bash login shell from a fixed environment, never `claude` itself, and reports the resolved path,
+   whether it is the ecosystem launcher `$ECO_INSTALL_ROOT/bin/claude` and that launcher's sha256
+   ([WSL page](platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)); the
+   `login-shell` step of `--configure-full-profile` passes both flags.
+
 7. **Per-host receipt.** Record `evidence/receipts/adoption-<host>-<date>.json`
    using the [`adoption/receipt.json`](receipt.json) schema: `schema_version`,
    `id`, `kind`, `component_ids`, `observed_at_utc`, `status`, `claim`, `scope`,
@@ -581,3 +676,51 @@ GitHub-hosted macOS runner; see
 Every step above is guidance; running or validating this page does not itself
 execute anything (`adoption/lifecycle.md`, "This guide supplies future-host
 commands; reading or validating it does not run those commands").
+
+## New repositories
+
+Added after `v2026.09.26.2`: `tools/adoption/scaffold_repo.py`, `adoption/scaffold/` and
+`.github/workflows/sota-sources-gate.yml`. Every new repository starts from the scaffold
+instead of hand copies, so it carries the standing rule from its first commit:
+
+```sh
+python3 tools/adoption/scaffold_repo.py --target <repo> --dry-run   # the plan; writes nothing, even before git init
+git init <repo>
+python3 tools/adoption/scaffold_repo.py --target <repo>             # writes it; <repo> must exist
+```
+
+| File in the new repository | From |
+| --- | --- |
+| `AGENTS.md` | `adoption/scaffold/AGENTS.md`: the top rule, byte for byte the block after the `native-agent-stack:top-rule` marker of `adoption/templates/codex.AGENTS.template.md` (a test binds the two), and a repository-expectations section to fill in |
+| `CLAUDE.md` | `@AGENTS.md` and one comment line: Claude Code reads the shared file through the import ([memory docs](https://code.claude.com/docs/en/memory), "Share one file with other coding tools") |
+| `.agents/skills/README.md` | where skills only this repository needs go; skills every repository uses stay global (`adoption/skills/manifest.json`) |
+| `.github/pull_request_template.md` | scope, lane, `## SOTA sources` and the evidence classes of this repository's own template |
+| `.github/workflows/sota-sources.yml` | `sota-sources.yml.template` with `<sha>` filled in: it calls this repository's reusable `sota-sources-gate.yml` at that main commit |
+| `.codex/config.toml` | `adoption/templates/project.codex.config.template.toml`, rendered for this host |
+
+The gate is `validate.yml`'s required `sota-sources` job made reusable (`on: workflow_call`), the same
+check byte for byte (`tests/test_sota_sources_gate.py`); a called workflow runs in its caller's
+context, so it reads the new repository's pull request
+([reusing workflow configurations](https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations),
+"`github` context"). `<sha>` is `--main-sha`, else what `git ls-remote origin refs/heads/main` reports;
+when that commit is in this checkout it must carry `.github/workflows/sota-sources-gate.yml`, or nothing
+is written (exit 2), and a commit this checkout lacks is used as given and reported unchecked. GitHub
+resolves the reusable workflow when the check runs, so the new repository's check works only once that
+commit, pushed to this repository on GitHub, carries the gate file. The caller is kept as a `.template` file because zizmor also audits nested
+`.github/workflows` directories, where an unfilled `<sha>` is an unpinned `uses:`. In the new repository,
+make the check the workflow reports a required status check, and if its Actions settings allow only
+selected actions, allow this reusable workflow and `step-security/harden-runner`, which it runs
+(`actions/github-script` is GitHub-owned).
+
+`.codex/config.toml` takes `ECO_ROOT` from `ECO_INSTALL_ROOT` (default `~/.local/share/codex-ecosystem`),
+`CODE_INDEX_PATH` from its variable (default `~/.code-index`) and `HOST_PATH` from
+`adoption/hosts/example.json`'s system directories, never this shell's `PATH`; `--host <name>` reads
+`adoption/hosts/<name>.json` instead and `--set KEY=VALUE` overrides one value. It holds this host's
+paths, so each host renders its own. Each file is created when absent and left alone when identical; one
+whose content differs is skipped and the run exits 3 unless `--force <path>` names it (the path as the
+table prints it, repeatable; no backup is kept, so commit first). Only the named files are overwritten:
+every other file that differs is still skipped, a bare `--force` or a path outside the scaffold is a usage
+error (exit 2), and a symlink is never written through. `--dry-run` also plans a `--target` that does
+not exist yet; a real run refuses one. The tool prints one line per file (`created`, `unchanged`,
+`skipped`, `overwritten`) and a summary; [update](update.md#start-a-new-repository) has the recipe
+that moves an existing repository's workflow to a newer gate.

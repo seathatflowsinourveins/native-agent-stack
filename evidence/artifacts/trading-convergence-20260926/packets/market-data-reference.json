@@ -1,0 +1,734 @@
+{
+ "layer_id": "market-data-reference",
+ "proposal": {
+  "layer_id": "market-data-reference",
+  "proposal": "add_candidates",
+  "summary": "All three current winners keep their place on individual merit; none is beaten by a verified alternative on its own terms, but one pin is stale and the layer's deep gaps remain genuinely open pending a paid-entitlement decision outside this research task's scope.\n\nalpaca-py (v0.44.0) is exactly current against both PyPI (upload_time 2026-08-11T10:15:07Z) and GitHub releases/latest (published 2026-08-11T10:11:55Z) -- confirmed by the incoming adversarial pass and independently reproducible. No free/open Python SDK substitutes for Alpaca's own API, and no rival (Massive, Databento, OpenBB) has an executed on-stack arm beating alpaca-py's measured 24,310,292-bar broad-universe acquisition (0 failed batches, 5,108 pages re-hashed, 0 mismatches; catalogs/sota-convergence/manifest-20260923.json trading[0]). The incoming packet's own adversarial check caught its own minor error (a pushed_at citation off by one calendar day); trivial, doesn't change the verdict.\n\nexchange_calendars (4.13.2) is also exactly current; its 29 unreleased upstream commits, read in full, are dependency bumps, CI/lint and an AGENTS.md addition only -- no calendar-semantic change missed. New grounding this pass added: reading blueprints/us-equities/adaptive-paper/sessions.py and runner.py directly shows exchange_calendars is wired into the live paper engine as an optional session-open fallback behind a primary hand-rolled session table, so this pick has a real (if secondary) effect on paper-lane session gating -- which raises the value of finally running the pandas_market_calendars comparison the layer's own decision text has deferred since at least 2026-09-23 (\"should not be mixed\" without one).\n\nedgartools is the one winner that is stale, not challenged: its pin (v5.58.0, 2026-09-11) sits two releases behind upstream v5.59.1 (2026-09-26, independently reconfirmed today via gh api, exact timestamp match). Both missed releases are correctness fixes on exactly what this project uses the library for: v5.59.0 fixes seven 10-K/10-Q table-of-contents section-boundary bugs (an issuer's Item 7 wrongly returning Item 8 text); v5.59.1 fixes a same-day regression plus a bug where edgar_read returned zero 13F holdings for any filing, until hours before this review. No alternative filing library beats edgartools; the action is a pin bump to v5.59.1, not a swap.\n\nThe layer's hard, named gaps -- a survivorship-free universe, complete corporate actions (dividend currency), established historical point-in-time availability, and licensing/redistribution rights -- remain open, and every candidate that could plausibly close them is already known to this stack, not newly discovered today: Databento is already a \"conditional\" catalog card since at least 2026-09-22/23 (pin v0.86.0), and is itself now one release behind its own upstream v0.87.0 (released 2026-09-22, independently reconfirmed live today via pypi.org -- no further drift since the 0923 sweep, but the bump is still pending). Sharadar's only Python access path, the nasdaq-data-link wrapper, was already found code-stale in the 2026-09-23 sweep (no PyPI release since 1.0.4 on 2022-08-29; its 2026-09-15 repo push is an unmerged README branch, not a functional update) -- independently reconfirmed. Norgate was already logged as \"not new\" in a 2026-09-24 sweep, blocked on a paid subscription and an unread EULA; independently refetching norgatedata.com today confirms it is Windows-desktop-only with \"access... no longer possible if a subscription lapses\" -- in real tension with this layer's own \"produce exact reproducible analytical snapshots\" requirement. CRSP is reachable in this stack only via WRDS, already deeply reviewed under the identity-provenance layer, and blocked by WRDS's own terms restricting use to \"academic and non-commercial research purposes only\" -- a licensing wall, not a cost question. OpenBB was already source-reviewed at a pinned commit (authenticated-data-review.json) and deferred; independently reconfirmed today that GitHub's own license.spdx_id is NOASSERTION (not \"AGPL-3.0-only\" as the incoming packet characterized it) while the repo's own pinned LICENSE file text is AGPLv3 -- a correction, not a reversal, since either way it's an unresolved copyleft-flavored license plus a generic fetcher pipeline that doesn't enforce this project's raw-byte/provenance contract.\n\nGiven all of that, \"add_candidates\" is the honest disposition: not \"keep\" (a pin is genuinely stale and several trial-worthy comparisons have never been run), not \"challenge\" (no alternative has verified, executed evidence of beating any winner outright). This pass registers concrete, boundable trial plans for the pieces that are tractable without a purchase -- an edgartools pin bump, a pandas_market_calendars side-by-side now motivated by exchange_calendars' real paper-lane wiring, and a free-tier edgartools-v5.59.1-vs-sec-api-python 13F diff motivated by edgartools' own just-fixed bug -- plus a bounded, entitlement-gated Databento/Sharadar trial design for whenever the user separately authorizes that paid-data decision. The deepest gaps correctly stay open; no research candidate found today closes them for free.",
+  "winner_status": [
+   {
+    "component_id": "data-alpaca-py",
+    "status": "earns_it",
+    "note": "Pin v0.44.0 is exactly upstream's current latest (PyPI upload_time 2026-08-11T10:15:07Z; GitHub releases/latest v0.44.0 published 2026-08-11T10:11:55Z) -- confirmed by the incoming adversarial pass and reproduced independently. No free/open Python SDK substitutes for Alpaca's own market-data/brokerage API, and no rival (Massive, Databento, OpenBB) has an executed on-stack arm beating alpaca-py's measured 24,310,292-bar broad-universe acquisition recorded in the 2026-09-23 sweep. The incoming packet's own adversarial pass caught a minor self-error (pushed_at citation off by one calendar day, live value 2026-09-23T08:14:11Z not the claimed 2026-09-24); trivial, doesn't change the verdict."
+   },
+   {
+    "component_id": "data-edgartools",
+    "status": "stale",
+    "note": "Pin v5.58.0 (2026-09-11) is two releases behind upstream v5.59.1 (2026-09-26) -- independently reconfirmed today via gh api repos/dgunning/edgartools/releases/latest, exact match to the incoming packet. Both missed releases are correctness fixes on this project's actual filing-parsing use: v5.59.0 fixes seven 10-K/10-Q table-of-contents section-boundary bugs; v5.59.1 fixes a same-day regression plus a bug where edgar_read returned zero 13F holdings for any filing, until today. No alternative filing-parser beats edgartools on evidence (sec-api-python is broader-scope and paid, not a free substitute) -- recommended action is a pin bump to v5.59.1, not a swap."
+   },
+   {
+    "component_id": "data-exchange-calendars",
+    "status": "earns_it",
+    "note": "Pin 4.13.2 is exactly upstream's latest tag; its 29 unreleased upstream commits, read in full, are dependency bumps, CI/lint and an AGENTS.md addition only -- no calendar-semantic change missed (independently reconfirmed via the same compare API). New grounding this pass added: blueprints/us-equities/adaptive-paper/sessions.py and runner.py import exchange_calendars as a live (optional, fallback) session-open cross-check behind the paper engine's primary session table, so this pick has a real, if secondary, effect on paper-lane session gating. A genuine, actively maintained, permissively licensed comparator (pandas_market_calendars) exists but has never been run side by side on this repo's own sessions; earns_it stands per the layer's own overturn_when gate (compare before switching), with that comparison now better motivated and listed as a challenger."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "Databento (databento-python SDK + dbn status schema + corporate-actions/reference-data + security master)",
+    "url": "https://github.com/databento/databento-python",
+    "why_better": "The only externally verified candidate that plausibly addresses three named gaps at once: corporate-action completeness (an explicit, dated event taxonomy on Databento's own docs/blog), historical halt/LULD reconstruction via its normalized `status` schema (cross-checked against the primary Nasdaq TotalView-ITCH 5.0 specification text itself, not just vendor marketing, per catalogs/us-equities/mover-v3-sweep-20260924.json), and a security master claiming 310,000+ listed/delisted securities across 85,000+ issuers -- a figure independently repeated across four separate research passes on 2026-09-22, 09-23, 09-24 and today, though every pass agrees it remains a vendor claim never checked against this project's own retained symbol list. Already an existing 'conditional' catalog card (data-databento), so this is a maturation of a known candidate, not a new find.",
+    "evidence_level": "source_review",
+    "trial_plan": "(1) Zero-cost first step: bump the already-approved conditional card's SDK pin from v0.86.0 to v0.87.0 (released 2026-09-22, independently reconfirmed live via pypi.org today -- still current, no further drift since the 2026-09-23 sweep flagged it pin_behind_upstream). (2) If and only if the user separately authorizes a paid Databento entitlement (out of scope for this research-only task), extend the existing blueprints/us-equities/engine-nautilus/spy-parity/compare.py-style harness with a Databento arm on the same frozen AAPL/SPY window alpaca-py already covers, adding at least one symbol delisted within that window (which the current AAPL-only sample never exercises). Pass criterion: Databento returns bar/corporate-action records for the delisted symbol that alpaca-py's feed cannot, and a fixed as-of pull reproduces byte-identical corporate-action records on repeat. Overturn: if the entitled trial shows no material coverage difference for the project's actual retained universe, or measured cost is unacceptable, keep alpaca-py as sole default and downgrade the Databento card.",
+    "paper_lane_impact": "none (research/backtest data-completeness question; no execution path in the adaptive-paper engine currently reads from Databento)",
+    "sources": [
+     "https://pypi.org/pypi/databento/json (independently fetched 2026-09-26: version 0.87.0, upload_time 2026-09-22T20:24:40Z)",
+     "https://github.com/databento/databento-python/releases/tag/v0.87.0",
+     "https://www.nasdaqtrader.com/content/technicalsupport/specifications/dataproducts/NQTVITCHSpecification.pdf",
+     "catalogs/sota-convergence/manifest-20260923.json (trading[0] entries: data-databento, review_status pin_behind_upstream)",
+     "catalogs/us-equities/mover-v3-sweep-20260924.json (mover-v3-dbn-status-schema)",
+     "catalogs/us-equities/gates-20260922.json line 137, 171"
+    ]
+   },
+   {
+    "name": "Sharadar SEP/SF1 (data itself, accessed directly -- not via the nasdaq-data-link PyPI wrapper)",
+    "url": "https://sharadar.com/docs/fundamentals",
+    "why_better": "Sharadar's own docs (fetched 2026-09-26) quote an explicit as-reported/point-in-time dimension (ARQ/ARY/ART) that excludes restatements and is time-indexed to the actual filing submission date -- a direct, quotable answer to this layer's 'reject data whose historical availability... is unknown' clause for fundamentals specifically, plus SEP's corporate-actions/reference coverage back to 1998 for 21,000+ active and delisted tickers. The only Python client (nasdaq-data-link, formerly Quandl) is independently confirmed code-stale: no PyPI release since 1.0.4 on 2022-08-29, and its most recent repo push (2026-09-15) is an unmerged README branch, not a functional update (catalogs/sota-convergence/manifest-20260923.json adversarial lens 1) -- so any trial must bypass that wrapper and hit Nasdaq Data Link's documented public REST API directly.",
+    "evidence_level": "metadata",
+    "trial_plan": "Do not adopt or pin the nasdaq-data-link PyPI package (confirmed stale). If a paid Sharadar/NDL entitlement is ever separately authorized, add a direct-REST arm (plain HTTP against the documented NDL API, no SDK dependency) to the same comparator harness as the Databento trial, scoring: (a) whether SF1's ARQ dimension reproduces as-filed (not restated) fundamentals with filing timestamps that edgartools's XBRL extraction cannot; (b) whether SEP dividend records carry a currency field that alpaca-py's corporate-actions records are missing (native-receipt.json lines 118-130). Pass criterion: both (a) and (b) hold on a small fixed fixture. Overturn: if edgartools's own as-reported XBRL facts already match, or SEP's dividend-currency field is also absent, do not adopt.",
+    "paper_lane_impact": "none (fundamentals/corporate-actions research question; no execution path reads from Sharadar today)",
+    "sources": [
+     "https://sharadar.com/docs/fundamentals",
+     "https://pypi.org/pypi/nasdaq-data-link/json (last release 1.0.4, 2022-08-29)",
+     "https://github.com/Nasdaq/data-link-python",
+     "catalogs/sota-convergence/manifest-20260923.json (Nasdaq/data-link-python candidate, disposition refuted_targeted_candidate, adversarial lens 1)"
+    ]
+   },
+   {
+    "name": "pandas_market_calendars",
+    "url": "https://github.com/rsheftel/pandas_market_calendars",
+    "why_better": "Not proven better on session semantics -- no executed comparison exists -- but it is a genuinely live, permissively licensed (MIT, independently reconfirmed today: not archived, 999 stars) and actively maintained (v5.4.0 released 2026-05-27, pushed 2026-07-12) direct challenger to exchange_calendars that this layer's own decision text has already flagged since 2026-09-23 as 'should not be mixed' absent a comparison. New motivation this pass found: exchange_calendars is not just a catalog pick, it is imported as a live optional session-open fallback inside the adaptive-paper engine's own sessions.py/runner.py (confirmed by direct code read), so a real session-semantics gap between the two libraries would have actual, if secondary, paper-lane consequences that the layer's existing evidence (one XNYS session, a 104-date check) has never tested against a second library.",
+    "evidence_level": "source_review",
+    "trial_plan": "Extend blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py (already in the checkout) with a pandas_market_calendars XNYS arm run over the same 2,693 retained sessions and the existing 104-session date check. Pass criterion: 100% agreement with exchange_calendars on session-open/closed status and holiday dates; any disagreement is resolved using sessions.py's own exchange_calendars_agrees() cross-check helper plus a real external source (Alpaca's clock/calendar endpoint) as tiebreak. Overturn: exchange_calendars stays the pin unless pandas_market_calendars is demonstrably more correct on a documented, reproduced mismatch.",
+    "paper_lane_impact": "paper acts passed (secondary/fallback path only, not the primary session gate -- see the data-exchange-calendars winner_status note; a session-classification defect here could incorrectly gate or admit a paper order at a session boundary)",
+    "sources": [
+     "https://pypi.org/pypi/pandas_market_calendars/json (v5.4.0, 2026-05-27)",
+     "gh api repos/rsheftel/pandas_market_calendars (independently reconfirmed 2026-09-26: MIT, pushed_at 2026-07-12T22:35:10Z, 999 stars, not archived)",
+     "blueprints/us-equities/adaptive-paper/sessions.py (exchange_calendars_agrees(), _exchange_calendars_day())",
+     "blueprints/gap-wave2-20260923/us-equities__market-data-reference/calendar_check.py"
+    ]
+   },
+   {
+    "name": "sec-api-python (SEC-API.io) -- targeted 13F/insider-trades cross-check only",
+    "url": "https://github.com/SEC-API-io/sec-api-python",
+    "why_better": "Directly named by this layer's own open_gaps as an 'unindexed alternative'; materially broader scope than edgartools (13F holdings, insider Form 4 trades, enforcement actions, real-time filing streaming). Freshly concrete motivation independently confirmed today: edgartools's own v5.59.1 release notes (2026-09-26) admit edgar_read 'returned no 13F holdings section for any filing' until today's patch -- i.e. the incumbent's 13F path was completely broken until hours before this review, which is exactly the capability sec-api-python is built around.",
+    "evidence_level": "metadata",
+    "trial_plan": "On the free tier only (no purchase -- research-only per task rules), pull 13F holdings for one filing already covered by this project's existing SEC fixtures (e.g. an accession from blueprints/us-equities/catalyst-provenance/access-resolution.json) via both the just-patched edgartools v5.59.1 and sec-api-python's free tier, and diff the extracted holdings tables. Pass/overturn: if edgartools v5.59.1's own fix already reproduces sec-api-python's holdings output exactly, no adoption is warranted -- the pin bump alone closes the gap; sec-api-python is adopted only as a conditional cross-check if a real extraction discrepancy survives the patched edgartools.",
+    "paper_lane_impact": "none (filing-extraction correctness feeds research, not the live paper order path)",
+    "sources": [
+     "https://github.com/SEC-API-io/sec-api-python",
+     "gh api repos/SEC-API-io/sec-api-python (independently reconfirmed 2026-09-26: MIT, pushed_at 2026-04-13T10:24:14Z, 320 stars, not archived)",
+     "https://github.com/dgunning/edgartools/releases/tag/v5.59.1",
+     "layers.json open_gaps: 'unindexed alternative sec-api-io/sec-api-python'"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Massive (formerly Polygon.io) client-python",
+    "reason": "metadata only / no demonstrated advantage -- already an existing 'conditional, not_individually_reviewed' catalog card (data-massive, v2.8.0) with no executed arm; its free 'Stocks Basic' tier is only 2 years of historical EOD data per its own pricing page, which cannot address this layer's pre-2020/survivorship-free priority gap, and paid-tier redistribution rights are unstated. The rebrand-history research usefully confirms polygon-io/client-python and massive-com/client-python are one renamed repo (same GitHub id), but that changes no disposition."
+   },
+   {
+    "name": "Norgate Data (norgatedata)",
+    "reason": "license/operational -- proprietary EULA (PyPI license classifier 'Other/Proprietary License', independently reconfirmed today), Windows-desktop-only access via a local updater service with no API, and no public source repository to review. Already logged as a known, unexecuted candidate in a 2026-09-24 sweep ('not new... EULA not read'); independently refetching norgatedata.com today confirms 'access to the database is no longer possible if a subscription lapses,' in tension with this layer's own reproducible-snapshot requirement."
+   },
+   {
+    "name": "CRSP US Stock Database (via WRDS)",
+    "reason": "license -- the only access path this stack has found is WRDS, whose terms restrict use to 'academic and non-commercial research purposes only' (already documented in this repo's own identity-provenance review, catalogs/us-equities/security-identity-review.md/.json); already adversarially refuted as a targeted candidate on this exact ToS ground in the 2026-09-23 sweep. A licensing wall, not a cost or freshness question."
+   },
+   {
+    "name": "OpenBB",
+    "reason": "license ambiguity + already reviewed -- GitHub's own license.spdx_id is NOASSERTION (independently reconfirmed today, correcting the incoming packet's 'AGPL-3.0-only (GitHub license field)' characterization) while the repo's pinned LICENSE file text is AGPLv3; already source-reviewed at commit 3e071fcc (authenticated-data-review.json) with a still-valid deferred decision -- its generic Fetcher pipeline does not itself enforce this project's raw-byte retention/provenance contract, and it would duplicate the existing alpaca-py/edgartools path without closing a concrete missing-provider gap."
+   },
+   {
+    "name": "yfinance",
+    "reason": "off-requirement -- explicitly unofficial with no SLA and no corporate-action-completeness or licensing guarantee per its own project description, so it cannot itself satisfy the layer's 'licensed, source-identifiable' requirement. Useful only as a free cross-check baseline, not a data-source candidate."
+   },
+   {
+    "name": "fedfred",
+    "reason": "off-requirement -- addresses a different, adjacent gap (FRED macro series) but its own documentation makes no ALFRED/point-in-time-vintage claim, so it does not close this layer's named macro-vintage gap; at most a freshness improvement over the already-catalogued-but-release-stale fredapi conditional (mortada/fredapi, last release 2024-05-05), not a gap closure."
+   },
+   {
+    "name": "FinanceDatabase",
+    "reason": "off-requirement -- a static, current-snapshot symbol/classification catalog (300,000+ symbols) with no point-in-time or delisting history, so it does not address the survivorship-free-history gap; already flagged 'not_adopted' on the same reasoning in the 2026-09-23 sweep (adversarial vote never executed there either)."
+   },
+   {
+    "name": "quantlab (Rossod4)",
+    "reason": "license -- no declared license (PyPI/GitHub license field null, independently reconfirmed today) and 0 stars; the repo's own description says 'in progress' and its most recent push was 2026-09-12, two weeks before this check. Nothing here is installable or redistributable under any stated terms. Already named directly in this layer's own open_gaps as an 'unindexed alternative' to watch, not adopt; re-check only if it reaches a licensed, tagged release."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "scope-top8-selection",
+   "claim": "'Top 8 candidates by fit' = the first 8 entries in the given candidates array (alpaca-py, edgartools, exchange_calendars, pandas_market_calendars, Massive, Databento, Norgate, CRSP), since the array's own order runs from strongest/most-confirmed gap-closure down to weakest (ending in yfinance/fedfred/FinanceDatabase/quantlab, each explicitly self-described as partial or speculative).",
+   "verdict": "unverifiable",
+   "note": "No explicit fit-ranking field was supplied; this is my own scope decision, stated for transparency, not a sourced fact. Sharadar, sec-api-python and OpenBB (ranked 9-11) also read as strong fits and are NOT checked below under this reading; flag if a different top-8 was intended.",
+   "sources": []
+  },
+  {
+   "name": "winner-alpaca-py-pin-latest",
+   "claim": "Winner note: pin v0.44.0 IS upstream's current latest release; PyPI shows 0.44.0 uploaded 2026-08-11T10:15:07Z and GitHub releases/latest returns tag v0.44.0 published 2026-08-11T10:11:55Z.",
+   "verdict": "supported",
+   "note": "Reproduced exactly. PyPI JSON: version 0.44.0, releases['0.44.0'][0].upload_time_iso_8601 = 2026-08-11T10:15:07.141408Z. gh api repos/alpacahq/alpaca-py/releases/latest: tag_name v0.44.0, published_at 2026-08-11T10:11:55Z. No newer tag exists.",
+   "sources": [
+    "https://pypi.org/pypi/alpaca-py/json",
+    "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0 (gh api repos/alpacahq/alpaca-py/releases/latest)"
+   ]
+  },
+  {
+   "name": "winner-alpaca-py-pushed-at-claim",
+   "claim": "Winner note: repo has commits after the release, pushed_at 2026-09-24T08:14:11Z, but no new tag.",
+   "verdict": "refuted",
+   "note": "Directly queried gh api repos/alpacahq/alpaca-py right now: pushed_at = 2026-09-23T08:14:11Z, one full calendar day earlier than the note's claimed 2026-09-24T08:14:11Z (same time-of-day, different date -- not a rounding or timezone artifact since both are already UTC 'Z' timestamps). The broader conclusion (no new tag since v0.44.0, current commits unreleased) still holds, but the specific timestamp cited in the note does not match what a primary gh api call returns.",
+   "sources": [
+    "gh api repos/alpacahq/alpaca-py --jq '{pushed_at}' (checked 2026-09-26, returned 2026-09-23T08:14:11Z)"
+   ]
+  },
+  {
+   "name": "winner-edgartools-pin-behind",
+   "claim": "Winner note: pin v5.58.0 (2026-09-11 release) is BEHIND upstream; v5.59.0 and v5.59.1 both shipped 2026-09-26.",
+   "verdict": "supported",
+   "note": "gh api releases/tags confirms exactly: v5.58.0 published_at 2026-09-11T15:41:47Z; v5.59.0 published_at 2026-09-26T11:14:38Z; v5.59.1 published_at 2026-09-26T13:11:28Z (both today, same-day). releases/latest also returns v5.59.1.",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.0",
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.1"
+   ]
+  },
+  {
+   "name": "winner-edgartools-v5590-content",
+   "claim": "Winner note: v5.59.0 fixes seven 10-K/10-Q table-of-contents section-boundary bugs, e.g. FirstEnergy Item 7 no longer returns Item 8, Southern Co. Item 7A no longer duplicates Item 7.",
+   "verdict": "supported",
+   "note": "Release body opens 'Seven fixes change how 10-K and 10-Q items are found through the table of contents' and states verbatim: 'FirstEnergy's Item 7 no longer returns Item 8, Southern Co.'s Item 7A no longer duplicates Item 7'. Exact textual match, read directly from the release body.",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.0"
+   ]
+  },
+  {
+   "name": "winner-edgartools-v5591-content",
+   "claim": "Winner note: v5.59.1 is a same-day patch fixing a v5.59.0 regression (sections opening on a one-row page-header/'Table of Contents' breadcrumb again) plus a bug where edgar_read returned no 13F holdings section for any filing.",
+   "verdict": "supported",
+   "note": "Release body: 'A patch release with two fixes. One is a regression from 5.59.0: ExxonMobil's 10-K Item 7 opened on a \"Table of Contents\" breadcrumb again... The other: edgar_read returned no 13F holdings section for any filing.' Matches the note's characterization exactly.",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.1"
+   ]
+  },
+  {
+   "name": "winner-edgartools-gap-scope",
+   "claim": "Winner note: these fixes are filing-parsing correctness fixes; none touch the layer's point-in-time-availability or licensing gaps.",
+   "verdict": "supported",
+   "note": "Both release bodies (read in full) cover only TOC/section-boundary parsing, 13F value-unit and holdings extraction, XBRL fact assembly and performance; neither mentions historical availability, dissemination lag, or redistribution/licensing terms.",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.0",
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.1"
+   ]
+  },
+  {
+   "name": "winner-exchcal-pin-latest",
+   "claim": "Winner note: pin 4.13.2 IS still upstream's latest tagged release; PyPI's latest is also 4.13.2, uploaded 2026-03-10T03:24:37.",
+   "verdict": "supported",
+   "note": "PyPI JSON: version 4.13.2, upload_time_iso_8601 2026-03-10T03:24:37.055242Z (exact match). gh api tags: first/latest tag is '4.13.2'.",
+   "sources": [
+    "https://pypi.org/pypi/exchange_calendars/json",
+    "gh api repos/gerrymanoim/exchange_calendars/tags"
+   ]
+  },
+  {
+   "name": "winner-exchcal-compare-count",
+   "claim": "Winner note: default branch is 29 commits ahead of the tag (compare API), pushed_at 2026-09-24T06:22:30Z.",
+   "verdict": "supported",
+   "note": "gh api repos/gerrymanoim/exchange_calendars/compare/4.13.2...HEAD returns ahead_by 29 exactly. gh api repos/gerrymanoim/exchange_calendars returns pushed_at 2026-09-24T06:22:30Z exactly -- matches (unlike the alpaca-py note, this timestamp reproduced exactly).",
+   "sources": [
+    "https://github.com/gerrymanoim/exchange_calendars/compare/4.13.2...HEAD",
+    "gh api repos/gerrymanoim/exchange_calendars"
+   ]
+  },
+  {
+   "name": "winner-exchcal-commit-characterization",
+   "claim": "Winner note: sampled commit messages are dependency bumps, a type-hint/pre-commit fix, a new monthly dependency-update GitHub Action, a ruff-version lint pass, and an added AGENTS.md/coding-agent-skills file -- housekeeping/CI, not calendar-semantic changes.",
+   "verdict": "supported",
+   "note": "Read all 29 commit messages via the compare API directly. Confirmed present: 'Bump release-drafter/release-drafter from 6 to 7', 'Bump actions/cache from 5.0.3 to 5.0.4' (dep bumps); 'Fix special_opens type hint, fix pre-commit config' (type-hint/pre-commit fix); 'Add gh action to automate monthly PR to update deps' (monthly dep-update action); 'Linting... following ruff upgrade from 0.13 to 0.15.11' (ruff lint pass); 'Add agents context files... AGENTS.md' and 'Update AGENTS.md (#569)' (agent-context file). No venue/holiday/session-semantic commit found among the 29.",
+   "sources": [
+    "https://github.com/gerrymanoim/exchange_calendars/compare/4.13.2...HEAD"
+   ]
+  },
+  {
+   "name": "cand-alpacapy-exists-license",
+   "claim": "alpaca-py exists at github.com/alpacahq/alpaca-py, Apache-2.0 licensed.",
+   "verdict": "supported",
+   "note": "Repo live, not archived/disabled. gh api license.spdx_id = Apache-2.0; PyPI info.license = Apache-2.0. Both agree.",
+   "sources": [
+    "gh api repos/alpacahq/alpaca-py",
+    "https://pypi.org/pypi/alpaca-py/json"
+   ]
+  },
+  {
+   "name": "cand-alpacapy-version-date-maintained",
+   "claim": "latest_version v0.44.0, latest_release_date 2026-08-11, maintained true.",
+   "verdict": "supported",
+   "note": "Exact match on PyPI and GitHub releases/latest (see winner-alpaca-py-pin-latest). Release ~6 weeks old, repo pushed within the last 3 days -- comfortably inside the 12-month maintained threshold.",
+   "sources": [
+    "https://pypi.org/pypi/alpaca-py/json",
+    "gh api repos/alpacahq/alpaca-py/releases/latest"
+   ]
+  },
+  {
+   "name": "cand-alpacapy-capability-sdk",
+   "claim": "Official Alpaca market-data and brokerage Python SDK: historical/streaming bars, trades, quotes, corporate actions, account/order management.",
+   "verdict": "supported",
+   "note": "Verified directly in the pinned repo's own file tree/code search rather than taking the description at face value: alpaca/data/historical/corporate_actions.py and alpaca/data/models/corporate_actions.py (corporate actions); alpaca/data/requests.py defines StockQuotesRequest and StockTradesRequest (quotes, trades); PyPI description shows CryptoBarsRequest/get_crypto_bars (bars); alpaca/data/live/ (streaming); alpaca/trading/client.py and alpaca/broker/client.py with BrokerClient.list_accounts (account/order management).",
+   "sources": [
+    "https://github.com/alpacahq/alpaca-py/blob/master/alpaca/data/historical/corporate_actions.py",
+    "https://github.com/alpacahq/alpaca-py/blob/master/alpaca/data/requests.py",
+    "https://github.com/alpacahq/alpaca-py/blob/master/alpaca/trading/client.py",
+    "https://github.com/alpacahq/alpaca-py/blob/master/alpaca/broker/client.py",
+    "https://pypi.org/pypi/alpaca-py/json (description)"
+   ]
+  },
+  {
+   "name": "cand-alpacapy-no-drift",
+   "claim": "Pin v0.44.0 matches upstream's current latest release exactly; no version drift as of 2026-09-26.",
+   "verdict": "supported",
+   "note": "Same primary evidence as the winner note: PyPI and GitHub releases/latest both show v0.44.0 as current with no newer tag.",
+   "sources": [
+    "https://pypi.org/pypi/alpaca-py/json",
+    "gh api repos/alpacahq/alpaca-py/releases/latest"
+   ]
+  },
+  {
+   "name": "cand-edgartools-exists-license",
+   "claim": "edgartools exists at github.com/dgunning/edgartools, MIT licensed.",
+   "verdict": "supported",
+   "note": "Repo live, not archived/disabled. gh api license.spdx_id = MIT; PyPI classifiers include 'License :: OSI Approved :: MIT License' (PyPI info.license itself is null, but the classifier and GitHub both independently agree on MIT).",
+   "sources": [
+    "gh api repos/dgunning/edgartools",
+    "https://pypi.org/pypi/edgartools/json (classifiers)"
+   ]
+  },
+  {
+   "name": "cand-edgartools-version-date-maintained",
+   "claim": "latest_version v5.59.1, latest_release_date 2026-09-26, maintained true.",
+   "verdict": "supported",
+   "note": "gh api releases/latest returns v5.59.1 published_at 2026-09-26T13:11:28Z -- exact match, released today.",
+   "sources": [
+    "gh api repos/dgunning/edgartools/releases (top 5)"
+   ]
+  },
+  {
+   "name": "cand-edgartools-capability-awesome",
+   "claim": "AI-native SEC EDGAR client with XBRL financials, 17+ typed forms, pandas output (awesome-quant listing).",
+   "verdict": "supported",
+   "note": "wilsonfreitas/awesome-quant README (29,768-star canonical curated list, fetched directly), line 509: 'edgartools ... AI-native SEC EDGAR library with XBRL financials, clean text extraction, 17+ typed forms, and pandas DataFrames.' Near-verbatim match.",
+   "sources": [
+    "https://github.com/wilsonfreitas/awesome-quant/blob/master/README.md (fetched via gh api contents)"
+   ]
+  },
+  {
+   "name": "cand-edgartools-today-releases",
+   "claim": "v5.59.0 fixes seven TOC bugs; v5.59.1 same-day patch fixing a v5.59.0 regression plus a 13F-holdings bug.",
+   "verdict": "supported",
+   "note": "Duplicate of winner-edgartools-v5590-content / v5591-content; both release bodies read in full and match verbatim.",
+   "sources": [
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.0",
+    "https://github.com/dgunning/edgartools/releases/tag/v5.59.1"
+   ]
+  },
+  {
+   "name": "cand-exchcal-exists-license",
+   "claim": "exchange_calendars exists at github.com/gerrymanoim/exchange_calendars, Apache-2.0 licensed.",
+   "verdict": "supported",
+   "note": "Repo live, not archived/disabled. gh api license.spdx_id = Apache-2.0 (PyPI info.license is null/no classifier, but GitHub's own detected LICENSE file is authoritative and matches the candidate's claim).",
+   "sources": [
+    "gh api repos/gerrymanoim/exchange_calendars"
+   ]
+  },
+  {
+   "name": "cand-exchcal-version-date-maintained",
+   "claim": "latest_version 4.13.2, latest_release_date 2026-03-10, maintained true.",
+   "verdict": "supported",
+   "note": "Exact PyPI/GitHub match (see winner-exchcal-pin-latest). Repo pushed 2026-09-24, well inside 12 months.",
+   "sources": [
+    "https://pypi.org/pypi/exchange_calendars/json"
+   ]
+  },
+  {
+   "name": "cand-exchcal-capability-50markets",
+   "claim": "Stock exchange trading calendars covering 50+ global markets (awesome-quant listing).",
+   "verdict": "supported",
+   "note": "Repo README states verbatim: 'Calendars for more than 50 exchanges available out-the-box!'. awesome-quant README line 553 lists it: 'exchange_calendars ... Stock Exchange Trading Calendars.'",
+   "sources": [
+    "https://github.com/gerrymanoim/exchange_calendars/blob/master/README.md",
+    "https://github.com/wilsonfreitas/awesome-quant/blob/master/README.md"
+   ]
+  },
+  {
+   "name": "cand-exchcal-29commits-nosemantic",
+   "claim": "29 unreleased commits since the pin are dependency bumps, CI/lint fixes and an added agent-context file, no calendar-semantic changes found.",
+   "verdict": "supported",
+   "note": "Same evidence as winner-exchcal-commit-characterization -- all 29 commit messages read directly, none touch calendar/venue/session logic.",
+   "sources": [
+    "https://github.com/gerrymanoim/exchange_calendars/compare/4.13.2...HEAD"
+   ]
+  },
+  {
+   "name": "cand-pmc-exists-license",
+   "claim": "pandas_market_calendars exists at github.com/rsheftel/pandas_market_calendars, MIT licensed.",
+   "verdict": "supported",
+   "note": "Repo live, not archived/disabled. gh api license.spdx_id = MIT; PyPI info.license = MIT. Agree.",
+   "sources": [
+    "gh api repos/rsheftel/pandas_market_calendars",
+    "https://pypi.org/pypi/pandas_market_calendars/json"
+   ]
+  },
+  {
+   "name": "cand-pmc-version-date-maintained",
+   "claim": "v5.4.0 released 2026-05-27, MIT-licensed, repo actively pushed 2026-07-12.",
+   "verdict": "supported",
+   "note": "PyPI upload_time_iso_8601 for 5.4.0 = 2026-05-27T02:42:06.350345Z (exact). gh api tags: latest tag v5.4.0. gh api repo pushed_at = 2026-07-12T22:35:10Z (exact match).",
+   "sources": [
+    "https://pypi.org/pypi/pandas_market_calendars/json",
+    "gh api repos/rsheftel/pandas_market_calendars",
+    "gh api repos/rsheftel/pandas_market_calendars/tags"
+   ]
+  },
+  {
+   "name": "cand-pmc-capability-awesome",
+   "claim": "Exchange-calendar challenger for pandas trading applications (awesome-quant note).",
+   "verdict": "supported",
+   "note": "awesome-quant README line 555 (fetched directly): 'pandas_market_calendars ... Exchange calendars to use with pandas for trading applications.' Near-verbatim match.",
+   "sources": [
+    "https://github.com/wilsonfreitas/awesome-quant/blob/master/README.md"
+   ]
+  },
+  {
+   "name": "cand-massive-exists-license",
+   "claim": "Massive/Polygon client exists at github.com/polygon-io/client-python, MIT licensed.",
+   "verdict": "supported",
+   "note": "gh api repos/polygon-io/client-python resolves (GitHub rename-redirect) to massive-com/client-python, same numeric repo id 216660192 confirmed by querying both names directly -- one renamed repo, not two. license.spdx_id = MIT on both; PyPI 'massive' info.license = MIT.",
+   "sources": [
+    "gh api repos/polygon-io/client-python",
+    "gh api repos/massive-com/client-python",
+    "https://pypi.org/pypi/massive/json"
+   ]
+  },
+  {
+   "name": "cand-massive-version-date-maintained",
+   "claim": "SDK now publishes as PyPI 'massive' v2.8.0 (MIT, 2026-05-26), superseding the stale 'polygon-api-client' (last released 2025-10-30, v1.16.3); repo pushed 2026-07-09.",
+   "verdict": "supported",
+   "note": "PyPI 'massive' json: version 2.8.0, upload_time_iso_8601 2026-05-26T08:18:35.766952Z (exact). PyPI 'polygon-api-client' json: version 1.16.3, upload_time_iso_8601 2025-10-30T14:39:24.134992Z (exact). gh api repo pushed_at = 2026-07-09T15:25:39Z (~2.5 months before this check, still inside 12 months).",
+   "sources": [
+    "https://pypi.org/pypi/massive/json",
+    "https://pypi.org/pypi/polygon-api-client/json",
+    "gh api repos/massive-com/client-python"
+   ]
+  },
+  {
+   "name": "cand-massive-capability-official-client",
+   "claim": "Official REST/WebSocket client for US-equity EOD data, Reference Data and Corporate Actions.",
+   "verdict": "supported",
+   "note": "Repo description: 'The official Python client library for the Massive.com REST and WebSocket API.' Pricing page (fetched directly) confirms the product surfaces End of Day Data, Reference Data and Corporate Actions as named tiers/features.",
+   "sources": [
+    "gh api repos/massive-com/client-python (description)",
+    "https://massive.com/pricing"
+   ]
+  },
+  {
+   "name": "cand-massive-rebrand-history",
+   "claim": "Polygon.io rebranded to Massive.com on 2025-10-30; api.polygon.io stays supported in parallel with api.massive.com.",
+   "verdict": "supported",
+   "note": "massive.com/blog/polygon-is-now-massive (fetched directly): 'We have just renamed Polygon.io to Massive.com, effective today (October 30, 2025) at 4 PM ET' and 'API endpoints at api.polygon.io continue to work for an extended period. The new api.massive.com base is available in parallel.' Repo README states the same verbatim. Note the candidate's phrasing omits that both sources also disclose an eventual, undated plan to 'phase out support for the old endpoints in the new year' -- parallel support is not stated as permanent.",
+   "sources": [
+    "https://massive.com/blog/polygon-is-now-massive",
+    "https://github.com/massive-com/client-python/blob/master/README.md"
+   ]
+  },
+  {
+   "name": "cand-massive-free-tier",
+   "claim": "Free 'Stocks Basic' tier: 2 years historical EOD data plus Reference Data and Corporate Actions; redistribution/license terms not stated on the pricing page.",
+   "verdict": "supported",
+   "note": "massive.com/pricing (fetched directly) confirms '2 Years Historical Data', 'End of Day Data', 'Reference Data', 'Corporate Actions' under the free tier, and no redistribution/license language appears on the page.",
+   "sources": [
+    "https://massive.com/pricing"
+   ]
+  },
+  {
+   "name": "cand-databento-exists-license",
+   "claim": "Databento client exists at github.com/databento/databento-python, Apache-2.0 SDK license.",
+   "verdict": "supported",
+   "note": "Repo live, not archived/disabled. gh api license.spdx_id = Apache-2.0.",
+   "sources": [
+    "gh api repos/databento/databento-python"
+   ]
+  },
+  {
+   "name": "cand-databento-version-date-maintained",
+   "claim": "Python client v0.87.0 released 2026-09-22, repo pushed 2026-09-25.",
+   "verdict": "supported",
+   "note": "gh api releases/tags/v0.87.0: published_at 2026-09-22T20:24:37Z (exact). gh api repo: pushed_at 2026-09-25T02:03:36Z (exact).",
+   "sources": [
+    "https://github.com/databento/databento-python/releases/tag/v0.87.0",
+    "gh api repos/databento/databento-python"
+   ]
+  },
+  {
+   "name": "cand-databento-capability-numbers",
+   "claim": "60+ event types, 310,000+ listed/delisted securities, 85,000+ issuers, 215 exchanges, 6 years of point-in-time history.",
+   "verdict": "supported",
+   "note": "Confirmed directly across two Databento-owned pages I fetched myself: databento.com/blog/corporate-actions gives '61' event types, '310,000+' securities, '215' venues, 'more than 85,000 issuers'; databento.com/corporate-actions gives '6 years' point-in-time history, '215' venues, '310,000+' securities, '61' event types. PR Newswire release (2024-08-27) independently repeats '215 exchanges' and 'six years of point-in-time history'.",
+   "sources": [
+    "https://databento.com/blog/corporate-actions",
+    "https://databento.com/corporate-actions",
+    "https://www.prnewswire.com/news-releases/databento-releases-corporate-actions-dataset-and-reference-data-api-302231578.html"
+   ]
+  },
+  {
+   "name": "cand-databento-2026-release-framing",
+   "claim": "Candidate labels this 'Normalized Corporate Actions + Reference Data API (2026 release)'.",
+   "verdict": "refuted",
+   "note": "The underlying corporate-actions dataset/API was announced in 2024, not 2026: the PR Newswire release is dated 2024-08-27 ('Databento Releases Corporate Actions Dataset and Reference Data API'), and the Databento blog post carries the same August 2024 publication date. Only the Python SDK version (v0.87.0, 2026-09-22) is genuinely 2026-dated; the corporate-actions product itself is about two years old, not a new 2026 release as the candidate's parenthetical implies.",
+   "sources": [
+    "https://www.prnewswire.com/news-releases/databento-releases-corporate-actions-dataset-and-reference-data-api-302231578.html",
+    "https://databento.com/blog/corporate-actions"
+   ]
+  },
+  {
+   "name": "cand-databento-edi-400-sources",
+   "claim": "Data sourced via partner EDI aggregating 400+ primary sources.",
+   "verdict": "unverifiable",
+   "note": "Not found on any of the three Databento-owned pages opened directly (databento.com/blog/corporate-actions, databento.com/corporate-actions, databento.com/security-master); a WebSearch synthesis surfaced this figure but I could not independently open a primary page stating it myself. Per this task's default, treated as unverifiable rather than accepted.",
+   "sources": [
+    "https://databento.com/blog/corporate-actions (checked, absent)",
+    "https://databento.com/corporate-actions (checked, absent)",
+    "https://databento.com/security-master (checked, absent)"
+   ]
+  },
+  {
+   "name": "cand-norgate-exists-license",
+   "claim": "Norgate Data exists at norgatedata.com; norgatedata PyPI package under EULA license.",
+   "verdict": "supported",
+   "note": "norgatedata.com loads live and describes the product directly. PyPI 'norgatedata' info.license = 'EULA' exactly.",
+   "sources": [
+    "https://norgatedata.com/",
+    "https://pypi.org/pypi/norgatedata/json"
+   ]
+  },
+  {
+   "name": "cand-norgate-version-date-maintained",
+   "claim": "norgatedata PyPI package v1.0.77, 2026-07-09.",
+   "verdict": "supported",
+   "note": "PyPI json: version 1.0.77, upload_time_iso_8601 2026-07-09T18:12:07.902602Z -- exact match. No public GitHub repo exists for the vendor's own code (confirmed via GitHub search: only an unrelated 0-star third-party 'jay47rain/norgatedata' repo turns up), so 'maintained' rests on this PyPI cadence plus a live, actively-described commercial site -- appropriately metadata-level evidence, consistent with the candidate's own evidence_level label.",
+   "sources": [
+    "https://pypi.org/pypi/norgatedata/json",
+    "gh api search/repositories?q=norgatedata"
+   ]
+  },
+  {
+   "name": "cand-norgate-capability-survivorship",
+   "claim": "Survivorship-bias-free EOD historical data for US, Australian and Canadian stocks plus futures and FX; maintained delisted-company archive.",
+   "verdict": "supported",
+   "note": "norgatedata.com homepage (fetched directly): 'We specialize in survivorship bias-free data for US, Australian and Canadian stock markets. Data is also available for selected World Futures and Forex rates.' A delisted-security archive is entailed by 'survivorship bias-free' branding and directly corroborated by the historical index-constituents table (see cand-norgate-index-constituents), which by construction tracks names no longer in an index. The specific '~100 futures markets' count was not independently verified on any page I opened.",
+   "sources": [
+    "https://norgatedata.com/"
+   ]
+  },
+  {
+   "name": "cand-norgate-delisted-flags",
+   "claim": "...with sector/index-membership flags...",
+   "verdict": "unverifiable",
+   "note": "Checked norgatedata.com/data-content-tables.php directly -- the page lists historical index constituents (confirmed separately) but the fetched content contains no reference to a 'sector flag' or 'index-membership flag' field. Not found on the page most likely to carry this schema detail; not confirmed elsewhere.",
+   "sources": [
+    "https://norgatedata.com/data-content-tables.php (checked, no flag terminology found)"
+   ]
+  },
+  {
+   "name": "cand-norgate-index-constituents",
+   "claim": "Historical constituents for indices such as DJIA, NASDAQ 100, Russell 1000/2000/3000 and S&P 100/400/500/600.",
+   "verdict": "supported",
+   "note": "norgatedata.com/data-content-tables.php (fetched directly) lists a 'US Historical Index Constituents' table naming exactly: Dow Jones Industrial Average ($DJI), Nasdaq-100 ($NDX), Russell 1000/2000/3000 ($RUI/$RUT/$RUA), S&P 100/500/MidCap 400/SmallCap 600 ($OEX/$SPX/$MID/$SML). Every named index in the claim is present.",
+   "sources": [
+    "https://norgatedata.com/data-content-tables.php"
+   ]
+  },
+  {
+   "name": "cand-norgate-pypi-ndu",
+   "claim": "Python access via the norgatedata PyPI package reads from a locally installed Norgate Data Updater (NDU) database rather than a hosted REST API.",
+   "verdict": "supported",
+   "note": "norgatedata.com homepage confirms directly: 'Data updates are performed by our Norgate Data Updater application' and 'The data is held on a user's Windows machine (or Windows Virtual Machine).' Matches the claim exactly.",
+   "sources": [
+    "https://norgatedata.com/"
+   ]
+  },
+  {
+   "name": "cand-crsp-exists-live",
+   "claim": "CRSP US Stock Database exists / is accessible at crsp.org (and crsp.com).",
+   "verdict": "refuted",
+   "note": "www.crsp.org returns HTTP 301 and now redirects permanently to indexes.morningstar.com/morningstar-market-indexes; a deeper crsp.org research URL 301s to indexes.morningstar.com/research-data-products/... . www.crsp.com (the candidate's second cited source) fails DNS resolution entirely (getaddrinfo ENOTFOUND). Neither of the candidate's two cited domains serves CRSP content as an independent site any more; the underlying product is real and reachable, but only under Morningstar's domain, not the candidate's stated URLs.",
+   "sources": [
+    "curl -sI https://www.crsp.org/ (301 -> indexes.morningstar.com/morningstar-market-indexes)",
+    "WebFetch https://www.crsp.com/... (getaddrinfo ENOTFOUND)"
+   ]
+  },
+  {
+   "name": "cand-crsp-morningstar-currency",
+   "claim": "(Implicit in candidate's framing) CRSP is treated as an independent academic-standard entity, with no mention of any 2026 corporate change.",
+   "verdict": "refuted",
+   "note": "Morningstar's own newsroom press release states Morningstar completed its acquisition of CRSP (Center for Research in Security Prices, from the University of Chicago) for $365M on 2026-02-02, and has since rebranded CRSP Market Indexes to Morningstar Indexes. The CRSP product page I reached (via the redirect) is footed '©2026 Morningstar, Inc. All rights reserved.' This is a material, dated-2026 primary fact the candidate's own research did not surface despite citing crsp.org directly -- opening that exact URL today immediately shows the redirect and the 2026 copyright.",
+   "sources": [
+    "https://newsroom.morningstar.com/news/news-details/2026/Morningstar-Completes-Acquisition-of-CRSP-and-Extends-Relationship-with-Vanguard/default.aspx",
+    "https://indexes.morningstar.com/research-data-products/crsp-survivor-bias-free-us-mutual-fund-database (footer copyright)"
+   ]
+  },
+  {
+   "name": "cand-crsp-permno-claim",
+   "claim": "Survivor-bias-free US equity/mutual-fund databases built around PERMNO, a proprietary permanent security identifier fixed for the life of a security.",
+   "verdict": "supported",
+   "note": "The (Morningstar-owned) CRSP product page states nearly verbatim: 'PERMNO® is a proprietary, permanent identifier used to track US-listed equities over time. Fixed for the life of a security, it allows researchers and analysts to follow securities with historical continuity and accuracy,' and separately: 'the CRSP Survivor-Bias-Free Mutual Fund Database preserves data on retired funds to eliminate survivorship bias.' Substance of the claim holds even though the page is Morningstar-branded (see cand-crsp-morningstar-currency).",
+   "sources": [
+    "https://indexes.morningstar.com/research-data-products/crsp-survivor-bias-free-us-mutual-fund-database"
+   ]
+  },
+  {
+   "name": "cand-crsp-bias-stat",
+   "claim": "Secondary literature citing CRSP-derived samples documents 7.4% vs. 9.0% annualized returns (1926-2001) between survivorship-free and survivorship-biased samples.",
+   "verdict": "unverifiable",
+   "note": "A WebSearch reproduced the same two figures and date range attributed to CRSP-based analysis, but none of the specific papers/pages returned (luxalgo blog, Bogleheads wiki, Brown/Goetzmann/Ibbotson/Ross paper, arXiv paper) were opened directly by me to confirm verbatim attribution and methodology. Search-engine corroboration only; no primary document opened myself states this figure.",
+   "sources": [
+    "WebSearch: CRSP survivorship bias 7.4% 9.0% 1926-2001 (no single primary document opened directly)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "alpaca-py",
+   "url": "https://github.com/alpacahq/alpaca-py",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Incumbent bounded market-data path; confirmed current, not behind upstream. Does not itself close this layer's named gaps: no survivorship-free universe, no dividend-currency field for full cash-unit reconciliation, and no independent establishment of historical point-in-time availability -- these are properties of Alpaca's feed/entitlements, not of the SDK version, and are unaffected by staying current."
+  },
+  {
+   "name": "edgartools",
+   "url": "https://github.com/dgunning/edgartools",
+   "modalities": [
+    "star",
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Incumbent filing parser. Pin (v5.58.0, 2026-09-11) is now two patch releases behind upstream, both released the day of this check. The delta is filing-section-boundary and 13F-extraction correctness fixes -- real quality improvements to the acquisition path -- but neither closes the layer's named gaps: no as-known historical filing corpus, no dissemination-lag evidence, no licensing/redistribution-rights record for acquired filings."
+  },
+  {
+   "name": "exchange_calendars",
+   "url": "https://github.com/gerrymanoim/exchange_calendars",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Incumbent session-semantics library; confirmed current, not behind upstream, with no evidence of pending functional changes being missed. Does not itself close the layer's named gap that native evidence covers only one XNYS session and a 104-date check -- that is a gap in this project's own test coverage of the library's session data, not evidence the library lacks other-venue/extended-hours/halt support upstream."
+  },
+  {
+   "name": "pandas_market_calendars",
+   "url": "https://github.com/rsheftel/pandas_market_calendars",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Direct challenger to exchange_calendars for session semantics. Both libraries are now permissively licensed (exchange_calendars Apache-2.0, pandas_market_calendars MIT) and both actively maintained, so the layer's own overturn condition -- compare on representative securities/venues before switching -- is the correct gate. No executed comparison exists yet on venue coverage, extended hours or halts for either candidate."
+  },
+  {
+   "name": "Massive (formerly Polygon.io) Python client",
+   "url": "https://github.com/polygon-io/client-python",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "This is exactly the comparator arm this layer's own open_gaps names ('a Databento or Massive arm cannot be scored without new code'). Directly read the repo README (rebrand notice) and the pricing page. Confirms the pre-gathered 'Massive' awesome-list entry is current and dated 2026, and resolves what looked like two unrelated repos (massive-com/client-python vs. polygon-io/client-python) into one rebranded product. Redistribution rights for the free tier remain unestablished from what I read, consistent with this layer's own licensing gap."
+  },
+  {
+   "name": "Databento",
+   "url": "https://github.com/databento/databento-python",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Strongest new-find candidate addressing two named gaps at once: corporate-action completeness (an explicit, dated event taxonomy) and 'licensed, source-identifiable' observations (a paid, documented-provenance dataset vs. scraping-based free feeds). The 6-year point-in-time corporate-actions history is a direct, dated answer to this layer's 'original historical point-in-time availability is not established' gap for corporate actions specifically. A direct fetch of the corporate-actions spec page did not return readable content, so this rests on Databento's own blog/announcement pages rather than a page I read in full myself, and it has not been compared against Alpaca on this layer's own frozen protocol; cost is unverified from what I read."
+  },
+  {
+   "name": "Norgate Data (norgatedata)",
+   "url": "https://norgatedata.com/",
+   "modalities": [
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The most direct available answer to this layer's #1 named gap ('No survivorship-free universe... the Alpaca receipt covers one retrospective AAPL sample'). Norgate explicitly markets survivorship-bias-free coverage including delisted names and historical index constituents -- exactly the universe property Alpaca's current evidence lacks. Access model differs sharply from alpaca-py: it needs a paid subscription and a running Windows desktop updater service as the actual data source, not a pure SDK call, and I found no public source repository to review -- evidence here is vendor/product description and independent quant-blog reviews, not code."
+  },
+  {
+   "name": "CRSP US Stock Database (Center for Research in Security Prices)",
+   "url": "https://www.crsp.org/",
+   "modalities": [
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The academic field's reference standard for exactly the property this layer's requirement, decision text and overturn_when repeatedly name: a survivorship-free universe with permanent identity, delistings and ticker reuse. Not a software library -- access is institutional (typically via a WRDS subscription), so it does not fit an alpaca-py/edgartools 'pip install' pattern, but it is the primary comparison point any survivorship-free claim from Norgate, Sharadar, or a broker feed should ultimately be measured against. I read product/description pages, not underlying data or a full methodology paper, and found no 2026-dated primary confirmation of current update cadence."
+  },
+  {
+   "name": "Sharadar SEP/SF1 on Nasdaq Data Link",
+   "url": "https://sharadar.com/docs/fundamentals",
+   "modalities": [
+    "docs",
+    "pypi",
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Closes both the survivorship-free-universe gap and the point-in-time-fundamentals gap in one paid dataset family, with an explicit as-reported dimension that is a direct, quotable answer to 'reject data whose historical availability... is unknown.' Caveat found while checking: the official Python client (nasdaq-data-link, formerly Quandl) has not shipped a new PyPI version since 1.0.4 on 2022-08-29, even though the GitHub repo shows a commit as recently as 2026-09-15 -- the wrapper library's release cadence is stale even if the underlying dataset and repo activity are not."
+  },
+  {
+   "name": "sec-api-python (SEC-API.io)",
+   "url": "https://github.com/SEC-API-io/sec-api-python",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "This layer's own open_gaps explicitly names this repo as an 'unindexed alternative' to edgartools, so I checked it directly. It is materially broader in scope than edgartools's filing-parsing focus -- 13F holdings, insider trades, enforcement actions and real-time streaming map onto capabilities this layer's gap list says have 'no native evidence among the adopted candidates.' It sits behind a paid commercial API (typical free-tier query caps apply per the vendor, not independently verified here), so it needs the same licensing/redistribution check as Databento/Massive/Norgate before adoption. Repo activity (last push 2026-04-13, about five months before this check) is thinner than edgartools's near-daily cadence."
+  },
+  {
+   "name": "OpenBB",
+   "url": "https://github.com/OpenBB-finance/OpenBB",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Strongest candidate for this layer's named gap 'no generalized multi-provider comparator exists' -- OpenBB's whole design is a provider-agnostic interface, so it could plausibly host an Alpaca-vs-Databento-vs-Massive comparison without hand-rolled code, unlike the current hard-coded, AAPL-only compare.py. Licensing is a real constraint: OpenBB's own repository license is AGPL-3.0-only (GitHub license field), notably more restrictive than alpaca-py/edgartools/exchange_calendars' permissive licenses, and needs an explicit decision before any OpenBB code (not just its data) ships in this stack."
+  },
+  {
+   "name": "yfinance",
+   "url": "https://github.com/ranaroussi/yfinance",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Free, zero-cost cross-check baseline against Alpaca bars -- useful against this layer's own 'no executed provider comparison' gap as the cheapest possible comparison arm. It is explicitly unofficial with no SLA and no corporate-action-completeness or licensing guarantee, so it cannot itself satisfy the 'licensed, source-identifiable' requirement; its value is strictly as a free sanity-check comparator, not a replacement for alpaca-py."
+  },
+  {
+   "name": "fedfred",
+   "url": "https://github.com/nikhilxsunder/fedfred",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Addresses this layer's named macro-vintage gap only partially. It is the actively maintained FRED-family client -- unlike the alternative pystlouisfed, whose GitHub repo (TomasKoutek/pystlouisfed) has had no commit since 2024-01-09 and is therefore unmaintained by the 12-month rule despite explicitly claiming ALFRED vintage-data support per its own description. There is a real, unresolved trade-off between 'maintained, no confirmed vintage data' (fedfred) and 'has vintage data, unmaintained' (pystlouisfed) that neither candidate alone closes."
+  },
+  {
+   "name": "FinanceDatabase",
+   "url": "https://github.com/JerBouma/FinanceDatabase",
+   "modalities": [
+    "awesome",
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "metadata",
+   "fit": "A candidate for a permanent-identity/universe reference layer, which is adjacent to but distinct from this layer's survivorship-free-history gap: FinanceDatabase is a static symbol/classification catalog (what exists and how it is classified today), not a point-in-time, delisting-aware historical dataset. It complements rather than replaces Norgate/Sharadar/CRSP for the survivorship-free gap specifically."
+  },
+  {
+   "name": "quantlab (Rossod4)",
+   "url": "https://github.com/Rossod4/quantlab",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "This layer's own open_gaps names this repo as an 'unindexed alternative,' and its stated scope -- point-in-time data, SEC EDGAR fundamentals, survivorship measurement -- maps almost exactly onto this layer's top two gaps by description alone. However: 0 stars, no declared license (license field is null), and the description itself says 'in progress.' There is no evidence here beyond the repository's own self-description -- no tagged release, no independent validation, nothing installable under a stated license. This is a repository to watch, not a candidate to compare against Alpaca/Norgate/CRSP/Sharadar today; worth a re-check if it reaches a licensed, tagged release."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/market-data-reference--gpt-6-live.md"
+  }
+ ]
+}

@@ -17,6 +17,12 @@ for that gate.
 
 ## Why 1.231.0
 
+**Update, 2026-10-01** (supersedes the #4983 statement in this section): #4983 is reclassified as a stale v1.227.0
+report for rc5 (source reading at tag `v2.0.0rc5`; `rc5_reclassified_reports` in
+`catalogs/us-equities/runtime-target.json`). The rc5 obstacles that remain are on the recovery and reconciliation
+paths: #5007, #5057 and #5060 (`rc5_blockers` there). rc5's IBKR stock-order path stays unqualified until native
+paper execution.
+
 The pinned 2.0.0rc5 Rust IB adapter denies every stock order locally: the
 execution client's `IB` venue never matches the `SMART` instrument venue
 ([nautilus_trader#4983](https://github.com/nautechsystems/nautilus_trader/issues/4983),

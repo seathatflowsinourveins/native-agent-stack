@@ -13,6 +13,8 @@ or download it from a `publish-catalog.yml` workflow artifact (7-day retention, 
 [trading gate ladder](us-equities/gates-20260922.json) tracks the sim → paper →
 live gates.
 
+The [skills lifecycle catalog](landscape/skills-lifecycle.json) lists the lifecycle tasks that the landscape sweep's skills modality sweeps, the installed skills serving each task and the pinned skill sources it searches.
+
 | Catalog | Purpose | Start here |
 | --- | --- | --- |
 | Foundation | Native Codex/Claude runtimes, rules, skills, workers, isolation, retrieval, memory, research, efficiency, evaluation, CI, scheduling, hosting, recovery and observation | [Foundation guide](foundation/README.md) · [Layer manifest](foundation/manifest.json) · [Harness defaults](../docs/harness-defaults.md) |
