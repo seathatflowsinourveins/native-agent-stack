@@ -36,7 +36,7 @@ sys.path.insert(0, str(TOOLS))
 import credential_run as run_mod  # noqa: E402
 import set_credential as writer  # noqa: E402
 
-INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily"}
+INJECTABLE_IDS = {"alpaca-paper", "alpaca-paper-2", "sec-contact", "databento", "typesafe", "omniroute", "tavily", "claude-oauth-token"}
 NOT_INJECTABLE_IDS = ("grafana-admin", "nativestack-generation-key", "openhands-session", "claude-native",
                       "codex-native", "gh-native", "huggingface-native", "huggingface-native-stored", "ibkr-gateway",
                       "github-actions")
@@ -93,8 +93,13 @@ FORMS = ("import base64, json, os, re, sys, urllib.parse\n"
          "        stream.write('form ' + line + '\\n')\n")
 
 
+# Synthetic values use the letters g-v, one per hex digit: the reports print hex SHA-256 digests, and a six-character
+# piece of a hex value matched one of them by chance in about 0.07% of runs (assert_never_echoed then failed).
+FAKE_LETTERS = str.maketrans("0123456789abcdef", "ghijklmnopqrstuv")
+
+
 def fake(prefix: str = "", tail: str = "") -> str:
-    return prefix + os.urandom(12).hex() + tail
+    return prefix + os.urandom(12).hex().translate(FAKE_LETTERS) + tail
 
 
 def sha(text: str) -> str:
