@@ -13,6 +13,10 @@ Supported blocks (the Linux full-profile flow uses claude-md and profile-path):
   codex-md      $CODEX_HOME/AGENTS.md (else ~/.codex/AGENTS.md), replacing only the canonical Codex
                 user-instructions block. Does not run Codex, inspect configuration/authentication, or change
                 profiles/roles. A nonblank AGENTS.override.md shadows this file and is refused.
+  decision-md   One bounded discovery/maintained-decision paragraph in an existing instruction source.
+                --client source --target PATH selects a generator's Markdown source; generated outputs are
+                refused. --dry-run previews the fragment and prints the target SHA-256; this mode never writes.
+                Apply through the source owner's guarded workflow, preserving existing defaults and RTK.
   profile-path  ~/.profile, which a Bash login shell reads when no ~/.bash_profile or ~/.bash_login exists (GNU bash
                 manual, "Bash Startup Files"): a POSIX sh block putting the ecosystem's bin directory first on PATH,
                 so `claude` in a login shell is the ecosystem launcher (adoption/bootstrap.md, step 2), between
@@ -41,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -55,6 +60,7 @@ import adoption_status  # noqa: E402  (native Rust whitespace for the override g
 
 CLAUDE_EXAMPLE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
+DECISION_TEMPLATE = ROOT / "adoption" / "templates" / "decision-routing.md"
 CODEX_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 CODEX_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
 CODEX_COPY_MARKERS = ("<!-- native-agent-stack:top-rule", "<!-- native-agent-stack:rtk-upstream",
@@ -67,6 +73,11 @@ PROFILE_BEGIN = "# native-agent-stack:profile-path:begin"
 PROFILE_END = "# native-agent-stack:profile-path:end"
 PROFILE_BEGIN_LINE = f"{PROFILE_BEGIN} (adoption/bootstrap-linux.sh --configure-full-profile; edit outside these markers)"
 RTK_IMPORT = re.compile(r"@RTK\.md[ \t]*")
+GENERATED_DIRECTIVES_HEADER = "<!-- Generated from config/directives; edit sources, then scripts/directives.py. -->"
+DECISION_BEGIN = "<!-- native-agent-stack:decision-routing:begin"
+DECISION_END = "<!-- native-agent-stack:decision-routing:end -->"
+DECISION_BEGIN_LINE = f"{DECISION_BEGIN} (adoption/templates/codex.AGENTS.template.md; edit outside these markers) -->"
+DECISION_PREFIX = "Bound discovery to task-filtered names, descriptions and source locators;"
 EXIT_USAGE, EXIT_REFUSED = 2, 3
 
 
@@ -101,7 +112,29 @@ def claude_block(example: str) -> str:
     return f"{CLAUDE_BEGIN_LINE}\n{example.strip()}\n{CLAUDE_END}\n"
 
 
+def refuse_generated_output(current: str) -> None:
+    if GENERATED_DIRECTIVES_HEADER in current:
+        raise Refused("this file is generated from config/directives; preview its owned Markdown source with "
+                      "decision-md, then use the owner's guarded workflow; do not append a second pack")
+
+
+def claude_target(home: str, explicit: Path | None) -> Path:
+    if explicit is not None:
+        return explicit.expanduser()
+    if "CLAUDE_CONFIG_DIR" in os.environ:
+        raise Refused("CLAUDE_CONFIG_DIR is set; select the intended instruction file explicitly with --target")
+    return Path(home).expanduser() / ".claude" / "CLAUDE.md"
+
+
+def refuse_narrow_block_in_full_pack(current: str) -> None:
+    if block_span(current, DECISION_BEGIN, DECISION_END) is not None:
+        raise Refused("a decision-routing block is already present; preview its owned source with decision-md; "
+                      "adding a full instruction pack would duplicate it")
+
+
 def merged_claude_md(current: str, example: str) -> str:
+    refuse_generated_output(current)
+    refuse_narrow_block_in_full_pack(current)
     block = claude_block(example)
     span = block_span(current, CLAUDE_BEGIN, CLAUDE_END)
     heading = next((line for line in example.splitlines() if line.strip()), "")
@@ -129,6 +162,8 @@ def merged_claude_md(current: str, example: str) -> str:
 
 
 def merged_codex_md(current: str, template: str) -> str:
+    refuse_generated_output(current)
+    refuse_narrow_block_in_full_pack(current)
     if block_span(template, CODEX_BEGIN, CODEX_END) != (0, len(template)):
         raise Refused("the Codex template must be exactly one complete managed block")
     span = block_span(current, CODEX_BEGIN, CODEX_END)
@@ -139,6 +174,43 @@ def merged_codex_md(current: str, template: str) -> str:
         # Keep operator bytes, including trailing blank lines, when appending a first block.
         return current + ("\n" if current.endswith("\n") else "\n\n") + template
     return with_block(current, template, CODEX_BEGIN, CODEX_END)
+
+
+def decision_rule(template: str) -> str:
+    if block_span(template, CODEX_BEGIN, CODEX_END) != (0, len(template)):
+        raise Refused("the Codex template must be exactly one complete managed block")
+    rules = [line for line in template.splitlines() if line.startswith(DECISION_PREFIX)]
+    if len(rules) != 1:
+        raise Refused("the canonical template must contain exactly one decision-routing paragraph")
+    return rules[0]
+
+
+def decision_block(rule: str) -> str:
+    block = DECISION_TEMPLATE.read_bytes().decode("utf-8")
+    expected = f"{DECISION_BEGIN_LINE}\n{rule}\n{DECISION_END}\n"
+    if block != expected:
+        raise Refused("the decision-routing fragment differs from the canonical template paragraph")
+    return block
+
+
+def merged_decision_md(current: str, rule: str) -> str:
+    refuse_generated_output(current)
+    if not current.strip():
+        raise Refused("decision-md refreshes an existing nonblank instruction source, not a new profile")
+    span = block_span(current, DECISION_BEGIN, DECISION_END)
+    outside = current if span is None else current[:span[0]] + current[span[1]:]
+    paragraphs = re.split(r"\r?\n[ \t]*\r?\n", outside)
+    copies = [normalized.removeprefix("- ") for paragraph in paragraphs
+              if DECISION_PREFIX in (normalized := " ".join(paragraph.split()))]
+    if copies:
+        if span is None and copies == [rule]:
+            return current
+        raise Refused("an unmanaged or conflicting decision-routing paragraph exists; reconcile its owned "
+                      "source before adding another copy")
+    block = decision_block(rule)
+    if span:
+        return current[:span[0]] + block + current[span[1]:]
+    return current + ("\n" if current.endswith("\n") else "\n\n") + block
 
 
 def sh_double_quoted(text: str) -> str:
@@ -188,6 +260,19 @@ def read_target(path: Path) -> tuple[str, int | None]:
         raise Refused(f"{path} is not UTF-8 text") from None
 
 
+def preview_decision(path: Path, rule: str) -> int:
+    current, _ = read_target(path)
+    merged = merged_decision_md(current, rule)
+    print(f"Reviewed target SHA-256: {hashlib.sha256(current.encode('utf-8')).hexdigest()}")
+    if current == merged:
+        print(f"{path}: already current, nothing written")
+    else:
+        sys.stdout.writelines(difflib.unified_diff(current.splitlines(keepends=True), merged.splitlines(keepends=True),
+                                                   fromfile=f"{path} (now)", tofile=f"{path} (proposed)"))
+        print(f"{path}: PREVIEW ONLY, apply through the source owner's guarded workflow")
+    return 0
+
+
 def apply(path: Path, merge, *, dry_run: bool) -> int:
     current, mode = read_target(path)
     merged = merge(current)
@@ -219,6 +304,12 @@ def build_parser() -> argparse.ArgumentParser:
     claude.add_argument("--example", type=Path, default=CLAUDE_EXAMPLE, help="default: examples/claude-native/CLAUDE.md")
     codex = blocks.add_parser("codex-md", help="only the Codex user instructions block; no config/profile/role changes")
     codex.add_argument("--codex-home", type=Path, help="default: $CODEX_HOME, else <home>/.codex")
+    decision = blocks.add_parser("decision-md", help="export or preview the routing paragraph; never write")
+    decision.add_argument("--client", choices=("source", "claude", "codex"), default="source",
+                          help="source requires --target; native clients use their normal instruction location")
+    decision.add_argument("--target", type=Path, help="the owned Markdown source (or a standalone Claude file)")
+    decision.add_argument("--codex-home", type=Path, help="Codex only: $CODEX_HOME, else <home>/.codex")
+    decision.add_argument("--print", action="store_true", help="print the canonical fragment; no target or client reads")
     profile = blocks.add_parser("profile-path", help="the PATH block in ~/.profile")
     profile.add_argument("--target", type=Path, help="default: <home>/.profile")
     profile.add_argument("--eco-root", required=True, help="the ecosystem root whose bin directory goes first")
@@ -229,9 +320,36 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     home = args.home or os.environ.get("HOME") or str(Path.home())
     try:
+        if args.block == "decision-md":
+            rule = decision_rule(CODEX_TEMPLATE.read_text(encoding="utf-8"))
+            if args.print:
+                if args.target or args.codex_home or args.client != "source":
+                    raise Refused("--print only exports the fragment; omit target and client options")
+                sys.stdout.write(decision_block(rule))
+                return 0
+            if not args.dry_run:
+                raise Refused("decision-md exports or previews only; use --print or --dry-run, then apply "
+                              "through the source owner's guarded workflow")
+            if args.client == "codex":
+                if args.target:
+                    raise Refused("use --codex-home for native Codex, or --client source for a generator source")
+                codex_home = (args.codex_home or Path(os.environ.get("CODEX_HOME") or Path(home) / ".codex")).expanduser()
+                override, _ = read_target(codex_home / "AGENTS.override.md")
+                if override.strip(adoption_status.RUST_WHITESPACE):
+                    raise Refused("AGENTS.override.md has text and would shadow AGENTS.md; nothing written")
+                target = codex_home / "AGENTS.md"
+            elif args.client == "claude":
+                if args.codex_home:
+                    raise Refused("--codex-home is only for --client codex")
+                target = claude_target(home, args.target)
+            else:
+                if not args.target or args.codex_home:
+                    raise Refused("--client source requires --target and does not use --codex-home")
+                target = args.target.expanduser()
+            return preview_decision(target, rule)
         if args.block == "claude-md":
             example = args.example.read_text(encoding="utf-8")
-            target = args.target or Path(home) / ".claude" / "CLAUDE.md"
+            target = claude_target(home, args.target)
             return apply(target, lambda text: merged_claude_md(text, example), dry_run=args.dry_run)
         if args.block == "codex-md":
             codex_home = (args.codex_home or Path(os.environ.get("CODEX_HOME") or Path(home) / ".codex")).expanduser()
