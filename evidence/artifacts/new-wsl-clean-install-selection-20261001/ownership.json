@@ -1,0 +1,244 @@
+{
+ "schema_version": 1,
+ "kind": "new_wsl_layer_ownership",
+ "date_utc": "2026-10-01",
+ "rule": "Every tool has exactly one owning layer, the layer whose requirement names its primary job; any other layer lists it under 'uses'. Two different tools that do the same job become one comparison owned by one layer. Two tools whose roles differ (as the judges recorded them) both stay, each with its role stated.",
+ "source": "selection.json in this folder (wf_c2377ebb-65c)",
+ "layers": [
+  {
+   "layer_id": "native-clients",
+   "owns": [
+    "Claude Code",
+    "Codex"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "agent-sdks",
+   "owns": [
+    "Claude Agent SDK",
+    "Codex SDK (the package; the CLI it drives comes from native-clients)"
+   ],
+   "uses": [
+    "Claude Code and Codex (native-clients)"
+   ]
+  },
+  {
+   "layer_id": "instructions-skills",
+   "owns": [
+    "Trail of Bits skills"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "owns": [
+    "mcporter",
+    "MCP Inspector"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "workers",
+   "owns": [],
+   "uses": [
+    "the native subagents of Claude Code and Codex (native-clients)",
+    "Worktrunk (git-github-automation)"
+   ]
+  },
+  {
+   "layer_id": "isolation",
+   "owns": [
+    "sandbox-runtime",
+    "compare: the container boundary for untrusted work (a rootless container on the hosting engine, gVisor runsc, boxlite)"
+   ],
+   "uses": [
+    "Worktrunk (git-github-automation)",
+    "the container engine (hosting-services)"
+   ]
+  },
+  {
+   "layer_id": "code-navigation",
+   "owns": [
+    "Serena (Codex sessions)",
+    "the official code-intelligence LSP plugins (Claude Code sessions)"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "semantic-rag",
+   "owns": [
+    "compare: SocratiCode, semble, ColGREP, against BM25 and ripgrep baselines"
+   ],
+   "uses": [
+    "the local model server for embeddings (observation-inference)"
+   ]
+  },
+  {
+   "layer_id": "document-retrieval",
+   "owns": [
+    "QMD",
+    "MinerU"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "web-research",
+   "owns": [
+    "trafilatura",
+    "Playwright CLI"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "durable-memory",
+   "owns": [
+    "compare, one memory owner: ai-memory, Hindsight, agentmemory, deja-vu"
+   ],
+   "uses": [
+    "the local model server for Hindsight's local-model arm (observation-inference)"
+   ]
+  },
+  {
+   "layer_id": "token-efficiency",
+   "owns": [
+    "ccusage (measurement)",
+    "compare: RTK, sqz, Headroom, against no compression layer"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "observation-inference",
+   "owns": [
+    "OTel Collector Contrib",
+    "Prometheus",
+    "Loki",
+    "Grafana",
+    "Phoenix (trace sink only)",
+    "compare, one local model server: Ollama, llama.cpp"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "owns": [
+    "Inspect AI (evaluations)",
+    "Harbor (agent end-to-end runner)",
+    "promptfoo (CI regression gate)"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "owns": [
+    "zizmor",
+    "attest",
+    "Syft",
+    "Dependabot",
+    "CodeQL upload-sarif",
+    "actionlint"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "owns": [
+    "Dagu"
+   ],
+   "uses": [
+    "systemd user units (cross:wsl-distro)"
+   ]
+  },
+  {
+   "layer_id": "hosting-services",
+   "owns": [
+    "Docker Compose",
+    "compare, one container engine: Podman with Quadlet, Docker Engine"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "secrets-credentials",
+   "owns": [
+    "betterleaks (detection: pre-commit, history, CI)",
+    "trufflehog (verification of found credentials only)"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "git-github-automation",
+   "owns": [
+    "git",
+    "gh",
+    "Worktrunk",
+    "difftastic (diffs for people)",
+    "sem (diffs for agents; only if its comparison shows a gain)",
+    "claude-code-action"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "recovery-portability",
+   "owns": [
+    "mise (runtimes; it installs uv, which owns Python packages and locks)",
+    "Restic",
+    "chezmoi"
+   ],
+   "uses": []
+  },
+  {
+   "layer_id": "cross:wsl-distro",
+   "owns": [
+    "Ubuntu 26.04.1 LTS (fallback 24.04.5 LTS)",
+    "systemd (part of the distribution)"
+   ],
+   "uses": []
+  }
+ ],
+ "overlaps_resolved": [
+  {
+   "overlap": "Claude Code and Codex were picked in native-clients, workers and agent-sdks.",
+   "resolution": "native-clients owns both clients; workers uses their native subagents and agent-sdks owns only the SDK packages."
+  },
+  {
+   "overlap": "Worktrunk was picked in workers, isolation and git-github-automation.",
+   "resolution": "git-github-automation owns it; workers and isolation use it."
+  },
+  {
+   "overlap": "Podman was an arm in isolation and in hosting-services, and Docker in both comparisons.",
+   "resolution": "One container-engine comparison, owned by hosting-services. isolation owns only the boundary question on top of the winning engine: plain rootless container, gVisor runsc or boxlite."
+  },
+  {
+   "overlap": "Ollama (semantic-rag, as SocratiCode's embedding service) and llama.cpp (observation-inference, as the local inference route) are two local model servers.",
+   "resolution": "One local model server, owned by observation-inference: Ollama against llama.cpp. It must serve the code-RAG winner's embeddings; SocratiCode documents Ollama, OpenAI, Google, LM Studio and LiteLLM as providers, not llama.cpp directly."
+  },
+  {
+   "overlap": "Phoenix (observation) also runs experiments and scores evals, the job of Inspect AI (quality-evaluation).",
+   "resolution": "Phoenix is the trace sink only; evaluations belong to Inspect AI. Grafana Tempo, a trace store inside the Grafana stack, survived the 2026-09-26 sweep but was not in the packets; its re-vote can replace Phoenix in this role."
+  },
+  {
+   "overlap": "systemd was a pick of scheduling-supervision.",
+   "resolution": "It comes with the base distribution; scheduling-supervision owns Dagu and uses systemd user units."
+  },
+  {
+   "overlap": "uv (Python versions, packages and locks) overlaps mise (runtime versions).",
+   "resolution": "mise owns runtime versions and installs uv; uv owns Python packages, virtual environments and locks. The judges placed uv under mise."
+  },
+  {
+   "overlap": "Serena and the official LSP plugins both give symbol navigation.",
+   "resolution": "Split by client: the LSP plugins in Claude Code sessions, Serena in Codex sessions, as the judges assigned them."
+  },
+  {
+   "overlap": "betterleaks and trufflehog both scan for secrets.",
+   "resolution": "betterleaks detects (pre-commit, history, CI); trufflehog only verifies what is found against the provider."
+  },
+  {
+   "overlap": "difftastic and sem both produce structural diffs.",
+   "resolution": "difftastic for people reviewing; sem for agents, and only if its comparison shows a gain."
+  }
+ ],
+ "residual": [
+  "QMD runs its own embedding and reranking models in process (node-llama-cpp); it is not a second model server, and it stays inside document-retrieval."
+ ],
+ "trading_rule": "The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI) is used from the owning foundation layer, not selected again."
+}

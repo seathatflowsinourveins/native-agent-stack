@@ -15,26 +15,74 @@ distribution confirms or overturns it.
 | instructions-skills | Trail of Bits security skills (trailofbits/skills) | selected |
 | mcp-surfaces | mcporter; MCP Inspector | selected |
 | workers | claude-code (native subagents, worktree isolation, agent teams); Codex native workers (subagents); Worktrunk | selected |
-| isolation | sandbox-runtime (srt); Worktrunk; Podman (rootless) | compare the arms on the new WSL |
+| isolation | sandbox-runtime (selected); Worktrunk (edit separation; owned by git-github-automation); rootless Podman; rootless Docker Engine; Podman or Docker with gVisor runsc; boxlite with /dev/kvm | compare the arms on the new WSL |
 | code-navigation | Serena; claude-plugins-official (code-intelligence LSP plugins) | selected |
-| semantic-rag | SocratiCode; semble; ollama | compare the arms on the new WSL |
+| semantic-rag | SocratiCode (with Ollama embeddings); semble; ColGREP with LateOn-Code-edge; ColGREP with LateOn-Code; BM25 baseline; ripgrep baseline | compare the arms on the new WSL |
 | document-retrieval | tobi/qmd; MinerU | selected |
 | web-research | trafilatura; Playwright CLI | selected |
-| durable-memory | ai-memory; Hindsight; agentmemory (rohitg00); deja-vu | compare the arms on the new WSL |
-| token-efficiency | ccusage; rtk-ai/rtk | compare the arms on the new WSL |
+| durable-memory | ai-memory, LLM reranker on and off; Hindsight, local model and hosted model; agentmemory through its Claude Code and Codex hooks; deja-vu | compare the arms on the new WSL |
+| token-efficiency | ccusage (measurement, selected); no compression layer (baseline); RTK; sqz; Headroom; Context Mode (frozen control) | compare the arms on the new WSL |
 | observation-inference | OTel Collector Contrib; Prometheus; Loki; Grafana; llama.cpp optional inference; Phoenix | selected |
 | quality-evaluation | Inspect AI; Harbor (containerized agent E2E runner); Promptfoo | selected |
 | ci-supply-chain | zizmor; attest; Syft; Dependabot; codeql-sarif; actionlint (kjanat) | selected |
 | scheduling-supervision | Dagu; systemd | selected |
-| hosting-services | Docker Compose; Podman / Quadlet (engine arm A); Docker Engine / Moby (engine arm B) | compare the arms on the new WSL |
+| hosting-services | Docker Compose (selected); Podman with Quadlet; rootless Docker Engine | compare the arms on the new WSL |
 | secrets-credentials | betterleaks; trufflehog | selected |
 | git-github-automation | git; gh (GitHub CLI); worktrunk; difftastic; sem (lowest confidence; kept only if the structural-diff comparison shows a gain); claude-code-action | selected |
 | recovery-portability | mise; Restic; chezmoi | selected |
 | cross:wsl-distro | Ubuntu 26.04.1 LTS (Canonical WSL image), primary; Ubuntu 24.04.5 LTS (Canonical WSL image), fallback | selected |
 
-Each pick's upstream install command and source, its role, the deciding comparison and the critics' checks are in
+For a compare layer the row lists every arm its deciding comparison names. Each pick's upstream install command and
+source, its role, the deciding comparison and the critics' checks are in
 `evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json`; the folder's README says where the
 full judge and critic returns are kept and why.
+
+## One owner per tool (no overlap)
+
+Each tool belongs to exactly one layer; another layer that needs it lists it under "uses". Two tools that do the same
+job became one comparison owned by one layer. The map is `ownership.json` in the evidence folder.
+
+| Layer | Owns | Uses from another layer |
+| --- | --- | --- |
+| native-clients | Claude Code; Codex | - |
+| agent-sdks | Claude Agent SDK; Codex SDK (the package; the CLI it drives comes from native-clients) | Claude Code and Codex (native-clients) |
+| instructions-skills | Trail of Bits skills | - |
+| mcp-surfaces | mcporter; MCP Inspector | - |
+| workers | nothing installed | the native subagents of Claude Code and Codex (native-clients); Worktrunk (git-github-automation) |
+| isolation | sandbox-runtime; compare: the container boundary for untrusted work (a rootless container on the hosting engine, gVisor runsc, boxlite) | Worktrunk (git-github-automation); the container engine (hosting-services) |
+| code-navigation | Serena (Codex sessions); the official code-intelligence LSP plugins (Claude Code sessions) | - |
+| semantic-rag | compare: SocratiCode, semble, ColGREP, against BM25 and ripgrep baselines | the local model server for embeddings (observation-inference) |
+| document-retrieval | QMD; MinerU | - |
+| web-research | trafilatura; Playwright CLI | - |
+| durable-memory | compare, one memory owner: ai-memory, Hindsight, agentmemory, deja-vu | the local model server for Hindsight's local-model arm (observation-inference) |
+| token-efficiency | ccusage (measurement); compare: RTK, sqz, Headroom, against no compression layer | - |
+| observation-inference | OTel Collector Contrib; Prometheus; Loki; Grafana; Phoenix (trace sink only); compare, one local model server: Ollama, llama.cpp | - |
+| quality-evaluation | Inspect AI (evaluations); Harbor (agent end-to-end runner); promptfoo (CI regression gate) | - |
+| ci-supply-chain | zizmor; attest; Syft; Dependabot; CodeQL upload-sarif; actionlint | - |
+| scheduling-supervision | Dagu | systemd user units (cross:wsl-distro) |
+| hosting-services | Docker Compose; compare, one container engine: Podman with Quadlet, Docker Engine | - |
+| secrets-credentials | betterleaks (detection: pre-commit, history, CI); trufflehog (verification of found credentials only) | - |
+| git-github-automation | git; gh; Worktrunk; difftastic (diffs for people); sem (diffs for agents; only if its comparison shows a gain); claude-code-action | - |
+| recovery-portability | mise (runtimes; it installs uv, which owns Python packages and locks); Restic; chezmoi | - |
+| cross:wsl-distro | Ubuntu 26.04.1 LTS (fallback 24.04.5 LTS); systemd (part of the distribution) | - |
+
+Overlaps in the selection and how they are resolved:
+
+- Claude Code and Codex were picked in native-clients, workers and agent-sdks. native-clients owns both clients; workers uses their native subagents and agent-sdks owns only the SDK packages.
+- Worktrunk was picked in workers, isolation and git-github-automation. git-github-automation owns it; workers and isolation use it.
+- Podman was an arm in isolation and in hosting-services, and Docker in both comparisons. One container-engine comparison, owned by hosting-services. isolation owns only the boundary question on top of the winning engine: plain rootless container, gVisor runsc or boxlite.
+- Ollama (semantic-rag, as SocratiCode's embedding service) and llama.cpp (observation-inference, as the local inference route) are two local model servers. One local model server, owned by observation-inference: Ollama against llama.cpp. It must serve the code-RAG winner's embeddings; SocratiCode documents Ollama, OpenAI, Google, LM Studio and LiteLLM as providers, not llama.cpp directly.
+- Phoenix (observation) also runs experiments and scores evals, the job of Inspect AI (quality-evaluation). Phoenix is the trace sink only; evaluations belong to Inspect AI.
+- systemd was a pick of scheduling-supervision. It comes with the base distribution; scheduling-supervision owns Dagu and uses systemd user units.
+- uv (Python versions, packages and locks) overlaps mise (runtime versions). mise owns runtime versions and installs uv; uv owns Python packages, virtual environments and locks. The judges placed uv under mise.
+- Serena and the official LSP plugins both give symbol navigation. Split by client: the LSP plugins in Claude Code sessions, Serena in Codex sessions, as the judges assigned them.
+- betterleaks and trufflehog both scan for secrets. betterleaks detects (pre-commit, history, CI); trufflehog only verifies what is found against the provider.
+- difftastic and sem both produce structural diffs. difftastic for people reviewing; sem for agents, and only if its comparison shows a gain.
+
+Residual: QMD runs its own embedding and reranking models in process (node-llama-cpp); it is not a second model server, and it stays inside document-retrieval.
+
+The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI) is used from the owning foundation layer, not selected again.
+
 
 ## Why this method
 
@@ -46,12 +94,15 @@ search made each newcomer prove a gap against the pick of record (the design rec
 `89424e36`). This run removed those advantages without waiting for that tooling:
 
 - **Blind packets.** Each judge read only the layer's requirement, what a deciding comparison would measure, the target
-  hosts and the candidates as name and repository, in a seeded shuffle; every candidate on record entered, including the
-  2026-09-29 sweep's survivors and the second-family review's selections. Selection words in the requirement texts were
+  hosts and the candidates as name and repository, in a seeded shuffle. The packets held every candidate of the
+  landscape catalogs, every survivor of the 2026-09-29 sweep and the second-family review's selections; they did not
+  hold 15 of the 25 survivors of the 2026-09-26 sweep or most proposals the v1 sweeps refuted (see Not covered). Selection words in the requirement texts were
   made neutral (`build_packets.py`, the `NEUTRAL` list).
 - **Symmetric evidence.** The project's own receipts and records were excluded, because native runs exist mostly for
-  what the source host installed. Judges used upstream public evidence only; comparisons on record entered only where
-  every named arm ran.
+  what the source host installed. Judges used upstream public evidence only. Comparisons on record were meant to enter
+  where every named arm ran; four did, and the Harbor end-to-end run of the token tools (36 tasks, seven arms, PR #570)
+  qualified under that rule but was left out of the token-efficiency packet, so its comparison on the new distribution
+  starts from that run.
 - **Frozen criteria.** Capability fit, public measured evidence, 90-day currency, maintenance, WSL2 and RTX 4090 fit, an
   upstream install command and agent-client integration; stars, popularity and current use are not evidence. The
   criteria and prompts were hashed at 2026-10-01T17:35:24Z (`preregistration.json`), 35 seconds before the run started.
@@ -95,6 +146,12 @@ GPU through WSL, and the toolchains.
 - The 12 us-equities layers: the trading lane owner runs this method unchanged on the GPT lane after the pool resets at
   2026-10-03T17:14Z. The user-pinned NautilusTrader and IBKR destination is a requirement, not a judged slot.
 - The cross rows for the runtime workers, the GPT-6 harnesses, the credential practice and the convergence practice.
+- Part of the field. The packets did not hold 15 of the 25 survivors of the 2026-09-26 sweep (in observation-inference
+  grafana/tempo, traceloop/openllmetry, ollama, nvidia_gpu_exporter and dcgm-exporter; in quality-evaluation mteb, mutmut,
+  cosmic-ray and opik; in mcp-surfaces mcpc and conformance; in scheduling-supervision absurd; in instructions-skills
+  skill-scanner and financial-services; in durable-memory anthropics/claude-code) or 266 of the 328 distinct layer and
+  repository pairs that the v1 sweeps refuted. Under the U11 design those enter the field as pending and are voted
+  again; until then this selection inherits the v1 refutations for them.
 
 ## What follows
 
@@ -105,9 +162,14 @@ GPU through WSL, and the toolchains.
 
 ## Evidence class
 
-Source review by model judges with adversarial checks. No candidate was installed or measured by the run.
+Source review by model judges with adversarial checks; all 14 agents were one model family (Claude Opus 5.5). No
+candidate was installed or measured by the run. The install commands record upstream's documented path, ten of them a
+script piped to a shell and eleven naming @latest; the install profile pins each release and verifies its checksum
+before stage 2 runs it. A judge's deciding comparison is input to the preregistered arm set of U11's section D, not the
+arm set itself.
 
 ## Overturn
 
-A preregistered comparison on the new distribution; a fact a later check finds wrong where a pick rests on it; a new
-upstream release or maintenance change that alters a criterion.
+A preregistered comparison on the new distribution; the re-vote of the candidates the packets did not hold, which can
+add arms or reopen a selected layer; a fact a later check finds wrong where a pick rests on it; a new upstream release
+or maintenance change that alters a criterion.

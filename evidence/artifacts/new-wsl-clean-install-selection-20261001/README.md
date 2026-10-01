@@ -7,6 +7,7 @@ The decision record is `docs/decisions/2026-10-01-new-wsl-clean-install-selectio
 | File | What it is |
 | --- | --- |
 | `selection.json` | Per layer: the selection after the critics' review, each pick's upstream install command and source, the deciding comparison, and the critics' failed fact checks |
+| `ownership.json` | The non-overlapping form: each tool's one owning layer, what each layer uses from another, and how each overlap was resolved |
 | `packets/` | The 21 blind packets the judges read: requirement, what a deciding comparison measures, candidates as name and repository in a seeded shuffle |
 | `criteria.txt`, `judge-prompt.txt`, `critic-prompt.txt` | The frozen criteria and prompts, verbatim |
 | `preregistration.json` | Their sha256 and the packet hashes, recorded at 2026-10-01T17:35:24Z, 35 seconds before the run started |

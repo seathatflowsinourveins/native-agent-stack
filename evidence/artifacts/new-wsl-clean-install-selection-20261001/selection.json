@@ -13,7 +13,7 @@
   "subagent_tokens": 3144333,
   "tool_uses": 622
  },
- "evidence_class": "source_review: model judges read upstream public evidence; no candidate was installed or measured by this run",
+ "evidence_class": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
  "meaning": "The clean-install selection for the new WSL distribution, chosen on repository evidence. A layer marked 'compare' installs every listed arm fresh and its preregistered head-to-head on the new distribution picks the winner; a 'selected' layer is confirmed by its own comparison when one runs. It is not a measured merit result (program decision 5).",
  "scope": "The 20 foundation layers and the WSL base distribution. The 12 us-equities layers run the same method on the GPT lane after 2026-10-03T17:14Z, owned by the trading lane, with the user-pinned NautilusTrader and IBKR destination as a requirement. The cross rows runtime-workers, gpt6-harnesses, credential-practice and convergence-practice were not judged.",
  "layers": [
@@ -194,7 +194,16 @@
    ],
    "deciding_comparison": "sandbox-runtime and Worktrunk stand. The OCI/VM slot needs a head-to-head on the WSL2 host using one frozen untrusted workload: escape and out-of-tree write attempts, allowed and denied egress, and memory, CPU and fork bombs. Arms: srt; rootless Podman from the Ubuntu archive; Docker Engine in rootless mode from Docker's own repository; Podman or Docker with gVisor runsc; boxlite with /dev/kvm. Measure filesystem, network and resource enforcement; cleanup after kill or stop (no leaked VMs, containers, mounts or cgroups); WSL2 compatibility (cgroup v2 delegation under systemd, /dev/kvm, AppArmor userns); the version each documented install command actually delivers; and whether Claude Code and Codex run unchanged inside each arm. Choose the OCI/VM arm from the result.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "sandbox-runtime (selected)",
+    "Worktrunk (edit separation; owned by git-github-automation)",
+    "rootless Podman",
+    "rootless Docker Engine",
+    "Podman or Docker with gVisor runsc",
+    "boxlite with /dev/kvm"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
   },
   {
    "layer_id": "code-navigation",
@@ -259,7 +268,16 @@
    ],
    "deciding_comparison": "Re-run the sealed 35-query set with expected source spans on the WSL2 host. Arms: SocratiCode (native Ollama on the RTX 4090, default nomic-embed-text), semble (CPU), ColGREP with LateOn-Code-edge and with LateOn-Code, BM25 and ripgrep. Also run semble's public 1,251-query bench under one harness to settle 0.693 vs 0.846. Measure span hits and NDCG@10, watcher correctness after edits and branch switches, p50/p95 latency, RSS and VRAM, cold index time, and restore after kill -9 and after cache deletion. Name the primary engine from the result, and install Ollama only if SocratiCode wins.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "SocratiCode (with Ollama embeddings)",
+    "semble",
+    "ColGREP with LateOn-Code-edge",
+    "ColGREP with LateOn-Code",
+    "BM25 baseline",
+    "ripgrep baseline"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
   },
   {
    "layer_id": "document-retrieval",
@@ -352,16 +370,23 @@
     {
      "name": "deja-vu",
      "repository": "https://github.com/vshulcz/deja-vu",
-     "role": null,
-     "install_command": null,
-     "install_source": null,
+     "role": "Comparison arm added by the critic: one Go binary that indexes existing session history for search and wires an MCP server into the clients.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/vshulcz/deja-vu/main/install.sh | sh && deja install --auto",
+     "install_source": "https://github.com/vshulcz/deja-vu README lines 75-81 (latest release v0.21.4, 2026-09-29; read 2026-10-01 with gh api); Homebrew, npm and go install are also documented",
      "judge_confidence": null,
      "added_by": "critic"
     }
    ],
    "deciding_comparison": "Run the judge's six-measure head-to-head on the new WSL2 host, with four arms. Install each one alone as the sole memory owner. (1) ai-memory, run with its LLM reranker on and off, using a matched embedder. (2) Hindsight, run once with a local model on the RTX 4090 and once with a hosted model. (3) agentmemory, through its Claude Code and Codex hooks path, not REST alone. (4) deja-vu as a full arm, including promote and remember notes. Measure: source-grounded recall and abstention over Claude Code -> Codex -> Claude Code chains in two projects; cross-project leakage; useful-write quality judged against the source transcripts; forget or purge, then confirm absence from both recall and indexes; backup -> fresh data dir -> restore, with recall compared for identity; and complete token, latency and cost usage, including LLM calls made during capture. As a secondary measure, report LongMemEval-S recall_all@5 with a matched embedder. The arm that leads on source-grounded recall while passing deletion and isolated restore becomes the single owner.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "ai-memory, LLM reranker on and off",
+    "Hindsight, local model and hosted model",
+    "agentmemory through its Claude Code and Codex hooks",
+    "deja-vu"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
   },
   {
    "layer_id": "token-efficiency",
@@ -389,7 +414,16 @@
    ],
    "deciding_comparison": "Run on the new WSL2 host as paired, randomized trials with k >= 3 per task, separately for Claude Code and for Codex. Arms: (1) a no-layer baseline; (2) RTK v0.50.x; (3) sqz v1.9.x; (4) Headroom v0.39.x. Headroom stays in because the +48.4% and +44% cost results measured v0.27.0 and a July build, not the current version. Context Mode 1.0.169 runs only as a frozen control unless human development resumes. Take complete provider usage per run from ccusage (input, output, cache creation, cache read) and keep it separate from each tool's own artifact estimate (rtk gain, headroom savings, sqz stats). Count recall, expand and retrieve calls, failed attempts and wall time. Decide on cost per solved task at equal success.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "ccusage (measurement, selected)",
+    "no compression layer (baseline)",
+    "RTK",
+    "sqz",
+    "Headroom",
+    "Context Mode (frozen control)"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
   },
   {
    "layer_id": "observation-inference",
@@ -619,7 +653,13 @@
    ],
    "deciding_comparison": "Run the judge's head-to-head on the new WSL2 host, starting with installed-against-upstream version on the chosen distro: rootless Docker from Docker's apt repository (which supports 26.04) against Podman from the Ubuntu archive (version unverified). Record both versions. Then run one Compose file (typed app, Postgres, and a CUDA job on the RTX 4090) under rootless `docker compose` and under `podman compose` with the docker-compose provider, plus a Quadlet version. Measure GPU access (nvidia-ctk runtime against CDI), volume persistence and service restart across `wsl --shutdown`, port reachability from Windows, rollback after an image update, and idle RSS/CPU. Keep the engine that passes at lower cost, and re-check the Podman arm on macOS arm64 through podman machine.",
    "failed_fact_checks": [],
-   "current_use_reasoning_found_by_critic": false
+   "current_use_reasoning_found_by_critic": false,
+   "comparison_arms": [
+    "Docker Compose (selected)",
+    "Podman with Quadlet",
+    "rootless Docker Engine"
+   ],
+   "comparison_arms_source": "the critic's deciding_comparison for this layer, listed out"
   },
   {
    "layer_id": "secrets-credentials",
@@ -787,5 +827,7 @@
    ],
    "current_use_reasoning_found_by_critic": false
   }
- ]
+ ],
+ "field_coverage": "The packets held every candidate of the landscape catalogs (148), every survivor of the 2026-09-29 sweep (37) and the second-family review's selections. They did not hold 15 of the 25 survivors of the 2026-09-26 sweep, or 266 of the 328 distinct layer and repository pairs that the v1 sweeps refuted (counted by the Gate A owner against the ledger).",
+ "install_note": "Ten install commands are upstream quick starts piped to a shell and eleven name @latest. They record upstream's documented path; the install profile pins each release and verifies its checksum before stage 2 runs it."
 }
