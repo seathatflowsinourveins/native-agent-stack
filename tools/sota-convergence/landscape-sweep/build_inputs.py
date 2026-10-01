@@ -118,14 +118,16 @@ ACCEPTANCE_REQUIREMENTS = {
         "Replay the frozen equity tasks with declared identity, data, time, visibility, fill, distribution, cost and "
         "margin mappings; reproduce numeric accounting and independently reconcile the fixed fixture oracle.", "1"),
     "broker-state-failures": (
-        "Keep a durable intent/order/fill journal and deterministic numeric risk per account. Exercise duplicate "
-        "intent, lost response, rejection, partial/duplicate fills, cancel race, crash/restart, stale/risk, rate and "
-        "disconnect, snapshot contradiction and kill boundaries, with zero duplicate economic effects or unexplained "
-        "differences; retain each broker's expected and actual results.", "4"),
+        "Offline, with a fake transport and injected clock and failures (no credentials or network): keep a durable "
+        "intent/order/fill journal and deterministic numeric risk per account. Under frozen limits, exercise duplicate "
+        "intent, lost response, rejection, partial/duplicate fills, cancel race, crash/restart, stale/session/risk, rate "
+        "and disconnect, snapshot contradiction and kill boundaries, with zero duplicate economic effects or "
+        "unexplained differences; retain each case's expected and actual results.", "4"),
     "separate-paper-adapters": (
-        "Qualify each broker independently: verify paper account and contract identity read-only, freeze numeric "
-        "risk and request limits, run bounded submit/fill/cancel and reconnect/restart cases, reconcile durable "
-        "state and cash, and apply the declared final order/position disposition with no unexplained differences.", "5"),
+        "Qualify each broker independently, only after its own offline suite passes: verify paper account and "
+        "contract identity read-only, freeze numeric risk and request limits, run bounded submit/fill/cancel and "
+        "reconnect/restart cases, reconcile durable state, cash and fees (including fee-posting timing), and apply "
+        "the declared final order/position disposition with zero duplicate effects and no unexplained differences.", "5"),
 }
 UPSTREAM_FACT_FIELDS = ("latest_release", "released_at", "pushed_at", "archived", "disabled", "default_branch",
                         "head_commit", "head_committed_at", "last_modified", "gated")

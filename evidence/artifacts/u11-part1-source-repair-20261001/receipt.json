@@ -88,6 +88,14 @@
     "v1_serialized_input_sha256": "c9ca8b33ca2363ee8759f60395d5d876bfb77de4913ccfa54db4a91a07415471",
     "not_verified": ["historical review union itself", "ae summary acknowledgement", "full 390-test run independently", "central validator independently", "live full-field API pull", "provider/GPU/new-host acceptance"]
   },
+  "trading_owner_summary_acknowledgement": {
+    "source": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/590#issuecomment-5942246194",
+    "condition": "broker-state-failures and separate-paper-adapters replaced byte for byte with the owner's requested texts",
+    "correction": "The earlier summaries omitted offline transport and frozen-limit scope, per-case results, adapter offline prerequisites, fees and duplicate-effect boundaries.",
+    "source_plan_unchanged": true,
+    "targeted_regression": {"command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests", "native_exit_code": 0, "tests": 14},
+    "runtime_acceptance": false
+  },
   "unchanged": {
     "v1_templates": 9,
     "v1_full_input_objects": 32,
