@@ -2,12 +2,14 @@
 count_only.dry_run and transport_check.seal_live_samples. Only temporary synthetic
 snapshots are read or damaged; every transport uses FakeMarket.
 """
+import contextlib
 import copy
 import gzip
 import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from core import count_only as CO
 from core import plan, transport_check
@@ -81,8 +83,7 @@ class DryRunSealRecovery(RecoveryChecks, unittest.TestCase):
             self.assertEqual(snapshot_bytes(tmp), before)
 
     def test_mismatched_or_missing_binding_refuses_without_requests(self):
-        changes = ({"sessions": ["2023-03-02"]}, {"symbols": ["BBB"]},
-                   {"fetch_date": "2026-09-27"}, {})
+        changes = ({"sessions": ["2023-03-02"]}, {"symbols": ["BBB"]}, {})
         for change in changes:
             with self.subTest(change=change), tempfile.TemporaryDirectory() as tmp:
                 self.run_dry(tmp)
@@ -169,6 +170,107 @@ class LiveSampleSealRecovery(RecoveryChecks, unittest.TestCase):
                 self.seal_samples(tmp)
                 self.alter_page(Path(tmp) / label)
                 self.assert_refuses_unchanged(tmp, self.market, lambda: self.seal_samples(tmp))
+
+
+class DryRunCommandRecovery(RecoveryChecks, unittest.TestCase):
+    """Repair of the round-18 reviews (H1, M1) at the command level. A dry run whose output step fails after the seal
+    writes a failed end line in run.py's finally block, so the next run opens a new start line and finds the seal.
+    It adopts that seal only for the study tree, protocol and runtime lock that fetched it (H1: freeze_preconditions[8]
+    wants the tree the freeze will pin to fetch), and on any later UTC day (M1: the fetch start is read back from the
+    seal, never matched)."""
+
+    SESSION = "2023-03-01"
+    DAY1, DAY2 = "2026-12-01T00:00:00Z", "2026-12-02T00:00:00Z"
+
+    def setUp(self):
+        self.cal = synth.calendar("2022-06-01", "2023-12-29")
+        self.market = synth.FakeMarket(self.cal)
+        s = self.SESSION
+        daily, prints = issuer_data(self.cal, self.cal.offset(s, -60), self.cal.offset(s, 12), lambda day: 7.25)
+        self.market.add("synthetic", [("2015-01-01", "AAA")], daily=daily, auctions=prints)
+        self.now = [self.DAY1]
+
+    @contextlib.contextmanager
+    def command(self):
+        import run
+        from tests import fixture_repo as FR
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = FR.build(tmp, frozen=False)["repo"]
+            with FR.isolated_bytecode(), mock.patch.object(run, "REPO", repo), \
+                    mock.patch.object(run, "transports", lambda *_: transports(self.market)), \
+                    mock.patch.object(run, "clock", lambda: self.now[0]):
+                yield run, repo, Path(tmp)
+
+    def argv(self, root):
+        return ["dry-run", "--sessions", self.SESSION, "--symbols", "AAA", "--snapshot-root", str(root)]
+
+    def fail_after_the_seal(self, run, repo, root) -> str:
+        """The pushed start line, then a run whose output step fails after the seal; returns the sha256 that its
+        failed end line logged (review round 12, F3). Both lines are pushed."""
+        from core import logs
+        from core.params import RUN_LOG
+        from tests import fixture_repo as FR
+        self.assertEqual(run.main(self.argv(root)), 0)
+        FR.commit_push(repo, "2026-10-01T01:00:00+00:00")
+        with mock.patch.object(CO, "dry_run_output", side_effect=RuntimeError("synthetic failure after the seal")), \
+                self.assertRaisesRegex(RuntimeError, "after the seal"):
+            run.main(self.argv(root))
+        line = logs.read_lines(repo / RUN_LOG)[-1]
+        self.assertEqual((line["purpose"], line["status"], len(line["input_snapshot_sha256s"])),
+                         ("dry_run", "failed", 1))
+        FR.commit_push(repo, "2026-10-01T01:05:00+00:00")
+        return line["input_snapshot_sha256s"][0]
+
+    def test_a_seal_left_by_a_failed_run_is_refused_to_another_study_tree(self):
+        """H1: tree A seals and fails after the seal; tree B changes only study/fetch/ (the request plan is the same).
+        At af38dced B adopted A's seal without a request and wrote an output stamped with B's tree, so the F12
+        calibration came from a transport B never ran. Now B is refused, nothing is fetched or written, and B fetches
+        its own snapshot under a new root."""
+        from core.params import DRY_RUN_OUTPUT, STUDY_PATH
+        from tests import fixture_repo as FR
+        with self.command() as (run, repo, tmp):
+            root = tmp / "snap"
+            sealed = self.fail_after_the_seal(run, repo, root)
+            FR.write(repo / STUDY_PATH / "fetch" / "transport.py", "HOST = 'fixture-fixed'\n")
+            FR.commit_push(repo, "2026-10-01T02:00:00+00:00")
+            tree_b = FR.sh(repo, "rev-parse", f"HEAD:{STUDY_PATH}")
+            self.assertEqual(run.main(self.argv(root)), 0)               # B's start line
+            FR.commit_push(repo, "2026-10-01T02:05:00+00:00")
+            self.assert_refuses_unchanged(root, self.market, lambda: run.main(self.argv(root)))
+            self.assertFalse((repo / DRY_RUN_OUTPUT).exists())
+            FR.commit_push(repo, "2026-10-01T02:10:00+00:00")             # the refused run's failed end line
+            fresh = tmp / "snap-tree-b"
+            self.assertEqual(run.main(self.argv(fresh)), 0)              # a new start line
+            FR.commit_push(repo, "2026-10-01T02:15:00+00:00")
+            calls = len(self.market.calls)
+            self.assertEqual(run.main(self.argv(fresh)), 0)
+            self.assertGreater(len(self.market.calls), calls)            # B's own transport fetched
+            out = json.loads((repo / DRY_RUN_OUTPUT).read_text())
+            self.assertEqual(out["study_tree"], tree_b)
+            self.assertNotEqual(out["snapshot_sha256"], sealed)
+
+    def test_a_seal_left_by_a_failed_run_is_adopted_on_a_later_utc_day(self):
+        """M1: the same tree, protocol and runtime lock retry on the next UTC day and adopt the seal without a request.
+        The output's fetch_utc_start is the first run's start, read back from the seal binding; the end line keeps its
+        own start. At af38dced the fetch date was matched, so this retry was refused for good."""
+        from core import logs
+        from core.params import DRY_RUN_OUTPUT, RUN_LOG
+        from tests import fixture_repo as FR
+        with self.command() as (run, repo, tmp):
+            root = tmp / "snap"
+            sealed = self.fail_after_the_seal(run, repo, root)
+            self.now[0] = self.DAY2
+            self.assertEqual(run.main(self.argv(root)), 0)               # a new start line on the next UTC day
+            FR.commit_push(repo, "2026-10-02T01:00:00+00:00")
+            before, calls = snapshot_bytes(root), len(self.market.calls)
+            self.assertEqual(run.main(self.argv(root)), 0)
+            self.assertEqual(self.market.calls[calls:], [])
+            self.assertEqual(snapshot_bytes(root), before)
+            out = json.loads((repo / DRY_RUN_OUTPUT).read_text())
+            self.assertEqual((out["snapshot_sha256"], out["fetch_utc_start"]), (sealed, self.DAY1))
+            line = logs.read_lines(repo / RUN_LOG)[-1]
+            self.assertEqual((line["purpose"], line["status"], line["input_snapshot_sha256s"], line["utc_start"]),
+                             ("dry_run", "complete", [sealed], self.DAY2))
 
 
 if __name__ == "__main__":
