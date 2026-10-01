@@ -1,4 +1,4 @@
-"""tools/adoption/managed_block.py: the ~/.claude/CLAUDE.md and ~/.profile blocks of --configure-full-profile.
+"""tools/adoption/managed_block.py: native client instruction blocks and the profile PATH block.
 
 Against real files in a temporary HOME: each block is created, appended after operator text, replaced in place when
 the source changes, and left alone (no write, no backup) when current. rtk's `@RTK.md` import and every line outside
@@ -18,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
@@ -155,6 +156,132 @@ class ClaudeMdBlockTests(ManagedBlockCase):
         self.assertIn("+" + managed_block.CLAUDE_END, out)
         self.assertFalse(self.target.exists())
         self.assertFalse(self.target.parent.exists())
+
+
+class CodexMdBlockTests(ManagedBlockCase):
+    def setUp(self):
+        super().setUp()
+        self.codex_home = self.home / ".codex"
+        self.target = self.codex_home / "AGENTS.md"
+        self.template = managed_block.CODEX_TEMPLATE.read_text(encoding="utf-8")
+
+    def apply(self, *extra):
+        return run("--home", str(self.home), *extra, "codex-md", "--codex-home", str(self.codex_home))
+
+    def test_create_exact_canonical_block_without_client_or_config_changes(self):
+        self.codex_home.mkdir()
+        fixtures = {"config.toml": b"keep config\n", "auth.json": b"synthetic private fixture\n",
+                    "stack-worker.config.toml": b"keep profile\n", "agents/role.toml": b"keep role\n"}
+        for name, data in fixtures.items():
+            path = self.codex_home / name
+            path.parent.mkdir(exist_ok=True)
+            path.write_bytes(data)
+        with mock.patch("subprocess.run", side_effect=AssertionError("must not execute a client")):
+            code, _, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), self.template)
+        for name, data in fixtures.items():
+            self.assertEqual((self.codex_home / name).read_bytes(), data)
+
+    def test_replace_keeps_outside_text_mode_backup_and_rerun_is_idempotent(self):
+        self.codex_home.mkdir()
+        old = f"{managed_block.CODEX_BEGIN} (old) -->\nold rules\n{managed_block.CODEX_END}\n"
+        before = "# Operator\n\n" + old + "\n# After\n"
+        self.target.write_text(before)
+        self.target.chmod(0o600)
+        code, _, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), "# Operator\n\n" + self.template + "\n# After\n")
+        self.assertEqual(stat.S_IMODE(self.target.stat().st_mode), 0o600)
+        backups = self.backups(self.target)
+        self.assertEqual(len(backups), 1)
+        self.assertEqual((self.codex_home / backups[0]).read_text(), before)
+        mtime = self.target.stat().st_mtime_ns
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(self.target.stat().st_mtime_ns, mtime)
+        self.assertEqual(self.backups(self.target), backups)
+
+    def test_dry_run_creates_no_home(self):
+        code, out, err = self.apply("--dry-run")
+        self.assertEqual(code, 0, err)
+        self.assertIn("DRY RUN", out)
+        self.assertFalse(self.codex_home.exists())
+
+    def test_crlf_and_bare_cr_operator_bytes_survive_replacement_and_backup(self):
+        self.codex_home.mkdir()
+        prefix = b"# Operator\r\n# Bare CR\rkeep this\r\n\r\n"
+        suffix = b"\r\n# After\r\n"
+        old = (managed_block.CODEX_BEGIN + " (old) -->\r\nold\r\n" + managed_block.CODEX_END + "\r\n").encode()
+        before = prefix + old + suffix
+        self.target.write_bytes(before)
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(self.target.read_bytes(), prefix + self.template.encode() + suffix)
+        self.assertEqual((self.codex_home / self.backups(self.target)[0]).read_bytes(), before)
+
+    def test_first_append_preserves_operator_trailing_blank_lines(self):
+        self.codex_home.mkdir()
+        before = b"# Operator\r\n\r\n\r\n"
+        self.target.write_bytes(before)
+        self.assertEqual(self.apply()[0], 0)
+        self.assertTrue(self.target.read_bytes().startswith(before))
+        self.assertEqual((self.codex_home / self.backups(self.target)[0]).read_bytes(), before)
+
+    def test_damaged_or_unmanaged_duplicate_text_is_left_untouched(self):
+        self.codex_home.mkdir()
+        for before in [managed_block.CODEX_BEGIN + "\nmissing end\n",
+                       self.template + self.template,
+                       "<!-- native-agent-stack:top-rule -->\nold unmanaged rules\n",
+                       self.template + "<!-- native-agent-stack:rtk-exceptions -->\nextra copy\n"]:
+            with self.subTest(before=before[:70]):
+                self.target.write_text(before)
+                self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+                self.assertEqual(self.target.read_text(), before)
+                self.assertEqual(self.backups(self.target), [])
+
+    def test_override_guard_uses_native_rust_whitespace(self):
+        self.codex_home.mkdir()
+        override = self.codex_home / "AGENTS.override.md"
+        for text in ["operator override", "\x1c"]:
+            override.write_text(text)
+            self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+            self.assertFalse(self.target.exists())
+        override.write_text(" \t\n\u00a0\u2000")
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(override.read_text(), " \t\n\u00a0\u2000")
+
+    def test_explicit_home_then_environment_then_default(self):
+        environment_home = self.home / "environment-codex"
+        with mock.patch.dict(os.environ, {"CODEX_HOME": str(environment_home)}):
+            self.assertEqual(self.apply()[0], 0)
+            self.assertFalse(environment_home.exists())
+            self.assertEqual(run("--home", str(self.home), "codex-md")[0], 0)
+            self.assertEqual((environment_home / "AGENTS.md").read_text(), self.template)
+        with mock.patch.dict(os.environ, {"CODEX_HOME": ""}):
+            self.target.unlink()
+            self.assertEqual(run("--home", str(self.home), "codex-md")[0], 0)
+            self.assertEqual(self.target.read_text(), self.template)
+
+    def test_symlink_target_or_override_is_refused(self):
+        self.codex_home.mkdir()
+        other = self.home / "operator.md"
+        other.write_text("keep operator")
+        for path in [self.target, self.codex_home / "AGENTS.override.md"]:
+            path.symlink_to(other)
+            self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+            self.assertEqual(other.read_text(), "keep operator")
+            path.unlink()
+
+    def test_quoted_home_expands_instead_of_creating_a_relative_tilde_directory(self):
+        with mock.patch.dict(os.environ, {"HOME": str(self.home)}):
+            code, _, err = run("codex-md", "--codex-home", "~/.codex")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), self.template)
+
+    def test_source_must_be_one_whole_canonical_block(self):
+        for template in ["", self.template + "extra\n", "extra\n" + self.template, self.template + self.template]:
+            with self.subTest(template=template[:50]):
+                with self.assertRaises(managed_block.Refused):
+                    managed_block.merged_codex_md("operator text", template)
 
 
 class ProfilePathBlockTests(ManagedBlockCase):

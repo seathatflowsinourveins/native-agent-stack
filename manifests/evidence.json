@@ -3910,8 +3910,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "71c8f5b7aa83664fb4633715bd12a0af4befa2a048f6e6daf70aff37d961b268",
-      "bytes": 13374
+      "sha256": "9e0877d9dc04647fe350a6ad37b87abbae2f745d51e14f9964f87239c9b56fcf",
+      "bytes": 13808
     },
     {
       "path": "CLAUDE.md",
@@ -4205,8 +4205,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "1604f5bdf623e91006eddfac3dba716096625e72cd4745a3e20f5f0213e3670d",
-      "bytes": 6054
+      "sha256": "e5b8b46002806cc49297125e74b2ac5fc190333a8a5ddbc235bd267c6736260d",
+      "bytes": 6486
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -4265,8 +4265,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "0216bd9ebaf9e2c852cd02fdbf5b84b3953ab0d166ef8cf2548957ee03ab1c40",
-      "bytes": 23847
+      "sha256": "604cf8a27efd6ef1f7e8ce8c6859c6274048dba42f10b74d9c9f965b19396977",
+      "bytes": 26507
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -15275,6 +15275,11 @@
       "bytes": 28168
     },
     {
+      "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
+      "sha256": "4135783851cc0c8cdfc26ade8cf73e8b95935898e75a8343d315822ba67c61cf",
+      "bytes": 14002
+    },
+    {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
       "sha256": "b2d99153c8dffb6169923e9129cfb6e4343cd9f5fc443ad8839fa5f162e20c1e",
       "bytes": 37375
@@ -15496,8 +15501,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "5a60d79327c2cf5361ec88400f2dee0e8e0024c4a8534bd2db12ae93d4db4943",
-      "bytes": 11656
+      "sha256": "0585dc639571da9a46dec287029cd52d148561fdd1264f341e999c8ef8496425",
+      "bytes": 14822
     },
     {
       "path": "docs/native-returned-results.md",
@@ -15646,8 +15651,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "5a4372ba22c74509a3990241234194e6ecdafb2e44e80b4a153585f1da04899e",
-      "bytes": 37966
+      "sha256": "7b4e30e942e4d3c49680b8443a3d58603224316b2b44dbe4006deecdd5cf2ed0",
+      "bytes": 39853
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -45006,8 +45011,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "bbd0bf98238947df92de1a03bc262f84d0892bf2b8ce21e1188f909cf3c5816b",
-      "bytes": 12044
+      "sha256": "d19658f0fdd4d8ff22b638da7965ef46913214615a6011674cda3e0a6b63f613",
+      "bytes": 12478
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -46176,8 +46181,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "8b367b530481824eb2f0b075b5af08b8dda30d7dcb2079c4c3b377b7c14c772d",
-      "bytes": 155332
+      "sha256": "744568f193b67576199d97c769915eba14ab823df0c1b948baf78d832a33f1e0",
+      "bytes": 155359
     },
     {
       "path": "tests/test_codex_worker_skill.py",
