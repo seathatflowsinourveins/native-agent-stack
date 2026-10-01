@@ -1,0 +1,455 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/observation-inference.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/sgl-project/sglang",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/sgl-project/sglang": {
+     "full_name": "sgl-project/sglang",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:26:29Z",
+     "created_at": "2024-01-08T04:15:52Z",
+     "updated_at": "2026-10-01T20:36:40Z",
+     "open_issues_count": 5503,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/sgl-project/sglang"
+    },
+    "repos/sgl-project/sglang/releases/latest": {
+     "tag_name": "v0.5.20",
+     "name": "v0.5.20",
+     "published_at": "2026-09-18T22:41:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/sgl-project/sglang/releases/tag/v0.5.20"
+    },
+    "repos/sgl-project/sglang/commits?per_page=1": {
+     "sha": "dcf4e182839c2df77f6eaf2c3303b80bcf982bff",
+     "date": "2026-10-01T19:34:23Z",
+     "html_url": "https://github.com/sgl-project/sglang/commit/dcf4e182839c2df77f6eaf2c3303b80bcf982bff"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/open-telemetry/opentelemetry-collector-contrib": {
+     "full_name": "open-telemetry/opentelemetry-collector-contrib",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:13:12Z",
+     "created_at": "2019-07-11T14:54:32Z",
+     "updated_at": "2026-10-01T18:18:13Z",
+     "open_issues_count": 990,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+    },
+    "repos/open-telemetry/opentelemetry-collector-contrib/releases/latest": {
+     "tag_name": "v0.162.0",
+     "name": "v1.1.0/v0.162.0",
+     "published_at": "2026-09-29T10:11:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0"
+    },
+    "repos/open-telemetry/opentelemetry-collector-contrib/commits?per_page=1": {
+     "sha": "4fce81880344cb6cdd24715935b69c53f1e3801d",
+     "date": "2026-10-01T16:47:53Z",
+     "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/4fce81880344cb6cdd24715935b69c53f1e3801d"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/prometheus/alertmanager",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/prometheus/alertmanager": {
+     "full_name": "prometheus/alertmanager",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T15:09:52Z",
+     "created_at": "2013-07-16T15:06:31Z",
+     "updated_at": "2026-10-01T17:02:17Z",
+     "open_issues_count": 426,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/prometheus/alertmanager"
+    },
+    "repos/prometheus/alertmanager/releases/latest": {
+     "tag_name": "v0.34.1",
+     "name": "0.34.1 / 2026-09-17",
+     "published_at": "2026-09-17T08:12:07Z",
+     "prerelease": false,
+     "html_url": "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1"
+    },
+    "repos/prometheus/alertmanager/commits?per_page=1": {
+     "sha": "61ba43d505ca5867ddfee77fc7a64ee80b114454",
+     "date": "2026-09-29T15:45:02Z",
+     "html_url": "https://github.com/prometheus/alertmanager/commit/61ba43d505ca5867ddfee77fc7a64ee80b114454"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/binwiederhier/ntfy",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/binwiederhier/ntfy": {
+     "full_name": "binwiederhier/ntfy",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T21:43:36Z",
+     "created_at": "2021-10-23T19:25:32Z",
+     "updated_at": "2026-10-01T20:23:48Z",
+     "open_issues_count": 412,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/binwiederhier/ntfy"
+    },
+    "repos/binwiederhier/ntfy/releases/latest": {
+     "tag_name": "v2.28.0",
+     "name": "v2.28.0",
+     "published_at": "2026-08-27T20:27:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0"
+    },
+    "repos/binwiederhier/ntfy/commits?per_page=1": {
+     "sha": "1e6305ccecc0af15b13d239c3281543bea27b960",
+     "date": "2026-09-29T00:53:39Z",
+     "html_url": "https://github.com/binwiederhier/ntfy/commit/1e6305ccecc0af15b13d239c3281543bea27b960"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/grafana/grafana",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/grafana/grafana": {
+     "full_name": "grafana/grafana",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:55Z",
+     "created_at": "2013-12-11T15:59:56Z",
+     "updated_at": "2026-10-01T19:53:09Z",
+     "open_issues_count": 3291,
+     "has_issues": true,
+     "license_spdx": "AGPL-3.0",
+     "html_url": "https://github.com/grafana/grafana"
+    },
+    "repos/grafana/grafana/releases/latest": {
+     "tag_name": "v13.2.3",
+     "name": "13.2.3",
+     "published_at": "2026-09-29T09:02:18Z",
+     "prerelease": false,
+     "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.3"
+    },
+    "repos/grafana/grafana/commits?per_page=1": {
+     "sha": "2de7134d3d97ba861f26ff2bcc58508a75c4325c",
+     "date": "2026-10-01T19:52:11Z",
+     "html_url": "https://github.com/grafana/grafana/commit/2de7134d3d97ba861f26ff2bcc58508a75c4325c"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/jarrodwatts/claude-hud",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/jarrodwatts/claude-hud": {
+     "full_name": "jarrodwatts/claude-hud",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:27:55Z",
+     "created_at": "2026-01-02T01:35:07Z",
+     "updated_at": "2026-10-01T19:27:59Z",
+     "open_issues_count": 0,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/jarrodwatts/claude-hud"
+    },
+    "repos/jarrodwatts/claude-hud/releases/latest": {
+     "tag_name": "v0.10.0",
+     "name": "v0.10.0",
+     "published_at": "2026-10-01T19:11:24Z",
+     "prerelease": false,
+     "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
+    },
+    "repos/jarrodwatts/claude-hud/commits?per_page=1": {
+     "sha": "33b51db6ceb5d0c91dc9c22404abcabacc8603b0",
+     "date": "2026-10-01T19:27:54Z",
+     "html_url": "https://github.com/jarrodwatts/claude-hud/commit/33b51db6ceb5d0c91dc9c22404abcabacc8603b0"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/openlit/openlit",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/openlit/openlit": {
+     "full_name": "openlit/openlit",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T06:39:28Z",
+     "created_at": "2024-01-23T17:40:59Z",
+     "updated_at": "2026-10-01T19:16:48Z",
+     "open_issues_count": 139,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openlit/openlit"
+    },
+    "repos/openlit/openlit/releases/latest": {
+     "tag_name": "openlit-2.1.0",
+     "name": "openlit: 2.1.0",
+     "published_at": "2026-09-10T10:55:59Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openlit/openlit/releases/tag/openlit-2.1.0"
+    },
+    "repos/openlit/openlit/commits?per_page=1": {
+     "sha": "897838a26e447f7f82dccfb59f7cbe0bfba3b694",
+     "date": "2026-10-01T06:35:33Z",
+     "html_url": "https://github.com/openlit/openlit/commit/897838a26e447f7f82dccfb59f7cbe0bfba3b694"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/Arize-ai/phoenix": {
+     "full_name": "Arize-ai/phoenix",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:24:07Z",
+     "created_at": "2022-11-09T23:44:35Z",
+     "updated_at": "2026-10-01T19:58:20Z",
+     "open_issues_count": 1063,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/Arize-ai/phoenix"
+    },
+    "repos/Arize-ai/phoenix/releases/latest": {
+     "tag_name": "@arizeai/phoenix-mcp@4.3.15",
+     "name": "@arizeai/phoenix-mcp@4.3.15",
+     "published_at": "2026-09-30T23:35:39Z",
+     "prerelease": false,
+     "html_url": "https://github.com/Arize-ai/phoenix/releases/tag/%40arizeai/phoenix-mcp%404.3.15"
+    },
+    "repos/Arize-ai/phoenix/commits?per_page=1": {
+     "sha": "d99a4dbf4910372f4d952e476776a7e2b13b279f",
+     "date": "2026-10-01T19:58:13Z",
+     "html_url": "https://github.com/Arize-ai/phoenix/commit/d99a4dbf4910372f4d952e476776a7e2b13b279f"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/prometheus/prometheus",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/prometheus/prometheus": {
+     "full_name": "prometheus/prometheus",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:34:30Z",
+     "created_at": "2012-11-24T11:14:12Z",
+     "updated_at": "2026-10-01T20:29:58Z",
+     "open_issues_count": 930,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/prometheus/prometheus"
+    },
+    "repos/prometheus/prometheus/releases/latest": {
+     "tag_name": "v3.15.0",
+     "name": "3.15.0 / 2026-09-24",
+     "published_at": "2026-09-25T08:56:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
+    },
+    "repos/prometheus/prometheus/commits?per_page=1": {
+     "sha": "fadf780dec7522178d84bcbb9ab6a78a82017a03",
+     "date": "2026-10-01T14:16:55Z",
+     "html_url": "https://github.com/prometheus/prometheus/commit/fadf780dec7522178d84bcbb9ab6a78a82017a03"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/kenn-io/agentsview",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/kenn-io/agentsview": {
+     "full_name": "kenn-io/agentsview",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:41:47Z",
+     "created_at": "2026-02-19T19:33:24Z",
+     "updated_at": "2026-10-01T20:41:53Z",
+     "open_issues_count": 161,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/kenn-io/agentsview"
+    },
+    "repos/kenn-io/agentsview/releases/latest": {
+     "tag_name": "v0.44.0",
+     "name": "v0.44.0",
+     "published_at": "2026-09-21T13:56:12Z",
+     "prerelease": false,
+     "html_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0"
+    },
+    "repos/kenn-io/agentsview/commits?per_page=1": {
+     "sha": "7203ab4df7071d0dd72bb2d215c12ef5aa706d3d",
+     "date": "2026-10-01T20:41:44Z",
+     "html_url": "https://github.com/kenn-io/agentsview/commit/7203ab4df7071d0dd72bb2d215c12ef5aa706d3d"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/vllm-project/vllm",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/vllm-project/vllm": {
+     "full_name": "vllm-project/vllm",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:10:16Z",
+     "created_at": "2023-02-09T11:23:20Z",
+     "updated_at": "2026-10-01T20:39:23Z",
+     "open_issues_count": 8465,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/vllm-project/vllm"
+    },
+    "repos/vllm-project/vllm/releases/latest": {
+     "tag_name": "v0.30.0",
+     "name": "v0.30.0",
+     "published_at": "2026-09-22T05:20:54Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0"
+    },
+    "repos/vllm-project/vllm/commits?per_page=1": {
+     "sha": "ccda9098cc5a91b6b6f73e0c0e697022382e01b4",
+     "date": "2026-10-01T19:54:26Z",
+     "html_url": "https://github.com/vllm-project/vllm/commit/ccda9098cc5a91b6b6f73e0c0e697022382e01b4"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/grafana/loki",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/grafana/loki": {
+     "full_name": "grafana/loki",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:37:32Z",
+     "created_at": "2018-04-16T09:22:48Z",
+     "updated_at": "2026-10-01T19:37:45Z",
+     "open_issues_count": 1247,
+     "has_issues": true,
+     "license_spdx": "AGPL-3.0",
+     "html_url": "https://github.com/grafana/loki"
+    },
+    "repos/grafana/loki/releases/latest": {
+     "tag_name": "v3.7.8",
+     "name": "v3.7.8",
+     "published_at": "2026-09-17T15:51:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/grafana/loki/releases/tag/v3.7.8"
+    },
+    "repos/grafana/loki/commits?per_page=1": {
+     "sha": "edc19ef40406d6c58c6b876f6548dd101df6c614",
+     "date": "2026-10-01T19:37:29Z",
+     "html_url": "https://github.com/grafana/loki/commit/edc19ef40406d6c58c6b876f6548dd101df6c614"
+    }
+   }
+  },
+  "C13": {
+   "repository": "https://github.com/ggml-org/llama.cpp",
+   "captured_at": "2026-10-01T20:42:33+00:00",
+   "endpoints": {
+    "repos/ggml-org/llama.cpp": {
+     "full_name": "ggml-org/llama.cpp",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:30:11Z",
+     "created_at": "2023-03-10T18:58:00Z",
+     "updated_at": "2026-10-01T20:39:58Z",
+     "open_issues_count": 2534,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/ggml-org/llama.cpp"
+    },
+    "repos/ggml-org/llama.cpp/releases/latest": {
+     "tag_name": "v0.5.0",
+     "name": "v0.5.0",
+     "published_at": "2026-09-23T20:50:06Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.5.0"
+    },
+    "repos/ggml-org/llama.cpp/commits?per_page=1": {
+     "sha": "ec7630a640789c393694fb194f1bbbf0369fc62d",
+     "date": "2026-10-01T19:55:41Z",
+     "html_url": "https://github.com/ggml-org/llama.cpp/commit/ec7630a640789c393694fb194f1bbbf0369fc62d"
+    }
+   }
+  },
+  "C14": {
+   "repository": "https://github.com/ymtdzzz/otel-tui",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/ymtdzzz/otel-tui": {
+     "full_name": "ymtdzzz/otel-tui",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-27T00:38:56Z",
+     "created_at": "2024-03-24T14:06:00Z",
+     "updated_at": "2026-10-01T18:12:47Z",
+     "open_issues_count": 23,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/ymtdzzz/otel-tui"
+    },
+    "repos/ymtdzzz/otel-tui/releases/latest": {
+     "tag_name": "v0.7.5",
+     "name": "v0.7.5",
+     "published_at": "2026-09-12T10:28:45Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5"
+    },
+    "repos/ymtdzzz/otel-tui/commits?per_page=1": {
+     "sha": "253c5e35ab39d1472955eaeb0304c3cf501dbf7c",
+     "date": "2026-09-21T03:28:45Z",
+     "html_url": "https://github.com/ymtdzzz/otel-tui/commit/253c5e35ab39d1472955eaeb0304c3cf501dbf7c"
+    }
+   }
+  }
+ }
+}

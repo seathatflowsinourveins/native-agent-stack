@@ -1,0 +1,109 @@
+{
+ "judges": [
+  {
+   "judge": "J01",
+   "packets": [
+    "native-clients",
+    "instructions-skills"
+   ]
+  },
+  {
+   "judge": "J02",
+   "packets": [
+    "workers",
+    "isolation"
+   ]
+  },
+  {
+   "judge": "J03",
+   "packets": [
+    "code-navigation",
+    "document-retrieval"
+   ]
+  },
+  {
+   "judge": "J04",
+   "packets": [
+    "semantic-rag",
+    "durable-memory"
+   ]
+  },
+  {
+   "judge": "J05",
+   "packets": [
+    "web-research",
+    "token-efficiency"
+   ]
+  },
+  {
+   "judge": "J06",
+   "packets": [
+    "quality-evaluation",
+    "ci-supply-chain"
+   ]
+  },
+  {
+   "judge": "J07",
+   "packets": [
+    "scheduling-supervision",
+    "hosting-services"
+   ]
+  },
+  {
+   "judge": "J08",
+   "packets": [
+    "recovery-portability",
+    "observation-inference"
+   ]
+  },
+  {
+   "judge": "J09",
+   "packets": [
+    "agent-sdks",
+    "mcp-surfaces"
+   ]
+  },
+  {
+   "judge": "J10",
+   "packets": [
+    "secrets-credentials",
+    "git-github-automation"
+   ]
+  },
+  {
+   "judge": "J11",
+   "packets": [
+    "cross:wsl-distro"
+   ]
+  }
+ ],
+ "groups": [
+  {
+   "group": "G1",
+   "judges": [
+    "J01",
+    "J02",
+    "J03",
+    "J04"
+   ]
+  },
+  {
+   "group": "G2",
+   "judges": [
+    "J05",
+    "J06",
+    "J07",
+    "J08"
+   ]
+  },
+  {
+   "group": "G3",
+   "judges": [
+    "J09",
+    "J10",
+    "J11"
+   ]
+  }
+ ],
+ "note": "Packets in preregistration order; judges J01-J10 take two consecutive packets, J11 the last; 3 groups with 1 critic each (the original dispatch shape: 11 judges in 3 groups, 1 critic per group). The original run's packet-to-judge assignment is not in the public record, so this assignment is the coordinator's."
+}

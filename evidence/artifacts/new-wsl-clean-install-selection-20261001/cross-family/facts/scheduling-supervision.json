@@ -1,0 +1,263 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/scheduling-supervision.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/conductor-oss/conductor",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/conductor-oss/conductor": {
+     "full_name": "conductor-oss/conductor",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:23:14Z",
+     "created_at": "2023-12-08T06:06:09Z",
+     "updated_at": "2026-10-01T20:32:13Z",
+     "open_issues_count": 261,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/conductor-oss/conductor"
+    },
+    "repos/conductor-oss/conductor/releases/latest": {
+     "tag_name": "v3.32.5",
+     "name": "v3.32.5",
+     "published_at": "2026-09-25T04:58:15Z",
+     "prerelease": false,
+     "html_url": "https://github.com/conductor-oss/conductor/releases/tag/v3.32.5"
+    },
+    "repos/conductor-oss/conductor/commits?per_page=1": {
+     "sha": "602bf6e97b9b9a4121fc2ef77156a33bf44b582c",
+     "date": "2026-10-01T20:22:30Z",
+     "html_url": "https://github.com/conductor-oss/conductor/commit/602bf6e97b9b9a4121fc2ef77156a33bf44b582c"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/PrefectHQ/prefect",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/PrefectHQ/prefect": {
+     "full_name": "PrefectHQ/prefect",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:43:35Z",
+     "created_at": "2018-06-29T21:59:26Z",
+     "updated_at": "2026-10-01T20:02:36Z",
+     "open_issues_count": 869,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/PrefectHQ/prefect"
+    },
+    "repos/PrefectHQ/prefect/releases/latest": {
+     "tag_name": "3.8.7",
+     "name": "3.8.7 - There's no place like local",
+     "published_at": "2026-09-26T23:41:44Z",
+     "prerelease": false,
+     "html_url": "https://github.com/PrefectHQ/prefect/releases/tag/3.8.7"
+    },
+    "repos/PrefectHQ/prefect/commits?per_page=1": {
+     "sha": "686d93ee93b8f44abe935e4a00cf80349990b9a5",
+     "date": "2026-10-01T17:58:11Z",
+     "html_url": "https://github.com/PrefectHQ/prefect/commit/686d93ee93b8f44abe935e4a00cf80349990b9a5"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/dagucloud/dagu",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/dagucloud/dagu": {
+     "full_name": "dagucloud/dagu",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T14:54:48Z",
+     "created_at": "2022-04-22T13:00:42Z",
+     "updated_at": "2026-10-01T18:30:33Z",
+     "open_issues_count": 97,
+     "has_issues": true,
+     "license_spdx": "GPL-3.0",
+     "html_url": "https://github.com/dagucloud/dagu"
+    },
+    "repos/dagucloud/dagu/releases/latest": {
+     "tag_name": "v2.18.1",
+     "name": "v2.18.1",
+     "published_at": "2026-09-29T15:24:51Z",
+     "prerelease": false,
+     "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1"
+    },
+    "repos/dagucloud/dagu/commits?per_page=1": {
+     "sha": "1ee69be8c2c6d833bf6731c7031271eaee47e222",
+     "date": "2026-10-01T14:54:48Z",
+     "html_url": "https://github.com/dagucloud/dagu/commit/1ee69be8c2c6d833bf6731c7031271eaee47e222"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/dagster-io/dagster",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/dagster-io/dagster": {
+     "full_name": "dagster-io/dagster",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T19:30:37Z",
+     "created_at": "2018-04-30T16:30:04Z",
+     "updated_at": "2026-10-01T19:30:56Z",
+     "open_issues_count": 2578,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/dagster-io/dagster"
+    },
+    "repos/dagster-io/dagster/releases/latest": {
+     "tag_name": "1.13.25",
+     "name": "1.13.25 (core) / 0.29.25 (libraries)",
+     "published_at": "2026-10-01T18:17:43Z",
+     "prerelease": false,
+     "html_url": "https://github.com/dagster-io/dagster/releases/tag/1.13.25"
+    },
+    "repos/dagster-io/dagster/commits?per_page=1": {
+     "sha": "a69038cd47003200a1c8fc3540b5855c6d93746e",
+     "date": "2026-10-01T19:30:31Z",
+     "html_url": "https://github.com/dagster-io/dagster/commit/a69038cd47003200a1c8fc3540b5855c6d93746e"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/systemd/systemd",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/systemd/systemd": {
+     "full_name": "systemd/systemd",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:46:33Z",
+     "created_at": "2015-03-25T15:27:27Z",
+     "updated_at": "2026-10-01T19:25:28Z",
+     "open_issues_count": 3527,
+     "has_issues": true,
+     "license_spdx": "GPL-2.0",
+     "html_url": "https://github.com/systemd/systemd"
+    },
+    "repos/systemd/systemd/releases/latest": {
+     "tag_name": "v262",
+     "name": "systemd v262",
+     "published_at": "2026-09-22T13:19:16Z",
+     "prerelease": false,
+     "html_url": "https://github.com/systemd/systemd/releases/tag/v262"
+    },
+    "repos/systemd/systemd/commits?per_page=1": {
+     "sha": "b43fed88efe34889a49a7710a92141849dc4906d",
+     "date": "2026-10-01T14:03:46Z",
+     "html_url": "https://github.com/systemd/systemd/commit/b43fed88efe34889a49a7710a92141849dc4906d"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/microsoft/pg_durable",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/microsoft/pg_durable": {
+     "full_name": "microsoft/pg_durable",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:28:03Z",
+     "created_at": "2026-02-13T18:21:46Z",
+     "updated_at": "2026-10-01T17:16:53Z",
+     "open_issues_count": 14,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/microsoft/pg_durable"
+    },
+    "repos/microsoft/pg_durable/releases/latest": {
+     "tag_name": "v0.2.8",
+     "name": "Release v0.2.8",
+     "published_at": "2026-09-11T17:00:02Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/pg_durable/releases/tag/v0.2.8"
+    },
+    "repos/microsoft/pg_durable/commits?per_page=1": {
+     "sha": "0ba88f3cfbf9d4422fd2399c226ea7952bba41a1",
+     "date": "2026-10-01T11:53:12Z",
+     "html_url": "https://github.com/microsoft/pg_durable/commit/0ba88f3cfbf9d4422fd2399c226ea7952bba41a1"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/temporalio/temporal",
+   "captured_at": "2026-10-01T20:42:37+00:00",
+   "endpoints": {
+    "repos/temporalio/temporal": {
+     "full_name": "temporalio/temporal",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:53Z",
+     "created_at": "2019-10-16T22:15:35Z",
+     "updated_at": "2026-10-01T20:27:51Z",
+     "open_issues_count": 1042,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/temporalio/temporal"
+    },
+    "repos/temporalio/temporal/releases/latest": {
+     "tag_name": "v1.32.0",
+     "name": "v1.32.0",
+     "published_at": "2026-09-11T16:10:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0"
+    },
+    "repos/temporalio/temporal/commits?per_page=1": {
+     "sha": "95f69832293f851fdebeb6d790854918f6cfd563",
+     "date": "2026-10-01T20:16:43Z",
+     "html_url": "https://github.com/temporalio/temporal/commit/95f69832293f851fdebeb6d790854918f6cfd563"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/restatedev/restate",
+   "captured_at": "2026-10-01T20:42:37+00:00",
+   "endpoints": {
+    "repos/restatedev/restate": {
+     "full_name": "restatedev/restate",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:51:13Z",
+     "created_at": "2023-01-04T15:03:32Z",
+     "updated_at": "2026-10-01T18:33:05Z",
+     "open_issues_count": 444,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/restatedev/restate"
+    },
+    "repos/restatedev/restate/releases/latest": {
+     "tag_name": "v1.7.13",
+     "name": "v1.7.13",
+     "published_at": "2026-10-01T17:06:19Z",
+     "prerelease": false,
+     "html_url": "https://github.com/restatedev/restate/releases/tag/v1.7.13"
+    },
+    "repos/restatedev/restate/commits?per_page=1": {
+     "sha": "08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd",
+     "date": "2026-10-01T15:31:25Z",
+     "html_url": "https://github.com/restatedev/restate/commit/08a6f25b8f6ae74557d0fa78d8cdc1b1c22e92cd"
+    }
+   }
+  }
+ }
+}

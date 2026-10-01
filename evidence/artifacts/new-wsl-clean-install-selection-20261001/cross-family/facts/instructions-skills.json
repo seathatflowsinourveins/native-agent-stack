@@ -1,0 +1,343 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/instructions-skills.json",
+ "candidates": {
+  "C01": {
+   "repository": null,
+   "non_github": true
+  },
+  "C02": {
+   "repository": "https://github.com/voltagent/awesome-claude-code-subagents",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/voltagent/awesome-claude-code-subagents": {
+     "full_name": "VoltAgent/awesome-claude-code-subagents",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-21T08:24:27Z",
+     "created_at": "2025-07-30T12:31:51Z",
+     "updated_at": "2026-10-01T19:07:49Z",
+     "open_issues_count": 3,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/VoltAgent/awesome-claude-code-subagents"
+    },
+    "repos/voltagent/awesome-claude-code-subagents/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/voltagent/awesome-claude-code-subagents/commits?per_page=1": {
+     "sha": "82b73821baa7a911d5b14cfb6da238b7f0db6b42",
+     "date": "2026-09-21T08:24:27Z",
+     "html_url": "https://github.com/VoltAgent/awesome-claude-code-subagents/commit/82b73821baa7a911d5b14cfb6da238b7f0db6b42"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/openai/skills",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/openai/skills": {
+     "full_name": "openai/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-08T20:35:26Z",
+     "created_at": "2025-11-25T06:25:42Z",
+     "updated_at": "2026-10-01T20:30:35Z",
+     "open_issues_count": 301,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/openai/skills"
+    },
+    "repos/openai/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/openai/skills/commits?per_page=1": {
+     "sha": "49f948faa9258a0c61caceaf225e179651397431",
+     "date": "2026-06-24T02:36:12Z",
+     "html_url": "https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/shanraisshan/claude-code-best-practice": {
+     "full_name": "shanraisshan/claude-code-best-practice",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T06:46:26Z",
+     "created_at": "2025-10-31T14:15:28Z",
+     "updated_at": "2026-10-01T19:30:19Z",
+     "open_issues_count": 49,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/shanraisshan/claude-code-best-practice"
+    },
+    "repos/shanraisshan/claude-code-best-practice/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/shanraisshan/claude-code-best-practice/commits?per_page=1": {
+     "sha": "c7b1a7e4021a6d6ceb2667219a022dbec4281d09",
+     "date": "2026-10-01T06:45:53Z",
+     "html_url": "https://github.com/shanraisshan/claude-code-best-practice/commit/c7b1a7e4021a6d6ceb2667219a022dbec4281d09"
+    }
+   }
+  },
+  "C05": {
+   "repository": null,
+   "non_github": true
+  },
+  "C06": {
+   "repository": "https://github.com/affaan-m/ECC",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/affaan-m/ECC": {
+     "full_name": "affaan-m/ECC",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:04:07Z",
+     "created_at": "2026-01-18T00:51:51Z",
+     "updated_at": "2026-10-01T20:40:30Z",
+     "open_issues_count": 271,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/affaan-m/ECC"
+    },
+    "repos/affaan-m/ECC/releases/latest": {
+     "tag_name": "v2.2.2",
+     "name": "v2.2.2",
+     "published_at": "2026-09-30T19:04:52Z",
+     "prerelease": false,
+     "html_url": "https://github.com/affaan-m/ECC/releases/tag/v2.2.2"
+    },
+    "repos/affaan-m/ECC/commits?per_page=1": {
+     "sha": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+     "date": "2026-09-30T01:24:05Z",
+     "html_url": "https://github.com/affaan-m/ECC/commit/c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/anthropics/skills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/anthropics/skills": {
+     "full_name": "anthropics/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T02:20:07Z",
+     "created_at": "2025-09-22T15:53:31Z",
+     "updated_at": "2026-10-01T20:22:15Z",
+     "open_issues_count": 1392,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/anthropics/skills"
+    },
+    "repos/anthropics/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/anthropics/skills/commits?per_page=1": {
+     "sha": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+     "date": "2026-09-29T02:20:03Z",
+     "html_url": "https://github.com/anthropics/skills/commit/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4"
+    }
+   }
+  },
+  "C08": {
+   "repository": null,
+   "non_github": true
+  },
+  "C09": {
+   "repository": "https://github.com/typesafe-ai/skills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/typesafe-ai/skills": {
+     "full_name": "typesafe-ai/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-12T05:42:06Z",
+     "created_at": "2026-08-24T23:58:39Z",
+     "updated_at": "2026-10-01T20:26:38Z",
+     "open_issues_count": 13,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/typesafe-ai/skills"
+    },
+    "repos/typesafe-ai/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/typesafe-ai/skills/commits?per_page=1": {
+     "sha": "65a39f393687675ce170e6094757de20370365b9",
+     "date": "2026-09-12T05:42:05Z",
+     "html_url": "https://github.com/typesafe-ai/skills/commit/65a39f393687675ce170e6094757de20370365b9"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/agentskills/agentskills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/agentskills/agentskills": {
+     "full_name": "agentskills/agentskills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-08-09T20:36:04Z",
+     "created_at": "2025-12-16T15:47:19Z",
+     "updated_at": "2026-10-01T20:23:40Z",
+     "open_issues_count": 95,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/agentskills/agentskills"
+    },
+    "repos/agentskills/agentskills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/agentskills/agentskills/commits?per_page=1": {
+     "sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+     "date": "2026-08-09T20:36:04Z",
+     "html_url": "https://github.com/agentskills/agentskills/commit/69ef37e9424c0a7ea9dd2293b559e43ec8176379"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/trailofbits/skills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/trailofbits/skills": {
+     "full_name": "trailofbits/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-28T18:06:38Z",
+     "created_at": "2026-01-14T18:23:21Z",
+     "updated_at": "2026-10-01T19:46:19Z",
+     "open_issues_count": 49,
+     "has_issues": true,
+     "license_spdx": "CC-BY-SA-4.0",
+     "html_url": "https://github.com/trailofbits/skills"
+    },
+    "repos/trailofbits/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/trailofbits/skills/commits?per_page=1": {
+     "sha": "82fe8226252622fa807643bdca1710901198553a",
+     "date": "2026-09-28T18:06:37Z",
+     "html_url": "https://github.com/trailofbits/skills/commit/82fe8226252622fa807643bdca1710901198553a"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/davila7/claude-code-templates",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/davila7/claude-code-templates": {
+     "full_name": "davila7/claude-code-templates",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:18Z",
+     "created_at": "2025-07-04T01:26:26Z",
+     "updated_at": "2026-10-01T20:31:33Z",
+     "open_issues_count": 309,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/davila7/claude-code-templates"
+    },
+    "repos/davila7/claude-code-templates/releases/latest": {
+     "tag_name": "v1.29.6",
+     "name": "v1.29.6 \u2014 Claude Mods: --mod installs Anthropic-layout plugins, 24 mods",
+     "published_at": "2026-09-17T01:14:32Z",
+     "prerelease": false,
+     "html_url": "https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6"
+    },
+    "repos/davila7/claude-code-templates/commits?per_page=1": {
+     "sha": "af199a18393f673bbbeda27501a9d1c0dd84ba57",
+     "date": "2026-10-01T20:18:17Z",
+     "html_url": "https://github.com/davila7/claude-code-templates/commit/af199a18393f673bbbeda27501a9d1c0dd84ba57"
+    }
+   }
+  },
+  "C13": {
+   "repository": "https://github.com/mattpocock/skills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/mattpocock/skills": {
+     "full_name": "mattpocock/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T12:38:37Z",
+     "created_at": "2026-02-03T11:15:53Z",
+     "updated_at": "2026-10-01T20:40:17Z",
+     "open_issues_count": 543,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/mattpocock/skills"
+    },
+    "repos/mattpocock/skills/releases/latest": {
+     "tag_name": "v1.2.3",
+     "name": "v1.2.3",
+     "published_at": "2026-08-06T14:05:28Z",
+     "prerelease": false,
+     "html_url": "https://github.com/mattpocock/skills/releases/tag/v1.2.3"
+    },
+    "repos/mattpocock/skills/commits?per_page=1": {
+     "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+     "date": "2026-09-29T12:37:40Z",
+     "html_url": "https://github.com/mattpocock/skills/commit/d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    }
+   }
+  },
+  "C14": {
+   "repository": "https://github.com/vercel-labs/agent-skills",
+   "captured_at": "2026-10-01T20:42:29+00:00",
+   "endpoints": {
+    "repos/vercel-labs/agent-skills": {
+     "full_name": "vercel-labs/agent-skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-08-28T13:36:31Z",
+     "created_at": "2025-12-08T19:10:06Z",
+     "updated_at": "2026-10-01T20:27:08Z",
+     "open_issues_count": 176,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/vercel-labs/agent-skills"
+    },
+    "repos/vercel-labs/agent-skills/releases/latest": {
+     "tag_name": "agent-skills-063bee94c3f4df8453406c830b0a7df0f2860278",
+     "name": "Agent Skills 063bee94c3f4df8453406c830b0a7df0f2860278",
+     "published_at": "2026-08-28T13:36:31Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vercel-labs/agent-skills/releases/tag/agent-skills-063bee94c3f4df8453406c830b0a7df0f2860278"
+    },
+    "repos/vercel-labs/agent-skills/commits?per_page=1": {
+     "sha": "063bee94c3f4df8453406c830b0a7df0f2860278",
+     "date": "2026-08-28T13:36:07Z",
+     "html_url": "https://github.com/vercel-labs/agent-skills/commit/063bee94c3f4df8453406c830b0a7df0f2860278"
+    }
+   }
+  }
+ }
+}

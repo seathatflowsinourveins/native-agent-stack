@@ -1,0 +1,391 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/ci-supply-chain.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/actions/attest",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/actions/attest": {
+     "full_name": "actions/attest",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T22:05:21Z",
+     "created_at": "2024-02-20T19:22:19Z",
+     "updated_at": "2026-09-25T13:34:43Z",
+     "open_issues_count": 18,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/actions/attest"
+    },
+    "repos/actions/attest/releases/latest": {
+     "tag_name": "v4.2.2",
+     "name": "v4.2.2",
+     "published_at": "2026-08-04T20:36:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/actions/attest/releases/tag/v4.2.2"
+    },
+    "repos/actions/attest/commits?per_page=1": {
+     "sha": "a0eb68d51f3a5d373e107cfa9c8455ba800479cd",
+     "date": "2026-09-24T18:16:26Z",
+     "html_url": "https://github.com/actions/attest/commit/a0eb68d51f3a5d373e107cfa9c8455ba800479cd"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/boostsecurityio/poutine",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/boostsecurityio/poutine": {
+     "full_name": "boostsecurityio/poutine",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-07-09T18:40:29Z",
+     "created_at": "2024-04-09T17:59:41Z",
+     "updated_at": "2026-09-30T07:48:26Z",
+     "open_issues_count": 21,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/boostsecurityio/poutine"
+    },
+    "repos/boostsecurityio/poutine/releases/latest": {
+     "tag_name": "v1.1.6",
+     "name": "v1.1.6",
+     "published_at": "2026-05-22T20:06:25Z",
+     "prerelease": false,
+     "html_url": "https://github.com/boostsecurityio/poutine/releases/tag/v1.1.6"
+    },
+    "repos/boostsecurityio/poutine/commits?per_page=1": {
+     "sha": "bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6",
+     "date": "2026-07-09T18:40:29Z",
+     "html_url": "https://github.com/boostsecurityio/poutine/commit/bd4c1f86fe8cfe61b456f1ea2b2106ce0cac51d6"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/zizmorcore/zizmor": {
+     "full_name": "zizmorcore/zizmor",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T05:10:59Z",
+     "created_at": "2024-08-19T18:26:28Z",
+     "updated_at": "2026-10-01T19:22:14Z",
+     "open_issues_count": 164,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/zizmorcore/zizmor"
+    },
+    "repos/zizmorcore/zizmor/releases/latest": {
+     "tag_name": "v1.30.1",
+     "name": "v1.30.1",
+     "published_at": "2026-09-09T05:34:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1"
+    },
+    "repos/zizmorcore/zizmor/commits?per_page=1": {
+     "sha": "7edf1f06b3da7b9093f85b583014a9f9036dc496",
+     "date": "2026-10-01T04:50:38Z",
+     "html_url": "https://github.com/zizmorcore/zizmor/commit/7edf1f06b3da7b9093f85b583014a9f9036dc496"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/gitleaks/gitleaks",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/gitleaks/gitleaks": {
+     "full_name": "gitleaks/gitleaks",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-30T04:14:02Z",
+     "created_at": "2018-01-27T18:19:31Z",
+     "updated_at": "2026-10-01T19:30:14Z",
+     "open_issues_count": 489,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/gitleaks/gitleaks"
+    },
+    "repos/gitleaks/gitleaks/releases/latest": {
+     "tag_name": "v8.30.1",
+     "name": "v8.30.1",
+     "published_at": "2026-03-21T02:17:58Z",
+     "prerelease": false,
+     "html_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1"
+    },
+    "repos/gitleaks/gitleaks/commits?per_page=1": {
+     "sha": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b",
+     "date": "2026-07-22T16:50:33Z",
+     "html_url": "https://github.com/gitleaks/gitleaks/commit/b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/aquasecurity/trivy",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/aquasecurity/trivy": {
+     "full_name": "aquasecurity/trivy",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T14:49:42Z",
+     "created_at": "2019-04-11T01:01:07Z",
+     "updated_at": "2026-10-01T20:35:02Z",
+     "open_issues_count": 252,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/aquasecurity/trivy"
+    },
+    "repos/aquasecurity/trivy/releases/latest": {
+     "tag_name": "v0.75.0",
+     "name": "v0.75.0",
+     "published_at": "2026-10-01T13:34:13Z",
+     "prerelease": false,
+     "html_url": "https://github.com/aquasecurity/trivy/releases/tag/v0.75.0"
+    },
+    "repos/aquasecurity/trivy/commits?per_page=1": {
+     "sha": "0976d5a1ec988f97cf843bed72fca7c8cd30e31b",
+     "date": "2026-10-01T13:49:07Z",
+     "html_url": "https://github.com/aquasecurity/trivy/commit/0976d5a1ec988f97cf843bed72fca7c8cd30e31b"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/kjanat/actionlint",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/kjanat/actionlint": {
+     "full_name": "kjanat/actionlint",
+     "archived": false,
+     "disabled": false,
+     "fork": true,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T14:47:26Z",
+     "created_at": "2026-08-07T03:31:46Z",
+     "updated_at": "2026-09-30T11:41:40Z",
+     "open_issues_count": 61,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/kjanat/actionlint"
+    },
+    "repos/kjanat/actionlint/releases/latest": {
+     "tag_name": "v1.17.0",
+     "name": "v1.17.0",
+     "published_at": "2026-09-13T16:07:47Z",
+     "prerelease": false,
+     "html_url": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0"
+    },
+    "repos/kjanat/actionlint/commits?per_page=1": {
+     "sha": "f45fbd2f408424ef20fa300d6b8386ba92a3d3d7",
+     "date": "2026-09-25T14:28:28Z",
+     "html_url": "https://github.com/kjanat/actionlint/commit/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/anchore/syft",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/anchore/syft": {
+     "full_name": "anchore/syft",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:00:53Z",
+     "created_at": "2020-05-07T18:19:29Z",
+     "updated_at": "2026-10-01T19:00:57Z",
+     "open_issues_count": 641,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/anchore/syft"
+    },
+    "repos/anchore/syft/releases/latest": {
+     "tag_name": "v1.52.0",
+     "name": "v1.52.0",
+     "published_at": "2026-09-17T14:38:17Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0"
+    },
+    "repos/anchore/syft/commits?per_page=1": {
+     "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+     "date": "2026-10-01T19:00:50Z",
+     "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/anchore/grype",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/anchore/grype": {
+     "full_name": "anchore/grype",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:56:16Z",
+     "created_at": "2020-05-26T13:44:38Z",
+     "updated_at": "2026-10-01T19:56:26Z",
+     "open_issues_count": 413,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/anchore/grype"
+    },
+    "repos/anchore/grype/releases/latest": {
+     "tag_name": "v0.119.0",
+     "name": "v0.119.0",
+     "published_at": "2026-09-17T16:45:23Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anchore/grype/releases/tag/v0.119.0"
+    },
+    "repos/anchore/grype/commits?per_page=1": {
+     "sha": "8ba5f6933bf8388364edd0f3cf2c18f32dbdf601",
+     "date": "2026-10-01T19:56:15Z",
+     "html_url": "https://github.com/anchore/grype/commit/8ba5f6933bf8388364edd0f3cf2c18f32dbdf601"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/dependabot/dependabot-core": {
+     "full_name": "dependabot/dependabot-core",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:14:56Z",
+     "created_at": "2017-06-02T12:23:31Z",
+     "updated_at": "2026-10-01T19:15:03Z",
+     "open_issues_count": 1555,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/dependabot/dependabot-core"
+    },
+    "repos/dependabot/dependabot-core/releases/latest": {
+     "tag_name": "v0.398.0",
+     "name": "v0.398.0",
+     "published_at": "2026-09-28T03:51:27Z",
+     "prerelease": false,
+     "html_url": "https://github.com/dependabot/dependabot-core/releases/tag/v0.398.0"
+    },
+    "repos/dependabot/dependabot-core/commits?per_page=1": {
+     "sha": "ea7cdf5880a156375eedf0105dc69188164cfbad",
+     "date": "2026-10-01T19:14:51Z",
+     "html_url": "https://github.com/dependabot/dependabot-core/commit/ea7cdf5880a156375eedf0105dc69188164cfbad"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/github/codeql-action",
+   "captured_at": "2026-10-01T20:42:21+00:00",
+   "endpoints": {
+    "repos/github/codeql-action": {
+     "full_name": "github/codeql-action",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T17:11:51Z",
+     "created_at": "2020-04-27T20:36:30Z",
+     "updated_at": "2026-09-29T17:47:12Z",
+     "open_issues_count": 194,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/github/codeql-action"
+    },
+    "repos/github/codeql-action/releases/latest": {
+     "tag_name": "codeql-bundle-v2.27.1",
+     "name": "CodeQL Bundle v2.27.1",
+     "published_at": "2026-09-22T17:10:11Z",
+     "prerelease": false,
+     "html_url": "https://github.com/github/codeql-action/releases/tag/codeql-bundle-v2.27.1"
+    },
+    "repos/github/codeql-action/commits?per_page=1": {
+     "sha": "61817fadad823920a8924645dd5f67985d6a1d94",
+     "date": "2026-09-29T17:31:06Z",
+     "html_url": "https://github.com/github/codeql-action/commit/61817fadad823920a8924645dd5f67985d6a1d94"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/rhysd/actionlint",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/rhysd/actionlint": {
+     "full_name": "rhysd/actionlint",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-07-16T06:05:57Z",
+     "created_at": "2021-05-25T11:27:00Z",
+     "updated_at": "2026-10-01T15:47:29Z",
+     "open_issues_count": 196,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/rhysd/actionlint"
+    },
+    "repos/rhysd/actionlint/releases/latest": {
+     "tag_name": "v1.7.12",
+     "name": "v1.7.12",
+     "published_at": "2026-03-30T17:49:21Z",
+     "prerelease": false,
+     "html_url": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12"
+    },
+    "repos/rhysd/actionlint/commits?per_page=1": {
+     "sha": "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7",
+     "date": "2026-04-19T14:46:58Z",
+     "html_url": "https://github.com/rhysd/actionlint/commit/011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/google/osv-scanner",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/google/osv-scanner": {
+     "full_name": "google/osv-scanner",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:04:32Z",
+     "created_at": "2022-11-14T01:05:20Z",
+     "updated_at": "2026-10-01T20:18:32Z",
+     "open_issues_count": 114,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/google/osv-scanner"
+    },
+    "repos/google/osv-scanner/releases/latest": {
+     "tag_name": "v2.6.0",
+     "name": "v2.6.0",
+     "published_at": "2026-09-14T02:55:16Z",
+     "prerelease": false,
+     "html_url": "https://github.com/google/osv-scanner/releases/tag/v2.6.0"
+    },
+    "repos/google/osv-scanner/commits?per_page=1": {
+     "sha": "6e5a83feb532cb873a10184073853125c5fab523",
+     "date": "2026-10-01T01:20:31Z",
+     "html_url": "https://github.com/google/osv-scanner/commit/6e5a83feb532cb873a10184073853125c5fab523"
+    }
+   }
+  }
+ }
+}

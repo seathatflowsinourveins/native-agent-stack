@@ -1,0 +1,239 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/native-clients.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/openclaw/mcporter",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/openclaw/mcporter": {
+     "full_name": "openclaw/mcporter",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:43:11Z",
+     "created_at": "2025-11-05T03:29:59Z",
+     "updated_at": "2026-10-01T18:43:14Z",
+     "open_issues_count": 0,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/openclaw/mcporter"
+    },
+    "repos/openclaw/mcporter/releases/latest": {
+     "tag_name": "v0.14.2",
+     "name": "mcporter 0.14.2",
+     "published_at": "2026-10-01T18:24:07Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2"
+    },
+    "repos/openclaw/mcporter/commits?per_page=1": {
+     "sha": "9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392",
+     "date": "2026-10-01T18:43:09Z",
+     "html_url": "https://github.com/openclaw/mcporter/commit/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/anthropics/claude-code",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-code": {
+     "full_name": "anthropics/claude-code",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:43:10Z",
+     "created_at": "2025-02-22T17:41:21Z",
+     "updated_at": "2026-10-01T20:23:20Z",
+     "open_issues_count": 14032,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/anthropics/claude-code"
+    },
+    "repos/anthropics/claude-code/releases/latest": {
+     "tag_name": "v2.1.287",
+     "name": "v2.1.287",
+     "published_at": "2026-10-01T18:00:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.287"
+    },
+    "repos/anthropics/claude-code/commits?per_page=1": {
+     "sha": "52c76441cae91f6891e4712306bffb057ff6fec5",
+     "date": "2026-10-01T18:43:08Z",
+     "html_url": "https://github.com/anthropics/claude-code/commit/52c76441cae91f6891e4712306bffb057ff6fec5"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/letta-ai/letta",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/letta-ai/letta": {
+     "full_name": "letta-ai/letta",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-10T17:59:08Z",
+     "created_at": "2023-10-11T07:38:37Z",
+     "updated_at": "2026-10-01T19:53:25Z",
+     "open_issues_count": 0,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/letta-ai/letta"
+    },
+    "repos/letta-ai/letta/releases/latest": {
+     "tag_name": "0.16.8",
+     "name": "v0.16.8",
+     "published_at": "2026-05-14T17:14:24Z",
+     "prerelease": false,
+     "html_url": "https://github.com/letta-ai/letta/releases/tag/0.16.8"
+    },
+    "repos/letta-ai/letta/commits?per_page=1": {
+     "sha": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+     "date": "2026-09-10T17:59:06Z",
+     "html_url": "https://github.com/letta-ai/letta/commit/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/letta-ai/letta-code",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/letta-ai/letta-code": {
+     "full_name": "letta-ai/letta-code",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:34Z",
+     "created_at": "2025-10-25T04:17:51Z",
+     "updated_at": "2026-10-01T20:40:40Z",
+     "open_issues_count": 475,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/letta-ai/letta-code"
+    },
+    "repos/letta-ai/letta-code/releases/latest": {
+     "tag_name": "v0.34.1",
+     "name": "Release v0.34.1",
+     "published_at": "2026-09-30T21:25:18Z",
+     "prerelease": false,
+     "html_url": "https://github.com/letta-ai/letta-code/releases/tag/v0.34.1"
+    },
+    "repos/letta-ai/letta-code/commits?per_page=1": {
+     "sha": "38a280c6682fc05b12175b421a5a3ff5f25d816d",
+     "date": "2026-10-01T20:40:31Z",
+     "html_url": "https://github.com/letta-ai/letta-code/commit/38a280c6682fc05b12175b421a5a3ff5f25d816d"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-agent-sdk-python": {
+     "full_name": "anthropics/claude-agent-sdk-python",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:01:48Z",
+     "created_at": "2025-06-11T21:33:43Z",
+     "updated_at": "2026-10-01T18:02:00Z",
+     "open_issues_count": 520,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python"
+    },
+    "repos/anthropics/claude-agent-sdk-python/releases/latest": {
+     "tag_name": "v0.2.163",
+     "name": "v0.2.163",
+     "published_at": "2026-09-30T19:47:45Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163"
+    },
+    "repos/anthropics/claude-agent-sdk-python/commits?per_page=1": {
+     "sha": "bfb895c6ef46e095191938b4eda798a025957c09",
+     "date": "2026-10-01T18:01:46Z",
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python/commit/bfb895c6ef46e095191938b4eda798a025957c09"
+    }
+   }
+  },
+  "C06": {
+   "repository": null,
+   "non_github": true
+  },
+  "C07": {
+   "repository": "https://github.com/openai/openai-agents-python",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/openai/openai-agents-python": {
+     "full_name": "openai/openai-agents-python",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:37:05Z",
+     "created_at": "2025-03-11T03:42:36Z",
+     "updated_at": "2026-10-01T20:18:21Z",
+     "open_issues_count": 5,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/openai/openai-agents-python"
+    },
+    "repos/openai/openai-agents-python/releases/latest": {
+     "tag_name": "v0.22.3",
+     "name": "v0.22.3",
+     "published_at": "2026-09-17T22:19:05Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/openai-agents-python/releases/tag/v0.22.3"
+    },
+    "repos/openai/openai-agents-python/commits?per_page=1": {
+     "sha": "f9da374e17a6ee09c5831e8a0075e7b6e9f1081b",
+     "date": "2026-10-01T17:38:44Z",
+     "html_url": "https://github.com/openai/openai-agents-python/commit/f9da374e17a6ee09c5831e8a0075e7b6e9f1081b"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/openai/codex",
+   "captured_at": "2026-10-01T20:42:32+00:00",
+   "endpoints": {
+    "repos/openai/codex": {
+     "full_name": "openai/codex",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:17:50Z",
+     "created_at": "2025-04-13T05:37:54Z",
+     "updated_at": "2026-10-01T20:30:37Z",
+     "open_issues_count": 20039,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openai/codex"
+    },
+    "repos/openai/codex/releases/latest": {
+     "tag_name": "rust-v0.160.0",
+     "name": "0.160.0",
+     "published_at": "2026-10-01T20:19:13Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0"
+    },
+    "repos/openai/codex/commits?per_page=1": {
+     "sha": "960e878df4bf87b9d7fa0849f14561d7cdcca942",
+     "date": "2026-10-01T20:17:34Z",
+     "html_url": "https://github.com/openai/codex/commit/960e878df4bf87b9d7fa0849f14561d7cdcca942"
+    }
+   }
+  },
+  "C09": {
+   "repository": null,
+   "non_github": true
+  }
+ }
+}

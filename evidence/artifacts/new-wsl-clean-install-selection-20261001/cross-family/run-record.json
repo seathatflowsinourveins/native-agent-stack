@@ -1,0 +1,426 @@
+{
+ "kind": "cross_family_run_record",
+ "records": [
+  {
+   "run_id": "J01",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 871.9,
+   "usage": {
+    "input_tokens": 1528693,
+    "cached_input_tokens": 1373824,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 20860,
+    "reasoning_output_tokens": 11623
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J01",
+   "key_coverage": {
+    "native-clients": [],
+    "instructions-skills": []
+   }
+  },
+  {
+   "run_id": "J02",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 980.1,
+   "usage": {
+    "input_tokens": 880884,
+    "cached_input_tokens": 752384,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 21500,
+    "reasoning_output_tokens": 14289
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J02",
+   "key_coverage": {
+    "workers": [],
+    "isolation": []
+   }
+  },
+  {
+   "run_id": "J03",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1100.9,
+   "usage": {
+    "input_tokens": 1852416,
+    "cached_input_tokens": 1687168,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 25860,
+    "reasoning_output_tokens": 16491
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J03",
+   "key_coverage": {
+    "code-navigation": [],
+    "document-retrieval": []
+   }
+  },
+  {
+   "run_id": "J04",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1394.7,
+   "usage": {
+    "input_tokens": 1958808,
+    "cached_input_tokens": 1810816,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 29125,
+    "reasoning_output_tokens": 14557
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J04",
+   "key_coverage": {
+    "semantic-rag": [],
+    "durable-memory": []
+   }
+  },
+  {
+   "run_id": "J05",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 828.8,
+   "usage": {
+    "input_tokens": 965334,
+    "cached_input_tokens": 830080,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 20428,
+    "reasoning_output_tokens": 12690
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J05",
+   "key_coverage": {
+    "web-research": [],
+    "token-efficiency": []
+   }
+  },
+  {
+   "run_id": "J07",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1120.3,
+   "usage": {
+    "input_tokens": 1061861,
+    "cached_input_tokens": 933760,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 25302,
+    "reasoning_output_tokens": 16869
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J07",
+   "key_coverage": {
+    "scheduling-supervision": [],
+    "hosting-services": []
+   }
+  },
+  {
+   "run_id": "J09",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 667.9,
+   "usage": {
+    "input_tokens": 747663,
+    "cached_input_tokens": 637312,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 17583,
+    "reasoning_output_tokens": 10889
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J09",
+   "key_coverage": {
+    "agent-sdks": [],
+    "mcp-surfaces": []
+   }
+  },
+  {
+   "run_id": "J06",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1530.0,
+   "usage": {
+    "input_tokens": 1997337,
+    "cached_input_tokens": 1825408,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 36741,
+    "reasoning_output_tokens": 21042
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J06",
+   "key_coverage": {
+    "quality-evaluation": [],
+    "ci-supply-chain": []
+   }
+  },
+  {
+   "run_id": "J08",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1192.6,
+   "usage": {
+    "input_tokens": 1793405,
+    "cached_input_tokens": 1646336,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 27102,
+    "reasoning_output_tokens": 14952
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J08",
+   "key_coverage": {
+    "recovery-portability": [],
+    "observation-inference": []
+   }
+  },
+  {
+   "run_id": "J11",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 389.1,
+   "usage": {
+    "input_tokens": 407660,
+    "cached_input_tokens": 322304,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 9680,
+    "reasoning_output_tokens": 6713
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J11",
+   "key_coverage": {
+    "cross:wsl-distro": []
+   }
+  },
+  {
+   "run_id": "J10",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1000.3,
+   "usage": {
+    "input_tokens": 1128510,
+    "cached_input_tokens": 1000064,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 24793,
+    "reasoning_output_tokens": 17151
+   },
+   "problems": []
+  },
+  {
+   "run_id": "J10",
+   "key_coverage": {
+    "secrets-credentials": [],
+    "git-github-automation": []
+   }
+  },
+  {
+   "run_id": "C-G1",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1307.0,
+   "usage": {
+    "input_tokens": 1978522,
+    "cached_input_tokens": 1791744,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 32703,
+    "reasoning_output_tokens": 16677
+   },
+   "problems": []
+  },
+  {
+   "run_id": "C-G2",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1608.5,
+   "usage": {
+    "input_tokens": 2959827,
+    "cached_input_tokens": 2688512,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 38778,
+    "reasoning_output_tokens": 21651
+   },
+   "problems": []
+  },
+  {
+   "run_id": "C-G3",
+   "attempt": 1,
+   "exit": 0,
+   "seconds": 1188.0,
+   "usage": {
+    "input_tokens": 1383240,
+    "cached_input_tokens": 1236608,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 29950,
+    "reasoning_output_tokens": 18533
+   },
+   "problems": []
+  }
+ ],
+ "audit": {
+  "C-G1.a1": {
+   "web_searches": 9,
+   "pages_opened": 19,
+   "commands": 0,
+   "flags": []
+  },
+  "C-G2.a1": {
+   "web_searches": 26,
+   "pages_opened": 26,
+   "commands": 0,
+   "flags": []
+  },
+  "C-G3.a1": {
+   "web_searches": 16,
+   "pages_opened": 7,
+   "commands": 6,
+   "flags": []
+  },
+  "J01.a1": {
+   "web_searches": 6,
+   "pages_opened": 13,
+   "commands": 2,
+   "flags": []
+  },
+  "J02.a1": {
+   "web_searches": 4,
+   "pages_opened": 5,
+   "commands": 1,
+   "flags": []
+  },
+  "J03.a1": {
+   "web_searches": 4,
+   "pages_opened": 13,
+   "commands": 4,
+   "flags": []
+  },
+  "J04.a1": {
+   "web_searches": 3,
+   "pages_opened": 5,
+   "commands": 2,
+   "flags": []
+  },
+  "J05.a1": {
+   "web_searches": 4,
+   "pages_opened": 15,
+   "commands": 4,
+   "flags": []
+  },
+  "J06.a1": {
+   "web_searches": 8,
+   "pages_opened": 15,
+   "commands": 4,
+   "flags": []
+  },
+  "J07.a1": {
+   "web_searches": 4,
+   "pages_opened": 15,
+   "commands": 4,
+   "flags": []
+  },
+  "J08.a1": {
+   "web_searches": 2,
+   "pages_opened": 6,
+   "commands": 2,
+   "flags": []
+  },
+  "J09.a1": {
+   "web_searches": 4,
+   "pages_opened": 8,
+   "commands": 4,
+   "flags": []
+  },
+  "J10.a1": {
+   "web_searches": 8,
+   "pages_opened": 10,
+   "commands": 4,
+   "flags": []
+  },
+  "J11.a1": {
+   "web_searches": 2,
+   "pages_opened": 3,
+   "commands": 2,
+   "flags": []
+  }
+ },
+ "private_originals_sha256": {
+  "C-G1.a1.events.jsonl": "f8d2eeb0ddadeaf15f415e6de86eab4ccdaaf7d3c3ba10be398bd0658a421aaa",
+  "C-G1.a1.last.json": "468b55b3da71535a1e38ef815afd9134eb8f37edc102cbddd4ac69d6c2eb28e0",
+  "C-G1.a1.prompt.txt": "2f143aa7cfec0b57cc78f8d32bbdd41dde091ef9f26c1ba8ff4022556b58e0fe",
+  "C-G1.a1.stderr.txt": "024cf23852fc0520d72c049202bdea3a0fb4c1defb6228e5b1af0916e7387c3e",
+  "C-G2.a1.events.jsonl": "29b7489156cbe4f47329bf2a87178309cb138fffac99db1746b5c8f3956942f9",
+  "C-G2.a1.last.json": "9d076c6394c3ad945a9a779a52a123ce2c24388ed47477094b53a8f302e9f0b1",
+  "C-G2.a1.prompt.txt": "334bcb801564dbd6695df93c1d711d011bea2946733bd7227ad2f443e1273274",
+  "C-G2.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "C-G3.a1.events.jsonl": "b27a0589d2552e389b8ed1d762c92619895804a33376f30ea46e7956279f3495",
+  "C-G3.a1.last.json": "677346391b08e908d9530047ee79261a77bc81b156907b3a526730471c11a097",
+  "C-G3.a1.prompt.txt": "09d31bee602ea645435dc61fcb55a91b70875a33da1252cf6bbc71a7f1919233",
+  "C-G3.a1.stderr.txt": "6b4f8d58af8278864c804654d17e094d3ffa34725ac90f8b5f1d354417c2d672",
+  "J01.a1.events.jsonl": "720dfd18b95dbe800205ac39a3fef790a7bf1949f75711d541124c969e749ec1",
+  "J01.a1.last.json": "e3229e886b7a983aabde5e0eb16e9b11ee3049d7158f82104100c632ecf1aa24",
+  "J01.a1.prompt.txt": "71fce4732a2ff9ed77f342e126dda57053a0a75e12f16e3bda03e68600e6ff5f",
+  "J01.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "J02.a1.events.jsonl": "89956edd3e38e99daca0df8dba07bfb397778185b5ede352b622acee6f8f3861",
+  "J02.a1.last.json": "69a1f7a77be8765cad70564a59ebb3855327608f0b9fdf578c32c4a35c4889a4",
+  "J02.a1.prompt.txt": "85a24969d01f98ad460e675382a2755890e329cbdf211f7b507163e1c8b40645",
+  "J02.a1.stderr.txt": "1e4d34359b6ad113ad3f90d57046a3b9ab0f3b2206b319a72d1594bd08c2bb34",
+  "J03.a1.events.jsonl": "8a270a92ecefce0c4df4f208304b77b73502d6e82c80b19e817e01a78868426e",
+  "J03.a1.last.json": "6d4e4e54d7bd05df3395ca5f9e05c169f849f3a9ad47f74c3e1e5afeec7b4939",
+  "J03.a1.prompt.txt": "e8d51124906c2fe5b0878cb15cb4d22213c4654a771392125c88bd91ce5966c4",
+  "J03.a1.stderr.txt": "294f8a58d7b10b97d6eb220723b5f77df380c29173f20db0b84f6ef80950943c",
+  "J04.a1.events.jsonl": "816c60d1ff47570add49ddf02cfe837ecdaad778c82c6a0d7af7faccd8485915",
+  "J04.a1.last.json": "844163f8afa67ad05adc60d67b43484147d0d02c32dc09331e0d11a27c438b89",
+  "J04.a1.prompt.txt": "6d4e2282e7322fed1b655e989a3b5e520ffe4f88de28137d0790ec613336e486",
+  "J04.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "J05.a1.events.jsonl": "f7aa604486fad912040774dbd3085d303afacea4a3497f45391a9e88bdab8c56",
+  "J05.a1.last.json": "c40cdc331857694cbf1b78a4d9622c3c0d40dda82e4d15a51fa954f80518c517",
+  "J05.a1.prompt.txt": "92653bebaadb934c106eef6bd832563bf31e9ba087dd5d02937dd5a2629de64c",
+  "J05.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "J06.a1.events.jsonl": "d6b3978388a51e98fdd49f3af4613d5eac59bacdc1ea946ffd9dc1fb15f42798",
+  "J06.a1.last.json": "7212c8608c27e0f2c854dc57b7df6ebb582148ededefac2f1e60bd4131eaa407",
+  "J06.a1.prompt.txt": "65fa01cc5138a7a88636baa889c21fc863d8bf7fe42538a5c5282ad5270a53fb",
+  "J06.a1.stderr.txt": "2b47b4d7f9237dded5af110bf9ebbb393a23a27a7ab52d5ec715aad7d920214c",
+  "J07.a1.events.jsonl": "82047c31c1eda32a249065ba66141413a4a0fbaff066917858a87bdea348670c",
+  "J07.a1.last.json": "2820cee0d9bead7bd681c6cf2fc6e61dc3570335d1761f62e7801f9847f31463",
+  "J07.a1.prompt.txt": "174cd91c7012c3e391684d75b66817e995643a433e2000c55363759c4c9320c8",
+  "J07.a1.stderr.txt": "a0a1c1eea7555b75b3e8f9ee243c3922a4cb37226dacbafc280454fa06ffae0d",
+  "J08.a1.events.jsonl": "a972a10a787dc43ec26d4fcd811cae441359d7b067049c7b10f59ec2f52df1ab",
+  "J08.a1.last.json": "3798ec40948db7d462bbd6b0477e8ea372ec6aadaac770ac18a78f18ae46dc58",
+  "J08.a1.prompt.txt": "dac2241b3447cde26fea5415ecb6e992313772ee3166c54ed531f36584094fc3",
+  "J08.a1.stderr.txt": "629022f61861c927b05d1bb710f67a3a8da091ef8b56abb460846008f699f362",
+  "J09.a1.events.jsonl": "b54e019d0de44453f528c3033003d09efc8b59c262d0ee199aa405b89d7f4c23",
+  "J09.a1.last.json": "355ee3650c3f47fe608290b4668cfdcc8ad639454ef826c7c44a076904f5b4c8",
+  "J09.a1.prompt.txt": "826e1443ecaf7b916d7ca6d09eeca5098e1d8520616aaef69f60cb79c43e0619",
+  "J09.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "J10.a1.events.jsonl": "57ffd27010783ce1cca27f2f69db4b8bf6778785c463e6e4c4b01f59a52a3469",
+  "J10.a1.last.json": "c4c37f1d524677bd62954f080d142388c50acf6098cf79bbd9a5e12e9bf58644",
+  "J10.a1.prompt.txt": "0aa38cf951eac4c2de947ba4a8cd32dc12bb0887592a1f9a6520b7c8ac05e4f2",
+  "J10.a1.stderr.txt": "7bea7a55053550a0757dac5126c8f0a4721a25d843d7e3289c1d8c4d62a56a5f",
+  "J11.a1.events.jsonl": "e5b4ddb9340567bf7bdb91eabeaa39b1101b56b6fe67a2eff320271e3ec4e151",
+  "J11.a1.last.json": "1b67071696a0192ab4420c71138b3ad7a4e6f25547b163324d53f08b3ffa17f9",
+  "J11.a1.prompt.txt": "98a9ed26acb3143e0c61799f1d112ef6f365f267852ae16f1ed191074e51b95f",
+  "J11.a1.stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+  "results.json": "0e36404d73fc3ae03af57fe3fcfb387ed41dd7d0432a80b4016679a69692fb10",
+  "run.log": "9558d32b43ead49495f3f589dcc241045772500d9d8422add40732aad12b23f0",
+  "runner.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runner.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "summary.json": "cdb505919982ba6061a30d71af33baa91b479da1c27a975afbc79af4ec1f46ee"
+ }
+}

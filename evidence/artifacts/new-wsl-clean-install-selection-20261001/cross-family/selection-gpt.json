@@ -1,0 +1,3019 @@
+{
+ "kind": "cross_family_blind_selection",
+ "family": "OpenAI GPT-6.1 Sol through Codex CLI 0.159.3, model_reasoning_effort=max, live web search, read-only sandbox, ephemeral sessions",
+ "run": {
+  "model": "gpt-6.1-sol",
+  "effort": "max",
+  "finished_at": "2026-10-01T21:58:06+00:00",
+  "processes": 14,
+  "attempts": 14
+ },
+ "contamination_audit": {
+  "status": "clean",
+  "flagged": {}
+ },
+ "layers": [
+  {
+   "layer_id": "native-clients",
+   "judge": "J01",
+   "critic": "C-G1",
+   "critic_verdict": "upheld",
+   "status": "recommended",
+   "picks": [
+    {
+     "key": "C08",
+     "name": "Codex",
+     "repository": "https://github.com/openai/codex",
+     "role": "Native client for existing ChatGPT accounts, coding, bounded research, model selection, MCP tools and resumable sessions.",
+     "install_command": "npm install -g @openai/codex",
+     "install_source": "https://github.com/openai/codex",
+     "confidence": "high"
+    },
+    {
+     "key": "C02",
+     "name": "Claude Code",
+     "repository": "https://github.com/anthropics/claude-code",
+     "role": "Complementary native client for existing eligible Anthropic accounts, coding tools, model selection and saved sessions.",
+     "install_command": "curl -fsSL https://claude.ai/install.sh | bash",
+     "install_source": "https://code.claude.com/docs/en/setup",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "The complementary native-client selection stands on documented account and capability fit. Compare C02 with C05, or C08 with C07, only for a specified missing event/tool/recovery requirement, preserving identical account access and independently checking completed-task correctness.",
+   "deciding_comparison": "The complementary native-client selection follows documented capability fit, not measured superiority. Neither packet records a completed comparison. On WSL2 Ubuntu x86_64, pin versions and identical tasks, accounts, models and permitted effects; compare tool/event coverage, interruption/resume recovery, permission-denial behavior, MCP failures, completed-task correctness, latency and whole-task usage. Check macOS arm64 separately. Add an SDK only when it closes the frozen missing requirement. Captured repositories expose issue reporting, but issue-resolution health and passing CI at the selected revisions remain unverified.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "MCPorter provides useful MCP discovery, calls and generated CLIs, but no missing native-client integration requirement establishes a need for this additional bridge."
+    },
+    {
+     "key": "C03",
+     "reason": "The server candidate has a current captured commit but a latest release outside 90 days; native account-backed coding and session parity were not established."
+    },
+    {
+     "key": "C04",
+     "reason": "Letta Code documents local/cloud backends and provider/model selection, but no matched comparison establishes an advantage in native account, tool or recovery behavior."
+    },
+    {
+     "key": "C05",
+     "reason": "The SDK bundles Claude Code and adds Python hooks/tools; select it only when a concrete missing programmatic event, tool or recovery requirement justifies the wrapper."
+    },
+    {
+     "key": "C06",
+     "reason": "This grouped entry has no repository locator, preventing a verified artifact-specific assessment of releases, maintenance, installation and session compatibility."
+    },
+    {
+     "key": "C07",
+     "reason": "The SDK publishes deterministic/integration tests and a Codex-tool example, but introduces application orchestration without an identified requirement the native client cannot satisfy."
+    },
+    {
+     "key": "C09",
+     "reason": "This multi-project entry has no repository locators; its constituent clients cannot receive a single verified maintenance, platform or capability judgment."
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C08": [
+     {
+      "claim": "The README documents ChatGPT sign-in, Linux x86_64 binaries and macOS arm64 binaries. This directly fits the account and host requirements.",
+      "url": "https://github.com/openai/codex"
+     },
+     {
+      "claim": "Official CLI documentation describes saved-session resume, live web search, MCP integration and configurable execution permissions. These are capability claims, not measured superiority.",
+      "url": "https://learn.chatgpt.com/docs/codex/cli"
+     },
+     {
+      "claim": "Captured GitHub facts at 2026-10-01T20:42:32Z report an unarchived repository and a default-branch commit dated 2026-10-01.",
+      "url": "https://github.com/openai/codex/commit/960e878df4bf87b9d7fa0849f14561d7cdcca942"
+     },
+     {
+      "claim": "The captured latest stable release is rust-v0.160.0, published 2026-10-01.",
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0"
+     },
+     {
+      "claim": "Upstream publishes Cargo/nextest CI coverage across platforms. This establishes a reproducible testing mechanism; passing CI for the captured release was not verified.",
+      "url": "https://github.com/openai/codex/blob/main/.github/workflows/README.md"
+     },
+     {
+      "claim": "A reviewed public CI run reports a Windows x64 build failure and failed aggregate CI. That historical result is retained and is not evidence that the selected Linux release fails.",
+      "url": "https://github.com/openai/codex/actions/runs/31220846597"
+     }
+    ],
+    "C02": [
+     {
+      "claim": "Official setup documentation supports Ubuntu, WSL2 and macOS with x64 or ARM64 processors, and documents browser authentication with eligible subscription or Console accounts.",
+      "url": "https://code.claude.com/docs/en/setup"
+     },
+     {
+      "claim": "The CLI exposes resume/continue, model selection, MCP configuration, tool restrictions and turn/budget controls for unattended work.",
+      "url": "https://code.claude.com/docs/en/cli-reference"
+     },
+     {
+      "claim": "Captured GitHub facts at 2026-10-01T20:42:31Z report an unarchived repository and a default-branch commit dated 2026-10-01.",
+      "url": "https://github.com/anthropics/claude-code/commit/52c76441cae91f6891e4712306bffb057ff6fec5"
+     },
+     {
+      "claim": "The captured latest stable release is v2.1.287, published 2026-10-01.",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.287"
+     },
+     {
+      "claim": "The public repository documents installation, plugins and issue reporting. A reproducible full-client test suite or matched WSL2 performance evaluation was not established in the reviewed sources. Full-client open-source status was not established; license is informational under the frozen criteria.",
+      "url": "https://github.com/anthropics/claude-code"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "No key factual error or popularity/current-installation preference was identified. Existing-account compatibility is an explicit criterion.",
+    "Release-specific passing CI, issue-resolution health and comparative task performance remain unverified. Public nextest commands establish testing machinery, not passing results. [Test instructions](https://github.com/openai/codex/blob/main/docs/install.md)",
+    "Claude's turn and dollar limits apply to print mode; resumed historical spend does not count toward the current dollar cap. These controls should not be described as universal session limits. [CLI reference](https://code.claude.com/docs/en/cli-reference)",
+    "Audit budget: four page opens and fifteen distinct captured API answers; no live API calls. Currency findings apply at the supplied capture times."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "instructions-skills",
+   "judge": "J01",
+   "critic": "C-G1",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C13",
+     "name": "skills (mattpocock)",
+     "repository": "https://github.com/mattpocock/skills",
+     "role": "Provisional source of individually selected engineering procedures and project configuration documents; use the installer’s skill selection rather than the whole-set plugin.",
+     "install_command": "npx skills@latest add mattpocock/skills",
+     "install_source": "https://github.com/mattpocock/skills",
+     "confidence": "medium"
+    },
+    {
+     "key": "C11",
+     "name": "Trail of Bits security skills",
+     "repository": "https://github.com/trailofbits/skills",
+     "role": "Individually activated testing or audit procedures, with property-based-testing as a broadly useful starting module.",
+     "install_command": "codex plugin marketplace add trailofbits/skills\ncodex plugin add property-based-testing@trailofbits",
+     "install_source": "https://github.com/trailofbits/skills",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare dependency-complete C13 and C11 modules with equivalent selectively installed C06 modules and concise canonical rules alone. Freeze matching engineering/testing tasks; verify loaded sections, installation scope, findings, correctness, conflicts and whole-task usage on WSL2, then repeat portability checks on macOS arm64.",
+   "deciding_comparison": "Selections are provisional: the packet records no completed comparison, and public validation suites do not establish agent task effectiveness. On WSL2, pin each skill and dependency closure, freeze identical tasks/accounts/models, and retain discovery metadata, every loaded section, concrete findings, correctness, instruction conflicts, setup effort, latency and whole-task usage. Test selective installation explicitly and repeat portability checks on macOS arm64. Add browser/frontend procedures only after their matching task comparison. Issue counts establish neither responsiveness nor resolution quality; those remain unknown.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "The subagent collection has no verified task-matched evaluation or selectively scoped skill integration established in the reviewed evidence."
+    },
+    {
+     "key": "C04",
+     "reason": "The captured commit is current, but a task-specific installation path and measured benefit over concise canonical rules were not established."
+    },
+    {
+     "key": "C06",
+     "reason": "ECC is a close contender with selective rules/install mechanisms and public tests; its broader hooks, memory and orchestration surface has no measured incremental benefit for this requirement."
+    },
+    {
+     "key": "C07",
+     "reason": "The Playwright procedure is useful on a matching browser-testing task, but examples and reported activation issues do not establish a general task-quality advantage."
+    },
+    {
+     "key": "C09",
+     "reason": "The skill specifically teaches TypeSafe model integration; the packet identifies no TypeSafe development task requiring that specialization."
+    },
+    {
+     "key": "C10",
+     "reason": "The portable format and progressive-disclosure guidance are useful references, but skills-ref explicitly describes its implementation as demonstration-only and unsuitable for production."
+    },
+    {
+     "key": "C12",
+     "reason": "Current captured releases establish activity, but a selectively loaded procedure with a demonstrated task advantage was not verified."
+    },
+    {
+     "key": "C14",
+     "reason": "React/frontend rules include validation and generated evaluation cases, but no completed evaluation establishes an advantage on this packet’s unspecified task mix."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C03",
+     "criterion": "stale_or_archived",
+     "fact": "At captured_at 2026-10-01T20:42:28Z, the latest default-branch commit is dated 2026-06-24, 99 days earlier. The newer repository pushed_at timestamp does not satisfy the frozen default-branch criterion.",
+     "url": "https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431"
+    },
+    {
+     "key": "C01",
+     "criterion": "duplicate",
+     "fact": "The packet names the Trail of Bits skills collection already represented by C11; retain its explicit upstream repository entry.",
+     "url": "https://github.com/trailofbits/skills"
+    },
+    {
+     "key": "C05",
+     "criterion": "duplicate",
+     "fact": "The packet names Vercel agent-skills already represented by the explicit upstream entry C14.",
+     "url": "https://github.com/vercel-labs/agent-skills"
+    },
+    {
+     "key": "C08",
+     "criterion": "duplicate",
+     "fact": "The packet names the same Anthropic webapp-testing skill represented by C07.",
+     "url": "https://github.com/anthropics/skills/blob/main/skills/webapp-testing/SKILL.md"
+    }
+   ],
+   "evidence": {
+    "C13": [
+     {
+      "claim": "The README documents selectable, editable project-local skills for Codex and other agents, and separates user-invoked orchestration from model-invoked procedures.",
+      "url": "https://github.com/mattpocock/skills"
+     },
+     {
+      "claim": "The setup procedure records repository-specific tracker and documentation decisions in local canonical documents instead of requiring edits throughout the skill collection.",
+      "url": "https://github.com/mattpocock/skills/blob/main/docs/engineering/setup-matt-pocock-skills.md"
+     },
+     {
+      "claim": "Captured GitHub facts at 2026-10-01T20:42:29Z report an unarchived repository, a 2026-09-29 default-branch commit and latest stable release v1.2.3 dated 2026-08-06; both dates satisfy 90-day currency.",
+      "url": "https://github.com/mattpocock/skills/commit/d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+     },
+     {
+      "claim": "An upstream issue reports overly broad installation from --skill= syntax and dependencies between some individually selected skills. These reports require checking the pinned selection and dependency closure; they were not reproduced here.",
+      "url": "https://github.com/mattpocock/skills/issues/1012"
+     },
+     {
+      "claim": "No matched-task performance evaluation or verified passing CI result was established. Portability of Markdown procedures through Node-based installation is an inference; WSL2 and macOS arm64 execution remain untested.",
+      "url": "https://github.com/mattpocock/skills"
+     }
+    ],
+    "C11": [
+     {
+      "claim": "The README documents per-plugin installation and integration with Claude Code and Codex, allowing selection of a matching procedure without activating the complete collection.",
+      "url": "https://github.com/trailofbits/skills"
+     },
+     {
+      "claim": "Upstream describes validator self-tests, evaluation-harness self-tests, Python/JavaScript suites, shell tests and client loadability checks. These establish public verification machinery, not proven superiority or a verified green run at the captured revision.",
+      "url": "https://github.com/trailofbits/skills/blob/main/AGENTS.md"
+     },
+     {
+      "claim": "Captured GitHub facts at 2026-10-01T20:42:29Z report an unarchived repository and a 2026-09-28 default-branch commit. The latest-release endpoint returns 404, so there is no captured stable release.",
+      "url": "https://github.com/trailofbits/skills/commit/82fe8226252622fa807643bdca1710901198553a"
+     },
+     {
+      "claim": "Instruction-text portability is inferred for Linux and macOS arm64; external dependencies of each chosen plugin require their own compatibility check. This layer requires no GPU.",
+      "url": "https://github.com/trailofbits/skills"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "Discounting C06 for its broader catalog is insufficient when its installer supports profiles, individual skill selection and omitted hooks. The comparison must concern the selected components. [Selective installation](https://github.com/affaan-m/ECC/blob/main/docs/SELECTIVE-INSTALL-ARCHITECTURE.md)",
+    "C13's narrow-install claim needs dependency closure and installer verification. An upstream report shows --skill=<name> falling through to whole-catalog installation, while --skill <name> filters correctly; the judge appropriately labels this an unreplicated report. [Issue 1012](https://github.com/mattpocock/skills/issues/1012)",
+    "Trail of Bits publishes validator, evaluation-harness, Python/JavaScript and shell checks, but these do not establish procedure effectiveness on the unspecified task mix. [Verification commands](https://github.com/trailofbits/skills/blob/main/AGENTS.md)",
+    "No popularity/current-installation preference was identified. Audit budget: four page opens and fifteen distinct captured API answers; no live API calls."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C06",
+     "why": "Stronger than C13 on publicly inspectable selective-install and automated-validation evidence, without requiring the whole catalog. Overall procedure effectiveness remains unresolved. [Installer architecture](https://github.com/affaan-m/ECC/blob/main/docs/SELECTIVE-INSTALL-ARCHITECTURE.md), [test commands](https://github.com/affaan-m/ECC)"
+    }
+   ]
+  },
+  {
+   "layer_id": "workers",
+   "judge": "J02",
+   "critic": "C-G1",
+   "critic_verdict": "revised",
+   "judge_picks": [
+    {
+     "key": "C05",
+     "name": "Codex native workers",
+     "repository": "https://github.com/openai/codex"
+    },
+    {
+     "key": "C10",
+     "name": "Worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk"
+    },
+    {
+     "key": "C02",
+     "name": "Codex for Claude companion",
+     "repository": "https://github.com/openai/codex-plugin-cc"
+    }
+   ],
+   "status": "recommended",
+   "picks": [
+    {
+     "key": "C05",
+     "name": "Codex native workers",
+     "repository": "https://github.com/openai/codex",
+     "role": "Retain provisionally as the native executor. The coordinator must retain actual failed outputs and obtain an explicit review verdict before integration; documented delegation policy is not enforcement proof.",
+     "install_command": "",
+     "install_source": "",
+     "confidence": ""
+    },
+    {
+     "key": "C10",
+     "name": "Worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Retain separate owned worktrees. Remove C02 from the default composition until its selected-version terminal-status, cancellation and review-completion reports are resolved or acceptance-tested.",
+     "install_command": "",
+     "install_source": "",
+     "confidence": ""
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare native single-agent execution, C05+C10 workers and C06 with equivalent owned workspaces on WSL2. Inject failures, cancellation and edit collisions; require preserved pre-existing edits, terminal failure records and an actual review verdict. Re-admit C02 only after its reported failure cases pass, including concurrent sessions and the secondary Mac host.",
+   "deciding_comparison": "Freeze one representative coding/research task and independently grade outputs, intentional failures, cancellation, edit collisions, preservation of pre-existing edits and review before integration. Record complete parent/child usage, retries, cache usage, latency and acceptance results; unavailable usage remains unknown. No recorded comparison ran every named arm, and no measured superiority is established. All candidates are unarchived and meet the captured default-branch 90-day criterion; issue counts are backlogs, not handling-rate evidence. Procedural failure: reading the complete workers sidecar exposed 36 captured API responses against the permitted 30, so this layer does not satisfy the API-budget constraint. Selections are provisional.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "A credible alternative with bundled delegation, filesystem tools and model flexibility, but owned-worktree and review integration need additional wiring; no comparable target-host result was verified. [README](https://github.com/langchain-ai/deepagents)"
+    },
+    {
+     "key": "C03",
+     "reason": "Captured API facts establish current maintenance, but the inspected evidence did not establish bounded worker execution, cancellation and review-gated integration; it cannot be ranked as the executor from this evidence."
+    },
+    {
+     "key": "C04",
+     "reason": "Documents bounded delegation and durable terminal results, but adds a broader gateway/server stack without verified target-host ownership or review superiority. [Subagent contract](https://github.com/bytedance/deer-flow/blob/main/docs/plans/2026-08-24-subagent-batch-capacity-implementation.md)"
+    },
+    {
+     "key": "C06",
+     "reason": "Strongest programmable alternative: delegation example, configurable workspaces and a combined-cost metric; ownership/review policy still needs implementation, and no comparable host acceptance result was verified. [Delegation example](https://github.com/OpenHands/software-agent-sdk/blob/main/examples/01_standalone_sdk/25_agent_delegation.py)"
+    },
+    {
+     "key": "C07",
+     "reason": "Durable execution and human oversight fit coordination, but coding-worker ownership and client integration require a custom workflow; the captured latest-release record is a CLI development tag. [README](https://github.com/langchain-ai/langgraph)"
+    },
+    {
+     "key": "C08",
+     "reason": "Its durable extension documents parallel orchestration, recovery and human review, but a coding-worker adapter and owned-workspace policy remain application work without verified comparative results. [Durable agents](https://github.com/microsoft/agent-framework-durable-extension/blob/main/docs/features/durable-agents/README.md)"
+    },
+    {
+     "key": "C09",
+     "reason": "The captured v2.1.287 release and default-branch commit establish currency, but insufficient worker implementation, test and ownership evidence was retrieved to rank it above the provisional composition."
+    },
+    {
+     "key": "C11",
+     "reason": "Captured API facts establish current maintenance, but no inspected source established a ready Claude Code/Codex worker and edit-ownership workflow; no measured inferiority is claimed."
+    },
+    {
+     "key": "C12",
+     "reason": "Agent Canvas consumes the SDK/Agent Server execution engine, adding a UI/backend layer without a verified advantage for this requirement. [Upstream repository boundaries](https://github.com/OpenHands/software-agent-sdk#repository-boundaries)"
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C05": [
+     {
+      "claim": "Upstream documents the npm installation and binaries for Linux x86_64 and macOS arm64.",
+      "url": "https://github.com/openai/codex"
+     },
+     {
+      "claim": "Public worker-tool source describes parallel delegation into disjoint code scopes. This establishes an interface and coordination policy, not enforced edit ownership.",
+      "url": "https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_spec.rs"
+     },
+     {
+      "claim": "Captured 2026-10-01: unarchived, with 20,039 open issues. That backlog does not establish issue-resolution speed.",
+      "url": "https://api.github.com/repos/openai/codex"
+     },
+     {
+      "claim": "Captured latest release: rust-v0.160.0, published 2026-10-01.",
+      "url": "https://api.github.com/repos/openai/codex/releases/latest"
+     },
+     {
+      "claim": "Captured default-branch commit: 960e878df4bf87b9d7fa0849f14561d7cdcca942, dated 2026-10-01.",
+      "url": "https://api.github.com/repos/openai/codex/commits?per_page=1"
+     },
+     {
+      "claim": "An upstream issue reports prolonged spawn/wait stalls. The inspected report does not establish current-release failure or resolution; cancellation and timeout behavior need acceptance testing.",
+      "url": "https://github.com/openai/codex/issues/24951"
+     }
+    ],
+    "C10": [
+     {
+      "claim": "Upstream documents installation on Linux and macOS, parallel agent launches in separate worktrees, hooks, and merge commands.",
+      "url": "https://github.com/max-sixty/worktrunk"
+     },
+     {
+      "claim": "Upstream documents cargo test and a separate shell-integration suite. Passing CI results and ownership/failure-preservation acceptance results were not verified.",
+      "url": "https://github.com/max-sixty/worktrunk#running-the-tests"
+     },
+     {
+      "claim": "Captured 2026-10-01: unarchived, with 47 open issues.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk"
+     },
+     {
+      "claim": "Captured latest release: v0.80.0, published 2026-09-27.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/latest"
+     },
+     {
+      "claim": "Captured default-branch commit: 85e685e313f7fbc0612c0e055e655c3917e39f29, dated 2026-10-01.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1"
+     }
+    ],
+    "C02": [
+     {
+      "claim": "Upstream documents delegation, background status, stored final output, cancellation and read-only review commands. It uses the installed Codex app server and requires Node.js 18.18 or later.",
+      "url": "https://github.com/openai/codex-plugin-cc"
+     },
+     {
+      "claim": "An optional Stop-hook review gate is documented. The repository exposes a tests directory, but passing CI, complete failed-result preservation and total usage were not verified.",
+      "url": "https://github.com/openai/codex-plugin-cc"
+     },
+     {
+      "claim": "Captured 2026-10-01: unarchived, with 514 open issues.",
+      "url": "https://api.github.com/repos/openai/codex-plugin-cc"
+     },
+     {
+      "claim": "Captured latest release: v1.0.6, published 2026-07-08, within the 90-day window.",
+      "url": "https://api.github.com/repos/openai/codex-plugin-cc/releases/latest"
+     },
+     {
+      "claim": "Captured default-branch commit: db52e28f4d9ded852ab3942cea316258ae4ef346, dated 2026-07-08; it meets the frozen currency criterion.",
+      "url": "https://api.github.com/repos/openai/codex-plugin-cc/commits?per_page=1"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 9,
+   "critic_issues": [
+    "The selected companion has reports against v1.0.6 of review exiting successfully without a verdict, hung gate jobs and concurrent-session tasks remaining falsely running. These directly challenge review completion and failed-result preservation; fixes and target-host reproduction were not established. [Issue 611](https://github.com/openai/codex-plugin-cc/issues/611), [issue 540](https://github.com/openai/codex-plugin-cc/issues/540)",
+    "A further report describes Codex error notifications leaving jobs non-terminal and cancellation doing nothing when pid is null. Documented commands alone do not close this requirement. [Issue 698](https://github.com/openai/codex-plugin-cc/issues/698)",
+    "Native worker timeout/stall reports also remain relevant; removing the companion does not establish that native workers pass acceptance. [Issue 24951](https://github.com/openai/codex/issues/24951)",
+    "The prior judgment admits exceeding its own API allowance. This audit used four page opens and fifteen distinct captured API answers, with no live API calls or popularity/current-installation preference."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C06",
+     "why": "Its public delegation example exposes combined conversation cost, strengthening usage observability. Cancellation, owned-workspace preservation and mandatory review still require acceptance. [Delegation example](https://github.com/OpenHands/software-agent-sdk/blob/main/examples/01_standalone_sdk/25_agent_delegation.py)"
+    }
+   ]
+  },
+  {
+   "layer_id": "isolation",
+   "judge": "J02",
+   "critic": "C-G1",
+   "critic_verdict": "upheld",
+   "status": "recommended",
+   "picks": [
+    {
+     "key": "C09",
+     "name": "Worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Separate edits into worktrees; use an additional boundary when enforced restrictions are required.",
+     "install_command": "brew install worktrunk && wt config shell install",
+     "install_source": "https://github.com/max-sixty/worktrunk#install",
+     "confidence": "medium"
+    },
+    {
+     "key": "C01",
+     "name": "sandbox-runtime",
+     "repository": "https://github.com/anthropics/sandbox-runtime",
+     "role": "Apply per-task filesystem permissions and network filtering when enforcement is required.",
+     "install_command": "sudo apt-get install bubblewrap socat ripgrep\nnpm install -g @anthropic-ai/sandbox-runtime",
+     "install_source": "https://github.com/anthropics/sandbox-runtime#installation",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "The conditional Worktrunk+sandbox-runtime composition stands for edit separation and per-task filesystem/network restrictions. Compare C01 with C08 for the actual untrusted workload, admitting the VM arm only after verifying KVM. Check denied reads/writes, network bypasses, subprocess behavior, cancellation and cleanup on WSL2 and macOS arm64.",
+   "deciding_comparison": "Measure denied filesystem access, permitted workspace access, prohibited network paths, subprocess escape attempts, resource enforcement, cancellation, residual processes/state and cleanup. Repeat compatibility checks on macOS arm64. No recorded comparison ran both arms, and no inspected passing CI or public benchmark establishes superior enforcement on these hosts. All nine candidates are unarchived with captured commits and releases inside 90 days; issue-resolution activity remains unverified. The isolation sidecar supplies 27 captured API responses. The two selections are complementary and provisional; neither worktrees nor documented test commands constitute observed enforcement proof.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Self-hosting is available through a separate Compose/KVM runtime stack, but adds infrastructure without verified superiority for the scoped worktree/per-command requirement; paid service is not assumed necessary. [Local runtime](https://github.com/e2b-dev/runtime/blob/main/embed/README.md)"
+    },
+    {
+     "key": "C03",
+     "reason": "A viable OCI alternative with official Ubuntu packages, but adds daemon/container setup; no comparable enforcement or cleanup result separates it from the provisional boundary. [Installation](https://docs.docker.com/engine/install/ubuntu/)"
+    },
+    {
+     "key": "C05",
+     "reason": "Current according to captured API facts, but the fetched upstream guide yielded no usable body; target compatibility, install details and measured enforcement remain unverified rather than disproved."
+    },
+    {
+     "key": "C06",
+     "reason": "A credible hardware-isolated alternative with CLI/MCP integration, but documented beta status and Linux KVM requirements leave WSL2 compatibility and comparative enforcement unresolved. [README](https://github.com/superradcompany/microsandbox)"
+    },
+    {
+     "key": "C07",
+     "reason": "Rootless OCI execution is a strong alternative, but requires container policy and host configuration; no retrieved target-host measurement establishes an advantage for this requirement. [Rootless support](https://github.com/podman-container-tools/podman#rootless)"
+    },
+    {
+     "key": "C08",
+     "reason": "Explicitly supports WSL2 x86_64 and macOS arm64 with VM isolation and egress controls, but WSL2 requires accessible KVM; host enforcement and cleanup results are unresolved. [Requirements](https://github.com/boxlite-ai/boxlite#system-requirements)"
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C04",
+     "criterion": "cannot_run_on_target",
+     "fact": "Requires an Apple-silicon Mac running macOS 26, so it cannot run on the primary WSL2 Linux x86_64 host; it remains relevant to the secondary Mac host.",
+     "url": "https://github.com/apple/container#requirements"
+    }
+   ],
+   "evidence": {
+    "C09": [
+     {
+      "claim": "Upstream documents separate Git worktrees, agent launch commands and Linux/macOS installation. Worktrees do not enforce filesystem or network restrictions.",
+      "url": "https://github.com/max-sixty/worktrunk"
+     },
+     {
+      "claim": "Rust and shell-integration test commands are public; passing results and target-host acceptance were not verified.",
+      "url": "https://github.com/max-sixty/worktrunk#running-the-tests"
+     },
+     {
+      "claim": "Captured 2026-10-01: unarchived, with 47 open issues.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk"
+     },
+     {
+      "claim": "Captured latest release: v0.80.0, published 2026-09-27.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/latest"
+     },
+     {
+      "claim": "Captured default-branch commit: 85e685e313f7fbc0612c0e055e655c3917e39f29, dated 2026-10-01.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1"
+     }
+    ],
+    "C01": [
+     {
+      "claim": "Upstream documents a standalone CLI/library developed for Claude Code, using Linux namespaces and macOS sandbox profiles with filtered network proxies; agents can invoke the CLI.",
+      "url": "https://github.com/anthropics/sandbox-runtime"
+     },
+     {
+      "claim": "Linux dependencies and Ubuntu user-namespace/AppArmor requirements are documented. macOS support is documented; the intended WSL2 configuration and macOS arm64 host were not tested here.",
+      "url": "https://github.com/anthropics/sandbox-runtime#platform-support"
+     },
+     {
+      "claim": "Upstream documents npm tests and CI preparation of bundled seccomp binaries for both Linux architectures. Passing CI outcomes were not inspected.",
+      "url": "https://github.com/anthropics/sandbox-runtime#development"
+     },
+     {
+      "claim": "The weaker nested-sandbox mode reduces protection. The inspected evidence does not establish VM-equivalent isolation or workload resource quotas.",
+      "url": "https://github.com/anthropics/sandbox-runtime"
+     },
+     {
+      "claim": "Captured 2026-10-01: unarchived, with 262 open issues.",
+      "url": "https://api.github.com/repos/anthropics/sandbox-runtime"
+     },
+     {
+      "claim": "Captured latest release: v0.0.78, published 2026-09-30.",
+      "url": "https://api.github.com/repos/anthropics/sandbox-runtime/releases/latest"
+     },
+     {
+      "claim": "Captured default-branch commit: 117eb928202b53c80d3cb6527d88d1b90e4ca7a9, dated 2026-10-01.",
+      "url": "https://api.github.com/repos/anthropics/sandbox-runtime/commits?per_page=1"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "Beta status was applied asymmetrically: selected sandbox-runtime is itself a research preview. Microsandbox's beta label alone cannot distinguish them. [Selected runtime status](https://github.com/anthropics/sandbox-runtime)",
+    "Default reads are broadly allowed; installation alone does not establish a task's read boundary. Explicit policy and Ubuntu user-namespace/AppArmor compatibility remain necessary. The weaker nested mode is explicitly documented as reducing protection. [Policies and requirements](https://github.com/anthropics/sandbox-runtime)",
+    "BoxLite documents WSL2 x86_64 support but requires accessible KVM. That condition prevents treating its stronger hardware boundary as an unconditional target-host advantage. [System requirements](https://github.com/boxlite-ai/boxlite#system-requirements)",
+    "No popularity/current-installation preference was identified. Audit budget: four fetched pages including shared Worktrunk evidence, fifteen distinct captured API answers and no live API calls."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C08",
+     "why": "Stronger hardware separation through an independent VM kernel, with documented egress controls and target-platform support. It becomes preferable if the workload needs that boundary and WSL2 KVM is available; overall superiority is unproved. [BoxLite](https://github.com/boxlite-ai/boxlite)"
+    }
+   ]
+  },
+  {
+   "layer_id": "code-navigation",
+   "judge": "J03",
+   "critic": "C-G1",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C09",
+     "name": "ast-grep",
+     "repository": "https://github.com/ast-grep/ast-grep",
+     "role": "On-demand structural pattern search through an agent-called CLI; pair matches with original source reads.",
+     "install_command": "npm install --global @ast-grep/cli@0.45.3",
+     "install_source": "https://github.com/ast-grep/ast-grep#installation",
+     "confidence": "medium"
+    },
+    {
+     "key": "C02",
+     "name": "Serena",
+     "repository": "https://github.com/oraios/serena",
+     "role": "Conditional semantic source and reference lookup using the free LSP backend, shared through MCP with Claude Code and Codex.",
+     "install_command": "uv tool install -p 3.13 serena-agent==1.7.0",
+     "install_source": "https://github.com/oraios/serena#quick-start",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare C02+C09 with C03 and C05 on sealed target-language source/reference questions, retaining direct reads as a control. Score source fidelity, reference precision/recall, ambiguous symbols, dynamic dispatch and changed/deleted files; include index/update cost and cold/warm latency. Qualify missed or unsupported constructs equally for every arm.",
+   "deciding_comparison": "The selection is provisional capability fit, not measured superiority. Blind-score exact source fidelity and reference precision/recall, including ambiguous symbols, dynamic dispatch and changed/deleted files. Include installation, index build/update cost, cold/warm latency, resident context and whole-task usage. All eight named GitHub repositories pass the captured archive/90-day commit gate; Glean and the bundled engines lack captured repository facts. Currency uses the 2026-10-01T20:42:22Z API capture. Budget: 6 searches, 8 fetch attempts, 24 captured API calls. The Serena documentation and guessed ast-grep workflow fetches failed, leaving detailed evaluation/CI results unverified. Install commands apply captured release pins to documented package commands; registry publication, artifact digests and host execution were not verified.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Relevant graph/context tools, but analyze also installs hooks, skills and project instructions; comparable exact-reference accuracy was not verified to justify that broader setup. [README](https://github.com/abhigyanpatwari/GitNexus)"
+    },
+    {
+     "key": "C03",
+     "reason": "Strong native platform coverage, source checks and coverage diagnostics; its upstream 31-repository summary reports 83% answer quality, but does not separate it from the selected pair on exact reference completeness. [README](https://github.com/DeusData/codebase-memory-mcp)"
+    },
+    {
+     "key": "C04",
+     "reason": "Glean supports source-fact queries and language indexers, but the packet supplies no repository revision; currency and a turnkey shared-agent installation remained unverified. [Documentation](https://glean.software/docs/introduction/)"
+    },
+    {
+     "key": "C05",
+     "reason": "Byte-exact symbol reads and published token/audit evaluations are promising; those evaluations do not establish reference precision and recall against Serena on representative target languages. [README](https://github.com/jgravelle/jcodemunch-mcp)"
+    },
+    {
+     "key": "C06",
+     "reason": "Exact source and dependency MCP tools fit, but comparable reference-accuracy outcomes were not verified for its broader tool, profile and memory surface. [Server source](https://github.com/Mibayy/token-savior/blob/main/src/token_savior/server.py)"
+    },
+    {
+     "key": "C07",
+     "reason": "The bundled candidate has no repository/revision or combined install definition; verified SCIP is a protocol/indexer building block, leaving bundle currency and shared-agent integration unresolved. [SCIP README](https://github.com/scip-code/scip/blob/main/README.md)"
+    },
+    {
+     "key": "C08",
+     "reason": "Seven-repository architectural A/B results and cross-file coverage are useful, but neither measures exhaustive references; upstream also reports approximately 80% more resident retrieval context. [README](https://github.com/colbymchenry/codegraph)"
+    },
+    {
+     "key": "C10",
+     "reason": "Official LSP plugins serve Claude Code, but this plugin directory has no verified equivalent Codex integration; the selected MCP toolkit serves both requested clients. [Directory README](https://github.com/anthropics/claude-plugins-official)"
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C09": [
+     {
+      "claim": "AST pattern matching directly fits structural lookup. It does not establish semantic symbol identity or exhaustive references.",
+      "url": "https://github.com/ast-grep/ast-grep"
+     },
+     {
+      "claim": "Upstream documents npm installation and a macOS Homebrew path. WSL2 execution and macOS arm64 package compatibility were not separately exercised; no GPU is needed.",
+      "url": "https://github.com/ast-grep/ast-grep#installation"
+     },
+     {
+      "claim": "Captured GitHub API: unarchived, with an open issue/PR counter of 70. Response and closure activity were not verified.",
+      "url": "https://api.github.com/repos/ast-grep/ast-grep"
+     },
+     {
+      "claim": "Captured latest release: 0.45.3, published 2026-08-31.",
+      "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+     },
+     {
+      "claim": "Captured default-branch commit: 2026-09-28, within 90 days. Current test totals and CI pass status remain unverified.",
+      "url": "https://github.com/ast-grep/ast-grep/commit/25334496c105c9c728f0a6024f3d164aed40cacc"
+     }
+    ],
+    "C02": [
+     {
+      "claim": "Documents symbol lookup, referencing-symbol lookup and source-body editing, backed by language servers. Some declaration and implementation capabilities depend on the language server.",
+      "url": "https://github.com/oraios/serena#retrieval"
+     },
+     {
+      "claim": "Documents Claude Code and Codex MCP integration and a uv/Python installation. Linux x86_64 and macOS arm64 suitability is inferred from that stack; language-specific prerequisites and platform CI remain unverified.",
+      "url": "https://github.com/oraios/serena#quick-start"
+     },
+     {
+      "claim": "Upstream describes approximately 20 routine-task agent evaluations. The README provides qualitative assessments, not a comparable exact-reference accuracy result.",
+      "url": "https://github.com/oraios/serena"
+     },
+     {
+      "claim": "Captured GitHub API: unarchived, with an open issue/PR counter of 190. Maintainer response rates were not verified.",
+      "url": "https://api.github.com/repos/oraios/serena"
+     },
+     {
+      "claim": "Captured latest release: v1.7.0, published 2026-08-09.",
+      "url": "https://github.com/oraios/serena/releases/tag/v1.7.0"
+     },
+     {
+      "claim": "Captured default-branch commit: 2026-09-30, within 90 days.",
+      "url": "https://github.com/oraios/serena/commit/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The cited Serena evaluations involve agents assessing their own tool experience. They support a qualitative capability assessment, not measured reference precision/recall. [Evaluation description](https://github.com/oraios/serena)",
+    "Requiring challengers to prove exhaustive references while accepting unmeasured completeness for Serena creates an evidentiary asymmetry. The selected pair has no demonstrated accuracy advantage on the target languages.",
+    "C03's coverage check explicitly means no recorded gap, not proof of completeness. Its 31-repository result and jCodeMunch's token benchmark measure different outcomes. [C03 evidence](https://github.com/DeusData/codebase-memory-mcp), [jCodeMunch benchmark](https://github.com/jgravelle/jcodemunch-mcp)",
+    "No popularity/current-installation preference was identified. Audit budget: four page opens and fifteen distinct captured API answers; no live API calls."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C03",
+     "why": "Stronger public evaluation and native-platform evidence: upstream reports 83% answer quality across 31 repositories and provides source/coverage tools. This does not establish greater reference completeness. [Upstream evidence](https://github.com/DeusData/codebase-memory-mcp)"
+    },
+    {
+     "key": "C05",
+     "why": "Stronger directly inspectable evidence for byte-precise symbol retrieval and reproducible token-efficiency measurement; semantic-reference superiority remains unresolved. [Upstream benchmark](https://github.com/jgravelle/jcodemunch-mcp)"
+    }
+   ]
+  },
+  {
+   "layer_id": "document-retrieval",
+   "judge": "J03",
+   "critic": "C-G1",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C08",
+     "name": "tobi/qmd",
+     "repository": "https://github.com/tobi/qmd",
+     "role": "Scoped local Markdown retrieval, with lexical search and optional hybrid retrieval; fetch full document bodies before reliance.",
+     "install_command": "npm install -g @tobilu/qmd@2.8.3",
+     "install_source": "https://github.com/tobi/qmd#installation",
+     "confidence": "medium"
+    },
+    {
+     "key": "C03",
+     "name": "MinerU",
+     "repository": "https://github.com/opendatalab/mineru",
+     "role": "Controlled document parsing and local document search, followed by page/block reads and original-image inspection through agent-called CLI tools.",
+     "install_command": "uv tool install --python 3.12 'mineru[full]==4.0.10'",
+     "install_source": "https://github.com/opendatalab/MinerU#installation-and-setup",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare C08 with C07 on a sealed Markdown/document corpus; separately compare C03 with C04 on difficult-layout ingestion. Require original-body/page verification, citation fidelity, update freshness and extraction-error accounting. Report retrieval quality and ingestion quality separately, with WSL2 latency and GPU/backend compatibility checks.",
+   "deciding_comparison": "The selected pair provisionally combines scoped Markdown retrieval with document parsing and source-locator reads. Repeat randomized lexical/hybrid/tree retrieval with sealed relevance judgments; measure precision/recall, ranking, body/citation fidelity, freshness after updates, ingestion errors, tables/formulas/reading order, cold/warm latency and total resource cost. Verify original documents alongside converted bodies. Published evaluations use different tasks, models and versions, so they do not establish an overall winner. Currency uses API captures at 2026-10-01T20:42:23/24Z; only Context Hub fails the commit-age gate. Budget: 6 searches, 8 fetch attempts, 27 captured API calls. The QMD test-directory fetch failed; CI totals remain unverified. Install commands apply captured release pins to documented package formats; registry publication, artifact digests and target-host execution were not verified.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "The OSS core supports local retrieval, but requires assembling ingestion, retrieval and agent/source-read interfaces; it is a broader application framework than the selected CLI workflows. [README](https://github.com/run-llama/llama_index)"
+    },
+    {
+     "key": "C02",
+     "reason": "Published FinanceBench QA and local lookup evaluations support long-PDF retrieval, but do not separate LLM tree search on a general Markdown corpus; local mode also lacks the cloud MCP/corpus-tree features. [README](https://github.com/VectifyAI/PageIndex)"
+    },
+    {
+     "key": "C04",
+     "reason": "Strong offline conversion, Markdown/lossless JSON exports and explicit x86_64/arm64 support; MinerU additionally documents library search and page/block reading, while a matched current-version ingestion comparison remains unresolved. [README](https://github.com/docling-project/docling)"
+    },
+    {
+     "key": "C05",
+     "reason": "Useful lightweight conversion CLI/MCP, but conversion alone does not provide collection retrieval; a matched difficult-layout evaluation separating its extraction from the selected parser was not verified. [README](https://github.com/microsoft/markitdown)"
+    },
+    {
+     "key": "C06",
+     "reason": "Actively released PDF rendering/text utilities are useful for known-PDF reads, but provide no collection-level Markdown retrieval or complete agent ingestion/read workflow. [Upstream](https://poppler.freedesktop.org/)"
+    },
+    {
+     "key": "C07",
+     "reason": "Close alternative with versioned crawling, local-folder indexing, search and fetch-url; no shared sealed local-corpus results separate it from QMD's explicit collection and full-body workflow. [README](https://github.com/arabold/docs-mcp-server)"
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C09",
+     "criterion": "stale_or_archived",
+     "fact": "The captured API identifies the latest default-branch commit as 2026-05-31T18:39:40Z, approximately 123 days before the 2026-10-01 capture, exceeding the frozen 90-day threshold.",
+     "url": "https://github.com/andrewyng/context-hub/commit/67dcbeb2eb42c808549f08397920ad58be7c2206"
+    }
+   ],
+   "evidence": {
+    "C08": [
+     {
+      "claim": "Explicit collections and glob masks control ingestion. Separate lexical/vector/hybrid modes and get --full support retrieval followed by indexed original-body reads; CLI and MCP support agents.",
+      "url": "https://github.com/tobi/qmd"
+     },
+     {
+      "claim": "Documents Node >=22, macOS SQLite prerequisites and CPU/CUDA/Vulkan/Metal backends. WSL2 CUDA setup has reported complications; RTX 4090 acceleration was not verified here.",
+      "url": "https://github.com/tobi/qmd/issues/640"
+     },
+     {
+      "claim": "qmd bench compares four backends using precision@k, recall, MRR and F1, with checkout fixtures. Benchmark scores and current CI passing totals were not verified.",
+      "url": "https://github.com/tobi/qmd#benchmarking"
+     },
+     {
+      "claim": "Captured GitHub API: unarchived, with an open issue/PR counter of 203. Maintainer response rates were not verified.",
+      "url": "https://api.github.com/repos/tobi/qmd"
+     },
+     {
+      "claim": "Captured latest release: v2.8.3, published 2026-08-16.",
+      "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+     },
+     {
+      "claim": "Captured default-branch commit: 2026-09-09, within 90 days.",
+      "url": "https://github.com/tobi/qmd/commit/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+     }
+    ],
+    "C03": [
+     {
+      "claim": "Version 4 documents local library search, explicit parsing tiers, continuation and stable page/block locators. Its workflows search first and then read content or inspect a block image.",
+      "url": "https://github.com/opendatalab/MinerU"
+     },
+     {
+      "claim": "Documents Python >=3.10,<3.15 and Linux NVIDIA support. The target exceeds the full-extra requirement of 16 GB RAM and 8 GB VRAM; Apple Silicon uses the base package. WSL2 execution remains unverified.",
+      "url": "https://github.com/opendatalab/MinerU"
+     },
+     {
+      "claim": "The upstream MinerU2.5-Pro paper reports 95.69 on OmniDocBench v1.6. This is a model/benchmark result, not proof of every 4.0.10 tier's accuracy or superiority over current Docling.",
+      "url": "https://arxiv.org/html/2604.04771"
+     },
+     {
+      "claim": "Captured GitHub API: unarchived, with an open issue/PR counter of 126. Maintainer response rates were not verified.",
+      "url": "https://api.github.com/repos/opendatalab/mineru"
+     },
+     {
+      "claim": "Captured latest release: MinerU 4.0.10, published 2026-09-29.",
+      "url": "https://github.com/opendatalab/MinerU/releases/tag/mineru-4.0.10-released"
+     },
+     {
+      "claim": "Captured default-branch commit: 2026-09-29, within 90 days.",
+      "url": "https://github.com/opendatalab/MinerU/commit/ed50cc15bc2c9bfb00520dadfe61979866e62236"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The MinerU benchmark attribution is correct and properly qualified. Its score cannot order current MinerU workflows against Docling without matching models, tiers and documents.",
+    "Docling's local conversion, structured document representation and lossless JSON exports fit the ingestion requirement. MinerU's additional library workflow does not establish better original-content fidelity. [Docling](https://github.com/docling-project/docling), [MinerU](https://github.com/opendatalab/MinerU)",
+    "Inference: retrieving full indexed or converted text does not by itself establish freshness or fidelity to the original file/page. Those checks remain necessary before reliance.",
+    "QMD's cited WSL2 issue is a user installation/fix guide, not proof that the selected release fails or that RTX 4090 acceleration passes. [Issue 640](https://github.com/tobi/qmd/issues/640)",
+    "No popularity/current-installation preference was identified. Audit budget: four page opens and fifteen distinct captured API answers; no live API calls."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C04",
+     "why": "Competitive on controlled offline ingestion and inspectable lossless structured output; no matched current-version result establishes that MinerU is stronger overall. [Docling capabilities](https://github.com/docling-project/docling)"
+    },
+    {
+     "key": "C07",
+     "why": "Its documented local-directory ingestion, search and fetch-url commands challenge the claimed workflow distinction for QMD. Overall retrieval quality remains unseparated. [Usage guide](https://github.com/arabold/docs-mcp-server/blob/main/docs/guides/basic-usage.md)"
+    }
+   ]
+  },
+  {
+   "layer_id": "semantic-rag",
+   "judge": "J04",
+   "critic": "C-G1",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C10",
+     "name": "SocratiCode",
+     "repository": "https://github.com/giancarloerra/SocratiCode",
+     "role": "Provisional scoped retrieval MCP for both clients; reuse the selected external Qdrant and native Ollama.",
+     "install_command": "QDRANT_MODE=external QDRANT_URL=http://localhost:6333 OLLAMA_MODE=external OLLAMA_URL=http://localhost:11434 npx -y --prefer-online socraticode@1.16.0",
+     "install_source": "https://github.com/giancarloerra/SocratiCode#quick-start",
+     "confidence": "medium"
+    },
+    {
+     "key": "C01",
+     "name": "Qdrant",
+     "repository": "https://github.com/qdrant/qdrant",
+     "role": "Persistent vector/metadata store for the selected frontend; one local service.",
+     "install_command": "docker run -d --name semantic-rag-qdrant -p 127.0.0.1:6333:6333 -v semantic-rag-qdrant:/qdrant/storage qdrant/qdrant:v1.19.1",
+     "install_source": "https://github.com/qdrant/qdrant#getting-started",
+     "confidence": "medium"
+    },
+    {
+     "key": "C03",
+     "name": "ollama",
+     "repository": "https://github.com/ollama/ollama",
+     "role": "Native local embedding service for SocratiCode, using its documented nomic-embed-text integration.",
+     "install_command": "curl -fsSL https://ollama.com/install.sh | OLLAMA_VERSION=0.35.0 sh\nollama pull nomic-embed-text",
+     "install_source": "https://docs.ollama.com/linux#installing-specific-versions",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare C10+C01+C03, C04 and C07 as complete scoped workflows on identical WSL2 repositories/questions. Score expected source-span retrieval, changed/deleted-file correctness, interrupted indexing and isolated restore; measure cold indexing, warm p50/p95 latency and RAM/VRAM. Verify both clients and repeat scope/recovery checks on macOS arm64.",
+   "deciding_comparison": "Provisional choice favors documented service compatibility and recovery, not measured retrieval superiority. Semble reports NDCG@10 0.854 and CPU query p50 0.91 ms across approximately 1250 queries/63 repositories/19 languages; labels were generated and checked by the same LLM. NextPlaid reports 0.859 for full ColGREP and 0.846 for its edge model on that benchmark; these do not establish SocratiCode's relative accuracy. The packet's 30/35 versus ripgrep 20/35 is descriptive and explicitly non-general. No target-host run, current CI pass, artifact digest or combined pinned-stack restore was verified. Research used 6 search queries and 8 page fetches; an empty snapshot page was supplemented by primary-source search results. Initial wholesale fact-file reading exposed 33 captured API answers, exceeding the 30-answer budget; no live GitHub API calls followed.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Useful local vector storage and versioning, but a verified code-index/frontend integration would need to replace the documented Qdrant path; database performance superiority is not established. [README](https://github.com/lancedb/lancedb)."
+    },
+    {
+     "key": "C04",
+     "reason": "Strong CPU-only MCP rival with incremental cached indexes and a broader public retrieval benchmark; its in-process Model2Vec path and recovery need comparison with the service-backed workflow. Not judged less accurate. [README](https://github.com/MinishLab/semble), [benchmark](https://github.com/MinishLab/semble/blob/main/benchmarks/README.md)."
+    },
+    {
+     "key": "C05",
+     "reason": "Credible Postgres storage primitive, but code indexing, watchers and a native-agent frontend still need assembly; no benefit over the integrated store was established. [Metadata](https://github.com/pgvector/pgvector/blob/master/META.json)."
+    },
+    {
+     "key": "C06",
+     "reason": "Embedding-serving alternative without an established workload advantage over Ollama, whose frontend integration and secondary-host acceleration were checked. [Upstream serving example](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16)."
+    },
+    {
+     "key": "C07",
+     "reason": "Strong local ColGREP contender with incremental indexing and Linux/macOS installation; Codex integration is documented as basic, and isolated recovery parity is unverified. [README and benchmark](https://github.com/lightonai/next-plaid)."
+    },
+    {
+     "key": "C08",
+     "reason": "Capable modular RAG framework, but code-specific indexing, watcher behavior and client integration require assembly; checked evidence establishes building blocks rather than this complete installation. [README](https://github.com/deepset-ai/haystack)."
+    },
+    {
+     "key": "C09",
+     "reason": "Viable embedding-model input, but no code-span quality/latency comparison or checked frontend integration establishes it over the documented default. License did not affect ranking. [Model card](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16)."
+    },
+    {
+     "key": "C11",
+     "reason": "No complete scoped code-index, embedding-serving, watcher and recovery workflow was verified for this candidate within the research budget; unselected rather than excluded."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C12",
+     "criterion": "stale_or_archived",
+     "fact": "At capture on 2026-10-01, the latest default-branch commit was 2026-05-20T13:58:06Z, about 134 days old and outside the frozen 90-day window.",
+     "url": "https://github.com/kapillamba4/code-memory/commit/5a8db166ca11a90c093ba4a9a54d266cde756f54"
+    }
+   ],
+   "evidence": {
+    "C10": [
+     {
+      "claim": "Documents project-scoped hybrid search, watcher updates, resumable indexing, both client configurations and external Qdrant/Ollama modes. Requires Node.js 18.17+.",
+      "url": "https://github.com/giancarloerra/SocratiCode"
+     },
+     {
+      "claim": "Documents unit/integration/E2E lifecycle suites; Docker tests may skip. Five-query VS Code benchmark measures bytes and tool calls, not general accuracy. Current CI results unverified.",
+      "url": "https://github.com/giancarloerra/SocratiCode#testing"
+     },
+     {
+      "claim": "Coordinator snapshot at 2026-10-01T20:42:38Z: unarchived, 1 open issue; issue response/resolution rates unknown.",
+      "url": "https://api.github.com/repos/giancarloerra/SocratiCode"
+     },
+     {
+      "claim": "Captured latest release v1.16.0 published 2026-09-28, within 90 days.",
+      "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+     },
+     {
+      "claim": "Captured default-branch commit dated 2026-09-30, within 90 days.",
+      "url": "https://github.com/giancarloerra/SocratiCode/commit/155ba9325f43a65c78a09930735b378f91651cf5"
+     }
+    ],
+    "C01": [
+     {
+      "claim": "Upstream documents local Docker deployment and filtered vector search; SocratiCode supports external Qdrant. The command adapts that Docker path with a captured release pin and persistent volume.",
+      "url": "https://github.com/qdrant/qdrant"
+     },
+     {
+      "claim": "Collection snapshots support recovery; aliases require separate handling. Restore requires the same or next minor version. This documents recovery, without demonstrating frontend restoration.",
+      "url": "https://qdrant.tech/documentation/operations/snapshots/"
+     },
+     {
+      "claim": "Coordinator snapshot at 2026-10-01T20:42:38Z: unarchived, 739 open issues; response/resolution rates unknown.",
+      "url": "https://api.github.com/repos/qdrant/qdrant"
+     },
+     {
+      "claim": "Captured latest release v1.19.1 published 2026-09-04, within 90 days.",
+      "url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1"
+     },
+     {
+      "claim": "Captured default-branch commit dated 2026-09-03, within 90 days; pushed_at was not substituted for commit currency.",
+      "url": "https://github.com/qdrant/qdrant/commit/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+     }
+    ],
+    "C03": [
+     {
+      "claim": "Linux instructions document amd64 installation, service startup and OLLAMA_VERSION pins. The service must be running before indexing.",
+      "url": "https://docs.ollama.com/linux"
+     },
+     {
+      "claim": "Hardware documentation lists RTX 4090 CUDA support and Apple Metal acceleration. WSL2 GPU passthrough and embedding latency remain untested here.",
+      "url": "https://docs.ollama.com/gpu"
+     },
+     {
+      "claim": "Native/external Ollama and nomic-embed-text integration documented; comparative embedding quality/throughput unmeasured.",
+      "url": "https://github.com/giancarloerra/SocratiCode#external-ollama-native-install"
+     },
+     {
+      "claim": "Coordinator snapshot at 2026-10-01T20:42:38Z: unarchived, 4135 open issues; response/resolution rates unknown.",
+      "url": "https://api.github.com/repos/ollama/ollama"
+     },
+     {
+      "claim": "Captured latest release v0.35.0 published 2026-09-28, within 90 days.",
+      "url": "https://github.com/ollama/ollama/releases/tag/v0.35.0"
+     },
+     {
+      "claim": "Captured default-branch commit dated 2026-09-30, within 90 days.",
+      "url": "https://github.com/ollama/ollama/commit/1abe35e6e6e777e858bbfbba283667ee8d516801"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 9,
+   "critic_issues": [
+    "Documented compatibility supports a viable composition, but neither the five-query efficiency benchmark nor the packet's 35-query comparison establishes superiority over C04 or C07.",
+    "Semble's NDCG@10 0.854 and CPU query p50 0.91 ms are supported upstream; its relevance labels were generated and judged by the same LLM. These are retrieval/component results, not whole-agent outcomes. [Benchmark](https://github.com/MinishLab/semble/blob/main/benchmarks/README.md)",
+    "Qdrant collection snapshots omit aliases and have version constraints. Their existence does not establish restoration of the complete frontend, index metadata and embedding configuration. [Snapshot contract](https://qdrant.tech/documentation/operations/snapshots/)",
+    "Reuse of an already selected service must not become a current-installation preference: the frozen requirement does not mandate Qdrant or Ollama.",
+    "The prior judgment admits exceeding its own API allowance. This audit used four page opens and fifteen distinct captured API answers, with no live API calls."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C04",
+     "why": "Stronger public retrieval-measurement evidence than the selected frontend, plus documented MCP integration and cached incremental CPU indexing without external services. Complete recovery and target-task superiority remain unresolved. [Semble](https://github.com/MinishLab/semble), [benchmark](https://github.com/MinishLab/semble/blob/main/benchmarks/README.md)"
+    },
+    {
+     "key": "C07",
+     "why": "Publishes code-search NDCG@10 results of 0.859 and 0.846 and documents incremental updates/deletions. Those results make it a serious measured challenger but do not directly compare it with SocratiCode. [NextPlaid/ColGREP](https://github.com/lightonai/next-plaid/blob/main/README.md)"
+    }
+   ]
+  },
+  {
+   "layer_id": "durable-memory",
+   "judge": "J04",
+   "critic": "C-G1",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C02",
+     "name": "ai-memory",
+     "repository": "https://github.com/akitaonrails/ai-memory",
+     "role": "Alternative sole owner for both native clients; favors documented typed handoffs and scoped capture. Evaluate separately from Basic Memory.",
+     "install_command": "docker run -d --name ai-memory --restart unless-stopped -p 127.0.0.1:49374:49374 -v ai-memory-data:/data docker.io/akitaonrails/ai-memory:latest",
+     "install_source": "https://github.com/akitaonrails/ai-memory",
+     "confidence": "medium"
+    },
+    {
+     "key": "C15",
+     "name": "Basic Memory",
+     "repository": "https://github.com/basicmachines-co/basic-memory",
+     "role": "Alternative sole owner using inspectable local Markdown and shared native-client MCP. Do not deploy alongside the other shortlisted owner.",
+     "install_command": "uv tool install basic-memory --prerelease=allow",
+     "install_source": "https://github.com/basicmachines-co/basic-memory",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare C02, C15 and C08 as isolated sole owners, with C05 as an additional measured challenger. Require scoped decision/handoff writes, recall and abstention, same-basename isolation, supersession, native compaction/restart capture, deletion across active and retained state, and isolated restore. Keep recall metrics separate from answer accuracy and lifecycle correctness; record p50/p95 latency and complete usage on WSL2 and macOS arm64.",
+   "deciding_comparison": "No unique winner is established; the shortlist separates typed handoffs/reversible history from simpler Markdown ownership. Agentmemory reports 500-question LongMemEval-S R@5 95.2%/R@10 98.6% and a passing-tests badge, not inspected current CI [source](https://github.com/rohitg00/agentmemory). MemPalace reports raw R@5 96.6% and held-out hybrid 98.4% [source](https://github.com/MemPalace/mempalace). Hindsight links model-dependent accuracy/latency/cost results, which were not opened [source](https://github.com/vectorize-io/hindsight). These metrics are not interchangeable. The supplied 470-question Mac recall_all@5 comparison was agentmemory 0.821, ai-memory prerelease without LLM reranking 0.570, BM25 0.747, with different capture amounts and embedders; it supports those configurations only. Reranked ai-memory, native agentmemory hooks, Hindsight and MemPalace were not run there. All supplied latest-commit dates fall within 90 days; no closed exclusion was established. Installation, current CI passes, permanent purge, isolated restore, artifact digests and whole-task savings remain unverified. Web research used 6 search queries and 8 page opens. Initial wholesale reading exposed all 51 captured API answers, exceeding the 30-answer limit; no live GitHub API calls followed.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Recent commit keeps Mem0 eligible, but native two-client capture, scoped handoffs and isolated deletion/recovery were not established within the bounded review."
+    },
+    {
+     "key": "C03",
+     "reason": "Credible dual-client option with scoped verbatim capture and published retrieval results; useful decision-write quality and transcript/vector deletion and recovery need comparison with the shortlist. [README](https://github.com/MemPalace/mempalace)."
+    },
+    {
+     "key": "C04",
+     "reason": "Recent commit establishes activity; the captured latest-release endpoint returned 404. Complete native Codex/Claude scope, capture and isolated deletion/recovery remain unverified."
+    },
+    {
+     "key": "C05",
+     "reason": "Credible dual-client option with per-repository banks and Linux x86_64/macOS arm64 support; PostgreSQL/vector state and LLM extraction enlarge restore and latency boundaries. Local providers are supported. [README](https://github.com/vectorize-io/hindsight)."
+    },
+    {
+     "key": "C06",
+     "reason": "Recent commit keeps Graphiti eligible; bounded evidence does not establish complete native capture, scope, deletion and recovery for this requirement."
+    },
+    {
+     "key": "C07",
+     "reason": "Recent commit keeps Claude-mem eligible; native Codex lifecycle parity, shared project isolation and recovery remain unverified rather than disproven."
+    },
+    {
+     "key": "C08",
+     "reason": "Strong contender with both clients' plugins/hooks and optional local embeddings; its multi-port iii-engine runtime adds a recovery boundary, and Codex Desktop hooks can need extra wiring. The packet's retrieval advantage warrants a lifecycle rematch. [README](https://github.com/rohitg00/agentmemory)."
+    },
+    {
+     "key": "C09",
+     "reason": "Recent commit keeps langmem eligible; the captured latest-release endpoint returned 404. Complete native capture, scoped handoffs, deletion and isolated restore were not verified."
+    },
+    {
+     "key": "C10",
+     "reason": "Credible Claude/Codex history-recall and compaction/resume option; durable decision-write quality and history/index deletion and restoration remain unresolved. [Changelog](https://github.com/vshulcz/deja-vu/blob/main/CHANGELOG.md)."
+    },
+    {
+     "key": "C11",
+     "reason": "Activity is current, but suitability as shared memory for native Codex and Claude with the required inspectable lifecycle was not established; no outside-requirement exclusion is inferred."
+    },
+    {
+     "key": "C12",
+     "reason": "Recent commit keeps MemOS eligible; complete native two-client scope and inspectable capture/deletion/restore were not established within the bounded review."
+    },
+    {
+     "key": "C13",
+     "reason": "Default-branch commit is current, but the captured latest release was 2026-05-14, outside 90 days. Shared native Codex/Claude fit, deletion and isolated recovery remain unverified."
+    },
+    {
+     "key": "C14",
+     "reason": "Recent commit keeps Supermemory eligible; native lifecycle and recovery were not established. Mandatory paid-service dependence was not verified, so it is not excluded."
+    },
+    {
+     "key": "C16",
+     "reason": "Recent commit keeps OpenViking eligible; a complete native two-client capture, scope, deletion and recovery contract was not verified within the bounded reads."
+    },
+    {
+     "key": "C17",
+     "reason": "Recent commit keeps Cognee eligible; shared native capture, project isolation and isolated deletion/restoration remain unverified in this review."
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C02": [
+     {
+      "claim": "Documents native Claude Code/Codex integration, project knowledge and typed handoffs with ownership and claim-once behavior.",
+      "url": "https://github.com/akitaonrails/ai-memory"
+     },
+     {
+      "claim": "Git-backed Markdown is authoritative and indexes are derived. Version restoration is documented; originals remain in history. Active-retrieval deletion and permanent purge coverage are unverified.",
+      "url": "https://github.com/akitaonrails/ai-memory"
+     },
+     {
+      "claim": "Pinned installation guide makes the server the state writer. Hook defaults use basename(cwd); explicitly choose repo-root scoping for each client to avoid inconsistent project identities.",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.5.2/docs/install.md"
+     },
+     {
+      "claim": "Documents Linux/WSL2/macOS and amd64/arm64 containers. README reports integration CI and recall-evaluation gates; current results and totals unknown. Docker example uses unpinned latest; digest and data-layout recovery unverified.",
+      "url": "https://github.com/akitaonrails/ai-memory"
+     },
+     {
+      "claim": "Coordinator snapshot at 2026-10-01T20:42:24Z: unarchived, 15 open issues; response/resolution activity unknown.",
+      "url": "https://api.github.com/repos/akitaonrails/ai-memory"
+     },
+     {
+      "claim": "Captured stable v2.5.2 published 2026-10-01T07:40:18Z, within 90 days.",
+      "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2"
+     },
+     {
+      "claim": "Captured default-branch commit dated 2026-10-01T19:18:44Z, within 90 days.",
+      "url": "https://github.com/akitaonrails/ai-memory/commit/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3"
+     }
+    ],
+    "C15": [
+     {
+      "claim": "Documents authoritative local Markdown, two-way SQLite synchronization, delete_note/delete_project and a consistency doctor. Local backups/sync are user-operated; complete deletion and isolated restore are unverified.",
+      "url": "https://github.com/basicmachines-co/basic-memory"
+     },
+     {
+      "claim": "Codex bridge is documented; its separate plugin follows the repository default branch independently of the installed Python version.",
+      "url": "https://github.com/basicmachines-co/basic-memory/blob/main/plugins/codex/README.md"
+     },
+     {
+      "claim": "README documents standalone MCP and package checks; tests/integration-tests/benchmarks are public, with results unverified. Direct MCP avoids plugin drift, but uv-tool installs can automatically update. Linux/macOS paths are documented; target-host execution untested.",
+      "url": "https://github.com/basicmachines-co/basic-memory"
+     },
+     {
+      "claim": "Coordinator snapshot at 2026-10-01T20:42:26Z: unarchived, 64 open issues; response/resolution activity unknown.",
+      "url": "https://api.github.com/repos/basicmachines-co/basic-memory"
+     },
+     {
+      "claim": "Captured stable v0.23.2 published 2026-08-25, within 90 days. The quoted upstream installation allows prereleases and is not a reproducible release pin.",
+      "url": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"
+     },
+     {
+      "claim": "Captured default-branch commit dated 2026-10-01T18:19:07Z, within 90 days.",
+      "url": "https://github.com/basicmachines-co/basic-memory/commit/06f0dcbba4780cf6c7f77b802131f87517112b94"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The judgment already says no unique winner is established; its selected pair is a shortlist of mutually exclusive owners, not an evidence-separated winning selection.",
+    "ai-memory explicitly retains originals in Git. That supports reversible history but does not close deletion across retained state. Active-retrieval deletion and isolated restoration still require verification. [Retention contract](https://github.com/akitaonrails/ai-memory)",
+    "Basic Memory's prerelease flag is required for its transitive FastMCP dependency; removing it is not a valid pinning fix. Its package also implements automatic updates, with an opt-out. [Installation and update behavior](https://github.com/basicmachines-co/basic-memory)",
+    "The supplied 470-question comparison favors agentmemory in those tested retrieval configurations. Different capture amounts, embedders and disabled ai-memory reranking prevent a general lifecycle ranking; they do not erase the observed result.",
+    "Agentmemory's Codex integration does not register every Claude-only lifecycle event, so two-client capture parity remains a separate gate. [Client integration](https://github.com/rohitg00/agentmemory)",
+    "The prior judgment admits exceeding its own API allowance. This audit used four page opens and fifteen distinct captured API answers, with no live API calls or current-installation preference."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C08",
+     "why": "Stronger on the packet's observed retrieval comparison and publishes reproducible LongMemEval-S retrieval results. Its native-client lifecycle, useful-write quality, deletion and restore still need matching tests. [Published evaluation](https://github.com/rohitg00/agentmemory)"
+    },
+    {
+     "key": "C05",
+     "why": "Stronger published memory-answer evaluation evidence: upstream reports independently reproduced LongMemEval results. Model-dependent accuracy, latency and cost cannot substitute for the required native-client lifecycle checks. [Hindsight evaluation](https://github.com/vectorize-io/hindsight)"
+    }
+   ]
+  },
+  {
+   "layer_id": "web-research",
+   "judge": "J05",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C03",
+     "name": "Playwright CLI",
+     "repository": "https://github.com/microsoft/playwright-cli",
+     "role": "Provisional choice for bounded page interaction and source capture alongside native retrieval.",
+     "install_command": "npm install -g @playwright/cli@0.1.22\nplaywright-cli install --skills",
+     "install_source": "Upstream README npm/skills commands, version-pinned using the captured GitHub release. Installation and package digest were not verified.",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Playwright CLI versus agent-browser, with Browser Use's local CLI as a third arm, on identical WSL2 tasks and native retrieval. Measure primary-source coverage, citation correctness, interaction completion, latency and setup failures; distinguish local CLI results from cloud-agent benchmarks.",
+   "deciding_comparison": "Freeze primary-source URLs, citation checks and interactions covering JavaScript pages, PDFs and navigation. Measure required-source coverage, attributable excerpts, interaction completion, latency and setup failures using identical native retrieval. Playwright CLI is a provisional capability-fit choice, not a measured winner. Add extraction or search services only for demonstrated coverage failures. No all-arm comparison was supplied; current CI pass results and issue-response activity were not verified. Budget used: 6 searches, 8 page-fetch attempts including 2 failed test-directory fetches, and 30 captured GitHub API answers; subsequent finds searched already fetched pages.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Current CLI/MCP driver, but its Linux path requires an interactive X11/XWayland desktop and AT-SPI; that adds setup for this headless web requirement without demonstrated coverage gains. [Upstream tutorial](https://github.com/trycua/cua/blob/main/docs/content/docs/tutorials/drive-your-first-app.mdx)."
+    },
+    {
+     "key": "C04",
+     "reason": "Provides attributable search/content retrieval and Claude/Codex MCP integration, but adds an Exa service dependency without a demonstrated native-retrieval gap; the captured latest-release endpoint returned 404. [README](https://github.com/exa-labs/exa-mcp-server)."
+    },
+    {
+     "key": "C05",
+     "reason": "Documents citation-bearing extraction and dynamic-page crawling, but no recorded comparison establishes that an additional crawler is needed for the frozen coverage requirement. [README](https://github.com/unclecode/crawl4ai)."
+    },
+    {
+     "key": "C06",
+     "reason": "Strong interchangeable contender: native Rust CLI, Linux x64/macOS ARM64 binaries and explicit Linux dependency installation; no measured citation/coverage result separates it from Playwright CLI. [README](https://github.com/vercel-labs/agent-browser)."
+    },
+    {
+     "key": "C07",
+     "reason": "Has published text-extraction evaluations and metadata extraction, but does not supply interactive browser commands; add it only after demonstrating an extraction gap. [README](https://github.com/adbar/trafilatura)."
+    },
+    {
+     "key": "C08",
+     "reason": "Its existing-agent CLI is relevant, but the published Browser Use benchmark's 60-task subset does not establish superiority on this primary-source and citation requirement. [README](https://github.com/browser-use/browser-use)."
+    },
+    {
+     "key": "C09",
+     "reason": "Supports free keyless retrieval and self-hosting, so payment is not a valid exclusion; an added service has no demonstrated coverage benefit here, and its captured latest GitHub release dates to September 2025 despite current commits. [README](https://github.com/firecrawl/firecrawl-mcp-server)."
+    },
+    {
+     "key": "C10",
+     "reason": "Its API-backed CLI and Claude/Codex skills fit search/extraction, but no measured coverage gap justifies adding Tavily; the captured latest-release endpoint returned 404. [README](https://github.com/tavily-ai/tavily-cli)."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C02",
+     "criterion": "outside_requirement",
+     "fact": "OpenResearch installs a persistent local research-agent workspace, dashboard and experiment-orchestration stack through orx up, contrary to the requirement to avoid another standing research-agent stack.",
+     "url": "https://github.com/alphaXiv/OpenResearch/blob/main/README.md"
+    }
+   ],
+   "evidence": {
+    "C03": [
+     {
+      "claim": "Documents headless operation, scoped sessions, navigation, snapshots, JavaScript evaluation, network inspection, PDFs and tracing without a separate research-agent service.",
+      "url": "https://github.com/microsoft/playwright-cli"
+     },
+     {
+      "claim": "Documents skills for coding agents and direct CLI operation when skills are unavailable.",
+      "url": "https://github.com/microsoft/playwright-cli#installing-skills"
+     },
+     {
+      "claim": "The underlying Playwright documentation explicitly supports WSL, Ubuntu x86_64/arm64 and macOS 14+. These browser operations do not require the RTX 4090; target-host execution was not tested.",
+      "url": "https://playwright.dev/docs/intro#system-requirements"
+     },
+     {
+      "claim": "Captured GitHub API answers at 2026-10-01T20:42:40Z report an unarchived repository, a default-branch commit on September 28 and release v0.1.22 on September 28.",
+      "url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22"
+     },
+     {
+      "claim": "The repository lists a test suite, but its directory fetch failed. Current CI results and comparative source-coverage measurements remain unknown.",
+      "url": "https://github.com/microsoft/playwright-cli"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 3,
+   "critic_issues": [
+    "C01's rejection introduces a headless requirement absent from the packet. Its Linux desktop prerequisites are documented, but preferring headless operation is an additional assumption. [Cua tutorial](https://github.com/trycua/cua/blob/main/docs/content/docs/tutorials/drive-your-first-app.mdx).",
+    "C08's benchmark description is incomplete: upstream also documents a current 200-task V2.1 dataset and reproducible runner. That runner uses BrowserCode and cloud browsers, so its results still do not establish superiority for the local CLI or frozen citation requirement. [Benchmark repository](https://github.com/browser-use/benchmark).",
+    "The documented CLI capabilities support candidacy, but do not establish required-source coverage or citation accuracy against agent-browser. No contender was established stronger overall.",
+    "Audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "token-efficiency",
+   "judge": "J05",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C01",
+     "name": "Context Mode",
+     "repository": "https://github.com/mksglu/context-mode",
+     "role": "On-demand indexed context retrieval and processing with preserved source content.",
+     "install_command": "npm install -g context-mode@1.0.169",
+     "install_source": "Upstream README global npm route, version-pinned using the captured release. Client configuration is documented separately; installation and package digest were not verified.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C10",
+     "name": "sqz",
+     "repository": "https://github.com/ojuschugh1/sqz",
+     "role": "Complementary deterministic command-output compression and deduplication with explicit original recovery.",
+     "install_command": "npm i -g sqz-cli@1.9.0\nsqz init",
+     "install_source": "Upstream README npm/init route, version-pinned using the captured v1.9.0 release. Registry-version correspondence, digest and installation were not verified.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C06",
+     "name": "ccusage",
+     "repository": "https://github.com/ccusage/ccusage",
+     "role": "Independent local usage reporting, kept separate from context/artifact reduction estimates.",
+     "install_command": "npx ccusage@20.0.26",
+     "install_source": "Upstream README npx route, version-pinned using the captured v20.0.26 release. Installation and package digest were not verified.",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare native baseline, Context Mode, sqz, RTK and Headroom separately before testing combinations. Require equal completion quality, original recovery and preserved failures; reconcile complete input/output/cache usage including children, retries and recovery calls. Compare ccusage and agent-console against identical accounting fixtures.",
+   "deciding_comparison": "On WSL2 x86_64, repeat frozen tasks at equal completion quality with blinded checks. Require recovery of omitted originals and preservation of failures, exit codes and test totals. Report artifact bytes, tokenizer counts and cache subsets separately from complete provider input/output/cache usage, including children, retries and failed attempts; include recovery calls and latency. Check usage readers against planted parent/child, duplicate, missing-field and retry records. Existing upstream benchmarks differ in tasks, versions, hosts and units, so the selection is provisional and whole-task net savings remain unknown. Issue-response activity and current CI outcomes were not verified. Budget used: 6 searches, 8 page fetches and 30 captured GitHub API answers; subsequent finds searched already fetched pages.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Strong usage-observation alternative with explicit unknowns and claimed cross-platform CI; ccusage supplies the required report role without another browser console, and no verified accounting-accuracy comparison separates them. [README](https://github.com/lockedinlabs-ai/agent-console)."
+    },
+    {
+     "key": "C04",
+     "reason": "Strong current Linux/macOS CLI contender that correctly separates bytes/4 output estimates from bills; documented recovery is failure/truncation-driven, while sqz documents byte-exact recovery for every compressed result. Their matched-task quality remains unresolved. [README](https://github.com/rtk-ai/rtk)."
+    },
+    {
+     "key": "C05",
+     "reason": "Useful repository packaging, token counting and Tree-sitter compression, but narrower than general indexed retrieval plus runtime-output recovery and independent usage accounting. [README](https://github.com/yamadashy/repomix)."
+    },
+    {
+     "key": "C08",
+     "reason": "CCR recovery and CPU benchmarks make it a serious alternative, but the reviewed benchmark page supplies artifact/anomaly checks and explicitly lacks a committed QA-comparison result; proxy transforms have no demonstrated equal-quality whole-task advantage over the selected paths. [Benchmarks](https://docs.headroomlabs.ai/docs/benchmarks)."
+    },
+    {
+     "key": "C09",
+     "reason": "The 4B-model gateway adds inference and provider-endpoint routing; no reviewed matched-task result verifies original-context recovery and complete usage on the RTX 4090. [README](https://github.com/Paritok-official/paritok-4b-v1)."
+    },
+    {
+     "key": "C11",
+     "reason": "Published token/retrieval benchmarks and reversible JSON conversion are useful, but this is a structured-data format rather than general task-context retrieval, command recovery or provider-use accounting. [Benchmarks](https://github.com/toon-format/toon/blob/main/benchmarks/README.md)."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C03",
+     "criterion": "stale_or_archived",
+     "fact": "The captured GitHub API answer gives the latest default-branch commit as 2026-06-16T03:07:00Z, before the July 3 cutoff for the frozen 90-day criterion. The repository is not archived.",
+     "url": "https://github.com/drona23/claude-token-efficient/commit/0d30a6db75af983b8ababf585f28faefdfc87895"
+    },
+    {
+     "key": "C07",
+     "criterion": "duplicate",
+     "fact": "This names the same Context Mode implementation as C01 with an always-on deployment policy, supplies no separate repository, and contributes no independent repository candidate.",
+     "url": "packets/token-efficiency.json"
+    }
+   ],
+   "evidence": {
+    "C01": [
+     {
+      "claim": "Documents FTS5 indexing, exact chunk/code retrieval and full-content externalization for large outputs, giving a recovery path rather than retaining only a summary.",
+      "url": "https://github.com/mksglu/context-mode/blob/main/BENCHMARK.md"
+     },
+     {
+      "claim": "The upstream benchmark reports 21 scenarios, 376 KB processed versus 16.5 KB returned, and 125 passing tests. These are published artifact/retrieval measurements and reported suite results, not complete provider-use or equal-quality task measurements.",
+      "url": "https://github.com/mksglu/context-mode/blob/main/BENCHMARK.md"
+     },
+     {
+      "claim": "Documents Claude Code and Codex MCP/hooks integration. Codex hooks require feature flags and trust; MCP reachability alone does not prove hooks work. The Node-based path is plausible on WSL2 and macOS arm64 but was not host-tested.",
+      "url": "https://github.com/mksglu/context-mode"
+     },
+     {
+      "claim": "Captured API answers at 2026-10-01T20:42:39Z report an unarchived repository and an October 1 default-branch commit; latest release v1.0.169, June 29, falls outside the 90-day release window.",
+      "url": "https://github.com/mksglu/context-mode/commit/22628d08bc30a30ea2fbb4623481172e508dbdd7"
+     }
+    ],
+    "C10": [
+     {
+      "claim": "Documents a local deterministic Rust CLI, source reads served in full, command/line-range deduplication, client hooks/MCP setup and byte-exact recovery through sqz expand.",
+      "url": "https://github.com/ojuschugh1/sqz/blob/main/README.md"
+     },
+     {
+      "claim": "Publishes reproducible command and deduplication fixtures. The benchmark distinguishes chars/4 estimates from a cl100k_base check reporting 88.9% aggregate formatter-fixture reduction; this is not whole-task provider savings.",
+      "url": "https://github.com/ojuschugh1/sqz/blob/main/BENCHMARKS.md"
+     },
+     {
+      "claim": "The benchmark is dated May 2026, version 1.2.0, on macOS aarch64. It supports secondary-host evidence but does not verify v1.9.0 on WSL2; Linux x86_64 suitability is inferred from the documented Rust/npm installation paths.",
+      "url": "https://github.com/ojuschugh1/sqz/blob/main/BENCHMARKS.md"
+     },
+     {
+      "claim": "Captured API answers at 2026-10-01T20:42:40Z report an unarchived repository, release v1.9.0 on September 23 and a default-branch commit on September 24.",
+      "url": "https://github.com/ojuschugh1/sqz/releases/tag/v1.9.0"
+     }
+    ],
+    "C06": [
+     {
+      "claim": "Reads coding-agent local usage data and documents Claude Code/Codex reports by day, week, month and session, including JSON export.",
+      "url": "https://github.com/ccusage/ccusage"
+     },
+     {
+      "claim": "Its usage-data reporting is a separate measurement channel from Context Mode's bytes and sqz's compression estimates. Complete provider totals still require verified coverage of parent/child sessions, retries and missing records; invoices and whole-task savings are not established.",
+      "url": "https://github.com/ccusage/ccusage#supported-sources"
+     },
+     {
+      "claim": "Documents npm, Bun, pnpm and Nix execution paths. WSL2/macOS arm64 portability is inferred from those paths, not demonstrated by this run; no accounting-accuracy CI result was verified.",
+      "url": "https://github.com/ccusage/ccusage#installation"
+     },
+     {
+      "claim": "Captured API answers at 2026-10-01T20:42:39Z report an unarchived repository, release v20.0.26 on September 27 and an October 1 default-branch commit.",
+      "url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 9,
+   "critic_issues": [
+    "The benchmark qualifications are accurate: artifact reduction, estimated tokens and local-log accounting do not establish equal-quality whole-task provider savings.",
+    "Current default-branch integration documentation does not by itself verify the pinned Context Mode release. The sqz benchmark also predates the selected version; neither artifact was qualified on WSL2.",
+    "Rejecting agent-console partly to avoid another browser console introduces a preference absent from the frozen requirement. Accounting correctness, rather than interface type, should decide that role.",
+    "Headroom publishes compression and latency measurements but explicitly lacks a committed QA-preservation result. Its exclusion therefore cannot establish the selected paths as an equal-quality winner either. [Headroom benchmarks](https://docs.headroomlabs.ai/docs/benchmarks).",
+    "Audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected; no challenger was established stronger overall."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "judge": "J06",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C08",
+     "name": "Inspect AI",
+     "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+     "role": "Provisional semantic-evaluation harness for independently labeled cases, explicit scoring policies and auditable failures.",
+     "install_command": "pip install inspect-ai",
+     "install_source": "https://inspect.aisi.org.uk/?lang=en-US — documented PyPI command; package version and digest remain unverified.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C04",
+     "name": "Harbor (containerized agent E2E runner)",
+     "repository": "https://github.com/harbor-framework/harbor",
+     "role": "Execute agent tasks and independent project verifier checks.",
+     "install_command": "uv tool install harbor==0.23.0",
+     "install_source": "https://github.com/harbor-framework/harbor#installation — documented install pattern pinned to the captured release; artifact digest unverified.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C05",
+     "name": "Playwright",
+     "repository": "https://github.com/microsoft/playwright",
+     "role": "Independent browser behavior checks and observations, retaining original failures before repairs.",
+     "install_command": "npm install --save-dev --save-exact @playwright/test@1.63.0\nnpx playwright install --with-deps",
+     "install_source": "https://playwright.dev/docs/intro — documented installation pattern pinned to the captured release.",
+     "confidence": "high"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Inspect AI versus Promptfoo versus MLflow on identical fresh, independently labeled outputs, with fixed error, abstention and disagreement policies. Measure false passes, false failures, evidence retention and reproducibility. Select browser, shell and container checks only after identifying the changed behavior.",
+   "deciding_comparison": "Selections are provisional capability judgments, not measured superiority. No matched all-arm comparison is supplied; public suites/examples do not establish semantic accuracy. Target-host execution, issue-response rates and whole-task usage remain unknown. ShellCheck remains current by commits despite its older stable release. Research used 6 searches, 8 page opens and 30 captured API responses; no new API calls.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Syntax-aware diffs aid review but do not establish changed runtime behavior; narrower coverage than the selected tools. [Upstream source](https://github.com/Wilfred/difftastic)."
+    },
+    {
+     "key": "C03",
+     "reason": "Useful shell-specific static checks and failure exit codes; no shell-specific requirement justifies a separate selection. [Upstream source](https://github.com/koalaman/shellcheck)."
+    },
+    {
+     "key": "C06",
+     "reason": "Strong declarative CLI/CI evaluation alternative; semantic accuracy versus Inspect remains unresolved, making it a deciding-comparison arm. [Upstream source](https://github.com/promptfoo/promptfoo)."
+    },
+    {
+     "key": "C07",
+     "reason": "Skill for building with System One; the read README supplies no independently labeled semantic-advice evaluation or failure-preserving regression harness. [Upstream source](https://github.com/typesafe-ai/skills)."
+    },
+    {
+     "key": "C09",
+     "reason": "Scriptable MCP testing and validation fixtures fit MCP-server changes; the packet requires broader behavior verification. [Upstream source](https://github.com/modelcontextprotocol/inspector/blob/main/README.md)."
+    },
+    {
+     "key": "C10",
+     "reason": "Capable self-hosted evaluation/tracing platform, but overlaps the evaluation role; no matched study establishes an advantage. Include it in the comparison. [Upstream source](https://github.com/mlflow/mlflow)."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C01",
+     "criterion": "stale_or_archived",
+     "fact": "Captured API at 2026-10-01T20:42:34Z reports latest default-branch commit 2026-06-24T02:36:12Z, outside 90 days. Later pushed_at does not satisfy the default-branch criterion.",
+     "url": "https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431"
+    }
+   ],
+   "evidence": {
+    "C08": [
+     {
+      "claim": "Documents evaluations, Docker sandboxes, local model providers and Claude Code/Codex integration. WSL Linux is a plausible fit; macOS arm64 was not separately verified. GPU requirements depend on the model provider.",
+      "url": "https://inspect.aisi.org.uk/?lang=en-US"
+     },
+     {
+      "claim": "Errored samples can retain both errors and scores. Failure thresholds and retries require explicit configuration; a successful evaluation status alone does not establish that every sample succeeded.",
+      "url": "https://inspect.aisi.org.uk/handling-errors.html"
+     },
+     {
+      "claim": "Upstream publishes tests and documents make check and make test. Executed CI totals and independently labeled semantic-advice accuracy were not verified.",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:35Z: unarchived; open_issues_count=367. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/UKGovernmentBEIS/inspect_ai/commit/617d06c72bcde8d6988e200f98946797614e29c2"
+     },
+     {
+      "claim": "Captured releases/latest returned 404; this does not establish absence of package-registry releases.",
+      "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/releases/latest"
+     }
+    ],
+    "C04": [
+     {
+      "claim": "Official Terminal-Bench 2.0 harness with local Docker execution, Claude Code/Codex support and public tests. These establish capability, not measured superiority. WSL requires Docker; macOS arm64 task-image compatibility remains task dependent.",
+      "url": "https://github.com/harbor-framework/harbor"
+     },
+     {
+      "claim": "Tasks supply an independent test script and write verifier rewards under /logs/verifier, including zero-valued failures. Test and reward definitions still require independent review.",
+      "url": "https://github.com/harbor-framework/harbor/blob/main/docs/content/docs/tasks/index.mdx"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:34Z: unarchived; open_issues_count=967. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/harbor-framework/harbor"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/harbor-framework/harbor/commit/bf991e490394ef9c3250a6db2bc5cbda903cb4c3"
+     },
+     {
+      "claim": "Captured latest stable release is v0.23.0, published 2026-09-12, within 90 days.",
+      "url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0"
+     }
+    ],
+    "C05": [
+     {
+      "claim": "Documents WSL, Ubuntu x86_64 and macOS 14+ support, three-browser tests and reports separating failed, skipped and flaky results. No RTX GPU is required. macOS arm64 and upstream CI pass totals were not separately audited.",
+      "url": "https://playwright.dev/docs/intro"
+     },
+     {
+      "claim": "Provides Claude Code and Codex agent definitions. Its healer may skip tests when functionality is broken; preserve original tests, failures and skipped outcomes when using repairs.",
+      "url": "https://playwright.dev/docs/test-agents"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:34Z: unarchived; open_issues_count=197. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/microsoft/playwright"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/microsoft/playwright/commit/ec17ddf9cd2ffbac6cacd455c7f236880362220b"
+     },
+     {
+      "claim": "Captured latest stable release is v1.63.0, published 2026-09-04, within 90 days.",
+      "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 9,
+   "critic_issues": [
+    "Recent Inspect package publication is verifiable; GitHub's 404 should not leave its release activity unresolved. The proposed pip command nevertheless remains unpinned.",
+    "Harbor supplies a verifier interface, but independent grading is not automatic: its default environment is shared. Grader authorship, isolation and reward handling require explicit qualification. [Task documentation](https://github.com/harbor-framework/harbor/blob/main/docs/content/docs/tasks/index.mdx).",
+    "The packet names no concrete browser or container change. Rejecting ShellCheck for lack of a shell-specific task while selecting Playwright without a browser-specific task applies inconsistent scope assumptions.",
+    "Inspect, Promptfoo and MLflow were not compared on independently labeled semantic cases. Published harness capabilities and test suites do not establish semantic scoring accuracy.",
+    "Audit used 4 page-open attempts, including one failed Harbor fetch recovered through primary-source search, and 14 captured API answers. No popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "judge": "J06",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C01",
+     "name": "attest",
+     "repository": "https://github.com/actions/attest",
+     "role": "Bind published artifact/SBOM digests to verifiable hosted build provenance.",
+     "install_command": "uses: actions/attest@v4.2.2",
+     "install_source": "https://github.com/actions/attest#usage — Linux Actions workflow step; immutable release SHA must be resolved before adoption.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C03",
+     "name": "zizmor",
+     "repository": "https://github.com/zizmorcore/zizmor",
+     "role": "Provisional workflow security auditor for excessive permissions, credential leakage and injection.",
+     "install_command": "unknown — linked Linux installation command was not recovered within the page budget",
+     "install_source": "https://github.com/zizmorcore/zizmor — links upstream installation instructions; command and target binaries remain unverified.",
+     "confidence": "low"
+    },
+    {
+     "key": "C06",
+     "name": "actionlint (kjanat)",
+     "repository": "https://github.com/kjanat/actionlint",
+     "role": "Workflow syntax/type checks, opt-in SHA-pin policy and attributable hosted annotations.",
+     "install_command": "gh release download v1.17.0 --repo kjanat/actionlint --pattern 'actionlint_*_linux_amd64.tar.gz' --output - | tar -xzf - actionlint",
+     "install_source": "https://github.com/kjanat/actionlint/blob/master/README.md — documented Linux archive pattern pinned to the captured release.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C07",
+     "name": "Syft",
+     "repository": "https://github.com/anchore/syft",
+     "role": "Inventory the built runtime image or installed filesystem and publish its SBOM.",
+     "install_command": "curl -sSfL https://get.anchore.io/syft | sudo sh -s -- -b /usr/local/bin",
+     "install_source": "https://github.com/anchore/syft/blob/main/README.md — documented bootstrap, not a verified version/digest pin; resolve the v1.52.0 release asset before adoption.",
+     "confidence": "medium"
+    },
+    {
+     "key": "C09",
+     "name": "Dependabot",
+     "repository": "https://github.com/dependabot/dependabot-core",
+     "role": "Keep manifest/lockfile updates reviewable through attributed dependency PRs.",
+     "install_command": "docker pull ghcr.io/dependabot/dependabot-updater-gomod",
+     "install_source": "https://github.com/dependabot/dependabot-core — documented local Go-ecosystem image example; hosted activation uses .github/dependabot.yml. Image digest unverified.",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare zizmor, poutine and kjanat/actionlint policy mode on identical benign and unsafe workflow fixtures without executing payloads. Measure precision, missed findings, exit codes and annotations. Separately verify repeat-build digests, runtime SBOM coverage, immutable dependency references and attributable hosted-check results.",
+   "deciding_comparison": "Select complementary security auditing, syntax checking, runtime SBOM, dependency updates and provenance roles. Adoption remains conditional where commands, digests or platforms are unverified. No all-arm host benchmark or executed CI totals were established. Add vulnerability tooling only for a defined artifact/database gap. Issue-response rates and whole-task usage remain unknown. Budget disclosure: 6 searches and 8 page opens; the supplied sidecar contains 36 API responses, exceeding the 30-response cap by 6. No additional API calls were made.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Credible multi-CI auditor with MCP integration; provisional preference is GitHub-specific permission auditing, without measured superiority. July 9 default commit is inside 90 days. [Upstream source](https://github.com/boostsecurityio/poutine)."
+    },
+    {
+     "key": "C04",
+     "reason": "Secret detection could address a defined leak-detection gap; none is specified here. [Upstream source](https://github.com/gitleaks/gitleaks/blob/master/README.md)."
+    },
+    {
+     "key": "C05",
+     "reason": "Broad scanner/SBOM alternative; dedicated Syft covers the inventory role without adding an undefined vulnerability-database requirement. No accuracy advantage is claimed. [Upstream source](https://github.com/aquasecurity/trivy/blob/main/docs/guide/target/sbom.md)."
+    },
+    {
+     "key": "C08",
+     "reason": "No vulnerability artifact/database gap warrants adding Grype; its Syft integration remains a future option. [Upstream source](https://github.com/anchore/syft/blob/main/README.md)."
+    },
+    {
+     "key": "C10",
+     "reason": "SARIF upload is conditional on code-scanning publication; attributable Actions checks and artifact provenance cover the stated role. [Upstream source](https://docs.github.com/en/code-security/how-tos/find-and-fix-code-vulnerabilities/integrate-with-existing-tools/upload-sarif-file?learn=code_security_integration)."
+    },
+    {
+     "key": "C12",
+     "reason": "No OSV advisory/database coverage gap or dependency-vulnerability acceptance gate is defined in the packet; an additional scanner lacks a specified role."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C11",
+     "criterion": "stale_or_archived",
+     "fact": "Captured API at 2026-10-01T20:42:22Z reports latest default-branch commit 2026-04-19T14:46:58Z, outside 90 days. Later pushed_at does not satisfy the default-branch criterion.",
+     "url": "https://github.com/rhysd/actionlint/commit/011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"
+    }
+   ],
+   "evidence": {
+    "C01": [
+     {
+      "claim": "Generates signed provenance/SBOM attestations with artifact digests and verifiable URLs. Scope documented OIDC/attestation permissions to publishing jobs. Public repositories are supported without Enterprise Cloud; private/internal attestations require that plan. Execution belongs in hosted workflows.",
+      "url": "https://github.com/actions/attest"
+     },
+     {
+      "claim": "Publishes __tests__ and Jest configuration. Executed CI results were not verified; provenance does not establish passing checks or reproducible build outputs.",
+      "url": "https://github.com/actions/attest"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:19Z: unarchived; open_issues_count=18. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/actions/attest"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-09-24, within 90 days.",
+      "url": "https://github.com/actions/attest/commit/a0eb68d51f3a5d373e107cfa9c8455ba800479cd"
+     },
+     {
+      "claim": "Captured latest stable release is v4.2.2, published 2026-08-04, within 90 days.",
+      "url": "https://github.com/actions/attest/releases/tag/v4.2.2"
+     }
+    ],
+    "C03": [
+     {
+      "claim": "Explicitly documents excessive permission scopes, credential grants/leaks, template injection and confusable references. Direct capability fit; precision against poutine and actionlint policy mode is unmeasured.",
+      "url": "https://github.com/zizmorcore/zizmor"
+     },
+     {
+      "claim": "Documentation confirms GitHub Actions, Dependabot and pre-commit coverage. Linux/macOS arm64 installation, test outcomes and agent-specific integration were not verified within budget; adoption remains conditional.",
+      "url": "https://docs.zizmor.sh/"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:21Z: unarchived; open_issues_count=164. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/zizmorcore/zizmor"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/zizmorcore/zizmor/commit/7edf1f06b3da7b9093f85b583014a9f9036dc496"
+     },
+     {
+      "claim": "Captured latest stable release is v1.30.1, published 2026-09-09, within 90 days.",
+      "url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1"
+     }
+    ],
+    "C06": [
+     {
+      "claim": "Fork adds policies, cache safety, composite validation and a Linux Docker action with ShellCheck/pyflakes and annotations. Either agent can call its CLI. macOS installation is documented; arm64 assets were not verified.",
+      "url": "https://github.com/kjanat/actionlint/blob/master/README.md"
+     },
+     {
+      "claim": "Generated worked example runs rhysd 1.7.12 and this fork 1.17.0: each reports three diagnostics, with different semantics and a SHA-pin finding in the fork. Narrow reproducible evidence, not a general precision benchmark or audited CI result.",
+      "url": "https://github.com/kjanat/actionlint/blob/master/README.md"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:21Z: unarchived fork; open_issues_count=61. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/kjanat/actionlint"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-09-25, within 90 days.",
+      "url": "https://github.com/kjanat/actionlint/commit/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7"
+     },
+     {
+      "claim": "Captured latest stable release is v1.17.0, published 2026-09-13, within 90 days.",
+      "url": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0"
+     }
+    ],
+    "C07": [
+     {
+      "claim": "Scans images, filesystems and archives across package ecosystems; emits SPDX/CycloneDX and supports attestations. Inventory the actual runtime artifact rather than its lockfile alone. This does not establish loaded modules or host GPU-driver state.",
+      "url": "https://github.com/anchore/syft/blob/main/README.md"
+     },
+     {
+      "claim": "Publishes a test directory and installation documentation. Executed totals, inventory completeness versus Trivy and macOS arm64 binaries were not verified. Both agents can call the CLI; SBOM generation requires no GPU.",
+      "url": "https://github.com/anchore/syft"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:21Z: unarchived; open_issues_count=641. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/anchore/syft"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676"
+     },
+     {
+      "claim": "Captured latest stable release is v1.52.0, published 2026-09-17, within 90 days.",
+      "url": "https://github.com/anchore/syft/releases/tag/v1.52.0"
+     }
+    ],
+    "C09": [
+     {
+      "claim": "Generates updated manifests/lockfiles and PR descriptions with upstream change evidence. Standalone CLI use creates diffs and requires separate PR wiring; hosted use is enabled by repository configuration.",
+      "url": "https://github.com/dependabot/dependabot-core"
+     },
+     {
+      "claim": "Documents ecosystem RSpec suites and Docker testing. Prebuilt images are AMD64; arm64 uses slower emulation. WSL2 x86_64 fits the image target. Executed CI totals and automatic full pin enforcement were not verified.",
+      "url": "https://github.com/dependabot/dependabot-core"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:21Z: unarchived; open_issues_count=1555. Issue-response activity remains unverified.",
+      "url": "https://api.github.com/repos/dependabot/dependabot-core"
+     },
+     {
+      "claim": "Captured default-branch commit is dated 2026-10-01, within 90 days.",
+      "url": "https://github.com/dependabot/dependabot-core/commit/ea7cdf5880a156375eedf0105dc69188164cfbad"
+     },
+     {
+      "claim": "Captured latest stable release is v0.398.0, published 2026-09-28, within 90 days.",
+      "url": "https://github.com/dependabot/dependabot-core/releases/tag/v0.398.0"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 15,
+   "critic_issues": [
+    "The missing zizmor installation command can be resolved: upstream documents uv tool install zizmor, alongside pip and pipx routes. Wheels remain best-effort, so this does not prove target-host acceptance. [Installation](https://docs.zizmor.sh/installation/).",
+    "The selected components provide plausible complementary roles, but provenance does not demonstrate reproducible output or passing hosted checks. Dependabot updates and opt-in workflow SHA policies do not alone enforce every dependency pin.",
+    "The actionlint example is one fixture, not a precision comparison. No labeled comparison separates zizmor, poutine and the fork's policy mode.",
+    "The judge disclosed exceeding its API cap. This audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "judge": "J07",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C03",
+     "name": "Dagu",
+     "repository": "https://github.com/dagucloud/dagu",
+     "role": "Local command-workflow scheduling, visible run history, retries and agent access; recovery semantics require workload qualification.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/main/scripts/installer.sh | bash",
+     "install_source": "https://github.com/dagucloud/dagu#install",
+     "confidence": "medium"
+    },
+    {
+     "key": "C05",
+     "name": "systemd",
+     "repository": "https://github.com/systemd/systemd",
+     "role": "Complementary WSL2 Linux process/service supervision and timers; explicit resource limits and subtree cancellation must be qualified. No native macOS role.",
+     "install_command": "sudo apt-get update -y && sudo apt-get install systemd systemd-sysv -y",
+     "install_source": "https://learn.microsoft.com/en-us/windows/wsl/systemd",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Dagu versus Prefect with identical systemd supervision and storage assumptions. Freeze cancellation, retry and external-effect contracts before crash/reboot tests. If host-loss durability is mandatory, compare Temporal and Restate under equivalent storage and effect contracts; qualify macOS supervision separately.",
+   "deciding_comparison": "This is a capability-based local-workflow proposal, not measured scheduler superiority. Preregister workload durability, then measure visible history, resource-limit enforcement, surviving descendants after cancellation, cancellation latency, retries, duplicate external effects, compensations, reboot/crash recovery and CPU/RSS/operating effort. The packet's Dagu/Prefect/Temporal comparison had material deviations and unequal recovery configuration and named no winner. All eight candidates were unarchived with recent commits and releases in the captured facts. Current CI pass totals, issue-response quality and macOS arm64 behavior remain unverified. Budget: 6 searches, 8 page-fetch attempts including 2 failed systemd-manual fetches, and 24 captured API responses. Install commands are documented examples; artifact/version/digest locking remains necessary before installation.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Conductor offers durable, inspectable workflows, but no verified target-host comparison justifies its Java/worker programming model for the unspecified local workload. [Upstream README](https://github.com/conductor-oss/conductor/blob/main/README.md)"
+    },
+    {
+     "key": "C02",
+     "reason": "Strong Python-flow alternative with self-hosted history and agent integration; the recorded comparison does not establish a fair recovery winner over Dagu. [Upstream README](https://github.com/PrefectHQ/prefect)"
+    },
+    {
+     "key": "C04",
+     "reason": "Its documented focus is data assets and pipelines; no data-asset requirement justifies selecting that programming model for general local commands. [Upstream README](https://github.com/dagster-io/dagster)"
+    },
+    {
+     "key": "C06",
+     "reason": "SQL-native durability is attractive for PostgreSQL-centric work, but the requirement does not establish that workload or demonstrate supervision of heterogeneous process trees. [Upstream README](https://github.com/microsoft/pg_durable/blob/main/README.md)"
+    },
+    {
+     "key": "C07",
+     "reason": "Durable finalist if host-loss survival is required; activity effects, cancellation and operating cost still need an equivalent target-host qualification. [Upstream README](https://github.com/temporalio/temporal)"
+    },
+    {
+     "key": "C08",
+     "reason": "Durable finalist with recoverable timers, state and an inspection CLI; no verified target-host evidence separates it from Temporal for the unstated durable workload. [Upstream README](https://github.com/restatedev/restate)"
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C03": [
+     {
+      "claim": "Upstream documents a single binary, file-backed state, command workflows, scheduling, retries, history, concurrency controls and an authenticated MCP server. Linux and macOS are documented.",
+      "url": "https://github.com/dagucloud/dagu"
+     },
+     {
+      "claim": "The repository exposes engine_test.go, example_test.go and conformance/. Test contents, passing totals and current CI results were not verified; their presence does not establish recovery superiority.",
+      "url": "https://github.com/dagucloud/dagu"
+     },
+     {
+      "claim": "Captured API answer: latest release v2.18.1 was published 2026-09-29.",
+      "url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/dagucloud/dagu/commit/1ee69be8c2c6d833bf6731c7031271eaee47e222"
+     },
+     {
+      "claim": "At the 2026-10-01 capture, archived=false and open_issues_count=97. This inventory does not establish issue-response quality.",
+      "url": "https://api.github.com/repos/dagucloud/dagu"
+     }
+    ],
+    "C05": [
+     {
+      "claim": "Upstream systemd-run documentation supports transient services/scopes, unit-property assignments, timer triggers and waiting for completion. This supplies a supervision interface alongside Dagu's workflow history.",
+      "url": "https://raw.githubusercontent.com/systemd/systemd/main/man/systemd-run.xml"
+     },
+     {
+      "claim": "Microsoft documents systemd support in WSL2, Linux cgroup process tracking and the Ubuntu/Debian package command. It explicitly states that systemd services do not keep a WSL instance alive.",
+      "url": "https://learn.microsoft.com/en-us/windows/wsl/systemd"
+     },
+     {
+      "claim": "Captured API answer: latest upstream release v262 was published 2026-09-22; this does not establish the version supplied by Ubuntu packages.",
+      "url": "https://github.com/systemd/systemd/releases/tag/v262"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/systemd/systemd/commit/b43fed88efe34889a49a7710a92141849dc4906d"
+     },
+     {
+      "claim": "At capture, archived=false and open_issues_count=3527. Current upstream test results and issue-resolution activity were not verified.",
+      "url": "https://api.github.com/repos/systemd/systemd"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The actual workload's effect and durability contracts remain unspecified. Scheduling, retries and persistent history do not by themselves prove recovery of external effects.",
+    "The recorded Dagu/Prefect/Temporal comparison had unequal recovery configuration and named no winner; it cannot support a scheduler ranking.",
+    "WSL lifetime, process-tree cancellation and resource enforcement need qualification together. The selected systemd role has no native macOS counterpart.",
+    "Audit used 4 page opens and 15 captured API answers, with no fresh API calls. Current CI outcomes and issue-response quality were not established; no popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "hosting-services",
+   "judge": "J07",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C02",
+     "name": "Docker Engine / Moby",
+     "repository": "https://github.com/moby/moby",
+     "role": "Provisional local Linux container-runtime choice, paired with Compose; runtime qualification against Podman remains open.",
+     "install_command": "sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin",
+     "install_source": "https://docs.docker.com/engine/install/ubuntu/",
+     "confidence": "medium"
+    },
+    {
+     "key": "C08",
+     "name": "Docker Compose",
+     "repository": "https://github.com/docker/compose",
+     "role": "Declarative application/service wiring alongside Docker Engine, with explicit service configuration and deployment project scope.",
+     "install_command": "sudo apt-get install docker-compose-plugin",
+     "install_source": "https://docs.docker.com/compose/install/linux/",
+     "confidence": "medium"
+    },
+    {
+     "key": "C05",
+     "name": "FastAPI",
+     "repository": "https://github.com/fastapi/fastapi",
+     "role": "Typed Python HTTP application finalist, conditional on a Python/API workload; authentication remains explicit application configuration.",
+     "install_command": "uv add \"fastapi[standard-no-fastapi-cloud-cli]\"",
+     "install_source": "https://github.com/fastapi/fastapi#installation",
+     "confidence": "medium"
+    },
+    {
+     "key": "C07",
+     "name": "PostgreSQL",
+     "repository": "https://github.com/postgres/postgres",
+     "role": "Supporting relational-state service when the application requires a database; database accounts and persistence must be configured explicitly.",
+     "install_command": "sudo apt install postgresql-18",
+     "install_source": "https://www.postgresql.org/download/linux/ubuntu/",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "First freeze application language, API/UI, state and GPU requirements. Compare Docker Engine plus Compose against rootless Podman plus Quadlet on the same application, accounts and data. Compare FastAPI with Next.js only where both satisfy that application contract; measure isolation, persistence, restore, rollback and workload cost.",
+   "deciding_comparison": "The selected set is a provisional local Python/API proposal, not a measured winner. First fix application, database, UI and GPU requirements. Run identical workloads and measure account/deployment isolation, explicit networks and ports, persistence through WSL shutdown, backup/restore, rollback, rootless permissions, startup time, latency, throughput and CPU/RSS/storage cost. Qualify RTX 4090 access only if a GPU workload is required. Linux package compatibility is documented; macOS arm64 application dependencies and container images remain unqualified. All candidates have recent captured commits and are unarchived; issue-response quality and current CI pass totals remain unknown. Budget: 6 searches and 8 page fetches. Reading the entire hosting facts file consumed 36 captured API responses, exceeding the 30-response limit; this judgment is therefore not strictly API-budget compliant. No additional GitHub API requests were made. Install commands require the cited repository setup and version/digest locking before actual installation.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "WSL2 is the packet's prescribed host substrate; selecting it again does not supply the application's reproducible service/deployment specification."
+    },
+    {
+     "key": "C03",
+     "reason": "No IB Gateway workload is specified, so adding this named specialized service would introduce an unsupported application requirement."
+    },
+    {
+     "key": "C04",
+     "reason": "Model-serving specialization is not required; its 2026-09-07 commit is recent despite the older 2026-05-07 release, so it is not stale. [Upstream README](https://github.com/bentoml/BentoML/blob/main/README.md?plain=1)"
+    },
+    {
+     "key": "C06",
+     "reason": "The requirement does not specify a UI, so adding a separate frontend component is not justified by the stated scope."
+    },
+    {
+     "key": "C09",
+     "reason": "Equally credible runtime alternative with rootless operation, networking, volumes and Mac/Windows VM support; the Docker/Compose versus Podman/Quadlet qualification remains unresolved. [Upstream README](https://github.com/podman-container-tools/podman)"
+    },
+    {
+     "key": "C10",
+     "reason": "Application language and UI requirements are unspecified; qualification against FastAPI is pending, and no exclusive application-framework winner is asserted."
+    },
+    {
+     "key": "C12",
+     "reason": "A separate development-container contract is not required by the packet; its incremental benefit beyond the proposed application/service specification remains unqualified."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C11",
+     "criterion": "outside_requirement",
+     "fact": "The repository supplies SDKs for deploying serverless applications to and interacting with the Modal platform; the requirement is local application and service hosting.",
+     "url": "https://github.com/modal-labs/modal-client"
+    }
+   ],
+   "evidence": {
+    "C02": [
+     {
+      "claim": "Docker's upstream Ubuntu installation guide documents official packages, version-specific installation and x86_64/arm64 compatibility. Repository setup is a prerequisite.",
+      "url": "https://docs.docker.com/engine/install/ubuntu/"
+     },
+     {
+      "claim": "Moby identifies Docker Engine release tags and exposes integration/ and integration-cli/ suites. Current passing totals and a comparative workload benchmark were not verified.",
+      "url": "https://github.com/moby/moby"
+     },
+     {
+      "claim": "Captured API answer: latest release docker-v29.8.2 was published 2026-09-30.",
+      "url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/moby/moby/commit/c8e265787b0a89d161f34c3920f73f136974744b"
+     },
+     {
+      "claim": "At capture, archived=false and open_issues_count=3911; issue-response quality was not measured.",
+      "url": "https://api.github.com/repos/moby/moby"
+     }
+    ],
+    "C08": [
+     {
+      "claim": "Upstream documents running multi-container applications from compose.yaml, including service configuration and volume mounts, through the docker compose CLI. Linux binaries and a macOS distribution path are documented.",
+      "url": "https://github.com/docker/compose"
+     },
+     {
+      "claim": "The documented Linux plugin installation uses Docker's package repository and requires Docker Engine and CLI.",
+      "url": "https://docs.docker.com/compose/install/linux/"
+     },
+     {
+      "claim": "Captured API answer: latest release v5.5.1 was published 2026-09-03.",
+      "url": "https://github.com/docker/compose/releases/tag/v5.5.1"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/docker/compose/commit/4d994cc26d5e6e559d20971c1365aca90535104e"
+     },
+     {
+      "claim": "At capture, archived=false and open_issues_count=93. Current test/CI pass totals were not verified.",
+      "url": "https://api.github.com/repos/docker/compose"
+     }
+    ],
+    "C05": [
+     {
+      "claim": "Upstream documents Python type hints, Pydantic validation, OpenAPI/JSON Schema, authentication facilities and local server execution. Cloud deployment is optional.",
+      "url": "https://github.com/fastapi/fastapi"
+     },
+     {
+      "claim": "The repository exposes tests/ and links TechEmpower benchmarks. Benchmark result matrices and current CI pass totals were not verified, so no measured performance superiority is claimed.",
+      "url": "https://github.com/fastapi/fastapi"
+     },
+     {
+      "claim": "The tutorial documents dependency locking with uv.lock and an official coding-agent skill compatible with Claude Code and Codex.",
+      "url": "https://fastapi.tiangolo.com/tutorial/"
+     },
+     {
+      "claim": "Captured API answer: latest release 0.142.2 was published 2026-09-30.",
+      "url": "https://github.com/fastapi/fastapi/releases/tag/0.142.2"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/fastapi/fastapi/commit/28a206107302ee20ce6a9a876d05a258c1c8d328"
+     },
+     {
+      "claim": "At capture, archived=false and open_issues_count=97; issue-response quality was not measured.",
+      "url": "https://api.github.com/repos/fastapi/fastapi"
+     }
+    ],
+    "C07": [
+     {
+      "claim": "Upstream describes transactional SQL, foreign keys and user-defined types. GitHub is an official mirror rather than the project's issue/PR workflow.",
+      "url": "https://github.com/postgres/postgres"
+     },
+     {
+      "claim": "The official Ubuntu guide documents PostgreSQL 18 installation through the project-maintained Apt repository, with amd64 and eligible arm64 distributions supported. Repository setup is a prerequisite.",
+      "url": "https://www.postgresql.org/download/linux/ubuntu/"
+     },
+     {
+      "claim": "Captured API answer: latest default-branch commit was dated 2026-10-01.",
+      "url": "https://github.com/postgres/postgres/commit/42e96cf2fe095c822f76bc94669ea875cb1e3351"
+     },
+     {
+      "claim": "Captured API answers show archived=false, GitHub issues disabled and releases/latest returning 404. These are not evidence of staleness; stable-release currency and current test results were not fully verified.",
+      "url": "https://api.github.com/repos/postgres/postgres"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 12,
+   "critic_issues": [
+    "The packet specifies a typed application, without fixing Python, an HTTP API, a UI or relational storage. FastAPI and PostgreSQL remain scenario-dependent choices rather than a complete selection established by the requirement.",
+    "PostgreSQL's GitHub 404 does not imply absent releases; the official August release notice supplies recent stable-release evidence. The notice alone does not establish the latest stable version at the audit time.",
+    "Podman documents rootless execution, networking and volumes, so Docker's account/deployment isolation advantage is unresolved. [Podman README](https://github.com/podman-container-tools/podman).",
+    "Documented installation and Compose configuration do not prove persistence, backup/restore or rollback on WSL2. The install strings also leave exact package and image digests unresolved.",
+    "The judge disclosed exceeding its API cap. This audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "recovery-portability",
+   "judge": "J08",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C03",
+     "name": "mise",
+     "repository": "https://github.com/jdx/mise",
+     "role": "Provision a locked tool/task profile and declared host configuration through a CLI usable by both agents. Provisional choice over Devbox.",
+     "install_command": "mise_version=2026.9.18\nmise_platform=linux-x64\ncurl -fL -o mise \"https://github.com/jdx/mise/releases/download/v${mise_version}/mise-v${mise_version}-${mise_platform}\"\nchmod +x mise",
+     "install_source": "https://mise.jdx.dev/installing-mise.html",
+     "confidence": "medium"
+    },
+    {
+     "key": "C06",
+     "name": "Restic",
+     "repository": "https://github.com/restic/restic",
+     "role": "Restore allowlisted application-data snapshots from independent backup storage. Recover the backup password separately and establish native sign-ins on the destination.",
+     "install_command": "./mise use -g restic@0.19.1",
+     "install_source": "https://restic.readthedocs.io/en/stable/020_installation.html",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "mise plus Restic versus Devbox plus chezmoi plus Restic for the same pinned profile and consistent application snapshot. On fresh WSL2 and macOS arm64 destinations, verify versions, dependencies, state integrity, useful tasks, independently recovered backup keys and native sign-ins; record failures, recovery time and manual steps.",
+   "deciding_comparison": "Provisional capability choice, not measured superiority. The 2026-10-01 API captures show all seven repositories unarchived, default-branch commits September 21–October 1 and stable releases July 5–September 30. Issue-response activity is unverified. No matched comparison is recorded; inspected sources provide no verified CI totals or complete destination recovery evaluation. On fresh WSL2 Ubuntu instances, reproduce the same small pinned profile, establish native sign-ins, run scoped Claude Code/Codex CLI calls and useful tasks, then independently restore consistent application data and backup-key access. Check exact versions and checksums, file/database integrity, useful application behavior, exclusion of authentication stores, cold recovery time, failures and manual steps. Repeat the portable profile on macOS arm64. New runs must supply new acceptance evidence.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Python tooling has a public benchmark/test harness, but its scope does not cover a general host tool profile or application-state recovery."
+    },
+    {
+     "key": "C02",
+     "reason": "SQLite replication and recovery are useful specialization; this packet names no SQLite workload, and arbitrary application files require broader restoration."
+    },
+    {
+     "key": "C04",
+     "reason": "Documents WSL2 support, rollback and compatibility tests, but the installer alone neither declares the required tool profile nor restores application data."
+    },
+    {
+     "key": "C05",
+     "reason": "A strong Nix-backed reproducibility alternative; no matched WSL2 test separates it from mise, and its documented focus is isolated project environments."
+    },
+    {
+     "key": "C07",
+     "reason": "Strong dotfile and secret-provider configuration support overlaps mise bootstrap; no reviewed recovery measurement establishes a need for another configuration manager."
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C03": [
+     {
+      "claim": "Upstream documents tools, environment variables, executable tasks and machine bootstrap for packages, dotfiles and services.",
+      "url": "https://github.com/jdx/mise"
+     },
+     {
+      "claim": "Commit mise.lock and use mise install --locked to share resolved tool versions; project dependencies still require their own lockfiles.",
+      "url": "https://mise.jdx.dev/continuous-integration.html"
+     },
+     {
+      "claim": "Official Linux x64 and macOS arm64 binaries and signed checksum verification are documented.",
+      "url": "https://mise.jdx.dev/installing-mise.html"
+     },
+     {
+      "claim": "The public repository contains e2e, e2e-win, test and tests directories; passing CI totals and destination recovery results were not verified.",
+      "url": "https://github.com/jdx/mise"
+     },
+     {
+      "claim": "Captured GitHub API on 2026-10-01: latest default-branch commit dated 2026-10-01.",
+      "url": "https://api.github.com/repos/jdx/mise/commits?per_page=1"
+     },
+     {
+      "claim": "Captured latest stable release v2026.9.18 was published 2026-09-30.",
+      "url": "https://github.com/jdx/mise/releases/tag/v2026.9.18"
+     },
+     {
+      "claim": "Captured repository metadata: unarchived and issues enabled; issue-response and resolution activity were not verified.",
+      "url": "https://api.github.com/repos/jdx/mise"
+     }
+    ],
+    "C06": [
+     {
+      "claim": "Upstream documents encrypted, integrity-verifiable snapshots, restore/mount commands and local, SFTP and object-storage backends.",
+      "url": "https://github.com/restic/restic"
+     },
+     {
+      "claim": "Linux and macOS installation paths and reproducible signed binaries are documented. The documented mise recipe is invoked through the downloaded executable and pinned to the captured release. WSL2 restores and macOS arm64 runtime acceptance were not measured here.",
+      "url": "https://restic.readthedocs.io/en/stable/020_installation.html"
+     },
+     {
+      "claim": "The README backup transcript is an example rather than a comparative recovery benchmark; verified CI pass totals were not obtained.",
+      "url": "https://github.com/restic/restic"
+     },
+     {
+      "claim": "Captured GitHub API on 2026-10-01: latest default-branch commit dated 2026-09-25.",
+      "url": "https://api.github.com/repos/restic/restic/commits?per_page=1"
+     },
+     {
+      "claim": "Captured latest stable release v0.19.1 was published 2026-07-05, within 90 days.",
+      "url": "https://github.com/restic/restic/releases/tag/v0.19.1"
+     },
+     {
+      "claim": "Captured repository metadata: unarchived and issues enabled; issue-response and resolution activity were not verified.",
+      "url": "https://api.github.com/repos/restic/restic"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The selected tools cover declared tool versions and file restoration, but no destination recovery establishes useful application behavior, key access or native agent sign-ins.",
+    "Tool locks do not alone reproduce application dependencies or host services. Restic restoration also needs an application-specific consistency procedure and an explicit backup allowlist.",
+    "Devbox supplies Nix-backed isolated tool environments, so its reproducibility tradeoff against mise cannot be dismissed by calling it project-focused; the small destination profile remains unspecified. [Devbox README](https://github.com/jetify-com/devbox).",
+    "Audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected; no alternative was established stronger across the complete recovery requirement."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "observation-inference",
+   "judge": "J08",
+   "critic": "C-G2",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C02",
+     "name": "OTel Collector Contrib",
+     "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+     "role": "Provisional local telemetry ingress and privacy-processing boundary: OpenLIT native hooks -> Collector -> OpenLIT receiver -> local ClickHouse/UI. Require one serial export path and distinct listener addresses.",
+     "install_command": "unknown",
+     "install_source": "https://opentelemetry.io/docs/collector/install/",
+     "confidence": "medium"
+    },
+    {
+     "key": "C07",
+     "name": "OpenLIT",
+     "repository": "https://github.com/openlit/openlit",
+     "role": "Provisional sole native coding-agent capture path and local backend/viewer. Configure hooks to send through Collector processing before persistence; upstream permits an external Collector and says a bundled Collector is unnecessary.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/openlit/openlit/main/cli/scripts/install.sh | sh\nopenlit coding install --vendor=claude-code\nopenlit coding install --vendor=codex\ngit clone https://github.com/openlit/openlit.git\ncd openlit\ndocker compose up -d",
+     "install_source": "https://github.com/openlit/openlit",
+     "confidence": "low"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "OpenLIT hooks through Collector versus AgentsView exports with all relevant session classes included through a validated adapter, using the same local backend and an uninstrumented control. Reconcile native counters and service outcomes across failures, children, retries, resume and outages; test privacy canaries at every persistence boundary. Optional inference needs a fixed workload before comparing SGLang, vLLM and llama.cpp.",
+   "deciding_comparison": "Provisional interface fit, not measured superiority. The packet records no matched comparisons. API captures at 2026-10-01T20:42:32–34Z show all 14 repositories unarchived with default-branch commits September 21–October 1; Collector v0.162.0 was released September 29 and SGLang v0.5.20 September 18. Other latest-release dates and maintainer response activity remain unverified. On WSL2 and macOS arm64, run identical real Claude Code/Codex tasks including children, retries, failures, resume and Collector restart. Reconcile native input/output/cache counters and service outcomes, detect missing/duplicate records, inject privacy canaries into attributes/bodies/events, and measure p50/p95 overhead and recovery. Run one capture arm at a time. Collector installation command, complete redaction, hook accounting completeness, listener remapping and OpenLIT arm64 backend images remain unresolved. OpenLIT's install string is an unpinned upstream recipe; no install or target test occurred. Public test documentation/fixtures do not establish passing CI. Whole-task usage and net savings remain unknown.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "Optional inference lacks a specified workload, model, quality threshold and executed target-host comparison."
+    },
+    {
+     "key": "C03",
+     "reason": "The packet provides no alert-policy workload or measured benefit from adding alert management."
+    },
+    {
+     "key": "C04",
+     "reason": "The packet provides no notification-delivery workload or measured benefit from another notification service."
+    },
+    {
+     "key": "C05",
+     "reason": "A second dashboard has no demonstrated incremental benefit; the proposed backend already supplies a local viewer."
+    },
+    {
+     "key": "C06",
+     "reason": "Reviewed evidence does not establish a common Claude Code/Codex capture pipeline or improved task accounting for both clients."
+    },
+    {
+     "key": "C08",
+     "reason": "A tracing/evaluation challenger, but inspected onboarding issues concern application instrumentation rather than validated native-session capture and accounting."
+    },
+    {
+     "key": "C09",
+     "reason": "Official local Docker deployment is documented, but no measured service-metrics need establishes the value of another store alongside the proposed backend."
+    },
+    {
+     "key": "C10",
+     "reason": "Strong native accounting challenger with exact-run capture, content-free exports and golden fixtures/test commands. No inspected direct OTLP interface closes the pipeline adapter gap; export defaults omit children, automated and one-shot sessions."
+    },
+    {
+     "key": "C11",
+     "reason": "Optional inference remains unqualified without a specified workload and target-host output/latency/recovery comparison."
+    },
+    {
+     "key": "C12",
+     "reason": "No demonstrated log-retention requirement justifies another persistence service."
+    },
+    {
+     "key": "C13",
+     "reason": "Cross-platform inference support alone cannot qualify actual output, privacy, latency and recovery on an unspecified workload."
+    },
+    {
+     "key": "C14",
+     "reason": "Documents an OTLP terminal viewer, Collector configuration and test commands, but its incremental value alongside the selected UI remains unmeasured."
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C02": [
+     {
+      "claim": "The redaction processor supports attribute allowlists and value masking across traces, logs and metrics; stability is beta for traces and alpha for logs/metrics. Comprehensive body/span-event scrubbing remains unverified.",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/redactionprocessor/README.md"
+     },
+     {
+      "claim": "Upstream documents unit/performance and contrib integration/end-to-end tests, primarily Linux amd64, plus Darwin arm64 cross-compilation. No passing target-host or CI run was inspected.",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/platform-support.md"
+     },
+     {
+      "claim": "Captured GitHub API: default-branch commit dated 2026-10-01.",
+      "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/commits?per_page=1"
+     },
+     {
+      "claim": "Captured latest release v0.162.0 was published 2026-09-29.",
+      "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib/releases/latest"
+     },
+     {
+      "claim": "Captured repository metadata: unarchived; issue-response and resolution activity were not established.",
+      "url": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-contrib"
+     },
+     {
+      "claim": "Official prebuilt distributions are published separately; v0.162.0 exists, but an exact documented Linux install command and artifact checksum were not established within the budget.",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0"
+     }
+    ],
+    "C07": [
+     {
+      "claim": "Upstream documents a macOS/Linux CLI and Claude Code/Codex hook integrations using OpenTelemetry gen_ai conventions.",
+      "url": "https://github.com/openlit/openlit"
+     },
+     {
+      "claim": "The documented self-hosted receiver accepts OTLP, persists in ClickHouse and supplies a dashboard; an external processing Collector is explicitly supported.",
+      "url": "https://github.com/openlit/openlit"
+     },
+     {
+      "claim": "Captured GitHub API: default-branch commit dated 2026-10-01.",
+      "url": "https://api.github.com/repos/openlit/openlit/commits?per_page=1"
+     },
+     {
+      "claim": "Captured repository metadata: unarchived; latest-release currency and issue-response activity were not independently established for this candidate.",
+      "url": "https://api.github.com/repos/openlit/openlit"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The proposed topology is documented interface fit, not a verified privacy-filtered accounting pipeline. Attribute redaction does not establish comprehensive body/event scrubbing.",
+    "OpenLIT's hook implementation deliberately returns success on telemetry failures and imposes export timeouts. Hook success therefore cannot be used as a delivery or complete-accounting receipt. [Hook implementation](https://github.com/openlit/openlit/blob/main/cli/internal/coding/hook/hook.go).",
+    "OpenLIT also persists session identity metadata before export. Collector filtering does not automatically cover that cache; its privacy boundary needs explicit qualification. [Hook guide](https://github.com/openlit/openlit/blob/main/agent-guides/coding-agents-hook.md).",
+    "AgentsView documents content-free exports and inclusion flags for children, automated and one-shot sessions. Its default undercount is configurable, while an OTLP adapter remains unverified. Neither capture arm has established complete reconciliation. [Session export](https://github.com/kenn-io/agentsview/blob/main/docs/session-export.md).",
+    "The exact current Collector install recipe, listener configuration and backend arm64 acceptance remain unresolved. Audit used 4 page opens and 15 captured API answers, with no fresh API calls. No popularity or current-install preference was detected."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "agent-sdks",
+   "judge": "J09",
+   "critic": "C-G3",
+   "critic_verdict": "upheld",
+   "status": "recommended",
+   "picks": [
+    {
+     "key": "C01",
+     "name": "codex",
+     "repository": "https://github.com/openai/codex",
+     "role": "Direct Codex worker integration with structured events, schema-constrained output and resumable threads.",
+     "install_command": "npm install @openai/codex-sdk",
+     "install_source": "https://github.com/openai/codex/blob/main/sdk/typescript/README.md",
+     "confidence": "high"
+    },
+    {
+     "key": "C07",
+     "name": "Claude Agent SDK",
+     "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+     "role": "Direct Claude Code session control with streamed messages, bidirectional conversations, Python tools and hooks.",
+     "install_command": "pip install claude-agent-sdk",
+     "install_source": "https://github.com/anthropics/claude-agent-sdk-python",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "For a concrete programmatic worker task, compare the direct SDKs with agentproto and standalone local OpenHands using identical models and tools on WSL2. Measure event completeness, permissions, cancellation, process death, resume correctness, latency and installation failures; repeat package compatibility checks on macOS arm64.",
+   "deciding_comparison": "The two selections provide complementary direct integrations with the named clients; overall runtime superiority remains unresolved. All seven captured repositories are nonarchived, have October 1 default-branch commits, and have latest-release dates within 90 days. LangGraph's captured latest release identifies its CLI development tag, not the core runtime version. Issue counts provide no response-rate measurement. No all-arm SDK comparison is supplied, and current CI pass totals were not verified. No local GPU is required for these integration roles. Research used 6 searches, 8 page-fetch attempts including one blocked fetch, and 21 captured GitHub API responses.",
+   "not_selected": [
+    {
+     "key": "C02",
+     "reason": "Strong local, Docker/Kubernetes and remote worker APIs, but the packet establishes no concrete remote-worker need to justify another runtime. [Upstream README](https://github.com/OpenHands/software-agent-sdk)."
+    },
+    {
+     "key": "C03",
+     "reason": "Durable execution and inspectable graph state fit checkpointed applications; that need is unspecified, while the selected SDKs directly control the named clients. [Upstream README](https://github.com/langchain-ai/langgraph)."
+    },
+    {
+     "key": "C04",
+     "reason": "Unified Claude/Codex lifecycle and MCP integration are relevant, but upstream warns of stabilizing APIs and breaking changes; comparative reliability remains unresolved. [Upstream README](https://github.com/agentproto/ts)."
+    },
+    {
+     "key": "C05",
+     "reason": "Programmatic Copilot integration is relevant to generic workers, but no Copilot-specific application need or advantage for the two named clients is established. [Upstream repository](https://github.com/github/copilot-sdk)."
+    },
+    {
+     "key": "C06",
+     "reason": "The packet establishes no concrete Temporal-backed application need, and this bounded review did not verify a direct Claude Code/Codex worker SDK install path. [Upstream repository](https://github.com/temporalio/temporal)."
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C01": [
+     {
+      "claim": "The supported TypeScript SDK wraps the native CLI, exchanges JSONL events, exposes runStreamed(), and resumes persisted threads; requires Node.js 18+.",
+      "url": "https://github.com/openai/codex/blob/main/sdk/typescript/README.md"
+     },
+     {
+      "claim": "Upstream Jest tests assert returned events, thread identifiers and usage accounting. Suite existence is verified; a current passing CI result was not established.",
+      "url": "https://github.com/openai/codex/blob/main/sdk/typescript/tests/run.test.ts"
+     },
+     {
+      "claim": "SDK executable resolution explicitly includes Linux x86_64 and macOS arm64 packages, supporting the two host architectures.",
+      "url": "https://github.com/openai/codex/blob/main/sdk/typescript/src/exec.ts"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:19Z: not archived; issues enabled, with 20,039 open issues. This is a backlog snapshot, not responsiveness evidence.",
+      "url": "https://api.github.com/repos/openai/codex"
+     },
+     {
+      "claim": "Captured latest repository release: rust-v0.160.0, published 2026-10-01. This identifies the CLI release, not an independently verified SDK package version.",
+      "url": "https://api.github.com/repos/openai/codex/releases/latest"
+     },
+     {
+      "claim": "Captured latest default-branch commit: 2026-10-01T20:17:34Z, within 90 days.",
+      "url": "https://api.github.com/repos/openai/codex/commits?per_page=1"
+     }
+    ],
+    "C07": [
+     {
+      "claim": "Python 3.10+ SDK bundles the Claude CLI. ClaudeSDKClient supports interactive conversations, custom tools through in-process MCP servers, and hooks.",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python"
+     },
+     {
+      "claim": "Upstream documents async tests under both asyncio and trio and a 13-contract session-store conformance harness. These establish test coverage mechanisms, not measured superiority.",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/main/CHANGELOG.md"
+     },
+     {
+      "claim": "An upstream Linux container test path installs the CLI and SDK and runs pytest. macOS arm64 packaging was not independently verified within this budget.",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/main/Dockerfile.test"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:19Z: not archived; issues enabled, with 520 open issues. Issue response times remain unknown.",
+      "url": "https://api.github.com/repos/anthropics/claude-agent-sdk-python"
+     },
+     {
+      "claim": "Captured latest release: v0.2.163, published 2026-09-30.",
+      "url": "https://api.github.com/repos/anthropics/claude-agent-sdk-python/releases/latest"
+     },
+     {
+      "claim": "Captured latest default-branch commit: 2026-10-01T18:01:46Z, within 90 days.",
+      "url": "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits?per_page=1"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "OpenHands cannot be dismissed solely for lack of a remote-worker requirement: its upstream README explicitly supports local workspaces and custom tools. That weakens the exclusion rationale without establishing superiority over direct native-client integrations. [OpenHands README](https://github.com/OpenHands/software-agent-sdk/blob/main/README.md)",
+    "Tests and benchmark infrastructure establish available verification mechanisms, not comparative SDK reliability or current CI success. Codex usage assertions are publicly visible. [Codex tests](https://github.com/openai/codex/blob/main/sdk/typescript/tests/run.test.ts)",
+    "The reported open_issues_count values include pull requests; calling them counts of open issues alone is imprecise. Neither backlog size nor repository release currency verifies the installed SDK package or release-specific host compatibility.",
+    "No popularity or installed-tool preference was found. The selections stand as complementary integrations for the named clients, with overall runtime superiority unresolved.",
+    "Audit budget: 4 page opens and 12 distinct captured API responses, dated 2026-10-01."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "judge": "J09",
+   "critic": "C-G3",
+   "critic_verdict": "upheld",
+   "status": "recommended",
+   "picks": [
+    {
+     "key": "C01",
+     "name": "mcporter",
+     "repository": "https://github.com/openclaw/mcporter",
+     "role": "Bridge native client configurations into scriptable MCP calls, reusable connections and generated typed clients or CLIs.",
+     "install_command": "npm install -g mcporter",
+     "install_source": "https://github.com/openclaw/mcporter",
+     "confidence": "high"
+    },
+    {
+     "key": "C02",
+     "name": "MCP Inspector",
+     "repository": "https://github.com/modelcontextprotocol/inspector",
+     "role": "Protocol inspection through web, CLI and TUI surfaces, including reproducible agent-driven server checks.",
+     "install_command": "npx @modelcontextprotocol/inspector",
+     "install_source": "https://github.com/modelcontextprotocol/inspector/blob/main/README.md",
+     "confidence": "high"
+    },
+    {
+     "key": "C04",
+     "name": "inspector",
+     "repository": "https://github.com/MCPJam/inspector",
+     "role": "Additional client-surface, widget and OAuth testing, with programmable inspection and cross-client evaluations.",
+     "install_command": "npx @mcpjam/inspector@latest",
+     "install_source": "https://github.com/MCPJam/inspector",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Run the three pinned versions against identical stdio/HTTP fixtures on WSL2. Compare configuration import, protocol assertions, OAuth, resources/prompts/tools, timeouts, forced-kill recovery and process listing. Use a concrete client/widget evaluation to measure what MCPJam adds beyond Inspector.",
+   "deciding_comparison": "The set combines configuration bridging, protocol inspection and additional client-surface testing; superiority in overlapping roles remains unresolved. The packet reports a 37/37 tie for older mcporter 0.14.1 and Inspector 2.8.0, plus a mcporter ps-listing regression. No linked public artifact verifies that comparison, current-version superiority or a regression fix. Upstream test infrastructure is documented, but current CI outcomes and same-host comparative measurements remain unknown. All four repositories with captured API records are nonarchived and recently committed; the discovery collection has no latest release and disables issues. Currency for the grouped C03 repositories and resolved C06 repository remains unverified. No GPU is required. Research used 6 searches, 8 page fetches and 12 captured GitHub API responses.",
+   "not_selected": [
+    {
+     "key": "C03",
+     "reason": "This grouped option combines Kubernetes gateway management and two registries; no concrete centralized-gateway or registry gap justifies adding them, and their currency API records were not supplied. [Gateway](https://github.com/microsoft/mcp-gateway), [Docker registry](https://github.com/docker/mcp-registry), [MCP registry](https://github.com/modelcontextprotocol/registry)."
+    },
+    {
+     "key": "C06",
+     "reason": "The resolved upstream CLI supports config-based inspection and noninteractive calls, overlapping selected CLI surfaces; no comparative advantage or captured 2.0.0 currency evidence is established. [Upstream README](https://github.com/wong2/mcp-cli)."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C05",
+     "criterion": "outside_requirement",
+     "fact": "The repository describes itself as a collection of MCP servers. It supplies discovery references rather than the required bridge, inspection or configuration runtime, and a listing alone cannot qualify a server for adoption.",
+     "url": "https://github.com/punkpeye/awesome-mcp-servers"
+    }
+   ],
+   "evidence": {
+    "C01": [
+     {
+      "claim": "Imports Claude Code and Codex configurations; supports stdio, Streamable HTTP and SSE, typed client generation and connection reuse. npm installation requires Node 24+.",
+      "url": "https://raw.githubusercontent.com/openclaw/mcporter/main/README.md"
+     },
+     {
+      "claim": "Upstream documents Vitest tests, modern/legacy protocol fixtures and end-to-end CI paths, with Node 24 on Linux/macOS/Windows and Node 26 on Linux. Current pass totals were not verified.",
+      "url": "https://raw.githubusercontent.com/openclaw/mcporter/main/README.md"
+     },
+     {
+      "claim": "The upstream installation guide documents signed macOS arm64 binaries; Linux is included in the documented CI matrix.",
+      "url": "https://github.com/openclaw/mcporter/blob/main/docs/install.md"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:31Z: not archived; issues enabled, with zero open issues. Zero backlog does not establish responsiveness.",
+      "url": "https://api.github.com/repos/openclaw/mcporter"
+     },
+     {
+      "claim": "Captured latest release: v0.14.2, published 2026-10-01.",
+      "url": "https://api.github.com/repos/openclaw/mcporter/releases/latest"
+     },
+     {
+      "claim": "Captured latest default-branch commit: 2026-10-01T18:43:09Z, within 90 days.",
+      "url": "https://api.github.com/repos/openclaw/mcporter/commits?per_page=1"
+     }
+    ],
+    "C02": [
+     {
+      "claim": "One package supplies web, CLI and TUI clients. Requires Node >=22.19.0; documents Linux secret-storage behavior. macOS arm64 native-dependency compatibility was not independently tested.",
+      "url": "https://raw.githubusercontent.com/modelcontextprotocol/inspector/main/README.md"
+     },
+     {
+      "claim": "CLI tests include in-process coverage and real-binary subprocess tests, with a documented per-file >=90% coverage gate. This is a gate specification, not an observed current coverage result.",
+      "url": "https://github.com/modelcontextprotocol/inspector/blob/main/clients/cli/README.md"
+     },
+     {
+      "claim": "Documented smoke workflow covers initialization, list/call assertions, bounded connections and exact-version execution for CI.",
+      "url": "https://github.com/modelcontextprotocol/inspector/blob/main/docs/cli-smoke-testing.md"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:31Z: not archived; issues enabled, with 60 open issues. Response rates remain unknown.",
+      "url": "https://api.github.com/repos/modelcontextprotocol/inspector"
+     },
+     {
+      "claim": "Captured latest release: 2.9.0, published 2026-09-30.",
+      "url": "https://api.github.com/repos/modelcontextprotocol/inspector/releases/latest"
+     },
+     {
+      "claim": "Captured latest default-branch commit: 2026-09-30T22:23:03Z, within 90 days.",
+      "url": "https://api.github.com/repos/modelcontextprotocol/inspector/commits?per_page=1"
+     }
+    ],
+    "C04": [
+     {
+      "claim": "Local Node 20+ installation supports HTTP/S and stdio servers; documented features include client emulation, MCP/App widgets, OAuth debugging, CLI and SDK access. WSL2 and macOS arm64 fit is inferred from the Node path, not host-tested.",
+      "url": "https://raw.githubusercontent.com/MCPJam/inspector/main/README.md"
+     },
+     {
+      "claim": "Upstream scripts run SDK, CLI, inspector, widget and other workspace tests, plus packaging and runtime-safety checks. Current totals and passing CI outcomes were not verified.",
+      "url": "https://github.com/MCPJam/inspector/blob/main/package.json"
+     },
+     {
+      "claim": "Captured API at 2026-10-01T20:42:31Z: not archived; issues enabled, with 308 open issues. Response rates remain unknown.",
+      "url": "https://api.github.com/repos/MCPJam/inspector"
+     },
+     {
+      "claim": "Captured latest release: v3.12.8, published 2026-10-01.",
+      "url": "https://api.github.com/repos/MCPJam/inspector/releases/latest"
+     },
+     {
+      "claim": "Captured latest default-branch commit: 2026-10-01T20:06:19Z, within 90 days.",
+      "url": "https://api.github.com/repos/MCPJam/inspector/commits?per_page=1"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 9,
+   "critic_issues": [
+    "The packet's older 37/37 comparison has no linked public artifact. It cannot establish current-version superiority or resolution of the mcporter process-listing regression.",
+    "Inspector's per-file coverage gate is documented. A historical upstream integration report also records passing CLI, TUI, launcher and web tests, but neither establishes current 2.9.0 CI results. [CLI tests](https://github.com/modelcontextprotocol/inspector/blob/main/clients/cli/README.md), [integration report](https://github.com/modelcontextprotocol/inspector/issues/1600)",
+    "MCPJam's additional client-evaluation capability supports its stated role; the incremental benefit of retaining both inspectors remains unmeasured. WSL2 and macOS arm64 execution, issue responsiveness and current CI totals remain unknown.",
+    "No stronger packet alternative or popularity-based rationale was established. The complementary bridge, protocol and client-surface roles survive the audit.",
+    "Audit budget: 4 page opens and 9 distinct captured API responses, dated 2026-10-01."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "secrets-credentials",
+   "judge": "J10",
+   "critic": "C-G3",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C02",
+     "name": "betterleaks",
+     "repository": "https://github.com/betterleaks/betterleaks",
+     "role": "Provisional local secret scanner for agent-invoked checks before publication; credential storage remains a separate need.",
+     "install_command": "brew install betterleaks",
+     "install_source": "https://github.com/betterleaks/betterleaks#installation",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare Betterleaks v1.9.0, Gitleaks v8.30.1 and ggshield v1.55.0 on identical labeled staged-change/history fixtures in WSL2. Measure recall, false publication blocks, redaction, hook enforcement, authentication/network failure behavior, latency and memory. Independently specify and verify the off-checkout credential-storage mechanism.",
+   "deciding_comparison": "Measure labeled-secret recall, false-positive publication blocks, staged-change/history coverage, redaction, failure behavior, latency and memory using identical fixtures. Betterleaks earns a provisional capability/currency preference, not measured superiority. A scanner alone does not provide off-checkout sign-in storage. Qualify OpenBao only after specifying a concrete sharing need and testing access controls, revocation, recovery and operator burden. Fresh passing CI and release-specific compatibility remain unverified. Budget: 6 searches, 8 page opens, 18 API calls including 15 captured answers and 3 failed attempts.",
+   "not_selected": [
+    {
+     "key": "C01",
+     "reason": "ggshield documents Claude Code/Codex blocking hooks, but scanning requires an authenticated GitGuardian API; local scanning is preferable provisionally for this clean-host layer."
+    },
+    {
+     "key": "C03",
+     "reason": "TruffleHog documents verification, pre-commit integration and Linux/macOS arm64 installation, but all three uncaptured API endpoints failed to load, leaving currency unverified and comparative accuracy/latency unresolved."
+    },
+    {
+     "key": "C04",
+     "reason": "OpenBao provides encrypted storage, identity controls and dynamic secrets, but the packet supplies no concrete secret-sharing need to qualify it under the stipulated comparison."
+    },
+    {
+     "key": "C05",
+     "reason": "Gitleaks has a documented prevention workflow and remains current by its July 22 commit; its March 21 release exceeds 90 days and upstream limits future releases to security patches. It remains the close alternative."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C06",
+     "criterion": "stale_or_archived",
+     "fact": "The captured repository API response marks Nosey Parker archived at 2026-10-01T20:42:37Z.",
+     "url": "https://api.github.com/repos/praetorian-inc/noseyparker"
+    }
+   ],
+   "evidence": {
+    "C02": [
+     {
+      "claim": "Upstream documents Git and filesystem scanning, contextual filtering, optional credential validation, and offline detection by default. It claims modern OS/architecture portability and documents Linux installation. Exact WSL2 and macOS arm64 release compatibility was not independently tested.",
+      "url": "https://github.com/betterleaks/betterleaks"
+     },
+     {
+      "claim": "The configuration documentation specifies expression compilation/evaluation tests using go test ./internal/exprruntime. This establishes upstream tests, not a freshly observed passing result.",
+      "url": "https://github.com/betterleaks/betterleaks/blob/main/docs/config.md"
+     },
+     {
+      "claim": "Published package documentation describes Git parser tests, fixtures and allocation benchmarks with reproducible commands; it does not establish scanner superiority.",
+      "url": "https://pkg.go.dev/github.com/betterleaks/betterleaks/v2%40v2.0.0-20260925163419-b8090ea38de7/internal/gitdiff"
+     },
+     {
+      "claim": "Captured API facts at 2026-10-01T20:42:37Z identify stable release v1.9.0, published September 29, within 90 days.",
+      "url": "https://api.github.com/repos/betterleaks/betterleaks/releases/latest"
+     },
+     {
+      "claim": "The captured latest default-branch commit is c4c0ffda3a148c209a1c77a437572aba004c10d1, dated September 30, within 90 days.",
+      "url": "https://api.github.com/repos/betterleaks/betterleaks/commits?per_page=1"
+     },
+     {
+      "claim": "The captured repository is unarchived with open_issues_count 108, which includes pull requests; resolution activity was not established.",
+      "url": "https://api.github.com/repos/betterleaks/betterleaks"
+     },
+     {
+      "claim": "The README labels main as v2 development while the captured stable release is v1.9.0. Default-branch capabilities and tests therefore do not prove stable-release compatibility; the tagged-page fetch failed.",
+      "url": "https://github.com/betterleaks/betterleaks"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 3,
+   "critic_issues": [
+    "The tagged README was retrievable in this audit. It documents a versioned Homebrew cask and Fedora installation; the judgment's generic brew command is not a verified release-pinned Ubuntu installation path. [v1.9.0 installation](https://github.com/betterleaks/betterleaks/blob/v1.9.0/README.md)",
+    "Preferring offline scanning introduces a preference absent from the frozen criteria. Authentication is an installation dependency, but ggshield's authenticated scanning is not itself a capability failure under the stated requirement.",
+    "A scanner covers exposure detection but does not establish off-checkout credential storage. OpenBao covers storage capabilities, yet the packet explicitly requires a concrete sharing need before qualifying it. [OpenBao capabilities](https://github.com/openbao/openbao)",
+    "Gitleaks is not stale under the frozen definition: its July 22 commit is within 90 days, despite an older release and security-patch-only policy. No release-pinned accuracy, false-positive, latency or passing-CI evidence separates the scanners. [Gitleaks policy and prevention workflow](https://github.com/gitleaks/gitleaks/blob/master/README.md)",
+    "Failed API retrieval is a research limitation, not evidence that TruffleHog is poorly maintained; its public release and pull-request pages remain available. No popularity-based rationale was found. [TruffleHog releases](https://github.com/trufflesecurity/trufflehog/releases)",
+    "Audit budget: 4 page opens, including one repeated cached-page open, and 13 distinct captured API responses, dated 2026-10-01."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C01",
+     "why": "ggshield has stronger documented built-in blocking integration for Claude Code and Codex, including prompt/action and Git hooks. That wins an integration subcriterion, while comparative detection quality remains unresolved. [Upstream integration documentation](https://github.com/GitGuardian/agent-skills)"
+    }
+   ]
+  },
+  {
+   "layer_id": "git-github-automation",
+   "judge": "J10",
+   "critic": "C-G3",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C07",
+     "name": "git/git",
+     "repository": "https://github.com/git/git",
+     "role": "Underlying Git engine for repositories and worktrees.",
+     "install_command": "sudo apt install git-all",
+     "install_source": "https://git-scm.com/book/ms/v2/Getting-Started-Installing-Git.html",
+     "confidence": "high"
+    },
+    {
+     "key": "C05",
+     "name": "worktrunk",
+     "repository": "https://github.com/max-sixty/worktrunk",
+     "role": "Worktree orchestration, agent launching and lifecycle hooks.",
+     "install_command": "brew install worktrunk && wt config shell install",
+     "install_source": "https://github.com/max-sixty/worktrunk#install",
+     "confidence": "high"
+    },
+    {
+     "key": "C03",
+     "name": "cli/cli",
+     "repository": "https://github.com/cli/cli",
+     "role": "GitHub PR, review and API lifecycle automation callable by both agents.",
+     "install_command": "brew install gh",
+     "install_source": "https://github.com/cli/cli/blob/trunk/docs/install_linux.md",
+     "confidence": "high"
+    },
+    {
+     "key": "C01",
+     "name": "ataraxy-labs/sem",
+     "repository": "https://github.com/ataraxy-labs/sem",
+     "role": "Provisional entity-level structural diffs with JSON and MCP interfaces for agents.",
+     "install_command": "curl -fsSL https://raw.githubusercontent.com/Ataraxy-Labs/sem/main/install.sh | sh",
+     "install_source": "https://github.com/Ataraxy-Labs/sem#install",
+     "confidence": "medium"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "The Git, Worktrunk and gh roles stand. Resolve the diff choice by comparing sem v0.25.0 with Difftastic 0.71.0, including its JSON mode, on labeled logic edits, formatting, moves, renames, unsupported syntax and parser failures. Measure missed changes, misleading classifications, agent consumption, latency and memory on WSL2, then verify macOS arm64 artifacts.",
+   "deciding_comparison": "Compare labeled logic edits, formatting, renames/moves, parser failures and large changes for missed changes, misleading classifications, latency, memory and agent-readable output. Sem's interface advantage is documented; measured superiority is unknown. Separately qualify gh v2.102.0 through authenticated PR creation, checkout, review, checks and squash-merge lifecycle tests. Any changed review-bridge version needs its own direct-review comparison; the capture establishes only v1.0.6. Fresh passing CI, release-specific feature compatibility and target-host execution remain unverified. Budget: 6 searches, 8 page opens and 21 captured API calls.",
+   "not_selected": [
+    {
+     "key": "C04",
+     "reason": "The eligible v1.0.6 bridge invokes Codex reviews and delegates tasks from Claude Code; no separate measured review benefit or lifecycle evaluation was verified to justify adding it to the Git toolset."
+    },
+    {
+     "key": "C06",
+     "reason": "Difftastic is a current syntax-aware alternative, but upstream targets human-readable output; sem's JSON/MCP interfaces fit agent consumption more directly. Comparative correctness and latency remain unresolved."
+    },
+    {
+     "key": "C09",
+     "reason": "Claude Code Action provides GitHub-runner model reviews and code changes, but adds provider authentication and workflow configuration without a verified incremental benefit for this host-agent lifecycle requirement."
+    }
+   ],
+   "excluded": [
+    {
+     "key": "C02",
+     "criterion": "duplicate",
+     "fact": "Native git worktree and git diff --no-index are operations of the selected Git implementation, not a separate repository to install.",
+     "url": "https://github.com/git/git"
+    },
+    {
+     "key": "C08",
+     "criterion": "duplicate",
+     "fact": "This names version 1.0.6 of C04's repository; the captured latest release of openai/codex-plugin-cc is also v1.0.6.",
+     "url": "https://api.github.com/repos/openai/codex-plugin-cc/releases/latest"
+    }
+   ],
+   "evidence": {
+    "C07": [
+     {
+      "claim": "Official Git documentation supplies the Ubuntu/Debian installation command and documents macOS installation. Specific macOS arm64 artifact compatibility was not inspected.",
+      "url": "https://git-scm.com/book/ms/v2/Getting-Started-Installing-Git.html"
+     },
+     {
+      "claim": "Worktrunk's upstream documentation demonstrates the native git worktree add, list and remove operations that its orchestration wraps.",
+      "url": "https://github.com/max-sixty/worktrunk"
+     },
+     {
+      "claim": "Captured facts at 2026-10-01T20:42:27Z identify default-branch commit a018953688f1b10bddf91bff8747068f5f4746a4, dated September 28, within 90 days.",
+      "url": "https://api.github.com/repos/git/git/commits?per_page=1"
+     },
+     {
+      "claim": "The captured repository is unarchived and has GitHub issues disabled; GitHub issue-resolution activity cannot be assessed from this mirror.",
+      "url": "https://api.github.com/repos/git/git"
+     },
+     {
+      "claim": "The captured latest-release endpoint returned 404. This does not establish absence of upstream releases; the latest upstream release date remains unverified.",
+      "url": "https://api.github.com/repos/git/git/releases/latest"
+     }
+    ],
+    "C05": [
+     {
+      "claim": "Upstream documents worktree creation/switching/removal, agent launching, hooks and PR checkout. Its installation command explicitly covers Linux and macOS; exact WSL2/macOS arm64 release compatibility was not tested.",
+      "url": "https://github.com/max-sixty/worktrunk"
+     },
+     {
+      "claim": "The README documents cargo test and shell integration tests covering multiple shells. No fresh passing run or measured advantage over native Git was verified.",
+      "url": "https://github.com/max-sixty/worktrunk#running-the-tests"
+     },
+     {
+      "claim": "Captured facts at 2026-10-01T20:42:26Z identify release v0.80.0, published September 27, within 90 days.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/releases/latest"
+     },
+     {
+      "claim": "The captured default-branch commit is 85e685e313f7fbc0612c0e055e655c3917e39f29, dated October 1, within 90 days.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1"
+     },
+     {
+      "claim": "The captured repository is unarchived with open_issues_count 47, including pull requests; resolution rates remain unknown.",
+      "url": "https://api.github.com/repos/max-sixty/worktrunk"
+     }
+    ],
+    "C03": [
+     {
+      "claim": "Upstream documents GitHub terminal workflows, Linux/macOS support and a coding-agent skill; the manual provides PR review commands.",
+      "url": "https://github.com/cli/cli"
+     },
+     {
+      "claim": "Official installation documentation supports Homebrew on Linux and lists precompiled amd64/arm64 architectures. Exact target-host binaries were not tested.",
+      "url": "https://github.com/cli/cli/blob/trunk/docs/install_linux.md?plain=1"
+     },
+     {
+      "claim": "The acceptance README documents a live GitHub test harness, including PR view/merge scenarios and required authentication. This verifies suite availability, not a current passing lifecycle result.",
+      "url": "https://github.com/cli/cli/blob/trunk/acceptance/README.md"
+     },
+     {
+      "claim": "Captured facts at 2026-10-01T20:42:26Z identify release v2.102.0, published September 30, within 90 days.",
+      "url": "https://api.github.com/repos/cli/cli/releases/latest"
+     },
+     {
+      "claim": "The captured default-branch commit is fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd, dated September 30, within 90 days.",
+      "url": "https://api.github.com/repos/cli/cli/commits?per_page=1"
+     },
+     {
+      "claim": "The captured repository is unarchived with open_issues_count 1109, including pull requests. The fetched Actions listing did not establish fresh test conclusions.",
+      "url": "https://api.github.com/repos/cli/cli"
+     }
+    ],
+    "C01": [
+     {
+      "claim": "Upstream documents tree-sitter entity diffs, rename/move detection, JSON output and a stdio MCP server with Linux/macOS client setup. This interface fit favors agent consumption; it does not prove superior diff correctness.",
+      "url": "https://github.com/Ataraxy-Labs/sem"
+     },
+     {
+      "claim": "Contributor documentation includes entity-extraction assertions and cd crates && cargo test. Current CI success and release-pinned end-to-end behavior were not verified.",
+      "url": "https://github.com/Ataraxy-Labs/sem/blob/main/CONTRIBUTING.md"
+     },
+     {
+      "claim": "Captured facts at 2026-10-01T20:42:26Z identify release v0.25.0, published September 13, within 90 days.",
+      "url": "https://api.github.com/repos/ataraxy-labs/sem/releases/latest"
+     },
+     {
+      "claim": "The captured default-branch commit is dfcb3de6c8bb32eda4005b0b3260b2b437f256db, dated October 1, within 90 days.",
+      "url": "https://api.github.com/repos/ataraxy-labs/sem/commits?per_page=1"
+     },
+     {
+      "claim": "The captured repository is unarchived with open_issues_count 3, including pull requests. Specific WSL2 x86_64 and macOS arm64 release artifacts remain unqualified.",
+      "url": "https://api.github.com/repos/ataraxy-labs/sem"
+     }
+    ]
+   },
+   "failed_fact_checks": [],
+   "fact_checks_run": 12,
+   "critic_issues": [
+    "The Git release-date uncertainty can be resolved through Git's official site: source release 2.56.0 is dated September 28.",
+    "The dismissal of Difftastic omits its documented machine-readable JSON mode. JSON alone therefore cannot favor sem; MCP remains a documented distinction. [Difftastic command reference](https://github.com/Wilfred/difftastic/blob/master/difft.1.md)",
+    "The gh acceptance harness is public, but suite availability does not establish a passing authenticated PR lifecycle on the target host. [Acceptance harness](https://github.com/cli/cli/blob/trunk/acceptance/README.md)",
+    "No measured diff-correctness or latency comparison establishes sem over Difftastic. Default-branch features also require verification against the selected release artifacts. No popularity or installed-tool preference was found.",
+    "Audit budget: 4 page opens and 15 distinct captured API responses, dated 2026-10-01."
+   ],
+   "stronger_candidates": []
+  },
+  {
+   "layer_id": "cross:wsl-distro",
+   "judge": "J11",
+   "critic": "C-G3",
+   "critic_verdict": "undetermined",
+   "status": "compare",
+   "picks": [
+    {
+     "key": "C02",
+     "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+     "repository": "https://ubuntu.com/download/server",
+     "role": "Co-finalist base distribution; strongest verified exact-image install path.",
+     "install_command": "wsl --install --from-file .\\ubuntu-24.04.5-wsl-amd64.wsl",
+     "install_source": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+     "confidence": "medium"
+    },
+    {
+     "key": "C01",
+     "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+     "repository": "https://ubuntu.com/download/server",
+     "role": "Co-finalist base distribution; longer security horizon, with an unresolved image-listing discrepancy.",
+     "install_command": "wsl --install --from-file .\\ubuntu-26.04.1-wsl-amd64.wsl",
+     "install_source": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+     "confidence": "low"
+    }
+   ],
+   "close_call": true,
+   "deciding_head_to_head": "Compare checksum-verified Ubuntu 24.04.5, Ubuntu 26.04.1 and Debian 13 images on the fixed WSL 2.7.13/kernel 6.18 host. Use identical bootstrap inputs and measure first boot, installation failures/time, exact toolchain versions, systemd user-service startup/restart and an actual RTX 4090 CUDA workload. The 26.04.1 filename discrepancy no longer blocks this comparison.",
+   "deciding_comparison": "The selections are alternatives, without a forced winner. Resolve the 26.04.1 artifact discrepancy, then compare first-boot failures, bootstrap duration, systemd user-service startup and restart, CUDA execution, and exact Python 3.13, Node 24 and Rust checks. No recorded all-arm comparison or numerical upstream benchmark separates them. Candidate-owned default-branch commits, issue activity and CI results remain unknown: the nine captured API answers describe microsoft/WSL only, showing an unarchived repository, a September 29 release and an October 1 commit at capture time. Installation commands run in Windows PowerShell. ARM64 images are listed, but macOS VM compatibility and Claude Code/Codex bootstrap operation remain untested.",
+   "not_selected": [
+    {
+     "key": "C03",
+     "reason": "Debian 13 has a recent 13.7 release and support through June 2030, plus a WSL image/hash in Microsoft's manifest; the reviewed evidence provides less specific GPU/toolchain validation than Ubuntu, without proving incompatibility. [Debian release information](https://www.debian.org/releases/trixie/)"
+    },
+    {
+     "key": "C04",
+     "reason": "A September 2026 AMD64 WSL image and checksum are listed, but a defined multiyear security-support commitment and target-host validation were not verified. [Distribution manifest](https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json)"
+    },
+    {
+     "key": "C05",
+     "reason": "Fedora 44 has vendor WSL images and checksums, but its required long-term security horizon could not be verified because the official lifecycle page returned Access Denied; insufficient evidence to shortlist or exclude. [Lifecycle page](https://docs.fedoraproject.org/en-US/releases/lifecycle/)"
+    }
+   ],
+   "excluded": [],
+   "evidence": {
+    "C02": [
+     {
+      "claim": "Canonical lists the exact AMD64 WSL image dated September 8, 2026, alongside SHA256SUMS and its signature. The binary was not downloaded or checksum-tested.",
+      "url": "https://releases.ubuntu.com/24.04.5/"
+     },
+     {
+      "claim": "Microsoft's distribution manifest supplies the expected SHA256: bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e.",
+      "url": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json"
+     },
+     {
+      "claim": "Canonical documents installation from a .wsl file. Its new image format requires WSL 2.4.10+, below the packet's 2.7.13.",
+      "url": "https://ubuntu.com/wsl/docs/latest/howto/install-ubuntu-wsl2/"
+     },
+     {
+      "claim": "Standard security maintenance for Main packages lasts through May 2029; expanded coverage is separate.",
+      "url": "https://ubuntu.com/about/release-cycle"
+     },
+     {
+      "claim": "NVIDIA documents an Ubuntu WSL CUDA installation path using the Windows GPU driver and supports Pascal-or-later GeForce GPUs. RTX 4090 acceptance on the specified host remains untested.",
+      "url": "https://docs.nvidia.com/cuda/wsl-user-guide/index.html"
+     },
+     {
+      "claim": "RAPIDS reports testing on Ubuntu 24.04 and supports Python 3.13 and Ada GPUs. This is upstream compatibility evidence, without comparative benchmark results or CI totals.",
+      "url": "https://docs.nvidia.com/datascience/platform-support/"
+     }
+    ],
+    "C01": [
+     {
+      "claim": "Microsoft's manifest lists the exact 26.04.1 image and SHA256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104; artifact availability and bytes remain unverified.",
+      "url": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json"
+     },
+     {
+      "claim": "The vendor archive shows recent point-release artifacts and signed checksum files, but its retrieved WSL listing showed ubuntu-26.04-wsl-amd64.wsl rather than the manifest's 26.04.1 filename. Resolve this before installation.",
+      "url": "https://releases.ubuntu.com/26.04.1/"
+     },
+     {
+      "claim": "Canonical documents Ubuntu 26.04 WSL installation and the from-file command used above.",
+      "url": "https://ubuntu.com/wsl/docs/latest/howto/install-ubuntu-wsl2/"
+     },
+     {
+      "claim": "Standard security maintenance for Main packages lasts through May 2031, two years beyond Ubuntu 24.04.",
+      "url": "https://ubuntu.com/about/release-cycle"
+     },
+     {
+      "claim": "Release notes document Rust 1.93 and default Python 3.14. These do not establish availability of the specifically requested Python 3.13 and Node 24.",
+      "url": "https://documentation.ubuntu.com/release-notes/26.04/summary-for-lts-users/"
+     },
+     {
+      "claim": "RAPIDS reports testing on Ubuntu 26.04, with WSL, Python 3.13 and Ada support documented. No evidence establishes superiority on the packet's host.",
+      "url": "https://docs.nvidia.com/datascience/platform-support/"
+     }
+    ]
+   },
+   "failed_fact_checks": [
+    {
+     "repository": "https://ubuntu.com/download/server",
+     "claim": "The current Canonical listing lacks ubuntu-26.04.1-wsl-amd64.wsl and only supplies the earlier 26.04 filename.",
+     "url": "https://releases.ubuntu.com/26.04.1/",
+     "holds": false
+    }
+   ],
+   "fact_checks_run": 6,
+   "critic_issues": [
+    "The current archive contains both the earlier 26.04 image and the exact 26.04.1 WSL image, dated 2026-08-27, alongside signed checksum files. The judgment's image-listing discrepancy no longer persists; downloaded bytes and checksums remain unverified. [Canonical archive](https://releases.ubuntu.com/26.04.1/)",
+    "Neither Ubuntu entry establishes the exact Python 3.13, Node 24 and Rust bootstrap, systemd user-service lifecycle or CUDA execution on the frozen host. General NVIDIA WSL compatibility is useful evidence but does not replace that execution check. [NVIDIA guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html)",
+    "Fedora's approximately 13-month maintenance lifecycle is publicly documented; the earlier blocked fetch was a research limitation, not an unknown support policy. This is materially shorter than the Ubuntu LTS horizons. [Fedora lifecycle](https://fedoraproject.org/wiki/Fedora_Release_Life_Cycle/ja)",
+    "WSL repository releases, commits and issue activity are not distribution-owned evidence. ARM64 image availability also does not establish macOS VM compatibility. No popularity or installed-distro preference was found.",
+    "Audit budget: 4 page opens and 3 captured microsoft/WSL API responses, dated 2026-10-01."
+   ],
+   "stronger_candidates": [
+    {
+     "key": "C03",
+     "why": "Debian 13 has stronger documented alignment with the requested Python 3.13 and a planned LTS horizon through June 2030, longer than Ubuntu 24.04 standard maintenance. Its Node 24 bootstrap and target-host GPU behavior remain unresolved. [Release notes](https://www.debian.org/releases/trixie/release-notes/whats-new.de.html), [LTS schedule](https://wiki.debian.org/LTS)"
+    }
+   ]
+  }
+ ]
+}

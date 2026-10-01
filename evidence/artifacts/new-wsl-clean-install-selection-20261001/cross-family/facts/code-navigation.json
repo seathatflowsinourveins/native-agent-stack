@@ -1,0 +1,267 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/code-navigation.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/abhigyanpatwari/gitnexus",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/abhigyanpatwari/gitnexus": {
+     "full_name": "abhigyanpatwari/GitNexus",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:21:52Z",
+     "created_at": "2025-08-02T23:20:31Z",
+     "updated_at": "2026-10-01T20:18:02Z",
+     "open_issues_count": 285,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/abhigyanpatwari/GitNexus"
+    },
+    "repos/abhigyanpatwari/gitnexus/releases/latest": {
+     "tag_name": "v1.6.12",
+     "name": "v1.6.12",
+     "published_at": "2026-09-12T21:40:04Z",
+     "prerelease": false,
+     "html_url": "https://github.com/abhigyanpatwari/GitNexus/releases/tag/v1.6.12"
+    },
+    "repos/abhigyanpatwari/gitnexus/commits?per_page=1": {
+     "sha": "ce79caaf86860957b85932cd12409179edb1d14a",
+     "date": "2026-10-01T19:55:13Z",
+     "html_url": "https://github.com/abhigyanpatwari/GitNexus/commit/ce79caaf86860957b85932cd12409179edb1d14a"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/oraios/serena",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/oraios/serena": {
+     "full_name": "oraios/serena",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T21:03:51Z",
+     "created_at": "2025-03-23T22:35:24Z",
+     "updated_at": "2026-10-01T19:25:37Z",
+     "open_issues_count": 190,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/oraios/serena"
+    },
+    "repos/oraios/serena/releases/latest": {
+     "tag_name": "v1.7.0",
+     "name": "v1.7.0",
+     "published_at": "2026-08-09T18:38:06Z",
+     "prerelease": false,
+     "html_url": "https://github.com/oraios/serena/releases/tag/v1.7.0"
+    },
+    "repos/oraios/serena/commits?per_page=1": {
+     "sha": "d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809",
+     "date": "2026-09-30T18:53:23Z",
+     "html_url": "https://github.com/oraios/serena/commit/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/DeusData/codebase-memory-mcp",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/DeusData/codebase-memory-mcp": {
+     "full_name": "DeusData/codebase-memory-mcp",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:38:18Z",
+     "created_at": "2026-02-24T22:01:00Z",
+     "updated_at": "2026-10-01T20:38:46Z",
+     "open_issues_count": 618,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/DeusData/codebase-memory-mcp"
+    },
+    "repos/DeusData/codebase-memory-mcp/releases/latest": {
+     "tag_name": "v0.11.0",
+     "name": "v0.11.0",
+     "published_at": "2026-09-15T23:40:39Z",
+     "prerelease": false,
+     "html_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+    },
+    "repos/DeusData/codebase-memory-mcp/commits?per_page=1": {
+     "sha": "bedbc0ac00c04f4a73ea92dcde93fbcfef6cbe8a",
+     "date": "2026-10-01T20:38:18Z",
+     "html_url": "https://github.com/DeusData/codebase-memory-mcp/commit/bedbc0ac00c04f4a73ea92dcde93fbcfef6cbe8a"
+    }
+   }
+  },
+  "C04": {
+   "repository": null,
+   "non_github": true
+  },
+  "C05": {
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/jgravelle/jcodemunch-mcp": {
+     "full_name": "jgravelle/jcodemunch-mcp",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:20:59Z",
+     "created_at": "2026-02-09T01:58:27Z",
+     "updated_at": "2026-10-01T20:21:03Z",
+     "open_issues_count": 2,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/jgravelle/jcodemunch-mcp"
+    },
+    "repos/jgravelle/jcodemunch-mcp/releases/latest": {
+     "tag_name": "v1.108.322",
+     "name": "v1.108.322 \u2014 the deletion investigator reads the match the search made",
+     "published_at": "2026-10-01T17:48:55Z",
+     "prerelease": false,
+     "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.322"
+    },
+    "repos/jgravelle/jcodemunch-mcp/commits?per_page=1": {
+     "sha": "c2a2348492077ce7c2eb3c70ef4c849dcc9e7e37",
+     "date": "2026-10-01T20:20:56Z",
+     "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/c2a2348492077ce7c2eb3c70ef4c849dcc9e7e37"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/mibayy/token-savior",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/mibayy/token-savior": {
+     "full_name": "Mibayy/token-savior",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-08-10T08:19:00Z",
+     "created_at": "2026-03-30T19:35:33Z",
+     "updated_at": "2026-09-30T12:35:36Z",
+     "open_issues_count": 4,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/Mibayy/token-savior"
+    },
+    "repos/mibayy/token-savior/releases/latest": {
+     "tag_name": "v4.21.0",
+     "name": "v4.21.0 \u2014 The server stops keeping what it knows to itself",
+     "published_at": "2026-07-28T13:21:26Z",
+     "prerelease": false,
+     "html_url": "https://github.com/Mibayy/token-savior/releases/tag/v4.21.0"
+    },
+    "repos/mibayy/token-savior/commits?per_page=1": {
+     "sha": "73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f",
+     "date": "2026-08-10T08:18:59Z",
+     "html_url": "https://github.com/Mibayy/token-savior/commit/73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f"
+    }
+   }
+  },
+  "C07": {
+   "repository": null,
+   "non_github": true
+  },
+  "C08": {
+   "repository": "https://github.com/colbymchenry/codegraph",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/colbymchenry/codegraph": {
+     "full_name": "colbymchenry/codegraph",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:37:54Z",
+     "created_at": "2026-01-18T21:45:37Z",
+     "updated_at": "2026-10-01T20:37:47Z",
+     "open_issues_count": 526,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/colbymchenry/codegraph"
+    },
+    "repos/colbymchenry/codegraph/releases/latest": {
+     "tag_name": "v1.6.1",
+     "name": "v1.6.1",
+     "published_at": "2026-09-29T05:08:55Z",
+     "prerelease": false,
+     "html_url": "https://github.com/colbymchenry/codegraph/releases/tag/v1.6.1"
+    },
+    "repos/colbymchenry/codegraph/commits?per_page=1": {
+     "sha": "c4babfce6afbd5b95ea10ddd9c4ccddb5910b3b7",
+     "date": "2026-10-01T20:37:37Z",
+     "html_url": "https://github.com/colbymchenry/codegraph/commit/c4babfce6afbd5b95ea10ddd9c4ccddb5910b3b7"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/ast-grep/ast-grep",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/ast-grep/ast-grep": {
+     "full_name": "ast-grep/ast-grep",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:31:47Z",
+     "created_at": "2022-07-01T19:21:00Z",
+     "updated_at": "2026-10-01T19:24:00Z",
+     "open_issues_count": 70,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/ast-grep/ast-grep"
+    },
+    "repos/ast-grep/ast-grep/releases/latest": {
+     "tag_name": "0.45.3",
+     "name": "0.45.3",
+     "published_at": "2026-08-31T01:42:23Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+    },
+    "repos/ast-grep/ast-grep/commits?per_page=1": {
+     "sha": "25334496c105c9c728f0a6024f3d164aed40cacc",
+     "date": "2026-09-28T14:22:46Z",
+     "html_url": "https://github.com/ast-grep/ast-grep/commit/25334496c105c9c728f0a6024f3d164aed40cacc"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/anthropics/claude-plugins-official",
+   "captured_at": "2026-10-01T20:42:22+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-plugins-official": {
+     "full_name": "anthropics/claude-plugins-official",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T22:40:08Z",
+     "created_at": "2025-11-20T18:36:20Z",
+     "updated_at": "2026-10-01T20:32:40Z",
+     "open_issues_count": 1048,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/anthropics/claude-plugins-official"
+    },
+    "repos/anthropics/claude-plugins-official/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/anthropics/claude-plugins-official/commits?per_page=1": {
+     "sha": "ab024cdcfa7ca80be204acd4907656ba5a968589",
+     "date": "2026-09-30T20:11:48Z",
+     "html_url": "https://github.com/anthropics/claude-plugins-official/commit/ab024cdcfa7ca80be204acd4907656ba5a968589"
+    }
+   }
+  }
+ }
+}

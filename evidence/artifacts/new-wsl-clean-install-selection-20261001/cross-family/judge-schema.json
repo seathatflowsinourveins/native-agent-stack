@@ -1,0 +1,14 @@
+{"type":"object","additionalProperties":false,"required":["layers"],"properties":{"layers":{"type":"array","items":{"type":"object","additionalProperties":false,
+"required":["layer_id","selection","not_selected","excluded","close_call","deciding_head_to_head","deciding_comparison","sources_read"],
+"properties":{
+"layer_id":{"type":"string"},
+"selection":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["key","name","repository","role","install_command","install_source","confidence","evidence"],"properties":{
+ "key":{"type":"string"},"name":{"type":"string"},"repository":{"type":"string"},"role":{"type":"string"},"install_command":{"type":"string"},"install_source":{"type":"string"},
+ "confidence":{"type":"string","enum":["high","medium","low"]},
+ "evidence":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["claim","url"],"properties":{"claim":{"type":"string"},"url":{"type":"string"}}}}}}},
+"not_selected":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["key","reason"],"properties":{"key":{"type":"string"},"reason":{"type":"string"}}}},
+"excluded":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["key","criterion","fact","url"],"properties":{"key":{"type":"string"},"criterion":{"type":"string","enum":["stale_or_archived","cannot_run_on_target","outside_requirement","needs_paid_service","duplicate"]},"fact":{"type":"string"},"url":{"type":"string"}}}},
+"close_call":{"type":"boolean"},
+"deciding_head_to_head":{"type":"string"},
+"deciding_comparison":{"type":"string"},
+"sources_read":{"type":"array","items":{"type":"string"}}}}}}}

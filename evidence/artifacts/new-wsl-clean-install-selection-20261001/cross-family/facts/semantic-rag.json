@@ -1,0 +1,359 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/semantic-rag.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/qdrant/qdrant",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/qdrant/qdrant": {
+     "full_name": "qdrant/qdrant",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:22:59Z",
+     "created_at": "2020-05-30T21:37:01Z",
+     "updated_at": "2026-10-01T17:32:43Z",
+     "open_issues_count": 739,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/qdrant/qdrant"
+    },
+    "repos/qdrant/qdrant/releases/latest": {
+     "tag_name": "v1.19.1",
+     "name": "v1.19.1",
+     "published_at": "2026-09-04T07:59:14Z",
+     "prerelease": false,
+     "html_url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1"
+    },
+    "repos/qdrant/qdrant/commits?per_page=1": {
+     "sha": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+     "date": "2026-09-03T12:36:18Z",
+     "html_url": "https://github.com/qdrant/qdrant/commit/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/lancedb/lancedb",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/lancedb/lancedb": {
+     "full_name": "lancedb/lancedb",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:26:26Z",
+     "created_at": "2023-02-28T01:15:17Z",
+     "updated_at": "2026-10-01T20:18:26Z",
+     "open_issues_count": 690,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/lancedb/lancedb"
+    },
+    "repos/lancedb/lancedb/releases/latest": {
+     "tag_name": "v0.39.0",
+     "name": "LanceDB v0.39.0",
+     "published_at": "2026-09-17T20:59:02Z",
+     "prerelease": false,
+     "html_url": "https://github.com/lancedb/lancedb/releases/tag/v0.39.0"
+    },
+    "repos/lancedb/lancedb/commits?per_page=1": {
+     "sha": "857e455361df77a0eb35e23764282e3d87dc1e44",
+     "date": "2026-10-01T14:13:08Z",
+     "html_url": "https://github.com/lancedb/lancedb/commit/857e455361df77a0eb35e23764282e3d87dc1e44"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/ollama/ollama",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/ollama/ollama": {
+     "full_name": "ollama/ollama",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:53Z",
+     "created_at": "2023-06-26T19:39:32Z",
+     "updated_at": "2026-10-01T20:38:08Z",
+     "open_issues_count": 4135,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/ollama/ollama"
+    },
+    "repos/ollama/ollama/releases/latest": {
+     "tag_name": "v0.35.0",
+     "name": "v0.35.0",
+     "published_at": "2026-09-28T21:23:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ollama/ollama/releases/tag/v0.35.0"
+    },
+    "repos/ollama/ollama/commits?per_page=1": {
+     "sha": "1abe35e6e6e777e858bbfbba283667ee8d516801",
+     "date": "2026-09-30T02:33:23Z",
+     "html_url": "https://github.com/ollama/ollama/commit/1abe35e6e6e777e858bbfbba283667ee8d516801"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/minishlab/semble",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/minishlab/semble": {
+     "full_name": "MinishLab/semble",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T06:56:12Z",
+     "created_at": "2026-04-06T14:56:45Z",
+     "updated_at": "2026-10-01T17:19:50Z",
+     "open_issues_count": 2,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/MinishLab/semble"
+    },
+    "repos/minishlab/semble/releases/latest": {
+     "tag_name": "v0.6.1",
+     "name": "v0.6.1",
+     "published_at": "2026-09-25T07:16:03Z",
+     "prerelease": false,
+     "html_url": "https://github.com/MinishLab/semble/releases/tag/v0.6.1"
+    },
+    "repos/minishlab/semble/commits?per_page=1": {
+     "sha": "aa634b14dc81ba6925a130cb999081f3240e2a3c",
+     "date": "2026-09-30T06:56:09Z",
+     "html_url": "https://github.com/MinishLab/semble/commit/aa634b14dc81ba6925a130cb999081f3240e2a3c"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/pgvector/pgvector",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/pgvector/pgvector": {
+     "full_name": "pgvector/pgvector",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T17:26:54Z",
+     "created_at": "2021-04-20T21:13:52Z",
+     "updated_at": "2026-10-01T20:42:30Z",
+     "open_issues_count": 17,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/pgvector/pgvector"
+    },
+    "repos/pgvector/pgvector/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/pgvector/pgvector/commits?per_page=1": {
+     "sha": "f37c13f68b57d2c3472b2214fbcff699d6d34876",
+     "date": "2026-10-01T17:26:23Z",
+     "html_url": "https://github.com/pgvector/pgvector/commit/f37c13f68b57d2c3472b2214fbcff699d6d34876"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/vllm-project/vllm",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/vllm-project/vllm": {
+     "full_name": "vllm-project/vllm",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:10:16Z",
+     "created_at": "2023-02-09T11:23:20Z",
+     "updated_at": "2026-10-01T20:39:23Z",
+     "open_issues_count": 8465,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/vllm-project/vllm"
+    },
+    "repos/vllm-project/vllm/releases/latest": {
+     "tag_name": "v0.30.0",
+     "name": "v0.30.0",
+     "published_at": "2026-09-22T05:20:54Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.30.0"
+    },
+    "repos/vllm-project/vllm/commits?per_page=1": {
+     "sha": "ccda9098cc5a91b6b6f73e0c0e697022382e01b4",
+     "date": "2026-10-01T19:54:26Z",
+     "html_url": "https://github.com/vllm-project/vllm/commit/ccda9098cc5a91b6b6f73e0c0e697022382e01b4"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/lightonai/next-plaid",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/lightonai/next-plaid": {
+     "full_name": "lightonai/next-plaid",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-22T15:06:53Z",
+     "created_at": "2026-01-06T17:41:05Z",
+     "updated_at": "2026-09-30T21:20:35Z",
+     "open_issues_count": 30,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/lightonai/next-plaid"
+    },
+    "repos/lightonai/next-plaid/releases/latest": {
+     "tag_name": "v1.7.0",
+     "name": "v1.7.0",
+     "published_at": "2026-08-18T15:36:44Z",
+     "prerelease": false,
+     "html_url": "https://github.com/lightonai/next-plaid/releases/tag/v1.7.0"
+    },
+    "repos/lightonai/next-plaid/commits?per_page=1": {
+     "sha": "00e26aae0006b322727db277672211d9a0e3ccec",
+     "date": "2026-08-18T15:25:37Z",
+     "html_url": "https://github.com/lightonai/next-plaid/commit/00e26aae0006b322727db277672211d9a0e3ccec"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/deepset-ai/haystack",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/deepset-ai/haystack": {
+     "full_name": "deepset-ai/haystack",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:39:36Z",
+     "created_at": "2019-11-14T09:05:28Z",
+     "updated_at": "2026-10-01T16:39:41Z",
+     "open_issues_count": 147,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/deepset-ai/haystack"
+    },
+    "repos/deepset-ai/haystack/releases/latest": {
+     "tag_name": "v3.3.0",
+     "name": "v3.3.0",
+     "published_at": "2026-10-01T10:39:53Z",
+     "prerelease": false,
+     "html_url": "https://github.com/deepset-ai/haystack/releases/tag/v3.3.0"
+    },
+    "repos/deepset-ai/haystack/commits?per_page=1": {
+     "sha": "9f31fb4b0ef318c51a6fa8ad30321336d99e2cb8",
+     "date": "2026-10-01T16:39:34Z",
+     "html_url": "https://github.com/deepset-ai/haystack/commit/9f31fb4b0ef318c51a6fa8ad30321336d99e2cb8"
+    }
+   }
+  },
+  "C09": {
+   "repository": null,
+   "non_github": true
+  },
+  "C10": {
+   "repository": "https://github.com/giancarloerra/SocratiCode",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/giancarloerra/SocratiCode": {
+     "full_name": "giancarloerra/SocratiCode",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T17:24:14Z",
+     "created_at": "2026-02-26T16:12:26Z",
+     "updated_at": "2026-10-01T19:09:50Z",
+     "open_issues_count": 1,
+     "has_issues": true,
+     "license_spdx": "AGPL-3.0",
+     "html_url": "https://github.com/giancarloerra/SocratiCode"
+    },
+    "repos/giancarloerra/SocratiCode/releases/latest": {
+     "tag_name": "v1.16.0",
+     "name": "v1.16.0",
+     "published_at": "2026-09-28T12:19:47Z",
+     "prerelease": false,
+     "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0"
+    },
+    "repos/giancarloerra/SocratiCode/commits?per_page=1": {
+     "sha": "155ba9325f43a65c78a09930735b378f91651cf5",
+     "date": "2026-09-30T17:24:14Z",
+     "html_url": "https://github.com/giancarloerra/SocratiCode/commit/155ba9325f43a65c78a09930735b378f91651cf5"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/huggingface/huggingface_hub",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/huggingface/huggingface_hub": {
+     "full_name": "huggingface/huggingface_hub",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T14:26:12Z",
+     "created_at": "2020-12-22T10:20:28Z",
+     "updated_at": "2026-10-01T16:44:43Z",
+     "open_issues_count": 166,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/huggingface/huggingface_hub"
+    },
+    "repos/huggingface/huggingface_hub/releases/latest": {
+     "tag_name": "v2.1.0",
+     "name": "[v2.1.0] Better Jobs tooling, ZeroGPU quota tracking, and revamped Model Catalog",
+     "published_at": "2026-10-01T12:12:05Z",
+     "prerelease": false,
+     "html_url": "https://github.com/huggingface/huggingface_hub/releases/tag/v2.1.0"
+    },
+    "repos/huggingface/huggingface_hub/commits?per_page=1": {
+     "sha": "1a76ad25c8f10fcd4ffa696d8289a3a1488dfa34",
+     "date": "2026-10-01T14:26:08Z",
+     "html_url": "https://github.com/huggingface/huggingface_hub/commit/1a76ad25c8f10fcd4ffa696d8289a3a1488dfa34"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/kapillamba4/code-memory",
+   "captured_at": "2026-10-01T20:42:38+00:00",
+   "endpoints": {
+    "repos/kapillamba4/code-memory": {
+     "full_name": "kapillamba4/code-memory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-05-20T14:01:55Z",
+     "created_at": "2026-02-21T09:19:48Z",
+     "updated_at": "2026-09-02T11:55:12Z",
+     "open_issues_count": 3,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/kapillamba4/code-memory"
+    },
+    "repos/kapillamba4/code-memory/releases/latest": {
+     "tag_name": "v1.0.33",
+     "name": "v1.0.33",
+     "published_at": "2026-05-20T14:01:55Z",
+     "prerelease": false,
+     "html_url": "https://github.com/kapillamba4/code-memory/releases/tag/v1.0.33"
+    },
+    "repos/kapillamba4/code-memory/commits?per_page=1": {
+     "sha": "5a8db166ca11a90c093ba4a9a54d266cde756f54",
+     "date": "2026-05-20T13:58:06Z",
+     "html_url": "https://github.com/kapillamba4/code-memory/commit/5a8db166ca11a90c093ba4a9a54d266cde756f54"
+    }
+   }
+  }
+ }
+}

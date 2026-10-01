@@ -1,0 +1,391 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/workers.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/langchain-ai/deepagents",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/langchain-ai/deepagents": {
+     "full_name": "langchain-ai/deepagents",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:41:34Z",
+     "created_at": "2025-07-27T23:07:53Z",
+     "updated_at": "2026-10-01T20:11:09Z",
+     "open_issues_count": 184,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/langchain-ai/deepagents"
+    },
+    "repos/langchain-ai/deepagents/releases/latest": {
+     "tag_name": "deepagents==0.7.21",
+     "name": "deepagents==0.7.21",
+     "published_at": "2026-09-30T19:28:24Z",
+     "prerelease": false,
+     "html_url": "https://github.com/langchain-ai/deepagents/releases/tag/deepagents%3D%3D0.7.21"
+    },
+    "repos/langchain-ai/deepagents/commits?per_page=1": {
+     "sha": "6b1385cadc01aeb36c906e47a58c0765604e24f8",
+     "date": "2026-10-01T20:11:02Z",
+     "html_url": "https://github.com/langchain-ai/deepagents/commit/6b1385cadc01aeb36c906e47a58c0765604e24f8"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/openai/codex-plugin-cc": {
+     "full_name": "openai/codex-plugin-cc",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-07-08T00:17:31Z",
+     "created_at": "2026-03-30T15:29:52Z",
+     "updated_at": "2026-10-01T18:02:26Z",
+     "open_issues_count": 514,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openai/codex-plugin-cc"
+    },
+    "repos/openai/codex-plugin-cc/releases/latest": {
+     "tag_name": "v1.0.6",
+     "name": "v1.0.6",
+     "published_at": "2026-07-08T00:17:32Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6"
+    },
+    "repos/openai/codex-plugin-cc/commits?per_page=1": {
+     "sha": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+     "date": "2026-07-08T00:17:00Z",
+     "html_url": "https://github.com/openai/codex-plugin-cc/commit/db52e28f4d9ded852ab3942cea316258ae4ef346"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/gastownhall/beads",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/gastownhall/beads": {
+     "full_name": "gastownhall/beads",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:34:07Z",
+     "created_at": "2025-10-12T03:09:46Z",
+     "updated_at": "2026-10-01T20:33:39Z",
+     "open_issues_count": 1264,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/gastownhall/beads"
+    },
+    "repos/gastownhall/beads/releases/latest": {
+     "tag_name": "v1.3.1",
+     "name": "v1.3.1",
+     "published_at": "2026-09-30T23:37:36Z",
+     "prerelease": false,
+     "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.1"
+    },
+    "repos/gastownhall/beads/commits?per_page=1": {
+     "sha": "555b01d7891d4b592d83c4545a6dcedd018cbb9c",
+     "date": "2026-10-01T18:34:06Z",
+     "html_url": "https://github.com/gastownhall/beads/commit/555b01d7891d4b592d83c4545a6dcedd018cbb9c"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/bytedance/deer-flow",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/bytedance/deer-flow": {
+     "full_name": "bytedance/deer-flow",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T12:36:36Z",
+     "created_at": "2025-05-07T02:50:19Z",
+     "updated_at": "2026-10-01T20:23:33Z",
+     "open_issues_count": 896,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/bytedance/deer-flow"
+    },
+    "repos/bytedance/deer-flow/releases/latest": {
+     "tag_name": "v2.1.0",
+     "name": "v2.1.0 Release",
+     "published_at": "2026-09-24T10:40:44Z",
+     "prerelease": false,
+     "html_url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0"
+    },
+    "repos/bytedance/deer-flow/commits?per_page=1": {
+     "sha": "f840e843d3e2db1485cb65ceae73a5525aa80193",
+     "date": "2026-10-01T12:36:35Z",
+     "html_url": "https://github.com/bytedance/deer-flow/commit/f840e843d3e2db1485cb65ceae73a5525aa80193"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/openai/codex",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/openai/codex": {
+     "full_name": "openai/codex",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:17:50Z",
+     "created_at": "2025-04-13T05:37:54Z",
+     "updated_at": "2026-10-01T20:30:37Z",
+     "open_issues_count": 20039,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openai/codex"
+    },
+    "repos/openai/codex/releases/latest": {
+     "tag_name": "rust-v0.160.0",
+     "name": "0.160.0",
+     "published_at": "2026-10-01T20:19:13Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0"
+    },
+    "repos/openai/codex/commits?per_page=1": {
+     "sha": "960e878df4bf87b9d7fa0849f14561d7cdcca942",
+     "date": "2026-10-01T20:17:34Z",
+     "html_url": "https://github.com/openai/codex/commit/960e878df4bf87b9d7fa0849f14561d7cdcca942"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/OpenHands/software-agent-sdk": {
+     "full_name": "OpenHands/software-agent-sdk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:10:13Z",
+     "created_at": "2025-08-23T20:34:39Z",
+     "updated_at": "2026-10-01T20:14:14Z",
+     "open_issues_count": 516,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/OpenHands/software-agent-sdk"
+    },
+    "repos/OpenHands/software-agent-sdk/releases/latest": {
+     "tag_name": "v1.50.1",
+     "name": "v1.50.1",
+     "published_at": "2026-09-30T19:31:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1"
+    },
+    "repos/OpenHands/software-agent-sdk/commits?per_page=1": {
+     "sha": "0a9abc87641ad7ffe02e2dadf5e2cb3976b35217",
+     "date": "2026-10-01T13:02:11Z",
+     "html_url": "https://github.com/OpenHands/software-agent-sdk/commit/0a9abc87641ad7ffe02e2dadf5e2cb3976b35217"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/langchain-ai/langgraph": {
+     "full_name": "langchain-ai/langgraph",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:32:30Z",
+     "created_at": "2023-08-09T18:33:12Z",
+     "updated_at": "2026-10-01T20:41:34Z",
+     "open_issues_count": 848,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/langchain-ai/langgraph"
+    },
+    "repos/langchain-ai/langgraph/releases/latest": {
+     "tag_name": "cli==0.4.32.dev0",
+     "name": "langgraph-cli==0.4.32.dev0",
+     "published_at": "2026-09-23T23:26:51Z",
+     "prerelease": false,
+     "html_url": "https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.32.dev0"
+    },
+    "repos/langchain-ai/langgraph/commits?per_page=1": {
+     "sha": "157a06dda988d85afeb8751ff27b35ab3f4f8bf4",
+     "date": "2026-10-01T18:57:28Z",
+     "html_url": "https://github.com/langchain-ai/langgraph/commit/157a06dda988d85afeb8751ff27b35ab3f4f8bf4"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/microsoft/agent-framework",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/microsoft/agent-framework": {
+     "full_name": "microsoft/agent-framework",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:58:29Z",
+     "created_at": "2025-04-28T19:40:42Z",
+     "updated_at": "2026-10-01T20:22:54Z",
+     "open_issues_count": 679,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/agent-framework"
+    },
+    "repos/microsoft/agent-framework/releases/latest": {
+     "tag_name": "dotnet-1.23.0",
+     "name": "dotnet-1.23.0",
+     "published_at": "2026-10-01T10:54:51Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/agent-framework/releases/tag/dotnet-1.23.0"
+    },
+    "repos/microsoft/agent-framework/commits?per_page=1": {
+     "sha": "6d8e16ea364100497723b99e3251f8c158047bf5",
+     "date": "2026-10-01T18:54:50Z",
+     "html_url": "https://github.com/microsoft/agent-framework/commit/6d8e16ea364100497723b99e3251f8c158047bf5"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/anthropics/claude-code",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-code": {
+     "full_name": "anthropics/claude-code",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:43:10Z",
+     "created_at": "2025-02-22T17:41:21Z",
+     "updated_at": "2026-10-01T20:23:20Z",
+     "open_issues_count": 14032,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/anthropics/claude-code"
+    },
+    "repos/anthropics/claude-code/releases/latest": {
+     "tag_name": "v2.1.287",
+     "name": "v2.1.287",
+     "published_at": "2026-10-01T18:00:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.287"
+    },
+    "repos/anthropics/claude-code/commits?per_page=1": {
+     "sha": "52c76441cae91f6891e4712306bffb057ff6fec5",
+     "date": "2026-10-01T18:43:08Z",
+     "html_url": "https://github.com/anthropics/claude-code/commit/52c76441cae91f6891e4712306bffb057ff6fec5"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/max-sixty/worktrunk": {
+     "full_name": "max-sixty/worktrunk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:01:15Z",
+     "created_at": "2025-10-17T22:13:14Z",
+     "updated_at": "2026-10-01T20:33:30Z",
+     "open_issues_count": 47,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/max-sixty/worktrunk"
+    },
+    "repos/max-sixty/worktrunk/releases/latest": {
+     "tag_name": "v0.80.0",
+     "name": "0.80.0",
+     "published_at": "2026-09-27T21:18:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+    },
+    "repos/max-sixty/worktrunk/commits?per_page=1": {
+     "sha": "85e685e313f7fbc0612c0e055e655c3917e39f29",
+     "date": "2026-10-01T20:01:12Z",
+     "html_url": "https://github.com/max-sixty/worktrunk/commit/85e685e313f7fbc0612c0e055e655c3917e39f29"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/temporalio/temporal",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/temporalio/temporal": {
+     "full_name": "temporalio/temporal",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:42:38Z",
+     "created_at": "2019-10-16T22:15:35Z",
+     "updated_at": "2026-10-01T20:27:51Z",
+     "open_issues_count": 1042,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/temporalio/temporal"
+    },
+    "repos/temporalio/temporal/releases/latest": {
+     "tag_name": "v1.32.0",
+     "name": "v1.32.0",
+     "published_at": "2026-09-11T16:10:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0"
+    },
+    "repos/temporalio/temporal/commits?per_page=1": {
+     "sha": "95f69832293f851fdebeb6d790854918f6cfd563",
+     "date": "2026-10-01T20:16:43Z",
+     "html_url": "https://github.com/temporalio/temporal/commit/95f69832293f851fdebeb6d790854918f6cfd563"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/OpenHands/OpenHands",
+   "captured_at": "2026-10-01T20:42:42+00:00",
+   "endpoints": {
+    "repos/OpenHands/OpenHands": {
+     "full_name": "OpenHands/OpenHands",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:20:30Z",
+     "created_at": "2024-03-13T03:33:31Z",
+     "updated_at": "2026-10-01T20:41:40Z",
+     "open_issues_count": 850,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/OpenHands/OpenHands"
+    },
+    "repos/OpenHands/OpenHands/releases/latest": {
+     "tag_name": "v1.24.0",
+     "name": "v1.24.0",
+     "published_at": "2026-09-25T15:09:26Z",
+     "prerelease": false,
+     "html_url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.24.0"
+    },
+    "repos/OpenHands/OpenHands/commits?per_page=1": {
+     "sha": "a8c05584ec6bb063a0857460b9cbff48e136919f",
+     "date": "2026-10-01T04:55:42Z",
+     "html_url": "https://github.com/OpenHands/OpenHands/commit/a8c05584ec6bb063a0857460b9cbff48e136919f"
+    }
+   }
+  }
+ }
+}

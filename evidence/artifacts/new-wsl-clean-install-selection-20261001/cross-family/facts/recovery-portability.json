@@ -1,0 +1,231 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/recovery-portability.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/astral-sh/uv",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/astral-sh/uv": {
+     "full_name": "astral-sh/uv",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:42:32Z",
+     "created_at": "2023-10-02T20:24:11Z",
+     "updated_at": "2026-10-01T19:27:45Z",
+     "open_issues_count": 2939,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/astral-sh/uv"
+    },
+    "repos/astral-sh/uv/releases/latest": {
+     "tag_name": "0.12.21",
+     "name": "0.12.21",
+     "published_at": "2026-09-29T21:14:06Z",
+     "prerelease": false,
+     "html_url": "https://github.com/astral-sh/uv/releases/tag/0.12.21"
+    },
+    "repos/astral-sh/uv/commits?per_page=1": {
+     "sha": "cbf610678ba180054ce502ba803bc4403fac630e",
+     "date": "2026-10-01T18:47:26Z",
+     "html_url": "https://github.com/astral-sh/uv/commit/cbf610678ba180054ce502ba803bc4403fac630e"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/benbjohnson/litestream",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/benbjohnson/litestream": {
+     "full_name": "benbjohnson/litestream",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-25T17:51:22Z",
+     "created_at": "2020-10-06T19:16:01Z",
+     "updated_at": "2026-10-01T17:40:43Z",
+     "open_issues_count": 158,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/benbjohnson/litestream"
+    },
+    "repos/benbjohnson/litestream/releases/latest": {
+     "tag_name": "v0.5.17",
+     "name": "v0.5.17",
+     "published_at": "2026-08-31T21:59:32Z",
+     "prerelease": false,
+     "html_url": "https://github.com/benbjohnson/litestream/releases/tag/v0.5.17"
+    },
+    "repos/benbjohnson/litestream/commits?per_page=1": {
+     "sha": "3b911591668be6dcf39c0ae70d828d65a1453b27",
+     "date": "2026-09-21T17:26:10Z",
+     "html_url": "https://github.com/benbjohnson/litestream/commit/3b911591668be6dcf39c0ae70d828d65a1453b27"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/jdx/mise",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/jdx/mise": {
+     "full_name": "jdx/mise",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:46:03Z",
+     "created_at": "2023-01-09T14:44:21Z",
+     "updated_at": "2026-10-01T20:07:51Z",
+     "open_issues_count": 18,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/jdx/mise"
+    },
+    "repos/jdx/mise/releases/latest": {
+     "tag_name": "v2026.9.18",
+     "name": "v2026.9.18: Remote config includes, OCI task catalogs, and a trust fix for inline tool options",
+     "published_at": "2026-09-30T12:51:01Z",
+     "prerelease": false,
+     "html_url": "https://github.com/jdx/mise/releases/tag/v2026.9.18"
+    },
+    "repos/jdx/mise/commits?per_page=1": {
+     "sha": "ec6f2c4d2eb308236581548b7398e2c60e082250",
+     "date": "2026-10-01T18:37:57Z",
+     "html_url": "https://github.com/jdx/mise/commit/ec6f2c4d2eb308236581548b7398e2c60e082250"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/DeterminateSystems/nix-installer",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/DeterminateSystems/nix-installer": {
+     "full_name": "DeterminateSystems/nix-installer",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:39:42Z",
+     "created_at": "2022-09-02T19:10:48Z",
+     "updated_at": "2026-10-01T19:39:40Z",
+     "open_issues_count": 440,
+     "has_issues": true,
+     "license_spdx": "LGPL-2.1",
+     "html_url": "https://github.com/DeterminateSystems/nix-installer"
+    },
+    "repos/DeterminateSystems/nix-installer/releases/latest": {
+     "tag_name": "v3.22.5",
+     "name": "v3.22.5",
+     "published_at": "2026-09-17T22:16:09Z",
+     "prerelease": false,
+     "html_url": "https://github.com/DeterminateSystems/nix-installer/releases/tag/v3.22.5"
+    },
+    "repos/DeterminateSystems/nix-installer/commits?per_page=1": {
+     "sha": "6613dfc41d1b306620048688b4c04adf8f7a51b8",
+     "date": "2026-10-01T19:39:33Z",
+     "html_url": "https://github.com/DeterminateSystems/nix-installer/commit/6613dfc41d1b306620048688b4c04adf8f7a51b8"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/jetify-com/devbox",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/jetify-com/devbox": {
+     "full_name": "jetify-com/devbox",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-28T22:41:48Z",
+     "created_at": "2022-08-18T20:27:16Z",
+     "updated_at": "2026-10-01T17:18:49Z",
+     "open_issues_count": 404,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/jetify-com/devbox"
+    },
+    "repos/jetify-com/devbox/releases/latest": {
+     "tag_name": "0.18.4",
+     "name": "0.18.4",
+     "published_at": "2026-09-25T18:11:02Z",
+     "prerelease": false,
+     "html_url": "https://github.com/jetify-com/devbox/releases/tag/0.18.4"
+    },
+    "repos/jetify-com/devbox/commits?per_page=1": {
+     "sha": "1d9ea45e1e51826df32ef0db7035c4c00ae2c184",
+     "date": "2026-09-28T22:41:46Z",
+     "html_url": "https://github.com/jetify-com/devbox/commit/1d9ea45e1e51826df32ef0db7035c4c00ae2c184"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/restic/restic",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/restic/restic": {
+     "full_name": "restic/restic",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T01:44:09Z",
+     "created_at": "2014-04-27T14:07:58Z",
+     "updated_at": "2026-10-01T19:30:13Z",
+     "open_issues_count": 607,
+     "has_issues": true,
+     "license_spdx": "BSD-2-Clause",
+     "html_url": "https://github.com/restic/restic"
+    },
+    "repos/restic/restic/releases/latest": {
+     "tag_name": "v0.19.1",
+     "name": "restic 0.19.1",
+     "published_at": "2026-07-05T08:13:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/restic/restic/releases/tag/v0.19.1"
+    },
+    "repos/restic/restic/commits?per_page=1": {
+     "sha": "5127c4abf921857fde4ae51f566c86028c8c2911",
+     "date": "2026-09-25T20:08:18Z",
+     "html_url": "https://github.com/restic/restic/commit/5127c4abf921857fde4ae51f566c86028c8c2911"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/twpayne/chezmoi",
+   "captured_at": "2026-10-01T20:42:36+00:00",
+   "endpoints": {
+    "repos/twpayne/chezmoi": {
+     "full_name": "twpayne/chezmoi",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-28T19:54:07Z",
+     "created_at": "2018-11-12T16:45:43Z",
+     "updated_at": "2026-10-01T16:25:37Z",
+     "open_issues_count": 58,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/twpayne/chezmoi"
+    },
+    "repos/twpayne/chezmoi/releases/latest": {
+     "tag_name": "v2.73.0",
+     "name": "v2.73.0",
+     "published_at": "2026-09-28T19:52:37Z",
+     "prerelease": false,
+     "html_url": "https://github.com/twpayne/chezmoi/releases/tag/v2.73.0"
+    },
+    "repos/twpayne/chezmoi/commits?per_page=1": {
+     "sha": "24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+     "date": "2026-09-28T18:53:18Z",
+     "html_url": "https://github.com/twpayne/chezmoi/commit/24b71e4cf9d98cce0801cfc68e7553355efeaff7"
+    }
+   }
+  }
+ }
+}

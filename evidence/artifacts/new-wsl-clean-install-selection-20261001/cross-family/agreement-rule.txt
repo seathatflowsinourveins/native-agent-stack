@@ -1,0 +1,7 @@
+Cross-family agreement and fold rule for the 21 packets of wf_c2377ebb-65c, frozen before any GPT-6.1 Sol return exists.
+Normalize a pick to its repository URL (lowercase, no trailing slash or .git); a pick without a GitHub URL is normalized by its name.
+Per layer: C = the Claude picks after the critics (selection.json "selection"); G = the GPT picks after the GPT critic (the judge's selection, replaced by revised_selection when the critic's verdict is revised).
+Status per family: "compare" when selection.json says compare (Claude) or the GPT critic's verdict is undetermined (GPT); otherwise "recommended".
+Agreement class: agree = C equals G and both statuses are equal; overlap = C and G share at least one pick and are not equal; differ = C and G share no pick.
+Fold (the #589 record's rule, made exact): agree and recommended -> the shared picks are the clean-install picks on source review (new-host acceptance still applies); agree and compare -> the layer stays a comparison whose arms are the union of both families' picks and arms; overlap -> the shared picks stand and every pick only one family made enters the layer's comparison (as an alternative or a with/without arm); differ -> the layer becomes a comparison whose arms are the union of both families' picks.
+A selection changes only through this rule plus measured comparisons on the new host; no family's pick is preferred over the other's.

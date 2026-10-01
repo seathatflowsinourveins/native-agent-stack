@@ -1,0 +1,231 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/agent-sdks.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/openai/codex",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/openai/codex": {
+     "full_name": "openai/codex",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:17:50Z",
+     "created_at": "2025-04-13T05:37:54Z",
+     "updated_at": "2026-10-01T20:30:37Z",
+     "open_issues_count": 20039,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openai/codex"
+    },
+    "repos/openai/codex/releases/latest": {
+     "tag_name": "rust-v0.160.0",
+     "name": "0.160.0",
+     "published_at": "2026-10-01T20:19:13Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0"
+    },
+    "repos/openai/codex/commits?per_page=1": {
+     "sha": "960e878df4bf87b9d7fa0849f14561d7cdcca942",
+     "date": "2026-10-01T20:17:34Z",
+     "html_url": "https://github.com/openai/codex/commit/960e878df4bf87b9d7fa0849f14561d7cdcca942"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/openhands/software-agent-sdk",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/openhands/software-agent-sdk": {
+     "full_name": "OpenHands/software-agent-sdk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:10:13Z",
+     "created_at": "2025-08-23T20:34:39Z",
+     "updated_at": "2026-10-01T20:14:14Z",
+     "open_issues_count": 516,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/OpenHands/software-agent-sdk"
+    },
+    "repos/openhands/software-agent-sdk/releases/latest": {
+     "tag_name": "v1.50.1",
+     "name": "v1.50.1",
+     "published_at": "2026-09-30T19:31:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1"
+    },
+    "repos/openhands/software-agent-sdk/commits?per_page=1": {
+     "sha": "0a9abc87641ad7ffe02e2dadf5e2cb3976b35217",
+     "date": "2026-10-01T13:02:11Z",
+     "html_url": "https://github.com/OpenHands/software-agent-sdk/commit/0a9abc87641ad7ffe02e2dadf5e2cb3976b35217"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/langchain-ai/langgraph",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/langchain-ai/langgraph": {
+     "full_name": "langchain-ai/langgraph",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:32:30Z",
+     "created_at": "2023-08-09T18:33:12Z",
+     "updated_at": "2026-10-01T20:41:34Z",
+     "open_issues_count": 848,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/langchain-ai/langgraph"
+    },
+    "repos/langchain-ai/langgraph/releases/latest": {
+     "tag_name": "cli==0.4.32.dev0",
+     "name": "langgraph-cli==0.4.32.dev0",
+     "published_at": "2026-09-23T23:26:51Z",
+     "prerelease": false,
+     "html_url": "https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.32.dev0"
+    },
+    "repos/langchain-ai/langgraph/commits?per_page=1": {
+     "sha": "157a06dda988d85afeb8751ff27b35ab3f4f8bf4",
+     "date": "2026-10-01T18:57:28Z",
+     "html_url": "https://github.com/langchain-ai/langgraph/commit/157a06dda988d85afeb8751ff27b35ab3f4f8bf4"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/agentproto/ts",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/agentproto/ts": {
+     "full_name": "agentproto/ts",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:14:50Z",
+     "created_at": "2026-05-01T01:58:20Z",
+     "updated_at": "2026-10-01T20:10:12Z",
+     "open_issues_count": 13,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/agentproto/ts"
+    },
+    "repos/agentproto/ts/releases/latest": {
+     "tag_name": "release/2026-10-01.2",
+     "name": "agentproto \u2014 October 1, 2026 release (2)",
+     "published_at": "2026-10-01T14:55:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/agentproto/ts/releases/tag/release/2026-10-01.2"
+    },
+    "repos/agentproto/ts/commits?per_page=1": {
+     "sha": "c2472bf496845004c32fd64ff857ee05045e6360",
+     "date": "2026-10-01T20:10:06Z",
+     "html_url": "https://github.com/agentproto/ts/commit/c2472bf496845004c32fd64ff857ee05045e6360"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/github/copilot-sdk",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/github/copilot-sdk": {
+     "full_name": "github/copilot-sdk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T17:26:10Z",
+     "created_at": "2026-01-14T00:23:22Z",
+     "updated_at": "2026-10-01T17:26:20Z",
+     "open_issues_count": 342,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/github/copilot-sdk"
+    },
+    "repos/github/copilot-sdk/releases/latest": {
+     "tag_name": "v1.0.16",
+     "name": "v1.0.16",
+     "published_at": "2026-09-30T21:59:40Z",
+     "prerelease": false,
+     "html_url": "https://github.com/github/copilot-sdk/releases/tag/v1.0.16"
+    },
+    "repos/github/copilot-sdk/commits?per_page=1": {
+     "sha": "0584472932d8124dc139f6e4fc35ea76397ef868",
+     "date": "2026-10-01T17:26:08Z",
+     "html_url": "https://github.com/github/copilot-sdk/commit/0584472932d8124dc139f6e4fc35ea76397ef868"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/temporalio/temporal",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/temporalio/temporal": {
+     "full_name": "temporalio/temporal",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:53Z",
+     "created_at": "2019-10-16T22:15:35Z",
+     "updated_at": "2026-10-01T20:27:51Z",
+     "open_issues_count": 1042,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/temporalio/temporal"
+    },
+    "repos/temporalio/temporal/releases/latest": {
+     "tag_name": "v1.32.0",
+     "name": "v1.32.0",
+     "published_at": "2026-09-11T16:10:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0"
+    },
+    "repos/temporalio/temporal/commits?per_page=1": {
+     "sha": "95f69832293f851fdebeb6d790854918f6cfd563",
+     "date": "2026-10-01T20:16:43Z",
+     "html_url": "https://github.com/temporalio/temporal/commit/95f69832293f851fdebeb6d790854918f6cfd563"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "captured_at": "2026-10-01T20:42:19+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-agent-sdk-python": {
+     "full_name": "anthropics/claude-agent-sdk-python",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:01:48Z",
+     "created_at": "2025-06-11T21:33:43Z",
+     "updated_at": "2026-10-01T18:02:00Z",
+     "open_issues_count": 520,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python"
+    },
+    "repos/anthropics/claude-agent-sdk-python/releases/latest": {
+     "tag_name": "v0.2.163",
+     "name": "v0.2.163",
+     "published_at": "2026-09-30T19:47:45Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163"
+    },
+    "repos/anthropics/claude-agent-sdk-python/commits?per_page=1": {
+     "sha": "bfb895c6ef46e095191938b4eda798a025957c09",
+     "date": "2026-10-01T18:01:46Z",
+     "html_url": "https://github.com/anthropics/claude-agent-sdk-python/commit/bfb895c6ef46e095191938b4eda798a025957c09"
+    }
+   }
+  }
+ }
+}

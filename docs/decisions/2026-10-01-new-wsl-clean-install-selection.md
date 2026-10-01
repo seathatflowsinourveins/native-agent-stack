@@ -208,3 +208,19 @@ arm set itself.
 A preregistered comparison on the new distribution; the re-vote of the candidates the packets did not hold, which can
 add arms or reopen a selected layer; a fact a later check finds wrong where a pick rests on it; a new upstream release
 or maintenance change that alters a criterion.
+
+## Addendum (2026-10-01): the cross-family half ran
+
+The blind GPT-6.1 Sol run requested under "Cross-family status" ran the same day on the same frozen packets, criteria
+and prompts: 11 judges in 3 groups and one critic per group, GPT-6.1 Sol at effort max through the Codex CLI
+(`cross-family/`, with its preregistration addendum recorded before the first process). Against this record's
+recommendations the two families agree exactly on 2 layers (native-clients and agent-sdks), overlap on 19 and differ on
+none. The GPT critics upheld 4 selections, revised 1 (workers) and found 16 undetermined. Under the agreement rule
+frozen before the run (`cross-family/agreement-rule.txt`), applied as written, every pick both families made stands as
+its layer's pick for the new distribution, so all 21 layers have standing picks: native-clients and agent-sdks on
+identical recommendations, document-retrieval, scheduling-supervision and the base distribution on identical pick
+sets, and the other 16 layers on shared picks with every pick of one family only entering the layer's comparison as a
+challenger. A standing pick is final once it passes acceptance on the new distribution and, where challengers exist,
+the measured comparison. Each row's standing picks, challengers, arms and gate ledger are in
+`catalogs/foundation/final-catalog-20261001.json` (decision record `docs/decisions/2026-10-01-final-catalog.md`). The
+Decision table above remains this run's record.

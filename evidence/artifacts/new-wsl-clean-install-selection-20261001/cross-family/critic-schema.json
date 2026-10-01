@@ -1,0 +1,10 @@
+{"type":"object","additionalProperties":false,"required":["layers"],"properties":{"layers":{"type":"array","items":{"type":"object","additionalProperties":false,
+"required":["layer_id","fact_checks","issues","stronger_candidates","verdict","revised_selection","deciding_head_to_head"],
+"properties":{
+"layer_id":{"type":"string"},
+"fact_checks":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["repository","claim","url","holds"],"properties":{"repository":{"type":"string"},"claim":{"type":"string"},"url":{"type":"string"},"holds":{"type":"boolean"}}}},
+"issues":{"type":"array","items":{"type":"string"}},
+"stronger_candidates":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["key","why"],"properties":{"key":{"type":"string"},"why":{"type":"string"}}}},
+"verdict":{"type":"string","enum":["upheld","revised","undetermined"]},
+"revised_selection":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["key","name","repository","why"],"properties":{"key":{"type":"string"},"name":{"type":"string"},"repository":{"type":"string"},"why":{"type":"string"}}}},
+"deciding_head_to_head":{"type":"string"}}}}}}

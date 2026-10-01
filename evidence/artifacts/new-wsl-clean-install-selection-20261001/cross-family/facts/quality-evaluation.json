@@ -1,0 +1,315 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/quality-evaluation.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/openai/skills",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/openai/skills": {
+     "full_name": "openai/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-08T20:35:26Z",
+     "created_at": "2025-11-25T06:25:42Z",
+     "updated_at": "2026-10-01T20:30:35Z",
+     "open_issues_count": 301,
+     "has_issues": true,
+     "license_spdx": null,
+     "html_url": "https://github.com/openai/skills"
+    },
+    "repos/openai/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/openai/skills/commits?per_page=1": {
+     "sha": "49f948faa9258a0c61caceaf225e179651397431",
+     "date": "2026-06-24T02:36:12Z",
+     "html_url": "https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/Wilfred/difftastic",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/Wilfred/difftastic": {
+     "full_name": "Wilfred/difftastic",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-22T08:42:53Z",
+     "created_at": "2018-12-18T11:19:45Z",
+     "updated_at": "2026-10-01T12:53:54Z",
+     "open_issues_count": 290,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/Wilfred/difftastic"
+    },
+    "repos/Wilfred/difftastic/releases/latest": {
+     "tag_name": "0.71.0",
+     "name": "0.71.0",
+     "published_at": "2026-09-18T22:57:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
+    },
+    "repos/Wilfred/difftastic/commits?per_page=1": {
+     "sha": "e2e1e3b7f5be18290135cc16ec521c16284eb21b",
+     "date": "2026-09-22T08:39:45Z",
+     "html_url": "https://github.com/Wilfred/difftastic/commit/e2e1e3b7f5be18290135cc16ec521c16284eb21b"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/koalaman/shellcheck",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/koalaman/shellcheck": {
+     "full_name": "koalaman/shellcheck",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-26T23:34:46Z",
+     "created_at": "2012-11-17T03:15:11Z",
+     "updated_at": "2026-10-01T13:22:45Z",
+     "open_issues_count": 1120,
+     "has_issues": true,
+     "license_spdx": "GPL-3.0",
+     "html_url": "https://github.com/koalaman/shellcheck"
+    },
+    "repos/koalaman/shellcheck/releases/latest": {
+     "tag_name": "v0.11.0",
+     "name": "Stable version v0.11.0",
+     "published_at": "2025-08-04T00:27:19Z",
+     "prerelease": false,
+     "html_url": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
+    },
+    "repos/koalaman/shellcheck/commits?per_page=1": {
+     "sha": "4549614bc0bba15231f9fc20cb7146c91a8758aa",
+     "date": "2026-09-26T23:34:45Z",
+     "html_url": "https://github.com/koalaman/shellcheck/commit/4549614bc0bba15231f9fc20cb7146c91a8758aa"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/harbor-framework/harbor",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/harbor-framework/harbor": {
+     "full_name": "harbor-framework/harbor",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T15:35:19Z",
+     "created_at": "2025-08-04T23:28:26Z",
+     "updated_at": "2026-10-01T20:42:12Z",
+     "open_issues_count": 967,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/harbor-framework/harbor"
+    },
+    "repos/harbor-framework/harbor/releases/latest": {
+     "tag_name": "v0.23.0",
+     "name": "v0.23.0",
+     "published_at": "2026-09-12T04:55:17Z",
+     "prerelease": false,
+     "html_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0"
+    },
+    "repos/harbor-framework/harbor/commits?per_page=1": {
+     "sha": "bf991e490394ef9c3250a6db2bc5cbda903cb4c3",
+     "date": "2026-10-01T06:31:25Z",
+     "html_url": "https://github.com/harbor-framework/harbor/commit/bf991e490394ef9c3250a6db2bc5cbda903cb4c3"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/microsoft/playwright",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/microsoft/playwright": {
+     "full_name": "microsoft/playwright",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:41:12Z",
+     "created_at": "2019-11-15T18:32:42Z",
+     "updated_at": "2026-10-01T20:41:18Z",
+     "open_issues_count": 197,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/microsoft/playwright"
+    },
+    "repos/microsoft/playwright/releases/latest": {
+     "tag_name": "v1.63.0",
+     "name": "v1.63.0",
+     "published_at": "2026-09-04T22:40:31Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0"
+    },
+    "repos/microsoft/playwright/commits?per_page=1": {
+     "sha": "ec17ddf9cd2ffbac6cacd455c7f236880362220b",
+     "date": "2026-10-01T20:41:11Z",
+     "html_url": "https://github.com/microsoft/playwright/commit/ec17ddf9cd2ffbac6cacd455c7f236880362220b"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/promptfoo/promptfoo": {
+     "full_name": "promptfoo/promptfoo",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:32:06Z",
+     "created_at": "2023-04-28T15:48:49Z",
+     "updated_at": "2026-10-01T20:32:14Z",
+     "open_issues_count": 696,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/promptfoo/promptfoo"
+    },
+    "repos/promptfoo/promptfoo/releases/latest": {
+     "tag_name": "0.123.1",
+     "name": "0.123.1",
+     "published_at": "2026-09-18T01:07:54Z",
+     "prerelease": false,
+     "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1"
+    },
+    "repos/promptfoo/promptfoo/commits?per_page=1": {
+     "sha": "6063a5951ce47aabed061a83e8cd41c396dd0fe4",
+     "date": "2026-10-01T20:32:02Z",
+     "html_url": "https://github.com/promptfoo/promptfoo/commit/6063a5951ce47aabed061a83e8cd41c396dd0fe4"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/typesafe-ai/skills",
+   "captured_at": "2026-10-01T20:42:34+00:00",
+   "endpoints": {
+    "repos/typesafe-ai/skills": {
+     "full_name": "typesafe-ai/skills",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-12T05:42:06Z",
+     "created_at": "2026-08-24T23:58:39Z",
+     "updated_at": "2026-10-01T20:26:38Z",
+     "open_issues_count": 13,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/typesafe-ai/skills"
+    },
+    "repos/typesafe-ai/skills/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/typesafe-ai/skills/commits?per_page=1": {
+     "sha": "65a39f393687675ce170e6094757de20370365b9",
+     "date": "2026-09-12T05:42:05Z",
+     "html_url": "https://github.com/typesafe-ai/skills/commit/65a39f393687675ce170e6094757de20370365b9"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/UKGovernmentBEIS/inspect_ai": {
+     "full_name": "UKGovernmentBEIS/inspect_ai",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:33:21Z",
+     "created_at": "2023-11-14T14:53:11Z",
+     "updated_at": "2026-10-01T20:33:25Z",
+     "open_issues_count": 367,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/UKGovernmentBEIS/inspect_ai"
+    },
+    "repos/UKGovernmentBEIS/inspect_ai/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/UKGovernmentBEIS/inspect_ai/commits?per_page=1": {
+     "sha": "617d06c72bcde8d6988e200f98946797614e29c2",
+     "date": "2026-10-01T20:33:10Z",
+     "html_url": "https://github.com/UKGovernmentBEIS/inspect_ai/commit/617d06c72bcde8d6988e200f98946797614e29c2"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/modelcontextprotocol/inspector": {
+     "full_name": "modelcontextprotocol/inspector",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:27:27Z",
+     "created_at": "2024-10-03T21:47:42Z",
+     "updated_at": "2026-10-01T19:15:48Z",
+     "open_issues_count": 60,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/modelcontextprotocol/inspector"
+    },
+    "repos/modelcontextprotocol/inspector/releases/latest": {
+     "tag_name": "2.9.0",
+     "name": "2.9.0",
+     "published_at": "2026-09-30T22:23:56Z",
+     "prerelease": false,
+     "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0"
+    },
+    "repos/modelcontextprotocol/inspector/commits?per_page=1": {
+     "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+     "date": "2026-09-30T22:23:03Z",
+     "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/mlflow/mlflow",
+   "captured_at": "2026-10-01T20:42:35+00:00",
+   "endpoints": {
+    "repos/mlflow/mlflow": {
+     "full_name": "mlflow/mlflow",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:36:51Z",
+     "created_at": "2018-06-05T16:05:58Z",
+     "updated_at": "2026-10-01T20:35:32Z",
+     "open_issues_count": 2155,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/mlflow/mlflow"
+    },
+    "repos/mlflow/mlflow/releases/latest": {
+     "tag_name": "v3.16.1",
+     "name": "MLflow 3.16.1",
+     "published_at": "2026-09-17T02:40:08Z",
+     "prerelease": false,
+     "html_url": "https://github.com/mlflow/mlflow/releases/tag/v3.16.1"
+    },
+    "repos/mlflow/mlflow/commits?per_page=1": {
+     "sha": "59dac6f73ed74e9cd7a1b7d21dc46aacc7ce3361",
+     "date": "2026-10-01T20:33:14Z",
+     "html_url": "https://github.com/mlflow/mlflow/commit/59dac6f73ed74e9cd7a1b7d21dc46aacc7ce3361"
+    }
+   }
+  }
+ }
+}

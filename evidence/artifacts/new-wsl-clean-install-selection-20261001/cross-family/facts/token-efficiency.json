@@ -1,0 +1,323 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/token-efficiency.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/mksglu/context-mode",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/mksglu/context-mode": {
+     "full_name": "mksglu/context-mode",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T12:07:41Z",
+     "created_at": "2026-02-23T05:56:28Z",
+     "updated_at": "2026-10-01T20:41:41Z",
+     "open_issues_count": 309,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/mksglu/context-mode"
+    },
+    "repos/mksglu/context-mode/releases/latest": {
+     "tag_name": "v1.0.169",
+     "name": "v1.0.169",
+     "published_at": "2026-06-29T18:18:53Z",
+     "prerelease": false,
+     "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+    },
+    "repos/mksglu/context-mode/commits?per_page=1": {
+     "sha": "22628d08bc30a30ea2fbb4623481172e508dbdd7",
+     "date": "2026-10-01T12:07:40Z",
+     "html_url": "https://github.com/mksglu/context-mode/commit/22628d08bc30a30ea2fbb4623481172e508dbdd7"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/lockedinlabs-ai/agent-console",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/lockedinlabs-ai/agent-console": {
+     "full_name": "LockedinLabs-AI/agent-console",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T03:32:54Z",
+     "created_at": "2026-09-20T17:55:58Z",
+     "updated_at": "2026-10-01T20:18:12Z",
+     "open_issues_count": 4,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/LockedinLabs-AI/agent-console"
+    },
+    "repos/lockedinlabs-ai/agent-console/releases/latest": {
+     "tag_name": "v0.4.1",
+     "name": "Agent Console v0.4.1",
+     "published_at": "2026-09-27T14:59:47Z",
+     "prerelease": false,
+     "html_url": "https://github.com/LockedinLabs-AI/agent-console/releases/tag/v0.4.1"
+    },
+    "repos/lockedinlabs-ai/agent-console/commits?per_page=1": {
+     "sha": "d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+     "date": "2026-09-28T18:56:01Z",
+     "html_url": "https://github.com/LockedinLabs-AI/agent-console/commit/d14755421d4a8b183d43ca227bcf8e2e871b3b27"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/drona23/claude-token-efficient",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/drona23/claude-token-efficient": {
+     "full_name": "drona23/claude-token-efficient",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-06-16T03:10:06Z",
+     "created_at": "2026-03-30T12:59:07Z",
+     "updated_at": "2026-10-01T07:48:37Z",
+     "open_issues_count": 2,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/drona23/claude-token-efficient"
+    },
+    "repos/drona23/claude-token-efficient/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/drona23/claude-token-efficient/commits?per_page=1": {
+     "sha": "0d30a6db75af983b8ababf585f28faefdfc87895",
+     "date": "2026-06-16T03:07:00Z",
+     "html_url": "https://github.com/drona23/claude-token-efficient/commit/0d30a6db75af983b8ababf585f28faefdfc87895"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/rtk-ai/rtk",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/rtk-ai/rtk": {
+     "full_name": "rtk-ai/rtk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "develop",
+     "pushed_at": "2026-10-01T18:32:57Z",
+     "created_at": "2026-01-22T16:54:16Z",
+     "updated_at": "2026-10-01T20:40:33Z",
+     "open_issues_count": 1565,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/rtk-ai/rtk"
+    },
+    "repos/rtk-ai/rtk/releases/latest": {
+     "tag_name": "v0.50.0",
+     "name": "v0.50.0",
+     "published_at": "2026-09-24T10:02:31Z",
+     "prerelease": false,
+     "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+    },
+    "repos/rtk-ai/rtk/commits?per_page=1": {
+     "sha": "3a12dfe3773603e55099e2a8bb0c58d9a92c2822",
+     "date": "2026-10-01T14:34:47Z",
+     "html_url": "https://github.com/rtk-ai/rtk/commit/3a12dfe3773603e55099e2a8bb0c58d9a92c2822"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/yamadashy/repomix",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/yamadashy/repomix": {
+     "full_name": "yamadashy/repomix",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T07:00:59Z",
+     "created_at": "2024-07-13T07:11:32Z",
+     "updated_at": "2026-10-01T19:57:26Z",
+     "open_issues_count": 150,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/yamadashy/repomix"
+    },
+    "repos/yamadashy/repomix/releases/latest": {
+     "tag_name": "v1.18.1",
+     "name": "v1.18.1",
+     "published_at": "2026-09-21T08:34:49Z",
+     "prerelease": false,
+     "html_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    },
+    "repos/yamadashy/repomix/commits?per_page=1": {
+     "sha": "0b3f82b401bbc520fd1aca67c06d24e40a868d3e",
+     "date": "2026-09-28T09:40:31Z",
+     "html_url": "https://github.com/yamadashy/repomix/commit/0b3f82b401bbc520fd1aca67c06d24e40a868d3e"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/ccusage/ccusage",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/ccusage/ccusage": {
+     "full_name": "ccusage/ccusage",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:28:30Z",
+     "created_at": "2025-05-29T16:56:50Z",
+     "updated_at": "2026-10-01T20:28:37Z",
+     "open_issues_count": 12,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/ccusage/ccusage"
+    },
+    "repos/ccusage/ccusage/releases/latest": {
+     "tag_name": "v20.0.26",
+     "name": "v20.0.26",
+     "published_at": "2026-09-27T16:26:00Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26"
+    },
+    "repos/ccusage/ccusage/commits?per_page=1": {
+     "sha": "a2099d4448b55a4de7a961575c32c5dd7c07caac",
+     "date": "2026-10-01T20:28:26Z",
+     "html_url": "https://github.com/ccusage/ccusage/commit/a2099d4448b55a4de7a961575c32c5dd7c07caac"
+    }
+   }
+  },
+  "C07": {
+   "repository": null,
+   "non_github": true
+  },
+  "C08": {
+   "repository": "https://github.com/headroomlabs-ai/headroom",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/headroomlabs-ai/headroom": {
+     "full_name": "headroomlabs-ai/headroom",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:26:54Z",
+     "created_at": "2026-01-07T19:58:51Z",
+     "updated_at": "2026-10-01T20:37:03Z",
+     "open_issues_count": 466,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/headroomlabs-ai/headroom"
+    },
+    "repos/headroomlabs-ai/headroom/releases/latest": {
+     "tag_name": "v0.39.1",
+     "name": "Release v0.39.1",
+     "published_at": "2026-09-26T20:31:39Z",
+     "prerelease": false,
+     "html_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.39.1"
+    },
+    "repos/headroomlabs-ai/headroom/commits?per_page=1": {
+     "sha": "7df8bd87b54725174e1ea88e2dcd428b66cb608f",
+     "date": "2026-10-01T19:25:56Z",
+     "html_url": "https://github.com/headroomlabs-ai/headroom/commit/7df8bd87b54725174e1ea88e2dcd428b66cb608f"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/paritok-official/paritok-4b-v1",
+   "captured_at": "2026-10-01T20:42:39+00:00",
+   "endpoints": {
+    "repos/paritok-official/paritok-4b-v1": {
+     "full_name": "Paritok-official/paritok-4b-v1",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-26T23:01:53Z",
+     "created_at": "2026-07-15T10:23:15Z",
+     "updated_at": "2026-10-01T08:45:18Z",
+     "open_issues_count": 9,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/Paritok-official/paritok-4b-v1"
+    },
+    "repos/paritok-official/paritok-4b-v1/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/paritok-official/paritok-4b-v1/commits?per_page=1": {
+     "sha": "2c913302073367f2402d8bc4bb1a929a3f70a030",
+     "date": "2026-09-26T23:01:48Z",
+     "html_url": "https://github.com/Paritok-official/paritok-4b-v1/commit/2c913302073367f2402d8bc4bb1a929a3f70a030"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/ojuschugh1/sqz",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/ojuschugh1/sqz": {
+     "full_name": "ojuschugh1/sqz",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-24T06:35:44Z",
+     "created_at": "2026-04-12T07:23:52Z",
+     "updated_at": "2026-10-01T08:16:41Z",
+     "open_issues_count": 4,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/ojuschugh1/sqz"
+    },
+    "repos/ojuschugh1/sqz/releases/latest": {
+     "tag_name": "v1.9.0",
+     "name": "v1.9.0",
+     "published_at": "2026-09-23T18:25:35Z",
+     "prerelease": false,
+     "html_url": "https://github.com/ojuschugh1/sqz/releases/tag/v1.9.0"
+    },
+    "repos/ojuschugh1/sqz/commits?per_page=1": {
+     "sha": "e66e717dc08d74977d6b991b071aac220046ed0d",
+     "date": "2026-09-24T06:35:39Z",
+     "html_url": "https://github.com/ojuschugh1/sqz/commit/e66e717dc08d74977d6b991b071aac220046ed0d"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/toon-format/toon",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/toon-format/toon": {
+     "full_name": "toon-format/toon",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T13:02:38Z",
+     "created_at": "2025-10-22T18:17:32Z",
+     "updated_at": "2026-10-01T19:04:49Z",
+     "open_issues_count": 4,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/toon-format/toon"
+    },
+    "repos/toon-format/toon/releases/latest": {
+     "tag_name": "v4.1.1",
+     "name": "v4.1.1",
+     "published_at": "2026-08-05T11:49:55Z",
+     "prerelease": false,
+     "html_url": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+    },
+    "repos/toon-format/toon/commits?per_page=1": {
+     "sha": "b6494104074afa5f234037d04139e03541f1fe16",
+     "date": "2026-10-01T13:02:35Z",
+     "html_url": "https://github.com/toon-format/toon/commit/b6494104074afa5f234037d04139e03541f1fe16"
+    }
+   }
+  }
+ }
+}

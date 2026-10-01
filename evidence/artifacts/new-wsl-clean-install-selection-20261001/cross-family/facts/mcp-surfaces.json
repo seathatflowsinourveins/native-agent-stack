@@ -1,0 +1,139 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/mcp-surfaces.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/openclaw/mcporter",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/openclaw/mcporter": {
+     "full_name": "openclaw/mcporter",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:43:11Z",
+     "created_at": "2025-11-05T03:29:59Z",
+     "updated_at": "2026-10-01T18:43:14Z",
+     "open_issues_count": 0,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/openclaw/mcporter"
+    },
+    "repos/openclaw/mcporter/releases/latest": {
+     "tag_name": "v0.14.2",
+     "name": "mcporter 0.14.2",
+     "published_at": "2026-10-01T18:24:07Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2"
+    },
+    "repos/openclaw/mcporter/commits?per_page=1": {
+     "sha": "9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392",
+     "date": "2026-10-01T18:43:09Z",
+     "html_url": "https://github.com/openclaw/mcporter/commit/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/modelcontextprotocol/inspector": {
+     "full_name": "modelcontextprotocol/inspector",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:27:27Z",
+     "created_at": "2024-10-03T21:47:42Z",
+     "updated_at": "2026-10-01T19:15:48Z",
+     "open_issues_count": 60,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/modelcontextprotocol/inspector"
+    },
+    "repos/modelcontextprotocol/inspector/releases/latest": {
+     "tag_name": "2.9.0",
+     "name": "2.9.0",
+     "published_at": "2026-09-30T22:23:56Z",
+     "prerelease": false,
+     "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0"
+    },
+    "repos/modelcontextprotocol/inspector/commits?per_page=1": {
+     "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+     "date": "2026-09-30T22:23:03Z",
+     "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184"
+    }
+   }
+  },
+  "C03": {
+   "repository": null,
+   "non_github": true
+  },
+  "C04": {
+   "repository": "https://github.com/MCPJam/inspector",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/MCPJam/inspector": {
+     "full_name": "MCPJam/inspector",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:34:40Z",
+     "created_at": "2025-05-23T15:56:00Z",
+     "updated_at": "2026-10-01T20:06:25Z",
+     "open_issues_count": 308,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/MCPJam/inspector"
+    },
+    "repos/MCPJam/inspector/releases/latest": {
+     "tag_name": "v3.12.8",
+     "name": "Release v3.12.8",
+     "published_at": "2026-10-01T09:53:48Z",
+     "prerelease": false,
+     "html_url": "https://github.com/MCPJam/inspector/releases/tag/v3.12.8"
+    },
+    "repos/MCPJam/inspector/commits?per_page=1": {
+     "sha": "74769051a357121a0a3492b2ff4ee3a736ac1e22",
+     "date": "2026-10-01T20:06:19Z",
+     "html_url": "https://github.com/MCPJam/inspector/commit/74769051a357121a0a3492b2ff4ee3a736ac1e22"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/punkpeye/awesome-mcp-servers": {
+     "full_name": "punkpeye/awesome-mcp-servers",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-27T02:12:17Z",
+     "created_at": "2024-11-30T04:49:10Z",
+     "updated_at": "2026-10-01T17:45:24Z",
+     "open_issues_count": 2708,
+     "has_issues": false,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/punkpeye/awesome-mcp-servers"
+    },
+    "repos/punkpeye/awesome-mcp-servers/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/punkpeye/awesome-mcp-servers/commits?per_page=1": {
+     "sha": "3c30195615095be4f22ac120a7cee82f215cf547",
+     "date": "2026-09-27T02:12:09Z",
+     "html_url": "https://github.com/punkpeye/awesome-mcp-servers/commit/3c30195615095be4f22ac120a7cee82f215cf547"
+    }
+   }
+  },
+  "C06": {
+   "repository": null,
+   "non_github": true
+  }
+ }
+}
