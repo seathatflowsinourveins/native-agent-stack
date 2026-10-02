@@ -6,7 +6,7 @@
   "statuses": {
     "two_family_pick": "both families made the same picks and neither asks for a comparison: the standing picks on source review; each installs by its upstream command and is final once it passes acceptance on the new host",
     "shared_pick": "both families made the same picks, but one family's critic found source review undetermined; no pick only one family made is left to compare, so the picks stand and are final once they pass acceptance on the new host",
-    "partial_comparison": "the families share some picks: those stand, and every pick only one family made, with the blind Claude half's comparison arms, enters the layer's measured comparison on the new host, where a challenger replaces or joins a standing pick only on a measured gain",
+    "partial_comparison": "the families share some picks: those stand, and every pick only one family made, with the blind Claude half's comparison arms, enters the layer's measured comparison on the new host, whose preregistered result decides whether a challenger replaces or joins a standing pick",
     "comparison": "the merit winner is undetermined (the families share no pick, or both ask for a comparison of the same picks): the arms install fresh on the new WSL and the head-to-head selects",
     "pending_cross_family": "one model family has judged so far; the blind GPT-6.1 Sol half decides how the recommendation folds",
     "owner_lane_run_pending": "a trading layer with no blind record yet: its selection of record is an unjudged incumbent, and its owner runs the blind method unchanged on the GPT lane after the pool resets at 2026-10-03T17:14Z",
@@ -320,7 +320,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -490,7 +490,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -660,7 +660,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -834,7 +834,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -1224,7 +1224,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -1414,7 +1414,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -1568,7 +1568,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -1783,7 +1783,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -1989,7 +1989,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -2257,7 +2257,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -2622,7 +2622,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -2790,7 +2790,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -3018,7 +3018,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -3322,7 +3322,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -3451,7 +3451,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },
@@ -3707,7 +3707,7 @@
           "source": "catalogs/foundation/new-wsl-architecture-20261001.json"
         },
         {
-          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command: a challenger replaces a standing pick, or joins the standing picks, only on a measured gain over them",
+          "gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream command; its preregistered result decides whether a challenger replaces or joins the standing picks",
           "kind": "comparison",
           "source": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"
         },

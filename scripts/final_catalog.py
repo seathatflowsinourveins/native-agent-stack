@@ -69,7 +69,8 @@ STATUSES = {
                    "acceptance on the new host",
     "partial_comparison": "the families share some picks: those stand, and every pick only one family made, with the "
                           "blind Claude half's comparison arms, enters the layer's measured comparison on the new "
-                          "host, where a challenger replaces or joins a standing pick only on a measured gain",
+                          "host, whose preregistered result decides whether a challenger replaces or joins a "
+                          "standing pick",
     "comparison": "the merit winner is undetermined (the families share no pick, or both ask for a comparison of the "
                   "same picks): the arms install fresh on the new WSL and the head-to-head selects",
     "pending_cross_family": "one model family has judged so far; the blind GPT-6.1 Sol half decides how the "
@@ -341,8 +342,8 @@ def build() -> dict:
                                    "command; its result selects", "kind": "comparison", "source": PROGRAM})
         if status == "partial_comparison":
             ledger.append({"gate": "Stage-2 comparison on the new WSL, every arm installed fresh by its upstream "
-                                   "command: a challenger replaces a standing pick, or joins the standing picks, only "
-                                   "on a measured gain over them", "kind": "comparison", "source": PROGRAM})
+                                   "command; its preregistered result decides whether a challenger replaces or joins "
+                                   "the standing picks", "kind": "comparison", "source": PROGRAM})
         if out["final"]["standing_picks"]:
             ledger.append({"gate": "Install each standing pick by its upstream command on the new WSL and record its "
                                    "acceptance", "kind": "new_host", "source": SELECTION})

@@ -54,17 +54,23 @@ host's record in 16 rows. No selection of record changes.
 | cross:wsl-distro | `shared_pick` | Ubuntu 24.04.5 LTS (Canonical WSL image), fallback, Ubuntu 26.04.1 LTS (Canonical WSL image), primary | — | recommended: Ubuntu 26.04.1 LTS (Canonical WSL image), primary, Ubuntu 24.04.5 LTS (Canonical WSL image), fallback | compare (undetermined): Ubuntu 24.04.5 LTS (Canonical WSL image), Ubuntu 26.04.1 LTS (Canonical WSL image) |
 
 The 12 trading rows are `owner_lane_run_pending` and the four cross-cutting rows `no_blind_record`; their pins of record
-are unjudged incumbents, not winners. Each row's comparison arms and full gate ledger are in the record. Six rows read
+are unjudged incumbents, not winners. Each row's comparison arms and full gate ledger are in the record. Seven rows read
 differently from their label:
 
-- **durable-memory.** ai-memory is the only memory pick both families made (Claude: ai-memory, Hindsight, agentmemory
-  and deja-vu; GPT: ai-memory and Basic Memory), so it stands. Hindsight, agentmemory, deja-vu and Basic Memory are
-  challengers; one replaces or joins ai-memory only by beating it on the current control and on the representative
-  lifecycle and latency gates, with the memory gaps of item 1 below. The pin of record is 2.4.1
-  (`manifests/stack.json:96`); upstream released v2.5.2 on 2026-10-01 (`cross-family/facts/durable-memory.json`).
+- **durable-memory.** ai-memory is the only memory pick both families made on source review (Claude: ai-memory,
+  Hindsight, agentmemory and deja-vu; GPT: ai-memory and Basic Memory), so the rule makes it the standing pick, not a
+  default. The only measurement on record points the other way: LongMemEval-S recall_all@5 on the source host,
+  descriptive and without ai-memory's production reranker (C4), gave agentmemory 0.821, BM25 0.747 and ai-memory
+  0.496 (`evidence/artifacts/memory-stack-20260925/convergence.json`); Hindsight is unmeasured (K1 has not run). #591
+  records the user's request that the memory head-to-head of #526 decide and that its best-scoring eligible system be
+  installed, so memory's install waits for that comparison, with the memory gaps of item 1 below. The pin of record is
+  2.4.1 (`manifests/stack.json:96`); upstream released v2.5.2 on 2026-10-01 (`cross-family/facts/durable-memory.json`).
 - **token-efficiency.** The only shared pick is ccusage, a usage meter rather than a compression tool. No compression
   tool has both families behind it: RTK (Claude), Context Mode and sqz (GPT) are challengers, and the compression slot
   stays the no-compression baseline until the Gate A E2E measures one.
+- **ci-supply-chain.** The challenger `github/codeql-action` is the Claude pick `codeql-sarif`: the `upload-sarif`
+  step this repository already runs (`.github/workflows/security-scan.yml:146`) next to CodeQL default setup, so it
+  needs no stage-2 comparison.
 - **workers and mcp-surfaces.** Claude Code's native subagents and MCPJam Inspector were picks of one family only, so
   each is a challenger (a with/without arm).
 - **git-github-automation.** sem stands under the rule, although the Claude pick's own text keeps it "only if the
@@ -87,7 +93,8 @@ family's critic found the evidence undetermined, it held the shared picks as com
 layers with no standing pick. After the results, at the user's direction on 2026-10-01, the generator applies the
 clause as written. No judgment was redone and no pick changed; only the reading of the frozen text did. The two
 readings differ in labels more than in work, since stage 2 installs every arm of a comparison layer either way (#589,
-"What follows"); what changes is that a challenger now has to beat the standing picks rather than tie them. Two cases
+"What follows"); what changes is that the standing picks install as each layer's default on the new WSL (memory excepted, above)
+while the comparison runs. Two cases
 the frozen definitions leave open are disclosed. Equal pick sets with unequal statuses (document-retrieval,
 scheduling-supervision and cross:wsl-distro) match neither agree, which needs equal statuses, nor overlap, which needs
 unequal sets; the generator classifies them as overlap, so their picks stand with nothing left to compare
@@ -131,8 +138,8 @@ picks standing whatever the statuses; no layer is in the first case. The tests e
 A layer's standing picks are the picks both model families made blind, and they are its picks for the new WSL clean
 install. A standing pick is final once it installs by its upstream command and passes acceptance on the new host
 (`two_family_pick`, `shared_pick`) and, where challengers exist (`partial_comparison`), once the layer's measured
-comparison has run there (the stage-2 comparison of program decision 5): a challenger replaces a standing pick, or
-joins the standing picks, only on a measured gain over them, never on a tie. A row without a blind record has no
+comparison has run there (the stage-2 comparison of program decision 5): its preregistered result decides whether a
+challenger replaces a standing pick or joins the standing picks. A row without a blind record has no
 standing pick until both families judge it. The record never promotes a row by itself: a status changes only through
 the frozen rule, a measured comparison on the new host, or a new edition, and no selection of record on the source
 host changes through it.
@@ -149,8 +156,8 @@ The gate ledger of each row in the record is the exact list; these are the gaps 
 unblocks the most.
 
 1. **Stage-2 comparisons on the new WSL.** Every `partial_comparison` row installs its standing picks and its
-   challengers fresh and runs a preregistered comparison in which a challenger has to beat the standing picks (program
-   decision 5). Order constraints from #589: semantic-rag runs before the
+   challengers fresh and runs a preregistered comparison whose result decides whether a challenger replaces or joins the
+   standing picks (program decision 5). Order constraints from #589: semantic-rag runs before the
    local-model-server comparison in observation-inference, and the container engine in hosting-services runs before
    isolation's container slot. For durable-memory, S3 is not frozen (#526, r7 draft); no result is recorded on any host
    for ai-memory with its reranker (C4), agentmemory through its hooks (D2h), Hindsight (K1) or MemPalace (M1/M2); the
@@ -164,18 +171,26 @@ unblocks the most.
    - `cross:runtime-workers`: no frozen candidate set or closure record; the roster README the row cites exists only in
      PR #535; the OpenHands worker on main is configured for `cx/gpt-6-astra-max`
      (`blueprints/runtime-workers/openhands/config/worker.json:8`), a resolved official task exits 2, and the isolation
-     probe has not run. Sol executions of the worker candidates are recorded only in open PRs (#524 pi, 28 tasks; #551
-     Codex SDK worker kit; #566 one OpenHands Sol-Max call). AgentRelay and Relaycast have no layer yet.
+     probe has not run. Sol executions of the worker candidates are recorded in open PRs (#524 pi, 28 tasks; #551
+     Codex SDK worker kit; #566 one OpenHands Sol-Max call) and, since #580, in one native-account turn of the Codex
+     Python SDK requested at `gpt-6.1-sol` max, which returned the exact canary marker (the backend model was not
+     observed, and the wrapper's exit 1 was corrected offline); the same SDK's attempt through OmniRoute
+     (`cx/gpt-6.1-sol-max`) returned HTTP 429, cause unknown, so the gateway route is held
+     (`evidence/artifacts/runtime-sdk-20261001/receipt.json`, status `native_account_pair_qualified_gateway_held`).
+     AgentRelay and Relaycast have no layer yet.
    - `cross:gpt6-harnesses`: the row cites Codex 0.159.2, main pins 0.159.3 since #580 merged on 2026-10-01, and
-     upstream released rust-v0.160.0 the same day; OmniRoute is pinned at 3.8.50 with 3.8.51 upstream. Sol runs of the Codex CLI lane through OmniRoute
-     are on main as reviews and one builder run (#532, #572, #575, #587), not as acceptance of the lane.
+     upstream released rust-v0.160.0 the same day. OmniRoute is pinned at 3.8.50; 3.8.51 is npm-qualified as a
+     candidate without moving the pin (`evidence/artifacts/omniroute-npm-3851-qualification-20260930/`), and the
+     source host runs rebuilt source builds, with Sol's max effort passed through on the running build only
+     (`evidence/artifacts/omniroute-sol-max-20260930/`). Sol runs of the Codex CLI lane through OmniRoute are on main
+     as reviews and one builder run (#532, #572, #575, #587), not as acceptance of the lane.
    - The GPT-6.1 Sol route of each runtime candidate, as recorded on 2026-10-01 (the routing contract sets Sol at ultra
      for coordination, where ultra is a Codex-client delegation mode that sends `xhigh`, and Sol at max for workers):
 
      | Candidate | Configured model on record | Sol execution recorded | Where |
      | --- | --- | --- | --- |
      | OpenHands software-agent-sdk | `cx/gpt-6-astra-max` (`blueprints/runtime-workers/openhands/config/worker.json:8`) | one Sol-Max call, 85 tokens | #566 (draft) |
-     | Codex Python SDK | `cx/gpt-6-astra-max` in the merged route qualification (#560, `evidence/artifacts/runtime-sdk-20260930/receipt.json:37`) | a Sol/Max parent (153,813 native tokens) with an Astra judge child | #551 (draft) |
+     | Codex Python SDK | `cx/gpt-6-astra-max` in the merged route qualification (#560, `evidence/artifacts/runtime-sdk-20260930/receipt.json:37`); since #580, `gpt-6.1-sol` at max on the native account and `cx/gpt-6.1-sol-max` through OmniRoute (`evidence/artifacts/runtime-sdk-20261001/receipt.json:89,107`) | on main, one native-account turn at Sol/max returned the exact canary marker (19,424 input tokens; backend model not observed), while the OmniRoute attempt returned HTTP 429 (gateway held); in a draft, a Sol/Max parent (153,813 native tokens) with an Astra judge child | #580 (merged); #551 (draft) |
      | pi v0.99.1 | `sharedgw/gpt-6.1-sol` | 28 tasks | #524 (open, decision "trial") |
      | GPT Researcher, DeerFlow, Crawl4AI | Astra arms (`cx/` and `sharedgw/gpt-6-astra-max`) | none; recipes only | #426, #427, #428 (drafts) |
      | Codex CLI lane (stack-worker profile) | `gpt-6.1-sol` at max with live web search | reviews and one builder run through OmniRoute; the lane proof is `none_recorded` | #532, #572, #575, #587 (merged) |
