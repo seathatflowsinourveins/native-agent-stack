@@ -110,7 +110,8 @@ def claude(prompt: str, cwd: Path, model: str, tools: list, schema: dict, timeou
                           "--allowedTools", *tools, "--json-schema", json.dumps(schema)]
     for d in add_dirs or []:
         cmd += ["--add-dir", str(d)]
-    cmd.append(prompt)
+    # "--add-dir" and "--allowedTools" take several values, so "--" ends the options before the prompt.
+    cmd += ["--", prompt]
     result = run(cmd, cwd, timeout, stdout_path=raw)
     parsed, usage = None, None
     try:
