@@ -4155,8 +4155,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "701936a708d3da185c9d8f4d946680d844ae28bb73437a99baa87d249758ea5d",
-      "bytes": 63187
+      "sha256": "bc342f0e98ae95e3128b58f9e4780d594de38b1753fb9af28799a353a3f7961c",
+      "bytes": 63199
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4260,13 +4260,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "88c34af08f5248997aa8ad6e3d6221ee69d2047a53b81f7c913b234dfd31cca5",
-      "bytes": 209294
+      "sha256": "1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0",
+      "bytes": 214941
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "35c283f0cd0f4d75ed84fd30a57772f59cdc9f154f3abaa3e65eca20e15a6e26",
-      "bytes": 17353
+      "sha256": "62fcb6658e588bece47042f4809f98fb93bbd14db5a12800596c9355c47fabef",
+      "bytes": 19269
     },
     {
       "path": "adoption/paired/README.md",
@@ -15741,8 +15741,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
-      "sha256": "afc49be29893c133d2f2475053d5c6addf1d14c5ad1c18f77d5aed43cd728dff",
-      "bytes": 39595
+      "sha256": "df94c30001ee7c19b517c7f43705179bdc6384c2e618c9ce37b9e00d2899decc",
+      "bytes": 49664
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
@@ -16016,13 +16016,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "acb62f1243736c39aee6aa21ffb78ff6d1cda20bb405217fe28954788d8c0a5d",
-      "bytes": 424610
+      "sha256": "f68e22f60bd0a1f1ef1ba7f7af8f0104451b64b14aaaf05121058c590fd25a65",
+      "bytes": 509886
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "f765b23e78b700cd5350fb2c4e6f02db4f6baa1106743d56a8b2010c8a10e1c4",
-      "bytes": 280212
+      "sha256": "ef5cb7b8abcfa01152f9f903884e67ae2f68269448cfd49977bb7e7f5255aa79",
+      "bytes": 311982
     },
     {
       "path": "docs/next-host-stages.md",
@@ -37196,7 +37196,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "27e855a54749b39d7fcee3b522a7c64954cef86e248fccdb2f3f21b8aa3f45c4",
+      "sha256": "f2e75e0877fbb12867c31c9931d9568cc4538c7f8df250bf9fe484c11f2bb419",
       "bytes": 4174
     },
     {
@@ -41693,6 +41693,11 @@
       "path": "evidence/artifacts/rtk-exclude-widen-20260926/hook-check.txt",
       "sha256": "dd2e7455b7a9b791730242dec4bf0eb369e6b2d10e1834dd91aeefe8cf6e9092",
       "bytes": 3721
+    },
+    {
+      "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
+      "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
+      "bytes": 29878
     },
     {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
@@ -48551,8 +48556,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "0fbe2750d529ab9b681956a6ffdede59c01c54a668c6e883e5a8083473fe26e7",
-      "bytes": 50484
+      "sha256": "1b00e26e019984a742476f658f491bcfdfc98ff7595cd04c154a7fcf84a5f52a",
+      "bytes": 64101
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -48621,8 +48626,8 @@
     },
     {
       "path": "scripts/new_wsl_profile.py",
-      "sha256": "301bdd1e37fd0aaaeafff679f0331a92b47b0027e0803204d5712dcbc5d7b6ac",
-      "bytes": 10278
+      "sha256": "333a702c0a50a61f482c50ce959329044c92e71fcf4798ab8917ea6513ec050e",
+      "bytes": 14217
     },
     {
       "path": "scripts/path_safety.py",
@@ -49461,13 +49466,13 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "524f2d60c73e8728318c8bc0fb463133f50414691d30294dd8ae4a441490c0ec",
-      "bytes": 50902
+      "sha256": "0a8e643dc6a50c1287a83dbd45eef3988f4481d1464942ba32a10bdb1167ca2f",
+      "bytes": 72252
     },
     {
       "path": "tests/test_new_wsl_profile.py",
-      "sha256": "62fc208c803910590ae5492a42f3decd6c8b17ce25ed5c27e7b34f118ee50d86",
-      "bytes": 12401
+      "sha256": "b7689a2d17c412ab7251890082c89a50563ed5599f9e663c7d1e291b586c2801",
+      "bytes": 17209
     },
     {
       "path": "tests/test_observability.py",
