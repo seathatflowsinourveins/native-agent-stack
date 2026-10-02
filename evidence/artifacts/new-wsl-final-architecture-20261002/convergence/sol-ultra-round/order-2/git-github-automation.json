@@ -1,0 +1,232 @@
+{
+  "layers": [
+    {
+      "layer_id": "git-github-automation",
+      "selection": [
+        {
+          "name": "C07: git/git",
+          "repository": "https://github.com/git/git",
+          "role": "Underlying Git runtime and native worktree operations.",
+          "install_command": "sudo apt-get install git",
+          "install_source": "Official Git Linux installation instructions; verified through primary-source search excerpts.",
+          "basis": [
+            {
+              "url": "https://git-scm.com/install/linux.html",
+              "shows": "Documents Debian/Ubuntu installation using apt-get install git."
+            },
+            {
+              "url": "https://github.com/git/git/commit/c46c1e37724f0478939de636ab8ea5a89086d532",
+              "shows": "Default-branch commit dated 2026-10-01, within the 90-day window."
+            },
+            {
+              "url": "https://api.github.com/repos/git/git",
+              "shows": "Not archived; publish-only source mirror whose contributions use mailing lists/GitGitGadget. Native CLI help verified worktree creation, removal, locking and repair, plus diff --no-index."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C05: worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "role": "Worktree workflow management, lifecycle hooks and parallel agent launching.",
+          "install_command": "cargo install worktrunk && wt config shell install",
+          "install_source": "Upstream README at v0.80.0; requires Cargo.",
+          "basis": [
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/v0.80.0/README.md",
+              "shows": "Documents creation, switching, cleanup, hooks, Claude Code/Codex workflows, PR checkout and the install command. PR creation delegates to gh."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+              "shows": "Released 2026-09-27, with Linux x86_64 and macOS arm64 binaries. Reports 47ms versus 120ms picker work for 50 worktrees and 25 versus 249 gh calls for 239 local branches; these compare its own revisions."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/commit/85e685e313f7fbc0612c0e055e655c3917e39f29",
+              "shows": "Default-branch commit dated 2026-10-01 reports 5,021 tests passed and one skipped, plus other checks. This is an upstream validation report; the corresponding CI result was not independently verified."
+            },
+            {
+              "url": "https://api.github.com/repos/max-sixty/worktrunk",
+              "shows": "Not archived. Recent release notes document fixes for reported worktree and recovery problems."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C03: cli/cli",
+          "repository": "https://github.com/cli/cli",
+          "role": "GitHub PR lifecycle and review publication callable by either agent.",
+          "install_command": "(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) && sudo mkdir -p -m 755 /etc/apt/keyrings && out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg && cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && sudo mkdir -p -m 755 /etc/apt/sources.list.d && echo \"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main\" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && sudo apt update && sudo apt install gh -y",
+          "install_source": "Official Debian/Ubuntu installation instructions at reviewed upstream commit fc4b137.",
+          "basis": [
+            {
+              "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md",
+              "shows": "Documents Linux/macOS support and an agent skill. Installed gh 2.101.0 help verified PR creation, checkout, checks, review and merge interfaces."
+            },
+            {
+              "url": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/install_linux.md",
+              "shows": "Documents the official Ubuntu installation command and package repository."
+            },
+            {
+              "url": "https://github.com/cli/cli/actions/runs/36659207933",
+              "shows": "Unit and Integration Tests completed successfully at the reviewed default-branch commit on 2026-09-30."
+            },
+            {
+              "url": "https://api.github.com/repos/cli/cli/git/trees/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd?recursive=1",
+              "shows": "Source tree contains dedicated tests for PR creation, review, checks, status, viewing and merging."
+            },
+            {
+              "url": "https://github.com/cli/cli/releases/tag/v2.102.0",
+              "shows": "Released 2026-09-30; includes Linux amd64 and macOS arm64 artifacts and current fixes."
+            },
+            {
+              "url": "https://api.github.com/repos/cli/cli",
+              "shows": "Not archived; reviewed default-branch commit fc4b137 is dated 2026-09-30."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C01: ataraxy-labs/sem",
+          "repository": "https://github.com/ataraxy-labs/sem",
+          "role": "Unresolved structural-diff finalist: entity-level changes and machine-readable agent integration. Choose one structural-diff finalist after comparison.",
+          "install_command": "cargo install sem-cli",
+          "install_source": "Upstream default-branch README at dfcb3de6; released-binary feature parity was not fully verified.",
+          "basis": [
+            {
+              "url": "https://github.com/Ataraxy-Labs/sem/blob/dfcb3de6c8bb32eda4005b0b3260b2b437f256db/README.md",
+              "shows": "Documents tree-sitter entity diffs, JSON output, impact analysis and installation. Its passing-test badge is not an independently observed CI result."
+            },
+            {
+              "url": "https://github.com/Ataraxy-Labs/sem?ref=winstall",
+              "shows": "Primary-source search excerpts document sem mcp over stdio and claude mcp add sem -- sem mcp."
+            },
+            {
+              "url": "https://github.com/Ataraxy-Labs/sem/releases/tag/v0.25.0",
+              "shows": "Released 2026-09-13, with Linux x86_64 and macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/Ataraxy-Labs/sem/commit/dfcb3de6c8bb32eda4005b0b3260b2b437f256db",
+              "shows": "Default-branch commit dated 2026-10-01. Reports tests for an experimental runtime change, rather than comparative structural-diff accuracy."
+            },
+            {
+              "url": "https://api.github.com/repos/ataraxy-labs/sem",
+              "shows": "Not archived. No verified head-to-head result establishes superiority over the other structural-diff finalist."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C06: Difftastic",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "role": "Unresolved structural-diff finalist: syntax-aware Git diffs. Choose one structural-diff finalist after comparison.",
+          "install_command": "cargo install --locked difftastic",
+          "install_source": "Official source-installation manual, verified through primary-source search excerpts; requires Rust and a C++ compiler.",
+          "basis": [
+            {
+              "url": "https://github.com/Wilfred/difftastic/blob/e2e1e3b7f5be18290135cc16ec521c16284eb21b/README.md",
+              "shows": "Documents syntax-aware comparison, Git compatibility and support for over 30 programming languages."
+            },
+            {
+              "url": "https://difftastic.wilfred.me.uk/from_source.html",
+              "shows": "Documents cargo install --locked difftastic and build prerequisites."
+            },
+            {
+              "url": "https://difftastic.wilfred.me.uk/contributing.html",
+              "shows": "Documents cargo test and sample-file testing; no passing CI result was verified."
+            },
+            {
+              "url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+              "shows": "Released 2026-09-18, with Linux x86_64 and macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/Wilfred/difftastic/commit/e2e1e3b7f5be18290135cc16ec521c16284eb21b",
+              "shows": "Default-branch commit dated 2026-09-22 describes a regression fix with a new CLI integration test."
+            },
+            {
+              "url": "https://api.github.com/repos/Wilfred/difftastic",
+              "shows": "Not archived. No verified head-to-head result establishes superiority over the other structural-diff finalist."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C04",
+          "name": "codex-for-claude",
+          "reason": "Documents local Codex review and delegation, but inspected sources provide no measured review-quality or CI result supporting this additional bridge; latest release and commit are 2026-07-08, so it is current under the frozen rule. [README](https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md), [release](https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6)."
+        },
+        {
+          "key": "C09",
+          "name": "claude-code-action",
+          "reason": "Fits GitHub-runner review automation, but inspected evidence does not qualify its test results, target-host installation or review effectiveness sufficiently to add it to the local toolset; its 2026-10-01 commit establishes currency despite the older releases/latest result. [README](https://github.com/anthropics/claude-code-action/blob/97c53473391bff1901034d4b454b5bac7ab7a029/README.md), [commit](https://github.com/anthropics/claude-code-action/commit/97c53473391bff1901034d4b454b5bac7ab7a029)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C02",
+          "name": "native git worktree and git diff --no-index",
+          "criterion": "duplicate",
+          "fact": "These are commands provided by the selected git/git implementation; native Git help verified both interfaces."
+        },
+        {
+          "key": "C08",
+          "name": "openai/codex-plugin-cc 1.0.6",
+          "criterion": "duplicate",
+          "fact": "The named pin is the same repository as codex-for-claude, whose verified latest release is v1.0.6, published 2026-07-08. https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The definite install set is Git, worktrunk and gh, plus one unresolved structural-diff finalist. On clean WSL2 Ubuntu x86_64, compare sem and Difftastic on independently labeled moves, renames, formatting-only edits, nested changes, malformed code and large files; measure missed changes, false structural changes, agent interpretation accuracy, latency and memory. Compare worktrunk with native Git on concurrent worktree creation, cleanup and interrupted-operation recovery. Qualify gh with an actual create/check/review/merge lifecycle, including publication and failure recovery. Before adding the Codex bridge, test the exact bridge version against direct Codex review for seeded-defect recall, false positives and review-gate recovery. Repeat installation and core correctness on macOS arm64. The packet contains no completed all-arm comparisons.",
+      "evidence_gaps": [
+        "Currency was judged against 2026-07-03 through 2026-10-01. All seven distinct repositories have a qualifying default-branch commit and none is archived.",
+        "Linux artifacts support WSL2 suitability by inference; no clean target-host installation or benchmark was executed. None of these roles requires the RTX 4090.",
+        "sem and Difftastic are tied alternatives, not a recommendation to install both. Comparative correctness and agent usefulness remain unresolved.",
+        "sem's default-branch README postdates v0.25.0; MCP/JSON feature parity at that release was not fully verified. Its repository description and README disagree on language count, so no exact count is asserted.",
+        "Only gh has an independently observed successful CI run here. Worktrunk's test count is commit-reported; other inspected test badges and commit reports are not equivalent to verified CI results.",
+        "Git releases/latest returned HTTP 404; this does not establish an absence of upstream releases. Git's latest release date and macOS arm64-specific evidence remain unverified.",
+        "Specific issue-response and resolution activity was not measured. Open issue/PR counts were not treated as maintenance-quality scores. Future-dated repository updated_at fields were disregarded.",
+        "No paid-service exclusion was justified: the Codex bridge documents Free-account authentication, while the Action's service-cost eligibility remained unverified.",
+        "Budget used: 30 GitHub API calls, 6 web searches, 7 attempted page fetches and 0 successful page fetches.",
+        "The requested ctx_fetch_and_index action was rejected with 'MCP tool call requires approval, but approval policy is never'. Consequently, the requested fetch/index/search workflow could not be completed; README evidence came through GitHub API and additional documentation through primary-source search excerpts."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/git/git",
+        "https://api.github.com/repos/git/git/releases/latest",
+        "https://api.github.com/repos/git/git/commits?per_page=1",
+        "https://git-scm.com/install/linux.html",
+        "https://api.github.com/repos/max-sixty/worktrunk",
+        "https://api.github.com/repos/max-sixty/worktrunk/releases/latest",
+        "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1",
+        "https://api.github.com/repos/max-sixty/worktrunk/readme",
+        "https://github.com/max-sixty/worktrunk/releases",
+        "https://api.github.com/repos/cli/cli",
+        "https://api.github.com/repos/cli/cli/releases/latest",
+        "https://api.github.com/repos/cli/cli/commits?per_page=1",
+        "https://api.github.com/repos/cli/cli/readme?ref=fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "https://api.github.com/repos/cli/cli/actions/runs?branch=trunk&event=push&per_page=10",
+        "https://api.github.com/repos/cli/cli/git/trees/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd?recursive=1",
+        "https://api.github.com/repos/cli/cli/contents/docs/install_linux.md?ref=fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "https://api.github.com/repos/ataraxy-labs/sem",
+        "https://api.github.com/repos/ataraxy-labs/sem/releases/latest",
+        "https://api.github.com/repos/ataraxy-labs/sem/commits?per_page=1",
+        "https://api.github.com/repos/ataraxy-labs/sem/readme",
+        "https://github.com/Ataraxy-Labs/sem?ref=winstall",
+        "https://api.github.com/repos/Wilfred/difftastic",
+        "https://api.github.com/repos/Wilfred/difftastic/releases/latest",
+        "https://api.github.com/repos/Wilfred/difftastic/commits?per_page=1",
+        "https://api.github.com/repos/Wilfred/difftastic/readme",
+        "https://difftastic.wilfred.me.uk/from_source.html",
+        "https://difftastic.wilfred.me.uk/contributing.html",
+        "https://api.github.com/repos/openai/codex-plugin-cc",
+        "https://api.github.com/repos/openai/codex-plugin-cc/releases/latest",
+        "https://api.github.com/repos/openai/codex-plugin-cc/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex-plugin-cc/readme",
+        "https://api.github.com/repos/anthropics/claude-code-action",
+        "https://api.github.com/repos/anthropics/claude-code-action/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code-action/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code-action/readme"
+      ]
+    }
+  ]
+}

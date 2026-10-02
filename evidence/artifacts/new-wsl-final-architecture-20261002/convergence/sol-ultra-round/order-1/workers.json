@@ -1,0 +1,195 @@
+{
+  "layers": [
+    {
+      "layer_id": "workers",
+      "selection": [
+        {
+          "name": "Codex native workers (C05)",
+          "repository": "https://github.com/openai/codex",
+          "role": "Delegation co-finalist: native worker lifecycle controls for Codex sessions; pair with isolated worktrees and explicit integration review.",
+          "install_command": "npm install -g @openai/codex",
+          "install_source": "Upstream README; assessed release rust-v0.160.0.",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_tests.rs",
+              "shows": "Tests cover thread-limit rejection, worker communication, interruption and permission inheritance. Important limit: V2 explicitly ignores agent_max_depth."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/agent/status.rs",
+              "shows": "Preserves distinct errored, interrupted and shutdown states. This does not establish faithful return of every failed shell command."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_spec.rs",
+              "shows": "Worker instructions require review before integration; this is guidance rather than an enforced merge gate."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "Stable release published October 1, 2026, with Linux x86_64 and macOS arm64 assets."
+            },
+            {
+              "url": "https://github.com/openai/codex/commit/d25c114d494ddb693290b76bf5e5f64ecbdb38fc",
+              "shows": "Recent default-branch commit; repository unarchived. The observed HEAD check rollup was FAILURE with several jobs still running, so an all-green CI result is not claimed."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/docs/install.md",
+              "shows": "Documents building and running the upstream test suite with just test; those tests were inspected, not executed here."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "DeerFlow (C04)",
+          "repository": "https://github.com/bytedance/deer-flow",
+          "role": "Delegation co-finalist: stronger supplied evidence for result provenance, deterministic acceptance and provider-reported child usage; validate its Docker path on WSL2.",
+          "install_command": "git clone https://github.com/bytedance/deer-flow.git\ncd deer-flow\nmake setup\nmake docker-init\nmake docker-start",
+          "install_source": "Upstream Docker quick start in README at v2.1.0; requires Docker and Compose v2.24+.",
+          "basis": [
+            {
+              "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md",
+              "shows": "Documents scoped delegation, structured child results, receipts, parent acceptance checks and child usage reporting. Children retain shared filesystem behavior. Claude Code integration is documented through the claude-to-deerflow skill."
+            },
+            {
+              "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_acceptance_checks.py",
+              "shows": "Tests reject misleading success evidence, including authoritative error status and redirected failing commands. These support verification rather than mandatory review before merging."
+            },
+            {
+              "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_subagent_status_contract.py",
+              "shows": "Tests preserve failure errors, bounded result metadata and explicit token/turn-cap stop reasons; they do not prove cancellation execution."
+            },
+            {
+              "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_subagent_token_collector.py",
+              "shows": "Mocked tests check caller attribution, token totals and duplicate-run handling. Missing provider usage is omitted; complete live accounting remains unverified."
+            },
+            {
+              "url": "https://github.com/bytedance/deer-flow/actions/runs/36941155177",
+              "shows": "Observed upstream backend golden CI succeeded at the recent default-branch head. Released README also documents make test, separate blocking-I/O checks and credentialed live tests."
+            },
+            {
+              "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.1.0",
+              "shows": "Release published September 24, 2026; default-branch commit October 1. Linux with Docker is recommended. The README explicitly does not guarantee the WSL local-development path; macOS arm64 execution was not verified."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Worktrunk (C10)",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "role": "Complementary edit-isolation tool for either co-finalist: separate worker branches/worktrees, command launching and a documented PR integration path.",
+          "install_command": "cargo install worktrunk && wt config shell install",
+          "install_source": "Upstream README at v0.80.0.",
+          "basis": [
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/v0.80.0/README.md",
+              "shows": "Documents separate worktrees, external agent launching through wt switch -x, change visibility, hooks and PR workflow. Worktrees are directory isolation, not enforced file ownership; direct local merging also remains available."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/v0.80.0/.github/workflows/ci.yaml",
+              "shows": "Defines Linux, macOS and Windows testing. README documents cargo test and extended shell integration tests."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/actions/runs/36918528100",
+              "shows": "Observed Linux and macOS affected-coverage jobs succeeded; the advisory affected-tests job was skipped. No WSL-specific execution is claimed."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+              "shows": "Release published September 27, 2026, with Linux x86_64 and macOS arm64 binaries; default-branch commit October 1."
+            }
+          ],
+          "confidence": "high"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Deep Agents",
+          "reason": "Context-isolated subagents and human oversight fit delegation, but the reviewed evidence does not establish protected edits or required postworker integration review. Current commit October 1 and code release October 1. [README](https://github.com/langchain-ai/deepagents/blob/372bc221ee8e66885f25e22f42bd8168a21c3ac7/README.md)."
+        },
+        {
+          "key": "C02",
+          "name": "Codex for Claude companion",
+          "reason": "Useful Claude delegation and optional review gate, but its same-checkout and final-output contract leaves edit isolation and failed-command evidence unresolved; no HEAD check rollup was returned. Commit and v1.0.6 release July 8 remain within 90 days. [README](https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md)."
+        },
+        {
+          "key": "C03",
+          "name": "Beads",
+          "reason": "Atomic task claims and dependency tracking help coordination, but task ownership does not protect code edits or verify worker results before integration. Commit October 1; v1.3.1 release September 30. [README](https://github.com/gastownhall/beads/blob/555b01d7891d4b592d83c4545a6dcedd018cbb9c/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "OpenHands SDK",
+          "reason": "Strong software-agent execution and workspace APIs, but the README assigns dispatch/run-history automation to another repository; the complete worker/review contract needs additional composition. Commit October 1; v1.50.1 release September 30. [README](https://github.com/OpenHands/software-agent-sdk/blob/53a4bc5014902ca84bb21fff30eac606ff4905aa/README.md)."
+        },
+        {
+          "key": "C07",
+          "name": "LangGraph",
+          "reason": "Durable execution and human oversight are strong foundations, but this is a lower-level framework requiring a code-worker, ownership and review policy. Commit October 1; repository CLI release activity September 23. [README](https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md)."
+        },
+        {
+          "key": "C08",
+          "name": "Microsoft Agent Framework",
+          "reason": "Concurrent/handoff workflows and checkpointing are credible, but protected code-worker edits and a verified result-to-review integration contract require application composition. Commit October 2 UTC; .NET release October 1. [README](https://github.com/microsoft/agent-framework/blob/a91fe6682f160cd9b2e57bbeba404d65ae51a9da/README.md)."
+        },
+        {
+          "key": "C09",
+          "name": "claude-code",
+          "reason": "The inspected public repository evidence covers client installation and plugins; comparable worker implementation and contract tests were not verified, leaving less public evidence for this repository judgment. Commit and release October 1. [README](https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md)."
+        },
+        {
+          "key": "C11",
+          "name": "Temporal",
+          "reason": "Strong durable infrastructure, but this repository supplies the server; agent workers, edit isolation and integration review remain external application responsibilities. Commit October 2 UTC; v1.30.7 release September 18. [README](https://github.com/temporalio/temporal/blob/37aa0e95e59523cd909dbdbdf20169ad7dbc33ae/README.md)."
+        },
+        {
+          "key": "C12",
+          "name": "OpenHands Agent Canvas",
+          "reason": "Agent product and backend choices are useful, but the reviewed README does not establish the required child ownership, faithful failed-result return and mandatory integration review contract. Commit October 2 UTC; v1.24.0 release September 25. [README](https://github.com/OpenHands/OpenHands/blob/1ff45c267fe5737c9387ccaf54d44cab3da6d9dd/README.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Keep Codex and DeerFlow as alternatives, with Worktrunk accompanying either. On the specified WSL2 host, freeze one coding/research task and compare Codex single-agent, Codex workers plus Worktrunk, and DeerFlow workers plus Worktrunk. Hold model, tools and budgets constant where possible. Inject a failed test command, a cancelled worker, a completed sibling and unrelated dirty edits. Independently verify delivered output, original failure/exit evidence, retained sibling results, cancellation state, protected edits and complete returned usage; deliberately reject one result and confirm it cannot integrate. Rank acceptance reliability before latency and token/cost totals. No existing all-arm result establishes a winner.",
+      "evidence_gaps": [
+        "This is a shortlist, not a proven combined installation. No inspected source establishes enforced worker-owned writes and mandatory independent review for either complete stack.",
+        "Tests were inspected and upstream CI snapshots read; no installation, test suite or benchmark was executed on either target host. Public test existence and mocked assertions are not measured comparative superiority.",
+        "All twelve repositories were unarchived and had default-branch commits within 90 days. All showed recent issue updates; response times and longitudinal maintenance quality were not measured.",
+        "DeerFlow's WSL Docker path and macOS arm64 execution remain unverified. Codex and Worktrunk publish matching architecture assets, but assets alone are not host acceptance tests. This layer does not inherently require the RTX 4090.",
+        "Per-child complete usage remains unresolved: DeerFlow depends on provider metadata, and the inspected Codex files do not establish complete returned accounting. Missing usage must remain unknown rather than zero.",
+        "Astra/Max cross-check trigger was the consequential worker choice and documentation-versus-implementation uncertainty. Acceptance result: insufficient evidence for a sole winner. Corrections verified in pinned sources: Codex V2 ignores agent_max_depth; Worktrunk can launch external agents through wt switch -x.",
+        "Install commands reproduce upstream defaults and may resolve newer versions later; assessed releases are Codex rust-v0.160.0, DeerFlow v2.1.0 and Worktrunk v0.80.0.",
+        "Retrieval compliance limitation: ctx_fetch_and_index required approval and was rejected under approval policy never. A delegated browser fallback exceeded the eight-page allowance; that evidence was discarded and consequential repository claims reverified through GitHub API files and ctx_search. Thirty GitHub API calls were used."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/bytedance/deer-flow/commits?per_page=1",
+        "https://api.github.com/repos/temporalio/temporal/commits?per_page=1",
+        "https://api.github.com/repos/langchain-ai/langgraph/commits?per_page=1",
+        "https://api.github.com/repos/langchain-ai/deepagents/commits?per_page=1",
+        "https://api.github.com/repos/gastownhall/beads/commits?per_page=1",
+        "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1",
+        "https://api.github.com/repos/OpenHands/OpenHands/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex-plugin-cc/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code/commits?per_page=1",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/agent-framework/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/bytedance/deer-flow/releases/latest",
+        "https://api.github.com/repos/max-sixty/worktrunk/releases/latest",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/docs/install.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_spec.rs",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/tools/handlers/multi_agents_tests.rs",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/agent/status.rs",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_acceptance_checks.py",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_tool_receipt.py",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_subagent_status_contract.py",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_subagent_token_collector.py",
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/.github/workflows/backend-unit-tests.yml",
+        "https://github.com/max-sixty/worktrunk/blob/v0.80.0/README.md",
+        "https://github.com/max-sixty/worktrunk/blob/v0.80.0/.github/workflows/ci.yaml",
+        "https://github.com/max-sixty/worktrunk/blob/v0.80.0/tests/cancel_background.rs"
+      ]
+    }
+  ]
+}

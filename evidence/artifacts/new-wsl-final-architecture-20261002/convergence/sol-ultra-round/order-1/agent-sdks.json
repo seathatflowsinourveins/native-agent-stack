@@ -1,0 +1,174 @@
+{
+  "layers": [
+    {
+      "layer_id": "agent-sdks",
+      "selection": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "role": "C01: TypeScript SDK for Codex workers needing structured events, repeated turns and persisted-session resumption.",
+          "install_command": "npm install -g @openai/codex\nnpm install @openai/codex-sdk",
+          "install_source": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md and https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+              "shows": "Supported CLI wrapper exchanging JSONL events; runStreamed() exposes structured progress events, startThread()/resumeThread() provide session control, and threads persist locally. Documents npm installation and Node.js 18+."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
+              "shows": "Documents Linux installation, Linux x86_64 binaries and macOS arm64 binaries. WSL2 suitability is inferred from Linux support; execution under WSL2 was not verified."
+            },
+            {
+              "url": "https://api.github.com/repos/openai/codex",
+              "shows": "Repository is unarchived."
+            },
+            {
+              "url": "https://github.com/openai/codex/commit/2635431edbd43279a4da9c1199456758fbbc8ad3",
+              "shows": "Latest inspected default-branch commit dated 2026-10-01, within the frozen 90-day window."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "Release published 2026-10-01; the SDK documentation inspected was pinned to this tag."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/package.json",
+              "shows": "SDK declares Jest tests and a coverage command. This establishes a test suite, not a passing result."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36920527987",
+              "shows": "Sampled completed main-branch blocking-ci run failed on 2026-10-01. Failure cause and SDK involvement were not inspected."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36920528954",
+              "shows": "Sampled completed main-branch postmerge-ci run also failed. Selection rests on documented capability and integration, without claiming measured reliability superiority."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Claude Agent SDK",
+          "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+          "role": "C07: Python SDK for Claude workers needing typed messages, bidirectional sessions, custom tools and hooks.",
+          "install_command": "pip install claude-agent-sdk",
+          "install_source": "https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md",
+              "shows": "Documents Python 3.10+, bundled Claude CLI, typed messages, ClaudeSDKClient bidirectional sessions, in-process custom tools, permission handling and hooks. Documents Linux and macOS wheel builds."
+            },
+            {
+              "url": "https://api.github.com/repos/anthropics/claude-agent-sdk-python",
+              "shows": "Repository is unarchived."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/commit/bfb895c6ef46e095191938b4eda798a025957c09",
+              "shows": "Latest inspected default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+              "shows": "Release published 2026-09-30, bundling Claude CLI 2.1.286."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110509104122",
+              "shows": "Ubuntu test job passed on the inspected latest commit, supporting Linux suitability; WSL2 execution remains unverified."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110509104008",
+              "shows": "macOS test job passed. Runner architecture was not verified, so this does not establish macOS arm64 execution."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110510306847",
+              "shows": "macOS end-to-end job failed on the same inspected commit."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110510306817",
+              "shows": "Docker end-to-end job failed. Mixed CI limits confidence; these results do not establish release-tag reliability."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "OpenHands SDK",
+          "reason": "Strong documented SDK with events, custom tools and remote workspaces, but its demonstrated worker uses an OpenHands agent engine; no concrete need for that engine or remote-worker stack was supplied. This is a scope deferral, not measured inferiority. Active commit 2026-10-01; v1.50.1 released 2026-09-30. [Pinned README](https://github.com/OpenHands/software-agent-sdk/blob/0a9abc87641ad7ffe02e2dadf5e2cb3976b35217/README.md), [release](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1)."
+        },
+        {
+          "key": "C03",
+          "name": "LangGraph",
+          "reason": "Documents stateful orchestration and durable execution, but no application need for graph orchestration was supplied; direct native-session integration was not established in the inspected README. Active commit 2026-10-01; latest-release endpoint returned a CLI tag dated 2026-09-23, rather than a verified core-library pin. [Pinned README](https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md), [release](https://github.com/langchain-ai/langgraph/releases/tag/cli%3D%3D0.4.32.dev0)."
+        },
+        {
+          "key": "C04",
+          "name": "agentproto/ts",
+          "reason": "Directly documents Claude Code/Codex adapters, durable session control and custom tools, making it a close alternative; its README warns of breaking API changes and does not establish a stable session-control SDK or event subscription. Passing CI was not assessed. Active commit and release 2026-10-01. [Pinned README](https://github.com/agentproto/ts/blob/c2472bf496845004c32fd64ff857ee05045e6360/README.md), [release](https://github.com/agentproto/ts/releases/tag/release%2F2026-10-01.2)."
+        },
+        {
+          "key": "C05",
+          "name": "copilot-sdk",
+          "reason": "Meets the custom-tool requirement and is a genuine alternative, but introduces the Copilot runtime for the named Claude Code/Codex users; inspected CI included passing Python checks and failed aggregate/Node checks. BYOK prevents a subscription-only exclusion. Active commit 2026-10-01; v1.0.16 released 2026-09-30. [Pinned README](https://github.com/github/copilot-sdk/blob/0584472932d8124dc139f6e4fc35ea76397ef868/README.md), [failed aggregate check](https://github.com/github/copilot-sdk/actions/runs/36899360472/job/110501493547), [release](https://github.com/github/copilot-sdk/releases/tag/v1.0.16)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C06",
+          "name": "Temporal",
+          "criterion": "outside_requirement",
+          "fact": "The nominated repository is the Temporal server; its README directs worker authors to separate language SDKs. The packet supplies no durable multi-host workflow requirement justifying this server layer. It is active, not stale: commit 2026-10-01 and v1.32.0 released 2026-09-11. [Pinned README](https://github.com/temporalio/temporal/blob/95f69832293f851fdebeb6d790854918f6cfd563/README.md), [release](https://github.com/temporalio/temporal/releases/tag/v1.32.0)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The two selections cover separate native-client roles; neither is a measured overall winner. First qualify the concrete application gap. On clean WSL2 Ubuntu x86_64 and macOS arm64 hosts, compare the selected SDKs with Copilot SDK and agentproto using the same event/tool/session contract: installation success, event ordering and completeness, permission denial, cancellation, process failure and session resumption, overhead and integration effort. Include OpenHands if a separate agent engine or container worker is acceptable; qualify graph checkpoints before reconsidering LangGraph and durable multi-host state before reconsidering Temporal. Control backend/model differences where supported and score runtime behavior separately from model quality.",
+      "evidence_gaps": [
+        "The required ctx_fetch_and_index/ctx_search pipeline could not be completed: context tools were rejected because approval is required and policy is never. Six upstream READMEs were fetched directly before that restriction was coordinated; this method deviation is disclosed rather than presented as compliant.",
+        "Research used 30 GitHub API calls, one web search and six successful direct page fetches. Only the authorized packet was read under the local repository.",
+        "All seven repositories were unarchived and had inspected default-branch commits on 2026-10-01, after the 2026-07-03 cutoff. Release activity was verified; human issue-response activity and backlog handling were not systematically assessed.",
+        "The packet contains no completed head-to-head comparison. No matched public benchmark or evaluation was established from the inspected sources, so no measured superiority is claimed.",
+        "Codex SDK Jest commands were verified, but an isolated passing SDK CI result was not. Its sampled main-branch CI failures were not diagnosed.",
+        "Claude CI covered all 13 returned checks and was mixed. Copilot's check-runs response covered only 30 of 146 checks. The inspected LangGraph run was still in progress; OpenHands, agentproto and Temporal passing CI results were not assessed.",
+        "No target-host installation was executed. Codex explicitly documents Linux x86_64 and macOS arm64 binaries; OpenHands release assets also cover those architectures. Claude macOS arm64 execution and WSL2 execution for every candidate remain unverified.",
+        "The inspected SDK entry points do not require a GPU; RTX 4090 compatibility becomes relevant only if a separately qualified local model backend is chosen.",
+        "Claude capabilities were inspected at current main, not the release tag. Codex documentation was inspected at rust-v0.160.0, but the corresponding published npm SDK version was not verified.",
+        "Claude authentication/payment requirements were not established. Codex documents ChatGPT-plan or API-key authentication, and Copilot documents BYOK. These findings do not justify excluding a repository as requiring a particular paid service.",
+        "Correction recorded: LangGraph's README establishes durable execution conceptually; a specific checkpoint API or multi-host persistence backend was not verified."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openai/codex",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/package.json",
+        "https://api.github.com/repos/openai/codex/actions/runs?branch=main&status=completed&per_page=40",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits?per_page=1",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits/bfb895c6ef46e095191938b4eda798a025957c09/check-runs",
+        "https://api.github.com/repos/github/copilot-sdk",
+        "https://api.github.com/repos/github/copilot-sdk/releases/latest",
+        "https://api.github.com/repos/github/copilot-sdk/commits?per_page=1",
+        "https://github.com/github/copilot-sdk/blob/0584472932d8124dc139f6e4fc35ea76397ef868/README.md",
+        "https://api.github.com/repos/github/copilot-sdk/commits/0584472932d8124dc139f6e4fc35ea76397ef868/check-runs",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk/releases/latest",
+        "https://api.github.com/repos/OpenHands/software-agent-sdk/commits?per_page=1",
+        "https://github.com/OpenHands/software-agent-sdk/blob/0a9abc87641ad7ffe02e2dadf5e2cb3976b35217/README.md",
+        "https://api.github.com/repos/agentproto/ts",
+        "https://api.github.com/repos/agentproto/ts/releases/latest",
+        "https://api.github.com/repos/agentproto/ts/commits?per_page=1",
+        "https://github.com/agentproto/ts/blob/c2472bf496845004c32fd64ff857ee05045e6360/README.md",
+        "https://api.github.com/repos/langchain-ai/langgraph",
+        "https://api.github.com/repos/langchain-ai/langgraph/releases/latest",
+        "https://api.github.com/repos/langchain-ai/langgraph/commits?per_page=1",
+        "https://github.com/langchain-ai/langgraph/blob/157a06dda988d85afeb8751ff27b35ab3f4f8bf4/README.md",
+        "https://github.com/langchain-ai/langgraph/actions/runs/36923696892",
+        "https://api.github.com/repos/temporalio/temporal",
+        "https://api.github.com/repos/temporalio/temporal/releases/latest",
+        "https://api.github.com/repos/temporalio/temporal/commits?per_page=1",
+        "https://github.com/temporalio/temporal/blob/95f69832293f851fdebeb6d790854918f6cfd563/README.md"
+      ]
+    }
+  ]
+}
