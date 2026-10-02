@@ -4300,8 +4300,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "002989d1ac41eac8b0b3e4cb8538632c9f6107e802716f2a1b2a5dc475f9c006",
-      "bytes": 79619
+      "sha256": "0fcdcf3169f931d5ff3b6109c1421cf1c86adb17efab749aa5007f6d2726cbef",
+      "bytes": 81561
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -4415,13 +4415,13 @@
     },
     {
       "path": "adoption/templates/wsl/first-boot-checklist.md",
-      "sha256": "acda94791b59c45164f3e0944e00f002fc82173ccd11fc3957db1e1c346329c0",
-      "bytes": 13384
+      "sha256": "2ecc17772416e39390a11d5cf30414bbc34540812114a6dfc44b9dc36eb7f23d",
+      "bytes": 13674
     },
     {
       "path": "adoption/templates/wsl/stage1-receipt.example.json",
-      "sha256": "947a894bb19d495a078169aceffa995615a54377ed8519ef9fefb10b8cf096d2",
-      "bytes": 60175
+      "sha256": "5dd17f19b447e92e1ecbbec82e5d38d219bd4cbc1f3402e03d9202c0afaa466d",
+      "bytes": 60178
     },
     {
       "path": "adoption/tools/README.md",
@@ -6486,8 +6486,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "858310299a0392623affdc0172a3423248a80de300161f2b6f600ef8e7dcb501",
-      "bytes": 22849
+      "sha256": "9a9c26b438454d7c1767332fe82267d217412eb8edb59b1a99e672e3558c6210",
+      "bytes": 23065
     },
     {
       "path": "blueprints/convergence-practice/wsl-restore/README.md",
@@ -15726,8 +15726,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-      "sha256": "c32906a00a804cb219384d331b1e6e5ca9403977875fad2497b9eb78efc7a30c",
-      "bytes": 134715
+      "sha256": "c07bab0c84d3bf17625ddabfffdca74cda2f2e7ebb19d63c57b8965ac4b813c4",
+      "bytes": 137074
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
@@ -49706,8 +49706,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "585db3d8d04825f547c13b117ccf3ee76419c06ade70300541b5ea18e2b20f75",
-      "bytes": 188890
+      "sha256": "b726b6a054d03f7f88ae567222826ee06069691980cb819922de85a88e48c551",
+      "bytes": 191553
     },
     {
       "path": "tests/test_wsl_restore.py",
