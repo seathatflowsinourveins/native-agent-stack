@@ -1,0 +1,596 @@
+{
+ "rule": "RULE.md",
+ "rows": [
+  {
+   "layer_id": "native-clients",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "anthropics/claude-code",
+    "openai/codex"
+   ],
+   "claude_only": [],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "agent-sdks",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "anthropics/claude-agent-sdk-python",
+    "openai/codex"
+   ],
+   "claude_only": [],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "instructions-skills",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "trailofbits/skills"
+   ],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "mattpocock/skills",
+     3
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "affaan-m/ecc",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "mcp-surfaces",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "modelcontextprotocol/inspector",
+    "openclaw/mcporter"
+   ],
+   "claude_only": [],
+   "gpt_only": [],
+   "single_gpt_votes": [
+    [
+     "mcpjam/inspector",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "workers",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "max-sixty/worktrunk",
+     3
+    ],
+    [
+     "openai/codex",
+     3
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "bytedance/deer-flow",
+     1
+    ],
+    [
+     "openai/codex-plugin-cc",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "isolation",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "anthropics/sandbox-runtime"
+   ],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "max-sixty/worktrunk",
+     3
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "code-navigation",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [
+    "oraios/serena"
+   ],
+   "claude_only": [
+    [
+     "anthropics/claude-plugins-official",
+     0
+    ]
+   ],
+   "gpt_only": [
+    [
+     "ast-grep/ast-grep",
+     2
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "semantic-rag",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "giancarloerra/socraticode",
+     2
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "lightonai/next-plaid",
+     1
+    ],
+    [
+     "minishlab/semble",
+     1
+    ],
+    [
+     "ollama/ollama",
+     1
+    ],
+    [
+     "qdrant/qdrant",
+     1
+    ]
+   ],
+   "untouched_slots": [
+    "code-search"
+   ]
+  },
+  {
+   "layer_id": "document-retrieval",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [
+    "opendatalab/mineru",
+    "tobi/qmd"
+   ],
+   "claude_only": [],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "web-research",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [],
+   "claude_only": [
+    [
+     "adbar/trafilatura",
+     0
+    ],
+    [
+     "microsoft/playwright-cli",
+     1
+    ]
+   ],
+   "gpt_only": [
+    [
+     "vercel-labs/agent-browser",
+     2
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "durable-memory",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "rohitg00/agentmemory",
+     2
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "akitaonrails/ai-memory",
+     1
+    ],
+    [
+     "basicmachines-co/basic-memory",
+     1
+    ],
+    [
+     "tigerless-labs/agent-memory",
+     1
+    ],
+    [
+     "vectorize-io/hindsight",
+     1
+    ]
+   ],
+   "untouched_slots": [
+    "memory-owner"
+   ]
+  },
+  {
+   "layer_id": "token-efficiency",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [],
+   "claude_only": [
+    [
+     "ccusage/ccusage",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [
+    [
+     "lockedinlabs-ai/agent-console",
+     1
+    ],
+    [
+     "ojuschugh1/sqz",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "observation-inference",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "open-telemetry/opentelemetry-collector-contrib"
+   ],
+   "claude_only": [
+    [
+     "arize-ai/phoenix",
+     0
+    ],
+    [
+     "grafana/grafana",
+     0
+    ],
+    [
+     "grafana/loki",
+     0
+    ],
+    [
+     "prometheus/prometheus",
+     1
+    ]
+   ],
+   "gpt_only": [
+    [
+     "openlit/openlit",
+     2
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": [
+    "local-model-server"
+   ]
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "gpt_samples_present": 2,
+   "g1_counted": false,
+   "orders_present": 2,
+   "final": [
+    "harbor-framework/harbor",
+    "ukgovernmentbeis/inspect_ai"
+   ],
+   "claude_only": [
+    [
+     "promptfoo/promptfoo",
+     0
+    ]
+   ],
+   "gpt_only": [
+    [
+     "microsoft/playwright",
+     2
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "koalaman/shellcheck",
+     1
+    ],
+    [
+     "modelcontextprotocol/inspector",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "ci-supply-chain",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "actions/attest",
+    "anchore/syft",
+    "kjanat/actionlint",
+    "zizmorcore/zizmor"
+   ],
+   "claude_only": [
+    [
+     "dependabot/dependabot-core",
+     1
+    ],
+    [
+     "github/codeql-action",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "dagucloud/dagu"
+   ],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "systemd/systemd",
+     3
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "hosting-services",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "docker/compose",
+    "moby/moby"
+   ],
+   "claude_only": [],
+   "gpt_only": [
+    [
+     "postgres/postgres",
+     2
+    ]
+   ],
+   "single_gpt_votes": [
+    [
+     "devcontainers/cli",
+     1
+    ],
+    [
+     "fastapi/fastapi",
+     1
+    ],
+    [
+     "podman-container-tools/podman",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "secrets-credentials",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "betterleaks/betterleaks"
+   ],
+   "claude_only": [
+    [
+     "trufflesecurity/trufflehog",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [
+    [
+     "gitguardian/ggshield",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "git-github-automation",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "cli/cli",
+    "git/git",
+    "max-sixty/worktrunk",
+    "wilfred/difftastic"
+   ],
+   "claude_only": [
+    [
+     "anthropics/claude-code-action",
+     0
+    ]
+   ],
+   "gpt_only": [
+    [
+     "ataraxy-labs/sem",
+     3
+    ]
+   ],
+   "single_gpt_votes": [],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "recovery-portability",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "jdx/mise",
+    "restic/restic"
+   ],
+   "claude_only": [
+    [
+     "twpayne/chezmoi",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [
+    [
+     "jetify-com/devbox",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "cross:wsl-distro",
+   "gpt_samples_present": 3,
+   "g1_counted": true,
+   "orders_present": 2,
+   "final": [
+    "https://ubuntu.com/download/server"
+   ],
+   "claude_only": [],
+   "gpt_only": [],
+   "single_gpt_votes": [
+    [
+     "ubuntu/wsl",
+     1
+    ]
+   ],
+   "untouched_slots": []
+  },
+  {
+   "layer_id": "cross:gpt6-harnesses",
+   "gpt_samples_present": 0,
+   "g1_counted": true,
+   "orders_present": 0,
+   "final": [],
+   "claude_only": [
+    [
+     "diegosouzapw/omniroute",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": [
+    "gpt-gateway"
+   ]
+  },
+  {
+   "layer_id": "cross:runtime-workers",
+   "gpt_samples_present": 0,
+   "g1_counted": true,
+   "orders_present": 0,
+   "final": [],
+   "claude_only": [
+    [
+     "assafelovic/gpt-researcher",
+     0
+    ],
+    [
+     "bytedance/deer-flow",
+     0
+    ],
+    [
+     "openhands/software-agent-sdk",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": [
+    "agent-runtime-worker",
+    "research-harnesses"
+   ]
+  },
+  {
+   "layer_id": "cross:credential-practice",
+   "gpt_samples_present": 0,
+   "g1_counted": true,
+   "orders_present": 0,
+   "final": [],
+   "claude_only": [
+    [
+     "seathatflowsinourveins/native-agent-stack",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": [
+    "credential-guard"
+   ]
+  },
+  {
+   "layer_id": "cross:convergence-practice",
+   "gpt_samples_present": 0,
+   "g1_counted": true,
+   "orders_present": 0,
+   "final": [],
+   "claude_only": [
+    [
+     "seathatflowsinourveins/native-agent-stack",
+     0
+    ]
+   ],
+   "gpt_only": [],
+   "single_gpt_votes": [],
+   "untouched_slots": [
+    "convergence-validators"
+   ]
+  }
+ ]
+}

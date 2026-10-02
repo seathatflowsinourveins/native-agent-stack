@@ -1,0 +1,153 @@
+{
+  "layers": [
+    {
+      "layer_id": "isolation",
+      "selection": [
+        {
+          "name": "Worktrunk (C09)",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "role": "Separate agent edits through Git worktrees, with creation, switching, hooks and removal. Pair with a restriction runtime when enforcement is required.",
+          "install_command": "cargo install worktrunk && wt config shell install",
+          "install_source": "https://github.com/max-sixty/worktrunk/blob/85e685e313f7fbc0612c0e055e655c3917e39f29/README.md#install",
+          "basis": [
+            {
+              "url": "https://github.com/max-sixty/worktrunk/blob/85e685e313f7fbc0612c0e055e655c3917e39f29/README.md",
+              "shows": "Direct capability fit: separate working directories for Claude Code and Codex sessions; agent-launch commands and lifecycle hooks. Documents Linux/macOS installation, cargo test, and shell integration tests."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+              "shows": "Released September 27, 2026. Upstream reports picker work starting at 47 ms per row versus 120 ms on a 50-worktree repository; this is a project-specific measurement, not an isolation comparison."
+            },
+            {
+              "url": "https://api.github.com/repos/max-sixty/worktrunk",
+              "shows": "Repository is not archived."
+            },
+            {
+              "url": "https://github.com/max-sixty/worktrunk/commit/85e685e313f7fbc0612c0e055e655c3917e39f29",
+              "shows": "Default-branch commit dated October 1, 2026, within the 90-day currency window."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "sandbox-runtime (C01)",
+          "repository": "https://github.com/anthropics/sandbox-runtime",
+          "role": "Provisional choice for task-specific filesystem/network enforcement. Wrap commands or MCP servers with srt; configure sensitive-file read restrictions explicitly because reads are unrestricted by default. Linux x86_64 and macOS mechanisms are documented; WSL2 and macOS arm64 execution remain unmeasured.",
+          "install_command": "sudo apt-get install bubblewrap socat ripgrep && npm install -g @anthropic-ai/sandbox-runtime",
+          "install_source": "https://github.com/anthropics/sandbox-runtime/blob/117eb928202b53c80d3cb6527d88d1b90e4ca7a9/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/anthropics/sandbox-runtime/blob/117eb928202b53c80d3cb6527d88d1b90e4ca7a9/README.md",
+              "shows": "Documents process-tree filesystem restrictions, Linux bubblewrap/network namespaces, domain-filtering proxies, macOS Seatbelt, srt CLI and MCP wrapping. Developed for Claude Code; generic CLI invocation is available to agents."
+            },
+            {
+              "url": "https://github.com/anthropics/sandbox-runtime/blob/117eb928202b53c80d3cb6527d88d1b90e4ca7a9/README.md#development",
+              "shows": "Documents npm test, typechecking and linting, and states that CI builds seccomp before tests on both Linux architectures. Actual CI outcomes were not verified."
+            },
+            {
+              "url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
+              "shows": "Released September 30, 2026; release notes describe test-validity repairs, write-policy tests and Linux enforcement fixes. These establish maintenance activity, not comparative security superiority."
+            },
+            {
+              "url": "https://api.github.com/repos/anthropics/sandbox-runtime",
+              "shows": "Repository is not archived."
+            },
+            {
+              "url": "https://github.com/anthropics/sandbox-runtime/commit/117eb928202b53c80d3cb6527d88d1b90e4ca7a9",
+              "shows": "Default-branch commit dated October 1, 2026; raises the supported Node floor to 22.12. Ubuntu user-namespace prerequisites also need checking before installation."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C05",
+          "name": "gVisor",
+          "reason": "Credible userspace-kernel OCI boundary, with documented unit/integration test commands; target-host workload compatibility and a cleanup/enforcement advantage remain unverified. [Pinned README](https://github.com/google/gvisor/blob/d3d566ad1979a92cb76918a18cba6e51fe252393/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "microsandbox",
+          "reason": "Local Linux execution requires KVM; KVM readiness inside the target WSL2 instance and comparative workload results remain unverified. Apple Silicon support is documented. [Upstream CLI documentation](https://github.com/superradcompany/microsandbox/blob/main/docs/cli/overview.mdx)."
+        },
+        {
+          "key": "C03",
+          "name": "Docker Engine / Moby",
+          "reason": "Active OCI alternative; no completed target-host boundary/resource/cleanup comparison justifies selecting it over the provisional native boundary. Latest inspected release is docker-v29.8.2, September 30, 2026. [Release](https://github.com/moby/moby/releases/tag/docker-v29.8.2)."
+        },
+        {
+          "key": "C08",
+          "name": "boxlite",
+          "reason": "Credible embedded microVM option, but Linux KVM availability and target-workload evidence remain unverified; upstream documents Linux x86_64 and Apple Silicon prerequisites. [Upstream cookbook](https://github.com/boxlite-ai/boxlite-cookbook/blob/main/README.md)."
+        },
+        {
+          "key": "C07",
+          "name": "Podman / Quadlet",
+          "reason": "Credible rootless OCI alternative and the proposed comparison arm; boundary selection remains open pending enforcement/resource/cleanup testing on WSL2. [Upstream README](https://github.com/podman-container-tools/podman/blob/main/README.md)."
+        },
+        {
+          "key": "C02",
+          "name": "e2b-dev/e2b",
+          "reason": "The inspected repository supplies SDK/CLI API operations; upstream places local self-hosting in a separate runtime stack, making this a less direct per-command host installation. Payment is not established as mandatory. [Release](https://github.com/e2b-dev/E2B/releases/tag/e2b%402.52.0), [upstream architecture](https://github.com/e2b-dev)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C04",
+          "name": "Apple Container",
+          "criterion": "cannot_run_on_target",
+          "fact": "Requires an Apple Silicon Mac and supported macOS 26; it cannot supply the primary Linux x86_64 WSL2 host runtime. It fits the secondary Mac host. [Upstream requirements](https://github.com/apple/container/blob/main/README.md#requirements)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Keep Worktrunk for edit separation. Compare sandbox-runtime v0.0.78 with rootless Podman v6.1.3 on the same WSL2 Ubuntu instance, using the intended untrusted agent workload and equivalent access policies. Measure denied reads/writes, symlink and child-process behavior, TCP/UDP/IPv6 and Unix-socket containment, CPU/RAM/PID limits, permitted workload completion, and residual processes/files after exit, cancellation and forced termination. Repeat compatibility checks on macOS arm64. The native boundary selection is provisional; no measured superiority is claimed.",
+      "evidence_gaps": [
+        "The packet contains no completed comparison where every named arm ran.",
+        "All nine repositories were non-archived and had default-branch commits and releases within 90 days. Recent merged-PR/release activity was observed; issue response and closure rates were not audited.",
+        "Published test commands and release notes were inspected, but successful test runs, coverage and current CI conclusions were not independently verified. Worktrunk's reported timing does not decide boundary quality.",
+        "WSL2 enforcement, macOS arm64 execution, resource ceilings and forced-termination cleanup were not measured. Linux support alone does not prove WSL2 compatibility. GPU access was not required by this packet and was not assessed.",
+        "Budget used: 30 GitHub API calls, 6 web search queries, and 8 attempted page URLs; no page-fetch attempt retrieved content. Documentation was verified through accessible GitHub API READMEs and primary-source search results.",
+        "Automatic approval review rejected ctx_fetch_and_index with: “MCP tool call requires approval, but approval policy is never.” Consequently, the required ctx_fetch_and_index/ctx_search retrieval method could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/google/gvisor",
+        "https://api.github.com/repos/google/gvisor/releases/latest",
+        "https://api.github.com/repos/google/gvisor/commits?per_page=1",
+        "https://api.github.com/repos/superradcompany/microsandbox",
+        "https://api.github.com/repos/superradcompany/microsandbox/releases/latest",
+        "https://api.github.com/repos/superradcompany/microsandbox/commits?per_page=1",
+        "https://api.github.com/repos/moby/moby",
+        "https://api.github.com/repos/moby/moby/releases/latest",
+        "https://api.github.com/repos/moby/moby/commits?per_page=1",
+        "https://api.github.com/repos/boxlite-ai/boxlite",
+        "https://api.github.com/repos/boxlite-ai/boxlite/releases/latest",
+        "https://api.github.com/repos/boxlite-ai/boxlite/commits?per_page=1",
+        "https://api.github.com/repos/apple/container",
+        "https://api.github.com/repos/apple/container/releases/latest",
+        "https://api.github.com/repos/apple/container/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/sandbox-runtime",
+        "https://api.github.com/repos/anthropics/sandbox-runtime/releases/latest",
+        "https://api.github.com/repos/anthropics/sandbox-runtime/commits?per_page=1",
+        "https://api.github.com/repos/podman-container-tools/podman",
+        "https://api.github.com/repos/podman-container-tools/podman/releases/latest",
+        "https://api.github.com/repos/podman-container-tools/podman/commits?per_page=1",
+        "https://api.github.com/repos/e2b-dev/E2B",
+        "https://api.github.com/repos/e2b-dev/E2B/releases/latest",
+        "https://api.github.com/repos/e2b-dev/E2B/commits?per_page=1",
+        "https://api.github.com/repos/max-sixty/worktrunk",
+        "https://api.github.com/repos/max-sixty/worktrunk/releases/latest",
+        "https://api.github.com/repos/max-sixty/worktrunk/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/sandbox-runtime/readme?ref=117eb928202b53c80d3cb6527d88d1b90e4ca7a9",
+        "https://api.github.com/repos/max-sixty/worktrunk/readme?ref=85e685e313f7fbc0612c0e055e655c3917e39f29",
+        "https://api.github.com/repos/google/gvisor/readme?ref=d3d566ad1979a92cb76918a18cba6e51fe252393",
+        "https://github.com/superradcompany/microsandbox/blob/main/docs/cli/overview.mdx",
+        "https://github.com/boxlite-ai/boxlite/blob/main/docs/architecture/README.md",
+        "https://github.com/boxlite-ai/boxlite-cookbook/blob/main/README.md",
+        "https://github.com/podman-container-tools/podman/blob/main/README.md",
+        "https://github.com/apple/container/blob/main/README.md",
+        "https://github.com/e2b-dev"
+      ]
+    }
+  ]
+}

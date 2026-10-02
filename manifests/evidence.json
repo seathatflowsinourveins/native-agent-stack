@@ -35780,6 +35780,236 @@
       "bytes": 10505
     },
     {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/README.md",
+      "sha256": "47d4062179f3c4044d6394df45c9a1f960b5798ce6d5159f69e307cd08de1fc9",
+      "bytes": 3201
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md",
+      "sha256": "3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6",
+      "bytes": 3895
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combine.py",
+      "sha256": "9e849240e410b4091f37773bde9c986ca2524cf94bff4bf26beff1ff0e620ce2",
+      "bytes": 4919
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json",
+      "sha256": "8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25",
+      "bytes": 9648
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/agent-sdks.json",
+      "sha256": "97419c0af0e87ac610a6b31a5db847906ddb708ddf0e0ef7f83ec9246cbb6b2a",
+      "bytes": 14785
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/ci-supply-chain.json",
+      "sha256": "998a14c0b8f20723ecf68107dc33c65483e817666460bcc8fb8126324e36ee70",
+      "bytes": 18529
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/code-navigation.json",
+      "sha256": "0a0e3a6531d41b63c568632ba9ae39689461a25b88dd88cffb17663ff360e236",
+      "bytes": 12751
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/cross_wsl-distro.json",
+      "sha256": "251c5ad4fbe6efc7eba9bc76dbbf4a8280cd6e886d17314a6ace82179ea64a3d",
+      "bytes": 9393
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/document-retrieval.json",
+      "sha256": "e239c1082187a1a83c83c30d8d37f544090a8e3b3a7e9000524f0d5f3e1c7fb3",
+      "bytes": 17349
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/durable-memory.json",
+      "sha256": "69a4a225ef9401113dd32847b366d1cf01320120fd64e2f86ded1b56a4b7cf0f",
+      "bytes": 11425
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/git-github-automation.json",
+      "sha256": "ccffde32e169f5bdae484fff27643747e0797f7a2be644db0a0a3b906ffd2e73",
+      "bytes": 14856
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/hosting-services.json",
+      "sha256": "dc864020210b69e5d21763972073ae06ef976c7afe5647adfbfbe86b336d5844",
+      "bytes": 16574
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/instructions-skills.json",
+      "sha256": "8593e456dfd0c0e41903bdf7e852c8c0ab33b35c20d2d005d3b1d2e4faac6d6a",
+      "bytes": 17616
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/isolation.json",
+      "sha256": "494ee9bf0e7a3299c5f7d4c2cb62553ac69644fd1c1facf7344a7e66482d1564",
+      "bytes": 11481
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/mcp-surfaces.json",
+      "sha256": "f7154426618c738164c733c924ea87d4a8fd4d7057ce2fcabc93d453c883a2a2",
+      "bytes": 9992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/native-clients.json",
+      "sha256": "625138739d2aac84506896faf2f632991fe3619a7b99bdf9719f2e475866743a",
+      "bytes": 14292
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/observation-inference.json",
+      "sha256": "5e6860962ded0d52e41df7fa005c6224ddd647dec4b6d08ef40536b2cb0ba62c",
+      "bytes": 15904
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/quality-evaluation.json",
+      "sha256": "1ab466627e47746ae02bcfc67b456a11cb37b4e3a9e4759105cef9884138f0a6",
+      "bytes": 19504
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/recovery-portability.json",
+      "sha256": "5985377ec7437428abd5803ea04a2c185cce694c18659c9555aa85a5b6b2d1e0",
+      "bytes": 11759
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/scheduling-supervision.json",
+      "sha256": "492efba5591e978fd0ec5b008d58703c4f9122e32105a24a1de971bf12818f74",
+      "bytes": 13401
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/secrets-credentials.json",
+      "sha256": "875ed69f6a5e440f20595ff58b6d828ef90a3370008ed3b912a89f9f3216eab1",
+      "bytes": 8953
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/semantic-rag.json",
+      "sha256": "f08ae599ae688a265cbde1f1b3f0dcd36d722fac337dd57be1513ad33e9cf9b2",
+      "bytes": 13389
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/token-efficiency.json",
+      "sha256": "04284d47b0089b4f6be03eea8e47df37c475015e4644b05b0f4249c958495e00",
+      "bytes": 7332
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/web-research.json",
+      "sha256": "da84c407d190f0ddaa19007caa35d84b95f2a4f92b83b0122e45ecfd2a433522",
+      "bytes": 15230
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-1/workers.json",
+      "sha256": "db3ab1576fe410e6cd33085c8ccd849f4b968b1a929846f22ce4db281501c1fd",
+      "bytes": 16055
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/agent-sdks.json",
+      "sha256": "d97dcd69364abb423e8a9a8edf5bebd467240cf102a3861d47d029649afd63f9",
+      "bytes": 14182
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/ci-supply-chain.json",
+      "sha256": "cc0ede27946af54e9e122292ae4439e1f7ff8e57083333b5a5d5059864388297",
+      "bytes": 17692
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/code-navigation.json",
+      "sha256": "090c330725b07aa22ff7d59e2bc7e25f9656a9825975a90a481a0cbda6dc49dc",
+      "bytes": 11434
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/cross_wsl-distro.json",
+      "sha256": "e5ffb5e56aa3cb1b4c76b95663d1829fb2dd264674a48cf260d2617490b9514d",
+      "bytes": 12630
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/document-retrieval.json",
+      "sha256": "d77ed5d78b508313a956d61516c5894e990de8c93c342eda3aed0d11dc56a80e",
+      "bytes": 14596
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/durable-memory.json",
+      "sha256": "f9191a5c6de8650f9b0ed67de1c1f05ebf3df80f72415ecba109d04dbf710d54",
+      "bytes": 22152
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/git-github-automation.json",
+      "sha256": "f3c22f87e68b10db4a1b1a503c578c7f5fc8c8e2a916b67750c129f32736257c",
+      "bytes": 16421
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/hosting-services.json",
+      "sha256": "882009d955e95b52440898fedb12e4c56e42c669d2ef76837a26ccac5d7cb843",
+      "bytes": 14599
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/instructions-skills.json",
+      "sha256": "5b47fb9733ea96f91add96a3757c1d501527f9e22907729891d05251b8c5f139",
+      "bytes": 18572
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/isolation.json",
+      "sha256": "16e565c2b5d526b18ebd53c4577f161c8635da8ec3f6e93007a74ee1a08b255b",
+      "bytes": 11549
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/mcp-surfaces.json",
+      "sha256": "f7a6b3195887e927345fb1b8f9d6f02ef1877799a2a2ce814339f14d6e771ade",
+      "bytes": 15143
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/native-clients.json",
+      "sha256": "47b18259891aea9d2a1757b08e9a0ff16261aade4a3f0780e7809ca591a44b3d",
+      "bytes": 11366
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/observation-inference.json",
+      "sha256": "9d4a649a39f6baf6bba26c7b161e1ef699400929a92174fc6728651db09e305f",
+      "bytes": 11582
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/quality-evaluation.json",
+      "sha256": "3166b3893f540cbc40d0139ddea27187b2311176eaf621b474882fb62841cc7a",
+      "bytes": 16330
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/recovery-portability.json",
+      "sha256": "1144d57a8801eba9894f391a590d45bf9a6044a30fdf3d899f3f52e343cb2ed1",
+      "bytes": 15342
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/scheduling-supervision.json",
+      "sha256": "24bebab03d57a2250ff0244c2949c9f21b8f6a64658e183794263c9e5b19a5ba",
+      "bytes": 20026
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/secrets-credentials.json",
+      "sha256": "704fecaf4572dc8ce22d477da217c1e0649a773903b31d794c551d726238964e",
+      "bytes": 11718
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/semantic-rag.json",
+      "sha256": "165739490b4052b8bfaed972c760f4b623f1878e0dcecb1b100d7221e5e3241b",
+      "bytes": 16344
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/token-efficiency.json",
+      "sha256": "d89e9c6a9851470be0f3cb19403ab8e7be2232be6ab03336cb0b9f423518bf19",
+      "bytes": 15400
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/web-research.json",
+      "sha256": "b789d5117c872cecb456d54710908a7f63fb46ccc32a68ae18e8c80eb4d4f986",
+      "bytes": 14721
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/workers.json",
+      "sha256": "af7166721da695c93feabf46158a5f377c6fb0ed3974d9b269f0b6a2628b1fbc",
+      "bytes": 16618
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
       "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
       "bytes": 6213
