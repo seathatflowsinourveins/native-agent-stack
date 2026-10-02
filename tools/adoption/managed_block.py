@@ -12,7 +12,8 @@ Supported blocks (the Linux full-profile flow uses claude-md and profile-path):
                 markers cost nothing.
   codex-md      $CODEX_HOME/AGENTS.md (else ~/.codex/AGENTS.md), replacing only the canonical Codex
                 user-instructions block. Does not run Codex, inspect configuration/authentication, or change
-                profiles/roles. A nonblank AGENTS.override.md shadows this file and is refused.
+                profiles/roles. A nonblank AGENTS.override.md shadows this file and is refused. `--template PATH`
+                reads another file of the same shape (one complete block) instead of the repository's template.
   decision-md   One bounded discovery/maintained-decision paragraph in an existing instruction source.
                 --client source --target PATH selects a generator's Markdown source; generated outputs are
                 refused. --dry-run previews the fragment and prints the target SHA-256; this mode never writes.
@@ -22,6 +23,8 @@ Supported blocks (the Linux full-profile flow uses claude-md and profile-path):
                 so `claude` in a login shell is the ecosystem launcher (adoption/bootstrap.md, step 2), between
                   # native-agent-stack:profile-path:begin (...)
                   # native-agent-stack:profile-path:end
+                `--extra-dir DIR` (repeatable, none by default) adds each DIR to PATH, behind the ecosystem's bin
+                directory, unless it is already on PATH.
 
 The merge is the one tools/adoption/apply_codex_lane.py applies to the Codex AGENTS.md block (block_span and
 with_block), with the markers as parameters: exactly one begin line and one end line, in that order, or neither; any
@@ -218,20 +221,37 @@ def sh_double_quoted(text: str) -> str:
     return re.sub(r'([\\"$`])', r"\\\1", text)
 
 
-def profile_block(eco_root: str, home: str) -> str:
-    root = os.path.normpath(eco_root)
+def shell_dir(path: str, home: str, what: str) -> str:
+    """path as the inside of a POSIX sh double-quoted string: under home it is written as $HOME/<relative>."""
+    normal = os.path.normpath(path)
     base = os.path.normpath(home)
-    if not os.path.isabs(root):
-        raise Refused(f"the ecosystem root must be an absolute path, got {eco_root!r}")
-    if any(ord(char) < 32 for char in root):
-        raise Refused("the ecosystem root holds a control character")
-    relative = os.path.relpath(root, base) if base != "/" else None
+    if not os.path.isabs(normal):
+        raise Refused(f"the {what} must be an absolute path, got {path!r}")
+    if any(ord(char) < 32 for char in normal):
+        raise Refused(f"the {what} holds a control character")
+    relative = os.path.relpath(normal, base) if base != "/" else None
     if relative is not None and relative != "." and not relative.startswith(".."):
-        directory = "$HOME/" + sh_double_quoted(relative) + "/bin"
-    else:
-        directory = sh_double_quoted(root.rstrip("/") + "/bin")
+        return "$HOME/" + sh_double_quoted(relative)
+    return sh_double_quoted(normal.rstrip("/"))
+
+
+def profile_block(eco_root: str, home: str, extra_dirs: tuple[str, ...] = ()) -> str:
+    directory = shell_dir(eco_root, home, "ecosystem root") + "/bin"
+    extras = ""
+    if extra_dirs:
+        # Each extra directory goes in front of the system path unless it is already on PATH, in reverse order so the
+        # first one named ends up next to the ecosystem directory, which is added last and stays first.
+        extras = ("# These directories are added when they are not on PATH yet: the native installers' bin directory "
+                  "and mise's shims.\n")
+        for extra in reversed(extra_dirs):
+            wanted = shell_dir(extra, home, "extra directory")
+            extras += ('case ":${PATH-}:" in\n'
+                       f'  *":{wanted}:"*) ;;\n'
+                       f'  *) PATH="{wanted}${{PATH:+:$PATH}}" ;;\n'
+                       "esac\n")
     return (f"{PROFILE_BEGIN_LINE}\n"
             "# The ecosystem's bin directory first on PATH, so `claude` in a login shell is its launcher.\n"
+            f"{extras}"
             'case ":${PATH-}:" in\n'
             f'  ":{directory}:"*) ;;\n'
             f'  *) PATH="{directory}${{PATH:+:$PATH}}" ;;\n'
@@ -240,8 +260,8 @@ def profile_block(eco_root: str, home: str) -> str:
             f"{PROFILE_END}\n")
 
 
-def merged_profile(current: str, eco_root: str, home: str) -> str:
-    return with_block(current, profile_block(eco_root, home), PROFILE_BEGIN, PROFILE_END)
+def merged_profile(current: str, eco_root: str, home: str, extra_dirs: tuple[str, ...] = ()) -> str:
+    return with_block(current, profile_block(eco_root, home, extra_dirs), PROFILE_BEGIN, PROFILE_END)
 
 
 def read_target(path: Path) -> tuple[str, int | None]:
@@ -304,6 +324,8 @@ def build_parser() -> argparse.ArgumentParser:
     claude.add_argument("--example", type=Path, default=CLAUDE_EXAMPLE, help="default: examples/claude-native/CLAUDE.md")
     codex = blocks.add_parser("codex-md", help="only the Codex user instructions block; no config/profile/role changes")
     codex.add_argument("--codex-home", type=Path, help="default: $CODEX_HOME, else <home>/.codex")
+    codex.add_argument("--template", type=Path, default=CODEX_TEMPLATE,
+                       help="default: adoption/templates/codex.AGENTS.template.md")
     decision = blocks.add_parser("decision-md", help="export or preview the routing paragraph; never write")
     decision.add_argument("--client", choices=("source", "claude", "codex"), default="source",
                           help="source requires --target; native clients use their normal instruction location")
@@ -313,6 +335,10 @@ def build_parser() -> argparse.ArgumentParser:
     profile = blocks.add_parser("profile-path", help="the PATH block in ~/.profile")
     profile.add_argument("--target", type=Path, help="default: <home>/.profile")
     profile.add_argument("--eco-root", required=True, help="the ecosystem root whose bin directory goes first")
+    profile.add_argument("--extra-dir", action="append", default=[], metavar="DIR",
+                         help="another absolute directory to put on PATH when it is not on it yet, behind the "
+                              "ecosystem's bin directory (repeatable; none by default). A host whose tools come from "
+                              "native installers and mise names ~/.local/bin and mise's shims directory here")
     return parser
 
 
@@ -356,10 +382,11 @@ def main(argv: list[str] | None = None) -> int:
             override, _ = read_target(codex_home / "AGENTS.override.md")
             if override.strip(adoption_status.RUST_WHITESPACE):
                 raise Refused("AGENTS.override.md has text and would shadow AGENTS.md; nothing written")
-            template = CODEX_TEMPLATE.read_text(encoding="utf-8")
+            template = args.template.read_text(encoding="utf-8")
             return apply(codex_home / "AGENTS.md", lambda text: merged_codex_md(text, template), dry_run=args.dry_run)
         target = args.target or Path(home) / ".profile"
-        return apply(target, lambda text: merged_profile(text, args.eco_root, home), dry_run=args.dry_run)
+        extra_dirs = tuple(args.extra_dir)
+        return apply(target, lambda text: merged_profile(text, args.eco_root, home, extra_dirs), dry_run=args.dry_run)
     except (Refused, file_io.ApplyError) as error:
         print(f"refused: {error}; nothing written", file=sys.stderr)
         return EXIT_REFUSED

@@ -525,8 +525,11 @@ The conditions that would overturn these decisions are in Overturn condition, it
    - `~/.bash_profile` gets the hand-off line of `adoption/platforms/linux-wsl2.md` (lines 185-188).
    - A clone of `origin/main`; `adoption/hosts/<host>.json` from the host template on ports 24318, 29374, 26333 and 28231,
      probed with `ss`.
-   - Native sign-in, then stage 2 with `--profile <id> --configure-full-profile --host <host>`. The brief's command lacked
-     `--profile`, which the script requires.
+   - Stage 2, changed 2026-10-02 (see "Stage 2 for the new distribution (2026-10-02)" below): the install plan's
+     `install.sh` and `accept.sh`, then the client-configuration tool's `--check` and `--apply --host <host>`, then the
+     native sign-ins by hand. Until then this step was the native sign-in followed by
+     `--profile <id> --configure-full-profile --host <host>`; the brief's command lacked `--profile`, which the script
+     requires.
    - The Windows Terminal fragment with profile names that carry `<Name>`, then `type -P claude codex`, with each printed
      path tested by `test -f` and `test -x`.
    - F11, after stage 2 and F10, in a login shell. `test -x` checks the `jcodemunch-mcp` binary in its own block. When
@@ -783,13 +786,15 @@ workstation distribution (Evidence classes).
 | F7 | sh | `git -C ~/code/native-agent-stack rev-parse HEAD` | a commit |
 | F7 | sh | `git -C ~/code/native-agent-stack ls-remote origin refs/heads/main` | the same commit |
 | F8 | sh | `cd ~/code/native-agent-stack` | the clone |
-| F8 | sh | `ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'` | no output |
+| F8 | sh | `ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'` | no output |
 | F8 | sh | `python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding="utf-8").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template "$(id -un)" > 'adoption/hosts/<host>.json'` | the host file written |
 | F8 | sh | `python3 -m json.tool 'adoption/hosts/<host>.json'` | the nine keys |
 | F8 | sh | `git check-ignore 'adoption/hosts/<host>.json'` | prints the path |
 | F9 | sh | `cd ~/code/native-agent-stack` | the clone |
-| F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>'` | stage 2 (bootstrap step 2) |
-| F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'` | stage 2, after native sign-in |
+| F9 | sh | `bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh` | the install plan's default run; exit 0 |
+| F9 | sh | `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh` | exit 0; a `skipped` line is not a pass |
+| F9 | sh | `python3 -B tools/adoption/new_wsl_client_config.py --check` | ends with `check passed` |
+| F9 | sh | `python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'` | ends with a `summary:` line in which no step is `failed`; no signed-in client is needed, so the native sign-ins follow |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two absolute paths |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'` | `executable:` and each path: both are regular executable files |
 | F11 | sh | `test -x "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | exit 0; exit 1 means `not installed`: record it and skip the rest of F11 |
@@ -1322,3 +1327,99 @@ remains as the command actually run then; it is not a command for the next run. 
 official image's files and the installed commands above are the sources for this bounded repair. The existing
 Python `unittest` harness tests repository contracts only; its controls do not qualify a host. The completeness
 check leaves the same decision-changing gaps: the corrected full run through F3, the rollback image and path B.
+
+## Stage 2 for the new distribution (2026-10-02)
+
+Added after `v2026.09.26.2`. The instructions of 2026-10-02 for the client-configuration work (three rounds, the repair
+after the cross-family review of the pull request, a repair after the first macOS run of its tests, and a last repair after an
+independent read) changed F8 and F9 of the recipe and the places that carried their old text, made `--apply` merge into the
+files the plan and the clients leave, made the authorization settings opt-in, and made F9 say, word for word, what the
+instruction blocks lose and what the line `--apply` prints about the authorization settings says. This section records what changed and why; it is not a host run, and no step below was run on the
+destination distribution. Earlier sections keep their dated text: the reading of
+`adoption/bootstrap-linux.sh` under "What stage 2 expects" and the ports that Decision 3 names describe the state of
+2026-10-01.
+
+What changed:
+
+1. **F9 is no longer the bootstrap's profile.** It runs the install plan's `install.sh` and `accept.sh`, then
+   `tools/adoption/new_wsl_client_config.py` with `--check` and `--apply --host '<host>'`, then the two native sign-ins by
+   hand, then the plan's after-sign-in checks one owner at a time (`accept.sh --only <slot> --stage after_sign_in`, for
+   `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `local-model-server`, `agent-runtime-worker` and
+   `research-harnesses`, the six owners whose plan row has that stage). Why: every profile of `adoption/manifest.json`
+   installs tools that the merged
+   [definitive manifest](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) does not
+   install, and wires the clients to them. The
+   [install plan](../../evidence/artifacts/new-wsl-install-plan-20261002/README.md) installs the 36 owners the manifest
+   does install, and the tool wires each client only to those
+   ([record](2026-10-02-new-wsl-client-configuration.md)).
+2. **The configuration comes before the sign-ins.** The guard hooks are then active in the first session a person
+   starts. (An earlier version of this item also gave `tools/adoption/codex_home.py`'s refusal to rewrite an existing
+   Codex `config.toml`, which a login or a first start can leave behind, as a reason. That was incomplete: the install
+   plan itself leaves one, because `codex plugin marketplace add trailofbits/skills --ref <commit>` writes a
+   `[marketplaces.trailofbits]` table, so the file exists before `--apply` in either order. Observed on the destination
+   after the plan and the sign-ins: 192 bytes, that table and a `[tui]` table. `--apply` therefore merges into an
+   existing `config.toml`; see the next item.) No step of `--apply` needs a signed-in client. Observed 2026-10-02 with the native
+   Claude Code 2.1.287 and a Codex 0.159.x binary against temporary homes that held no credential file: every step but
+   one applied and no credential file appeared. The exception, `codex-config`, was refused on the workstation because
+   other Codex processes run there, a guard of `codex_home.py` that belongs to this host and not to a sign-in. Its one
+   Codex call, `codex features disable daemon_auto_start` for an existing `config.toml`, was run with that guard's
+   process name pointed at nothing and exited 0 and wrote the key. On the destination that call is made once, because the
+   plan leaves a `config.toml` without the key; an empty Codex home starts Codex not at all, because the render carries
+   it.
+3. **`--apply` merges into the files that exist.** A `~/.codex/config.toml` that exists is merged, never rewritten: every
+   key and table it has stays as it is; each top-level key and each table the render has and it lacks is added; where a
+   table exists on both sides only the missing keys are added; a value that differs stays as the file has it, is printed
+   beside the render's, and the step ends `merged with conflicts kept` (exit 0). The file is backed up first, read back
+   with `tomllib` after the write, and put back from the backup when it is not the merge; `features.daemon_auto_start`
+   goes through Codex's own writer, as `codex_home.py` does; a running Codex stops either write of `config.toml`, the merge and the creation of an absent file, and the message says
+to close the sessions and run again; so does a `pgrep` that cannot run or exits with a status other than 0 or 1, because
+whether a Codex runs is then not known. `~/.claude/settings.json` keeps the keys it has (on the destination
+   `extraKnownMarketplaces` and `theme`); the template's values win except the theme, which stays as the file has it.
+4. **One port truth.** Observed 2026-10-02 in the first real run of the recipe: the template's ports 24318 and 26333 had
+   listeners on the workstation (its own collector and its Qdrant, in the shared network namespace), so F8's proof failed
+   and the page's fallback rule was used. The template's `OTEL_ENDPOINT` is now `127.0.0.1:21318`, the OTLP/HTTP port
+   of the plan's collector (`config/otel.yaml`), and `QDRANT_URL` is `127.0.0.1:21633`, a port no service of the plan uses.
+   F8's `ss` probe checks `21318`, `29374`, `21633` and `28231`, and its exclusion set gains `24318` and `26333`. The
+   tool takes the collector port from the plan, so the render and the host file agree.
+5. **The authorization settings are written only on request.** Claude Code's `permissions.defaultMode`
+   (`bypassPermissions`) and `skipDangerousModePermissionPrompt` and Codex's `approval_policy` (`never`) and `sandbox_mode`
+   (`danger-full-access`) grant permissions and suppress confirmations, so the plain `--apply` of F9 writes none of them and
+   leaves any value a file has; `--with-authorization-settings`, added to that line only on a host whose owner asked for the
+   repository's permission practice, adds the ones a file lacks and still keeps a differing value, printed beside the
+   render's. The receipt's `authorization_settings` records who asked. The cross-family review of the pull request asked
+   for this; the first rounds had classed the four as practice.
+6. **F9's sentence about the instruction blocks.** It said every unit that names a tool the manifest does not install is
+   left out; the fourth round's repair said the filter goes by the names the map declares as not wired, which the
+   filter's own dropped list contradicts: the Promptfoo unit names no tool of any map entry (only the former default of
+   the manifest row `promptfoo`) and also names `skill-creator`, and it is left out of both blocks. F9 now says: a unit
+   is left out when it names a tool that is not wired, which is a name the map lists for an unwired piece or the former
+   default of a manifest row that installs nothing; a unit is not left out merely for naming a skill or timer that
+   neither lists, and whether those skills exist on the host is not established by this step.
+7. **F9 says what the line `--apply` prints about the authorization settings says.** It names every outcome of the line,
+   in the words the tool prints: a line before the summary that starts `authorization settings:` and says `left to the
+   clients' own defaults` when the option was not given and, when it was, `applied`, `partly applied`, `kept` or `not
+   applied` (`would be applied` or `would be partly applied` in a dry run), followed by what it added, kept, found
+   already the same and did not reach, a skipped step and a failed step told apart.
+8. **Four places that carried the old text.** F7's first sentence gave `--configure-full-profile`'s refusal of a checkout
+   that is not `origin/main` as the reason to clone `main`; it now says the plan and the tool are on `main`. The
+   placeholder table loses `<id>`, which only the bootstrap's `--profile` took. F11's opening no longer says stage 2 copies
+   the carrier blocks that name jCodeMunch tools. This record's command table, the receipt example's F8 and F9 rows and the
+   checklist's F9 line carry the new commands, and the two comparisons in `tests/test_wsl_new_distro_recipe.py` read F9
+   again, with a test that the template's collector port equals the plan's.
+
+Alternatives, each rejected against that evidence:
+
+- **Keep `--profile <id> --configure-full-profile`.** It installs and wires tools the manifest does not install; the
+  client-configuration record lists them.
+- **Sign in first, then configure.** The first session would start without the guard hooks. (The plan leaves a Codex
+  `config.toml` whichever order is run, so that file does not decide the order; the merge handles it.)
+- **Keep the template's ports and add 24318 and 26333 to the fallback rule.** The page would keep a port that fails on the
+  workstation the page is written for, and the collector port would differ from the plan's.
+
+Overturned when the plan and the tool run on the destination distribution and a step fails for a reason this section
+did not name (a client that needs a sign-in before `--apply`, or a listener on `21318` that is not the plan's collector),
+or when the manifest installs a tool whose pieces the map leaves out.
+
+Not established: any run of `install.sh`, `accept.sh` or `--apply` on the destination distribution; the after-sign-in
+checks of `agent-runtime-worker` and `research-harnesses` run upstream model examples (plan README, stage descriptions), and whether the two
+native sign-ins are enough for them was not read from their sources and not run.

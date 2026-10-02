@@ -67,6 +67,27 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   - no recipe command controls ``systemd-binfmt``: the restart that served WSL 2.7.x exits 1 on the adopted release, so a
     failed interop check after an unregister stops for review with two records after the check (a history sentence may
     still name the restart).
+- the stage-2 follow-up of 2026-10-02 (the client-configuration work, tools/adoption/new_wsl_client_config.py), bound to
+  the recipe, the record's command table, the checklist and the receipt example:
+  - F9 is one ``sh`` block, the install plan's ``install.sh`` and ``accept.sh``, then the tool's ``--check`` and
+    ``--apply``, and runs no profile of the bootstrap; the two native sign-ins are named after that block and the plan's
+    ``accept.sh --only <slot> --stage after_sign_in`` after them, for exactly the owners whose plan row has that stage;
+    the record's table and the receipt example carry the same five rows, and both comparisons read F9 like any other step;
+  - the host template's collector port is the install plan's OTLP/HTTP port (``config/otel.yaml``), its other ports are
+    neither the plan's nor the workstation's, and F8's exclusion set names the workstation's collector and Qdrant ports
+    (24318 and 26333, observed listening 2026-10-02);
+
+- the repair of 2026-10-02 after the cross-family review of the client-configuration pull request, bound to the recipe, the
+  checklist and the receipt example:
+  - the command block of F9 keeps the plain ``--apply``; the authorization settings (the ones that grant a permission or
+    suppress a confirmation) are written only with ``--with-authorization-settings``, which F9 names in prose, for a host
+    whose owner asked for the repository's permission practice, and the receipt's ``authorization_settings`` records who
+    asked;
+  - F9 says that a unit of the instruction blocks is left out when it names a tool that is not wired (a name the map lists
+    for an unwired piece, or the former default of a manifest row that installs nothing), that a unit is not left out merely
+    for naming a skill or timer that neither lists, and that this step does not establish those skills;
+  - F9 says what the line ``--apply`` prints about the authorization settings says: every outcome, in the words the tool
+    prints;
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -186,15 +207,56 @@ UNIT_CONTROL_RE = re.compile(r"\bsystemctl\b.*\b(?:restart|try-restart|reload-or
 USER_SESSION_WARNING = "wsl: Failed to start the systemd user session"
 # Loopback ports the workstation distribution already uses: the four in adoption/hosts/example.json, the gateway,
 # memory and the 2026-09-25 relocations named in adoption/platforms/linux-wsl2.md ("Listeners and ports"), and every
-# 127.0.0.1 port in observability/backends/templates and configure.py. The recipe lists the same set (F8).
+# 127.0.0.1 port in observability/backends/templates and configure.py. The recipe lists the same set (F8). 24318 and
+# 26333 are the workstation's own collector and Qdrant after their 2026-09-25 relocation, observed listening on
+# 2026-10-02 in the first real run of F8.
 WORKSTATION_PORTS = frozenset({3710, 3800, 8231, 13000, 13100, 14318, 14333, 16333, 18080, 18231, 18525, 18888,
-                               18889, 19090, 19093, 20128, 20129, 31415, 49374, 49474})
+                               18889, 19090, 19093, 20128, 20129, 24318, 26333, 31415, 49374, 49474})
 URL_KEYS = ("OTEL_ENDPOINT", "AI_MEMORY_URL", "QDRANT_URL", "EMBED_URL")
 SHELLS = ("powershell", "sh")
 # F11: the code block right after this lead in adoption/bootstrap.md (step 4a) is the per-project registration.
 JCODEMUNCH_LEAD = "**jCodeMunch, per project.**"
 JCODEMUNCH_OUTCOMES = ("registered", "not installed", "skipped")
 CLONE = "cd ~/code/native-agent-stack"
+# F9 (2026-10-02, tools/adoption/new_wsl_client_config.py): stage 2 is the install plan, the client-configuration tool's
+# check and apply, the native sign-ins by hand and the plan's after-sign-in checks, not the bootstrap's profile. The
+# record's command table and the receipt example carry the same five rows, and f9_errors pins the block and its prose.
+F9_PLAN = "evidence/artifacts/new-wsl-install-plan-20261002"
+PLAN_DIR = ROOT / F9_PLAN
+F9_COMMANDS = [
+    CLONE,
+    f"bash {F9_PLAN}/install.sh",
+    f"bash {F9_PLAN}/accept.sh",
+    "python3 -B tools/adoption/new_wsl_client_config.py --check",
+    "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
+]
+F9_SIGN_IN = "After the `--apply` line, run `codex login`, then `claude`, by hand"
+F9_AFTER_SIGN_IN = "accept.sh --only <slot> --stage after_sign_in"
+# The repair of 2026-10-02: the plain --apply writes no authorization setting, the option is prose, and F9's sentence about
+# the instruction blocks says what the filter does (it goes by the names the map lists for unwired pieces and the former
+# defaults of the manifest rows that install nothing) and what it does not establish. The same words stand in the decision
+# records, and tests/test_new_wsl_client_config.py holds them against the tool's own dropped list and printed line.
+AUTHORIZATION_OPTION = "--with-authorization-settings"
+F9_AUTHORIZATION_PHRASES = (
+    "writes none of the authorization settings",
+    "`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice",
+    "the receipt's `authorization_settings` records who asked",
+    "F9's `authorization_settings`",
+)
+F9_BLOCKS_SENTENCE = ("a unit is left out when it names a tool that is not wired, which is a name the map lists for an "
+                      "unwired piece or the former default of a manifest row that installs nothing; a unit is not left out "
+                      "merely for naming a skill or timer that neither lists, and whether those skills exist on the host is "
+                      "not established by this step")
+F9_OLD_BLOCKS_CLAIM = "every unit that names a tool the manifest does not install left out"
+# The fourth round's wording, which the dropped list contradicts: the Promptfoo unit names no tool of any map entry (it is the
+# former default of the manifest row `promptfoo`) and names `skill-creator`, and it is left out of both blocks.
+F9_PREVIOUS_BLOCKS_CLAIM = "every unit that names a tool the map declares as not wired left out"
+# What F9 says of the line that --apply prints about the authorization settings: every outcome, as the tool prints it.
+AUTHORIZATION_LINE_SENTENCE = ("a line before the summary that starts `authorization settings:` and says `left to the "
+                               "clients' own defaults` when the option was not given and, when it was, `applied`, `partly "
+                               "applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry "
+                               "run), followed by what it added, kept, found already the same and did not reach, a skipped "
+                               "step and a failed step told apart")
 CLAUDE_MCP_PAGE = "https://code.claude.com/docs/en/mcp"
 # F5: Docker says 65,536 entries suffice for most images and names the error an image that needs more produces.
 DOCKER_TROUBLESHOOT = "https://docs.docker.com/engine/security/rootless/troubleshoot/"
@@ -338,7 +400,8 @@ def command_table(text: str) -> list[tuple[str, str, str]]:
 
 def command_table_errors(recipe: str, record: str) -> list[str]:
     """The table lists each recipe command line once per occurrence, under its step and shell, and nothing else."""
-    commands, table = Counter(recipe_rows(recipe)), Counter(command_table(record))
+    commands = Counter(recipe_rows(recipe))
+    table = Counter(command_table(record))
     errors = [] if commands else ["the recipe has no powershell or sh command"]
     errors += [f"recipe command missing from the record's command table: {step} {shell}: {command}"
                for (step, shell, command), count in sorted((commands - table).items()) for _ in range(count)]
@@ -379,8 +442,38 @@ def user_data_errors(template: str, user: str = "example") -> list[str]:
     return errors
 
 
+def plan_rows() -> list[dict]:
+    """The install plan's owner rows (evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json)."""
+    return json.loads(read(PLAN_DIR / "install-plan.json"))["owners"]
+
+
+def plan_after_sign_in_slots() -> list[str]:
+    """The slots of the installed rows whose acceptance has an ``after_sign_in`` stage, in the plan's order."""
+    return [row["slot"] for row in plan_rows() if row.get("installed") and "after_sign_in" in (row.get("acceptance") or {})]
+
+
+def plan_collector_ports() -> tuple[int, int]:
+    """(OTLP/gRPC port, OTLP/HTTP port) of the install plan's collector, read from the plan's config/otel.yaml and not
+    from the tool that renders from it."""
+    match = re.search(r"protocols:\s*\n\s*grpc:\s*\n\s*endpoint:\s*127\.0\.0\.1:(\d+)\s*\n\s*http:\s*\n"
+                      r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", read(PLAN_DIR / "config/otel.yaml"))
+    if match is None:
+        raise AssertionError("the install plan's config/otel.yaml has no OTLP grpc and http endpoints")
+    return int(match.group(1)), int(match.group(2))
+
+
+def plan_loopback_ports() -> set[int]:
+    """Every loopback port the install plan's services (their ``service.port``) and configuration files use."""
+    ports = {int(row["service"]["port"]) for row in plan_rows()
+             if isinstance(row.get("service"), dict) and row["service"].get("port") is not None}
+    for config in sorted((PLAN_DIR / "config").iterdir()):
+        ports.update(int(port) for port in re.findall(r"127\.0\.0\.1:(\d+)", read(config)))
+    return ports | set(plan_collector_ports())
+
+
 def host_template_errors(template: str, example: dict, recipe: str, user: str = "example") -> list[str]:
     errors = []
+    collector, plan_used = plan_collector_ports()[1], plan_loopback_ports()
     if "$" in template.replace(PLACEHOLDER, ""):
         errors.append("the host template has a $ other than ${WSL_USER}")
     try:
@@ -399,6 +492,11 @@ def host_template_errors(template: str, example: dict, recipe: str, user: str = 
         ports.append(port)
         if port in WORKSTATION_PORTS:
             errors.append(f"{key} uses {port}, a port the workstation distribution holds in the shared namespace")
+        if key == "OTEL_ENDPOINT" and port != collector:
+            errors.append(f"OTEL_ENDPOINT uses {port}; the install plan's collector listens on {collector} (OTLP/HTTP), "
+                          "the port the client-configuration tool renders into both clients")
+        elif key != "OTEL_ENDPOINT" and port in plan_used:
+            errors.append(f"{key} uses {port}, a port the install plan's services use")
     if len(set(ports)) != len(ports):
         errors.append("two services share a port")
     for key in ("HOME", "ECO_ROOT", "PROJECT_ROOT", "CODE_INDEX_PATH"):
@@ -649,6 +747,78 @@ def powershell_quote_errors(recipe: str) -> list[str]:
     return errors
 
 
+def f9_errors(recipe: str) -> list[str]:
+    """F9 is one sh block of exactly F9_COMMANDS and runs no profile of the bootstrap. The two native sign-ins come after
+    the block's last line (the tool's --apply needs no signed-in client, and the configuration must exist before a first
+    start leaves a config.toml behind), then the plan's after-sign-in check, for exactly the owners whose plan row has that
+    stage. The sign-in and the checks are prose, not comments in the block: a `#` line inside a fence starts a new unit for
+    tests/test_adoption_docs_consistency.py."""
+    errors = []
+    blocks = step_blocks(recipe, "F9")
+    if blocks != [F9_COMMANDS]:
+        errors.append(f"F9 must hold one command block of exactly {F9_COMMANDS}, not {blocks}")
+    text = section(recipe, "F9")
+    if "--configure-full-profile" in "\n".join(command for block in blocks for command in block) or any(
+            command.startswith("adoption/bootstrap-linux.sh") for block in blocks for command in block):
+        errors.append("F9 runs the bootstrap's profile, which installs and wires tools the manifest does not install")
+    fences = [match["lang"] for match in FENCE_RE.finditer(text)]
+    if fences != ["sh"]:
+        errors.append(f"F9 must hold exactly one fenced block, an sh block, not {fences}")
+    if "<id>" in text:
+        errors.append("F9 names an <id> placeholder, which only the bootstrap's --profile took")
+    fence = FENCE_RE.search(text)
+    before = " ".join(text[:fence.start()].split()) if fence else ""
+    after = " ".join(text[fence.end():].split()) if fence else " ".join(text.split())
+    if "run `codex login`" in before or F9_SIGN_IN not in after:
+        errors.append("F9 does not say, after the block, to sign in by hand: `codex login`, then `claude`")
+    elif F9_AFTER_SIGN_IN not in after or after.index(F9_AFTER_SIGN_IN) < after.index(F9_SIGN_IN):
+        errors.append("F9 does not give the plan's after-sign-in check after the sign-in sentence")
+    slots = {row["slot"] for row in plan_rows()}
+    named = {token for token in re.findall(r"`([^`]+)`", after) if token in slots}
+    owners = set(plan_after_sign_in_slots())
+    if named != owners:
+        errors.append(f"F9 names the owners {sorted(named)} for the after-sign-in checks; the plan's rows with that stage "
+                      f"are {sorted(owners)}")
+    return errors
+
+
+def reword(page: str, phrase: str, new: str) -> str:
+    """The page with `phrase` replaced once, found by its words whatever the line breaks, so that the page stays wrapped
+    and its sections still parse (a page joined into one line has no F9 section: every phrase would then read as missing,
+    and a mutant would fail for that reason and not for its own)."""
+    pattern = r"\s+".join(re.escape(word) for word in phrase.split())
+    changed, count = re.subn(pattern, lambda match: new, page, count=1)
+    assert count == 1, phrase
+    return changed
+
+
+def authorization_errors(recipe: str, checklist: str, receipt: dict) -> list[str]:
+    """The plain `--apply` of F9 writes none of the authorization settings. The option that writes the missing ones is named in
+    F9's prose, for a host whose owner asked for the repository's permission practice, and never in the command block; the
+    receipt records who asked; and F9 says what the filter of the instruction blocks does and does not establish."""
+    errors = []
+    text = " ".join(section(recipe, "F9").split())
+    whole = " ".join(recipe.split())
+    for phrase in F9_AUTHORIZATION_PHRASES[:3] + (F9_BLOCKS_SENTENCE, AUTHORIZATION_LINE_SENTENCE):
+        if phrase not in text:
+            errors.append(f"F9 lacks: {phrase}")
+    if F9_AUTHORIZATION_PHRASES[3] not in whole:
+        errors.append("the receipt contents list does not name F9's authorization_settings")
+    for claim in (F9_OLD_BLOCKS_CLAIM, F9_PREVIOUS_BLOCKS_CLAIM):
+        if claim in text:
+            errors.append(f"F9 still says {claim!r}; the filter goes by the names the map lists for unwired pieces and by "
+                          "the former defaults of the manifest rows that install nothing")
+    if any(AUTHORIZATION_OPTION in command for block in step_blocks(recipe, "F9") for command in block):
+        errors.append(f"the F9 command block carries {AUTHORIZATION_OPTION}; the operator adds it, the page does not")
+    line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **F9**")), "")
+    if AUTHORIZATION_OPTION not in line or "authorization_settings" not in line:
+        errors.append("the checklist's F9 line does not name the option and the receipt's authorization_settings")
+    field = receipt.get("authorization_settings") if isinstance(receipt, dict) else None
+    if not isinstance(field, str) or not field.startswith("<F9:") or f"who asked for {AUTHORIZATION_OPTION}" not in field:
+        errors.append("the receipt example has no authorization_settings field that records who asked for the option")
+    return errors
+
+
 def step_blocks(recipe: str, step: str) -> list[list[str]]:
     """The command lines of each ``powershell`` or ``sh`` code block of one recipe step, one list per block."""
     return [[command for _, command in fenced_commands(match.group(0))]
@@ -665,7 +835,9 @@ def bootstrap_registration(bootstrap: str) -> list[str]:
 def jcodemunch_errors(recipe: str, bootstrap: str, record: str, checklist: str, receipt: dict) -> list[str]:
     """F11. Four of the six SubagentStart carrier blocks name jCodeMunch tools. The user-scope MCP template leaves the
     server out, because it registers per project (the 2026-09-25 addendum of
-    docs/decisions/2026-09-23-claude-user-profile.md), and no script registers it. F11 runs bootstrap step 4a's own line
+    docs/decisions/2026-09-23-claude-user-profile.md), and no script registers it. Since 2026-10-02 F9 does not copy the
+    carrier blocks, so no session on the new distribution is told to use jCodeMunch; F11 stays as the way a host that
+    installs the binary registers it. F11 runs bootstrap step 4a's own line
     from the clone's root, where local scope is keyed (Claude Code's MCP page), after stage 2 and the PATH proof. It runs
     in a block after the binary test, because one block run as a script would register a missing binary. Every outcome
     is recorded."""
@@ -1128,6 +1300,55 @@ class HostTemplateTests(unittest.TestCase):
                 self.assertNotEqual(template + page, good + recipe)
                 self.assertTrue(host_template_errors(template, example, page))
 
+    def test_the_template_collector_port_is_the_install_plans_otlp_http_port(self):
+        grpc, http = plan_collector_ports()
+        # The plan states the collector's ports twice, in config/otel.yaml and in its inventory row; they agree.
+        stated = re.search(r"OTLP grpc/http endpoint=127\.0\.0\.1:(\d+)/(\d+)", next(
+            row for row in plan_rows() if row["slot"] == "otel-collector-contrib")["service"]["port_setting"])
+        self.assertEqual((grpc, http), tuple(int(port) for port in stated.groups()))
+        values = json.loads(string.Template(read(HOST_TEMPLATE)).substitute(WSL_USER="example"))
+        self.assertEqual(values["OTEL_ENDPOINT"], f"127.0.0.1:{http}")
+        # None of the template's other ports is one the plan's services or configuration files use.
+        others = {int(values[key].rsplit(":", 1)[1]) for key in URL_KEYS if key != "OTEL_ENDPOINT"}
+        self.assertEqual(others & plan_loopback_ports(), set())
+        self.assertEqual(others & WORKSTATION_PORTS, set())
+
+    def test_the_check_rejects_a_collector_port_that_is_not_the_plans_and_a_plan_port_elsewhere(self):
+        example, good, recipe = json.loads(read(HOST_EXAMPLE)), read(HOST_TEMPLATE), read(RECIPE)
+        grpc, http = plan_collector_ports()
+        other = next(port for port in range(21900, 21999) if port not in plan_loopback_ports()
+                     and port not in WORKSTATION_PORTS)
+        plan_port = next(int(row["service"]["port"]) for row in plan_rows() if row["slot"] == "local-model-server")
+        qdrant = int(re.search(r'"QDRANT_URL": "127\.0\.0\.1:(\d+)"', good).group(1))
+
+        def moved(key: str, old: int, new: int):
+            """The template and the recipe's probe both moved, so only the plan comparison can object."""
+            return (good.replace(f'"{key}": "127.0.0.1:{old}"', f'"{key}": "127.0.0.1:{new}"'),
+                    recipe.replace(f"sport = :{old}", f"sport = :{new}"))
+
+        mutants = {
+            "the workstation's collector port": moved("OTEL_ENDPOINT", http, 24318),
+            "a free port that is not the plan's": moved("OTEL_ENDPOINT", http, other),
+            "the plan's gRPC port": moved("OTEL_ENDPOINT", http, grpc),
+            "Qdrant on a port the plan's services use": moved("QDRANT_URL", qdrant, plan_port),
+            "the workstation's Qdrant port": moved("QDRANT_URL", qdrant, 26333),
+            "the relocated collector port not excluded": (good, recipe.replace("`24318`", "24318")),
+            "the relocated Qdrant port not excluded": (good, recipe.replace("`26333`", "26333")),
+        }
+        for name, (template, page) in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(template + page, good + recipe)
+                self.assertTrue(host_template_errors(template, example, page))
+        template, page = moved("OTEL_ENDPOINT", http, other)
+        self.assertTrue(any("install plan's collector" in error for error in host_template_errors(template, example, page)))
+        template, page = moved("QDRANT_URL", qdrant, plan_port)
+        self.assertTrue(any("install plan's services" in error for error in host_template_errors(template, example, page)))
+
+    def test_f8_gives_the_reason_for_excluding_the_workstations_collector_and_qdrant_ports(self):
+        text = " ".join(section(read(RECIPE), "F8").split())
+        for part in ("`24318` and `26333`", "collector", "Qdrant", "observed listening 2026-10-02"):
+            self.assertIn(part, text)
+
 
 class CommandTableTests(unittest.TestCase):
     def test_every_recipe_command_is_a_row_of_the_record_command_table(self):
@@ -1162,6 +1383,147 @@ class CommandTableTests(unittest.TestCase):
     def test_commands_are_read_from_indented_fences_with_continuations(self):
         text = "1. Step\n\n   ```sh\n   # comment\n   apt-get install \\\n     jq\n   ```\n\n```text\nnot a command\n```\n"
         self.assertEqual(fenced_commands(text), [("sh", "apt-get install jq")])
+
+
+class StageTwoTests(unittest.TestCase):
+    """F9 runs the install plan, the client-configuration tool's check and apply, then the native sign-ins by hand, then
+    the plan's after-sign-in checks."""
+
+    def test_f9_is_the_install_plan_the_tool_the_sign_ins_and_the_after_sign_in_checks(self):
+        self.assertEqual(f9_errors(read(RECIPE)), [])
+
+    def test_the_commands_name_files_that_exist(self):
+        for command in F9_COMMANDS[1:]:
+            path = re.search(r"(?:bash|python3 -B) (\S+)", command).group(1)
+            self.assertTrue((ROOT / path).is_file(), path)
+        self.assertEqual(sorted(path.name for path in PLAN_DIR.iterdir() if path.name.endswith(".sh")),
+                         ["accept.sh", "install.sh"])
+
+    def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
+        owners = plan_after_sign_in_slots()
+        self.assertEqual(owners, ["codex", "claude-agent-sdk", "codex-sdk-and-codex-exec-app-server",
+                                  "local-model-server", "agent-runtime-worker", "research-harnesses"])
+        script = read(PLAN_DIR / "accept.sh")
+        for part in ("--only)", "--stage)", "post_install|service_health|after_sign_in) ;;"):
+            self.assertIn(part, script)
+        accepted = re.search(r'case "\$only" in\n\s*(\S+?)\) ;;', script).group(1).split("|")
+        self.assertEqual([owner for owner in owners if owner not in accepted], [])
+
+    def test_the_check_rejects_the_old_commands_a_lost_step_a_wrong_order_and_a_second_block(self):
+        recipe = read(RECIPE)
+        block = "\n".join(F9_COMMANDS[1:3])
+        old = ("adoption/bootstrap-linux.sh --profile '<id>'\n"
+               "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'")
+        tool = "\n".join(F9_COMMANDS[3:])
+        self.assertIn(block, recipe)
+        sign_in_and_checks = re.search(r"(After the `--apply` line, run `codex login`.*?signed in\)\.)\s+"
+                                       r"(Then run the plan's\s+after-sign-in checks.*?has that stage\.)", recipe, re.S)
+        self.assertIsNotNone(sign_in_and_checks)
+        mutants = {
+            "the old bootstrap commands": recipe.replace(block, old),
+            "no acceptance script": recipe.replace(F9_COMMANDS[2] + "\n", ""),
+            "no check before the apply": recipe.replace(F9_COMMANDS[3] + "\n", ""),
+            "apply before check": recipe.replace(tool, "\n".join(reversed(F9_COMMANDS[3:]))),
+            "no sign-in sentence": recipe.replace(F9_SIGN_IN, "Sign in later"),
+            "the sign-in before the tool, the earlier order": recipe.replace(
+                F9_SIGN_IN, "After the `accept.sh` line and before the `--check` line, run `codex login`, then `claude`, by hand"),
+            "a sign-in sentence before the block": recipe.replace(
+                f"```sh\n{CLONE}\nbash {F9_PLAN}/install.sh", f"First run `codex login`.\n\n```sh\n{CLONE}\nbash {F9_PLAN}/install.sh"),
+            "no after-sign-in checks": recipe.replace("--stage after_sign_in", "--stage post_install"),
+            "the checks before the sign-in": recipe.replace(
+                sign_in_and_checks.group(0), sign_in_and_checks.group(2) + " " + sign_in_and_checks.group(1)),
+            "an owner lost": recipe.replace("`agent-runtime-worker` and ", ""),
+            "an owner without that stage": recipe.replace("`research-harnesses`", "`research-harnesses` and `claude-code`"),
+            "an id placeholder": recipe.replace("`--dry-run` shows", "`--dry-run` '<id>' shows"),
+            "a second block": recipe.replace("Proof: `accept.sh` exits 0", "```sh\necho again\n```\n\nProof: `accept.sh` exits 0"),
+            "the profile after the tool": recipe.replace(tool, tool + "\nadoption/bootstrap-linux.sh --configure-full-profile"),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(mutant, recipe)
+                self.assertTrue(f9_errors(mutant), name)
+
+    def test_f9_keeps_the_plain_apply_names_the_option_in_prose_and_the_receipt_records_who_asked(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        self.assertEqual(authorization_errors(recipe, checklist, receipt), [])
+        self.assertEqual(step_blocks(recipe, "F9"), [F9_COMMANDS])
+        self.assertEqual(F9_COMMANDS[-1], "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'")
+        without_field = {key: value for key, value in receipt.items() if key != "authorization_settings"}
+        mutants = {
+            "no sentence about what the plain apply writes": (
+                recipe.replace("writes none of the authorization settings", "writes the settings"), checklist, receipt),
+            "no condition on the owner's request": (
+                recipe.replace("only on a host whose owner asked for the repository's permission practice",
+                               "on any host"), checklist, receipt),
+            "no word that the receipt records who asked": (
+                re.sub(r"and the receipt's\s+`authorization_settings` records who asked", "", recipe), checklist, receipt),
+            "the option in the command block": (
+                recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION), checklist, receipt),
+            "the old claim about the instruction blocks": (
+                reword(recipe, F9_BLOCKS_SENTENCE, F9_OLD_BLOCKS_CLAIM), checklist, receipt),
+            "the fourth round's claim about the instruction blocks": (
+                reword(recipe, F9_BLOCKS_SENTENCE, F9_PREVIOUS_BLOCKS_CLAIM), checklist, receipt),
+            "no manifest row among the names that decide": (
+                reword(recipe, " or the former default of a manifest row that installs nothing", ""), checklist, receipt),
+            "a unit left out merely for naming a skill": (
+                reword(recipe, "a unit is not left out merely for naming a skill or timer that neither lists",
+                       "sentences that name skills or timers stay as written"), checklist, receipt),
+            "no sentence about the line --apply prints": (
+                reword(recipe, AUTHORIZATION_LINE_SENTENCE, "a line about the settings"), checklist, receipt),
+            "a line without the partial outcome": (reword(recipe, "`partly applied`, ", ""), checklist, receipt),
+            "no word that the skills are not established": (
+                re.sub(r"whether those skills exist on the host is not\s+established by this step",
+                       "those skills exist on the host", recipe), checklist, receipt),
+            "a receipt contents list without the field": (
+                recipe.replace("F9's `authorization_settings`", "F9's settings"), checklist, receipt),
+            "a checklist without the option": (recipe, checklist.replace(AUTHORIZATION_OPTION, "--x"), receipt),
+            "a receipt without the field": (recipe, checklist, without_field),
+            "a receipt field that does not say who asked": (
+                recipe, checklist, dict(receipt, authorization_settings="<F9: none>")),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                # A mutant must differ from the page in what is read, and must still be a page whose F9 section parses:
+                # an unparsable page would fail every check for that reason alone.
+                self.assertNotEqual((" ".join(mutant[0].split()), *mutant[1:]), (" ".join(recipe.split()), checklist, receipt))
+                self.assertTrue(section(mutant[0], "F9").strip(), name)
+                self.assertTrue(authorization_errors(*mutant), name)
+        # The command block is also pinned by f9_errors, so the option in it fails there too.
+        self.assertTrue(f9_errors(recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION)))
+
+    def test_the_record_and_the_receipt_example_carry_the_f9_rows_and_both_comparisons_read_them(self):
+        recipe, record = read(RECIPE), read(RECORD)
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        components = {component["id"] for component in json.loads(read(STACK))["components"]}
+        self.assertEqual([command for step, _, command in command_table(record) if step == "F9"], F9_COMMANDS)
+        self.assertEqual([entry["cmd"] for entry in receipt["steps"] if entry["step"] == "F9"], F9_COMMANDS)
+        self.assertEqual(command_table_errors(recipe, record), [])
+        self.assertEqual(receipt_errors(receipt, recipe, components), [])
+        # F9 is compared like any other step: a lost row, a changed command and a stale old row each fail.
+        check = F9_COMMANDS[3]
+        row = next(line for line in record.splitlines() if line.startswith(f"| F9 | sh | `{check}` |"))
+        stale = "| F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>'` | stage 2 (bootstrap step 2) |"
+        for name, mutant in {"a lost row": record.replace(row + "\n", ""),
+                             "a changed command": record.replace(row, row.replace(check, check + " --skip verify")),
+                             "a stale old row": record.replace(row + "\n", row + "\n" + stale + "\n")}.items():
+            with self.subTest(record=name):
+                self.assertNotEqual(mutant, record)
+                self.assertTrue(command_table_errors(recipe, mutant))
+        apply = F9_COMMANDS[4]
+        entry_mutants = {
+            "a lost entry": [e for e in receipt["steps"] if not (e["step"] == "F9" and e["cmd"] == check)],
+            "a changed command": [dict(e, cmd=e["cmd"] + " --skip verify") if e["step"] == "F9" and e["cmd"] == apply else e
+                                  for e in receipt["steps"]],
+            "a stale old entry": [*receipt["steps"], {"step": "F9", "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+                                                      "exit": "<exit code>", "output_excerpt": "<sanitized output>"}],
+        }
+        for name, entries in entry_mutants.items():
+            with self.subTest(receipt=name):
+                self.assertTrue(receipt_errors(dict(receipt, steps=entries), recipe, components))
+        # Another step still fails both comparisons, as before.
+        step, shell, command = next(row for row in recipe_rows(recipe) if row[0] == "F8")
+        self.assertTrue(command_table_errors(recipe.replace(command, command + " # changed"), record))
 
 
 class ImageHashTests(unittest.TestCase):
