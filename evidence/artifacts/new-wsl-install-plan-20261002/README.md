@@ -1,32 +1,47 @@
 # New WSL install plan
-Source-only plan for a clean Ubuntu 26.04.1 WSL 2 distribution with systemd, one non-root user, passwordless sudo, and existing RTX 4090 passthrough. **Every install, service-start, and acceptance command is UNRUN.** No installer or model/GPU check was executed.
-The input selects 46 of 53 owners. All seven exclusions retain their original reason and have no command.
-Route counts (selected owners): native-installer 4; none 6; npm-global 7; uv-tool 5; release-binary 4; compose 2; mise 10; github-action 4; apt-repo 2; repository-recipe 2. Including exclusions: none 13; other counts unchanged.
-Acceptance counts (selected owners): smoke 25; health 7; version only 8; unavailable 6. Seven excluded owners have no check.
-`install-plan.json` holds sources, pins, dependencies, configuration, and commands. `mise.toml` declares the global tool set plus Node 24.21.0, Python 3.13.16, and uv 0.12.22.
-`install.sh --list`, `install.sh --only <slot>`, and `accept.sh --only <slot>` are **UNRUN** usage forms. Scripts refuse root. Both research tools share `research-harnesses`; selecting that slot retains both.
-The installer orders system packages, mise/runtimes, user CLIs, rootless Docker/Compose, then services. Owner functions isolate failures; existing configuration is retained. No default-shell or Windows-side change is prescribed.
-Only the upstream Dagu user-service installer and Phoenix Compose start services during a future install. Other foreground/daemon starts are separate in SOURCES.md; their health checks require a running service.
-Docker requires uidmap/dbus-user-session and its upstream user unit. Exact 29.8.2/5.5.1 apt revisions are selected from repository metadata at execution; missing versions fail rather than silently upgrade. User-session startup is distinct from boot lingering.
-SDK/research examples require native/provider configuration and can make model calls; Ollama's smoke downloads a model. These are planned checks, not installation acceptance already obtained.
-## Gaps
-Git documents source building, outside the permitted route enum; its owner has no install command. The system prerequisite Git is Ubuntu-managed.
-The enum lacks library/venv, local npm, and marketplace labels. Claude Agent SDK, Codex SDK, OpenHands, GPT Researcher, and Trail of Bits use `none` with accurate commands and explicit classification notes.
-Trail of Bits registers both pinned marketplaces; individual security plugin names were not selected, so registration does not claim every skill installed.
-No host check exists here for attest, Dependabot, CodeQL SARIF, Claude Code Action, Git, or credential guard. `accept.sh` reports unavailable/77 and fails instead of inventing a pass. Repository recipes remain manual adoption pointers.
-Dependabot Core has no action entrypoint, so there is no valid `uses:` reference; its tag SHA is provenance. CodeQL uses `upload-sarif` because its root action deliberately fails.
-Upstream checks limited here to a version: Inspect AI; Harbor (containerized agent E2E runner); Promptfoo; actionlint (kjanat); Docker Compose; gh (GitHub CLI); difftastic; Restic.
-Systemd user units are documented for Docker and Dagu only. OTel, Prometheus, Loki, Grafana, Ollama, OmniRoute, and Phoenix have the recorded service-form limitation; no new unit was invented.
-Prometheus documents a release download in prose and quotes tar extraction; its HTTPS/checksum transport helper is separately sourced, not claimed as a Prometheus quotation.
-## Route choices
-Claude/Codex use native self-updating installers over npm; their reviewed releases are not runtime locks.
-mise replaces system packages, alternate managers, and ad-hoc binaries where the registry supports the exact owner. Chez­moi/restic document mise; zizmor has Homebrew/PyPI alternatives. Dagu's first user-level installer wins over mise.
-actionlint uses the documented `github:kjanat/actionlint` backend; the short registry name selects rhysd. Docker/Compose use the required official apt/rootless special case rather than mise.
-Python CLIs documented with pip (Trafilatura/Inspect) use uv's documented isolated-tool command forms. Python libraries use dedicated uv environments; Codex SDK stays a local npm library.
-GPT Researcher uses tagged source requirements because v3.7.0 declares package 0.16.0. DeerFlow uses noninteractive config/Compose preparation and Compose readiness instead of interactive `make setup` or host-only `make doctor`; model configuration remains native.
-Phoenix uses documented Compose because native gRPC binds a wildcard even when its HTTP host is loopback. Only loopback HTTP/gRPC ports are published. Other auxiliary ports and settings are recorded in JSON/SOURCES.md.
-MinerU's sample Python 3.12 becomes 3.13 within its documented supported range. Playwright's browser installation matches the CLI's pinned Playwright dependency; runtime WSL/browser compatibility is unrun.
-## Review
-Static/source check results are recorded in `validation.json`; none is a new installed-client, provider, GPU, or service acceptance run. SOURCES.md records quotations, adaptations, corrections, and the completeness critic.
-Commit is blocked in this session: shared Git worktree metadata is read-only; staging failed with exit128. No commit hash exists for this plan.
-UNRUN commit commands: `git add evidence/artifacts/new-wsl-install-plan-20261002 manifests/evidence.json`, then `git commit -m "New WSL install plan: one upstream install and acceptance command per owner (source-only, unrun)"`.
+
+Revised after the coordinator's first run of 34 user-level slots in a disposable Ubuntu 26.04.1 container. Sixteen passed installation and acceptance; eighteen failed installation or acceptance. [VALIDATION.md](VALIDATION.md) classifies the failures with log locations and records the repairs. The revised installation and native acceptance commands have not been rerun on the target distribution. Local JSON, shell syntax, inventory and stage-dispatch checks are separate evidence.
+
+The target remains a clean Ubuntu 26.04.1 WSL 2 distribution with systemd, one non-root user, passwordless sudo and existing RTX 4090 passthrough. The inventory retains all 53 owner rows: 46 selected and seven exclusions with their original reasons. GPT Researcher and DeerFlow share the `research-harnesses` slot and retain independent checks.
+
+## Installation and acceptance
+
+```sh
+bash install.sh --list
+bash install.sh --only <slot>
+bash accept.sh --only <slot>
+bash accept.sh --only <slot> --stage service_health
+bash accept.sh --only <slot> --stage after_sign_in
+```
+
+Both scripts refuse root. Installation selects dependencies, isolates owner failures and retains existing operator configuration. No default-shell or Windows-side change is prescribed. `--list` is read-only and still lists every owner, including exclusions and both research owners.
+
+`install-plan.json` schema version 2 stores acceptance as an object with up to three stage keys. Each check retains `command`, `kind` and `source`:
+
+- `post_install` is the default. It checks the fresh installation with no stack service running and no sign-in. Prefer the documented local diagnostic/configuration validator; use a version command when no applicable self-test is documented.
+- `service_health` retains the readiness/runtime checks and runs after the corresponding service starts. It does not perform sign-in or configure a provider.
+- `after_sign_in` retains native-client diagnostics that need credentials and upstream model examples. Local Ollama also belongs here once its server and model route are provisioned; it needs no remote account.
+
+Output is `slot | stage | exit-code`. An excluded owner, absent stage or unavailable host check prints `slot | stage | skipped`; a skip does not certify acceptance and does not fail the script. A selected executable check failing with any nonzero status makes the script exit 1. Application stdout stays suppressed to avoid printing private diagnostic/model data; stderr and status are retained.
+
+All 46 selected rows have a `post_install` entry: 23 smoke/configuration checks, 18 version checks and five explicit unavailable checks. There are ten service checks and six checks after sign-in or model provisioning. The five unavailable entries have `command: null`, `kind: unavailable`, a cited source and a reason. They are workflow/adoption pointers with no installed host executable: attest, Dependabot, CodeQL SARIF, Claude Code Action and credential guard. No passing host check was invented for them.
+
+Version-only post-install checks: Codex; Claude Agent SDK; Codex SDK; Grafana; Ollama; Inspect AI; Harbor; Promptfoo; actionlint (kjanat); Dagu; Docker Compose; Docker Engine; Git; gh; difftastic; Restic; OpenHands SDK/tools; GPT Researcher. SDK checks report package versions. GPT Researcher imports the source checkout and reports its declared package version, because this route installs requirements rather than distribution metadata. Compose checks for Phoenix and DeerFlow validate configuration preparation only; they do not prove image availability or application readiness.
+
+## Routes and lifecycle
+
+Ubuntu's own `apt` package is Git's route. The base image/prerequisite installation already supplies it; rerunning this owner is idempotent. The Ubuntu candidate is not pinned to upstream Git v2.56.0. There is no PPA or source build.
+
+Selected route counts: native-installer 4; none 5; npm-global 7; uv-tool 5; release-binary 4; compose 2; mise 10; github-action 4; apt-repo 2; apt 1; repository-recipe 2. Including exclusions adds seven to `none`. The enum still lacks precise library/venv, local npm and marketplace labels; existing classification notes remain.
+
+`mise.toml` retains the exact global tools and Node 24.21.0, Python 3.13.16 and uv 0.12.22 pins. `install.sh` merges them through `mise use -g`. Noninteractive diagnostics add mise shims to the process PATH without changing the shell. Doctor runs in the owned global tool directory so selecting only mise does not require the inventory's optional tools. Playwright's pinned CLI now installs its own bundled Chromium; the real browser open/close smoke explicitly selects that browser. OmniRoute service-health requires `/readyz` to succeed before its full doctor; doctor alone can warn about a stopped service and return zero.
+
+Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its upstream user unit. Exact Engine 29.8.2/Compose 5.5.1 apt revisions come from repository metadata; missing versions fail. Harbor's CLI installed in round 1; its overall installer failed later in Docker setup. Keep this prerequisite gate for the real distribution.
+
+Upstream Docker/Dagu user setup and Phoenix Compose can start services during installation. Other documented foreground/daemon starts are in [SOURCES.md](SOURCES.md#service-starts--separate-from-installation-all-unrun). Post-install checks do not require those services. Dagu's user-bus setup, rootless Docker, sandbox namespaces and Git worktree access still need real-distribution acceptance.
+
+GPT Researcher's example performs model/search research. DeerFlow's `make docker-init` prepares the development workflow and can tolerate a sandbox image pull failure. Its post-install check validates that development Compose configuration with `DEER_FLOW_ROOT`; the retained production readiness probe applies to the separately documented `make up` start. Image builds, app model configuration and readiness are distinct checks.
+
+Native self-updating Claude/Codex installers remain preferred over npm; reviewed releases are not runtime locks. Existing loopback service configuration, supported isolated Python environments, exact action references and excluded overlaps remain in the JSON and [SOURCES.md](SOURCES.md). No new user unit was invented. No credentials or provider values are filled in.
+
+The original [validation.json](validation.json) records the earlier source/static review. Round 1 results are historical container evidence; this revision does not claim a new provider, GPU, service or target-distribution run. The coordinator owns commits; this repair does not push or commit.

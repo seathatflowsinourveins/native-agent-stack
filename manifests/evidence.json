@@ -35775,6 +35775,86 @@
       "bytes": 10505
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "sha256": "71eb2ceeb05f11e403f33b5039fcd1962e18a2ad629212a07ef7ae28411faec6",
+      "bytes": 6673
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "7341cd9051203080333c974b81d3f1d04de4f4cdbe0cc627925f58ad7cf64283",
+      "bytes": 32758
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
+      "sha256": "1132e1b1d300a817a64f85f96f1e5d701756900fb5b2b0453102f343d9cf269e",
+      "bytes": 10854
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "5165a152b64a36b77ee8766dfc517c5bd70a876c1790acd075cdf1cf0cbee882",
+      "bytes": 32724
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
+      "sha256": "139c743c02b428653de39bfac449a9a0f4f02f786732891715838022b25f936d",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/loki.yaml",
+      "sha256": "151a56b093712f20ebd15329a8fa33678ca21fc36a7a8db46ed890a887032bb7",
+      "bytes": 1069
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
+      "sha256": "f5ee98e1470cc83e2c62b146ac72e851f2896038705149716ded1007a049893f",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute.env.example",
+      "sha256": "bbdb13b104e9337c30bf671a943e42439866dfe5dbbaa3390bd82347b80d7761",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
+      "sha256": "1bcdf496537bab925fd39b42fd5b2b8226e2d4fb4f95b3aaba1d52e23c3d731f",
+      "bytes": 1114
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/phoenix-compose.yaml",
+      "sha256": "1cbb55c045a0ddbb5f5bca8600090b73150c04ab39c34218b77ff515bee5a079",
+      "bytes": 356
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml",
+      "sha256": "1565e9df52167eb06e5b33a4d57bc45fa1f9d1bd87a1bc3c268f9a3d5f0e58c4",
+      "bytes": 321
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "c03f9799c7f2392165fa93064aec1f5043355993b873f5d24e7e76b7f711a003",
+      "bytes": 90524
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "1fb3b1341ae3a1f1e4ec90389260ceda67c54d23f960a0ad834f2c28b152d369",
+      "bytes": 38433
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
+      "sha256": "da1ab86ab31e888ae72e49d8ac072eb159e484894925edbde71658e508006586",
+      "bytes": 882
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "sha256": "f6261e49d0c8c21c377a80280812c71e42f2dcbb88f3a49b3ea15e4cda390e8b",
+      "bytes": 17547
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
+      "sha256": "3e45b756af99d7683eb329af5672d48b14c2cac35e058f1900a87d6c19532552",
+      "bytes": 13984
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
       "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
       "bytes": 6213

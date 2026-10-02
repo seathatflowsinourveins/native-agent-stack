@@ -1,7 +1,8 @@
 {
+  "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
   "base": "Ubuntu 26.04.1 WSL 2",
-  "status": "source-only, unrun",
+  "status": "revised after round1; revised target-distribution checks unrun",
   "owners": [
     {
       "layer": "native-clients",
@@ -30,17 +31,19 @@
       },
       "service": null,
       "acceptance": {
-        "command": "claude doctor",
-        "kind": "smoke",
-        "source": {
-          "url": "https://code.claude.com/docs/en/setup.md#L184",
-          "line": 184
+        "post_install": {
+          "command": "claude doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://code.claude.com/docs/en/setup.md#L184",
+            "line": 184
+          }
         }
       },
       "config_paths": [
         "$HOME/.claude/settings.json"
       ],
-      "notes": "UNRUN. Native installer self-updates; v2.1.287 is the reviewed release, not a runtime lock. Version check documented setup.md:174; doctor is read-only setup.md:187."
+      "notes": "Planned. Native installer self-updates; v2.1.287 is the reviewed release, not a runtime lock. Version check documented setup.md:174; doctor is read-only setup.md:187."
     },
     {
       "layer": "native-clients",
@@ -69,17 +72,27 @@
       },
       "service": null,
       "acceptance": {
-        "command": "codex doctor",
-        "kind": "smoke",
-        "source": {
-          "url": "https://developers.openai.com/codex/cli/reference.md#L176",
-          "line": 176
+        "post_install": {
+          "command": "codex --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/main.rs#L110",
+            "line": 110
+          }
+        },
+        "after_sign_in": {
+          "command": "codex doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/doctor.rs#L1287",
+            "line": 1287
+          }
         }
       },
       "config_paths": [
         "${CODEX_HOME:-$HOME/.codex}/config.toml"
       ],
-      "notes": "UNRUN. Native installer/self-update exception; rust-v0.160.0 reviewed, not locked. --version defined in pinned codex-rs/cli/src/main.rs:116; doctor at :186. Native account sign-in remains separate."
+      "notes": "Planned. Native installer/self-update exception; rust-v0.160.0 reviewed, not locked. --version defined in pinned codex-rs/cli/src/main.rs:116; doctor at :186. Native account sign-in remains separate. Doctor is valid but reports missing credentials as FAIL; retained after sign-in. Post-install verifies the executable version only."
     },
     {
       "layer": "agent-sdks",
@@ -108,17 +121,27 @@
       },
       "service": null,
       "acceptance": {
-        "command": "\"$tool_root/claude-agent-sdk/bin/python\" - <<'PY'\nimport anyio\nfrom claude_agent_sdk import query\n\nasync def main():\n    async for message in query(prompt=\"What is 2 + 2?\"):\n        print(message)\n\nanyio.run(main)\nPY",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md#L22",
-          "line": 22
+        "post_install": {
+          "command": "\"$tool_root/claude-agent-sdk/bin/python\" -c 'from claude_agent_sdk import __version__; print(__version__)'",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/src/claude_agent_sdk/__init__.py#L68",
+            "line": 68
+          }
+        },
+        "after_sign_in": {
+          "command": "\"$tool_root/claude-agent-sdk/bin/python\" - <<'PY'\nimport anyio\nfrom claude_agent_sdk import query\n\nasync def main():\n    async for message in query(prompt=\"What is 2 + 2?\"):\n        print(message)\n\nanyio.run(main)\nPY",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md#L22",
+            "line": 22
+          }
         }
       },
       "config_paths": [
         "$tool_root/claude-agent-sdk"
       ],
-      "notes": "UNRUN. Classification gap: permitted route enum has no Python library/venv label. Upstream pip install package pinned inside dedicated uv-managed virtual environment, NOT uv tool install (library has no CLI). Helpers only create isolated env. uv isolation source docs/pip/environments.md:21,27,100; documented example makes a real authenticated model call."
+      "notes": "Planned. Classification gap: permitted route enum has no Python library/venv label. Upstream pip install package pinned inside dedicated uv-managed virtual environment, NOT uv tool install (library has no CLI). Helpers only create isolated env. uv isolation source docs/pip/environments.md:21,27,100; documented example makes a real authenticated model call."
     },
     {
       "layer": "agent-sdks",
@@ -147,17 +170,27 @@
       },
       "service": null,
       "acceptance": {
-        "command": "cd \"$tool_root/codex-sdk\"\nnode --input-type=module - <<'JS'\nimport { Codex } from \"@openai/codex-sdk\";\n\nconst codex = new Codex();\nconst thread = codex.startThread({ skipGitRepoCheck: true });\nconst turn = await thread.run(\"Diagnose the test failure and propose a fix\");\n\nconsole.log(turn.finalResponse);\nconsole.log(turn.items);\nJS",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/sdk/typescript/README.md#L15",
-          "line": 15
+        "post_install": {
+          "command": "cd \"$tool_root/codex-sdk\"\nnpm ls --depth=0 @openai/codex-sdk",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/npm/cli/bfacd33ccbcd908480610703b60455d2da5b57a9/docs/lib/content/commands/npm-ls.md#L13",
+            "line": 13
+          }
+        },
+        "after_sign_in": {
+          "command": "cd \"$tool_root/codex-sdk\"\nnode --input-type=module - <<'JS'\nimport { Codex } from \"@openai/codex-sdk\";\n\nconst codex = new Codex();\nconst thread = codex.startThread({ skipGitRepoCheck: true });\nconst turn = await thread.run(\"Diagnose the test failure and propose a fix\");\n\nconsole.log(turn.finalResponse);\nconsole.log(turn.items);\nJS",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/sdk/typescript/README.md#L15",
+            "line": 15
+          }
         }
       },
       "config_paths": [
         "$tool_root/codex-sdk/package.json"
       ],
-      "notes": "UNRUN. Classification gap: no npm-local route in required enum. Install documented library locally, NOT globally. Published @openai/codex-sdk@0.160.0 verified in npm registry; tagged package.json is 0.0.0-dev. SDK example plus documented skipGitRepoCheck option (README:110) runs in isolated directory and makes authenticated model call. Native codex owns exec/app-server; no separate daemon starts."
+      "notes": "Planned. Classification gap: no npm-local route in required enum. Install documented library locally, NOT globally. Published @openai/codex-sdk@0.160.0 verified in npm registry; tagged package.json is 0.0.0-dev. SDK example plus documented skipGitRepoCheck option (README:110) runs in isolated directory and makes authenticated model call. Native codex owns exec/app-server; no separate daemon starts."
     },
     {
       "layer": "instructions-skills",
@@ -186,18 +219,20 @@
       },
       "service": null,
       "acceptance": {
-        "command": "claude plugin list && codex plugin list",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L28",
-          "line": 28
+        "post_install": {
+          "command": "claude plugin list && codex plugin list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L28",
+            "line": 28
+          }
         }
       },
       "config_paths": [
         "$HOME/.claude/plugins",
         "${CODEX_HOME:-$HOME/.codex}/plugins"
       ],
-      "notes": "UNRUN. Classification gap: permitted enum has no marketplace route. Both marketplace registrations are pinned. Trail README Claude slash command translated using official CLI reference:634,647 and v2.1.287 CHANGELOG:50; Codex --ref verified native help. Inventory only; individual plugin names not supplied, so do not install every marketplace plugin."
+      "notes": "Planned. Classification gap: permitted enum has no marketplace route. Both marketplace registrations are pinned. Trail README Claude slash command translated using official CLI reference:634,647 and v2.1.287 CHANGELOG:50; Codex --ref verified native help. Inventory only; individual plugin names not supplied, so do not install every marketplace plugin."
     },
     {
       "layer": "mcp-surfaces",
@@ -225,15 +260,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "mcporter list",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/docs/install.md#L52",
-          "line": 52
+        "post_install": {
+          "command": "mcporter list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/docs/install.md#L52",
+            "line": 52
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. First persistent user-level npm route (docs/install.md:23). Verify section:51-52 lists version and mcporter list; inventory smoke needs no network."
+      "notes": "Planned. First persistent user-level npm route (docs/install.md:23). Verify section:51-52 lists version and mcporter list; inventory smoke needs no network."
     },
     {
       "layer": "mcp-surfaces",
@@ -255,11 +292,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": "run on demand with npx; mcporter owns MCP calls from scripts"
     },
@@ -289,17 +322,19 @@
       },
       "service": null,
       "acceptance": {
-        "command": "srt echo \"hello world\"",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168",
-          "line": 168
+        "post_install": {
+          "command": "srt echo \"hello world\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168",
+            "line": 168
+          }
         }
       },
       "config_paths": [
         "$HOME/.srt-settings.json"
       ],
-      "notes": "UNRUN. README first npm route. Key-free documented sandbox smoke; Linux prerequisites bubblewrap, socat, ripgrep documented README:550-558. Optional seccomp helper prerequisites gcc/libseccomp-dev documented README:580; include them in system prerequisites."
+      "notes": "Planned. README first npm route. Key-free documented sandbox smoke; Linux prerequisites bubblewrap, socat, ripgrep documented README:550-558. Optional seccomp helper prerequisites gcc/libseccomp-dev documented README:580; include them in system prerequisites."
     },
     {
       "layer": "isolation",
@@ -321,11 +356,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": ""
     },
@@ -355,15 +386,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "serena init",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md#L237",
-          "line": 237
+        "post_install": {
+          "command": "serena init",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md#L237",
+            "line": 237
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. README verifies setup with serena init. Acceptance executes in its own empty working directory to avoid project mutation."
+      "notes": "Planned. README verifies setup with serena init. Acceptance executes in its own empty working directory to avoid project mutation."
     },
     {
       "layer": "code-navigation",
@@ -385,11 +418,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": "Serena owns symbol navigation in both clients"
     },
@@ -419,15 +448,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "qmd status",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671",
-          "line": 671
+        "post_install": {
+          "command": "qmd status",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671",
+            "line": 671
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Upstream first global npm route; Node >=22; status verifies grammars."
+      "notes": "Planned. Upstream first global npm route; Node >=22; status verifies grammars."
     },
     {
       "layer": "document-retrieval",
@@ -455,15 +486,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "mineru --help",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/opendatalab/mineru/mineru-4.0.10-released/README.md#L365",
-          "line": 365
+        "post_install": {
+          "command": "mineru --help",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/opendatalab/mineru/mineru-4.0.10-released/README.md#L365",
+            "line": 365
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Pin README's uv-tool version range. README:259 supports Python >=3.10,<3.15, so use architecture's Python 3.13 instead of sample 3.12. GPU passthrough pre-exists; no Windows/GPU driver installation. CLI help does not download models or qualify GPU inference."
+      "notes": "Planned. Pin README's uv-tool version range. README:259 supports Python >=3.10,<3.15, so use architecture's Python 3.13 instead of sample 3.12. GPU passthrough pre-exists; no Windows/GPU driver installation. CLI help does not download models or qualify GPU inference."
     },
     {
       "layer": "web-research",
@@ -491,15 +524,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "trafilatura -u \"https://github.blog/2019-03-29-leader-spotlight-erin-spiceland/\"",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/quickstart.rst#L102",
-          "line": 102
+        "post_install": {
+          "command": "trafilatura -u \"https://github.blog/2019-03-29-leader-spotlight-erin-spiceland/\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/quickstart.rst#L102",
+            "line": 102
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Upstream pip package/version route isolated with uv tool (astral-sh/uv 0.12.22 docs/guides/tools.md:172,207,275); pin rather than installing into OS Python. Smoke downloads public article."
+      "notes": "Planned. Upstream pip package/version route isolated with uv tool (astral-sh/uv 0.12.22 docs/guides/tools.md:172,207,275); pin rather than installing into OS Python. Smoke downloads public article."
     },
     {
       "layer": "web-research",
@@ -511,7 +546,7 @@
       "route": "npm-global",
       "commands": [
         "npm install -g @playwright/cli@0.1.22",
-        "npx --yes playwright@1.64.0-alpha-1790635538000 install --with-deps chromium"
+        "playwright-cli install-browser --with-deps chromium"
       ],
       "needs": {
         "sudo": true,
@@ -528,15 +563,23 @@
       },
       "service": null,
       "acceptance": {
-        "command": "playwright-cli open https://playwright.dev && playwright-cli close",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L85",
-          "line": 85
+        "post_install": {
+          "command": "playwright-cli open https://playwright.dev --browser=chromium && playwright-cli close",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/mcp/config.ts#L285",
+            "line": 285
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Upstream first global npm route; Node >=18. Browser/system dependencies required; acceptance requires network and a usable browser. Headless is default at README:69. Browser install adapts microsoft/playwright b630e71fcda7885885c459bcbb88e5bfa7c0a1ac docs/src/browsers.md:122 to CLI's package.json:25 dependency pin; close documented README:316. Ubuntu 26.04 native browser dependency support remains unrun."
+      "notes": "Planned. Upstream first global npm route; Node >=18. Browser/system dependencies required; acceptance requires network and a usable browser. Headless is default at README:69. Browser install adapts microsoft/playwright b630e71fcda7885885c459bcbb88e5bfa7c0a1ac docs/src/browsers.md:122 to CLI's package.json:25 dependency pin; close documented README:316. Ubuntu 26.04 native browser dependency support remains unrun. Round1 installed the correctly pinned bundled Chromium, while the unspecified browser selected system Chrome. Use the installed CLI's bundled browser installer and explicitly select chromium; retain the real open/close smoke.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346",
+          "line": 346
+        }
+      ]
     },
     {
       "layer": "token-efficiency",
@@ -564,15 +607,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "ccusage daily",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/docs/guide/installation.md#L144",
-          "line": 144
+        "post_install": {
+          "command": "ccusage daily",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/docs/guide/installation.md#L144",
+            "line": 144
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Choose documented persistent npm route; bunx/npx are ephemeral execution routes. Daily-report smoke requires native client usage data."
+      "notes": "Planned. Choose documented persistent npm route; bunx/npx are ephemeral execution routes. Daily-report smoke requires native client usage data."
     },
     {
       "layer": "token-efficiency",
@@ -594,11 +639,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": ""
     },
@@ -634,17 +675,27 @@
         "port_setting": "health_check.endpoint=127.0.0.1:21333 path=/health/status; OTLP grpc/http endpoint=127.0.0.1:21317/21318; service.telemetry.metrics.readers.pull.exporter.prometheus host=127.0.0.1 port=21888"
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21333/health/status",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
-          "line": 96
+        "post_install": {
+          "command": "otelcol-contrib validate --config=\"$config_root/otel.yaml\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector/62cdad2ea133239380b44d20d84eb26e114779b6/otelcol/command_validate.go#L15",
+            "line": 15
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21333/health/status",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
+            "line": 96
+          }
         }
       },
       "config_paths": [
         "$config_root/otel.yaml"
       ],
-      "notes": "UNRUN. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
       "release_asset": {
         "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
         "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
@@ -683,17 +734,27 @@
         "port_setting": "--web.listen-address=127.0.0.1:21090 (docs/command-line/prometheus.md:17)"
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21090/-/ready",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/management_api.md#L22",
-          "line": 22
+        "post_install": {
+          "command": "\"$tool_root/prometheus/prometheus-3.15.0.linux-amd64/promtool\" check config \"$config_root/prometheus.yaml\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/prometheus/5241a27fe3c6983549fccc32f6e65917408c63cd/docs/command-line/promtool.md#L91",
+            "line": 91
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21090/-/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/management_api.md#L22",
+            "line": 22
+          }
         }
       },
       "config_paths": [
         "$config_root/prometheus.yaml"
       ],
-      "notes": "UNRUN. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
       "release_asset": {
         "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
         "sha256": "2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0"
@@ -732,17 +793,27 @@
         "port_setting": "server.http_listen_address=127.0.0.1 http_listen_port=21300 grpc_listen_address=127.0.0.1 grpc_listen_port=21396 (docs/sources/shared/configuration.md:6196-6216)"
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21300/ready",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/reference/loki-http-api.md#L1204",
-          "line": 1204
+        "post_install": {
+          "command": "cd \"$tool_root/loki\"\nloki -config.file=\"$config_root/loki.yaml\" -verify-config=true",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/loki/09e6ce2ff1bdc19763a10265b870c86f51c98655/pkg/loki/config_wrapper.go#L54",
+            "line": 54
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21300/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/reference/loki-http-api.md#L1204",
+            "line": 1204
+          }
         }
       },
       "config_paths": [
         "$config_root/loki.yaml"
       ],
-      "notes": "UNRUN. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Release-note template tools/release-note.md:24-28 supplies exact curl/unzip/chmod commands; release variable pinned to v3.7.8. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Release-note template tools/release-note.md:24-28 supplies exact curl/unzip/chmod commands; release variable pinned to v3.7.8. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
       "release_asset": {
         "url": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip",
         "sha256": "62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61"
@@ -781,17 +852,27 @@
         "port_setting": "[server] http_addr=127.0.0.1 http_port=21301 (conf/defaults.ini:50-53); [grpc_server] address=127.0.0.1:21302 (conf/defaults.ini:117-119)"
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21301/api/health",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/other.md#L99",
-          "line": 99
+        "post_install": {
+          "command": "grafana cli -v",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/grafana/6193dc03311b631b9727b560d24369e683dc396e/docs/sources/administration/cli.md#L69",
+            "line": 69
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21301/api/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/other.md#L99",
+            "line": 99
+          }
         }
       },
       "config_paths": [
         "$config_root/grafana.ini"
       ],
-      "notes": "UNRUN. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Official page quotes wget URL and tar -zxvf archive; use common checksum-verifying HTTPS transport wrapper. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
+      "notes": "Planned. Documented release-binary route plus published checksum. Download/checksum/user-prefix operations are script transport glue, not a claimed verbatim upstream installer; version/artifact parameterization and extraction follow cited source. Official page quotes wget URL and tar -zxvf archive; use common checksum-verifying HTTPS transport wrapper. No upstream systemd user unit documented; installed binary/configuration only, foreground service start remains separate.",
       "release_asset": {
         "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz",
         "sha256": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235"
@@ -828,17 +909,27 @@
         "port_setting": "Compose ports 127.0.0.1:21606:6006 and 127.0.0.1:21617:4317. Optional metrics unpublished; host binding is Docker publication setting."
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21606/readyz",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/helm/templates/phoenix/deployment.yaml#L72",
-          "line": 72
+        "post_install": {
+          "command": "docker compose -f \"$plan_dir/config/phoenix-compose.yaml\" config --quiet",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27",
+            "line": 27
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21606/readyz",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/helm/templates/phoenix/deployment.yaml#L72",
+            "line": 72
+          }
         }
       },
       "config_paths": [
         "$plan_dir/config/phoenix-compose.yaml"
       ],
-      "notes": "UNRUN. Choose upstream documented Compose over earlier native pip/uvx route because native grpc_server.py:107-109 hardcodes [::], violating host loopback-only. PHOENIX_HOST affects HTTP only. Upstream SQLite Compose:156-171, image pinning:47, compose up:102; -d is supported Compose detach flag. Pin image arizephoenix/phoenix:20.19.0; only loopback host ports are published."
+      "notes": "Planned. Choose upstream documented Compose over earlier native pip/uvx route because native grpc_server.py:107-109 hardcodes [::], violating host loopback-only. PHOENIX_HOST affects HTTP only. Upstream SQLite Compose:156-171, image pinning:47, compose up:102; -d is supported Compose detach flag. Pin image arizephoenix/phoenix:20.19.0; only loopback host ports are published. Post-install checks Compose configuration preparation only; it does not prove image availability or application health."
     },
     {
       "layer": "observation-inference",
@@ -870,17 +961,35 @@
         "port_setting": "OLLAMA_HOST=127.0.0.1:21434 (ollama v0.35.0 docs/faq.mdx:185)"
       },
       "acceptance": {
-        "command": "OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma \"Hello world\"",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73",
-          "line": 73
+        "post_install": {
+          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2181",
+            "line": 2181
+          }
+        },
+        "service_health": {
+          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama ls",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L97",
+            "line": 97
+          }
+        },
+        "after_sign_in": {
+          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma \"Hello world\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73",
+            "line": 73
+          }
         }
       },
       "config_paths": [
         "$config_root/ollama.env.example"
       ],
-      "notes": "UNRUN. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Smoke downloads/runs upstream example model; GPU inference remains unrun.",
+      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Smoke downloads/runs upstream example model; GPU inference remains unrun. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The original model smoke is retained after a model route is provisioned; its inference behavior remains unverified.",
       "mise_tool": "ollama"
     },
     {
@@ -909,15 +1018,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "inspect --version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/src/inspect_ai/_cli/main.py#L23",
-          "line": 23
+        "post_install": {
+          "command": "inspect --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/src/inspect_ai/_cli/main.py#L23",
+            "line": 23
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Input has no GitHub release tag; resolve upstream tag 0.3.273 to 9e44f1b77ed7c912bf58baf30db8560937e7ce53. Documented pip package isolated using supported uv tool format (uv docs/guides/tools.md:172,275). No credential-free documented install smoke; real evaluation requires provider setup."
+      "notes": "Planned. Input has no GitHub release tag; resolve upstream tag 0.3.273 to 9e44f1b77ed7c912bf58baf30db8560937e7ce53. Documented pip package isolated using supported uv tool format (uv docs/guides/tools.md:172,275). No credential-free documented install smoke; real evaluation requires provider setup."
     },
     {
       "layer": "quality-evaluation",
@@ -945,15 +1056,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "harbor --version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/skills/create-adapter/SKILL.md#L30",
-          "line": 30
+        "post_install": {
+          "command": "harbor --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/skills/create-adapter/SKILL.md#L30",
+            "line": 30
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. First upstream uv tool route. Python >=3.12. Upstream skill states CLI installed when --version succeeds. Actual E2E requires Docker/provider authentication."
+      "notes": "Planned. First upstream uv tool route. Python >=3.12. Upstream skill states CLI installed when --version succeeds. Actual E2E requires Docker/provider authentication."
     },
     {
       "layer": "quality-evaluation",
@@ -981,15 +1094,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "promptfoo --version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/installation.md#L80",
-          "line": 80
+        "post_install": {
+          "command": "promptfoo --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/installation.md#L80",
+            "line": 80
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. README first persistent npm route; Node >=22.22, recommended24. Documented getting-started eval needs provider credentials; version-only verification does not certify LLM evaluation."
+      "notes": "Planned. README first persistent npm route; Node >=22.22, recommended24. Documented getting-started eval needs provider credentials; version-only verification does not certify LLM evaluation."
     },
     {
       "layer": "ci-supply-chain",
@@ -1017,15 +1132,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "zizmor -h",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/quickstart.md#L3",
-          "line": 3
+        "post_install": {
+          "command": "zizmor -h",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/zizmorcore/zizmor/v1.30.1/docs/quickstart.md#L3",
+            "line": 3
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Choose mise registry over Homebrew/PyPI alternatives to keep one version manager. Quickstart explicitly names -h to verify installation.",
+      "notes": "Planned. Choose mise registry over Homebrew/PyPI alternatives to keep one version manager. Quickstart explicitly names -h to verify installation.",
       "mise_tool": "zizmor"
     },
     {
@@ -1052,14 +1169,20 @@
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/actions/attest/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md#L80",
+            "line": 80
+          },
+          "reason": "Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route."
+        }
       },
       "config_paths": [
         ".github/workflows/*.yml"
       ],
-      "notes": "UNRUN. uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6. No host installation/acceptance command. Workflows require repository/artifact configuration. "
+      "notes": "Planned. uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6. No host installation/acceptance command. Workflows require repository/artifact configuration. "
     },
     {
       "layer": "ci-supply-chain",
@@ -1087,15 +1210,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "syft alpine:latest",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/anchore/syft/v1.54.0/README.md#L48",
-          "line": 48
+        "post_install": {
+          "command": "syft alpine:latest",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anchore/syft/v1.54.0/README.md#L48",
+            "line": 48
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. README first Linux script targets /usr/local/bin via sudo; choose registry mise for user-level ownership. Documented public-container scan needs network; alpine:latest is upstream's smoke input, not a reproducible image pin.",
+      "notes": "Planned. README first Linux script targets /usr/local/bin via sudo; choose registry mise for user-level ownership. Documented public-container scan needs network; alpine:latest is upstream's smoke input, not a reproducible image pin.",
       "mise_tool": "syft"
     },
     {
@@ -1122,14 +1247,20 @@
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/dependabot/dependabot-core/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md#L42",
+            "line": 42
+          },
+          "reason": "Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route."
+        }
       },
       "config_paths": [
         ".github/dependabot.yml"
       ],
-      "notes": "UNRUN. Tag resolves to a1750051287d1f3786081d3aa3e6e2b04a72edde. No valid uses: reference: upstream repository has no action entrypoint. Enable GitHub Dependabot through .github/dependabot.yml; no host installation."
+      "notes": "Planned. Tag resolves to a1750051287d1f3786081d3aa3e6e2b04a72edde. No valid uses: reference: upstream repository has no action entrypoint. Enable GitHub Dependabot through .github/dependabot.yml; no host installation."
     },
     {
       "layer": "ci-supply-chain",
@@ -1155,14 +1286,20 @@
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/github/codeql-action/416ff0dea110f80f0f56f0046500dbf7420e4bb0/upload-sarif/action.yml#L1",
+            "line": 1
+          },
+          "reason": "Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route."
+        }
       },
       "config_paths": [
         ".github/workflows/*.yml"
       ],
-      "notes": "UNRUN. uses: github/codeql-action/upload-sarif@416ff0dea110f80f0f56f0046500dbf7420e4bb0. No host installation/acceptance command. Workflows require repository/artifact configuration. Root action is a deliberate failure stub; use upload-sarif."
+      "notes": "Planned. uses: github/codeql-action/upload-sarif@416ff0dea110f80f0f56f0046500dbf7420e4bb0. No host installation/acceptance command. Workflows require repository/artifact configuration. Root action is a deliberate failure stub; use upload-sarif."
     },
     {
       "layer": "ci-supply-chain",
@@ -1190,15 +1327,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "actionlint -version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md#L127",
-          "line": 127
+        "post_install": {
+          "command": "actionlint -version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md#L127",
+            "line": 127
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Explicit upstream-documented github backend; short actionlint selects rhysd and would install the wrong owner (docs/install.md:208). Remove example's ./ prefix because mise exposes the binary on PATH.",
+      "notes": "Planned. Explicit upstream-documented github backend; short actionlint selects rhysd and would install the wrong owner (docs/install.md:208). Remove example's ./ prefix because mise exposes the binary on PATH.",
       "mise_tool": "github:kjanat/actionlint"
     },
     {
@@ -1231,18 +1370,28 @@
         "port_setting": "--host 127.0.0.1 --port 21080; DAGU_HOST/DAGU_PORT in upstream env file. Coordinator default 127.0.0.1:50055 (internal/cmn/config/loader.go:2017); start-all disables extra health listeners."
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:21080/api/v1/health",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997",
-          "line": 1997
+        "post_install": {
+          "command": "dagu version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/version.go#L15",
+            "line": 15
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21080/api/v1/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997",
+            "line": 1997
+          }
         }
       },
       "config_paths": [
         "$HOME/.config/systemd/user/dagu.service",
         "$HOME/.config/dagu/dagu.env"
       ],
-      "notes": "UNRUN. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
+      "notes": "Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
     },
     {
       "layer": "hosting-services",
@@ -1271,17 +1420,19 @@
       },
       "service": null,
       "acceptance": {
-        "command": "docker compose version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/docker/docs/f0e4e4790191aaee83f9375dce56ada3971c6773/content/manuals/compose/install/linux.md#L51",
-          "line": 51
+        "post_install": {
+          "command": "docker compose version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/docs/f0e4e4790191aaee83f9375dce56ada3971c6773/content/manuals/compose/install/linux.md#L51",
+            "line": 51
+          }
         }
       },
       "config_paths": [
         "/etc/apt/sources.list.d/docker.sources"
       ],
-      "notes": "UNRUN. Special-case official apt docker-compose-plugin; use repository metadata to match5.5.1 exactly, fail if unavailable. Compose uses Docker's rootless user service, has no separate unit. mise entry deliberately not used."
+      "notes": "Planned. Special-case official apt docker-compose-plugin; use repository metadata to match5.5.1 exactly, fail if unavailable. Compose uses Docker's rootless user service, has no separate unit. mise entry deliberately not used."
     },
     {
       "layer": "hosting-services",
@@ -1317,11 +1468,21 @@
         "port_setting": "Unix socket ${XDG_RUNTIME_DIR}/docker.sock; no TCP listener"
       },
       "acceptance": {
-        "command": "docker run hello-world",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/docker/docs/0571430b6a9c6ff1742baede7c265c3c5e9e3322/content/manuals/engine/security/rootless/troubleshoot.md#L212",
-          "line": 212
+        "post_install": {
+          "command": "dockerd --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/moby/moby/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/command/docker.go#L51",
+            "line": 51
+          }
+        },
+        "service_health": {
+          "command": "docker run hello-world",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/docs/0571430b6a9c6ff1742baede7c265c3c5e9e3322/content/manuals/engine/security/rootless/troubleshoot.md#L212",
+            "line": 212
+          }
         }
       },
       "config_paths": [
@@ -1329,7 +1490,7 @@
         "$HOME/.config/systemd/user/docker.service",
         "$HOME/.config/docker/daemon.json"
       ],
-      "notes": "UNRUN. Special-case official Docker apt repository on supported Ubuntu Resolute26.04. Version29.8.2 selected from native apt metadata at future execution; fail if absent, do not guess Resolute package revision. uidmap/dbus-user-session prerequisites; docker-ce-rootless-extras required. Disable rootful service/socket before rootless setup. Upstream setup creates unit/context. Package dependencies remain repo-managed. Linger not enabled: unit runs with user session; boot persistence needs OS policy separately."
+      "notes": "Planned. Special-case official Docker apt repository on supported Ubuntu Resolute26.04. Version29.8.2 selected from native apt metadata at future execution; fail if absent, do not guess Resolute package revision. uidmap/dbus-user-session prerequisites; docker-ce-rootless-extras required. Disable rootful service/socket before rootless setup. Upstream setup creates unit/context. Package dependencies remain repo-managed. Linger not enabled: unit runs with user session; boot persistence needs OS policy separately."
     },
     {
       "layer": "secrets-credentials",
@@ -1357,15 +1518,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "betterleaks dir \"$plan_dir\" -v",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/betterleaks/betterleaks/v1.9.0/README.md#L57",
-          "line": 57
+        "post_install": {
+          "command": "betterleaks dir \"$plan_dir\" -v",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/betterleaks/betterleaks/v1.9.0/README.md#L57",
+            "line": 57
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Registry repository identity checked. Prefer mise over Homebrew cask/Fedora/Go alternatives for user-level executable. Documented directory scan uses the plan folder in place of upstream's path placeholder; this is a functional smoke, not a scan of credentials or unrelated files.",
+      "notes": "Planned. Registry repository identity checked. Prefer mise over Homebrew cask/Fedora/Go alternatives for user-level executable. Documented directory scan uses the plan folder in place of upstream's path placeholder; this is a functional smoke, not a scan of credentials or unrelated files.",
       "mise_tool": "betterleaks"
     },
     {
@@ -1388,11 +1551,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": "betterleaks owns secret scanning"
     },
@@ -1401,12 +1560,14 @@
       "slot": "git",
       "owner": "git",
       "repository": "https://github.com/git/git",
-      "release": "v2.56.0",
+      "release": "Ubuntu 26.04 apt candidate",
       "installed": true,
-      "route": "none",
-      "commands": [],
+      "route": "apt",
+      "commands": [
+        "sudo apt-get install -y --no-install-recommends git"
+      ],
       "needs": {
-        "sudo": false,
+        "sudo": true,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
@@ -1415,17 +1576,22 @@
       },
       "version_pinned": false,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/git/git/v2.56.0/INSTALL#L4",
-        "line": 4
+        "url": "https://raw.githubusercontent.com/git/git-scm.com/422e163b96cdcff929cd63028657597752d4b9d7/content/install/linux.html#L19",
+        "line": 19
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": "git --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/git/git/v2.56.0/Documentation/git.adoc#L44",
+            "line": 44
+          }
+        }
       },
       "config_paths": [],
-      "notes": "UNRUN. No suitable Linux install route in the permitted route set: upstream documents make/make install (source build), while mise v2026.10.0 has no git entry. Git supplied as a system prerequisite remains Ubuntu-managed, not an accepted pinned owner install."
+      "notes": "Ubuntu-managed Git is already supplied by the base image/prerequisite apt packages. Use Ubuntu's own apt candidate without a PPA or a source build; do not claim the reviewed upstream v2.56.0 is the installed pin. This route is idempotent; post-install is git --version."
     },
     {
       "layer": "git-github-automation",
@@ -1453,15 +1619,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "gh --version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/github-cli.toml#L4",
-          "line": 4
+        "post_install": {
+          "command": "gh --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/github-cli.toml#L4",
+            "line": 4
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
       "mise_tool": "github-cli"
     },
     {
@@ -1490,15 +1658,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "cd \"$repo_root\"\nwt list",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/v0.80.0/README.md#L166",
-          "line": 166
+        "post_install": {
+          "command": "cd \"$repo_root\"\nwt list",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/max-sixty/worktrunk/v0.80.0/README.md#L166",
+            "line": 166
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. wt list runs in this git checkout; shell integration is omitted.",
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. wt list runs in this git checkout; shell integration is omitted.",
       "mise_tool": "worktrunk"
     },
     {
@@ -1527,15 +1697,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "difft --version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/Wilfred/difftastic/0.71.0/.github/ISSUE_TEMPLATE/bug_report.md#L16",
-          "line": 16
+        "post_install": {
+          "command": "difft --version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/Wilfred/difftastic/0.71.0/.github/ISSUE_TEMPLATE/bug_report.md#L16",
+            "line": 16
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Registry correct owner; release download/Homebrew alternatives use mise for one user-level version manager. Upstream issue template documents version reporting only.",
+      "notes": "Planned. Registry correct owner; release download/Homebrew alternatives use mise for one user-level version manager. Upstream issue template documents version reporting only.",
       "mise_tool": "difftastic"
     },
     {
@@ -1562,14 +1734,20 @@
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/97c53473391bff1901034d4b454b5bac7ab7a029/docs/usage.md#L17",
+            "line": 17
+          },
+          "reason": "Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route."
+        }
       },
       "config_paths": [
         ".github/workflows/*.yml"
       ],
-      "notes": "UNRUN. uses: anthropics/claude-code-action@97c53473391bff1901034d4b454b5bac7ab7a029. No host installation/acceptance command. Workflows require repository/artifact configuration. "
+      "notes": "Planned. uses: anthropics/claude-code-action@97c53473391bff1901034d4b454b5bac7ab7a029. No host installation/acceptance command. Workflows require repository/artifact configuration. "
     },
     {
       "layer": "git-github-automation",
@@ -1591,11 +1769,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": ""
     },
@@ -1625,17 +1799,19 @@
       },
       "service": null,
       "acceptance": {
-        "command": "mise doctor",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L511",
-          "line": 511
+        "post_install": {
+          "command": "cd \"$tool_root\"\nPATH=\"${MISE_SHIMS_DIR:-${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims}:$PATH\" mise doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jdx/mise/bc11f90c74eba23bf0d7350efb540e62fb7d9ffd/src/cli/doctor/mod.rs#L532",
+            "line": 532
+          }
         }
       },
       "config_paths": [
         "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
       ],
-      "notes": "UNRUN. README's first Linux route; MISE_VERSION pin documented at docs/installing-mise.md:128. Shell activation optional and omitted. Runtimes node 24.21.0, python 3.13.16, uv 0.12.22 are bootstrap prerequisites."
+      "notes": "Planned. README's first Linux route; MISE_VERSION pin documented at docs/installing-mise.md:128. Shell activation optional and omitted. Runtimes node 24.21.0, python 3.13.16, uv 0.12.22 are bootstrap prerequisites. Full doctor needs activation or shims; process-scoped mise env alone does not activate the shell. Add the default shims directory to this process's PATH; preserve every doctor check and all version pins. Doctor runs in the owned global tool directory so a selective install does not select the inventory manifest's optional tools."
     },
     {
       "layer": "recovery-portability",
@@ -1663,15 +1839,17 @@
       },
       "service": null,
       "acceptance": {
-        "command": "restic version",
-        "kind": "version only",
-        "source": {
-          "url": "https://raw.githubusercontent.com/restic/restic/v0.19.1/doc/man/restic-version.1#L9",
-          "line": 9
+        "post_install": {
+          "command": "restic version",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/restic/restic/v0.19.1/doc/man/restic-version.1#L9",
+            "line": 9
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
+      "notes": "Planned. Registry repository identity checked. Prefer architecture's mise to system package/alternate manager or ad-hoc release downloads. No documented key-free install smoke selected beyond upstream version test.",
       "mise_tool": "restic"
     },
     {
@@ -1700,16 +1878,24 @@
       },
       "service": null,
       "acceptance": {
-        "command": "chezmoi doctor",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/twpayne/chezmoi/v2.73.0/assets/chezmoi.io/docs/reference/commands/doctor.md#L14",
-          "line": 14
+        "post_install": {
+          "command": "chezmoi_probe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$chezmoi_probe\"' EXIT\nmkdir -p -- \"$chezmoi_probe/source\" \"$chezmoi_probe/destination\"\nchezmoi --config \"$chezmoi_probe/chezmoi.toml\" --source \"$chezmoi_probe/source\" --destination \"$chezmoi_probe/destination\" --working-tree \"$chezmoi_probe/source\" doctor",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/twpayne/chezmoi/24b71e4cf9d98cce0801cfc68e7553355efeaff7/internal/cmd/doctorcmd.go#L613",
+            "line": 613
+          }
         }
       },
       "config_paths": [],
-      "notes": "UNRUN. System packages are listed first; documented mise route precedes curl binary route. No dotfiles applied.",
-      "mise_tool": "chezmoi"
+      "notes": "Planned. System packages are listed first; documented mise route precedes curl binary route. No dotfiles applied. Full doctor checks existing source/destination/working-tree directories. Use an owned temporary fixture and the documented config/directory flags, retaining every diagnostic including network/version checks. The round1 stdout was suppressed, so the precise historical failing row is unknown.",
+      "mise_tool": "chezmoi",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/twpayne/chezmoi/24b71e4cf9d98cce0801cfc68e7553355efeaff7/assets/chezmoi.io/docs/reference/command-line-flags/global.md#L22",
+          "line": 22
+        }
+      ]
     },
     {
       "layer": "cross:wsl-distro",
@@ -1731,11 +1917,7 @@
       "version_pinned": false,
       "install_source": null,
       "service": null,
-      "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
-      },
+      "acceptance": {},
       "config_paths": [],
       "notes": ""
     },
@@ -1769,17 +1951,37 @@
         "port_setting": "OMNIROUTE_SERVER_HOST=127.0.0.1 API_HOST=127.0.0.1 PORT=21128 LIVE_WS_HOST=127.0.0.1 LIVE_WS_PORT=21129 (docs/reference/ENVIRONMENT.md:158-190)"
       },
       "acceptance": {
-        "command": "omniroute doctor --json --liveness-url http://127.0.0.1:21128/api/monitoring/health",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/docs/reference/CLI-TOOLS.md#L650",
-          "line": 650
+        "post_install": {
+          "command": "omniroute --output json doctor --no-liveness",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L630",
+            "line": 630
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:21128/readyz\nomniroute --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/healthz/route.ts#L17",
+            "line": 17
+          }
         }
       },
       "config_paths": [
         "$config_root/omniroute.env.example"
       ],
-      "notes": "UNRUN. First persistent npm route. After provider configuration, run with all loopback env settings: omniroute serve --port 21128 --no-open --daemon (bin/cli/commands/serve.mjs:56-62). No user unit documented. HOSTNAME does not set server bind. Provider configuration remains native; no credential values in plan; daemon not automatically started."
+      "notes": "Planned. First persistent npm route. After provider configuration, run with all loopback env settings: omniroute serve --port 21128 --no-open --daemon (bin/cli/commands/serve.mjs:56-62). No user unit documented. HOSTNAME does not set server bind. Provider configuration remains native; no credential values in plan; daemon not automatically started. The installed doctor rejects --json despite the documentation example. JSON is global --output json. --no-liveness is the upstream local diagnostic mode; full liveness and machine-token HTTP checks remain in service_health. Doctor only warns for unreachable endpoints, so service-health first requires upstream /readyz HTTP success, then retains the full doctor. /readyz aliases the lifecycle 200/503 healthz route.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/program.mjs#L18",
+          "line": 18
+        },
+        {
+          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/unit/cli-doctor-command.test.ts#L74",
+          "line": 74
+        }
+      ]
     },
     {
       "layer": "cross:runtime-workers",
@@ -1809,18 +2011,28 @@
       },
       "service": null,
       "acceptance": {
-        "command": "cd \"$tool_root/openhands-source\"\n\"$tool_root/agent-runtime-worker/bin/python\" examples/01_standalone_sdk/01_hello_world.py",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/OpenHands/docs/832ad1635431c7711cbfdc9d1f52c2dab9ee7e61/sdk/getting-started.mdx#L149",
-          "line": 149
+        "post_install": {
+          "command": "\"$tool_root/agent-runtime-worker/bin/python\" -c 'from importlib.metadata import version; print(version(\"openhands-sdk\")); print(version(\"openhands-tools\"))'",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/1e1390acc8788346ba4804c34323284009bf3f5e/openhands-sdk/openhands/sdk/__init__.py#L113",
+            "line": 113
+          }
+        },
+        "after_sign_in": {
+          "command": "cd \"$tool_root/openhands-source\"\n\"$tool_root/agent-runtime-worker/bin/python\" examples/01_standalone_sdk/01_hello_world.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/OpenHands/docs/832ad1635431c7711cbfdc9d1f52c2dab9ee7e61/sdk/getting-started.mdx#L149",
+            "line": 149
+          }
         }
       },
       "config_paths": [
         "$tool_root/agent-runtime-worker",
         "$tool_root/openhands-source"
       ],
-      "notes": "UNRUN. Classification gap: isolated Python SDK library, not a CLI uv-tool package. Official matching-version pip route wrapped by supported uv pip --python. Tagged working example invoked by the venv interpreter instead of uv run to avoid a second environment. OpenAI-compatible names: LLM_BASE_URL, LLM_API_KEY, LLM_MODEL (tagged example:9-12). Example makes a model call and writes FACTS.txt only in owned source checkout."
+      "notes": "Planned. Classification gap: isolated Python SDK library, not a CLI uv-tool package. Official matching-version pip route wrapped by supported uv pip --python. Tagged working example invoked by the venv interpreter instead of uv run to avoid a second environment. OpenAI-compatible names: LLM_BASE_URL, LLM_API_KEY, LLM_MODEL (tagged example:9-12). Example makes a model call and writes FACTS.txt only in owned source checkout."
     },
     {
       "layer": "cross:runtime-workers",
@@ -1850,17 +2062,27 @@
       },
       "service": null,
       "acceptance": {
-        "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python - <<'PY'\nfrom gpt_researcher import GPTResearcher\nimport asyncio\n\nasync def get_report(query: str, report_type: str):\n    researcher = GPTResearcher(query, report_type)\n    research_result = await researcher.conduct_research()\n    report = await researcher.write_report()\n    research_context = researcher.get_research_context()\n    research_costs = researcher.get_costs()\n    research_images = researcher.get_research_images()\n    research_sources = researcher.get_research_sources()\n    return report, research_context, research_costs, research_images, research_sources\n\nif __name__ == \"__main__\":\n    query = \"what team may win the NBA finals?\"\n    report_type = \"research_report\"\n    report, context, costs, images, sources = asyncio.run(get_report(query, report_type))\n    print(\"Report:\")\n    print(report)\n    print(\"\\nResearch Costs:\")\n    print(costs)\n    print(\"\\nNumber of Research Images:\")\n    print(len(images))\n    print(\"\\nNumber of Research Sources:\")\n    print(len(sources))\nPY",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/docs/docs/gpt-researcher/gptr/pip-package.md#L32",
-          "line": 32
+        "post_install": {
+          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'",
+          "kind": "version only",
+          "source": {
+            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23",
+            "line": 23
+          }
+        },
+        "after_sign_in": {
+          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python - <<'PY'\nfrom gpt_researcher import GPTResearcher\nimport asyncio\n\nasync def get_report(query: str, report_type: str):\n    researcher = GPTResearcher(query, report_type)\n    research_result = await researcher.conduct_research()\n    report = await researcher.write_report()\n    research_context = researcher.get_research_context()\n    research_costs = researcher.get_costs()\n    research_images = researcher.get_research_images()\n    research_sources = researcher.get_research_sources()\n    return report, research_context, research_costs, research_images, research_sources\n\nif __name__ == \"__main__\":\n    query = \"what team may win the NBA finals?\"\n    report_type = \"research_report\"\n    report, context, costs, images, sources = asyncio.run(get_report(query, report_type))\n    print(\"Report:\")\n    print(report)\n    print(\"\\nResearch Costs:\")\n    print(costs)\n    print(\"\\nNumber of Research Images:\")\n    print(len(images))\n    print(\"\\nNumber of Research Sources:\")\n    print(len(sources))\nPY",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/docs/docs/gpt-researcher/gptr/pip-package.md#L32",
+            "line": 32
+          }
         }
       },
       "config_paths": [
         "$tool_root/gpt-researcher/.venv"
       ],
-      "notes": "UNRUN. Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. OpenAI-compatible names: OPENAI_BASE_URL, OPENAI_API_KEY; search TAVILY_API_KEY (README:107-124). Example performs full model/search research. No server enabled for library use."
+      "notes": "Planned. Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. OpenAI-compatible names: OPENAI_BASE_URL, OPENAI_API_KEY; search TAVILY_API_KEY (README:107-124). Example performs full model/search research. No server enabled for library use. Post-install imports the checkout and reports its declared source version; requirements-only installation does not install gpt-researcher distribution metadata. Full research remains after provider/search configuration."
     },
     {
       "layer": "cross:runtime-workers",
@@ -1894,11 +2116,21 @@
         "port_setting": "PORT=2026; BIND_HOST=127.0.0.1 (docker/docker-compose.yaml:45-67)"
       },
       "acceptance": {
-        "command": "curl -fsS http://127.0.0.1:2026/health/ready",
-        "kind": "health",
-        "source": {
-          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152",
-          "line": 152
+        "post_install": {
+          "command": "cd \"$tool_root/deer-flow/docker\"\nDEER_FLOW_ROOT=\"$tool_root/deer-flow\" docker compose -p deer-flow-dev -f docker-compose-dev.yaml config --quiet",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27",
+            "line": 27
+          }
+        },
+        "service_health": {
+          "command": "curl -fsS http://127.0.0.1:2026/health/ready",
+          "kind": "health",
+          "source": {
+            "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152",
+            "line": 152
+          }
         }
       },
       "config_paths": [
@@ -1906,7 +2138,17 @@
         "$tool_root/deer-flow/.env",
         "$tool_root/deer-flow/frontend/.env"
       ],
-      "notes": "UNRUN. Skip interactive make setup; Install.md documents make config/make docker-init. Guard existing complete config because make config otherwise exits 1. Upstream make up runs service; model must first be configured via models[].base_url and OPENAI_API_KEY. No general base-URL env name documented in reviewed sources; IMAGE_GENERATION_BASE_URL is image-only. Host make doctor is inapplicable to the selected Compose install because it requires host pnpm/nginx/backend environment. Use shipped Compose readiness probe /health/ready; container Python remains upstream-managed. Host make is a preparation prerequisite. No secrets/config values filled."
+      "notes": "Planned. Skip interactive make setup; Install.md documents make config/make docker-init. Guard existing complete config because make config otherwise exits 1. Upstream make up runs service; model must first be configured via models[].base_url and OPENAI_API_KEY. No general base-URL env name documented in reviewed sources; IMAGE_GENERATION_BASE_URL is image-only. Host make doctor is inapplicable to the selected Compose install because it requires host pnpm/nginx/backend environment. Use shipped Compose readiness probe /health/ready; container Python remains upstream-managed. Host make is a preparation prerequisite. No secrets/config values filled. make docker-init prepares the development Compose workflow and can tolerate a sandbox image pull failure; this does not establish installed images. Post-install validates the actual dev Compose configuration using its DEER_FLOW_ROOT parameter. The existing production readiness probe remains for the explicitly documented make up production start.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/345f08be00c8a9495079b732a39b46aa9af1584e/scripts/docker.sh#L18",
+          "line": 18
+        },
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/345f08be00c8a9495079b732a39b46aa9af1584e/Install.md#L44",
+          "line": 44
+        }
+      ]
     },
     {
       "layer": "cross:credential-practice",
@@ -1932,16 +2174,22 @@
       },
       "service": null,
       "acceptance": {
-        "command": null,
-        "kind": null,
-        "source": null
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
+            "line": 400
+          },
+          "reason": "Repository adoption practice; no standalone host self-test or version command was found in the cited recipe."
+        }
       },
       "config_paths": [
         "adoption/bootstrap.md",
         "adoption/hooks/claude",
         "adoption/codex.config.template.toml"
       ],
-      "notes": "UNRUN. Follow adoption/bootstrap.md step 4a guard hooks and settings. No new install command. Recipe source is this checkout commit; selected release metadata retained. No isolated upstream smoke/version command for the combined practice."
+      "notes": "Planned. Follow adoption/bootstrap.md step 4a guard hooks and settings. No new install command. Recipe source is this checkout commit; selected release metadata retained. No isolated upstream smoke/version command for the combined practice."
     },
     {
       "layer": "cross:convergence-practice",
@@ -1967,17 +2215,19 @@
       },
       "service": null,
       "acceptance": {
-        "command": "python3 scripts/validate.py",
-        "kind": "smoke",
-        "source": {
-          "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L68",
-          "line": 68
+        "post_install": {
+          "command": "cd \"$repo_root\"\npython3 scripts/validate.py",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L68",
+            "line": 68
+          }
         }
       },
       "config_paths": [
         "adoption/README.md"
       ],
-      "notes": "UNRUN. Adoption recipe, no new install command. Check verifies repository evidence, not host installation. Scoped convergence experiments require their own records; not generated for this source-only install inventory."
+      "notes": "Planned. Adoption recipe, no new install command. Check verifies repository evidence, not host installation. Scoped convergence experiments require their own records; not generated for this source-only install inventory."
     }
   ]
 }
