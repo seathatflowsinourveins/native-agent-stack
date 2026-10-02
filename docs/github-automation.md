@@ -1054,12 +1054,25 @@ close together -- `--force-with-lease` above is what keeps that safe, not
 this concurrency group.
 `gh pr create` opens `automation/catalog-freshness` against `main` (or
 `gh pr edit` updates the existing one, keyed on `gh pr list --head
-automation/catalog-freshness`), with a body that includes the run's
-`drift.md` table (each cell rendered as escaped inline code by
-`scripts/freshness_propose.py`'s `md_cell()`, so an upstream release tag
-fetched from an external API can never break the Markdown table or smuggle
-formatting) and states plainly: "no selection or pin changed; pin bumps
-require a qualified receipt under evidence/artifacts/*/".
+automation/catalog-freshness`), with a description pointing to the branch's
+current report and receipt. The description contains no run-specific table,
+so overlapping proposals cannot leave an older run's report in the body. It
+includes the required `### SOTA sources` section and states plainly:
+"no selection or pin changed; pin bumps require a qualified receipt under
+evidence/artifacts/*/". Reports cover foundation and trading source observations,
+so a new or unlabeled PR defaults to `lane:shared`. An existing single supported
+lane label is preserved and reflected in the body; multiple or unknown lane
+labels stop the metadata step for owner resolution. Shared reports retain the
+other lane's acknowledgement requirement in [the lane policy](lanes.md).
+See the [metadata decision](decisions/2026-10-02-catalog-freshness-pr-metadata.md).
+
+For an existing PR whose old body lacks source metadata, the preceding push can
+capture that old body in its `synchronize` payload. The later bot body edit does
+not trigger another run. After approval, if the source gate fails for that reason,
+make a genuine human-authenticated body edit that retains the source section;
+rerunning the old event retains the old payload. Future synchronizations carry
+the corrected body. This one-time migration preserves the workflow's push order
+and token permissions. [GitHub documents the event behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
 
 **No workflow is dispatched from this job, and that is deliberate.** An
 earlier version of this design called `gh workflow run validate.yml
