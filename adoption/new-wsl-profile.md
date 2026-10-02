@@ -75,8 +75,8 @@ fact corrections, the red-to-green CLI results and the completeness critic.
 Unverified pin-matching install or functional acceptance fields remain null;
 version checks never substitute for functional acceptance.
 
-The [current command review](../evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json)
-closes ten exact command/merged-PR gaps: **51 of 69 entries** retain **128 gaps**,
+The [first command review](../evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json)
+closed ten exact command/merged-PR gaps. At that checkpoint, **51 of 69 entries** retained **128 gaps**,
 and all **23 comparison arms** remain isolated. An empty gap list means the
 recorded source fields are populated; it establishes no installation,
 prerequisite readiness, merit winner or acceptance. The seven reviewed tool
@@ -93,6 +93,36 @@ package and standalone executable retain their distinct GitHub release digests
 as published metadata. None was installed. Current host versions differ from
 the selected Claude, ai-memory and Worktrunk pins, so their help probes supply
 only host-interface observations.
+
+The [core native recipe wave 1](../evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json)
+adds source-backed install/test examples for Serena, trafilatura, Playwright CLI,
+Claude Agent SDK, Codex TypeScript SDK, Harbor, promptfoo and mise. The current
+profile has **45 entries with 117 gaps**, **35 null install-command fields** and
+**40 null acceptance-command fields**. Nineteen populated acceptance fields name
+source-test commands; none is evidence of an installed functional run. All 69
+entries retain their prior provisioning status, and all 23 comparison arms
+retain their prior ownership and default-install exclusions.
+
+Every added command is **UNRUN**. Serena's local install and source suite require
+the exact retained checkout and its Python 3.13 developer environment; PyPI
+equivalence remains unresolved. The trafilatura workflow's `--system` operand
+belongs to an owned disposable CI environment, and its non-minimal arm has extra
+native/dependency setup. Playwright's CI uses Node 20 and its data-URL fixture
+needs a working browser runtime. Claude's `tests/` suite excludes its separate
+authenticated E2E suite. The Codex TypeScript workflow needs Node 22, pnpm, its
+Bazel-built CLI and matching code-mode host staged together, and
+`CODEX_EXEC_PATH` pointing to that CLI. Its source tests do not inherit Python
+SDK qualification.
+
+Harbor's selected Linux source test requires its upstream developer setup,
+including Python 3.13, Docker/Compose and Deno, and excludes the runtime suite.
+Its wheel digest is **published PyPI metadata only**; the wheel was not downloaded
+or rehashed, and the profile's integrity gap is unchanged. promptfoo's `npm test`
+maps to `vitest run`; provider evaluations remain separate. mise requires its
+upstream development setup, and the selected E2E regex runs only `test_use`.
+The receipt retains the prior mise source-fetch 404 and researcher capacity
+retry with the actual backend unknown. This wave preserves the historical
+freeze and first command-review files byte for byte.
 
 The following primary citations cover every non-null `install.command` in the
 contract. The commands themselves, integrity kind and unresolved fields remain
@@ -112,6 +142,8 @@ have no default-install precedence.
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
 | sandbox-runtime | 0.0.77 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md) |
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
+| Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
+| trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
 | Playwright CLI | 0.1.21 | [reviewed install source](https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md) |
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
 | Harbor | 0.23.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) |
@@ -132,6 +164,7 @@ have no default-install precedence.
 | Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md) |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |
 | Dagu | 2.16.6 | [reviewed install source](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md) |
+| mise | 2026.9.18 | [tagged installation guide](https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md), [version normalization in the selected installer source](https://github.com/jdx/mise/blob/v2026.9.18/packaging/standalone/install.envsubst#L300) |
 | betterleaks | 1.9.0 | [reviewed install source](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md) |
 
 The inherited review retains the eight public CLI tests' initial red result,
@@ -141,8 +174,11 @@ suite passed **172 tests (exit 0)**. Both public profile/status commands and
 `git diff --check` returned exit 0; the profile CLI output matched the source
 JSON byte for byte, with runtime/new-host acceptance false. The previous
 per-step dry run is reused because the selected installer inputs are unchanged.
-The current command review retains these checks separately. The documentation
-publication check has a known remaining
-condition: its script inventory reads tracked files, and the new adapter is
-untracked until the coordinator stages it. Central validation, staging and
-registry inventory remain with their owner.
+The first command review retains these historical checks separately. It deferred
+the tracked-script publication check to coordinator staging; the adapter is now
+tracked at the wave-1 base. The wave-1 receipt records its own scoped profile
+checks. Central validation, registry inventory and regeneration of the book
+after integrating the parallel patches remain with their owner.
+The wave-1 profile adapter and prerequisite-status commands returned exit 0,
+and the existing eight `NewWslProfileCliTests` passed. These are local contract
+checks; the upstream install and source-test examples remain unrun.

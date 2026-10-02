@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -13,6 +14,7 @@ from scripts import build_new_wsl_handbook as handbook
 
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULTS_SOURCE = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 
 
 class NewWslHandbookTests(unittest.TestCase):
@@ -240,6 +242,141 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(unknown["checksum"], unresolved["checksum"])
         self.assertTrue(any("package identity" in gap for gap in unknown["blocking_gaps"]))
         self.assertNotEqual(unknown["status"], "final")
+
+    def defaults_fixture(self):
+        """Synthetic records in the reviewed owner's assemble_manifest.py format."""
+        layers = [{"layer_id": row["layer_id"],
+                   "catalog": "foundation" if row["catalog"] == "cross" else row["catalog"],
+                   "owns": [row["layer_id"] + " fixture ownership"], "uses": []}
+                  for row in self.read(handbook.EDITION)["rows"]]
+        slots = []
+        for layer, state in [("native-clients", "definitive"), ("semantic-rag", "split"),
+                             ("durable-memory", "measurement"), ("document-retrieval", "")]:
+            slots.append({"catalog": "foundation", "layer_id": layer, "slot_id": layer + "-fixture",
+                          "row_kind": "judged", "default": "Fixture candidate / alternative",
+                          "repository": "", "installs_nothing_extra": False,
+                          "definitive": state == "definitive", "state": state,
+                          "label": "Synthetic source-fit decision; no execution.",
+                          "claude": "converged", "gpt": "converged"})
+        return {"schema_version": 1, "kind": "new-wsl-definitive-manifest",
+                "date_utc": "2026-10-01", "meaning": "Fixture slot decisions only.",
+                "decision_rule": "Fixture source text; this adapter makes no decisions.",
+                "no_install_rule": "Fixture source text.", "not_claimed": "No host or provider acceptance.",
+                "sources": {catalog: {"file": catalog + ".json", "sha256": "a" * 64}
+                            for catalog in ("foundation", "us-equities")},
+                "counts": {"layers": len(layers), "slots": len(slots), "definitive": 1,
+                           "by_row_kind": {"judged": len(slots)}},
+                "pinned_requirements": {}, "no_blind_default_today": {}, "layers": layers, "slots": slots}
+
+    def test_defaults_manifest_actual_source_projection(self):
+        source = Path(os.environ.get("NEW_WSL_DEFAULTS_FIXTURE", str(ROOT / DEFAULTS_SOURCE)))
+        if not source.is_file():
+            self.skipTest("owner manifest not published; supply NEW_WSL_DEFAULTS_FIXTURE for source preview")
+        raw = source.read_bytes()
+        manifest = json.loads(raw)
+        shutil.copyfile(ROOT / handbook.PROFILE, self.root / handbook.PROFILE)
+        before = handbook.build_data(self.root)
+        destination = self.root / DEFAULTS_SOURCE
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(raw)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = self.read(handbook.OUTPUTS[1])
+        self.assertEqual(data["default_decisions"]["status"], "published-source")
+        self.assertEqual(data["default_decisions"]["metadata"],
+                         {key: value for key, value in manifest.items() if key not in {"layers", "slots"}})
+        source_record = next(row for row in data["sources"] if row["path"] == DEFAULTS_SOURCE)
+        self.assertEqual(source_record["sha256"], handbook.digest(raw))
+        projected = []
+        for layer in data["layers"]:
+            expected = [slot for slot in manifest["slots"] if slot["layer_id"] == layer["layer_id"]]
+            self.assertEqual([slot["record"] for slot in layer["default_slots"]], expected)
+            self.assertEqual(layer["default_ownership"], next(row for row in manifest["layers"]
+                                                             if row["layer_id"] == layer["layer_id"]))
+            for slot in layer["default_slots"]:
+                self.assertEqual(slot["state"], slot["record"].get("state") or "pending")
+                projected.append(slot)
+        self.assertEqual(len(projected), 74)
+        self.assertEqual({state: sum(slot["state"] == state for slot in projected)
+                          for state in ("definitive", "split", "measurement", "pending")},
+                         {"definitive": 3, "split": 2, "measurement": 1, "pending": 68})
+        self.assertEqual(data["tools"], before["tools"])
+        self.assertEqual([row["status"] for row in data["layers"]],
+                         [row["status"] for row in before["layers"]])
+        self.assertFalse(data["new_host_acceptance_claimed"])
+        markdown = (self.root / handbook.OUTPUTS[0]).read_text()
+        memory = next(slot for slot in manifest["slots"] if slot["slot_id"] == "memory-owner")
+        self.assertIn(memory["default"], markdown)
+        self.assertIn(memory["label"], markdown)
+
+    def test_defaults_manifest_rejects_invalid_states_layers_and_ownership(self):
+        def changed_slot(data, field, value):
+            data["slots"][0][field] = value
+        mutations = [
+            (lambda data: changed_slot(data, "state", "final"), "state"),
+            (lambda data: changed_slot(data, "state", None), "state"),
+            (lambda data: changed_slot(data, "layer_id", "unknown-layer"), "layer"),
+            (lambda data: changed_slot(data, "catalog", "us-equities"), "catalog"),
+            (lambda data: data["layers"].pop(), "layer"),
+            (lambda data: data["layers"].append(deepcopy(data["layers"][0])), "duplicate layer"),
+            (lambda data: data["layers"][1]["owns"].append(data["layers"][0]["owns"][0]), "ownership"),
+            (lambda data: data["slots"][1].update(slot_id=data["slots"][0]["slot_id"]), "duplicate slot"),
+        ]
+        for mutate, message in mutations:
+            with self.subTest(message=message):
+                manifest = self.defaults_fixture()
+                mutate(manifest)
+                self.write(DEFAULTS_SOURCE, manifest)
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(message, result.stderr)
+                self.assertFalse(any((self.root / path).exists() for path in handbook.OUTPUTS))
+
+    def test_defaults_manifest_preview_hash_covers_complete_payload(self):
+        manifest = self.defaults_fixture()
+        manifest["unused_metadata"] = "Keep this field in the full source hash."
+        self.write("staged-defaults.json", manifest)
+        supplied = self.root / "staged-defaults.json"
+        result = self.public_cli(defaults_manifest=supplied)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = self.read(handbook.OUTPUTS[1])
+        self.assertEqual(data["default_decisions"]["status"], "supplied-preview")
+        recorded = next(row for row in data["sources"] if row["path"] == DEFAULTS_SOURCE)
+        self.assertEqual(recorded["sha256"], handbook.digest(supplied.read_bytes()))
+        self.assertNotIn(str(supplied), json.dumps(data))
+        previous = {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS}
+        manifest["unused_metadata"] = "private file /" + "home/" + "private/source.json"
+        self.write("staged-defaults.json", manifest)
+        result = self.public_cli(defaults_manifest=supplied)
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("host path", result.stderr)
+        self.assertEqual(previous, {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS})
+
+    def test_defaults_manifest_published_path_is_confined(self):
+        self.write("external-defaults.json", self.defaults_fixture())
+        destination = self.root / DEFAULTS_SOURCE
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.symlink_to(self.root / "external-defaults.json")
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("symlinks", result.stderr)
+
+    def test_defaults_manifest_does_not_make_source_fit_host_acceptance(self):
+        before = handbook.build_data(self.root)
+        self.write(DEFAULTS_SOURCE, self.defaults_fixture())
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = self.read(handbook.OUTPUTS[1])
+        self.assertEqual(data["tools"], before["tools"])
+        self.assertFalse(data["new_host_acceptance_claimed"])
+        self.assertTrue(all(row["status"] != "final" for row in data["layers"]))
+        slots = [slot for row in data["layers"] for slot in row["default_slots"]]
+        self.assertEqual([slot["state"] for slot in slots], ["definitive", "pending", "split", "measurement"])
+
+    def test_defaults_manifest_explicit_missing_input_fails(self):
+        result = self.public_cli(defaults_manifest=self.root / "missing-defaults.json")
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("explicit defaults manifest input does not exist", result.stderr)
 
     def test_each_published_layer_appears_once(self):
         data = handbook.build_data(self.root)

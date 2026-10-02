@@ -42,6 +42,87 @@
     }
   ],
   "cross_family_boundary": "One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01 (PR #575) reviewed the source host's record, not these blind packets, so they are not a second blind judgment; a blind GPT-6.1 Sol run on the same packets is requested from the Codex lane. Where both families agree, the recommendation stands as an arm; where they differ, both picks enter the comparison.",
+  "default_decisions": {
+    "metadata": {
+      "counts": {
+        "by_row_kind": {
+          "first_round": 53,
+          "judged": 11,
+          "no_blind_default_today": 2,
+          "pinned": 6,
+          "project_practice": 2
+        },
+        "definitive": 3,
+        "layers": 37,
+        "slots": 74
+      },
+      "date_utc": "2026-10-01",
+      "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
+      "kind": "new-wsl-definitive-manifest",
+      "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
+      "no_blind_default_today": {
+        "us-equities": [
+          {
+            "owner": "identity-provenance",
+            "reason": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate",
+            "slot": "security-identity"
+          },
+          {
+            "owner": "research-factors-ml",
+            "reason": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist",
+            "slot": "predictive-ml"
+          }
+        ]
+      },
+      "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
+      "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
+      "pinned_requirements": {
+        "us-equities": [
+          {
+            "evidence": [
+              "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json (one_zero PASS, rc5)",
+              "evidence/receipts/native-nautilus-v2-20260920.json (unchanged rc5 EURUSD quickstart)"
+            ],
+            "name": "NautilusTrader 2.0.0rc5",
+            "owner": "backtesting-engine",
+            "release_pin_rule": "the release pin changes only through a dated version-selection record after qualification",
+            "source": "catalogs/us-equities/runtime-target.json engine (decision selected_destination)"
+          },
+          {
+            "evidence": [
+              "evidence/receipts/ibkr-readonly-acceptance-20260923.json (step 1 passed; steps 2-4 need the user's IB Gateway paper sign-in)"
+            ],
+            "name": "IBKR path (NautilusTrader in-tree IBKR adapter)",
+            "owner": "execution-broker",
+            "source": "catalogs/us-equities/runtime-target.json broker_boundaries"
+          },
+          {
+            "evidence": [
+              "blueprints/us-equities/adaptive-paper/trials/{pre,rth,ext}-20260929/receipt.json (11 of 13 trials passed, engine b528bb55)",
+              "blueprints/us-equities/adaptive-paper/native-faults/receipt.json (native_faults_passed on dca821cc, PR #584)"
+            ],
+            "name": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)",
+            "owner": "execution-broker",
+            "source": "catalogs/us-equities/runtime-target.json broker_boundaries"
+          }
+        ]
+      },
+      "schema_version": 1,
+      "sources": {
+        "foundation": {
+          "file": "foundation-definitive.compact.json",
+          "sha256": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2"
+        },
+        "us-equities": {
+          "file": "trading/trading-definitive.compact.json",
+          "owner": "trading lane (native-agent-stack-ae)",
+          "sha256": "dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081"
+        }
+      }
+    },
+    "source": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "status": "published-source"
+  },
   "evidence_class": "repository integration artifact; source projection, not host acceptance",
   "finality_gates": [
     {
@@ -81,6 +162,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "native-clients",
+        "owns": [
+          "Claude Code",
+          "Codex"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Claude Code",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld",
+            "layer_id": "native-clients",
+            "repository": "https://github.com/anthropics/claude-code",
+            "row_kind": "first_round",
+            "slot_id": "claude-code",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Codex",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld",
+            "layer_id": "native-clients",
+            "repository": "https://github.com/openai/codex",
+            "row_kind": "first_round",
+            "slot_id": "codex",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -153,6 +281,34 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "instructions-skills",
+        "owns": [
+          "Trail of Bits security skills (trailofbits/skills)"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Trail of Bits security skills (trailofbits/skills)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+            "layer_id": "instructions-skills",
+            "repository": "https://github.com/trailofbits/skills",
+            "row_kind": "first_round",
+            "slot_id": "trail-of-bits-security-skills-trailofbits-skills",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -223,6 +379,16 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "workers",
+        "owns": [],
+        "uses": [
+          "the native subagents of Claude Code and Codex (native-clients)",
+          "Worktrunk (git-github-automation)"
+        ]
+      },
+      "default_slots": [],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -298,6 +464,55 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "isolation",
+        "owns": [
+          "sandbox-runtime (srt)"
+        ],
+        "uses": [
+          "Worktrunk (git-github-automation)",
+          "the container engine (hosting-services)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "sandbox-runtime (srt)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+            "layer_id": "isolation",
+            "repository": "https://github.com/anthropics/sandbox-runtime",
+            "row_kind": "first_round",
+            "slot_id": "sandbox-runtime-srt",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "No additional component: rootless containers on the container engine that the hosting layer installs",
+            "definitive": true,
+            "gpt": "converged",
+            "installs_nothing_extra": true,
+            "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
+            "layer_id": "isolation",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "isolation-container-boundary",
+            "state": "definitive"
+          },
+          "state": "definitive"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -377,6 +592,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "code-navigation",
+        "owns": [
+          "Serena",
+          "claude-plugins-official (code-intelligence LSP plugins)"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Serena",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+            "layer_id": "code-navigation",
+            "repository": "https://github.com/oraios/serena",
+            "row_kind": "first_round",
+            "slot_id": "serena",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "claude-plugins-official (code-intelligence LSP plugins)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+            "layer_id": "code-navigation",
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "row_kind": "first_round",
+            "slot_id": "claude-plugins-official-code-intelligence-lsp-pl",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -449,6 +711,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "document-retrieval",
+        "owns": [
+          "tobi/qmd",
+          "MinerU"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "tobi/qmd",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "document-retrieval",
+            "repository": "https://github.com/tobi/qmd",
+            "row_kind": "first_round",
+            "slot_id": "tobi-qmd",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "MinerU",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "document-retrieval",
+            "repository": "https://github.com/opendatalab/mineru",
+            "row_kind": "first_round",
+            "slot_id": "mineru",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -523,6 +832,34 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "semantic-rag",
+        "owns": [],
+        "uses": [
+          "the local model server for embeddings (observation-inference)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "Not installed until the deciding measurement returns (the families split between semble and SocratiCode)",
+            "definitive": false,
+            "gpt": "converged",
+            "installs_nothing_extra": true,
+            "label": "split between the model families; the measurement the critics named decides, before the clean install",
+            "layer_id": "semantic-rag",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "code-search",
+            "state": "split"
+          },
+          "state": "split"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -602,6 +939,34 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "durable-memory",
+        "owns": [],
+        "uses": [
+          "the local model server for Hindsight's local-model arm (observation-inference)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory)",
+            "definitive": false,
+            "gpt": "converged",
+            "installs_nothing_extra": true,
+            "label": "decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent",
+            "layer_id": "durable-memory",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "memory-owner",
+            "state": "measurement"
+          },
+          "state": "measurement"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -677,6 +1042,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "web-research",
+        "owns": [
+          "trafilatura",
+          "Playwright CLI"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "trafilatura",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "web-research",
+            "repository": "https://github.com/adbar/trafilatura",
+            "row_kind": "first_round",
+            "slot_id": "trafilatura",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Playwright CLI",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "web-research",
+            "repository": "https://github.com/microsoft/playwright-cli",
+            "row_kind": "first_round",
+            "slot_id": "playwright-cli",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -751,6 +1163,52 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "token-efficiency",
+        "owns": [
+          "ccusage"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "ccusage",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+            "layer_id": "token-efficiency",
+            "repository": "https://github.com/ccusage/ccusage",
+            "row_kind": "first_round",
+            "slot_id": "ccusage",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "No context-supply layer: the usage meter only",
+            "definitive": true,
+            "gpt": "converged",
+            "installs_nothing_extra": true,
+            "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
+            "layer_id": "token-efficiency",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "context-supply",
+            "state": "definitive"
+          },
+          "state": "definitive"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -826,6 +1284,72 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "quality-evaluation",
+        "owns": [
+          "Inspect AI",
+          "Harbor (containerized agent E2E runner)",
+          "Promptfoo"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Inspect AI",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "quality-evaluation",
+            "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+            "row_kind": "first_round",
+            "slot_id": "inspect-ai",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Harbor (containerized agent E2E runner)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "quality-evaluation",
+            "repository": "https://github.com/harbor-framework/harbor",
+            "row_kind": "first_round",
+            "slot_id": "harbor-containerized-agent-e2e-runner",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Promptfoo",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "quality-evaluation",
+            "repository": "https://github.com/promptfoo/promptfoo",
+            "row_kind": "first_round",
+            "slot_id": "promptfoo",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -900,6 +1424,129 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "ci-supply-chain",
+        "owns": [
+          "zizmor",
+          "attest",
+          "Syft",
+          "Dependabot",
+          "codeql-sarif",
+          "actionlint (kjanat)"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "zizmor",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/zizmorcore/zizmor",
+            "row_kind": "first_round",
+            "slot_id": "zizmor",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "attest",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/actions/attest",
+            "row_kind": "first_round",
+            "slot_id": "attest",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Syft",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/anchore/syft",
+            "row_kind": "first_round",
+            "slot_id": "syft",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Dependabot",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/dependabot/dependabot-core",
+            "row_kind": "first_round",
+            "slot_id": "dependabot",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "codeql-sarif",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/github/codeql-action",
+            "row_kind": "first_round",
+            "slot_id": "codeql-sarif",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "actionlint (kjanat)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "ci-supply-chain",
+            "repository": "https://github.com/kjanat/actionlint",
+            "row_kind": "first_round",
+            "slot_id": "actionlint-kjanat",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -980,6 +1627,36 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "scheduling-supervision",
+        "owns": [
+          "Dagu"
+        ],
+        "uses": [
+          "systemd user units (cross:wsl-distro)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Dagu",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "scheduling-supervision",
+            "repository": "https://github.com/dagucloud/dagu",
+            "row_kind": "first_round",
+            "slot_id": "dagu",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1055,6 +1732,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "hosting-services",
+        "owns": [
+          "Docker Compose",
+          "Docker Engine / Moby"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Docker Compose",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+            "layer_id": "hosting-services",
+            "repository": "https://github.com/docker/compose",
+            "row_kind": "first_round",
+            "slot_id": "docker-compose",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "Docker Engine / Moby",
+            "definitive": true,
+            "gpt": "converged",
+            "installs_nothing_extra": false,
+            "label": "default on documented fit; nothing measured separates the finalists",
+            "layer_id": "hosting-services",
+            "repository": "https://github.com/moby/moby",
+            "row_kind": "judged",
+            "slot_id": "container-engine",
+            "state": "definitive"
+          },
+          "state": "definitive"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1128,6 +1852,72 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "recovery-portability",
+        "owns": [
+          "mise",
+          "Restic",
+          "chezmoi"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "mise",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "recovery-portability",
+            "repository": "https://github.com/jdx/mise",
+            "row_kind": "first_round",
+            "slot_id": "mise",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Restic",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "recovery-portability",
+            "repository": "https://github.com/restic/restic",
+            "row_kind": "first_round",
+            "slot_id": "restic",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "chezmoi",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "recovery-portability",
+            "repository": "https://github.com/twpayne/chezmoi",
+            "row_kind": "first_round",
+            "slot_id": "chezmoi",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1207,6 +1997,128 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "observation-inference",
+        "owns": [
+          "OTel Collector Contrib",
+          "Prometheus",
+          "Loki",
+          "Grafana",
+          "Phoenix"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "OTel Collector Contrib",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "observation-inference",
+            "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "row_kind": "first_round",
+            "slot_id": "otel-collector-contrib",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Prometheus",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "observation-inference",
+            "repository": "https://github.com/prometheus/prometheus",
+            "row_kind": "first_round",
+            "slot_id": "prometheus",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Loki",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "observation-inference",
+            "repository": "https://github.com/grafana/loki",
+            "row_kind": "first_round",
+            "slot_id": "loki",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Grafana",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "observation-inference",
+            "repository": "https://github.com/grafana/grafana",
+            "row_kind": "first_round",
+            "slot_id": "grafana",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Phoenix",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "observation-inference",
+            "repository": "https://github.com/Arize-ai/phoenix",
+            "row_kind": "first_round",
+            "slot_id": "phoenix",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "converged",
+            "coincides_with_lane_record": null,
+            "default": "Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama)",
+            "definitive": false,
+            "gpt": "converged",
+            "installs_nothing_extra": true,
+            "label": "split between the model families; the measurement the critics named decides, before the clean install",
+            "layer_id": "observation-inference",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "local-model-server",
+            "state": "split"
+          },
+          "state": "split"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1288,6 +2200,55 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "agent-sdks",
+        "owns": [
+          "Claude Agent SDK",
+          "Codex SDK and codex exec/app-server"
+        ],
+        "uses": [
+          "Claude Code and Codex (native-clients)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Claude Agent SDK",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld",
+            "layer_id": "agent-sdks",
+            "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+            "row_kind": "first_round",
+            "slot_id": "claude-agent-sdk",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Codex SDK and codex exec/app-server",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld",
+            "layer_id": "agent-sdks",
+            "repository": "https://github.com/openai/codex",
+            "row_kind": "first_round",
+            "slot_id": "codex-sdk-and-codex-exec-app-server",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1364,6 +2325,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "mcp-surfaces",
+        "owns": [
+          "mcporter",
+          "MCP Inspector"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "mcporter",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "mcp-surfaces",
+            "repository": "https://github.com/openclaw/mcporter",
+            "row_kind": "first_round",
+            "slot_id": "mcporter",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "MCP Inspector",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "mcp-surfaces",
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "row_kind": "first_round",
+            "slot_id": "mcp-inspector",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1436,6 +2444,53 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "secrets-credentials",
+        "owns": [
+          "betterleaks",
+          "trufflehog"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "betterleaks",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "secrets-credentials",
+            "repository": "https://github.com/betterleaks/betterleaks",
+            "row_kind": "first_round",
+            "slot_id": "betterleaks",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "trufflehog",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "secrets-credentials",
+            "repository": "https://github.com/trufflesecurity/trufflehog",
+            "row_kind": "first_round",
+            "slot_id": "trufflehog",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1508,6 +2563,128 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "git-github-automation",
+        "owns": [
+          "git",
+          "gh (GitHub CLI)",
+          "worktrunk",
+          "difftastic",
+          "claude-code-action"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "git",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "git-github-automation",
+            "repository": "https://github.com/git/git",
+            "row_kind": "first_round",
+            "slot_id": "git",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "gh (GitHub CLI)",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "git-github-automation",
+            "repository": "https://github.com/cli/cli",
+            "row_kind": "first_round",
+            "slot_id": "gh-github-cli",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "worktrunk",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "git-github-automation",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "row_kind": "first_round",
+            "slot_id": "worktrunk",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "difftastic",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "git-github-automation",
+            "repository": "https://github.com/Wilfred/difftastic",
+            "row_kind": "first_round",
+            "slot_id": "difftastic",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "claude-code-action",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "git-github-automation",
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "row_kind": "first_round",
+            "slot_id": "claude-code-action",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Not installed: git diff and difftastic cover diffs",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": true,
+            "label": "no-install default: the first round kept sem only if a comparison shows a gain",
+            "layer_id": "git-github-automation",
+            "repository": "",
+            "row_kind": "first_round",
+            "slot_id": "agent-structural-diff",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -1591,6 +2768,76 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "market-data-reference",
+        "owns": [
+          "slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research",
+          "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing",
+          "slot exchange-calendars (judged): exchange session calendars and half days"
+        ],
+        "uses": [
+          "alpaca-py (execution-broker) where the Alpaca market-data API is used",
+          "DuckDB with Parquet (storage-compute) for snapshots",
+          "pandera (data-quality-orchestration) for validation"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "Alpaca market data through alpaca-py (already installed for the selected broker path)",
+            "definitive": false,
+            "gpt": "returned",
+            "installs_nothing_extra": true,
+            "label": "",
+            "layer_id": "market-data-reference",
+            "repository": "https://github.com/alpacahq/alpaca-py",
+            "row_kind": "judged",
+            "slot_id": "market-data-provider",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "EdgarTools",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "market-data-reference",
+            "repository": "https://github.com/dgunning/edgartools",
+            "row_kind": "first_round",
+            "slot_id": "sec-filings",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "exchange_calendars",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "market-data-reference",
+            "repository": "https://github.com/gerrymanoim/exchange_calendars",
+            "row_kind": "first_round",
+            "slot_id": "exchange-calendars",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -1660,6 +2907,57 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "identity-provenance",
+        "owns": [
+          "slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)",
+          "slot security-identity (no blind default today): permanent security identity across ticker changes"
+        ],
+        "uses": [
+          "EdgarTools (market-data-reference) for CIK-keyed filings",
+          "DuckDB with Parquet (storage-compute)",
+          "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "DVC",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "identity-provenance",
+            "repository": "https://github.com/treeverse/dvc",
+            "row_kind": "first_round",
+            "slot_id": "research-data-versioning",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate",
+            "layer_id": "identity-provenance",
+            "repository": "",
+            "row_kind": "no_blind_default_today",
+            "slot_id": "security-identity",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -1729,6 +3027,54 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "storage-compute",
+        "owns": [
+          "slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"
+        ],
+        "uses": [
+          "Restic (foundation recovery-portability)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "DuckDB",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "storage-compute",
+            "repository": "https://github.com/duckdb/duckdb",
+            "row_kind": "first_round",
+            "slot_id": "analytical-storage/engine",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": true,
+            "label": "",
+            "layer_id": "storage-compute",
+            "repository": "",
+            "row_kind": "judged",
+            "slot_id": "analytical-storage/snapshot-table-layer",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -1798,6 +3144,37 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "data-quality-orchestration",
+        "owns": [
+          "slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"
+        ],
+        "uses": [
+          "Dagu (foundation scheduling-supervision)",
+          "systemd user units (foundation cross:wsl-distro) for the paper units"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "Pointblank",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "data-quality-orchestration",
+            "repository": "https://github.com/posit-dev/pointblank",
+            "row_kind": "judged",
+            "slot_id": "market-data-validation",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -1867,6 +3244,58 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "research-factors-ml",
+        "owns": [
+          "slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging",
+          "slot predictive-ml (no blind default today)"
+        ],
+        "uses": [
+          "EdgarTools (market-data-reference)",
+          "skfolio (portfolio-risk) for chronological evaluation",
+          "NautilusTrader (backtesting-engine) for replays",
+          "MLflow (evaluation-experiments) for run tracking"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "Qlib",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "research-factors-ml",
+            "repository": "https://github.com/microsoft/qlib",
+            "row_kind": "first_round",
+            "slot_id": "factor-research",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist",
+            "layer_id": "research-factors-ml",
+            "repository": "",
+            "row_kind": "no_blind_default_today",
+            "slot_id": "predictive-ml",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -1936,6 +3365,51 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "backtesting-engine",
+        "owns": [
+          "pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine",
+          "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "not judged",
+            "default": "NautilusTrader 2.0.0rc5",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "a requirement the user selected; carried with its committed receipts, never judged",
+            "layer_id": "backtesting-engine",
+            "repository": "",
+            "row_kind": "pinned",
+            "slot_id": "pinned/nautilustrader-2-0-0rc5"
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "LEAN",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "backtesting-engine",
+            "repository": "https://github.com/quantconnect/lean",
+            "row_kind": "judged",
+            "slot_id": "backtest-oracle",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2005,6 +3479,70 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "execution-broker",
+        "owns": [
+          "pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)",
+          "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc",
+          "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"
+        ],
+        "uses": [
+          "NautilusTrader (backtesting-engine)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "not judged",
+            "default": "IBKR path (NautilusTrader in-tree IBKR adapter)",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "a requirement the user selected; carried with its committed receipts, never judged",
+            "layer_id": "execution-broker",
+            "repository": "",
+            "row_kind": "pinned",
+            "slot_id": "pinned/ibkr-path--nautilustrader-in-tree-ibkr-a"
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "not judged",
+            "default": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "a requirement the user selected; carried with its committed receipts, never judged",
+            "layer_id": "execution-broker",
+            "repository": "",
+            "row_kind": "pinned",
+            "slot_id": "pinned/alpaca-adapter-path--alpaca-py-0-44-0---"
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "Dockerized IB Gateway",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "execution-broker",
+            "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+            "row_kind": "first_round",
+            "slot_id": "ib-gateway-runtime",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2074,6 +3612,55 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "portfolio-risk",
+        "owns": [
+          "slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)",
+          "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"
+        ],
+        "uses": [
+          "NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "skfolio",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "portfolio-risk",
+            "repository": "https://github.com/skfolio/skfolio",
+            "row_kind": "first_round",
+            "slot_id": "portfolio-construction",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "fincore",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "portfolio-risk",
+            "repository": "https://github.com/cloudQuant/fincore",
+            "row_kind": "judged",
+            "slot_id": "performance-analytics",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2143,6 +3730,74 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "evaluation-experiments",
+        "owns": [
+          "slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)",
+          "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"
+        ],
+        "uses": [
+          "Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations",
+          "agent-retrieval-bench (foundation quality-evaluation candidate task set)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": true,
+            "default": "MLflow",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "evaluation-experiments",
+            "repository": "https://github.com/mlflow/mlflow",
+            "row_kind": "first_round",
+            "slot_id": "experiment-tracking",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "arch",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "evaluation-experiments",
+            "repository": "https://github.com/bashtage/arch",
+            "row_kind": "first_round",
+            "slot_id": "strategy-qualification-statistics/arch",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "us-equities",
+            "claude": "converged",
+            "coincides_with_lane_record": false,
+            "default": "purgedcv / purged-cross-validation",
+            "definitive": false,
+            "gpt": "pending",
+            "installs_nothing_extra": false,
+            "label": "",
+            "layer_id": "evaluation-experiments",
+            "repository": "https://github.com/eslazarev/purged-cross-validation",
+            "row_kind": "first_round",
+            "slot_id": "strategy-qualification-statistics/purgedcv---purged-cross-validati",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2212,6 +3867,20 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "agents-models-workers",
+        "owns": [],
+        "uses": [
+          "Claude Code and Codex (foundation native-clients)",
+          "Claude Agent SDK and Codex SDK (foundation agent-sdks)",
+          "the durable-memory owner (foundation durable-memory)",
+          "QMD and MinerU (foundation document-retrieval) for dated financial sources",
+          "the semantic-rag owner (foundation semantic-rag)",
+          "native subagents (foundation workers)"
+        ]
+      },
+      "default_slots": [],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2281,6 +3950,20 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "observability-hosting",
+        "owns": [
+          "configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"
+        ],
+        "uses": [
+          "OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)",
+          "Dagu (foundation scheduling-supervision)",
+          "Restic (foundation recovery-portability)",
+          "the container engine (foundation hosting-services)"
+        ]
+      },
+      "default_slots": [],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2350,6 +4033,18 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "us-equities",
+        "layer_id": "security-supply-chain",
+        "owns": [
+          "engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"
+        ],
+        "uses": [
+          "betterleaks and trufflehog (foundation secrets-credentials)",
+          "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"
+        ]
+      },
+      "default_slots": [],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2416,6 +4111,34 @@
         "proposal_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "cross:wsl-distro",
+        "owns": [
+          "Ubuntu 26.04.1 LTS (Canonical WSL image), primary"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "returned",
+            "coincides_with_lane_record": null,
+            "default": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+            "definitive": false,
+            "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+            "installs_nothing_extra": false,
+            "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+            "layer_id": "cross:wsl-distro",
+            "repository": "https://ubuntu.com/download/server",
+            "row_kind": "first_round",
+            "slot_id": "base-distribution",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
       "family_verdicts": {
         "claude": {
@@ -2495,6 +4218,58 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "cross:runtime-workers",
+        "owns": [
+          "OpenHands software-agent-sdk",
+          "GPT Researcher",
+          "DeerFlow"
+        ],
+        "uses": [
+          "OmniRoute (cross:gpt6-harnesses)",
+          "the container engine (hosting-services)",
+          "Harbor and Inspect AI (quality-evaluation) for graded tasks"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "OpenHands software-agent-sdk",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "named by the user's directive of 2026-10-01; the source host's selection of record",
+            "layer_id": "cross:runtime-workers",
+            "repository": "https://github.com/OpenHands/software-agent-sdk",
+            "row_kind": "pinned",
+            "slot_id": "agent-runtime-worker",
+            "state": ""
+          },
+          "state": "pending"
+        },
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "GPT Researcher and DeerFlow, kept as two independent evidence gatherers",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "both named by the user's directive of 2026-10-01 for the evaluation work",
+            "layer_id": "cross:runtime-workers",
+            "repository": "https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow",
+            "row_kind": "pinned",
+            "slot_id": "research-harnesses",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2565,6 +4340,37 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "cross:gpt6-harnesses",
+        "owns": [
+          "OmniRoute (the GPT gateway)"
+        ],
+        "uses": [
+          "Codex (native-clients)",
+          "Codex SDK (agent-sdks)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "OmniRoute",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway",
+            "layer_id": "cross:gpt6-harnesses",
+            "repository": "https://github.com/diegosouzapw/OmniRoute",
+            "row_kind": "pinned",
+            "slot_id": "gpt-gateway",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2635,6 +4441,36 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "cross:credential-practice",
+        "owns": [
+          "the command and secret-path guard (this repository)"
+        ],
+        "uses": [
+          "betterleaks and trufflehog (secrets-credentials)"
+        ]
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "Command and secret-path guard (K4)",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "the project's own practice, not a third-party repository; settled by its closure record, not by a blind round",
+            "layer_id": "cross:credential-practice",
+            "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+            "row_kind": "project_practice",
+            "slot_id": "credential-guard",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2705,6 +4541,34 @@
         "proposal_source": null,
         "status": "pending target-host experiment preregistration"
       },
+      "default_ownership": {
+        "catalog": "foundation",
+        "layer_id": "cross:convergence-practice",
+        "owns": [
+          "the convergence practice and its validators (this repository)"
+        ],
+        "uses": []
+      },
+      "default_slots": [
+        {
+          "record": {
+            "catalog": "foundation",
+            "claude": "not judged",
+            "coincides_with_lane_record": null,
+            "default": "Convergence practice and its validators",
+            "definitive": false,
+            "gpt": "not judged",
+            "installs_nothing_extra": false,
+            "label": "the project's own practice, not a third-party repository; settled by its closure record",
+            "layer_id": "cross:convergence-practice",
+            "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+            "row_kind": "project_practice",
+            "slot_id": "convergence-validators",
+            "state": ""
+          },
+          "state": "pending"
+        }
+      ],
       "evidence_class_today": "pending clean-install assessment",
       "family_verdicts": {
         "claude": {
@@ -2779,7 +4643,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa"
+      "sha256": "b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -2892,6 +4756,10 @@
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
       "sha256": "2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f"
     }
   ],
   "stage_order": [
@@ -3106,17 +4974,21 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "pip install -e \".[dev]\" && python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.2.163 source checkout in the upstream Python test environment with its development extras.",
+          "This selects tests/, not the separate authenticated e2e-tests/ workflow."
+        ],
+        "scope": "Unchanged upstream source tests; no native sign-in, authenticated SDK turn, provider or new-host acceptance.",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Claude Agent SDK"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -3134,11 +5006,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
         "command": "pip install claude-agent-sdk==0.2.163",
-        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Python environment and pip for claude-agent-sdk 0.2.163."
+        ],
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Claude Agent SDK",
       "owner_layer_id": "agent-sdks",
@@ -3620,22 +5498,25 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "pytest test -vv",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Same exact source checkout with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.",
+          "The upstream Poe test task supplies pytest test -vv; language-server dependencies remain those of the upstream test configuration."
+        ],
+        "scope": "Unchanged upstream source test task, not installed language-server, MCP, provider or new-host acceptance.",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Serena"
       ],
       "blocking_gaps": [
         "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; a pin-matching upstream install remains required.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The reviewed quick start targets PyPI, while this row retains a Git commit. The exact supported commit-pinned install requires verification.",
+        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; the documented source-checkout installation does not establish PyPI equivalence.",
         "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
+        "checksum: source identity does not verify an install artifact or lockfile"
       ],
       "checksum": {
         "algorithm": "git-sha1",
@@ -3654,11 +5535,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
-        "command": null,
-        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+        "command": "uv tool install --reinstall -p 3.13 .",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from an owned checkout at c6fbd1c5932df2494ffa0020af5a9fbe80b82143; the dot operand refers to that checkout.",
+          "uv and Python 3.13 must be available; this local source install does not prove equivalence to the PyPI package."
+        ],
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Serena",
       "owner_layer_id": "code-navigation",
@@ -4068,19 +5956,21 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "uv pip install --system -e \".[dev]\" && python -m pytest --cov=./ --cov-report=xml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2.2.0 source checkout in an owned disposable workflow environment with its selected Python and uv.",
+          "The --system argument is copied from CI and targets that disposable environment, not the host OS Python. The non-minimal workflow arm also installs .[all] plus libcurl4-gnutls-dev and libgnutls28-dev; those prerequisites are not implied by this two-step excerpt."
+        ],
+        "scope": "Upstream editable dev install and pytest steps only; the omitted lint, type-check, docs and non-minimal setup are not qualified. No installed extraction or new-host execution.",
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/.github/workflows/tests.yml",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "trafilatura"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The selected official installation URL could not be fetched in this session, and the tagged README did not establish the full install command. Do not infer one from the PyPI artifact.",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -4098,11 +5988,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://trafilatura.readthedocs.io/en/latest/installation.html"
+        "https://trafilatura.readthedocs.io/en/latest/installation.html",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
-        "command": null,
-        "source": null
+        "command": "pip install trafilatura==2.2.0",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Use an owned Python environment with pip; the selected package is trafilatura 2.2.0."
+        ],
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "trafilatura",
       "owner_layer_id": "web-research",
@@ -4128,17 +6024,21 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "npm ci && npm run test",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
+          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
+        ],
+        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Playwright CLI"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -4156,13 +6056,19 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md"
+        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
         "command": "npm install -g @playwright/cli@0.1.21",
+        "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "prerequisites": [
+          "Node/npm and the selected package installation target must be available."
+        ],
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md"
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Playwright CLI",
       "owner_layer_id": "web-research",
@@ -4997,9 +6903,16 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ -m \"not runtime\" --cov=src/harbor --cov-report=term-missing",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.23.0 Linux source checkout with the locked all-packages/all-extras environment and Python 3.13.",
+          "The upstream Linux workflow sets up Docker, Docker Compose and Deno v2.x before this non-runtime suite. Those developer prerequisites remain unprovisioned."
+        ],
+        "scope": "Exact Linux non-runtime pytest steps; the separate runtime/Podman and Windows suites, agent/provider benchmarks and destination acceptance are excluded. Published wheel metadata is not a downloaded or rehashed artifact.",
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/.github/workflows/pytest.yml",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Harbor (containerized agent E2E runner)",
@@ -5007,10 +6920,8 @@
       ],
       "blocking_gaps": [
         "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
         "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
+        "checksum: source identity does not verify an install artifact or lockfile"
       ],
       "checksum": {
         "algorithm": "git-sha1",
@@ -5029,11 +6940,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
         "command": "uv tool install harbor==0.23.0",
-        "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv and an owned tool installation scope for harbor 0.23.0."
+        ],
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Harbor",
       "owner_layer_id": "quality-evaluation",
@@ -5063,18 +6980,22 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "npm install && npm test",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
+        ],
+        "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Promptfoo",
         "promptfoo"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -5092,13 +7013,19 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md"
+        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
         "command": "npm install -g promptfoo@0.123.1",
+        "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "prerequisites": [
+          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+        ],
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md"
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "promptfoo",
       "owner_layer_id": "quality-evaluation",
@@ -6172,19 +8099,21 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "mise run test:unit && mise run test:e2e '^test_use$'",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
+        ],
+        "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "mise"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The tagged guide documents MISE_VERSION, but its exact v-prefixed version invocation was not independently verified. Node's minimal native adapter does not depend on mise.",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -6202,11 +8131,18 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
-        "command": null,
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "curl, sh and a chosen owned installation target; no installer was executed.",
+          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
+        ],
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "mise",
       "owner_layer_id": "recovery-portability",
@@ -6758,17 +8694,22 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "pnpm install --frozen-lockfile && pnpm -r --filter ./sdk/typescript run build && pnpm -r --filter ./sdk/typescript run test",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the rust-v0.159.3 repository root with the workflow's pnpm setup and Node.js 22.",
+          "Complete the selected workflow's Bazel preparation and build //codex-rs/cli:codex plus //codex-rs/code-mode-host:codex-code-mode-host. Stage both matching binaries together and set CODEX_EXEC_PATH to that CLI as the workflow specifies; no environment or credential values were read here.",
+          "The recorded install/build/test steps omit the separate lint step and do not reproduce the whole CI job."
+        ],
+        "scope": "Upstream SDK source test workflow with its matching CLI/code-mode-host prerequisites; no live provider/sign-in or new-host result. Python SDK qualification does not qualify this TypeScript SDK.",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/.github/workflows/sdk.yml#L126",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
         "Codex TypeScript SDK"
       ],
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
@@ -6782,13 +8723,19 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
         "command": "npm install @openai/codex-sdk@0.159.3",
+        "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "prerequisites": [
+          "Owned Node/npm project environment for @openai/codex-sdk 0.159.3."
+        ],
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md"
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "Codex TypeScript SDK",
       "owner_layer_id": "agent-sdks",

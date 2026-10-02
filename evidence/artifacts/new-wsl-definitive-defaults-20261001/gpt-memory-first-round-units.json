@@ -1,0 +1,64 @@
+{
+ "schema_version": 1,
+ "kind": "source-review-run-summary",
+ "what": "The GPT family's two first-round units for the durable-memory layer on 2026-10-01: the first ran without shell network or page fetching, the second is the rerun with shell network. Read from the units' retained event logs; the logs and returns stay private and are cited by hash.",
+ "model": "gpt-6.1-sol at ultra, native codex exec (codex-cli 0.159.3)",
+ "units": [
+  {
+   "unit": "order-1",
+   "events_sha256": "c91fe85b584f11d213ff46db33fc2c22f519fbc89bd10c65c8b73b65915a7e23",
+   "return_sha256": "69a4a225ef9401113dd32847b366d1cf01320120fd64e2f86ded1b56a4b7cf0f",
+   "shell_commands": 6,
+   "failed_shell_commands": [
+    {
+     "command": "gh auth status",
+     "exit_code": 1
+    },
+    {
+     "command": "curl to api.github.com",
+     "exit_code": 6
+    },
+    {
+     "command": "gh api",
+     "exit_code": 1
+    }
+   ],
+   "usage": {
+    "input_tokens": 742792,
+    "cached_input_tokens": 675840,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 10071,
+    "reasoning_output_tokens": 4694
+   },
+   "selection": [
+    "C08 — agentmemory (rohitg00)",
+    "C04 — agent-memory (tigerless-labs)",
+    "C15 — Basic Memory"
+   ],
+   "sources_read": 19,
+   "close_call": true
+  },
+  {
+   "unit": "order-1-parity",
+   "events_sha256": "53bc14364fe69db8c4d661366cc477714d725447940729431f4ca9f43426cb16",
+   "return_sha256": "5c8f26d48dd448db89db7bf9ce756f8a702273e3846b17353e61e3cd128a9569",
+   "shell_commands": 21,
+   "failed_shell_commands": [],
+   "usage": {
+    "input_tokens": 4330666,
+    "cached_input_tokens": 4189952,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 31070,
+    "reasoning_output_tokens": 14004
+   },
+   "selection": [
+    "C02 — ai-memory",
+    "C08 — agentmemory (rohitg00)",
+    "C10 — deja-vu"
+   ],
+   "sources_read": 41,
+   "close_call": true
+  }
+ ],
+ "limits": "counts and exit codes only; the page-fetch tool was refused by the session's approval policy in the rerun, which the unit's own evidence gaps record"
+}

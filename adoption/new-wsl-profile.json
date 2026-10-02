@@ -833,9 +833,7 @@
       "default_install": false,
       "blocking_gaps": [
         "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; a pin-matching upstream install remains required.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The reviewed quick start targets PyPI, while this row retains a Git commit. The exact supported commit-pinned install requires verification."
+        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; the documented source-checkout installation does not establish PyPI equivalence."
       ],
       "artifact": {
         "name": "git source at c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
@@ -849,13 +847,26 @@
       },
       "integrity_observation": "source_identity_only",
       "install": {
-        "command": null,
-        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+        "command": "uv tool install --reinstall -p 3.13 .",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from an owned checkout at c6fbd1c5932df2494ffa0020af5a9fbe80b82143; the dot operand refers to that checkout.",
+          "uv and Python 3.13 must be available; this local source install does not prove equivalence to the PyPI package."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "pytest test -vv",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Same exact source checkout with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.",
+          "The upstream Poe test task supplies pytest test -vv; language-server dependencies remain those of the upstream test configuration."
+        ],
+        "scope": "Unchanged upstream source test task, not installed language-server, MCP, provider or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -864,7 +875,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": null,
       "source_pin_kind": "commit"
@@ -884,10 +896,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The selected official installation URL could not be fetched in this session, and the tagged README did not establish the full install command. Do not infer one from the PyPI artifact."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "trafilatura-2.2.0-py3-none-any.whl",
         "url": "https://files.pythonhosted.org/packages/c3/01/af18878398102a5a5afa0811f4f8f2a8a94a60cc16e8e9cf54bc95f96808/trafilatura-2.2.0-py3-none-any.whl"
@@ -900,13 +909,25 @@
       },
       "integrity_observation": "published_digest_not_rehashed",
       "install": {
-        "command": null,
-        "source": null
+        "command": "pip install trafilatura==2.2.0",
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Use an owned Python environment with pip; the selected package is trafilatura 2.2.0."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "uv pip install --system -e \".[dev]\" && python -m pytest --cov=./ --cov-report=xml",
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/.github/workflows/tests.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2.2.0 source checkout in an owned disposable workflow environment with its selected Python and uv.",
+          "The --system argument is copied from CI and targets that disposable environment, not the host OS Python. The non-minimal workflow arm also installs .[all] plus libcurl4-gnutls-dev and libgnutls28-dev; those prerequisites are not implied by this two-step excerpt."
+        ],
+        "scope": "Upstream editable dev install and pytest steps only; the omitted lint, type-check, docs and non-minimal setup are not qualified. No installed extraction or new-host execution.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -915,7 +936,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://trafilatura.readthedocs.io/en/latest/installation.html"
+        "https://trafilatura.readthedocs.io/en/latest/installation.html",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "2.2.0",
@@ -939,9 +961,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "cli-0.1.21.tgz",
         "url": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.21.tgz"
@@ -955,14 +975,26 @@
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
         "command": "npm install -g @playwright/cli@0.1.21",
-        "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node/npm and the selected package installation target must be available."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "npm ci && npm run test",
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
+          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
+        ],
+        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -971,7 +1003,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md"
+        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "0.1.21",
@@ -1102,8 +1135,7 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked."
       ],
       "artifact": {
         "name": "git source at 1e5c5c6db929a10a140d05e606882c671ae20729",
@@ -1118,12 +1150,24 @@
       "integrity_observation": "source_identity_only",
       "install": {
         "command": "uv tool install harbor==0.23.0",
-        "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv and an owned tool installation scope for harbor 0.23.0."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ -m \"not runtime\" --cov=src/harbor --cov-report=term-missing",
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/.github/workflows/pytest.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.23.0 Linux source checkout with the locked all-packages/all-extras environment and Python 3.13.",
+          "The upstream Linux workflow sets up Docker, Docker Compose and Deno v2.x before this non-runtime suite. Those developer prerequisites remain unprovisioned."
+        ],
+        "scope": "Exact Linux non-runtime pytest steps; the separate runtime/Podman and Windows suites, agent/provider benchmarks and destination acceptance are excluded. Published wheel metadata is not a downloaded or rehashed artifact.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -1132,7 +1176,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+        "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "v0.23.0",
@@ -1156,9 +1201,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "promptfoo-0.123.1.tgz",
         "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz"
@@ -1172,14 +1215,26 @@
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
         "command": "npm install -g promptfoo@0.123.1",
-        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "npm install && npm test",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
+        ],
+        "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -1188,7 +1243,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/quality-evaluation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md"
+        "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "0.123.1",
@@ -1322,9 +1378,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "claude_agent_sdk-0.2.163.tar.gz",
         "url": "https://files.pythonhosted.org/packages/9b/74/635d38e2ef813a2d1ba4ff7f3de736c35ee3bce9ebf4a5b7e89f3293604f/claude_agent_sdk-0.2.163.tar.gz"
@@ -1338,12 +1392,24 @@
       "integrity_observation": "published_digest_not_rehashed",
       "install": {
         "command": "pip install claude-agent-sdk==0.2.163",
-        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Python environment and pip for claude-agent-sdk 0.2.163."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "pip install -e \".[dev]\" && python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.2.163 source checkout in the upstream Python test environment with its development extras.",
+          "This selects tests/, not the separate authenticated e2e-tests/ workflow."
+        ],
+        "scope": "Unchanged upstream source tests; no native sign-in, authenticated SDK turn, provider or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -1352,7 +1418,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "0.2.163",
@@ -1376,9 +1443,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "codex-sdk-0.159.3.tgz",
         "url": "https://registry.npmjs.org/@openai/codex-sdk/-/codex-sdk-0.159.3.tgz"
@@ -1394,12 +1459,25 @@
         "command": "npm install @openai/codex-sdk@0.159.3",
         "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Node/npm project environment for @openai/codex-sdk 0.159.3."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "pnpm install --frozen-lockfile && pnpm -r --filter ./sdk/typescript run build && pnpm -r --filter ./sdk/typescript run test",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/.github/workflows/sdk.yml#L126",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the rust-v0.159.3 repository root with the workflow's pnpm setup and Node.js 22.",
+          "Complete the selected workflow's Bazel preparation and build //codex-rs/cli:codex plus //codex-rs/code-mode-host:codex-code-mode-host. Stage both matching binaries together and set CODEX_EXEC_PATH to that CLI as the workflow specifies; no environment or credential values were read here.",
+          "The recorded install/build/test steps omit the separate lint step and do not reproduce the whole CI job."
+        ],
+        "scope": "Upstream SDK source test workflow with its matching CLI/code-mode-host prerequisites; no live provider/sign-in or new-host result. Python SDK qualification does not qualify this TypeScript SDK.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "PR #580's Python package gate is merged. This TypeScript 0.159.3 row remains an independent source-review recommendation; PR #580 did not qualify TypeScript SDK adoption, installation, sign-in, provider execution or new-host acceptance.",
@@ -1409,7 +1487,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": {
         "tag": "0.159.3",
@@ -3106,10 +3185,7 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The tagged guide documents MISE_VERSION, but its exact v-prefixed version invocation was not independently verified. Node's minimal native adapter does not depend on mise."
-      ],
+      "blocking_gaps": [],
       "artifact": {
         "name": "mise-v2026.9.18-linux-x64.tar.gz",
         "url": "https://github.com/jdx/mise/releases/download/v2026.9.18/mise-v2026.9.18-linux-x64.tar.gz"
@@ -3122,13 +3198,26 @@
       },
       "integrity_observation": "published_digest_not_rehashed",
       "install": {
-        "command": null,
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "curl, sh and a chosen owned installation target; no installer was executed.",
+          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "mise run test:unit && mise run test:e2e '^test_use$'",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
+        ],
+        "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -3137,7 +3226,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "release": null,
       "source_pin_kind": "release_or_artifact_version"

@@ -338,7 +338,90 @@ the exact Hindsight exception and verdict-binding code were not changed.
 These results remain local integration evidence with no execution of the
 profile's provider or hardware commands. The continued failure triggered the
 requested Astra/max route; actual backend identity and usage remain unknown.
-Independent acceptance of this new frozen correction remains pending.
+Independent acceptance was pending at that frozen-correction handoff.
+
+## Project the owner's slot default states
+
+The separate default-state protocol is consumed from
+[`definitive-manifest.json` at reviewed source `f565764972a65554bd8968f6205957989c6ab3a7`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f565764972a65554bd8968f6205957989c6ab3a7/evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json).
+Its exact fetched bytes have SHA-256
+`16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f`.
+The schema and state meanings come from the same revision's
+[`assemble_manifest.py`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/f565764972a65554bd8968f6205957989c6ab3a7/evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py),
+especially `rows_of()` and `build()`. This extends the maintained handbook at
+[`18d9308cff5761c65cd36967db58020f5e40b6c8`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/18d9308cff5761c65cd36967db58020f5e40b6c8/scripts/build_new_wsl_handbook.py)
+using its existing confined reader, complete-payload privacy check, hashing and
+rendering functions. No new runtime or decision procedure was added.
+
+The canonical optional input is
+`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`.
+When present, it is read with the repository's confined `safe_file` path check.
+`--defaults-manifest` accepts an explicit file as a `supplied-preview`; its full
+bytes are hashed under the public canonical source path, and its complete
+payload is checked before projection. The external filesystem location never
+enters the handbook. The default path is labelled `published-source` when it
+exists. An explicit missing input fails instead of silently dropping the source.
+
+Each layer gains a separate default-slot table and JSON `default_slots`, joined
+by exact `layer_id`. The original slot row is retained under `record`; the
+displayed `state` maps an empty or omitted state to `pending`. The source has
+37 layers and 74 slots: three definitive, two split, one measurement, 65 with
+empty states and three pinned requirement rows with no state field. Thus 68
+display as pending. The original missing-versus-empty distinction survives in
+the retained records. The memory slot remains a measurement decision, and
+both split rows retain their exact deciding text.
+
+The producer emits no separate candidate-ID array. Its exact `default`,
+`repository`, `label`, `row_kind` and family-status fields supply the
+recommendation/candidate and provenance columns; the adapter does not parse
+candidate identities from prose. Manifest ownership is retained separately as
+`default_ownership`. The owner catalogues all five cross rows under foundation;
+the handbook keeps its conceptual cross inventory and preserves that source
+catalogue in provenance. Invalid states, missing or duplicate layers, unknown
+slot layers, inconsistent slot catalogues, duplicate slot IDs, duplicate
+ownership declarations and inconsistent declared counts fail generation.
+
+Top-level `default_decisions` retains the source's meaning, rules, limitations,
+counts and upstream source-file hashes. Those hashes remain the producer's
+provenance statements; reading the manifest does not re-run its model rounds or
+independently rehash its companion sources. The handbook introduces no decision
+rule and changes none of the existing tool picks, pins, provisioning statuses,
+acceptance examples, finality gates or `new_host_acceptance_claimed` flag.
+A source-fit default therefore cannot create host readiness or a live-provider
+claim. The coordinator requested Astra/max for this consequential separation
+of decision state from measured acceptance; actual backend identity and usage
+are not exposed by these integration checks.
+
+Six new local controls cover the exact reviewed manifest, invalid state/layer/
+ownership mutations, complete external source hashes and payload privacy,
+canonical-path confinement, source-fit/host-acceptance separation, and explicit
+missing inputs. Their initial run returned exit 1: `Ran 6 tests in 5.125s`,
+`FAILED (failures=11, errors=2)`. After implementation, the same scoped suite
+returned exit 0: `Ran 6 tests in 4.965s`, `OK`, with no skipped tests.
+`NEW_WSL_DEFAULTS_FIXTURE` supplied the exact reviewed manifest for the actual
+source test while its canonical repository path was unpublished. That test also
+exercises canonical-path loading inside an isolated fixture; it does not assert
+that the owner PR has merged. All 45 prior test bodies remain unchanged; their
+earlier evidence was retained rather than rerunning unrelated checks.
+
+The real source preview's `--write` and `--check` both returned exit 0 in a
+separate fixture checkout, with 37 layers, 74 projected slots, 73 existing tools,
+zero final layers and `new_host_acceptance_claimed: false`. The preview hashes
+are `6c824993b85541c3febc26efc3ff13dd24d9a6f743beb91bff35cee59c5681ec`
+for Markdown and
+`5daf91b58d846a61070e1f5ca0605394fb2b8c25bee93684fd971ee06812439a`
+for JSON. The worktree's manifest-absent `--check` also returned exit 0 and
+preserved its previous Markdown/JSON hashes `5a443fa223aa356f8723f3c467cbc0a3bb1d23dd67481cb9989309eae8e4c5b7`
+and `a3411297d8b33bd7363a9b99d659252585c5d7119b6586c7ce1b5c6cdb1ec687`
+byte for byte. Profile SHA-256 remains
+`d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa`.
+
+At this source-preview checkpoint the reviewed owner PR was still awaiting
+accepted-main confirmation. The two generated files in the worker checkout
+therefore retain the manifest-absent output; the preview artifacts are separate
+private integration evidence. Publication must regenerate against the accepted
+canonical source. These results are local adapter checks, not upstream model
+tests, new measurements, installations, provider calls or new-host acceptance.
 
 ## Task correction log
 
@@ -354,6 +437,7 @@ Independent acceptance of this new frozen correction remains pending.
 | Any Docker/Podman token enabled path exceptions across an entire payload. | Require the run prefix and a bounded named-volume option before the image; give unrelated shell text no exception. Preserve the one published multiline template only by its complete digest. | Both exact verifier payloads and the echo/operator/after-image mutations failed before the repair and now reject publication; the actual source reference and its altered-copy rejection are tested. |
 | Repository/owner identity collapsed the TypeScript and Python Codex packages and rejected their different checksums. | Use supported npm/PyPI metadata URLs to retain separate package identities; preserve unresolved aggregates, alias deduplication and strict same-package conflicts. | The real 69-entry profile and five new public-CLI controls failed before the correction and pass afterward; all 44 handbook checks pass, and the original profile-absent bytes are unchanged. |
 | The sole-package repository fallback assigned a canonical package to an explicit entry with an unsupported metadata URL. | Permit that fallback only for selection aliases without their own profile entry; retain an explicit unresolved entry separately with a package-binding gap. | The independent single-sibling probe was reproduced through the public CLI, failed before repair and passes afterward; all six affected package checks and actual-profile write/check pass. |
+| Initial manifest inspection assumed every slot had a `state` field and returned `KeyError: 'state'`. | The reviewed producer's `build()` emits three pinned requirement rows without that field. Preserve their raw records and display the missing states as pending, alongside the 65 explicit empty states. | The actual 74-slot projection control checks all original records and the exact 3 definitive / 2 split / 1 measurement / 68 pending display counts. |
 
 These corrections are recorded here because this bounded worker does not own
 the shared harness-defaults log. The coordinator can carry them into that log

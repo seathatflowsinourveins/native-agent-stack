@@ -1,9 +1,12 @@
 # U11: merit-neutral selection rules (design for review, 2026-10-01)
 
-Status: proposed, revision 4: the repair round over the two reviews of revision 1, the wording repair after the
+Status: proposed, revision 5 (2026-10-01): revision 4 plus the amendments in "Revision 5" below. Revision 4 was the
+repair round over the two reviews of revision 1, the wording repair after the
 second reads of revision 2, and the last qualifier and clarifications after the delta-reads of revision 3 (see Review
 history).
-Nothing in this record is implemented, and no prompt, verdict or acceptance record changes with it. Owner of the files
+Revisions 1 to 4 implemented nothing. Revision 5's item 1 records a round that has already run (the decision round of
+2026-10-01); it changed no sweep prompt, verdict or acceptance record. Its other items are policy for the
+implementing parts. Owner of the files
 and of the implementing pull requests: the foundation lane's coordinator (session `sota-default-harness-setup`).
 
 ## Why
@@ -143,20 +146,24 @@ hashes stay for every sweep already started (`tests/test_landscape_sweep_harness
 - Run order and time windows are counterbalanced across arms. No arm gets the source host's wiring beyond the
   upstream-documented integration, or every arm gets the same.
 - What installs on the new distribution, in this order:
-  - A layer that needs a comparison installs its arms fresh for the window in which its preregistered comparison runs.
-    Before that comparison any installation of the incumbent is one isolated comparison arm with no operational or
-    default precedence (program decision 5, which names a provisional default install of the recorded selection as its
-    overturn); a label alone does not satisfy this.
-  - Every other layer, and a layer past the re-vote cutoff, installs its selection of record provisionally (program
-    decision 3), labeled as not a merit result, with its pending set recorded and a reopening trigger: a `credible`
-    challenger after the re-vote moves it to `comparison_required` (F).
-  - The preregistration names what a no-selection outcome installs: both arms behind a selector, or neither, with the
-    layer's function left to the clients' built-in tools.
+  - A layer that needs a comparison installs one default: the pick of the blind decision round (revision 5, item 1;
+    program decision 6). Its arms run beforehand, on the current workstation or on a rehearsal distribution, each
+    installed fresh and isolated. No arm is installed on the new distribution, and the source host's recorded
+    selection has no precedence in the round. (Revision 4 read: arms install on the new distribution with no default
+    precedence.)
+  - Every other layer, and a layer past the re-vote cutoff, installs the blind first round's pick as its default
+    (program decision 6), labeled as not a merit result, with its pending set recorded and a reopening trigger: a
+    `credible` challenger after the re-vote moves it to `comparison_required` (F). The source host's selection of
+    record is not what installs; it is one member of the field. (Revision 4 read: installs its selection of record
+    provisionally.)
+  - A no-selection outcome, a split between the families and a slot the user hands to a measurement all install
+    nothing: the layer's function is left to the clients' built-in tools until the measurement returns. (Revision 4
+    also allowed both arms behind a selector.)
 - Tasks come from the layer's real workload. A named external benchmark is allowed with a recorded reason; unless that
   reason shows it represents the workload, its run is a pilot, not the deciding comparison.
-- Each arm runs fresh at its current release on the target host, installed by its upstream commands. Program decision 5
-  carries over: for a layer that needs a comparison, every arm installs fresh on the new distribution and the
-  comparison runs there; the recorded incumbent is not installed first as the default. Partial native evidence counts
+- Each arm runs fresh at its current release, installed by its upstream commands, on the current workstation or on a
+  rehearsal distribution of the target host, never on the clean install (program decision 6, which amends decision
+  5); the recorded incumbent has no precedence among the arms. Partial native evidence counts
   only for the operation it observed (`docs/acceptance-evidence-policy.md`, the claim boundary of each class); it neither
   disqualifies a member that lacks it nor replaces the comparison.
 - Uncertainty: paired differences on the shared tasks, clustered standard errors where tasks share a source, and a power
@@ -284,6 +291,47 @@ without an executed comparison.
 - Every external source was read on 2026-10-01 before it was cited. The Codex catalog lane's root named the OpenAI,
   Anthropic and Inspect sources and the paper sections; the Gate A owner's review named the tooling anchors and the
   ledger counts.
+
+## Revision 5 (2026-10-01)
+
+Two things prompted it: the user's directive for one default per slot (program decision 6), and the Gate A owner's review
+of the first implementing pull request (part 1). Each item is frozen policy for the implementing parts.
+
+1. **One default per slot.** Where the first blind round leaves several finalists, or the ownership map leaves two
+   tools for one job, a decision round names exactly one
+   default: per slot and per model family, two deciders with the finalists in different seeded orders, then one
+   adversarial critic. A default is definitive when both deciders of both families name it and both critics return
+   converged; a split is settled by the measurement the critics name, and until it returns nothing is installed for the
+   slot. Measured against measured, the evidence bar is the same in both directions (C). A default decided on documented
+   fit did not have to show a measured gain, while a challenger replaces it only with one (an interval that excludes
+   zero, plus the slot's gates): the bar to replace such a default is higher than the one it faced, and its row says
+   that it rests on documented fit. An option that installs nothing extra is the default unless a challenger shows a
+   gain on the requirement's own metric with an interval that excludes zero; this rule was stated before the round.
+   Where a documented-fit default is also the source host's selection of record, the asymmetry may not protect it:
+   its replacement is decided by a symmetric measurement (identical gates, the higher primary score on an interval,
+   measured secondaries in an order fixed before the data), and the blind round's pick decides only a tie that the
+   measurement leaves. Judges of later rounds run outside the project's agent environment, whose instructions and
+   tool lists name the source host's tools. A definitive default is an install decision. It does not meet C's bar
+   for a merit winner and is never recorded as one.
+2. **Equal facts for every member.** The blind fit input takes each member's upstream facts from one deterministic API
+   pull, the same pull the maintenance screen uses, never from whichever record names the member. Stars and license are
+   not in the blind input. (Measured on part 1: facts were populated for 74%, 30% and 81% of the foundation's adopted,
+   catalog and sweep-only members.)
+3. **Criterion (i), archived or stale,** is decided by script from the API fact for every member. Until that screen
+   exists no V2 run launches, and the implementing part says so.
+4. **Criterion (iv), paid service.** Each layer carries `paid_service_allowed`, set by the layer's owner, false by
+   default and bound into the frozen scope hash; a later change makes a new frozen field. Where it is false, a member
+   that cannot meet the requirement without a paid service is excluded with the fact. Where it is true, the member stays
+   and carries a user purchase gate. Until the field exists, a `paid_service_required` vote never excludes and is
+   recorded pending.
+5. **Which role may exclude on what.** The facts role may exclude only on the target-host and paid-service criteria. An
+   outside-the-requirement exclusion stands only when the fit role returns it, or when both roles agree. Every exclusion
+   needs both families' majorities within one role, with the criterion and the fact recorded.
+6. **A proposal the tooling cannot identify** (a repository outside the supported hosts, a documentation page, a null or
+   malformed identity) stays pending with its raw return and a failure record. It never aborts the conversion of the
+   other layers.
+7. **Acceptance summaries.** Where the tooling restates a plan's acceptance requirement, a test pins the sha256 of the
+   plan section it summarizes, and the owning lane confirms the text.
 
 ## Overturn
 

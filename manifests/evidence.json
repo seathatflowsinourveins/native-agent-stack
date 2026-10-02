@@ -4260,13 +4260,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
-      "bytes": 195818
+      "sha256": "b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92",
+      "bytes": 204217
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "c9ee10df153a4b8cb5636ea0f69296591795e6be1861d957d4cc4eadac18ae4a",
-      "bytes": 12564
+      "sha256": "f6671904e37be92690306934303ba99be0c16c47436a9414163de256ccafadbd",
+      "bytes": 15522
     },
     {
       "path": "adoption/paired/README.md",
@@ -15710,9 +15710,14 @@
       "bytes": 20693
     },
     {
+      "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+      "sha256": "65e5dd299b3ed7f5fb533d2e61634d409968de1d2f804e862e77ba749019f6cd",
+      "bytes": 33018
+    },
+    {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
-      "sha256": "0cbc8f65e6b09618208724fc118c0d9e13fd4326674650fb2699e2db9b8a6f7c",
-      "bytes": 25617
+      "sha256": "3602843d89b1d7e71df09e5e6c2ae0b244bf4d9b8d2966602c7347a3107894d9",
+      "bytes": 31917
     },
     {
       "path": "docs/direct-results.md",
@@ -15846,8 +15851,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "6cdbf83785a788bbae6fe46c36a8df156b605d80d10024403fc62642bbed7de8",
-      "bytes": 126065
+      "sha256": "bcfd68430f325a4395ad02e4a0bfbeeb3cd18722b12d6fcd87763b988f69075b",
+      "bytes": 129343
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -15976,13 +15981,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "a3411297d8b33bd7363a9b99d659252585c5d7119b6586c7ce1b5c6cdb1ec687",
-      "bytes": 339709
+      "sha256": "6721c9cc60e2f7f7cf2479801bfab215b0046cea06812b03a2c33090ea4838d3",
+      "bytes": 419270
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "5a443fa223aa356f8723f3c467cbc0a3bb1d23dd67481cb9989309eae8e4c5b7",
-      "bytes": 221312
+      "sha256": "efaa74ace284b9b9e8c49cb54ded268912e7cc321303e71e031b5e3b17703fb7",
+      "bytes": 274884
     },
     {
       "path": "docs/next-host-stages.md",
@@ -35635,9 +35640,174 @@
       "bytes": 79538
     },
     {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/README.md",
+      "sha256": "7f8ff105e4a573021afc32ea068993a491ebafcaf6920b0c357ceb7f77a8ec34",
+      "bytes": 4337
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_foundation_definitive.py",
+      "sha256": "9781d344f98a56bd3bc1e77530ffa78d346d92c791095461add6a2d56704d08b",
+      "bytes": 31537
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
+      "sha256": "882dee00ef856aba9f126eba89e2bbadee54f2de7f1e2458dfd6dd163fe8efc9",
+      "bytes": 6376
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
+      "sha256": "4c54bd2f866cc53b3beca465fd23e5178472d8f58c04d8b61ed0f167fcbe2411",
+      "bytes": 12719
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/claude-decision-round-run.json",
+      "sha256": "65d97cbf4c24149e5a8810bcb869fd889c5475adffa92f4a7eb5e27f7bd71f0b",
+      "bytes": 749
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+      "bytes": 992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-critic-prompt.txt",
+      "sha256": "5300306720bd7c5507e8baf828fa57adbadd9efe7c410a33940cf53d501f1507",
+      "bytes": 2128
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-prompt.txt",
+      "sha256": "39b2bff604833badfd2c46647a1bd26651f3b2e2ddb8f06cef1b98bf3bd86086",
+      "bytes": 2557
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-workflow.js",
+      "sha256": "2c94d902ea8e161e951187595c52fc964d7a663f7b33bd4d2a17d082cff78f48",
+      "bytes": 4508
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f",
+      "bytes": 53054
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
+      "sha256": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2",
+      "bytes": 320806
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/gpt-memory-first-round-units.json",
+      "sha256": "ba62499255776f3797487f9a60f9381fd5c47ee3c02d8dfdd533c4b870205935",
+      "bytes": 2044
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/code-search.order-1.json",
+      "sha256": "2f7aac38e186e549645cb3e4fd943f25a9145c82aee336121d8c6608e3a49ff1",
+      "bytes": 15272
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/code-search.order-2.json",
+      "sha256": "8e9fafa5189138325517e995bab227e8888a6306cb3985e06c6bae9b8a2e73c6",
+      "bytes": 15272
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/container-engine.order-1.json",
+      "sha256": "ecd521616f2a6a6e4036b9dc82b3e2b27132b5e01ac09f279912c8f64feb69ec",
+      "bytes": 19549
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/container-engine.order-2.json",
+      "sha256": "a953209b28a56a708127c3bc57fe18b8648548c45847c9274b50138dcdc3979b",
+      "bytes": 19549
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/context-supply.order-1.json",
+      "sha256": "4fbce0ce7c889bcd38648ae04dc898dbcf6d3531da8c8b0c68b3ccb77b1a7990",
+      "bytes": 15880
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/context-supply.order-2.json",
+      "sha256": "22a6275c33a05cff1ce2e81102ed5709d6d0396143cf5b739638467bd7798cb5",
+      "bytes": 15880
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/isolation-container-boundary.order-1.json",
+      "sha256": "ce69a582ec5328a4a3c3db7ce0b07676471d77b083266fc168c301707b6e4eb0",
+      "bytes": 14672
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/isolation-container-boundary.order-2.json",
+      "sha256": "1179d213a9872c1226f86e2098a5dfbfc35cd47f4c29b57b68caaaf4722ba76a",
+      "bytes": 14672
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/local-model-server.order-1.json",
+      "sha256": "acf0dc2ccfbfe7cfbd2584a955654bc268f0f092885ffceed5adb681cae1378c",
+      "bytes": 14196
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/local-model-server.order-2.json",
+      "sha256": "02059ce01081b5696ee832cc36fb61581c180a87e7ba9720cb8c2d1ab497e293",
+      "bytes": 14196
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/memory-owner.order-1.json",
+      "sha256": "4570b6493df94bfa3f2c925d0619c77259e0a9fd0bf1e2723ab1768e40a1bfd7",
+      "bytes": 30991
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/memory-owner.order-2.json",
+      "sha256": "1acb10449dcaf49dcb6db6abef37ec530a83d9613ddb154d7d3e39e0566cc43d",
+      "bytes": 30991
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/preregistration.json",
+      "sha256": "197d27b9714743e1c4d686ab091a6bf3ce7f63710ac2316497e90c276d730963",
+      "bytes": 2990
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
+      "sha256": "fdc9aa3fd7138fccb727a6f3ea0581557b4428a592255077619801e88dcf683e",
+      "bytes": 4118
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
+      "sha256": "4f57ef59740602131f90c7158bbc7b2c6744dc8d73c580b398ecf0f9e52f31ce",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
+      "sha256": "8bc7685af13c56284923b61fc1a1baadd336dd5f3e4e7db4c284dee023c1a30a",
+      "bytes": 23936
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/round1-preregistration.json",
+      "sha256": "de0192442f8317fa97f185974109e1a8835fc5122154f3c77ab4dbd33f00fef4",
+      "bytes": 4960
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/round2-preregistration.json",
+      "sha256": "e965175236e0601065c6572e205eaa30671752621e260eca4fe5873bceb69fa5",
+      "bytes": 3342
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json",
+      "sha256": "dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081",
+      "bytes": 115484
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-ownership.json",
+      "sha256": "4424d1abb1208518fb27ecec6219bec7f101b25b4d01f4b8d4c3e0ea0e76cf57",
+      "bytes": 10505
+    },
+    {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
       "sha256": "a69eacab74ce5c0bcc8abe6ecc35a2e4424b32ecd3f18737553e02680497f8fc",
       "bytes": 4174
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
+      "sha256": "2f655a90ccb7aab746b224865999387e804cc7e45623fc928bbb19739753bd31",
+      "bytes": 4419
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
@@ -35903,6 +36073,11 @@
       "path": "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
       "sha256": "9328a16072d7b54a0c5be6546bca2cf8a05b28de8cb8db95b25c85896673e47b",
       "bytes": 1468
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+      "sha256": "79b5cbbe8dc21fc53709b5a0dac60216348992ec5dfe5c0f6c464061af2c38e0",
+      "bytes": 54343
     },
     {
       "path": "evidence/artifacts/new-wsl-profile-20261001/final-freeze.json",
@@ -46876,8 +47051,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "f82e74111e4781881a01d43c243923b0cbf0ac3a6d7b07e18fba50585fa06d6c",
-      "bytes": 39270
+      "sha256": "bd1423260c589c226760dfdbdec751c13ae99b788cdf30bd5e9ce70e968a70d7",
+      "bytes": 46200
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -47781,8 +47956,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "eec812e2eb391f9518c67be56c70843bcd99bcc37185dbee70e5abf3d8ca1898",
-      "bytes": 34352
+      "sha256": "64ae954e7d6dd64bd9b45c2bf2615d8430f2e612b251540d80659d221590398b",
+      "bytes": 43192
     },
     {
       "path": "tests/test_new_wsl_profile.py",

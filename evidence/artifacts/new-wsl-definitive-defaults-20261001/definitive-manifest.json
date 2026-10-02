@@ -1,0 +1,1572 @@
+{
+ "schema_version": 1,
+ "kind": "new-wsl-definitive-manifest",
+ "date_utc": "2026-10-01",
+ "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
+ "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
+ "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
+ "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
+ "sources": {
+  "foundation": {
+   "file": "foundation-definitive.compact.json",
+   "sha256": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2"
+  },
+  "us-equities": {
+   "file": "trading/trading-definitive.compact.json",
+   "sha256": "dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081",
+   "owner": "trading lane (native-agent-stack-ae)"
+  }
+ },
+ "counts": {
+  "layers": 37,
+  "slots": 74,
+  "definitive": 3,
+  "by_row_kind": {
+   "first_round": 53,
+   "judged": 11,
+   "pinned": 6,
+   "project_practice": 2,
+   "no_blind_default_today": 2
+  }
+ },
+ "pinned_requirements": {
+  "us-equities": [
+   {
+    "name": "NautilusTrader 2.0.0rc5",
+    "owner": "backtesting-engine",
+    "source": "catalogs/us-equities/runtime-target.json engine (decision selected_destination)",
+    "evidence": [
+     "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json (one_zero PASS, rc5)",
+     "evidence/receipts/native-nautilus-v2-20260920.json (unchanged rc5 EURUSD quickstart)"
+    ],
+    "release_pin_rule": "the release pin changes only through a dated version-selection record after qualification"
+   },
+   {
+    "name": "IBKR path (NautilusTrader in-tree IBKR adapter)",
+    "owner": "execution-broker",
+    "source": "catalogs/us-equities/runtime-target.json broker_boundaries",
+    "evidence": [
+     "evidence/receipts/ibkr-readonly-acceptance-20260923.json (step 1 passed; steps 2-4 need the user's IB Gateway paper sign-in)"
+    ]
+   },
+   {
+    "name": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)",
+    "owner": "execution-broker",
+    "source": "catalogs/us-equities/runtime-target.json broker_boundaries",
+    "evidence": [
+     "blueprints/us-equities/adaptive-paper/trials/{pre,rth,ext}-20260929/receipt.json (11 of 13 trials passed, engine b528bb55)",
+     "blueprints/us-equities/adaptive-paper/native-faults/receipt.json (native_faults_passed on dca821cc, PR #584)"
+    ]
+   }
+  ]
+ },
+ "no_blind_default_today": {
+  "us-equities": [
+   {
+    "slot": "security-identity",
+    "owner": "identity-provenance",
+    "reason": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate"
+   },
+   {
+    "slot": "predictive-ml",
+    "owner": "research-factors-ml",
+    "reason": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist"
+   }
+  ]
+ },
+ "layers": [
+  {
+   "catalog": "foundation",
+   "layer_id": "native-clients",
+   "owns": [
+    "Claude Code",
+    "Codex"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "agent-sdks",
+   "owns": [
+    "Claude Agent SDK",
+    "Codex SDK and codex exec/app-server"
+   ],
+   "uses": [
+    "Claude Code and Codex (native-clients)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "instructions-skills",
+   "owns": [
+    "Trail of Bits security skills (trailofbits/skills)"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "mcp-surfaces",
+   "owns": [
+    "mcporter",
+    "MCP Inspector"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "workers",
+   "owns": [],
+   "uses": [
+    "the native subagents of Claude Code and Codex (native-clients)",
+    "Worktrunk (git-github-automation)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "isolation",
+   "owns": [
+    "sandbox-runtime (srt)"
+   ],
+   "uses": [
+    "Worktrunk (git-github-automation)",
+    "the container engine (hosting-services)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "code-navigation",
+   "owns": [
+    "Serena",
+    "claude-plugins-official (code-intelligence LSP plugins)"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "semantic-rag",
+   "owns": [],
+   "uses": [
+    "the local model server for embeddings (observation-inference)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "document-retrieval",
+   "owns": [
+    "tobi/qmd",
+    "MinerU"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "web-research",
+   "owns": [
+    "trafilatura",
+    "Playwright CLI"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "durable-memory",
+   "owns": [],
+   "uses": [
+    "the local model server for Hindsight's local-model arm (observation-inference)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "token-efficiency",
+   "owns": [
+    "ccusage"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "owns": [
+    "OTel Collector Contrib",
+    "Prometheus",
+    "Loki",
+    "Grafana",
+    "Phoenix"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "quality-evaluation",
+   "owns": [
+    "Inspect AI",
+    "Harbor (containerized agent E2E runner)",
+    "Promptfoo"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "owns": [
+    "zizmor",
+    "attest",
+    "Syft",
+    "Dependabot",
+    "codeql-sarif",
+    "actionlint (kjanat)"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "scheduling-supervision",
+   "owns": [
+    "Dagu"
+   ],
+   "uses": [
+    "systemd user units (cross:wsl-distro)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "hosting-services",
+   "owns": [
+    "Docker Compose",
+    "Docker Engine / Moby"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "secrets-credentials",
+   "owns": [
+    "betterleaks",
+    "trufflehog"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "owns": [
+    "git",
+    "gh (GitHub CLI)",
+    "worktrunk",
+    "difftastic",
+    "claude-code-action"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "recovery-portability",
+   "owns": [
+    "mise",
+    "Restic",
+    "chezmoi"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:wsl-distro",
+   "owns": [
+    "Ubuntu 26.04.1 LTS (Canonical WSL image), primary"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:gpt6-harnesses",
+   "owns": [
+    "OmniRoute (the GPT gateway)"
+   ],
+   "uses": [
+    "Codex (native-clients)",
+    "Codex SDK (agent-sdks)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:runtime-workers",
+   "owns": [
+    "OpenHands software-agent-sdk",
+    "GPT Researcher",
+    "DeerFlow"
+   ],
+   "uses": [
+    "OmniRoute (cross:gpt6-harnesses)",
+    "the container engine (hosting-services)",
+    "Harbor and Inspect AI (quality-evaluation) for graded tasks"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:credential-practice",
+   "owns": [
+    "the command and secret-path guard (this repository)"
+   ],
+   "uses": [
+    "betterleaks and trufflehog (secrets-credentials)"
+   ]
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:convergence-practice",
+   "owns": [
+    "the convergence practice and its validators (this repository)"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "market-data-reference",
+   "owns": [
+    "slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research",
+    "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing",
+    "slot exchange-calendars (judged): exchange session calendars and half days"
+   ],
+   "uses": [
+    "alpaca-py (execution-broker) where the Alpaca market-data API is used",
+    "DuckDB with Parquet (storage-compute) for snapshots",
+    "pandera (data-quality-orchestration) for validation"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "identity-provenance",
+   "owns": [
+    "slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)",
+    "slot security-identity (no blind default today): permanent security identity across ticker changes"
+   ],
+   "uses": [
+    "EdgarTools (market-data-reference) for CIK-keyed filings",
+    "DuckDB with Parquet (storage-compute)",
+    "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "storage-compute",
+   "owns": [
+    "slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"
+   ],
+   "uses": [
+    "Restic (foundation recovery-portability)"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "data-quality-orchestration",
+   "owns": [
+    "slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"
+   ],
+   "uses": [
+    "Dagu (foundation scheduling-supervision)",
+    "systemd user units (foundation cross:wsl-distro) for the paper units"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "research-factors-ml",
+   "owns": [
+    "slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging",
+    "slot predictive-ml (no blind default today)"
+   ],
+   "uses": [
+    "EdgarTools (market-data-reference)",
+    "skfolio (portfolio-risk) for chronological evaluation",
+    "NautilusTrader (backtesting-engine) for replays",
+    "MLflow (evaluation-experiments) for run tracking"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "backtesting-engine",
+   "owns": [
+    "pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine",
+    "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"
+   ],
+   "uses": []
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "execution-broker",
+   "owns": [
+    "pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)",
+    "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc",
+    "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"
+   ],
+   "uses": [
+    "NautilusTrader (backtesting-engine)"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "portfolio-risk",
+   "owns": [
+    "slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)",
+    "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"
+   ],
+   "uses": [
+    "NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "evaluation-experiments",
+   "owns": [
+    "slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)",
+    "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"
+   ],
+   "uses": [
+    "Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations",
+    "agent-retrieval-bench (foundation quality-evaluation candidate task set)"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "agents-models-workers",
+   "owns": [],
+   "uses": [
+    "Claude Code and Codex (foundation native-clients)",
+    "Claude Agent SDK and Codex SDK (foundation agent-sdks)",
+    "the durable-memory owner (foundation durable-memory)",
+    "QMD and MinerU (foundation document-retrieval) for dated financial sources",
+    "the semantic-rag owner (foundation semantic-rag)",
+    "native subagents (foundation workers)"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "observability-hosting",
+   "owns": [
+    "configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"
+   ],
+   "uses": [
+    "OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)",
+    "Dagu (foundation scheduling-supervision)",
+    "Restic (foundation recovery-portability)",
+    "the container engine (foundation hosting-services)"
+   ]
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "security-supply-chain",
+   "owns": [
+    "engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"
+   ],
+   "uses": [
+    "betterleaks and trufflehog (foundation secrets-credentials)",
+    "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"
+   ]
+  }
+ ],
+ "slots": [
+  {
+   "catalog": "foundation",
+   "layer_id": "native-clients",
+   "slot_id": "claude-code",
+   "row_kind": "first_round",
+   "default": "Claude Code",
+   "repository": "https://github.com/anthropics/claude-code",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "native-clients",
+   "slot_id": "codex",
+   "row_kind": "first_round",
+   "default": "Codex",
+   "repository": "https://github.com/openai/codex",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "agent-sdks",
+   "slot_id": "claude-agent-sdk",
+   "row_kind": "first_round",
+   "default": "Claude Agent SDK",
+   "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "agent-sdks",
+   "slot_id": "codex-sdk-and-codex-exec-app-server",
+   "row_kind": "first_round",
+   "default": "Codex SDK and codex exec/app-server",
+   "repository": "https://github.com/openai/codex",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "instructions-skills",
+   "slot_id": "trail-of-bits-security-skills-trailofbits-skills",
+   "row_kind": "first_round",
+   "default": "Trail of Bits security skills (trailofbits/skills)",
+   "repository": "https://github.com/trailofbits/skills",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "mcp-surfaces",
+   "slot_id": "mcporter",
+   "row_kind": "first_round",
+   "default": "mcporter",
+   "repository": "https://github.com/openclaw/mcporter",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "mcp-surfaces",
+   "slot_id": "mcp-inspector",
+   "row_kind": "first_round",
+   "default": "MCP Inspector",
+   "repository": "https://github.com/modelcontextprotocol/inspector",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "isolation",
+   "slot_id": "sandbox-runtime-srt",
+   "row_kind": "first_round",
+   "default": "sandbox-runtime (srt)",
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "isolation",
+   "slot_id": "isolation-container-boundary",
+   "row_kind": "judged",
+   "default": "No additional component: rootless containers on the container engine that the hosting layer installs",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": true,
+   "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
+   "state": "definitive",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "code-navigation",
+   "slot_id": "serena",
+   "row_kind": "first_round",
+   "default": "Serena",
+   "repository": "https://github.com/oraios/serena",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "code-navigation",
+   "slot_id": "claude-plugins-official-code-intelligence-lsp-pl",
+   "row_kind": "first_round",
+   "default": "claude-plugins-official (code-intelligence LSP plugins)",
+   "repository": "https://github.com/anthropics/claude-plugins-official",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "semantic-rag",
+   "slot_id": "code-search",
+   "row_kind": "judged",
+   "default": "Not installed until the deciding measurement returns (the families split between semble and SocratiCode)",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "split between the model families; the measurement the critics named decides, before the clean install",
+   "state": "split",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "document-retrieval",
+   "slot_id": "tobi-qmd",
+   "row_kind": "first_round",
+   "default": "tobi/qmd",
+   "repository": "https://github.com/tobi/qmd",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "document-retrieval",
+   "slot_id": "mineru",
+   "row_kind": "first_round",
+   "default": "MinerU",
+   "repository": "https://github.com/opendatalab/mineru",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "web-research",
+   "slot_id": "trafilatura",
+   "row_kind": "first_round",
+   "default": "trafilatura",
+   "repository": "https://github.com/adbar/trafilatura",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "web-research",
+   "slot_id": "playwright-cli",
+   "row_kind": "first_round",
+   "default": "Playwright CLI",
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "durable-memory",
+   "slot_id": "memory-owner",
+   "row_kind": "judged",
+   "default": "Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory)",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent",
+   "state": "measurement",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "token-efficiency",
+   "slot_id": "ccusage",
+   "row_kind": "first_round",
+   "default": "ccusage",
+   "repository": "https://github.com/ccusage/ccusage",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "token-efficiency",
+   "slot_id": "context-supply",
+   "row_kind": "judged",
+   "default": "No context-supply layer: the usage meter only",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": true,
+   "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
+   "state": "definitive",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "otel-collector-contrib",
+   "row_kind": "first_round",
+   "default": "OTel Collector Contrib",
+   "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "prometheus",
+   "row_kind": "first_round",
+   "default": "Prometheus",
+   "repository": "https://github.com/prometheus/prometheus",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "loki",
+   "row_kind": "first_round",
+   "default": "Loki",
+   "repository": "https://github.com/grafana/loki",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "grafana",
+   "row_kind": "first_round",
+   "default": "Grafana",
+   "repository": "https://github.com/grafana/grafana",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "phoenix",
+   "row_kind": "first_round",
+   "default": "Phoenix",
+   "repository": "https://github.com/Arize-ai/phoenix",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "observation-inference",
+   "slot_id": "local-model-server",
+   "row_kind": "judged",
+   "default": "Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama)",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "split between the model families; the measurement the critics named decides, before the clean install",
+   "state": "split",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "quality-evaluation",
+   "slot_id": "inspect-ai",
+   "row_kind": "first_round",
+   "default": "Inspect AI",
+   "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "quality-evaluation",
+   "slot_id": "harbor-containerized-agent-e2e-runner",
+   "row_kind": "first_round",
+   "default": "Harbor (containerized agent E2E runner)",
+   "repository": "https://github.com/harbor-framework/harbor",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "quality-evaluation",
+   "slot_id": "promptfoo",
+   "row_kind": "first_round",
+   "default": "Promptfoo",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "zizmor",
+   "row_kind": "first_round",
+   "default": "zizmor",
+   "repository": "https://github.com/zizmorcore/zizmor",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "attest",
+   "row_kind": "first_round",
+   "default": "attest",
+   "repository": "https://github.com/actions/attest",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "syft",
+   "row_kind": "first_round",
+   "default": "Syft",
+   "repository": "https://github.com/anchore/syft",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "dependabot",
+   "row_kind": "first_round",
+   "default": "Dependabot",
+   "repository": "https://github.com/dependabot/dependabot-core",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "codeql-sarif",
+   "row_kind": "first_round",
+   "default": "codeql-sarif",
+   "repository": "https://github.com/github/codeql-action",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "ci-supply-chain",
+   "slot_id": "actionlint-kjanat",
+   "row_kind": "first_round",
+   "default": "actionlint (kjanat)",
+   "repository": "https://github.com/kjanat/actionlint",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "scheduling-supervision",
+   "slot_id": "dagu",
+   "row_kind": "first_round",
+   "default": "Dagu",
+   "repository": "https://github.com/dagucloud/dagu",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "hosting-services",
+   "slot_id": "docker-compose",
+   "row_kind": "first_round",
+   "default": "Docker Compose",
+   "repository": "https://github.com/docker/compose",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "hosting-services",
+   "slot_id": "container-engine",
+   "row_kind": "judged",
+   "default": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby",
+   "installs_nothing_extra": false,
+   "definitive": true,
+   "label": "default on documented fit; nothing measured separates the finalists",
+   "state": "definitive",
+   "coincides_with_lane_record": null,
+   "claude": "converged",
+   "gpt": "converged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "secrets-credentials",
+   "slot_id": "betterleaks",
+   "row_kind": "first_round",
+   "default": "betterleaks",
+   "repository": "https://github.com/betterleaks/betterleaks",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "secrets-credentials",
+   "slot_id": "trufflehog",
+   "row_kind": "first_round",
+   "default": "trufflehog",
+   "repository": "https://github.com/trufflesecurity/trufflehog",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "git",
+   "row_kind": "first_round",
+   "default": "git",
+   "repository": "https://github.com/git/git",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "gh-github-cli",
+   "row_kind": "first_round",
+   "default": "gh (GitHub CLI)",
+   "repository": "https://github.com/cli/cli",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "worktrunk",
+   "row_kind": "first_round",
+   "default": "worktrunk",
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "difftastic",
+   "row_kind": "first_round",
+   "default": "difftastic",
+   "repository": "https://github.com/Wilfred/difftastic",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "claude-code-action",
+   "row_kind": "first_round",
+   "default": "claude-code-action",
+   "repository": "https://github.com/anthropics/claude-code-action",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "git-github-automation",
+   "slot_id": "agent-structural-diff",
+   "row_kind": "first_round",
+   "default": "Not installed: git diff and difftastic cover diffs",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "no-install default: the first round kept sem only if a comparison shows a gain",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "recovery-portability",
+   "slot_id": "mise",
+   "row_kind": "first_round",
+   "default": "mise",
+   "repository": "https://github.com/jdx/mise",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "recovery-portability",
+   "slot_id": "restic",
+   "row_kind": "first_round",
+   "default": "Restic",
+   "repository": "https://github.com/restic/restic",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "recovery-portability",
+   "slot_id": "chezmoi",
+   "row_kind": "first_round",
+   "default": "chezmoi",
+   "repository": "https://github.com/twpayne/chezmoi",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:wsl-distro",
+   "slot_id": "base-distribution",
+   "row_kind": "first_round",
+   "default": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+   "repository": "https://ubuntu.com/download/server",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "returned",
+   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:gpt6-harnesses",
+   "slot_id": "gpt-gateway",
+   "row_kind": "pinned",
+   "default": "OmniRoute",
+   "repository": "https://github.com/diegosouzapw/OmniRoute",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:runtime-workers",
+   "slot_id": "agent-runtime-worker",
+   "row_kind": "pinned",
+   "default": "OpenHands software-agent-sdk",
+   "repository": "https://github.com/OpenHands/software-agent-sdk",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "named by the user's directive of 2026-10-01; the source host's selection of record",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:runtime-workers",
+   "slot_id": "research-harnesses",
+   "row_kind": "pinned",
+   "default": "GPT Researcher and DeerFlow, kept as two independent evidence gatherers",
+   "repository": "https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "both named by the user's directive of 2026-10-01 for the evaluation work",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:credential-practice",
+   "slot_id": "credential-guard",
+   "row_kind": "project_practice",
+   "default": "Command and secret-path guard (K4)",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "the project's own practice, not a third-party repository; settled by its closure record, not by a blind round",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "foundation",
+   "layer_id": "cross:convergence-practice",
+   "slot_id": "convergence-validators",
+   "row_kind": "project_practice",
+   "default": "Convergence practice and its validators",
+   "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "the project's own practice, not a third-party repository; settled by its closure record",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "market-data-reference",
+   "slot_id": "market-data-provider",
+   "row_kind": "judged",
+   "default": "Alpaca market data through alpaca-py (already installed for the selected broker path)",
+   "repository": "https://github.com/alpacahq/alpaca-py",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "returned"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "market-data-reference",
+   "slot_id": "sec-filings",
+   "row_kind": "first_round",
+   "default": "EdgarTools",
+   "repository": "https://github.com/dgunning/edgartools",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "market-data-reference",
+   "slot_id": "exchange-calendars",
+   "row_kind": "first_round",
+   "default": "exchange_calendars",
+   "repository": "https://github.com/gerrymanoim/exchange_calendars",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "identity-provenance",
+   "slot_id": "research-data-versioning",
+   "row_kind": "first_round",
+   "default": "DVC",
+   "repository": "https://github.com/treeverse/dvc",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "identity-provenance",
+   "slot_id": "security-identity",
+   "row_kind": "no_blind_default_today",
+   "default": "",
+   "repository": "",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "storage-compute",
+   "slot_id": "analytical-storage/engine",
+   "row_kind": "first_round",
+   "default": "DuckDB",
+   "repository": "https://github.com/duckdb/duckdb",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "storage-compute",
+   "slot_id": "analytical-storage/snapshot-table-layer",
+   "row_kind": "judged",
+   "default": "No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool",
+   "repository": "",
+   "installs_nothing_extra": true,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "data-quality-orchestration",
+   "slot_id": "market-data-validation",
+   "row_kind": "judged",
+   "default": "Pointblank",
+   "repository": "https://github.com/posit-dev/pointblank",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "research-factors-ml",
+   "slot_id": "factor-research",
+   "row_kind": "first_round",
+   "default": "Qlib",
+   "repository": "https://github.com/microsoft/qlib",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "research-factors-ml",
+   "slot_id": "predictive-ml",
+   "row_kind": "no_blind_default_today",
+   "default": "",
+   "repository": "",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist",
+   "state": "",
+   "coincides_with_lane_record": null,
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "backtesting-engine",
+   "slot_id": "pinned/nautilustrader-2-0-0rc5",
+   "row_kind": "pinned",
+   "default": "NautilusTrader 2.0.0rc5",
+   "repository": "",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "backtesting-engine",
+   "slot_id": "backtest-oracle",
+   "row_kind": "judged",
+   "default": "LEAN",
+   "repository": "https://github.com/quantconnect/lean",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "execution-broker",
+   "slot_id": "pinned/ibkr-path--nautilustrader-in-tree-ibkr-a",
+   "row_kind": "pinned",
+   "default": "IBKR path (NautilusTrader in-tree IBKR adapter)",
+   "repository": "",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "execution-broker",
+   "slot_id": "pinned/alpaca-adapter-path--alpaca-py-0-44-0---",
+   "row_kind": "pinned",
+   "default": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)",
+   "repository": "",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "claude": "not judged",
+   "gpt": "not judged"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "execution-broker",
+   "slot_id": "ib-gateway-runtime",
+   "row_kind": "first_round",
+   "default": "Dockerized IB Gateway",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "portfolio-risk",
+   "slot_id": "portfolio-construction",
+   "row_kind": "first_round",
+   "default": "skfolio",
+   "repository": "https://github.com/skfolio/skfolio",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "portfolio-risk",
+   "slot_id": "performance-analytics",
+   "row_kind": "judged",
+   "default": "fincore",
+   "repository": "https://github.com/cloudQuant/fincore",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "evaluation-experiments",
+   "slot_id": "experiment-tracking",
+   "row_kind": "first_round",
+   "default": "MLflow",
+   "repository": "https://github.com/mlflow/mlflow",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": true,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "evaluation-experiments",
+   "slot_id": "strategy-qualification-statistics/arch",
+   "row_kind": "first_round",
+   "default": "arch",
+   "repository": "https://github.com/bashtage/arch",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  },
+  {
+   "catalog": "us-equities",
+   "layer_id": "evaluation-experiments",
+   "slot_id": "strategy-qualification-statistics/purgedcv---purged-cross-validati",
+   "row_kind": "first_round",
+   "default": "purgedcv / purged-cross-validation",
+   "repository": "https://github.com/eslazarev/purged-cross-validation",
+   "installs_nothing_extra": false,
+   "definitive": false,
+   "label": "",
+   "state": "",
+   "coincides_with_lane_record": false,
+   "claude": "converged",
+   "gpt": "pending"
+  }
+ ]
+}

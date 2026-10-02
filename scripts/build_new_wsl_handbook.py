@@ -34,6 +34,7 @@ TRADING = "catalogs/landscape/us-equities.json"
 DISTRO = "adoption/platforms/linux-wsl2-new-distro.md"
 ADOPTION = "adoption/manifest.json"
 PROFILE = "adoption/new-wsl-profile.json"
+DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
 SOURCES = (OWNERSHIP, SELECTION, EDITION, RESEARCH, TRADING, DISTRO,
            ADOPTION, PREREGISTRATION)
@@ -297,7 +298,77 @@ def read_verdicts(inputs, path, family, selection_hash, packets, releases):
     return bound, source
 
 
-def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=None):
+def read_default_decisions(inputs, reference, override=None):
+    """Project the owner's slot protocol; never derive a decision or readiness.
+
+    Source schema: assemble_manifest.py at f565764972a65554bd8968f6205957989c6ab3a7.
+    Empty states and the owner's pinned rows with no state remain pending.
+    """
+    if override is not None:
+        require(Path(override).is_file(), "explicit defaults manifest input does not exist")
+        value = inputs.read(DEFAULTS_MANIFEST, override=Path(override))
+    else:
+        path = inputs.root / DEFAULTS_MANIFEST
+        if not path.exists() and not path.is_symlink():
+            return None
+        value = inputs.read(DEFAULTS_MANIFEST)
+    validate_payload(value)
+    require(isinstance(value, dict) and value.get("schema_version") == 1
+            and value.get("kind") == "new-wsl-definitive-manifest", "unsupported defaults manifest schema")
+    require(isinstance(value.get("layers"), list) and isinstance(value.get("slots"), list),
+            "defaults manifest needs layer and slot lists")
+    layers = index_rows(value["layers"], "defaults manifest")
+    require(set(layers) == set(reference), "defaults manifest layer inventory differs from the handbook")
+    sources = value["sources"]
+    require(isinstance(sources, dict), "defaults manifest needs catalog provenance")
+    for source in sources.values():
+        require(isinstance(source, dict) and re.fullmatch(r"[a-fA-F0-9]{64}", str(source.get("sha256", ""))),
+                "defaults manifest catalog source needs SHA-256")
+        relative = public_path(source["file"])
+        safe_file(inputs.root, (Path(DEFAULTS_MANIFEST).parent / relative).as_posix())
+    declarations = set()
+    for row in layers.values():
+        require(row["catalog"] in sources, "defaults manifest layer has unknown source catalog")
+        for field in ("owns", "uses"):
+            require(isinstance(row.get(field), list)
+                    and all(isinstance(item, str) and item.strip() for item in row[field]),
+                    "defaults manifest ownership declarations must be text lists")
+        for declaration in row["owns"]:
+            normalized = declaration.casefold().strip()
+            require(normalized not in declarations, "duplicate defaults manifest ownership declaration")
+            declarations.add(normalized)
+    slots = {layer_id: [] for layer_id in layers}
+    identifiers = set()
+    kinds = {}
+    for slot in value["slots"]:
+        layer_id = slot["layer_id"]
+        require(layer_id in layers, "defaults manifest slot has unknown layer")
+        require(slot["catalog"] == layers[layer_id]["catalog"], "defaults manifest slot catalog differs from its owner")
+        identifier = slot["slot_id"]
+        require(isinstance(identifier, str) and identifier.strip(), "defaults manifest slot needs an identifier")
+        require(identifier not in identifiers, "duplicate slot in defaults manifest")
+        identifiers.add(identifier)
+        state = slot.get("state", "")
+        require(state in {"", "definitive", "split", "measurement"}, "invalid defaults manifest slot state")
+        require(isinstance(slot.get("definitive"), bool) and slot["definitive"] == (state == "definitive"),
+                "defaults manifest definitive flag differs from its state")
+        kind = slot["row_kind"]
+        require(kind in {"first_round", "judged", "pinned", "project_practice", "no_blind_default_today"},
+                "unknown defaults manifest row kind")
+        require(all(isinstance(slot.get(field), str) for field in ("default", "label", "repository", "claude", "gpt")),
+                "defaults manifest slot recommendation and provenance must be text")
+        kinds[kind] = kinds.get(kind, 0) + 1
+        slots[layer_id].append({"state": state or "pending", "record": slot})
+    require(value["counts"] == {"layers": len(layers), "slots": len(identifiers),
+                                "definitive": sum(slot["definitive"] for slot in value["slots"]),
+                                "by_row_kind": kinds}, "defaults manifest counts differ from its records")
+    return {"source": DEFAULTS_MANIFEST,
+            "status": "supplied-preview" if override is not None else "published-source",
+            "metadata": {key: child for key, child in value.items() if key not in {"layers", "slots"}},
+            "layers": layers, "slots": slots}
+
+
+def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=None, defaults_manifest=None):
     root = Path(root)
     inputs = Inputs(root)
     ownership = inputs.read(OWNERSHIP)
@@ -311,6 +382,7 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
     selected = index_rows(selection["layers"], SELECTION)
     owners = index_rows(ownership["layers"], OWNERSHIP)
     reference = index_rows(edition["rows"], EDITION)
+    default_decisions = read_default_decisions(inputs, reference, defaults_manifest)
     declarations = {}
     for layer_id, row in owners.items():
         for declaration in row["owns"]:
@@ -527,6 +599,9 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             "reference_edition": {"source": EDITION, "role": "reference only; no winners, pins or closure inherited"},
             "blocking_gaps": missing,
         })
+        if default_decisions is not None:
+            layers[-1]["default_slots"] = default_decisions["slots"][layer_id]
+            layers[-1]["default_ownership"] = default_decisions["layers"][layer_id]
     final_layers = {row["layer_id"] for row in layers if row["status"] == "final"}
     for tool in tools:
         if tool["owner_layer_id"] in final_layers and not tool["blocking_gaps"]:
@@ -569,6 +644,9 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
         "blocking_gaps": gaps,
         "sources": sorted(inputs.sources.values(), key=lambda source: source["path"]),
     }
+    if default_decisions is not None:
+        result["default_decisions"] = {key: value for key, value in default_decisions.items()
+                                       if key not in {"layers", "slots"}}
     validate_payload(result)
     return result
 
@@ -604,6 +682,11 @@ def render_markdown(data):
         if stage.get("after_bootstrap"):
             lines += ["After stage 2:", ""]
             lines += [f"- {step}" for step in stage["after_bootstrap"]] + [""]
+    if data.get("default_decisions"):
+        defaults = data["default_decisions"]
+        lines += ["## Slot default decisions", "", f"Source: {link(defaults['source'])}; {defaults['status']}.", "",
+                  defaults["metadata"]["meaning"], "", defaults["metadata"]["not_claimed"], "",
+                  "Empty or missing slot states are displayed as pending. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
     lines += [f"Profile: {link(data['profile']['source']) if data['profile']['status'] == 'published' else 'pending publication'}; native manifest registration: {data['profile']['native_manifest_registered']}.", "",
               data["comparison_order_text"], "", "## Five finality gates", ""]
     lines += [f"{i}. **{gate['id']}**: {gate['requirement']} ({link(gate['source'])})"
@@ -618,8 +701,25 @@ def render_markdown(data):
                   f"Requirement: {row['requirement']['text'] or 'pending'} ({link(row['requirement']['source'])}).", "",
                   "Owns: " + ("; ".join(row["owns"]) or "none declared / pending") + ".", "",
                   "Uses: " + ("; ".join(row["uses"]) or "none declared / pending") + ".", "",
-                  f"Ownership source: {link(row['ownership_source'])}.", "",
-                  "| Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |", "| --- | --- | --- | --- | --- | --- |"]
+                  f"Ownership source: {link(row['ownership_source'])}.", ""]
+        if "default_slots" in row:
+            owner = row["default_ownership"]
+            lines += ["### Slot default decisions", "",
+                      "Default ownership: " + cell(owner["owns"]) + "; uses: " + cell(owner["uses"]) + ".", "",
+                      "| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |",
+                      "| --- | --- | --- | --- | --- | --- |"]
+            for slot in row["default_slots"]:
+                record = slot["record"]
+                recommendation = record["default"] or "pending"
+                if record["repository"]:
+                    recommendation = f"[{recommendation}]({record['repository']})"
+                lines.append("| " + " | ".join(map(cell, [record["slot_id"], slot["state"], recommendation,
+                             record["label"], f"claude: {record['claude']}; gpt: {record['gpt']}",
+                             f"{record['catalog']} / {record['row_kind']}; {link(data['default_decisions']['source'])}"])) + " |")
+            if not row["default_slots"]:
+                lines.append("| pending slot publication | pending | pending | pending | pending | pending |")
+            lines += [""]
+        lines += ["| Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |", "| --- | --- | --- | --- | --- | --- |"]
         for key in row["tools"]:
             tool = tools[key]
             repository = f"[{tool['name']}]({tool['repository']})" if tool["repository"] else tool["name"]
@@ -663,13 +763,14 @@ def main(argv=None):
     parser.add_argument("--profile", type=Path, help="W-PROF input; defaults to adoption/new-wsl-profile.json if published")
     parser.add_argument("--claude-verdicts", type=Path, help="Published Claude verdict file bound to selection SHA-256")
     parser.add_argument("--codex-verdicts", type=Path, help="Published Codex verdict file bound to selection SHA-256")
+    parser.add_argument("--defaults-manifest", type=Path, help="Explicit slot-decision source preview; otherwise read the published canonical manifest if present")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true")
     mode.add_argument("--check", action="store_true", help="Check both committed outputs (default)")
     args = parser.parse_args(argv)
     try:
         options = {"profile_path": args.profile, "claude_verdicts": args.claude_verdicts,
-                   "codex_verdicts": args.codex_verdicts}
+                   "codex_verdicts": args.codex_verdicts, "defaults_manifest": args.defaults_manifest}
         outputs = render(args.root, **options)
         require(outputs == render(args.root, **options), "nondeterministic handbook regeneration")
         for path, raw in outputs.items():

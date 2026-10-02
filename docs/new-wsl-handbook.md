@@ -54,6 +54,16 @@ After stage 2:
 - F10. Windows Terminal profiles and the PATH proof
 - F11. jCodeMunch for this clone
 
+## Slot default decisions
+
+Source: [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json); published-source.
+
+one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance
+
+no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate
+
+Empty or missing slot states are displayed as pending. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.
+
 Profile: [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json); native manifest registration: True.
 
 The code-RAG comparison (semantic-rag) runs before the local-model-server comparison (observation-inference); the server comparison then requires serving the code-RAG winner's embedding provider. The container-engine comparison (hosting-services) runs before isolation's container-boundary comparison.
@@ -92,6 +102,15 @@ Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["Claude Code", "Codex"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| claude-code | pending | [Claude Code](https://github.com/anthropics/claude-code) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codex | pending | [Codex](https://github.com/openai/codex) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s 2.1.284", "execution_status": "UNRUN", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected Claude Code 2.1.284 installed.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Installed host 2.1.287 help/version checks do not qualify selected 2.1.284; no model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
@@ -124,6 +143,14 @@ Owns: Trail of Bits skills.
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["Trail of Bits security skills (trailofbits/skills)"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| trail-of-bits-security-skills-trailofbits-skills | pending | [Trail of Bits security skills (trailofbits/skills)](https://github.com/trailofbits/skills) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -163,6 +190,14 @@ Uses: the native subagents of Claude Code and Codex (native-clients); Worktrunk 
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: []; uses: ["the native subagents of Claude Code and Codex (native-clients)", "Worktrunk (git-github-automation)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s 2.1.284", "execution_status": "UNRUN", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected Claude Code 2.1.284 installed.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Installed host 2.1.287 help/version checks do not qualify selected 2.1.284; no model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
@@ -197,6 +232,15 @@ Owns: sandbox-runtime; compare: the container boundary for untrusted work (a roo
 Uses: Worktrunk (git-github-automation); the container engine (hosting-services).
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["sandbox-runtime (srt)"]; uses: ["Worktrunk (git-github-automation)", "the container engine (hosting-services)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| sandbox-runtime-srt | pending | [sandbox-runtime (srt)](https://github.com/anthropics/sandbox-runtime) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| isolation-container-boundary | definitive | No additional component: rootless containers on the container engine that the hosting layer installs | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -264,9 +308,18 @@ Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["Serena", "claude-plugins-official (code-intelligence LSP plugins)"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| serena | pending | [Serena](https://github.com/oraios/serena) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| claude-plugins-official-code-intelligence-lsp-pl | pending | [claude-plugins-official (code-intelligence LSP plugins)](https://github.com/anthropics/claude-plugins-official) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [Serena](https://github.com/oraios/serena) | code-navigation / picked | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143", "value": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"} | {"command": null, "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"} | {"command": null, "evidence_class": null, "source": null} | native-extensions / 5 |
+| [Serena](https://github.com/oraios/serena) | code-navigation / picked | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143", "value": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"} | {"command": "uv tool install --reinstall -p 3.13 .", "execution_status": "UNRUN", "prerequisites": ["Run from an owned checkout at c6fbd1c5932df2494ffa0020af5a9fbe80b82143; the dot operand refers to that checkout.", "uv and Python 3.13 must be available; this local source install does not prove equivalence to the PyPI package."], "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "pytest test -vv", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Same exact source checkout with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.", "The upstream Poe test task supplies pytest test -vv; language-server dependencies remain those of the upstream test configuration."], "scope": "Unchanged upstream source test task, not installed language-server, MCP, provider or new-host acceptance.", "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | native-extensions / 5 |
 | [Claude code-intelligence LSP plugins](https://github.com/anthropics/claude-plugins-official) | code-navigation / picked | ab024cdcfa7ca80be204acd4907656ba5a968589 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/anthropics/claude-plugins-official/commits/ab024cdcfa7ca80be204acd4907656ba5a968589", "value": "ab024cdcfa7ca80be204acd4907656ba5a968589"} | {"command": null, "source": "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/README.md"} | {"command": null, "evidence_class": null, "source": null} | user-decisions / 2 |
 
 - claude verdict: pending; pending.
@@ -283,13 +336,9 @@ Overturn condition: Use the judge's sealed set of 30-50 target-language question
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
 - Serena gap: No install artifact or native lock checksum verified; only the immutable Git source identity was checked.
-- Serena gap: The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; a pin-matching upstream install remains required.
-- Serena gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- Serena gap: The reviewed quick start targets PyPI, while this row retains a Git commit. The exact supported commit-pinned install requires verification.
+- Serena gap: The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; the documented source-checkout installation does not establish PyPI equivalence.
 - Serena gap: checksum: real SHA-256 and its source pending in W-PROF
 - Serena gap: checksum: source identity does not verify an install artifact or lockfile
-- Serena gap: install: upstream-documented command and source pending in W-PROF
-- Serena gap: acceptance: upstream test or documented example and source pending in W-PROF
 - Serena packet install reference (not a pinned recipe): [{"command": "uv tool install -p 3.13 serena-agent && serena init   (then register the MCP launch command for Claude Code or Codex as the client page describes)", "source": "https://github.com/oraios/serena README 'Quick Start'; client setup is on https://oraios.github.io/serena/02-usage/030_clients.html (linked from the README, not fetched)"}]
 - Claude code-intelligence LSP plugins gap: No install artifact or native lock checksum verified; only the immutable Git source identity was checked.
 - Claude code-intelligence LSP plugins gap: No complete pin-matching supported install command verified for this owned row.
@@ -311,6 +360,15 @@ Owns: QMD; MinerU.
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["tobi/qmd", "MinerU"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| tobi-qmd | pending | [tobi/qmd](https://github.com/tobi/qmd) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| mineru | pending | [MinerU](https://github.com/opendatalab/mineru) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -349,6 +407,14 @@ Owns: compare: SocratiCode, semble, ColGREP, against BM25 and ripgrep baselines.
 Uses: the local model server for embeddings (observation-inference).
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: []; uses: ["the local model server for embeddings (observation-inference)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| code-search | split | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | split between the model families; the measurement the critics named decides, before the clean install | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -412,6 +478,14 @@ Uses: the local model server for Hindsight's local-model arm (observation-infere
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: []; uses: ["the local model server for Hindsight's local-model arm (observation-inference)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| memory-owner | measurement | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | [ai-memory](https://github.com/akitaonrails/ai-memory) | durable-memory / head-to-head-arm | 2.5.2 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/akitaonrails/ai-memory/releases/tags/v2.5.2", "value": "acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8"} | {"command": "mise use -g github:akitaonrails/ai-memory@2.5.2", "execution_status": "UNRUN", "pinning_source": "https://mise.jdx.dev/dev-tools/backends/github.html", "prerequisites": ["mise available and the selected owned global-tool scope explicitly chosen."], "scope": "Upstream GitHub-backend example with the selected release version supplied using the documented @VERSION syntax. mise is optional and unprovisioned in this profile; this command does not add it to the default install.", "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622"} | {"alias_source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/.cargo/config.toml", "command": "cargo t", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected upstream source checkout, pinned Rust 1.95 and cargo-nextest."], "scope": "Everyday source-test tier: cargo t aliases cargo nextest run for default workspace members. It excludes the full/slow tier and eval harness; it does not qualify a running daemon, model/backend, MCP connection or lifecycle hook. Installed host 2.4.2 does not qualify selected 2.5.2.", "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/AGENTS.md#L225"} | memory-comparison / 1 |
@@ -459,10 +533,19 @@ Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["trafilatura", "Playwright CLI"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| trafilatura | pending | [trafilatura](https://github.com/adbar/trafilatura) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| playwright-cli | pending | [Playwright CLI](https://github.com/microsoft/playwright-cli) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [trafilatura](https://github.com/adbar/trafilatura) (`pypi:trafilatura`) | web-research / picked | 2.2.0 / {"algorithm": "sha256", "kind": "artifact", "source": "https://pypi.org/pypi/trafilatura/2.2.0/json", "value": "ac43592a6201264dfc4f9c361cbe3eb3fea96e54437010a159d5e7365360ed98"} | {"command": null, "source": null} | {"command": null, "evidence_class": null, "source": null} | native-extensions / 6 |
-| [Playwright CLI](https://github.com/microsoft/playwright-cli) (`npm:@playwright/cli`) | web-research / picked | 0.1.21 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21", "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c"} | {"command": "npm install -g @playwright/cli@0.1.21", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md"} | {"command": null, "evidence_class": null, "source": null} | native-extensions / 7 |
+| [trafilatura](https://github.com/adbar/trafilatura) (`pypi:trafilatura`) | web-research / picked | 2.2.0 / {"algorithm": "sha256", "kind": "artifact", "source": "https://pypi.org/pypi/trafilatura/2.2.0/json", "value": "ac43592a6201264dfc4f9c361cbe3eb3fea96e54437010a159d5e7365360ed98"} | {"command": "pip install trafilatura==2.2.0", "execution_status": "UNRUN", "prerequisites": ["Use an owned Python environment with pip; the selected package is trafilatura 2.2.0."], "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "uv pip install --system -e \".[dev]\" && python -m pytest --cov=./ --cov-report=xml", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the v2.2.0 source checkout in an owned disposable workflow environment with its selected Python and uv.", "The --system argument is copied from CI and targets that disposable environment, not the host OS Python. The non-minimal workflow arm also installs .[all] plus libcurl4-gnutls-dev and libgnutls28-dev; those prerequisites are not implied by this two-step excerpt."], "scope": "Upstream editable dev install and pytest steps only; the omitted lint, type-check, docs and non-minimal setup are not qualified. No installed extraction or new-host execution.", "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/.github/workflows/tests.yml", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | native-extensions / 6 |
+| [Playwright CLI](https://github.com/microsoft/playwright-cli) (`npm:@playwright/cli`) | web-research / picked | 0.1.21 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21", "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c"} | {"command": "npm install -g @playwright/cli@0.1.21", "execution_status": "UNRUN", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "prerequisites": ["Node/npm and the selected package installation target must be available."], "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "npm ci && npm run test", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.", "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."], "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.", "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | native-extensions / 7 |
 
 - claude verdict: pending; pending.
 - codex verdict: pending; pending.
@@ -477,13 +560,7 @@ Overturn condition: I endorse the judge's comparison. Freeze a set of primary-so
 
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
-- trafilatura gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- trafilatura gap: The selected official installation URL could not be fetched in this session, and the tagged README did not establish the full install command. Do not infer one from the PyPI artifact.
-- trafilatura gap: install: upstream-documented command and source pending in W-PROF
-- trafilatura gap: acceptance: upstream test or documented example and source pending in W-PROF
 - trafilatura packet install reference (not a pinned recipe): [{"command": "pip install trafilatura   # optional extras: pip install trafilatura[all]", "source": "https://trafilatura.readthedocs.io/en/latest/installation.html"}]
-- Playwright CLI gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- Playwright CLI gap: acceptance: upstream test or documented example and source pending in W-PROF
 - Playwright CLI packet install reference (not a pinned recipe): [{"command": "npm install -g @playwright/cli@latest && playwright-cli install --skills", "source": "https://github.com/microsoft/playwright-cli#installation"}]
 
 ## token-efficiency: Context and usage efficiency
@@ -497,6 +574,15 @@ Owns: ccusage (measurement); compare: RTK, sqz, Headroom, against no compression
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["ccusage"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| ccusage | pending | [ccusage](https://github.com/ccusage/ccusage) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| context-supply | definitive | No context-supply layer: the usage meter only | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -553,11 +639,21 @@ Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["Inspect AI", "Harbor (containerized agent E2E runner)", "Promptfoo"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| inspect-ai | pending | [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| harbor-containerized-agent-e2e-runner | pending | [Harbor (containerized agent E2E runner)](https://github.com/harbor-framework/harbor) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| promptfoo | pending | [Promptfoo](https://github.com/promptfoo/promptfoo) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | quality-evaluation / picked | 0321960a92aa52390413ce011d67ffb5962a2b11 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits/0321960a92aa52390413ce011d67ffb5962a2b11", "value": "0321960a92aa52390413ce011d67ffb5962a2b11"} | {"command": "pip install -e \".[dev]\"", "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md"} | {"command": "make test", "evidence_class": "upstream_test_command_not_executed", "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md"} | native-extensions / 9 |
-| [Harbor](https://github.com/harbor-framework/harbor) | quality-evaluation / picked | 0.23.0 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/harbor-framework/harbor/commits/1e5c5c6db929a10a140d05e606882c671ae20729", "value": "1e5c5c6db929a10a140d05e606882c671ae20729"} | {"command": "uv tool install harbor==0.23.0", "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"} | {"command": null, "evidence_class": null, "source": null} | native-extensions / 10 |
-| [promptfoo](https://github.com/promptfoo/promptfoo) (`npm:promptfoo`) | quality-evaluation / picked | 0.123.1 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/promptfoo/0.123.1", "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f"} | {"command": "npm install -g promptfoo@0.123.1", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md"} | {"command": null, "evidence_class": null, "source": null} | native-extensions / 11 |
+| [Harbor](https://github.com/harbor-framework/harbor) | quality-evaluation / picked | 0.23.0 / {"algorithm": "git-sha1", "kind": "source", "source": "https://api.github.com/repos/harbor-framework/harbor/commits/1e5c5c6db929a10a140d05e606882c671ae20729", "value": "1e5c5c6db929a10a140d05e606882c671ae20729"} | {"command": "uv tool install harbor==0.23.0", "execution_status": "UNRUN", "prerequisites": ["uv and an owned tool installation scope for harbor 0.23.0."], "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ -m \"not runtime\" --cov=src/harbor --cov-report=term-missing", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the v0.23.0 Linux source checkout with the locked all-packages/all-extras environment and Python 3.13.", "The upstream Linux workflow sets up Docker, Docker Compose and Deno v2.x before this non-runtime suite. Those developer prerequisites remain unprovisioned."], "scope": "Exact Linux non-runtime pytest steps; the separate runtime/Podman and Windows suites, agent/provider benchmarks and destination acceptance are excluded. Published wheel metadata is not a downloaded or rehashed artifact.", "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/.github/workflows/pytest.yml", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | native-extensions / 10 |
+| [promptfoo](https://github.com/promptfoo/promptfoo) (`npm:promptfoo`) | quality-evaluation / picked | 0.123.1 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/promptfoo/0.123.1", "value": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f"} | {"command": "npm install -g promptfoo@0.123.1", "execution_status": "UNRUN", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "prerequisites": ["Node/npm and an owned global install scope for promptfoo 0.123.1."], "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "npm install && npm test", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the 0.123.1 source checkout after the contributing guide's developer setup.", "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."], "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.", "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | native-extensions / 11 |
 
 - claude verdict: pending; pending.
 - codex verdict: pending; pending.
@@ -577,13 +673,9 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 - Inspect AI gap: checksum: source identity does not verify an install artifact or lockfile
 - Inspect AI packet install reference (not a pinned recipe): [{"command": "pip install inspect-ai", "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/docs/index.qmd (line 38, read at HEAD 0321960a92aa on 2026-10-01)"}]
 - Harbor gap: No install artifact or native lock checksum verified; only the immutable Git source identity was checked.
-- Harbor gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
 - Harbor gap: checksum: real SHA-256 and its source pending in W-PROF
 - Harbor gap: checksum: source identity does not verify an install artifact or lockfile
-- Harbor gap: acceptance: upstream test or documented example and source pending in W-PROF
 - Harbor packet install reference (not a pinned recipe): [{"command": "uv tool install harbor", "source": "https://github.com/harbor-framework/harbor/blob/main/docs-mintlify/getting-started/installation.mdx (line 15; line 60 says Docker is the default sandbox runtime and must be installed)"}]
-- promptfoo gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- promptfoo gap: acceptance: upstream test or documented example and source pending in W-PROF
 - promptfoo packet install reference (not a pinned recipe): [{"command": "npm install -g promptfoo", "source": "https://github.com/promptfoo/promptfoo/blob/main/site/docs/installation.md (line 19; npx promptfoo@latest line 24; brew install promptfoo line 29)"}]
 
 ## ci-supply-chain: CI and supply chain
@@ -597,6 +689,19 @@ Owns: zizmor; attest; Syft; Dependabot; CodeQL upload-sarif; actionlint.
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["zizmor", "attest", "Syft", "Dependabot", "codeql-sarif", "actionlint (kjanat)"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| zizmor | pending | [zizmor](https://github.com/zizmorcore/zizmor) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| attest | pending | [attest](https://github.com/actions/attest) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| syft | pending | [Syft](https://github.com/anchore/syft) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| dependabot | pending | [Dependabot](https://github.com/dependabot/dependabot-core) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codeql-sarif | pending | [codeql-sarif](https://github.com/github/codeql-action) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| actionlint-kjanat | pending | [actionlint (kjanat)](https://github.com/kjanat/actionlint) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -672,6 +777,14 @@ Uses: systemd user units (cross:wsl-distro).
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["Dagu"]; uses: ["systemd user units (cross:wsl-distro)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| dagu | pending | [Dagu](https://github.com/dagucloud/dagu) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | [Dagu](https://github.com/dagucloud/dagu) | scheduling-supervision / picked | 2.16.6 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6", "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717"} | {"command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"} | {"command": "make test", "evidence_class": "upstream_test_command_not_executed", "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"} | optional-services / 6 |
@@ -709,6 +822,15 @@ Owns: Docker Compose; compare, one container engine: Podman with Quadlet, Docker
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["Docker Compose", "Docker Engine / Moby"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| docker-compose | pending | [Docker Compose](https://github.com/docker/compose) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| container-engine | definitive | [Docker Engine / Moby](https://github.com/moby/moby) | default on documented fit; nothing measured separates the finalists | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -766,9 +888,19 @@ Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["mise", "Restic", "chezmoi"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| mise | pending | [mise](https://github.com/jdx/mise) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| restic | pending | [Restic](https://github.com/restic/restic) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| chezmoi | pending | [chezmoi](https://github.com/twpayne/chezmoi) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [mise](https://github.com/jdx/mise) | recovery-portability / picked | 2026.9.18 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18", "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"} | {"command": null, "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"} | {"command": null, "evidence_class": null, "source": null} | optional-reproduction / 1 |
+| [mise](https://github.com/jdx/mise) | recovery-portability / picked | 2026.9.18 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18", "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"} | {"command": "curl -fsSL https://mise.run \| MISE_VERSION=v2026.9.18 sh", "execution_status": "UNRUN", "prerequisites": ["curl, sh and a chosen owned installation target; no installer was executed.", "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."], "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "mise run test:unit && mise run test:e2e '^test_use$'", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.", "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."], "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.", "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | optional-reproduction / 1 |
 | [Restic](https://github.com/restic/restic) | recovery-portability / picked | 0.19.1 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/restic/restic/releases/tags/v0.19.1", "value": "f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c"} | {"command": null, "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md"} | {"command": null, "evidence_class": null, "source": null} | optional-reproduction / 2 |
 | [chezmoi](https://github.com/twpayne/chezmoi) | recovery-portability / picked | 2.73.0 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/twpayne/chezmoi/releases/tags/v2.73.0", "value": "4b42a0fb0dec69f37964c6701f89daa6bf6393aaeb92bbcbc8f3ee9f08a49bcd"} | {"command": null, "source": "https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/README.md"} | {"command": null, "evidence_class": null, "source": null} | optional-reproduction / 3 |
 | [Node 24](https://github.com/nodejs/node) | recovery-portability / picked | 24.21.0 / {"algorithm": "sha256", "kind": "artifact", "source": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt", "value": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6"} | {"command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages", "scope": "Supported manifest-driven native adapter; profile parameter names the newly added manifest row. The source revision's installer/pin format is reused without modifying it.", "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh"} | {"command": "node hello-world.js", "evidence_class": "documented_upstream_example_not_executed", "scope": "Use the unchanged upstream synopsis.md hello-world.js fixture and independently observe its HTTP response; neither was executed.", "source": "https://github.com/nodejs/node/blob/v24.21.0/doc/api/synopsis.md"} | native-toolchain / 2 |
@@ -788,10 +920,6 @@ Overturn condition: Run the judge's comparison. On the destination WSL2 host and
 
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
-- mise gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- mise gap: The tagged guide documents MISE_VERSION, but its exact v-prefixed version invocation was not independently verified. Node's minimal native adapter does not depend on mise.
-- mise gap: install: upstream-documented command and source pending in W-PROF
-- mise gap: acceptance: upstream test or documented example and source pending in W-PROF
 - mise packet install reference (not a pinned recipe): [{"command": "curl https://mise.run \| sh", "source": "jdx/mise README, Quickstart '1. Install mise' (read via gh api repos/jdx/mise/readme on 2026-10-01); package-manager alternatives at https://mise.jdx.dev/installing-mise.html"}]
 - Restic gap: No complete pin-matching supported install command verified for this owned row.
 - Restic gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
@@ -815,6 +943,19 @@ Owns: OTel Collector Contrib; Prometheus; Loki; Grafana; Phoenix (trace sink onl
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["OTel Collector Contrib", "Prometheus", "Loki", "Grafana", "Phoenix"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| otel-collector-contrib | pending | [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| prometheus | pending | [Prometheus](https://github.com/prometheus/prometheus) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| loki | pending | [Loki](https://github.com/grafana/loki) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| grafana | pending | [Grafana](https://github.com/grafana/grafana) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| phoenix | pending | [Phoenix](https://github.com/Arize-ai/phoenix) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| local-model-server | split | Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama) | split between the model families; the measurement the critics named decides, before the clean install | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -894,11 +1035,20 @@ Uses: Claude Code and Codex (native-clients).
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
 
+### Slot default decisions
+
+Default ownership: ["Claude Agent SDK", "Codex SDK and codex exec/app-server"]; uses: ["Claude Code and Codex (native-clients)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| claude-agent-sdk | pending | [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codex-sdk-and-codex-exec-app-server | pending | [Codex SDK and codex exec/app-server](https://github.com/openai/codex) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) (`pypi:claude-agent-sdk`) | agent-sdks / picked | 0.2.163 / {"algorithm": "sha256", "kind": "artifact", "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json", "value": "269821ad5acff5967522ff15f444b0598840fd9bdc45c645de569a5478061a53"} | {"command": "pip install claude-agent-sdk==0.2.163", "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"} | {"command": null, "evidence_class": null, "source": null} | sdk-source-review / 1 |
+| [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) (`pypi:claude-agent-sdk`) | agent-sdks / picked | 0.2.163 / {"algorithm": "sha256", "kind": "artifact", "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json", "value": "269821ad5acff5967522ff15f444b0598840fd9bdc45c645de569a5478061a53"} | {"command": "pip install claude-agent-sdk==0.2.163", "execution_status": "UNRUN", "prerequisites": ["Owned Python environment and pip for claude-agent-sdk 0.2.163."], "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "pip install -e \".[dev]\" && python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the v0.2.163 source checkout in the upstream Python test environment with its development extras.", "This selects tests/, not the separate authenticated e2e-tests/ workflow."], "scope": "Unchanged upstream source tests; no native sign-in, authenticated SDK turn, provider or new-host acceptance.", "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | sdk-source-review / 1 |
 | [Codex SDK and codex exec/app-server](https://github.com/openai/codex) | agent-sdks / picked | pending / pending | pending | pending | None / None |
-| [Codex TypeScript SDK](https://github.com/openai/codex) (`npm:@openai/codex-sdk`) | agent-sdks / picked | 0.159.3 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3", "value": "f10a967cab205ad7875bd2cd8c508ccc5ab9501ff900f9466378e1b0e14b0522"} | {"command": "npm install @openai/codex-sdk@0.159.3", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md"} | {"command": null, "evidence_class": null, "source": null} | sdk-source-review / 2 |
+| [Codex TypeScript SDK](https://github.com/openai/codex) (`npm:@openai/codex-sdk`) | agent-sdks / picked | 0.159.3 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3", "value": "f10a967cab205ad7875bd2cd8c508ccc5ab9501ff900f9466378e1b0e14b0522"} | {"command": "npm install @openai/codex-sdk@0.159.3", "execution_status": "UNRUN", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "prerequisites": ["Owned Node/npm project environment for @openai/codex-sdk 0.159.3."], "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | {"command": "pnpm install --frozen-lockfile && pnpm -r --filter ./sdk/typescript run build && pnpm -r --filter ./sdk/typescript run test", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Run from the rust-v0.159.3 repository root with the workflow's pnpm setup and Node.js 22.", "Complete the selected workflow's Bazel preparation and build //codex-rs/cli:codex plus //codex-rs/code-mode-host:codex-code-mode-host. Stage both matching binaries together and set CODEX_EXEC_PATH to that CLI as the workflow specifies; no environment or credential values were read here.", "The recorded install/build/test steps omit the separate lint step and do not reproduce the whole CI job."], "scope": "Upstream SDK source test workflow with its matching CLI/code-mode-host prerequisites; no live provider/sign-in or new-host result. Python SDK qualification does not qualify this TypeScript SDK.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/.github/workflows/sdk.yml#L126", "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"} | sdk-source-review / 2 |
 | [Codex Python SDK](https://github.com/openai/codex) (`pypi:openai-codex`) | agent-sdks / picked | 0.159.3 / {"algorithm": "sha256", "kind": "artifact", "source": "https://pypi.org/pypi/openai-codex/0.159.3/json", "value": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f"} | {"command": "python -m pip install openai-codex==0.159.3", "execution_status": "UNRUN", "package_source": "https://pypi.org/pypi/openai-codex/0.159.3/json", "pinning_source": "https://pip.pypa.io/en/stable/cli/pip_install/", "scope": "Upstream package installed using pip documented module invocation and exact version syntax; run in the owned Python environment, never the OS Python.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md"} | {"command": "python - <<'PY'\nfrom openai_codex import Codex\n\nwith Codex() as codex:\n    thread = codex.thread_start()\n    result = thread.run(\"Explain this repository in three bullets.\")\n    print(result.final_response)\nPY", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Owned Python environment with the selected SDK and its native CLI dependency installed.", "Existing authorized native Codex authentication and the intended repository context."], "scope": "The Python body is the unchanged upstream quickstart; the here-document is only its shell carrier. No SDK/provider/model execution or output-quality acceptance occurred.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md#quickstart"} | sdk-source-review / 3 |
 
 - claude verdict: pending; pending.
@@ -914,8 +1064,6 @@ Overturn condition: The judge's comparison is sound. On the WSL2 host, run the s
 
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
-- Claude Agent SDK gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- Claude Agent SDK gap: acceptance: upstream test or documented example and source pending in W-PROF
 - Claude Agent SDK packet install reference (not a pinned recipe): [{"command": "pip install claude-agent-sdk", "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/main/README.md line 8 (Python 3.10+, line 13; Claude Code CLI bundled, line 15); read 2026-10-01"}]
 - Codex SDK and codex exec/app-server gap: pin: release or immutable revision pending in W-PROF
 - Codex SDK and codex exec/app-server gap: checksum: real SHA-256 and its source pending in W-PROF
@@ -924,8 +1072,6 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 - Codex SDK and codex exec/app-server gap: install order: stage and position pending in W-PROF
 - Codex SDK and codex exec/app-server gap: package identity: multiple installable packages share this repository; W-PROF binding pending
 - Codex SDK and codex exec/app-server packet install reference (not a pinned recipe): [{"command": "npm install @openai/codex-sdk   # Python: pip install openai-codex", "source": "https://github.com/openai/codex/blob/main/sdk/typescript/README.md line 10; https://github.com/openai/codex/blob/main/sdk/python/README.md line 11; https://developers.openai.com/codex/sdk (read 2026-10-01)"}]
-- Codex TypeScript SDK gap: No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.
-- Codex TypeScript SDK gap: acceptance: upstream test or documented example and source pending in W-PROF
 
 ## mcp-surfaces: MCP servers and client surfaces
 
@@ -938,6 +1084,15 @@ Owns: mcporter; MCP Inspector.
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["mcporter", "MCP Inspector"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| mcporter | pending | [mcporter](https://github.com/openclaw/mcporter) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| mcp-inspector | pending | [MCP Inspector](https://github.com/modelcontextprotocol/inspector) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -971,6 +1126,15 @@ Owns: betterleaks (detection: pre-commit, history, CI); trufflehog (verification
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["betterleaks", "trufflehog"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| betterleaks | pending | [betterleaks](https://github.com/betterleaks/betterleaks) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| trufflehog | pending | [trufflehog](https://github.com/trufflesecurity/trufflehog) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1010,6 +1174,19 @@ Owns: git; gh; Worktrunk; difftastic (diffs for people); sem (diffs for agents; 
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["git", "gh (GitHub CLI)", "worktrunk", "difftastic", "claude-code-action"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| git | pending | [git](https://github.com/git/git) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| gh-github-cli | pending | [gh (GitHub CLI)](https://github.com/cli/cli) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| worktrunk | pending | [worktrunk](https://github.com/max-sixty/worktrunk) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| difftastic | pending | [difftastic](https://github.com/Wilfred/difftastic) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| claude-code-action | pending | [claude-code-action](https://github.com/anthropics/claude-code-action) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| agent-structural-diff | pending | Not installed: git diff and difftastic cover diffs | no-install default: the first round kept sem only if a comparison shows a gain | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1077,6 +1254,16 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research", "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing", "slot exchange-calendars (judged): exchange session calendars and half days"]; uses: ["alpaca-py (execution-broker) where the Alpaca market-data API is used", "DuckDB with Parquet (storage-compute) for snapshots", "pandera (data-quality-orchestration) for validation"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| market-data-provider | pending | [Alpaca market data through alpaca-py (already installed for the selected broker path)](https://github.com/alpacahq/alpaca-py) |  | claude: converged; gpt: returned | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| sec-filings | pending | [EdgarTools](https://github.com/dgunning/edgartools) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| exchange-calendars | pending | [exchange_calendars](https://github.com/gerrymanoim/exchange_calendars) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1108,6 +1295,15 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: ["slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)", "slot security-identity (no blind default today): permanent security identity across ticker changes"]; uses: ["EdgarTools (market-data-reference) for CIK-keyed filings", "DuckDB with Parquet (storage-compute)", "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| research-data-versioning | pending | [DVC](https://github.com/treeverse/dvc) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| security-identity | pending | pending | the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate | claude: not judged; gpt: not judged | us-equities / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1141,6 +1337,15 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"]; uses: ["Restic (foundation recovery-portability)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| analytical-storage/engine | pending | [DuckDB](https://github.com/duckdb/duckdb) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| analytical-storage/snapshot-table-layer | pending | No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1172,6 +1377,14 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: ["slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"]; uses: ["Dagu (foundation scheduling-supervision)", "systemd user units (foundation cross:wsl-distro) for the paper units"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| market-data-validation | pending | [Pointblank](https://github.com/posit-dev/pointblank) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1205,6 +1418,15 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging", "slot predictive-ml (no blind default today)"]; uses: ["EdgarTools (market-data-reference)", "skfolio (portfolio-risk) for chronological evaluation", "NautilusTrader (backtesting-engine) for replays", "MLflow (evaluation-experiments) for run tracking"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| factor-research | pending | [Qlib](https://github.com/microsoft/qlib) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| predictive-ml | pending | pending | no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist | claude: not judged; gpt: not judged | us-equities / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1236,6 +1458,15 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: ["pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine", "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pinned/nautilustrader-2-0-0rc5 | pending | NautilusTrader 2.0.0rc5 | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| backtest-oracle | pending | [LEAN](https://github.com/quantconnect/lean) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1269,6 +1500,16 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)", "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc", "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"]; uses: ["NautilusTrader (backtesting-engine)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pinned/ibkr-path--nautilustrader-in-tree-ibkr-a | pending | IBKR path (NautilusTrader in-tree IBKR adapter) | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| pinned/alpaca-adapter-path--alpaca-py-0-44-0--- | pending | Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc) | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| ib-gateway-runtime | pending | [Dockerized IB Gateway](https://github.com/gnzsnz/ib-gateway-docker) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1300,6 +1541,15 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: ["slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)", "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"]; uses: ["NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| portfolio-construction | pending | [skfolio](https://github.com/skfolio/skfolio) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| performance-analytics | pending | [fincore](https://github.com/cloudQuant/fincore) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1333,6 +1583,16 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)", "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"]; uses: ["Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations", "agent-retrieval-bench (foundation quality-evaluation candidate task set)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| experiment-tracking | pending | [MLflow](https://github.com/mlflow/mlflow) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| strategy-qualification-statistics/arch | pending | [arch](https://github.com/bashtage/arch) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| strategy-qualification-statistics/purgedcv---purged-cross-validati | pending | [purgedcv / purged-cross-validation](https://github.com/eslazarev/purged-cross-validation) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1364,6 +1624,14 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: []; uses: ["Claude Code and Codex (foundation native-clients)", "Claude Agent SDK and Codex SDK (foundation agent-sdks)", "the durable-memory owner (foundation durable-memory)", "QMD and MinerU (foundation document-retrieval) for dated financial sources", "the semantic-rag owner (foundation semantic-rag)", "native subagents (foundation workers)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1397,6 +1665,14 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"]; uses: ["OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)", "Dagu (foundation scheduling-supervision)", "Restic (foundation recovery-portability)", "the container engine (foundation hosting-services)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1429,6 +1705,14 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"]; uses: ["betterleaks and trufflehog (foundation secrets-credentials)", "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1460,6 +1744,14 @@ Owns: Ubuntu 26.04.1 LTS (fallback 24.04.5 LTS); systemd (part of the distributi
 Uses: none declared / pending.
 
 Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+
+### Slot default decisions
+
+Default ownership: ["Ubuntu 26.04.1 LTS (Canonical WSL image), primary"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| base-distribution | pending | [Ubuntu 26.04.1 LTS (Canonical WSL image), primary](https://ubuntu.com/download/server) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1527,6 +1819,15 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["OpenHands software-agent-sdk", "GPT Researcher", "DeerFlow"]; uses: ["OmniRoute (cross:gpt6-harnesses)", "the container engine (hosting-services)", "Harbor and Inspect AI (quality-evaluation) for graded tasks"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| agent-runtime-worker | pending | [OpenHands software-agent-sdk](https://github.com/OpenHands/software-agent-sdk) | named by the user's directive of 2026-10-01; the source host's selection of record | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| research-harnesses | pending | [GPT Researcher and DeerFlow, kept as two independent evidence gatherers](https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow) | both named by the user's directive of 2026-10-01 for the evaluation work | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1559,6 +1860,14 @@ Owns: none declared / pending.
 Uses: none declared / pending.
 
 Ownership source: pending.
+
+### Slot default decisions
+
+Default ownership: ["OmniRoute (the GPT gateway)"]; uses: ["Codex (native-clients)", "Codex SDK (agent-sdks)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| gpt-gateway | pending | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1593,6 +1902,14 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["the command and secret-path guard (this repository)"]; uses: ["betterleaks and trufflehog (secrets-credentials)"].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| credential-guard | pending | [Command and secret-path guard (K4)](https://github.com/seathatflowsinourveins/native-agent-stack) | the project's own practice, not a third-party repository; settled by its closure record, not by a blind round | claude: not judged; gpt: not judged | foundation / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1626,6 +1943,14 @@ Uses: none declared / pending.
 
 Ownership source: pending.
 
+### Slot default decisions
+
+Default ownership: ["the convergence practice and its validators (this repository)"]; uses: [].
+
+| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- |
+| convergence-validators | pending | [Convergence practice and its validators](https://github.com/seathatflowsinourveins/native-agent-stack) | the project's own practice, not a third-party repository; settled by its closure record | claude: not judged; gpt: not judged | foundation / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
 | pending selection | pending | pending | pending | pending | pending |
@@ -1652,7 +1977,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | Repository source | SHA-256 |
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
-| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa` |
+| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `144d01671fcd63263f81e4e18415f3e75daa50dd6d356651588ab2281f4b8250` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1` |
@@ -1681,3 +2006,4 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/workers.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/workers.json) | `4f6e5929cd70f1fd624c85d616abeed9a8c0ae608c67a743e302a6205c053838` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json) | `eec6b4c65649062443cfe421ae30301e43f8019172e5708e2dfd4db6e201652f` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json) | `2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb` |
+| [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) | `16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f` |
