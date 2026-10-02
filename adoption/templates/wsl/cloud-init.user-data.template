@@ -23,3 +23,8 @@ write_files:
   content: |
     [user]
     default=${WSL_USER}
+
+# /dev/tty1 is shared across distributions in the WSL VM. Mask its getty in cloud-init's network stage,
+# before systemd starts the unit. The source review, ordering and proof are in the page's W5.
+bootcmd:
+- [systemctl, mask, --now, getty@tty1.service]

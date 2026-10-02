@@ -6,7 +6,7 @@
   "component_ids": [
     "systemd"
   ],
-  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's baseline and storage age; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, W5's paired record showed the same uid, distinct namespaces and two active user managers, and F1-F3 printed running (or degraded with only systemd-binfmt.service failed), Linger yes and a user-owned bus socket.>",
+  "claim": "<One or two sentences quoting only this run's output: P1's good signature, P2's valid schema and P3's baseline and storage age; the image hash matched SHA256SUMS and DistributionInfo.json, the install and the first launch exited 0, cloud-init created <WSL_USER> (uid 1000) as the default user, W7 read 1000:1000, W5's paired record showed the same uid, distinct namespaces and two active user managers, and F1 met F1's pass condition, F2 printed Linger yes and a user-owned bus socket.>",
   "limitations": [
     "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
     "Stage 1 and first boot only: stage 2 (the bootstrap), native sign-in, services and the Windows Terminal PATH proof are not covered.",
@@ -27,7 +27,7 @@
       "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
       "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
       "catalog_name": "Ubuntu-26.04",
-      "bytes": null
+      "bytes": 418495746
     },
     "24.04.5": {
       "file": "ubuntu-24.04.5-wsl-amd64.wsl",
@@ -56,7 +56,7 @@
     "user_data_schema": "<P2: workstation cloud-init version/schema exit and render hash equal to W3; selected image qualification is W5>"
   },
   "storage_errors": {
-    "baseline": "<P3: the hv_storvsc count without the registration line, before anything is installed>",
+    "baseline": "<P3: the hv_storvsc count without the registration line or kernel command-line echo, before anything is installed>",
     "newest_line_time": "<P3: the newest error line's kernel time in seconds, the first number of /proc/uptime and the age they give; none when no line; an age under 3600 s stopped the run>",
     "swap": "<P3: the swapon --show lines>",
     "second_count": "<W5, both paths: count after the first launch compared with the P3 baseline before the import; an attachment-only increase before cloud-init starts does not stop>",
@@ -71,18 +71,19 @@
     "z_free_bytes": "<Free of Get-PSDrive Z in W1>",
     "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>",
     "workstation_baseline": {
-      "uid": "<W1: id -u printed natively in the already-running distribution>",
-      "system_state": "<W1: systemctl is-system-running; running, or degraded with systemd-binfmt.service as the only failed unit>",
-      "failed_units": "<W1: the unit names of systemctl --failed --no-legend --plain, or none>",
+      "uid": "<W1: id -u printed natively; must equal the planned default uid 1000>",
+      "system_state": "<W1: running with no failed unit, or degraded with failed set contained in {systemd-binfmt.service, getty@tty1.service}; otherwise stop>",
+      "failed_units": "<W1: first column of each systemctl --failed --no-legend --plain row, or none; failed getty only as an earlier collision with Result=start-limit-hit>",
       "user_manager": "<W1: systemctl is-active user@<uid>.service; active>",
-      "cgroup_namespace": "<W1: actual readlink /proc/self/ns/cgroup output; initial namespace 4026531835 is corroboration, not the gate>"
+      "cgroup_namespace": "<W1: readlink /proc/self/ns/cgroup; must not be cgroup:[4026531835]; W5 must prove isolation>",
+      "getty_tty1_result": "<W1, optional: present only when systemctl show getty@tty1.service -p Result -p NRestarts ran for a failed getty; Result=start-limit-hit required and actual NRestarts recorded; otherwise omit this key>"
     }
   },
   "image": {
     "release": "<RELEASE>",
     "file": "ubuntu-<RELEASE>-wsl-amd64.wsl",
     "url": "https://releases.ubuntu.com/<RELEASE>/ubuntu-<RELEASE>-wsl-amd64.wsl",
-    "bytes": "<W2: Get-Item Length of this host's selected image; 26.04.1 source size is unknown>",
+    "bytes": "<W2: Get-Item Length of this run's selected image; run 2 observed 418495746 for 26.04.1>",
     "sha256_published": "<W2: exact selected-release sha256 from the recipe, supported_images and Canonical's signed sums>",
     "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256; must equal the recipe's selected-release digest and the signed publication>",
     "sha256_computed": "<W2: Get-FileHash .Hash in lower case; must equal the recipe's selected-release digest and the signed publication>"
@@ -92,22 +93,28 @@
     "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
     "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>",
     "cloud_init_version": "<W5: selected image cloud-init --version and its exit>",
-    "cgroup_isolation": "<W5, after launch before F1, while both run: common active system unit, process ids with no 0 entry read natively from the running distribution, and active new user@<uid>.service; the paired five-value record is paired_isolation; failure of either proof uses the guarded cgroup export/removal>",
-    "systemd_user_session_warning": "<W5: warning text and stop if wsl: Failed to start the systemd user session appears, even with launch exit 0; absent otherwise>"
+    "cgroup_isolation": "<W5, after launch before F1, while both run: common active system unit, process ids with no 0 entry read natively from the running distribution, and active new user@<uid>.service; the paired five-value record is paired_isolation; any failed W5 proof uses the guarded w5_failure_export/removal>",
+    "systemd_user_session_warning": "<W5: warning text and stop if wsl: Failed to start the systemd user session appears, even with launch exit 0; absent otherwise>",
+    "getty_mask": {
+      "is_enabled": "<W5: masked; is-enabled exit 1 is normal for a masked unit>",
+      "load_state": "<W5: LoadState=masked>",
+      "active_state": "<W5: ActiveState=inactive>",
+      "n_restarts": "<W5: NRestarts=0>"
+    }
   },
   "paired_isolation": {
     "recorded_with": "<W5: the WSL version and kernel lines of W1's wsl.exe --version and the image release and SHA-256 of W2 that these observations were made on>",
     "workstation": {
-      "uid": "<W5: id -u printed natively in the workstation's shell; equal to the new distribution's>",
-      "system_state": "<W5: systemctl is-system-running; running, or degraded with systemd-binfmt.service as the only failed unit>",
+      "uid": "<W5: id -u printed natively in the workstation's shell; equal to the new distribution's; equal to host.workstation_baseline>",
+      "system_state": "<W5: workstation systemctl is-system-running; equal to host.workstation_baseline>",
       "failed_units": "<W5: the unit names of systemctl --failed --no-legend --plain, or none; equal to host.workstation_baseline>",
-      "user_manager": "<W5: systemctl is-active user@<uid>.service; active>",
-      "cgroup_namespace": "<W5: readlink /proc/self/ns/cgroup; differs from the new distribution's, is not cgroup:[4026531835] and equals host.workstation_baseline>"
+      "user_manager": "<W5: systemctl is-active user@<uid>.service; active; equal to host.workstation_baseline>",
+      "cgroup_namespace": "<W5: readlink /proc/self/ns/cgroup; differs from the new distribution's, is not cgroup:[4026531835] and equal to host.workstation_baseline>"
     },
     "new_distribution": {
       "uid": "<W5: id -u printed inside <Name> through wsl.exe; equal to the workstation's>",
-      "system_state": "<W5: systemctl is-system-running inside <Name>; running, or degraded with systemd-binfmt.service as the only failed unit>",
-      "failed_units": "<W5: the unit names of systemctl --failed --no-legend --plain inside <Name>, or none>",
+      "system_state": "<W5: running with no failed unit, or degraded with systemd-binfmt.service as its only failed unit; message proved at F1>",
+      "failed_units": "<W5: first column of each failed-unit row inside <Name>, or none; getty@tty1.service must not be failed>",
       "user_manager": "<W5: systemctl is-active user@<uid>.service inside <Name>; active>",
       "cgroup_namespace": "<W5: readlink /proc/self/ns/cgroup inside <Name>; differs from the workstation's and is not cgroup:[4026531835]>"
     }
@@ -376,13 +383,13 @@
     },
     {
       "step": "P3",
-      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
       "exit": "<0, or 1 when the count is 0>",
       "output_excerpt": "<the count: the baseline>"
     },
     {
       "step": "P3",
-      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1",
       "exit": "<exit code>",
       "output_excerpt": "<the newest error line's kernel time and shape without device ids, or nothing>"
     },
@@ -466,9 +473,39 @@
     },
     {
       "step": "W1",
-      "cmd": "id -u; systemctl is-system-running; systemctl --failed --no-legend --plain | awk '{print $1}'; systemctl is-active \"user@$(id -u).service\"; readlink /proc/self/ns/cgroup",
-      "exit": "<recorded exit code; null with reason when not run>",
-      "output_excerpt": "<W1: actual sanitized output, the five baseline lines; no synthetic success>"
+      "cmd": "id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W1",
+      "cmd": "systemctl show getty@tty1.service -p Result -p NRestarts",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W1, only when the baseline has a failed getty: Result=start-limit-hit and actual NRestarts; omit this entry when the command did not run>"
     },
     {
       "step": "W2",
@@ -682,6 +719,18 @@
     },
     {
       "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service",
+      "exit": "<1 for masked, this command's normal exit>",
+      "output_excerpt": "<W5: masked>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: LoadState=masked, ActiveState=inactive, NRestarts=0>"
+    },
+    {
+      "step": "W5",
       "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init --version",
       "exit": "<recorded exit code>",
       "output_excerpt": "<W5: returned output required by the selected recipe proof>"
@@ -760,15 +809,63 @@
     },
     {
       "step": "W5",
-      "cmd": "id -u; systemctl is-system-running; systemctl --failed --no-legend --plain | awk '{print $1}'; systemctl is-active \"user@$(id -u).service\"; readlink /proc/self/ns/cgroup",
-      "exit": "<recorded exit code; null with reason when not run>",
-      "output_excerpt": "<W5: actual sanitized output, the workstation's five lines for paired_isolation; no synthetic success>"
+      "cmd": "id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
     },
     {
       "step": "W5",
-      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'id -u; systemctl is-system-running; systemctl --failed --no-legend --plain | awk \"{print \\$1}\"; systemctl is-active \"user@$(id -u).service\"; readlink /proc/self/ns/cgroup'",
-      "exit": "<recorded exit code; null with reason when not run>",
-      "output_excerpt": "<W5: actual sanitized output, the new distribution's five lines for paired_isolation; no synthetic success>"
+      "cmd": "systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "systemctl is-active \"user@$(id -u).service\"",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running",
+      "exit": "<0 for running; 1 for degraded, expected and recorded>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W5: printed value required by this command's proof; record its own exit>"
     },
     {
       "step": "W5",
@@ -790,7 +887,7 @@
     },
     {
       "step": "W5",
-      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar'",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'",
       "exit": "<recorded exit code; null with reason when not run>",
       "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
@@ -808,13 +905,13 @@
     },
     {
       "step": "W5",
-      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar').Hash.ToLowerInvariant()",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Hash.ToLowerInvariant()",
       "exit": "<recorded exit code; null with reason when not run>",
       "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
     {
       "step": "W5",
-      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar').Length",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar').Length",
       "exit": "<recorded exit code; null with reason when not run>",
       "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
@@ -844,7 +941,7 @@
     },
     {
       "step": "W5",
-      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'",
       "exit": "<0, or 1 when the count is 0>",
       "output_excerpt": "<the second count, both paths>"
     },
@@ -925,6 +1022,12 @@
       "cmd": "wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long",
       "exit": "<path B only: exit code; null on path A>",
       "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "systemctl mask --now getty@tty1.service",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<W6: printed value required by this command's proof; record its own exit>"
     },
     {
       "step": "W6",
@@ -1036,7 +1139,7 @@
     },
     {
       "step": "F1",
-      "cmd": "journalctl -b 0 -t systemd-binfmt --no-pager | tail -n 4",
+      "cmd": "journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output: with degraded, the Failed to flush binfmt_misc rules, ignoring: Read-only file system line>"
     },
@@ -1045,6 +1148,12 @@
       "cmd": "systemctl list-unit-files --type=service --no-pager",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F1",
+      "cmd": "sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4",
+      "exit": "<recorded exit code>",
+      "output_excerpt": "<F1: printed value required by this command's proof; record its own exit>"
     },
     {
       "step": "F2",
@@ -1222,7 +1331,7 @@
     },
     {
       "step": "F10",
-      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=\"$(type -P \"$n\")\"; test -f \"$p\" && test -x \"$p\" && echo \"executable: $p\"; done'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
@@ -1255,7 +1364,7 @@
     "26.04.1": {
       "status": "unrun",
       "name": "<R1: this release's separate throwaway name>",
-      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1 running, or degraded with only systemd-binfmt.service failed>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1's pass condition>",
       "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
       "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
       "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
@@ -1264,17 +1373,18 @@
     "24.04.5": {
       "status": "unrun",
       "name": "<R1: this release's separate throwaway name>",
-      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1 running, or degraded with only systemd-binfmt.service failed>",
+      "first_boot": "<R1: W5 default uid/user, retained cloud-init results, selected image version/schema and F1's pass condition>",
       "systemd_user_from_second_instance": "<R1: second-instance user-owned directory/socket, manager running and F2 linger/idle observation>",
       "wsl_gpu": "<R1: /dev/dxg character-device and native nvidia-smi exits/output on the same Windows driver; failed or skipped stays explicit>",
       "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
       "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
     }
   },
-  "cgroup_failure_export": {
-    "file": "<W5, cgroup failure only: Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar; null otherwise>",
+  "w5_failure_export": {
+    "file": "<W5, any failed proof: Z:\\\\WSL\\\\downloads\\\\<Name>-w5-failed.tar; null otherwise>",
     "sha256": "<W5: the export's lower-case Get-FileHash value; null otherwise>",
-    "bytes": "<W5: the export's Get-Item Length; null otherwise>"
+    "bytes": "<W5: the export's Get-Item Length; null otherwise>",
+    "cause": "<W5: cgroup, tty or a short text naming the failed proof; null otherwise>"
   },
   "interop_after_unregister": "<R1/W5/W6: after each actual unregister, surviving WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches; on a failed check, the outputs of R1's three native commands (the check again, ls /proc/sys/fs/binfmt_misc and systemctl status systemd-binfmt.service --no-pager), then a stop for review with nothing imported or provisioned>",
   "rootless_container": "<F3: rootless context info includes name=rootless; hello-world output and exit, or owed pending F4/F5 and supported rootless setup; required on the first run after update before F9 or accepting R1>"

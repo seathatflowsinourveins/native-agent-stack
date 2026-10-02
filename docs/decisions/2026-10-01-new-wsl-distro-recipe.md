@@ -243,8 +243,9 @@ public recipe/template/experiment seams. No new dependency or skill installation
 | 26.04.1 default | https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl | `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104` | `Ubuntu-26.04` (also `Ubuntu`) |
 | 24.04.5 rollback | https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl | `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e` | `Ubuntu-24.04` |
 
-Both arms use the same R1 preregistered criteria table and native probes in the recipe, on separate throwaway names
-under the same host kernel, driver, settings, checkout, user-data and bootstrap profile. R1 keeps its initial run
+Both arms use the same R1 preregistered criteria with the amendments of 2026-10-02 made before any comparison ran
+(recorded below), and native probes in the recipe, on separate throwaway names under the same host kernel, driver,
+settings, checkout, user-data and bootstrap profile. R1 keeps its initial run
 through F3, then extends successful rehearsals through F9 for the existing toolkit and the bounded comparison probes.
 The default-user systemd manager and bus are checked from the workstation's second-instance session. GPU visibility
 uses Microsoft's/NVIDIA's native WSL guidance; toolkit runtime checks use the accepted bootstrap and official Node
@@ -568,9 +569,9 @@ The conditions that would overturn these decisions are in Overturn condition, it
      per-project registration, which turns F11 into a check.
 
    Drop `libatomic1` when the coordinator accepts the `readelf` measurement.
-4. **Host-wide.** Revisit when the keys lane updates WSL (re-verify install, import and first run at that tag; from
-   2.9.8 or 3.0.1 on, the fix for microsoft/WSL#40941 is present and W7 becomes a check) or when a separate decision
-   makes the new distribution the default. Revisit P3 when microsoft/WSL#41482 names a fixed release, or when a run
+4. **Host-wide.** Revisit on a later WSL update after the completed 3.0.1 update (re-verify install, import and first
+   run at that tag, including W7's check of the microsoft/WSL#40941 fix already present in 3.0.1) or when a separate
+   decision makes the new distribution the default. Revisit P3 when microsoft/WSL#41482 names a fixed release, or when a run
    shows storage errors that the one-hour threshold, this recipe's choice, misjudges. Revisit the adopted target and
    W5's paired record when a stable release after 3.0.1 changes how distributions share cgroups, or when a run shows two
    equal namespaces or an unhealthy user manager. Revisit F1's one accepted failed unit when a WSL release stops mounting
@@ -628,8 +629,8 @@ workstation distribution (Evidence classes).
 | P2 | sh | `cloud-init --version` | the workstation's cloud-init version, recorded |
 | P2 | sh | `cloud-init schema -c "$RENDER_DIR/<Name>.user-data"` | `Valid schema` and exit 0; `Invalid user-data` (exit 1) stops the run |
 | P2 | sh | `sha256sum "$RENDER_DIR/<Name>.user-data"` | the render's SHA-256, equal to W3's |
-| P3 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | the count, recorded as the baseline (a count of `0` makes the last `grep` exit 1) |
-| P3 | sh | `sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname \| grep hv_storvsc \| grep -v 'registering driver hv_storvsc' \| tail -n 1` | the newest error line with its kernel time in brackets, or nothing |
+| P3 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -Evc 'registering driver hv_storvsc\|[Cc]ommand line:'` | the count, recorded as the baseline (a count of `0` makes the last `grep` exit 1) |
+| P3 | sh | `sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname \| grep hv_storvsc \| grep -Ev 'registering driver hv_storvsc\|[Cc]ommand line:' \| tail -n 1` | the newest error line with its kernel time in brackets, or nothing |
 | P3 | sh | `cat /proc/uptime` | the seconds since boot as the first number; minus the line's kernel time, an age under 3600 s stops the run (microsoft/WSL#41482) |
 | P3 | sh | `swapon --show` | recorded; active swap is the issue's condition, not a failure by itself |
 | W1 | powershell | `New-Item -ItemType Directory -Force -Path 'Z:\WSL\downloads'` | the folder for the transcript and the image exists |
@@ -643,7 +644,12 @@ workstation distribution (Evidence classes).
 | W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue` | no output, or the top-level keys recorded and neither `users:` nor `write_files:` among them |
 | W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\s*\[', '^\s*instanceIdleTimeout\s*=', '^\s*vmIdleTimeout\s*=' -ErrorAction SilentlyContinue` | a read only: the section headers and the two idle keys, or nothing; recorded as `idle_keys` |
 | W1 | powershell | `Get-PSDrive -Name Z \| Select-Object -Property Name, Used, Free` | `Free` recorded |
-| W1 | sh | `id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk '{print $1}'; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup` | the workstation's baseline of five values, recorded as `workstation_baseline`, already meeting W5's rule for one distribution; cgroup:[4026531835] is PROC_CGROUP_INIT_INO, corroboration rather than the gate |
+| W1 | sh | `id -u` | planned default uid 1000; otherwise stop before W4 or any W6 import |
+| W1 | sh | `systemctl is-system-running` | running with no failed unit, or degraded with the failed set contained in {systemd-binfmt.service, getty@tty1.service}; otherwise stop |
+| W1 | sh | `systemctl --failed --no-legend --plain` | first column of each row, or none; failed getty only as a prior collision with Result=start-limit-hit |
+| W1 | sh | `systemctl is-active "user@$(id -u).service"` | active; otherwise stop before W4 or any W6 import |
+| W1 | sh | `readlink /proc/self/ns/cgroup` | not cgroup:[4026531835], PROC_CGROUP_INIT_INO; necessary, with W5 required to prove isolation |
+| W1 | sh | `systemctl show getty@tty1.service -p Result -p NRestarts` | only when the baseline includes failed getty: Result=start-limit-hit; record NRestarts in optional getty_tty1_result; another result stops |
 | W2 | powershell | `$ProgressPreference = 'SilentlyContinue'` | no progress rendering during the download |
 | W2 | powershell | `$Release = '<RELEASE>'` | W2: record the returned exit and output required by the recipe |
 | W2 | powershell | `switch ($Release) {` | W2: record the returned exit and output required by the recipe |
@@ -662,7 +668,7 @@ workstation distribution (Evidence classes).
 | W2 | powershell | `$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()` | W2: record the returned exit and output required by the recipe |
 | W2 | powershell | `"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)"` | the selected release's exact hash three times and its pinned release URL |
 | W2 | powershell | `if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }` | no throw: whole-image, signed-publication, catalog hash and URL match |
-| W2 | powershell | `(Get-Item -LiteralPath $ImagePath).Length` | actual selected-image byte count for this host run; source size of 26.04.1 is unknown |
+| W2 | powershell | `(Get-Item -LiteralPath $ImagePath).Length` | actual selected-image byte count for this host run; run 2 observed 418,495,746 bytes for 26.04.1 |
 | W3 | powershell | `New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')` | the folder exists |
 | W3 | powershell | `$Text = [System.IO.File]::ReadAllText('<checkout>\adoption\templates\wsl\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')` | the template rendered in memory |
 | W3 | powershell | `[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data'), $Text)` | UTF-8 without a byte order mark |
@@ -679,6 +685,8 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `$LASTEXITCODE` | `0`; nonzero with the markers means W6 |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -un` | `<WSL_USER>` |
 | W5 | powershell | `wsl.exe -d '<Name>' --exec id -u` | `1000` |
+| W5 | powershell | `wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service` | masked; exit 1 is normal for a masked unit; otherwise W5 recovery |
+| W5 | powershell | `wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts` | LoadState=masked, ActiveState=inactive, NRestarts=0; otherwise W5 recovery |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init --version` | selected-image packaged cloud-init version; not the P2 workstation version |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --long` | `status: disabled` and `boot_status_code: disabled-by-marker-file`; proves the marker, not the run |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json` | `"datasource": "DataSourceWSL"` and `"errors": []`: the run completed without errors |
@@ -691,22 +699,30 @@ workstation distribution (Evidence classes).
 | W5 | sh | `systemctl is-active '<COMMON_UNIT>'` | natively on the already-running distribution: active and exit 0 |
 | W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'` | the same system unit is active in the new distribution, exit 0 |
 | W5 | sh | `cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'` | read from the already-running distribution while both run: local process ids, no exact 0 entry; empty or unreadable stops |
-| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'` | the new default user has uid 1000 and user@1000.service is active, exit 0; otherwise cgroup recovery |
-| W5 | sh | `id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk '{print $1}'; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup` | natively in the workstation's shell, the paired record's first line: the five values, equal to W1's baseline |
-| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk "{print \$1}"; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup'` | the same five values inside `<Name>`: the same uid, both user managers `active`, each system manager `running` or `degraded` with only `systemd-binfmt.service` failed, namespaces that differ from each other and from cgroup:[4026531835]; recorded as `paired_isolation` |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'` | the new default user has uid 1000 and user@1000.service is active, exit 0; otherwise W5 recovery |
+| W5 | sh | `id -u` | workstation uid, equal to host.workstation_baseline; record its own exit and printed value |
+| W5 | sh | `systemctl is-system-running` | workstation system_state, equal to host.workstation_baseline; record its own exit and printed value |
+| W5 | sh | `systemctl --failed --no-legend --plain` | workstation failed_units, equal to host.workstation_baseline; record its own exit and printed value |
+| W5 | sh | `systemctl is-active "user@$(id -u).service"` | workstation user_manager, equal to host.workstation_baseline; record its own exit and printed value |
+| W5 | sh | `readlink /proc/self/ns/cgroup` | workstation cgroup_namespace, equal to host.workstation_baseline; record its own exit and printed value |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u` | same uid as the workstation (1000) |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running` | running with no failed unit, or degraded with systemd-binfmt.service as its only failed unit; its message is proved at F1 |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain` | first column of each row, or none; getty@tty1.service must not be failed |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'` | new default user manager active; paired observation with its own exit |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup` | different from the workstation namespace and not cgroup:[4026531835] |
 | W5 | powershell | `$env:WSL_UTF8 = '1'` | W5: record the returned exit and output required by the recipe |
 | W5 | powershell | `wsl.exe --list --quiet` | W5: record the returned exit and output required by the recipe |
-| W5 | powershell | `wsl.exe --terminate '<Name>'` | cgroup failure only: terminate the new distribution, never stop or restart a system unit in either distribution |
-| W5 | powershell | `wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-cgroup-failed.tar'` | the failed cgroup state saved before unregister; nonzero export prevents deletion |
+| W5 | powershell | `wsl.exe --terminate '<Name>'` | any failed W5 proof: terminate the new distribution, never stop or restart a system unit in either distribution |
+| W5 | powershell | `wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-w5-failed.tar'` | the failed W5 state saved before unregister; nonzero export prevents deletion |
 | W5 | powershell | `$LASTEXITCODE` | W5: record the returned exit and output required by the recipe |
 | W5 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }` | export failure stops with the name still registered; otherwise continue to hash, size and unregister |
-| W5 | powershell | `(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-cgroup-failed.tar').Hash.ToLowerInvariant()` | record the export hash in cgroup_failure_export |
-| W5 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-cgroup-failed.tar').Length` | record the export size in cgroup_failure_export |
-| W5 | powershell | `wsl.exe --unregister '<Name>'` | cgroup failure only: guarded export succeeded; remove only the new distribution and immediately check surviving interop |
+| W5 | powershell | `(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-w5-failed.tar').Hash.ToLowerInvariant()` | record the export hash in w5_failure_export |
+| W5 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-w5-failed.tar').Length` | record the export size in w5_failure_export |
+| W5 | powershell | `wsl.exe --unregister '<Name>'` | any failed W5 proof: guarded export succeeded; remove only the new distribution and immediately check surviving interop |
 | W5 | powershell | `wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'` | on the surviving distribution: WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches with exit 0 |
 | W5 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | W5 | powershell | `wsl.exe --list --verbose` | W5: record the returned exit and output required by the recipe |
-| W5 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | On both paths, record P3's baseline before the import and `second_count` after the first launch. An increase confined to the window in which the new disk is attached, before cloud-init starts, is recorded with the new lines and does not stop the run. Any storage error after that window, or any provisioning step that fails with a storage cause, stops the run. |
+| W5 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -Evc 'registering driver hv_storvsc\|[Cc]ommand line:'` | On both paths, record P3's baseline before the import and `second_count` after the first launch. An increase confined to the window in which the new disk is attached, before cloud-init starts, is recorded with the new lines and does not stop the run. Any storage error after that window, or any provisioning step that fails with a storage cause, stops the run. |
 | W6 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
 | W6 | powershell | `wsl.exe --list --quiet` | read before unregistering: `<Name>` is the new distribution |
 | W6 | powershell | `wsl.exe --terminate '<Name>'` | `<Name>` stopped before the export; no other distribution stops |
@@ -720,6 +736,7 @@ workstation distribution (Evidence classes).
 | W6 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2` | W6: record the returned exit and output required by the recipe |
 | W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | `done` or `error` when cloud-init ran, `disabled` by `disabled-by-generator` when it found no datasource; recorded (open question 1) |
+| W6 | sh | `systemctl mask --now getty@tty1.service` | the imported getty masked; first boot already started it, so W5 paired proof after relaunch must show workstation unchanged |
 | W6 | sh | `id -u '<WSL_USER>' \|\| useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'` | uid 1000 exists |
 | W6 | sh | `printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user` | the drop-in written |
 | W6 | sh | `chmod 0440 /etc/sudoers.d/90-wsl-default-user` | mode 0440 |
@@ -736,10 +753,11 @@ workstation distribution (Evidence classes).
 | W7 | powershell | `New-Item -ItemType File -Path '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'` | an empty file created from Windows under the user's home |
 | W7 | powershell | `wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'` | `1000:1000`; `0:0` is recorded and stops every write from Windows |
 | W7 | powershell | `Remove-Item -LiteralPath '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'` | the probe file deleted |
-| F1 | sh | `systemctl is-system-running --wait` | `running`; or `degraded` (exit 1) only when the next two rows show `systemd-binfmt.service` as the only failed unit, with its read-only flush message |
+| F1 | sh | `systemctl is-system-running --wait` | `running` with no failed unit; or `degraded` (exit 1) only when the next two rows show `systemd-binfmt.service` as the only failed unit, with its read-only flush message |
 | F1 | sh | `systemctl --failed --no-legend --plain` | no output when `running`; when `degraded`, a list of exactly `systemd-binfmt.service`; any other failed unit stops the run |
-| F1 | sh | `journalctl -b 0 -t systemd-binfmt --no-pager \| tail -n 4` | when `degraded`: the unit's log holds `Failed to flush binfmt_misc rules, ignoring: Read-only file system`; read without `sudo` through the `adm` group, or repeated once with `sudo` when only the journal's permission notice prints |
+| F1 | sh | `journalctl -b 0 -t systemd-binfmt --no-pager -n 4` | when `degraded`: the unit's log holds `Failed to flush binfmt_misc rules, ignoring: Read-only file system`; read without `sudo` through the `adm` group, or repeated once with `sudo` when only the journal's permission notice prints |
 | F1 | sh | `systemctl list-unit-files --type=service --no-pager` | the service list prints |
+| F1 | sh | `sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4` | only after an unreadable degraded journal: record both outputs and judge this read-only flush message |
 | F2 | sh | `sudo loginctl enable-linger "$(id -un)"` | exit 0 |
 | F2 | sh | `loginctl show-user "$(id -un)" --property=Linger --value` | `yes` |
 | F2 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
@@ -769,7 +787,7 @@ workstation distribution (Evidence classes).
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>'` | stage 2 (bootstrap step 2) |
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'` | stage 2, after native sign-in |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two absolute paths |
-| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'` | `executable:` and each path: both are regular executable files |
+| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p="$(type -P "$n")"; test -f "$p" && test -x "$p" && echo "executable: $p"; done'` | `executable:` and each path: both are regular executable files |
 | F11 | sh | `test -x "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | exit 0; exit 1 means `not installed`: record it and skip the rest of F11 |
 | F11 | sh | `cd ~/code/native-agent-stack` | the clone, the project the local scope belongs to |
 | F11 | sh | `claude mcp add --scope local jcodemunch -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | an `Added ...` line; on a re-run the name already exists |
@@ -1141,3 +1159,139 @@ Sources for the updated-host correction (2026-10-02), read that day by the third
   was read, not `v259.5`.
 - The coordinator's brief of 2026-10-02: the host observations of the Updated-host correction and the contract for the
   three changes.
+
+## Amendment 2026-10-02 (rehearsal run 2 on WSL 3.0.1, and the scoped cross-family read)
+
+The coordinator accepted run 2 and the scoped cross-family read of `fed1e93c` for PR #593. This amendment records
+their source reviews and host observations and changes the next run's commands and proofs; it is not another host
+run. Earlier sections retain their dated evidence and planning statements. The observations below supersede their
+statements that simultaneous distributions on 3.0.1 were unobserved. No image comparison has run; the criteria are
+the preregistered ones with the amendments of 2026-10-02 made before any comparison ran.
+
+Run 2, 2026-10-02T08:32Z to 08:40Z, used a throwaway name, Ubuntu 26.04.1, path A, WSL 3.0.1.0 and kernel
+6.18.40.1-1. P1, P2, W1, W2, W3, W4 and W5's path-A proofs passed: launch exit 0, uid 1000, cloud-init
+26.1-0ubuntu3~26.04.1, retained `result.json` and `status.json` without errors, `Valid schema user-data`,
+`/etc/wsl.conf`, the marker and sudo. It stopped at W5's paired rule and was removed through W5's recovery block.
+The seven findings are:
+
+1. **P3 counted the kernel's command line.** The baseline of `2` was `kernel: Command line:` at 0.000000 s and
+   `kernel: Kernel command line:` at 0.018761 s, both naming `hv_storvsc.storvsc_max_hw_queues=4`. Neither is a
+   storage error. The old age rule would stop a run within one hour of boot on these echoes. P3's two filters and
+   W5's second count now exclude the registration line and `[Cc]ommand line:` with the same extended-regexp filter.
+2. **Cgroup isolation held.** The workstation printed `cgroup:[4026532183]` and the new distribution
+   `cgroup:[4026532407]`; the common unit's `cgroup.procs` held one local pid and no `0`. Both user managers were
+   `active`, and the launch printed no user-session warning. This observes two distributions running together on
+   3.0.1, while a complete corrected recipe run and F3 remain owed.
+3. **The shared console failed the paired rule.** In the second the new distribution booted, both
+   `getty@tty1.service` units received SIGHUP and restarted five times, then showed `Result=start-limit-hit`.
+   Both system managers listed that unit and `systemd-binfmt.service` failed. The workstation changed from its W1
+   baseline: `1000`, `degraded`, only `systemd-binfmt.service` failed, `active`, `cgroup:[4026532183]`.
+   Both expose `/dev/tty1` as character device 4,1 of the one VM kernel. Source review of the two running images
+   (workstation Ubuntu 24.04.5/systemd 255; new Ubuntu 26.04.1/systemd 259) found `TTYPath=/dev/tty1`,
+   `TTYVHangup=yes`, `Restart=always`, `RestartSec=0` and enablement in `/etc/systemd/system/getty.target.wants/`;
+   both `console-getty.service` units read `masked-runtime`. The workstation's getty stays failed until the next
+   WSL start; no unit action is permitted there by this page, and nothing uses the VM console.
+4. **One real storage error appeared.** The second count was `3`. The new driver line, `cmd 0x2a`, `srb 0x4`,
+   host `0xc00000a1`, was at kernel time 7118.5 s in W4's install window. The disk was unmounted at 7126.9 s,
+   and cloud-init's `init-local` started at 7134.15 s. The written attachment-window rule recorded the line and
+   did not stop the run; the other two lines were the command-line echoes.
+5. **Removal preserved interop.** Export and unregister both exited 0, and the survivor check passed. On 3.0.1
+   `WSLInterop` survived both unregisters of 2026-10-02, in run 2 and probe E1, unlike the 2.7.13 rehearsal.
+   The check after every unregister and its stop-for-review rule remain required.
+6. **The image size was observed.** W2 printed `418495746` bytes for `ubuntu-26.04.1-wsl-amd64.wsl`.
+7. **Journal access depends on the user's group.** The workstation user is not in `adm`: without `sudo` the
+   identifier query printed the permission hint and `-- No entries --`; with `sudo` it printed
+   `Failed to flush binfmt_misc rules, ignoring: Read-only file system`. The new user belongs to `adm` through
+   the user-data. `journalctl -b 0 -t systemd-binfmt --no-pager -n 4`, without `tail`, printed the same lines.
+
+The mechanism's upstream sources were reviewed at microsoft/WSL tag `3.0.1`:
+
+- [`src/linux/init/init.cpp:363-365`](https://github.com/microsoft/WSL/blob/3.0.1/src/linux/init/init.cpp#L363-L365):
+  "Mask console-getty.service since /dev/tty devices are shared at the VM level across all distros. When multiple
+  distros are running, the second distro's getty fails because the tty is already held."
+  [PR #14490](https://github.com/microsoft/WSL/pull/14490), merged 2026-04-09, says "Fixes #13595".
+- [`distributions/validate-modern.py:27-40`](https://github.com/microsoft/WSL/blob/3.0.1/distributions/validate-modern.py#L27-L40):
+  `DISCOURAGED_SYSTEM_UNITS` includes `console-getty.service` and does not include `getty@tty1.service`.
+- A maintainer in [issue #13595](https://github.com/microsoft/WSL/issues/13595): "the best way to solve this would
+  probably to try to get distros to disable the `getty` and adjacent units in WSL".
+
+**Probe E1, 2026-10-02T08:42Z.** Outside the recipe, a second throwaway name used the same template with the new
+`bootcmd`. Its rendered SHA-256 was `c0732303a0004121f9d373f7856454e3e59eeadea395bac46eb17e1671b32af4`.
+It returned `Valid schema` on the workstation and `Valid schema user-data` in the image. The getty was `masked`
+(`is-enabled` exit 1, normal for a masked unit), with `LoadState=masked`, `ActiveState=inactive` and `NRestarts=0`.
+Only `systemd-binfmt.service` was failed. The journal recorded cloud-init creating the mask symlink and, 0.18 s later,
+systemd's `Failed to start getty@tty1.service.`: the refused job of a masked unit, not a failed unit. Cloud-init
+finished without errors; the user manager was `running`; namespaces were `cgroup:[4026532183]` and
+`cgroup:[4026532410]`. The workstation's values did not change, and the probe was removed afterwards.
+
+Ordering is a source review of the pinned 26.04.1 image's own files: `cloud-init-network.service` has
+`Before=systemd-user-sessions.service`, `getty@.service` has `After=systemd-user-sessions.service`, and
+`/etc/cloud/cloud.cfg` lists `bootcmd` among `cloud_init_modules`. The workstation's cloud-init
+26.1-0ubuntu1~24.04.1 has the same ordering in `cloud-init.service`; that is the version the 24.04.5 image packages,
+but the 24.04.5 image's own unit files were not read.
+
+**Decision.** Mask `getty@tty1.service` in the new distribution through the template's `bootcmd`, during cloud-init's
+network stage before systemd starts the unit. W5 proves the mask and retains all five paired observations with
+separate exits. The workstation's five values must equal its W1 baseline. W1 accepts a failed workstation getty
+only as an earlier collision's leftover with `Result=start-limit-hit`; it does not prove the workstation's unit
+messages again, because that distribution is compared with itself and F1 proves the new distribution's message.
+Any other baseline stops before W4 or any W6 import, including a uid other than 1000, an inactive user manager or
+the initial cgroup namespace. Any failed W5 proof uses `w5_failure_export`, with `cause` (`cgroup`, `tty` or a short
+text), and `<Name>-w5-failed.tar`; do not take path B for any such cause. Only the OOBE prompt failure permits W6.
+On path B the root block masks the getty after its first boot has already started it, so W5's paired proof after
+the relaunch decides whether the workstation changed; a difference stops and uses W5's recovery.
+
+**P3's age rule, one exception (added in the coordinator's review of this repair, 2026-10-02).** With the corrected
+filter the workstation's kernel journal holds two real driver errors of the same shape, at 7118.5 s (run 2's install)
+and 7678.6 s (probe E1's install): each `wsl.exe --install --from-file` on this host left one line in its install
+window. P3 as written would stop a second arm that starts within the hour on its predecessor's line. P3 now lets a
+run continue when the newest line's kernel time is one that an earlier run of the page recorded as its own
+attachment-window line; a line no earlier receipt explains keeps the stop. Overturned when an install leaves more
+than its one line, or lines appear outside an install window: then the count is exposure to microsoft/WSL#41482 and
+the stop applies. F10's sentence now renames every profile of the example without naming a count, so it holds for
+the example with three profiles and with five (pull request 604 added two resume profiles).
+
+Alternatives considered, with what would overturn each rejection:
+
+- **Accept getty as a second by-design failed unit in both distributions.** This hides a real cross-distribution
+  effect and changes the workstation's state at every import. Reconsider only if upstream evidence eliminates the
+  effect or a separate decision accepts that workstation change; a failed getty is not part of F1's pass condition.
+- **Mask it in the workstation as well.** This changes the owner's running distribution and would also protect it
+  from other distributions' gettys. It is left to the owner. Reconsider if a run proves the new-distribution mask
+  takes effect after the unit started, with the owner's decision required for that broader change.
+- **Use a kernel command-line or `.wslconfig` setting.** The page never changes `.wslconfig`; a kernel choice also
+  reaches every distribution. Reconsider only with an upstream-supported setting and a separate host-wide decision.
+- **Change the image.** The page installs the official image unmodified. Reconsider if Canonical's official image
+  stops enabling the getty, or a separate image decision replaces that requirement.
+
+Drop the `bootcmd` when WSL masks `getty@tty1.service` itself or Canonical's image stops enabling it. If a run shows
+the mask taking effect after the unit started, the proof fails and masking the workstation is reconsidered.
+A host whose other systemd distributions retain an unmasked getty will see both fail when two of them run; changing
+those units belongs to the host owner, outside this page.
+
+**Not established.** A live workstation getty surviving a new distribution's first boot follows from the masked
+unit never starting, but was not observed: the workstation's getty had already failed in run 2 before E1. The
+24.04.5 image's own unit files and path B's first boot are unobserved. A complete recipe run with the amended
+template through F3 remains owed; E1 is a probe, not a recipe run. Full image comparisons and full-stack acceptance
+remain owed.
+
+The scoped review's points and their repairs are:
+
+- W1's incomplete stop: W1's four baseline conditions and the checklist now stop every incompatible baseline;
+  tests remove the stop paragraph, uid, namespace and user-manager conditions separately.
+- Receipt equality and abbreviated F1 exceptions: every workstation field requires equality to
+  `host.workstation_baseline`; the comparison table, receipt and experiment use F1's complete pass condition.
+- Linux entry paths and F10 quoting: the launch forms use full Windows paths in Linux shells, and F10 tests each
+  quoted executable path without word splitting.
+- Hidden exits: W1 and both W5 halves have five separate commands and receipt entries; F1 and its sudo fallback
+  use `journalctl -n 4` directly.
+- Test blind spots: the new controls reject every weakened baseline/equality/message instruction, and the full
+  original quality rule is compared after removing the dated amendments.
+- Preregistered label and stale framing: the page, checklist and named record sentence identify the amendments;
+  the W7 sentence describes the 2.7.13 rehearsal in the past, and overturn now concerns a later WSL update.
+
+The command table mirrors the amended operational commands. Historical command text in earlier evidence sections
+remains as the command actually run then; it is not a command for the next run. The supplied primary reviews, the
+official image's files and the installed commands above are the sources for this bounded repair. The existing
+Python `unittest` harness tests repository contracts only; its controls do not qualify a host. The completeness
+check leaves the same decision-changing gaps: the corrected full run through F3, the rollback image and path B.

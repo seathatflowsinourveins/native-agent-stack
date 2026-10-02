@@ -104,7 +104,7 @@ RELEASE_PINS = {
         "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
         "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
         "catalog_name": "Ubuntu-26.04",
-        "bytes": None,
+        "bytes": 418495746,
     },
     "24.04.5": {
         "file": "ubuntu-24.04.5-wsl-amd64.wsl",
@@ -130,11 +130,12 @@ INTEROP_GUARD = ("if ($LASTEXITCODE -ne 0) { throw "
 # earlier W1 read `/proc/1`.
 OLD_NAMESPACE_READ = "readlink /proc/1/ns/cgroup"
 NAMESPACE_READ = "readlink /proc/self/ns/cgroup"
-WORKSTATION_BASELINE = ("id -u; systemctl is-system-running; systemctl --failed --no-legend --plain | awk '{print $1}'; "
-                        'systemctl is-active "user@$(id -u).service"; ' + NAMESPACE_READ)
-PAIRED_NEW = ("/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'id -u; systemctl is-system-running; "
-              'systemctl --failed --no-legend --plain | awk "{print \\$1}"; systemctl is-active "user@$(id -u).service"; '
-              + NAMESPACE_READ + "'")
+WORKSTATION_COMMANDS = ["id -u", "systemctl is-system-running", "systemctl --failed --no-legend --plain",
+                        'systemctl is-active "user@$(id -u).service"', NAMESPACE_READ]
+NEW_COMMANDS = ["/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec " + command for command in
+                (*WORKSTATION_COMMANDS[:3], "sh -c '" + WORKSTATION_COMMANDS[3] + "'", NAMESPACE_READ)]
+WORKSTATION_BASELINE = "\n".join(WORKSTATION_COMMANDS)
+PAIRED_NEW = "\n".join(NEW_COMMANDS)
 ISOLATION_KEYS = {"uid", "system_state", "failed_units", "user_manager", "cgroup_namespace"}
 CGROUP_PROCS = "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'"
 USER_MANAGER_ACTIVE = ('/mnt/c/Windows/System32/wsl.exe -d \'<Name>\' --exec sh -c '
@@ -150,14 +151,15 @@ OLD_STORAGE_RULE = ("On both paths, the second storage count equals P3's baselin
 ADOPTED_TARGET = ("This recipe adopts stable WSL 3.0.1 or later for a second systemd distribution, and requires it "
                   "before W4 or any W6 import.")
 HOST_UPDATE = ("The host was updated to WSL 3.0.1.0 on 2026-10-02 and passed its check (rootless container, interop, "
-               "user manager); the two-distribution proof is still owed.")
+               "user manager); run 2 observed distinct cgroup namespaces, local process ids and two active user "
+               "managers while both distributions ran.")
 OLD_ADOPTED_TARGET = "A second systemd distribution requires WSL 3.0.1 or later before W4 or any W6 import."
 OLD_HOST_UPDATE = "The host's 2.7.13 must be updated outside this page before this second-distribution run."
 # Change 3: on the adopted release WSL mounts the binfmt status file read-only (microsoft/WSL#40621), so
 # systemd-binfmt.service fails at every boot, which upstream calls benign (#41226). F1 accepts that one failed unit.
 BINFMT_UNIT = "systemd-binfmt.service"
 F1_FAILED = "systemctl --failed --no-legend --plain"
-F1_LOG = "journalctl -b 0 -t systemd-binfmt --no-pager | tail -n 4"
+F1_LOG = "journalctl -b 0 -t systemd-binfmt --no-pager -n 4"
 F1_PASS = ("`degraded` when `systemctl --failed --no-legend --plain` lists exactly `systemd-binfmt.service` and that "
            "unit's log, from the `journalctl` line, holds")
 FLUSH_MESSAGE = "Failed to flush binfmt_misc rules, ignoring: Read-only file system"
@@ -226,11 +228,15 @@ W3_HASH = ("(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPRO
 SCHEMA_SYSTEM = "wsl.exe -d '<Name>' -u root --exec cloud-init schema --system"
 SCHEMA_LINE = "`^\\s*Valid schema user-data$`"
 CLOUD_INIT_HOWTO = "https://ubuntu.com/wsl/docs/stable/howto/cloud-init/"
-STORVSC_COUNT = "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'"
+STORVSC_COUNT = ("sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | "
+                 "grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'")
 # The coordinator's P3 rule (2026-10-01): the count is a baseline; the newest error line's kernel time against the
 # uptime decides whether errors are current; W5 counts again after the first launch.
 STORVSC_NEWEST = ("sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | "
-                  "grep -v 'registering driver hv_storvsc' | tail -n 1")
+                  "grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1")
+# Earlier evidence sections retain the commands actually run in the 2026-10-01 artifact check (B6).
+HISTORICAL_STORAGE_COMMANDS = tuple(command.replace("grep -Ev", "grep -v").replace("|[Cc]ommand line:", "")
+                                    for command in (STORVSC_COUNT, STORVSC_NEWEST))
 UPTIME = "cat /proc/uptime"
 P3_COMMANDS = [STORVSC_COUNT, STORVSC_NEWEST, UPTIME, "swapon --show"]
 STORAGE_FIELDS = {"baseline": "<P3", "newest_line_time": "<P3", "swap": "<P3", "second_count": "<W5", "new_lines": "<W5"}
@@ -244,6 +250,15 @@ PROBE_SHARE = r"\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe"
 PROBE_CREATE = f"New-Item -ItemType File -Path '{PROBE_SHARE}'"
 PROBE_OWNER = "wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'"
 PROBE_DELETE = f"Remove-Item -LiteralPath '{PROBE_SHARE}'"
+GETTY_UNIT = "getty@tty1.service"
+GETTY_MASK = "systemctl mask --now " + GETTY_UNIT
+GETTY_BOOTCMD = "bootcmd:\n- [systemctl, mask, --now, getty@tty1.service]\n"
+GETTY_ENABLED = "wsl.exe -d '<Name>' --exec systemctl is-enabled " + GETTY_UNIT
+GETTY_SHOW = "wsl.exe -d '<Name>' --exec systemctl show " + GETTY_UNIT + " -p LoadState -p ActiveState -p NRestarts"
+GETTY_RESULT = "systemctl show " + GETTY_UNIT + " -p Result -p NRestarts"
+F10_PROBE = ("wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc "
+             "'for n in claude codex; do p=\"$(type -P \"$n\")\"; "
+             "test -f \"$p\" && test -x \"$p\" && echo \"executable: $p\"; done'")
 IDLE_READ = ("Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', "
              "'^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue")
 IDLE_POLL = ("foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); "
@@ -352,6 +367,10 @@ def user_data_errors(template: str, user: str = "example") -> list[str]:
                 r"^  append: true$", r"^  content: \|$", r"^    \[user\]$", rf"^    default={re.escape(user)}$")
     errors += [f"the render lacks a line matching {pattern}" for pattern in required
                if not re.search(pattern, rendered, re.M)]
+    if template.count(GETTY_BOOTCMD) != 1:
+        errors.append("the user-data must hold the exact bootcmd getty mask once")
+    if not re.search(r"^    default=\$\{WSL_USER\}\n\n(?:#[^\n]*\n){1,4}" + re.escape(GETTY_BOOTCMD), template, re.M):
+        errors.append("the bootcmd must follow write_files with one blank line and at most four comment lines")
     if re.search(r"^\s*(passwd|hashed_passwd|plain_text_passwd):", rendered, re.M):
         errors.append("the user-data sets a password; the recipe's user has a locked password and NOPASSWD sudo")
     return errors
@@ -489,6 +508,20 @@ def receipt_errors(receipt: dict, recipe: str, component_ids: set[str]) -> list[
     for entry in receipt.get("steps", []):
         if not isinstance(entry, dict) or not {"step", "cmd", "exit", "output_excerpt"} <= set(entry):
             errors.append(f"receipt step {entry!r} lacks step, cmd, exit or output_excerpt")
+    mask = field(receipt, "first_launch", "getty_mask")
+    if not isinstance(mask, dict) or set(mask) != {"is_enabled", "load_state", "active_state", "n_restarts"} or not all(
+            is_placeholder(value, "<W5") for value in mask.values()):
+        errors.append("first_launch.getty_mask must retain W5's four mask observations")
+    export = field(receipt, "w5_failure_export")
+    if not isinstance(export, dict) or set(export) != {"file", "sha256", "bytes", "cause"} or not all(
+            is_placeholder(value, "<W5") for value in export.values()):
+        errors.append("w5_failure_export must hold W5 placeholders for file, sha256, bytes and cause")
+    baseline = field(receipt, "host", "workstation_baseline")
+    if isinstance(baseline, dict) and "getty_tty1_result" in baseline:
+        optional = baseline["getty_tty1_result"]
+        if not is_placeholder(optional, "<W1") or not all(part in optional for part in
+                ("present only when", "Result=start-limit-hit", "NRestarts", "omit this key")):
+            errors.append("getty_tty1_result is optional and present only when W1's extra command ran")
     return errors
 
 
@@ -593,9 +626,9 @@ def path_proof_errors(recipe: str) -> list[str]:
     (adoption/platforms/linux-wsl2.md, Windows Terminal step 2), so F10 tests every printed path with ``test -f`` and
     ``test -x``."""
     f10 = [command for step, _, command in recipe_rows(recipe) if step == "F10"]
-    if any("type -P claude codex" in command and "test -f" in command and "test -x" in command for command in f10):
+    if F10_PROBE in f10:
         return []
-    return ["F10 does not test each path `type -P claude codex` prints with `test -f` and `test -x`"]
+    return ["F10 does not obtain each path without word splitting and quote it in test -f, test -x and echo"]
 
 
 def step_blocks(recipe: str, step: str) -> list[list[str]]:
@@ -885,7 +918,7 @@ def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dic
                if needed not in w5]
     evidence = prose(chapter(record, "Evidence classes"))
     errors += [f"the record's Evidence classes lack P3's {needed}" for needed in
-               (STORVSC_COUNT, STORVSC_NEWEST, UPTIME, "swapon --show", "registering driver hv_storvsc", "baseline")
+               (*HISTORICAL_STORAGE_COMMANDS, UPTIME, "swapon --show", "registering driver hv_storvsc", "baseline")
                if needed not in evidence]
     if THRESHOLD_SOURCE not in prose(record) or "bare count" not in prose(chapter(record, "Alternatives")):
         errors.append("the record does not say the threshold is the recipe's choice and why a bare count was rejected")
@@ -1273,8 +1306,8 @@ class CrossFamilyReviewTests(unittest.TestCase):
 
     def test_the_path_proof_check_rejects_type_p_alone(self):
         recipe = read(RECIPE)
-        self.assertIn("test -x $p && ", recipe)
-        self.assertTrue(path_proof_errors(recipe.replace("test -x $p && ", "")))
+        self.assertIn('test -x "$p" && ', recipe)
+        self.assertTrue(path_proof_errors(recipe.replace('test -x "$p" && ', "")))
 
 
 class JCodeMunchStepTests(unittest.TestCase):
@@ -1394,7 +1427,7 @@ class FollowUpCase(unittest.TestCase):
         good = self.inputs()
         for name, mutant in mutants.items():
             with self.subTest(mutant=name):
-                self.assertNotEqual(mutant, good)
+                self.assertTrue(mutant != good, f"control made no change: {name}")
                 self.assertTrue(check(*mutant))
 
 
@@ -1525,7 +1558,8 @@ class KernelStorageTests(FollowUpCase):
             "no exposure rule": (recipe.replace(w5, w5.replace("exposure to microsoft/WSL#41482", "a warning")), record,
                                  checklist, receipt),
             "after the install": (recipe.replace(p3, "").replace(later, p3 + later, 1), record, checklist, receipt),
-            "record without the run": (recipe, record.replace(STORVSC_NEWEST, "the newest line"), checklist, receipt),
+            "record without the run": (recipe, record.replace("sudo journalctl -k -b 0 --no-pager", "the journal read"),
+                                        checklist, receipt),
             "record without the threshold's source": (recipe, record.replace(THRESHOLD_SOURCE, "an upstream figure"),
                                                       checklist, receipt),
             "checklist with the old rule": (recipe, record, checklist.replace(checklist_line(checklist, "P3"),
@@ -1645,7 +1679,7 @@ class RehearsalTests(unittest.TestCase):
                                             record, checklist, receipt, experiment),
             "no host-wide rule": (recipe.replace(r1, r1.replace("only its own distribution", "its distribution")), record,
                                   checklist, receipt, experiment),
-            "no storage readings": (recipe.replace(r1, r1.replace("P3's baseline and W5's second count", "the counts")),
+            "no storage readings": (recipe.replace(r1, reword(r1, "P3's baseline and W5's second count", "the counts")),
                                     record, checklist, receipt, experiment),
             "checklist without R1": (recipe, record, checklist.replace(checklist_line(checklist, "R1") + "\n", ""), receipt,
                                      experiment),
@@ -1657,7 +1691,7 @@ class RehearsalTests(unittest.TestCase):
         }
         for name, mutant in mutants.items():
             with self.subTest(mutant=name):
-                self.assertNotEqual(mutant, (recipe, record, checklist, receipt, experiment))
+                self.assertTrue(mutant != (recipe, record, checklist, receipt, experiment), f"control made no change: {name}")
                 self.assertTrue(rehearsal_errors(*mutant))
 
 
@@ -1704,7 +1738,7 @@ class DualImageParameterizationTests(unittest.TestCase):
         self.assertEqual(experiment["status"], "planned")
         self.assertEqual(experiment["observations"], [])
         self.assertEqual(experiment["decision_and_scope"]["qualification_run_ids"], [])
-        self.assertIn("no merit precedence", experiment["predeclared_metrics"]["quality_rule"])
+        self.assertEqual(quality_rule_errors(experiment), [])
 
 
 def version_gate_errors(recipe: str, checklist: str) -> list[str]:
@@ -1728,12 +1762,13 @@ def version_gate_errors(recipe: str, checklist: str) -> list[str]:
 
 def namespace_observation_errors(recipe: str, checklist: str) -> list[str]:
     errors = []
-    if ("sh", WORKSTATION_BASELINE) not in step_commands(recipe, "W1"):
+    if not any(block == WORKSTATION_COMMANDS for block in step_blocks(recipe, "W1")):
         errors.append("W1 lacks the native observation on the running distribution")
-    for needed in ("cgroup:[4026531835]", "PROC_CGROUP_INIT_INO", "initial cgroup namespace", "corroboration", "not the gate"):
+    for needed in ("cgroup:[4026531835]", "PROC_CGROUP_INIT_INO", "initial cgroup namespace",
+                   "A noninitial namespace is necessary but does not prove isolation"):
         if needed not in prose(section(recipe, "W1")):
             errors.append(f"W1 lacks the namespace observation's interpretation: {needed}")
-    if NAMESPACE_READ not in checklist_line(checklist, "W1"):
+    if NAMESPACE_READ not in checklist:
         errors.append("the checklist omits the namespace observation")
     return errors
 
@@ -1752,11 +1787,11 @@ def cgroup_launch_errors(recipe: str, checklist: str) -> list[str]:
                    "user@<uid>.service", "empty or unreadable", "never stop or restart a unit in either distribution"):
         if needed not in prose(w5):
             errors.append(f"W5 lacks its conclusive cgroup proof or recovery rule: {needed}")
-    failed_tar = r"Z:\WSL\downloads\<Name>-cgroup-failed.tar"
+    failed_tar = r"Z:\WSL\downloads\<Name>-w5-failed.tar"
     export = f"wsl.exe --export '<Name>' '{failed_tar}'"
     failures = [block for block in blocks if export in block]
     if len(failures) != 1:
-        errors.append("W5 lacks the dedicated cgroup-failure recovery")
+        errors.append("W5 lacks the recovery for any failed proof")
     else:
         block = failures[0]
         recovery = (TERMINATE, export, EXPORT_GUARD, UNREGISTER, INTEROP_VERIFY, INTEROP_GUARD)
@@ -1830,19 +1865,19 @@ def adopted_target_errors(recipe: str) -> list[str]:
 def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
     """Change 2 of the follow-up of 2026-10-02. A reading of one distribution cannot show the same uid, distinct namespaces
     and two healthy managers, so W5 runs, natively in the workstation's shell after its cgroup block and before F1, one
-    block of two command lines that read the same five values from both running distributions, and records them under the
+    block of ten command lines that read the same five values from both running distributions, and records them under the
     receipt's ``paired_isolation`` (one object per distribution). W1 holds the workstation's baseline of the five, without
     sudo, and W6 repeats the record as it repeats the cgroup proof."""
     errors = []
     w1 = step_commands(recipe, "W1")
-    if ("sh", WORKSTATION_BASELINE) not in w1:
+    if not all(("sh", command) in w1 for command in WORKSTATION_COMMANDS):
         errors.append("W1 lacks the workstation's baseline of the five observations")
     if ("sh", OLD_NAMESPACE_READ) in w1:
         errors.append("W1 still records the lone `/proc/1` namespace read, which needs privilege")
     blocks = step_blocks(recipe, "W5")
-    paired = [block for block in blocks if WORKSTATION_BASELINE in block or PAIRED_NEW in block]
-    if paired != [[WORKSTATION_BASELINE, PAIRED_NEW]]:
-        errors.append("W5 does not hold one block of the two paired command lines, the workstation's first")
+    paired = [block for block in blocks if "systemctl is-system-running" in block or NEW_COMMANDS[0] in block]
+    if paired != [WORKSTATION_COMMANDS + NEW_COMMANDS]:
+        errors.append("W5 does not hold one block of ten separate paired commands, the workstation's five first")
     else:
         cgroup = next((index for index, block in enumerate(blocks) if CGROUP_PROCS in block), len(blocks))
         if blocks.index(paired[0]) <= cgroup:
@@ -1850,7 +1885,8 @@ def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: d
     w5 = prose(section(recipe, "W5"))
     errors += [f"W5's proof does not say: {needed}" for needed in (
         "both distributions print the same uid", "both user managers print `active`",
-        "each system manager prints `running`, or `degraded` with `systemd-binfmt.service` as its only failed unit",
+        "the new distribution's system state is `running` with no failed unit, or `degraded` with "
+        "`systemd-binfmt.service` as its only failed unit",
         "differ from each other and neither is `cgroup:[4026531835]`",
         "equal its own values recorded in W1 before the import",
         "the WSL version and kernel from W1 and the image revision from W2", "`paired_isolation`",
@@ -1859,10 +1895,11 @@ def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: d
         errors.append("W6 does not repeat the paired record with the cgroup proof")
     rows = command_table(record)
     errors += [f"the record's command table lacks {step} {command}" for step, command in
-               (("W1", WORKSTATION_BASELINE), ("W5", WORKSTATION_BASELINE), ("W5", PAIRED_NEW))
+               [*(('W1', command) for command in WORKSTATION_COMMANDS),
+                *(('W5', command) for command in WORKSTATION_COMMANDS + NEW_COMMANDS)]
                if (step, "sh", command) not in rows]
     w1_line, w5_line = checklist_line(checklist, "W1"), checklist_line(checklist, "W5")
-    if NAMESPACE_READ not in w1_line or "baseline" not in w1_line:
+    if NAMESPACE_READ not in checklist or "baseline" not in w1_line:
         errors.append("the checklist's W1 line does not require the workstation's baseline")
     if "paired_isolation" not in w5_line or "W1 baseline" not in w5_line:
         errors.append("the checklist's W5 line does not require the paired record against the W1 baseline")
@@ -1875,7 +1912,7 @@ def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: d
         errors.append("the receipt example has no paired_isolation with the five keys for two distributions")
     host = field(receipt, "host")
     baseline = host.get("workstation_baseline") if isinstance(host, dict) else None
-    if not isinstance(baseline, dict) or set(baseline) != ISOLATION_KEYS or not all(
+    if not isinstance(baseline, dict) or set(baseline) - {"getty_tty1_result"} != ISOLATION_KEYS or not all(
             is_placeholder(item, "<W1") for item in baseline.values()):
         errors.append("the receipt example's host has no workstation_baseline with the five keys (W1)")
     if isinstance(host, dict) and "cgroup_namespace" in host:
@@ -1915,15 +1952,15 @@ def binfmt_unit_errors(recipe: str, record: str, checklist: str, receipt: dict) 
     errors += [f"the record's Sources lack {url}" for url in (BINFMT_PR, BINFMT_ISSUE) if url not in record]
     line = checklist_line(checklist, "F1")
     if not all(part in line for part in ("`running`", "`degraded`", "exactly `systemd-binfmt.service`",
-                                         "any other failed unit stops")):
+                                         "any other failed unit stops", FLUSH_MESSAGE, "with no failed unit")):
         errors.append("the checklist's F1 line does not accept `degraded` for the one unit only")
     first = next((entry for entry in receipt.get("steps", []) if entry.get("step") == "F1"
                   and entry.get("cmd") == "systemctl is-system-running --wait"), {})
     if not all(isinstance(first.get(key), str) and "degraded" in first[key] for key in ("exit", "output_excerpt")):
         errors.append("the receipt example's F1 entry for the wait command still holds a fixed `running`")
     arms = receipt.get("comparison_arms", {})
-    if not arms or not all("degraded" in str(arm.get("first_boot")) for arm in arms.values()):
-        errors.append("the receipt example's first_boot criteria still read F1 `running` only")
+    if not arms or not all("F1's pass condition" in str(arm.get("first_boot")) for arm in arms.values()):
+        errors.append("the receipt example's first_boot criteria do not refer to F1's complete pass condition")
     return errors
 
 
@@ -1980,7 +2017,7 @@ class RehearsalRepairTests(unittest.TestCase):
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         components = {c["id"] for c in json.loads(read(STACK))["components"]}
         self.assertEqual(tuple(STEP_RE.findall(recipe)), REQUIRED_STAGE_IDS)
-        self.assertIn(("W1", "sh", WORKSTATION_BASELINE), recipe_rows(recipe))
+        self.assertTrue(all(("W1", "sh", command) in recipe_rows(recipe) for command in WORKSTATION_COMMANDS))
         # The old checks derived their entire contract from the recipe and accepted this coordinated deletion.
         old_page = recipe.replace(section(recipe, "F4"), "")
         old_ticks = checklist.replace(checklist_line(checklist, "F4") + "\n", "")
@@ -2023,7 +2060,8 @@ class RehearsalRepairTests(unittest.TestCase):
         self.assertNotEqual(old, recipe)
         self.assertTrue(namespace_observation_errors(old, checklist))
         self.assertTrue(namespace_observation_errors(recipe, checklist.replace(NAMESPACE_READ, "the namespace")))
-        self.assertTrue(namespace_observation_errors(recipe.replace("not the gate", "the gate"), checklist))
+        self.assertTrue(namespace_observation_errors(recipe.replace("does not prove isolation", "proves isolation"),
+                                                      checklist))
 
     def test_cgroups_are_checked_from_the_running_distribution_before_f1(self):
         recipe, checklist = read(RECIPE), read(CHECKLIST)
@@ -2038,7 +2076,7 @@ class RehearsalRepairTests(unittest.TestCase):
         recipe, checklist = read(RECIPE), read(CHECKLIST)
         self.assertEqual(cgroup_launch_errors(recipe, checklist), [])
         w5 = section(recipe, "W5")
-        old = recipe.replace(w5, w5.replace("wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar'\n", ""))
+        old = recipe.replace(w5, w5.replace("wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-w5-failed.tar'\n", ""))
         self.assertNotEqual(old, recipe)
         self.assertTrue(cgroup_launch_errors(old, checklist))
         unsafe = recipe.replace(w5, w5.replace(TERMINATE + "\n", "sudo systemctl restart user@1000.service\n", 1))
@@ -2192,8 +2230,7 @@ class PairedIsolationTests(FollowUpCase):
         self.assertIn(WORKSTATION_BASELINE + "\n", w1)
         self.assertIn(block, w5)
         self.assertIn(cgroup_block, w5)
-        row = next(line for line in record.splitlines() if line.startswith("| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' "
-                                                                           "--exec sh -c 'id -u;"))
+        row = next(line for line in record.splitlines() if line.startswith(f"| W5 | sh | `{NEW_COMMANDS[0]}` |"))
         pair = receipt["paired_isolation"]
         names = [name for name, value in pair.items() if isinstance(value, dict)]
         host = {key: value for key, value in receipt["host"].items() if key != "workstation_baseline"}
@@ -2251,13 +2288,12 @@ class BinfmtUnitTests(FollowUpCase):
         for line in (F1_FAILED, F1_LOG):
             self.assertIn(line + "\n", f1)
         log_row = next(line for line in record.splitlines() if line.startswith("| F1 | sh | `journalctl -b 0 -t "))
-        pass_rule = f"Proof: `running`, or {F1_PASS} `{FLUSH_MESSAGE}`;"
+        pass_rule = f"Proof: `running` with no failed unit, or {F1_PASS} `{FLUSH_MESSAGE}`;"
         first = next(entry for entry in receipt["steps"] if entry["step"] == "F1"
                      and entry["cmd"] == "systemctl is-system-running --wait")
         old_steps = [dict(entry, exit=0, output_excerpt="running") if entry is first else entry
                      for entry in receipt["steps"]]
-        old_arms = {name: dict(arm, first_boot=arm["first_boot"].replace(", or degraded with only systemd-binfmt.service "
-                                                                         "failed", "")) for name, arm in
+        old_arms = {name: dict(arm, first_boot=arm["first_boot"].replace("F1's pass condition", "F1 running")) for name, arm in
                     receipt["comparison_arms"].items()}
         page = lambda new_f1: (recipe.replace(f1, new_f1), record, checklist, receipt)  # noqa: E731
         self.assert_mutants_fail(binfmt_unit_errors, {
@@ -2347,8 +2383,8 @@ class BinfmtRecoveryTests(FollowUpCase):
         self.assert_mutants_fail(binfmt_recovery_errors, {
             "the old restart recovery": page(r1.replace(block, OLD_INTEROP_RECOVERY)),
             "the restart beside the records": page(r1.replace(block, RESTART_UNIT + "\n" + block)),
-            "a restart in another step": (recipe.replace("```sh\nid -u '<WSL_USER>' ||", "```sh\nsudo systemctl restart "
-                                                         "systemd-binfmt\nid -u '<WSL_USER>' ||", 1), record, checklist,
+            "a restart in another step": (recipe.replace("```sh\n" + GETTY_MASK + "\n", "```sh\nsudo systemctl restart "
+                                                         "systemd-binfmt\n" + GETTY_MASK + "\n", 1), record, checklist,
                                           receipt),
             "a start beside the records": page(r1.replace(block, block + "sudo systemctl start systemd-binfmt.service\n")),
             "no listing of the formats": page(r1.replace(INTEROP_RECORDS[0] + "\n", "")),
@@ -2371,6 +2407,373 @@ class BinfmtRecoveryTests(FollowUpCase):
                                                                                            old_decision)), checklist, receipt),
             "receipt with the old recovery note": (recipe, record, checklist, dict(receipt, interop_after_unregister=old_interop)),
         })
+
+
+ORIGINAL_QUALITY_RULE = (
+    "Both 26.04.1 trial and 24.04.5 fallback are symmetric provisional arms with no merit precedence. "
+    "Preregister the same separate-throwaway R1 comparisons on one unchanged host/kernel/driver, checkout, "
+    "user-data and bootstrap profile. Both signed sums pass P1; P2 workstation schema is not image qualification. "
+    "W2 hashes the whole selected image against its exact signed/catalog release mapping; W4/W6 use that filename. "
+    "Each arm must record first_boot (W5 default uid 1000, retained results, selected-image cloud-init version/schema "
+    "and F1 running); systemd_user_from_second_instance (F2 linger/idle and F3 directory/socket ownership plus manager "
+    "running from the workstation second instance); wsl_gpu (/dev/dxg and native nvidia-smi visibility on the same "
+    "Windows driver); uv_cpython_3_13 (separate managed Python 3.13.x through uv); node_24 (bootstrap v24.21.0 startup). "
+    "Preserve P3 age/baseline, W5 second count, W7 owner 1000:1000 and failed-rehearsal/W6 export-before-unregister "
+    "guards. Missing, failed or skipped criteria do not qualify an arm or rank its peer. Record sanitized native "
+    "per-arm output before selecting within the measured host scope. Full-stack, GPU-workload and model acceptance "
+    "remain separate and unrun."
+)
+FIRST_QUALITY_AMENDMENT = (
+    "; amended on 2026-10-02 before any comparison ran: on WSL 3.0.1 the criterion is F1's pass condition, running, "
+    "or degraded with systemd-binfmt.service as the only failed unit, which fails by design there"
+)
+QUALITY_AMENDMENT_RE = re.compile(r"; amended on 2026-10-02 .*?(?=; amended on 2026-10-02 |\); "
+                                  r"systemd_user_from_second_instance)")
+BASELINE_STOP_PARTS = (
+    "The workstation's baseline passes only when all four hold:",
+    "its uid equals the new distribution's planned default uid `1000`",
+    "its system state is `running` with no failed unit, or `degraded` with its failed set contained in "
+    "{`systemd-binfmt.service`, `getty@tty1.service`}",
+    "its user manager is `active`",
+    "its cgroup namespace is not `cgroup:[4026531835]`",
+    "Anything else stops the run before W4 and before any W6 import",
+)
+BASELINE_STOP_RE = re.compile(r"^- The workstation's baseline passes.*?(?=^- |^```|\Z)", re.M | re.S)
+LINUX_ENTRIES = (
+    '/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass '
+    '-File "$(wslpath -w step.ps1)"',
+    "/mnt/c/Windows/System32/wsl.exe -d <Name>",
+    "/mnt/c/Windows/System32/wsl.exe -d <Name> -- bash -s < steps.sh",
+    "/mnt/c/Windows/System32/wsl.exe -d <Name> -u root",
+    "/mnt/c/Windows/System32/wsl.exe -d <Name> -u root -- bash -s < path-b.sh",
+)
+
+
+def quality_rule_errors(experiment: dict) -> list[str]:
+    """Keep the full original preregistration and the first amendment; remove only the two dated amendments."""
+    rule = field(experiment, "predeclared_metrics", "quality_rule")
+    if not isinstance(rule, str):
+        return ["quality_rule is not text"]
+    retained, count = QUALITY_AMENDMENT_RE.subn("", rule)
+    errors = []
+    if retained != ORIGINAL_QUALITY_RULE:
+        errors.append("the quality rule outside its dated amendments differs from the full original wording")
+    if count != 2 or rule.count(FIRST_QUALITY_AMENDMENT) != 1:
+        errors.append("the quality rule must retain the first amendment and exactly one further dated amendment")
+    amendments = QUALITY_AMENDMENT_RE.findall(rule)
+    if len(amendments) != 2 or "F1's complete pass condition" not in amendments[-1] or FLUSH_MESSAGE not in amendments[-1]:
+        errors.append("the second amendment must interpret the first short form as F1's complete pass condition")
+    return errors
+
+
+def workstation_stop_errors(recipe: str) -> list[str]:
+    """W1 must reject every incompatible baseline before any install or import, in its own stop paragraph."""
+    w1 = section(recipe, "W1")
+    paragraph = BASELINE_STOP_RE.search(w1)
+    stop = prose(paragraph.group(0)) if paragraph else ""
+    errors = [f"W1's baseline stop lacks: {part}" for part in BASELINE_STOP_PARTS if part not in stop]
+    for part in ("leftover of an earlier collision", "`Result=start-limit-hit` is required",
+                 "another result stops the run", "`getty_tty1_result`"):
+        if part not in prose(w1):
+            errors.append(f"W1 lacks the conditional getty baseline proof: {part}")
+    if ("sh", GETTY_RESULT) not in step_commands(recipe, "W1"):
+        errors.append("W1 lacks the extra read-only command for an already failed getty")
+    return errors
+
+
+def receipt_baseline_errors(receipt: dict) -> list[str]:
+    """Each of the five workstation instructions must require equality to its own W1 baseline."""
+    workstation = field(receipt, "paired_isolation", "workstation")
+    return [f"workstation {key} does not require equality to host.workstation_baseline" for key in sorted(ISOLATION_KEYS)
+            if not is_placeholder(field(workstation, key), "<W5") or
+            "equal to host.workstation_baseline" not in str(field(workstation, key))]
+
+
+def separate_observation_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """Commands and receipt entries retain each observation's exit; no compound or tail pipeline hides it."""
+    errors = []
+    if WORKSTATION_COMMANDS not in step_blocks(recipe, "W1"):
+        errors.append("W1 must hold five native commands on five lines")
+    if WORKSTATION_COMMANDS + NEW_COMMANDS not in step_blocks(recipe, "W5"):
+        errors.append("W5 must hold five commands per distribution on ten lines")
+    if [command for _, command in fenced_commands(checklist)] != (
+            WORKSTATION_COMMANDS + WORKSTATION_COMMANDS + NEW_COMMANDS):
+        errors.append("the checklist must repeat W1's five commands and W5's two halves separately")
+    table = Counter(command_table(record))
+    entries = Counter((entry.get("step"), entry.get("cmd")) for entry in receipt.get("steps", []))
+    for step, commands in (("W1", WORKSTATION_COMMANDS), ("W5", WORKSTATION_COMMANDS + NEW_COMMANDS)):
+        for command in commands:
+            expected = 2 if step == "W5" and command == USER_MANAGER_ACTIVE else 1
+            if table[(step, "sh", command)] != expected or entries[(step, command)] != expected:
+                errors.append(f"{step} must record each occurrence of {command} in the table and receipt")
+    texts = (recipe, checklist, json.dumps(receipt), "\n".join(command for _, _, command in command_table(record)))
+    for text in texts:
+        if "id -u; systemctl is-system-running;" in text or "| tail -n 4" in text:
+            errors.append("an operational command still hides exits in the old compound or journal pipeline")
+    return errors
+
+
+def storage_filter_errors(recipe: str, record: str, receipt: dict) -> list[str]:
+    """All three operational filters exclude registration and both forms of the kernel's command-line echo."""
+    expected = Counter({STORVSC_COUNT: 2, STORVSC_NEWEST: 1})
+    inventories = ([command for _, _, command in recipe_rows(recipe)],
+                   [command for _, _, command in command_table(record)],
+                   [entry.get("cmd", "") for entry in receipt.get("steps", [])])
+    errors = []
+    for commands in inventories:
+        filters = [command for command in commands if "grep hv_storvsc" in command]
+        if Counter(filters) != expected:
+            errors.append("the operational inventory does not hold exactly the three corrected hv_storvsc filters")
+    return errors
+
+
+def getty_proof_errors(recipe: str, record: str, receipt: dict) -> list[str]:
+    errors = []
+    for command in (GETTY_ENABLED, GETTY_SHOW):
+        if ("powershell", command) not in step_commands(recipe, "W5") or (
+                "W5", "powershell", command) not in command_table(record):
+            errors.append(f"W5 or the command table lacks {command}")
+    roots = [block for block in step_blocks(recipe, "W6") if any(line.startswith("id -u '<WSL_USER>'") for line in block)]
+    if len(roots) != 1 or roots[0][:1] != [GETTY_MASK]:
+        errors.append("W6's root block must start with the getty mask")
+    for part in ("`masked`", "exit 1", "`LoadState=masked`", "`ActiveState=inactive`", "`NRestarts=0`",
+                 "refused job of a masked unit"):
+        if part not in prose(section(recipe, "W5")):
+            errors.append(f"W5 lacks its getty proof: {part}")
+    if "starts the getty before the first line below can run" not in prose(section(recipe, "W6")):
+        errors.append("W6 must state the import's first-boot ordering limitation")
+    values = field(receipt, "first_launch", "getty_mask")
+    for key, part in (("is_enabled", "masked"), ("load_state", "LoadState=masked"),
+                      ("active_state", "ActiveState=inactive"), ("n_restarts", "NRestarts=0")):
+        if not is_placeholder(field(values, key), "<W5") or part not in str(field(values, key)):
+            errors.append(f"the receipt lacks the getty_mask.{key} proof")
+    return errors
+
+
+def w5_recovery_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    errors = []
+    for text in (recipe, record, checklist, json.dumps(receipt)):
+        if "cgroup" + "_failure_export" in text or "<Name>-cgroup" + "-failed.tar" in text:
+            errors.append("an old W5 recovery name remains")
+    w5 = prose(section(recipe, "W5"))
+    for part in ("When any W5 proof fails", "Do not take path B for any such failure", "`w5_failure_export`",
+                 "`cgroup`, `tty` or a short text", "this recovery block serves every failed W5 proof"):
+        if part not in w5:
+            errors.append(f"W5's recovery lacks: {part}")
+    export = field(receipt, "w5_failure_export")
+    if not isinstance(export, dict) or set(export) != {"file", "sha256", "bytes", "cause"}:
+        errors.append("w5_failure_export lacks file, sha256, bytes or cause")
+    elif "<Name>-w5-failed.tar" not in str(export["file"]) or not all(part in str(export["cause"]) for part in
+                                                                          ("cgroup", "tty", "short text")):
+        errors.append("w5_failure_export does not name the recovery file and its possible causes")
+    return errors
+
+
+def linux_entry_errors(recipe: str) -> list[str]:
+    errors = [f"the Linux entry lacks its full Windows path: {command}" for command in LINUX_ENTRIES
+              if "`" + command + "`" not in recipe]
+    inline = re.findall(r"`([^`\n]*)`", recipe)
+    if any(command.startswith("powershell.exe -NoProfile") or (command.startswith("wsl.exe -d <Name>") and
+            ("bash -s" in command or "-u root" in command)) for command in inline):
+        errors.append("a Linux entry starts a Windows program by a bare name")
+    if any(shell == "sh" and re.match(r"(?:wsl|powershell)\.exe\b", command)
+           for shell, command in fenced_commands(recipe)):
+        errors.append("an sh block starts a Windows program by a bare name")
+    return errors
+
+
+def release_size_errors(recipe: str, receipt: dict) -> list[str]:
+    row = next((line for line in recipe.splitlines() if line.startswith("| 26.04.1 |")), "")
+    errors = []
+    if "418,495,746; rehearsal run 2, 2026-10-02" not in row:
+        errors.append("the release table lacks run 2's observed 26.04.1 size")
+    if field(receipt, "supported_images", "26.04.1", "bytes") != 418495746:
+        errors.append("the receipt's supported image size does not match run 2")
+    return errors
+
+
+class Run2RepairTests(FollowUpCase):
+    """The accepted PR #593 repair; every test asserts the new contract before trying a pre-change mutation."""
+
+    def test_bootcmd_is_exact_and_the_template_has_only_the_wsl_user_placeholder(self):
+        template = read(USER_DATA)
+        self.assertEqual(user_data_errors(template), [])
+        self.assertEqual(set(string.Template(template).get_identifiers()), {"WSL_USER"})
+        self.assertEqual(string.Template(template).substitute(WSL_USER="example"), template.replace(PLACEHOLDER, "example"))
+        for old in (template.replace(GETTY_BOOTCMD, ""), template.replace("mask, --now", "mask"),
+                    template + "# ${OTHER_USER}\n"):
+            with self.subTest(control="old or incorrect bootcmd"):
+                self.assertNotEqual(old, template)
+                self.assertTrue(user_data_errors(old))
+
+    def test_observations_are_separate_in_page_checklist_receipt_and_table(self):
+        inputs = self.inputs()
+        self.assertEqual(separate_observation_errors(*inputs), [])
+        recipe, record, checklist, receipt = inputs
+        for step, commands in (("W1", WORKSTATION_COMMANDS), ("W5", WORKSTATION_COMMANDS + NEW_COMMANDS)):
+            for command in commands:
+                with self.subTest(control="lost separate observation", step=step, command=command):
+                    current = WORKSTATION_BASELINE if step == "W1" else WORKSTATION_BASELINE + "\n" + PAIRED_NEW
+                    removed = re.sub(r"^" + re.escape(command) + r"\n", "", current + "\n", count=1, flags=re.M)
+                    old = section(recipe, step).replace(current + "\n", removed, 1)
+                    self.assertTrue(separate_observation_errors(recipe.replace(section(recipe, step), old), record,
+                                                                checklist, receipt))
+        self.assertTrue(separate_observation_errors(recipe, record, checklist.replace(WORKSTATION_BASELINE, "id -u; "
+                                                    "systemctl is-system-running; " + NAMESPACE_READ), receipt))
+        for step, command in (("W1", WORKSTATION_COMMANDS[1]), ("W5", NEW_COMMANDS[1])):
+            row = next(line for line in record.splitlines() if line.startswith(f"| {step} | sh | `{command}` |"))
+            self.assertTrue(separate_observation_errors(recipe, record.replace(row + "\n", ""), checklist, receipt))
+            self.assertTrue(separate_observation_errors(recipe, record, checklist, dict(receipt, steps=[entry for entry in
+                            receipt["steps"] if (entry["step"], entry["cmd"]) != (step, command)])))
+
+    def test_w1_stop_paragraph_is_required(self):
+        recipe = read(RECIPE)
+        self.assertEqual(workstation_stop_errors(recipe), [])
+        self.assertTrue(workstation_stop_errors(BASELINE_STOP_RE.sub("", recipe)))
+
+    def test_w1_stop_requires_the_uid_1000_condition(self):
+        recipe = read(RECIPE)
+        self.assertEqual(workstation_stop_errors(recipe), [])
+        self.assertTrue(workstation_stop_errors(reword(recipe, BASELINE_STOP_PARTS[1], "")))
+
+    def test_w1_stop_requires_a_noninitial_namespace(self):
+        recipe = read(RECIPE)
+        self.assertEqual(workstation_stop_errors(recipe), [])
+        self.assertTrue(workstation_stop_errors(reword(recipe, BASELINE_STOP_PARTS[4], "")))
+
+    def test_w1_stop_requires_an_active_user_manager(self):
+        recipe = read(RECIPE)
+        self.assertEqual(workstation_stop_errors(recipe), [])
+        self.assertTrue(workstation_stop_errors(reword(recipe, BASELINE_STOP_PARTS[3], "")))
+
+    def test_w1_stop_requires_the_system_state_and_conditional_getty_result(self):
+        recipe = read(RECIPE)
+        self.assertEqual(workstation_stop_errors(recipe), [])
+        for part in (BASELINE_STOP_PARTS[2], "`Result=start-limit-hit` is required", "another result stops the run"):
+            with self.subTest(control=part):
+                self.assertTrue(workstation_stop_errors(reword(recipe, part, "")))
+        self.assertTrue(workstation_stop_errors(recipe.replace(GETTY_RESULT + "\n", "")))
+
+    def test_all_five_receipt_instructions_require_the_workstation_baseline(self):
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        self.assertEqual(receipt_baseline_errors(receipt), [])
+        for key in sorted(ISOLATION_KEYS):
+            with self.subTest(control="weakened baseline equality", key=key):
+                old = json.loads(json.dumps(receipt))
+                value = old["paired_isolation"]["workstation"][key]
+                old["paired_isolation"]["workstation"][key] = value.replace("equal to host.workstation_baseline", "recorded")
+                self.assertEqual(len(receipt_baseline_errors(old)), 1)
+
+    def test_checklist_f1_requires_the_read_only_flush_message(self):
+        inputs = self.inputs()
+        self.assertEqual(binfmt_unit_errors(*inputs), [])
+        recipe, record, checklist, receipt = inputs
+        old = checklist.replace(FLUSH_MESSAGE, "any message is accepted")
+        self.assertNotEqual(old, checklist)
+        self.assertTrue(binfmt_unit_errors(recipe, record, old, receipt))
+
+    def test_quality_rule_retains_every_original_word_and_the_first_amendment(self):
+        experiment = json.loads(read(EXPERIMENT))
+        self.assertEqual(quality_rule_errors(experiment), [])
+        rule = experiment["predeclared_metrics"]["quality_rule"]
+        controls = ("no merit precedence", rule.replace("and F1 running", "and any state"),
+                    rule.replace(FIRST_QUALITY_AMENDMENT, ""), QUALITY_AMENDMENT_RE.sub("", rule),
+                    rule.replace(FLUSH_MESSAGE, "any message"))
+        for old in controls:
+            with self.subTest(control="original or amendment weakened"):
+                mutant = dict(experiment, predeclared_metrics=dict(experiment["predeclared_metrics"], quality_rule=old))
+                self.assertTrue(quality_rule_errors(mutant))
+
+    def test_all_three_storage_filters_exclude_the_command_line_echo(self):
+        recipe, record, _, receipt = self.inputs()
+        self.assertEqual(storage_filter_errors(recipe, record, receipt), [])
+        rows = [(step, command) for step, _, command in recipe_rows(recipe) if "grep hv_storvsc" in command]
+        self.assertEqual(len(rows), 3)
+        for step, command in rows:
+            with self.subTest(control="pre-change filter", step=step, command=command):
+                old_filter = command.replace("grep -Ev", "grep -v").replace("|[Cc]ommand line:", "")
+                old = section(recipe, step).replace(command, old_filter, 1)
+                self.assertTrue(storage_filter_errors(recipe.replace(section(recipe, step), old), record, receipt))
+
+    def test_w5_getty_proofs_are_commands_and_command_table_rows(self):
+        recipe, record, _, receipt = self.inputs()
+        self.assertEqual(getty_proof_errors(recipe, record, receipt), [])
+        for command in (GETTY_ENABLED, GETTY_SHOW):
+            with self.subTest(control="lost getty command or row", command=command):
+                self.assertTrue(getty_proof_errors(recipe.replace(command + "\n", ""), record, receipt))
+                row = next(line for line in record.splitlines() if line.startswith(f"| W5 | powershell | `{command}` |"))
+                self.assertTrue(getty_proof_errors(recipe, record.replace(row + "\n", ""), receipt))
+
+    def test_w6_root_block_starts_with_the_getty_mask(self):
+        recipe, record, _, receipt = self.inputs()
+        self.assertEqual(getty_proof_errors(recipe, record, receipt), [])
+        self.assertTrue(getty_proof_errors(recipe.replace(GETTY_MASK + "\n", ""), record, receipt))
+        w6 = section(recipe, "W6")
+        old = w6.replace(GETTY_MASK + "\n", "").replace("touch /etc/cloud/cloud-init.disabled\n",
+                                                         "touch /etc/cloud/cloud-init.disabled\n" + GETTY_MASK + "\n")
+        self.assertTrue(getty_proof_errors(recipe.replace(w6, old), record, receipt))
+
+    def test_recovery_uses_the_w5_filename_key_and_cause_for_every_failure(self):
+        inputs = self.inputs()
+        self.assertEqual(w5_recovery_errors(*inputs), [])
+        recipe, record, checklist, receipt = inputs
+        old_file = "<Name>-cgroup" + "-failed.tar"
+        for index, text in enumerate((recipe, record, checklist)):
+            old = text.replace("<Name>-w5-failed.tar", old_file)
+            self.assertNotEqual(old, text)
+            self.assertTrue(w5_recovery_errors(*((*inputs[:index], old, *inputs[index + 1:]))))
+        old = json.loads(json.dumps(receipt))
+        old["cgroup" + "_failure_export"] = old.pop("w5_failure_export")
+        self.assertTrue(w5_recovery_errors(recipe, record, checklist, old))
+        self.assertTrue(w5_recovery_errors(recipe, record, checklist, without(receipt, "w5_failure_export", "cause")))
+        self.assertTrue(w5_recovery_errors(reword(recipe, "Do not take path B for any such failure", "Take path B"),
+                                           record, checklist, receipt))
+
+    def test_linux_entry_commands_use_full_windows_paths(self):
+        recipe = read(RECIPE)
+        self.assertEqual(linux_entry_errors(recipe), [])
+        for command in LINUX_ENTRIES:
+            with self.subTest(command=command):
+                self.assertIn("`" + command + "`", recipe)
+                old = recipe.replace("`" + command + "`", "`" + command.rsplit("/", 1)[-1] + "`", 1)
+                self.assertTrue(linux_entry_errors(old))
+
+    def test_f10_quotes_each_path_without_word_splitting(self):
+        recipe, record, _, receipt = self.inputs()
+        self.assertEqual(path_proof_errors(recipe), [])
+        self.assertIn(("F10", "powershell", F10_PROBE), command_table(record))
+        self.assertTrue(any(entry["step"] == "F10" and entry["cmd"] == F10_PROBE for entry in receipt["steps"]))
+        for old_probe in (F10_PROBE.replace('test -f "$p"', 'test -f $p'),
+                          F10_PROBE.replace('p="$(type -P "$n")"', 'p=$(type -P "$n")')):
+            self.assertTrue(path_proof_errors(recipe.replace(F10_PROBE, old_probe)))
+
+    def test_release_table_and_receipt_hold_the_observed_image_size(self):
+        recipe, _, _, receipt = self.inputs()
+        self.assertEqual(release_size_errors(recipe, receipt), [])
+        row = next(line for line in recipe.splitlines() if line.startswith("| 26.04.1 |"))
+        self.assertIn("418,495,746; rehearsal run 2, 2026-10-02", row)
+        self.assertEqual(receipt["supported_images"]["26.04.1"]["bytes"], 418495746)
+        self.assertTrue(release_size_errors(recipe.replace(row, row.replace("418,495,746", "unknown")), receipt))
+        old = json.loads(json.dumps(receipt))
+        old["supported_images"]["26.04.1"]["bytes"] = None
+        self.assertTrue(release_size_errors(recipe, old))
+
+    def test_receipt_new_keys_validate_and_the_getty_baseline_key_is_optional(self):
+        recipe, record, checklist, receipt = self.inputs()
+        components = {component["id"] for component in json.loads(read(STACK))["components"]}
+        self.assertEqual(receipt_errors(receipt, recipe, components), [])
+        self.assertEqual(getty_proof_errors(recipe, record, receipt), [])
+        self.assertEqual(paired_isolation_errors(recipe, record, checklist, receipt), [])
+        optional = without(receipt, "host", "workstation_baseline", "getty_tty1_result")
+        self.assertEqual(receipt_errors(optional, recipe, components), [])
+        self.assertEqual(paired_isolation_errors(recipe, record, checklist, optional), [])
+        for key in ("is_enabled", "load_state", "active_state", "n_restarts"):
+            with self.subTest(control="lost mask key", key=key):
+                self.assertTrue(receipt_errors(without(receipt, "first_launch", "getty_mask", key), recipe, components))
+        self.assertTrue(receipt_errors(without(receipt, "w5_failure_export", "cause"), recipe, components))
+        old = json.loads(json.dumps(receipt))
+        old["host"]["workstation_baseline"]["getty_tty1_result"] = "<W1: always record it>"
+        self.assertTrue(receipt_errors(old, recipe, components))
 
 
 if __name__ == "__main__":
