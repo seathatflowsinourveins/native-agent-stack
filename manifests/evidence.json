@@ -15651,8 +15651,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "0c3a440fca32ef0c435d0cf030bf6cdc39648ec9292f4131b232e2585ad8cbcf",
-      "bytes": 133677
+      "sha256": "04722d8d8691e9ce6e4d95d88fff58adb838690ed0cf3b4bd966ba7b7a4ace8a",
+      "bytes": 135109
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -49631,8 +49631,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "1dfdc8dada79af42e62e13f14545228f4a31ac80a1393c55d23532d7d050b165",
-      "bytes": 48614
+      "sha256": "dcc5217c3e17f90332bdab357b1ac27860b17862aa6e3d6d8e6d93107eb62d36",
+      "bytes": 49282
     },
     {
       "path": "tests/test_worker_recovery.py",
