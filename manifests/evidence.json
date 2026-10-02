@@ -15701,8 +15701,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "05a91c908fa06195126cd8fb391dd5ce59028a0190bb2402146af62ff93562a3",
-      "bytes": 62100
+      "sha256": "19431b3f3bb47ae7f85a2dd5e91b231713e41d518705d55f532e2a494bbee92f",
+      "bytes": 62594
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
@@ -36381,8 +36381,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "5d11a14f497175e3a7528ee544e234c7dca2234600dbc140f593d7180be936df",
-      "bytes": 16829
+      "sha256": "c92211c42147709e6e33602d94caca39d6a90dfc61a1c570e79bdb64362334cd",
+      "bytes": 20901
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -36396,13 +36396,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/controls.py",
-      "sha256": "47e1baa414de0d1edc9545975f588d004e3e69662ec860599314c14aba3172aa",
-      "bytes": 6895
+      "sha256": "0a2dc12291694d3b52a3f9c77107f22fad61216f67e46af54657558013c9f6d3",
+      "bytes": 8255
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json",
-      "sha256": "7399b6b17b14b18f16b2ebab9c19fa61461b8affc1a2ba0e319a10cfd3188cd9",
-      "bytes": 36861
+      "sha256": "2c1df503112cb02816e80231728a3d54d57165190dc863e15e0d15c2118f9c45",
+      "bytes": 37100
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
@@ -36426,8 +36426,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "5a65f3d7d6d4e40248720b9344709ac20ec432749b9ca2f644aebc94c686eb01",
-      "bytes": 93878
+      "sha256": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b",
+      "bytes": 104384
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -36506,8 +36506,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "dd382c13a4a92c4c8441f1cb6835b0cb888a0c1e4acb22e7561b8011fe9de3ff",
-      "bytes": 5817
+      "sha256": "bdf05cadbea0f8be7ef4606abce64c90be915337850f2896c19a558c213f1ead",
+      "bytes": 5982
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -49331,8 +49331,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "8db1c30272189632b2cece2469d31d91299e5e60d04af126c1c36659a7455bad",
-      "bytes": 36119
+      "sha256": "b4dcb528eeebfe76fdd0387f99701ac1ecb86de9941ce2d69efbe73e9163dafb",
+      "bytes": 41427
     },
     {
       "path": "tests/test_observability.py",
