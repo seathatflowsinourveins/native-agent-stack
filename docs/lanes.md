@@ -37,11 +37,13 @@ Every path below was verified against `main` at `6d9a7a5`.
   `catalogs/foundation/final-catalog-20261001.json` and
   `docs/final-catalog-20261001.md` are generated foundation reports. Either lane
   rewrites them, but only with their `--write` commands (see the
-  [hot-file protocol](#hot-file-protocol)). The final catalog's `--check` fails
-  when the architecture edition, the blind selection, its cross-family record or
-  their facts change, so a PR that edits an edition row runs
-  `python3 scripts/final_catalog.py --write`; a move of the grand list alone is
-  reported as drift and does not fail.
+  [hot-file protocol](#hot-file-protocol)). The final catalog records what each
+  blind half of the 2026-10-01 clean-install selection named and is not an
+  install list (the install record is the definitive manifest). Its `--check`
+  fails when the architecture edition, the blind selection, its cross-family
+  record, their facts or the agreement rule change, so a PR that edits an
+  edition row runs `python3 scripts/final_catalog.py --write`; a move of the
+  grand list alone is reported as drift and does not fail.
 
 ### Trading tests
 

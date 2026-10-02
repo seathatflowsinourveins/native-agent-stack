@@ -1,12 +1,16 @@
-"""Tests for scripts/final_catalog.py: pick normalization follows the frozen agreement rule, every agreement class
-folds as the rule says, the join covers every edition row once, the GPT-6.1 Sol record changes statuses only through
-the rule, and --check fails on a stale record but only reports a grand-list move."""
+"""Tests for scripts/final_catalog.py: the record names what each blind half picked in neutral evidence terms and is not
+an install list; pick normalization and the agreement classes follow the frozen rule except for the two disclosed
+extensions, which the record reports next to the class the rule's text gives as written; an arm names a pick only by
+its full owner/name; the join covers every edition row once; and --check, run against real files, fails on a stale
+output or a changed agreement rule but only reports a grand-list move."""
 
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import io
 import json
+import re
 import shutil
 import tempfile
 import unittest
@@ -18,8 +22,21 @@ from scripts import final_catalog as f
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def pick(key, label):
-    return {"key": key, "label": label}
+def pick(key, label, written=None):
+    return {"key": key, "label": label, "written": written or key}
+
+
+def literal_url(url: str) -> str:
+    """The agreement rule's own normalization of a repository URL (its line 2): lowercase, no trailing slash or .git."""
+    text = (url or "").strip().lower().rstrip("/")
+    return text[:-4] if text.endswith(".git") else text
+
+
+def run_main(argv):
+    out, err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        code = f.main(argv)
+    return code, out.getvalue(), err.getvalue()
 
 
 class NormalizationTests(unittest.TestCase):
@@ -34,110 +51,168 @@ class NormalizationTests(unittest.TestCase):
 
     def test_a_github_pick_is_its_repository_whatever_its_name(self):
         candidates = ["Claude Code"]
-        self.assertEqual(f.pick_key({"name": "anything", "repository": "https://github.com/anthropics/claude-code"},
-                                    candidates), "anthropics/claude-code")
+        repo = {"name": "anything", "repository": "https://github.com/anthropics/claude-code"}
+        self.assertEqual(f.pick_key(repo, candidates), "anthropics/claude-code")
+        self.assertEqual(f.written_key(repo), "anthropics/claude-code")
 
-    def test_a_named_pick_matches_the_packet_candidate_despite_word_order_and_a_role_suffix(self):
+    def test_packet_matching_drops_word_order_and_a_role_suffix(self):
+        # The second extension: the rule as written normalizes such a pick by its name alone.
         candidates = ["Ubuntu 26.04.1 LTS (Canonical WSL image)", "Ubuntu 24.04.5 LTS (Canonical WSL image)"]
         primary = {"name": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary", "repository": "https://ubuntu.com/x"}
         record = {"name": "Ubuntu 24.04.5 LTS WSL image (Canonical)", "repository": "https://releases.ubuntu.com/24.04.5"}
         self.assertEqual(f.pick_key(primary, candidates), "name:ubuntu 26.04.1 lts canonical wsl image")
         self.assertEqual(f.pick_key(record, candidates), "name:ubuntu 24.04.5 lts canonical wsl image")
 
+    def test_the_written_normalization_keeps_a_name_as_written(self):
+        primary = {"name": "Ubuntu 26.04.1 LTS (Canonical WSL image),  primary", "repository": "https://ubuntu.com/x"}
+        plain = {"name": "Ubuntu 26.04.1 LTS (Canonical WSL image)", "repository": "https://ubuntu.com/x"}
+        self.assertEqual(f.written_key(primary), "name:ubuntu 26.04.1 lts (canonical wsl image), primary")
+        self.assertNotEqual(f.written_key(primary), f.written_key(plain))
+
     def test_an_unmatched_name_stands_as_written(self):
         self.assertEqual(f.pick_key({"name": "Command and secret-path guard (K4)"}, []),
                          "name:command and secret path guard k4")
 
+    def test_every_pick_url_in_both_records_is_a_plain_repository_url(self):
+        # Reducing a GitHub URL to owner/name equals the rule's literal URL form for every pick on record, so that
+        # reduction is not a third extension.
+        checked = 0
+        for rel, field in ((f.SELECTION, "selection"), (f.CROSS_FAMILY, "picks")):
+            for row in json.loads((ROOT / rel).read_text(encoding="utf-8"))["layers"]:
+                for p in row.get(field) or []:
+                    key = f.github_key(p.get("repository"))
+                    if key is None:
+                        continue
+                    checked += 1
+                    self.assertEqual(literal_url(p["repository"]), "https://github.com/" + key,
+                                     (rel, row["layer_id"], p["repository"]))
+        self.assertGreater(checked, 100)
+
 
 class AgreementTests(unittest.TestCase):
-    def test_the_four_cases(self):
+    def test_the_generator_classes(self):
         self.assertEqual(f.agreement({"a", "b"}, "recommended", {"a", "b"}, "recommended"), "agree")
+        self.assertEqual(f.agreement({"a", "b"}, "compare", {"a", "b"}, "compare"), "agree")
         self.assertEqual(f.agreement({"a", "b"}, "recommended", {"b", "c"}, "recommended"), "overlap")
         self.assertEqual(f.agreement({"a"}, "recommended", {"c"}, "recommended"), "differ")
-        # Same picks but one family asks for a comparison: not agreement.
+        # The first extension: equal sets with unequal statuses count as overlap.
         self.assertEqual(f.agreement({"a"}, "compare", {"a"}, "recommended"), "overlap")
+
+    def test_the_rule_as_written_leaves_equal_sets_with_unequal_statuses_unclassified(self):
+        self.assertEqual(f.agreement_as_written({"a"}, "compare", {"a"}, "recommended"), "unclassified")
+        self.assertEqual(f.agreement_as_written({"a"}, "compare", {"a"}, "compare"), "agree")
+        self.assertEqual(f.agreement_as_written({"a", "b"}, "compare", {"a"}, "recommended"), "overlap")
+        self.assertEqual(f.agreement_as_written({"a"}, "compare", {"b"}, "compare"), "differ")
+
+    def test_each_case_has_its_own_neutral_class(self):
+        self.assertEqual(f.classify({"a"}, "recommended", {"a"}, "recommended"), "same_picks_both_recommended")
+        self.assertEqual(f.classify({"a"}, "compare", {"a"}, "compare"), "same_picks_both_compare")
+        self.assertEqual(f.classify({"a"}, "recommended", {"a"}, "compare"), "same_picks_split_status")
+        self.assertEqual(f.classify({"a", "b"}, "recommended", {"a"}, "recommended"), "some_picks_shared")
+        self.assertEqual(f.classify({"a"}, "recommended", {"b"}, "recommended"), "no_picks_shared")
+        for name in ("same_picks_both_recommended", "same_picks_both_compare", "same_picks_split_status",
+                     "some_picks_shared", "no_picks_shared"):
+            self.assertIn(name, f.CLASSES)
+
+    def test_extensions_are_reported_only_where_they_change_a_row(self):
+        self.assertEqual(f.extensions_applied([pick("a", "o/a")], "recommended", [pick("a", "o/a")], "compare"),
+                         ["equal_sets_unequal_statuses"])
+        # Same matched key, different names as written: the packet matching made the sets equal.
+        c = [pick("name:x", "X, primary", "name:x, primary")]
+        g = [pick("name:x", "X", "name:x")]
+        self.assertEqual(f.extensions_applied(c, "recommended", g, "compare"),
+                         ["equal_sets_unequal_statuses", "packet_name_matching"])
+        self.assertEqual(f.extensions_applied([pick("a", "o/a"), pick("b", "o/b")], "recommended",
+                                              [pick("a", "o/a")], "compare"), [])
 
 
 class FoldTests(unittest.TestCase):
-    def test_agree_and_recommended_gives_two_family_picks(self):
+    def test_the_same_picks_both_recommended_derive_no_comparison_set(self):
         c = [pick("a", "o/a"), pick("b", "o/b")]
-        result = f.fold(c, {"a", "b"}, "recommended", [], c, {"a", "b"}, "recommended", "agree")
-        self.assertEqual(result, ("two_family_pick", ["o/a", "o/b"], ["o/a", "o/b"], [], []))
+        result = f.fold(c, {"a", "b"}, "recommended", ["o/a"], c, {"a", "b"}, "recommended")
+        self.assertEqual(result, ("same_picks_both_recommended", ["o/a", "o/b"], [], [], []))
 
-    def test_agree_on_a_comparison_keeps_it_a_comparison(self):
+    def test_the_same_picks_both_compare_derive_the_arms_and_every_pick(self):
         c = [pick("a", "o/a")]
-        status, picks, _, _, arms = f.fold(c, {"a"}, "compare", ["a (recommended)", "baseline"], c, {"a"}, "compare",
-                                           "agree")
-        self.assertEqual(status, "comparison")
-        self.assertEqual(picks, [])
-        self.assertEqual(arms, ["a (recommended)", "baseline"])  # o/a is already named by an arm
+        result = f.fold(c, {"a"}, "compare", ["o/a (recommended)", "baseline"], c, {"a"}, "compare")
+        # o/a is named by an arm through its full owner/name, so it is not added again.
+        self.assertEqual(result, ("same_picks_both_compare", ["o/a"], [], [], ["o/a (recommended)", "baseline"]))
 
-    def test_overlap_of_two_recommendations_keeps_the_shared_pick_and_challenges_it_with_the_rest(self):
+    def test_shared_picks_split_into_both_and_one_half_only(self):
         c = [pick("a", "o/a"), pick("b", "o/b")]
         g = [pick("a", "o/a"), pick("c", "o/c")]
-        result = f.fold(c, {"a", "b"}, "recommended", [], g, {"a", "c"}, "recommended", "overlap")
-        self.assertEqual(result, ("partial_comparison", ["o/a"], ["o/a"], ["o/b", "o/c"], ["o/b", "o/c"]))
+        result = f.fold(c, {"a", "b"}, "recommended", [], g, {"a", "c"}, "recommended")
+        self.assertEqual(result, ("some_picks_shared", ["o/a"], ["o/b"], ["o/c"], ["o/b", "o/c"]))
 
-    def test_overlap_keeps_the_shared_pick_standing_even_when_both_families_ask_for_a_comparison(self):
-        # The overlap clause ("the shared picks stand") carries no status condition.
-        c = [pick("a", "o/a"), pick("b", "o/b")]
-        g = [pick("a", "o/a")]
-        result = f.fold(c, {"a", "b"}, "compare", ["o/a with reranker", "o/b"], g, {"a"}, "compare", "overlap")
-        self.assertEqual(result, ("partial_comparison", ["o/a"], ["o/a"], ["o/b"], ["o/a with reranker", "o/b"]))
-
-    def test_the_same_picks_with_split_statuses_stand_with_nothing_left_to_compare(self):
+    def test_the_same_picks_with_split_statuses_add_nothing_to_the_arms(self):
         c = [pick("a", "o/a")]
-        result = f.fold(c, {"a"}, "recommended", [], c, {"a"}, "compare", "overlap")
-        self.assertEqual(result, ("shared_pick", ["o/a"], ["o/a"], [], []))
+        self.assertEqual(f.fold(c, {"a"}, "recommended", [], c, {"a"}, "compare"),
+                         ("same_picks_split_status", ["o/a"], [], [], []))
 
-    def test_picks_sharing_a_generic_repository_name_are_both_kept(self):
-        # Regression: two packs both named "skills" must stay two arms.
-        c = [pick("t", "trailofbits/skills")]
-        g = [pick("m", "mattpocock/skills")]
-        status, _, _, _, arms = f.fold(c, {"t"}, "recommended", [], g, {"m"}, "compare", "differ")
-        self.assertEqual(status, "comparison")
-        self.assertEqual(arms, ["mattpocock/skills", "trailofbits/skills"])
-
-    def test_an_arm_description_names_a_pick_as_whole_words_only(self):
-        self.assertTrue(f.mentioned("mksglu/context-mode", ["Context Mode (frozen control)"]))
-        self.assertTrue(f.mentioned("anthropics/sandbox-runtime", ["sandbox-runtime (recommended)"]))
-        self.assertFalse(f.mentioned("rtk-ai/rtk", ["artkit baseline"]))
-        self.assertFalse(f.mentioned("qdrant/qdrant", ["SocratiCode (embeddings from the local model server)"]))
-
-    def test_differ_puts_every_pick_of_both_families_into_the_comparison(self):
+    def test_no_shared_pick_derives_every_pick_of_both_halves(self):
         c = [pick("a", "o/a")]
         g = [pick("c", "x/c")]
-        result = f.fold(c, {"a"}, "recommended", [], g, {"c"}, "recommended", "differ")
-        self.assertEqual(result, ("comparison", [], [], [], ["o/a", "x/c"]))
+        self.assertEqual(f.fold(c, {"a"}, "recommended", ["o/a arm"], g, {"c"}, "recommended"),
+                         ("no_picks_shared", [], ["o/a"], ["x/c"], ["o/a", "x/c"]))
+
+    def test_a_pick_sharing_only_a_repository_name_with_an_arm_is_kept(self):
+        # Regression (finding 4 of the #595 review): "mattpocock/skills" was dropped because the arm
+        # "trailofbits/skills (recommended)" contains the word "skills".
+        self.assertFalse(f.mentioned("mattpocock/skills", ["trailofbits/skills"]))
+        c = [pick("t", "trailofbits/skills")]
+        g = [pick("t", "trailofbits/skills"), pick("m", "mattpocock/skills")]
+        status, both, c_only, g_only, arms = f.fold(c, {"t"}, "recommended", ["trailofbits/skills (recommended)"],
+                                                    g, {"t", "m"}, "compare")
+        self.assertEqual((status, both, c_only, g_only), ("some_picks_shared", ["trailofbits/skills"], [],
+                                                          ["mattpocock/skills"]))
+        self.assertEqual(arms, ["trailofbits/skills (recommended)", "mattpocock/skills"])
+
+    def test_an_arm_names_a_pick_by_its_full_owner_and_name_only(self):
+        self.assertTrue(f.mentioned("trailofbits/skills", ["trailofbits/skills (recommended)"]))
+        self.assertTrue(f.mentioned("openai/codex", ["see https://github.com/openai/codex."]))
+        self.assertTrue(f.mentioned("Ubuntu 24.04.5 LTS (Canonical WSL image)",
+                                    ["ubuntu 24.04.5 lts (canonical wsl image) fallback"]))
+        self.assertFalse(f.mentioned("mksglu/context-mode", ["Context Mode (frozen control)"]))
+        self.assertFalse(f.mentioned("anthropics/sandbox-runtime", ["sandbox-runtime (recommended)"]))
+        self.assertFalse(f.mentioned("anthropics/claude-code", ["anthropics/claude-code-action"]))
+        self.assertFalse(f.mentioned("rtk-ai/rtk", ["artkit baseline"]))
+        self.assertFalse(f.mentioned("", ["anything"]))
+
+    def test_an_arm_described_in_words_and_the_pick_it_describes_both_appear(self):
+        # The cost of full-name matching, disclosed in the fields: one tool can appear twice (token-efficiency's shape).
+        c = [pick("r", "rtk-ai/rtk"), pick("u", "ccusage/ccusage")]
+        g = [pick("u", "ccusage/ccusage"), pick("m", "mksglu/context-mode")]
+        c_arms = ["ccusage (measurement, selected)", "RTK", "Context Mode (frozen control)"]
+        status, _, _, _, arms = f.fold(c, {"r", "u"}, "compare", c_arms, g, {"u", "m"}, "compare")
+        self.assertEqual(status, "some_picks_shared")
+        self.assertEqual(arms, c_arms + ["mksglu/context-mode", "rtk-ai/rtk"])
 
 
 class BuildTests(unittest.TestCase):
-    def setUp(self):
-        self.data = f.build()
-        self.edition = json.loads((ROOT / f.EDITION).read_text(encoding="utf-8"))
+    @classmethod
+    def setUpClass(cls):
+        cls.data = f.build()
+        cls.rows = {r["layer_id"]: r for r in cls.data["rows"]}
+        cls.edition = json.loads((ROOT / f.EDITION).read_text(encoding="utf-8"))
+        cls.texts = (json.dumps(cls.data, indent=2, ensure_ascii=False), f.render_md(cls.data))
 
     def test_every_edition_row_appears_once_in_order(self):
         self.assertEqual([r["layer_id"] for r in self.data["rows"]], [r["layer_id"] for r in self.edition["rows"]])
 
-    def test_every_status_is_known_and_the_counts_add_up(self):
+    def test_every_class_is_known_and_the_counts_add_up(self):
         for row in self.data["rows"]:
-            self.assertIn(row["final"]["status"], f.STATUSES)
-        self.assertEqual(sum(self.data["summary"]["final_status"].values()), len(self.data["rows"]))
+            self.assertIn(row["pick_sets"]["class"], f.CLASSES)
+        self.assertEqual(sum(self.data["summary"]["class"].values()), len(self.data["rows"]))
 
-    def test_trading_rows_wait_for_their_owner_and_uncovered_cross_rows_say_so(self):
+    def test_rows_outside_the_blind_run_name_no_picks(self):
         for row in self.data["rows"]:
             if row["blind"] is None:
                 expected = "owner_lane_run_pending" if row["catalog"] == "us-equities" else "no_blind_record"
-                self.assertEqual(row["final"]["status"], expected, row["layer_id"])
-                self.assertEqual(row["final"]["standing_picks"], [])
+                self.assertEqual(row["pick_sets"]["class"], expected, row["layer_id"])
+                for field in ("named_by_both", "named_by_claude_only", "named_by_gpt_only", "fold_comparison_set"):
+                    self.assertEqual(row["pick_sets"][field], [], (row["layer_id"], field))
 
-    def test_standing_picks_only_where_the_rule_allows_them(self):
-        for row in self.data["rows"]:
-            if row["final"]["standing_picks"]:
-                self.assertIn(row["final"]["status"], ("two_family_pick", "shared_pick", "partial_comparison"),
-                              row["layer_id"])
-
-    def test_every_pick_both_families_made_stands_and_every_other_pick_challenges_it(self):
+    def test_named_by_both_and_by_one_half_partition_the_two_pick_sets(self):
         judged = 0
         for row in self.data["rows"]:
             if not row["cross_family"]:
@@ -146,14 +221,49 @@ class BuildTests(unittest.TestCase):
             candidates = f.packet_names(row["layer_id"])
             c = {f.pick_key(p, candidates) for p in row["blind"]["picks"]}
             g = {f.pick_key(p, candidates) for p in row["cross_family"]["picks"]}
-            final = row["final"]
-            if row["agreement"] == "agree" and row["blind"]["status"] == "compare":
-                self.assertEqual(final["standing_picks"], [], row["layer_id"])
-                continue
-            self.assertEqual(len(final["standing_picks"]), len(c & g), row["layer_id"])
-            self.assertEqual(final["standing_picks"], final["shared_picks"], row["layer_id"])
-            self.assertEqual(len(final["challengers"]), len(c ^ g), row["layer_id"])
-        self.assertGreater(judged, 0)
+            sets = row["pick_sets"]
+            self.assertEqual(len(sets["named_by_both"]), len(c & g), row["layer_id"])
+            self.assertEqual(len(sets["named_by_claude_only"]), len(c - g), row["layer_id"])
+            self.assertEqual(len(sets["named_by_gpt_only"]), len(g - c), row["layer_id"])
+        self.assertEqual(judged, 21)
+
+    def test_the_two_extensions_are_reported_on_the_rows_they_change(self):
+        self.assertEqual(self.data["summary"]["extensions_applied"], {
+            "equal_sets_unequal_statuses": ["document-retrieval", "scheduling-supervision", "cross:wsl-distro"],
+            "packet_name_matching": ["cross:wsl-distro"]})
+        for layer in ("document-retrieval", "scheduling-supervision"):
+            self.assertEqual((self.rows[layer]["agreement"], self.rows[layer]["agreement_as_written"]),
+                             ("overlap", "unclassified"), layer)
+        # Compared as written, the two halves' distribution names share nothing.
+        self.assertEqual((self.rows["cross:wsl-distro"]["agreement"], self.rows["cross:wsl-distro"]["agreement_as_written"]),
+                         ("overlap", "differ"))
+        for row in self.data["rows"]:
+            if row["cross_family"] and not row["extensions_applied"]:
+                self.assertEqual(row["agreement_as_written"], row["agreement"], row["layer_id"])
+
+    def test_the_agreement_rule_is_hashed(self):
+        digest = hashlib.sha256((ROOT / f.AGREEMENT_RULE).read_bytes()).hexdigest()
+        self.assertEqual(self.data["agreement_rule"]["sha256"], digest)
+        self.assertEqual(self.data["inputs"][f.AGREEMENT_RULE], digest)
+        self.assertEqual(set(self.data["agreement_rule"]["extensions"]), set(f.EXTENSIONS))
+
+    def test_the_record_is_not_an_install_list_and_names_the_install_record(self):
+        md = self.texts[1]
+        self.assertTrue(md.splitlines()[2].startswith("**This is not an install list.**"))
+        self.assertIn(f.INSTALL_RECORD["manifest"], md.split("\n\n")[1])
+        self.assertIn("not an install list", self.data["scope"])
+        self.assertNotIn(f.INSTALL_RECORD["manifest"], self.data["inputs"])
+        self.assertIn("not the rule applied exactly as written", md)
+
+    def test_no_row_reads_as_installed_standing_or_a_challenger(self):
+        for text in self.texts:
+            for word in ("standing", "challenger", "install_command", "install_source", "two_family_pick",
+                         "partial_comparison", "gate_ledger", "stage-2"):
+                self.assertNotIn(word, text.lower(), word)
+        for row in self.data["rows"]:
+            for half in ("blind", "cross_family"):
+                for p in (row[half] or {}).get("picks", []):
+                    self.assertEqual(set(p), {"name", "repository", "upstream"}, row["layer_id"])
 
     def test_the_selection_of_record_is_carried_unchanged(self):
         by_id = {r["layer_id"]: r for r in self.edition["rows"]}
@@ -161,16 +271,12 @@ class BuildTests(unittest.TestCase):
             self.assertEqual([w["pin"] for w in row["selection_of_record"]],
                              [w.get("pin") for w in by_id[row["layer_id"]]["winners"]])
 
-    def test_every_row_has_a_gate(self):
-        for row in self.data["rows"]:
-            self.assertTrue(row["gate_ledger"], row["layer_id"])
-
     def test_picks_of_packet_candidates_carry_the_captured_upstream_facts(self):
         facts = f.load_facts()
         checked = 0
         for row in self.data["rows"]:
-            for family in ("blind", "cross_family"):
-                for p in (row[family] or {}).get("picks", []):
+            for half in ("blind", "cross_family"):
+                for p in (row[half] or {}).get("picks", []):
                     key = f.github_key(p["repository"])
                     if key in facts:
                         checked += 1
@@ -180,15 +286,30 @@ class BuildTests(unittest.TestCase):
         self.assertGreater(checked, 0)
 
 
-class CrossFamilyFoldTests(unittest.TestCase):
-    """A synthetic GPT-6.1 Sol record over a copy of the real inputs: statuses move only as the rule says."""
+class TempRoot(unittest.TestCase):
+    """A copy of the generator's real inputs and checked-in outputs, with ROOT pointed at it. The definitive manifest is
+    deliberately not copied: --check must not depend on it."""
+
+    FILES = (f.EDITION, f.SELECTION, f.CROSS_FAMILY, f.AGREEMENT_RULE, f.GRAND_LIST, f.OUT_JSON, f.OUT_MD)
 
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp())
-        for rel in (f.EDITION, f.SELECTION, f.GRAND_LIST):
+        self.addCleanup(shutil.rmtree, self.tmp)
+        for rel in self.FILES:
             (self.tmp / rel).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(ROOT / rel, self.tmp / rel)
-        shutil.copytree(ROOT / f.PACKETS, self.tmp / f.PACKETS)
+        for rel in (f.PACKETS, f.FACTS):
+            shutil.copytree(ROOT / rel, self.tmp / rel)
+        patch = mock.patch.object(f, "ROOT", self.tmp)
+        patch.start()
+        self.addCleanup(patch.stop)
+
+
+class CrossFamilySyntheticTests(TempRoot):
+    """A synthetic GPT-6.1 Sol record over the real Claude record: each case lands in its own class."""
+
+    def setUp(self):
+        super().setUp()
         selection = json.loads((ROOT / f.SELECTION).read_text(encoding="utf-8"))
         layers = []
         for row in selection["layers"]:
@@ -198,74 +319,121 @@ class CrossFamilyFoldTests(unittest.TestCase):
                 picks = [{"name": "gitleaks", "repository": "https://github.com/gitleaks/gitleaks"}]
             if row["layer_id"] == "web-research":
                 picks = picks[:1] + [{"name": "Crawl4AI", "repository": "https://github.com/unclecode/crawl4ai"}]
-            layers.append({"layer_id": row["layer_id"], "status": status, "critic_verdict": "upheld", "picks": picks,
-                           "deciding_head_to_head": ""})
-        target = self.tmp / f.CROSS_FAMILY
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(json.dumps({"family": "synthetic", "run": {}, "contamination_audit": {}, "layers": layers}))
-        self.patch = mock.patch.object(f, "ROOT", self.tmp)
-        self.patch.start()
-        self.data = f.build()
-        self.rows = {r["layer_id"]: r for r in self.data["rows"]}
+            layers.append({"layer_id": row["layer_id"], "status": status, "critic_verdict": "upheld", "picks": picks})
+        (self.tmp / f.CROSS_FAMILY).write_text(json.dumps({"family": "synthetic", "run": {}, "contamination_audit": {},
+                                                           "layers": layers}))
+        self.rows = {r["layer_id"]: r for r in f.build()["rows"]}
 
-    def tearDown(self):
-        self.patch.stop()
-        shutil.rmtree(self.tmp)
-
-    def test_identical_recommendations_become_two_family_picks(self):
+    def test_identical_recommendations(self):
         row = self.rows["native-clients"]
-        self.assertEqual(row["agreement"], "agree")
-        self.assertEqual(row["final"]["status"], "two_family_pick")
-        self.assertEqual(row["final"]["standing_picks"], ["anthropics/claude-code", "openai/codex"])
+        self.assertEqual((row["agreement"], row["agreement_as_written"]), ("agree", "agree"))
+        self.assertEqual(row["pick_sets"]["class"], "same_picks_both_recommended")
+        self.assertEqual(row["pick_sets"]["named_by_both"], ["anthropics/claude-code", "openai/codex"])
+        self.assertEqual(row["pick_sets"]["fold_comparison_set"], [])
 
-    def test_disjoint_picks_become_a_comparison_of_both(self):
+    def test_disjoint_picks(self):
         row = self.rows["secrets-credentials"]
         self.assertEqual(row["agreement"], "differ")
-        self.assertEqual(row["final"]["status"], "comparison")
-        self.assertIn("gitleaks/gitleaks", row["final"]["comparison_arms"])
-        self.assertIn("betterleaks/betterleaks", row["final"]["comparison_arms"])
+        self.assertEqual(row["pick_sets"]["class"], "no_picks_shared")
+        self.assertEqual(row["pick_sets"]["named_by_gpt_only"], ["gitleaks/gitleaks"])
+        self.assertIn("betterleaks/betterleaks", row["pick_sets"]["named_by_claude_only"])
+        self.assertIn("gitleaks/gitleaks", row["pick_sets"]["fold_comparison_set"])
 
-    def test_partly_shared_picks_keep_the_shared_one_standing(self):
+    def test_partly_shared_picks(self):
         row = self.rows["web-research"]
         self.assertEqual(row["agreement"], "overlap")
-        self.assertEqual(row["final"]["status"], "partial_comparison")
-        self.assertEqual(row["final"]["standing_picks"], ["adbar/trafilatura"])
-        self.assertEqual(row["final"]["challengers"], ["microsoft/playwright-cli", "unclecode/crawl4ai"])
-        self.assertIn("unclecode/crawl4ai", row["final"]["comparison_arms"])
+        self.assertEqual(row["pick_sets"]["class"], "some_picks_shared")
+        self.assertEqual(row["pick_sets"]["named_by_both"], ["adbar/trafilatura"])
+        self.assertEqual(row["pick_sets"]["named_by_claude_only"], ["microsoft/playwright-cli"])
+        self.assertEqual(row["pick_sets"]["named_by_gpt_only"], ["unclecode/crawl4ai"])
 
-    def test_agreed_comparisons_stay_comparisons(self):
+    def test_the_same_picks_both_asked_to_compare(self):
         for layer in ("durable-memory", "semantic-rag", "token-efficiency", "isolation", "hosting-services"):
-            self.assertEqual(self.rows[layer]["final"]["status"], "comparison", layer)
+            self.assertEqual(self.rows[layer]["pick_sets"]["class"], "same_picks_both_compare", layer)
 
     def test_rows_outside_the_blind_run_are_untouched(self):
-        self.assertEqual(self.rows["cross:runtime-workers"]["final"]["status"], "no_blind_record")
-        self.assertEqual(self.rows["backtesting-engine"]["final"]["status"], "owner_lane_run_pending")
+        self.assertEqual(self.rows["cross:runtime-workers"]["pick_sets"]["class"], "no_blind_record")
+        self.assertEqual(self.rows["backtesting-engine"]["pick_sets"]["class"], "owner_lane_run_pending")
 
-
-class CheckTests(unittest.TestCase):
-    def test_checked_in_outputs_are_fresh(self):
-        out = io.StringIO()
-        with contextlib.redirect_stdout(out):
-            self.assertEqual(f.main(["--check"]), 0)
-        self.assertEqual(json.loads(out.getvalue())["status"], "passed")
-
-    def test_a_grand_list_move_is_drift_and_anything_else_is_stale(self):
+    def test_without_a_gpt_record_every_judged_layer_is_pending(self):
+        (self.tmp / f.CROSS_FAMILY).unlink()
         data = f.build()
-        moved = json.loads(json.dumps(data))
-        moved["inputs"][f.GRAND_LIST] = "0" * 64
-        for row in moved["rows"]:
-            if row["grand_list"]:
-                row["grand_list"]["open_gaps"] = -1
-        self.assertEqual(f.without_context(moved), f.without_context(data))
-        changed = json.loads(json.dumps(data))
-        changed["rows"][0]["final"]["status"] = "comparison"
-        self.assertNotEqual(f.without_context(changed), f.without_context(data))
+        self.assertEqual(data["cross_family"], {"status": "not_run"})
+        self.assertEqual(data["summary"]["class"]["pending_cross_family"], 21)
+
+
+class CheckTests(TempRoot):
+    """--check run against real files in a temporary root."""
+
+    def test_the_faithful_copy_passes_without_the_install_record(self):
+        self.assertFalse((self.tmp / f.INSTALL_RECORD["manifest"]).exists())
+        code, out, err = run_main(["--check"])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out), {"status": "passed", "rows": 37, "grand_list_drift": False})
+
+    def test_a_stale_json_output_fails(self):
+        path = self.tmp / f.OUT_JSON
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["rows"][0]["pick_sets"]["class"] = "no_picks_shared"
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        code, _, err = run_main(["--check"])
+        self.assertEqual(code, 1)
+        self.assertIn(f.OUT_JSON, err)
+        self.assertNotIn(f.OUT_MD, err)
+
+    def test_a_stale_markdown_output_fails(self):
+        with (self.tmp / f.OUT_MD).open("a", encoding="utf-8") as handle:
+            handle.write("hand edit\n")
+        code, _, err = run_main(["--check"])
+        self.assertEqual(code, 1)
+        self.assertIn(f.OUT_MD, err)
+
+    def test_a_changed_agreement_rule_fails_until_the_outputs_are_regenerated(self):
+        with (self.tmp / f.AGREEMENT_RULE).open("a", encoding="utf-8") as handle:
+            handle.write("An eighth line.\n")
+        code, _, err = run_main(["--check"])
+        self.assertEqual(code, 1)
+        self.assertIn(f.OUT_JSON, err)
+        with mock.patch.object(f.host_receipts, "register_file") as register:
+            self.assertEqual(run_main(["--write"])[0], 0)
+        self.assertEqual(register.call_count, 2)
+        written = json.loads((self.tmp / f.OUT_JSON).read_text(encoding="utf-8"))
+        digest = hashlib.sha256((self.tmp / f.AGREEMENT_RULE).read_bytes()).hexdigest()
+        self.assertEqual(written["agreement_rule"]["sha256"], digest)
+        self.assertEqual(run_main(["--check"])[0], 0)
+
+    def test_a_grand_list_move_alone_is_reported_as_drift(self):
+        path = self.tmp / f.GRAND_LIST
+        grand = json.loads(path.read_text(encoding="utf-8"))
+        grand["layers"][0]["open_gaps"] = -1
+        path.write_text(json.dumps(grand), encoding="utf-8")
+        code, out, err = run_main(["--check"])
+        self.assertEqual(code, 0, err)
+        self.assertTrue(json.loads(out)["grand_list_drift"])
+
+    def test_a_missing_output_fails(self):
+        (self.tmp / f.OUT_MD).unlink()
+        self.assertEqual(run_main(["--check"])[0], 1)
+
+
+class CheckedInTests(unittest.TestCase):
+    def test_checked_in_outputs_are_fresh(self):
+        code, out, err = run_main(["--check"])
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(out)["status"], "passed")
 
     def test_generated_output_passes_the_private_content_guard(self):
         data = f.build()
         for text in (json.dumps(data, indent=2, ensure_ascii=False), f.render_md(data)):
             for label, pattern in f.PRIVATE_CONTENT:
                 self.assertIsNone(pattern.search(text), label)
+
+    def test_the_markdown_table_cells_hold_no_unescaped_pipe(self):
+        md = f.render_md(f.build())
+        for line in md.splitlines():
+            if line.startswith("| ") and not line.startswith("| ---"):
+                cells = re.split(r"(?<!\\)\|", line.strip())[1:-1]
+                self.assertIn(len(cells), (2, 9), line[:80])
 
 
 if __name__ == "__main__":

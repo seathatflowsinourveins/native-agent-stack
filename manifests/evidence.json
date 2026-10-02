@@ -14916,8 +14916,8 @@
     },
     {
       "path": "catalogs/foundation/final-catalog-20261001.json",
-      "sha256": "ddc48386d1aa24b10b25009579839dce7a9ff49263b9abafd4838548628d9c7d",
-      "bytes": 244314
+      "sha256": "19191aad0911fd11e9d0112374893545240528d2a28b27322af567d8f5128c73",
+      "bytes": 126991
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -15726,8 +15726,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-final-catalog.md",
-      "sha256": "867b8423f1e4e5d3c4a8a09ec6828163c1cedb6b6e72afad27af7655f022d6ba",
-      "bytes": 30594
+      "sha256": "15fc4ad4d798a0bd86739229c95b055bbdd0e501f201be831d24515103ab1fe1",
+      "bytes": 32467
     },
     {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
@@ -15736,8 +15736,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
-      "sha256": "cc599939dc3280d16152fd6b06a555a8ebb6b2fe6d543ac422cee96e7366e003",
-      "bytes": 22160
+      "sha256": "0634cf9dcf144dc0e1ad2b0a27985448000223a3b557dce5d0565993fdb4d806",
+      "bytes": 22151
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
@@ -15831,8 +15831,8 @@
     },
     {
       "path": "docs/final-catalog-20261001.md",
-      "sha256": "565827aece816eb79fe00ed37701255ae06f32e3159c882cc4d0cedd77fdd39c",
-      "bytes": 24481
+      "sha256": "38c0bd5fa7e708a808e59173843da6982b1520239451daa0341136ee409f268f",
+      "bytes": 20608
     },
     {
       "path": "docs/foundation-closure-20260921.md",
@@ -15946,8 +15946,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "4d08f01bb0ae651c5102e6fde0001a829526a29e489dfaf172f7d0f19f79054c",
-      "bytes": 13761
+      "sha256": "8c2c567bc142ba8046291205f58056284eea9e0cef3b1958d9d08b557070fecd",
+      "bytes": 13940
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -36311,8 +36311,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/README.md",
-      "sha256": "e030f1715cfddbb953c2d7402b125161591a0cdac9f497a4242a09b05c28659c",
-      "bytes": 2940
+      "sha256": "09a6d9e818d1ee999965cd5611fd2ee48b597d30b75835c69febdb804f5f551b",
+      "bytes": 3503
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/adapter.txt",
@@ -50286,8 +50286,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "03ddd57c1d21bd2dc07bb8a18eba38b6db85f3fc36850ff99153b47ad5a4c186",
-      "bytes": 58102
+      "sha256": "15927b70176b269bbe1da2cb6e0d30b160223e8a9ef819d6c984ef03818efd0a",
+      "bytes": 58106
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",

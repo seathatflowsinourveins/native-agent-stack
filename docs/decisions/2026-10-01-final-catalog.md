@@ -1,113 +1,152 @@
-# The final catalog of the new-WSL architecture (2026-10-01)
+# The final catalog of 2026-10-01: the blind GPT half of the clean-install selection and its comparison with the Claude record
 
-Lane: shared (foundation content; it lists the trading rows read-only). North-star action served: the clean install of
-the new WSL distribution and the finalization board (#140). Status: a generated record. It judges nothing; it applies
-the frozen agreement rule as written.
+Lane: shared (foundation content; it lists the trading rows read-only). North-star action served: the evidence behind
+the new WSL's definitive round and the finalization board (#140); the clean install itself follows the definitive
+manifest. Status: a generated record. It judges nothing, and it is not an install list. Its fold extends the frozen
+agreement rule in two places, disclosed below. Revised on 2026-10-02 after the cross-family review of #595 (see
+"Revision of 2026-10-02").
 
 ## Decision
 
 `catalogs/foundation/final-catalog-20261001.json`, rendered as `docs/final-catalog-20261001.md` by
-`scripts/final_catalog.py` and checked in CI (`--check`), is the one final list for the new WSL. For each of the 37
-rows of the dated edition (`catalogs/foundation/new-wsl-architecture-20261001.json`: 20 foundation layers, 12 trading
-layers and 5 cross-cutting rows) it carries:
+`scripts/final_catalog.py` and checked in CI (`--check`), is the record of the blind GPT-6.1 Sol half of the
+clean-install selection of 2026-10-01 and of its comparison with the blind Claude Opus 5.5 record of the same day
+(#589). **It is not an install list.** The install record is the definitive manifest (#602,
+`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`, decided in
+`docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`); the generator names that manifest and never reads it, so
+`--check` does not depend on it. For each of the 37 rows of the dated edition
+(`catalogs/foundation/new-wsl-architecture-20261001.json`: 20 foundation layers, 12 trading layers and 5 cross-cutting
+rows) the record carries:
 
 - the source host's selection of record at its pin of record, labelled as bookkeeping (program decision 5,
   `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`), and as an unjudged incumbent where no blind record
   exists;
-- the blind clean-install recommendation of #589 (Claude Opus 5.5) and its cross-family counterpart, the blind
-  GPT-6.1 Sol run recorded here (`evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/`);
-- the standing picks and status that the agreement rule gives, frozen before any GPT return existed
-  (`cross-family/agreement-rule.txt`, in `preregistration-addendum.json` at 2026-10-01T20:44:31Z, committed as a
-  scanner-safe rendering that carries the recorded file's sha256): every pick both families made stands as the layer's
-  pick for the new WSL, and every pick only one family made is a challenger in the layer's measured comparison;
-- a gate ledger: the edition's gates and closure gaps, plus the gates that make each standing pick final.
+- the blind Claude half of #589 and the blind GPT-6.1 Sol half recorded here
+  (`evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/`): each half's status, critic verdict and
+  picks, with the upstream facts captured for each pick before the GPT run;
+- which picks both halves named, which only the Claude half named and which only the GPT half named, and the agreement
+  class: the class the generator gives and, next to it, the class that the text of the rule frozen before any GPT
+  return existed gives as written (`cross-family/agreement-rule.txt`, in `preregistration-addendum.json`). The record
+  carries the rule's sha256, so a change to the rule fails `--check` until the record is regenerated.
 
-Result at main `85543efe` plus this record, across 37 rows: `two_family_pick` 2, `shared_pick` 3,
-`partial_comparison` 16, `owner_lane_run_pending` 12 and `no_blind_record` 4. All 21 judged layers have standing
-picks: the two families agree exactly on 2, overlap on 19 and differ on none. The GPT critics found source review
-unable to separate the top candidates in 16 layers; under the rule that leaves the picks both families made standing
-and sends the rest to each layer's measured comparison as challengers. The standing picks differ from the source
+A pick both halves named is agreement on source review, not an install decision, and the record schedules no
+comparison. The rule's fold (its line 6) attaches install and comparison consequences to each class; the record does
+not carry them out. The definitive manifest decides every slot, and its decision can differ from what both halves
+named: at #602 (`675bdd51`) it installs nothing yet for durable memory (the memory-owner slot waits for the memory
+head-to-head), for code search (split between semble and SocratiCode) or for the agent structural diff (sem not
+installed), although both halves named ai-memory, SocratiCode and sem.
+
+Result at main `58030172` plus this record, across 37 rows: `same_picks_both_recommended` 2,
+`same_picks_split_status` 3, `some_picks_shared` 16, `owner_lane_run_pending` 12 and `no_blind_record` 4. In the 21
+judged layers the generator's classes are agree 2 and overlap 19; the rule's text as written gives agree 2, overlap 16,
+differ 1 (cross:wsl-distro) and unclassified 2 (document-retrieval and scheduling-supervision). The GPT critics found
+source review unable to separate the top candidates in 16 layers. The picks both halves named differ from the source
 host's record in 16 rows. No selection of record changes.
 
-| Layer | Status | Standing picks (both families) | Challengers (one family) | Claude Opus 5.5 | GPT-6.1 Sol |
-| --- | --- | --- | --- | --- | --- |
-| native-clients | `two_family_pick` | anthropics/claude-code, openai/codex | — | recommended: anthropics/claude-code, openai/codex | recommended (upheld): openai/codex, anthropics/claude-code |
-| instructions-skills | `partial_comparison` | trailofbits/skills | mattpocock/skills | recommended: trailofbits/skills | compare (undetermined): mattpocock/skills, trailofbits/skills |
-| workers | `partial_comparison` | max-sixty/worktrunk, openai/codex | anthropics/claude-code | recommended: anthropics/claude-code, openai/codex, max-sixty/worktrunk | recommended (revised): openai/codex, max-sixty/worktrunk |
-| isolation | `partial_comparison` | anthropics/sandbox-runtime, max-sixty/worktrunk | podman-container-tools/podman | compare: anthropics/sandbox-runtime, max-sixty/worktrunk, podman-container-tools/podman | recommended (upheld): max-sixty/worktrunk, anthropics/sandbox-runtime |
-| code-navigation | `partial_comparison` | oraios/serena | anthropics/claude-plugins-official, ast-grep/ast-grep | recommended: oraios/serena, anthropics/claude-plugins-official | compare (undetermined): ast-grep/ast-grep, oraios/serena |
-| document-retrieval | `shared_pick` | opendatalab/mineru, tobi/qmd | — | recommended: tobi/qmd, opendatalab/mineru | compare (undetermined): tobi/qmd, opendatalab/mineru |
-| semantic-rag | `partial_comparison` | giancarloerra/socraticode, ollama/ollama | minishlab/semble, qdrant/qdrant | compare: giancarloerra/socraticode, minishlab/semble, ollama/ollama | compare (undetermined): giancarloerra/socraticode, qdrant/qdrant, ollama/ollama |
-| durable-memory | `partial_comparison` | akitaonrails/ai-memory | basicmachines-co/basic-memory, rohitg00/agentmemory, vectorize-io/hindsight, vshulcz/deja-vu | compare: akitaonrails/ai-memory, vectorize-io/hindsight, rohitg00/agentmemory, vshulcz/deja-vu | compare (undetermined): akitaonrails/ai-memory, basicmachines-co/basic-memory |
-| web-research | `partial_comparison` | microsoft/playwright-cli | adbar/trafilatura | recommended: adbar/trafilatura, microsoft/playwright-cli | compare (undetermined): microsoft/playwright-cli |
-| token-efficiency | `partial_comparison` | ccusage/ccusage | mksglu/context-mode, ojuschugh1/sqz, rtk-ai/rtk | compare: ccusage/ccusage, rtk-ai/rtk | compare (undetermined): mksglu/context-mode, ojuschugh1/sqz, ccusage/ccusage |
-| quality-evaluation | `partial_comparison` | harbor-framework/harbor, ukgovernmentbeis/inspect_ai | microsoft/playwright, promptfoo/promptfoo | recommended: ukgovernmentbeis/inspect_ai, harbor-framework/harbor, promptfoo/promptfoo | compare (undetermined): ukgovernmentbeis/inspect_ai, harbor-framework/harbor, microsoft/playwright |
-| ci-supply-chain | `partial_comparison` | actions/attest, anchore/syft, dependabot/dependabot-core, kjanat/actionlint, zizmorcore/zizmor | github/codeql-action | recommended: zizmorcore/zizmor, actions/attest, anchore/syft, dependabot/dependabot-core, github/codeql-action, kjanat/actionlint | compare (undetermined): actions/attest, zizmorcore/zizmor, kjanat/actionlint, anchore/syft, dependabot/dependabot-core |
-| scheduling-supervision | `shared_pick` | dagucloud/dagu, systemd/systemd | — | recommended: dagucloud/dagu, systemd/systemd | compare (undetermined): dagucloud/dagu, systemd/systemd |
-| hosting-services | `partial_comparison` | docker/compose, moby/moby | fastapi/fastapi, podman-container-tools/podman, postgres/postgres | compare: docker/compose, podman-container-tools/podman, moby/moby | compare (undetermined): moby/moby, docker/compose, fastapi/fastapi, postgres/postgres |
-| recovery-portability | `partial_comparison` | jdx/mise, restic/restic | twpayne/chezmoi | recommended: jdx/mise, restic/restic, twpayne/chezmoi | compare (undetermined): jdx/mise, restic/restic |
-| observation-inference | `partial_comparison` | open-telemetry/opentelemetry-collector-contrib | arize-ai/phoenix, ggml-org/llama.cpp, grafana/grafana, grafana/loki, openlit/openlit, prometheus/prometheus | recommended: open-telemetry/opentelemetry-collector-contrib, prometheus/prometheus, grafana/loki, grafana/grafana, ggml-org/llama.cpp, arize-ai/phoenix | compare (undetermined): open-telemetry/opentelemetry-collector-contrib, openlit/openlit |
-| agent-sdks | `two_family_pick` | anthropics/claude-agent-sdk-python, openai/codex | — | recommended: anthropics/claude-agent-sdk-python, openai/codex | recommended (upheld): openai/codex, anthropics/claude-agent-sdk-python |
-| mcp-surfaces | `partial_comparison` | modelcontextprotocol/inspector, openclaw/mcporter | mcpjam/inspector | recommended: openclaw/mcporter, modelcontextprotocol/inspector | recommended (upheld): openclaw/mcporter, modelcontextprotocol/inspector, mcpjam/inspector |
-| secrets-credentials | `partial_comparison` | betterleaks/betterleaks | trufflesecurity/trufflehog | recommended: betterleaks/betterleaks, trufflesecurity/trufflehog | compare (undetermined): betterleaks/betterleaks |
-| git-github-automation | `partial_comparison` | ataraxy-labs/sem, cli/cli, git/git, max-sixty/worktrunk | anthropics/claude-code-action, wilfred/difftastic | recommended: git/git, cli/cli, max-sixty/worktrunk, wilfred/difftastic, ataraxy-labs/sem, anthropics/claude-code-action | compare (undetermined): git/git, max-sixty/worktrunk, cli/cli, ataraxy-labs/sem |
-| cross:wsl-distro | `shared_pick` | Ubuntu 24.04.5 LTS (Canonical WSL image), fallback, Ubuntu 26.04.1 LTS (Canonical WSL image), primary | — | recommended: Ubuntu 26.04.1 LTS (Canonical WSL image), primary, Ubuntu 24.04.5 LTS (Canonical WSL image), fallback | compare (undetermined): Ubuntu 24.04.5 LTS (Canonical WSL image), Ubuntu 26.04.1 LTS (Canonical WSL image) |
+| Layer | Class | Named by both halves | Claude half only | GPT half only | Claude Opus 5.5 | GPT-6.1 Sol |
+| --- | --- | --- | --- | --- | --- | --- |
+| native-clients | `same_picks_both_recommended` (agree) | anthropics/claude-code; openai/codex | — | — | recommended (upheld) | recommended (upheld) |
+| instructions-skills | `some_picks_shared` (overlap) | trailofbits/skills | — | mattpocock/skills | recommended (revised) | compare (undetermined) |
+| workers | `some_picks_shared` (overlap) | max-sixty/worktrunk; openai/codex | anthropics/claude-code | — | recommended (upheld) | recommended (revised) |
+| isolation | `some_picks_shared` (overlap) | anthropics/sandbox-runtime; max-sixty/worktrunk | podman-container-tools/podman | — | compare (undetermined) | recommended (upheld) |
+| code-navigation | `some_picks_shared` (overlap) | oraios/serena | anthropics/claude-plugins-official | ast-grep/ast-grep | recommended (revised) | compare (undetermined) |
+| document-retrieval | `same_picks_split_status` (overlap; as written: unclassified) | opendatalab/mineru; tobi/qmd | — | — | recommended (upheld) | compare (undetermined) |
+| semantic-rag | `some_picks_shared` (overlap) | giancarloerra/socraticode; ollama/ollama | minishlab/semble | qdrant/qdrant | compare (undetermined) | compare (undetermined) |
+| durable-memory | `some_picks_shared` (overlap) | akitaonrails/ai-memory | rohitg00/agentmemory; vectorize-io/hindsight; vshulcz/deja-vu | basicmachines-co/basic-memory | compare (undetermined) | compare (undetermined) |
+| web-research | `some_picks_shared` (overlap) | microsoft/playwright-cli | adbar/trafilatura | — | recommended (upheld) | compare (undetermined) |
+| token-efficiency | `some_picks_shared` (overlap) | ccusage/ccusage | rtk-ai/rtk | mksglu/context-mode; ojuschugh1/sqz | compare (undetermined) | compare (undetermined) |
+| quality-evaluation | `some_picks_shared` (overlap) | harbor-framework/harbor; ukgovernmentbeis/inspect_ai | promptfoo/promptfoo | microsoft/playwright | recommended (upheld) | compare (undetermined) |
+| ci-supply-chain | `some_picks_shared` (overlap) | actions/attest; anchore/syft; dependabot/dependabot-core; kjanat/actionlint; zizmorcore/zizmor | github/codeql-action | — | recommended (upheld) | compare (undetermined) |
+| scheduling-supervision | `same_picks_split_status` (overlap; as written: unclassified) | dagucloud/dagu; systemd/systemd | — | — | recommended (upheld) | compare (undetermined) |
+| hosting-services | `some_picks_shared` (overlap) | docker/compose; moby/moby | podman-container-tools/podman | fastapi/fastapi; postgres/postgres | compare (undetermined) | compare (undetermined) |
+| recovery-portability | `some_picks_shared` (overlap) | jdx/mise; restic/restic | twpayne/chezmoi | — | recommended (upheld) | compare (undetermined) |
+| observation-inference | `some_picks_shared` (overlap) | open-telemetry/opentelemetry-collector-contrib | arize-ai/phoenix; ggml-org/llama.cpp; grafana/grafana; grafana/loki; prometheus/prometheus | openlit/openlit | recommended (upheld) | compare (undetermined) |
+| agent-sdks | `same_picks_both_recommended` (agree) | anthropics/claude-agent-sdk-python; openai/codex | — | — | recommended (upheld) | recommended (upheld) |
+| mcp-surfaces | `some_picks_shared` (overlap) | modelcontextprotocol/inspector; openclaw/mcporter | — | mcpjam/inspector | recommended (upheld) | recommended (upheld) |
+| secrets-credentials | `some_picks_shared` (overlap) | betterleaks/betterleaks | trufflesecurity/trufflehog | — | recommended (upheld) | compare (undetermined) |
+| git-github-automation | `some_picks_shared` (overlap) | ataraxy-labs/sem; cli/cli; git/git; max-sixty/worktrunk | anthropics/claude-code-action; wilfred/difftastic | — | recommended (upheld) | compare (undetermined) |
+| cross:wsl-distro | `same_picks_split_status` (overlap; as written: differ) | Ubuntu 24.04.5 LTS (Canonical WSL image); Ubuntu 26.04.1 LTS (Canonical WSL image) | — | — | recommended (upheld) | compare (undetermined) |
 
-The 12 trading rows are `owner_lane_run_pending` and the four cross-cutting rows `no_blind_record`; their pins of record
-are unjudged incumbents, not winners. Each row's comparison arms and full gate ledger are in the record. Seven rows read
-differently from their label:
+The 12 trading rows are `owner_lane_run_pending` and the four cross-cutting rows other than the distribution are
+`no_blind_record`; their pins of record are unjudged incumbents, not winners. Each half's picks with their captured
+facts, the Claude half's comparison arms and the set the rule's fold derives from the two halves are in the JSON record.
+Seven rows need a note:
 
-- **durable-memory.** ai-memory is the only memory pick both families made on source review (Claude: ai-memory,
-  Hindsight, agentmemory and deja-vu; GPT: ai-memory and Basic Memory), so the rule makes it the standing pick, not a
-  default. The only measurement on record points the other way: LongMemEval-S recall_all@5 on the source host,
-  descriptive and without ai-memory's production reranker (C4), gave agentmemory 0.821, BM25 0.747 and ai-memory
-  0.496 (`evidence/artifacts/memory-stack-20260925/convergence.json`); Hindsight is unmeasured (K1 has not run). #591
-  records the user's request that the memory head-to-head of #526 decide and that its best-scoring eligible system be
-  installed, so memory's install waits for that comparison, with the memory gaps of item 1 below. The pin of record is
-  2.4.1 (`manifests/stack.json:96`); upstream released v2.5.2 on 2026-10-01 (`cross-family/facts/durable-memory.json`).
-- **token-efficiency.** The only shared pick is ccusage, a usage meter rather than a compression tool. No compression
-  tool has both families behind it: RTK (Claude), Context Mode and sqz (GPT) are challengers, and the compression slot
-  stays the no-compression baseline until the Gate A E2E measures one.
-- **ci-supply-chain.** The challenger `github/codeql-action` is the Claude pick `codeql-sarif`: the `upload-sarif`
-  step this repository already runs (`.github/workflows/security-scan.yml:146`) next to CodeQL default setup, so it
-  needs no stage-2 comparison.
-- **workers and mcp-surfaces.** Claude Code's native subagents and MCPJam Inspector were picks of one family only, so
-  each is a challenger (a with/without arm).
-- **git-github-automation.** sem stands under the rule, although the Claude pick's own text keeps it "only if the
-  structural-diff comparison shows a gain"; that comparison is its first gate.
-- **hosting-services.** The families read the layer differently: the Claude judges scoped it to the container engine
-  and listed Docker Engine as one arm against Podman with Quadlet, while the GPT judge, like the source host's record,
-  also picked the application stack (FastAPI, PostgreSQL). Docker Compose and Moby stand; Podman, FastAPI and
-  PostgreSQL are challengers, and the comparison's preregistration settles the layer's scope before its arms run.
-- **cross:wsl-distro.** Both families picked both Ubuntu images, so both stand. The order (26.04.1 primary, 24.04.5
+- **durable-memory.** ai-memory is the only memory pick both halves named on source review (Claude: ai-memory,
+  Hindsight, agentmemory and deja-vu; GPT: ai-memory and Basic Memory). That is not a merit result: the only
+  measurement on record at 2026-10-01 points the other way. LongMemEval-S recall_all@5 on the source host, descriptive
+  and without ai-memory's production reranker (C4), gave agentmemory 0.821, BM25 0.747 and ai-memory 0.496
+  (`evidence/artifacts/memory-stack-20260925/convergence.json`); Hindsight is unmeasured (K1 has not run). #591 records
+  the user's request that the memory head-to-head of #526 decide the memory slot. The pin of record is 2.4.1
+  (`manifests/stack.json:96`); upstream released v2.5.2 on 2026-10-01 (`cross-family/facts/durable-memory.json`).
+- **token-efficiency.** The only pick both halves named is ccusage, a usage meter rather than a compression tool. No
+  compression tool was named by both halves: RTK by the Claude half, Context Mode and sqz by the GPT half.
+- **ci-supply-chain.** `github/codeql-action`, named by the Claude half only, is the Claude pick `codeql-sarif`: the
+  `upload-sarif` step this repository already runs (`.github/workflows/security-scan.yml:146`) next to CodeQL default
+  setup.
+- **workers and mcp-surfaces.** Claude Code's native subagents (workers) were named by the Claude half only, and MCPJam
+  Inspector (mcp-surfaces) by the GPT half only.
+- **git-github-automation.** Both halves named sem, although the Claude pick's own text keeps it "only if the
+  structural-diff comparison shows a gain".
+- **hosting-services.** The halves read the layer differently: the Claude judges scoped it to the container engine and
+  listed Docker Engine as one arm against Podman with Quadlet, while the GPT judge, like the source host's record, also
+  picked the application stack (FastAPI, PostgreSQL). Both halves named Docker Compose and Moby; Podman was named by
+  the Claude half only, FastAPI and PostgreSQL by the GPT half only.
+- **cross:wsl-distro.** Both halves picked both Ubuntu images under the generator's packet matching (the second
+  extension below). Compared as written, the Claude names carry the role suffixes ", primary" and ", fallback", so the
+  halves share no name and the rule's text classifies the layer as differ. The order (26.04.1 primary, 24.04.5
   fallback) is the Claude judges' alone; the GPT critic found it undetermined. Its one failed fact check refuted its
   own judge's claim that Canonical's listing lacked the 26.04.1 WSL image: the critic found that image, dated
-  2026-08-27, with signed checksum files. Neither run downloaded or checksum-tested the bytes. The rehearsal that #589
-  plans compares the two images; the GPT critic also named Debian 13 as possibly stronger, a question for that
-  rehearsal's preregistration rather than a pick.
+  2026-08-27, with signed checksum files. Neither run downloaded or checksum-tested the bytes. The GPT critic also
+  named Debian 13 as possibly stronger, without picking it.
 
-**How the rule is read, and when that changed.** The overlap clause ("the shared picks stand and every pick only one
-family made enters the layer's comparison") names no status condition; the rule attaches one only to its agree clause.
-The generator's first version, written while the judges ran and before any critic returned, added one: where either
-family's critic found the evidence undetermined, it held the shared picks as comparison arms, which left 17 judged
-layers with no standing pick. After the results, at the user's direction on 2026-10-01, the generator applies the
-clause as written. No judgment was redone and no pick changed; only the reading of the frozen text did. The two
-readings differ in labels more than in work, since stage 2 installs every arm of a comparison layer either way (#589,
-"What follows"); what changes is that the standing picks install as each layer's default on the new WSL (memory excepted, above)
-while the comparison runs. Two cases
-the frozen definitions leave open are disclosed. Equal pick sets with unequal statuses (document-retrieval,
-scheduling-supervision and cross:wsl-distro) match neither agree, which needs equal statuses, nor overlap, which needs
-unequal sets; the generator classifies them as overlap, so their picks stand with nothing left to compare
-(`shared_pick`). And agreement on a comparison keeps a layer without a standing pick, while an overlap keeps its shared
-picks standing whatever the statuses; no layer is in the first case. The tests encode each branch of the rule.
+**How the fold extends the frozen rule.** The generator does not apply the frozen rule exactly as written: its fold
+extends the rule's text in two places. Every judged row carries both the generator's class (`agreement`) and the class
+the text gives as written (`agreement_as_written`), with the extensions that changed it (`extensions_applied`):
+
+1. *Equal pick sets with unequal statuses.* The rule's agree needs equal statuses and its overlap needs unequal sets
+   (`agreement-rule.txt`, line 5), so the text leaves the case unclassified. The generator classifies it as overlap
+   (`agreement` in `scripts/final_catalog.py`), and the record names the case `same_picks_split_status`. Rows:
+   document-retrieval, scheduling-supervision and cross:wsl-distro.
+2. *Names matched to packet candidates.* The rule normalizes a pick without a GitHub URL by its name (line 2). The
+   generator matches the name to the packet candidate whose words it contains (`pick_key`), which drops a role suffix
+   such as ", primary" or ", fallback". Compared as written (lowercase, whitespace collapsed), the two halves share no
+   distribution name. Row: cross:wsl-distro.
+
+Reducing a GitHub URL to owner/name is not a third extension: every pick URL in both records is a plain repository URL,
+where that reduction equals the rule's literal URL form (a test checks every pick). A Claude arm description names a
+pick only through the pick's full owner/name; a whole-word match on the repository name alone had dropped
+`mattpocock/skills` behind the arm `trailofbits/skills`. An arm described in words and the pick it describes can
+therefore both appear in the derived set, which the record keeps for reading the halves side by side and which
+schedules nothing.
+
+## Revision of 2026-10-02
+
+The cross-family review of #595 (GPT-6.1 Sol, reading `025c4892`) found that the record's claim to apply the rule
+exactly as written was false in the two places above, and that its framing conflicted with the merged install
+decisions: it made every pick both halves named the layer's pick for the new WSL (a "standing pick") and every pick one
+half named a challenger in a measured comparison on the new host, which would have put comparison arms on the clean
+WSL and given that status to slots the definitive manifest holds. This revision re-scopes the record as the record of
+the blind GPT half and its comparison with the Claude record, with the definitive manifest as the install record. It
+removes the install and comparison consequences, the gate ledger, the install commands and the judges'
+deciding-comparison texts from the record; discloses the two extensions and reports the class as written; hashes the
+rule; matches arm descriptions by full owner/name; and records the timing and inventory limits below. No judgment was
+redone and no pick changed.
+
+The reading of the overlap clause had changed once before, also without any judgment redone. The generator's first
+version, written while the judges ran and before any critic returned, held the shared picks as comparison arms wherever
+either half's critic found the evidence undetermined (17 judged layers). After the results, at the user's direction on
+2026-10-01, the second version let the shared picks stand with no status condition and described that reading as the
+rule applied as written.
 
 ## The cross-family run
 
 - **Inputs.** The frozen criteria, judge prompt, critic prompt and 21 packets of #589, each verified against
   `preregistration.json` by sha256 before the run. Added and frozen first (`preregistration-addendum.json`, recorded
-  2026-10-01T20:44:31Z, five seconds before the first process): a harness adapter (`adapter.txt`), output schemas, the
-  packet-to-judge assignment and the agreement rule, plus a facts sidecar with the three GitHub API endpoints the
-  judge prompt names for all 209 candidates, captured without popularity fields (`facts/`).
+  2026-10-01T20:44:31Z): a harness adapter (`adapter.txt`), output schemas, the packet-to-judge assignment and the
+  agreement rule, plus a facts sidecar with the three GitHub API endpoints the judge prompt names for all 209
+  candidates, captured without popularity fields (`facts/`). By the coordinator's private run log, the first process
+  started five seconds after the addendum was recorded; the committed files cannot show that (see the limits below).
 - **Family and dispatch.** GPT-6.1 Sol at `model_reasoning_effort=max` through `codex exec` (Codex CLI 0.159.3, native
   ChatGPT sign-in), read-only sandbox, live web search, ephemeral sessions, schema-bound final message; 11 independent
   judge processes in 3 groups and one critic per group, the original dispatch shape. Every process succeeded on its
@@ -129,6 +168,17 @@ picks standing whatever the statuses; no layer is in the first case. The tests e
   event stream counts 100 web searches, 160 opened pages and 39 commands, and none of them names the project's
   repositories or a local path outside the inputs (`run-record.json`). The audit sees queries, page actions and
   commands, not the instructions or the content of search results.
+- **Timing and inventory: disclosed limits.** Three properties of the run cannot be checked from the committed files:
+  - `run-record.json` gives each process attempt's exit, duration and returned usage, but no start or end timestamp.
+    The order of the addendum and the processes therefore rests on the coordinator's account.
+  - The first process's start, 2026-10-01T20:44:36Z, is stated only in this record and the folder's README. It comes
+    from the coordinator's run log, which stays private with the other originals: `run-record.json` lists its sha256,
+    not its content. The committed records time only the addendum (`preregistration-addendum.json`, `recorded_at`) and
+    the run's finish (`selection-gpt.json`, `run.finished_at`, 2026-10-01T21:58:06Z).
+  - The instruction file every process loaded (`$CODEX_HOME/AGENTS.md`, above) is absent from the frozen-input
+    inventory of `preregistration-addendum.json`. Its sha256 appears only in the probe of the next day
+    (`instruction-probe.json`, `default_home_agents_md_sha256`, recorded 2026-10-02T02:25:00Z), which shows what the
+    file held then, not what the run loaded.
 - **Usage, as returned by Codex.** 20,644,160 input tokens (18,536,320 cached) and 360,405 output tokens (214,127
   reasoning) across the 14 processes; wall time per process up to 27 minutes. The Claude side of this unit (research
   workflow, verifiers and completeness critic) is reported with the pull request.
@@ -139,19 +189,17 @@ picks standing whatever the statuses; no layer is in the first case. The tests e
   launch. Codex's delegation to a child agent failed under `--ephemeral` ("no rollout found for thread id") once in
   each of 8 of the 14 processes (judges J02, J03, J06, J07, J08 and J10, critics C-G1 and C-G3); each finished alone,
   and the failure is kept in the private stderr.
-- **Private originals.** Prompts, event streams, returns and stderr stay outside the repository with the coordinator's
-  private records; `run-record.json` lists the sha256 of each.
+- **Private originals.** Prompts, event streams, returns, stderr and the run log stay outside the repository with the
+  coordinator's private records; `run-record.json` lists the sha256 of each.
 
-## What final means here
+## What the record does not decide
 
-A layer's standing picks are the picks both model families made blind, and they are its picks for the new WSL clean
-install. A standing pick is final once it installs by its upstream command and passes acceptance on the new host
-(`two_family_pick`, `shared_pick`) and, where challengers exist (`partial_comparison`), once the layer's measured
-comparison has run there (the stage-2 comparison of program decision 5): its preregistered result decides whether a
-challenger replaces a standing pick or joins the standing picks. A row without a blind record has no
-standing pick until both families judge it. The record never promotes a row by itself: a status changes only through
-the frozen rule, a measured comparison on the new host, or a new edition, and no selection of record on the source
-host changes through it.
+The record decides nothing about installation. A pick both halves named is two-family agreement on source review,
+within the limits above; a pick one half named is that half's alone. Whether a slot installs a tool, which tool, and
+which comparison backs or overturns that choice are the definitive manifest's decisions. Its decision record runs those
+comparisons before the clean install, on the current workstation or on a throwaway rehearsal distribution, and the
+clean WSL never installs comparison arms (`docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`, decision 6). The
+record never promotes a row by itself, and no selection of record on the source host changes through it.
 
 The six exit criteria of #140 are the acceptance test for the whole catalog. At main `20ea4ae2` one is met (the
 `verdict-review-gate` required check), two are partly met (the release pin, and the grid and matrix regeneration) and
@@ -161,22 +209,13 @@ criterion, with its evidence, is posted on #140 with this record.
 
 ## Gaps that remain
 
-The gate ledger of each row in the record is the exact list; these are the gaps that span rows, in the order that
-unblocks the most.
+These are the gaps of this record, in the order that unblocks the most. Slot install decisions, and the measurements a
+held slot waits for, are the definitive manifest's.
 
-1. **Stage-2 comparisons on the new WSL.** Every `partial_comparison` row installs its standing picks and its
-   challengers fresh and runs a preregistered comparison whose result decides whether a challenger replaces or joins the
-   standing picks (program decision 5). Order constraints from #589: semantic-rag runs before the
-   local-model-server comparison in observation-inference, and the container engine in hosting-services runs before
-   isolation's container slot. For durable-memory, S3 is not frozen (#526, r7 draft); no result is recorded on any host
-   for ai-memory with its reranker (C4), agentmemory through its hooks (D2h), Hindsight (K1) or MemPalace (M1/M2); the
-   confirmatory gates name the retired VelaNext host, so a surviving host is preregistered first
-   (`docs/decisions/2026-09-25-retire-vela-velanext.md`); the frozen LongMemEval harness runs only in an isolated
-   runner. Token efficiency is decided by the Gate A E2E.
-2. **The trading layers.** No blind record exists for the 12 us-equities rows; the trading lane owner runs the method
-   unchanged on the GPT lane after 2026-10-03T17:14Z (#589).
-3. **The cross-cutting rows without a blind record.** None of them has a standing pick; each pin of record is an
-   unjudged incumbent.
+1. **The trading layers.** No blind record exists for the 12 us-equities rows; #589 left the method, unchanged, to the
+   trading lane owner on the GPT lane after 2026-10-03T17:14Z.
+2. **The cross-cutting rows without a blind record.** Neither half judged them; each pin of record is an unjudged
+   incumbent.
    - `cross:runtime-workers`: no frozen candidate set or closure record; the roster README the row cites exists only in
      PR #535; the OpenHands worker on main is configured for `cx/gpt-6-astra-max`
      (`blueprints/runtime-workers/openhands/config/worker.json:8`), a resolved official task exits 2, and the isolation
@@ -209,13 +248,11 @@ unblocks the most.
    - `cross:credential-practice` and `cross:convergence-practice` are this repository's own practices and carry no
      blind record by design; their gates are the lane owners'.
    - Neither runtime row has a landscape layer, a saturation-ledger entry or a packet, so neither model family has
-     judged "GPT-6.1 Sol runtime workers through harness SDKs" yet. The next step is a preregistered packet for each row
-     (worker runtimes: OpenHands, GPT Researcher, DeerFlow, Crawl4AI, pi, DeepAgents, Harbor, AgentRelay, Relaycast and
-     the 13 unvoted sweep rows above; harnesses and gateways: Codex CLI and SDKs, OmniRoute, LiteLLM, claude-code-router,
-     agentgateway), judged by both families with the frozen method.
-4. **New-host acceptance for every standing pick.** Neither run installed or measured a candidate; each standing pick
-   installs by its upstream command on the new distribution and records its acceptance there.
-5. **The field the packets did not hold.** 15 of the 25 survivors of the 2026-09-26 sweep and 266 of the 328 refuted
+     judged "GPT-6.1 Sol runtime workers through harness SDKs" yet. A blind record for either row needs a preregistered
+     packet first (worker runtimes: OpenHands, GPT Researcher, DeerFlow, Crawl4AI, pi, DeepAgents, Harbor, AgentRelay,
+     Relaycast and the 13 unvoted sweep rows below; harnesses and gateways: Codex CLI and SDKs, OmniRoute, LiteLLM,
+     claude-code-router, agentgateway), judged by both families with the frozen method.
+3. **The field the packets did not hold.** 15 of the 25 survivors of the 2026-09-26 sweep and 266 of the 328 refuted
    layer-repository pairs enter as pending and are voted again under U11 (#589, "Not covered"). This pass's
    completeness critic found more that the packets never held:
    - 13 rows that `catalogs/sota-convergence/sdk-runtime-coverage-20260922.json` rated keep-but-compare or targeted and
@@ -238,13 +275,13 @@ unblocks the most.
    openai-agents-python, adk-python and smolagents have written dispositions in
    `sdk-runtime-coverage-20260922.json` and `catalogs/landscape/foundation.json`; they are re-voted with the rest of the
    field, not added as new.
-6. **Record drift for the next edition update** (overturn conditions 2, 3 and 5 of the edition): the agent-sdks row
+4. **Record drift for the next edition update** (overturn conditions 2, 3 and 5 of the edition): the agent-sdks row
    cites `openai-codex==0.154.0`, and the rows that pin Codex read 0.159.2 where main pins 0.159.3 (#580); the
    gpt6-harnesses row calls #560 open, and it merged on 2026-10-01; the durable-memory row and `manifests/stack.json:96`
-   pin ai-memory 2.4.1, and upstream released v2.5.2 on 2026-10-01; the Next.js pin of record reads 16.3.6 where the stack pins 16.3.8 (#587), and #587 shifted later
-   `manifests/stack.json` line citations by one; the trading lane asked for its wording correction of the
-   `trading_rule` passage of `ownership.json` (#589 comment, 2026-10-01T19:21Z).
-7. **The #140 exit criteria** (see above): the non-grandfathered re-record (program unit U4, foundation), widening
+   pin ai-memory 2.4.1, and upstream released v2.5.2 on 2026-10-01; the Next.js pin of record reads 16.3.6 where the
+   stack pins 16.3.8 (#587), and #587 shifted later `manifests/stack.json` line citations by one; the trading lane asked
+   for its wording correction of the `trading_rule` passage of `ownership.json` (#589 comment, 2026-10-01T19:21Z).
+5. **The #140 exit criteria** (see above): the non-grandfathered re-record (program unit U4, foundation), widening
    `ENFORCED_PLATFORMS` (`scripts/landscape.py:51`) after the four Linux overclaims clear, regenerating the grid and
    matrix from the new wave, a release (main is about 200 commits past v2026.09.26.2 and `release_due --strict` exits
    1), and the readiness snapshot (agent-lab #29 is merged and dated v2026.09.24.1).
@@ -261,20 +298,27 @@ unblocks the most.
 - **Add merit fields to the edition's rows.** The edition is a hand-maintained dated record whose winners column is
   defined as bookkeeping; generated merit data inside it would blur that definition and could drift from the blind
   records. A generated sibling with `--check` keeps both exact.
+- **Join the definitive manifest into this record.** It would print each slot's install decision beside the two
+  halves, but it would couple `--check` to the manifest, which changes with every settlement, and would make this
+  record a second install list. The record names the manifest and never reads it.
+- **Classify by the rule's text alone.** The text leaves two layers unclassified and reads the halves' identical
+  distribution images as different names. The record keeps the generator's class, discloses the two extensions and
+  shows the class as written beside it.
 
 ## Overturn
 
-Regenerate with `python3 scripts/final_catalog.py --write` and re-read the statuses when any of these happens: a new
-edition or an update of this one; a change to `selection.json` or the cross-family record; the trading lane's blind run
-on the 12 us-equities layers; a blind run for the four cross-cutting rows; a stage-2 comparison result on the new host;
+Regenerate with `python3 scripts/final_catalog.py --write` and re-read the classes when any of these happens: a new
+edition or an update of this one; a change to `selection.json`, the cross-family record, the agreement rule or the
+captured facts; the trading lane's blind run on the 12 us-equities layers; a blind run for the four cross-cutting rows;
 a fact a later check finds wrong where a pick rests on it. A move of the grand list alone shows as drift in `--check`.
+Install decisions change only through the definitive manifest.
 
 ## Evidence class
 
-The statuses and standing picks are a deterministic join (`structural_validation`). The picks they join are
-`source_review` by model judges with adversarial critics in two model families, whose instructions named some
-candidates (see "Blindness, and its limit"), so a standing pick rests on two-family agreement alone: neither run installed or measured a candidate, and the source host's records were
-excluded from both. Install and comparison evidence on the new host is still owed for every row.
+The classes are a deterministic join (`structural_validation`) of two `source_review` records by model judges with
+adversarial critics in two model families, whose instructions named some candidates (see "Blindness, and its limit").
+Neither run installed or measured a candidate, and the source host's records were excluded from both. The record
+carries no install, acceptance or comparison evidence.
 
 ## SOTA sources
 

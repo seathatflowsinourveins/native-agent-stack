@@ -220,8 +220,8 @@ REMOVE_GLOBS = (
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
     # The new-WSL architecture edition, its layer crosswalk and the final catalog generated from them, with the blind
-    # clean-install selection records they join: each names every layer's selection of record, standing picks or
-    # challengers (final catalog, 2026-10-01). The selection's frozen criteria, prompts and packets stay, so a later
+    # clean-install selection records they join: each names every layer's selection of record or the picks each blind
+    # half named (final catalog, 2026-10-01). The selection's frozen criteria, prompts and packets stay, so a later
     # blind run can reuse them.
     "catalogs/foundation/new-wsl-architecture-*",
     "catalogs/foundation/new-wsl-layer-crosswalk-*",

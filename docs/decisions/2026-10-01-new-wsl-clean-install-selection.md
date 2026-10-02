@@ -209,18 +209,18 @@ A preregistered comparison on the new distribution; the re-vote of the candidate
 add arms or reopen a selected layer; a fact a later check finds wrong where a pick rests on it; a new upstream release
 or maintenance change that alters a criterion.
 
-## Addendum (2026-10-01): the cross-family half ran
+## Addendum (2026-10-01, revised 2026-10-02): the cross-family half ran
 
 The blind GPT-6.1 Sol run requested under "Cross-family status" ran the same day on the same frozen packets, criteria
 and prompts: 11 judges in 3 groups and one critic per group, GPT-6.1 Sol at effort max through the Codex CLI
-(`cross-family/`, with its preregistration addendum recorded before the first process). Against this record's
-recommendations the two families agree exactly on 2 layers (native-clients and agent-sdks), overlap on 19 and differ on
-none. The GPT critics upheld 4 selections, revised 1 (workers) and found 16 undetermined. Under the agreement rule
-frozen before the run (`cross-family/agreement-rule.txt`), applied as written, every pick both families made stands as
-its layer's pick for the new distribution, so all 21 layers have standing picks: native-clients and agent-sdks on
-identical recommendations, document-retrieval, scheduling-supervision and the base distribution on identical pick
-sets, and the other 16 layers on shared picks with every pick of one family only entering the layer's comparison as a
-challenger. A standing pick is final once it passes acceptance on the new distribution and, where challengers exist,
-the measured comparison. Each row's standing picks, challengers, arms and gate ledger are in
-`catalogs/foundation/final-catalog-20261001.json` (decision record `docs/decisions/2026-10-01-final-catalog.md`). The
-Decision table above remains this run's record.
+(`cross-family/`, with its preregistration addendum recorded before the first process, by the coordinator's private
+run log). The GPT critics upheld 4 selections, revised 1 (workers) and found 16 undetermined. Against this record's
+recommendations the two halves name the same picks with the same status in 2 layers (native-clients and agent-sdks),
+the same picks with split statuses in 3 (document-retrieval, scheduling-supervision and the base distribution) and
+partly shared picks in the other 16; no layer has disjoint picks. These counts use the final catalog's fold, which
+extends the agreement rule frozen before the run (`cross-family/agreement-rule.txt`) in two places: under the rule's
+text as written, document-retrieval and scheduling-supervision are unclassified and the base distribution is differ.
+The comparison is recorded in `catalogs/foundation/final-catalog-20261001.json` (decision record
+`docs/decisions/2026-10-01-final-catalog.md`). It is evidence, not an install list: a pick both halves named is not an
+install decision, and the install record is the definitive manifest (#602). The Decision table above remains this
+run's record.
