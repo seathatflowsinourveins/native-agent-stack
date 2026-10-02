@@ -43,6 +43,11 @@ OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
 SOURCES = (OWNERSHIP, SELECTION, EDITION, RESEARCH, TRADING, DISTRO,
            ADOPTION, PREREGISTRATION)
 FAMILIES = ("claude", "codex")
+# The manifest producer's closed sets: rows_of() states and row kinds and apply_convergence() outcomes in
+# assemble_manifest.py at 675bdd51c96af28aa98012d9e4ff772a77a38f3d. "" is a slot with no decision yet (counted as open).
+SLOT_STATES = {"", "definitive", "resolved", "split", "measurement"}
+ROW_KINDS = {"first_round", "added", "judged", "pinned", "project_practice", "no_blind_default_today"}
+OUTCOMES = {"final", "installed_on_critic", "not_installed", "split", "kept"}
 HOST_PATH = re.compile(
     r"(?<!\w)/(?:home|Users|tmp|var/tmp)/[^\s<]"
     r"|(?<!\w)/root(?=/|$|[\s'\"`])"
@@ -207,8 +212,9 @@ def profile_fields(entry):
              "provisioning_status": entry.get("provisioning_status", "pending"),
              "evidence_refs": entry.get("evidence_refs", []),
              "blocking_gaps": list(dict.fromkeys(gaps))}
-    if entry.get("version_policy"):
-        facts["version_policy"] = entry["version_policy"]
+    for field in ("version_policy", "native_update"):
+        if entry.get(field):
+            facts[field] = entry[field]
     return facts
 
 
@@ -320,27 +326,67 @@ def inventory_slot_ids(slot):
         yield slot["slot_id"]
 
 
-def default_slot_inventory(inputs, sources):
-    """Bind IDs to the compact catalog inputs named by the manifest producer.
+def manifest_source_path(source):
+    """Resolve one provenance entry of the defaults manifest to a public repository path.
 
-    Reference: assemble_manifest.py build()/rows_of() at f565764972a65554bd8968f6205957989c6ab3a7.
-    Read identifiers and owners only; recommendations and states stay supplied.
+    assemble_manifest.py build() at 675bdd51c96af28aa98012d9e4ff772a77a38f3d writes `file`, relative to the
+    manifest's folder, for the two compact catalogs, the settlements and the convergence decisions, and `path`,
+    relative to the repository root, for the rule and the combined results that convergence.json cites.
     """
-    inventory = {}
-    for catalog, source in sources.items():
-        relative = public_path(source["file"])
-        data = inputs.read((Path(DEFAULTS_MANIFEST).parent / relative).as_posix())
-        require(isinstance(data, dict) and isinstance(data.get("layers"), list),
+    require(isinstance(source, dict), "defaults manifest source must be an object")
+    require(re.fullmatch(r"[a-fA-F0-9]{64}", str(source.get("sha256", ""))), "defaults manifest source needs SHA-256")
+    require(("file" in source) != ("path" in source), "defaults manifest source needs exactly one of file or path")
+    if "file" in source:
+        return (Path(DEFAULTS_MANIFEST).parent / public_path(source["file"])).as_posix()
+    return public_path(source["path"])
+
+
+def read_manifest_sources(inputs, sources, catalogs):
+    """Read every source the manifest names and bind each to its declared SHA-256.
+
+    The catalogs and the convergence decisions are parsed because they give the slot inventory. The other files are
+    hashed only, so the handbook's provenance lists exactly the inputs the manifest rests on.
+    """
+    data = {}
+    for name, source in sources.items():
+        path = manifest_source_path(source)
+        data[name] = inputs.read(path, as_json=name in catalogs or name == "convergence")
+        require(inputs.sources[path]["sha256"] == source["sha256"].lower(),
+                f"defaults manifest source {name} differs from its declared SHA-256")
+    return data
+
+
+def default_slot_inventory(data, catalogs):
+    """Bind IDs to the compact catalogs and the added slots that the manifest producer reads.
+
+    Reference: assemble_manifest.py build(), rows_of() and apply_convergence() at
+    675bdd51c96af28aa98012d9e4ff772a77a38f3d: one row for each catalog slot, role or multi-default part, one for each
+    pinned requirement, and one for each added slot of convergence.json. Read identifiers and owners only;
+    recommendations and states stay supplied.
+    """
+    inventory, layer_catalogs = {}, {}
+    for catalog in catalogs:
+        document = data[catalog]
+        require(isinstance(document, dict) and isinstance(document.get("layers"), list),
                 "defaults manifest slot inventory needs catalog layers")
-        for layer in data["layers"] + data.get("cross_rows", []):
+        for layer in document["layers"] + document.get("cross_rows", []):
+            require(layer["layer_id"] not in layer_catalogs, f"duplicate layer in catalog inventory: {layer['layer_id']}")
+            layer_catalogs[layer["layer_id"]] = catalog
             identifiers = [identifier for slot in layer.get("slots", []) for identifier in inventory_slot_ids(slot)]
-            for pin in data.get("pinned_requirements", []):
+            for pin in document.get("pinned_requirements", []):
                 if pin["owner"] == layer["layer_id"]:
                     identifiers.append("pinned/" + "".join(
                         char if char.isalnum() else "-" for char in pin["name"].lower()).strip("-")[:40])
             for identifier in identifiers:
                 require(identifier not in inventory, f"duplicate slot in catalog inventory: {identifier}")
                 inventory[identifier] = (catalog, layer["layer_id"])
+    convergence = data.get("convergence")
+    require(convergence is None or isinstance(convergence, dict), "defaults manifest convergence source must be an object")
+    for added in (convergence or {}).get("added_slots", []):
+        identifier, layer_id = added["slot_id"], added["layer_id"]
+        require(layer_id in layer_catalogs, f"added slot {identifier} names an unknown layer: {layer_id}")
+        require(identifier not in inventory, f"duplicate slot in catalog inventory: {identifier}")
+        inventory[identifier] = (layer_catalogs[layer_id], layer_id)
     return inventory
 
 
@@ -354,8 +400,11 @@ def require_slot_inventory(identifiers, inventory):
 def read_default_decisions(inputs, reference, override=None):
     """Project the owner's slot protocol; never derive a decision or readiness.
 
-    Source schema: assemble_manifest.py at f565764972a65554bd8968f6205957989c6ab3a7.
-    Empty states and the owner's pinned rows with no state remain pending.
+    Source schema: assemble_manifest.py at 675bdd51c96af28aa98012d9e4ff772a77a38f3d. An empty state is a slot with no
+    decision yet and is shown as open, as the producer's own counts name it. A row installs something by the
+    producer's rule (a default, and not installs_nothing_extra); the same invariants the producer enforces for a
+    split, an unreturned measurement and a not_installed row are checked here so that no row is shown contradicting
+    them. Every count is computed from the rows and must equal the manifest's own counts.
     """
     if override is not None:
         require(Path(override).is_file(), "explicit defaults manifest input does not exist")
@@ -374,15 +423,12 @@ def read_default_decisions(inputs, reference, override=None):
     require(set(layers) == set(reference), "defaults manifest layer inventory differs from the handbook")
     sources = value["sources"]
     require(isinstance(sources, dict), "defaults manifest needs catalog provenance")
-    for source in sources.values():
-        require(isinstance(source, dict) and re.fullmatch(r"[a-fA-F0-9]{64}", str(source.get("sha256", ""))),
-                "defaults manifest catalog source needs SHA-256")
-        relative = public_path(source["file"])
-        safe_file(inputs.root, (Path(DEFAULTS_MANIFEST).parent / relative).as_posix())
-    inventory = default_slot_inventory(inputs, sources)
+    catalogs = sorted({row["catalog"] for row in layers.values()})
+    for catalog in catalogs:
+        require(catalog in sources, "defaults manifest layer has unknown source catalog")
+    inventory = default_slot_inventory(read_manifest_sources(inputs, sources, set(catalogs)), catalogs)
     declarations = set()
     for row in layers.values():
-        require(row["catalog"] in sources, "defaults manifest layer has unknown source catalog")
         for field in ("owns", "uses"):
             require(isinstance(row.get(field), list)
                     and all(isinstance(item, str) and item.strip() for item in row[field]),
@@ -393,7 +439,8 @@ def read_default_decisions(inputs, reference, override=None):
             declarations.add(normalized)
     slots = {layer_id: [] for layer_id in layers}
     identifiers = set()
-    kinds = {}
+    kinds, states = {}, {}
+    pending = returned = 0
     for slot in value["slots"]:
         layer_id = slot["layer_id"]
         require(layer_id in layers, "defaults manifest slot has unknown layer")
@@ -403,27 +450,144 @@ def read_default_decisions(inputs, reference, override=None):
         require(identifier not in identifiers, "duplicate slot in defaults manifest")
         identifiers.add(identifier)
         state = slot.get("state", "")
-        require(state in {"", "definitive", "split", "measurement"}, "invalid defaults manifest slot state")
+        require(state in SLOT_STATES, "invalid defaults manifest slot state")
         require(isinstance(slot.get("definitive"), bool) and slot["definitive"] == (state == "definitive"),
                 "defaults manifest definitive flag differs from its state")
         kind = slot["row_kind"]
-        require(kind in {"first_round", "judged", "pinned", "project_practice", "no_blind_default_today"},
-                "unknown defaults manifest row kind")
+        require(kind in ROW_KINDS, "unknown defaults manifest row kind")
         require(all(isinstance(slot.get(field), str) for field in ("default", "label", "repository", "claude", "gpt")),
                 "defaults manifest slot recommendation and provenance must be text")
+        require(isinstance(slot.get("job"), str) and slot["job"].strip(),
+                f"defaults manifest slot needs its job: {identifier}")
+        resolution, measurement = slot.get("resolution"), slot.get("measurement")
+        require(isinstance(resolution, dict) and resolution.get("outcome") in OUTCOMES,
+                f"defaults manifest slot needs a known outcome: {identifier}")
+        require(measurement is None or (isinstance(measurement, dict) and isinstance(measurement.get("returned"), bool)),
+                f"defaults manifest slot measurement must be empty or say whether it returned: {identifier}")
+        require(isinstance(slot.get("installs_nothing_extra"), bool),
+                f"defaults manifest slot must say whether it installs anything: {identifier}")
+        installs = bool(slot["default"]) and not slot["installs_nothing_extra"]
+        waiting = state == "split" or (measurement is not None and not measurement["returned"])
+        if waiting or resolution["outcome"] == "not_installed":
+            require(slot["installs_nothing_extra"] and not slot["repository"],
+                    f"defaults manifest row installs something while it waits or is not installed: {identifier}")
+        if measurement is not None:
+            pending, returned = pending + (not measurement["returned"]), returned + measurement["returned"]
         kinds[kind] = kinds.get(kind, 0) + 1
-        slots[layer_id].append({"state": state or "pending", "record": slot})
+        states[state or "open"] = states.get(state or "open", 0) + 1
+        slots[layer_id].append({
+            "state": state or "open", "installed": installs,
+            "not_installed_reason": None if installs else resolution.get("reason") or slot["default"] or slot["label"],
+            "record": slot})
     require_slot_inventory(identifiers, inventory)
     for slot in value["slots"]:
         require(inventory[slot["slot_id"]] == (slot["catalog"], slot["layer_id"]),
                 f"defaults manifest slot owner differs from inventory: {slot['slot_id']}")
-    require(value["counts"] == {"layers": len(layers), "slots": len(identifiers),
-                                "definitive": sum(slot["definitive"] for slot in value["slots"]),
-                                "by_row_kind": kinds}, "defaults manifest counts differ from its records")
+    installed = sum(row["installed"] for rows in slots.values() for row in rows)
+    counts = {"layers": len(layers), "slots": len(identifiers),
+              "definitive": sum(slot["definitive"] for slot in value["slots"]),
+              "by_row_kind": kinds, "by_state": states, "installed": installed}
+    require(value["counts"] == counts, "defaults manifest counts differ from its records")
     return {"source": DEFAULTS_MANIFEST,
             "status": "supplied-preview" if override is not None else "published-source",
             "metadata": {key: child for key, child in value.items() if key not in {"layers", "slots"}},
+            "inventory": dict(counts, not_installed=len(identifiers) - installed,
+                              measurements_pending=pending, measurements_returned=returned),
             "layers": layers, "slots": slots}
+
+
+FENCE = "`" * 3
+# Page anchors: prose that begins the blocks to copy. They locate text; the copied commands and rules are the page's own.
+PAIRED_NOTE = "Then record the same five observations from both running distributions at once"
+PAIRED_RULE = "Proof: both distributions print the same uid"
+GETTY_PROOF = "prints `masked`"
+
+
+def page_section(page, step):
+    """The text of one recipe-page step, from its heading to the next heading."""
+    headings = list(re.finditer(rf"^### {re.escape(step)}\. .+$", page, re.MULTILINE))
+    require(len(headings) == 1, f"recipe page needs exactly one {step} step")
+    rest = page[headings[0].end():]
+    following = re.search(r"^#{2,3} ", rest, re.MULTILINE)
+    return rest[:following.start()] if following else rest
+
+
+def page_blocks(section):
+    """Split a section into paragraphs and fenced code blocks, in page order.
+
+    A paragraph is ("text", text) and a fenced block is ("code", info string, body).
+    """
+    blocks, lines, fence = [], [], None
+    for line in section.splitlines():
+        if fence is None and line.startswith(FENCE):
+            if lines:
+                blocks.append(("text", "\n".join(lines)))
+            lines, fence = [], line[len(FENCE):].strip()
+        elif fence is not None and line.startswith(FENCE):
+            blocks.append(("code", fence, "\n".join(lines)))
+            lines, fence = [], None
+        elif fence is None and not line.strip():
+            if lines:
+                blocks.append(("text", "\n".join(lines)))
+            lines = []
+        else:
+            lines.append(line)
+    require(fence is None, "recipe page step ends inside a code fence")
+    if lines:
+        blocks.append(("text", "\n".join(lines)))
+    return blocks
+
+
+def page_bullet(section, marker):
+    """The one list item of a section whose text holds the marker: it starts with `- ` and indented lines continue it."""
+    lines = section.splitlines()
+    items, current = [], []
+    for line in lines:
+        if line.startswith("- "):
+            items.append(current)
+            current = [line]
+        elif current and line.startswith("  ") and line.strip():
+            current.append(line)
+        else:
+            items.append(current)
+            current = []
+    items.append(current)
+    found = [" ".join(" ".join(item).split())[2:] for item in items if item and marker in " ".join(item)]
+    require(len(found) == 1, f"recipe page needs exactly one list item that holds {marker!r}")
+    return found[0]
+
+
+def paired_record_from_page(distro):
+    """Read W5's paired record, its pass rule and its getty mask proof from the recipe page.
+
+    Nothing here is typed: the commands and the rules are the page's own text, so a change of the page changes the
+    handbook, and a page that no longer has these blocks stops the generator.
+    """
+    headings = re.findall(r"^### (W5\. .+)$", distro, re.MULTILINE)
+    require(len(headings) == 1, "recipe page needs exactly one W5 step")
+    section = page_section(distro, "W5")
+    blocks = page_blocks(section)
+    starts = [i for i, block in enumerate(blocks)
+              if block[0] == "text" and " ".join(block[1].split()).startswith(PAIRED_NOTE)]
+    require(len(starts) == 1 and starts[0] + 2 < len(blocks), "recipe page W5 has no paired record")
+    note, commands, rule = blocks[starts[0]:starts[0] + 3]
+    require(commands[0] == "code" and rule[0] == "text" and " ".join(rule[1].split()).startswith(PAIRED_RULE),
+            "recipe page W5 paired record is not a paragraph, a command block and its pass rule")
+    masks = [block for block in blocks if block[0] == "code" and "getty@tty1.service" in block[2]]
+    require(masks, "recipe page W5 has no getty mask commands")
+    return {"source": DISTRO, "step": headings[0],
+            "observation_note": " ".join(note[1].split()),
+            "observation_commands": commands[2].splitlines(),
+            "pass_rule": " ".join(rule[1].split()),
+            "getty_mask": {"commands": [line for line in masks[0][2].splitlines() if "getty@tty1.service" in line],
+                           "proof": page_bullet(section, GETTY_PROOF)}}
+
+
+def stage_two_commands_from_page(distro):
+    """The command block of F9, the recipe page's hand-off to stage 2."""
+    codes = [block for block in page_blocks(page_section(distro, "F9")) if block[0] == "code"]
+    require(len(codes) == 1, "recipe page F9 needs exactly one command block")
+    return codes[0][2].splitlines()
 
 
 def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=None, defaults_manifest=None):
@@ -687,9 +851,10 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             {"stage": 1, "source": DISTRO, "steps": stage1, "first_boot_prerequisites": first_boot,
              "boundary": "Recipe order only. The distro recipe is reference evidence; the clean-install image comparison remains open."},
             {"stage": 2, "source": DISTRO, "steps": [
-                "Install the selected pinned profile with adoption/bootstrap-linux.sh --profile <id>.",
-                "Complete native sign-ins on this host: codex login, then claude.",
-                "Configure the same profile with --configure-full-profile --host <host>; collect its native receipts."],
+                "Install the selected pinned profile with the first bootstrap command of F9.",
+                "Complete the native sign-ins F9 names on this host; they are never copied from another machine.",
+                "Configure the same profile with the second bootstrap command of F9; collect its native receipts."],
+             "commands": stage_two_commands_from_page(distro),
              "profile_order": (profile or {}).get("stage_order", []),
              "after_bootstrap": after_stage2,
              "boundary": "Per-tool order is the W-PROF stage/position; missing entries block installation."},
@@ -701,6 +866,7 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
         "comparison_order_text": selection["comparison_order"],
         "finality_gates": [{"id": f"c{i}", "requirement": text, "source": RESEARCH}
                            for i, text in enumerate(research["saturation"]["close_only_when"], 1)],
+        "paired_proof": paired_record_from_page(distro),
         "trading_boundary": {"text": ownership["trading_rule"], "source": OWNERSHIP},
         "cross_boundaries": ownership["boundary"], "layers": layers, "tools": tools,
         "blocking_gaps": gaps,
@@ -731,6 +897,54 @@ def cell(value):
     return str(value).replace("|", "\\|").replace("\n", " ")
 
 
+STATE_ORDER = ("definitive", "resolved", "split", "measurement", "open")
+
+
+def inventory_sentence(counts):
+    """One sentence of counts, every one of them computed from the manifest's rows."""
+    states = ", ".join(f"{state} {counts['by_state'][state]}" for state in STATE_ORDER if state in counts["by_state"])
+    kinds = ", ".join(f"{kind} {count}" for kind, count in sorted(counts["by_row_kind"].items()))
+    return (f"The manifest holds {counts['slots']} slots in {counts['layers']} layers. By state: {states}. "
+            f"By row kind: {kinds}. {counts['installed']} slots install something and {counts['not_installed']} install nothing. "
+            f"Measurements not yet returned: {counts['measurements_pending']}; returned: {counts['measurements_returned']}.")
+
+
+def render_paired_record(paired):
+    """The recipe page's W5 paired record: prose is quoted and commands are fenced, all of it read from the page."""
+    return [f"### {paired['step']}: the paired record, as the recipe page gives it", "",
+            f"The generator copies the next blocks from {link(paired['source'])}; none of their text is typed here.", "",
+            "> " + paired["observation_note"], "", FENCE + "sh", *paired["observation_commands"], FENCE, "",
+            "> " + paired["pass_rule"], "",
+            "The getty mask proof for the new distribution, from the same step:", "",
+            FENCE + "powershell", *paired["getty_mask"]["commands"], FENCE, "",
+            "> " + paired["getty_mask"]["proof"], ""]
+
+
+def render_host_prerequisites(data):
+    """Each prerequisite the profile declares, then the page's own paired record."""
+    lines = ["## Host prerequisites", ""]
+    for item in data["profile"]["host_prerequisites"]:
+        lines += [f"### {item.get('title') or item['id']}", "", item["requirement"], ""]
+        for key, label in (("not_adopted", "Pre-releases"), ("single_distribution", "Single-distribution install"),
+                           ("receipt", "Receipt")):
+            if item.get(key):
+                lines += [f"{label}: {item[key]}", ""]
+        if item.get("observations"):
+            lines += ["Observations, kept apart from the policy:", ""]
+            lines += [f"- {text}" for text in item["observations"]] + [""]
+        if item.get("execution_status"):
+            lines += [f"Status for the real distribution: **{item['execution_status']}**.", ""]
+        if item.get("rehearsal"):
+            rehearsal = item["rehearsal"]
+            lines += [f"Rehearsal: {rehearsal['result']} Record: {link(rehearsal['record'])}. {rehearsal['scope']}", ""]
+        if item.get("gate"):
+            lines += [f"Gate: {item['gate']}", ""]
+        lines += [f"The gate is executed in {link(item['gate_source'])}.", ""]
+        if item.get("sources"):
+            lines += ["Sources: " + "; ".join(link(source) for source in item["sources"]) + ".", ""]
+    return lines + render_paired_record(data["paired_proof"])
+
+
 def render_markdown(data):
     lines = ["# New WSL handbook", "", "Generated by `python3 scripts/build_new_wsl_handbook.py --write`. Do not edit this file.", "",
              f"As of {data['as_of']}. {data['evidence_class']}.", "",
@@ -741,6 +955,8 @@ def render_markdown(data):
     for stage in data["stage_order"]:
         lines += [f"### Stage {stage['stage']}", "", stage["boundary"], "", f"Source: {link(stage['source'])}.", ""]
         lines += [f"{i}. {step}" for i, step in enumerate(stage["steps"], 1)] + [""]
+        if stage.get("commands"):
+            lines += ["Commands, as the recipe page gives them:", "", FENCE + "sh", *stage["commands"], FENCE, ""]
         if stage.get("first_boot_prerequisites"):
             lines += ["First-boot prerequisites before stage 2:", ""]
             lines += [f"- {step}" for step in stage["first_boot_prerequisites"]] + [""]
@@ -751,12 +967,10 @@ def render_markdown(data):
         defaults = data["default_decisions"]
         lines += ["## Slot default decisions", "", f"Source: {link(defaults['source'])}; {defaults['status']}.", "",
                   defaults["metadata"]["meaning"], "", defaults["metadata"]["not_claimed"], "",
-                  "Empty or missing slot states are displayed as pending. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
+                  inventory_sentence(defaults["inventory"]), "",
+                  "An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.", ""]
     lines += [f"Profile: {link(data['profile']['source']) if data['profile']['status'] == 'published' else 'pending publication'}; native manifest registration: {data['profile']['native_manifest_registered']}.", ""]
-    for prerequisite in data["profile"]["host_prerequisites"]:
-        lines += [prerequisite["requirement"], "",
-                  f"The gate is executed in {link(prerequisite['gate_source'])}.", "",
-                  "Sources: " + "; ".join(link(source) for source in prerequisite["sources"]) + ".", ""]
+    lines += render_host_prerequisites(data)
     lines += [data["comparison_order_text"], "", "## Five finality gates", ""]
     lines += [f"{i}. **{gate['id']}**: {gate['requirement']} ({link(gate['source'])})"
               for i, gate in enumerate(data["finality_gates"], 1)]
@@ -775,18 +989,21 @@ def render_markdown(data):
             owner = row["default_ownership"]
             lines += ["### Slot default decisions", "",
                       "Default ownership: " + cell(owner["owns"]) + "; uses: " + cell(owner["uses"]) + ".", "",
-                      "| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |",
-                      "| --- | --- | --- | --- | --- | --- |"]
+                      "| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |",
+                      "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
             for slot in row["default_slots"]:
                 record = slot["record"]
-                recommendation = record["default"] or "pending"
+                recommendation = record["default"] or "none"
                 if record["repository"]:
                     recommendation = f"[{recommendation}]({record['repository']})"
-                lines.append("| " + " | ".join(map(cell, [record["slot_id"], slot["state"], recommendation,
-                             record["label"], f"claude: {record['claude']}; gpt: {record['gpt']}",
-                             f"{record['catalog']} / {record['row_kind']}; {link(data['default_decisions']['source'])}"])) + " |")
+                install = "installed" if slot["installed"] else "not installed: " + slot["not_installed_reason"]
+                lines.append("| " + " | ".join(map(cell, [
+                    record["slot_id"], slot["state"], record["job"], recommendation, install,
+                    record["repository"] or "none", record["resolution"]["outcome"], record["label"],
+                    f"claude: {record['claude']}; gpt: {record['gpt']}",
+                    f"{record['catalog']} / {row['layer_id']} / {record['row_kind']}; {link(data['default_decisions']['source'])}"])) + " |")
             if not row["default_slots"]:
-                lines.append("| pending slot publication | pending | pending | pending | pending | pending |")
+                lines.append("| pending slot publication | " + " | ".join(["pending"] * 9) + " |")
             lines += [""]
         lines += ["| Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |", "| --- | --- | --- | --- | --- | --- |"]
         for key in row["tools"]:
@@ -814,6 +1031,13 @@ def render_markdown(data):
             tool = tools[key]
             if tool.get("version_policy"):
                 lines += [f"- {tool['name']} version rule: {tool['version_policy']}"]
+            update = tool.get("native_update")
+            if update:
+                lines += [f"- {tool['name']} native update: `{update['command']}`, {update['execution_status']}. "
+                          f"{update['help_observation']} {update['order']} {update['on_refusal']} {update['after_update']} "
+                          "Sources: " + "; ".join(link(source) for source in update["sources"]) + "."]
+                lines += [f"- {tool['name']} receipt field {name}: {meaning}"
+                          for name, meaning in update["receipt_fields"].items()]
             lines += [f"- {tool['name']} gap: {gap}" for gap in tool["blocking_gaps"]]
             if tool["documented_install"]:
                 lines += [f"- {tool['name']} packet install reference (not a pinned recipe): {cell(tool['documented_install'])}"]

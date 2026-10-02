@@ -45,9 +45,17 @@ Per-tool order is the W-PROF stage/position; missing entries block installation.
 
 Source: [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md).
 
-1. Install the selected pinned profile with adoption/bootstrap-linux.sh --profile <id>.
-2. Complete native sign-ins on this host: codex login, then claude.
-3. Configure the same profile with --configure-full-profile --host <host>; collect its native receipts.
+1. Install the selected pinned profile with the first bootstrap command of F9.
+2. Complete the native sign-ins F9 names on this host; they are never copied from another machine.
+3. Configure the same profile with the second bootstrap command of F9; collect its native receipts.
+
+Commands, as the recipe page gives them:
+
+```sh
+cd ~/code/native-agent-stack
+adoption/bootstrap-linux.sh --profile '<id>'
+adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'
+```
 
 After stage 2:
 
@@ -62,15 +70,77 @@ one default per slot for the clean install of the new WSL distribution; a defini
 
 no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate
 
-Empty or missing slot states are displayed as pending. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.
+The manifest holds 84 slots in 37 layers. By state: definitive 31, resolved 19, split 7, measurement 2, open 25. By row kind: added 10, first_round 53, judged 11, no_blind_default_today 2, pinned 6, project_practice 2. 54 slots install something and 30 install nothing. Measurements not yet returned: 8; returned: 1.
+
+An empty source state is displayed as open. A row that installs nothing by the manifest's own rule (a default, and not installs_nothing_extra) is shown as not installed, with the manifest's reason; that includes every split row, every measurement row whose measurement has not returned and every row resolved as not installed. Slot decisions do not change the tool provisioning fields or the five acceptance gates below.
 
 Profile: [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json); native manifest registration: True.
 
-A second systemd distribution requires WSL 3.0.1 or later with per-distribution cgroup isolation enabled. On WSL 2.7.x, distributions share one cgroup tree and the new distribution's user manager fails when the existing distribution owns the shared user cgroup. microsoft/WSL pull requests 40519 and 41512 supply the per-distribution cgroup and namespace isolation.
+## Host prerequisites
+
+### WSL release for a second systemd distribution
+
+This launch adopts stable WSL 3.0.1 or later for a second systemd distribution.
+
+Pre-releases: The 2.9.8 and 2.9.13 pre-releases carried the fixes first and are not adopted. The 2.9.8 pre-release notes name PR 40519, which isolates distribution cgroups, and the 2.9.13 pre-release notes name PR 41512, which creates their namespaces. WSL 3.0.1 is the first stable release with both.
+
+Single-distribution install: An install with a single systemd distribution, with no second systemd distribution running, has its own, lower install-only minimum: WSL 2.4.10 or later, the conservative figure among Microsoft's 2.4.4, Ubuntu's announcement of 2.4.8 and Ubuntu's install guide of 2.4.10. The recipe keeps the workstation's distribution running, so it adopts 3.0.1.
+
+Observations, kept apart from the policy:
+
+- The 2026-10-02 rehearsal on WSL 2.7.13 stopped at F1 on shared cgroups: that release has a shared cgroup tree, equal user uids collide, and a system-unit stop or restart can act on another distribution's processes.
+- The host was updated to WSL 3.0.1.0 on 2026-10-02 and passed its check (rootless container, interop, user manager).
+- Run 2 on 3.0.1.0 observed distinct cgroup namespaces, local process ids and two active user managers while both distributions ran.
+
+Gate: W1 records the version, and W5 must repeat the isolation proof before F1 changes anything.
 
 The gate is executed in [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md).
 
-Sources: [https://github.com/microsoft/WSL/pull/40519](https://github.com/microsoft/WSL/pull/40519); [https://github.com/microsoft/WSL/pull/41512](https://github.com/microsoft/WSL/pull/41512); [https://github.com/microsoft/WSL/releases/tag/3.0.1](https://github.com/microsoft/WSL/releases/tag/3.0.1); [https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291).
+Sources: [https://github.com/microsoft/WSL/releases/tag/3.0.1](https://github.com/microsoft/WSL/releases/tag/3.0.1); [https://github.com/microsoft/WSL/releases/tag/2.9.13](https://github.com/microsoft/WSL/releases/tag/2.9.13); [https://github.com/microsoft/WSL/releases/tag/2.9.8](https://github.com/microsoft/WSL/releases/tag/2.9.8); [https://github.com/microsoft/WSL/pull/40519](https://github.com/microsoft/WSL/pull/40519); [https://github.com/microsoft/WSL/pull/41512](https://github.com/microsoft/WSL/pull/41512); [https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291); [https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro](https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro); [https://ubuntu.com/blog/ubuntu-wsl-new-format-available](https://ubuntu.com/blog/ubuntu-wsl-new-format-available); [https://documentation.ubuntu.com/wsl/stable/howto/install-ubuntu-wsl2/](https://documentation.ubuntu.com/wsl/stable/howto/install-ubuntu-wsl2/).
+
+### Paired proof for two systemd distributions
+
+The executable gate for two systemd distributions is the recipe's W5 paired record, not a version check. It takes five observations from both running distributions at once: the uid, the system state, the failed units, the user manager and the cgroup namespace. It passes by the rule the recipe page states in W5, together with the getty mask proof for the new distribution. A version check or one healthy user bus does not satisfy it.
+
+Receipt: The receipt records it in its paired_isolation object, one for the workstation and one for the new distribution, with the WSL version and kernel from W1 and the image revision from W2.
+
+Status for the real distribution: **UNRUN**.
+
+Rehearsal: The paired record was observed on one host in rehearsals on throwaway distributions, and run 3 of 2026-10-02 passed it. Record: [evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json](../evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json). A rehearsal is not acceptance of the real distribution.
+
+Gate: W5 of the recipe page, taken from both running distributions before F1.
+
+The gate is executed in [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md).
+
+### W5. First launch, without a terminal: the paired record, as the recipe page gives it
+
+The generator copies the next blocks from [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md); none of their text is typed here.
+
+> Then record the same five observations from both running distributions at once, because a reading of one side does not show the same uid, distinct namespaces and two healthy managers. Run this block natively in the workstation's shell, after the cgroup block above and before F1. Its first five lines repeat W1's baseline commands, and its next five run the same commands inside `<Name>`. Record each command's output and exit in its own receipt entry:
+
+```sh
+id -u
+systemctl is-system-running
+systemctl --failed --no-legend --plain
+systemctl is-active "user@$(id -u).service"
+readlink /proc/self/ns/cgroup
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup
+```
+
+> Proof: both distributions print the same uid; both user managers print `active`; the new distribution's system state is `running` with no failed unit, or `degraded` with `systemd-binfmt.service` as its only failed unit (its message is proved at F1); the two `cgroup:[...]` values differ from each other and neither is `cgroup:[4026531835]`; and all five workstation values equal its own values recorded in W1 before the import, so the new distribution did not disturb it. A `getty@tty1.service` in the new distribution's failed set, or one that newly appears in the workstation's, fails the proof: the mask did not take effect before the unit started. Record all of it, with the WSL version and kernel from W1 and the image revision from W2, in the receipt's `paired_isolation`: one object for the workstation and one for `<Name>`, each with `uid`, `system_state`, `failed_units`, `user_manager` and `cgroup_namespace`.
+
+The getty mask proof for the new distribution, from the same step:
+
+```powershell
+wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service
+wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts
+```
+
+> `systemctl is-enabled getty@tty1.service` prints `masked`; exit 1 is that command's normal exit for a masked unit. `systemctl show` prints `LoadState=masked`, `ActiveState=inactive` and `NRestarts=0`. The user-data's `bootcmd` masks the unit in cloud-init's network stage, before systemd starts it: the 26.04.1 image's `cloud-init-network.service` has `Before=systemd-user-sessions.service`, `getty@.service` has `After=systemd-user-sessions.service`, and `/etc/cloud/cloud.cfg` lists `bootcmd` in `cloud_init_modules`. These are source reviews of the pinned official image's own files, read for probe E1 on 2026-10-02, not a complete recipe run. In that probe the unit was masked and inactive with no restarts, cloud-init finished without errors, and the only failed unit was `systemd-binfmt.service`. The journal's `Failed to start getty@tty1.service.` line was the refused job of a masked unit, which did not appear in the failed-unit list.
 
 The code-RAG comparison (semantic-rag) runs before the local-model-server comparison (observation-inference); the server comparison then requires serving the code-RAG winner's embedding provider. The container-engine comparison (hosting-services) runs before isolation's container-boundary comparison.
 
@@ -112,14 +182,14 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Claude Code", "Codex"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| claude-code | pending | [Claude Code](https://github.com/anthropics/claude-code) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| codex | pending | [Codex](https://github.com/openai/codex) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| claude-code | definitive | coding agent on Claude models | [Claude Code](https://github.com/anthropics/claude-code) | installed | https://github.com/anthropics/claude-code | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / native-clients / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codex | definitive | coding agent on GPT models | [Codex](https://github.com/openai/codex) | installed | https://github.com/openai/codex | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / native-clients / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s latest", "execution_status": "UNRUN", "scope": "The documented latest channel installs the release current at install time. The artifact and checksum above identify the pin; the receipt records the installed release.", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
+| [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s 2.1.284", "execution_status": "UNRUN", "scope": "The documented specific-version form with the accepted pin as its operand: the floor that the selected bootstrap installs through the native binary's own `install <version>`. The bootstrap keeps a newer existing install instead of downgrading it. This is a reviewed example; the move to the current release is the native update below.", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
 | [Codex](https://github.com/openai/codex) (`npm:@openai/codex`) | native-clients / picked | 0.159.3 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3", "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79"} | {"command": "npm install -g @openai/codex@0.159.3", "execution_status": "UNRUN", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md"} | {"command": "codex exec \"summarize the repository structure and list the top 5 risky areas\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected Codex CLI and its native platform dependency installed.", "Existing authorized native sign-in and the intended repository context."], "scope": "Official noninteractive example. No model request, result-quality assessment, account activation or destination-host execution occurred.", "source": "https://developers.openai.com/codex/noninteractive"} | native-clients / 1 |
 
 - claude verdict: pending; pending.
@@ -135,8 +205,16 @@ Overturn condition: The picks are complementary first-party clients. No packet c
 
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
-- Claude Code version rule: The pin is the last qualified release and a floor; the install takes the release current at install time; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host.
+- Claude Code version rule: The pin is the last qualified release and a floor; the bootstrap installs the pin and keeps a newer existing install; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host.
+- Claude Code native update: `claude install latest`, UNRUN. `claude install --help` on client 2.1.287 prints: Install Claude Code native build. Use [target] to specify version (stable, latest, or specific version). It runs after the bootstrap has installed the pin or kept a newer existing install, and before this client's acceptance command. An updater that refuses is recorded with its error and the version actually on PATH. The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host. Sources: [https://code.claude.com/docs/en/cli-reference](https://code.claude.com/docs/en/cli-reference); [evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json](../evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json).
+- Claude Code receipt field floor: The pin of this entry, 2.1.284: the release the bootstrap installs when no newer one is present.
+- Claude Code receipt field version_after_native_update: The version that PATH resolves to after the native update, or after the updater's refusal.
+- Claude Code receipt field acceptance_result_on_that_version: The result of this entry's acceptance command on that version.
 - Claude Code packet install reference (not a pinned recipe): [{"command": "curl -fsSL https://claude.ai/install.sh \| bash", "source": "https://code.claude.com/docs/en/setup (setup.md lines 40-43, tab 'macOS, Linux, WSL'; read 2026-10-01)"}, {"command": "curl -fsSL https://claude.ai/install.sh \| bash", "source": "https://github.com/anthropics/claude-code/blob/main/README.md"}]
+- Codex native update: `codex update`, UNRUN. `codex update --help` on codex-cli 0.159.3 prints: Update Codex to the latest version. It runs after the bootstrap has installed the pin and before this client's acceptance command. An updater that refuses is recorded with its error and the version actually on PATH. The anti-pattern log of docs/harness-defaults.md records that `codex update` did not establish that a versioned launcher's target had changed, so the version that PATH resolves to is read after the update and never assumed from it. The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host. Sources: [docs/harness-defaults.md](../docs/harness-defaults.md).
+- Codex receipt field floor: The pin of this entry, 0.159.3: the release the bootstrap installs.
+- Codex receipt field version_after_native_update: The version that PATH resolves to after the native update, or after the updater's refusal.
+- Codex receipt field acceptance_result_on_that_version: The result of this entry's acceptance command on that version.
 - Codex packet install reference (not a pinned recipe): [{"command": "npm install -g @openai/codex", "source": "https://github.com/openai/codex/blob/main/README.md line 42 (macOS alternative: brew install --cask codex, line 47); read 2026-10-01"}, {"command": "curl -fsSL https://chatgpt.com/codex/install.sh \| sh", "source": "https://github.com/openai/codex/blob/main/README.md"}]
 
 ## instructions-skills: Instructions and skills
@@ -155,9 +233,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Trail of Bits security skills (trailofbits/skills)"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| trail-of-bits-security-skills-trailofbits-skills | pending | [Trail of Bits security skills (trailofbits/skills)](https://github.com/trailofbits/skills) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| trail-of-bits-security-skills-trailofbits-skills | definitive | security review skills in both clients | [Trail of Bits security skills (trailofbits/skills)](https://github.com/trailofbits/skills) | installed | https://github.com/trailofbits/skills | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / instructions-skills / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| engineering-process-skills | resolved | engineering-process skills in both clients, installed per skill | [mattpocock/skills (selected skills, not the bundle)](https://github.com/mattpocock/skills) | installed | https://github.com/mattpocock/skills | installed_on_critic | kept or added on a blind critic's verdict | claude: not judged in the first round; gpt: returned: 3 of 3 blind GPT samples | foundation / instructions-skills / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -201,13 +280,13 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: []; uses: ["the native subagents of Claude Code and Codex (native-clients)", "Worktrunk (git-github-automation)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pending slot publication | pending | pending | pending | pending | pending |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| agent-messaging | split | messages between running agent sessions of both clients | Not installed until the deciding measurement returns | not installed: native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install | none | split | split: decided by the named measurement, nothing installed until it returns | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / workers / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
-| [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s latest", "execution_status": "UNRUN", "scope": "The documented latest channel installs the release current at install time. The artifact and checksum above identify the pin; the receipt records the installed release.", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
+| [Claude Code](https://github.com/anthropics/claude-code) | native-clients / picked | 2.1.284 / {"algorithm": "sha256", "kind": "artifact", "source": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json", "value": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f"} | {"command": "curl -fsSL https://claude.ai/install.sh \| bash -s 2.1.284", "execution_status": "UNRUN", "scope": "The documented specific-version form with the accepted pin as its operand: the floor that the selected bootstrap installs through the native binary's own `install <version>`. The bootstrap keeps a newer existing install instead of downgrading it. This is a reviewed example; the move to the current release is the native update below.", "source": "https://code.claude.com/docs/en/setup#install-a-specific-version"} | {"command": "claude -p \"explain this function\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.", "Existing authorized native sign-in and actual function/project context sufficient to answer the example."], "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.", "source": "https://code.claude.com/docs/en/quickstart#essential-commands"} | native-clients / 2 |
 | [Codex](https://github.com/openai/codex) (`npm:@openai/codex`) | native-clients / picked | 0.159.3 / {"algorithm": "sha256", "kind": "artifact", "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.3", "value": "31d5e584e93e118dd37dbb8bc89ddbbe9998178fc437dc0b9d0f7cc72ef0cf79"} | {"command": "npm install -g @openai/codex@0.159.3", "execution_status": "UNRUN", "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install", "scope": "Upstream npm install form with the accepted package version supplied using npm documented version syntax. This is a reviewed example; the selected bootstrap keeps its existing isolated-prefix installation path.", "source": "https://github.com/openai/codex/blob/rust-v0.159.3/README.md"} | {"command": "codex exec \"summarize the repository structure and list the top 5 risky areas\"", "evidence_class": "documented_upstream_example_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected Codex CLI and its native platform dependency installed.", "Existing authorized native sign-in and the intended repository context."], "scope": "Official noninteractive example. No model request, result-quality assessment, account activation or destination-host execution occurred.", "source": "https://developers.openai.com/codex/noninteractive"} | native-clients / 1 |
 | [Worktrunk](https://github.com/max-sixty/worktrunk) | git-github-automation / picked | 0.80.0 / {"algorithm": "sha256", "kind": "artifact", "source": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0", "value": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199"} | {"command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh \| sh && wt config shell install", "execution_status": "UNRUN", "scope": "Exact versioned release-installer command including upstream wt config shell install. This writes shell integration when executed; no installer or shell mutation was run.", "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"} | {"command": "cargo test", "evidence_class": "upstream_test_command_not_executed", "execution_status": "UNRUN", "prerequisites": ["Selected upstream source checkout and Rust build/test dependencies."], "scope": "README default cargo test unit suite only; shell integration has a separate feature-enabled suite requiring bash, zsh, fish, nushell, pwsh and jq. No shell integration was qualified. The observed host release 0.79.0 is below the selected release 0.80.0; acceptance is owed on the new host.", "source": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md"} | native-extensions / 4 |
 
@@ -224,8 +303,16 @@ Overturn condition: The judge's four-arm run on the WSL2 host is the right test:
 
 Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json); no source-host acceptance inherited.
 
-- Claude Code version rule: The pin is the last qualified release and a floor; the install takes the release current at install time; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host.
+- Claude Code version rule: The pin is the last qualified release and a floor; the bootstrap installs the pin and keeps a newer existing install; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host.
+- Claude Code native update: `claude install latest`, UNRUN. `claude install --help` on client 2.1.287 prints: Install Claude Code native build. Use [target] to specify version (stable, latest, or specific version). It runs after the bootstrap has installed the pin or kept a newer existing install, and before this client's acceptance command. An updater that refuses is recorded with its error and the version actually on PATH. The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host. Sources: [https://code.claude.com/docs/en/cli-reference](https://code.claude.com/docs/en/cli-reference); [evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json](../evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json).
+- Claude Code receipt field floor: The pin of this entry, 2.1.284: the release the bootstrap installs when no newer one is present.
+- Claude Code receipt field version_after_native_update: The version that PATH resolves to after the native update, or after the updater's refusal.
+- Claude Code receipt field acceptance_result_on_that_version: The result of this entry's acceptance command on that version.
 - Claude Code packet install reference (not a pinned recipe): [{"command": "curl -fsSL https://claude.ai/install.sh \| bash", "source": "https://code.claude.com/docs/en/setup (setup.md lines 40-43, tab 'macOS, Linux, WSL'; read 2026-10-01)"}, {"command": "curl -fsSL https://claude.ai/install.sh \| bash", "source": "https://github.com/anthropics/claude-code/blob/main/README.md"}]
+- Codex native update: `codex update`, UNRUN. `codex update --help` on codex-cli 0.159.3 prints: Update Codex to the latest version. It runs after the bootstrap has installed the pin and before this client's acceptance command. An updater that refuses is recorded with its error and the version actually on PATH. The anti-pattern log of docs/harness-defaults.md records that `codex update` did not establish that a versioned launcher's target had changed, so the version that PATH resolves to is read after the update and never assumed from it. The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host. Sources: [docs/harness-defaults.md](../docs/harness-defaults.md).
+- Codex receipt field floor: The pin of this entry, 0.159.3: the release the bootstrap installs.
+- Codex receipt field version_after_native_update: The version that PATH resolves to after the native update, or after the updater's refusal.
+- Codex receipt field acceptance_result_on_that_version: The result of this entry's acceptance command on that version.
 - Codex packet install reference (not a pinned recipe): [{"command": "npm install -g @openai/codex", "source": "https://github.com/openai/codex/blob/main/README.md line 42 (macOS alternative: brew install --cask codex, line 47); read 2026-10-01"}, {"command": "curl -fsSL https://chatgpt.com/codex/install.sh \| sh", "source": "https://github.com/openai/codex/blob/main/README.md"}]
 - Worktrunk packet install reference (not a pinned recipe): [{"command": "brew install worktrunk && wt config shell install  (alternative without Homebrew: cargo install worktrunk && wt config shell install)", "source": "https://github.com/max-sixty/worktrunk/blob/main/README.md"}, {"command": "cargo install worktrunk && wt config shell install (or brew install worktrunk && wt config shell install). Release v0.80.0 also ships worktrunk-installer.sh and an x86_64-unknown-linux-musl tarball with sha256 files and a sigstore packslip. Then run wt config plugins claude install and wt config plugins codex install.", "source": "https://github.com/max-sixty/worktrunk README Install section; https://worktrunk.dev/claude-code/ ; https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"}]
 
@@ -245,10 +332,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["sandbox-runtime (srt)"]; uses: ["Worktrunk (git-github-automation)", "the container engine (hosting-services)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| sandbox-runtime-srt | pending | [sandbox-runtime (srt)](https://github.com/anthropics/sandbox-runtime) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| isolation-container-boundary | definitive | No additional component: rootless containers on the container engine that the hosting layer installs | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| sandbox-runtime-srt | definitive | process sandbox for agent commands | [sandbox-runtime (srt)](https://github.com/anthropics/sandbox-runtime) | installed | https://github.com/anthropics/sandbox-runtime | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / isolation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| isolation-container-boundary | definitive | second isolation boundary around agents | No additional component: rootless containers on the container engine that the hosting layer installs | not installed: decided by both families in the decision round: no second container boundary | none | kept | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / isolation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -319,10 +406,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Serena", "claude-plugins-official (code-intelligence LSP plugins)"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| serena | pending | [Serena](https://github.com/oraios/serena) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| claude-plugins-official-code-intelligence-lsp-pl | pending | [claude-plugins-official (code-intelligence LSP plugins)](https://github.com/anthropics/claude-plugins-official) | first-round pick: one blind judge, critic verdict revised; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| serena | definitive | symbol navigation and references for both clients | [Serena](https://github.com/oraios/serena) | installed | https://github.com/oraios/serena | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / code-navigation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| claude-plugins-official-code-intelligence-lsp-pl | resolved | symbol navigation through language servers, Claude Code only | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 2 blind GPT samples | foundation / code-navigation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| structural-search | resolved | syntax-pattern code search and rewrite | [ast-grep](https://github.com/ast-grep/ast-grep) | installed | https://github.com/ast-grep/ast-grep | installed_on_critic | kept or added on a blind critic's verdict | claude: not judged in the first round; gpt: returned: 2 of 2 blind GPT samples | foundation / code-navigation / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -372,10 +460,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["tobi/qmd", "MinerU"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| tobi-qmd | pending | [tobi/qmd](https://github.com/tobi/qmd) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| mineru | pending | [MinerU](https://github.com/opendatalab/mineru) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| tobi-qmd | definitive | search over Markdown documents | [tobi/qmd](https://github.com/tobi/qmd) | installed | https://github.com/tobi/qmd | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / document-retrieval / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| mineru | definitive | document parsing to text | [MinerU](https://github.com/opendatalab/mineru) | installed | https://github.com/opendatalab/mineru | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / document-retrieval / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -419,9 +507,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: []; uses: ["the local model server for embeddings (observation-inference)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| code-search | split | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | split between the model families; the measurement the critics named decides, before the clean install | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| code-search | split | semantic code search | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | not installed: waits for or was settled by a measurement: outside the combination rule | none | kept | split between the model families; the measurement the critics named decides, before the clean install | claude: converged; gpt: converged | foundation / semantic-rag / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| embedding-model | split | local embedding model | Not installed until the deciding measurement returns | not installed: one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates | none | split | split: decided by the named measurement, nothing installed until it returns | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / semantic-rag / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| reranker-model | resolved | reranker model for retrieval | Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | none | not_installed | not installed: resolved by the rule or a blind critic | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / semantic-rag / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -489,9 +579,9 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: []; uses: ["the local model server for Hindsight's local-model arm (observation-inference)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| memory-owner | measurement | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| memory-owner | measurement | long-term memory across sessions and clients | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | not installed: waits for or was settled by a measurement: outside the combination rule | none | kept | decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent | claude: converged; gpt: converged | foundation / durable-memory / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -544,10 +634,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["trafilatura", "Playwright CLI"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| trafilatura | pending | [trafilatura](https://github.com/adbar/trafilatura) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| playwright-cli | pending | [Playwright CLI](https://github.com/microsoft/playwright-cli) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| trafilatura | resolved | web page text extraction | Not installed: text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it | not installed: text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 2 blind GPT samples | foundation / web-research / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| playwright-cli | split | browser automation for agents | Not installed until the deciding measurement returns | not installed: both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2) | none | split | split: decided by the named measurement, nothing installed until it returns | claude: returned; gpt: returned: 1 of 2 blind GPT samples | foundation / web-research / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| web-search-provider | resolved | web search for the research harnesses | Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries | not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries | none | not_installed | not installed: resolved by the rule or a blind critic | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / web-research / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -586,10 +677,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["ccusage"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| ccusage | pending | [ccusage](https://github.com/ccusage/ccusage) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| context-supply | definitive | No context-supply layer: the usage meter only | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| ccusage | resolved | token and cost usage meter | Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it | not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 2 blind GPT samples | foundation / token-efficiency / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| context-supply | definitive | context-supply layer between tools and the model | No context-supply layer: the usage meter only | not installed: decided by both families in the decision round on a measured comparison: no context-supply layer | none | kept | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | claude: converged; gpt: converged | foundation / token-efficiency / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -650,11 +741,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Inspect AI", "Harbor (containerized agent E2E runner)", "Promptfoo"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| inspect-ai | pending | [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| harbor-containerized-agent-e2e-runner | pending | [Harbor (containerized agent E2E runner)](https://github.com/harbor-framework/harbor) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| promptfoo | pending | [Promptfoo](https://github.com/promptfoo/promptfoo) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| inspect-ai | definitive | model and task evaluation | [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai) | installed | https://github.com/UKGovernmentBEIS/inspect_ai | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / quality-evaluation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| harbor-containerized-agent-e2e-runner | definitive | agent evaluation in containers | [Harbor (containerized agent E2E runner)](https://github.com/harbor-framework/harbor) | installed | https://github.com/harbor-framework/harbor | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / quality-evaluation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| promptfoo | resolved | prompt and provider regression tests | Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it | not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 2 blind GPT samples | foundation / quality-evaluation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -701,14 +792,14 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["zizmor", "attest", "Syft", "Dependabot", "codeql-sarif", "actionlint (kjanat)"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| zizmor | pending | [zizmor](https://github.com/zizmorcore/zizmor) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| attest | pending | [attest](https://github.com/actions/attest) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| syft | pending | [Syft](https://github.com/anchore/syft) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| dependabot | pending | [Dependabot](https://github.com/dependabot/dependabot-core) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| codeql-sarif | pending | [codeql-sarif](https://github.com/github/codeql-action) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| actionlint-kjanat | pending | [actionlint (kjanat)](https://github.com/kjanat/actionlint) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| zizmor | definitive | workflow security audit | [zizmor](https://github.com/zizmorcore/zizmor) | installed | https://github.com/zizmorcore/zizmor | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| attest | definitive | build provenance attestation | [attest](https://github.com/actions/attest) | not installed: a GitHub-hosted feature configured in a workflow: nothing is installed on the host | https://github.com/actions/attest | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| syft | definitive | software bill of materials | [Syft](https://github.com/anchore/syft) | installed | https://github.com/anchore/syft | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| dependabot | resolved | dependency update pull requests | [Dependabot](https://github.com/dependabot/dependabot-core) | not installed: the only owner of dependency update pull requests: none of zizmor, actionlint, Syft or attest moves a pin; one blind GPT sample of three picked it; a GitHub-hosted service configured by .github/dependabot.yml: nothing is installed on the host | https://github.com/dependabot/dependabot-core | installed_on_critic | kept or added on a blind critic's verdict | claude: returned; gpt: returned: 1 of 3 blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codeql-sarif | resolved | upload of scan results to code scanning | Not installed: a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot | not installed: a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| actionlint-kjanat | definitive | workflow syntax and expression check | [actionlint (kjanat)](https://github.com/kjanat/actionlint) | installed | https://github.com/kjanat/actionlint | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / ci-supply-chain / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -788,9 +879,9 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Dagu"]; uses: ["systemd user units (cross:wsl-distro)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| dagu | pending | [Dagu](https://github.com/dagucloud/dagu) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dagu | definitive | scheduled workflows | [Dagu](https://github.com/dagucloud/dagu) | installed | https://github.com/dagucloud/dagu | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / scheduling-supervision / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -834,10 +925,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Docker Compose", "Docker Engine / Moby"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| docker-compose | pending | [Docker Compose](https://github.com/docker/compose) | first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| container-engine | definitive | [Docker Engine / Moby](https://github.com/moby/moby) | default on documented fit; nothing measured separates the finalists | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| docker-compose | definitive | multi-container service definitions | [Docker Compose](https://github.com/docker/compose) | installed | https://github.com/docker/compose | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / hosting-services / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| container-engine | definitive | container engine | [Docker Engine / Moby](https://github.com/moby/moby) | installed | https://github.com/moby/moby | kept | default on documented fit; nothing measured separates the finalists | claude: converged; gpt: converged | foundation / hosting-services / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| gpu-container-runtime | resolved | GPU access for containers | Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | none | not_installed | not installed: resolved by the rule or a blind critic | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / hosting-services / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -898,11 +990,11 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["mise", "Restic", "chezmoi"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| mise | pending | [mise](https://github.com/jdx/mise) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| restic | pending | [Restic](https://github.com/restic/restic) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| chezmoi | pending | [chezmoi](https://github.com/twpayne/chezmoi) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mise | definitive | tool version management | [mise](https://github.com/jdx/mise) | installed | https://github.com/jdx/mise | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / recovery-portability / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| restic | definitive | backup and restore | [Restic](https://github.com/restic/restic) | installed | https://github.com/restic/restic | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / recovery-portability / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| chezmoi | resolved | dotfile management | Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / recovery-portability / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -954,14 +1046,17 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["OTel Collector Contrib", "Prometheus", "Loki", "Grafana", "Phoenix"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| otel-collector-contrib | pending | [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| prometheus | pending | [Prometheus](https://github.com/prometheus/prometheus) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| loki | pending | [Loki](https://github.com/grafana/loki) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| grafana | pending | [Grafana](https://github.com/grafana/grafana) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| phoenix | pending | [Phoenix](https://github.com/Arize-ai/phoenix) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| local-model-server | split | Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama) | split between the model families; the measurement the critics named decides, before the clean install | claude: converged; gpt: converged | foundation / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| otel-collector-contrib | definitive | telemetry collection and routing | [OTel Collector Contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | installed | https://github.com/open-telemetry/opentelemetry-collector-contrib | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / observation-inference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| prometheus | resolved | metrics store | [Prometheus](https://github.com/prometheus/prometheus) | installed | https://github.com/prometheus/prometheus | installed_on_critic | kept or added on a blind critic's verdict | claude: returned; gpt: returned: 1 of 3 blind GPT samples | foundation / observation-inference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| loki | split | log store | Not installed until the deciding measurement returns | not installed: critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus | none | split | split: decided by the named measurement, nothing installed until it returns | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / observation-inference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| grafana | split | dashboards | Not installed until the deciding measurement returns | not installed: critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus | none | split | split: decided by the named measurement, nothing installed until it returns | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / observation-inference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| phoenix | resolved | agent and LLM trace store | Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it | not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / observation-inference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| local-model-server | measurement | local model serving | [Ollama](https://github.com/ollama/ollama) | installed | https://github.com/ollama/ollama | kept | settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance | claude: converged; gpt: converged | foundation / observation-inference / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| alerting | resolved | alert routing and delivery | [Alertmanager](https://github.com/prometheus/alertmanager) | installed | https://github.com/prometheus/alertmanager | installed_on_critic | kept or added on a blind critic's verdict | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / observation-inference / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| local-generation-model | split | local generation model | Not installed until the deciding measurement returns | not installed: the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured | none | split | split: decided by the named measurement, nothing installed until it returns | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / observation-inference / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| session-analytics | resolved | analytics over past agent sessions | Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set | not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set | none | not_installed | not installed: resolved by the rule or a blind critic | claude: not judged in the first round; gpt: returned: named by the critic or the added-slot round, not by the layer's blind samples | foundation / observation-inference / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1045,10 +1140,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Claude Agent SDK", "Codex SDK and codex exec/app-server"]; uses: ["Claude Code and Codex (native-clients)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| claude-agent-sdk | pending | [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| codex-sdk-and-codex-exec-app-server | pending | [Codex SDK and codex exec/app-server](https://github.com/openai/codex) | first-round pick: one blind judge, critic verdict upheld | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| claude-agent-sdk | definitive | agent SDK on the Claude route | [Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python) | installed | https://github.com/anthropics/claude-agent-sdk-python | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / agent-sdks / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| codex-sdk-and-codex-exec-app-server | definitive | agent SDK on the native GPT route | [Codex SDK and codex exec/app-server](https://github.com/openai/codex) | installed | https://github.com/openai/codex | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / agent-sdks / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1095,10 +1190,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["mcporter", "MCP Inspector"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| mcporter | pending | [mcporter](https://github.com/openclaw/mcporter) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| mcp-inspector | pending | [MCP Inspector](https://github.com/modelcontextprotocol/inspector) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mcporter | definitive | calling MCP servers from scripts and the shell | [mcporter](https://github.com/openclaw/mcporter) | installed | https://github.com/openclaw/mcporter | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / mcp-surfaces / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| mcp-inspector | definitive | interactive test of an MCP server, run on demand | [MCP Inspector](https://github.com/modelcontextprotocol/inspector) | installed | https://github.com/modelcontextprotocol/inspector | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / mcp-surfaces / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1137,10 +1232,10 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["betterleaks", "trufflehog"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| betterleaks | pending | [betterleaks](https://github.com/betterleaks/betterleaks) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| trufflehog | pending | [trufflehog](https://github.com/trufflesecurity/trufflehog) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| betterleaks | definitive | secret scanning before commit and in CI | [betterleaks](https://github.com/betterleaks/betterleaks) | installed | https://github.com/betterleaks/betterleaks | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / secrets-credentials / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| trufflehog | resolved | secret scanning with live verification | Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for | not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / secrets-credentials / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1185,14 +1280,14 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["git", "gh (GitHub CLI)", "worktrunk", "difftastic", "claude-code-action"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| git | pending | [git](https://github.com/git/git) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| gh-github-cli | pending | [gh (GitHub CLI)](https://github.com/cli/cli) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| worktrunk | pending | [worktrunk](https://github.com/max-sixty/worktrunk) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| difftastic | pending | [difftastic](https://github.com/Wilfred/difftastic) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| claude-code-action | pending | [claude-code-action](https://github.com/anthropics/claude-code-action) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| agent-structural-diff | pending | Not installed: git diff and difftastic cover diffs | no-install default: the first round kept sem only if a comparison shows a gain | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| git | definitive | version control | [git](https://github.com/git/git) | installed | https://github.com/git/git | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| gh-github-cli | definitive | GitHub from the command line | [gh (GitHub CLI)](https://github.com/cli/cli) | installed | https://github.com/cli/cli | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| worktrunk | definitive | worktrees for parallel agents | [worktrunk](https://github.com/max-sixty/worktrunk) | installed | https://github.com/max-sixty/worktrunk | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| difftastic | definitive | syntax-aware diff | [difftastic](https://github.com/Wilfred/difftastic) | installed | https://github.com/Wilfred/difftastic | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| claude-code-action | resolved | coding agent in CI | Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it | not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 3 blind GPT samples | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| agent-structural-diff | resolved | entity-level diff for agents | Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes) | not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes) | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: all three blind GPT samples picked a challenger for this job (ataraxy-labs/sem) | foundation / git-github-automation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1264,11 +1359,11 @@ Ownership source: pending.
 
 Default ownership: ["slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research", "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing", "slot exchange-calendars (judged): exchange session calendars and half days"]; uses: ["alpaca-py (execution-broker) where the Alpaca market-data API is used", "DuckDB with Parquet (storage-compute) for snapshots", "pandera (data-quality-orchestration) for validation"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| market-data-provider | pending | [Alpaca market data through alpaca-py (already installed for the selected broker path)](https://github.com/alpacahq/alpaca-py) |  | claude: converged; gpt: returned | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| sec-filings | pending | [EdgarTools](https://github.com/dgunning/edgartools) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| exchange-calendars | pending | [exchange_calendars](https://github.com/gerrymanoim/exchange_calendars) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| market-data-provider | open | market data | [Alpaca market data through alpaca-py (already installed for the selected broker path)](https://github.com/alpacahq/alpaca-py) | not installed: trading row: the blind GPT round covered the foundation layers only | https://github.com/alpacahq/alpaca-py | kept |  | claude: converged; gpt: returned | us-equities / market-data-reference / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| sec-filings | open | SEC filings | [EdgarTools](https://github.com/dgunning/edgartools) | installed | https://github.com/dgunning/edgartools | kept |  | claude: converged; gpt: pending | us-equities / market-data-reference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| exchange-calendars | open | exchange calendars | [exchange_calendars](https://github.com/gerrymanoim/exchange_calendars) | installed | https://github.com/gerrymanoim/exchange_calendars | kept |  | claude: converged; gpt: pending | us-equities / market-data-reference / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1306,10 +1401,10 @@ Ownership source: pending.
 
 Default ownership: ["slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)", "slot security-identity (no blind default today): permanent security identity across ticker changes"]; uses: ["EdgarTools (market-data-reference) for CIK-keyed filings", "DuckDB with Parquet (storage-compute)", "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| research-data-versioning | pending | [DVC](https://github.com/treeverse/dvc) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| security-identity | pending | pending | the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate | claude: not judged; gpt: not judged | us-equities / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| research-data-versioning | open | research data versioning | [DVC](https://github.com/treeverse/dvc) | installed | https://github.com/treeverse/dvc | kept |  | claude: converged; gpt: pending | us-equities / identity-provenance / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| security-identity | open | security identity over time | none | not installed: trading row: the blind GPT round covered the foundation layers only | none | kept | the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate | claude: not judged; gpt: not judged | us-equities / identity-provenance / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1347,10 +1442,10 @@ Ownership source: pending.
 
 Default ownership: ["slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"]; uses: ["Restic (foundation recovery-portability)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| analytical-storage/engine | pending | [DuckDB](https://github.com/duckdb/duckdb) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| analytical-storage/snapshot-table-layer | pending | No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| analytical-storage/engine | open | analytical storage engine | [DuckDB](https://github.com/duckdb/duckdb) | installed | https://github.com/duckdb/duckdb | kept |  | claude: converged; gpt: pending | us-equities / storage-compute / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| analytical-storage/snapshot-table-layer | open | snapshot table layer | No additional component: DuckDB tables, with dataset versions kept by the research-data versioning tool | not installed: trading row: the blind GPT round covered the foundation layers only | none | kept |  | claude: converged; gpt: pending | us-equities / storage-compute / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1388,9 +1483,9 @@ Ownership source: pending.
 
 Default ownership: ["slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"]; uses: ["Dagu (foundation scheduling-supervision)", "systemd user units (foundation cross:wsl-distro) for the paper units"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| market-data-validation | pending | [Pointblank](https://github.com/posit-dev/pointblank) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| market-data-validation | open | market data validation | [Pointblank](https://github.com/posit-dev/pointblank) | installed | https://github.com/posit-dev/pointblank | kept |  | claude: converged; gpt: pending | us-equities / data-quality-orchestration / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1428,10 +1523,10 @@ Ownership source: pending.
 
 Default ownership: ["slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging", "slot predictive-ml (no blind default today)"]; uses: ["EdgarTools (market-data-reference)", "skfolio (portfolio-risk) for chronological evaluation", "NautilusTrader (backtesting-engine) for replays", "MLflow (evaluation-experiments) for run tracking"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| factor-research | pending | [Qlib](https://github.com/microsoft/qlib) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| predictive-ml | pending | pending | no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist | claude: not judged; gpt: not judged | us-equities / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| factor-research | open | factor research | [Qlib](https://github.com/microsoft/qlib) | installed | https://github.com/microsoft/qlib | kept |  | claude: converged; gpt: pending | us-equities / research-factors-ml / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| predictive-ml | open | predictive machine learning | none | not installed: trading row: the blind GPT round covered the foundation layers only | none | kept | no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist | claude: not judged; gpt: not judged | us-equities / research-factors-ml / no_blind_default_today; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1469,10 +1564,10 @@ Ownership source: pending.
 
 Default ownership: ["pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine", "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pinned/nautilustrader-2-0-0rc5 | pending | NautilusTrader 2.0.0rc5 | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| backtest-oracle | pending | [LEAN](https://github.com/quantconnect/lean) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pinned/nautilustrader-2-0-0rc5 | open | backtesting and execution engine | NautilusTrader 2.0.0rc5 | installed | none | kept | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / backtesting-engine / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| backtest-oracle | open | independent backtest oracle | [LEAN](https://github.com/quantconnect/lean) | installed | https://github.com/quantconnect/lean | kept |  | claude: converged; gpt: pending | us-equities / backtesting-engine / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1510,11 +1605,11 @@ Ownership source: pending.
 
 Default ownership: ["pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)", "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc", "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"]; uses: ["NautilusTrader (backtesting-engine)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pinned/ibkr-path--nautilustrader-in-tree-ibkr-a | pending | IBKR path (NautilusTrader in-tree IBKR adapter) | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| pinned/alpaca-adapter-path--alpaca-py-0-44-0--- | pending | Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc) | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| ib-gateway-runtime | pending | [Dockerized IB Gateway](https://github.com/gnzsnz/ib-gateway-docker) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pinned/ibkr-path--nautilustrader-in-tree-ibkr-a | open | broker path, IBKR | IBKR path (NautilusTrader in-tree IBKR adapter) | installed | none | kept | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / execution-broker / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| pinned/alpaca-adapter-path--alpaca-py-0-44-0--- | open | broker path, Alpaca | Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc) | installed | none | kept | a requirement the user selected; carried with its committed receipts, never judged | claude: not judged; gpt: not judged | us-equities / execution-broker / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| ib-gateway-runtime | open | IB Gateway runtime | [Dockerized IB Gateway](https://github.com/gnzsnz/ib-gateway-docker) | installed | https://github.com/gnzsnz/ib-gateway-docker | kept |  | claude: converged; gpt: pending | us-equities / execution-broker / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1552,10 +1647,10 @@ Ownership source: pending.
 
 Default ownership: ["slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)", "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"]; uses: ["NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| portfolio-construction | pending | [skfolio](https://github.com/skfolio/skfolio) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| performance-analytics | pending | [fincore](https://github.com/cloudQuant/fincore) |  | claude: converged; gpt: pending | us-equities / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| portfolio-construction | open | portfolio construction | [skfolio](https://github.com/skfolio/skfolio) | installed | https://github.com/skfolio/skfolio | kept |  | claude: converged; gpt: pending | us-equities / portfolio-risk / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| performance-analytics | open | performance analytics | [fincore](https://github.com/cloudQuant/fincore) | installed | https://github.com/cloudQuant/fincore | kept |  | claude: converged; gpt: pending | us-equities / portfolio-risk / judged; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1593,11 +1688,11 @@ Ownership source: pending.
 
 Default ownership: ["slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)", "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"]; uses: ["Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations", "agent-retrieval-bench (foundation quality-evaluation candidate task set)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| experiment-tracking | pending | [MLflow](https://github.com/mlflow/mlflow) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| strategy-qualification-statistics/arch | pending | [arch](https://github.com/bashtage/arch) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| strategy-qualification-statistics/purgedcv---purged-cross-validati | pending | [purgedcv / purged-cross-validation](https://github.com/eslazarev/purged-cross-validation) |  | claude: converged; gpt: pending | us-equities / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| experiment-tracking | open | experiment tracking | [MLflow](https://github.com/mlflow/mlflow) | installed | https://github.com/mlflow/mlflow | kept |  | claude: converged; gpt: pending | us-equities / evaluation-experiments / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| strategy-qualification-statistics/arch | open | strategy qualification statistics | [arch](https://github.com/bashtage/arch) | installed | https://github.com/bashtage/arch | kept |  | claude: converged; gpt: pending | us-equities / evaluation-experiments / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| strategy-qualification-statistics/purgedcv---purged-cross-validati | open | purged cross-validation | [purgedcv / purged-cross-validation](https://github.com/eslazarev/purged-cross-validation) | installed | https://github.com/eslazarev/purged-cross-validation | kept |  | claude: converged; gpt: pending | us-equities / evaluation-experiments / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1635,9 +1730,9 @@ Ownership source: pending.
 
 Default ownership: []; uses: ["Claude Code and Codex (foundation native-clients)", "Claude Agent SDK and Codex SDK (foundation agent-sdks)", "the durable-memory owner (foundation durable-memory)", "QMD and MinerU (foundation document-retrieval) for dated financial sources", "the semantic-rag owner (foundation semantic-rag)", "native subagents (foundation workers)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pending slot publication | pending | pending | pending | pending | pending |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1675,9 +1770,9 @@ Ownership source: pending.
 
 Default ownership: ["configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"]; uses: ["OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)", "Dagu (foundation scheduling-supervision)", "Restic (foundation recovery-portability)", "the container engine (foundation hosting-services)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pending slot publication | pending | pending | pending | pending | pending |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1715,9 +1810,9 @@ Ownership source: pending.
 
 Default ownership: ["engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"]; uses: ["betterleaks and trufflehog (foundation secrets-credentials)", "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| pending slot publication | pending | pending | pending | pending | pending |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| pending slot publication | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1755,9 +1850,9 @@ Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/o
 
 Default ownership: ["Ubuntu 26.04.1 LTS (Canonical WSL image), primary"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| base-distribution | pending | [Ubuntu 26.04.1 LTS (Canonical WSL image), primary](https://ubuntu.com/download/server) | first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call | claude: returned; gpt: pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress | foundation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| base-distribution | definitive | base operating system image | [Ubuntu 26.04.1 LTS (Canonical WSL image), primary](https://releases.ubuntu.com/26.04.1/) | installed | https://releases.ubuntu.com/26.04.1/ | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: at least two of three blind GPT samples | foundation / cross:wsl-distro / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1829,10 +1924,10 @@ Ownership source: pending.
 
 Default ownership: ["OpenHands software-agent-sdk", "GPT Researcher", "DeerFlow"]; uses: ["OmniRoute (cross:gpt6-harnesses)", "the container engine (hosting-services)", "Harbor and Inspect AI (quality-evaluation) for graded tasks"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| agent-runtime-worker | pending | [OpenHands software-agent-sdk](https://github.com/OpenHands/software-agent-sdk) | named by the user's directive of 2026-10-01; the source host's selection of record | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
-| research-harnesses | pending | [GPT Researcher and DeerFlow, kept as two independent evidence gatherers](https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow) | both named by the user's directive of 2026-10-01 for the evaluation work | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| agent-runtime-worker | open | GPT task worker for coding tasks | [OpenHands software-agent-sdk](https://github.com/OpenHands/software-agent-sdk) | installed | https://github.com/OpenHands/software-agent-sdk | kept | named by the user's directive of 2026-10-01; the source host's selection of record | claude: not judged; gpt: not judged | foundation / cross:runtime-workers / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| research-harnesses | open | GPT deep research with two independent gatherers | [GPT Researcher and DeerFlow, kept as two independent evidence gatherers](https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow) | installed | https://github.com/assafelovic/gpt-researcher ; https://github.com/bytedance/deer-flow | kept | both named by the user's directive of 2026-10-01 for the evaluation work | claude: not judged; gpt: not judged | foundation / cross:runtime-workers / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1871,9 +1966,9 @@ Ownership source: pending.
 
 Default ownership: ["OmniRoute (the GPT gateway)"]; uses: ["Codex (native-clients)", "Codex SDK (agent-sdks)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| gpt-gateway | pending | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway | claude: not judged; gpt: not judged | foundation / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gpt-gateway | open | GPT account pool gateway | [OmniRoute](https://github.com/diegosouzapw/OmniRoute) | installed | https://github.com/diegosouzapw/OmniRoute | kept | pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway | claude: not judged; gpt: not judged | foundation / cross:gpt6-harnesses / pinned; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1912,9 +2007,9 @@ Ownership source: pending.
 
 Default ownership: ["the command and secret-path guard (this repository)"]; uses: ["betterleaks and trufflehog (secrets-credentials)"].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| credential-guard | pending | [Command and secret-path guard (K4)](https://github.com/seathatflowsinourveins/native-agent-stack) | the project's own practice, not a third-party repository; settled by its closure record, not by a blind round | claude: not judged; gpt: not judged | foundation / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| credential-guard | open | command and secret-path guard | [Command and secret-path guard (K4)](https://github.com/seathatflowsinourveins/native-agent-stack) | installed | https://github.com/seathatflowsinourveins/native-agent-stack | kept | the project's own practice, not a third-party repository; settled by its closure record, not by a blind round | claude: not judged; gpt: not judged | foundation / cross:credential-practice / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1953,9 +2048,9 @@ Ownership source: pending.
 
 Default ownership: ["the convergence practice and its validators (this repository)"]; uses: [].
 
-| Slot | Default state | Recommendation / candidates | Source basis | Family source status | Provenance |
-| --- | --- | --- | --- | --- | --- |
-| convergence-validators | pending | [Convergence practice and its validators](https://github.com/seathatflowsinourveins/native-agent-stack) | the project's own practice, not a third-party repository; settled by its closure record | claude: not judged; gpt: not judged | foundation / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+| Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| convergence-validators | open | convergence records and their validators | [Convergence practice and its validators](https://github.com/seathatflowsinourveins/native-agent-stack) | installed | https://github.com/seathatflowsinourveins/native-agent-stack | kept | the project's own practice, not a third-party repository; settled by its closure record | claude: not judged; gpt: not judged | foundation / cross:convergence-practice / project_practice; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -1983,8 +2078,8 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | Repository source | SHA-256 |
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
-| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `88c34af08f5248997aa8ad6e3d6221ee69d2047a53b81f7c913b234dfd31cca5` |
-| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `144d01671fcd63263f81e4e18415f3e75daa50dd6d356651588ab2281f4b8250` |
+| [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0` |
+| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
@@ -2012,6 +2107,10 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/workers.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/workers.json) | `4f6e5929cd70f1fd624c85d616abeed9a8c0ae608c67a743e302a6205c053838` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/preregistration.json) | `eec6b4c65649062443cfe421ae30301e43f8019172e5708e2dfd4db6e201652f` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json) | `2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb` |
-| [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) | `16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f` |
+| [evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json) | `2c1df503112cb02816e80231728a3d54d57165190dc863e15e0d15c2118f9c45` |
+| [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) | `894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json) | `d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2` |
+| [evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json) | `2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24` |
 | [evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json) | `dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081` |
+| [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md) | `3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6` |
+| [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json) | `8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25` |

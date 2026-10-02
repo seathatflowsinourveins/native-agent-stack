@@ -6,6 +6,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -18,6 +19,49 @@ from scripts import build_new_wsl_handbook as handbook
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULTS_SOURCE = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+REHEARSAL_RECORD = "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json"
+RELEASE_SENTENCE = "adopts stable WSL 3.0.1 or later for a second systemd distribution"
+RECEIPT_FIELDS = {"floor", "version_after_native_update", "acceptance_result_on_that_version"}
+CLIENT_UPDATES = {"Claude Code": "claude install latest", "Codex": "codex update"}
+
+
+def source_name(source):
+    """The repository path of one provenance entry of the definitive manifest.
+
+    `file` is relative to the manifest's folder and `path` to the repository root, as assemble_manifest.py writes them.
+    """
+    if "file" in source:
+        return (Path(DEFAULTS_SOURCE).parent / source["file"]).as_posix()
+    return source["path"]
+
+
+def page_commands():
+    """Every command line in a fenced block of the recipe page."""
+    page = (ROOT / handbook.DISTRO).read_text(encoding="utf-8")
+    blocks = re.findall(r"^```[a-z]*\n(.*?)^```$", page, re.MULTILINE | re.DOTALL)
+    return {line.strip() for block in blocks for line in block.splitlines() if len(line.strip()) >= 15}
+
+
+def table_cells(line):
+    """The cells of one Markdown table row; `\\|` is a pipe inside a cell."""
+    return [cell.strip().replace("\\|", "|") for cell in re.split(r"(?<!\\)\|", line.strip())[1:-1]]
+
+
+def page_block_after(page, marker):
+    """The lines of the first fenced block after the marker, found without the generator's own parser."""
+    match = re.search(r"```[a-z]*\n(.*?)```", page[page.index(marker):], re.DOTALL)
+    return match.group(1).splitlines()
+
+
+def all_strings(value):
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for child in value.values():
+            yield from all_strings(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from all_strings(child)
 
 
 class NewWslHandbookTests(unittest.TestCase):
@@ -32,7 +76,7 @@ class NewWslHandbookTests(unittest.TestCase):
         shutil.copytree(ROOT / handbook.PACKETS, self.root / handbook.PACKETS)
         manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
         for source in manifest["sources"].values():
-            name = (Path(DEFAULTS_SOURCE).parent / source["file"]).as_posix()
+            name = source_name(source)
             destination = self.root / name
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, destination)
@@ -252,37 +296,61 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertTrue(any("package identity" in gap for gap in unknown["blocking_gaps"]))
         self.assertNotEqual(unknown["status"], "final")
 
+    def fixture_slot(self, layer, state):
+        """One synthetic row in the producer's shape: a split or an unreturned measurement installs nothing."""
+        waiting = state in ("split", "measurement")
+        return {"catalog": "foundation", "layer_id": layer, "slot_id": layer + "-fixture",
+                "row_kind": "judged",
+                "default": "Not installed until the fixture measurement returns" if waiting
+                else "Fixture candidate / alternative",
+                "repository": "", "installs_nothing_extra": waiting,
+                "definitive": state == "definitive", "state": state,
+                "measurement": {"returned": False, "receipts": []} if waiting else None,
+                "label": "Synthetic source-fit decision; no execution.",
+                "coincides_with_lane_record": None, "claude": "converged", "gpt": "converged",
+                "job": layer + " fixture job",
+                "resolution": {"outcome": {"definitive": "final", "split": "split"}.get(state, "kept"),
+                               "reason": "Synthetic fixture reason for " + layer + "."}}
+
+    def fixture_counts(self, manifest):
+        """The counts the producer writes, computed again from the fixture's own rows."""
+        kinds, states = {}, {}
+        for row in manifest["slots"]:
+            kinds[row["row_kind"]] = kinds.get(row["row_kind"], 0) + 1
+            states[row["state"] or "open"] = states.get(row["state"] or "open", 0) + 1
+        return {"layers": len(manifest["layers"]), "slots": len(manifest["slots"]),
+                "definitive": sum(row["definitive"] for row in manifest["slots"]),
+                "by_row_kind": kinds, "by_state": states,
+                "installed": sum(bool(row["default"]) and not row["installs_nothing_extra"]
+                                 for row in manifest["slots"])}
+
     def defaults_fixture(self):
         """Synthetic records in the reviewed owner's assemble_manifest.py format."""
         layers = [{"layer_id": row["layer_id"],
                    "catalog": "foundation" if row["catalog"] == "cross" else row["catalog"],
                    "owns": [row["layer_id"] + " fixture ownership"], "uses": []}
                   for row in self.read(handbook.EDITION)["rows"]]
-        slots = []
-        for layer, state in [("native-clients", "definitive"), ("semantic-rag", "split"),
-                             ("durable-memory", "measurement"), ("document-retrieval", "")]:
-            slots.append({"catalog": "foundation", "layer_id": layer, "slot_id": layer + "-fixture",
-                          "row_kind": "judged", "default": "Fixture candidate / alternative",
-                          "repository": "", "installs_nothing_extra": False,
-                          "definitive": state == "definitive", "state": state,
-                          "label": "Synthetic source-fit decision; no execution.",
-                          "claude": "converged", "gpt": "converged"})
+        slots = [self.fixture_slot(layer, state) for layer, state in
+                 [("native-clients", "definitive"), ("semantic-rag", "split"),
+                  ("durable-memory", "measurement"), ("document-retrieval", "")]]
+        sources = {}
         for catalog in ("foundation", "us-equities"):
-            self.write((Path(DEFAULTS_SOURCE).parent / (catalog + ".json")).as_posix(), {
+            name = (Path(DEFAULTS_SOURCE).parent / (catalog + ".json")).as_posix()
+            self.write(name, {
                 "layers": [{"layer_id": layer["layer_id"], "slots": [
                     {"slot_id": slot["slot_id"], "default": {"name": "Fixture candidate"}}
                     for slot in slots if slot["layer_id"] == layer["layer_id"]]}
                     for layer in layers if layer["catalog"] == catalog],
                 "cross_rows": [], "pinned_requirements": []})
-        return {"schema_version": 1, "kind": "new-wsl-definitive-manifest",
-                "date_utc": "2026-10-01", "meaning": "Fixture slot decisions only.",
-                "decision_rule": "Fixture source text; this adapter makes no decisions.",
-                "no_install_rule": "Fixture source text.", "not_claimed": "No host or provider acceptance.",
-                "sources": {catalog: {"file": catalog + ".json", "sha256": "a" * 64}
-                            for catalog in ("foundation", "us-equities")},
-                "counts": {"layers": len(layers), "slots": len(slots), "definitive": 1,
-                           "by_row_kind": {"judged": len(slots)}},
-                "pinned_requirements": {}, "no_blind_default_today": {}, "layers": layers, "slots": slots}
+            sources[catalog] = {"file": catalog + ".json", "sha256": handbook.digest((self.root / name).read_bytes())}
+        manifest = {"schema_version": 1, "kind": "new-wsl-definitive-manifest",
+                    "date_utc": "2026-10-01", "meaning": "Fixture slot decisions only.",
+                    "decision_rule": "Fixture source text; this adapter makes no decisions.",
+                    "no_install_rule": "Fixture source text.", "not_claimed": "No host or provider acceptance.",
+                    "sources": sources, "pinned_requirements": {}, "no_blind_default_today": {},
+                    "layers": layers, "slots": slots}
+        manifest["counts"] = self.fixture_counts(manifest)
+        return manifest
 
     def test_defaults_manifest_actual_source_projection(self):
         source = Path(os.environ.get("NEW_WSL_DEFAULTS_FIXTURE", str(ROOT / DEFAULTS_SOURCE)))
@@ -310,12 +378,14 @@ class NewWslHandbookTests(unittest.TestCase):
             self.assertEqual(layer["default_ownership"], next(row for row in manifest["layers"]
                                                              if row["layer_id"] == layer["layer_id"]))
             for slot in layer["default_slots"]:
-                self.assertEqual(slot["state"], slot["record"].get("state") or "pending")
+                self.assertEqual(slot["state"], slot["record"].get("state") or "open")
                 projected.append(slot)
-        self.assertEqual(len(projected), 74)
-        self.assertEqual({state: sum(slot["state"] == state for slot in projected)
-                          for state in ("definitive", "split", "measurement", "pending")},
-                         {"definitive": 3, "split": 2, "measurement": 1, "pending": 68})
+        # Every expectation comes from the manifest itself, never from a typed number.
+        self.assertEqual(len(projected), len(manifest["slots"]))
+        shown = {state: sum(slot["state"] == state for slot in projected)
+                 for state in ("definitive", "resolved", "split", "measurement", "open")}
+        self.assertEqual({state: count for state, count in shown.items() if count}, manifest["counts"]["by_state"])
+        self.assertEqual(data["default_decisions"]["inventory"]["by_state"], manifest["counts"]["by_state"])
         self.assertEqual(data["tools"], before["tools"])
         self.assertEqual([row["status"] for row in data["layers"]],
                          [row["status"] for row in before["layers"]])
@@ -387,7 +457,7 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertFalse(data["new_host_acceptance_claimed"])
         self.assertTrue(all(row["status"] != "final" for row in data["layers"]))
         slots = [slot for row in data["layers"] for slot in row["default_slots"]]
-        self.assertEqual([slot["state"] for slot in slots], ["definitive", "pending", "split", "measurement"])
+        self.assertEqual([slot["state"] for slot in slots], ["definitive", "open", "split", "measurement"])
 
     def test_negative_control_unknown_slot_identifier_is_rejected(self):
         manifest = self.defaults_fixture()
@@ -404,8 +474,7 @@ class NewWslHandbookTests(unittest.TestCase):
     def test_missing_inventory_slot_is_rejected_even_with_consistent_counts(self):
         manifest = self.defaults_fixture()
         omitted = manifest["slots"].pop()
-        manifest["counts"]["slots"] -= 1
-        manifest["counts"]["by_row_kind"]["judged"] -= 1
+        manifest["counts"] = self.fixture_counts(manifest)
         self.write(DEFAULTS_SOURCE, manifest)
         result = self.public_cli()
         self.assertEqual(result.returncode, 1, result.stdout)
@@ -883,6 +952,296 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(checked.returncode, 1)
         self.assertIn("stale generated output: docs/new-wsl-handbook.md", checked.stderr)
         self.assertEqual(previous, {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS})
+
+    # Repair for the merged definitive manifest and the platform review of 2026-10-02.
+
+    def committed(self, name):
+        return (ROOT / name).read_text(encoding="utf-8")
+
+    def real_tree(self):
+        """The real manifest and profile beside the copied sources, so that the real generator runs on real inputs."""
+        for name in (DEFAULTS_SOURCE, handbook.PROFILE):
+            destination = self.root / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, destination)
+
+    def generated(self):
+        self.real_tree()
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return self.read(handbook.OUTPUTS[1]), (self.root / handbook.OUTPUTS[0]).read_text(encoding="utf-8")
+
+    def slot_lines(self, markdown):
+        """Each slot table row of the handbook by slot id: a slot row has ten cells and a tool row has six.
+
+        The header, the separator and the placeholder of a layer with no slot in the manifest are not slots.
+        """
+        rows = {}
+        for line in markdown.splitlines():
+            cells = table_cells(line) if line.startswith("| ") else []
+            if len(cells) == 10 and cells[0] not in ("Slot", "---", "pending slot publication"):
+                self.assertNotIn(cells[0], rows, "slot shown twice")
+                rows[cells[0]] = cells
+        return rows
+
+    def test_inventory_holds_all_84_manifest_rows_and_the_ten_added_ones(self):
+        data, markdown = self.generated()
+        manifest = self.read(DEFAULTS_SOURCE)
+        self.assertEqual(len(manifest["slots"]), 84)
+        self.assertEqual(sum(row["row_kind"] == "added" for row in manifest["slots"]), 10)
+        rows = {slot["record"]["slot_id"]: (layer["layer_id"], slot)
+                for layer in data["layers"] for slot in layer.get("default_slots", [])}
+        self.assertEqual(len(rows), 84)
+        lines = self.slot_lines(markdown)
+        self.assertEqual(set(lines), set(rows))
+        for row in manifest["slots"]:
+            layer_id, slot = rows[row["slot_id"]]
+            cells = lines[row["slot_id"]]
+            with self.subTest(slot=row["slot_id"]):
+                state = row["state"] or "open"
+                self.assertEqual(layer_id, row["layer_id"])
+                self.assertEqual(slot["record"], row)
+                self.assertEqual([slot["state"], cells[1]], [state, state])
+                self.assertEqual(cells[2], row["job"])
+                self.assertIn(row["default"] or "none", cells[3])
+                self.assertEqual(cells[5], row["repository"] or "none")
+                self.assertEqual(cells[6], row["resolution"]["outcome"])
+                self.assertIn(f"{row['catalog']} / {row['layer_id']} / {row['row_kind']}", cells[9])
+        self.assertEqual(sum(slot["record"]["row_kind"] == "added" for _, slot in rows.values()), 10)
+        # Counts come from the rows and agree with the manifest's own.
+        inventory = data["default_decisions"]["inventory"]
+        self.assertEqual({key: inventory[key] for key in manifest["counts"]}, manifest["counts"])
+        self.assertEqual(inventory["installed"] + inventory["not_installed"], 84)
+        self.assertIn("The manifest holds 84 slots in 37 layers.", markdown)
+        self.assertIn("added 10", markdown)
+
+    def test_a_split_row_is_shown_as_not_installed_with_the_manifests_reason(self):
+        """A measurement row whose measurement returned installs its settled default, as the manifest counts it."""
+        data, markdown = self.generated()
+        lines = self.slot_lines(markdown)
+        rows = [slot for layer in data["layers"] for slot in layer["default_slots"]]
+
+        def waits(record):
+            return (record["state"] == "split" or record["resolution"]["outcome"] == "not_installed"
+                    or (record["measurement"] is not None and not record["measurement"]["returned"]))
+        waiting = [slot for slot in rows if waits(slot["record"])]
+        self.assertTrue(any(slot["state"] == "split" for slot in waiting))
+        for slot in waiting:
+            record = slot["record"]
+            with self.subTest(slot=record["slot_id"]):
+                reason = record["resolution"]["reason"]
+                self.assertFalse(slot["installed"])
+                self.assertEqual(slot["not_installed_reason"], reason)
+                self.assertEqual(lines[record["slot_id"]][4], "not installed: " + reason)
+        messaging = next(slot for slot in rows if slot["record"]["slot_id"] == "agent-messaging")
+        self.assertEqual(messaging["state"], "split")
+        self.assertTrue(lines["agent-messaging"][4].startswith("not installed: native facilities do not cover"))
+        returned = [slot for slot in rows
+                    if slot["record"]["measurement"] and slot["record"]["measurement"]["returned"]]
+        self.assertTrue(returned)
+        for slot in returned:
+            record = slot["record"]
+            installs = bool(record["default"]) and not record["installs_nothing_extra"]
+            self.assertEqual(slot["installed"], installs)
+            self.assertEqual(lines[record["slot_id"]][4],
+                             "installed" if installs else "not installed: " + record["resolution"]["reason"])
+
+    def test_negative_control_a_split_row_that_installs_something_is_rejected(self):
+        self.real_tree()
+        manifest = self.read(DEFAULTS_SOURCE)
+        row = next(row for row in manifest["slots"] if row["state"] == "split")
+        row.update(installs_nothing_extra=False, default="A tool", repository="https://example.org/tool")
+        self.write(DEFAULTS_SOURCE, manifest)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("installs something while it waits", result.stderr)
+        self.assertIn(row["slot_id"], result.stderr)
+
+    def test_a_manifest_source_that_differs_from_its_declared_hash_is_rejected(self):
+        for name, source in json.loads((ROOT / DEFAULTS_SOURCE).read_text())["sources"].items():
+            with self.subTest(source=name):
+                self.real_tree()
+                path = self.root / source_name(source)
+                original = path.read_bytes()
+                path.write_bytes(original + b"\n")
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(f"source {name} differs from its declared SHA-256", result.stderr)
+                path.write_bytes(original)
+
+    def test_the_generator_refuses_a_recipe_page_without_the_paired_record(self):
+        self.real_tree()
+        page = self.root / handbook.DISTRO
+        text = page.read_text(encoding="utf-8")
+        marker = "Then record the same five observations"
+        self.assertEqual(text.count(marker), 1)
+        page.write_text(text.replace(marker, "Then record the observations"), encoding="utf-8")
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("W5 has no paired record", result.stderr)
+
+    def test_no_recipe_command_is_typed_into_the_generator_or_the_profile(self):
+        commands = page_commands()
+        self.assertIn("readlink /proc/self/ns/cgroup", commands)
+        generator = self.committed("scripts/build_new_wsl_handbook.py")
+        profile = "\n".join(all_strings(json.loads(self.committed(handbook.PROFILE))))
+        profile += "\n" + self.committed("adoption/new-wsl-profile.md")
+        for command in sorted(commands):
+            with self.subTest(command=command):
+                self.assertNotIn(command, generator)
+                self.assertNotIn(command, profile)
+        # Stage 2 once carried its commands as typed text; they are F9's block now, and the steps only point at F9.
+        for typed in ("bootstrap-linux.sh", "codex login", "--configure-full-profile"):
+            self.assertNotIn(typed, generator)
+        self.assertEqual(handbook.build_data(self.root)["stage_order"][1]["commands"],
+                         page_block_after(self.committed(handbook.DISTRO), "### F9."))
+
+    def assert_release_is_a_target(self, label, text):
+        """The release is a selected target for a second systemd distribution, never a universal minimum."""
+        flat = " ".join(text.split())
+        self.assertIn(RELEASE_SENTENCE, flat, label)
+        for sentence in re.split(r"(?<=[.!?])\s+", flat):
+            if "3.0.1" in sentence and "second systemd distribution" in sentence:
+                self.assertNotRegex(sentence, r"(?i)\b(?:minimum|universal|requires?|required)\b",
+                                    label + ": " + sentence)
+
+    def test_wsl_release_is_the_adopted_target_and_no_sentence_calls_it_a_universal_minimum(self):
+        profile = json.loads(self.committed(handbook.PROFILE))
+        data = json.loads(self.committed(handbook.OUTPUTS[1]))
+        texts = {"profile JSON": " ".join(all_strings(profile["host_prerequisites"])),
+                 "profile page": self.committed("adoption/new-wsl-profile.md"),
+                 "handbook JSON": " ".join(all_strings(data["profile"]["host_prerequisites"])),
+                 "handbook": self.committed(handbook.OUTPUTS[0])}
+        for label, text in texts.items():
+            with self.subTest(text=label):
+                self.assert_release_is_a_target(label, text)
+        item = next(item for item in profile["host_prerequisites"] if item["id"] == "wsl-release-target")
+        self.assertIn("not adopted", item["not_adopted"])
+        for version in ("2.9.8", "2.9.13", "40519", "41512"):
+            self.assertIn(version, item["not_adopted"])
+        self.assertIn("lower install-only minimum", item["single_distribution"])
+        self.assertIn("2.4.10", item["single_distribution"])
+        # The observations are stated, and apart from the policy.
+        policy = " ".join([item["requirement"], item["not_adopted"], item["single_distribution"]])
+        observations = " ".join(item["observations"])
+        self.assertNotIn("2.7.13", policy)
+        for fragment in ("2.7.13", "shared cgroups", "3.0.1.0", "2026-10-02"):
+            self.assertIn(fragment, observations)
+        # Nothing here restates a version that the recipe page's host-wide rules do not have.
+        page = self.committed(handbook.DISTRO)
+        rules = page[page.index("## Host-wide rules"):page.index("## Rehearsal first")]
+        for version in set(re.findall(r"\b\d+\.\d+\.\d+(?:\.\d+)?\b", policy + " " + observations)):
+            self.assertIn(version, rules, version)
+
+    def test_paired_proof_is_named_with_its_real_status_and_the_rehearsal_record(self):
+        profile = json.loads(self.committed(handbook.PROFILE))
+        data = json.loads(self.committed(handbook.OUTPUTS[1]))
+        markdown = self.committed(handbook.OUTPUTS[0])
+        item = next(item for item in profile["host_prerequisites"]
+                    if item["id"] == "paired-systemd-distribution-proof")
+        self.assertEqual(item["execution_status"], "UNRUN")
+        self.assertEqual(item["rehearsal"]["record"], REHEARSAL_RECORD)
+        self.assertTrue((ROOT / REHEARSAL_RECORD).is_file())
+        self.assertIn(item, data["profile"]["host_prerequisites"])
+        self.assertNotRegex(" ".join(all_strings(item)), r"(?i)real distribution (?:has passed|passed|passes|is accepted)")
+        for observation in ("uid", "system state", "failed units", "user manager", "cgroup namespace"):
+            self.assertIn(observation, item["requirement"])
+        self.assertIn("getty mask proof", item["requirement"])
+        self.assertIn("A version check or one healthy user bus does not satisfy it.", item["requirement"])
+        self.assertIn("Status for the real distribution: **UNRUN**.", markdown)
+        self.assertIn(REHEARSAL_RECORD, markdown)
+        self.assertIn("run 3 of 2026-10-02 passed it", markdown)
+        self.assertIn("A rehearsal is not acceptance of the real distribution.", markdown)
+        # The five observations, the pass rule and the getty mask proof are the recipe page's own text.
+        page = self.committed(handbook.DISTRO)
+        flat_page = " ".join(page.split())
+        paired = data["paired_proof"]
+        self.assertTrue(paired["step"].startswith("W5. "))
+        commands = page_block_after(page, "Then record the same five observations")
+        self.assertEqual(paired["observation_commands"], commands)
+        self.assertEqual(len(commands), 10)
+        for line in commands:
+            self.assertNotRegex(line, r"&&|;|\|\|", "five separate commands, not one combined line")
+            self.assertIn(line, markdown)
+        self.assertTrue(paired["pass_rule"].startswith("Proof: both distributions print the same uid"))
+        self.assertIn(paired["pass_rule"], flat_page)
+        self.assertIn("prints `masked`", paired["getty_mask"]["proof"])
+        self.assertIn(paired["getty_mask"]["proof"], flat_page)
+        self.assertTrue(paired["getty_mask"]["commands"])
+        for line in paired["getty_mask"]["commands"]:
+            self.assertIn("getty@tty1.service", line)
+            self.assertIn(line, page)
+            self.assertIn(line, markdown)
+
+    def test_each_client_carries_the_three_receipt_fields_in_the_profile_and_the_handbook(self):
+        profile = json.loads(self.committed(handbook.PROFILE))
+        data = json.loads(self.committed(handbook.OUTPUTS[1]))
+        markdown = self.committed(handbook.OUTPUTS[0])
+        for name, command in CLIENT_UPDATES.items():
+            with self.subTest(client=name):
+                entry = next(row for row in profile["entries"] if row["name"] == name)
+                tool = next(tool for tool in data["tools"] if tool["name"] == name)
+                self.assertEqual(tool["native_update"], entry["native_update"])
+                self.assertEqual(entry["native_update"]["command"], command)
+                self.assertEqual(set(entry["native_update"]["receipt_fields"]), RECEIPT_FIELDS)
+                self.assertIn(f"- {name} native update: `{command}`, UNRUN.", markdown)
+                for field in RECEIPT_FIELDS:
+                    self.assertIn(f"- {name} receipt field {field}: ", markdown)
+        # The bootstrap installs the pin and keeps a newer install; it does not take the current release.
+        rule = next(row for row in profile["entries"] if row["name"] == "Claude Code")["version_policy"]
+        self.assertIn("keeps a newer existing install", rule)
+        for label, text in (("profile", self.committed(handbook.PROFILE)), ("handbook", markdown),
+                            ("handbook JSON", self.committed(handbook.OUTPUTS[1])),
+                            ("bootstrap page", self.committed("adoption/bootstrap.md"))):
+            self.assertNotIn("current at install time", " ".join(text.split()), label)
+
+    def test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them(self):
+        result = subprocess.run([sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"), "--check"],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        # The receipt freezes the generator, the profile and both outputs; its hashes follow the regenerated files.
+        receipt = json.loads(self.committed("evidence/artifacts/new-wsl-handbook-20261001/receipt.json"))
+        profile = json.loads(self.committed(handbook.PROFILE))
+        data = json.loads(self.committed(handbook.OUTPUTS[1]))
+        self.assertEqual(receipt["generator_sha256"],
+                         handbook.digest((ROOT / "scripts/build_new_wsl_handbook.py").read_bytes()))
+        self.assertEqual(receipt["profile_sha256"], handbook.digest((ROOT / handbook.PROFILE).read_bytes()))
+        self.assertEqual(set(receipt["outputs"]), set(handbook.OUTPUTS))
+        for path, digest in receipt["outputs"].items():
+            self.assertEqual(digest, handbook.digest((ROOT / path).read_bytes()), path)
+        self.assertEqual(receipt["inventory"],
+                         {"layers": len(data["layers"]), "profile_entries": len(profile["entries"]),
+                          "projected_tools": len(data["tools"]),
+                          "canonical_package_ids": sum(1 for tool in data["tools"] if tool.get("package_id"))})
+
+    def test_check_fails_after_a_one_byte_change_to_either_output_or_to_the_manifest(self):
+        self.real_tree()
+        self.assertEqual(self.public_cli().returncode, 0)
+        self.assertEqual(self.public_cli(mode="--check").returncode, 0)
+        for path in handbook.OUTPUTS:
+            with self.subTest(output=path):
+                target = self.root / path
+                original = target.read_bytes()
+                changed = bytearray(original)
+                changed[len(changed) // 2] ^= 1
+                target.write_bytes(bytes(changed))
+                failed = self.public_cli(mode="--check")
+                self.assertEqual(failed.returncode, 1, failed.stdout)
+                self.assertIn("stale generated output: " + path, failed.stderr)
+                target.write_bytes(original)
+                self.assertEqual(self.public_cli(mode="--check").returncode, 0)
+        manifest = self.root / DEFAULTS_SOURCE
+        original = manifest.read_bytes()
+        for label, changed in (("a projected label", original.replace(b'"label": "', b'"label": "X', 1)),
+                               ("whitespace only", original + b"\n")):
+            with self.subTest(manifest=label):
+                self.assertNotEqual(changed, original)
+                manifest.write_bytes(changed)
+                failed = self.public_cli(mode="--check")
+                self.assertEqual(failed.returncode, 1, failed.stdout)
+                self.assertIn("stale generated output", failed.stderr)
+                manifest.write_bytes(original)
+                self.assertEqual(self.public_cli(mode="--check").returncode, 0)
 
 
 if __name__ == "__main__":

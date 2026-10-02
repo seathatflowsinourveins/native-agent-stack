@@ -543,3 +543,123 @@ owns re-registration in the evidence manifest.
 These corrections are recorded here because this bounded worker does not own
 the shared harness-defaults log. The coordinator can carry them into that log
 and shared memory without competing edits.
+
+## Repair for the merged manifest and the platform review (2026-10-02)
+
+Main moved under pull request 592. The definitive manifest has its next version
+(84 rows, each with a job, a state and a resolution, ten of them added by the
+decision rounds), produced by `assemble_manifest.py` at
+`675bdd51c96af28aa98012d9e4ff772a77a38f3d`, and the new-distribution recipe was
+repaired and rehearsed (`3a8dc31a67115f85b69709d7ad8c2c5f6ea9f40e`). On the
+merged tree `python3 -B scripts/build_new_wsl_handbook.py --check` printed
+`new-wsl-handbook: 'file'` and exited 1, and the two test modules ran 72 tests
+with 2 failures and 59 errors, nearly all of them `KeyError: 'file'` in the test
+setup. The pull request's reviewers also left three comments that the source
+owner accepted: two platform points, the owner's acceptance of both, and the
+fresh-install version policy (pull request 592, comments 5945871425,
+5946244282 and 5947019967).
+
+Earlier sections stay as written. Where they say that the install takes the release
+current at install time, or that the profile requires WSL 3.0.1 or later, this
+section governs.
+
+**Cause of the `KeyError`.** The manifest's `sources` now has six entries.
+`foundation` and `us-equities` are the two compact catalogs and `settlements` and
+`convergence` are decision files; all four carry `file`, relative to the
+manifest's folder. `rule` and `combined` are the convergence rule and its combined
+results that `convergence.json` cites, and they carry `path`, relative to the
+repository root, with no `file`. The generator and the test setup read every entry
+as a catalog with a `file`, and `rule` is the first entry without one. Repairing
+only that read would still have failed three more ways: the closed sets refused
+the `resolved` state and the `added` row kind, the ten added rows came from
+`convergence.json`'s `added_slots` and not from a catalog, so the inventory
+reported them as unknown ids, and the counts check lacked the producer's new
+`by_state` and `installed` counts.
+
+**Generator.** Each source is resolved by its `file` or its `path` and read through
+the confined reader, and its SHA-256 must equal the manifest's declared value.
+Only the layers' catalogs are parsed as catalogs; the inventory adds the added
+slots from `convergence.json` as the producer's `apply_convergence()` does. The
+closed sets follow the producer. Every count is computed from the rows and must
+equal the manifest's own, and the computed counts are projected to both outputs.
+Each row shows its layer, slot, state (an empty state is shown as `open`, as the
+producer's counts name it), job, default, repository and outcome. The invariants
+that the producer enforces for a split, an unreturned measurement and a
+`not_installed` row are checked before display. A row that installs nothing by the
+producer's rule (a default, and not `installs_nothing_extra`) is shown as not
+installed with the manifest's reason. The W5 paired record, its pass rule and the
+getty mask proof are read from the recipe page, and so is F9's command block,
+which replaces the three stage-2 steps that carried their commands as typed text.
+No command is typed into the generator.
+
+**Platform review, point 1.** The release is a selected target. The profile and the
+handbook say that this launch adopts stable WSL 3.0.1 or later for a second systemd
+distribution; that the 2.9.8 and 2.9.13 pre-releases carried the cgroup fixes first
+(pull requests 40519 and 41512) and are not adopted; that a single-distribution
+install has its own, lower install-only minimum, which the recipe page gives; and
+that the observations (the 2026-10-02 rehearsal on 2.7.13 failed on shared cgroups,
+and the host was updated to 3.0.1.0 that day) stay apart from the policy. The
+wording and the sources come from the page's host-wide rules, and the single-
+distribution sources come from the recipe's decision record. A test refuses any
+version in the policy text that the page's host-wide rules do not hold.
+
+**Platform review, point 2.** The paired proof is named. The executable gate for two
+systemd distributions is the recipe's W5: five observations from both running
+distributions (uid, system state, failed units, user manager, cgroup namespace),
+the pass rule the page states and the getty mask proof. It was observed on one host
+in rehearsals on throwaway distributions, and run 3 of 2026-10-02 passed it
+(`evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json`). A
+rehearsal is not acceptance of the real distribution, so the status for the real
+distribution stays `UNRUN`; a version check or one healthy user bus does not
+satisfy the gate. The profile validator rejects a profile that declares the proof
+passed or leaves it out.
+
+**Fresh-install versions.** The bootstrap stays as it is. Its `install_native()`
+(`adoption/bootstrap-linux.sh` at `b9c27644cc61a9a6a96773f6a272d28625f7835e`)
+installs Claude Code's pin and keeps a newer existing launcher, so the shared rule
+now says that, and the sentence in `adoption/bootstrap.md` that said the install
+takes the release current at install time is corrected. The profile adds the step
+the bootstrap does not perform: each client moves to the current release with its
+own native command, `claude install latest` and `codex update`. Both commands are in
+the installed clients' help (`claude install --help` on client 2.1.287 and
+`codex update --help` on codex-cli 0.159.3, read-only, exit 0 each). Claude's
+command is also in the official CLI reference, whose command table gives
+`claude install [version]` as accepting a version number, `stable` or `latest`
+(<https://code.claude.com/docs/en/cli-reference>, read 2026-10-02); the profile
+cites that page for the command. An updater
+that refuses is recorded with its error and the version actually on PATH; the
+anti-pattern log in `docs/harness-defaults.md` records why that version is read
+and never assumed (`codex update` did not establish that a versioned launcher's
+target had changed). The client's target acceptance then runs on the version that
+results, the receipt records per client the floor, the version after the native
+update and the acceptance result on that version, and a newer release counts as
+installed and not yet qualified until that acceptance has passed on that host. The
+step is `UNRUN`.
+
+| Choice | Alternative not taken | What would overturn it |
+| --- | --- | --- |
+| Installation follows the producer's own rule, so the one measurement row whose measurement returned (`local-model-server`, default Ollama, counted among the manifest's 54 installs) is shown as installed. | Show every row in the `measurement` state as not installed, as the brief words it. That would contradict the manifest's count and the merged decision that settled the local model server. | The producer marks that row as installing nothing, or the owner's record for the local model server changes. |
+| Commands come from the page and the generator copies them. | Type them into the generator, or copy them into the profile. | The page stops carrying a block: generation then refuses and names the missing block. |
+| Claude's install command in the profile is the documented specific-version form with the pin as its operand. | Keep `bash -s latest`, which contradicts the bootstrap. | The bootstrap is changed to install the current release directly, as the owner's decision says. |
+| Every manifest source is bound to its declared SHA-256. | The shape check of the earlier generator. | None; a bound hash only refuses a stale manifest. |
+| The shared version rule names Claude Code, whose bootstrap path is a native installer. Codex's receipt floor is the pin that the bootstrap installs. | Say that the bootstrap keeps a newer Codex too: `install_npm` installs the exact pin and Codex's version probe is exact. | The bootstrap gains a keep-newer rule for npm clients. |
+
+**Verification.** The tests grew from 72 to 87. Fifteen are new, and each fails on
+the pre-change tree: the old generator exits 1 with `new-wsl-handbook: 'file'`, and
+the old profile, outputs and generator lack the new text. In order: `--write` and
+then `--check` returned exit 0; the two test modules returned exit 0 (`Ran 87 tests`, `OK`); the
+adoption docs-consistency and contract modules returned exit 0 (`Ran 52 tests`,
+`OK`, one skip); the reviewer's four mutants (a secret-shaped install command, an
+unknown slot id, a changed manifest default and ai-memory picked before its
+measurement) were all killed and the files restored. The publication validator
+returned exit 1 only for the registered hash and byte count of each changed file,
+which the coordinator re-registers. These are local integration checks of
+projections of source documents; none is host acceptance, and no install, service
+or `wsl.exe` command was run.
+
+| Mistake | Correction | Prevention |
+| --- | --- | --- |
+| The generator and the test setup read every manifest source as a catalog with a `file`. | Resolve `file` or `path`, build the inventory from the catalogs and the added slots, and bind every source to its declared hash. | A test changes each of the six sources by one byte and expects a refusal that names it; the inventory test holds all 84 rows and the ten added ones. |
+| Stage 2's steps carried bootstrap, sign-in and configure commands as typed text. | The steps point at F9 and the commands are F9's block, read from the page. | A test fails when the generator source types those commands or any command line of the page. |
+| The version rule said that the install takes the release current at install time, which the bootstrap does not do. | The rule says what the bootstrap does, and the profile adds the native update step. | The rule is byte-enforced across the profile, the overview and the bootstrap page, and a test fails if the old sentence returns. |
+| A handbook receipt named frozen hashes that nothing checked. | The receipt's generator, profile and output hashes follow the regenerated files. | The test that the committed outputs are current also compares each frozen hash with its file. |

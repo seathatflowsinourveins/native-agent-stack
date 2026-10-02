@@ -19,20 +19,45 @@ preserves the prior profile and receipt hashes; the earlier PR-open observation
 remains historical in the source review, with an appended correction.
 
 Claude Code uses this version rule. The pin is the last qualified release and a
-floor; the install takes the release current at install time; the receipt records
+floor; the bootstrap installs the pin and keeps a newer existing install; the receipt records
 the installed version; a release newer than the pin counts as installed and not
-yet qualified until its acceptance command has passed on that host. Its native installer uses
-the documented `latest` channel. The pinned artifact checksum describes the
-qualified release; the receipt records the release actually installed.
+yet qualified until its acceptance command has passed on that host. The profile's install
+command is the documented specific-version form with the pin as its operand, which is the
+floor the bootstrap installs. The pinned artifact checksum describes the qualified release;
+the receipt records the release actually installed.
 
-A second systemd distribution requires WSL 3.0.1 or later with per-distribution
-cgroup isolation enabled. On 2.7.x, distributions share one cgroup tree and the
-new distribution's user manager fails when the existing distribution owns the
-shared user cgroup. The source is microsoft/WSL
-[PR 40519](https://github.com/microsoft/WSL/pull/40519),
-[PR 41512](https://github.com/microsoft/WSL/pull/41512) and the
-[3.0.1 release](https://github.com/microsoft/WSL/releases/tag/3.0.1).
-The gate is executed in the [new-distribution recipe](platforms/linux-wsl2-new-distro.md).
+The profile adds the step the bootstrap does not perform. Each client moves to the
+current release with its own native command, `claude install latest` for Claude Code
+and `codex update` for Codex; both appear in the installed clients' help. An updater
+that refuses is recorded with its error and the version actually on PATH, and the
+client's target acceptance then runs on the version that results. The receipt records,
+per client, the floor, the version after the native update and the acceptance result on
+that version. A newer release counts as installed and not yet qualified until that
+acceptance has passed on that host. The step is **UNRUN**. The anti-pattern log in
+[docs/harness-defaults.md](../docs/harness-defaults.md) records that `codex update` did
+not establish that a versioned launcher's target had changed, which is why the version
+that `PATH` resolves to is read after the update.
+
+This launch adopts stable WSL 3.0.1 or later for a second systemd distribution. The
+2.9.8 and 2.9.13 pre-releases carried the fixes first and are not adopted. Their release
+notes name [PR 40519](https://github.com/microsoft/WSL/pull/40519), which isolates
+distribution cgroups, and [PR 41512](https://github.com/microsoft/WSL/pull/41512), which
+creates their namespaces, and the
+[3.0.1 release](https://github.com/microsoft/WSL/releases/tag/3.0.1) is the first stable
+one with both. An install with a single systemd distribution has its own, lower
+install-only minimum, which the recipe page gives. Observations are kept apart from that
+policy: the 2026-10-02 rehearsal on 2.7.13 failed on shared cgroups, and the host was
+updated to 3.0.1.0 that day.
+
+The gate for two systemd distributions is the recipe's W5 paired record, not a version
+check. It takes five observations from both running distributions at once (the uid, the
+system state, the failed units, the user manager and the cgroup namespace), applies the
+pass rule the page states in W5 and adds the getty mask proof for the new distribution.
+It was observed on one host in rehearsals on throwaway distributions, and run 3 of
+2026-10-02 passed it
+([the record](../evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json)).
+A rehearsal is not acceptance of the real distribution, so the gate is **UNRUN** for the
+real one. The gate is executed in the [new-distribution recipe](platforms/linux-wsl2-new-distro.md).
 
 Each JSON entry has one owning layer. `boundary.layer_uses` preserves other
 layers' uses. recovery-portability retains mise's reproduction ownership; uv

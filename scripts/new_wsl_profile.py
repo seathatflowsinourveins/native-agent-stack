@@ -25,13 +25,22 @@ except ImportError:
 SOURCE_PATH = "adoption/new-wsl-profile.json"
 DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 EVIDENCE_CLASS = "source_review_recommendations"
-VERSION_FLOOR_RULE = ("The pin is the last qualified release and a floor; the install takes the release current at install time; "
-                      "the receipt records the installed version; a release newer than the pin counts as installed and not yet "
-                      "qualified until its acceptance command has passed on that host.")
+VERSION_FLOOR_RULE = ("The pin is the last qualified release and a floor; the bootstrap installs the pin and keeps a newer "
+                      "existing install; the receipt records the installed version; a release newer than the pin counts as "
+                      "installed and not yet qualified until its acceptance command has passed on that host.")
 ACCEPTANCE_CLASSES = {"documented_upstream_example_not_executed", "upstream_test_command_not_executed"}
 ENTRY_FIELDS = {"name", "layer_id", "owner_layer_id", "status", "repository", "pin", "checksum",
                 "install", "acceptance", "stage", "position", "blocking_gaps", "evidence_refs",
                 "provisioning_status"}
+# The step the bootstrap does not perform: each native client moves to the current release with its own command, and
+# the receipt then records these three facts for it.
+NATIVE_UPDATE_CLIENTS = {"codex", "claude-code"}
+NATIVE_UPDATE_FIELDS = {"command", "help_observation", "sources", "order", "on_refusal", "after_update",
+                        "execution_status", "receipt_fields"}
+RECEIPT_FIELDS = {"floor", "version_after_native_update", "acceptance_result_on_that_version"}
+# The gate for a second systemd distribution is the recipe's W5 paired record; it stays UNRUN until it is observed on
+# the real distribution.
+PAIRED_PROOF_ID = "paired-systemd-distribution-proof"
 
 
 def strings(value):
@@ -47,6 +56,53 @@ def https_url(value):
                 and url.password is None and not url.query and not url.fragment and "\\" not in value)
     except ValueError:
         return False
+
+
+def filled(value):
+    return isinstance(value, str) and bool(value.strip())
+
+
+def validate_native_update(row, update):
+    """A native client moves to the current release by its own command; a source review leaves that step unrun."""
+    name = row["name"]
+    require(isinstance(update, dict) and NATIVE_UPDATE_FIELDS.issubset(update),
+            f"{name}: native update fields are incomplete")
+    require(all(filled(update[field]) for field in ("command", "help_observation", "order", "on_refusal", "after_update")),
+            f"{name}: native update contains an invalid field")
+    require(strings(update["sources"]) and bool(update["sources"])
+            and all(source.startswith("https://") or "://" not in source for source in update["sources"]),
+            f"{name}: native update sources must be repository paths or HTTPS URLs")
+    require(update["execution_status"] == "UNRUN", f"{name}: a source review cannot run the native update")
+    receipt = update["receipt_fields"]
+    require(isinstance(receipt, dict) and set(receipt) == RECEIPT_FIELDS and all(filled(item) for item in receipt.values()),
+            f"{name}: the receipt records exactly the floor, the version after the native update and the acceptance "
+            "result on that version")
+
+
+def validate_host_prerequisites(items):
+    """Declare the release target and the paired proof; the proof's status for the real distribution stays UNRUN."""
+    require(isinstance(items, list) and bool(items), "host_prerequisites must be a nonempty array")
+    seen = {}
+    for item in items:
+        require(isinstance(item, dict) and filled(item.get("id")) and item["id"] not in seen,
+                "each host prerequisite needs one unique id")
+        seen[item["id"]] = item
+        require(filled(item.get("requirement")) and filled(item.get("gate_source")),
+                f"{item['id']}: host prerequisite needs its statement and its gate source")
+        require(all(item.get(key) is None or strings(item[key]) for key in ("observations", "sources")),
+                f"{item['id']}: observations and sources must be text lists")
+        require(all(re.fullmatch(r"https://[A-Za-z0-9.-]+/\S*", source) for source in item.get("sources") or []),
+                f"{item['id']}: sources must be HTTPS URLs")
+    paired = seen.get(PAIRED_PROOF_ID)
+    require(paired is not None, "the paired proof for two systemd distributions must be declared")
+    require(paired.get("execution_status") == "UNRUN",
+            "the paired proof stays UNRUN until it is observed on the real distribution")
+    rehearsal = paired.get("rehearsal")
+    require(isinstance(rehearsal, dict) and filled(rehearsal.get("result")) and filled(rehearsal.get("scope"))
+            and isinstance(rehearsal.get("record"), str)
+            and re.fullmatch(r"[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)+", rehearsal["record"])
+            and ".." not in rehearsal["record"].split("/"),
+            "the paired proof must name its rehearsal record by repository path")
 
 
 def validate_profile(data, source_path=SOURCE_PATH, profile_id=None):
@@ -75,6 +131,8 @@ def validate_profile(data, source_path=SOURCE_PATH, profile_id=None):
         names.add(name)
         if row.get("version_policy") is not None:
             require(row["version_policy"] == VERSION_FLOOR_RULE, "entry must use the shared version floor rule")
+        if row.get("component_id") in NATIVE_UPDATE_CLIENTS or row.get("native_update") is not None:
+            validate_native_update(row, row.get("native_update"))
         text = json.dumps(row)
         if "floor" in text:
             require(not re.search(r"\b(?:does|do) not qualify\b", text),
@@ -118,6 +176,7 @@ def validate_profile(data, source_path=SOURCE_PATH, profile_id=None):
         require(not acceptance["command"] or not re.search(r"(^|\s)--(version|help)(\s|$)", acceptance["command"]),
                 "version/help checks do not qualify as acceptance")
         require(not missing or bool(row["blocking_gaps"]), "missing evidence requires a blocking gap")
+    validate_host_prerequisites(data.get("host_prerequisites"))
     return data
 
 

@@ -21,6 +21,7 @@ SOURCE = "adoption/new-wsl-profile.json"
 HEAD = "85543efe5abcddb7b7cddb14e8774e83b6758616"
 CLI = ROOT / "scripts/new_wsl_profile.py"
 DEFAULTS_SOURCE = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+REHEARSAL_RECORD = "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json"
 
 
 def run_cli(*args):
@@ -83,13 +84,18 @@ class NewWslProfileCliTests(unittest.TestCase):
 
     def assert_no_unmeasured_defaults(self, data):
         manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
+        checked = 0
         for slot in manifest["slots"]:
             if slot.get("state") in {"split", "measurement"}:
                 arms = [row for row in data["entries"] if row["layer_id"] == slot["layer_id"]
                         and (row.get("comparison_group") or row["status"] == "head-to-head-arm")]
-                self.assertTrue(arms, slot["slot_id"])
-                for row in arms:
+                # A split slot added by a decision round may list no arm in this profile (agent-messaging and
+                # playwright-cli do not). Then no entry of its layer may be installed by default either, because
+                # that would decide the slot before its measurement returns.
+                for row in arms or [row for row in data["entries"] if row["layer_id"] == slot["layer_id"]]:
                     self.assertFalse(row["default_install"], row["name"] + " in " + slot["slot_id"])
+                    checked += 1
+        self.assertTrue(checked, "no unresolved slot was checked")
 
     def test_negative_control_memory_cannot_become_a_default_before_measurement(self):
         data = self.load()
@@ -120,11 +126,13 @@ class NewWslProfileCliTests(unittest.TestCase):
         data = self.load()
         claude = next(row for row in data["entries"] if row["name"] == "Claude Code")
         rule = claude["version_policy"]
-        for phrase in ("last qualified release", "floor", "current at install time", "receipt",
-                       "installed version", "installed and not yet qualified", "acceptance command",
-                       "passed on that host"):
+        for phrase in ("last qualified release", "floor", "bootstrap installs the pin",
+                       "keeps a newer existing install", "receipt", "installed version",
+                       "installed and not yet qualified", "acceptance command", "passed on that host"):
             self.assertIn(phrase, rule)
-        self.assertTrue(claude["install"]["command"].endswith("bash -s latest"))
+        self.assertNotIn("current at install time", rule)
+        # The bootstrap installs the floor, so the profile's install form names the pin, not the latest channel.
+        self.assertTrue(claude["install"]["command"].endswith("bash -s " + claude["pin"]))
         for row in data["entries"]:
             text = json.dumps(row)
             self.assertIsNone(re.search(r"Installed host .*?\b(?:does|do) not qualify\b.*?selected", text), row["name"])
@@ -159,7 +167,8 @@ class NewWslProfileCliTests(unittest.TestCase):
             self.assertIn("41492", json.dumps(row))
             self.assertIn("first run on the new host", " ".join(row["blocking_gaps"]))
         prerequisites = json.dumps(data["host_prerequisites"])
-        for fragment in ("3.0.1", "2.7.x", "40519", "41512", "adoption/platforms/linux-wsl2-new-distro.md"):
+        for fragment in ("3.0.1", "2.9.13", "2.9.8", "2.7.13", "40519", "41512",
+                         "adoption/platforms/linux-wsl2-new-distro.md"):
             self.assertIn(fragment, prerequisites)
 
     def test_accepted_cli_and_sdk_pins_do_not_assert_sdk_provisioning(self):
@@ -171,6 +180,69 @@ class NewWslProfileCliTests(unittest.TestCase):
             self.assertEqual(rows[name]["pin"], "0.159.3")
             self.assertEqual(rows[name]["provisioning_status"], "unprovisioned_source_review")
             self.assertFalse(rows[name]["default_install"])
+
+    def paired_proof(self, data):
+        return next(item for item in data["host_prerequisites"] if item["id"] == "paired-systemd-distribution-proof")
+
+    def test_native_update_is_declared_for_both_clients_with_the_three_receipt_fields(self):
+        rows = {row["name"]: row for row in self.load()["entries"]}
+        for name, command in {"Claude Code": "claude install latest", "Codex": "codex update"}.items():
+            with self.subTest(client=name):
+                update = rows[name]["native_update"]
+                self.assertEqual(update["command"], command)
+                self.assertEqual(update["execution_status"], "UNRUN")
+                self.assertEqual(set(update["receipt_fields"]),
+                                 {"floor", "version_after_native_update", "acceptance_result_on_that_version"})
+                self.assertIn(rows[name]["pin"], update["receipt_fields"]["floor"])
+                self.assertIn("version actually on PATH", update["on_refusal"])
+                self.assertIn("error", update["on_refusal"])
+                self.assertIn("installed and not yet qualified", update["after_update"])
+                self.assertIn("acceptance", update["after_update"])
+        self.assertIn("Update Codex to the latest version", rows["Codex"]["native_update"]["help_observation"])
+        self.assertIn("stable, latest, or specific version", rows["Claude Code"]["native_update"]["help_observation"])
+
+    def test_negative_control_client_without_its_native_update_or_a_receipt_field_is_rejected(self):
+        for name in ("Claude Code", "Codex"):
+            with self.subTest(client=name, change="no native update"):
+                data = self.load()
+                del next(row for row in data["entries"] if row["name"] == name)["native_update"]
+                result = self.fixture_cli(data)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("native update", result.stderr)
+            with self.subTest(client=name, change="receipt field dropped"):
+                data = self.load()
+                row = next(row for row in data["entries"] if row["name"] == name)
+                del row["native_update"]["receipt_fields"]["version_after_native_update"]
+                result = self.fixture_cli(data)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("version after the native update", result.stderr)
+
+    def test_paired_proof_is_declared_unrun_beside_a_rehearsal_record_that_exists(self):
+        item = self.paired_proof(self.load())
+        self.assertEqual(item["execution_status"], "UNRUN")
+        self.assertIn("not acceptance of the real distribution", item["rehearsal"]["scope"])
+        for observation in ("uid", "system state", "failed units", "user manager", "cgroup namespace"):
+            self.assertIn(observation, item["requirement"])
+        self.assertIn("getty mask proof", item["requirement"])
+        self.assertIn("paired_isolation", item["receipt"])
+        self.assertEqual(item["rehearsal"]["record"], REHEARSAL_RECORD)
+        record = json.loads((ROOT / item["rehearsal"]["record"]).read_text(encoding="utf-8"))
+        run = next(run for run in record["runs"] if run["id"] == "run-3")
+        self.assertIn("passed", run["result"])
+        self.assertIn("W5-paired", [step["step"] for step in run["steps"]])
+
+    def test_negative_control_paired_proof_cannot_be_declared_passed_or_dropped(self):
+        data = self.load()
+        self.paired_proof(data)["execution_status"] = "PASSED"
+        result = self.fixture_cli(data)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("paired proof", result.stderr)
+        data = self.load()
+        data["host_prerequisites"] = [item for item in data["host_prerequisites"]
+                                      if item["id"] != "paired-systemd-distribution-proof"]
+        result = self.fixture_cli(data)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("paired proof", result.stderr)
 
     def fixture_cli(self, data):
         with tempfile.TemporaryDirectory() as directory:

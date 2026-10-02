@@ -504,6 +504,22 @@
       "source_pin_kind": "release_or_artifact_version",
       "source_commit": "01fc69f4026735edfdf6789820549727a4867b11",
       "artifact_scope": "Thin npm launcher package only (4,904 bytes); the platform dependency and complete native package are separate artifacts. The npm archive was downloaded and rehashed, not installed.",
+      "native_update": {
+        "command": "codex update",
+        "help_observation": "`codex update --help` on codex-cli 0.159.3 prints: Update Codex to the latest version.",
+        "sources": [
+          "docs/harness-defaults.md"
+        ],
+        "order": "It runs after the bootstrap has installed the pin and before this client's acceptance command.",
+        "on_refusal": "An updater that refuses is recorded with its error and the version actually on PATH. The anti-pattern log of docs/harness-defaults.md records that `codex update` did not establish that a versioned launcher's target had changed, so the version that PATH resolves to is read after the update and never assumed from it.",
+        "after_update": "The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host.",
+        "execution_status": "UNRUN",
+        "receipt_fields": {
+          "floor": "The pin of this entry, 0.159.3: the release the bootstrap installs.",
+          "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal.",
+          "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version."
+        }
+      },
       "native_release_artifacts": [
         {
           "name": "codex-package-x86_64-unknown-linux-musl.tar.gz",
@@ -557,10 +573,10 @@
       },
       "integrity_observation": "published_manifest_digest_not_rehashed",
       "install": {
-        "command": "curl -fsSL https://claude.ai/install.sh | bash -s latest",
+        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.284",
         "source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
         "execution_status": "UNRUN",
-        "scope": "The documented latest channel installs the release current at install time. The artifact and checksum above identify the pin; the receipt records the installed release."
+        "scope": "The documented specific-version form with the accepted pin as its operand: the floor that the selected bootstrap installs through the native binary's own `install <version>`. The bootstrap keeps a newer existing install instead of downgrading it. This is a reviewed example; the move to the current release is the native update below."
       },
       "acceptance": {
         "command": "claude -p \"explain this function\"",
@@ -590,7 +606,24 @@
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version",
-      "version_policy": "The pin is the last qualified release and a floor; the install takes the release current at install time; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host."
+      "version_policy": "The pin is the last qualified release and a floor; the bootstrap installs the pin and keeps a newer existing install; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host.",
+      "native_update": {
+        "command": "claude install latest",
+        "help_observation": "`claude install --help` on client 2.1.287 prints: Install Claude Code native build. Use [target] to specify version (stable, latest, or specific version).",
+        "sources": [
+          "https://code.claude.com/docs/en/cli-reference",
+          "evidence/artifacts/new-wsl-layer-reviews-20261001/upstream-install-document-bindings.json"
+        ],
+        "order": "It runs after the bootstrap has installed the pin or kept a newer existing install, and before this client's acceptance command.",
+        "on_refusal": "An updater that refuses is recorded with its error and the version actually on PATH.",
+        "after_update": "The acceptance command then runs on the version that results. A release newer than the pin counts as installed and not yet qualified until that acceptance has passed on that host.",
+        "execution_status": "UNRUN",
+        "receipt_fields": {
+          "floor": "The pin of this entry, 2.1.284: the release the bootstrap installs when no newer one is present.",
+          "version_after_native_update": "The version that PATH resolves to after the native update, or after the updater's refusal.",
+          "acceptance_result_on_that_version": "The result of this entry's acceptance command on that version."
+        }
+      }
     },
     {
       "name": "mcporter",
@@ -4191,15 +4224,43 @@
   },
   "host_prerequisites": [
     {
-      "requirement": "A second systemd distribution requires WSL 3.0.1 or later with per-distribution cgroup isolation enabled. On WSL 2.7.x, distributions share one cgroup tree and the new distribution's user manager fails when the existing distribution owns the shared user cgroup. microsoft/WSL pull requests 40519 and 41512 supply the per-distribution cgroup and namespace isolation.",
+      "id": "wsl-release-target",
+      "title": "WSL release for a second systemd distribution",
+      "requirement": "This launch adopts stable WSL 3.0.1 or later for a second systemd distribution.",
+      "not_adopted": "The 2.9.8 and 2.9.13 pre-releases carried the fixes first and are not adopted. The 2.9.8 pre-release notes name PR 40519, which isolates distribution cgroups, and the 2.9.13 pre-release notes name PR 41512, which creates their namespaces. WSL 3.0.1 is the first stable release with both.",
+      "single_distribution": "An install with a single systemd distribution, with no second systemd distribution running, has its own, lower install-only minimum: WSL 2.4.10 or later, the conservative figure among Microsoft's 2.4.4, Ubuntu's announcement of 2.4.8 and Ubuntu's install guide of 2.4.10. The recipe keeps the workstation's distribution running, so it adopts 3.0.1.",
+      "observations": [
+        "The 2026-10-02 rehearsal on WSL 2.7.13 stopped at F1 on shared cgroups: that release has a shared cgroup tree, equal user uids collide, and a system-unit stop or restart can act on another distribution's processes.",
+        "The host was updated to WSL 3.0.1.0 on 2026-10-02 and passed its check (rootless container, interop, user manager).",
+        "Run 2 on 3.0.1.0 observed distinct cgroup namespaces, local process ids and two active user managers while both distributions ran."
+      ],
+      "gate": "W1 records the version, and W5 must repeat the isolation proof before F1 changes anything.",
       "gate_source": "adoption/platforms/linux-wsl2-new-distro.md",
       "sources": [
+        "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+        "https://github.com/microsoft/WSL/releases/tag/2.9.13",
+        "https://github.com/microsoft/WSL/releases/tag/2.9.8",
         "https://github.com/microsoft/WSL/pull/40519",
         "https://github.com/microsoft/WSL/pull/41512",
-        "https://github.com/microsoft/WSL/releases/tag/3.0.1",
-        "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291"
-      ],
-      "execution_status": "UNRUN"
+        "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291",
+        "https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro",
+        "https://ubuntu.com/blog/ubuntu-wsl-new-format-available",
+        "https://documentation.ubuntu.com/wsl/stable/howto/install-ubuntu-wsl2/"
+      ]
+    },
+    {
+      "id": "paired-systemd-distribution-proof",
+      "title": "Paired proof for two systemd distributions",
+      "requirement": "The executable gate for two systemd distributions is the recipe's W5 paired record, not a version check. It takes five observations from both running distributions at once: the uid, the system state, the failed units, the user manager and the cgroup namespace. It passes by the rule the recipe page states in W5, together with the getty mask proof for the new distribution. A version check or one healthy user bus does not satisfy it.",
+      "receipt": "The receipt records it in its paired_isolation object, one for the workstation and one for the new distribution, with the WSL version and kernel from W1 and the image revision from W2.",
+      "execution_status": "UNRUN",
+      "rehearsal": {
+        "result": "The paired record was observed on one host in rehearsals on throwaway distributions, and run 3 of 2026-10-02 passed it.",
+        "record": "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json",
+        "scope": "A rehearsal is not acceptance of the real distribution."
+      },
+      "gate": "W5 of the recipe page, taken from both running distributions before F1.",
+      "gate_source": "adoption/platforms/linux-wsl2-new-distro.md"
     }
   ]
 }
