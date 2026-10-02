@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+"""Daily check of the local OmniRoute gateway (launchd: com.native-stack.omniroute-update-check).
+
+1. Codex follow: when the installed Codex CLI's version differs from the version the running gateway announced at its
+   start (omniroute-gateway.json, written by omniroute-serve.sh), restart the gateway so it announces the installed
+   version and its live catalog offers the models that version supports. The restart waits while any non-browser
+   client holds a connection to port 20128, and is retried at the next run.
+2. Upstream notice: when an official OmniRoute release carries every change this build carries (omniroute-build.json:
+   the upstream PRs), post a macOS notification and write omniroute-update.json, so the next switch can go to the
+   official release. Nothing is installed or switched by this check.
+It never reads the gateway's data directory or any credential.
+"""
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+PREFIX = Path(__file__).resolve().parent
+STATE = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state")) / "native-agent-stack"
+LABEL = "com.native-stack.omniroute"
+BROWSERS = {"Google", "Chrome", "Safari", "firefox", "Arc", "Brave"}
+GH = os.environ.get("GH_BIN", str(Path.home() / ".local/bin/gh"))
+
+
+def now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def log(event: dict) -> None:
+    print(json.dumps({"at": now(), **event}), flush=True)
+
+
+def installed_codex() -> str | None:
+    try:
+        out = subprocess.run([str(Path.home() / ".local/bin/codex"), "--version"], capture_output=True, text=True,
+                             timeout=30).stdout.strip()
+        return out.split()[-1] if out else None
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def busy_clients() -> list:
+    out = subprocess.run(["/usr/sbin/lsof", "-nP", "-iTCP:20128", "-sTCP:ESTABLISHED"], capture_output=True,
+                         text=True).stdout.splitlines()[1:]
+    names = {line.split()[0] for line in out if line.split()}
+    return sorted(n for n in names if n not in BROWSERS and n != "node")
+
+
+def follow_codex() -> None:
+    gateway = STATE / "omniroute-gateway.json"
+    announced = json.loads(gateway.read_text())["announced_codex_client_version"] if gateway.is_file() else None
+    installed = installed_codex()
+    if not installed or installed == announced:
+        log({"codex_follow": "unchanged", "installed": installed, "announced": announced})
+        return
+    busy = busy_clients()
+    if busy:
+        log({"codex_follow": "deferred", "installed": installed, "announced": announced, "busy_clients": busy})
+        return
+    rc = subprocess.run(["/bin/launchctl", "kickstart", "-k", f"gui/{os.getuid()}/{LABEL}"]).returncode
+    log({"codex_follow": "restarted" if rc == 0 else "restart_failed", "installed": installed, "announced": announced})
+
+
+def upstream_notice() -> None:
+    build = json.loads((PREFIX / "omniroute-build.json").read_text())
+    try:
+        rel = json.loads(subprocess.run([GH, "api", "repos/diegosouzapw/OmniRoute/releases/latest"], capture_output=True,
+                                        text=True, timeout=60).stdout)
+    except Exception as exc:  # noqa: BLE001
+        log({"upstream": "unreadable", "error": str(exc)[:200]})
+        return
+    released = rel.get("published_at") or ""
+    carried = []
+    for pr in build["carried_pull_requests"]:
+        try:
+            info = json.loads(subprocess.run([GH, "api", f"repos/diegosouzapw/OmniRoute/pulls/{pr}"], capture_output=True,
+                                             text=True, timeout=60).stdout)
+        except Exception:  # noqa: BLE001
+            info = {}
+        merged_at = info.get("merged_at")
+        carried.append({"pr": pr, "merged_at": merged_at, "in_latest_release": bool(merged_at and merged_at <= released)})
+    ready = all(c["in_latest_release"] for c in carried)
+    record = {"checked_at": now(), "latest_release": rel.get("tag_name"), "published_at": released,
+              "carried": carried, "official_release_carries_everything": ready, "build": build.get("name")}
+    STATE.mkdir(parents=True, exist_ok=True)
+    (STATE / "omniroute-update.json").write_text(json.dumps(record, indent=2) + "\n")
+    log({"upstream": record})
+    if ready:
+        msg = f"OmniRoute {rel.get('tag_name')} carries every PR the local build carries; switch to the official release."
+        subprocess.run(["/usr/bin/osascript", "-e", f'display notification "{msg}" with title "OmniRoute update"'])
+
+
+def main() -> int:
+    follow_codex()
+    upstream_notice()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

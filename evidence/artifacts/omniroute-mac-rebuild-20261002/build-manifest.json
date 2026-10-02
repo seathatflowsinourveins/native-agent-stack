@@ -1,0 +1,45 @@
+{
+  "name": "omniroute-3.8.52-528235175-pr13788-pr15167",
+  "upstream": "https://github.com/diegosouzapw/OmniRoute",
+  "version": "3.8.52",
+  "base": {
+    "branch": "release/v3.8.52",
+    "commit": "52823517533cfceec7abef2ff3e6285a19fe4121"
+  },
+  "carried_pull_requests": [
+    13788,
+    15167
+  ],
+  "carried_commits": [
+    {
+      "pr": 13788,
+      "upstream": "24bbadbad15eec0d598c908416e4b01be4e37671"
+    },
+    {
+      "pr": 13788,
+      "upstream": "6c7990058c4ce9677de79452c8cefb10b4bf1b3d"
+    },
+    {
+      "pr": 15167,
+      "upstream": "0585aba5589d5a1f49243a13a8db249558e7c9e3"
+    }
+  ],
+  "applied_commits": [
+    "7ec203aa9033457e3688cdc39dc938c38d758936",
+    "4376a0a91742acb42106c751de4a0483c289c1c6",
+    "6f246e84a3c23e5871a912b0366210bc3191571a"
+  ],
+  "build_sha": "6f246e84a",
+  "build_steps": [
+    "npm ci --no-audit --no-fund",
+    "npm run build:release",
+    "OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact (passed; recorded as a canary build because the carried PRs are not on the release line)",
+    "npm pack"
+  ],
+  "tarball": "omniroute-3.8.52.tgz",
+  "tarball_sha256": "d602dc42c7357e032b1e2323ba6660e0e1400bb5e997cb1c3857882654f9dbe4",
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "fallback_codex_client_version": "0.159.3",
+  "built_at": "2026-10-02T03:33:38+00:00"
+}
