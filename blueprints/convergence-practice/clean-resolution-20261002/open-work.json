@@ -28,9 +28,9 @@
     },
     {
       "id": "sdk-workers-researchers-reviewers",
-      "state": "local_oracle_prepared_independent_review_and_native_execution_open",
-      "evidence": "Three local oracle-discrimination runs retained with source and result hashes; target SDK pin identities checked.",
-      "remaining": ["Independent acceptance-contract review", "Actual selected SDK tool task and result/usage capture", "Separately qualify resume, recovery, selected MCP integration and role boundaries"],
+      "state": "oracle_and_architecture_reviewed_final_binding_and_native_execution_open",
+      "evidence": "Three local oracle-discrimination runs retained with source and result hashes; target SDK pin identities checked. Scoped Claude and Astra reviews at 6537a17a1 accept the oracle and cross-runtime architecture; the requested evidence-wording correction is incorporated for final binding review.",
+      "remaining": ["Final evidence/head binding review", "Actual selected SDK tool task and result/usage capture", "Separately qualify resume, recovery, selected MCP integration and role boundaries"],
       "sources": ["examples/native-sdk-acceptance/README.md", "blueprints/convergence-practice/clean-resolution-20261002/oracle-experiment.json"]
     },
     {

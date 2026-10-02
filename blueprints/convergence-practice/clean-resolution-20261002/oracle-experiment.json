@@ -120,11 +120,11 @@
     "This record describes completed local checks and is not a preregistered model comparison.",
     "The SDK, model/provider, native upstream test suite, new-host lifecycle and full foundation goal remain unqualified by this slice.",
     "Manual controls are distinct synthetic inputs, not agent attempts or evidence of comparative quality. Each command received NATIVE_SDK_CANDIDATE in its process environment, selecting respectively the original fixture, manual positive control and manual regression control. Their hashes bind the retained bytes; private absolute paths are omitted.",
-    "An independent reviewer has not accepted the oracle or cross-runtime contract; the required Astra review returned no verdict after an account usage-limit failure.",
-    "The output files contain only documented checkout-path redaction; original-byte hashes and reversible reconstruction checks are retained in the local observation."
+    "The first required Astra review returned no verdict after an account usage-limit failure. Subsequent scoped Claude and Astra reviews accepted the oracle and cross-runtime architecture at 6537a17a1; final evidence/head binding and target execution remain separate gates (PR609 comments 5958056799 and 5958338134).",
+    "Original-output hashes are recorded separately; the public files contain checkout-path redaction."
   ],
   "decision_and_scope": {"decision": "trial", "scope": "local oracle discrimination only", "qualification_run_ids": []},
   "rollback": "Leave the selected native acceptance commands unchanged; remove this unaccepted preparation if independent review rejects it.",
-  "next_decision_changing_test": "Independent source/oracle review, then selected SDK native useful-task execution after the current builder's readiness handoff, retaining actual result and native usage.",
+  "next_decision_changing_test": "Final evidence/head binding review, then selected SDK native useful-task execution after the current builder's readiness handoff, retaining actual result and native usage.",
   "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": ["baseline-errors", "manual-positive", "manual-regression"], "coverage_artifact": null}
 }
