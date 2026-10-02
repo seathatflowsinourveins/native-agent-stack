@@ -2635,9 +2635,9 @@
       "title": "Portfolio and risk",
       "group": "engines-strategies",
       "requirement": "Use the selected NautilusTrader destination with broker-specific execution boundaries, deterministic numeric risk and reproducible equity accounting; preserve the prior LEAN oracle and qualify any strategy with causal data, costs and independent reconciliation.",
-      "current_choice": "NautilusTrader 2.0.0rc5 is the user-selected destination; LEAN remains the retained historical comparison engine. Nautilus native IBKR awaits broker acceptance; Alpaca uses official alpaca-py and a separately qualified deterministic paper path. No strategy is promoted as profitable.",
+      "current_choice": "Retain skfolio 1.2.9 for the accepted offline WalkForward chronology and raw-price-label control study. Its portfolio optimizers, risk estimators and CPCV remain conditional candidates, not accepted portfolio P&L or pre-trade enforcement. The selected NautilusTrader destination and retained LEAN oracle own separate deterministic cash/order/risk and broker-specific execution acceptance; no profitable strategy or broader portfolio runtime is promoted.",
       "decision": "keep_but_compare",
-      "rationale": "Derived from domain row engines-strategies (2026-09-22): The current choice follows the explicit runtime target and supported native IBKR direction, with real installation/replay and bounded AAPL accounting evidence. LEAN has deeper retained SPY stress/dividend/cash evidence and is kept as the comparison oracle rather than relabeled a losing engine. The AAPL diagnostic and one Alpaca paper roundtrip do not prove SPY parity, realistic liquidity, IBKR operation, continuous paper service or a winning strategy. Existing research modules remain task-specific.",
+      "rationale": "Derived from domain row engines-strategies (2026-09-22): The layer-specific selected evidence is skfolio 1.2.9's September 19 chronological raw-price-label control, not an accepted portfolio optimizer or broker risk service. The September 23 MLflow binding reproduced its ledger and all 21 selection hashes; tracking does not broaden that study into portfolio P&L. NautilusTrader/LEAN and the paper adapters remain separate execution/accounting authorities at their own accepted scopes. The recorded verdict, broader conditional candidates and historical failures remain unchanged.",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
         "catalogs/us-equities/runtime-target.json",
@@ -2647,7 +2647,8 @@
         "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
         "blueprints/us-equities/historical-simulation/receipt.json",
         "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
-        "blueprints/us-equities/research-evaluation/receipt.json"
+        "blueprints/us-equities/research-evaluation/receipt.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/8-research-evaluation-mlflow-binding.json"
       ],
       "limitations": [
         "Nautilus 2.0.0rc5 is a prerelease. The old September 19 Nautilus alternative and LEAN default cards remain historical; runtime-target.json governs the current destination.",
@@ -2655,7 +2656,8 @@
         "SPY/LEAN dividend/cash parity is still planned. LEAN's known-crash fixtures are engineering stresses, not untouched holdout results or calibrated broker execution.",
         "The Alpaca trial observed two actual writes, a -0.08 USD cash-matched gross result, flat/idle reconciliation and completed-trial recovery with zero additional writes. In-flight native failure cases, IBKR, live operation and continuous paper operation remain open.",
         "No accepted point-in-time universe, extreme-mover/catalyst strategy, financing-inclusive performance or deployable profitability follows from these receipts.",
-        "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md."
+        "Independent source review found two bare matches! expressions that do not assert denial-event variants in Nautilus risk tests, also present in v2.0.0rc5 source. Other tests assert denial and reasons. This narrow test defect is not an observed runtime failure; see docs/blind-catalog-source-adjudication-20260921.md.",
+        "Layer-specific selection retains only the native skfolio WalkForward chronology/raw-price-label scope, with Linux/WSL Python 3.13.15 acceptance. No optimizer, risk estimator, CPCV, dividends/financing-inclusive portfolio P&L or deterministic broker risk enforcement is accepted. The September 23 MLflow replay/readback is local integration evidence and does not transfer that acceptance to macOS or the surviving workstation."
       ],
       "overturn_when": "Reopen the implementation choice if Nautilus cannot preserve a required cash/order semantic, fails a preregistered SPY/LEAN parity tolerance, or a broker-specific adapter cannot pass ownership, reconciliation, partial/cancel/reconnect and numeric risk cases. Compare alternatives on the same frozen inputs and failure contract; promote a strategy only after independent temporal and cost-aware evaluation.",
       "candidates": [
@@ -2936,9 +2938,9 @@
       "title": "Evaluation and experiments",
       "group": "agents-operations",
       "requirement": "Run bounded research with native identity and complete returned results; supervise owned processes; retain scoped telemetry, failed attempts and recoverable state without granting research workers broker execution authority.",
-      "current_choice": "Native Codex and Claude for bounded research and review; Dagu/systemd for selected local command workflows; one OpenTelemetry Collector with Prometheus/Loki/Grafana; native sandboxing and Restic for their separately qualified scopes. Optional gateways and agent frameworks remain task-specific.",
+      "current_choice": "Retain complementary evaluation roles: Inspect AI for the bounded programmable mock task/solver/scorer harness, MLflow 3.16.1 for local SQLite experiment tracking and chronology-run readback, and agent-retrieval-bench v0.2.1 for the retained offline code/document retrieval fixtures. Existing deterministic project oracles govern numeric and trading experiments. The dated September 23 receipts qualify only their named harness, tracking and retrieval operations; native identity, supervision, telemetry and broker-authority isolation remain separate runtime responsibilities.",
       "decision": "retain",
-      "rationale": "Derived from domain row agents-operations (2026-09-22): The retained native lane has actual task results, process/usage observations and local command workflow history. Adding an agent framework or gateway by default would not close a demonstrated requirement and can alter account identity, tool behavior or retry ownership. Dagu's accepted local scope fits existing commands; larger workflow and data platforms become preferable only when their durability, partitioning or operational requirements are real.",
+      "rationale": "Derived from domain row agents-operations (2026-09-22): Coordination and observation services meet different responsibilities from this layer's evaluation harnesses and tracker. Later September 23 receipts retain an eight-case Inspect/promptfoo mock comparison with repeat-stable scoring and native resume, an MLflow local SQLite binding/readback of the unchanged chronology study, and an ARB Linux replay. Inspect retained retried errors and all eight frozen source hashes in the measured fixture; both arms matched only three of eight labels, so this is harness-property evidence, not a model-quality or semantic-accuracy win. MLflow tracks provenance/results; ARB evaluates retrieval; neither replaces the deterministic trading oracle or grants broker authority. Dated winner classes, pins and original failed attempts remain unchanged.",
       "evidence_refs": [
         "catalogs/us-equities/agents-operations.json",
         "docs/foundation-closure-20260921.md",
@@ -2948,14 +2950,27 @@
         "blueprints/us-equities/research-runtime/receipt.json",
         "evidence/receipts/foundation-native-20260920.json",
         "catalogs/landscape/candidate-quality-review.json",
-        "docs/candidate-quality-review-20260921.md"
+        "docs/candidate-quality-review-20260921.md",
+        "blueprints/convergence-practice/arb-trace2code/receipt.json",
+        "blueprints/convergence-practice/local-fixture/evaluation-receipt.json",
+        "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+        "catalogs/us-equities/data-research.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/0-promptfoo-inspect-two-arm.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/2-matched-promptfoo-inspect-comparison.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/4-arb-trace2code-host-rerun.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/5-fixture-abstention-bootstrap.json",
+        "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/8-research-evaluation-mlflow-binding.json"
       ],
       "limitations": [
         "Native worker success and telemetry matching are bounded by the recorded task, process and account. They do not establish every native client/session, whole-task savings or unlimited allowance.",
         "Dagu's older completed-history restart is not in-flight recovery. Later recovery receipts must be evaluated for their own process, host and workload rather than promoting all workflows.",
         "Gateway transport health, routed text and ACP research acceptance do not establish native hook/tool parity or independent provider/model attestation.",
         "Same-host recovery and configured restrictions do not establish off-host disaster recovery, a VM boundary, unattended broker operation or paid hosting.",
-        "The us-equities catalog also tags entries for this taxonomy layer under data-research (3), foundation-memory (3); agents-operations (6) was picked as the primary group by entry count."
+        "The us-equities catalog also tags entries for this taxonomy layer under data-research (3), foundation-memory (3); agents-operations (6) was picked as the primary group by entry count.",
+        "The recorded September 22 verdict and open_gaps retain their historical source-review statuses. The cited September 23 follow-ups provide the later scoped execution evidence; this reconciliation does not alter winner pins/classes, rerun a comparison, promote a runtime or establish a new host.",
+        "The Inspect comparison used a locally authored mock adapter, eight cases, one interruption point per arm and zero provider calls. Both arms retained only 3/8 label matches; promptfoo exit 100, source-byte differences, retry-log behavior and superseded runner failures remain recorded. No semantic model quality, production agent behavior or timing superiority follows.",
+        "MLflow readback covers a temporary local SQLite store: 16 params, 19 metrics and 9 dataset inputs with no mismatches in the corrected round. Full SHA256 tags supplement 36-character dataset digests; metrics are floats while exact Decimals stay in the results artifact. The digest-limit failure and earlier omitted exit metric remain; no registry, remote store or production tracking acceptance follows.",
+        "ARB's 101-sample released subset and authored public-document fixtures do not establish financial-document answer quality, external held-out relevance or trading performance. The later abstention/bootstrap diagnostic did not trigger its preregistered promotion rule; no default or savings promotion follows."
       ],
       "overturn_when": "Escalate to another scheduler, graph or host only when a specified long-running workflow, host-loss recovery, asset/backfill lineage or scale requirement exceeds the retained lane and the candidate passes the same failure, cancellation, output, identity and usage checks without duplicate effect owners.",
       "candidates": [
