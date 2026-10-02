@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "input_class": "synthetic",
+  "observed_on": "2026-10-02",
+  "source_base": "231eed43e17cc7953751b7caf90376b01cb5feec",
+  "canonical_observed": "49a4260029244e3e20d8b2dd3ada00af7983a3c9",
+  "claim": "Official ai-memory 2.5.2 container online backup restored a synthetic wiki page and DB-only pending message into a separate private volume; both survived a subsequent server restart. External config was copied and hash-verified separately.",
+  "does_not_establish": [
+    "Native macOS full restore or compaction/resume",
+    "Codex/Claude effective hook isolation, automatic capture or handoff",
+    "Hindsight server, ingestion, retrieval or generation behavior in this VM",
+    "Quality, comparative latency, complete provider accounting or a promoted memory backend"
+  ],
+  "command_source": "runtime/README.md",
+  "events": [
+    {"operation": "colima start with explicit profile, mount none, activate false", "exit_code": 0, "result": "4 CPU, 12 GiB RAM, 32 GiB disk; Ubuntu 24.04.4; Docker server 29.5.2"},
+    {"operation": "docker buildx imagetools inspect", "exit_code": 1, "result": "buildx unavailable; used supported docker manifest inspect --verbose instead"},
+    {"operation": "docker compose version", "exit_code": 1, "result": "compose unavailable; used native docker commands"},
+    {"operation": "digest-pinned OCI pulls", "exit_code": 0, "result": "Both linux/arm64 images pulled; ai-memory --version 2.5.2 and Hindsight installed distribution metadata 0.10.2"},
+    {"operation": "message send before sender scope existed", "at": "2026-10-02T05:41:24.920676Z", "exit_code": 1, "result": "404 project producer not found; created synthetic sender scope before retry"},
+    {"operation": "backup --to /snapshots/control.tar.gz", "at": "2026-10-02T05:41:25.358243Z", "exit_code": 1, "result": "Permission denied on unseeded root-owned volume; corrected destination to image-owned /data"},
+    {"operation": "tar list missing archive", "exit_code": 2, "result": "No such file or directory"},
+    {"operation": "docker cp missing archive", "exit_code": 1, "result": "Archive not found"},
+    {"operation": "restore missing archive", "at": "2026-10-02T05:41:27.390779Z", "exit_code": 1, "result": "Rejected missing tarball; target remained unpopulated"},
+    {"operation": "write sender scope; message send", "at": "2026-10-02T05:41:40.304859Z", "exit_code": 0, "result": "Pending message created; identity hash 68a57130021e7258935da44fd86828bfba799fc96ebd178298a13b248b48f19d"},
+    {"operation": "online backup --to /data/control.tar.gz", "at": "2026-10-02T05:41:40.586486Z", "exit_code": 0, "result": "33014-byte archive"},
+    {"operation": "restore --from /input/control.tar.gz --force into separate volume", "at": "2026-10-02T05:42:17.753874Z", "exit_code": 0, "result": "Staged, verified and swapped; no guard bypass; schema version 70"},
+    {"operation": "restored scoped read-page and message list", "exit_code": 0, "result": "Exact page body and original pending message ID/state recovered"},
+    {"operation": "wrong-project read-page", "at": "2026-10-02T05:42:50.407364Z", "exit_code": 1, "result": "404, no such file; discriminating scope control"},
+    {"operation": "restart restored server and repeat both reads", "exit_code": 0, "result": "Page and pending message persisted; exact returned JSON retained"},
+    {"operation": "stop owned containers, then colima stop", "exit_code": 0, "result": "No running containers before VM stop; colima list reported Stopped; default Docker context remained default"}
+  ],
+  "independent_observations": {
+    "archive_sha256": "e966b75d46d45e958a05cfe2cf7146d67da31d560014303194a6f735474b93d8",
+    "archive_file_count": 34,
+    "database_member": "db/memory.sqlite",
+    "wiki_page_present": true,
+    "external_config_in_archive": false,
+    "external_config_sha256": "cc323d06f5365f93c6cd7c2210b3b2337c35c4045980ed01647c62ecdfeee330",
+    "containers": {
+      "network_mode": "none",
+      "pid_mode": "private default",
+      "privileged": false,
+      "published_ports": [],
+      "mount_types": ["volume"],
+      "host_bind_mounts": []
+    },
+    "provider_status": "Both LLM and embeddings disabled in native status; network none",
+    "provider_attempt_count": null
+  },
+  "artifacts": [
+    {"path": "runtime/evidence/restored-page.json", "sha256": "f4af2f6c62cdb8faa47c7dada5bc9843b7d3fcb9d4f9928009f99fa9c7755ba7", "operation_exit_code": 0},
+    {"path": "runtime/evidence/restored-messages.json", "sha256": "e41d8c0e8cd7d38ed7cb58d8024968a5af6e1421fc8d29a68cc2c0e3c533ac31", "operation_exit_code": 0, "sanitized": true},
+    {"path": "runtime/evidence/control-server.log", "sha256": "73bce9d6b65e296cc6bb36c32fd43c42f733fe1ba5c611266101e0f5bc7d49d1"},
+    {"path": "runtime/evidence/restored-server.log", "sha256": "116418c0728ca2f03668d96e0f19c654309ec28be8237025cc08b44adb54de4c"}
+  ],
+  "retention": "Raw server logs and post-restart read results are retained privately. The published message receipt replaces synthetic UUIDs with stable role labels after repository publication validation rejected local identifiers; its private original SHA256 is 8aa90183991228d4de8762d3a0469cd5d384fbf3bd8a4b44e08bff3646bb4cc2. Earlier CLI failures are selected exact diagnostics transcribed from tool returns, not full process transcripts. Private archive/Colima logs and stopped volumes remain in the coordinator task directory/runtime.",
+  "production_changed": false,
+  "winner": null,
+  "whole_task_usage": null,
+  "net_savings": null,
+  "owner_notification": {
+    "native_queue_exit_code": 1,
+    "native_queue_error": "no rollout found for the source owner thread (code -32603)",
+    "durable_scope": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/384#issuecomment-5946223153"
+  }
+}

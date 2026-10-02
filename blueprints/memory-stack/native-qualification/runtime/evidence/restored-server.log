@@ -1,0 +1,39 @@
+[2m2026-10-02T05:42:18.528292Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.5.2" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m/data [3mbind[0m[2m=[0m127.0.0.1:49374
+[2m2026-10-02T05:42:18.528380Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m single-instance serve lock held [3mlock[0m[2m=[0m/data/.serve.lock
+[2m2026-10-02T05:42:18.529938Z[0m [32m INFO[0m [2mrefinery_core::traits[0m[2m:[0m current version: 70
+[2m2026-10-02T05:42:18.529956Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m no migrations to apply
+[2m2026-10-02T05:42:18.529959Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m preparing to apply 0 migrations: Map {
+    iter: Iter(
+        [],
+    ),
+}
+[2m2026-10-02T05:42:18.536307Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+[2m2026-10-02T05:42:18.536716Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m watcher disabled by --no-watcher
+[2m2026-10-02T05:42:18.536728Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m active-project isolation mode [3mmode[0m[2m=[0mPerActor [3msession_ttl_secs[0m[2m=[0m3600 [3mmax_entries[0m[2m=[0m4096
+[2m2026-10-02T05:42:18.539565Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+[2m2026-10-02T05:42:18.539582Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m scheduled retention/lint/embed maintenance disabled
+[2m2026-10-02T05:42:18.539585Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m auto-improve scheduler disabled; manual auto-improve remains available
+[2m2026-10-02T05:42:18.539586Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m scheduled maintenance enabled but all intervals are disabled
+[2m2026-10-02T05:42:18.539668Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m HTTP Host-header allowlist [3mallowed_hosts[0m[2m=[0m["localhost", "127.0.0.1", "::1", "host.docker.internal"]
+[2m2026-10-02T05:42:18.539680Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m MCP Streamable HTTP transport mode [3mstateful[0m[2m=[0mfalse
+[2m2026-10-02T05:42:18.540107Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) [3mlocal_addr[0m[2m=[0m127.0.0.1:49374 [3mauth[0m[2m=[0mfalse [3mbody_limit_mb[0m[2m=[0m10
+[2m2026-10-02T05:42:50.661735Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m shutdown signal received; draining [3msignal[0m[2m=[0m"SIGTERM"
+[2m2026-10-02T05:42:50.720590Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.5.2" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m/data [3mbind[0m[2m=[0m127.0.0.1:49374
+[2m2026-10-02T05:42:50.720720Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m single-instance serve lock held [3mlock[0m[2m=[0m/data/.serve.lock
+[2m2026-10-02T05:42:50.722907Z[0m [32m INFO[0m [2mrefinery_core::traits[0m[2m:[0m current version: 70
+[2m2026-10-02T05:42:50.722937Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m no migrations to apply
+[2m2026-10-02T05:42:50.722942Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m preparing to apply 0 migrations: Map {
+    iter: Iter(
+        [],
+    ),
+}
+[2m2026-10-02T05:42:50.729589Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m AI_MEMORY_EMBEDDING_PROVIDER unset; vector search disabled (FTS5 + entity + graph active)
+[2m2026-10-02T05:42:50.730462Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m watcher disabled by --no-watcher
+[2m2026-10-02T05:42:50.730484Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m active-project isolation mode [3mmode[0m[2m=[0mPerActor [3msession_ttl_secs[0m[2m=[0m3600 [3mmax_entries[0m[2m=[0m4096
+[2m2026-10-02T05:42:50.733560Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m AI_MEMORY_LLM_PROVIDER unset; memory_consolidate disabled, PreCompact falls back to rule-based checkpoint, lint runs rule-based only
+[2m2026-10-02T05:42:50.733609Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m scheduled retention/lint/embed maintenance disabled
+[2m2026-10-02T05:42:50.733621Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m auto-improve scheduler disabled; manual auto-improve remains available
+[2m2026-10-02T05:42:50.733632Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m scheduled maintenance enabled but all intervals are disabled
+[2m2026-10-02T05:42:50.733817Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m HTTP Host-header allowlist [3mallowed_hosts[0m[2m=[0m["localhost", "127.0.0.1", "::1", "host.docker.internal"]
+[2m2026-10-02T05:42:50.733835Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m MCP Streamable HTTP transport mode [3mstateful[0m[2m=[0mfalse
+[2m2026-10-02T05:42:50.734454Z[0m [32m INFO[0m [2mai_memory_cli::commands::serve[0m[2m:[0m MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) [3mlocal_addr[0m[2m=[0m127.0.0.1:49374 [3mauth[0m[2m=[0mfalse [3mbody_limit_mb[0m[2m=[0m10
