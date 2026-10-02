@@ -50,3 +50,15 @@ processes.
 3. P3/W5: six new storage-error lines appeared about 15 seconds before cloud-init started, when the new disk was
    attached; the rule "equal to the baseline" does not hold on a host that attaches a disk.
 4. The rootless-container check (issue 41492) belongs right after F3 on whichever WSL release the host ends on.
+
+## Runs on WSL 3.0.1 (2026-10-02)
+
+`runs-on-wsl-3.0.1.json` holds the compact, sanitized record of three units on the updated host, each on its own
+throwaway name: run 2 (08:32Z to 08:39Z, the recipe before its repair, stopped at W5's paired rule on the shared VM
+console), probe E1 (08:42Z, outside the recipe, the template plus the `bootcmd` mask) and run 3 (10:54Z to 11:01Z, the
+repaired recipe, P1 to F5 with a rootless container). Each step names its raw output by sha256 and keeps a bounded
+excerpt; the raw files stay in the coordinator's private state folder. The record is built by a script that replaces
+the user name, the Windows computer name, device ids and profile paths and refuses to write if one survives.
+
+These are rehearsals. They qualify neither image arm of the preregistered comparison; stage 2 with its uv and Node
+probes, the 24.04.5 rollback arm and path B are still owed.

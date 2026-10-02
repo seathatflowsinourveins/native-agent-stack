@@ -379,13 +379,13 @@
       "step": "W1",
       "cmd": "wsl.exe --list --verbose",
       "exit": 0,
-      "output_excerpt": "  NAME                STATE           VERSION\n* NativeStack         Running         2\n  NoesisFoundation    Running         2"
+      "output_excerpt": "  NAME                STATE           VERSION\n* NativeStack         Running         2\n  <another-distribution>    Running         2"
     },
     {
       "step": "W1",
       "cmd": "wsl.exe --list --quiet",
       "exit": 0,
-      "output_excerpt": "NativeStack\nNoesisFoundation"
+      "output_excerpt": "NativeStack\n<another-distribution>"
     },
     {
       "step": "W1",
@@ -601,7 +601,7 @@
       "step": "W4",
       "cmd": "wsl.exe --list --verbose",
       "exit": 0,
-      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Stopped         2"
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  <another-distribution>      Running         2\n  StackRehearsal2604    Stopped         2"
     },
     {
       "step": "W5",
@@ -685,7 +685,7 @@
       "step": "W5",
       "cmd": "wsl.exe --list --verbose",
       "exit": 0,
-      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Running         2"
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  <another-distribution>      Running         2\n  StackRehearsal2604    Running         2"
     },
     {
       "step": "W5",
@@ -835,7 +835,7 @@
       "step": "W7",
       "cmd": "wsl.exe --list --running --quiet",
       "exit": 0,
-      "output_excerpt": "NativeStack\nNoesisFoundation (StackRehearsal2604 absent)"
+      "output_excerpt": "NativeStack\n<another-distribution> (StackRehearsal2604 absent)"
     },
     {
       "step": "W7",
@@ -1099,7 +1099,7 @@
       "step": "final-state (not in the recipe)",
       "cmd": "wsl.exe --list --verbose",
       "exit": 0,
-      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Running         2"
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  <another-distribution>      Running         2\n  StackRehearsal2604    Running         2"
     }
   ],
   "comparison_arms": {
