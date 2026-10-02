@@ -626,9 +626,8 @@ Proof: as in [`adoption/bootstrap.md`](../bootstrap.md); stage 2 records its own
 
 After stage 2, install the profile example for `<Name>` as step 5 of
 [Windows Terminal profiles and the login shell](linux-wsl2.md#windows-terminal-profiles-and-the-login-shell) describes:
-`<DISTRO>` is `<Name>`, `<WSL_USER>` the new user and `<PROJECT>` `/home/<WSL_USER>/code/native-agent-stack`. Rename all
-five profiles, for example to `<Name> - Shell`, `<Name> - Codex`, `<Name> - Codex - resume`, `<Name> - Claude` and
-`<Name> - Claude - resume`, and save the file as
+`<DISTRO>` is `<Name>`, `<WSL_USER>` the new user and `<PROJECT>` `/home/<WSL_USER>/code/native-agent-stack`. Rename the
+three profiles, for example to `<Name> - Shell`, `<Name> - Codex` and `<Name> - Claude`, and save the file as
 `<Name>.json` in the same Fragments folder. Windows Terminal derives a fragment profile's identity from the folder name
 and the profile name, so the workstation's identically named profiles would collide with these. Then prove the profile
 launch shape from Windows:
