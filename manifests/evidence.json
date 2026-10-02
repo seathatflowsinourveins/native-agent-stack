@@ -4300,8 +4300,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "52513428d4b10ab40e0dbeb05373514ceae1e79f1d81a79afdc52868f58c743c",
-      "bytes": 24767
+      "sha256": "149b05c61320363dca3264f88962019fcd51523dbbc78f1be818a6df9fbd3cba",
+      "bytes": 25956
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
@@ -15651,8 +15651,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
-      "sha256": "de936e27ab396580c9d26d082da659e3f5c551280a9f5444eb2daf4e5c43b21b",
-      "bytes": 110919
+      "sha256": "0c3a440fca32ef0c435d0cf030bf6cdc39648ec9292f4131b232e2585ad8cbcf",
+      "bytes": 133677
     },
     {
       "path": "docs/decisions/2026-09-28-top-rule-templates.md",
@@ -47256,8 +47256,8 @@
     },
     {
       "path": "examples/claude-native/windows-terminal.fragment.example.json",
-      "sha256": "470b1389448ddef3111c092f1e8534f3ce462e81be9d12c386bcac19f42d2a56",
-      "bytes": 1296
+      "sha256": "f68d0be2f73d58dc6839b9e4ff1ef3f14fb941a1b99ec1c80ba2de6a9098cd7e",
+      "bytes": 2230
     },
     {
       "path": "examples/claude-native/workflows/README.md",
@@ -47796,8 +47796,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "06a1114f09a4a9d44af520c878ed02a66c0f6144e4dcfb2fbbcdf44adcfdbddd",
-      "bytes": 39587
+      "sha256": "1267c78f2b719ce6ed23c781ce97f2b189d29a2897c970e4d64610cb42b6efba",
+      "bytes": 39626
     },
     {
       "path": "recipes/claude-native-ultracode.md",
@@ -49031,8 +49031,8 @@
     },
     {
       "path": "tests/test_windows_terminal_defaults.py",
-      "sha256": "27015c534bc0b4c2ea7c8810cc5223dd351d3fb0a0224e916592348044df1b65",
-      "bytes": 34783
+      "sha256": "1dfdc8dada79af42e62e13f14545228f4a31ac80a1393c55d23532d7d050b165",
+      "bytes": 48614
     },
     {
       "path": "tests/test_worker_recovery.py",
