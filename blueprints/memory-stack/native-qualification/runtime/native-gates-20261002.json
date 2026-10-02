@@ -16,12 +16,14 @@
     "HINDSIGHT_CONFIG scopes candidate configuration; it does not disable production ai-memory hooks.",
     "The local gateway's GET /v1/models at loopback port 20128 returned HTTP 401. Other observed local listeners returned 426 and 404 respectively.",
     "secret has OMNIROUTE_API_KEY exited 44; secret list succeeded but contained no names matching OmniRoute or gateway. No credential value was read or printed.",
-    "Supported native auth status commands succeeded: Codex is logged in using ChatGPT; Claude is logged in through claude.ai/firstParty. Existing native authentication is available."
+    "Supported native auth status commands succeeded: Codex is logged in using ChatGPT; Claude is logged in through claude.ai/firstParty. Existing native authentication is available.",
+    "The installed patched OmniRoute 3.8.52 variant exposes a native CLI broker, but its built-in Claude and Codex definitions are legacy stdio adapters. Codex's configured --quiet flag is absent from observed CLI help; Claude's adapter writes stdin without ending it. No successful broker model execution is claimed.",
+    "The official Claude ACP adapter 0.23.1 source supports CLAUDE_CODE_EXECUTABLE and a native terminal login method. This is a source-qualified integration option, not an installed or measured resolution of the gateway compatibility gate."
   ],
   "unresolved_prerequisites": [
     "Native configuration owner attests all effective hook/MCP/startup-context sources and exact reversible config snapshots.",
     "Prove supported suppression of control capture and unwanted control recall in the candidate lane while preserving the intended handoff behavior.",
-    "Resolve a supported passwordless native/OAuth or command-scoped Keychain gateway lane; do not ask the user to handle a key or import native account stores.",
+    "The shared gateway owner must qualify a pinned supported native ACP adapter with the authenticated native executable, exact model/effort and process cleanup. Do not request a user-supplied key, copy native tokens or weaken gateway authentication. See passwordless.md; no broker smoke result exists yet.",
     "Freeze model/configuration/source hashes, budgets and exposure attestation before any held-out query.",
     "Run matching native lifecycle and representative quality/latency checks, blind cross-family review and genuine-session canary."
   ],

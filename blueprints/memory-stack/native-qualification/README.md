@@ -106,12 +106,13 @@ install a backend or change production settings.
 - Synthetic cases and scorer checks establish fixture behavior, not production
   quality. Historical failed native compaction, rerank latency and synthesis
   checks remain open; this package does not relabel them.
-- [Native prerequisites](runtime/native-gates-20261002.json): native hooks have
-  not been rewired by this package. The local gateway's models
-  endpoint returned 401, and `secret has OMNIROUTE_API_KEY` returned nonzero on
-  this host. No authenticated cross-family vote was obtained. The maintained
-  repository requires the coordinator to start those votes through its gateway;
-  native credentials are not imported into it.
+- [Native prerequisites](runtime/native-gates-20261002.json): both native clients
+  already report authenticated sessions. No new key is requested from the user.
+  The gateway models endpoint's earlier 401 is retained, but does not establish
+  missing native authentication. The installed gateway's legacy CLI adapters
+  need compatibility qualification; see the [passwordless integration boundary](runtime/passwordless.md).
+  No authenticated cross-family vote was obtained. Native hooks and credential
+  stores have not been rewired by this package.
 - Representative native lifecycle, real comparative runs, blind convergence and
   the 20 genuine-session/two-restart canary still gate a selection change. Other
   hosts require their own acceptance. Whole-task usage and net savings are unknown.
