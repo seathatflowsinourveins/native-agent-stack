@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "0d2d1d89f40575f4bc541b7ccb9321c51ca3ed64b962500cce6bafd2bdaa13fd"
+        "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -90,7 +90,7 @@
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "6d9437cf15a30ce420351f7d7c2182a1f0a27c63e6cbbdab236e2747e3afbb6c"
+        "sha256": "ec03a494aa4d80ac004f74710250bf1ac7cf18e0506758d97a1cf98a0cee42a3"
       }
     ],
     "inputs": [
@@ -106,11 +106,11 @@
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "5a8ae20258382bb197d600a9fc6d41ce32dd8d50d2423608cbdfffa03e706708"
+        "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "b9c9912c9789a4999fa43ce5cb38495af64289a16122188af8ca34d15fca13a3"
+        "sha256": "b1c8b52f4358d03b00c6bb3ffdc5171febaa187ab5ff538fcf6bc2963096ac58"
       }
     ]
   },

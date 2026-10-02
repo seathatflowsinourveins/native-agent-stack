@@ -1,0 +1,118 @@
+{
+  "checks": [
+    {
+      "name": "decoded_archive_identity",
+      "passed": true
+    },
+    {
+      "name": "holdout_safe_regular_members",
+      "passed": true
+    },
+    {
+      "name": "archive_identity",
+      "passed": true
+    },
+    {
+      "name": "sealed_member_inventory_and_hashes",
+      "passed": true
+    },
+    {
+      "name": "development_manifest_hashes",
+      "passed": true
+    },
+    {
+      "name": "dev_counts_categories",
+      "passed": true
+    },
+    {
+      "name": "dev_case_source_hashes",
+      "passed": true
+    },
+    {
+      "name": "dev_ids_unique",
+      "passed": true
+    },
+    {
+      "name": "dev_source_metadata_prose_and_timestamps",
+      "passed": true
+    },
+    {
+      "name": "dev_gold_support_scope_temporal_contract",
+      "passed": true
+    },
+    {
+      "name": "dev_requested_fact_keys_model_visible",
+      "passed": true
+    },
+    {
+      "name": "holdout_counts_categories",
+      "passed": true
+    },
+    {
+      "name": "holdout_case_source_hashes",
+      "passed": true
+    },
+    {
+      "name": "holdout_ids_unique",
+      "passed": true
+    },
+    {
+      "name": "holdout_source_metadata_prose_and_timestamps",
+      "passed": true
+    },
+    {
+      "name": "holdout_gold_support_scope_temporal_contract",
+      "passed": true
+    },
+    {
+      "name": "holdout_requested_fact_keys_model_visible",
+      "passed": true
+    },
+    {
+      "name": "splits_ids_scenarios_source_bytes_disjoint",
+      "passed": true
+    },
+    {
+      "name": "negative_controls_rejected",
+      "passed": true
+    }
+  ],
+  "checks_passed": 19,
+  "checks_total": 19,
+  "corpus_freeze_id": "synthetic-native-qualification-20261002-v1",
+  "corpus_manifest_sha256": "44d9b260e4240986b4295af2555659c40d92e1263d621c9da58b599922762b12",
+  "counts": {
+    "dev": {
+      "cases": 12,
+      "sources": 34
+    },
+    "holdout": {
+      "cases": 60,
+      "sources": 169
+    }
+  },
+  "evidence_class": "structural_validation",
+  "exit_code": 0,
+  "exposure": {
+    "author": true,
+    "coordinator": "not_attested",
+    "tuning_executor": "not_attested",
+    "validator": true
+  },
+  "limitations": "Consistency only; validator reads authored fixtures; no runtime acceptance, blindness or production-representativeness proof.",
+  "negative_controls": [
+    {
+      "control": "wrong_archive_hash",
+      "rejected": true
+    },
+    {
+      "control": "absent_required_source_reference",
+      "rejected": true
+    }
+  ],
+  "observed_at": "2026-10-02T05:58:26.666677+00:00",
+  "runtime_model_calls": 0,
+  "source_revision": "231eed43e17cc7953751b7caf90376b01cb5feec",
+  "validator_path": "corpus-author-scratch/validate_corpus.py",
+  "validator_sha256": "9ad065aa0dcb2f9270003a696f26723fb9d2c9210cec786b3c26b805f5eec22b"
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-02",
+  "scope": "Isolated Linux ARM64 qualification on macOS Colima; not production promotion",
+  "ai_memory": {
+    "version": "2.5.2",
+    "source": "https://github.com/akitaonrails/ai-memory",
+    "revision": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+    "image": "docker.io/akitaonrails/ai-memory@sha256:8fd85dd8cb14e75ea62d74423565121b1cc2ed20d0016ed38b546e9082f16e65",
+    "platform": "linux/arm64",
+    "repository_license": "MIT",
+    "verification": "Versioned OCI manifest, successful digest pull, native --version"
+  },
+  "hindsight": {
+    "version": "0.10.2",
+    "source": "https://github.com/vectorize-io/hindsight",
+    "revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "image": "ghcr.io/vectorize-io/hindsight@sha256:07873ca79a79bcb5662c6015bf9e40cf32fc0ae5bd7f5e8e71974fffa48e31c1",
+    "platform": "linux/arm64",
+    "repository_license": "MIT",
+    "verification": "Versioned OCI manifest, successful digest pull, image labels and installed hindsight-api-slim metadata; server not launched"
+  },
+  "coding_agents": {
+    "package": "@vectorize-io/hindsight-coding-agents",
+    "version": "0.8.0",
+    "source_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "tarball": "https://registry.npmjs.org/@vectorize-io/hindsight-coding-agents/-/hindsight-coding-agents-0.8.0.tgz",
+    "integrity": "sha512-CViWmh2fnVjhQM8kqOJ2GIGC0kp/Gv4t5X+j+kzpzP+T54PiKQPsrQOunvmluEE3JCGnRQOIcz91Vu/0QUcZow==",
+    "sha256": "afc489206154f2e7254057e52b455be8751e8b8bbf5e4a720a104c136fbeed7c",
+    "verification": "Downloaded official 3423600-byte npm archive; registry SHA512 integrity matched; pinned installer/config source reviewed; no installation",
+    "package_license_metadata": null
+  },
+  "inspect_ai": {
+    "version": "0.3.275",
+    "source": "https://github.com/UKGovernmentBEIS/inspect_ai",
+    "source_revision": "c05398d897affcb85bd4cb9d10a7c03e1779a18e",
+    "wheel": "inspect_ai-0.3.275-py3-none-any.whl",
+    "sha256": "624f94404a01a2b8ffd884986b50ed7a6f7f13a845d7e67927267629b55ca11d",
+    "python_requirement": ">=3.10",
+    "repository_license": "MIT",
+    "catalog_delta": "Installed catalog records trial 0.3.268 at 2026-09-26; this isolated package does not update that catalog"
+  },
+  "host": {
+    "colima_version": "0.10.3",
+    "colima_revision": "00f6c297e92a82c04a4ab507db0a61435650d7e8",
+    "docker_client_version": "29.8.2",
+    "docker_server_version": "29.5.2",
+    "guest_os": "Ubuntu 24.04.4 LTS",
+    "profile": "memory-qualification",
+    "architecture": "aarch64",
+    "vm_type": "vz",
+    "cpus": 4,
+    "memory_gib": 12,
+    "disk_gib": 32,
+    "host_mounts": [],
+    "default_docker_context_changed": false
+  },
+  "dependency_and_model_license_review": "Not established by repository licenses; required before any additional model or dependency adoption"
+}

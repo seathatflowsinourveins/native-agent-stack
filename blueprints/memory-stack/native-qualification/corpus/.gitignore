@@ -1,0 +1,2 @@
+# Keep the bounded development input despite the repository-wide JSONL ignore.
+!dev/cases.jsonl

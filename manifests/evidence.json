@@ -3925,8 +3925,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "97c35ece0b41e0ad3b06bc48857aa5c1eb0119862f35603920c33a7ea0244637",
-      "bytes": 10394
+      "sha256": "2ee4a6de196999b33a1f37bb979076308d1a805efd96c0f28f9c23ee6c9e5c22",
+      "bytes": 10639
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -3960,8 +3960,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "1b40c567365c23214847f7eab052dca9dc1925cf7bc65714de291a799586c382",
-      "bytes": 21269
+      "sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f",
+      "bytes": 23346
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -4310,8 +4310,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "0d2d1d89f40575f4bc541b7ccb9321c51ca3ed64b962500cce6bafd2bdaa13fd",
-      "bytes": 86433
+      "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80",
+      "bytes": 86950
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -4430,8 +4430,8 @@
     },
     {
       "path": "adoption/templates/wsl/stage1-receipt.example.json",
-      "sha256": "5a8ae20258382bb197d600a9fc6d41ce32dd8d50d2423608cbdfffa03e706708",
-      "bytes": 60784
+      "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a",
+      "bytes": 60963
     },
     {
       "path": "adoption/tools/README.md",
@@ -6496,7 +6496,7 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "954d0bfc086e40fa6ab38edbc534e91af3be270e2c26195e69b3c70a5524d84e",
+      "sha256": "73ddb6640d03414d71a31e6d6d26812cac3bd9aab0ad82536db0097cc21e0413",
       "bytes": 23065
     },
     {
@@ -15736,8 +15736,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-      "sha256": "6d9437cf15a30ce420351f7d7c2182a1f0a27c63e6cbbdab236e2747e3afbb6c",
-      "bytes": 146325
+      "sha256": "ec03a494aa4d80ac004f74710250bf1ac7cf18e0506758d97a1cf98a0cee42a3",
+      "bytes": 147654
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
@@ -15876,8 +15876,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "4695177fb498cfa277790b113971b152b4f5bb7bf23cf1cf836ebde4571646cd",
-      "bytes": 95856
+      "sha256": "595a97353798afdbaa5153db1393231a0ad0ac38d045e5f3bf1fa37be2bfbe14",
+      "bytes": 96941
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -16016,12 +16016,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "3e36a48347ad232b80310650f34649ac84b31215d265caa29844c171c962d3af",
+      "sha256": "159d381dd77a3066feee265220de9f6c1142c5236f448ba1d762c4b06769d7dc",
       "bytes": 510040
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "684a9eafbb8841fb7360e195211b532fe7147009266d0fdabd0ec717c33dfd33",
+      "sha256": "6833563e5718a5f8fc75b2b16b064722e0aa5aea180e88f44d2ff0059f522ee7",
       "bytes": 312114
     },
     {
@@ -37196,7 +37196,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "51dfde631fa7be1fd52b69dd00b13641a17c639a26eab31b5762d0f035c3d4fd",
+      "sha256": "ba8cfd7fa91b2d413a7f9dad7dfb05e46c250b19037112fad47d24088d9181e6",
       "bytes": 4174
     },
     {
@@ -49156,8 +49156,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "241697711e74fa15c1763c2650e0a9ee8316ab442fb69003312a9aa4a923da58",
-      "bytes": 55352
+      "sha256": "572d280922a42d62159c545094225d93d30cc3d6ca3f0253f794a044675a60d3",
+      "bytes": 59111
     },
     {
       "path": "tests/test_catalogs.py",
@@ -49901,8 +49901,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "b9c9912c9789a4999fa43ce5cb38495af64289a16122188af8ca34d15fca13a3",
-      "bytes": 214953
+      "sha256": "b1c8b52f4358d03b00c6bb3ffdc5171febaa187ab5ff538fcf6bc2963096ac58",
+      "bytes": 218408
     },
     {
       "path": "tests/test_wsl_restore.py",

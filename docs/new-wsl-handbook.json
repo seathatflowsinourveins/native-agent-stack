@@ -6206,7 +6206,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "0d2d1d89f40575f4bc541b7ccb9321c51ca3ed64b962500cce6bafd2bdaa13fd"
+      "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
