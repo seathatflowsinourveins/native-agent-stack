@@ -272,7 +272,7 @@
    "check_plan.py": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c"
   }
  },
- "changes_after_the_runs": "After both commits had run, the header comments of install.sh (lines 2 and 3) and of accept.sh (line 2) and the `status` text of install-plan.json were corrected on 2026-10-02: they had said that this revision was unrun. One sentence of the notes of the engineering-process-skills row in install-plan.json was scoped later the same day. No command, row or check changed, and the corrected files were not run again, so the published files differ from the executed ones in those lines and that sentence only.",
+ "changes_after_the_runs": "After both commits had run, the header comments of install.sh (lines 2 and 3) and of accept.sh (line 2) and the `status` text of install-plan.json were corrected on 2026-10-02: they had said that this revision was unrun. Two sentences of the notes of the engineering-process-skills row in install-plan.json were scoped or marked as superseded later the same day. No command, row or check changed, and the corrected files were not run again, so the published files differ from the executed ones in those lines and those two sentences only.",
  "raw_outputs_scope": "The raw outputs are private files kept outside the repository. Their SHA-256 values bind them for a later inspection; no reviewer has inspected them. This record takes from them only counts, exit codes, slot names and time stamps.",
  "raw_outputs": {
   "P1": "bc3df15df8b254a2e0c22ad73f5215cc19abbb2d6de41cc9817ef83eb33cde72",
