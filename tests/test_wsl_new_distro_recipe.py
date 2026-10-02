@@ -46,8 +46,8 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   - C2: W5 runs ``cloud-init schema --system`` as root on path A, and W6 skips it on path B;
   - D: P3 records the current boot's ``hv_storvsc`` kernel journal count, without the driver's registration line, as
     a baseline and stops only when the newest error line is less than one hour old by its kernel time; W5 counts again
-    after the first launch on both paths, and a larger count is exposure to microsoft/WSL#41482 (the coordinator's
-    rule of 2026-10-01, which replaced the stop on any nonzero count);
+    after the first launch on both paths; attachment-only increases before cloud-init starts are recorded, and later
+    storage errors or a provisioning failure with a storage cause stop the run (the 2026-10-02 rehearsal correction);
   - E1 and E2: W7 terminates ``<Name>`` once after the first launch, relaunches it and reads the owner of a file created
     from Windows (microsoft/WSL#40941, PR #40977);
   - F: W1 reads the two idle keys of the global WSL configuration, F2 observes ``<Name>`` for two minutes with no client
@@ -79,6 +79,7 @@ USER_DATA = TEMPLATES / "cloud-init.user-data.template"
 HOST_TEMPLATE = TEMPLATES / "host.new-distro.json.template"
 RECEIPT_EXAMPLE = TEMPLATES / "stage1-receipt.example.json"
 CHECKLIST = TEMPLATES / "first-boot-checklist.md"
+SOURCE_RECEIPT = ROOT / "evidence/artifacts/new-wsl-dual-image-20261001/receipt.json"
 HOST_EXAMPLE = ROOT / "adoption/hosts/example.json"
 STACK = ROOT / "manifests/stack.json"
 BOOTSTRAP = ROOT / "adoption/bootstrap.md"
@@ -102,6 +103,28 @@ RELEASE_PINS = {
     },
 }
 PLACEHOLDER = "${WSL_USER}"
+# The review contract is independent of the recipe, checklist and receipt. Losing a stage from all three must fail.
+REQUIRED_STAGE_IDS = (
+    "R1", "P1", "P2", "P3", "W1", "W2", "W3", "W4", "W5", "W6", "W7",
+    "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11",
+)
+SELECTED_IMAGE_DIGEST_FIELDS = ("sha256_published", "sha256_computed", "sha256_distributioninfo")
+INTEROP_VERIFY = ("wsl.exe -d '<Survivor>' --exec sh -c "
+                  "'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'")
+INTEROP_GUARD = ("if ($LASTEXITCODE -ne 0) { throw "
+                 "'interop failed: recover in the surviving distribution before continuing' }")
+NAMESPACE_READ = "readlink /proc/1/ns/cgroup"
+CGROUP_PROCS = "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'"
+USER_MANAGER_ACTIVE = ('/mnt/c/Windows/System32/wsl.exe -d \'<Name>\' --exec sh -c '
+                       '\'systemctl is-active "user@$(id -u).service"\'')
+STORAGE_RULE = ("On both paths, record P3's baseline before the import and `second_count` after the first launch. "
+                "An increase confined to the window in which the new disk is attached, before cloud-init starts, "
+                "is recorded with the new lines and does not stop the run. Any storage error after that window, "
+                "or any provisioning step that fails with a storage cause, stops the run.")
+OLD_STORAGE_RULE = ("On both paths, the second storage count equals P3's baseline; a larger count is recorded "
+                    "with the new lines, a failed W5 counts as exposure to microsoft/WSL#41482, and nothing "
+                    "continues to stage 2 until that is decided.")
+USER_SESSION_WARNING = "wsl: Failed to start the systemd user session"
 # Loopback ports the workstation distribution already uses: the four in adoption/hosts/example.json, the gateway,
 # memory and the 2026-09-25 relocations named in adoption/platforms/linux-wsl2.md ("Listeners and ports"), and every
 # 127.0.0.1 port in observability/backends/templates and configure.py. The recipe lists the same set (F8).
@@ -343,9 +366,36 @@ def sha256_errors(recipe: str, record: str, receipt: dict, checklist: str) -> li
     if image.get("release") != "<RELEASE>" or image.get("file") != IMAGE or image.get("url") != (
             "https://releases.ubuntu.com/<RELEASE>/" + IMAGE):
         errors.append("the synthetic receipt does not name the selected release's file and URL")
-    for key in ("bytes", "sha256_published"):
+    for key in ("bytes", *SELECTED_IMAGE_DIGEST_FIELDS):
         if not is_placeholder(image.get(key), "<W2"):
             errors.append(f"the synthetic receipt's selected-image {key} must be filled from the actual W2 run")
+    return errors + selected_image_digest_errors(recipe, receipt)
+
+
+def selected_image_digest_errors(recipe: str, receipt: dict) -> list[str]:
+    """Check every selected-image digest, including additional digest fields, against the recipe's release pair."""
+    image = receipt.get("image", {})
+    errors = [f"image lacks {key}" for key in SELECTED_IMAGE_DIGEST_FIELDS if key not in image]
+    release = image.get("release")
+    synthetic = receipt.get("artifact_class") == "synthetic_fixture" and release == "<RELEASE>"
+    if not synthetic and release not in RELEASE_PINS:
+        return errors + ["image has no supported selected release"]
+    selected = RELEASE_PINS if synthetic else {release: RELEASE_PINS[release]}
+    recipe_hashes = {}
+    for name, pin in selected.items():
+        hashes = {value for line in recipe.splitlines() if pin["file"] in line for value in SHA256_RE.findall(line)}
+        if len(hashes) != 1:
+            errors.append(f"recipe has no single digest for {name}")
+        else:
+            recipe_hashes[name] = hashes.pop()
+    for key, value in image.items():
+        if "sha256" not in key.lower():
+            continue
+        if synthetic:
+            if not is_placeholder(value, "<W2") or "recipe" not in value or "selected-release" not in value:
+                errors.append(f"image.{key} must await the selected release's W2 digest")
+        elif value != recipe_hashes.get(release):
+            errors.append(f"image.{key} differs from the recipe's {release} digest")
     return errors
 
 
@@ -366,6 +416,8 @@ def receipt_errors(receipt: dict, recipe: str, component_ids: set[str]) -> list[
     # recipe's command rows (the rows the command-table check reads), once per occurrence, and nothing else.
     rows = recipe_rows(recipe)
     steps = set(STEP_RE.findall(recipe))
+    if steps != set(REQUIRED_STAGE_IDS):
+        errors.append("the recipe does not contain the independent required stage ids")
     if {step for step, _, _ in rows} != steps:
         errors.append(f"recipe steps without a command line: {sorted(steps - {step for step, _, _ in rows})}")
     entries = [entry for entry in receipt.get("steps", []) if isinstance(entry, dict)]
@@ -423,6 +475,8 @@ def checklist_errors(checklist: str, recipe: str) -> list[str]:
     if not steps:
         return ["the recipe has no ### W<n>. or ### F<n>. step headings"]
     errors = []
+    if tuple(steps) != REQUIRED_STAGE_IDS or tuple(listed) != REQUIRED_STAGE_IDS:
+        errors.append("the recipe or checklist differs from the independent required stage ids and order")
     if sorted(set(listed)) != sorted(set(steps)):
         errors.append(f"the checklist names {sorted(set(listed))}, the recipe has {sorted(set(steps))}")
     if len(listed) != len(set(listed)):
@@ -738,8 +792,8 @@ def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dic
     without the driver's registration line, which every boot logs. The count is a baseline, not a verdict. P3 prints the
     newest error line with its kernel time and the uptime: a line less than one hour old means errors are happening now,
     and the run stops. The one-hour threshold is the recipe's choice. W5 counts again after the first launch, on both
-    paths: an equal count passes; a larger one is recorded with the new lines as exposure to microsoft/WSL#41482, and
-    nothing continues to stage 2 until that is decided. A bare count that stops on any line was rejected: it cannot tell
+    paths: attachment errors before cloud-init starts are recorded; later errors or a provisioning failure with a
+    storage cause stop the run. A bare count that stops on any line was rejected: it cannot tell
     an old burst from errors that are happening now."""
     steps = STEP_RE.findall(recipe)
     if "P3" not in steps:
@@ -756,7 +810,8 @@ def kernel_storage_errors(recipe: str, record: str, checklist: str, receipt: dic
     rows = recipe_rows(recipe)
     second = [index for index, (step, shell, command) in enumerate(rows) if step == "W5" and shell == "sh"]
     launch = [index for index, (step, _, command) in enumerate(rows) if step == "W5" and "< NUL" in command]
-    if [rows[index][2] for index in second] != [STORVSC_COUNT] or not launch or second[0] < launch[0]:
+    counts = [index for index in second if rows[index][2] == STORVSC_COUNT]
+    if len(counts) != 1 or not launch or counts[0] < launch[0]:
         errors.append("W5 does not count the storage errors again, in the workstation distribution, after the launch")
     w5 = prose(section(recipe, "W5"))
     errors += [f"W5's text does not name {needed}" for needed in
@@ -1573,7 +1628,8 @@ class DualImageParameterizationTests(unittest.TestCase):
                         "/usr/lib/wsl/lib/nvidia-smi", "uv run --no-project --python 3.13 python --version",
                         "node --version"):
             self.assertTrue(any(command in line for _, line in step_commands(recipe, "R1")), command)
-        self.assertIn("no merit precedence", prose(r1))
+        self.assertIn("26.04.1 is the single default", prose(r1))
+        self.assertIn("release-caused 26.04 failure with no in-release remedy", prose(r1))
         self.assertIn("from the workstation's second-instance session", prose(r1))
         self.assertIn("host check is not image qualification", prose(section(recipe, "P2")))
         self.assertIn("wsl.exe -d '<Name>' -u root --exec cloud-init --version",
@@ -1583,6 +1639,292 @@ class DualImageParameterizationTests(unittest.TestCase):
         self.assertEqual(experiment["observations"], [])
         self.assertEqual(experiment["decision_and_scope"]["qualification_run_ids"], [])
         self.assertIn("no merit precedence", experiment["predeclared_metrics"]["quality_rule"])
+
+
+def version_gate_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    w1 = prose(section(recipe, "W1"))
+    if ("powershell", "wsl.exe --version") not in step_commands(recipe, "W1"):
+        errors.append("W1 does not record the installed WSL version")
+    for needed in ("3.0.1 or later", "second systemd distribution", "before W4 or W6", "stop", "40519", "41512"):
+        if needed not in w1:
+            errors.append(f"W1 lacks the cgroup version precondition: {needed}")
+    if "3.0.1 or later" not in checklist_line(checklist, "W1"):
+        errors.append("the checklist still accepts an older second systemd distribution")
+    rules = prose(chapter(recipe, "Host-wide rules"))
+    for needed in ("single systemd distribution", "2.4.10 or later", "2.7.13", "shared cgroup"):
+        if needed not in rules:
+            errors.append(f"the host rules lack the older single-distribution boundary: {needed}")
+    if "No WSL update is needed to install" in rules or "2.4.10 or later" in w1:
+        errors.append("the second-distribution preflight still accepts the old install-only minimum")
+    return errors
+
+
+def namespace_observation_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    if ("sh", NAMESPACE_READ) not in step_commands(recipe, "W1"):
+        errors.append("W1 lacks the native observation on the running distribution")
+    for needed in ("cgroup:[4026531835]", "PROC_CGROUP_INIT_INO", "initial cgroup namespace", "corroboration", "not the gate"):
+        if needed not in prose(section(recipe, "W1")):
+            errors.append(f"W1 lacks the namespace observation's interpretation: {needed}")
+    if NAMESPACE_READ not in checklist_line(checklist, "W1"):
+        errors.append("the checklist omits the namespace observation")
+    return errors
+
+
+def cgroup_launch_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    w5 = section(recipe, "W5")
+    order = ("systemctl is-active '<COMMON_UNIT>'",
+             "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'", CGROUP_PROCS, USER_MANAGER_ACTIVE)
+    blocks = step_blocks(recipe, "W5")
+    if not any(all(command in block for command in order) and
+               [block.index(command) for command in order] == sorted(block.index(command) for command in order)
+               for block in blocks):
+        errors.append("W5 lacks the native cross-distribution cgroup and user-manager checks in order")
+    for needed in ("after the first launch", "before F1", "while both distributions run", "no `0` entry",
+                   "user@<uid>.service", "empty or unreadable", "never stop or restart a unit in either distribution"):
+        if needed not in prose(w5):
+            errors.append(f"W5 lacks its conclusive cgroup proof or recovery rule: {needed}")
+    failed_tar = r"Z:\WSL\downloads\<Name>-cgroup-failed.tar"
+    export = f"wsl.exe --export '<Name>' '{failed_tar}'"
+    failures = [block for block in blocks if export in block]
+    if len(failures) != 1:
+        errors.append("W5 lacks the dedicated cgroup-failure recovery")
+    else:
+        block = failures[0]
+        recovery = (TERMINATE, export, EXPORT_GUARD, UNREGISTER, INTEROP_VERIFY, INTEROP_GUARD)
+        if not all(command in block for command in recovery) or (
+                [block.index(command) for command in recovery] != sorted(block.index(command) for command in recovery)):
+            errors.append("cgroup failure must terminate only the new distro, guard the export, unregister and check interop")
+        if any(re.search(r"systemctl\s+(?:stop|restart)\b", command) for command in block):
+            errors.append("cgroup failure recovery tries to stop or restart a system unit")
+    if "cgroup.procs" not in checklist_line(checklist, "W5"):
+        errors.append("the checklist lacks the post-launch cgroup proof")
+    return errors
+
+
+def unregister_interop_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    sites = Counter()
+    for step in REQUIRED_STAGE_IDS:
+        for block in step_blocks(recipe, step):
+            for index, command in enumerate(block):
+                if command != UNREGISTER:
+                    continue
+                sites[step] += 1
+                if block[index + 1:index + 3] != [INTEROP_VERIFY, INTEROP_GUARD]:
+                    errors.append(f"{step} unregister {sites[step]} lacks the immediate surviving-distribution interop check")
+    if sites != Counter({"R1": 2, "W5": 1, "W6": 1}):
+        errors.append(f"unregister sites {dict(sites)} differ from the four reviewed removals")
+    r1 = prose(section(recipe, "R1"))
+    if "sudo systemctl restart systemd-binfmt || exit 1" not in [c for _, c in step_commands(recipe, "R1")]:
+        errors.append("R1 lacks the supported surviving-distribution binfmt recovery")
+    if "If either check still fails, stop" not in r1:
+        errors.append("interop recovery lacks a stop when Windows execution does not return")
+    for step in ("R1", "W6"):
+        if "WSLInterop" not in checklist_line(checklist, step) or "Windows executable" not in checklist_line(checklist, step):
+            errors.append(f"the checklist's {step} removal lacks both interop observations")
+    if "whether binfmt registrations survive" in recipe:
+        errors.append("the recipe still presents the observed binfmt loss as an open question")
+    return errors
+
+
+def storage_window_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    for name, text in (("recipe", section(recipe, "W5")), ("checklist", checklist_line(checklist, "W5"))):
+        if STORAGE_RULE not in prose(text):
+            errors.append(f"the {name} lacks the single storage-count and attachment-window rule")
+        if "count equals P3's baseline" in prose(text) or "count equals the baseline" in prose(text):
+            errors.append(f"the {name} still stops on an attachment-only increase")
+        if USER_SESSION_WARNING not in text:
+            errors.append(f"the {name} does not stop on the systemd user-session launch warning")
+    p3 = STEP_RE.findall(recipe).index("P3") if "P3" in STEP_RE.findall(recipe) else -1
+    w4 = STEP_RE.findall(recipe).index("W4") if "W4" in STEP_RE.findall(recipe) else -1
+    if not 0 <= p3 < w4 or ("sh", STORVSC_COUNT) not in step_commands(recipe, "P3"):
+        errors.append("the baseline is not recorded before the import")
+    if ("sh", STORVSC_COUNT) not in step_commands(recipe, "W5"):
+        errors.append("there is no second count after the first launch")
+    return errors
+
+
+class RehearsalRepairTests(unittest.TestCase):
+    """Source contracts from the real rehearsal; controls restore the unsafe old text in memory only."""
+
+    def test_required_stages_are_independent_even_when_all_artifacts_lose_one(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        components = {c["id"] for c in json.loads(read(STACK))["components"]}
+        self.assertEqual(tuple(STEP_RE.findall(recipe)), REQUIRED_STAGE_IDS)
+        self.assertIn(("W1", "sh", NAMESPACE_READ), recipe_rows(recipe))
+        # The old checks derived their entire contract from the recipe and accepted this coordinated deletion.
+        old_page = recipe.replace(section(recipe, "F4"), "")
+        old_ticks = checklist.replace(checklist_line(checklist, "F4") + "\n", "")
+        old_receipt = dict(receipt, steps=[e for e in receipt["steps"] if e["step"] != "F4"])
+        self.assertTrue(checklist_errors(old_ticks, old_page))
+        self.assertTrue(receipt_errors(old_receipt, old_page, components))
+
+    def test_every_selected_image_digest_rejects_the_old_unchecked_fields(self):
+        recipe, record, checklist = read(RECIPE), read(RECORD), read(CHECKLIST)
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        self.assertEqual(sha256_errors(recipe, record, receipt, checklist), [])
+        for key in SELECTED_IMAGE_DIGEST_FIELDS:
+            with self.subTest(field=key, control="old unchecked selected digest"):
+                old = dict(receipt, image=dict(receipt["image"], **{key: "0" * 64}))
+                self.assertTrue(sha256_errors(recipe, record, old, checklist))
+        for release, pin in RELEASE_PINS.items():
+            image = dict(pin, release=release, **{key: pin["sha256"] for key in SELECTED_IMAGE_DIGEST_FIELDS})
+            selected = dict(receipt, image=image)
+            self.assertEqual(selected_image_digest_errors(recipe, selected), [])
+            other = next(p["sha256"] for r, p in RELEASE_PINS.items() if r != release)
+            for key in (*SELECTED_IMAGE_DIGEST_FIELDS, "sha256_additional"):
+                with self.subTest(release=release, field=key, control="swapped selected digest"):
+                    self.assertTrue(selected_image_digest_errors(recipe, dict(selected, image=dict(image, **{key: other}))))
+            for key in SELECTED_IMAGE_DIGEST_FIELDS:
+                self.assertTrue(selected_image_digest_errors(recipe, dict(selected, image={k:v for k,v in image.items()
+                                                                                           if k != key})))
+
+    def test_version_gate_rejects_the_old_install_only_minimum(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(version_gate_errors(recipe, checklist), [])
+        old_w1 = section(recipe, "W1").replace("3.0.1 or later", "2.4.10 or later")
+        self.assertNotEqual(old_w1, section(recipe, "W1"))
+        self.assertTrue(version_gate_errors(recipe.replace(section(recipe, "W1"), old_w1), checklist))
+        self.assertTrue(version_gate_errors(recipe, checklist.replace("3.0.1 or later", "2.4.10 or later")))
+
+    def test_namespace_is_observed_and_never_used_as_the_version_gate(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(namespace_observation_errors(recipe, checklist), [])
+        old = recipe.replace(NAMESPACE_READ + "\n", "")
+        self.assertNotEqual(old, recipe)
+        self.assertTrue(namespace_observation_errors(old, checklist))
+        self.assertTrue(namespace_observation_errors(recipe.replace("not the gate", "the gate"), checklist))
+
+    def test_cgroups_are_checked_from_the_running_distribution_before_f1(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(cgroup_launch_errors(recipe, checklist), [])
+        for command in (CGROUP_PROCS, USER_MANAGER_ACTIVE):
+            with self.subTest(control="old launch without isolation proof", command=command):
+                old = recipe.replace(command + "\n", "")
+                self.assertNotEqual(old, recipe)
+                self.assertTrue(cgroup_launch_errors(old, checklist))
+
+    def test_cgroup_failure_uses_only_the_new_distribution_recovery(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(cgroup_launch_errors(recipe, checklist), [])
+        w5 = section(recipe, "W5")
+        old = recipe.replace(w5, w5.replace("wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar'\n", ""))
+        self.assertNotEqual(old, recipe)
+        self.assertTrue(cgroup_launch_errors(old, checklist))
+        unsafe = recipe.replace(w5, w5.replace(TERMINATE + "\n", "sudo systemctl restart user@1000.service\n", 1))
+        self.assertTrue(cgroup_launch_errors(unsafe, checklist))
+
+    def test_every_unregister_checks_surviving_interop_and_stops_on_failed_recovery(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(unregister_interop_errors(recipe, checklist), [])
+        self.assertEqual(sum(command == UNREGISTER for _, _, command in recipe_rows(recipe)), 4)
+        removal = UNREGISTER + "\n" + INTEROP_VERIFY + "\n" + INTEROP_GUARD + "\n"
+        self.assertEqual(recipe.count(removal), 4)
+        for site in range(4):
+            with self.subTest(control="old unregister without interop check", site=site + 1):
+                parts = recipe.split(removal)
+                parts[site] += UNREGISTER + "\n"
+                old = removal.join(parts[:site + 1]) + removal.join(parts[site + 1:])
+                self.assertEqual(old.count(removal), 3)
+                self.assertTrue(unregister_interop_errors(old, checklist))
+        old = recipe.replace("sudo systemctl restart systemd-binfmt || exit 1\n", "")
+        self.assertNotEqual(old, recipe)
+        self.assertTrue(unregister_interop_errors(old, checklist))
+
+    def test_both_storage_rules_reject_the_old_equal_count_requirement(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(storage_window_errors(recipe, checklist), [])
+        pattern = re.escape(STORAGE_RULE).replace(r"\ ", r"\s+")
+        for name in ("recipe", "checklist"):
+            with self.subTest(control="old equal-count storage rule", file=name):
+                page = re.sub(pattern, OLD_STORAGE_RULE, recipe) if name == "recipe" else recipe
+                ticks = re.sub(pattern, OLD_STORAGE_RULE, checklist) if name == "checklist" else checklist
+                self.assertNotEqual((page, ticks), (recipe, checklist))
+                self.assertTrue(storage_window_errors(page, ticks))
+
+    def test_launch_warning_stops_even_when_the_launch_exits_zero(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(storage_window_errors(recipe, checklist), [])
+        for name in ("recipe", "checklist"):
+            with self.subTest(control="old exit-zero launch proof", file=name):
+                page = recipe.replace(USER_SESSION_WARNING, "launch exit 0") if name == "recipe" else recipe
+                ticks = checklist.replace(USER_SESSION_WARNING, "launch exit 0") if name == "checklist" else checklist
+                self.assertTrue(storage_window_errors(page, ticks))
+
+    def test_default_and_rollback_reject_the_old_symmetric_arms(self):
+        inputs = (read(RECIPE), read(RECORD), read(CHECKLIST))
+        self.assertEqual(default_image_errors(*inputs), [])
+        for index, text in enumerate(inputs):
+            with self.subTest(control="old symmetric image arms", file=index):
+                old = text + "\nBoth are symmetric provisional arms with no merit precedence.\n"
+                mutant = (*inputs[:index], old, *inputs[index + 1:])
+                self.assertTrue(default_image_errors(*mutant))
+
+    def test_signature_class_rejects_unretained_output_claims(self):
+        record, receipt = read(RECORD), json.loads(read(SOURCE_RECEIPT))
+        self.assertEqual(signature_class_errors(record, receipt), [])
+        old = record + "\nThe retained logs are each release's native-signed-sums.stdout and native-signed-sums.stderr.\n"
+        self.assertTrue(signature_class_errors(old, receipt))
+        old_receipt = dict(receipt, source_verification=dict(receipt['source_verification'],
+                                                           evidence_class='native signature output for both releases'))
+        self.assertTrue(signature_class_errors(record, old_receipt))
+
+    def test_rootless_start_rejects_the_old_bus_only_f3(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        self.assertEqual(rootless_start_errors(recipe, checklist), [])
+        f3 = section(recipe, "F3")
+        old_f3 = f3.split("Right after the bus proof,", 1)[0]
+        self.assertNotEqual(old_f3, f3)
+        self.assertTrue(rootless_start_errors(recipe.replace(f3, old_f3), checklist))
+        old_ticks = checklist.replace(checklist_line(checklist, "F3"),
+                                      "- [ ] **F3** The bus is a socket and the user manager is running.")
+        self.assertTrue(rootless_start_errors(recipe, old_ticks))
+
+
+def default_image_errors(recipe: str, record: str, checklist: str) -> list[str]:
+    errors = []
+    for name, text in (("recipe", recipe), ("record", record), ("checklist", checklist)):
+        for needed in ("single default", "26.04.1", "24.04.5", "rollback",
+                       "release-caused 26.04 failure with no in-release remedy"):
+            if needed not in prose(text):
+                errors.append(f"the {name} lacks the default/rollback contract: {needed}")
+        if "no merit precedence" in text:
+            errors.append(f"the {name} still presents symmetric clean-install arms")
+    return errors
+
+
+def signature_class_errors(record: str, receipt: dict) -> list[str]:
+    errors = []
+    if "no retained verification output" not in prose(record):
+        errors.append("the record does not qualify the 26.04.1 signature evidence")
+    if any(name in record for name in ("native-signed-sums.stdout", "native-signed-sums.stderr")):
+        errors.append("the record claims unretained signature output streams")
+    evidence = field(receipt, "source_verification", "evidence_class")
+    if not isinstance(evidence, str) or not all(part in evidence for part in
+            ("reported", "exit codes", "fingerprint", "stream hash match", "no retained verification output")):
+        errors.append("the receipt's signature class exceeds its retained reported facts")
+    return errors
+
+
+def rootless_start_errors(recipe: str, checklist: str) -> list[str]:
+    errors = []
+    info = "docker --context rootless info --format '{{json .SecurityOptions}}'"
+    run = "docker --context rootless run --rm hello-world"
+    blocks = step_blocks(recipe, "F3")
+    if not any(info in block and run in block and block.index(info) < block.index(run) for block in blocks):
+        errors.append("F3 does not prove rootless mode before starting a container as the user")
+    for needed in ("owed on the first run after the WSL update", "41492", "name=rootless",
+                   "failed container start", "stops the run", "before F9"):
+        if needed not in prose(section(recipe, "F3")):
+            errors.append(f"F3 lacks its rootless-container proof, stop or owed result: {needed}")
+    if run not in checklist_line(checklist, "F3") or "owed" not in checklist_line(checklist, "F3"):
+        errors.append("the checklist still accepts the bus proof without the rootless-container result")
+    return errors
 
 
 if __name__ == "__main__":

@@ -59,8 +59,8 @@
     "baseline": "<P3: the hv_storvsc count without the registration line, before anything is installed>",
     "newest_line_time": "<P3: the newest error line's kernel time in seconds, the first number of /proc/uptime and the age they give; none when no line; an age under 3600 s stopped the run>",
     "swap": "<P3: the swapon --show lines>",
-    "second_count": "<W5, both paths: the same count after the first launch; equal to the baseline passes>",
-    "new_lines": "<W5, only when the count grew: the new lines without device ids, and the decision on microsoft/WSL#41482; null otherwise>"
+    "second_count": "<W5, both paths: count after the first launch compared with the P3 baseline before the import; an attachment-only increase before cloud-init starts does not stop>",
+    "new_lines": "<W5, when the count grew: new lines without device ids, their attachment window and kernel times against cloud-init start; later storage errors or provisioning failure with a storage cause stop; unknown window stops for review; null otherwise>"
   },
   "host": {
     "wsl_version": [
@@ -69,22 +69,25 @@
     "default_distribution_before": "<starred line of wsl.exe --list --verbose in W1>",
     "default_distribution_after": "<starred line in W5; equal to the line above>",
     "z_free_bytes": "<Free of Get-PSDrive Z in W1>",
-    "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>"
+    "idle_keys": "<W1: the instanceIdleTimeout and vmIdleTimeout lines of the .wslconfig read, with their section headers, or absent (defaults 15000 and 60000 ms)>",
+    "cgroup_namespace": "<W1: actual readlink /proc/1/ns/cgroup output in the already-running distribution; initial namespace 4026531835 is corroboration, not the gate>"
   },
   "image": {
     "release": "<RELEASE>",
     "file": "ubuntu-<RELEASE>-wsl-amd64.wsl",
     "url": "https://releases.ubuntu.com/<RELEASE>/ubuntu-<RELEASE>-wsl-amd64.wsl",
     "bytes": "<W2: Get-Item Length of this host's selected image; 26.04.1 source size is unknown>",
-    "sha256_published": "<W2: exact selected-release sha256 from supported_images and Canonical's signed sums>",
-    "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256>",
-    "sha256_computed": "<W2: Get-FileHash .Hash in lower case>"
+    "sha256_published": "<W2: exact selected-release sha256 from the recipe, supported_images and Canonical's signed sums>",
+    "sha256_distributioninfo": "<W2: $Listed.Amd64Url.Sha256; must equal the recipe's selected-release digest and the signed publication>",
+    "sha256_computed": "<W2: Get-FileHash .Hash in lower case; must equal the recipe's selected-release digest and the signed publication>"
   },
   "first_launch": {
     "user_prompt_marker": "<true when the W5 output contains 'Create a default Unix user account:'>",
     "oobe_failed_marker": "<true when it contains 'OOBE command \"/usr/lib/wsl/wsl-setup\" failed, exiting'>",
     "schema_system": "<W5, path A: the line matching ^\\s*Valid schema user-data$ and the exit code; skipped (path B) on path B>",
-    "cloud_init_version": "<W5: selected image cloud-init --version and its exit>"
+    "cloud_init_version": "<W5: selected image cloud-init --version and its exit>",
+    "cgroup_isolation": "<W5, after launch before F1, while both run: common active system unit, process ids with no 0 entry read natively from the running distribution, and active new user@<uid>.service; failure uses the guarded cgroup export/removal>",
+    "systemd_user_session_warning": "<W5: warning text and stop if wsl: Failed to start the systemd user session appears, even with launch exit 0; absent otherwise>"
   },
   "ownership_probe": "<W7: the stat -c %u:%g output for the file created from Windows after the terminate; 1000:1000 passes>",
   "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
@@ -164,6 +167,18 @@
     },
     {
       "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
       "cmd": "wsl.exe --list --verbose",
       "exit": "<rehearsal passed: exit code; null otherwise>",
       "output_excerpt": "<rehearsal passed: sanitized output; null otherwise>"
@@ -224,9 +239,39 @@
     },
     {
       "step": "R1",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
       "cmd": "wsl.exe --list --verbose",
       "exit": "<rehearsal failed after W4: exit code; null otherwise>",
       "output_excerpt": "<rehearsal failed after W4: sanitized output; null otherwise>"
+    },
+    {
+      "step": "R1",
+      "cmd": "sudo systemctl restart systemd-binfmt || exit 1",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "R1",
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<R1: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
     {
       "step": "P1",
@@ -395,6 +440,12 @@
       "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "W1",
+      "cmd": "readlink /proc/1/ns/cgroup",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W1: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
     {
       "step": "W2",
@@ -662,6 +713,102 @@
     },
     {
       "step": "W5",
+      "cmd": "systemctl is-active '<COMMON_UNIT>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active \"user@$(id -u).service\"'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --terminate '<Name>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --export '<Name>' 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar').Hash.ToLowerInvariant()",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar').Length",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --unregister '<Name>'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W5: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W5",
       "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
       "exit": "<0, or 1 when the count is 0>",
       "output_excerpt": "<the second count, both paths>"
@@ -719,6 +866,18 @@
       "cmd": "wsl.exe --unregister '<Name>'",
       "exit": "<path B only: exit code; null on path A>",
       "output_excerpt": "<path B only: sanitized output; null on path A>"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W6: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<W6: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
     {
       "step": "W6",
@@ -881,6 +1040,18 @@
       "cmd": "systemctl --user is-system-running --wait",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless info --format '{{json .SecurityOptions}}'",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<F3: actual sanitized output; recovery commands only on failure; no synthetic success>"
+    },
+    {
+      "step": "F3",
+      "cmd": "docker --context rootless run --rm hello-world",
+      "exit": "<recorded exit code; null with reason when not run>",
+      "output_excerpt": "<F3: actual sanitized output; recovery commands only on failure; no synthetic success>"
     },
     {
       "step": "F4",
@@ -1058,5 +1229,12 @@
       "uv_cpython_3_13": "<R1: uv managed Python 3.13.x exit/output, separately from recorded system Python>",
       "node_24": "<R1: bootstrap Node v24.21.0 exit/output or loader failure>"
     }
-  }
+  },
+  "cgroup_failure_export": {
+    "file": "<W5, cgroup failure only: Z:\\WSL\\downloads\\<Name>-cgroup-failed.tar; null otherwise>",
+    "sha256": "<W5: the export's lower-case Get-FileHash value; null otherwise>",
+    "bytes": "<W5: the export's Get-Item Length; null otherwise>"
+  },
+  "interop_after_unregister": "<R1/W5/W6: after each actual unregister, surviving WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches; record any systemd-binfmt recovery and repeat observations; failure stops>",
+  "rootless_container": "<F3: rootless context info includes name=rootless; hello-world output and exit, or owed pending F4/F5 and supported rootless setup; required on the first run after update before F9 or accepting R1>"
 }

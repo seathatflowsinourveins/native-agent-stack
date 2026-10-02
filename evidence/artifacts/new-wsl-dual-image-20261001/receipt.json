@@ -18,6 +18,7 @@
     {"scope": "frozen seven-file patch application on accepted main", "native_exit_code": 0}
   ],
   "source_verification": {
+    "evidence_class": "reported signature verification exit codes and signer fingerprint; reported 26.04.1 stream hash match; no retained verification output",
     "signed_checksum_verification_exit_codes": {"26.04.1": 0, "24.04.5": 0},
     "signer_fingerprint": "843938DF228D22F7B3742BC0D94AA3F0EFE21092",
     "catalog_commit": "8bc98bc33b246fe66710eec9eaa1b24c323da987",
