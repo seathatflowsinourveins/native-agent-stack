@@ -24,7 +24,7 @@ from inspect_ai.log import read_eval_log
 from inspect_ai.model import ModelOutput
 from inspect_ai.scorer import Score, Target, mean, scorer, stderr
 from inspect_ai.solver import Generate, TaskState, solver
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictFloat, StrictInt, StrictStr, model_validator
 
 Scalar = StrictStr | StrictInt | StrictFloat | StrictBool | None
 Arm = Literal["native_files", "ai_memory", "hindsight"]
@@ -132,6 +132,7 @@ class Runtime(Contract):
     holdout_exposed: bool
     accounting: Accounting = Field(default_factory=Accounting)
     latency_ms: StrictFloat | StrictInt | None = Field(default=None, ge=0)
+    evidence_budget_tokens: StrictInt | None = Field(default=None, ge=0)
 
 
 class Result(Contract):
@@ -143,6 +144,14 @@ class Result(Contract):
     citations: list[Citation]
     evidence: Evidence
     runtime: Runtime
+
+    @model_validator(mode="after")
+    def native_provenance(self):
+        if self.runtime.actual and (self.runtime.client == "synthetic"
+                or not all((self.runtime.model, self.runtime.model_family, self.runtime.version, self.runtime.run_id))
+                or self.evidence.kind != "native_transcript"):
+            raise ValueError("actual native runtime identity/transcript provenance required")
+        return self
 
 
 # Inspect loads task files in a transient module; resolve Pydantic aliases using
@@ -168,7 +177,13 @@ def _time(value: str) -> datetime:
 
 def _same(left: Any, right: Any) -> bool:
     # JSON booleans must not silently equal integer 1/0.
-    return type(left) is type(right) and left == right
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(_same(left[k], right[k]) for k in left)
+    if isinstance(left, list):
+        return len(left) == len(right) and all(_same(a, b) for a, b in zip(left, right))
+    return left == right
 
 
 def _verified_path(base: Path, path: str, digest: str) -> Path:
@@ -286,6 +301,8 @@ def load_inputs(cases: Path | str, sources: Path | str, results: Path | str, *,
         output.append({"case": case.model_dump(), "sources": {k: v.model_dump() for k, v in relevant.items()},
                        "freeze": {"manifest_sha256": manifest_sha256, "cases_sha256": case_digest,
                                   "sources_registry_sha256": registry_digest,
+                                  "manifest_path": str(corpus_manifest.resolve()), "cases_path": str(cases.resolve()),
+                                  "sources_registry_path": str(sources.resolve()),
                                   "parent_manifest_sha256": manifest.get("parent_manifest_sha256")},
                        "record": record.model_dump()})
     return output
@@ -435,6 +452,12 @@ def paired_comparison(rows: list[dict[str, Any]], *, baseline: str, candidate: s
         treatment = arms[candidate][case_id]
         if control["category"] != treatment["category"]:
             raise ValueError("paired case category mismatch")
+        if mode == "common_retrieval":
+            a, b = control["runtime"], treatment["runtime"]
+            if (any(not a.get(k) or a.get(k) != b.get(k) for k in ("model", "model_family", "version"))
+                    or a.get("evidence_budget_tokens") is None
+                    or a["evidence_budget_tokens"] != b.get("evidence_budget_tokens")):
+                raise ValueError("common_retrieval requires identical answer model and explicit frozen evidence budget")
         groups[control["category"]].append(treatment["score"] - control["score"])
     categories = {category: sum(values) / len(values) for category, values in sorted(groups.items())}
     gain = sum(categories.values()) / len(categories)
@@ -483,7 +506,7 @@ def _gate_evidence(name: str, gate: dict[str, Any], freeze_id: str, root: Path |
         path = _verified_path(root, gate["evidence"]["path"], gate["evidence"]["sha256"])
         receipt = json.loads(path.read_text())
         for key in ("passed", "actual_native", "arm", "observed_ids", "corpus_freeze_id"):
-            if receipt.get(key) != gate[key]:
+            if not _same(receipt.get(key), gate[key]):
                 return False
         if receipt.get("gate") != name or receipt.get("evidence_class") != "native_operation":
             return False
@@ -530,6 +553,7 @@ def promotion_decision(rows: list[dict[str, Any]], gates: dict[str, Any], *, fre
     """Fail closed; a quality recommendation and production promotion are distinct."""
     if look not in ("initial", "extension"):
         raise ValueError("look must be initial or the single extension")
+    rows = [row for row in rows if row["split"] == "holdout"]
     configs = _configuration(rows)
     primary = [r for r in rows if r["mode"] == "tuned_pipeline" and r["split"] == "holdout"]
     identities = {r["case_id"] for r in primary}
@@ -542,6 +566,11 @@ def promotion_decision(rows: list[dict[str, Any]], gates: dict[str, Any], *, fre
                 or not set(previous.get("case_ids", [])) < identities or len(previous.get("case_ids", [])) != 60
                 or previous.get("extension_eligible") is not True):
             raise ValueError("extension requires unchanged frozen configs and the initial 60-case decision")
+        retained = {json.dumps([r["arm"], r["mode"], r["case_id"]]): hashlib.sha256(
+            json.dumps(r, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+            for r in rows if r["case_id"] in set(previous["case_ids"])}
+        if retained != previous.get("initial_observations"):
+            raise ValueError("extension must retain exact original observations; replacements/reruns are forbidden")
     comparisons = [paired_comparison(primary, baseline=b, candidate="hindsight", mode="tuned_pipeline",
                                      iterations=iterations) for b in ("native_files", "ai_memory")]
     comparisons.append(paired_comparison(primary, baseline="ai_memory", candidate="native_files",
@@ -557,6 +586,11 @@ def promotion_decision(rows: list[dict[str, Any]], gates: dict[str, Any], *, fre
         if not runtime["actual"] or runtime["client"] == "synthetic":
             reasons.append("synthetic runtime cannot establish promotion")
             break
+    runtime_valid = all(r["runtime"].get("actual") is True and r["runtime"].get("client") in ("codex", "claude")
+                        and all(r["runtime"].get(k) for k in ("model", "model_family", "version", "run_id"))
+                        for r in rows)
+    if not runtime_valid:
+        reasons.append("native runtime identity metadata incomplete")
     if any(r["runtime"]["corpus_freeze_id"] != freeze_id for r in rows):
         reasons.append("corpus freeze identifiers mismatch")
     if not _digest(manifest_sha256):
@@ -583,10 +617,10 @@ def promotion_decision(rows: list[dict[str, Any]], gates: dict[str, Any], *, fre
     if missing:
         reasons.append("operational gates unqualified: " + ", ".join(missing))
     pre_canary = all(value for name, value in gate_results.items() if name != "canary_20_sessions_2_restarts")
-    inputs_valid = not any("holdout" in r or "synthetic" in r or "corpus" in r for r in reasons)
+    inputs_valid = runtime_valid and not any("holdout" in r or "synthetic" in r or "corpus" in r for r in reasons)
     quality_ok = inputs_valid and all(c["decision_pass"] for c in comparisons[:2])
     confirmed_operational_failure = any(gates.get(name, {}).get("passed") is False for name in OPERATIONAL_GATES)
-    extension_eligible = (look == "initial" and not all(c["decision_pass"] for c in comparisons[:2])
+    extension_eligible = (inputs_valid and look == "initial" and not all(c["decision_pass"] for c in comparisons[:2])
                           and all(c["decision_ci"][1] >= .05 for c in comparisons[:2])
                           and not confirmed_operational_failure
                           and not any("synthetic" in r or "exposed" in r or "freeze" in r for r in reasons))
@@ -599,12 +633,49 @@ def promotion_decision(rows: list[dict[str, Any]], gates: dict[str, Any], *, fre
             "decision_scope": "eligibility only; receipt consistency requires independent native verification",
             "corpus_freeze_id": freeze_id, "pipeline_configs": configs, "case_ids": sorted(identities),
             "corpus_manifest_sha256": manifest_sha256,
+            "initial_observations": {json.dumps([r["arm"], r["mode"], r["case_id"]]): hashlib.sha256(
+                json.dumps(r, sort_keys=True, separators=(",", ":")).encode()).hexdigest() for r in rows},
             "accounting": {"whole_task_usage": None, "net_savings": None}}
+
+
+def _corpus_snapshot(metadata: dict[str, Any], cache: dict[Any, Any] | None = None) -> None:
+    """Bind logged oracle/source snapshots to independently frozen on-disk bytes."""
+    freeze = metadata.get("freeze", {})
+    key = tuple(freeze.get(k) for k in ("manifest_path", "manifest_sha256", "cases_path", "cases_sha256",
+                                      "sources_registry_path", "sources_registry_sha256"))
+    cache = cache if cache is not None else {}
+    if key not in cache:
+        if any(not value for value in key):
+            raise ValueError("native log lacks retained frozen corpus artifact locators")
+        manifest_path, cases_path, sources_path = Path(key[0]), Path(key[2]), Path(key[4])
+        if any(not _digest(key[i]) or sha256_file(Path(key[i - 1])) != key[i] for i in (1, 3, 5)):
+            raise ValueError("native log frozen corpus artifact hash mismatch")
+        manifest = json.loads(manifest_path.read_text())
+        split = metadata["case"]["split"]
+        contract = manifest.get("splits", {}).get(split, {})
+        if (manifest.get("corpus_freeze_id") != metadata["record"]["runtime"]["corpus_freeze_id"]
+                or contract.get("cases_sha256") != key[3] or contract.get("sources_registry_sha256") != key[5]):
+            raise ValueError("native log frozen corpus manifest does not bind case/source bytes")
+        cases = _unique([Case.model_validate(r) for r in _jsonl(cases_path)], "case_id")
+        sources = _unique([Source.model_validate(r) for r in json.loads(sources_path.read_text())], "source_id")
+        if contract.get("case_count") != len(cases) or contract.get("source_count") != len(sources):
+            raise ValueError("native log frozen corpus totals mismatch")
+        for source in sources.values():
+            _verified_path(sources_path.parent, source.path, source.sha256)
+        cache[key] = (cases, sources)
+    cases, sources = cache[key]
+    case = Case.model_validate(metadata["case"])
+    if case.case_id not in cases or not _same(case.model_dump(), cases[case.case_id].model_dump()):
+        raise ValueError("logged case/oracle differs from frozen corpus bytes")
+    expected_sources = {sid: sources[sid].model_dump() for sid in case.source_ids}
+    if not _same(metadata["sources"], expected_sources):
+        raise ValueError("logged source metadata differs from frozen source registry bytes")
 
 
 def rows_from_inspect_logs(paths: list[Path]) -> list[dict[str, Any]]:
     rows = []
     seen = set()
+    corpus_cache = {}
     for path in paths:
         log = read_eval_log(str(path))
         if log.status != "success" or not log.samples or log.stats.model_usage:
@@ -613,6 +684,8 @@ def rows_from_inspect_logs(paths: list[Path]) -> list[dict[str, Any]]:
             metadata = sample.metadata or {}
             record = Result.model_validate(metadata.get("record"))
             case = Case.model_validate(metadata.get("case"))
+            if record.runtime.actual:
+                _corpus_snapshot(metadata, corpus_cache)
             if sample.id != case.case_id or record.case_id != case.case_id or sample.error or sample.model_usage:
                 raise ValueError("Inspect sample identity/error mismatch")
             if any(getattr(event, "event", None) == "model" for event in sample.events):
@@ -630,7 +703,8 @@ def rows_from_inspect_logs(paths: list[Path]) -> list[dict[str, Any]]:
             seen.add(identity)
             rows.append(dict(case_id=case.case_id, category=case.category, split=case.split,
                              arm=record.arm, mode=record.mode, score=value, runtime=record.runtime.model_dump(),
-                             freeze=metadata.get("freeze", {})))
+                             freeze=metadata.get("freeze", {}), observation_sha256=hashlib.sha256(
+                                 json.dumps(metadata, sort_keys=True, separators=(",", ":")).encode()).hexdigest()))
     return rows
 
 

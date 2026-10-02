@@ -71,6 +71,29 @@ class QualificationTests(unittest.TestCase):
                                arm="hindsight", mode="tuned_pipeline", split="dev", freeze_id="freeze-1",
                                corpus_manifest=manifest_path, manifest_sha256=self.q.sha256_file(manifest_path))
 
+    def test_logged_oracle_and_source_snapshots_are_bound_to_frozen_bytes(self):
+        metadata = self.inputs()[0]
+        self.q._corpus_snapshot(metadata)
+        changed = copy.deepcopy(metadata)
+        changed["case"]["expected"]["required_facts"][0]["value"] = "green"
+        with self.assertRaisesRegex(ValueError, "oracle differs"):
+            self.q._corpus_snapshot(changed)
+        changed = copy.deepcopy(metadata)
+        changed["sources"]["source-1"]["supported_facts"]["project.color"] = "green"
+        with self.assertRaisesRegex(ValueError, "source metadata differs"):
+            self.q._corpus_snapshot(changed)
+
+    def test_actual_log_record_requires_native_identity_and_transcript_kind(self):
+        record = copy.deepcopy(self.record)
+        for key in ("model", "model_family", "version"):
+            record["runtime"][key] = None
+        with self.assertRaises(ValueError):
+            self.q.Result.model_validate(record)
+        record = copy.deepcopy(self.record)
+        record["evidence"]["kind"] = "synthetic_fixture"
+        with self.assertRaises(ValueError):
+            self.q.Result.model_validate(record)
+
     def test_exact_facts_and_attributed_citations_pass(self):
         self.assertEqual(self.score()["score"], 1)
 
@@ -178,6 +201,24 @@ class QualificationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.q.paired_comparison(missing, baseline="ai_memory", candidate="hindsight", mode="tuned_pipeline")
 
+    def test_common_mode_requires_same_answer_model_and_explicit_budget(self):
+        rows = self.rows()
+        for row in rows:
+            row["mode"] = "common_retrieval"
+        with self.assertRaisesRegex(ValueError, "explicit frozen evidence budget"):
+            self.q.paired_comparison(rows, baseline="ai_memory", candidate="hindsight", mode="common_retrieval")
+        for row in rows:
+            row["runtime"]["evidence_budget_tokens"] = 1000
+        self.assertTrue(self.q.paired_comparison(rows, baseline="ai_memory", candidate="hindsight",
+                                               mode="common_retrieval", iterations=200)["decision_pass"])
+        rows[2]["runtime"]["model"] = "stronger-model"
+        with self.assertRaises(ValueError):
+            self.q.paired_comparison(rows, baseline="ai_memory", candidate="hindsight", mode="common_retrieval")
+        rows[2]["runtime"]["model"] = self.record["runtime"]["model"]
+        rows[2]["runtime"]["evidence_budget_tokens"] = 2000
+        with self.assertRaises(ValueError):
+            self.q.paired_comparison(rows, baseline="ai_memory", candidate="hindsight", mode="common_retrieval")
+
     def test_perfect_quality_without_operational_evidence_cannot_promote(self):
         decision = self.q.promotion_decision(self.rows(), {}, freeze_id="freeze-1", manifest_sha256="d" * 64, iterations=200)
         self.assertFalse(decision["promote"])
@@ -246,6 +287,11 @@ class QualificationTests(unittest.TestCase):
                                              previous=previous, iterations=200)
         self.assertTrue(decision["extension_used"])
         self.assertFalse(decision["extension_eligible"])
+        replaced = copy.deepcopy(extension)
+        replaced[0]["score"] = 1
+        with self.assertRaisesRegex(ValueError, "exact original observations"):
+            self.q.promotion_decision(replaced, {}, freeze_id="freeze-1", manifest_sha256="e" * 64,
+                                      look="extension", previous=previous, iterations=200)
         extension[-1]["runtime"]["pipeline_config_sha256"] = "c" * 64
         with self.assertRaises(ValueError):
             self.q.promotion_decision(extension, {}, freeze_id="freeze-1", manifest_sha256="e" * 64, look="extension", previous=previous)
