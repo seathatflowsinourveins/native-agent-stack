@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Revised after round1; revised target-distribution installation remains unrun.
+# Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision;
+# this revision's installation remains unrun on a distribution.
 # Baseline results and limitations: VALIDATION.md.
-# Upstream command quotations and parameterizations: install-plan.json and SOURCES.md.
+# Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail
 if (( EUID == 0 )); then
   printf 'Refusing to run as root.\n' >&2
@@ -24,6 +25,8 @@ while (( $# )); do
   esac
 done
 selected() { [[ -z "$only" || "$only" == "$1" ]]; }
+# Planned. Slots the merged manifest leaves split install only when named: the deciding measurement installs them on purpose.
+named() { [[ "$only" == "$1" ]]; }
 refresh_path() {
   # Planned. mise v2026.10.0 docs/cli/env.md:40; process-scoped, no shell activation.
   local env_script
@@ -127,7 +130,7 @@ run_command() {
 export -f ensure_venv checkout_tag fetch_verified link_grafana docker_repository apt_release_version \
   docker_engine_packages docker_compose_package
 
-# Planned. One function per input slot; duplicate research slot retains both owners.
+# Planned. One function per installed or measurement-only slot; the research slot retains both owners under one dispatcher.
 claude-code() {
   # Claude Code | native-installer | planned
   # Planned. Source: https://raw.githubusercontent.com/anthropics/claude-code/v2.1.287/README.md#L23
@@ -139,7 +142,8 @@ claude-code() {
 codex() {
   # Codex | native-installer | planned
   # Planned. Source: https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/README.md#L19
-  run_command 'curl -fsSL https://chatgpt.com/codex/install.sh | sh' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/scripts/install/install.sh#L100 (CODEX_NON_INTERACTIVE skips the prompt that hangs on a terminal)
+  run_command 'curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/README.md#L19
   run_command 'codex --version' || return "$?"
 }
@@ -162,10 +166,18 @@ codex-sdk-and-codex-exec-app-server() {
 
 trail-of-bits-security-skills-trailofbits-skills() {
   # Trail of Bits security skills (trailofbits/skills) | none | planned
-  # Planned. Source: https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L9
-  run_command 'claude plugin marketplace add trailofbits/skills@82fe8226252622fa807643bdca1710901198553a' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L9
+  # Planned. Source: https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L12
+  # Planned. Source: https://code.claude.com/docs/en/plugins/cli-reference.md#L649 (full https clone URL; no pin: the client takes a branch or tag after #, and this repository has no tag)
+  run_command 'claude plugin marketplace add https://github.com/trailofbits/skills.git' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L28
   run_command 'codex plugin marketplace add trailofbits/skills --ref 82fe8226252622fa807643bdca1710901198553a' || return "$?"
+}
+
+engineering-process-skills() {
+  # mattpocock/skills (selected skills, not the bundle) | none | planned
+  # Planned. Source: https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L52
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L111 (non-interactive flags), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/source-parser.ts#L284 (owner/repo#ref pin)
+  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''mattpocock/skills#v1.2.3'\'' -g -a claude-code codex -s tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills -y' || return "$?"
 }
 
 mcporter() {
@@ -174,20 +186,10 @@ mcporter() {
   run_command 'npm install -g mcporter@0.14.2' || return "$?"
 }
 
-mcp-inspector() {
-  # MCP Inspector | none | planned
-  printf '%s\n' 'Excluded: run on demand with npx; mcporter owns MCP calls from scripts'
-}
-
 sandbox-runtime-srt() {
   # sandbox-runtime (srt) | npm-global | planned
   # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14
   run_command 'npm install -g @anthropic-ai/sandbox-runtime@0.0.78' || return "$?"
-}
-
-isolation-container-boundary() {
-  # No additional component: rootless containers on the container engine that the hosting layer installs | none | planned
-  printf '%s\n' 'Excluded: '
 }
 
 serena() {
@@ -196,9 +198,11 @@ serena() {
   run_command 'uv tool install -p 3.13 serena-agent==1.7.0' || return "$?"
 }
 
-claude-plugins-official-code-intelligence-lsp-pl() {
-  # claude-plugins-official (code-intelligence LSP plugins) | none | planned
-  printf '%s\n' 'Excluded: Serena owns symbol navigation in both clients'
+structural-search() {
+  # ast-grep | mise | planned
+  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ast-grep.toml#L1
+  run_command 'mise use -g ast-grep@0.45.3' || return "$?"
+  refresh_path || return "$?"
 }
 
 tobi-qmd() {
@@ -213,29 +217,12 @@ mineru() {
   run_command 'uv tool install --python 3.13 "mineru==4.0.10"' || return "$?"
 }
 
-trafilatura() {
-  # trafilatura | uv-tool | planned
-  # Planned. Source: https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/installation.rst#L73
-  run_command 'uv tool install --python 3.13 trafilatura==2.2.0' || return "$?"
-}
-
 playwright-cli() {
-  # Playwright CLI | npm-global | planned
+  # Playwright CLI | npm-global | measurement-only
   # Planned. Source: https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L26
   run_command 'npm install -g @playwright/cli@0.1.22' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346
   run_command 'playwright-cli install-browser --with-deps chromium' || return "$?"
-}
-
-ccusage() {
-  # ccusage | npm-global | planned
-  # Planned. Source: https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/docs/guide/installation.md#L58
-  run_command 'npm install -g ccusage@20.0.26' || return "$?"
-}
-
-context-supply() {
-  # No context-supply layer: the usage meter only | none | planned
-  printf '%s\n' 'Excluded: '
 }
 
 otel-collector-contrib() {
@@ -260,8 +247,19 @@ prometheus() {
   copy_config 'prometheus.yaml' || return "$?"
 }
 
+alerting() {
+  # Alertmanager | release-binary | planned
+  # Planned. Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14
+  run_command 'fetch_verified '\''https://github.com/prometheus/alertmanager/releases/download/v0.34.1/alertmanager-0.34.1.linux-amd64.tar.gz'\'' '\''265b9d1e55ef0d5306a436018af6d2b686c2ce051f03d968f7464ecb1372a7e8'\'' "$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64.tar.gz"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14
+  run_command '(cd "$tool_root/alertmanager" && tar xvfz '\''alertmanager-0.34.1.linux-amd64.tar.gz'\'')' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14
+  run_command 'install -m 0755 "$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64/alertmanager" "$HOME/.local/bin/alertmanager"' || return "$?"
+  copy_config 'alertmanager.yaml' || return "$?"
+}
+
 loki() {
-  # Loki | release-binary | planned
+  # Loki | release-binary | measurement-only
   # Planned. Source: https://raw.githubusercontent.com/grafana/loki/v3.7.8/tools/release-note.md#L24
   run_command 'fetch_verified '\''https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip'\'' '\''62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61'\'' "$tool_root/loki/loki-linux-amd64.zip"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/grafana/loki/v3.7.8/tools/release-note.md#L24
@@ -272,7 +270,7 @@ loki() {
 }
 
 grafana() {
-  # Grafana | release-binary | planned
+  # Grafana | release-binary | measurement-only
   # Planned. Source: https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux
   run_command 'fetch_verified '\''https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz'\'' '\''6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235'\'' "$tool_root/grafana/grafana_13.2.3_36482603486_linux_amd64.tar.gz"' || return "$?"
   # Planned. Source: https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux
@@ -280,12 +278,6 @@ grafana() {
   # Planned. Source: https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux
   run_command 'link_grafana' || return "$?"
   copy_config 'grafana.ini' || return "$?"
-}
-
-phoenix() {
-  # Phoenix | compose | planned
-  # Planned. Source: https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/docs/phoenix/self-hosting/deployment-options/docker.mdx#L156
-  run_command 'docker compose -f "$plan_dir/config/phoenix-compose.yaml" up -d' || return "$?"
 }
 
 local-model-server() {
@@ -308,12 +300,6 @@ harbor-containerized-agent-e2e-runner() {
   run_command 'uv tool install --python 3.13 harbor==0.23.0' || return "$?"
 }
 
-promptfoo() {
-  # Promptfoo | npm-global | planned
-  # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/README.md#L31
-  run_command 'npm install -g promptfoo@0.123.1' || return "$?"
-}
-
 zizmor() {
   # zizmor | mise | planned
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/zizmor.toml#L1
@@ -321,26 +307,11 @@ zizmor() {
   refresh_path || return "$?"
 }
 
-attest() {
-  # attest | github-action | planned
-  printf '%s\n' 'UNRUN. uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6. No host installation/acceptance command. Workflows require repository/artifact configuration.  Recipe/source: https://raw.githubusercontent.com/actions/attest/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md#L80'
-}
-
 syft() {
   # Syft | mise | planned
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/syft.toml#L1
   run_command 'mise use -g syft@1.54.0' || return "$?"
   refresh_path || return "$?"
-}
-
-dependabot() {
-  # Dependabot | github-action | planned
-  printf '%s\n' 'UNRUN. Tag resolves to a1750051287d1f3786081d3aa3e6e2b04a72edde. No valid uses: reference: upstream repository has no action entrypoint. Enable GitHub Dependabot through .github/dependabot.yml; no host installation. Recipe/source: https://raw.githubusercontent.com/dependabot/dependabot-core/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md#L42'
-}
-
-codeql-sarif() {
-  # codeql-sarif | github-action | planned
-  printf '%s\n' 'UNRUN. uses: github/codeql-action/upload-sarif@416ff0dea110f80f0f56f0046500dbf7420e4bb0. No host installation/acceptance command. Workflows require repository/artifact configuration. Root action is a deliberate failure stub; use upload-sarif. Recipe/source: https://raw.githubusercontent.com/github/codeql-action/416ff0dea110f80f0f56f0046500dbf7420e4bb0/upload-sarif/action.yml#L1'
 }
 
 actionlint-kjanat() {
@@ -385,11 +356,6 @@ betterleaks() {
   refresh_path || return "$?"
 }
 
-trufflehog() {
-  # trufflehog | none | planned
-  printf '%s\n' 'Excluded: betterleaks owns secret scanning'
-}
-
 git() {
   # Ubuntu-managed Git | apt | planned; base/prerequisite packages already supply it.
   # Source: https://raw.githubusercontent.com/git/git-scm.com/422e163b96cdcff929cd63028657597752d4b9d7/content/install/linux.html#L19
@@ -417,16 +383,6 @@ difftastic() {
   refresh_path || return "$?"
 }
 
-claude-code-action() {
-  # claude-code-action | github-action | planned
-  printf '%s\n' 'UNRUN. uses: anthropics/claude-code-action@97c53473391bff1901034d4b454b5bac7ab7a029. No host installation/acceptance command. Workflows require repository/artifact configuration.  Recipe/source: https://raw.githubusercontent.com/anthropics/claude-code-action/97c53473391bff1901034d4b454b5bac7ab7a029/docs/usage.md#L17'
-}
-
-agent-structural-diff() {
-  # Not installed: git diff and difftastic cover diffs | none | planned
-  printf '%s\n' 'Excluded: '
-}
-
 mise() {
   # mise | native-installer | planned
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82
@@ -438,18 +394,6 @@ restic() {
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/restic.toml#L1
   run_command 'mise use -g restic@0.19.1' || return "$?"
   refresh_path || return "$?"
-}
-
-chezmoi() {
-  # chezmoi | mise | planned
-  # Planned. Source: https://raw.githubusercontent.com/twpayne/chezmoi/v2.73.0/assets/chezmoi.io/docs/install.md.tmpl#L137
-  run_command 'mise use -g chezmoi@2.73.0' || return "$?"
-  refresh_path || return "$?"
-}
-
-base-distribution() {
-  # Ubuntu 26.04.1 LTS (Canonical WSL image), primary | none | planned
-  printf '%s\n' 'Excluded: '
 }
 
 gpt-gateway() {
@@ -513,75 +457,90 @@ if $list; then
   printf '%s\n' 'claude-agent-sdk | Claude Agent SDK | none | planned'
   printf '%s\n' 'codex-sdk-and-codex-exec-app-server | Codex SDK and codex exec/app-server | none | planned'
   printf '%s\n' 'trail-of-bits-security-skills-trailofbits-skills | Trail of Bits security skills (trailofbits/skills) | none | planned'
+  printf '%s\n' 'engineering-process-skills | mattpocock/skills (selected skills, not the bundle) | none | planned'
   printf '%s\n' 'mcporter | mcporter | npm-global | planned'
-  printf '%s\n' 'mcp-inspector | MCP Inspector | none | excluded: run on demand with npx; mcporter owns MCP calls from scripts'
+  printf '%s\n' 'mcp-inspector | MCP Inspector | none | excluded'
+  printf '%s\n' 'agent-messaging | Not installed until the deciding measurement returns | none | excluded'
   printf '%s\n' 'sandbox-runtime-srt | sandbox-runtime (srt) | npm-global | planned'
-  printf '%s\n' 'isolation-container-boundary | No additional component: rootless containers on the container engine that the hosting layer installs | none | excluded: '
+  printf '%s\n' 'isolation-container-boundary | No additional component: rootless containers on the container engine that the hosting layer installs | none | excluded'
   printf '%s\n' 'serena | Serena | uv-tool | planned'
-  printf '%s\n' 'claude-plugins-official-code-intelligence-lsp-pl | claude-plugins-official (code-intelligence LSP plugins) | none | excluded: Serena owns symbol navigation in both clients'
+  printf '%s\n' 'claude-plugins-official-code-intelligence-lsp-pl | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | excluded'
+  printf '%s\n' 'structural-search | ast-grep | mise | planned'
+  printf '%s\n' 'code-search | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | none | excluded'
+  printf '%s\n' 'embedding-model | Not installed until the deciding measurement returns | none | excluded'
+  printf '%s\n' 'reranker-model | Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | none | excluded'
   printf '%s\n' 'tobi-qmd | tobi/qmd | npm-global | planned'
   printf '%s\n' 'mineru | MinerU | uv-tool | planned'
-  printf '%s\n' 'trafilatura | trafilatura | uv-tool | planned'
-  printf '%s\n' 'playwright-cli | Playwright CLI | npm-global | planned'
-  printf '%s\n' 'ccusage | ccusage | npm-global | planned'
-  printf '%s\n' 'context-supply | No context-supply layer: the usage meter only | none | excluded: '
+  printf '%s\n' 'trafilatura | Not installed: text extraction is a sub-step of retrieval that the two agents'\'' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it | none | excluded'
+  printf '%s\n' 'playwright-cli | Playwright CLI | npm-global | measurement-only'
+  printf '%s\n' 'web-search-provider | Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries | none | excluded'
+  printf '%s\n' 'memory-owner | Not installed until the memory head-to-head returns (the blind round'\''s documented-fit pick is ai-memory) | none | excluded'
+  printf '%s\n' 'ccusage | Not installed: the two agents'\'' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it | none | excluded'
+  printf '%s\n' 'context-supply | No context-supply layer: the usage meter only | none | excluded'
   printf '%s\n' 'otel-collector-contrib | OTel Collector Contrib | release-binary | planned'
   printf '%s\n' 'prometheus | Prometheus | release-binary | planned'
-  printf '%s\n' 'loki | Loki | release-binary | planned'
-  printf '%s\n' 'grafana | Grafana | release-binary | planned'
-  printf '%s\n' 'phoenix | Phoenix | compose | planned'
+  printf '%s\n' 'loki | Loki | release-binary | measurement-only'
+  printf '%s\n' 'grafana | Grafana | release-binary | measurement-only'
+  printf '%s\n' 'phoenix | Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer'\''s requirement has no trace-store job; no blind GPT sample picked it | none | excluded'
   printf '%s\n' 'local-model-server | Ollama | mise | planned'
+  printf '%s\n' 'alerting | Alertmanager | release-binary | planned'
+  printf '%s\n' 'local-generation-model | Not installed until the deciding measurement returns | none | excluded'
+  printf '%s\n' 'session-analytics | Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set | none | excluded'
   printf '%s\n' 'inspect-ai | Inspect AI | uv-tool | planned'
   printf '%s\n' 'harbor-containerized-agent-e2e-runner | Harbor (containerized agent E2E runner) | uv-tool | planned'
-  printf '%s\n' 'promptfoo | Promptfoo | npm-global | planned'
+  printf '%s\n' 'promptfoo | Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it | none | excluded'
   printf '%s\n' 'zizmor | zizmor | mise | planned'
-  printf '%s\n' 'attest | attest | github-action | planned'
+  printf '%s\n' 'attest | attest | none | excluded'
   printf '%s\n' 'syft | Syft | mise | planned'
-  printf '%s\n' 'dependabot | Dependabot | github-action | planned'
-  printf '%s\n' 'codeql-sarif | codeql-sarif | github-action | planned'
+  printf '%s\n' 'dependabot | Dependabot | none | excluded'
+  printf '%s\n' 'codeql-sarif | Not installed: a transport, not a scanner: zizmor'\''s own action carries the pinned upload step; no blind GPT sample picked it as a slot | none | excluded'
   printf '%s\n' 'actionlint-kjanat | actionlint (kjanat) | mise | planned'
   printf '%s\n' 'dagu | Dagu | native-installer | planned'
   printf '%s\n' 'docker-compose | Docker Compose | apt-repo | planned'
   printf '%s\n' 'container-engine | Docker Engine / Moby | apt-repo | planned'
+  printf '%s\n' 'gpu-container-runtime | Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | none | excluded'
   printf '%s\n' 'betterleaks | betterleaks | mise | planned'
-  printf '%s\n' 'trufflehog | trufflehog | none | excluded: betterleaks owns secret scanning'
+  printf '%s\n' 'trufflehog | Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog'\''s verification against live services is a separate audit job that the layer'\''s requirement does not ask for | none | excluded'
   printf '%s\n' 'git | git | apt | planned'
   printf '%s\n' 'gh-github-cli | gh (GitHub CLI) | mise | planned'
   printf '%s\n' 'worktrunk | worktrunk | mise | planned'
   printf '%s\n' 'difftastic | difftastic | mise | planned'
-  printf '%s\n' 'claude-code-action | claude-code-action | github-action | planned'
-  printf '%s\n' 'agent-structural-diff | Not installed: git diff and difftastic cover diffs | none | excluded: '
+  printf '%s\n' 'claude-code-action | Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it | none | excluded'
+  printf '%s\n' 'agent-structural-diff | Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic'\''s JSON output is still behind DFT_UNSTABLE=yes) | none | excluded'
   printf '%s\n' 'mise | mise | native-installer | planned'
   printf '%s\n' 'restic | Restic | mise | planned'
-  printf '%s\n' 'chezmoi | chezmoi | mise | planned'
-  printf '%s\n' 'base-distribution | Ubuntu 26.04.1 LTS (Canonical WSL image), primary | none | excluded: '
+  printf '%s\n' 'chezmoi | Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | none | excluded'
+  printf '%s\n' 'base-distribution | Ubuntu 26.04.1 LTS (Canonical WSL image), primary | none | excluded'
   printf '%s\n' 'gpt-gateway | OmniRoute | npm-global | planned'
   printf '%s\n' 'agent-runtime-worker | OpenHands software-agent-sdk | none | planned'
   printf '%s\n' 'research-harnesses | GPT Researcher and DeerFlow, kept as two independent evidence gatherers | none | planned'
-  printf '%s\n' 'research-harnesses | GPT Researcher and DeerFlow, kept as two independent evidence gatherers | compose | planned'
   printf '%s\n' 'credential-guard | Command and secret-path guard (K4) | repository-recipe | planned'
   printf '%s\n' 'convergence-validators | Convergence practice and its validators | repository-recipe | planned'
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|mcporter|mcp-inspector|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|tobi-qmd|mineru|trafilatura|playwright-cli|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
+# Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
+[[ -e "$repo_root/.git" ]] || { printf 'Run this plan from a checkout of the repository: %s is not a git checkout (see README.md).\n' "$repo_root" >&2; exit 1; }
 
 # Planned. Package prerequisites, then mise/runtimes, user CLIs, containers, services.
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'tobi-qmd' 'mineru' 'trafilatura' 'playwright-cli' 'ccusage' 'otel-collector-contrib' 'prometheus' 'loki' 'grafana' 'phoenix' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'chezmoi' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'tobi-qmd' 'mineru' 'trafilatura' 'playwright-cli' 'ccusage' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'chezmoi' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
-for slot in 'phoenix' 'harbor-containerized-agent-e2e-runner' 'docker-compose' 'research-harnesses'; do selected "$slot" && needs_docker=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'playwright-cli' 'loki' 'grafana'; do named "$slot" && needs_execution=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'playwright-cli'; do named "$slot" && needs_runtime=true; done
+for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose' 'research-harnesses'; do selected "$slot" && needs_docker=true; done
 
 if $needs_execution; then
   # Planned. Repository bootstrap-linux.sh:206-216; selected owner prereqs extend its package list.
   packages=(ca-certificates curl git tar gzip xz-utils jq)
   if selected research-harnesses; then packages+=(make); fi
   if selected sandbox-runtime-srt; then packages+=(bubblewrap socat ripgrep gcc libseccomp-dev); fi
-  if selected loki; then packages+=(unzip); fi
+  if named loki; then packages+=(unzip); fi
   if $needs_docker || selected container-engine; then packages+=(uidmap dbus-user-session); fi
   sudo apt-get update
   sudo apt-get install -y --no-install-recommends "${packages[@]}"
@@ -602,6 +561,10 @@ run_slot() {
   last_rc="$rc"
   printf '%s | install | %s\n' "$slot" "$rc"
 }
+measured_slot() {
+  # Planned. A split slot installs only when named; the default run skips it.
+  if named "$1"; then run_slot "$1"; elif selected "$1"; then printf '%s | install | skipped\n' "$1"; fi
+}
 # Planned. Selective installs include the native clients required by their integration.
 if [[ "$only" == trail-of-bits-security-skills-trailofbits-skills ]]; then
   run_slot claude-code
@@ -613,31 +576,25 @@ if selected 'codex'; then run_slot 'codex'; fi
 if selected 'claude-agent-sdk'; then run_slot 'claude-agent-sdk'; fi
 if selected 'codex-sdk-and-codex-exec-app-server'; then run_slot 'codex-sdk-and-codex-exec-app-server'; fi
 if selected 'trail-of-bits-security-skills-trailofbits-skills'; then run_slot 'trail-of-bits-security-skills-trailofbits-skills'; fi
+if selected 'engineering-process-skills'; then run_slot 'engineering-process-skills'; fi
 if selected 'mcporter'; then run_slot 'mcporter'; fi
 if selected 'sandbox-runtime-srt'; then run_slot 'sandbox-runtime-srt'; fi
 if selected 'serena'; then run_slot 'serena'; fi
+if selected 'structural-search'; then run_slot 'structural-search'; fi
 if selected 'tobi-qmd'; then run_slot 'tobi-qmd'; fi
 if selected 'mineru'; then run_slot 'mineru'; fi
-if selected 'trafilatura'; then run_slot 'trafilatura'; fi
-if selected 'playwright-cli'; then run_slot 'playwright-cli'; fi
-if selected 'ccusage'; then run_slot 'ccusage'; fi
+measured_slot 'playwright-cli'
 if selected 'inspect-ai'; then run_slot 'inspect-ai'; fi
 if selected 'harbor-containerized-agent-e2e-runner'; then run_slot 'harbor-containerized-agent-e2e-runner'; fi
-if selected 'promptfoo'; then run_slot 'promptfoo'; fi
 if selected 'zizmor'; then run_slot 'zizmor'; fi
-if selected 'attest'; then run_slot 'attest'; fi
 if selected 'syft'; then run_slot 'syft'; fi
-if selected 'dependabot'; then run_slot 'dependabot'; fi
-if selected 'codeql-sarif'; then run_slot 'codeql-sarif'; fi
 if selected 'actionlint-kjanat'; then run_slot 'actionlint-kjanat'; fi
 if selected 'betterleaks'; then run_slot 'betterleaks'; fi
 if selected 'git'; then run_slot 'git'; fi
 if selected 'gh-github-cli'; then run_slot 'gh-github-cli'; fi
 if selected 'worktrunk'; then run_slot 'worktrunk'; fi
 if selected 'difftastic'; then run_slot 'difftastic'; fi
-if selected 'claude-code-action'; then run_slot 'claude-code-action'; fi
 if selected 'restic'; then run_slot 'restic'; fi
-if selected 'chezmoi'; then run_slot 'chezmoi'; fi
 if selected 'agent-runtime-worker'; then run_slot 'agent-runtime-worker'; fi
 if selected 'credential-guard'; then run_slot 'credential-guard'; fi
 if selected 'convergence-validators'; then run_slot 'convergence-validators'; fi
@@ -654,9 +611,9 @@ fi
 if $needs_docker || selected docker-compose; then run_slot docker-compose; fi
 if selected 'otel-collector-contrib'; then run_slot 'otel-collector-contrib'; fi
 if selected 'prometheus'; then run_slot 'prometheus'; fi
-if selected 'loki'; then run_slot 'loki'; fi
-if selected 'grafana'; then run_slot 'grafana'; fi
-if selected 'phoenix'; then run_slot 'phoenix'; fi
+if selected 'alerting'; then run_slot 'alerting'; fi
+measured_slot 'loki'
+measured_slot 'grafana'
 if selected 'local-model-server'; then run_slot 'local-model-server'; fi
 if selected 'dagu'; then run_slot 'dagu'; fi
 if selected 'gpt-gateway'; then run_slot 'gpt-gateway'; fi

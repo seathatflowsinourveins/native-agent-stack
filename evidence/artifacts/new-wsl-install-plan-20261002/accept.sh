@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Revised staged acceptance after round1. Target-distribution execution remains unrun.
+# Revised staged acceptance for the merged definitive manifest (64 foundation rows). Target-distribution execution of this revision remains unrun.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi
@@ -24,9 +24,11 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|mcporter|mcp-inspector|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|tobi-qmd|mineru|trafilatura|playwright-cli|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
+# Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
+[[ -e "$repo_root/.git" ]] || { printf 'Run this plan from a checkout of the repository: %s is not a git checkout (see README.md).\n' "$repo_root" >&2; exit 1; }
 
 failed=0
 path_ready=false
@@ -133,9 +135,33 @@ trail-of-bits-security-skills-trailofbits-skills() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L28
-      check trail-of-bits-security-skills-trailofbits-skills smoke 'claude plugin list && codex plugin list'
+      # Source: https://code.claude.com/docs/en/plugins/loading.md#L171 (marketplace clone directory), https://raw.githubusercontent.com/git/git/v2.56.0/Documentation/git.adoc#L63 (-C)
+      check trail-of-bits-security-skills-trailofbits-skills smoke 'reviewed=82fe8226252622fa807643bdca1710901198553a
+actual="$(git -C "$HOME/.claude/plugins/marketplaces/trailofbits" rev-parse HEAD)"
+printf '"'"'trailofbits marketplace HEAD %s, reviewed %s\n'"'"' "$actual" "$reviewed" >&2
+[[ "$actual" == "$reviewed" ]]
+claude plugin list && codex plugin list'
       ;;
     *) skipped trail-of-bits-security-skills-trailofbits-skills ;;
+  esac
+}
+
+engineering-process-skills() {
+  # mattpocock/skills (selected skills, not the bundle); https://github.com/mattpocock/skills
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L164
+      check engineering-process-skills smoke 'lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+lock="${lock:-$HOME/.agents/.skill-lock.json}"
+listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
+for skill in tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills; do
+  for agent in '"'"'Claude Code'"'"' Codex; do
+    jq -e --arg skill "$skill" --arg agent "$agent" '"'"'any(.[]; .name == $skill and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
+  done
+  jq -e --arg skill "$skill" '"'"'.skills[$skill].ref == "v1.2.3"'"'"' "$lock" >/dev/null
+done'
+      ;;
+    *) skipped engineering-process-skills ;;
   esac
 }
 
@@ -150,13 +176,6 @@ mcporter() {
   esac
 }
 
-mcp-inspector() {
-  # MCP Inspector; https://github.com/modelcontextprotocol/inspector
-  case "$stage" in
-    *) skipped mcp-inspector ;;
-  esac
-}
-
 sandbox-runtime-srt() {
   # sandbox-runtime (srt); https://github.com/anthropics/sandbox-runtime
   case "$stage" in
@@ -165,13 +184,6 @@ sandbox-runtime-srt() {
       check sandbox-runtime-srt smoke 'srt echo "hello world"'
       ;;
     *) skipped sandbox-runtime-srt ;;
-  esac
-}
-
-isolation-container-boundary() {
-  # No additional component: rootless containers on the container engine that the hosting layer installs; excluded
-  case "$stage" in
-    *) skipped isolation-container-boundary ;;
   esac
 }
 
@@ -186,10 +198,18 @@ serena() {
   esac
 }
 
-claude-plugins-official-code-intelligence-lsp-pl() {
-  # claude-plugins-official (code-intelligence LSP plugins); https://github.com/anthropics/claude-plugins-official
+structural-search() {
+  # ast-grep; https://github.com/ast-grep/ast-grep
   case "$stage" in
-    *) skipped claude-plugins-official-code-intelligence-lsp-pl ;;
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ast-grep/ast-grep/0.45.3/README.md#L84
+      check structural-search smoke 'ast-grep --version
+ast_grep_probe="$(mktemp -d)"
+trap '"'"'rm -rf -- "$ast_grep_probe"'"'"' EXIT
+printf '"'"'callback && callback();\n'"'"' > "$ast_grep_probe/probe.ts"
+ast-grep -p '"'"'$A && $A()'"'"' -l ts "$ast_grep_probe/probe.ts"'
+      ;;
+    *) skipped structural-search ;;
   esac
 }
 
@@ -215,17 +235,6 @@ mineru() {
   esac
 }
 
-trafilatura() {
-  # trafilatura; https://github.com/adbar/trafilatura
-  case "$stage" in
-    post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/quickstart.rst#L102
-      check trafilatura smoke 'trafilatura -u "https://github.blog/2019-03-29-leader-spotlight-erin-spiceland/"'
-      ;;
-    *) skipped trafilatura ;;
-  esac
-}
-
 playwright-cli() {
   # Playwright CLI; https://github.com/microsoft/playwright-cli
   case "$stage" in
@@ -234,24 +243,6 @@ playwright-cli() {
       check playwright-cli smoke 'playwright-cli open https://playwright.dev --browser=chromium && playwright-cli close'
       ;;
     *) skipped playwright-cli ;;
-  esac
-}
-
-ccusage() {
-  # ccusage; https://github.com/ccusage/ccusage
-  case "$stage" in
-    post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/docs/guide/installation.md#L144
-      check ccusage smoke 'ccusage daily'
-      ;;
-    *) skipped ccusage ;;
-  esac
-}
-
-context-supply() {
-  # No context-supply layer: the usage meter only; excluded
-  case "$stage" in
-    *) skipped context-supply ;;
   esac
 }
 
@@ -285,6 +276,21 @@ prometheus() {
   esac
 }
 
+alerting() {
+  # Alertmanager; https://github.com/prometheus/alertmanager
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/configuration.md#L620
+      check alerting smoke '"$tool_root/alertmanager/alertmanager-0.34.1.linux-amd64/amtool" check-config "$config_root/alertmanager.yaml"'
+      ;;
+    service_health)
+      # Kind: health; Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/management_api.md#L22
+      check alerting health 'curl -fsS http://127.0.0.1:21093/-/ready'
+      ;;
+    *) skipped alerting ;;
+  esac
+}
+
 loki() {
   # Loki; https://github.com/grafana/loki
   case "$stage" in
@@ -313,21 +319,6 @@ grafana() {
       check grafana health 'curl -fsS http://127.0.0.1:21301/api/health'
       ;;
     *) skipped grafana ;;
-  esac
-}
-
-phoenix() {
-  # Phoenix; https://github.com/Arize-ai/phoenix
-  case "$stage" in
-    post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27
-      check phoenix smoke 'docker compose -f "$plan_dir/config/phoenix-compose.yaml" config --quiet'
-      ;;
-    service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/helm/templates/phoenix/deployment.yaml#L72
-      check phoenix health 'curl -fsS http://127.0.0.1:21606/readyz'
-      ;;
-    *) skipped phoenix ;;
   esac
 }
 
@@ -372,17 +363,6 @@ harbor-containerized-agent-e2e-runner() {
   esac
 }
 
-promptfoo() {
-  # Promptfoo; https://github.com/promptfoo/promptfoo
-  case "$stage" in
-    post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/installation.md#L80
-      check promptfoo 'version only' 'promptfoo --version'
-      ;;
-    *) skipped promptfoo ;;
-  esac
-}
-
 zizmor() {
   # zizmor; https://github.com/zizmorcore/zizmor
   case "$stage" in
@@ -394,18 +374,6 @@ zizmor() {
   esac
 }
 
-attest() {
-  # attest; https://github.com/actions/attest
-  case "$stage" in
-    post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/actions/attest/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md#L80
-      # Unavailable: Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route.
-      skipped attest
-      ;;
-    *) skipped attest ;;
-  esac
-}
-
 syft() {
   # Syft; https://github.com/anchore/syft
   case "$stage" in
@@ -414,30 +382,6 @@ syft() {
       check syft smoke 'syft alpine:latest'
       ;;
     *) skipped syft ;;
-  esac
-}
-
-dependabot() {
-  # Dependabot; https://github.com/dependabot/dependabot-core
-  case "$stage" in
-    post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/dependabot/dependabot-core/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md#L42
-      # Unavailable: Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route.
-      skipped dependabot
-      ;;
-    *) skipped dependabot ;;
-  esac
-}
-
-codeql-sarif() {
-  # codeql-sarif; https://github.com/github/codeql-action
-  case "$stage" in
-    post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/github/codeql-action/416ff0dea110f80f0f56f0046500dbf7420e4bb0/upload-sarif/action.yml#L1
-      # Unavailable: Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route.
-      skipped codeql-sarif
-      ;;
-    *) skipped codeql-sarif ;;
   esac
 }
 
@@ -504,13 +448,6 @@ betterleaks() {
   esac
 }
 
-trufflehog() {
-  # trufflehog; https://github.com/trufflesecurity/trufflehog
-  case "$stage" in
-    *) skipped trufflehog ;;
-  esac
-}
-
 git() {
   # git; https://github.com/git/git
   case "$stage" in
@@ -556,25 +493,6 @@ difftastic() {
   esac
 }
 
-claude-code-action() {
-  # claude-code-action; https://github.com/anthropics/claude-code-action
-  case "$stage" in
-    post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/anthropics/claude-code-action/97c53473391bff1901034d4b454b5bac7ab7a029/docs/usage.md#L17
-      # Unavailable: Workflow/repository adoption pointer; no host executable is installed. No post-install host self-test or version command is supplied by this route.
-      skipped claude-code-action
-      ;;
-    *) skipped claude-code-action ;;
-  esac
-}
-
-agent-structural-diff() {
-  # Not installed: git diff and difftastic cover diffs; excluded
-  case "$stage" in
-    *) skipped agent-structural-diff ;;
-  esac
-}
-
 mise() {
   # mise; https://github.com/jdx/mise
   case "$stage" in
@@ -595,27 +513,6 @@ restic() {
       check restic 'version only' 'restic version'
       ;;
     *) skipped restic ;;
-  esac
-}
-
-chezmoi() {
-  # chezmoi; https://github.com/twpayne/chezmoi
-  case "$stage" in
-    post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/twpayne/chezmoi/24b71e4cf9d98cce0801cfc68e7553355efeaff7/internal/cmd/doctorcmd.go#L613
-      check chezmoi smoke 'chezmoi_probe="$(mktemp -d)"
-trap '"'"'rm -rf -- "$chezmoi_probe"'"'"' EXIT
-mkdir -p -- "$chezmoi_probe/source" "$chezmoi_probe/destination"
-chezmoi --config "$chezmoi_probe/chezmoi.toml" --source "$chezmoi_probe/source" --destination "$chezmoi_probe/destination" --working-tree "$chezmoi_probe/source" doctor'
-      ;;
-    *) skipped chezmoi ;;
-  esac
-}
-
-base-distribution() {
-  # Ubuntu 26.04.1 LTS (Canonical WSL image), primary; https://ubuntu.com/download/server
-  case "$stage" in
-    *) skipped base-distribution ;;
   esac
 }
 
@@ -653,12 +550,19 @@ agent-runtime-worker() {
 }
 
 research-harnesses() {
-  # GPT Researcher and DeerFlow, kept as two independent evidence gatherers; https://github.com/assafelovic/gpt-researcher
+  # GPT Researcher and DeerFlow, kept as two independent evidence gatherers; https://github.com/assafelovic/gpt-researcher and https://github.com/bytedance/deer-flow
   case "$stage" in
     post_install)
-      # Kind: version only; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23
-      check research-harnesses 'version only' 'cd "$tool_root/gpt-researcher"
-.venv/bin/python -c '"'"'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])'"'"''
+      # Kind: smoke; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23
+      # Source: https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27 (DeerFlow Compose configuration, second part)
+      check research-harnesses smoke 'cd "$tool_root/gpt-researcher"
+.venv/bin/python -c '"'"'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])'"'"'
+cd "$tool_root/deer-flow/docker"
+DEER_FLOW_ROOT="$tool_root/deer-flow" docker compose -p deer-flow-dev -f docker-compose-dev.yaml config --quiet'
+      ;;
+    service_health)
+      # Kind: health; Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152
+      check research-harnesses health 'curl -fsS http://127.0.0.1:2026/health/ready'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/docs/docs/gpt-researcher/gptr/pip-package.md#L32
@@ -693,19 +597,6 @@ PY'
       ;;
     *) skipped research-harnesses ;;
   esac
-  # GPT Researcher and DeerFlow, kept as two independent evidence gatherers; https://github.com/bytedance/deer-flow
-  case "$stage" in
-    post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27
-      check research-harnesses smoke 'cd "$tool_root/deer-flow/docker"
-DEER_FLOW_ROOT="$tool_root/deer-flow" docker compose -p deer-flow-dev -f docker-compose-dev.yaml config --quiet'
-      ;;
-    service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152
-      check research-harnesses health 'curl -fsS http://127.0.0.1:2026/health/ready'
-      ;;
-    *) skipped research-harnesses ;;
-  esac
 }
 
 credential-guard() {
@@ -737,51 +628,42 @@ if [[ -z "$only" || "$only" == codex ]]; then codex; fi
 if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
 if [[ -z "$only" || "$only" == codex-sdk-and-codex-exec-app-server ]]; then codex-sdk-and-codex-exec-app-server; fi
 if [[ -z "$only" || "$only" == trail-of-bits-security-skills-trailofbits-skills ]]; then trail-of-bits-security-skills-trailofbits-skills; fi
+if [[ -z "$only" || "$only" == engineering-process-skills ]]; then engineering-process-skills; fi
 if [[ -z "$only" || "$only" == mcporter ]]; then mcporter; fi
-if [[ -z "$only" || "$only" == mcp-inspector ]]; then mcp-inspector; fi
 if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt; fi
-if [[ -z "$only" || "$only" == isolation-container-boundary ]]; then isolation-container-boundary; fi
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
-if [[ -z "$only" || "$only" == claude-plugins-official-code-intelligence-lsp-pl ]]; then claude-plugins-official-code-intelligence-lsp-pl; fi
+if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
 if [[ -z "$only" || "$only" == tobi-qmd ]]; then tobi-qmd; fi
 if [[ -z "$only" || "$only" == mineru ]]; then mineru; fi
-if [[ -z "$only" || "$only" == trafilatura ]]; then trafilatura; fi
-if [[ -z "$only" || "$only" == playwright-cli ]]; then playwright-cli; fi
-if [[ -z "$only" || "$only" == ccusage ]]; then ccusage; fi
-if [[ -z "$only" || "$only" == context-supply ]]; then context-supply; fi
+if [[ "$only" == playwright-cli ]]; then playwright-cli; elif [[ -z "$only" ]]; then skipped playwright-cli; fi
 if [[ -z "$only" || "$only" == otel-collector-contrib ]]; then otel-collector-contrib; fi
 if [[ -z "$only" || "$only" == prometheus ]]; then prometheus; fi
-if [[ -z "$only" || "$only" == loki ]]; then loki; fi
-if [[ -z "$only" || "$only" == grafana ]]; then grafana; fi
-if [[ -z "$only" || "$only" == phoenix ]]; then phoenix; fi
+if [[ "$only" == loki ]]; then loki; elif [[ -z "$only" ]]; then skipped loki; fi
+if [[ "$only" == grafana ]]; then grafana; elif [[ -z "$only" ]]; then skipped grafana; fi
 if [[ -z "$only" || "$only" == local-model-server ]]; then local-model-server; fi
+if [[ -z "$only" || "$only" == alerting ]]; then alerting; fi
 if [[ -z "$only" || "$only" == inspect-ai ]]; then inspect-ai; fi
 if [[ -z "$only" || "$only" == harbor-containerized-agent-e2e-runner ]]; then harbor-containerized-agent-e2e-runner; fi
-if [[ -z "$only" || "$only" == promptfoo ]]; then promptfoo; fi
 if [[ -z "$only" || "$only" == zizmor ]]; then zizmor; fi
-if [[ -z "$only" || "$only" == attest ]]; then attest; fi
 if [[ -z "$only" || "$only" == syft ]]; then syft; fi
-if [[ -z "$only" || "$only" == dependabot ]]; then dependabot; fi
-if [[ -z "$only" || "$only" == codeql-sarif ]]; then codeql-sarif; fi
 if [[ -z "$only" || "$only" == actionlint-kjanat ]]; then actionlint-kjanat; fi
 if [[ -z "$only" || "$only" == dagu ]]; then dagu; fi
 if [[ -z "$only" || "$only" == docker-compose ]]; then docker-compose; fi
 if [[ -z "$only" || "$only" == container-engine ]]; then container-engine; fi
 if [[ -z "$only" || "$only" == betterleaks ]]; then betterleaks; fi
-if [[ -z "$only" || "$only" == trufflehog ]]; then trufflehog; fi
 if [[ -z "$only" || "$only" == git ]]; then git; fi
 if [[ -z "$only" || "$only" == gh-github-cli ]]; then gh-github-cli; fi
 if [[ -z "$only" || "$only" == worktrunk ]]; then worktrunk; fi
 if [[ -z "$only" || "$only" == difftastic ]]; then difftastic; fi
-if [[ -z "$only" || "$only" == claude-code-action ]]; then claude-code-action; fi
-if [[ -z "$only" || "$only" == agent-structural-diff ]]; then agent-structural-diff; fi
 if [[ -z "$only" || "$only" == mise ]]; then mise; fi
 if [[ -z "$only" || "$only" == restic ]]; then restic; fi
-if [[ -z "$only" || "$only" == chezmoi ]]; then chezmoi; fi
-if [[ -z "$only" || "$only" == base-distribution ]]; then base-distribution; fi
 if [[ -z "$only" || "$only" == gpt-gateway ]]; then gpt-gateway; fi
 if [[ -z "$only" || "$only" == agent-runtime-worker ]]; then agent-runtime-worker; fi
 if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; fi
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
+# Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
+for slot in 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'claude-code-action' 'agent-structural-diff' 'chezmoi' 'base-distribution'; do
+  if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
+done
 exit "$failed"

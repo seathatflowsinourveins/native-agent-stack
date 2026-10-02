@@ -1,4 +1,43 @@
-# Round 1 install-plan repair
+# Install-plan validation
+
+## Revision to the merged manifest, after the real-distribution run
+
+### Evidence class
+
+The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added, which have not run on a distribution. The round 1 container run below is a separate, earlier class of evidence.
+
+### Result of that run
+
+- Install: 42 owners exit 0; `codex` 143 (finding 1); `trail-of-bits-security-skills-trailofbits-skills` 1 (finding 2).
+- `post_install` acceptance: 39 exit 0, 12 skipped (excluded or no host install), worktrunk 1 and convergence-validators 2 (finding 3). After the three repairs, applied by hand on that host: 41 of 41.
+- The four owners the container could not show (Dagu, Harbor, sandbox-runtime, worktrunk) pass on the real distribution.
+- `service_health`: container-engine, Dagu (port 21080) and Phoenix (21606, 21617) pass because the install starts them. The gateway, Grafana, Loki, the OTel collector, Prometheus and the research harnesses return curl's 28 and the local model server 1, because the install does not start their services.
+- The 21xxx port band does not collide with the host's listeners in the shared network namespace.
+
+### Findings and what changed
+
+1. The `codex` slot hung for ten minutes: the native installer asks "Start Codex now? [y/N]" on /dev/tty when a terminal exists, and a WSL launch has a pty (the container run had none). The installer documents `CODEX_NON_INTERACTIVE` ("Set to 1, true, or yes to skip prompts"). **Changed:** the line is now `curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh`. On the host, with the variable set, no prompt appeared and the installer exited 0 (Codex 0.160.0), which is finding 4.
+2. `claude plugin marketplace add trailofbits/skills@<commit>` failed twice over: the shorthand clones over SSH ("No ED25519 host key is known for github.com"), and `@<ref>`, like `#<ref>`, is a branch or tag, not a commit ("Remote branch <sha> not found"); the repository has no tags. `claude plugin marketplace add https://github.com/trailofbits/skills.git` works. **Changed:** that line, unpinned. The acceptance prints `git -C "$HOME/.claude/plugins/marketplaces/trailofbits" rev-parse HEAD` beside the reviewed commit `82fe8226252622fa807643bdca1710901198553a` and fails when they differ (the head was `82fe8226` on the day of the run). The Codex line, `codex plugin marketplace add trailofbits/skills --ref <commit>`, worked as written and is unchanged.
+3. The acceptance checks of worktrunk and the convergence validators change into `repo_root`; from a copy outside a checkout they failed, and from the clone both exit 0. **Changed:** the README says first that the plan runs from a checkout (recipe step F7), and both scripts stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
+
+### Rows
+
+The inventory is the merged manifest's 64 foundation rows (the previous revision had 53 owner rows, 46 of them selected): 36 installed by default, three measurement-only (Loki, Grafana, Playwright CLI) and 25 not installed. Trafilatura, ccusage, Phoenix, Promptfoo, chezmoi, Claude Code Action, CodeQL SARIF, trufflehog, the LSP plugins, the structural-diff row, attest and Dependabot left the installed set; ast-grep, Alertmanager and mattpocock/skills joined it, and GPT Researcher and DeerFlow became one row. The round 1 table below keeps its rows for owners that left the plan: it records what that run did.
+
+### Checks run for this revision
+
+All static; none installs anything, and `install.sh` and `accept.sh` were not run except `install.sh --list`.
+
+- `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- `bash install.sh --list`: exit 0, 64 lines.
+- `python3 -B check_plan.py`: exit 0, "OK: 64 rows: 36 installed by default, 3 measurement-only, 25 not installed; 65 commands and 55 acceptance entries agree with the scripts".
+- Python `json.load` of the four JSON files of this folder: exit 0.
+- `check_plan.py` against defects planted one at a time in scratch copies (our own mutations, not an upstream test): deleting the `serena` install function, adding an unknown mise tool and giving two rows one port each exit 1 and name the problem; so do an orphan function for an excluded row, a drifting install command, a dropped `--list` line, a split row marked installed, a `run_command` without a source comment, a missing post-install acceptance, a removed row, a stray config file, a command without a source URL, a `not_installed` row marked installed and a drifting acceptance command. The unmodified copy exits 0.
+- `python3 -B scripts/validate.py`: exit 1; it reports only that the changed files differ from the hashes registered in `manifests/evidence.json`, that `check_plan.py` and `config/alertmanager.yaml` are not hash-listed and that `config/phoenix-compose.yaml` is gone, all to be re-registered by the coordinator.
+
+Observations from upstream release archives run in a scratch directory (Alertmanager's `amtool check-config` on `config/alertmanager.yaml`, its readiness endpoint, the ast-grep probe) and fixtures for the skills and Trail of Bits acceptance programs are described in [SOURCES.md](SOURCES.md), last section; they are not acceptance.
+
+## Round 1 install-plan repair (historical)
 
 The coordinator ran 34 slots as uid 1000 in a disposable `ubuntu:26.04` container (Ubuntu 26.04.1 LTS), with passwordless sudo, no systemd/user bus, no bubblewrap user namespaces, no service started by the validation procedure and no sign-in. The repository was read-only at `/repo`; the mounted worktree's Git metadata was outside the container. This file quotes only nonprivate evidence. Log locations below are relative to the supplied read-only `round1/` results directory.
 
