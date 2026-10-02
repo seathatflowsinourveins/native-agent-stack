@@ -14,6 +14,11 @@ to evaluate a proposed change. Source pins live in
 [the stack manifest](../manifests/stack.json); evidence classes and publication
 limits live in [the evidence guide](evidence.md).
 
+For the current macOS/workstation operating selection and the immediate North
+Star R&D starting boundary, use the [October 2 two-host architecture decision](decisions/2026-10-02-two-host-north-star-architecture.md).
+It separates native clients, SDK/gateway workers and the optional Pi runtime,
+and distinguishes local acceptance from the workstation's remaining activation.
+
 The working sequence is:
 
 ```text
