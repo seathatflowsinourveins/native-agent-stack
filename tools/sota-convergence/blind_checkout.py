@@ -23,7 +23,13 @@ What is stripped, and how each strip is recorded in
   new-host-grand-list,blind-convergence}.json`` and their rendered twins
   ``docs/{component-evidence-matrix,new-host-grand-list}.md``,
   ``catalogs/sota-convergence/manifest-*.json`` and
-  ``catalogs/sota-convergence/sdk-runtime-coverage-*``.
+  ``catalogs/sota-convergence/sdk-runtime-coverage-*``; and the new-WSL
+  architecture edition, its layer crosswalk, the final catalog generated from
+  them (``catalogs/foundation/final-catalog-*``, ``docs/final-catalog-*``) and
+  the blind clean-install selection records they join (``selection.json``,
+  ``ownership.json``, ``cross-family/selection-gpt.json`` and their two
+  decision records), keeping that selection's frozen criteria, prompts and
+  packets.
 - **Ledger candidate order**: each ledger row's ``candidates`` list is sorted
   by lowercased ``(repository, name)`` before anything else is stripped (the
   checked-in order lists the selected incumbent first), so every recorded
@@ -209,6 +215,20 @@ REMOVE_GLOBS = (
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
+    # The new-WSL architecture edition, its layer crosswalk and the final catalog generated from them, with the blind
+    # clean-install selection records they join: each names every layer's selection of record, standing picks or
+    # challengers (final catalog, 2026-10-01). The selection's frozen criteria, prompts and packets stay, so a later
+    # blind run can reuse them.
+    "catalogs/foundation/new-wsl-architecture-*",
+    "catalogs/foundation/new-wsl-layer-crosswalk-*",
+    "catalogs/foundation/final-catalog-*",
+    "docs/final-catalog-*",
+    "tests/test_final_catalog.py",
+    "evidence/artifacts/new-wsl-clean-install-selection-*/selection.json",
+    "evidence/artifacts/new-wsl-clean-install-selection-*/ownership.json",
+    "evidence/artifacts/new-wsl-clean-install-selection-*/cross-family/selection-gpt.json",
+    "docs/decisions/2026-10-01-final-catalog.md",
+    "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/

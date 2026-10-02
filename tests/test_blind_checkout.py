@@ -171,6 +171,36 @@ class RemovedFilesTests(BlindCheckoutFixture):
         # An unrelated docs file is untouched.
         self.assertTrue((self.dest / "docs/keep-me.md").is_file())
 
+    def test_final_catalog_edition_and_selection_records_are_removed_but_frozen_inputs_kept(self):
+        selection = "evidence/artifacts/new-wsl-clean-install-selection-20261001"
+        removed = [
+            "catalogs/foundation/new-wsl-architecture-20261001.json",
+            "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
+            "catalogs/foundation/final-catalog-20261001.json",
+            "docs/final-catalog-20261001.md",
+            "tests/test_final_catalog.py",
+            f"{selection}/selection.json",
+            f"{selection}/ownership.json",
+            f"{selection}/cross-family/selection-gpt.json",
+            "docs/decisions/2026-10-01-final-catalog.md",
+            "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
+        ]
+        kept = [f"{selection}/criteria.txt", f"{selection}/judge-prompt.txt", f"{selection}/packets/durable-memory.json",
+                f"{selection}/cross-family/agreement-rule.txt"]
+        for relative in removed + kept:
+            self.write(relative, "{}\n" if relative.endswith(".json") else "fixture\n")
+        git(["add", "-A"], self.source)
+        git(["commit", "-q", "-m", "final catalog fixture"], self.source)
+        manifest = self.run_checkout()
+        self.addCleanup(self.remove_worktree)
+        for relative in removed:
+            self.assertIn(relative, manifest["removed_files"])
+            self.assertFalse((self.dest / relative).exists(), relative)
+            self.assertTrue(blind_checkout.removed_from_blind_export(relative), relative)
+        for relative in kept:
+            self.assertTrue((self.dest / relative).is_file(), relative)
+            self.assertFalse(blind_checkout.removed_from_blind_export(relative), relative)
+
 
 class LedgerV2ResetTests(BlindCheckoutFixture):
     def test_v2_verdict_fields_reset_to_pending_and_requirement_kept(self):
