@@ -536,31 +536,31 @@ class NewWslHandbookTests(unittest.TestCase):
         result = self.public_cli()
         self.assertEqual(result.returncode, 0, result.stderr)
         previous = {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS}
-        secret = "sk-" + "syntheticFixtureValue" * 3
+        planted = "sk-" + "syntheticFixtureValue" * 3
         profile = self.read(handbook.PROFILE)
-        profile["entries"][0]["install"]["command"] += " --token " + secret
+        profile["entries"][0]["install"]["command"] += " --token " + planted
         self.write(handbook.PROFILE, profile)
         for mode in ("--write", "--check"):
             with self.subTest(mode=mode):
                 result = self.public_cli(mode=mode)
                 self.assertEqual(result.returncode, 1)
                 self.assertIn("API secret", result.stderr)
-                self.assertNotIn(secret, result.stdout + result.stderr)
+                self.assertNotIn(planted, result.stdout + result.stderr)
                 self.assertEqual(previous, {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS})
 
     def test_each_rendered_output_is_scanned_before_publication(self):
         clean = handbook.render(self.root)
-        secret = "ghp_" + "SyntheticFixtureValue" * 3
+        planted = "ghp_" + "SyntheticFixtureValue" * 3
         for path in handbook.OUTPUTS:
             for mode in ("--write", "--check"):
                 with self.subTest(path=path, mode=mode):
                     outputs = dict(clean)
                     if path.endswith(".json"):
                         data = json.loads(outputs[path])
-                        data["fixture_metadata"] = secret
+                        data["fixture_metadata"] = planted
                         outputs[path] = json.dumps(data).encode()
                     else:
-                        outputs[path] += (secret + "\n").encode()
+                        outputs[path] += (planted + "\n").encode()
                     # Matching on-disk bytes would otherwise let --check succeed.
                     for destination, raw in outputs.items():
                         target = self.root / destination
@@ -572,7 +572,7 @@ class NewWslHandbookTests(unittest.TestCase):
                         code = handbook.main(["--root", str(self.root), mode])
                     self.assertEqual(code, 1)
                     self.assertIn("GitHub token", stderr.getvalue())
-                    self.assertNotIn(secret, stdout.getvalue() + stderr.getvalue())
+                    self.assertNotIn(planted, stdout.getvalue() + stderr.getvalue())
                     self.assertEqual(previous, {name: (self.root / name).read_bytes() for name in outputs})
 
     def test_comparison_dependencies_and_reference_boundaries_survive(self):
