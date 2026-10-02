@@ -15886,8 +15886,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "227f9f65d4bece414b3e83864e308b539c93cbafd640460c41b00b350bd69b22",
-      "bytes": 135077
+      "sha256": "87229ac5a96c1c46165d8de5a09f38d3751dd6fc8264aaf78adec3dc35b2f425",
+      "bytes": 135407
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -37206,8 +37206,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "1fd491bbf1e93b418ed12d51d5d05906a0af74db540fc87a9df641487ee0c0ce",
-      "bytes": 12501
+      "sha256": "68d23be52f2b6a2bc26737d2bdba484b6cf2c1fae3a7d929b6eddb767e24cfe7",
+      "bytes": 12636
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -37216,8 +37216,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "c21bee9177097b74fd2acfc8d91e127923c8b7a47c18d7d7e39afde67f37e19d",
-      "bytes": 20302
+      "sha256": "2604bfbfee99f66d8d7b6c5ce2dcef634571c530a4c5bd73ec8834ecde41e039",
+      "bytes": 20515
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
@@ -37271,8 +37271,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "14e80961d1e20420bb2891bbec1e8dd55d2db67433f12a242b0f3c311e965d34",
-      "bytes": 109336
+      "sha256": "8d45c6c9257973c5739e2407c3bdd47bb19e4e7163790be29e8a6e8c7d57ee27",
+      "bytes": 109470
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -37291,8 +37291,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
-      "sha256": "7de61ac3ae94b7f0c5b6cd7753b83d1b4368387dd18b04ef3eff60cf9ff19839",
-      "bytes": 11786
+      "sha256": "96a2362e9f2c2701734e3d08e8139c9cc03619000cb177943927299c07c2e72d",
+      "bytes": 12090
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
