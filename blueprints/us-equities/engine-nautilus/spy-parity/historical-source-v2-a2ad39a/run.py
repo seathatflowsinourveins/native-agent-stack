@@ -45,8 +45,6 @@ EVIDENCE_CLASS = "HIST"
 SEED = 20260922
 MANIFEST_V2 = "mapping-manifest-v2.json"
 MANIFEST_V1 = "mapping-manifest.json"
-MANIFEST_STRESS = "mapping-manifest-stress-20261002.json"
-PREREGISTRATION_STRESS = "PREREGISTRATION-stress-20261002.md"
 EXTENSION = "_libnautilus.cpython-312-x86_64-linux-gnu.so"
 # Explicit venue settings from the v2 manifest's case_configuration, passed to
 # add_venue instead of relied on as defaults. fill_model, fee_model and
@@ -204,38 +202,6 @@ def _load(name, path):
 CONVERT = _load("spy_parity_convert", SOURCE / "convert.py")
 FIXTURE = _load("spy_parity_fixture", SOURCE / "fixture_strategy.py")
 DISTRIBUTION = _load("spy_parity_distribution", SOURCE / "distribution_module.py")
-COSTS = _load("spy_parity_costs", SOURCE / "cost_models.py")
-
-
-def case_settings(case_id):
-    if case_id == "one_zero":
-        return dict(CASE), dict(INSTRUMENT), dict(VENUE)
-    if case_id != "one_stress":
-        raise ValueError("unsupported_case:" + case_id)
-    return ({**CASE, "id": case_id, "fee_usd": "1", "slippage": "0.002",
-             "oco_trigger_increment": "0.0001"},
-            {**INSTRUMENT, "price_precision": 6, "price_increment": "0.000001"},
-            {**VENUE, "fill_model": "TwentyBasisPointFillModel",
-             "fee_model": "FixedFeeModel(1.00 USD,charge_commission_once=true)"})
-
-
-def stress_reviewed_files():
-    return (*REVIEWED_HARNESS_FILES, "cost_models.py", MANIFEST_STRESS,
-            PREREGISTRATION_STRESS, "requirements-stress-macos-arm64-py313.lock",
-            "requirements-stress-linux-arm64-py313.lock")
-
-
-def require_stress_review(review, hashes, started_utc):
-    """Refuse new stress engine operation until these exact bytes are reviewed."""
-    if not review:
-        raise ValueError("stress_review_required_before_engine")
-    if review.get("unresolved_findings") != 0:
-        raise ValueError("stress_review_unresolved_findings")
-    if review.get("reviewed_local_source_sha256") != hashes:
-        raise ValueError("stress_review_source_mismatch")
-    completed = datetime.fromisoformat(review["completed_utc"].replace("Z", "+00:00"))
-    if completed.tzinfo is None or completed >= datetime.fromisoformat(started_utc):
-        raise ValueError("stress_review_must_precede_engine")
 
 
 def digest(path):
@@ -271,7 +237,7 @@ def effective_manifest(v2: dict, v1: dict) -> dict:
     return {**v2, "mappings": rows + list(v2["mappings"])}
 
 
-def load_bound_manifests(case_id="one_zero") -> tuple[dict, dict]:
+def load_bound_manifests() -> tuple[dict, dict]:
     """The sealed v2 manifest, and the v1 file checked against v2's record of it."""
     v2 = load_manifest(SOURCE / MANIFEST_V2)
     if v2.get("schema_version") != 2:
@@ -279,17 +245,7 @@ def load_bound_manifests(case_id="one_zero") -> tuple[dict, dict]:
     v1_path = SOURCE / MANIFEST_V1
     if digest(v1_path) != v2["supersedes"]["sha256"]:
         raise ValueError("superseded_manifest_sha256_mismatch")
-    effective = effective_manifest(v2, json.loads(v1_path.read_text()))
-    if case_id == "one_zero":
-        return v2, effective
-    case_settings(case_id)
-    stress = load_manifest(SOURCE / MANIFEST_STRESS)
-    if digest(SOURCE / MANIFEST_V2) != stress["extends_v2"]["sha256"]:
-        raise ValueError("stress_base_manifest_sha256_mismatch")
-    rows = {r["id"]: r for r in effective["mappings"]}
-    rows.update({r["id"]: r for r in stress["mappings"]})
-    effective = {**effective, **stress, "mappings": list(rows.values())}
-    return effective, effective
+    return v2, effective_manifest(v2, json.loads(v1_path.read_text()))
 
 
 def unsupported_mappings(manifest: dict) -> list:
@@ -310,15 +266,11 @@ def check_engine_binary(manifest: dict) -> dict:
     """The installed extension must be the one the manifest pins."""
     import nautilus_trader
 
-    package = Path(nautilus_trader.__file__).resolve().parent
-    candidates = [p for p in package.glob("_libnautilus*.so") if p.is_file()]
-    if len(candidates) != 1:
-        raise ValueError("engine_extension_not_unique")
-    path = candidates[0]
+    path = Path(nautilus_trader.__file__).resolve().parent / EXTENSION
     found = digest(path)
-    if found != manifest["engine"]["extension_sha256"].get(path.name):
+    if found != manifest["engine"]["extension_sha256"][EXTENSION]:
         raise ValueError("engine_extension_sha256_mismatch")
-    return {path.name: found}
+    return {EXTENSION: found}
 
 
 def check_bound_inputs(manifest: dict, tolerances_path: Path) -> None:
@@ -589,31 +541,25 @@ def account_events(account, currency) -> list:
     return found
 
 
-def run_once(rows, events, out: Path, label: str, case=None, instrument=None, venue_config=None) -> dict:
+def run_once(rows, events, out: Path, label: str) -> dict:
     from nautilus_trader.backtest import BacktestEngine
     from nautilus_trader.common import LogColor, LogLevel, logger_flush, logger_log
     from nautilus_trader.config import BacktestEngineConfig, LoggerConfig
     from nautilus_trader.model import (AccountType, ClientOrderId, Currency, Equity, InstrumentId,
                                        Money, OmsType, Price, Quantity, Symbol, Venue)
 
-    case = CASE if case is None else case
-    instrument = INSTRUMENT if instrument is None else instrument
-    venue_config = VENUE if venue_config is None else venue_config
-    fill_model, fee_model = (COSTS.build_models(case, instrument)
-                             if case["id"] == "one_stress" else (None, None))
     random.seed(SEED)
     out.mkdir(mode=0o700, parents=True, exist_ok=False)
-    usd = Currency.from_str(instrument["currency"])
-    venue = Venue(instrument["venue"])
-    equity = Equity(InstrumentId.from_str(instrument["instrument_id"]), Symbol(instrument["symbol"]),
-                    usd, instrument["price_precision"], Price.from_str(instrument["price_increment"]),
-                    0, 0, lot_size=Quantity.from_int(instrument["lot_size"]))
-    bars = CONVERT.to_bars(rows, instrument["bar_type"], instrument["price_precision"],
-                           instrument["size_precision"])
-    strategy_class = FIXTURE.build_strategy(equity.id, instrument["bar_type"], rows, case,
-                                            [e["ex_instant_ns"] for e in events],
-                                            price_precision=instrument["price_precision"])
-    module = DISTRIBUTION.build_module(events, instrument["instrument_id"], instrument["currency"])
+    usd = Currency.from_str(INSTRUMENT["currency"])
+    venue = Venue(INSTRUMENT["venue"])
+    equity = Equity(InstrumentId.from_str(INSTRUMENT["instrument_id"]), Symbol(INSTRUMENT["symbol"]),
+                    usd, INSTRUMENT["price_precision"], Price.from_str(INSTRUMENT["price_increment"]),
+                    0, 0, lot_size=Quantity.from_int(INSTRUMENT["lot_size"]))
+    bars = CONVERT.to_bars(rows, INSTRUMENT["bar_type"], INSTRUMENT["price_precision"],
+                           INSTRUMENT["size_precision"])
+    strategy_class = FIXTURE.build_strategy(equity.id, INSTRUMENT["bar_type"], rows, CASE,
+                                            [e["ex_instant_ns"] for e in events])
+    module = DISTRIBUTION.build_module(events, INSTRUMENT["instrument_id"], INSTRUMENT["currency"])
     modules = [module]
     log_path = out / "engine.log"
     # Bound before the try so an engine failure surfaces as itself, never as a
@@ -625,17 +571,17 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
         engine = BacktestEngine(BacktestEngineConfig(
             logging=LoggerConfig(stdout_level=LogLevel.INFO, is_colored=False)))
         try:
-            engine.add_venue(venue, getattr(OmsType, venue_config["oms_type"]),
-                             getattr(AccountType, venue_config["account_type"]),
-                             [Money(Decimal(case["initial_cash_usd"]), usd)], base_currency=usd,
-                             fill_model=fill_model, fee_model=fee_model,
-                             latency_model=venue_config["latency_model"], modules=modules,
-                             reject_stop_orders=venue_config["reject_stop_orders"],
-                             support_contingent_orders=venue_config["support_contingent_orders"],
-                             use_random_ids=venue_config["use_random_ids"],
-                             bar_execution=venue_config["bar_execution"],
-                             bar_adaptive_high_low_ordering=venue_config["bar_adaptive_high_low_ordering"],
-                             frozen_account=venue_config["frozen_account"])
+            engine.add_venue(venue, getattr(OmsType, VENUE["oms_type"]),
+                             getattr(AccountType, VENUE["account_type"]),
+                             [Money(Decimal(CASE["initial_cash_usd"]), usd)], base_currency=usd,
+                             fill_model=VENUE["fill_model"], fee_model=VENUE["fee_model"],
+                             latency_model=VENUE["latency_model"], modules=modules,
+                             reject_stop_orders=VENUE["reject_stop_orders"],
+                             support_contingent_orders=VENUE["support_contingent_orders"],
+                             use_random_ids=VENUE["use_random_ids"],
+                             bar_execution=VENUE["bar_execution"],
+                             bar_adaptive_high_low_ordering=VENUE["bar_adaptive_high_low_ordering"],
+                             frozen_account=VENUE["frozen_account"])
             engine.add_instrument(equity)
             engine.add_data(bars)
             strategy = strategy_class()
@@ -695,7 +641,7 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
     external = FIXTURE.distribution_ledger(
         [{"ex_date": e["ex_date"], "utc_seconds": e["ex_instant_utc_seconds"],
           "per_share": e["per_share"]} for e in events], strategy.fills)
-    cash = FIXTURE.cash_ledger(Decimal(case["initial_cash_usd"]), strategy.fills, ledger)
+    cash = FIXTURE.cash_ledger(Decimal(CASE["initial_cash_usd"]), strategy.fills, ledger)
     oco_pairs = FIXTURE.attach_engine_views(strategy.oco_pairs, strategy.accepted_orders, final_views)
     native_balances = [str(number(row["total"])) for row in raw["account"]]
     module_record = {"class": type(module).__name__, "process_calls": module.process_calls,
@@ -713,8 +659,6 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
                 "alerts_fired": strategy.alerts_fired,
                 "native_fills": normalize(raw["fills"], counters),
                 "positions": normalize(raw["positions"], counters)}
-    if fill_model is not None:
-        economic["stress_fill_model_calls"] = fill_model.calls
     normalized_text = json.dumps(economic, sort_keys=True, default=str)
     record = {
         "label": label,
@@ -743,7 +687,7 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
         "external_distribution_cross_check": external,
         "dividend_cash_usd": str(sum((Decimal(d["amount"]) for d in ledger), Decimal(0))),
         "cash_ledger": cash,
-        "reconciled_end_cash_usd": cash[-1]["cash"] if cash else case["initial_cash_usd"],
+        "reconciled_end_cash_usd": cash[-1]["cash"] if cash else CASE["initial_cash_usd"],
         "buying_power_events": strategy.buying_power_events,
         "latch_events": strategy.latch_events,
         "engine_log_scan": log_scan,
@@ -751,7 +695,6 @@ def run_once(rows, events, out: Path, label: str, case=None, instrument=None, ve
         "raw_report_sha256": {name: digest(out / (name + ".csv")) for name in reports},
         "raw_reports_json_sha256": digest(out / "reports.private.json"),
         "normalized_economic_sha256": digest_text(normalized_text),
-        **({"stress_fill_model_calls": fill_model.calls} if fill_model is not None else {}),
     }
     save(out / "summary.json", {k: v for k, v in record.items() if k != "_raw_reports"})
     return record
@@ -774,14 +717,7 @@ def main():
     parser.add_argument("--harness-commit", default=None,
                         help="Commit of the checkout being run, recorded as declared by the operator "
                              "(the isolated run cannot read Git); local_source_sha256 binds the files")
-    parser.add_argument("--case", choices=("one_zero", "one_stress"), default="one_zero")
     args = parser.parse_args()
-    case, instrument, venue_config = case_settings(args.case)
-    manifest_name = MANIFEST_STRESS if args.case == "one_stress" else MANIFEST_V2
-    preregistration_name = PREREGISTRATION_STRESS if args.case == "one_stress" else "PREREGISTRATION-v2.md"
-    source_names = (*REVIEWED_HARNESS_FILES, MANIFEST_V1, MANIFEST_V2, "tolerances.json")
-    if args.case == "one_stress":
-        source_names = tuple(dict.fromkeys((*source_names, *stress_reviewed_files())))
 
     started_utc = datetime.now(timezone.utc).isoformat()
     installed = importlib.metadata.version("nautilus_trader")
@@ -794,7 +730,7 @@ def main():
     review = load_review_record(args.review_record)
     acceptance = load_deviation_acceptance()
     history = load_replay_history()
-    manifest_v2, manifest = load_bound_manifests(args.case)
+    manifest_v2, manifest = load_bound_manifests()
     extension = check_engine_binary(manifest_v2)
     check_bound_inputs(manifest_v2, args.tolerances)
     conversion = CONVERT.convert(args.lean_data, WINDOW["symbol"], WINDOW["start"], WINDOW["end"],
@@ -811,16 +747,7 @@ def main():
                            "pf1": e["pf1"], "ref0": e["ref0"], "per_share": e["per_share"]}
                           for e in events]
 
-    source_hashes = {name: digest(SOURCE / name) for name in source_names}
-    if args.case == "one_stress":
-        require_stress_review(review, {name: source_hashes[name] for name in stress_reviewed_files()},
-                              started_utc)
-    save(args.out / "frozen-arguments.private.json", {
-        "argv": list(sys.argv), "case": case, "instrument": instrument, "venue": venue_config,
-        "input_sha256": conversion["input_hashes"], "local_source_sha256": source_hashes,
-        "mapping_manifest_sha256": digest(SOURCE / manifest_name),
-        "preregistration_sha256": digest(SOURCE / preregistration_name)})
-    runs = [run_once(conversion["rows"], events, args.out / label, label, case, instrument, venue_config)
+    runs = [run_once(conversion["rows"], events, args.out / label, label)
             for label in ("run-1", "run-2")]
     raw_differences = field_differences(runs[0]["_raw_reports"], runs[1]["_raw_reports"])
     undeclared = undeclared_differences(raw_differences)
@@ -843,7 +770,7 @@ def main():
         "schema_version": 2,
         "id": "spy-parity-one-zero-v2",
         "gate": "G-a",
-        "case": case["id"],
+        "case": CASE["id"],
         "evidence_class": EVIDENCE_CLASS,
         "classification": "local historical replay on retained bundled sample data; not an unchanged "
                           "upstream test, a point-in-time dataset or any broker execution",
@@ -857,20 +784,24 @@ def main():
                    "extension_sha256": extension,
                    "python": sys.version.split()[0]},
         "frozen_plan": frozen_plan,
-        "case_configuration": {**case, "instrument": instrument, "window": WINDOW, "seed": SEED,
-                               **venue_config, "venue_modules": [module_class_name()],
-                               "determinism_note": "Both fixture cases configure no stochastic fill, fee or "
+        "case_configuration": {**CASE, "instrument": INSTRUMENT, "window": WINDOW, "seed": SEED,
+                               **VENUE, "venue_modules": [module_class_name()],
+                               "determinism_note": "one_zero configures no stochastic fill, fee or "
                                                    "latency model; the seed is recorded and applied "
                                                    "but no sampled component is exercised."},
-        "mapping_manifest": {"path": manifest_name, "sha256": digest(SOURCE / manifest_name),
+        "mapping_manifest": {"path": MANIFEST_V2, "sha256": digest(SOURCE / MANIFEST_V2),
                              "schema_version": manifest_v2["schema_version"]},
         "superseded_manifest": {"path": MANIFEST_V1, "sha256": digest(SOURCE / MANIFEST_V1),
                                 "carried_rows": manifest_v2["carried_unchanged_from_v1"]},
-        "preregistration": {"path": preregistration_name,
-                            "sha256": digest(SOURCE / preregistration_name)},
+        "preregistration": {"path": "PREREGISTRATION-v2.md",
+                            "sha256": digest(SOURCE / "PREREGISTRATION-v2.md")},
         "tolerances": {"path": str(args.tolerances.name), "sha256": digest(args.tolerances),
                        "limits": tolerances["limits"], "status": tolerances["status"]},
-        "local_source_sha256": source_hashes,
+        "local_source_sha256": {name: digest(SOURCE / name) for name in
+                                ("convert.py", "fixture_strategy.py", "distribution_module.py",
+                                 "run.py", "compare.py", MANIFEST_V1, MANIFEST_V2,
+                                 "tolerances.json")
+                                if (SOURCE / name).is_file()},
         "distribution_module": {"class": module_class_name(), "source": "distribution_module.py",
                                 "source_sha256": digest(SOURCE / "distribution_module.py"),
                                 "venue_module_count": primary["distribution_module"]["venue_module_count"],
@@ -913,8 +844,6 @@ def main():
         "two_run_determinism": determinism,
         "intents": primary["intents"],
         "fills": primary["fills"],
-        **({"stress_fill_model_calls": primary["stress_fill_model_calls"]}
-           if args.case == "one_stress" else {}),
         "oco_pairs": primary["oco_pairs"],
         "order_events": primary["order_events"],
         "alerts_registered": primary["alerts_registered"],
@@ -959,7 +888,7 @@ def main():
         ],
     }
     save(args.out / "receipt.json", receipt)
-    print(json.dumps({"case": case["id"], "evidence_class": EVIDENCE_CLASS,
+    print(json.dumps({"case": CASE["id"], "evidence_class": EVIDENCE_CLASS,
                       "two_run_records_equal": equal,
                       "processed_bars": primary["processed_bars"],
                       "fills": len(primary["fills"]),

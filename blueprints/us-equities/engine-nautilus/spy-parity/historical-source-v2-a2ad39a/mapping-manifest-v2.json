@@ -1,0 +1,352 @@
+{
+  "schema_version": 2,
+  "id": "spy-parity-one-zero-mappings-v2",
+  "gate": "G-a",
+  "drafted_utc_date": "2026-09-22",
+  "case": "one_zero",
+  "frozen_before_execution": true,
+  "run_status": "preregistered_not_run",
+  "run_status_note": "No v2 replay, no v2 comparison and no v2 verdict exists. Nothing in this file was produced by running the parity harness. The only engine executions behind it are the synthetic engine-semantics probes under probes/v2/, and the one_zero predictions below are arithmetic on the frozen, hash-pinned LEAN inputs.",
+  "supersedes": {
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest.json",
+    "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+    "scope": "Replaces v1's market_on_open_proxy and distributions_and_cash rows and amends decision_visibility. Every other v1 row is carried unchanged by reference to the v1 file at this sha256. v1 itself is not edited; it stays the manifest bound to the published BLOCKED verdict (verdict.json sha256 b7b898a861492348ae864de25551c127a0367e4638ef5dfa65152f233a6b0d10)."
+  },
+  "status_vocabulary": {
+    "resolved": "As v1: a concrete pinned-engine mapping exists, is implemented here and is checked by a test or by the replay itself.",
+    "unsupported": "As v1.",
+    "blocked": "As v1.",
+    "preregistered": "New in v2. A named, engine-native mechanism, its exact rules and its acceptance criteria are frozen here and were probed on synthetic engine-semantics data only. It becomes 'resolved' only after a v2 replay meets every criterion in acceptance_criteria; until then it is neither resolved nor a pass. A preregistered row cannot be named as an attribution for a failing check: under v2 any failure on these rows is a FAIL, not BLOCKED."
+  },
+  "evidence_class": "HIST (for the future replay); the probes behind this file are synthetic engine-semantics fixtures",
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "environment": "~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5",
+    "interpreter": "~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5/bin/python",
+    "extension_sha256": {
+      "_libnautilus.cpython-312-x86_64-linux-gnu.so": "a53dd5a24fe77f4c66169af84ee9c7e292018010922e3dce9a8b6c9f7f3b7021"
+    },
+    "equivalent_environment": "~/.local/share/codex-ecosystem/tools/adaptive-paper-20260921 reports nautilus_trader 2.0.0rc5 with the same extension sha256 (checked 2026-09-22); the probes were run under the environment named above.",
+    "upstream_source_at_pin_available_offline": true,
+    "upstream_source_note": "A checkout of tag v2.0.0rc5 at the pinned commit was read on this host (a session-local scratch checkout, not retained here). Source citations below are file:line at that commit and can be re-read from any checkout of the pin. v1 recorded the source as unavailable; that is no longer the case for this manifest.",
+    "source_citations": {
+      "module_process_to_account": "crates/backtest/src/exchange.rs:1639-1690 process_modules calls each module's process(ts_now, ctx); a Completed(list[Money]) result is applied by try_adjust_account and the per-adjustment outcomes are passed to acknowledge.",
+      "try_adjust_account": "crates/backtest/src/exchange.rs:686-734 adds the Money to the venue account's total and free balance and emits generate_account_state(..., reported=true, ts_event=clock now).",
+      "module_timing": "crates/backtest/src/engine.rs:1977-2006 run_venue_modules runs once per engine timestamp after command queues settle, then settles again; module processing happens at data timestamps and at timer timestamps.",
+      "module_context_positions": "crates/backtest/src/python/modules.rs:138-166,199-201 ctx.positions is the cache's open positions for the venue at ts_now, sorted by position id.",
+      "python_module_api": "python/nautilus_trader/backtest/__init__.pyi:545-566 SimulationModule.process(ts_now, context) -> list[Money] | None; add_venue(..., modules=...).",
+      "gap_open_tick": "crates/execution/src/matching_engine/mod.rs:1883-1930 process_trade_ticks_from_bar: when bar.open differs from the engine's last price (the previous bar's close), it first processes a 'bar gap-open trade tick' at bar.open with fill_at_market=true; high/low/close ticks follow with fill_at_market=false (fill at the trigger price).",
+      "bar_ordering": "crates/execution/src/matching_engine/mod.rs:2209-2211 bar_high_first: O>H>L>C by default; adaptive ordering swaps H/L when the low is closer to the open. The open tick is always first.",
+      "oco_cancel": "crates/execution/src/matching_engine/mod.rs:5407-5425 on a fill of an OCO order, every linked order that is not closed is canceled by the matching engine.",
+      "bar_tick_sizes": "crates/execution/src/matching_engine/mod.rs:6917-6960 BarTickSizes::from_volume splits the bar volume across the O/H/L/C ticks (about volume/4 each at integer lots); an order larger than the open tick's size fills partly at the open and the remainder at a worse price (probes/v2/probe_oco_full.observed.json).",
+      "venue_defaults": "python/nautilus_trader/backtest/__init__.pyi:464-476 reject_stop_orders=True, support_contingent_orders=True, bar_adaptive_high_low_ordering=False."
+    },
+    "lean_source_citations": {
+      "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f (retained at ~/.local/share/codex-ecosystem/tools/lean-985ef30)",
+      "ex_date_rule": "Engine/DataFeeds/Enumerators/DividendEventProvider.cs:72-108 GetEvents: on the tradable date equal to a factor-row date, HasDividendEventOnNextTradingDay arms the event; the Dividend is emitted on the NEXT NewTradableDate event (the next trading day for which the map file has data), dated eventArgs.Date. Tests/Engine/DataFeeds/Enumerators/DividendEventProviderTests.cs:67-76 assert nothing is emitted on the row date and one Dividend on the following tradable date.",
+      "factor_ratio": "Common/Data/Auxiliary/CorporateFactorProvider.cs:110-130 HasDividendEventOnNextTradingDay: priceFactorRatio = thisRow.PriceFactor / nextRow.PriceFactor, referencePrice = thisRow.ReferencePrice, only when the price factors differ.",
+      "distribution": "Common/Data/Market/Dividend.cs:95-98 ComputeDistribution = Math.Round(close - close * priceFactorRatio, 2) (.NET default MidpointRounding.ToEven).",
+      "cash_credit": "Common/Securities/SecurityPortfolioManager.cs:789-810 ApplyDividend (backtest, Raw or SplitAdjusted): total = Holdings.Quantity * Distribution * ConversionRate, added to base-currency cash with no further rounding."
+    }
+  },
+  "oracle": {
+    "receipt": "blueprints/us-equities/historical-simulation/receipt.json",
+    "receipt_id": "native-historical-leverage-stress-20260919",
+    "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+    "plan": "blueprints/us-equities/historical-simulation/plan.json",
+    "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "note": "Unchanged from v1."
+  },
+  "inputs": {
+    "data_root": "<LEAN_DATA>/Data (retained bundled sample; ~/.local/share/codex-ecosystem/tools/lean-985ef30/Data on this host)",
+    "frozen_sha256": {
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    },
+    "note": "Unchanged from v1. The run must refuse to start if any hash differs."
+  },
+  "case_configuration": {
+    "case": "one_zero",
+    "seed": 20260922,
+    "account_type": "CASH",
+    "oms_type": "NETTING",
+    "use_random_ids": false,
+    "fill_model": null,
+    "fee_model": null,
+    "latency_model": null,
+    "bar_execution": true,
+    "bar_adaptive_high_low_ordering": false,
+    "reject_stop_orders": true,
+    "support_contingent_orders": true,
+    "frozen_account": false,
+    "venue_modules": ["DistributionModule (the only module; defined by distributions_and_cash below)"],
+    "window": {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"},
+    "plan_owned_fields": ["initial_cash_usd", "sizing_buffer", "target", "fee_usd", "slippage"],
+    "note": "v1's block plus the venue settings the two v2 mechanisms depend on, stated explicitly instead of relied on as defaults. Every value other than venue_modules is the pinned default or v1's value."
+  },
+  "tolerances": {
+    "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
+    "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+    "changed_in_v2": false,
+    "limits": {
+      "event_seconds_abs": "0",
+      "fill_quantity_abs": "0",
+      "fill_price_usd_abs": "0",
+      "fees_usd_abs": "0",
+      "dividend_usd_abs": "0",
+      "cash_usd_abs": "0.01",
+      "end_cash_usd_abs": "0.01",
+      "final_quantity_abs": "0"
+    },
+    "note": "Copied verbatim; the file must still hash to the value above at comparison time. No limit is widened for v2 and none may be retuned after a result."
+  },
+  "probes": {
+    "directory": "blueprints/us-equities/engine-nautilus/spy-parity/probes/v2",
+    "evidence_class": "synthetic engine-semantics probes: synthetic bars and synthetic factor rows, never SPY/LEAN data, never a parity run",
+    "isolation": "Each probe ran once for its recorded output under the pinned interpreter inside bwrap --unshare-all --clearenv with a read-only runtime and probe mount and no network namespace, on 2026-09-22.",
+    "artifacts": {
+      "probe_sim_module_cash.py": "e48870b2dece9eedf446ab6721c7294cbc4813251315cd74547cf800bc9f3d81",
+      "probe_sim_module_cash.observed.json": "afd061e125a761be0fb0b1548e3cde8fcc9e7326a1256e39fd58d7cd25e5fedf",
+      "probe_sim_module_timer.py": "f208abaadbed6f34b8ec7e69595cd8a6c97d14164208e6412e10d870d64c5482",
+      "probe_sim_module_timer.observed.json": "854e8dba24b7d22a325d393a1bc73c46928fcf402918581478678fc707c255b3",
+      "nt_probe.py": "28a39f20b6a813702b9160ed7c4c71bfbe6bc105e081ddb2121471ad52404183",
+      "nt_probe-div.observed.json": "af0423d12045c2f2fcd8b622e74cb349b58e2d7daa95be8b4ddee32277ccb086",
+      "probe_sim_module_exdate.py": "eb5363800ade98fdea90387c92530b2b320681c7e3e709bfbd4dcd281ad9cc59",
+      "probe_sim_module_exdate.observed.json": "a0fa8868051d593421bcc71ef3e2d287373a94d3716937c06beb2465616efc4f",
+      "probe_gap_open.py": "31e309217b04fd79e5820c55cfaf10f99020cf21bf9833003ec4969dd68c738a",
+      "probe_gap_open.observed.json": "a96296816b18837a65799342db3e96bfa2c6f06e4756aa4a4673edb69fba565e",
+      "probe_oco.py": "4e66d20c9adfa13176a35e7785d07c062f1a4d029cac6e79cfcb90faa85744cb",
+      "probe_oco-default.observed.json": "3390402c2d430cda16aff7e373ef8e1b0d913fd2050c4cecfd635c8b6cc026a5",
+      "probe_oco-adaptive.observed.json": "0481620d334136f8df756bfc8b5f9ff45eb305a94b78a9a682a7eb12622a0367",
+      "probe_oco_full.py": "a9d7ac9eff27c1b085e4a4bf85e6d4d1eda00a2868d1bf829587ea8b9f3a862b",
+      "probe_oco_full.observed.json": "12c2aa58db003b064ab78e51a275f519c0760dd89fb970453169223707342278",
+      "probe_oco_moo_p4.py": "d51dff36abe593d6f438f4fde0f3443729e5462c14762a2008a76b891fe1089f",
+      "probe_oco_moo_p4-default.observed.json": "884cf16ff0ac9653e6b65a04d34e73f87bd2c1b406f909714bd975763eda525f",
+      "probe_oco_moo_p4-adaptive.observed.json": "07778e2a408c77b7bd6a6dcfbc54fa4ae0b4f1180924a2e991fb775ee6d90ee1",
+      "probe_oco_moo_p4-default-shift220.observed.json": "5dec34cdb10af1fe377ae99d0f168f4d607f8ae23b3d7104c0277af26870ab14",
+      "probe_oco_moo_p4-adaptive-shift220.observed.json": "68ae2316c30dbcfa51cb363f8552f9fc3435b8499ed8066655a62d296b689d9b"
+    },
+    "note": "Each *.observed.json carries the probe's sha256, the exact arguments, exit code, stdout and stderr sha256, ANSI-stripped stderr and the full parsed stdout. nt_probe.py was run only in mode 'div'; its opentick modes are retained unrun and are not relied on (they inject a synthetic open tick, which v2 forbids). probe_sim_module_exdate.py and probe_oco_moo_p4.py were written for v2; the others are unchanged copies of the research probes."
+  },
+  "carried_unchanged_from_v1": ["instrument_identity", "raw_data_decoding", "sessions_and_time", "costs_and_rounding", "margin_and_adaptive_state"],
+  "mappings": [
+    {
+      "id": "decision_visibility",
+      "supersedes_v1_row": true,
+      "lean_concept": "A completed 16:00 bar may form an intent; the fill must land on a later session",
+      "nautilus_concept": "Intent recorded in Strategy.on_bar for the 15:00 row (bar end 16:00 New York). The market_on_open_proxy OCO pair is submitted from that same on_bar call, after the matching engine has processed the decision bar, with both triggers strictly outside the engine's last price, so neither leg can fill on the decision bar.",
+      "status": "preregistered",
+      "decision": "v1 deferred a plain market order to the next session's first bar. v2 instead submits the resting OCO pair at the decision instant, because the pair must already rest when the next session's first bar is processed for its open to be matched. The decision bar must be the final bar of its session (true for both one_zero decisions: 2019-12-31 and 2020-04-29 are full sessions, 7 rows each).",
+      "validation": "fixture_strategy.check_causality (fill instant strictly after its decision instant) is kept and applied to every native fill of both runs. Additionally: every OCO leg's OrderAccepted and trigger price is recorded; any fill at or before the decision bar's ts_event fails look_ahead_fill.",
+      "limitations": ["The pair rests overnight; that is the mechanism, not a look-ahead, because its trigger prices are fixed from the decision bar's own close before any later bar exists in the engine."]
+    },
+    {
+      "id": "market_on_open_proxy",
+      "supersedes_v1_row": true,
+      "lean_concept": "MarketOnOpenOrder filled by EquityFillModel.MarketOnOpenFill at the next session's first hourly bar OPEN, stamped at that bar's end (10:00 New York)",
+      "nautilus_concept": "Native OCO pair (ContingencyType.OCO, one order_list_id, reciprocal linked_order_ids) of a STOP_MARKET and a MARKET_IF_TOUCHED order in the intent's direction, full intent quantity each, TimeInForce.GTC, TriggerType.DEFAULT, reduce_only=false, submitted from the decision bar's on_bar. The matching engine's gap-open trade tick (fill_at_market=true) fills whichever leg the next bar's open crosses at the open price; the engine's OCO contingency cancels the other leg.",
+      "status": "preregistered",
+      "mechanism_rules": {
+        "tick": "0.0001 (the instrument's declared price_increment; instrument_identity is unchanged)",
+        "reference_price": "C = the decision bar's close as delivered to on_bar (bar.close), which equals the matching engine's last price after that bar.",
+        "buy_intent": {"STOP_MARKET_BUY_trigger": "C + tick", "MARKET_IF_TOUCHED_BUY_trigger": "C - tick"},
+        "sell_intent": {"STOP_MARKET_SELL_trigger": "C - tick", "MARKET_IF_TOUCHED_SELL_trigger": "C + tick"},
+        "quantity": "Each leg carries the full signed intent quantity from the unchanged v1 sizing rule on the decision bar (304 for one_zero). The engine's OCO guarantees at most one leg fills.",
+        "fill_rule_by_open": {
+          "open >= C + tick": "BUY: stop leg fills at the open. SELL: MIT leg fills at the open.",
+          "open <= C - tick": "BUY: MIT leg fills at the open. SELL: stop leg fills at the open.",
+          "open == C (the only on-grid value strictly between the triggers)": "NOT faithful. No gap-open tick is generated, so the first leg crossed by the high or low tick fills at its trigger price (C + tick or C - tick, which one depends on bar ordering), or, if the bar never leaves C, no leg fills in that bar and the pair fills in a later bar. Recorded as the named failure moo_proxy_no_gap; never absorbed by tolerance and never attributed as BLOCKED."
+        },
+        "faithfulness_domain": "The proxy equals LEAN's MarketOnOpenFill in price and instant exactly when |open - C| >= tick and the intent quantity does not exceed the open tick's share of the bar volume and the fill does not overdraw the CASH account. Outside that domain it is not an MOO equivalent."
+      },
+      "evidence_probes": [
+        "probes/v2/probe_oco_moo_p4-default.observed.json",
+        "probes/v2/probe_oco_moo_p4-adaptive.observed.json",
+        "probes/v2/probe_oco_moo_p4-default-shift220.observed.json",
+        "probes/v2/probe_oco_moo_p4-adaptive-shift220.observed.json",
+        "probes/v2/probe_oco-default.observed.json",
+        "probes/v2/probe_oco-adaptive.observed.json",
+        "probes/v2/probe_oco_full.observed.json",
+        "probes/v2/probe_gap_open.observed.json"
+      ],
+      "evidence": [
+        "Precision 4, 304 shares, BUY and SELL, default and adaptive ordering, decision close 100.0000 and again shifted to 320.0000: gap_up, gap_down, one_tick_up and one_tick_down each produce exactly one fill of 304 at the tested bar's ts_event at exactly the tested bar's open, with the sibling OrderCanceled at the same ts and no OrderDenied or OrderRejected (probe_oco_moo_p4 *.observed.json, check.single_fill_in_tested_bar and check.fill_px_equals_tested_open both true in all 32 gap rows: 4 runs x 2 sides x 4 gap cases).",
+        "Same probe, no_gap (open == C): exactly one fill in the tested bar but at the trigger, not the open: BUY 100.0001 (default ordering) or 99.9999 (adaptive); SELL 100.0001 (default) or 99.9999 (adaptive). no_gap_flat: no fill in the tested bar; the pair fills in the following bar at its open (105.0000 / 325.0000).",
+        "Shifted run (each leg 304 x about 320 = about 97,280 USD against a 100,000 USD CASH account, both BUY legs together about 194,560 USD): neither leg denied, stderr empty, so resting both legs does not trip the pinned risk engine or balance locking at the one_zero allocation.",
+        "Unlinked pair (probe_gap_open, strategy-level sibling cancel): no_gap_both and gap_up_both_range_crosses_back fill BOTH legs in the same bar (double fill). The native OCO pair (probe_oco) fills one leg and cancels the other in every case. Only the native OCO contingency is allowed.",
+        "990 shares against a 1,000-share bar (probe_oco_full): the filled leg splits into two fills at two prices (open, then open + 0.01) because the open tick carries only part of the bar volume; the gap-up BUY also overdraws the CASH account and the portfolio logs 'Cash account balance would become negative'. Both are refused conditions in acceptance_criteria.",
+        "TimeInForce.AT_THE_OPEN remains rejected by the pinned simulated exchange (v1 probes/fill-semantics-atopen.json); v2 does not use it."
+      ],
+      "limitations": [
+        "The OCO pair is a proxy that coincides with MarketOnOpenFill only inside faithfulness_domain. It is not a general MOO order and nothing here claims so.",
+        "LEAN's MarketOnOpenFill does not depend on the previous close; the proxy does. The no-gap case is therefore a structural gap in the mapping, reported per event, not a rounding matter."
+      ]
+    },
+    {
+      "id": "distributions_and_cash",
+      "supersedes_v1_row": true,
+      "lean_concept": "Raw-normalized cash dividends posted to the account at the ex-date, derived from the bundled factor file; unexpected splits block the fixture",
+      "nautilus_concept": "A Python SimulationModule subclass (DistributionModule) passed as add_venue(..., modules=[module]). At each ex-date instant its process(ts_now, ctx) returns [Money(amount, USD)]; the simulated exchange applies it through try_adjust_account, which emits a reported AccountState on the venue's CASH account. This is the engine's native cash-adjustment path, not a balancing entry.",
+      "status": "preregistered",
+      "mechanism_rules": {
+        "event_derivation": "From the frozen factor file only. For consecutive rows (d0, pf0, ref0), (d1, pf1, ...) with pf0 != pf1 and split_factor unchanged: the event is armed on d0, which must be a session in the retained daily bundle.",
+        "ex_date_rule": "ex_date = the next session after d0 in the retained daily spy.zip session list (LEAN's next NewTradableDate), NOT d0 + 1 calendar day. The ex-date instant is 00:00 America/New_York on ex_date, as integer UTC nanoseconds via zoneinfo.",
+        "per_share": "per_share = round_half_even(ref0 - ref0 * (pf0 / pf1), 2) in Decimal, reproducing Dividend.ComputeDistribution.",
+        "eligible_quantity": "q = sum of p.signed_qty over ctx.positions with instrument_id SPY.SIM, read inside process() at ts_now == ex-date instant. Not the strategy's own bookkeeping, not the oracle's holdings.",
+        "amount": "amount = q * per_share exactly (whole shares times cents is exact to the cent). No second rounding stage; in particular not round(q * unrounded_ratio_amount). A zero q posts Money(0.00, USD) so the event is observable in the native account report.",
+        "timing": "The strategy registers one no-op clock.set_time_alert_ns at each ex-date instant in on_start. The alert handler does nothing; it only gives the engine a timestamp at which run_venue_modules executes. The module emits an event only when ts_now == its ex-date instant; ts_now > instant (a late emission) is a module error that aborts the run.",
+        "acknowledgement": "acknowledge(outcomes) must see applied=true and error=None for every emitted Money, otherwise the module records the failure and the run is refused.",
+        "window_events_for_one_zero": [
+          {"factor_row_date": "2019-12-19", "ex_date": "2019-12-20", "ex_instant_utc_seconds": 1576818000, "pf0": "0.9736767", "pf1": "0.9784638", "ref0": "320.9", "per_share": "1.57"},
+          {"factor_row_date": "2020-03-19", "ex_date": "2020-03-20", "ex_instant_utc_seconds": 1584676800, "pf0": "0.9784638", "pf1": "0.9842156", "ref0": "240.51", "per_share": "1.41"}
+        ],
+        "window_events_note": "Both armed rows are Thursdays, so next-session and calendar + 1 coincide for one_zero; the rule still binds the implementation. Values read from the frozen factor file; per-share values recomputed here in Decimal (1.56999... -> 1.57, 1.40555... -> 1.41)."
+      },
+      "evidence_probes": [
+        "probes/v2/probe_sim_module_cash.observed.json",
+        "probes/v2/probe_sim_module_timer.observed.json",
+        "probes/v2/nt_probe-div.observed.json",
+        "probes/v2/probe_sim_module_exdate.observed.json"
+      ],
+      "evidence": [
+        "A module returning [Money(157.00, USD)] is acknowledged applied=true, the account total moves 90000.00 -> 90157.00, and generate_account_report shows the adjustment as an AccountState row with reported=true (probe_sim_module_cash).",
+        "With a strategy time alert at an instant carrying no bar, process() is called at exactly that instant and the credit is visible to the next bar (probe_sim_module_timer: process at 1600005400000000000, balance 90157.00 at the next bar).",
+        "probe_sim_module_exdate (v2 design, synthetic sessions and factor rows): process() runs at both ex-date midnights (on_time true); a Friday factor row pays at Monday 00:00 New York, not Saturday; a fill later on the ex-date is excluded (eligible 0 on the first ex-date although 50 shares were bought at 10:00 that day; eligible 50, not 75, on the second); Money(0.00) is applied and appears as a reported AccountState row; per-share 1.005 rounds half-to-even to 1.00; final balance 92550.00 equals the independent expectation.",
+        "nt_probe div shows the rounding order v2 forbids: quantizing qty x unrounded per-share (10 x 1.2345 -> 12.34) instead of qty x cent-rounded per-share."
+      ],
+      "limitations": [
+        "The module posts cash only; it does not adjust prices. Raw normalization is unchanged, as in LEAN's Raw mode.",
+        "Payable-date modelling, withholding and short-position debits are outside one_zero (it holds only long positions); the signed-quantity rule would debit shorts as LEAN does, but that is not probed on a CASH account."
+      ]
+    }
+  ],
+  "corrections_to_v1": [
+    {
+      "v1_location": "mapping-manifest.json line 141 (distributions_and_cash.decision) and line 153 (symbol_scan.conclusion)",
+      "v1_statement": "The pinned wheel exposes no dividend, corporate-action or cash-distribution mechanism that a backtest account can be credited from ... none credits a simulated account.",
+      "correction": "False as a statement about crediting. The pinned engine credits a simulated account natively: SimulationModule.process returning list[Money] is applied by SimulatedExchange.try_adjust_account and emitted as a reported AccountState (exchange.rs:686-734, 1639-1690; probes/v2/probe_sim_module_cash.observed.json). The v1 symbol scan searched for dividend-named symbols, so it could not see a generic cash-adjustment path. The narrower claim that the engine ingests no dividend data type remains true."
+    },
+    {
+      "v1_location": "mapping-manifest.json line 158 (distributions_and_cash.limitations[0])",
+      "v1_statement": "writing a custom module to post dividend cash would be exactly the invented balancing cash entry the acceptance plan forbids",
+      "correction": "False as a blanket rule. A module is an invented balancing entry only if its amount is chosen to reconcile a target (the oracle's distributions or end cash). A module whose amount is derived from the frozen factor file and the engine-observed position at the ex-date instant, posted through the engine's own adjustment path, is the native cash-posting mechanism acceptance-plan.md section 2 asks to establish. v2 fixes the derivation and forbids every oracle-derived input (forbidden_as_fabrication)."
+    },
+    {
+      "v1_location": "mapping-manifest.json line 155 (distributions_and_cash.derivation)",
+      "v1_statement": "the ex-date is the day after the earlier row's date",
+      "correction": "LEAN arms the event on the factor-row date and emits it on the next tradable date (DividendEventProvider.cs:72-108), so the ex-date is the next session, not calendar + 1. For one_zero both armed rows are Thursdays, so v1's two ex-dates and the 428.64 total are unaffected."
+    },
+    {
+      "v1_location": "mapping-manifest.json line 121 (market_on_open_proxy.decision) and line 128 (evidence[3])",
+      "v1_statement": "No pinned-engine construct produces a bar-open fill ... None selects the bar open as the fill price",
+      "correction": "Incomplete. No venue option or fill model selects the open for a MARKET order, but the matching engine does fill resting stop-market and market-if-touched orders at bar.open through its gap-open trade tick whenever the open differs from the previous close (matching_engine/mod.rs:1883-1930). v2 uses that, bounded by faithfulness_domain."
+    }
+  ],
+  "one_zero_predictions": {
+    "source": "Arithmetic on the frozen hourly spy.zip rows (decoded Decimal / 10000) and factor file; not produced by running the harness.",
+    "entry": {
+      "decision_bar": "2019-12-31 15:00 row, ts 1577826000 (16:00 EST)", "C": "321.8600",
+      "tested_bar": "2020-01-02 09:00 row, ts 1577977200 (10:00 EST)", "open": "323.5800", "high": "324.0200", "low": "323.4100", "volume": 6498003,
+      "gap": "+1.7200 (>= tick)", "triggers": {"STOP_MARKET_BUY": "321.8601", "MARKET_IF_TOUCHED_BUY": "321.8599"},
+      "predicted": "gap-open tick at 323.5800 crosses the buy stop; one fill, 304 @ 323.5800 at 1577977200; MIT leg canceled by OCO (its trigger is below the bar's low in any case)",
+      "faithful_to_oracle": true, "oracle_fill": "323.58 @ 1577977200",
+      "allocation_check": "304 x 323.58 = 98368.32 <= 100000 cash; open tick carries about 6498003 / 4 shares >> 304"
+    },
+    "exit": {
+      "decision_bar": "2020-04-29 15:00 row, ts 1588190400 (16:00 EDT)", "C": "293.2100",
+      "tested_bar": "2020-04-30 09:00 row, ts 1588255200 (10:00 EDT)", "open": "291.6900", "high": "291.7100", "low": "289.5800", "volume": 13673384,
+      "gap": "-1.5200 (>= tick)", "triggers": {"STOP_MARKET_SELL": "293.2099", "MARKET_IF_TOUCHED_SELL": "293.2101"},
+      "predicted": "gap-open tick at 291.6900 crosses the sell stop; one fill, -304 @ 291.6900 at 1588255200; MIT leg canceled by OCO (its trigger is above the bar's high in any case)",
+      "faithful_to_oracle": true, "oracle_fill": "291.69 @ 1588255200"
+    },
+    "no_gap_case": "Neither one_zero event has open == C, so moo_proxy_no_gap is predicted not to occur. The proxy is NOT faithful in that case in general (see mechanism_rules.fill_rule_by_open).",
+    "distributions": [
+      {"ex_instant_utc_seconds": 1576818000, "eligible_quantity": 0, "per_share": "1.57", "amount_usd": "0.00"},
+      {"ex_instant_utc_seconds": 1584676800, "eligible_quantity": 304, "per_share": "1.41", "amount_usd": "428.64"}
+    ],
+    "end_cash_usd": "100000 - 304 x 323.58 + 0.00 + 428.64 + 304 x 291.69 = 90734.08, equal to the oracle's 90734.08; predicted native exported end cash 90734.08 (engine-posted distributions included)"
+  },
+  "acceptance_criteria": {
+    "preconditions": [
+      "The harness changes listed in harness_changes_required are implemented and independently reviewed before the first v2 run; the review record is retained.",
+      "This file, tolerances.json and the five frozen inputs hash-match at run and at comparison time; the receipt records this file's sha256 and compare.py refuses a receipt bound to any other manifest.",
+      "Engine: nautilus_trader 2.0.0rc5 with the extension sha256 above; isolation as v1 (bwrap --unshare-all, cleared environment, read-only mounts, no network); two fresh runs."
+    ],
+    "market_on_open_proxy": [
+      "Exactly two OCO pairs are submitted (four orders), each from its decision bar's on_bar at ts 1577826000 and 1588190400 respectively, with the exact trigger prices of mechanism_rules computed from that bar's close; both legs OrderAccepted; zero OrderDenied, OrderRejected or strategy callback failures.",
+      "Each pair produces exactly one OrderFilled event (one fill, not partial fills) for the full quantity (304, then -304), at ts_event 1577977200 and 1588255200 respectively, and exactly one OrderCanceled for its sibling at the same ts_event.",
+      "Per event, the harness checks from the converted rows that |tested_bar.open - C| >= 0.0001 and that fill price == tested_bar.open exactly; a failure of either is the named failure moo_proxy_no_gap or moo_proxy_not_open and fails the comparison.",
+      "Fill prices then equal the oracle (323.58, 291.69) with fill_price_usd_abs 0 and fill instants with event_seconds_abs 0.",
+      "No ERROR-level engine log line (in particular no 'Cash account balance would become negative') in either run."
+    ],
+    "distributions_and_cash": [
+      "The venue has exactly one module, a DistributionModule instance; the receipt records the module source sha256.",
+      "process() is called at exactly 1576818000 and 1584676800 (as nanoseconds); at each it reads eligible quantity 0 and 304 from ctx.positions and emits Money(0.00 USD) and Money(428.64 USD); every acknowledgement outcome is applied=true.",
+      "The native account report contains a reported=true AccountState at each ex-date instant whose total differs from the preceding balance by exactly the posted amount.",
+      "Distribution total 428.64 with dividend_usd_abs 0; the distribution ledger is flagged engine_posted=true for both events."
+    ],
+    "economics": [
+      "Native exported end cash and the independently rebuilt ledger both equal the oracle's 90734.08 within end_cash_usd_abs 0.01; every intermediate cash-ledger entry within cash_usd_abs 0.01; final quantity 0; fees 0.00.",
+      "All v1 checks that passed (intent times and quantities, fill times and quantities, counts, determinism) still pass unchanged."
+    ],
+    "verdict": "The v2 comparison passes only if every check above passes with zero skipped checks and zero attributions. Because v2 declares no unsupported row for one_zero, any failing check is FAIL, never BLOCKED. Only then may market_on_open_proxy and distributions_and_cash be moved to 'resolved' in a later dated manifest revision."
+  },
+  "falsification": [
+    "Any OCO fill price differs from the tested bar's open, or any fill lands in a bar other than the first bar of the next session.",
+    "Both legs of a pair fill, a leg fills partially, or a leg is denied or rejected.",
+    "A leg fills on the decision bar (look_ahead_fill).",
+    "The module's process() is not called at an ex-date instant, reads a quantity other than 0 and 304, or an adjustment is not applied.",
+    "The posted distributions do not appear as reported AccountState rows in the native account report, or native end cash differs from 90734.08 by more than 0.01.",
+    "Any residual that is not exactly zero after these mechanisms."
+  ],
+  "forbidden_as_fabrication": {
+    "market_on_open_proxy": [
+      "Injecting any synthetic TradeTick, QuoteTick, Bar or order-book data at or near the open (for example nt_probe.py opentick modes).",
+      "Using a latency model or timer to release an order onto an injected tick.",
+      "A LIMIT order, or any trigger, priced from the next bar's open or any datum not available at the decision bar's close.",
+      "Submitting the orders at the next bar, or on_start pre-seeding, or any strategy-level sibling cancel in place of the native ContingencyType.OCO.",
+      "A custom fill model, slippage setting or post-hoc re-pricing of exported fills that selects the open.",
+      "Treating moo_proxy_no_gap as a tolerance matter."
+    ],
+    "distributions_and_cash": [
+      "Any amount taken from the oracle receipt (its 428.64 total, its per-event distributions or its end cash), or chosen so the balance reconciles to a target.",
+      "Posting cash by any path other than the module's process() return value (for example strategy-side generate_account_state calls or portfolio/cache mutation).",
+      "Eligible quantity from the strategy's own bookkeeping or from the oracle instead of ctx.positions at the ex-date instant.",
+      "Ex-date by calendar + 1, posting at the first bar after the ex-date instant (which would count that day's fills), or a second rounding stage on qty x per-share.",
+      "Adjusting prices or quantities of the replayed bars."
+    ]
+  },
+  "harness_changes_required": {
+    "implemented": false,
+    "items": [
+      "fixture_strategy.py: replace the deferred market order with the OCO pair submitted from the decision bar; register the no-op ex-date alerts; record trigger prices, accepted/canceled/filled events and callback failures.",
+      "fixture_strategy.py or a new module file: DistributionModule implementing mechanism_rules, deriving events from the frozen factor file and the retained daily session list.",
+      "run.py: add modules=[DistributionModule(...)] and the explicit case_configuration venue settings to add_venue; bind mapping-manifest-v2.json and record the module source sha256 and the ERROR-log scan.",
+      "compare.py: bind the v2 manifest; treat engine-posted distributions as part of native cash; add the moo_proxy_no_gap / moo_proxy_not_open and single-fill checks; with no unsupported rows, report FAIL on any failure.",
+      "tests/test_spy_parity.py: boundary fixtures for the no-gap, flat-bar, double-fill, partial-fill, late-module-emission and calendar+1 ex-date refusals."
+    ]
+  },
+  "dependent_comparison_status": {
+    "one_zero_event_times": "unblocked",
+    "one_zero_quantities": "unblocked",
+    "one_zero_fill_prices": "preregistered:market_on_open_proxy (not run)",
+    "one_zero_cash_and_end_cash": "preregistered:market_on_open_proxy,distributions_and_cash (not run)",
+    "one_zero_distributions": "preregistered:distributions_and_cash (engine-posted; not run)",
+    "one_stress": "blocked_by:costs_and_rounding_stress (unchanged)",
+    "two_zero": "blocked_by:margin_and_adaptive_state (unchanged)",
+    "two_stress": "blocked_by:margin_and_adaptive_state,costs_and_rounding_stress (unchanged)",
+    "adaptive_stress": "blocked_by:margin_and_adaptive_state (unchanged)",
+    "over_limit": "blocked_by:margin_and_adaptive_state (unchanged)",
+    "note": "The v2 MOO faithfulness condition must be re-checked per event for every later case; a later case with an open equal to its decision close is not covered by this mapping."
+  },
+  "generated_id_normalization": {
+    "unchanged_from_v1": true,
+    "note": "v1's declared rule applies verbatim. The OCO orders' client_order_id and order_list_id are strategy-assigned and deterministic, and are retained raw."
+  }
+}
