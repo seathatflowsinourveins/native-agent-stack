@@ -95,6 +95,8 @@ install a backend or change production settings.
 
 ## Evidence and present boundaries
 
+- [Implementation validation](VALIDATION.md): 20 regression tests, 12 synthetic
+  Inspect samples, one scoped unchanged upstream test and bounded source review.
 - [Pinned artifacts](runtime/artifacts.json): ai-memory 2.5.2, Hindsight 0.10.2,
   coding-agents 0.8.0 and Inspect 0.3.275. Repository license observations do not
   substitute for dependency/model license qualification.
