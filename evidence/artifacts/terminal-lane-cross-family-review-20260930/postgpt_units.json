@@ -1,0 +1,88 @@
+{
+ "V1": {
+  "findings": [
+   "F-sol-P1-1",
+   "F-sol-P1-2",
+   "F-sol-P1-3"
+  ],
+  "also": {
+   "F-sol-P1-1": [
+    "F-sol-P3-3",
+    "F-ultra-P1-1"
+   ],
+   "F-sol-P1-2": [
+    "F-ultra-P1-3"
+   ],
+   "F-sol-P1-3": [
+    "F-sol-P3-1",
+    "F-ultra-P1-2",
+    "F-ultra-P3-2"
+   ]
+  }
+ },
+ "V2": {
+  "findings": [
+   "F-sol-P3-2",
+   "F-sol-P1-4",
+   "F-sol-P1-6"
+  ],
+  "also": {
+   "F-sol-P3-2": [
+    "F-ultra-P1-4"
+   ],
+   "F-sol-P1-4": [
+    "F-ultra-P1-5",
+    "F-sol-P3-4"
+   ]
+  }
+ },
+ "V3": {
+  "findings": [
+   "F-sol-P2-1",
+   "F-sol-P2-3",
+   "F-ultra-P2-2",
+   "F-sol-P2-5",
+   "F-sol-P3-6",
+   "F-sol-P1-5"
+  ],
+  "also": {
+   "F-sol-P2-1": [
+    "F-ultra-P2-1"
+   ],
+   "F-sol-P2-3": [
+    "F-ultra-P2-3"
+   ],
+   "F-ultra-P2-2": [
+    "F-ultra-P3-1",
+    "F-sol-P2-2"
+   ],
+   "F-sol-P2-5": [
+    "F-ultra-P2-5"
+   ],
+   "F-sol-P1-5": [
+    "F-sol-P2-4",
+    "F-sol-P3-5",
+    "F-ultra-P1-6",
+    "F-ultra-P2-4",
+    "F-ultra-P3-3"
+   ]
+  }
+ },
+ "V4": {
+  "findings": [
+   "F-sol-P2-6",
+   "F-sol-P3-7",
+   "F-sol-P3-8",
+   "F-sol-P3-9"
+  ],
+  "also": {
+   "F-sol-P2-6": [
+    "F-ultra-P3-5",
+    "F-ultra-P2-6"
+   ],
+   "F-sol-P3-8": [
+    "F-ultra-P3-4"
+   ]
+  }
+ }
+}

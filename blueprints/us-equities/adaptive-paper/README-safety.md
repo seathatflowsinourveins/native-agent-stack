@@ -80,7 +80,8 @@ limit-order mechanism guarantees a flat finish.
   was first observed on the paper endpoint in the 2026-09-24 14:39Z native-fault
   run (`native-faults/receipt-20260924t143905.json`, C04: submit 422, then lookup
   404), and again in the 18:58Z run that day (`native-faults/receipt-20260924t185811.json`)
-  and the 2026-09-25 18:25Z run (`native-faults/receipt.json`). The same body
+  and the 2026-09-25 18:25Z run (`native-faults/receipt-20260925t182513.json`; the current
+  `native-faults/receipt.json` is the 2026-10-01 14:38Z run on engine dca821cc). The same body
   under any other status still stays ambiguous. The message, not the code, is the discriminator. The ledger also requires the intent's own durable
   limit price to violate the minimum price variance (`refusal_contradicts_intent_price`
   otherwise). Any other 422, including "client_order_id must be unique", stays
@@ -104,6 +105,10 @@ limit-order mechanism guarantees a flat finish.
   overlapping execution, or an execution price beyond the order's limit fails
   (`execution_conflict_requires_reconciliation`, `execution_overlap_requires_reconciliation`,
   `incremental_fill_violates_limit`).
+- `record_fees(fees, now)` durably records broker FEE activities (the
+  `{id, date, net_amount, sub_type}` rows `transport.normalize_fee_activity`
+  returns) and returns the newly recorded ones; `fees()` lists what is recorded.
+  See "Broker FEE activities" below.
 - `request_budget(now, kind, client_id=None)` supports `submit`, `read`, `cancel`
   and `data_read`. Zero means an attempt was durably reserved. A positive delay
   means nothing was reserved: wait within the caller's remaining deadline, then
@@ -149,10 +154,12 @@ fill delta; that derived notional is checked against the limit only beyond Alpac
 average at the limit no longer freezes, and the booked notional then differs from the
 executions' by at most that rounding. Cost basis uses weighted
 average inventory accounting. `cash_delta_usd` is the exact sum of observed gross
-buy/sell cash flows; broker fees and other account activity require independent
-reconciliation. `cumulative_realized_loss_usd` accumulates losing realized deltas;
-wins do not erase it. `gross_loss_usd` adds current negative marked position P&L.
-Drawdown measures the fall from the persisted peak total marked P&L.
+buy/sell cash flows plus the broker FEE activities the ledger records (see "Broker
+FEE activities" below); every other account activity requires independent
+reconciliation. `cumulative_realized_loss_usd` accumulates losing realized deltas,
+a recorded fee included; wins do not erase it. `gross_loss_usd` adds current
+negative marked position P&L. Drawdown measures the fall from the persisted peak
+total marked P&L.
 
 The transport/coordinator must validate event ownership, reconcile stream gaps,
 compare broker positions and cash, and stop on unexplained differences. Per-order
@@ -170,6 +177,157 @@ database is not a supported reset. A timed-out trial requires reconciliation and
 a fresh trial or reset request history to hide unresolved state. Identify the
 actual recovery adapter: a direct SDK fractional exit does not establish that a
 whole-share native engine adapter supports fractional execution.
+
+## Broker FEE activities (recorded, 2026-09-30)
+
+Every account 2 `mover_runner.py recover` attempt on 2026-09-30 (06:00 to 06:51 ET)
+ended `needs_attention` with `cash_mismatch_or_unmodeled_fees` and no order: broker
+cash minus the trial's baseline cash minus the ledger's execution cash flow was
+-0.47 USD, three FEE activities for the account's 2026-09-29 sells (REG -0.19,
+TAF -0.27, CAT -0.01). Paper posts these fees (see the correction under "Financing
+costs"), so the engine records them. Sources (fetched 2026-09-30):
+
+* Alpaca, "Account Activities" (https://docs.alpaca.markets/us/docs/account-activities.md,
+  updatedAt 2026-05-25): a NonTradeActivity `id` is "An ID for the activity. Always
+  in `::` format. Can be sent as `page_token` in requests to facilitate the paging
+  of results." (the page renders the `<timestamp>::<uuid>` form as `::`);
+  `net_amount` is "The net amount of money (positive or negative) associated with
+  the activity."; `date` is "The date on which the activity occurred or on which
+  the transaction associated with the activity settled."; `FEE` is "Fee
+  denominated in USD".
+* Alpaca, "Retrieve Account Activities of Specific Type"
+  (https://docs.alpaca.markets/us/reference/getaccountactivitiesbyactivitytype-1.md,
+  updatedAt 2026-05-27): `GET /v2/account/activities/{activity_type}`; `after`: "Get
+  activities created after this date. Both formats YYYY-MM-DD and
+  YYYY-MM-DDTHH:MM:SSZ are supported."; its `date` filter adds "For non-trade
+  activities such as fees, the creation date is typically the day after the trade
+  date (in UTC)."; `page_size` 1 to 100; `page_token`: "Provide the ID of the last
+  activity from the last page to retrieve the next set of results."; the
+  NonTradeActivities example carries `activity_sub_type`, `activity_type`,
+  `created_at`, `currency`, `date`, `id`, `net_amount` and `status` (`executed`,
+  `correct` or `canceled`); ActivitySubType for FEE: REG (Regulatory Fee), TAF
+  (Trading Activity Fee), LCT, ORF, OCC, NRC, NRV, COM (Commission), CAT
+  (Consolidated Audit Trail Fee).
+* Alpaca, "Regulatory Fees" (https://docs.alpaca.markets/docs/regulatory-fees,
+  updatedAt 2025-10-03): equities pay the Trading Activity Fee (TAF) on "Sells
+  only" and the Consolidated Audit Trail (CAT) fee on "Buys and sells"; "Alpaca's
+  trading system keeps track of the accrued FEE amounts intraday and deducts the
+  pending amounts from account balances." and "At EOD, we charge each account the
+  fees for that trading day".
+
+**Transport read.** `transport.py` allows one more read, a budgeted `read`: `GET
+/v2/account/activities/FEE` with `after` (a UTC `YYYY-MM-DDTHH:MM:SSZ` string) and
+`direction` `asc` required and an optional `page_size` 1-100 and activity-id
+`page_token`. Every other path, parameter or method stays refused before the
+budget hook. `normalize_fee_activity` accepts only `activity_type` FEE, an activity
+id, a decimal string `net_amount`, a `YYYY-MM-DD` `date`, a documented FEE
+sub-type (absent or null is recorded as `UNSPECIFIED`), `currency` absent or USD
+and `status` absent or `executed`; anything else fails closed. It returns `{id,
+date, net_amount, sub_type}` only: the `description` field, which carries the
+account number, is never read, stored or logged.
+
+**Snapshot.** `AlpacaPaperTransport(fee_history_start=...)` (default
+`history_start`) makes `snapshot()` list `"fees"`: every FEE activity created after
+that instant, oldest first, read last (after the account's cash), 100 per page
+within `max_snapshot_pages`. A page bound reached is "completeness unproven" and
+any fee-read failure makes the snapshot incomplete (frozen), never an empty list.
+`transport.fee_activities(...)` is the same read on a fresh read-only client.
+
+**Ledger schema 3.** Table `fees(activity_id TEXT PRIMARY KEY, date TEXT NOT
+NULL, net_amount TEXT NOT NULL, sub_type TEXT NOT NULL, recorded_at REAL NOT
+NULL)`. Opening a schema None/1/2 ledger creates it and sets `schema_version` "3";
+the migration is one way (engines before it accept only None/1/2 and refuse a
+migrated ledger), and any other version raises `unsupported_ledger_schema` before
+any change. `record_fees` validates every row, then inserts each new activity id
+once, in one transaction: `net_amount` is added to `cash_delta` and to realized
+P&L and `max(0, -net_amount)` to the realized loss, so a fee is a realized cost
+that counts against the gross-loss budget and a credit never lowers it; peak P&L
+and the risk halts refresh after each newly inserted fee, as after each fill, and one `fee_recorded` event carries
+the id, date, amount and sub-type. A known id is a no-op; the same id with another
+date, amount or sub-type raises `fee_activity_changed` and records nothing from
+that batch. The open-time accounting re-derivation adds recorded fees back beside
+the per-symbol money.
+
+**Reconciliation.** `runner.reconcile`, and `mover_reconcile` through it, records
+`snapshot["fees"]`, when the key is present, before its cash comparison; the
+comparison and its 0.01 USD tolerance are unchanged. Deposits, withdrawals,
+journals, dividends, interest and every other activity stay unexplained and still
+fail it.
+
+**Fee window: a consistent checkpoint (repair brief, 2026-09-30).** Under the
+account lock, `transport.fee_checkpoint` uses one fresh read-only client to read
+F1 (the FEE list after L), then the account, then F2 with the same filter. It
+compares id-to-normalized-row maps and refuses a start if they differ. Every GET
+is admitted synchronously through the ledger's durable read budget before sending.
+The mover uses the saved `fee_window_start` of a continuing lineage (legacy:
+`started_at`); a new lineage takes L immediately before the checkpoint. It books
+F2 before `begin_next_trial` and before taking the accounting snapshot, then
+computes `baseline_cash = checkpoint account cash - ledger cash_delta`. The
+between-trial cash observation also uses checkpoint cash. `trial.json` saves L
+as epoch seconds; every paper/recover snapshot uses its same formatted `after`
+string. The adaptive lane does this at its first trial, keeps that baseline, and
+uses L for snapshots and its synchronously admitted next-trial fee read (legacy:
+`started_at`). The old preflight account read precedes `started_at`.
+
+Assumption: a FEE activity is visible in the activity list exactly when its
+amount is in account cash. Under that assumption, every fee in F2 is in both
+checkpoint cash and ledger `cash_delta` before computing the baseline. Later
+fees after the fixed cutoff are listed and booked once by id. Fees before the
+cutoff are in cash and never listed, so the per-trial baseline neither double
+counts nor misses a fee. Alpaca's documented `after` has whole-second precision:
+formatting fractional L can include a fee from earlier within that second, which
+is also booked before baseline and deduplicated thereafter. Fees earlier engines
+absorbed into a baseline are booked at the next checkpoint; recomputing baseline
+after booking preserves cash reconciliation. Fee losses still consume the risk
+budget during recovery. More generally, any risk cap that trips during a recovery
+(a fee, a fill, or a mark that lifts the residual above the gross-exposure cap)
+now replaces `recovery_only` with that halt reason, exactly as it would halt a
+trial. The halt is permanent for the ledger (`next_trial_cannot_clear_risk_halt`),
+the sell-only exit is not blocked, and a flat recovery still ends `finished`.
+Before this change a cap trip during recovery stayed masked as `recovery_only`:
+loss-budget crossings were still refused at the next trial
+(`next_trial_risk_budget_exhausted`), but an exposure-cap trip was cleared.
+
+**Receipts.** The mover trial receipt and the `mover_recovery_receipt` carry
+`fees_recorded` (count, total and per sub-type count and total; no activity ids).
+The trial receipt's `totals.fees_recorded_usd` joins the per-symbol P&L in
+`pnl_consistent`.
+
+**Limits.** A fee posted during the checkpoint refuses that start; the next
+start retries. Fees that post after a lineage's final snapshot are booked into
+that lineage only if a later `paper` or `recover` runs on it: `recover` accepts a
+finished trial, keeps its fee window and books any new fee there (they then count
+against that lineage's budgets). A lineage that is retired and never invoked again
+never books them; cash stays consistent because the next lineage absorbs them into
+its baseline (except any included by the whole-second cutoff, which are booked
+before baseline). A fee posted between a later snapshot's
+account and fee reads can still cause a cash mismatch; reconciliation fails
+closed. Under the Regulatory Fees page's intraday-accrual hypothesis, a mover
+trial starting after an earlier trial's accrual stays blocked once the FEE posts
+inside its window, until an operator re-baselines. The 2026-09-30 measured gap
+equaled the three posted activities; that observation did not establish pending
+accrual behavior. Legacy mover metadata without `fee_window_start` keeps
+`current_trial_started_at` for recovery, including the account-2 residual's
+2026-09-29T20:25:19Z window. Legacy adaptive metadata keeps `started_at`, but its
+baseline came from a preflight account read taken before `started_at`. A fee
+created between that read and `started_at` is never listed, and one created in the
+truncated second before the read is counted twice. Either leaves that adaptive lane
+mismatched until an operator re-baselines. New adaptive lanes use the checkpoint.
+The adaptive lane's next-trial check compares the preflight's cash, which is read
+before its fee read, so a fee posted between those two reads is booked but refuses
+that start (`next_trial_cash_mismatch`); a retry then reconciles. A fee a
+checkpoint books at a start that `begin_next_trial` then refuses (for example, one
+that trips a cap) is in the ledger and its `fee_recorded` event, but in no
+receipt's `fees_recorded`. The checkpoint's window L is the local clock, while the
+broker filters on its own `created_at`. If the local clock runs ahead of the broker's
+by more than the gap between the truncated L and the account read, a fee created
+inside that gap is neither listed nor in the baseline, and it stays mismatched. The
+gap is bounded: `validate_preflight` refuses a clock drift above 0.25 s
+(`clock_drift`) just before the checkpoint. It affects only a new lineage's first
+checkpoint. Both lineages' fee
+windows grow with their life (more pages per snapshot, bounded by
+`max_snapshot_pages`). `tests/test_adaptive_paper_fees.py` covers this section
+with local synthetic fixtures (no broker request).
 
 ## Leverage schedule (opt-in, `leverage-schedule-v1-20260922`)
 
@@ -334,9 +492,15 @@ margin-interest cost of an overnight hold. Sources (fetched 2026-09-25):
   month end. A settlement-date debit balance at the end of day Friday incurs 3
   days of interest (Fri, Sat, Sun), since no trade settles over the weekend.
 * Alpaca, "Paper Trading" (https://docs.alpaca.markets/docs/paper-trading):
-  paper does not simulate regulatory fees or dividends; its "Paper vs Live"
-  table marks Borrow Fees "Coming Soon"; it does not say whether paper posts
-  margin interest at all.
+  its "Paper vs Live" table marks Borrow Fees "Coming Soon"; it does not say
+  whether paper posts margin interest at all. **Correction (2026-09-30):** this
+  bullet also said that paper "does not simulate regulatory fees or dividends".
+  The page, re-fetched 2026-09-30 (updatedAt 2026-07-07), still lists
+  "Regulatory fees" and "Dividends" under "paper trading does not account for",
+  while its "Rules and Assumptions" say only "Paper trading account **does NOT**
+  simulate dividends." A paper account showed three FEE activities (REG, TAF,
+  CAT) for its 2026-09-29 sells on 2026-09-30, so paper does post regulatory
+  fees; the engine records them (see "Broker FEE activities").
 
 **Settlement convention:** `financing.settlement_date` is T+1, the next NYSE
 *trading* day (`sessions.next_trading_day`) -- not the separate SIFMA

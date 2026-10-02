@@ -1051,7 +1051,7 @@ if [[ "$configure_full_profile" == 1 ]]; then
   full_profile_run claude-profile \
     python3 "$repo_root/tools/adoption/install_claude_profile.py" --claude-bin "$bin_dir/claude" --eco-root "$ecosystem_root"
   full_profile_run claude-settings full_profile_claude_settings
-  full_profile_run claude-md python3 "$repo_root/tools/adoption/managed_block.py" claude-md
+  full_profile_run claude-md python3 "$repo_root/tools/adoption/managed_block.py" claude-md --target "$HOME/.claude/CLAUDE.md"
   full_profile_run skills full_profile_skills
   full_profile_run codex-lane full_profile_codex_lane
   full_profile_run path-block python3 "$repo_root/tools/adoption/managed_block.py" profile-path --eco-root "$ecosystem_root"

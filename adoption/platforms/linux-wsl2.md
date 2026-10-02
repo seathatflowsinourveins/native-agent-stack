@@ -71,11 +71,13 @@ Version **0.29.0 failed real startup with "UVA is not available"** on this
 WSL GPU path (unified virtual addressing unsupported by the WSL GPU driver
 surface at that release).
 [`adoption/lifecycle.md`](../lifecycle.md) records this exactly: "The working
-WSL vLLM pin remains 0.25.0. Version 0.29.0 failed real startup with
-unavailable UVA support. Preserve the accepted environment and model/vector
-data; repeating installation until the version number is newer would not
-resolve that compatibility failure." Do not bump this pin on a new WSL host
-without first re-testing 0.29.0 (or any newer release) startup on that host's
+WSL vLLM pin is 0.30.0 since 2026-09-25, qualified against 0.25.0 on the same
+host before the switch; 0.25.0 stays installed for rollback. Version 0.29.0
+failed real startup with unavailable UVA support. Preserve the accepted
+environment and model/vector data; repeating installation until the version
+number is newer would not resolve such a compatibility failure, so a new
+version is qualified on an owned instance first." Do not bump this pin on a new
+WSL host without first re-testing any newer release's startup on that host's
 actual GPU/driver combination; a newer upstream version number is not by
 itself evidence the WSL UVA gap closed.
 
@@ -164,6 +166,16 @@ upstream behavior behind each.
   `/dev/stdin` could not be reopened by path across the interop boundary
   either. Pipe the script to `bash -s` instead:
   `wsl.exe -d <distro> -- bash -s < script.sh`.
+
+## A new distro from the official Ubuntu WSL image
+
+Added after `v2026.09.26.2`. [A new distro from the official Ubuntu WSL image](linux-wsl2-new-distro.md) creates a
+second WSL 2 distribution on this Windows host from Canonical's `ubuntu-24.04.5-wsl-amd64.wsl`, after checking the file
+against both published sha256 values. cloud-init gives it a passwordless default user before its first launch, and the page
+proves systemd, linger and the user bus before the bootstrap runs there. It changes nothing for the other distributions:
+no `.wslconfig` edit, no `wsl --update`, never `wsl --shutdown`, and the default distribution stays as it is. The
+decisions, their alternatives, the command table and the open questions are in
+[the 2026-10-01 record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
 
 ## Windows Terminal profiles and the login shell
 

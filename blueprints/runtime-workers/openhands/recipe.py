@@ -92,7 +92,10 @@ def arm_config(arm="control", model=None, base_url=None, compression=None):
         raise ValueError("unknown_arm")
     port = 20128 if arm == "control" else 20129
     selected = model or ("cx/gpt-6-astra-max" if arm == "control" else "sharedgw/gpt-6-astra-max")
-    valid = (isinstance(selected, str) and re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", selected)
+    valid = (isinstance(selected, str) and selected in {
+                 "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max", "cx/gpt-6-sol-max", "cx/gpt-6-sol-medium",
+                 "cx/gpt-6-astra", "cx/gpt-6-astra-max",
+             }
              if arm == "control" else selected == "sharedgw/gpt-6-astra-max")
     if not valid:
         raise ValueError("gateway_requires_gpt6_route_for_selected_arm")
@@ -136,6 +139,10 @@ def llm_config(config, model=None, *, arm="control", base_url=None, compression=
     result["model"] = "openai/" + selected["requested_model"]
     result["base_url"] = selected["base_url"]
     result["extra_headers"] = selected["headers"]
+    # SDK@dcf401af v1.50.0 LLM.litellm_extra_body is the native extra_body field.
+    extra_body = dict(result.get("litellm_extra_body") or {})
+    extra_body["reasoning"] = {**(extra_body.get("reasoning") or {}), "effort": "max"}
+    result["litellm_extra_body"] = extra_body
     return result
 
 

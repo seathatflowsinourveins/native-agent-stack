@@ -2265,8 +2265,12 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
               "mcp-surfaces")
     CURRENT_CHOICE = {"RTK": "rtk", "Context Mode": "context-mode", "Repomix": "repomix", "Headroom": "headroom",
                       "TOON": "toon", "ccusage": "ccusage"}
+    # jcodemunch-mcp, ast-grep and codebase-memory-mcp are the code-navigation layer's task-selected tools and the
+    # SubagentStart carrier's task-appended lanes, and they stay optional rows: neither bootstrap can install a profile
+    # member that has no pin, and none of the three has one (docs/decisions/2026-09-30-task-model-routing.md).
     OPTIONAL = {"jcodemunch-mcp", "ast-grep", "codebase-memory-mcp", "context-hub", "agentsview", "claude-hud",
                 "otel-tui", "omniroute"}
+    PIN_FILES = ("adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json")
 
     @staticmethod
     def load(relative: str):
@@ -2312,6 +2316,18 @@ class TokenEfficiencyProfileTests(unittest.TestCase):
                                             "agentsview", "otel-tui"})
         self.assertLessEqual(tools - selected, self.OPTIONAL)
         self.assertEqual(selected - tools, {"codex", "claude-code", "ccusage", "mcporter"})
+
+    def test_every_profile_component_has_a_pin_on_both_platforms(self):
+        # adoption/bootstrap-linux.sh and adoption/bootstrap-macos.sh fail closed on a selected component that their
+        # pin file lacks ("No pin in <file> for selected component(s)", exit 3, before anything is installed), and
+        # adoption/bootstrap-macos.sh no longer exempts any component from a pin by default. So a profile lists only
+        # components that both pin files carry; the bootstrap plan tests (tests/test_adoption_bootstrap_macos.py,
+        # TokenEfficiencyPlanTests) fail otherwise, and they are outside this file's module set.
+        selected = set(self.profile["component_ids"])
+        for pin_file in self.PIN_FILES:
+            with self.subTest(pin_file=pin_file):
+                pinned = {tool["id"] for tool in self.load(pin_file)["tools"]}
+                self.assertEqual(selected - pinned, set(), "a profile component without a pin makes the bootstrap exit 3")
 
 
 class RetainedEvidenceTests(unittest.TestCase):

@@ -1,4 +1,4 @@
-"""tools/adoption/managed_block.py: the ~/.claude/CLAUDE.md and ~/.profile blocks of --configure-full-profile.
+"""tools/adoption/managed_block.py: native client instruction blocks and the profile PATH block.
 
 Against real files in a temporary HOME: each block is created, appended after operator text, replaced in place when
 the source changes, and left alone (no write, no backup) when current. rtk's `@RTK.md` import and every line outside
@@ -9,6 +9,7 @@ second sourcing adds nothing.
 """
 
 import contextlib
+import hashlib
 import io
 import os
 from pathlib import Path
@@ -18,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
@@ -155,6 +157,299 @@ class ClaudeMdBlockTests(ManagedBlockCase):
         self.assertIn("+" + managed_block.CLAUDE_END, out)
         self.assertFalse(self.target.exists())
         self.assertFalse(self.target.parent.exists())
+
+
+class CodexMdBlockTests(ManagedBlockCase):
+    def setUp(self):
+        super().setUp()
+        self.codex_home = self.home / ".codex"
+        self.target = self.codex_home / "AGENTS.md"
+        self.template = managed_block.CODEX_TEMPLATE.read_text(encoding="utf-8")
+
+    def apply(self, *extra):
+        return run("--home", str(self.home), *extra, "codex-md", "--codex-home", str(self.codex_home))
+
+    def test_create_exact_canonical_block_without_client_or_config_changes(self):
+        self.codex_home.mkdir()
+        fixtures = {"config.toml": b"keep config\n", "auth.json": b"synthetic private fixture\n",
+                    "stack-worker.config.toml": b"keep profile\n", "agents/role.toml": b"keep role\n"}
+        for name, data in fixtures.items():
+            path = self.codex_home / name
+            path.parent.mkdir(exist_ok=True)
+            path.write_bytes(data)
+        with mock.patch("subprocess.run", side_effect=AssertionError("must not execute a client")):
+            code, _, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), self.template)
+        for name, data in fixtures.items():
+            self.assertEqual((self.codex_home / name).read_bytes(), data)
+
+    def test_replace_keeps_outside_text_mode_backup_and_rerun_is_idempotent(self):
+        self.codex_home.mkdir()
+        old = f"{managed_block.CODEX_BEGIN} (old) -->\nold rules\n{managed_block.CODEX_END}\n"
+        before = "# Operator\n\n" + old + "\n# After\n"
+        self.target.write_text(before)
+        self.target.chmod(0o600)
+        code, _, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), "# Operator\n\n" + self.template + "\n# After\n")
+        self.assertEqual(stat.S_IMODE(self.target.stat().st_mode), 0o600)
+        backups = self.backups(self.target)
+        self.assertEqual(len(backups), 1)
+        self.assertEqual((self.codex_home / backups[0]).read_text(), before)
+        mtime = self.target.stat().st_mtime_ns
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(self.target.stat().st_mtime_ns, mtime)
+        self.assertEqual(self.backups(self.target), backups)
+
+    def test_dry_run_creates_no_home(self):
+        code, out, err = self.apply("--dry-run")
+        self.assertEqual(code, 0, err)
+        self.assertIn("DRY RUN", out)
+        self.assertFalse(self.codex_home.exists())
+
+    def test_crlf_and_bare_cr_operator_bytes_survive_replacement_and_backup(self):
+        self.codex_home.mkdir()
+        prefix = b"# Operator\r\n# Bare CR\rkeep this\r\n\r\n"
+        suffix = b"\r\n# After\r\n"
+        old = (managed_block.CODEX_BEGIN + " (old) -->\r\nold\r\n" + managed_block.CODEX_END + "\r\n").encode()
+        before = prefix + old + suffix
+        self.target.write_bytes(before)
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(self.target.read_bytes(), prefix + self.template.encode() + suffix)
+        self.assertEqual((self.codex_home / self.backups(self.target)[0]).read_bytes(), before)
+
+    def test_first_append_preserves_operator_trailing_blank_lines(self):
+        self.codex_home.mkdir()
+        before = b"# Operator\r\n\r\n\r\n"
+        self.target.write_bytes(before)
+        self.assertEqual(self.apply()[0], 0)
+        self.assertTrue(self.target.read_bytes().startswith(before))
+        self.assertEqual((self.codex_home / self.backups(self.target)[0]).read_bytes(), before)
+
+    def test_damaged_or_unmanaged_duplicate_text_is_left_untouched(self):
+        self.codex_home.mkdir()
+        for before in [managed_block.CODEX_BEGIN + "\nmissing end\n",
+                       self.template + self.template,
+                       "<!-- native-agent-stack:top-rule -->\nold unmanaged rules\n",
+                       self.template + "<!-- native-agent-stack:rtk-exceptions -->\nextra copy\n"]:
+            with self.subTest(before=before[:70]):
+                self.target.write_text(before)
+                self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+                self.assertEqual(self.target.read_text(), before)
+                self.assertEqual(self.backups(self.target), [])
+
+    def test_override_guard_uses_native_rust_whitespace(self):
+        self.codex_home.mkdir()
+        override = self.codex_home / "AGENTS.override.md"
+        for text in ["operator override", "\x1c"]:
+            override.write_text(text)
+            self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+            self.assertFalse(self.target.exists())
+        override.write_text(" \t\n\u00a0\u2000")
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(override.read_text(), " \t\n\u00a0\u2000")
+
+    def test_explicit_home_then_environment_then_default(self):
+        environment_home = self.home / "environment-codex"
+        with mock.patch.dict(os.environ, {"CODEX_HOME": str(environment_home)}):
+            self.assertEqual(self.apply()[0], 0)
+            self.assertFalse(environment_home.exists())
+            self.assertEqual(run("--home", str(self.home), "codex-md")[0], 0)
+            self.assertEqual((environment_home / "AGENTS.md").read_text(), self.template)
+        with mock.patch.dict(os.environ, {"CODEX_HOME": ""}):
+            self.target.unlink()
+            self.assertEqual(run("--home", str(self.home), "codex-md")[0], 0)
+            self.assertEqual(self.target.read_text(), self.template)
+
+    def test_symlink_target_or_override_is_refused(self):
+        self.codex_home.mkdir()
+        other = self.home / "operator.md"
+        other.write_text("keep operator")
+        for path in [self.target, self.codex_home / "AGENTS.override.md"]:
+            path.symlink_to(other)
+            self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+            self.assertEqual(other.read_text(), "keep operator")
+            path.unlink()
+
+    def test_quoted_home_expands_instead_of_creating_a_relative_tilde_directory(self):
+        with mock.patch.dict(os.environ, {"HOME": str(self.home)}):
+            code, _, err = run("codex-md", "--codex-home", "~/.codex")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_text(), self.template)
+
+    def test_source_must_be_one_whole_canonical_block(self):
+        for template in ["", self.template + "extra\n", "extra\n" + self.template, self.template + self.template]:
+            with self.subTest(template=template[:50]):
+                with self.assertRaises(managed_block.Refused):
+                    managed_block.merged_codex_md("operator text", template)
+
+
+class DecisionMdBlockTests(ManagedBlockCase):
+    def setUp(self):
+        super().setUp()
+        self.target = self.home / "shared.md"
+        self.legacy = ("# Generated profile source\r\nModel and effort stay selected.\r\n"
+                       "# RTK\r\nKeep the existing inline RTK pack.\r\n@RTK.md\r\n\r\n")
+        self.target.write_bytes(self.legacy.encode())
+        self.target.chmod(0o600)
+        self.rule = managed_block.decision_rule(managed_block.CODEX_TEMPLATE.read_text())
+        self.fragment = managed_block.decision_block(self.rule)
+
+    def digest(self):
+        return hashlib.sha256(self.target.read_bytes()).hexdigest()
+
+    def apply(self, *, dry_run=True):
+        args = (["--dry-run"] if dry_run else []) + ["decision-md", "--target", str(self.target)]
+        return run(*args)
+
+    def test_print_reads_only_canonical_sources_and_exports_three_lines(self):
+        with mock.patch.object(managed_block, "read_target", side_effect=AssertionError("target read")), \
+             mock.patch.object(subprocess, "run", side_effect=AssertionError("client execution")):
+            code, out, err = run("decision-md", "--print")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, self.fragment)
+        self.assertEqual(len(out.splitlines()), 3)
+        self.assertNotIn("# RTK", out)
+        self.assertEqual(self.target.read_bytes(), self.legacy.encode())
+        self.assertEqual(self.backups(self.target), [])
+
+    def test_preview_preserves_every_legacy_byte_mode_and_creates_no_backup(self):
+        before = (self.target.read_bytes(), self.target.stat().st_mtime_ns, self.target.stat().st_mode)
+        with mock.patch.object(managed_block.file_io, "write_backup", side_effect=AssertionError("backup")), \
+             mock.patch.object(managed_block.file_io, "atomic_write", side_effect=AssertionError("write")):
+            code, out, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertIn(f"Reviewed target SHA-256: {self.digest()}", out)
+        self.assertIn("PREVIEW ONLY", out)
+        self.assertEqual((self.target.read_bytes(), self.target.stat().st_mtime_ns, self.target.stat().st_mode), before)
+        self.assertEqual(self.backups(self.target), [])
+
+    def test_write_mode_refuses_before_any_target_read_backup_or_replacement(self):
+        with mock.patch.object(managed_block, "read_target", side_effect=AssertionError("target read")), \
+             mock.patch.object(managed_block.file_io, "write_backup", side_effect=AssertionError("backup")), \
+             mock.patch.object(managed_block.file_io, "atomic_write", side_effect=AssertionError("write")):
+            code, _, err = self.apply(dry_run=False)
+        self.assertEqual(code, managed_block.EXIT_REFUSED)
+        self.assertIn("exports or previews only", err)
+        self.assertEqual(self.target.read_bytes(), self.legacy.encode())
+
+    def test_proposal_replaces_only_owned_block_with_bare_cr_and_crlf_outside(self):
+        current = "before\ronly\r\n" + managed_block.DECISION_BEGIN_LINE + "\r\nold\r\n" + \
+                  managed_block.DECISION_END + "\r\nafter\rbytes\r\n\r\n"
+        self.target.write_bytes(current.encode())
+        proposed = managed_block.merged_decision_md(current, self.rule)
+        self.assertEqual(proposed, "before\ronly\r\n" + self.fragment + "after\rbytes\r\n\r\n")
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(self.target.read_bytes(), current.encode())
+
+    def test_exact_wrapped_rule_is_current_but_conflicting_or_duplicate_copies_refuse(self):
+        wrapped = self.rule.replace("names, descriptions", "names,\n  descriptions")
+        for rule in (self.rule, wrapped):
+            self.target.write_bytes((self.legacy + "- " + rule + "\n").encode())
+            before = self.target.read_bytes()
+            code, out, err = self.apply()
+            self.assertEqual(code, 0, err)
+            self.assertIn("already current", out)
+            self.assertEqual(self.target.read_bytes(), before)
+        for extra in (wrapped + "\n\n" + self.rule, wrapped.replace("limit=2", "limit=4"),
+                      self.fragment + wrapped, self.rule + "\n" + wrapped):
+            with self.subTest(extra=extra[:40]):
+                self.target.write_bytes((self.legacy + extra + "\n").encode())
+                before = self.target.read_bytes()
+                self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+                self.assertEqual(self.target.read_bytes(), before)
+                self.assertEqual(self.backups(self.target), [])
+
+    def test_generated_outputs_refuse_full_and_minimal_operations(self):
+        current = managed_block.GENERATED_DIRECTIVES_HEADER + "\n" + self.legacy
+        self.target.write_bytes(current.encode())
+        for client in ("claude-md", "codex-md"):
+            with self.subTest(client=client):
+                merge = (lambda text: managed_block.merged_claude_md(text, EXAMPLE)) if client == "claude-md" else \
+                        (lambda text: managed_block.merged_codex_md(text, managed_block.CODEX_TEMPLATE.read_text()))
+                with self.assertRaisesRegex(managed_block.Refused, "generated from config/directives"):
+                    merge(current)
+        self.assertEqual(self.apply(dry_run=True)[0], managed_block.EXIT_REFUSED)
+        self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+        self.assertEqual(self.target.read_bytes(), current.encode())
+        self.assertEqual(self.backups(self.target), [])
+
+    def test_damaged_or_duplicate_markers_refuse(self):
+        for body in (managed_block.DECISION_BEGIN_LINE, managed_block.DECISION_END + "\n" +
+                     managed_block.DECISION_BEGIN_LINE, self.fragment + self.fragment):
+            with self.subTest(body=body[:50]):
+                self.target.write_text(self.legacy + body)
+                before = self.target.read_bytes()
+                self.assertEqual(self.apply()[0], managed_block.EXIT_REFUSED)
+                self.assertEqual(self.target.read_bytes(), before)
+
+    def test_a_later_full_pack_cannot_duplicate_the_narrow_block(self):
+        current = self.legacy + self.fragment
+        for merge in (lambda text: managed_block.merged_claude_md(text, EXAMPLE),
+                      lambda text: managed_block.merged_codex_md(text, managed_block.CODEX_TEMPLATE.read_text())):
+            with self.assertRaisesRegex(managed_block.Refused, "decision-routing block"):
+                merge(current)
+
+    def test_missing_empty_non_utf8_or_symlink_sources_refuse(self):
+        self.target.unlink()
+        self.assertEqual(self.apply(dry_run=True)[0], managed_block.EXIT_REFUSED)
+        self.assertFalse(self.target.exists())
+        for body in (b"", b"\xff"):
+            self.target.write_bytes(body)
+            self.assertEqual(self.apply(dry_run=True)[0], managed_block.EXIT_REFUSED)
+            self.assertEqual(self.target.read_bytes(), body)
+        self.target.unlink()
+        real = self.home / "real.md"
+        real.write_text(self.legacy)
+        self.target.symlink_to(real)
+        self.assertEqual(self.apply(dry_run=True)[0], managed_block.EXIT_REFUSED)
+        self.assertEqual(real.read_bytes(), self.legacy.encode())
+
+    def test_codex_override_uses_native_whitespace_and_never_executes_client(self):
+        codex_home = self.home / "codex"
+        codex_home.mkdir()
+        (codex_home / "AGENTS.md").write_bytes(self.legacy.encode())
+        override = codex_home / "AGENTS.override.md"
+        args = ["--dry-run", "decision-md", "--client", "codex", "--codex-home", str(codex_home)]
+        override.write_text("\u2003\n")
+        with mock.patch.object(subprocess, "run", side_effect=AssertionError("client execution")):
+            self.assertEqual(run(*args)[0], 0)
+            override.write_text("\u001c")
+            self.assertEqual(run(*args)[0], managed_block.EXIT_REFUSED)
+        self.assertEqual((codex_home / "AGENTS.md").read_bytes(), self.legacy.encode())
+
+    def test_custom_claude_root_requires_explicit_target_for_full_and_narrow_modes(self):
+        before = self.target.read_bytes()
+        for value in ("", str(self.home / "custom-claude")):
+            with mock.patch.dict(os.environ, {"CLAUDE_CONFIG_DIR": value}):
+                for args in (["--dry-run", "claude-md"],
+                             ["--dry-run", "decision-md", "--client", "claude"]):
+                    with self.subTest(value=value, args=args):
+                        code, _, err = run("--home", str(self.home), *args)
+                        self.assertEqual(code, managed_block.EXIT_REFUSED)
+                        self.assertIn("select the intended instruction file", err)
+                self.assertEqual(run("--dry-run", "decision-md", "--client", "claude", "--target",
+                                     str(self.target))[0], 0)
+        self.assertEqual(self.target.read_bytes(), before)
+        self.assertFalse((self.home / ".claude").exists())
+        self.assertEqual(self.backups(self.target), [])
+
+    def test_concurrent_change_during_preview_cannot_be_overwritten(self):
+        real_read = managed_block.read_target
+        other = b"Another owner changed the source while it was being previewed.\n"
+        def change_after_read(path):
+            result = real_read(path)
+            self.target.write_bytes(other)
+            return result
+        with mock.patch.object(managed_block, "read_target", side_effect=change_after_read), \
+             mock.patch.object(managed_block.file_io, "write_backup", side_effect=AssertionError("backup")), \
+             mock.patch.object(managed_block.file_io, "atomic_write", side_effect=AssertionError("write")):
+            code, _, err = self.apply()
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_bytes(), other)
+        self.assertEqual(self.backups(self.target), [])
+        self.assertEqual(list(self.target.parent.glob(".shared.md.*.tmp")), [])
 
 
 class ProfilePathBlockTests(ManagedBlockCase):

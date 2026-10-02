@@ -108,6 +108,27 @@ class SafetyTests(unittest.TestCase):
         self.assertEqual(self.ledger.positions()["SPY"].cost_basis_usd, D("60.6"))
         self.assertEqual(self.ledger.accounting().realized_pnl_usd, D("0.4"))
 
+    def three_share_ledger(self, name="three-shares"):
+        ledger = s.Ledger(self.root / f"{name}.sqlite3", replace(s.RiskLimits(), max_order_qty=D(3)))
+        ledger.start_trial(self.now)
+        self.addCleanup(ledger.close)
+        args = {"quote": self.quote(), "now": self.now, "market_open": True,
+                "session_close": self.now + 3600, "stop_file": self.root / "STOP"}
+        return ledger, args
+
+    def test_a_certain_limit_violation_still_halts(self):
+        ledger, args = self.three_share_ledger("buy-violation")
+        ledger.reserve_intent("buy-3", "SPY", "buy", "3", "100.01", **args)
+        ledger.record_order("buy-3", "broker-buy-3", "partially_filled", "1", "100")
+        with self.assertRaisesRegex(s.SafetyError, "incremental_fill_violates_limit"):
+            ledger.record_order("buy-3", "broker-buy-3", "filled", "3", "100.01")  # 2 new shares at 100.015
+        ledger, args = self.three_share_ledger("sell-violation")
+        ledger.reserve_intent("buy-1", "SPY", "buy", "1", "100.01", **args)
+        ledger.record_order("buy-1", "broker-buy-1", "filled", "1", "100")
+        ledger.reserve_intent("sell-1", "SPY", "sell", "1", "100.00", **args)
+        with self.assertRaisesRegex(s.SafetyError, "incremental_fill_violates_limit"):
+            ledger.record_order("sell-1", "broker-sell-1", "filled", "1", "99.99")
+
     def test_stale_and_duplicate_fills_do_not_change_accounting(self):
         self.reserve()
         self.fill(qty="0.4", status="partially_filled")

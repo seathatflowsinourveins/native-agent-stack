@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "layer_id": "recovery-portability",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "confirmed",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Independent host/key/application-data restore, client rebinding and actual-data atomicity remain outside the existing scoped receipts.",
+      "Selected Ubuntu24.04.5 locks/runtime selection and WSL export/import recovery have not been executed; Ubuntu26.04.1 remains a queued comparison candidate."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "pin_of_record": "0.19.1",
+      "pin_source": "manifests/stack.json:1305",
+      "source_pinned_url": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst",
+      "upstream_currency": "v0.19.1 releases/latest matches record; no new promotion",
+      "native_install": {
+        "command": "bzip2 -d restic_0.19.1_linux_amd64.bz2; install restic_0.19.1_linux_amd64 \"$BIN_DIR/restic\"",
+        "source": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "restic check --read-data; restic restore latest --target \"$RESTORE_TARGET\" --verify",
+        "source": "https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst; https://github.com/restic/restic/blob/v0.19.1/doc/050_restore.rst",
+        "evidence_class": "source_only"
+      }
+    },
+    {
+      "component_id": "uv",
+      "repository": "https://github.com/astral-sh/uv",
+      "pin_of_record": "0.12.17",
+      "pin_source": "adoption/manifest.json:426",
+      "source_pinned_url": "https://github.com/astral-sh/uv/blob/0.12.17/docs/getting-started/installation.md",
+      "upstream_currency": "https://github.com/astral-sh/uv/releases/tag/0.12.21; unmeasured candidate",
+      "native_install": {
+        "command": "curl -LsSf https://astral.sh/uv/0.12.17/install.sh | sh",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/getting-started/installation.md",
+        "evidence_class": "source_only"
+      },
+      "native_acceptance": {
+        "command": "uv sync --frozen; uv pip sync --require-hashes \"$LOCKFILE\"",
+        "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md; installed0.12.17 sync/pip-sync --help exited0",
+        "evidence_class": "source_only"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "mise",
+      "repository": "https://github.com/jdx/mise",
+      "verdict": "Tool/runtime environment candidate; compare a concrete portable-version gap",
+      "sources": [
+        "https://github.com/jdx/mise/blob/v2026.9.18/README.md"
+      ]
+    },
+    {
+      "name": "chezmoi",
+      "repository": "https://github.com/twpayne/chezmoi",
+      "verdict": "Dotfile distribution candidate; not independent application-data recovery",
+      "sources": [
+        "https://github.com/twpayne/chezmoi/blob/v2.73.0/README.md"
+      ]
+    },
+    {
+      "name": "Litestream",
+      "repository": "https://github.com/benbjohnson/litestream",
+      "verdict": "SQLite replication candidate; use SQLite-native recovery semantics for an actual DB",
+      "sources": [
+        "https://github.com/benbjohnson/litestream/blob/v0.5.17/README.md"
+      ]
+    },
+    {
+      "name": "Determinate Nix installer",
+      "repository": "https://github.com/DeterminateSystems/nix-installer",
+      "verdict": "Reproducible environment/installation candidate; distinct adoption and rollback footprint",
+      "sources": [
+        "https://github.com/DeterminateSystems/nix-installer/blob/v3.22.5/README.md"
+      ]
+    },
+    {
+      "name": "Devbox",
+      "repository": "https://github.com/jetify-com/devbox",
+      "verdict": "Nix-backed developer environment candidate; compare selected locks/runtime cost",
+      "sources": [
+        "https://github.com/jetify-com/devbox/blob/0.18.4/README.md"
+      ]
+    }
+  ],
+  "corrections": [],
+  "evidence_assessment": [
+    "Restic0.19.1 pin, native installation/check/restore docs and returned installed version/restore-help read; no backup, restore or key access occurred.",
+    "restic check --read-data reads all pack data; --verify verifies restored file content. Neither establishes an independently recovered application without its consistency/restore checks.",
+    "uv0.12.17 is an adoption toolchain pin; newer0.12.21 is currency only. Keep managed project Python and locks separate from the new distro's system Python.",
+    "Native session resume and owned rollback recipes remain scoped to their matching existing receipts. No version check or receipt replay is a new model run."
+  ],
+  "failed_access": [
+    "Restic guessed doc/050_restore_backup.rst404 twice; resolved via tagged tree as doc/050_restore.rst and read its native verify semantics.",
+    "Guessed uv docs/reference/cli.md404 resolved by reading docs/concepts/projects/sync.md at0.12.17 and installed sync --help (exit0)."
+  ],
+  "omissions": [
+    "No native-auth store, client-state copy, independent key restore or WSL export/import.",
+    "No declaration that reproducing packages alone recovers tasks or application state."
+  ],
+  "next_wave": [
+    "Select one actual owned application plus independent target/key and exercise its native restore consistency, then client rebinding.",
+    "On the new distro qualify one selected lock/runtime and separate package installation, session resume, distro recovery and Windows reboot."
+  ],
+  "reopen_on": [
+    "Restic/uv pin or selected lock changes",
+    "Actual data loses consistency or independent recovery fails",
+    "A concrete missing runtime/dotfile/SQLite recovery requirement emerges"
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

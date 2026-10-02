@@ -131,33 +131,51 @@ def reproduction_from_sealed(planner, store, changed_paths: list, fetch_prefix: 
     return _combine(out)
 
 
-def seal_live_samples(store, transports, seed, holdout_stores, live_root, clock=None) -> dict:
+def seal_live_samples(store, transports, seed, holdout_stores, live_root, run_identity: dict, clock=None) -> dict:
     """{label: sha256} of each snapshot's sealed live sample. A label whose sample is already sealed under live_root
-    (a run killed after sealing it) is read, never fetched again, so a sample is drawn at most once."""
+    (a run killed after sealing it) is adopted, never fetched again, so a sample is drawn at most once, and only
+    through core.store.recover_seal (review round 18, R5, and its repair): its seal record verifies the ledger and
+    pages (G-H), and its binding names the running study tree, protocol and runtime lock (run_identity, H1), the
+    label, the seed, the source snapshot and the sample's requests."""
     from pathlib import Path
     from core.canon import sha256_bytes
+    from core.store import checked_run_identity, recover_seal
+    run = checked_run_identity(run_identity)
     shas = {}
     for label, st in [("stage", store), *holdout_stores]:
         d = Path(live_root) / label
-        if (d / "ledger.jsonl").exists():
-            shas[label] = sha256_bytes((d / "ledger.jsonl").read_bytes())
+        # Bind the source's binding, requests and sealed attempts (raw-page digests, not parsed outcomes), as
+        # collect's base_snapshots bind its inputs. Follow core.holdout.collect's recovery pattern at 803bc351.
+        source = {"binding": st.binding, "requests": st.request_records(), "attempts": {
+            key: [{**attempt, "pages": [sha256_bytes(raw) for raw in attempt["pages"]]}
+                  for attempt in st.history.get(key, []) + [st.state[key]]] for key in sorted(st.req)}}
+        identity = {**run, "label": label, "seed": seed,
+                    "source_sha256": sha256_bytes(dumps(source).encode("utf-8")),
+                    "requests": sorted(record(r) for _, reqs in live_sample(st, seed=seed) for r in reqs)}
+        recovered = recover_seal(d, identity, f"live sample {label!r}")
+        if recovered is not None:
+            shas[label] = recovered[1]
         else:
-            shas[label] = fetch_live(st, transports, seed=seed, clock=clock).write(d)
+            shas[label] = fetch_live(st, transports, seed=seed, clock=clock).write(
+                d, binding={"identity": identity}, seal_record=True)
     return shas
 
 
 def reproduction_check(planner, store, transports, changed_paths: list, fetch_prefix: str, seed: str | None = None,
-                       holdout_stores: tuple = (), live_root=None, clock=None) -> dict:
+                       holdout_stores: tuple = (), live_root=None, clock=None,
+                       run_identity: dict | None = None) -> dict:
     """holdout_stores: [(label, sealed store)] of every sealed holdout snapshot (review round 11, F3), each checked
     by (b) and (c); (a) needs the holdout planners and is a deterministic function of unchanged code. With live_root
-    (run.py transport-check), each live sample is sealed first and the check is computed from the seals."""
+    (run.py transport-check), each live sample is sealed first, bound to run_identity (the running study tree,
+    protocol and runtime lock; required there, review round 18 repair, H1), and the check is computed from the
+    seals."""
     only_fetch = tree_diff_only_under_fetch(changed_paths, fetch_prefix)
     out = {"only_fetch_changed": only_fetch}
     if not only_fetch:
         out["passes"] = False
         return out
     if live_root is not None:
-        shas = seal_live_samples(store, transports, seed, holdout_stores, live_root, clock)
+        shas = seal_live_samples(store, transports, seed, holdout_stores, live_root, run_identity, clock)
         return reproduction_from_sealed(planner, store, changed_paths, fetch_prefix, seed, holdout_stores, live_root,
                                         shas)
     out["plan"] = check_plan(planner, store)

@@ -1,0 +1,176 @@
+{
+  "layers": [
+    {
+      "layer_id": "native-clients",
+      "selection": [
+        {
+          "name": "Codex (C08)",
+          "repository": "https://github.com/openai/codex",
+          "role": "Native coding and research client for existing ChatGPT accounts, preserving Codex tools, model controls and resumable sessions.",
+          "install_command": "npm install -g @openai/codex",
+          "install_source": "https://github.com/openai/codex/blob/e7ea5f4a8658ebe49e879be933effed2340fa276/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/e7ea5f4a8658ebe49e879be933effed2340fa276/README.md",
+              "shows": "Documents ChatGPT-account sign-in, Linux/macOS installation and architecture-specific binaries. Apache-2.0 implementation."
+            },
+            {
+              "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server/README.md",
+              "shows": "Release-tag source documents model discovery, resumable threads and MCP tool events/history."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "Latest release published October 1, 2026. Repository is unarchived; observed default-branch commit e7ea5f4 was October 1 in New York."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36897822835/job/110571615272",
+              "shows": "Successful release-tag Linux x86_64 build."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36897822835/job/110571672508",
+              "shows": "Successful release-tag macOS arm64 build."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36955723949/job/110678136524",
+              "shows": "Successful Ubuntu x86_64 Bazel test job on the observed default-branch commit."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36955724818/job/110678138538",
+              "shows": "The same newer default-branch commit also has a failed Linux Rust lint/build job; release-build success does not establish uniformly passing current CI."
+            },
+            {
+              "url": "https://github.com/openai/codex/issues/49048",
+              "shows": "Recent issue activity: September 28 startup-hang report closed October 1 in New York."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "Claude Code (C02)",
+          "repository": "https://github.com/anthropics/claude-code",
+          "role": "Complementary native Claude-account client with its own tools, model choices and resumable sessions. Its distributed runtime is commercially licensed.",
+          "install_command": "curl -fsSL https://claude.ai/install.sh | bash",
+          "install_source": "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+              "shows": "Documents the native terminal coding client and recommended Linux/macOS installer; npm installation is deprecated."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/blob/v2.1.287/CHANGELOG.md",
+              "shows": "Documents Claude.ai authentication, model selection, MCP tools, WebFetch/WebSearch, max-turn limits, resumed sessions and WSL-specific fixes."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.287",
+              "shows": "Latest release published October 1, 2026. Repository is unarchived; observed default-branch commit 52c7644 was also October 1."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/actions/runs/36908920636/job/110526399870",
+              "shows": "Successful public security-settings check. This is not evidence that the coding runtime passed functional tests; runtime source/tests were not found in the inspected public tree and release-tag check contexts."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/LICENSE.md",
+              "shows": "Commercial terms and reserved rights. Selection follows the frozen license-is-informational rule; this runtime is not described as open source."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "MCPorter native bridge",
+          "reason": "Current, tested MCP-tool bridge that imports native-client configuration; no missing bridge requirement was demonstrated for native coding-session execution. [README](https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md), [Linux CI](https://github.com/openclaw/mcporter/actions/runs/36908921494/job/110526404114)."
+        },
+        {
+          "key": "C04",
+          "name": "Letta Code",
+          "reason": "Current persistent client with local operation, model switching, WSL documentation and passing Ubuntu tests; reviewed sources do not establish native-account and client-tool parity. [README](https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md), [CI](https://github.com/letta-ai/letta-code/actions/runs/36956099691/job/110679328752)."
+        },
+        {
+          "key": "C05",
+          "name": "Claude Agent SDK",
+          "reason": "Current SDK exposes Claude tools, hooks, bounded turns and session handling, but no missing native event/tool/recovery requirement justifies embedding; authentication parity remains unverified and E2E CI is mixed. [README](https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md), [passing unit tests](https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110509104122), [failing E2E](https://github.com/anthropics/claude-agent-sdk-python/actions/runs/36903779143/job/110510306817)."
+        },
+        {
+          "key": "C06",
+          "name": "opencode and gemini-cli",
+          "reason": "Both are current with passing Linux tests; Gemini documents Google login, tools and resumable conversations, but the reviewed READMEs do not establish preservation of the required Claude/Codex account and client controls. [OpenCode](https://github.com/anomalyco/opencode/blob/a79ecfe109294909a239c98fb89f02979d5aa10b/README.md), [Gemini](https://github.com/google-gemini/gemini-cli/blob/c9096a847193c16e282d7bd20a70fddc57646bbe/README.md), [OpenCode CI](https://github.com/anomalyco/opencode/actions/runs/36930306447/job/110603185266), [Gemini CI](https://github.com/google-gemini/gemini-cli/actions/runs/36919639043/job/110562267433)."
+        },
+        {
+          "key": "C07",
+          "name": "OpenAI Agents SDK",
+          "reason": "Current, tested application framework with sessions and guardrails; its documented API-key application path does not establish equivalent native-account/client behavior for this requirement. [README](https://github.com/openai/openai-agents-python/blob/ce8ae9f368e7e3e2f495fc80a0c44137e88b78c4/README.md), [Python CI](https://github.com/openai/openai-agents-python/actions/runs/36949464708/job/110658934827)."
+        },
+        {
+          "key": "C09",
+          "name": "goose, pi, jcode, maka, codex-acp, prime-agent, hermes-agent, claude-agent-acp",
+          "reason": "The eight-project bundle supplies no repository identifiers; its constituents were not sufficiently verified within the budget to recommend the bundle, without implying that any constituent is inferior."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Letta V1 legacy server",
+          "criterion": "outside_requirement",
+          "fact": "Upstream explicitly identifies the retired V1 API server and directs maintained client work to Letta Code. It is unarchived with a September documentation commit, so the stale criterion does not apply. [Pinned README](https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The native pair has the clearest documented account/client fit, but comparative performance is unresolved. If a concrete missing event, tool or recovery requirement emerges, compare the affected native client with its supported SDK on WSL2 using identical account, model, task, permissions and expected effects. Measure event completeness, tool effects, bounded termination, resume after process interruption, lost/duplicated effects, task completion, latency and cost. Admit alternative clients only after verifying the same account/model path; different underlying models would confound repository quality.",
+      "evidence_gaps": [
+        "No comparison is recorded in the packet, and no matched public coding/research benchmark was verified in the consulted upstream sources. Selection asserts documented fit, not measured superiority.",
+        "Claude Code supplies native Claude-account coverage, but its commercial runtime and limited inspected public test evidence qualify the request's open-source wording; license was kept informational.",
+        "All nine resolved repositories were unarchived and had default-branch commits within July 3–October 1, 2026, New York time. Latest releases were also within that window except retired Letta V1's May 14 release. October 2 UTC observations occurred October 1 locally.",
+        "Linux documentation/builds support the WSL2 fit inference; no target-host head-to-head was run. Codex macOS arm64 release builds were verified; Claude Code arm64-specific support was not established in the inspected sources. The requirement does not activate a GPU workload.",
+        "Recent issues were sampled through the API, establishing activity but not comparative maintainer responsiveness. CI check counts are not test-case counts or task-quality scores.",
+        "The unspecified eight-project bundle remains unevaluated; it was not classified as stale, unsupported or paid-only.",
+        "ctx_fetch_and_index rejected all eight attempted page URLs because approval was required while approval policy was never. Upstream repository content was retrieved through GitHub APIs, indexed with ctx_index and read with ctx_search. Budget used: 30 GitHub API calls, one web search, zero successful page fetches."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openai/codex",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code",
+        "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code/commits?per_page=1",
+        "https://api.github.com/repos/openclaw/mcporter",
+        "https://api.github.com/repos/openclaw/mcporter/releases/latest",
+        "https://api.github.com/repos/openclaw/mcporter/commits?per_page=1",
+        "https://api.github.com/repos/letta-ai/letta-code",
+        "https://api.github.com/repos/letta-ai/letta-code/releases/latest",
+        "https://api.github.com/repos/letta-ai/letta-code/commits?per_page=1",
+        "https://api.github.com/repos/letta-ai/letta",
+        "https://api.github.com/repos/letta-ai/letta/releases/latest",
+        "https://api.github.com/repos/letta-ai/letta/commits?per_page=1",
+        "https://api.github.com/repos/letta-ai/letta/readme?ref=5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits?per_page=1",
+        "https://api.github.com/repos/openai/openai-agents-python",
+        "https://api.github.com/repos/openai/openai-agents-python/releases/latest",
+        "https://api.github.com/repos/openai/openai-agents-python/commits?per_page=1",
+        "https://api.github.com/repos/anomalyco/opencode",
+        "https://api.github.com/repos/anomalyco/opencode/releases/latest",
+        "https://api.github.com/repos/anomalyco/opencode/commits?per_page=1",
+        "https://api.github.com/repos/google-gemini/gemini-cli",
+        "https://api.github.com/repos/google-gemini/gemini-cli/releases/latest",
+        "https://api.github.com/repos/google-gemini/gemini-cli/commits?per_page=1",
+        "https://api.github.com/graphql",
+        "https://github.com/openai/codex/blob/e7ea5f4a8658ebe49e879be933effed2340fa276/README.md",
+        "https://github.com/openai/codex/blob/e7ea5f4a8658ebe49e879be933effed2340fa276/codex-rs/app-server/README.md",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server/README.md",
+        "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+        "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/LICENSE.md",
+        "https://github.com/anthropics/claude-code/blob/v2.1.287/CHANGELOG.md",
+        "https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md",
+        "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md",
+        "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md",
+        "https://github.com/openai/openai-agents-python/blob/ce8ae9f368e7e3e2f495fc80a0c44137e88b78c4/README.md",
+        "https://github.com/anomalyco/opencode/blob/a79ecfe109294909a239c98fb89f02979d5aa10b/README.md",
+        "https://github.com/google-gemini/gemini-cli/blob/c9096a847193c16e282d7bd20a70fddc57646bbe/README.md"
+      ]
+    }
+  ]
+}

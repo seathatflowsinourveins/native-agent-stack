@@ -53,6 +53,14 @@ def count_only_dependencies(ctx: dict, protocol: dict, rate: dict, allowance: di
             "rate_limit": dict(rate), "pipeline_allowance": dict(allowance) if allowance is not None else None}
 
 
+def seal_run_identity(ctx: dict) -> dict:
+    """The running study tree, protocol sha256 and runtime-lock sha256 that a recoverable seal binds, as
+    core.holdout.collect's identity does (review round 18 repair, H1): the native dry run's snapshot and each
+    transport-check live sample (core.store.recover_seal)."""
+    return {"study_tree": ctx["tree"], "protocol_sha256": ctx["protocol_sha256"],
+            "runtime_lock_sha256": ctx["runtime_lock_sha256"]}
+
+
 def adopt_uncited_output(out_path, expected: dict, ignore=("code_revision",)) -> str:
     """Review round 15, N02 (R14-open-2): a pre-freeze output that a hard kill left with no run-log line (the process
     died between the output's rename and its line) is adopted, never fetched again: its content must equal the

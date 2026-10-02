@@ -1,0 +1,89 @@
+{
+ "schema_version": 1,
+ "kind": "merit-round-preregistration",
+ "catalog": "us-equities",
+ "round": 1,
+ "recorded_at": "2026-10-01T21:03:10Z",
+ "owner": "trading lane (native-agent-stack-ae)",
+ "trigger": "the user's first-hand directive of 2026-10-01 about 20:35Z (relayed by the foundation coordinator): a definitive converged architecture with evidence from upstream evaluations and no missing layers",
+ "source_main": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+ "method": "unchanged copies of the #589 merit method (evidence/artifacts/new-wsl-clean-install-selection-20261001/): criteria, judge prompt, critic prompt and workflow script; packets in the same shape and seed rule, built by build_trading_packets.py",
+ "criteria_sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+ "judge_prompt_sha256": "5b190230982c3e113d5299d412ef6e74251b52fa3b66649235dcbc33ec64168c",
+ "critic_prompt_sha256": "e7a01ed699ecec2d232eb1da16df4a6f1191d58987040f1e770b9445494eb58f",
+ "workflow_sha256": "0c969f178587a3567114f3a7e069648a1446ac3255f86dd72d2ec09eb975cb49",
+ "builder_sha256": "fc5ce6f3479222d85ce551f2c6e58d1d908f7d2b0d99240a826f2f81072b8c87",
+ "ownership_map_sha256": "4424d1abb1208518fb27ecec6219bec7f101b25b4d01f4b8d4c3e0ea0e76cf57",
+ "inclusion_log_sha256": "8837a0e91639b36b02d8b680d3da076d905b91f902ca02885692fe20a582dd2a",
+ "seed_rule": "first 16 hex digits of sha256('merit-20261001:<layer_id>') as the seed of Python random.Random, which shuffles the candidates before keys C01.. are assigned",
+ "inclusion_rule": "every candidate recorded for the slot's trading layer in catalogs/landscape/us-equities.json candidates[] or catalogs/us-equities/convergence-20260926.json (candidates, gpt6_omitted_candidates), name and repository only, whose recorded role is the slot's job; canonical repositories added where a record names a project without one; exclusions listed in inclusion-log.json",
+ "packets_sha256": {
+  "us-equities:market-data-provider": "aea2675ef0d806abcf3ebb2258d8077a6c840e46b10c0ad7c78d304ddbf4c53a",
+  "us-equities:sec-filings": "57f671b3250e57b06e36c36bb93fe71cc5ff290a75e6506c06e90e86d5b11910",
+  "us-equities:exchange-calendars": "69af87038e08616069ae1f3ba13b86959423f2ee1eecf30293c8ca4bc795b77d",
+  "us-equities:research-data-versioning": "1bd2a0f0ad8217855045175fd22e812b90a990392503d64b412dd136b514c4b3",
+  "us-equities:analytical-storage": "84919fd36ed8c3a905a159480031ec18ba7e93b3877b298e526cd7e283feb0b9",
+  "us-equities:market-data-validation": "d22d9449108a018bd469ab7843df83d8e2365b41c066896e6de4b20942428c39",
+  "us-equities:factor-research": "6ca8263a9516065676ed9576c9c251d8fc6257f7731b23254aa40e0f28415065",
+  "us-equities:portfolio-construction": "1caaff0179766034679e620bbac959ca7adf48614723e16e5d306f538be63729",
+  "us-equities:performance-analytics": "07c538ed6cda5ac58c50267ea3f3854e00ad832b4d5c97d45c858220dfc0bddd",
+  "us-equities:backtest-oracle": "291b6450bcfdaeb37e3b504a4ab8a3f29b83ca6c42fd96be2bee606a208b910d",
+  "us-equities:ib-gateway-runtime": "48703de7343a78ecbb714e828d9251973d70c09edc5a6fe59737bc9c684ca608",
+  "us-equities:experiment-tracking": "0ad726060f3087c3461252fee9d9c765aceb77df793e56a7ff9215006511c502",
+  "us-equities:strategy-qualification-statistics": "68aedb116aaea6a0127439b26a7f961ed9ccdeeb16a751d26f36cac5999befd9"
+ },
+ "dispatch": "one judge (stack-researcher, opus, effort max) per one or two slots, one adversarial critic (stack-researcher, opus, effort max) per group; the GPT-6.1 Sol family runs the same packets and prompts through the Codex lane's handoff file with parity tools (live web search, network for gh api)",
+ "groups": [
+  [
+   [
+    "us-equities:market-data-provider"
+   ],
+   [
+    "us-equities:sec-filings",
+    "us-equities:exchange-calendars"
+   ]
+  ],
+  [
+   [
+    "us-equities:research-data-versioning"
+   ],
+   [
+    "us-equities:analytical-storage"
+   ],
+   [
+    "us-equities:market-data-validation"
+   ]
+  ],
+  [
+   [
+    "us-equities:factor-research"
+   ],
+   [
+    "us-equities:portfolio-construction"
+   ],
+   [
+    "us-equities:performance-analytics"
+   ]
+  ],
+  [
+   [
+    "us-equities:backtest-oracle"
+   ],
+   [
+    "us-equities:ib-gateway-runtime"
+   ]
+  ],
+  [
+   [
+    "us-equities:experiment-tracking",
+    "us-equities:strategy-qualification-statistics"
+   ]
+  ]
+ ],
+ "deviations": [
+  "no round one existed for the trading layers; this round is it, followed by round two with the definitive-defaults method",
+  "requirement texts are per trading-specific slot (the catalog's group requirements are shared by several layers); pinned requirements are stated as requirements and no incumbent is named"
+ ],
+ "not_claimed": "no candidate is installed or measured by this round; selections are judged on upstream evidence only; the pinned destination engine and broker paths are not judged",
+ "gh_budget_note": "about 11 judges x 30 and 5 critics x 15 GitHub API calls at most, within the shared 5,000-per-hour bucket"
+}

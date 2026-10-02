@@ -1,0 +1,981 @@
+{
+  "schema_version": 1,
+  "layer_id": "observability-hosting",
+  "catalog": "us-equities",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Replacement distro, systemd user-session prerequisites and the complete selected service scrape/log/alert/restart path remain unobserved.",
+      "Current local telemetry does not qualify broker/order/market truth, remote availability, immutable account state or provider billing/cancellation.",
+      "Existing static public-file backup/recovery evidence excludes independent keys, off-host loss and transactional application/broker data consistency.",
+      "Conditional workflow/router/agent candidates have no matched trading-specific control/recovery comparison; missing inherited command references remain open."
+    ]
+  },
+  "research_method": {
+    "scope": "One bounded independent trading source wave for six assigned layers; no universal SOTA, saturation or full convergence claim.",
+    "source_order": "Coordinator package metadata where relevant; native gh release/tag checks; exact source files; official docs. Reuse this pass's cited foundation sources when repository/pin/capability inputs match.",
+    "channels": {
+      "github_cli": "gh 2.101.0; native public API access succeeded",
+      "skill_discovery": "Supported openai/skills curated list-skills.py --format json succeeded; research/output skills read, no skill installed",
+      "source_reading": "RTK-prefixed commands; large JSON/tree/source responses processed in context-mode outside model context"
+    },
+    "installed_probe_boundary": "importlib.metadata in the coordinator default Python found none of nautilus_trader, alpaca-py, skfolio, PyPortfolioOpt or ib_async; this is not an all-environments absence claim or a replacement-host observation.",
+    "account_and_models": "Native client accounts/routes and explicit model choices preserved. No broker/provider calls, market-data acquisition, model trials, sign-in, install or trading execution in this source wave.",
+    "usage": "reviewer/provider usage not returned; unknown"
+  },
+  "new_host_acceptance": "unknown; replacement WSL distro not created",
+  "selected_repositories": [
+    {
+      "component_id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "pin_of_record": "0.159.2",
+      "pin_source": "manifests/stack.json:295; adoption/pins-linux-x86_64.json:53",
+      "source_pinned_url": "https://github.com/openai/codex/tree/rust-v0.159.2",
+      "upstream_currency": "Latest/installed 0.159.3; published 2026-09-30. Main remains 0.159.2.",
+      "native_install": {
+        "command": "npm install -g @openai/codex@0.159.2",
+        "source": "README.md at rust-v0.159.2; Linux pin's verified package provenance",
+        "evidence_class": "source-only; not run",
+        "recipe_pin": "0.159.2",
+        "recipe_source_ref": "https://github.com/openai/codex/tree/rust-v0.159.2",
+        "upstream_document_binding": {
+          "url": "https://github.com/openai/codex/blob/rust-v0.159.2/README.md#L42",
+          "document_line": 42,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "just test -p codex-tui",
+        "source": "AGENTS.md:192 at rust-v0.159.2",
+        "evidence_class": "source-only; not run"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "role": "Retain the native bounded research/review client, selected model/effort and account. No matched client/model quality/cost or remote cancellation acceptance is inferred.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "pin_of_record": "2.1.284",
+      "pin_source": "manifests/stack.json:190; adoption/pins-linux-x86_64.json:68 (minimum, native auto-update)",
+      "source_pinned_url": "https://github.com/anthropics/claude-code/tree/v2.1.284",
+      "upstream_currency": "Latest/installed 2.1.286; published 2026-09-30. Main 2.1.284 is a native auto-update floor.",
+      "native_install": {
+        "command": "claude install 2.1.284",
+        "source": "installed claude install --help; https://code.claude.com/docs/en/setup",
+        "evidence_class": "source-only; not run",
+        "recipe_pin": "2.1.284",
+        "recipe_source_ref": "https://github.com/anthropics/claude-code/tree/v2.1.284",
+        "upstream_document_binding": {
+          "url": "https://code.claude.com/docs/en/setup.md",
+          "document_line": 346,
+          "line_basis": "returned official Markdown document",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Official setup documents installing a specific version through the native installer. The recorded claude install 2.1.284 shape comes from the installed CLI install --help in the reused review, not a verbatim setup command."
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "v2.1.284 README.md; v2.1.286 CHANGELOG.md; installed --help",
+        "evidence_class": "CLI test command not found in these sources; version/help probes executed, not functional acceptance"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "role": "Retain native research/judgment client and explicit role/effort/account; workflow success does not qualify trading decisions or broker state.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "pin_of_record": "2.16.6",
+      "pin_source": "manifests/stack.json:1333",
+      "source_pinned_url": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+      "upstream_currency": "https://github.com/dagucloud/dagu/releases/tag/v2.18.1; unmeasured candidate",
+      "native_install": {
+        "command": "tar -xzf dagu_2.16.6_linux_amd64.tar.gz; install dagu \"$BIN_DIR/dagu\"",
+        "source": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "2.16.6",
+        "recipe_source_ref": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md#L105",
+          "document_line": 105,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents its native binary installer. The retained versioned archive unpack/copy commands are the matching foundation recipe, rather than a verbatim command from the README installer block."
+        }
+      },
+      "native_acceptance": {
+        "command": "dagu validate --dagu-home \"$DAG_HOME\" \"$DAG\"; dagu start --context local --dagu-home \"$DAG_HOME\" --run-id \"$RUN_ID\" \"$DAG\"",
+        "source": "https://docs.dagu.sh/getting-started/installation/linux; installed validate/start --help exited 0",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json",
+      "role": "Selected local command DAGs with owned state and bounded retries. External broker writes require explicit reconciliation; workflow success is not exactly-once order execution.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "pin_of_record": "255.4-1ubuntu8.17 (historical host package)",
+      "pin_source": "manifests/stack.json:1446",
+      "source_pinned_url": "https://github.com/systemd/systemd/blob/v255/man/systemd-run.xml",
+      "upstream_currency": "https://github.com/systemd/systemd/releases/tag/v262; Ubuntu target package unresolved",
+      "native_install": {
+        "command": "sudo apt-get install systemd systemd-sysv",
+        "source": "https://github.com/systemd/systemd/blob/v255/man/systemd-run.xml",
+        "evidence_class": "source_only",
+        "recipe_pin": "255.4-1ubuntu8.17 (historical host package)",
+        "recipe_source_ref": "https://github.com/systemd/systemd/blob/v255/man/systemd-run.xml",
+        "upstream_document_binding": {
+          "url": "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/systemd.md#L53",
+          "document_line": 53,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Official WSL docs declare the Ubuntu/Debian systemd and systemd-sysv apt command. Selected image is Ubuntu 24.04.5, with 26.04.1 a queued comparison; no replacement-distro package version is claimed or installation performed."
+        }
+      },
+      "native_acceptance": {
+        "command": "systemd-run --user --wait --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group \"$COMMAND\"",
+        "source": "Pinned v255 manual; https://learn.microsoft.com/en-us/windows/wsl/systemd",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json",
+      "role": "Selected user-scoped process lifecycle primitive; historical host package is not the absent replacement distro's pin.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin_of_record": "0.161.0",
+      "pin_source": "manifests/stack.json:1085",
+      "source_pinned_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+      "upstream_currency": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0; currency only",
+      "native_install": {
+        "command": "tar -xzf otelcol-contrib_0.161.0_linux_amd64.tar.gz",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "0.161.0",
+        "recipe_source_ref": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/open-telemetry/opentelemetry.io/blob/7fdabd2ed2c394ad4cbff90314c2f12eea6db1d9/content/en/docs/collector/install/binary/linux.md#L88",
+          "document_line": 88,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "otelcol-contrib validate --config=\"$CONFIG\"",
+        "source": "Installed0.161.0 validate --help exited0; binaries are from opentelemetry-collector-releases",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected single sanitized telemetry collector. Operational spans/counters remain observations rather than source-of-truth broker/market records.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "pin_of_record": "3.15.0",
+      "pin_source": "manifests/stack.json:1116",
+      "source_pinned_url": "https://github.com/prometheus/prometheus/blob/v3.15.0/README.md",
+      "upstream_currency": "v3.15.0; matches record",
+      "native_install": {
+        "command": "tar xvfz prometheus-3.15.0.linux-amd64.tar.gz",
+        "source": "https://github.com/prometheus/prometheus/blob/v3.15.0/README.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "3.15.0",
+        "recipe_source_ref": "https://github.com/prometheus/prometheus/blob/v3.15.0/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/prometheus/docs/blob/605cf81fefc2e8e91f8ba89bb1555ae52a43a318/docs/introduction/first_steps.md#L15",
+          "document_line": 15,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "promtool check config \"$CONFIG\"; promtool query instant \"$LOOPBACK_URL\" up",
+        "source": "Pinned cmd/promtool/main.go; installed check config --help exited0",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected operational metrics/rules for freshness, runtime and risk-control observations; metrics are not an immutable account/order ledger or proof of provider billing cessation.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "pin_of_record": "3.7.8",
+      "pin_source": "manifests/stack.json:1154",
+      "source_pinned_url": "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+      "upstream_currency": "v3.7.8; matches record",
+      "native_install": {
+        "command": "unzip loki-linux-amd64.zip; install loki-linux-amd64 \"$BIN_DIR/loki\"",
+        "source": "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "3.7.8",
+        "recipe_source_ref": "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/grafana/loki/blob/v3.7.8/docs/sources/setup/install/local.md#L51",
+          "document_line": 51,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native release/download/archive installation. The separate recorded unpack/copy or dpkg recipe specializes the versioned release asset and local installation path; it is not attributed as a verbatim upstream command."
+        }
+      },
+      "native_acceptance": {
+        "command": "loki -config.file=\"$CONFIG\" -verify-config=true",
+        "source": "Pinned cmd/loki/main.go; help exits2 while printing Go flag usage",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected bounded sanitized logs; log query/retention does not qualify complete data provenance, immutable transaction evidence or full conversation reconstruction.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "pin_of_record": "13.2.2",
+      "pin_source": "manifests/stack.json:1191",
+      "source_pinned_url": "https://github.com/grafana/grafana/blob/v13.2.2/conf/defaults.ini",
+      "upstream_currency": "https://github.com/grafana/grafana/releases/tag/v13.2.3; currency only",
+      "native_install": {
+        "command": "sudo dpkg -i grafana_13.2.2_34846740809_linux_amd64.deb",
+        "source": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/; pinned13.2.2 release asset",
+        "evidence_class": "source_only",
+        "recipe_pin": "13.2.2",
+        "recipe_source_ref": "https://github.com/grafana/grafana/blob/v13.2.2/conf/defaults.ini",
+        "upstream_document_binding": {
+          "url": "https://github.com/grafana/grafana/blob/v13.2.2/docs/sources/setup-grafana/installation/debian/index.md#L107",
+          "document_line": 107,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native release/download/archive installation. The separate recorded unpack/copy or dpkg recipe specializes the versioned release asset and local installation path; it is not attributed as a verbatim upstream command."
+        }
+      },
+      "native_acceptance": {
+        "command": "curl --fail --silent \"$LOOPBACK_URL/api/health\"",
+        "source": "Pinned pkg/api/http_server.go and pkg/api/health.go; documentation health alone is limited",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected loopback anonymous Viewer observation. Keep operator authentication distinct and do not expose execution authority through a dashboard.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "pin_of_record": "0.34.1",
+      "pin_source": "manifests/stack.json:1224",
+      "source_pinned_url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+      "upstream_currency": "v0.34.1; matches record",
+      "native_install": {
+        "command": "tar -xzf alertmanager-0.34.1.linux-amd64.tar.gz",
+        "source": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "0.34.1",
+        "recipe_source_ref": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md#L16",
+          "document_line": 16,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native release/download/archive installation. The separate recorded unpack/copy or dpkg recipe specializes the versioned release asset and local installation path; it is not attributed as a verbatim upstream command."
+        }
+      },
+      "native_acceptance": {
+        "command": "amtool check-config \"$CONFIG\"",
+        "source": "Pinned cli/check_config.go; installed help exited0",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected alert delivery primitive; new-host notification/delivery is unqualified.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "pin_of_record": "2.28.0",
+      "pin_source": "manifests/stack.json:1248",
+      "source_pinned_url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+      "upstream_currency": "v2.28.0; matches record",
+      "native_install": {
+        "command": "tar zxvf ntfy_2.28.0_linux_amd64.tar.gz",
+        "source": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+        "evidence_class": "source_only",
+        "recipe_pin": "2.28.0",
+        "recipe_source_ref": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+        "upstream_document_binding": {
+          "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md#L38",
+          "document_line": 38,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "curl --fail --silent \"$LOOPBACK_URL/v1/health\"",
+        "source": "Pinned server/server.go; installed serve --help exited0; external delivery requires its own observation",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json",
+      "role": "Selected notification sink for the bounded local observation path; native delivery is distinct from broker action.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    },
+    {
+      "component_id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "pin_of_record": "0.19.1",
+      "pin_source": "manifests/stack.json:1305",
+      "source_pinned_url": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst",
+      "upstream_currency": "v0.19.1 releases/latest matches record; no new promotion",
+      "native_install": {
+        "command": "bzip2 -d restic_0.19.1_linux_amd64.bz2; install restic_0.19.1_linux_amd64 \"$BIN_DIR/restic\"",
+        "source": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst",
+        "evidence_class": "source_only",
+        "recipe_pin": "0.19.1",
+        "recipe_source_ref": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst",
+        "upstream_document_binding": {
+          "url": "https://github.com/restic/restic/blob/v0.19.1/doc/020_installation.rst#L212",
+          "document_line": 212,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "Upstream documents native release/download/archive installation. The separate recorded unpack/copy or dpkg recipe specializes the versioned release asset and local installation path; it is not attributed as a verbatim upstream command."
+        }
+      },
+      "native_acceptance": {
+        "command": "restic check --read-data; restic restore latest --target \"$RESTORE_TARGET\" --verify",
+        "source": "https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst; https://github.com/restic/restic/blob/v0.19.1/doc/050_restore.rst",
+        "evidence_class": "source_only"
+      },
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/recovery-portability.json",
+      "role": "Selected scoped recovery primitive. Existing static public-file restore does not qualify broker ledger/application consistency, independent keys, off-host loss or host recovery.",
+      "evidence_class": "This pass's primary-source findings reused for matching inputs; independently assessed trading fit only. Historical native receipts retain their original scope.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created"
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Temporal",
+      "repository": "https://github.com/temporalio/temporal",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional durable workflow comparator only for a demonstrated cross-process/external-effect gap. Activity retries need bounded broker-specific ambiguity handling; durable history is not exactly-once external execution.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json",
+      "sources": [
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make install",
+        "source": "https://github.com/temporalio/temporal/blob/v1.32.0/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/temporalio/temporal/blob/v1.32.0/Makefile#L3",
+          "document_line": 3,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make unit-test",
+        "source": "https://github.com/temporalio/temporal/blob/v1.32.0/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Prefect",
+      "repository": "https://github.com/prefecthq/prefect",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional Python workflow deployment comparator for a measured scheduler gap; choose a concrete ownership/control envelope instead of adding an unqualified coordinator.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json",
+      "sources": [
+        "https://github.com/PrefectHQ/prefect",
+        "https://github.com/PrefectHQ/prefect/blob/3.8.7/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/PrefectHQ/prefect/blob/3.8.7/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "uv sync --locked",
+        "source": "https://github.com/prefecthq/prefect/blob/3.8.7/.github/workflows/python-tests.yaml",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Recorded pytest entrypoint is the original API-compatibility workflow, not every server/database/integration test. Full Python CI uses named matrix modules and external PostgreSQL or Redis services.",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/PrefectHQ/prefect/blob/3.8.7/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/prefecthq/prefect/blob/3.8.7/.github/workflows/python-tests.yaml#L268",
+          "document_line": 268,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "pytest -vv",
+        "source": "https://github.com/prefecthq/prefect/blob/3.8.7/.github/workflows/api-compatibility-tests.yaml",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Recorded pytest entrypoint is the original API-compatibility workflow, not every server/database/integration test. Full Python CI uses named matrix modules and external PostgreSQL or Redis services."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Dagster",
+      "repository": "https://github.com/dagster-io/dagster",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional data assets/backfill/lineage comparator. As-known universe, original revisions and corporate-action availability remain data contracts, regardless of scheduling.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json",
+      "sources": [
+        "https://github.com/dagster-io/dagster",
+        "https://github.com/dagster-io/dagster/blob/1.13.24/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/dagster-io/dagster/blob/1.13.24/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "pip install dagster==1.13.24",
+        "source": "https://github.com/dagster-io/dagster/blob/1.13.24/docs/docs/getting-started/installation.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/dagster-io/dagster/blob/1.13.24/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/dagster-io/dagster/blob/1.13.24/docs/docs/getting-started/installation.md#L72",
+          "document_line": 72,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "python -m pytest python_modules/dagster/dagster_tests",
+        "source": "https://github.com/dagster-io/dagster/blob/1.13.24/docs/docs/about/contributing.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "LangGraph",
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional stateful research graph with explicit checkpoints. In-memory state is not durable broker reconciliation, and graph/tool routing does not authorize risk/order decisions.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json",
+      "sources": [
+        "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make install",
+        "source": "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "The original test target starts/stops development services when Docker is available; its original NO_DOCKER branch is different evidence. Neither is broker exactly-once or crash reconciliation acceptance.",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/Makefile#L10",
+          "document_line": 10,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/libs/langgraph/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "libs/langgraph",
+        "boundary": "The original test target starts/stops development services when Docker is available; its original NO_DOCKER branch is different evidence. Neither is broker exactly-once or crash reconciliation acceptance."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "DeerFlow",
+      "repository": "https://github.com/bytedance/deer-flow",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional research harness; freeze artifacts, sources, cancellation and provider/model identity before a matched native-client comparison.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "sources": [
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make install",
+        "source": "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "boundary": "Default backend tests explicitly exclude live and blocking-I/O suites; test-live requires config and provider credentials and is outside this wave.",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L398",
+          "document_line": 398,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/bytedance/deer-flow/blob/v2.1.0/CONTRIBUTING.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "backend",
+        "boundary": "Default backend tests explicitly exclude live and blocking-I/O suites; test-live requires config and provider credentials and is outside this wave."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "OmniRoute",
+      "repository": "https://github.com/diegosouzapw/omniroute",
+      "catalog_disposition": "measured_tradeoff",
+      "verdict": "Optional explicitly selected research-provider route. Preserve native client/account/model identity and existing protocol/compatibility gaps; exclude broker credentials/order tools and avoid automatic version adoption.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "sources": [
+        "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+        "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51"
+      ],
+      "pin_of_record": "3.8.50",
+      "review_source_refs": [
+        "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+        "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json"
+      ],
+      "upstream_currency": {
+        "latest_release": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "source": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "adoption": "none; recorded route or default preserved"
+      },
+      "evidence_class": "fresh tagged/pinned source and native gh release observation; no install/provider/model call",
+      "native_install": {
+        "command": "npm install -g omniroute@3.8.50",
+        "source": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "3.8.50",
+        "recipe_source_ref": [
+          "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md",
+          "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/README.md#L722",
+          "document_line": 722,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/diegosouzapw/omniroute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/package.json",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "FreeLLMAPI",
+      "repository": "https://github.com/tashfeenahmed/freellmapi",
+      "catalog_disposition": "unqualified",
+      "verdict": "Optional explicit research router. Tagged docs support Linux/Docker source deployment; historical Windows reachability is not a new Linux install. Compatibility aliases do not establish model family or entitlement.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "sources": [
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/README.md",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/package.json",
+        "https://github.com/tashfeenahmed/freellmapi/releases/tag/v0.13.3",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/docs/en/install/01-install.md"
+      ],
+      "pin_of_record": "v0.11.0",
+      "review_source_refs": [
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/README.md",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/package.json"
+      ],
+      "upstream_currency": {
+        "latest_release": "v0.13.3",
+        "published_at": "2026-09-30T14:49:20Z",
+        "source": "https://github.com/tashfeenahmed/freellmapi/releases/tag/v0.13.3",
+        "adoption": "none; recorded route or default preserved"
+      },
+      "evidence_class": "fresh tagged/pinned source and native gh release observation; no install/provider/model call",
+      "native_install": {
+        "command": "docker compose up -d",
+        "source": "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/docs/en/install/01-install.md",
+        "evidence_class": "source-only; not run in this wave",
+        "recipe_pin": "v0.11.0",
+        "recipe_source_ref": [
+          "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/README.md",
+          "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/package.json"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/docs/en/install/01-install.md#L51",
+          "document_line": 51,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/package.json",
+        "evidence_class": "source-only; not run in this wave"
+      },
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "OpenAI Agents SDK",
+      "repository": "https://github.com/openai/openai-agents-python",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional API-agent SDK, separate from account-preserving native CLI and its SDK. New provider billing/tools/resume/cancellation need task-specific qualification.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/native-clients.json",
+      "sources": [
+        "https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make sync",
+        "source": "https://github.com/openai/openai-agents-python/blob/v0.22.3/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/openai/openai-agents-python/blob/v0.22.3/Makefile#L2",
+          "document_line": 2,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make tests",
+        "source": "https://github.com/openai/openai-agents-python/blob/v0.22.3/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "vLLM",
+      "repository": "https://github.com/vllm-project/vllm",
+      "catalog_disposition": "measured_tradeoff",
+      "verdict": "Retain the separately qualified optional local inference/embedding route only where selected workload fits. Source/package identity is not fresh GPU acceptance or numeric/risk/order judgment authority.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/semantic-rag.json",
+      "sources": [
+        "https://github.com/vllm-project/vllm",
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/README.md",
+        "https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/tests/models/language/pooling/test_embedding.py"
+      ],
+      "pin_of_record": "0.30.0 @ ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+      "review_source_refs": [
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/README.md",
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+        "https://github.com/vllm-project/vllm/blob/v0.30.0/tests/models/language/pooling/test_embedding.py"
+      ],
+      "upstream_currency": "Latest v0.30.0: https://github.com/vllm-project/vllm/releases/tag/v0.30.0",
+      "native_install": {
+        "command": "uv pip install vllm==0.30.0 --torch-backend=auto",
+        "source": "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+        "evidence_class": "source_review",
+        "recipe_pin": "0.30.0 @ ced6857afa0ea7b2e3f0846a62e1394e90f15607",
+        "recipe_source_ref": [
+          "https://github.com/vllm-project/vllm/blob/v0.30.0/README.md",
+          "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+          "https://github.com/vllm-project/vllm/blob/v0.30.0/tests/models/language/pooling/test_embedding.py"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md#L25",
+          "document_line": 25,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "pytest tests/models/language/pooling/test_embedding.py",
+        "source": "https://github.com/vllm-project/vllm/blob/v0.30.0/tests/models/language/pooling/test_embedding.py",
+        "evidence_class": "source_review"
+      },
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Deep Agents",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional filesystem/subagent research harness; require matched artifact quality, source provenance, ownership and full-attempt accounting.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "sources": [
+        "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "uv sync --group test",
+        "source": "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/.github/workflows/_test.yml",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "libs/deepagents",
+        "boundary": "Default native target is unit_tests with sockets disabled; provider integration, runtime isolation and trading authority are separate.",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/.github/workflows/_test.yml#L95",
+          "document_line": 95,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "make test",
+        "source": "https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/libs/deepagents/Makefile",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "libs/deepagents",
+        "boundary": "Default native target is unit_tests with sockets disabled; provider integration, runtime isolation and trading authority are separate."
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "OpenHands SDK",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional coding SDK; native account/tool/resume/recovery and frozen deterministic oracle comparisons remain open.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/agent-sdks.json",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "make build",
+        "source": "https://github.com/openhands/software-agent-sdk/blob/v1.50.1/DEVELOPMENT.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/openhands/software-agent-sdk/blob/v1.50.1/DEVELOPMENT.md#L8",
+          "document_line": 8,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv run pytest tests/sdk/",
+        "source": "https://github.com/openhands/software-agent-sdk/blob/v1.50.1/DEVELOPMENT.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "OpenHands Agent Canvas",
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional Agent Canvas/server surface; useful only for a concrete orchestration/UI gap with recoverable ownership and source/native acceptance.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "sources": [
+        "https://github.com/OpenHands/OpenHands/blob/v1.24.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/OpenHands/OpenHands/blob/v1.24.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "npm install -g @openhands/agent-canvas@1.24.0",
+        "source": "https://github.com/openhands/openhands/blob/v1.24.0/README.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/OpenHands/OpenHands/blob/v1.24.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/openhands/openhands/blob/v1.24.0/README.md#L71",
+          "document_line": 71,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/openhands/openhands/blob/v1.24.0/package.json",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    },
+    {
+      "name": "Microsoft Agent Framework",
+      "repository": "https://github.com/microsoft/agent-framework",
+      "catalog_disposition": "conditional",
+      "verdict": "Conditional Python/.NET orchestration framework; require a matched workflow contract and explicit external-effect semantics before use in the trading lane.",
+      "new_host_acceptance": "unknown; replacement WSL distro not created",
+      "reused_review": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json",
+      "sources": [
+        "https://github.com/microsoft/agent-framework/blob/python-1.19.0/README.md"
+      ],
+      "pin_of_record": "not an adopted layer pin; exact cited review ref below",
+      "review_source_refs": [
+        "https://github.com/microsoft/agent-framework/blob/python-1.19.0/README.md"
+      ],
+      "upstream_currency": "reuse cited same-pass release/source observation; no duplicate release query",
+      "evidence_class": "same-pass cited primary-source review reused; independent trading-fit assessment only, no new native/model/provider execution",
+      "native_install": {
+        "command": "uv sync --all-groups; uv run poe install",
+        "source": "https://github.com/microsoft/agent-framework/blob/python-1.19.0/python/DEV_SETUP.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "python",
+        "recipe_pin": "not an adopted layer pin; exact cited review ref below",
+        "recipe_source_ref": [
+          "https://github.com/microsoft/agent-framework/blob/python-1.19.0/README.md"
+        ],
+        "upstream_document_binding": {
+          "url": "https://github.com/microsoft/agent-framework/blob/python-1.19.0/python/DEV_SETUP.md#L64",
+          "document_line": 64,
+          "line_basis": "original upstream file",
+          "status": "original upstream install command or route read",
+          "recipe_relationship": "The separate native_install command retains the recorded version, host architecture and recipe flags. This binding identifies the original upstream command/installation route; it does not claim that every pin, local path or lifecycle flag is copied verbatim from that document."
+        }
+      },
+      "native_acceptance": {
+        "command": "uv run poe test -A -m \"not integration\"",
+        "source": "https://github.com/microsoft/agent-framework/blob/python-1.19.0/python/DEV_SETUP.md",
+        "evidence_class": "exact previously cited foundation ref; native entrypoint recovered from tagged source, not installed or run",
+        "working_directory": "python"
+      },
+      "native_command_review": "Command-only recovery at the exact cited foundation refs; no duplicate release/currency query or runtime adoption.",
+      "trading_fit_delta": "Independent fit review for observability-hosting; inherited domain membership is not a runtime selection or authority over deterministic numeric/risk/order state."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "The broad agents-operations domain row makes every router/framework/inference server part of the selected hosting runtime.",
+      "correction": "The selected local scheduler/process and single collector/Prometheus/Loki/Grafana path have their own source/native scopes. Optional agent/router/server candidates require a measured missing capability; their membership does not authorize installation or extra provider/model routes.",
+      "deciding_source": "evidence/artifacts/new-wsl-layer-reviews-20261001/scheduling-supervision.json; evidence/artifacts/new-wsl-layer-reviews-20261001/observation-inference.json; catalogs/us-equities/runtime-target.json"
+    },
+    {
+      "claim": "Dashboard health, fresh emission or a successful restore proves trading readiness and current account state.",
+      "correction": "Emitter/checkpoint age, process liveness, application recovery and independent broker observations are separate. Existing Restic evidence covers static public reference files; native market/account/source availability must retain separate records.",
+      "deciding_source": "observability/grand-dashboard/README.md; evidence/artifacts/new-wsl-layer-reviews-20261001/recovery-portability.json; catalogs/us-equities/agents-operations.json"
+    },
+    {
+      "claim": "No Linux-native FreeLLMAPI deployment is supported because its historical receipt observed Windows from WSL.",
+      "correction": "Tagged v0.11.0 official install docs support Linux source/Docker Compose deployment. That source capability does not qualify a new Linux host or provider/model compatibility.",
+      "deciding_source": "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/docs/en/install/01-install.md"
+    }
+  ],
+  "evidence_assessment": [
+    "Source/currency/native-help evidence is reused from the same-pass native-clients, scheduling-supervision, observation-inference, recovery-portability, workers, semantic-rag and agent-sdks receipts only where inputs match. Independent delta concerns trading freshness, immutable records, broker boundary and external writes.",
+    "Native accounts/model routes and source-of-truth numeric/risk/order state remain intact. Grafana loopback anonymous Viewer is the observation contract; Dagu operator auth and native broker/client sign-ins remain separate.",
+    "The new primary gateway checks retain OmniRoute 3.8.50 source 5458026c216f77a3da68ea49152dc33470cfe2cb and FreeLLMAPI v0.11.0 sources, while their latest releases are 3.8.51 and 0.13.3. npm tests/install docs were inspected but no gateway/provider was queried or updated.",
+    "This pass's foundation observation review retains Collector 0.161.0 versus candidate 0.162.0 and Grafana 13.2.2 versus 13.2.3 without promotion. Historical telemetry, UI, GPU and native service receipts retain their specific original inputs.",
+    "All 21 inherited operations candidates have explicit fit/citation coverage. Current-source gaps and absent native install/test command references in inherited alternatives remain declared, not promoted to whole-runtime acceptance."
+  ],
+  "failed_access": [],
+  "omissions": [
+    "No service start/restart, HTTP health/scrape query, dashboard publishing, auth change, gateway route, provider call, model/GPU trial, data/transaction restore or operating-system change.",
+    "No high-availability or production-host claim; optional servers/services remain uninstalled in this wave."
+  ],
+  "next_wave": [
+    "On the created distro, freeze user-service readiness and one bounded telemetry freshness/loss/restart condition with independent native process, scrape, log, alert and delivery observations; broker/account truth remains separately observed.",
+    "Qualify application-consistent off-host recovery with independent keys and client/state rebinding before relying on restored trading artifacts; recover missing conditional candidate command references only for a demonstrated hosting/control gap."
+  ],
+  "reopen_on": [
+    "Changed distro/systemd behavior, telemetry/recovery input or source revision, failed bounded freshness/alert condition, or measured availability/control/throughput need for a different scheduler or host."
+  ],
+  "named_candidate_accounting": {
+    "source": "catalogs/landscape/us-equities.json:3983",
+    "named_count": 21,
+    "accounted_for": 21,
+    "boundary": "accounting includes explicit source/command omissions; it is not completeness or native qualification"
+  }
+}

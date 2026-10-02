@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-30T22:45:17Z",
-  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
+  "recorded_at_utc": "2026-10-02T08:41:35Z",
+  "meaning": "Recorded checkpoint preserving main's Codex, foundation, paper and simulation evidence and adding scoped runtime source/effort repair gates. Linked records retain their original dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
@@ -14,8 +14,8 @@
       "kind": "lane",
       "id": "paper",
       "title": "Alpaca paper accounts 1 and 2",
-      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
+      "state": "09-29 mechanics-only / acct 2 pre 3 of 3 passed -2.05 USD / acct 1 rth 5 of 6 passed -115.94 USD then halted / acct 2 ext 3 of 4 passed IOVA 68 held (PR 559)",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md"
     },
     {
       "kind": "lane",
@@ -30,15 +30,22 @@
       "kind": "gate",
       "id": "runtime-worker-quality-and-image",
       "title": "Runtime candidate image and task-quality acceptance",
-      "state": "pending / full OpenHands image has 56 fixable High-Critical scanner matches / observer and frozen task-quality controls unqualified",
+      "state": "Historical 2026-09-30 image triage records 56 fixable High-Critical matches; full-image and task-quality gates remain open",
       "evidence_ref": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json"
     },
     {
       "kind": "gate",
       "id": "runtime-litellm-closure",
       "title": "OpenHands package closure and owner review",
-      "state": "1.50 LiteLLM 1.93.2 native checks and bounded independent review pass / MAIN335 owner adoption pending / image and task-quality gates open",
+      "state": "SDK1.50.0/Linux LiteLLM1.93.2 closure retains linked native checks; source adoption, host integration and full-image/task-quality acceptance remain pending",
       "evidence_ref": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930.json"
+    },
+    {
+      "kind": "gate",
+      "id": "runtime-sol-model-effort",
+      "title": "Sol route and native effort qualification",
+      "state": "Dotted Sol aliases and nested max repaired; local checks and independent source review pass; effective provider wire, inference and task-quality acceptance remain open",
+      "evidence_ref": "evidence/artifacts/runtime-sol-routing-20261002/receipt.json"
     },
     {
       "kind": "gate",
@@ -51,7 +58,7 @@
       "kind": "gate",
       "id": "alpaca-paper-operational",
       "title": "Alpaca bounded paper lifecycle",
-      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on order-contract engine 2026-09-24 / corporate-action guard merged 2026-09-25",
+      "state": "smoke passed / 1x broker trial passed 2026-09-23 / native faults re-verified on fee-aware engine 2026-10-01 / corporate-action guard merged 2026-09-25",
       "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
@@ -354,6 +361,27 @@
       "title": "Skills trial window 2026-09-25 to 2026-10-25",
       "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
       "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
+    },
+    {
+      "kind": "gate",
+      "id": "codex-native-daemon-queue-20261001",
+      "title": "Codex native daemon and cross-session queue",
+      "state": "0.159.3 native idle / busy / reconnect delivery passed in owned thread / no shared restart",
+      "evidence_ref": "evidence/receipts/codex-01593-native-queue-20261001.json"
+    },
+    {
+      "kind": "gate",
+      "id": "codex-hindsight-capture-20261001",
+      "title": "Codex automatic Hindsight capture and recollection",
+      "state": "headless and daemon paths passed / captured synthetic facts survived recovery / seed and pages separate",
+      "evidence_ref": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "kind": "gate",
+      "id": "sdk-pair-candidate-01593-20261001",
+      "title": "SDK and bundled CLI 0.159.3 pair qualification",
+      "state": "paired protocol and native marker passed / qualified inventory and model guards intact / 209-test run passed (32 skips) / gateway HTTP 429 held - cause unknown",
+      "evidence_ref": "evidence/artifacts/runtime-sdk-20261001/receipt.json"
     }
   ],
   "workers": [
@@ -398,20 +426,6 @@
       "title": "Broad-universe builders and reviewers",
       "state": "3 builders + 3 Opus reviewers + 3 fix builders in owned worktrees / Codex foreground lane 4 passes / all findings resolved",
       "evidence_ref": "blueprints/us-equities/broad-universe/receipt.json"
-    },
-    {
-      "kind": "worker",
-      "id": "foundation-runtime-candidates",
-      "title": "Native runtime worker candidates",
-      "state": "OpenHands 1208 selected upstream tests / GPT Researcher 24 / DeerFlow 309 + 8 scorer / Crawl4AI model-free job + 16 tests / image and quality gates pending",
-      "evidence_ref": "blueprints/runtime-workers/README.md"
-    },
-    {
-      "kind": "worker",
-      "id": "runtime-claude-coordination",
-      "title": "Claude runtime and SDK ownership handoff",
-      "state": "reviewed-head replies / new relay quota-blocked / MAIN335 owner handoff pending / SDK749 validation passes / security gate pending",
-      "evidence_ref": "docs/decisions/2026-09-30-runtime-convergence-followup.md"
     }
   ],
   "plan_ref": "blueprints/us-equities/catalyst-convergence/plan.json",

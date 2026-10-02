@@ -111,8 +111,11 @@ def host_settings(path):
 
 def worker_model(settings):
     model = settings.get("model") or read(HERE / "defaults.json")["model"]
-    if not isinstance(model, str) or not re.fullmatch(r"cx/gpt-6-[a-z0-9-]+-max|sharedgw/gpt-6-astra-max", model):
-        raise ValueError("worker/judgment roles require a configured GPT-6 max gateway route")
+    if not isinstance(model, str) or model not in {
+        "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max", "cx/gpt-6-sol-max",
+        "cx/gpt-6-astra", "cx/gpt-6-astra-max", "sharedgw/gpt-6-astra-max",
+    }:
+        raise ValueError("worker/judgment roles require an approved GPT-6 gateway route")
     return model
 
 
@@ -120,7 +123,7 @@ def arm_settings(settings, arm=None):
     """Round-3 gateway-owner contract; never infer the arm from a model slug.
 
     DeerFlow@345f08be config/app_config.py:432,565 resolves $VAR model fields.
-    The control override preserves this recipe's existing GPT-6 max routes.
+    The control override preserves the requested approved GPT-6 model ID.
     """
     arm = arm if arm is not None else os.environ.get("RUNTIME_WORKER_ARM", "control")
     if arm not in {"control", "engines-on"}:
@@ -130,7 +133,7 @@ def arm_settings(settings, arm=None):
     if arm == "control":
         model = worker_model({"model": os.environ.get("DEERFLOW_CONTROL_MODEL") or settings.get("model")})
         if not model.startswith("cx/"):
-            raise ValueError("the control arm requires a cx/ GPT-6 max route")
+            raise ValueError("the control arm requires a cx/ GPT-6 route")
         port = 20128
     headers = ["Idempotency-Key", "x-omniroute-session"]
     if arm == "engines-on":

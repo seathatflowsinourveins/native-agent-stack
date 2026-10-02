@@ -1,0 +1,238 @@
+{
+  "layers": [
+    {
+      "layer_id": "agent-messaging",
+      "selection": [
+        {
+          "name": "hcom",
+          "repository": "https://github.com/aannoo/hcom",
+          "role": "C04 — Shortlisted alternative for direct session messaging, idle wakeup, and handing work to spawned or resumed agents.",
+          "install_command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
+          "install_source": "Upstream v0.7.27 release instructions. The README documents launching Claude Code and Codex in separate terminals with `hcom claude` and `hcom codex`.",
+          "basis": [
+            {
+              "url": "https://github.com/aannoo/hcom/blob/v0.7.27/README.md",
+              "shows": "Direct capability fit: agents exchange messages through local SQLite and client hooks; the CLI also supports observing, spawning, forking, and resuming sessions."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/support/real_tool.rs",
+              "shows": "The shared integration contract exercises outgoing messages, idle inbound delivery, delivery cursor advancement, fork, kill, resume, and cleanup. It uses real client binaries with simulated model providers."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/scripts/mock-tools.pins",
+              "shows": "The integration tests pin Codex 0.159.2 and Claude Code 2.1.283. These are explicit compatibility evidence, rather than proof for every later client version."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/actions/runs/36803903267/job/110183965493",
+              "shows": "The real Codex integration job on Ubuntu 24.04 completed successfully on 2026-10-01."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/actions/runs/36803903267/job/110183965480",
+              "shows": "The real Claude Code integration job on Ubuntu completed successfully on 2026-10-01."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/releases/tag/v0.7.27",
+              "shows": "Release published 2026-10-01, with Linux x86_64 and macOS arm64 binaries. Release notes document fixes for unread batches exceeding 50 messages, truncated send output, dead-agent cleanup, and Codex resume behavior."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/commit/2c5f343b2f9e",
+              "shows": "Latest default-branch commit was 2026-10-01. Repository metadata reports unarchived status; recent delivery and resume issues have been closed. Release and commit currency satisfy the 90-day criterion."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Agent Message Queue",
+          "repository": "https://github.com/avivsinai/agent-message-queue",
+          "role": "C07 — Shortlisted alternative for durable named mailboxes, consumption receipts, and request handoffs between Claude Code and Codex.",
+          "install_command": "curl -fsSL https://raw.githubusercontent.com/avivsinai/agent-message-queue/main/scripts/install.sh | VERSION=v0.85.0 bash",
+          "install_source": "INSTALL.md at v0.85.0 documents the VERSION selector and checksum verification. The README additionally documents installing agent instructions, running `amq setup`, and launching the Claude/Codex pair.",
+          "basis": [
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/README.md",
+              "shows": "Explicit same-machine Claude Code/Codex walkthrough. Messages are atomically published files, with threads and receipts distinguishing queued messages from drained messages."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/blob/v0.85.0/INSTALL.md",
+              "shows": "Documented Linux and WSL installation, Linux x86_64 and macOS arm64 assets, and platform limits. Linux terminal injection can be restricted by kernel hardening."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/blob/v0.85.0/COOP.md",
+              "shows": "Documents consumption acknowledgments, notification-versus-consumption semantics, and recovery for messages sent before wake monitoring starts. Such messages remain unread and require draining."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/internal/fsq/claim_rename_test.go",
+              "shows": "Upstream tests cover exactly-once claim winners, concurrent single-winner claims, and losing claims for missing messages."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/actions/runs/36772954454/job/110083684477",
+              "shows": "The Linux build job succeeded. Its inspected workflow runs the Go suite, smoke tests, contract checks, hook tests, and a targeted race test."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/actions/runs/36772954454/job/110083684035",
+              "shows": "The macOS test job succeeded. Live client and terminal paths are environment-gated, so this is narrower than a successful live Claude/Codex handoff."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/actions/runs/36772954444/job/110083684481",
+              "shows": "The default-commit aggregate check state was FAILURE and included cancelled release automation. The separately cited Linux and macOS jobs succeeded."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/releases/tag/v0.85.0",
+              "shows": "Latest release published 2026-09-30, including Linux x86_64 and macOS arm64 core binaries."
+            },
+            {
+              "url": "https://github.com/avivsinai/agent-message-queue/commit/f42f46fbedef",
+              "shows": "Latest default-branch commit was 2026-09-30. Repository metadata reports unarchived status; issue activity includes a recently closed message-ID report. Release and commit currency satisfy the 90-day criterion."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Agent Relay",
+          "repository": "https://github.com/AgentWorkforce/relay",
+          "role": "C05 — Shortlisted alternative for broker-managed Claude Code/Codex sessions and durable local delivery queues.",
+          "install_command": "npm install -g agent-relay",
+          "install_source": "packages/cli/README.md at commit 35e7cdedad77fb6c5d4c2a15f0ee4537cb0f4b3b documents Node.js 22+, installation, and `agent-relay node up --local-only`. GitHub's latest release is v13.0.0; matching npm package publication was not independently verified.",
+          "basis": [
+            {
+              "url": "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/packages/cli/README.md",
+              "shows": "Documents managed Claude and Codex runtimes and a local-only broker that runs without a workspace key. Local delivery persists through restart and can wait for an absent recipient to respawn."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/packages/sdk/README.md",
+              "shows": "Separates messaging from harness process management and documents local broker startup, agent lifecycle integration, and managed Claude/Codex harnesses."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/actions/runs/36893989154/job/110476255447",
+              "shows": "Ubuntu E2E integration CI completed successfully on 2026-10-01."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/actions/runs/36893989154/job/110476254883",
+              "shows": "macOS E2E integration CI completed successfully on 2026-10-01. The inspected record did not independently establish its CPU architecture."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/actions/runs/36893989523/job/110477724436",
+              "shows": "Fresh-install CI with Node 22.14.0 succeeded; the queried checks also included a successful Node 24 fresh-install job and Linux x86_64 broker build."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/packages/cli/README.md#local-operation-during-a-relaycast-outage",
+              "shows": "Local-only mode disables injected Relaycast messaging tools and fleet facilities while retaining the local delivery API and queue. Queue acceptance is distinct from agent consumption."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/releases/tag/v13.0.0",
+              "shows": "Latest GitHub release published 2026-09-30."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/commit/35e7cdedad77",
+              "shows": "Latest default-branch commit was 2026-10-01. Repository metadata reports unarchived status, with current release and issue activity."
+            },
+            {
+              "url": "https://github.com/AgentWorkforce/relay/issues/1874",
+              "shows": "An open upstream report concerns duplicate MCP DMs across a process boundary. This was observed as an issue report, not independently reproduced."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C06",
+          "name": "ai-memory",
+          "reason": "Active: latest release v2.5.2 and default commit are dated 2026-10-01, with successful Ubuntu CI; its documented messaging addresses projects, uses deliberate inbox pops, and explicitly provides no automatic agent wakeup, giving it weaker fit for individually addressed concurrent sessions. [Messaging contract](https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/docs/agent-messaging.md), [CI](https://github.com/akitaonrails/ai-memory/actions/runs/36913374060/job/110541286658)."
+        },
+        {
+          "key": "C09",
+          "name": "Concord MCP",
+          "reason": "Strong runner-up: acknowledged handoffs and busy/idle delivery fit well, with release v0.10.5 on 2026-09-23 and default commit on 2026-09-25; inspected CI verifies Ubuntu Node 22/24, its relay tests mock receiving adapters, and the live Claude/Codex demo supplies a runnable recipe rather than recorded measurements, leaving less complete platform and client-integration evidence than the shortlist. [CI](https://github.com/Get-Concord-AI/concord-mcp/actions/runs/36152839951), [relay tests](https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/relay/relay.test.ts), [demo](https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/examples/whack-a-mole/README.md)."
+        },
+        {
+          "key": "C02",
+          "name": "AI Maestro",
+          "reason": "Active and capable, with release v0.47.1 and default commit on 2026-10-01 and successful Node 20/22 CI; the dashboard/tmux deployment adds components for this messaging requirement, while its published 2026-02-04 routing report verifies queue/ACK/tmux paths without a recorded Claude↔Codex ordering comparison. [README](https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/README.md), [routing results](https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/docs/AMP-ROUTING-TEST-RESULTS.md), [CI](https://github.com/23blocks-OS/ai-maestro/actions/runs/36943210040)."
+        },
+        {
+          "key": "C08",
+          "name": "agmsg",
+          "reason": "Active: release v1.5.1 on 2026-09-28, default commit on 2026-10-02 UTC, and successful Ubuntu/macOS Bats jobs; its Codex monitor documentation labels the bridge beta and documents launch interception, first-turn priming, and lingering bridge processes, making the clean-install integration less settled. [Codex bridge documentation](https://github.com/fujibee/agmsg/blob/07a67a3e3304/docs/codex-monitor-beta.md), [CI](https://github.com/fujibee/agmsg/actions/runs/36950864535)."
+        },
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "Installed Codex 0.159.3 exposes `queue` for existing sessions, and Claude Code 2.1.287 exposes background-session management; a reciprocal native bridge delivering into an existing Claude session was not found in the inspected client helps and matching version release notes, so complete bidirectional coverage remains unproven. [Codex release](https://github.com/openai/codex/releases/tag/rust-v0.159.3), [Claude Code release](https://github.com/anthropics/claude-code/releases/tag/v2.1.287)."
+        },
+        {
+          "key": "C10",
+          "name": "Sno Station",
+          "reason": "Active, with release v1.0.1 and default commit on 2026-10-01, but the README says published installation packages provide shared memory, Reach release archives are pending, and complete onboarding is forthcoming; this leaves an incomplete documented clean-install path for the messaging layer. [Current installation and component status](https://github.com/sno-ai/sno-station/blob/4b4cafe43e3d/README.md)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "A2A",
+          "criterion": "outside_requirement",
+          "fact": "The named repository supplies the protocol/specification and points to runtime SDKs and samples in separate repositories; this layer requires a session connector for Claude Code and Codex. It remains active, with a 2026-10-01 default-branch commit, so staleness is not the exclusion reason. [Repository scope](https://github.com/a2aproject/A2A/blob/e16c0e9f66c9/README.md)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "These are alternative installations, with no unique measured winner established. Assessment date: 2026-10-02 UTC, equivalent to 2026-10-01 in America/New_York; the 90-day cutoff is 2026-07-04 UTC. Run hcom v0.7.27, AMQ v0.85.0, Agent Relay at the cited revision/package versions, and runner-up Concord v0.10.5 on fresh WSL2 Ubuntu x86_64, using Claude Code 2.1.287 and Codex 0.159.3. Send uniquely numbered messages in both directions, sequentially and concurrently, with receivers idle, busy, awaiting approval, terminated, and restarted. Measure loss, duplicates, per-sender ordering, acceptance versus consumption receipts, delivery latency, restart recovery, and successful task handoff. Record installation steps, configuration edits, privileges, and setup time. Repeat the platform checks on macOS arm64 before resolving the secondary-host choice.",
+      "evidence_gaps": [
+        "The packet contains no comparison where all named arms ran. No cross-repository benchmark was verified, and no measured delivery or latency superiority is claimed.",
+        "The required ctx_fetch_and_index call was rejected because it requires approval while this session's approval policy is never. The official-domain web-search attempt also timed out. Repository documentation, source tests, releases, and CI status were read through the permitted GitHub API; the requested webpage workflow remains incomplete.",
+        "Research used 30 GitHub API calls, one web-search attempt, and one page-fetch attempt. No successful webpage fetch was completed.",
+        "No clean installation or Claude↔Codex exchange was executed on WSL2. Published Ubuntu CI supports Linux compatibility but does not establish WSL2 terminal, kernel, hook-trust, or busy-receiver behavior.",
+        "hcom's real-client tests use simulated providers and slightly earlier client versions. AMQ's ordinary CI skips environment-gated live-client paths. Relay's CI success does not establish current-provider handoff performance or resolve its open duplicate-DM report.",
+        "hcom and AMQ explicitly publish macOS arm64 assets. Relay has successful macOS CI, but exact arm64 coverage was not independently confirmed. Concord's inspected CI runs on Ubuntu only.",
+        "All nine repositories were unarchived and had default-branch commits within 90 days. Issue maintenance sampling covered the three most recently updated issues per repository; reported defects were not independently reproduced."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://github.com/aannoo/hcom/blob/v0.7.27/README.md",
+        "https://github.com/aannoo/hcom/releases/tag/v0.7.27",
+        "https://github.com/aannoo/hcom/commit/2c5f343b2f9e",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/.github/workflows/ci.yml",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/real_tool_codex.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/real_tool_claude.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/support/real_tool.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/send_delivery.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/pty_backpressure.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/scripts/mock-tools.pins",
+        "https://github.com/aannoo/hcom/actions/runs/36803903267",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/README.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/v0.85.0/INSTALL.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/v0.85.0/COOP.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/.github/workflows/ci.yml",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/internal/fsq/atomic_test.go",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/internal/fsq/claim_rename_test.go",
+        "https://github.com/avivsinai/agent-message-queue/releases/tag/v0.85.0",
+        "https://github.com/avivsinai/agent-message-queue/actions/runs/36772954454",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/README.md",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/packages/cli/README.md",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/packages/sdk/README.md",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/.github/workflows/stress-tests.yml",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/.github/workflows/relay-cleanroom-qualification.yml",
+        "https://github.com/AgentWorkforce/relay/releases/tag/v13.0.0",
+        "https://github.com/AgentWorkforce/relay/actions/runs/36893989154",
+        "https://github.com/AgentWorkforce/relay/actions/runs/36893989523",
+        "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/README.md",
+        "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/docs/agent-messaging.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/v0.10.5/README.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/claude-code.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/codex.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/relay/relay.test.ts",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/tools/handoff-lifecycle.test.ts",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/examples/whack-a-mole/README.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/actions/runs/36152839951",
+        "https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/README.md",
+        "https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/docs/AMP-ROUTING-TEST-RESULTS.md",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/README.md",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/docs/codex-monitor-beta.md",
+        "https://github.com/fujibee/agmsg/actions/runs/36950864535",
+        "https://github.com/sno-ai/sno-station/blob/4b4cafe43e3d/README.md",
+        "https://github.com/a2aproject/A2A/blob/e16c0e9f66c9/README.md",
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "https://github.com/anthropics/claude-code/releases/tag/v2.1.287"
+      ]
+    }
+  ]
+}

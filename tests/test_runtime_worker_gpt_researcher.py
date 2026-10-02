@@ -9,7 +9,7 @@ import copy
 import asyncio
 from contextlib import asynccontextmanager
 import hashlib
-from contextlib import closing
+from contextlib import closing, nullcontext
 import importlib.util
 from pathlib import Path
 import sqlite3
@@ -238,6 +238,7 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
             cfg = json.loads((root / "config.json").read_text())
             self.assertEqual(cfg["MCP_SERVERS"], [])
             self.assertEqual(cfg["LLM_KWARGS"]["reasoning_effort"], "max")
+            self.assertEqual(cfg["LLM_KWARGS"]["extra_body"]["reasoning"], {"effort": "max"})
 
     def test_receipt_records_separate_entry_gateways_phases_and_header_names(self):
         sys.path.insert(0, str(RECIPE / "e2e"))
@@ -525,14 +526,76 @@ class RuntimeWorkerGPTResearcherTests(unittest.TestCase):
                 transport.request_hook(request)
         self.assertEqual(gateway.select_routes({"GPTR_MODEL": "cx/gpt-6-sol-medium"})["worker"]["model"],
                          "cx/gpt-6-sol-medium")
+        for model in ("cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max"):
+            with self.subTest(model=model):
+                selection = gateway.select_routes({"GPTR_MODEL": model})
+                self.assertEqual(selection["worker"]["model"], model)
+                self.assertEqual(selection["judge"], control["judge"])
+                config = gateway.render_config({"LLM_KWARGS": {}}, selection["worker"], "conversation")
+                for role in ("FAST_LLM", "SMART_LLM", "STRATEGIC_LLM"):
+                    self.assertEqual(config[role], "openai:" + model)
+                self.assertEqual(config["LLM_KWARGS"]["reasoning_effort"], "max")
+                transport = gateway.GatewayTransport("conversation", **selection["worker"])
+                payload = {"model": model, "reasoning_effort": "max"}
+                request = SimpleNamespace(url=selection["worker"]["base_url"] + "/responses", headers={},
+                                          content=json.dumps(payload).encode())
+                transport.request_hook(request)
+                self.assertEqual(json.loads(request.content), payload)
+                self.assertNotIn("x-omniroute-compression", request.headers)
         for env in ({"RUNTIME_WORKER_ARM": "other"}, {"GPTR_MODEL": "sharedgw/cx/gpt-6-astra-max"},
                     {"GPTR_MODEL": "sharedgw/gpt-6-astra-max"},
                     {"RUNTIME_WORKER_ARM": "engines-on", "GPTR_MODEL": "cx/gpt-6-astra-max"},
-                    {"GPTR_JUDGE_BASE_URL": "http://127.0.0.1:20129/v1"},
-                    {"GPTR_BASE_URL": "https://example.invalid/v1"},
-                    {"GPTR_MODEL": "claude-opus-5-5"}):
+                     {"GPTR_JUDGE_BASE_URL": "http://127.0.0.1:20129/v1"},
+                     {"GPTR_BASE_URL": "https://example.invalid/v1"},
+                     {"GPTR_MODEL": "cx/gpt-6-unknown-max"},
+                     {"GPTR_MODEL": "cx/gpt-6.1-sol-unknown"},
+                     {"GPTR_MODEL": "claude-opus-5-5"}):
             with self.subTest(env=env), self.assertRaises(ValueError):
                 gateway.select_routes(env)
+
+    def test_nested_max_survives_worker_client_configuration_and_oracle_controls(self):
+        gateway = load("gptr_nested_max", RECIPE / "gateway.py")
+
+        class Provider:
+            @classmethod
+            def from_provider(cls, provider, **kwargs):
+                return kwargs
+
+        def assert_nested_max(fields):
+            self.assertEqual(fields.get("extra_body", {}).get("reasoning"), {"effort": "max"})
+
+        clients = SimpleNamespace(Client=lambda **kwargs: nullcontext(object()),
+                                  AsyncClient=lambda **kwargs: nullcontext(object()))
+        for model in ("cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max"):
+            with self.subTest(model=model):
+                route = gateway.select_routes({"GPTR_MODEL": model})["worker"]
+                config = gateway.render_config({"LLM_KWARGS": {}}, route, "conversation")
+                assert_nested_max(config["LLM_KWARGS"])
+                transport = gateway.GatewayTransport("conversation", **route)
+
+                async def construct():
+                    async with transport.worker_clients():
+                        return Provider.from_provider("openai", model=model, **config["LLM_KWARGS"])
+
+                with patch.dict(sys.modules, {
+                    "httpx": clients,
+                    "gpt_researcher.llm_provider.generic.base": SimpleNamespace(GenericLLMProvider=Provider),
+                }):
+                    fields = asyncio.run(construct())
+                assert_nested_max(fields)
+                self.assertEqual(fields["model"], model)
+                self.assertEqual(fields["reasoning_effort"], "max")
+                self.assertEqual(fields["base_url"], "http://127.0.0.1:20128/v1")
+                self.assertNotIn("x-omniroute-compression", fields["default_headers"])
+                for bad_body in (None, {}, {"reasoning": {}}, {"reasoning": {"effort": "high"}},
+                                 {"reasoning": {"effort": "xhigh"}}):
+                    invalid = dict(fields)
+                    if bad_body is None:
+                        invalid.pop("extra_body")
+                    else:
+                        invalid["extra_body"] = bad_body
+                    with self.subTest(bad_body=bad_body), self.assertRaises(AssertionError):
+                        assert_nested_max(invalid)
 
     def test_recipe_contract_and_empty_result(self):
         for name in ("README.md", "install.sh", "run-e2e.sh", "config.template.json",

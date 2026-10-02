@@ -1,0 +1,10 @@
+label=warmup-A
+arm=llama
+profile=llamacpp-gate
+server_pid=3716886
+server_started_utc=2026-10-01T23:58:56Z
+server_ready_utc=2026-10-01T23:59:16Z
+codex_exit=0
+codex_finished_utc=2026-10-02T00:09:57Z
+server_stopped_utc=2026-10-02T00:09:59Z
+server_alive_after_stop=no

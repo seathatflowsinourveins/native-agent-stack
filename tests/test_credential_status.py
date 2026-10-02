@@ -420,6 +420,27 @@ class CredentialStatusTests(unittest.TestCase):
             with self.subTest(store=store):
                 self.assertTrue(any(message in error for error in cs.inventory_errors(broken, ROOT)))
 
+    def test_test_only_and_test_canary_go_together(self):
+        # The canary proof's synthetic key is the only test_only row; the status and class pair (never one alone).
+        row = next(e for e in self.inventory["entries"] if e["id"] == "canary-e2e")
+        self.assertEqual((row["status"], row["class"], row["variables"]), ("test_only", "test_canary", ["CANARY_E2E_KEY"]))
+        self.assertEqual(row["environment_only_consumers"], ["tools/credentials/canary_probe.py"])
+        for status, klass in (("test_only", "provider_api_key"), ("optional", "test_canary")):
+            broken = copy.deepcopy(self.inventory)
+            planted = next(e for e in broken["entries"] if e["id"] == "canary-e2e")
+            planted["status"], planted["class"] = status, klass
+            with self.subTest(status=status, klass=klass):
+                self.assertTrue(any("test_only and class test_canary go together" in error
+                                    for error in cs.inventory_errors(broken, ROOT)))
+
+    def test_missing_test_only_file_is_informational(self):
+        # Missing is the canary row's normal state (it exists only between arm and disarm): never an unsafe exit.
+        entry = self.entry(self.report(), "canary-e2e")
+        self.assertEqual(entry["state"], "missing")
+        result = self.run_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("missing   canary-e2e", result.stdout)
+
     def test_missing_required_file_is_informational(self):
         entry = self.entry(self.report())
         self.assertEqual(entry["state"], "missing")

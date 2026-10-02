@@ -35,7 +35,10 @@ DRB_RESPONSE_FORMAT = {
 
 
 def model_id(value):
-    if not isinstance(value, str) or not re.fullmatch(r"(?:cx/gpt-6(?:-[a-z0-9]+)*|sharedgw/gpt-6-astra-max)", value):
+    if not isinstance(value, str) or value not in {
+        "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max", "cx/gpt-6-sol-max", "cx/gpt-6-sol-medium",
+        "cx/gpt-6-astra", "cx/gpt-6-astra-max", "sharedgw/gpt-6-astra-max",
+    }:
         raise ValueError("this gateway recipe accepts only approved GPT-6 model routes")
     return value
 
@@ -74,6 +77,10 @@ def render_config(template, route, session):
         headers["x-omniroute-compression"] = "allow-lossy"
     cfg["LLM_KWARGS"].update(base_url=route["base_url"], default_headers=headers,
                              reasoning_effort="max")
+    # GPTR@0957c301 forwards LLM_KWARGS; langchain-openai@1.6.6 accepts extra_body.
+    extra_body = dict(cfg["LLM_KWARGS"].get("extra_body") or {})
+    extra_body["reasoning"] = {**(extra_body.get("reasoning") or {}), "effort": "max"}
+    cfg["LLM_KWARGS"]["extra_body"] = extra_body
     return cfg
 
 

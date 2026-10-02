@@ -106,6 +106,22 @@ def harness(body: str, env=None) -> subprocess.CompletedProcess:
 
 
 class UsageTests(unittest.TestCase):
+    @unittest.skipUnless(BASH, "requires Bash")
+    def test_claude_md_caller_explicitly_preserves_the_full_profile_home_scope(self):
+        line = next(line for line in TEXT.splitlines() if "full_profile_run claude-md python3" in line)
+        with tempfile.TemporaryDirectory() as temporary:
+            home = Path(temporary) / "home"
+            home.mkdir()
+            custom = Path(temporary) / "custom-claude"
+            for value in ("", str(custom)):
+                result = harness('repo_root=' + shlex.quote(str(ROOT)) +
+                                 '\nfull_profile_run() { shift; "$@"; }\n' + line,
+                                 env=clean_env(HOME=str(home), CLAUDE_CONFIG_DIR=value))
+                self.assertEqual(result.returncode, 0, result.stderr)
+                target = home / ".claude/CLAUDE.md"
+                self.assertIn("native-agent-stack:claude-user-instructions:begin", target.read_text())
+                self.assertFalse(custom.exists())
+
     def test_usage_errors_exit_two_before_anything_runs(self):
         cases = (
             (["--configure-full-profile", "--skip", "claude-settings,codex-lane,nope"], "Unknown --skip step: nope"),

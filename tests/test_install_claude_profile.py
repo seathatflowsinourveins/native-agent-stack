@@ -11,10 +11,12 @@ import io
 import json
 import os
 import re
+import shutil
 import string
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -23,6 +25,112 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 
 import install_claude_profile as icp  # noqa: E402
+
+# The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
+# repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
+CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
+# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
+                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
+CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
+HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
+# A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
+# it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
+# its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
+# accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
+# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph). The first phrase is Claude
+# Code's per-project registration command, so the exception holds only while a project can still register the server
+# the carrier names; the second is the Codex user template's statement of the same scope.
+CARRIER_EXCEPTIONS = {
+    "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
+                   ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
+}
+# Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
+# entry has carried neither since 2026-09-23.
+CODEX_ONLY_ENV = {"PATH", "RTK_TELEMETRY_DISABLED"}
+TOOL_ID = re.compile(r"(?<![A-Za-z0-9_])mcp__([A-Za-z0-9_-]+?)__[A-Za-z0-9_]+")
+
+
+def carrier_servers(text: str) -> set[str]:
+    """Server names of the mcp__<server>__<tool> ids a text names. A plugin's server (mcp__plugin_<plugin>_<server>__)
+    comes with its plugin, not from a user-scope registration, so it is left out."""
+    return {name for name in TOOL_ID.findall(text) if not name.startswith("plugin_")}
+
+
+def carrier_blocks_text(directory: Path) -> str:
+    """The text of every token-lanes-block*.md carrier block in `directory`, in name order: the union is what the
+    SubagentStart hook can hand a subagent, whichever role block it picks."""
+    return "\n".join(path.read_text(encoding="utf-8") for path in sorted(directory.glob("token-lanes-block*.md")))
+
+
+def carrier_coverage_errors(carrier_text: str, registered: set[str], exceptions: dict, read) -> list[str]:
+    """One error per server the carrier names that the template neither registers nor excepts, per exception phrase
+    missing from its named file (read(path) -> text or None), and per exception for a server the template registers
+    anyway."""
+    errors = []
+    for name in sorted(carrier_servers(carrier_text)):
+        if name in registered:
+            if name in exceptions:
+                errors.append(f"{name}: registered and also listed as an exception")
+            continue
+        if name not in exceptions:
+            errors.append(f"{name}: named by the carrier, not registered at user scope and not an exception")
+            continue
+        for path, phrase in exceptions[name]:
+            if phrase not in (read(path) or ""):
+                errors.append(f"{name}: the exception's phrase is not in {path}")
+    return errors
+
+
+# Arguments that differ by client on purpose, Codex value -> Claude value. serena runs its `claude-code` context under
+# Claude and `codex` under Codex (oraios/serena c6fbd1c src/serena/resources/config/contexts/). SocratiCode's script
+# is the npm bin link both bootstraps' install_npm create (adoption/bootstrap-linux.sh install_npm,
+# adoption/bootstrap-macos.sh install_npm), because the Claude installer renders only ${HOME} and ${ECO_ROOT}, never
+# the Codex template's per-platform ${SOCRATICODE_VERSION}; node runs the link's target (--preserve-symlinks-main is off
+# by default).
+CLIENT_ARGS = {
+    "serena": {"codex": "claude-code"},
+    "socraticode": {"${ECO_ROOT}/tools/socraticode-${SOCRATICODE_VERSION}/lib/node_modules/socraticode/dist/index.js":
+                    "${ECO_ROOT}/bin/socraticode"},
+}
+
+
+def codex_host_values() -> dict:
+    """adoption/hosts/example.json without HOME and ECO_ROOT, which both templates keep as placeholders."""
+    values = json.loads(HOST_EXAMPLE.read_text(encoding="utf-8"))
+    return {key: value for key, value in values.items() if key not in ("HOME", "ECO_ROOT")}
+
+
+def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
+    """One error per difference between a Claude user-scope entry and the Codex user template's entry of each server
+    the Claude template names: transport, URL or command, arguments (after CLIENT_ARGS), and env names and values
+    (Codex's rendered with `values`, less CODEX_ONLY_ENV)."""
+    def render(value):
+        return string.Template(value).safe_substitute(values)
+
+    errors = []
+    for name, entry in sorted(claude.items()):
+        other = codex.get(name)
+        if other is None:
+            errors.append(f"{name}: not in the Codex user template")
+            continue
+        if "url" in other:
+            if (entry.get("type"), entry.get("url")) != ("http", render(other["url"])):
+                errors.append(f"{name}: transport or URL differs")
+            continue
+        if entry.get("type") != "stdio" or entry.get("command") != other.get("command"):
+            errors.append(f"{name}: transport or command differs")
+        mapped = [CLIENT_ARGS.get(name, {}).get(arg, arg) for arg in other.get("args", [])]
+        if entry.get("args", []) != mapped:
+            errors.append(f"{name}: arguments differ")
+        expected_env = {key: render(value) for key, value in other.get("env", {}).items() if key not in CODEX_ONLY_ENV}
+        if set(entry.get("env", {})) != set(expected_env):
+            errors.append(f"{name}: env names differ")
+        elif entry.get("env", {}) != expected_env:
+            errors.append(f"{name}: env values differ")
+    return errors
 
 # The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
 # to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
@@ -292,6 +400,110 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
             for spelling in (command, "rtk " + command):
                 with self.subTest(allowed=spelling):
                     self.assertFalse(any(self.bash_rule_matches(rule, spelling) for rule in rules))
+
+    # skills@1.7.0 (vercel-labs/skills@7407f389) src/cli.ts L336-402: the spellings that write installed skills are
+    # add/a/i/install (L355-358), remove/rm/r (L381-383), check/update/upgrade (one runUpdate, L398-400) and the two
+    # experimental_* commands (L350, L388). find/search/f/s, list/ls, init, use (a temporary copy) and --version do not.
+    SKILLS_CLI_WRITERS = ("add", "a", "i", "install", "remove", "rm", "r", "check", "update", "upgrade")
+    # In `npx *skills@* <word> *` the `*` after `@` can also span a find query, so the versioned form leaves out the
+    # one-letter aliases, which are common query words.
+    SKILLS_CLI_VERSIONED_WRITERS = ("add", "install", "remove", "rm", "check", "update", "upgrade")
+    # Without arguments these three update every installed skill, and a trailing ` *` after another `*` needs an
+    # argument (permissions page, "Wildcard patterns"), so their rules with a leading or middle `*` end in `<word>*`.
+    SKILLS_CLI_BARE_WRITERS = ("check", "update", "upgrade")
+
+    def skills_cli_rules(self) -> list[str]:
+        def tail(word: str) -> str:
+            return word + ("*" if word in self.SKILLS_CLI_BARE_WRITERS else " *")
+        rules = []
+        for word in self.SKILLS_CLI_WRITERS:
+            rules += [f"Bash(skills {tail(word)})", f"Bash(npx *skills {tail(word)})", f"Bash(*bin/skills {tail(word)})"]
+        rules += [f"Bash(npx *skills@* {tail(word)})" for word in self.SKILLS_CLI_VERSIONED_WRITERS]
+        return rules + ["Bash(skills experimental_*)", "Bash(npx *skills experimental_*)",
+                        "Bash(npx *skills@* experimental_*)", "Bash(*bin/skills experimental_*)"]
+
+    def test_a_session_cannot_install_or_remove_skills_through_the_skills_cli(self):
+        # adoption/skills/lifecycle.md: a session never installs a skill ad hoc; installation goes only through
+        # tools/adoption/install_skills.py, whose own `add` and rollback `remove` run as subprocesses that Bash rules
+        # do not see (https://code.claude.com/docs/en/permissions, "What a Bash rule doesn't match"). The pinned
+        # find-skills body tells the model to run `npx skills add ... -g -y` and `npx skills update`
+        # (vercel-labs/skills@7407f389 skills/find-skills/SKILL.md L28-29, L90, L100). Raised by the Gate A owner's
+        # review of PR #553 (#381: an install during a run changes the measured skill catalog).
+        deny = self.settings()["permissions"]["deny"]
+        for rule in self.skills_cli_rules() + ["Edit(~/.agents/**)"]:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, deny)
+        rules = [rule for rule in deny if rule.startswith("Bash(")]
+
+        def denied(command: str) -> bool:
+            # Deny rules apply when any subcommand matches, and match past any leading variable assignment
+            # (permissions page, "Compound commands" and "Wrappers").
+            parts = re.split(r"\s*(?:&&|\|\||;|\|)\s*", command)
+            parts = [re.sub(r"^(?:[A-Za-z_][A-Za-z0-9_]*=\S*\s+)+", "", part) for part in parts]
+            return any(self.bash_rule_matches(rule, part) for rule in rules for part in parts)
+
+        tool = "/opt/eco/tools/skills-1.7.0/bin/skills"
+        blocked = (
+            "npx skills add owner/repo@skill -g -y", "npx skills add vercel-labs/agent-skills@react-best-practices",
+            "npx skills update", "npx skills remove name -g -y", "npx -y skills@1.7.0 add owner/repo@skill -g -y",
+            "npx --yes skills@latest install owner/repo", "npx skills@1.7.0 remove name -g -y",
+            "skills add owner/repo@skill -g -y", "skills a owner/repo", "skills i owner/repo",
+            "skills install owner/repo", "skills remove name -g -y", "skills rm name", "skills r name",
+            "skills check", "skills update -g", "skills upgrade", "skills experimental_install",
+            "skills experimental_sync", f"{tool} add https://github.com/owner/repo/tree/0123abc/skills/x -g -y",
+            f"{tool} remove name -g -y", "./node_modules/.bin/skills add owner/repo",
+            "npx skills check", "npx -y skills@1.7.0 update", f"{tool} update", f"{tool} check -g",
+            "npx skills experimental_install", "DISABLE_TELEMETRY=1 skills remove name -g -y",
+            "cd /var/tmp/scratch && npx skills add owner/repo@skill -g -y")
+        allowed = (
+            "npx skills find react performance", "npx skills find", "npx skills find pr review --owner vercel-labs",
+            "npx -y skills@1.7.0 find changelog", "skills find typescript", "skills search testing",
+            "skills f testing", "skills s testing", f"{tool} find testing", f"{tool} list -g --json",
+            "skills list -g --json", "skills ls", "skills --version", "skills init my-skill",
+            "npx skills init my-xyz-skill", "skills use owner/repo@skill",
+            f"python3 tools/adoption/install_skills.py --skills-bin {tool} --json",
+            "python3 scripts/skills_status.py --json", "git commit -m 'lifecycle: deny skills add in sessions'",
+            "grep -rn 'npx skills add' adoption/skills")
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertTrue(denied(command))
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertFalse(denied(command))
+
+    @unittest.skipUnless(shutil.which("node") and os.environ.get("CONTEXT_MODE_SECURITY_JS")
+                         and Path(os.environ.get("CONTEXT_MODE_SECURITY_JS", "")).is_file(),
+                         "set CONTEXT_MODE_SECURITY_JS to an installed context-mode security module "
+                         "(a checkout's build/security.js or the plugin's hooks/security.bundle.mjs)")
+    def test_context_mode_applies_the_skills_cli_deny_rules_on_its_own_command_path(self):
+        # Context Mode (mksglu/context-mode 1.0.169, src/security.ts: evaluateCommandDenyOnly, matchesAnyPattern,
+        # globToRegex) checks ctx_execute / ctx_batch_execute commands and the shell calls embedded in code against
+        # the same user deny rules, but with a plain ^glob$ regex: a trailing " *" does not match the bare command
+        # and a leading assignment is not stripped. The three bare-form writer verbs therefore end in "<word>*", so a
+        # bare `skills update` is denied on both paths; the short aliases keep " *" because `skills init` is
+        # legitimate (the Gate A owner's decision on #553, 2026-09-30). The leading-assignment gap remains there.
+        deny = [rule for rule in self.settings()["permissions"]["deny"] if rule.startswith("Bash(")]
+        script = (
+            "const [url, rulesJson, commandsJson] = process.argv.slice(1);\n"
+            "const m = await import(url);\n"
+            "const policies = [{deny: JSON.parse(rulesJson)}];\n"
+            "const out = {};\n"
+            "for (const c of JSON.parse(commandsJson)) out[c] = m.evaluateCommandDenyOnly(c, policies, false).decision;\n"
+            "console.log(JSON.stringify(out));\n")
+        blocked = ("skills update", "skills check", "skills upgrade", "skills update -g", "skills add owner/repo -g -y",
+                   "npx skills update", "npx skills add owner/repo@skill -g -y", "npx -y skills@1.7.0 check")
+        allowed = ("skills find x", "skills init my-skill", "skills list -g --json", "npx skills find pr review")
+        url = Path(os.environ["CONTEXT_MODE_SECURITY_JS"]).resolve().as_uri()
+        done = subprocess.run([shutil.which("node"), "--input-type=module", "-e", script, url, json.dumps(deny),
+                               json.dumps(list(blocked + allowed))], capture_output=True, text=True, timeout=120)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        decisions = json.loads(done.stdout)
+        for command in blocked:
+            with self.subTest(denied=command):
+                self.assertEqual(decisions[command], "deny")
+        for command in allowed:
+            with self.subTest(allowed=command):
+                self.assertNotEqual(decisions[command], "deny")
 
     def test_the_bash_ceiling_and_the_status_line_refresh(self):
         settings = self.settings()
@@ -863,12 +1075,14 @@ class McpMatchTests(unittest.TestCase):
 
 
 class McpTemplateShapeTests(unittest.TestCase):
-    def test_template_names_the_two_expected_servers(self):
-        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in.
+    def test_template_names_the_expected_servers(self):
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in; socraticode, headroom,
+        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
-        self.assertEqual(set(data["mcpServers"].keys()), {"ai-memory", "serena"})
+        self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
-        self.assertEqual(data["mcpServers"]["serena"]["type"], "stdio")
+        for name in USER_SCOPE_SERVERS - {"ai-memory"}:
+            self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
     def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
@@ -881,6 +1095,123 @@ class McpTemplateShapeTests(unittest.TestCase):
         self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
         self.assertIn('"JCODEMUNCH_SHARE_SAVINGS": "0"', paragraph)
         self.assertEqual(paragraph.count("JCODEMUNCH_SHARE_SAVINGS"), 2)
+
+
+class McpCarrierCoverageTests(unittest.TestCase):
+    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
+    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    written in the file each cites. Structural validation of repository files; no client runs."""
+
+    BLOCKS = ROOT / "adoption" / "hooks" / "claude"
+
+    @staticmethod
+    def read(path: str) -> str | None:
+        target = ROOT / path
+        return target.read_text(encoding="utf-8") if target.is_file() else None
+
+    def test_the_carrier_names_the_lane_servers(self):
+        # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
+        # name a subset of the general block's servers today, so the union is the general block's set.
+        self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
+                         sorted(CARRIER_BLOCK_NAMES))
+        lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
+        self.assertEqual(carrier_servers(carrier_blocks_text(self.BLOCKS)), lanes)
+        self.assertEqual(carrier_servers(CARRIER.read_text(encoding="utf-8")), lanes)
+        self.assertEqual(carrier_servers("mcp__plugin_context-mode_context-mode__ctx_execute, mcp__qmd__get"), {"qmd"})
+
+    def test_every_carrier_server_is_registered_or_a_sourced_exception(self):
+        registered = set(template_server_names())
+        carrier = carrier_blocks_text(self.BLOCKS)
+        self.assertEqual(carrier_coverage_errors(carrier, registered, CARRIER_EXCEPTIONS, self.read), [])
+        # Exactly: no server the carrier blocks do not name.
+        self.assertEqual(registered, carrier_servers(carrier) - set(CARRIER_EXCEPTIONS))
+
+    def test_a_server_named_only_by_a_role_block_is_caught(self):
+        # Control for reading every block: a server that only a role block names is invisible to the general block
+        # alone and is reported from the union.
+        with tempfile.TemporaryDirectory() as tmp:
+            blocks = Path(tmp)
+            for name in CARRIER_BLOCK_NAMES:
+                shutil.copyfile(self.BLOCKS / name, blocks / name)
+            reviewer = blocks / "token-lanes-block.reviewer.md"
+            reviewer.write_text(reviewer.read_text(encoding="utf-8") + "\nmcp__newserver__tool\n", encoding="utf-8")
+            registered = set(template_server_names())
+            self.assertEqual(carrier_coverage_errors((blocks / "token-lanes-block.md").read_text(encoding="utf-8"),
+                                                     registered, CARRIER_EXCEPTIONS, self.read), [])
+            self.assertEqual(carrier_coverage_errors(carrier_blocks_text(blocks), registered, CARRIER_EXCEPTIONS,
+                                                     self.read),
+                             ["newserver: named by the carrier, not registered at user scope and not an exception"])
+
+    def test_the_check_rejects_a_gap_a_stale_exception_and_a_redundant_one(self):
+        carrier = carrier_blocks_text(self.BLOCKS)
+        registered = set(template_server_names())
+        cases = {
+            "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),
+            "a new lane server": (carrier + "\nmcp__newserver__tool", registered, CARRIER_EXCEPTIONS, self.read),
+            "the exception's reason removed": (carrier, registered, CARRIER_EXCEPTIONS,
+                                               lambda path: (self.read(path) or "").replace(
+                                                   "jcodemunch stays project-scoped (#240)", "")),
+            "the per-project registration removed": (carrier, registered, CARRIER_EXCEPTIONS,
+                                                     lambda path: (self.read(path) or "").replace(
+                                                         "claude mcp add --scope local jcodemunch", "")),
+            "an exception for a registered server": (carrier, registered | {"jcodemunch"}, CARRIER_EXCEPTIONS,
+                                                     self.read),
+        }
+        for label, args in cases.items():
+            with self.subTest(mutant=label):
+                self.assertEqual(len(carrier_coverage_errors(*args)), 1)
+
+
+class McpCodexParityTests(unittest.TestCase):
+    """Each user-scope server runs the command, arguments and environment the Codex user template gives it
+    (adoption/templates/codex.config.template.toml), rendered with this repository's default host values
+    (adoption/hosts/example.json), except the documented per-client arguments and the Codex-only PATH and
+    RTK_TELEMETRY_DISABLED. Claude Code has no per-server start-up timeout (MCP_TIMEOUT is global), so the Codex
+    template's startup_timeout_sec has no counterpart here."""
+
+    @staticmethod
+    def claude() -> dict:
+        return json.loads(icp.MCP_TEMPLATE.read_text(encoding="utf-8"))["mcpServers"]
+
+    @staticmethod
+    def codex() -> dict:
+        return tomllib.loads(CODEX_TEMPLATE.read_text(encoding="utf-8"))["mcp_servers"]
+
+    def test_each_entry_matches_the_codex_user_template(self):
+        self.assertEqual(codex_parity_errors(self.claude(), self.codex(), codex_host_values()), [])
+
+    def test_the_codex_user_template_has_no_other_server_but_the_plugin_one(self):
+        # context-mode is bound per session on Codex and comes with its plugin on Claude.
+        self.assertEqual(set(self.codex()) - set(self.claude()), {"context-mode"})
+
+    def test_the_parity_check_rejects_each_kind_of_drift(self):
+        values = codex_host_values()
+        base = self.claude()
+        mutants = {
+            "command": ("headroom", lambda entry: entry.update(command="${ECO_ROOT}/bin/headroom-x")),
+            "argument": ("qmd", lambda entry: entry.update(args=["--index", "other", "mcp"])),
+            "env name missing": ("headroom", lambda entry: entry["env"].pop("DO_NOT_TRACK")),
+            "env name added": ("codebase-memory", lambda entry: entry.setdefault("env", {}).update(X="1")),
+            "env value": ("socraticode", lambda entry: entry["env"].update(QDRANT_URL="http://127.0.0.1:1")),
+            "url": ("ai-memory", lambda entry: entry.update(url="http://127.0.0.1:1/mcp")),
+        }
+        for label, (name, change) in mutants.items():
+            with self.subTest(mutant=label):
+                servers = json.loads(json.dumps(base))
+                change(servers[name])
+                self.assertEqual(len(codex_parity_errors(servers, self.codex(), values)), 1)
+
+    def test_codebase_memory_is_the_bare_frontend_of_the_shared_daemon(self):
+        # Each session's codebase-memory-mcp is a frontend of one shared daemon, so the entry is the binary itself:
+        # no wrapper (a bounded runner that stops its scope would take a daemon it started down with it), no args.
+        entry = self.claude()["codebase-memory"]
+        self.assertEqual(entry["command"], "${ECO_ROOT}/bin/codebase-memory-mcp")
+        self.assertEqual(entry.get("args", []), [])
+        self.assertEqual(entry.get("env", {}), {})
+
+    def test_qmd_serves_the_named_catalog_index(self):
+        self.assertEqual(self.claude()["qmd"]["args"], ["--index", "native-agent-stack-catalog", "mcp"])
+        self.assertIn("qmd --index native-agent-stack-catalog", (ROOT / "AGENTS.md").read_text(encoding="utf-8"))
 
 
 class McpRenderAndCommandTests(unittest.TestCase):
@@ -1062,6 +1393,50 @@ class McpGetOutputTests(unittest.TestCase):
                              Path("/home/example/.local/share/codex-ecosystem"))
 
 
+class StandingRuleSurfacesTests(unittest.TestCase):
+    """The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md carry the same wording on the three
+    rule surfaces (the Gate A owner's review of PR #557): the repository AGENTS.md, the portable user-level template and
+    the Codex user-level block. The Codex block names a bounded worker where the Claude surfaces name a delegated child
+    in the skill-discovery sentence. A clause the review dropped stays off all three."""
+
+    SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
+                "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
+    SHARED = (
+        "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
+        "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
+        "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
+        "benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.",
+        "A coordinator ends every substantive research or adoption unit with a completeness critic (missed modality, "
+        "source or candidate class) whose findings feed that layer's next landscape sweep; the skills sweep is keyed by "
+        "lifecycle task.",
+        "The harness exists to build complex systems, projects and the north-star R&D; each coordinator unit names the "
+        "north-star action it serves.",
+        "Codex CLI is the second native client. For unpinned work, `gpt-6.1-sol` at ultra coordinates and at max runs "
+        "workers; `gpt-6-astra` at ultra coordinates a complex workflow that needs Astra, and at max takes a single "
+        "consequential judgment (conflicting primary evidence, consequential architecture, complex changes across "
+        "systems, or a failure unresolved after one bounded Sol repair). Where a launch pins the model and effort "
+        "(`-m`, `-c model_reasoning_effort`), children inherit that pin and a spawn call names neither. Preserve "
+        "explicit model choices and role definitions; a coordinator records the trigger and acceptance result. "
+        "Cross-family research, review and sweep votes run through the OmniRoute gateway; a coordinator, never a "
+        "delegated child, starts a cross-family lane.",
+        # AGENTS.md follows this clause with the path of its decision record.
+        "No audits, trials or network at startup; the daily currency timer's one read-only due-file line is allowed",
+    )
+    CODEX_VARIANT = ("A coordinator, not a delegated child,", "A coordinator, not a bounded worker,")
+    DROPPED = ("every manifest skill stays listed for model invocation", "npx skills find")
+
+    def test_the_three_surfaces_carry_the_same_standing_sentences(self):
+        for name, path in self.SURFACES.items():
+            text = path.read_text(encoding="utf-8")
+            for sentence in self.SHARED:
+                expected = sentence.replace(*self.CODEX_VARIANT) if name == "codex" else sentence
+                with self.subTest(surface=name, sentence=sentence[:48]):
+                    self.assertIn(expected, text)
+            for phrase in self.DROPPED:
+                with self.subTest(surface=name, dropped=phrase):
+                    self.assertNotIn(phrase, text)
+
+
 class PortableTopRuleTests(unittest.TestCase):
     """The portable user instructions (examples/claude-native/CLAUDE.md, merged into the user-level
     ~/.claude/CLAUDE.md by recipes/claude-native-profile.md) open with the top rule as an
@@ -1075,12 +1450,16 @@ class PortableTopRuleTests(unittest.TestCase):
     not hold; the 5% rule applies from the new baseline. Re-baselined again on 2026-09-29 to 1,372 words: the
     Quality and Ultracode bullets took the Sonnet 5.5 fan-out rule (its classes and conditions match the workflows README), the
     default child model and the measured effort rule (docs/decisions/2026-09-29-sonnet-5-5-dispatch.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-09-30 to 1,750 words (Python str.split()): the file became the single managed source of the
+    operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
+    routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
+    (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1372  # wc -w after the 2026-09-29 Sonnet 5.5 rule and its review repairs (1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
@@ -1101,6 +1480,28 @@ class PortableTopRuleTests(unittest.TestCase):
     )
     # A relative path such as docs/harness-defaults.md; one that exists here is absent from other projects.
     RELATIVE_PATH = re.compile(r"[\w.-]+(?:/[\w.-]+)+")
+    # Checked anywhere in the file, since this template became the single managed source of the operator's
+    # user-level file (docs/decisions/2026-09-30-rule-text-every-layer.md): the six standing clauses of 2026-09-30
+    # with the Sol-primary Codex routing, skill matching, the rules that file held beyond this template, and its
+    # worker, model, Ultracode and agent-team rules.
+    STANDING_PHRASES = (
+        "OmniRoute gateway", "`gpt-6.1-sol` at ultra", "`gpt-6-astra` at ultra", "complex workflow that needs Astra",
+        "single consequential judgment", "complex changes across systems", "one bounded Sol repair",
+        "Codex CLI is the second native client", "Keep context small", "match available skill descriptions",
+        "`SKILL.md`",
+        "completeness critic", "next landscape sweep", "lifecycle task",
+        "`search-first`", "`find-skills`", "`skill-creator`", "A coordinator, not a delegated child, invokes",
+        "when no listed skill fits the task", "children inherit that pin", "a spawn call names neither",
+        "never a delegated child, starts a cross-family lane", "each coordinator unit names the north-star action",
+        "promptfoo", "paired benchmark", "Harbor or Inspect", "never a self-written runner",
+        "audits, trials or network at startup", "due-file line",
+        "record what you found", "build only from a cited reference implementation", "from the selected source revision",
+        "popularity guide discovery", "More tools, more reasoning and reviewer agreement alone do not prove quality",
+        "retain source pins and reasons", "Research only the relevant layers", "Use a short plan for bounded work",
+        "so the reads, searches and dead ends stay in the child",
+        "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1", "CLAUDE_CODE_SUBAGENT_MODEL=opus", "CLAUDE_CODE_EFFORT_LEVEL",
+        "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS", "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1", "safety refusal",
+    )
 
     @staticmethod
     def top_rule(text: str) -> str:
@@ -1127,6 +1528,10 @@ class PortableTopRuleTests(unittest.TestCase):
     def test_the_template_states_the_procedure_within_the_word_budget(self):
         self.assertEqual(self.errors(self.TEMPLATE.read_text(encoding="utf-8")), [])
 
+    def test_the_template_carries_the_standing_clauses_and_the_user_level_rules(self):
+        text = self.TEMPLATE.read_text(encoding="utf-8")
+        self.assertEqual([phrase for phrase in self.STANDING_PHRASES if phrase not in text], [])
+
     def test_the_check_rejects_a_missing_step_a_repository_path_and_a_padded_template(self):
         text = self.TEMPLATE.read_text(encoding="utf-8")
         self.assertEqual(len(self.errors(text.replace("upstream citation", "citation"))), 1)
@@ -1134,6 +1539,21 @@ class PortableTopRuleTests(unittest.TestCase):
         padded = text + " word" * max(1, self.ceiling() + 1 - len(text.split()))
         self.assertEqual(len(self.errors(padded)), 1)
         self.assertEqual(len(self.errors("# Native engineering defaults\n\nNo rule.\n")), len(self.PROCEDURE_PHRASES))
+
+
+class McpStartupTimeoutTemplateTests(unittest.TestCase):
+    """MCP_TIMEOUT is Claude Code's MCP server startup timeout, default 30000 ms
+    (https://code.claude.com/docs/en/env-vars); a server's own `timeout` field bounds tool
+    execution only (https://code.claude.com/docs/en/mcp), and `claude mcp add --help` on 2.1.285
+    and 2.1.286 has no startup option. The Codex template gives serena 60 s and socraticode 120 s
+    (startup_timeout_sec), so the one global value matches the slowest of them
+    (docs/decisions/2026-09-30-mcp-startup-timeout.md)."""
+
+    TEMPLATE = ROOT / "adoption" / "templates" / "claude.settings.template.json"
+
+    def test_the_template_env_sets_the_mcp_startup_timeout(self):
+        env = json.loads(self.TEMPLATE.read_text(encoding="utf-8"))["env"]
+        self.assertEqual(env.get("MCP_TIMEOUT"), "120000")
 
 
 if __name__ == "__main__":

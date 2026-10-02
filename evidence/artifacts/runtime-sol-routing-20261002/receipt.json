@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "record": "Scoped Sol route and nested-effort source repair",
+  "base_revision": "1195e212c49ecf9cd6024bffda9ecddb9b2d54ed",
+  "integration_main": "49a4260029244e3e20d8b2dd3ada00af7983a3c9",
+  "evidence_class": "local_integration",
+  "route_contract": "Fixed approved advertisement snapshot; both cx/gpt-6.1-sol and cx/gpt-6.1-sol-max remain exact. Unknown routes are rejected. DeerFlow retains its legacy-medium refusal. No dispatch-time discovery is claimed.",
+  "effort_contract": "GPTResearcher emits LLM_KWARGS.extra_body.reasoning.effort=max; OpenHands emits llm.litellm_extra_body.reasoning.effort=max. Existing flat max and other nested keys are retained. DeerFlow already emits nested max.",
+  "source_references": [
+    "https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/utils/llm.py#L103",
+    "https://github.com/langchain-ai/langchain/blob/langchain-openai%3D%3D1.6.6/libs/partners/openai/langchain_openai/chat_models/base.py#L1563",
+    "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/llm/options/common.py#L49",
+    "https://github.com/diegosouzapw/OmniRoute/blob/f5d8e150b79e0901fa18241c7f29bff889b87c14/open-sse/translator/request/openai-responses/helpers.ts#L53",
+    "https://github.com/BerriAI/litellm/blob/v1.93.0/litellm/litellm_core_utils/get_model_cost_map.py#L277"
+  ],
+  "checks": [
+    {"command": "python3 -m unittest discover -s tests -p test_runtime_worker_gpt_researcher.py -v", "exit_code": 0, "tests_run": 28, "passed": 28, "skipped": 0, "original_output_sha256": "3eb0ea72781cab559b8d31286feb3812881dc6c8e4a67354d21f1bea7cd0f962"},
+    {"command": "python3 -m unittest discover -s tests -p test_runtime_worker_openhands.py -v", "exit_code": 0, "tests_run": 122, "passed": 122, "skipped": 0, "original_output_sha256": "ab6ea0f189ed5e2163cf64fd0885db5eecf5704fd20cad59f9d2b7d33b6fa232"},
+    {"command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -v", "exit_code": 0, "tests_run": 40, "passed": 39, "skipped": 1, "original_output_sha256": "4899f117f2042cf3064ff3a6f42df6baa52a687d4e8b74e9d198543aefeba26c", "reuse": "DeerFlow source/test hashes remain identical to the passing route-only snapshot; unavailable pinned grader control remains skipped"},
+    {"command": "python3 -B -m unittest tests.test_runtime_worker_skills", "exit_code": 0, "tests_run": 22, "passed": 22, "skipped": 0, "original_output_sha256": "5e59f69863ea99f062e0cbc934fab2e6322880d0aacdfec671e0875383080d9d", "scope": "Fresh merged-main skill/adoption reconciliation"}
+  ],
+  "native_constructor_candidate": {
+    "sdk_version": "1.50.1",
+    "source_revision": "1e1390acc8788346ba4804c34323284009bf3f5e",
+    "litellm_version": "1.93.0",
+    "final_exit_code": 0,
+    "model_ids_preserved": true,
+    "flat_max_preserved": true,
+    "nested_max_preserved": true,
+    "network_attempts": 0,
+    "settings_scope": "Only the optional constructor subprocess received supported LITELLM_LOCAL_MODEL_COST_MAP=True; OPENHANDS_SUPPRESS_BANNER=1 was cosmetic",
+    "original_output_sha256": "1cf681f1c7c23a5e5fad0ad804715ee26ce073014beb5f236cbac36e9ff79f27",
+    "qualification": "Offline candidate constructor only; the recipe remains SDK1.50.0 with its separate repaired package closure. This candidate environment is not promoted or used for provider acceptance."
+  },
+  "source_hashes": {
+    "blueprints/runtime-workers/gpt-researcher/gateway.py": "cadb2e097a9ccbf0fdc609c5cba9a82645da46a2d9e2e6fcb59b10fcf5ba657c",
+    "blueprints/runtime-workers/deerflow/recipe.py": "59b39b72e42e7a96efe078caa79bf928ce5dd8da54e9447490bfee29c4abc4a0",
+    "blueprints/runtime-workers/openhands/recipe.py": "b648c9241c35ab9301c127423695d5018218ba8f901fed8db99e07f211750603",
+    "tests/test_runtime_worker_gpt_researcher.py": "b7c9cc3ec10997a03c5b9e337044fc9305c357ada18fb6480869a07df4fa6413",
+    "tests/test_runtime_worker_deerflow.py": "aaa21a827e3dc7d3719051e76a8727b33a6438317509eea66adaf9ceab6326d2",
+    "tests/test_runtime_worker_openhands.py": "1f79392caed23c3ac5e9c493c7b4e32d6db909138a7da2437b35f5fee14f0083"
+  },
+  "independent_review": "Astra/max accepted the six-file source/effort repair with no blocking findings; source hashes and patch matched. It did not rerun tests or establish provider acceptance.",
+  "retained_failures": [
+    "Targeted dotted-route, unknown-route, legacy-medium and missing/wrong nested-effort controls returned exit1 before their repairs and exit0 after; exact commands and returned output remain private",
+    "Initial SDK1.50.1 constructor preserved fields but attempted the remote model-price-map fetch; socket guard blocked it and the offline-control verdict exited1. The failure was retained before the supported local-map rerun."
+  ],
+  "output_retention": "Original returned native logs and exact command envelopes retained privately; this public receipt carries sanitized summaries and exact output hashes.",
+  "limitations": [
+    "Local tests are repository fixtures, not unchanged upstream tests or model execution",
+    "Recipe SDK1.50.0 constructor, serialized requests, effective gateway effort, tool-call round trips and provider inference remain unverified by this repair",
+    "Historical Omni f5d8 normalizes dotted-Sol flat max to xhigh; newer0585 source is not evidence that the running gateway changed",
+    "Full-image/task-quality and actual new-host acceptance remain separate open gates; frozen defaults are not promoted"
+  ],
+  "usage": {"provider_usage": null, "reason": "No model inference invoked and no native provider usage returned; offline fixtures, source review, advertisement and construction are separate evidence"}
+}

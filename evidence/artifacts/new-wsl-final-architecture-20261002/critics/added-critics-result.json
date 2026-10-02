@@ -1,0 +1,667 @@
+[
+ {
+  "label": "refute:local-models",
+  "result": {
+   "slots": [
+    {
+     "slot": "local-generation-model",
+     "default": "Qwen3.8-27B (Qwen/Qwen3.8-27B, released 2026-08-14) as Ollama library tag qwen3.8:27b, quantization Q4_K_M",
+     "installs_nothing": false,
+     "job": "Local fallback generation with tool calling through Ollama, resident beside the embedder: 16.5 GiB weights and projector, about 4.0 GiB cache at 64k context, 0.6 GiB embedder, about 21.1 of 23.99 GiB (inferred, not measured).",
+     "refutation": "Both finalists are beaten on public measured evidence by a listed candidate the judges dropped on fit without reading the server's library: Artificial Analysis index v4.3.2 gives Qwen3.8-27B 34 (28 medium, 20 non-reasoning), Granite 4.2 8B 11, gpt-oss-20b 9, and Ollama's library serves qwen3.8:27b at Q4_K_M with tools and thinking. Granite 4.2 has no tools tag or agent launch entry there; IBM documents tool calling only for Transformers, vLLM and SGLang. Neither remaining model passes reliability cleanly: gpt-oss #17638 (HTTP 500 on apply_patch-style calls, roughly 2 in 5 in its reproduction) and qwen3.8 #17778 (500 on context overflow) are both open. Qwen's published scores are not for the Q4_K_M build; its fit is inferred.",
+     "candidates": [
+      {
+       "name": "Qwen3.8-27B (QwenLM/Qwen3.8), Ollama qwen3.8:27b",
+       "verdict": "install",
+       "reason": "Highest third-party score of the candidates that fit 24 GB (Artificial Analysis 34, against 11 and 9), served by Ollama's library at Q4_K_M with tools, thinking and a Claude Code launch entry; the library page is the upstream for the command because Ollama is the settled server and Qwen's own README documents only SGLang, vLLM and TokenSpeed."
+      },
+      {
+       "name": "gpt-oss-20b (openai/gpt-oss), Ollama gpt-oss:20b",
+       "verdict": "decide_by_measurement",
+       "reason": "Vendor-stated fit ('run within 16GB', about 7 GiB headroom at 64k with the embedder), evaluated in its deployed MXFP4 precision and Codex's built-in --oss default, but the lowest index score and an open Ollama tool-call parsing bug; it takes the slot if Qwen fails co-residency or tool-call reliability."
+      },
+      {
+       "name": "Granite 4.2 3B/8B/30B (ibm-granite/granite-4.2-language-models)",
+       "verdict": "do_not_install",
+       "reason": "Ollama's library gives granite4.2 no tools tag or agent launch entry (its GGUF chat template carries tools, so v0.35.0 may enable them at runtime, undemonstrated), IBM documents tool calling only for Transformers, vLLM and SGLang, and it trails on the index (11) and on IBM's own BFCL v4 chart (52.4 against Gemma 4 26B-A4B's 64.4)."
+      },
+      {
+       "name": "Gemma 4 E4B IT and its 26B-A4B sibling (google-deepmind/gemma)",
+       "verdict": "do_not_install",
+       "reason": "26B-A4B scores 17 on the same index, half of Qwen3.8-27B, and Ollama's tracker lists at least ten open gemma4 tool-call parser issues (for example #18390, #18354, #18649)."
+      },
+      {
+       "name": "Nemotron 3.5 Lightning 30B-A3B (NVIDIA-NeMo/Nemotron)",
+       "verdict": "do_not_install",
+       "reason": "Its Ollama build is a 25.4 GB Q4_K_M model blob, larger than the 24 GB card before any context or embedder."
+      }
+     ],
+     "install_command": "ollama run qwen3.8:27b",
+     "evidence": [
+      {
+       "url": "https://artificialanalysis.ai/models/qwen3-8-27b",
+       "quote": "Qwen3.8 27B (Xhigh) scores 34 on the Artificial Analysis Intelligence Index, placing it well above average among comparable models (median: 8)."
+      },
+      {
+       "url": "https://artificialanalysis.ai/models/gpt-oss-20b",
+       "quote": "gpt-oss-20b (High) scores 9 on the Artificial Analysis Intelligence Index, placing it above average among comparable models (median: 8)."
+      },
+      {
+       "url": "https://ollama.com/library/qwen3.8",
+       "quote": "vision tools thinking 27b"
+      },
+      {
+       "url": "https://github.com/ollama/ollama/issues/17638",
+       "quote": "It is non-deterministic \u2014 roughly 2 in 5 at the API level."
+      },
+      {
+       "url": "https://github.com/ollama/ollama/issues/17778",
+       "quote": "The model had processed the prompt and was calling tools in a loop (doing web searches, and urls gets), when this error occurred."
+      }
+     ],
+     "measurement": "Fit is inferred today: 17.74 GB of weights and projector (Ollama registry manifest), about 4.0 GiB of KV cache at 64k (model config: 16 full-attention layers; an Ollama server log in issue #17778 showing 28.3 GiB at num_ctx=205000 is consistent), a 0.6 GiB embedder, and one third-party RTX 4090 write-up (not a primary source) holding 65,536 tokens fully on GPU with no embedder. Run on this host with Ollama v0.35.0, OLLAMA_CONTEXT_LENGTH=64000 and the embedder kept loaded: qwen3.8:27b versus gpt-oss:20b on one fixed tool-call set through /v1/responses (Codex request shapes including apply_patch), /v1/messages (Claude Code shapes) and /v1/chat/completions with a JSON schema. Metrics: first-pass valid tool calls with no HTTP 500, schema validity, task success, tokens per second, `ollama ps` at 100% GPU with both models resident, peak VRAM. gpt-oss:20b overturns the default if Qwen offloads to CPU or evicts the embedder at 64k, or has the lower valid tool-call rate.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "embedding-model",
+     "default": "Qwen3-Embedding-0.6B (Qwen/Qwen3-Embedding-0.6B, released 2025-06, weights repository last updated 2026-04-20) as Ollama library tag qwen3-embedding:0.6b, Q8_0, 639 MB, 1024 dimensions, 32K input",
+     "installs_nothing": false,
+     "job": "One embedding model behind Ollama's OpenAI-compatible /v1/embeddings for the memory system and workers such as GPT Researcher, over code, documents and session text.",
+     "refutation": "Judge 2's picks each add a second model server beside the settled Ollama: TEI for EmbeddingGemma, vLLM for Nemotron-3-Embed (its card lists only PyTorch and vLLM), a Docker server for Jina. Judge 1's deferral leaves the endpoint empty although GPT Researcher documents Ollama embeddings; QMD is no consumer, it embeds in-process. The repository gate cannot rank Ollama-served embedders: discovery credited google-deepmind/gemma, whose README never mentions EmbeddingGemma, and excluded Qwen3-Embedding whose weights repository was updated more recently; I applied it to the server (v0.35.0). Then the requirement's axes decide: 32K input against EmbeddingGemma's 2K, and higher published code retrieval (75.41 against 68.76, different aggregations, directional) at the same 0.6 GB.",
+     "candidates": [
+      {
+       "name": "Qwen3-Embedding-0.6B (QwenLM/Qwen3-Embedding), Ollama qwen3-embedding:0.6b",
+       "verdict": "install",
+       "reason": "Among the embedding models Ollama serves it has the longest input (32K against 2K and 8K), the higher published multilingual and code retrieval scores, a 639 MB Q8_0 build and a place on Ollama's recommended list; Ollama's library page is the upstream for the command."
+      },
+      {
+       "name": "EmbeddingGemma (google-deepmind/gemma), Ollama embeddinggemma:300m",
+       "verdict": "decide_by_measurement",
+       "reason": "Ollama serves it natively (622 MB), so TEI is unnecessary, but its input is capped at 2K and its published multilingual mean is lower (61.15 against 64.33); a matched run decides whether the gap holds on this host's code and session text."
+      },
+      {
+       "name": "Nemotron-3-Embed-1B-BF16 (huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16)",
+       "verdict": "do_not_install",
+       "reason": "It has the strongest published retrieval scores (RTEB 72.38), but its card lists only PyTorch and vLLM as runtimes, so it would add a second model server beside Ollama."
+      },
+      {
+       "name": "Jina embeddings through jina-on-prem (jina-ai/jina-on-prem)",
+       "verdict": "do_not_install",
+       "reason": "It runs as its own Docker embedding server, a second owner of model serving, and the v5 models are not in Ollama's library."
+      },
+      {
+       "name": "BGE-M3 (FlagOpen/FlagEmbedding), Ollama bge-m3",
+       "verdict": "do_not_install",
+       "reason": "Ollama serves it, but its published MMTEB mean (59.56 in Qwen's table) is below both EmbeddingGemma (61.15) and Qwen3-Embedding-0.6B (64.33)."
+      }
+     ],
+     "install_command": "ollama pull qwen3-embedding:0.6b",
+     "evidence": [
+      {
+       "url": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/raw/main/README.md",
+       "quote": "- Context Length: 32k"
+      },
+      {
+       "url": "https://ai.google.dev/gemma/docs/embeddinggemma/model_card",
+       "quote": "Maximum input context length of 2K"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/QwenLM/Qwen3-Embedding/main/README.md",
+       "quote": "| **Qwen3-Embedding-0.6B**               | 0.6B   | 61.82   | 71.02   | 64.64   | 50.26  | 75.41     | 5.09     |"
+      },
+      {
+       "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/raw/main/README.md",
+       "quote": "**Runtime Engine(s):**  PyTorch, vLLM<br>"
+      },
+      {
+       "url": "https://ollama.com/library/qwen3-embedding:0.6b",
+       "quote": "ollama pull qwen3-embedding:0.6b"
+      }
+     ],
+     "measurement": "Serve qwen3-embedding:0.6b and embeddinggemma:300m through Ollama /v1/embeddings on the RTX 4090 with the generation model resident. Run the retrieval tasks of MTEB (eng, v2) and MTEB (Code, v1) plus a judged set of this host's session text, at 768 dimensions for both (Qwen cut through the `dimensions` field) and at native size, with inputs truncated at 2K and at full length. Metrics: nDCG@10, Recall@10, texts per second, VRAM. EmbeddingGemma overturns the default if it matches Qwen on code and session text within run-to-run noise at 768 dimensions and inputs beyond 2K add nothing.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "reranker-model",
+     "default": "nothing installed",
+     "installs_nothing": true,
+     "job": "Second-stage reranking for local retrieval; QMD already performs it in-process with its bundled Qwen3-Reranker-0.6B GGUF.",
+     "refutation": "The judges kept two rerankers because no baseline comparison existed; the test here is whether an installed retrieval owner would call one. None can. QMD v2.8.3 reranks in-process through node-llama-cpp with its own Qwen3-Reranker-0.6B GGUF and accepts only a GGUF override, no endpoint. GPT Researcher's configuration exposes embeddings and a similarity threshold, no reranker. Ollama has no rerank endpoint (issue #3368 open since 2024, two PRs unmerged), so FlagEmbedding (pip) and the NVIDIA reranker (Transformers or vLLM) would each add a second runtime. Qwen's published table also shows BGE-reranker-v2-m3 below its first stage on English (57.03 versus 61.82) and code (41.38 versus 75.41). The memory system is undecided.",
+     "candidates": [
+      {
+       "name": "FlagEmbedding, BGE reranker models (FlagOpen/FlagEmbedding)",
+       "verdict": "do_not_install",
+       "reason": "No installed retrieval owner can call it, it needs its own Python runtime because Ollama has no rerank endpoint, and Qwen's published table shows BGE-reranker-v2-m3 scoring below the first stage on English and code retrieval."
+      },
+      {
+       "name": "NeMo Retriever, llama-nemotron-rerank-1b-v2 (NVIDIA/NeMo-Retriever)",
+       "verdict": "do_not_install",
+       "reason": "Its published gain (Recall@5 68.60% to 73.64%) is over NVIDIA's own embedder, it runs only through Transformers or vLLM, and nothing installed on this host would call it."
+      }
+     ],
+     "install_command": "",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md",
+       "quote": "QMD combines BM25 full-text search, vector semantic search, and LLM re-ranking\u2014all running locally via node-llama-cpp with GGUF models."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md",
+       "quote": "| `qwen3-reranker-0.6b-q8_0` | Re-ranking | ~640MB |"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md",
+       "quote": "| `models.embed` / `.rerank` / `.generate` | top-level | HuggingFace GGUF URIs (`hf:<user>/<repo>/<file>`) overriding the built-in defaults per role. |"
+      },
+      {
+       "url": "https://github.com/ollama/ollama/issues/3368",
+       "quote": "Reranking models \u00b7 Issue #3368 \u00b7 ollama/ollama \u00b7 GitHub"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/QwenLM/Qwen3-Embedding/main/README.md",
+       "quote": "| BGE-reranker-v2-m3                 | 0.6B   | 57.03   | 72.16   | 58.36   | 59.51  | 41.38     | -0.01    |"
+      }
+     ],
+     "measurement": "On this host's QMD index and a fixed judged query set covering code, documents and session text, compare `qmd query --no-rerank`, the default bundled reranker, and one alternative GGUF set through `models.rerank`: nDCG@5, Recall@5, added p50/p95 latency and VRAM. A separate reranker is installed only if the measured memory winner exposes an external rerank endpoint setting and a served reranker beats that system's built-in ranking on the same set by a margin fixed before the run.",
+     "confidence": "high"
+    }
+   ],
+   "notes": "The 4090 reports 24,564 MiB (23.99 GiB); Ollama's docs give under-24-GiB cards a 4k default context, so set OLLAMA_CONTEXT_LENGTH=64000 for either generation model. Confirm no other process holds VRAM before loading the 27B model. `ollama run` opens a chat; `ollama pull qwen3.8:27b` is the non-interactive form. If Hindsight wins the memory slot, its default in-process reranker (cross-encoder/ms-marco-MiniLM-L-6-v2) keeps slot 3 empty. Fetch-and-index worked here, unlike in the judges' sessions; search throttling meant some extracts came from a cached read-only fetch of the same URLs. gh calls: 14 of 14. Token tools: Context Mode fetch, search, execute."
+  }
+ },
+ {
+  "label": "refute:observe-inspect",
+  "result": {
+   "notes": "Alertmanager: pin the v0.34.1 tag and keep its data directory on a volume; receiver is webhook_configs to https://ntfy.sh/<secret-topic>?template=alertmanager (alert text leaves the host; telegram_configs is the alternative). Phoenix: agents export to the settled collector, which forwards to 6006/v1/traces; set PHOENIX_WORKING_DIR, PHOENIX_HOST=127.0.0.1 and move PHOENIX_GRPC_PORT off 4317; leave its experiment and evaluation features unused. Arize's hook installer has no release and uses Codex's notify hook: not adopted. Session-analytics is nothing-installed on native pickers, stored telemetry and Phoenix; if Phoenix is overturned or the question set fails, agentsview v0.44.0 is the owner. gh calls: 4; token lanes: ctx_fetch_and_index, ctx_search, ctx_execute.",
+   "slots": [
+    {
+     "slot": "alerting-notification",
+     "default": "prometheus/alertmanager v0.34.1",
+     "installs_nothing": false,
+     "job": "Receive alerts from Prometheus rules and the log store's rule evaluator, then deduplicate, group, silence and send them to the user through a configured receiver (one job, one owner).",
+     "refutation": "Tried to show the metrics store or a dashboard already covers this, and that ntfy is a needed second owner. Prometheus documents that it only sends rule alerts while Alertmanager does silencing, aggregation and sending notifications; Grafana's built-in Alertmanager handles only Grafana-managed alerts; v0.34.1 (2026-09-17) is maintained. Alertmanager stands. ntfy as an installed server is refuted: delivery is an Alertmanager receiver, and the free ntfy.sh service formats Alertmanager webhooks with a built-in template, so the job has an owner without a server here. A self-hosted ntfy in WSL2 is not LAN-reachable by default (Microsoft), loses its in-memory cache on restart and still relays iOS pushes through ntfy.sh. The requirement excludes paid, not hosted, services.",
+     "candidates": [
+      {
+       "name": "Alertmanager",
+       "verdict": "install",
+       "reason": "Only component that groups, silences and sends notifications for alerts from Prometheus rules, a split Prometheus itself documents, and v0.34.1 ships a linux-amd64 binary and a container image."
+      },
+      {
+       "name": "ntfy",
+       "verdict": "do_not_install",
+       "reason": "Device delivery already has an owner in Alertmanager's webhook receiver posting to the free ntfy.sh service with ntfy's alertmanager template, while a v2.28.0 server inside WSL2 adds a daemon that LAN devices cannot reach by default."
+      },
+      {
+       "name": "Grafana Alerting",
+       "verdict": "do_not_install",
+       "reason": "Its built-in Alertmanager can only handle Grafana-managed alerts, so it cannot route Prometheus-rule alerts and would be a second rule owner if Grafana becomes the dashboard."
+      }
+     ],
+     "install_command": "docker run --name alertmanager -d -p 127.0.0.1:9093:9093 quay.io/prometheus/alertmanager",
+     "evidence": [
+      {
+       "url": "https://prometheus.io/docs/alerting/latest/overview/",
+       "quote": "Alerting with Prometheus is separated into two parts. Alerting rules in Prometheus servers send alerts to an Alertmanager. The Alertmanager then manages those alerts, including silencing, inhibition, aggregation and sending out notifications"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md",
+       "quote": "$ docker run --name alertmanager -d -p 127.0.0.1:9093:9093 quay.io/prometheus/alertmanager"
+      },
+      {
+       "url": "https://grafana.com/docs/grafana/latest/alerting/set-up/configure-alertmanager/",
+       "quote": "This is the default Alertmanager and is referred to as \u201cGrafana\u201d in the user interface. It can only handle Grafana-managed alerts."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/binwiederhier/ntfy/v2.28.0/docs/publish.md",
+       "quote": "* `alertmanager`: Formats [Alertmanager webhook](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config) payloads (firing/resolved alerts)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/binwiederhier/ntfy/v2.28.0/README.md",
+       "quote": "You can access the free version of ntfy at **[ntfy.sh](https://ntfy.sh)**."
+      }
+     ],
+     "measurement": "On this host, send one fixed set of firing and resolved alerts from Prometheus rules (duplicates, two simultaneous groups, one silenced alert, matched group and repeat intervals) through Alertmanager v0.34.1 with (a) a webhook receiver to https://ntfy.sh/<topic>?template=alertmanager and (b) a webhook receiver to a self-hosted ntfy v2.28.0 with cache-file set; and, only if Grafana becomes the dashboard, (c) the same rules as Grafana-managed alerts through Grafana's built-in Alertmanager. Metric: notifications received on the Windows workstation, a macOS laptop and a phone (missing, duplicate, resolved delivered, silenced suppressed), repeated after a graceful and a forced restart. ntfy is added if (b) delivers what (a) loses; (c) replaces Alertmanager only if it loses nothing and Prometheus rules are retired.",
+     "confidence": "high"
+    },
+    {
+     "slot": "session-analytics",
+     "default": "nothing installed",
+     "installs_nothing": true,
+     "job": "Inspect past sessions of both agents (what ran, tool calls, tokens and cost per session) from local data; owned by each agent's transcripts, session picker and usage commands, with the cross-agent view from stored telemetry events and Phoenix traces.",
+     "refutation": "Tried to refute agentsview, ccx and Sidekick on the gates: all three are maintained, install on Linux x86_64 and read both agents' files, and no public measurement comparing them was found. The refutation that holds is ownership. Claude Code writes every message, tool use and result to local JSONL and its picker previews, searches and spans all projects; Codex resume searches local chats; both agents' telemetry records each tool result and API request against a session id, stored behind the settled collector. Anthropic also states the JSONL format is internal and breaks parsers on any release. A viewer would be a second owner with no measured gain.",
+     "candidates": [
+      {
+       "name": "agentsview",
+       "verdict": "decide_by_measurement",
+       "reason": "Strongest of the three (one binary, SQLite, CLI and MCP usable by both agents, v0.44.0) and the owner if native pickers plus stored telemetry fail the fixed question set, but no public measurement shows a gain today."
+      },
+      {
+       "name": "ccx",
+       "verdict": "do_not_install",
+       "reason": "Same job as agentsview with Claude Code-only skills, a skill runner outside the requirement and an installer fetched from main, and nothing it does lacks an owner."
+      },
+      {
+       "name": "sidekick-agent-hub",
+       "verdict": "do_not_install",
+       "reason": "Same inspection job bundled with VS Code completions and account switching that registers the agents' logins, which is outside this requirement and touches native sign-ins."
+      }
+     ],
+     "install_command": "",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/how-claude-code-works.md",
+       "quote": "Each message, tool use, and result is written to a plaintext JSONL file under `~/.claude/projects/`"
+      },
+      {
+       "url": "https://code.claude.com/docs/en/sessions.md",
+       "quote": "The entry format is internal to Claude Code and changes between versions, so scripts that parse these files directly can break on any release."
+      },
+      {
+       "url": "https://developers.openai.com/codex/cli/features.md",
+       "quote": "`codex resume`: Reopen a recent chat from the current repository, or search across local chats when you need to return to older work."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/agent-sdk/observability.md",
+       "quote": "| Log events | Structured records for each prompt, API request, API error, and tool result | `OTEL_LOGS_EXPORTER` |"
+      },
+      {
+       "url": "https://developers.openai.com/codex/config-advanced.md",
+       "quote": "- `codex.tool_result` (duration, success, output snippet)"
+      }
+     ],
+     "measurement": "Freeze one corpus of Claude Code and Codex sessions on this host (resumed, forked, subagent and failed sessions, telemetry on). Answer a fixed question set (which session edited a given file, which command failed, the tool sequence of one session, tokens and cost of one session) two ways: (a) nothing installed: /resume and codex resume pickers, /export, rg over the two session directories, and queries on the stored events and Phoenix traces; (b) agentsview v0.44.0 CLI, MCP and UI. Metric: correct answers, wall time and agent tokens per answer, and token totals against /usage and /status. agentsview becomes the owner if (b) answers what (a) cannot, or is materially faster or cheaper at equal correctness.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "llm-tracing",
+     "default": "Arize-ai/phoenix arize-phoenix-v20.19.0",
+     "installs_nothing": false,
+     "job": "Store and inspect the OpenTelemetry spans both agents export (turns, LLM requests, tool executions, subagent nesting, timing, tokens), received through the settled collector; transcripts and their replay stay with the agents.",
+     "refutation": "Tried to show no store is needed: refuted, since Claude Code exports a span tree per prompt (beta flag) with LLM-request, tool and subagent spans, Codex has a trace exporter, and no settled tool stores spans. OpenLIT fails here: its compose pins ClickHouse 24.4.1, floats openlit:latest and binds 4317/4318, the collector's default OTLP ports. LangWatch fails: its packaged server is a seven-service stack with its own AI gateway, and its Codex setup rewrites config.toml. Phoenix, which the list missed, survives: one process, OTLP on 6006, gen_ai attributes converted at ingest, sessions by session.id. Weak points: its agent pages rely on an unreleased hook repository, and no public head-to-head was found.",
+     "candidates": [
+      {
+       "name": "OpenLIT",
+       "verdict": "do_not_install",
+       "reason": "Two containers with ClickHouse pinned at 24.4.1, a floating openlit:latest image and its own OTLP receiver on 4317/4318, the ports the settled collector's receiver defaults to."
+      },
+      {
+       "name": "LangWatch",
+       "verdict": "do_not_install",
+       "reason": "Its packaged server starts postgres, redis, clickhouse, nlpgo, langevals, an AI gateway and the app, duplicating the settled gateway and evaluation owners for a trace-store job."
+      },
+      {
+       "name": "Arize Phoenix",
+       "verdict": "install",
+       "reason": "One process with a trace UI and OTLP collector, documented pip and uvx commands, release v20.19.0 on 2026-10-01, and it accepts both agents' native OTLP through the collector."
+      },
+      {
+       "name": "Jaeger",
+       "verdict": "decide_by_measurement",
+       "reason": "Single-binary generic OTLP store (v2.21.0) with no experiment-tracking overlap, but its documented command keeps traces in transient memory and it has no LLM-aware view, so it is the control arm."
+      }
+     ],
+     "install_command": "pip install arize-phoenix\nphoenix serve",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Distributed tracing exports spans that link each user prompt to the API requests and tool executions it triggers, so you can view a full request as a single trace in your tracing backend."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/codex-rs/otel/src/config.rs",
+       "quote": "pub trace_exporter: OtelExporter,"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docker-compose.yml",
+       "quote": "image: clickhouse/clickhouse-server:24.4.1"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/langwatch/langwatch/v3.20.0/.github/workflows/npx-server-smoke.yml",
+       "quote": "# Asserts the full stack (postgres + redis + clickhouse + nlpgo + langevals"
+      },
+      {
+       "url": "https://arize.com/docs/phoenix/self-hosting/configuration.md",
+       "quote": "Phoenix is an all-in-one solution that has a tracing UI as well as a trace collector over both HTTP and gRPC."
+      }
+     ],
+     "measurement": "On this host, export native OTLP traces from Claude Code (CLAUDE_CODE_ENHANCED_TELEMETRY_BETA=1) and Codex (otel.trace_exporter) through the settled collector, for the same fixed sessions including one workflow with subagents, into (a) Phoenix v20.19.0 on SQLite and (b) Jaeger v2.21.0 on Badger. Metric: spans stored versus emitted, correct parent links, a fixed question set (which subagent or workflow run made which LLM request and tool call, tokens per request, slowest tool), persistence across restart, idle and peak memory, disk growth, and whether token counts render from native spans (Claude Code sets no gen_ai.usage.* attributes) without Arize's hook installer. Jaeger replaces Phoenix if it answers the same set with less memory; nothing is installed if the stored log events answer every question without spans.",
+     "confidence": "medium"
+    }
+   ]
+  }
+ },
+ {
+  "label": "refute:agents-secrets",
+  "result": {
+   "slots": [
+    {
+     "slot": "agents-in-ci",
+     "default": "nothing installed",
+     "installs_nothing": true,
+     "job": "Run Claude Code and Codex from GitHub Actions on pull requests and issues with least privilege.",
+     "refutation": "Tried to refute gh-aw v0.89.21 as a host component. Its README describes the gh extension as a compiler that turns Markdown into a standard Actions workflow; the agent job then runs on a GitHub runner (self-hosted needs Linux with Docker). Its Claude engine rejects subscription OAuth tokens (API key or WIF only), which Anthropic's action accepts. Its default-branch checks were failing on 2026-10-02. Neither judge found a measured gain in findings, permissions or cost, and one search here found none. Both clients already have first-party entry points that install nothing on this machine: Claude Code's `/install-github-app` prepares the workflow pull request; Codex offers `openai/codex-action@v1` and hosted automatic review. No host action is needed.",
+     "candidates": [
+      {
+       "name": "github/gh-aw v0.89.21",
+       "verdict": "do_not_install",
+       "reason": "Its only host part is a gh extension that compiles per-repository workflows for GitHub runners, its Claude engine cannot use subscription tokens, and no public measurement shows a gain over the first-party actions."
+      },
+      {
+       "name": "anthropics/claude-code-action v1 (added)",
+       "verdict": "do_not_install",
+       "reason": "It is a per-repository `uses:` reference that runs on GitHub-hosted runners and that Claude Code's `/install-github-app` sets up, so the machine installs nothing."
+      },
+      {
+       "name": "openai/codex-action v1 (added)",
+       "verdict": "do_not_install",
+       "reason": "It is a per-repository `uses: openai/codex-action@v1` reference that installs the Codex CLI on the runner and needs an API-key secret, so the machine installs nothing."
+      }
+     ],
+     "install_command": "",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/github/gh-aw/v0.89.21/README.md",
+       "quote": "The `gh-aw` GitHub CLI extension compiles each agentic workflow into a standard GitHub Actions workflow."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/github/gh-aw/v0.89.21/docs/src/content/docs/engines/claude.md",
+       "quote": "Claude subscription OAuth tokens such as `CLAUDE_CODE_OAUTH_TOKEN` are not supported."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/github-actions.md",
+       "quote": "the Claude Code GitHub Action runs on GitHub-hosted runners, which consume your GitHub Actions minutes."
+      },
+      {
+       "url": "https://developers.openai.com/codex/github-action.md",
+       "quote": "The action installs the Codex CLI, starts the Responses API proxy when you provide an API key, and runs `codex exec` under the permissions you specify."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/github-actions.md",
+       "quote": "run `/install-github-app` from Claude Code. Claude Code installs the GitHub App, adds your authentication secret, and prepares the workflow pull request for you"
+      }
+     ],
+     "measurement": "On one repository with a fixed set of at least 30 past pull requests with known defects and 10 issues, on ubuntu-latest with the same models, prompts and turn limits: (A) gh-aw v0.89.21 with engine claude and engine codex; (B) anthropics/claude-code-action@v1 plus openai/codex-action@v1 with a read-only agent job and a separate comment job; (C) no agent. Metrics: findings a human confirms and false positives per pull request, write scopes granted to the job that runs the agent, provider plus runner cost per run. Install the gh-aw extension only if A beats B on confirmed findings at no more permissions or cost, and beats C.",
+     "confidence": "high"
+    },
+    {
+     "slot": "agent-messaging",
+     "default": "aannoo/hcom v0.7.27",
+     "installs_nothing": false,
+     "job": "Deliver messages and hand work between concurrent Claude Code and Codex sessions on one host.",
+     "refutation": "Tried to show native facilities cover it. Into Claude Code they largely do: each session binds an inbox socket that scripts and other sessions, including `claude -p`, can post to under its inbound controls (v2.1.224+, WSL 2 included). Into a running Codex session nothing is documented: subagents stay inside one session, `codex mcp-server` was removed, the app-server is called experimental, and `codex exec` only starts or resumes a headless run. An exchange needs both directions, so the job has no native owner. Then tried to break hcom: released 2026-10-01, Linux x86_64 assets, release-commit CI green including real Claude Code and Codex jobs on Ubuntu, WSL handling in source, delivery through its own PTY. Not refuted; its defaults need review.",
+     "candidates": [
+      {
+       "name": "aannoo/hcom v0.7.27",
+       "verdict": "install",
+       "reason": "Its release-commit CI drives real, pinned Claude Code and Codex CLIs on Ubuntu, and it delivers through hooks and its own PTY from one binary with a local SQLite store."
+      },
+      {
+       "name": "Get-Concord-AI/concord-mcp v0.10.5",
+       "verdict": "do_not_install",
+       "reason": "Same job with more parts: a Node MCP server, a Codex app-server bridge on a protocol OpenAI calls experimental, telemetry to getconcord.ai on by default, and blocks written into CLAUDE.md and AGENTS.md."
+      },
+      {
+       "name": "avivsinai/agent-message-queue v0.85.0",
+       "verdict": "do_not_install",
+       "reason": "Messages wait in a file queue until the receiver drains them, and its optional wake depends on raw terminal injection that its own docs say kernel hardening can disable, as on this WSL2 kernel (legacy_tiocsti=0 observed)."
+      },
+      {
+       "name": "AgentWorkforce/relay v13.0.0",
+       "verdict": "do_not_install",
+       "reason": "It is built around the hosted Relaycast service: its documented local-only mode is a degraded broker with the injected messaging tools disabled, and it needs Node 22."
+      },
+      {
+       "name": "openai/codex-plugin-cc v1.0.6 (added)",
+       "verdict": "do_not_install",
+       "reason": "OpenAI's plugin delegates work one way, from Claude Code to Codex jobs, and does not carry messages between running sessions; `codex exec` and hcom already cover that handoff."
+      },
+      {
+       "name": "Dicklesworthstone/mcp_agent_mail v0.3.2 (added; discovery excluded it on license)",
+       "verdict": "do_not_install",
+       "reason": "It is an asynchronous mailbox on an HTTP MCP server that agents poll with `fetch_inbox`, and its installer also replaces the `bd` CLI."
+      }
+     ],
+     "install_command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/cross-session-messaging.md",
+       "quote": "Claude Code binds an inbox socket for each session with cross-session messaging enabled, where other sessions on the machine deliver messages."
+      },
+      {
+       "url": "https://developers.openai.com/codex/guides/agents-sdk",
+       "quote": "The codex mcp-server command and the standalone codex-mcp-server binary have been removed."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/aannoo/hcom/v0.7.27/README.md",
+       "quote": "**Message** each other in real time: mid-turn or wake immediately when idle"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/aannoo/hcom/v0.7.27/.github/workflows/ci.yml",
+       "quote": "- { os: ubuntu-24.04, tool: codex, install: codex, test: real_tool_codex }"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/aannoo/hcom/v0.7.27/src/tools/codex_preprocessing.rs",
+       "quote": "\"sandbox_workspace_write.network_access=true\".to_string(),"
+      }
+     ],
+     "measurement": "On a fresh WSL2 Ubuntu x86_64 instance with one live Claude Code session and one live Codex session at pinned versions, run hcom v0.7.27 against Concord MCP v0.10.5 and a native-only control (Claude cross-session messaging plus `codex exec resume`). Send 200 numbered messages each way with the receiver idle, mid-turn, waiting on an approval, killed, and resumed. Metrics: lost, duplicated and out-of-order messages, p50/p95 delivery latency, correct queued or unreachable reports, setup steps and client settings changed. Concord replaces hcom if it loses or reorders fewer messages with no more setup; nothing is installed if the native control delivers both ways without loss.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "secret-scanning",
+     "default": "betterleaks/betterleaks v1.9.0",
+     "installs_nothing": false,
+     "job": "Block credentials at commit time and find leaked ones in Git history, before commit and in CI.",
+     "refutation": "Tried to refute Kingfisher v2.9.1 as sole owner; its own rule bundle supplies the refutation. The generated catalog imports Betterleaks' rules but omits `generic-api-key`, `generic-password` and `generic-username` as low-value, and GitGuardian (a vendor report) puts generic secrets at 58% of leaked credentials. Betterleaks v1.9.0 keeps those rules behind a token-efficiency filter (author-run CredData result, tuned config: precision 0.91, recall 0.87). Kingfisher's real additions are 26 Veles detectors (five families absent from Betterleaks' rule ids), 246 validated rules against 218, a hook installer, a mise install and a vendor-run runtime benchmark with no Betterleaks arm. No head-to-head exists. One scanner must cover generic credentials, so Betterleaks owns the job.",
+     "candidates": [
+      {
+       "name": "betterleaks/betterleaks v1.9.0",
+       "verdict": "install",
+       "reason": "It scans staged changes and full history with both format-specific and generic credential rules, validates 218 of them live on request, and is the upstream catalog that Kingfisher imports."
+      },
+      {
+       "name": "mongodb/kingfisher v2.9.1",
+       "verdict": "do_not_install",
+       "reason": "Its built-in catalog omits the three generic key and password rules, so alone it misses the largest measured leak class, and beside Betterleaks its Veles detectors, extra validators and revocation are not a distinct job in this requirement."
+      }
+     ],
+     "install_command": "go install github.com/betterleaks/betterleaks@latest",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/mongodb/kingfisher/v2.9.1/crates/kingfisher-rules/generated/rules/betterleaks.yml",
+       "quote": "# Imported 458 of 462 Betterleaks rules. Omitted low-value generic rules: generic-api-key, generic-password, generic-username."
+      },
+      {
+       "url": "https://blog.gitguardian.com/the-state-of-secrets-sprawl-2025/",
+       "quote": "secrets sprawl is accelerating, particularly with generic secrets, which accounted for 58% of all leaked credentials."
+      },
+      {
+       "url": "https://lookingatcomputer.substack.com/p/rare-not-random",
+       "quote": "Using this config and running Betterleaks against the CredData dataset yields an F1 score of .892."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/betterleaks/betterleaks/v1.9.0/README.md",
+       "quote": "| **Secrets Validation** | Validate if a detected secret is active by making asynchronous HTTP requests directly from within the rule definition using Expr. |"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/betterleaks/betterleaks/v1.9.0/.pre-commit-hooks.yaml",
+       "quote": "entry: betterleaks git --pre-commit --redact --staged --verbose"
+      }
+     ],
+     "measurement": "Run at upstream defaults, validation off: (1) Betterleaks v1.9.0, (2) Kingfisher v2.9.1, (3) Kingfisher with Betterleaks' three generic rules loaded through `--rules-path` (untested; `filter.failsTokenEfficiency` appears nowhere in Kingfisher's bundle or RULES.md). Corpus: Samsung CredData at a pinned revision plus a seeded Git history with format-specific and generic credentials, including deleted and merged ones. Also time `betterleaks git --pre-commit --staged` against `kingfisher scan . --staged --quiet --no-update-check --no-validate` on this WSL2 host, cold and warm. Metrics: recall and false positives per credential class, true positives unique to each arm, p50/p95 hook latency. Kingfisher takes the slot if arm 2 or 3 matches Betterleaks' generic-class recall with no more false positives or lower p95 latency. Repeat when Betterleaks v2.0.0 leaves release candidate.",
+     "confidence": "medium"
+    }
+   ],
+   "notes": "Secret scanning reverses both judges on one primary fact: Kingfisher's bundle header documents the generic-rule omission. Betterleaks: `@latest` resolves to v1.x because v2 lives under `/v2`; upstream documents no Ubuntu package, and the signed linux_x64 tarball is the toolchain-free path; re-run at v2.0.0 GA. hcom defaults to review: `auto_approve`, `auto_trust_workspace` and `relay_enabled` true, Codex launched with `network_access=true`, client hooks installed; sessions start through `hcom`, so check the launcher's effort flag; tested pins are Codex 0.159.2 and Claude Code 2.1.283. If ai-memory wins memory, re-run messaging against its inbox. Tools: ctx_fetch_and_index, ctx_execute, ctx_search; 9 of 14 gh calls."
+  }
+ },
+ {
+  "label": "refute:runtime-search",
+  "result": {
+   "slots": [
+    {
+     "slot": "gpu-container-runtime",
+     "default": "nothing installed",
+     "installs_nothing": true,
+     "job": "Give rootless Docker containers access to the NVIDIA GPU through WSL2 passthrough.",
+     "refutation": "Tried to fail the judges' shared pick, NVIDIA Container Toolkit, on gates. It passes: v1.20.1 (2026-09-19), Ubuntu 26.04 amd64 in the tested table, a documented Rootless-mode procedure for Docker, and JIT-CDI selected automatically on WSL2; no fetched page states the rootless-plus-WSL2 combination as tested. What fails is the need. No settled owner runs GPU work in a container: Ollama's upstream install is native and its script handles WSL2 NVIDIA passthrough, MinerU installs with uv pip, and the Harbor, Inspect AI and OpenHands pages fetched state no GPU requirement. Apptainer, Podman and nerdctl are second container engines beside rootless Docker; Docker's GPU page says NVIDIA GPUs work with a single engine.",
+     "candidates": [
+      {
+       "name": "NVIDIA Container Toolkit (NVIDIA/nvidia-container-toolkit v1.20.1)",
+       "verdict": "do_not_install",
+       "reason": "It passes every gate and is the documented route for rootless Docker, but no settled owner runs GPU work in a container, so the no-install default holds until one does."
+      },
+      {
+       "name": "Apptainer (apptainer/apptainer)",
+       "verdict": "do_not_install",
+       "reason": "It is a second container engine beside the settled rootless Docker Engine and adds no job this requirement contains."
+      },
+      {
+       "name": "nerdctl (containerd/nerdctl)",
+       "verdict": "do_not_install",
+       "reason": "It is a second container engine and daemon beside the settled rootless Docker Engine."
+      },
+      {
+       "name": "Podman CDI (podman-container-tools/podman)",
+       "verdict": "do_not_install",
+       "reason": "It is a second container engine beside the settled rootless Docker Engine, where CDI device support is already enabled by default."
+      }
+     ],
+     "install_command": "",
+     "evidence": [
+      {
+       "url": "https://ollama.com/install.sh",
+       "quote": "# WSL2 only supports GPUs via nvidia passthrough\n# so check for nvidia-smi to determine if GPU is available"
+      },
+      {
+       "url": "https://opendatalab.github.io/MinerU/quick_start/",
+       "quote": "uv pip install -U \"mineru>=4.0,<5\""
+      },
+      {
+       "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+       "quote": "nvidia-ctk runtime configure --runtime=docker --config=$HOME/.config/docker/daemon.json"
+      },
+      {
+       "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/cdi-support.html",
+       "quote": "the runtime selects JIT-CDI mode on systems that use the NVIDIA Management Library (NVML) or Windows Subsystem for Linux 2 (WSL2)"
+      },
+      {
+       "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/supported-platforms.html",
+       "quote": "Recent NVIDIA Container Toolkit releases are tested and expected to work on these Linux distributions:"
+      }
+     ],
+     "measurement": "On the new WSL host: (1) install Ollama and MinerU by their upstream native commands and confirm GPU placement (ollama ps reports 100% GPU for the selected models; nvidia-smi lists the MinerU process). (2) Overturn trigger: any settled or measured owner deployed as a GPU container (the embedding-model server, MinerU's Docker deployment, the memory system). Then install NVIDIA Container Toolkit v1.20.1 with the documented Rootless-mode steps and, as the non-root user, run docker run --rm --gpus all ubuntu nvidia-smi and one inference workload in that container. Metrics: exit status, tokens per second against the native run, setup steps and failures.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "web-search-provider",
+     "default": "nothing installed: deedy5/ddgs (latest release v9.16.0, 2026-08-26), already a declared dependency of both harnesses, owns the job by configuration",
+     "installs_nothing": true,
+     "job": "Keyless web search provider for GPT Researcher and DeerFlow, set by each harness's configuration.",
+     "refutation": "Tried to show the three picks are needed; the sources show the job already has an owner. Both harnesses declare ddgs, a keyless metasearch library: GPT Researcher 3.7.0 lists it in requirements and exposes RETRIEVER=duckduckgo, and DeerFlow 2.1.0 ships it as the active default web_search. SearXNG, which both also accept natively by configuration, would be a second owner adding two services, with no public measured gain found. mcp-searxng and free-search-mcp are MCP servers for agent clients that already have native search: a job this requirement does not contain. Health flags on the default: ddgs head CI fails, v9.15.0 disabled Google and Yandex, and GPT Researcher turns a failed search into an empty result.",
+     "candidates": [
+      {
+       "name": "ddgs (deedy5/ddgs), added",
+       "verdict": "install",
+       "reason": "It is already present as a declared dependency of both harnesses and as DeerFlow's shipped default, so it owns the job with no separate install step."
+      },
+      {
+       "name": "SearXNG (searxng/searxng, rolling; docs 2026.9.30+a9d990033)",
+       "verdict": "decide_by_measurement",
+       "reason": "It is the one credible challenger, natively configurable in both harnesses, but it adds a core and a Valkey service and no public measurement shows it beats the bundled ddgs."
+      },
+      {
+       "name": "mcp-searxng (ihor-sokoliuk/mcp-searxng v2.5.0)",
+       "verdict": "do_not_install",
+       "reason": "It is an MCP bridge from agent clients to a SearXNG instance, while the harnesses read SearXNG directly by configuration and both agents have native web search."
+      },
+      {
+       "name": "free-search-mcp (sweetcornna/free-search-mcp v0.13.1)",
+       "verdict": "do_not_install",
+       "reason": "It is an MCP-only search server for agent clients, so it would be a second owner reached through extra MCP wiring when the harnesses have native provider settings and the agents have native search."
+      }
+     ],
+     "install_command": "",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/config.example.yaml",
+       "quote": "# Web search tool (uses DuckDuckGo, no API key required)\n  - name: web_search\n    group: web\n    use: deerflow.community.ddg_search.tools:web_search_tool"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/requirements.txt",
+       "quote": "# Search & Research\ntavily-python>=0.7.12\nddgs>=9.0.0"
+      },
+      {
+       "url": "https://docs.gptr.dev/docs/gpt-researcher/search-engines",
+       "quote": "Searx - Env: RETRIEVER=searx\nDuckduckgo - Env: RETRIEVER=duckduckgo"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/config.example.yaml",
+       "quote": "# Web search tool (uses SearXNG, self-hosted, no API key required)"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/gpt_researcher/retrievers/duckduckgo/duckduckgo.py",
+       "quote": "print(f\"Error: {e}. Failed fetching sources. Resulting in empty response.\")"
+      }
+     ],
+     "measurement": "GPT Researcher 3.7.0 and DeerFlow 2.1.0 on the new WSL, a frozen set of 30 technical queries with known-relevant URLs listed in advance. Arm A: the shipped ddgs settings (RETRIEVER=duckduckgo; deerflow.community.ddg_search). Arm B: RETRIEVER=searx with SEARX_URL and deerflow.community.searxng against a Compose-deployed SearXNG with json added to search.formats. Metrics: recall@10 of the known URLs, and the share of failed or empty search calls with ten queries in parallel, repeated on three days. SearXNG replaces the default only if it gains at least 0.10 recall@10 or halves the failed-call rate.",
+     "confidence": "medium"
+    },
+    {
+     "slot": "structural-code-search",
+     "default": "ast-grep/ast-grep 0.45.3 (released 2026-08-31)",
+     "installs_nothing": false,
+     "job": "Search and rewrite code by syntax-tree pattern from the command line, callable by both agents.",
+     "refutation": "Tried to fail ast-grep on gates and to show Semgrep adds a job this slot asks for. ast-grep passes: release 0.45.3 (2026-08-31), head CI green, a one-line npm, pip or brew install, and a CLI both agents call. Semgrep's README calls it a static analysis tool that searches code by pattern, and its docs rewrite matches with a fix: key and --autofix: the same search-and-rewrite job, so a second owner. Its distinct job, rule-based security scanning, belongs to the security layer. No public measured head-to-head was found; ast-grep's comparison page, an author's opinion, calls Semgrep security-focused and slow on the command line. Missed candidates Opengrep (a Semgrep fork) and srgn change nothing.",
+     "candidates": [
+      {
+       "name": "ast-grep (ast-grep/ast-grep 0.45.3)",
+       "verdict": "install",
+       "reason": "It owns syntax-tree search and rewrite from the CLI and is already the settled owner, so this slot adds no second install."
+      },
+      {
+       "name": "Semgrep Community Edition (semgrep/semgrep v1.179.0)",
+       "verdict": "do_not_install",
+       "reason": "It is a second owner of pattern search and rewrite (a fix: key applied with --autofix), and its distinct job, rule-based security scanning, belongs to the security layer."
+      },
+      {
+       "name": "Opengrep (opengrep/opengrep v1.30.0), added",
+       "verdict": "do_not_install",
+       "reason": "Its README calls it a fork of Semgrep, so it is the same class and gets the same verdict."
+      },
+      {
+       "name": "srgn (alexpovel/srgn), added",
+       "verdict": "do_not_install",
+       "reason": "It scopes regular expressions by tree-sitter grammar rather than matching metavariable patterns, and its README benchmarks only itself."
+      }
+     ],
+     "install_command": "npm install --global @ast-grep/cli",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/semgrep/semgrep/develop/README.md",
+       "quote": "Semgrep is a fast, open-source, static analysis tool that searches code, finds bugs, and enforces secure guardrails and coding standards."
+      },
+      {
+       "url": "https://semgrep.dev/docs/writing-rules/autofix",
+       "quote": "Semgrep\u2019s rule format supports a fix: key that supports the replacement of metavariables and regex matches with potential fixes."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/ast-grep/ast-grep/main/README.md",
+       "quote": "ast-grep's core is an algorithm to search and replace code based on abstract syntax tree produced by tree-sitter."
+      },
+      {
+       "url": "https://ast-grep.github.io/advanced/tool-comparison.html",
+       "quote": "It is mainly focused on security issues, which may limit its applicability for other use cases."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/trailofbits/skills/main/README.md",
+       "quote": "| [static-analysis](plugins/static-analysis/) | Static analysis toolkit with CodeQL, Semgrep, and SARIF parsing |"
+      }
+     ],
+     "measurement": "A fixed set of 40 structural queries and 15 rewrites with hand-labelled matches over one multilingual corpus (TypeScript, Python, Rust, Go). Arms: ast-grep 0.45.3, Semgrep CE 1.179.0, and ripgrep plus Serena as the no-tool baseline, each driven by Claude Code and by Codex. Metrics: precision and recall per query, share of correct rewrites, tokens per correctly answered query. Semgrep replaces ast-grep only if it wins recall or rewrite correctness at equal or lower tokens; the baseline wins only if it matches both at lower tokens.",
+     "confidence": "high"
+    }
+   ],
+   "notes": "GPU: the slot flips to NVIDIA Container Toolkit v1.20.1 (documented rootless steps) if the embedding-model slot or MinerU lands on a GPU container; one embedding judge chose TEI and jina-on-prem with docker run --gpus all. Web search: this session's three GPT Researcher runs used RETRIEVER=duckduckgo and each wrote a report; three failed search calls were logged, successes not counted. Structural: ast-grep is the install two critics already made, not a second one; Trail of Bits skills reference Semgrep, a security-layer decision. gh calls: 9 of 14. Token tools used: context-mode fetch, search, execute."
+  }
+ }
+]

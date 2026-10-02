@@ -500,16 +500,32 @@ class DeerFlowRecipeTests(unittest.TestCase):
         renderer = module("deerflow_route", RECIPE / "recipe.py")
         self.assertEqual(renderer.worker_model({}), "cx/gpt-6-astra-max")
         self.assertEqual(renderer.worker_model({"model": "cx/gpt-6-sol-max"}), "cx/gpt-6-sol-max")
-        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-next-max", "gpt-6"):
+        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-next-max", "gpt-6",
+                      "cx/gpt-6-unknown-max", "cx/gpt-6.1-sol-unknown", "cx/gpt-6-sol-medium"):
             with self.assertRaises(ValueError):
                 renderer.worker_model({"model": model})
 
     def test_round3_arms_render_endpoint_model_and_only_selected_header(self):
         renderer = module("deerflow_arms", RECIPE / "recipe.py")
         headers = module("deerflow_arm_headers", RECIPE / "runtime/gateway_headers.py")
-        for arm, model, port in (("control", "cx/gpt-6-astra-max", 20128),
-                                 ("engines-on", "sharedgw/gpt-6-astra-max", 20129)):
-            with patch.dict("os.environ", {"RUNTIME_WORKER_ARM": arm}):
+
+        class NativeClient:
+            def _get_request_payload(self, input_, **kwargs):
+                return copy.deepcopy(input_)
+
+        with patch.dict(sys.modules, {
+            "langchain_openai": types.SimpleNamespace(ChatOpenAI=NativeClient),
+            "langgraph.config": types.SimpleNamespace(get_config=lambda: {"configurable": {"thread_id": "conversation"}}),
+            "gateway_headers": headers,
+        }):
+            extension = module("deerflow_arm_model", RECIPE / "runtime/gateway_model.py")
+        for arm, model, port, override in (("control", "cx/gpt-6-astra-max", 20128, ""),
+                                           ("engines-on", "sharedgw/gpt-6-astra-max", 20129, ""),
+                                           ("control", "cx/gpt-6.1-sol", 20128, "cx/gpt-6.1-sol"),
+                                           ("control", "cx/gpt-6.1-sol-max", 20128, "cx/gpt-6.1-sol-max")):
+            with self.subTest(arm=arm, model=model), patch.dict("os.environ", {
+                "RUNTIME_WORKER_ARM": arm, "DEERFLOW_CONTROL_MODEL": override,
+            }):
                 selection = renderer.arm_settings({})
                 self.assertEqual(selection["arm"], arm)
                 self.assertEqual(selection["model"], model)
@@ -527,6 +543,16 @@ class DeerFlowRecipeTests(unittest.TestCase):
                     labels = compose["services"]["gateway"]["labels"]
                     self.assertEqual(labels["com.native-agent-stack.arm"], arm)
                     self.assertEqual(labels["com.native-agent-stack.model"], model)
+                    environment = compose["services"]["gateway"]["environment"]
+                    self.assertEqual(environment["DEERFLOW_MODEL"], model)
+                    outgoing = extension.ChatOpenAI()._get_request_payload({
+                        "model": environment["DEERFLOW_MODEL"], "input": [], "temperature": 0.0,
+                    })
+                    self.assertEqual(outgoing["model"], model)
+                    self.assertEqual(outgoing["reasoning"], {"effort": "max"})
+                    self.assertNotIn("temperature", outgoing)
+                    self.assertEqual(outgoing["extra_headers"].get("x-omniroute-compression"),
+                                     "allow-lossy" if arm == "engines-on" else None)
         self.assertEqual(renderer.worker_model({"model": "sharedgw/gpt-6-astra-max"}),
                          "sharedgw/gpt-6-astra-max")
         for value in ("sharedgw/cx/gpt-6-astra-max", "sharedgw/gpt-6-sol-max"):

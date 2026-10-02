@@ -1,0 +1,6 @@
+no data received on data stream for 3.0s, reconnecting
+trading stream websocket error, restarting  connection: sent 1000 (OK); no close frame received
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+data websocket error, restarting connection: sent 1000 (OK); no close frame received
+trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)
+{"status": "needs_attention", "flat": false, "evidence_class": "PAPER"}

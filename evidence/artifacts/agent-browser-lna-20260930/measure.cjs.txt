@@ -1,0 +1,258 @@
+// Synthetic LNA measurement using the installed Playwright 1.63.0 API and
+// Chromium CDP pipe transport (upstream src/server/pipeTransport.ts).
+// Two HTTP listeners only; the page server also carries agent-browser's CDP.
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const http = require('http');
+const cp = require('child_process');
+const {once} = require('events');
+const PW = '~/.local/share/codex-ecosystem/tools/crawl4ai-0.9.4/grader/node_modules/playwright-core';
+const CHROME = '~/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
+const SHELL = '~/.cache/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell';
+const AGENT = '~/.local/share/codex-ecosystem/bin/agent-browser';
+const A=45871, B=45872;
+const ROOT=process.cwd();
+const {chromium} = require(PW);
+const {wsServer: WebSocketServer} = require(PW+'/lib/utilsBundle.js');
+const sleep = ms=>new Promise(r=>setTimeout(r,ms));
+const save = (name,value)=>fs.writeFileSync(path.join(ROOT,'artifacts',name),JSON.stringify(value,null,2)+'\n');
+const append = (name,value)=>fs.appendFileSync(path.join(ROOT,'artifacts',name),JSON.stringify(value)+'\n');
+for (const d of ['artifacts','state/tmp','state/runtime','state/profiles','s']) fs.mkdirSync(d,{recursive:true,mode:0o700});
+const reports = new Map();
+const runs=fs.existsSync('artifacts/runs.json')?JSON.parse(fs.readFileSync('artifacts/runs.json','utf8')):[];
+let active;
+let pipeChrome;
+let pending = new Map();
+let nextId=100000000;
+let wsPeer;
+let pipeBuffer=Buffer.alloc(0);
+const children=new Set();
+const commands=fs.existsSync('artifacts/commands.json')?JSON.parse(fs.readFileSync('artifacts/commands.json','utf8')):[];
+function launch(exe,args,options={}) {
+  commands.push({case:active?.id,exe,args}); save('commands.json',commands);
+  const p=cp.spawn(exe,args,{cwd:ROOT,env:process.env,...options});
+  children.add(p); p.once('exit',()=>children.delete(p)); return p;
+}
+async function command(args,timeout=30000) {
+  const p=launch(AGENT,args,{stdio:['ignore','pipe','pipe']});
+  let stdout='',stderr=''; p.stdout.on('data',x=>stdout+=x);p.stderr.on('data',x=>stderr+=x);
+  const timer=setTimeout(()=>p.kill('SIGTERM'),timeout);
+  const [code,signal]=await once(p,'exit');clearTimeout(timer);
+  const result={args,code,signal,stdout,stderr};append(active.id+'.agent-commands.jsonl',result);return result;
+}
+function procArgs(pid) {
+  try{return fs.readFileSync(`/proc/${pid}/cmdline`,'utf8').split('\0').filter(Boolean);}catch{return null;}
+}
+function captureChromeProcesses() {
+  const result=[];
+  for (const ent of fs.readdirSync('/proc')) {
+    if (!/^\d+$/.test(ent)) continue;
+    const args=procArgs(ent);
+    if (args && [CHROME,SHELL].includes(args[0]) && !args.some(x=>x.startsWith('--type=')) && args.some(x=>x.includes(ROOT)))
+      result.push({pid:+ent,args});
+  }
+  return result;
+}
+function logCdp(message,direction) {
+  if (!active) return;
+  if (direction==='send' && /Permission/.test(message.method||'')) active.permissionCommands.push(message);
+  if (direction==='receive' && (/^(Network\.|Audits\.|Page\.javascriptDialog)/.test(message.method||'')))
+    append(active.id+'.cdp.jsonl',{direction,...message});
+}
+function cdp(method,params={},sessionId) {
+  const id=nextId++;
+  const message={id,method,params,...(sessionId?{sessionId}:{})};
+  logCdp(message,'send');
+  return new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{pending.delete(id);reject(new Error('CDP timeout '+method));},8000);
+    pending.set(id,{resolve:x=>{clearTimeout(timer);resolve(x);},reject});
+    pipeChrome.stdio[3].write(JSON.stringify(message)+'\0');
+  });
+}
+async function startPipeChrome(args) {
+  const effective=args.filter(x=>!x.startsWith('--remote-debugging-port='));
+  effective.push('--remote-debugging-pipe');
+  if (!effective.some(x=>x.startsWith('--log-net-log='))) effective.push(`--log-net-log=${ROOT}/artifacts/${active.id}.netlog.json`);
+  active.requestedBrowserArgs=args;
+  active.effectiveBrowserArgs=effective;
+  const err=fs.openSync(`artifacts/${active.id}.chrome-stderr.txt`,'w');
+  pipeBuffer=Buffer.alloc(0);
+  pipeChrome=launch(CHROME,effective,{stdio:['ignore','ignore',err,'pipe','pipe']});
+  fs.closeSync(err);
+  pipeChrome.stdio[3].on('error',()=>{});
+  pipeChrome.stdio[4].on('data',chunk=>{
+    pipeBuffer=Buffer.concat([pipeBuffer,chunk]);
+    let i;
+    while ((i=pipeBuffer.indexOf(0))>=0) {
+      const message=JSON.parse(pipeBuffer.subarray(0,i).toString());pipeBuffer=pipeBuffer.subarray(i+1);
+      logCdp(message,'receive');
+      if (pending.has(message.id)) {pending.get(message.id).resolve(message);pending.delete(message.id);}
+      else if (wsPeer?.readyState===1) wsPeer.send(JSON.stringify(message));
+      if (message.method==='Target.attachedToTarget' && message.params.targetInfo.type==='page') {
+        const s=message.params.sessionId;
+        void cdp('Network.enable',{},s).catch(()=>{});
+        void cdp('Audits.enable',{},s).catch(()=>{});
+      }
+    }
+  });
+  active.chromePid=pipeChrome.pid;
+  active.processArguments=procArgs(pipeChrome.pid);
+  active.browserVersion=(await cdp('Browser.getVersion')).result;
+  return {pid:pipeChrome.pid};
+}
+const pageServer=http.createServer(async(req,res)=>{
+  const u=new URL(req.url,`http://127.0.0.1:${A}`);
+  const chunks=[];for await (const c of req) chunks.push(c);
+  const body=Buffer.concat(chunks).toString();
+  append('page-requests.jsonl',{time:new Date().toISOString(),method:req.method,path:req.url,origin:req.headers.origin||null});
+  res.setHeader('Cache-Control','no-store');
+  if (u.pathname==='/report') {
+    const report=JSON.parse(body);reports.set(u.searchParams.get('run'),report);append('reports.jsonl',report);res.end('ok');
+  } else if (u.pathname==='/launch') {
+    try {res.end(JSON.stringify(await startPipeChrome(JSON.parse(body).args)));}
+    catch(e){res.end(JSON.stringify({error:String(e)}));}
+  } else if (u.pathname==='/alive') res.end(JSON.stringify({alive:!!pipeChrome && pipeChrome.exitCode===null && !pipeChrome.killed}));
+  else if (u.pathname.startsWith('/json/version')) res.end(JSON.stringify({Browser:'Chrome/153.0.8010.12','Protocol-Version':'1.3',webSocketDebuggerUrl:`ws://127.0.0.1:${A}/devtools/browser/lna`}));
+  else if (u.pathname==='/') {res.setHeader('Content-Type','text/html');res.end(fs.readFileSync('scripts/page.html','utf8').replace('__TARGET_PORT__',B));}
+  else {res.statusCode=404;res.end('fixture path not found');}
+});
+const wss=new WebSocketServer({noServer:true});
+pageServer.on('upgrade',(req,socket,head)=>{
+  if (req.url!=='/devtools/browser/lna') return socket.destroy();
+  wss.handleUpgrade(req,socket,head,ws=>{
+    wsPeer=ws;
+    ws.on('message',raw=>{
+      const msg=JSON.parse(raw.toString());logCdp(msg,'send');
+      if (pipeChrome && !pipeChrome.killed) pipeChrome.stdio[3].write(raw.toString()+'\0');
+    });
+    ws.on('close',()=>{if(wsPeer===ws)wsPeer=undefined;});
+  });
+});
+const targetServer=http.createServer((req,res)=>{
+  const u=new URL(req.url,`http://127.0.0.1:${B}`);
+  const row={time:new Date().toISOString(),run:u.searchParams.get('run'),method:req.method,path:req.url,
+    origin:req.headers.origin||null,preflight:req.method==='OPTIONS',headers:req.headers};
+  append('target-requests.jsonl',row);
+  if(active)active.targetRequests.push(row);
+  res.setHeader('Access-Control-Allow-Origin',req.headers.origin||'*');
+  res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers',req.headers['access-control-request-headers']||'*');
+  res.setHeader('Access-Control-Allow-Private-Network','true');
+  res.setHeader('Cache-Control','no-store');
+  if(req.method==='OPTIONS')return res.end('preflight ok');
+  if(u.pathname==='/img'){res.setHeader('Content-Type','image/svg+xml');res.end('<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8"><rect width="8" height="8" fill="green"/></svg>');}
+  else if(u.pathname==='/frame'){res.setHeader('Content-Type','text/html');res.end('<!doctype html><link rel="icon" href="data:,"><p>loopback frame</p><script>parent.postMessage({run:'+JSON.stringify(u.searchParams.get('run'))+'},"http://127.0.0.1:'+A+'");</script>');}
+  else {res.setHeader('Content-Type','text/plain');res.end('loopback target reached');}
+});
+async function awaitReport(id,timeout=12000) {
+  const deadline=Date.now()+timeout;
+  while(!reports.has(id) && Date.now()<deadline)await sleep(100);
+  return reports.get(id)||{error:'no page report before deadline'};
+}
+async function stopChrome(p) {
+  if (!p || p.exitCode!==null) return;
+  const exited=once(p,'exit');p.kill('SIGTERM');
+  await Promise.race([exited,sleep(2500)]);
+  if(p.exitCode===null){p.kill('SIGKILL');await Promise.race([exited,sleep(1000)]);}
+}
+async function measureAgent(override) {
+  const args=['--config',path.join(ROOT,'scripts/agent-config.json'),'--namespace','lna','--session',override?'ap':'al',
+    '--executable-path',path.join(ROOT,'scripts/chrome-wrapper.cjs')];
+  const extra=['--no-sandbox',...(override?[`--ip-address-space-overrides=127.0.0.1:${A}=public`]:[])];
+  args.push('--args',extra.join('\n'));
+  const opened=await command([...args,'open','about:blank']);
+  if(opened.code!==0)throw new Error('agent-browser open failed: '+opened.stderr+opened.stdout);
+  await command([...args,'eval',`location.href=${JSON.stringify(active.url)}`]);
+  active.pageObserved=await awaitReport(active.id);
+  active.domRead=await command([...args,'get','text','#results']);
+  await command([...args,'close']);
+  await stopChrome(pipeChrome);pipeChrome=undefined;
+}
+async function measurePlaywright(override,headed,disableGate=false,cliStyle=false) {
+  const args=[...(headed?['--ozone-platform=headless']:[]),
+    ...(override?[`--ip-address-space-overrides=127.0.0.1:${A}=public`]:[]),
+    ...(disableGate?['--disable-features=LocalNetworkAccessChecks']:[]),
+    ...(cliStyle?['--disable-blink-features=AutomationControlled']:[]),
+    `--log-net-log=${ROOT}/artifacts/${active.id}.netlog.json`];
+  const options={headless:!headed,args,...(cliStyle?{channel:'chrome-for-testing'}:{})};
+  const contextOptions=cliStyle?{viewport:headed?null:{width:1280,height:720}}:{};
+  active.launchOptions=options;active.contextOptions=contextOptions;
+  // Installed 1.63.0 CLI: isolated by default, --browser chromium selects
+  // chrome-for-testing, and validateBrowserConfig adds AutomationControlled.
+  const browser=cliStyle?await chromium.launch(options):undefined;
+  const context=browser?await browser.newContext(contextOptions):await chromium.launchPersistentContext(path.join(ROOT,'state/profiles',active.id),options);
+  active.browserVersion=context.browser()?.version();
+  active.browserProcesses=captureChromeProcesses();
+  const page=context.pages()[0]||await context.newPage();
+  const devtools=await context.newCDPSession(page);
+  for (const event of ['Network.requestWillBeSent','Network.responseReceived','Network.responseReceivedExtraInfo','Network.loadingFailed','Audits.issueAdded'])
+    devtools.on(event,params=>append(active.id+'.cdp.jsonl',{method:event,params}));
+  await devtools.send('Network.enable');await devtools.send('Audits.enable');
+  page.on('console',msg=>append(active.id+'.console.jsonl',{type:msg.type(),text:msg.text()}));
+  await page.goto(active.url,{waitUntil:'domcontentloaded'});
+  active.pageObserved=await awaitReport(active.id);
+  active.domRead=await page.locator('#results').textContent();
+  active.promptHistograms=await devtools.send('Browser.getHistograms',{query:'Permissions.Prompt',delta:false}).catch(e=>({error:String(e)}));
+  await context.close();
+  if(browser)await browser.close();
+}
+async function measureDirect(override,headless=false,noFirstRun=false) {
+  const args=['--no-sandbox',`--user-data-dir=${ROOT}/state/profiles/${active.id}`,
+    ...(headless?['--headless']:['--ozone-platform=headless']),
+    ...(noFirstRun?['--no-first-run']:[]),
+    ...(override?[`--ip-address-space-overrides=127.0.0.1:${A}=public`]:[]),
+    `--log-net-log=${ROOT}/artifacts/${active.id}.netlog.json`,active.url];
+  const fd=fs.openSync(`artifacts/${active.id}.chrome-stderr.txt`,'w');
+  const p=launch(CHROME,args,{stdio:['ignore','ignore',fd]});fs.closeSync(fd);
+  active.processArguments=procArgs(p.pid);
+  active.pageObserved=await awaitReport(active.id);
+  active.browserProcesses=captureChromeProcesses();
+  await stopChrome(p);
+}
+async function main(){
+  for(const file of ['target-requests.jsonl','page-requests.jsonl','reports.jsonl'])
+    if(!fs.existsSync('artifacts/'+file))fs.writeFileSync('artifacts/'+file,'');
+  save('runtime.json',{date:new Date().toISOString(),node:process.version,playwright:require(PW+'/package.json').version,
+    agent:cp.execFileSync(AGENT,['--version'],{encoding:'utf8'}).trim(),
+    chrome:cp.execFileSync(CHROME,['--version'],{encoding:'utf8'}).trim(),
+    shell:cp.execFileSync(SHELL,['--version'],{encoding:'utf8'}).trim(),A,B});
+  await Promise.all([new Promise(r=>pageServer.listen(A,'127.0.0.1',r)),new Promise(r=>targetServer.listen(B,'127.0.0.1',r))]);
+  fs.writeFileSync('artifacts/namespace-listeners-running.txt',cp.execFileSync('ss',['-ltn'],{encoding:'utf8'}));
+  const cases=[
+    ['agent-local','agent-browser',false,()=>measureAgent(false)],
+    ['agent-public','agent-browser',true,()=>measureAgent(true)],
+    ['pw-shell-local','Playwright headless shell',false,()=>measurePlaywright(false,false)],
+    ['pw-shell-public','Playwright headless shell',true,()=>measurePlaywright(true,false)],
+    ['pw-headed-local','Playwright headed CfT (Ozone headless display)',false,()=>measurePlaywright(false,true)],
+    ['pw-headed-public','Playwright headed CfT (Ozone headless display)',true,()=>measurePlaywright(true,true)],
+    ['direct-local','Direct CfT (Ozone headless display)',false,()=>measureDirect(false)],
+    ['direct-public','Direct CfT (Ozone headless display)',true,()=>measureDirect(true)],
+    ['direct-headless-public','Direct CfT --headless',true,()=>measureDirect(true,true)],
+    ['pw-gate-disabled-public','Diagnostic: Playwright headless shell, LNA disabled',true,()=>measurePlaywright(true,false,true)],
+    ['direct-clean-local','Direct CfT, first-run UI suppressed (Ozone headless display)',false,()=>measureDirect(false,false,true)],
+    ['direct-clean-public','Direct CfT, first-run UI suppressed (Ozone headless display)',true,()=>measureDirect(true,false,true)],
+    ['direct-headless-local','Direct CfT --headless',false,()=>measureDirect(false,true)],
+    ['pw-cli-local','Playwright 1.63 CLI Chromium configuration (CfT headless)',false,()=>measurePlaywright(false,false,false,true)],
+    ['pw-cli-public','Playwright 1.63 CLI Chromium configuration (CfT headless)',true,()=>measurePlaywright(true,false,false,true)],
+    ['pw-cli-headed-local','Playwright 1.63 CLI --headed Chromium configuration (CfT offscreen)',false,()=>measurePlaywright(false,true,false,true)],
+    ['pw-cli-headed-public','Playwright 1.63 CLI --headed Chromium configuration (CfT offscreen)',true,()=>measurePlaywright(true,true,false,true)]
+  ];
+  const selected=new Set(process.argv.slice(2));
+  for(const [id,tool,override,fn] of cases){
+    if(selected.size && !selected.has(id))continue;
+    if(runs.some(r=>r.id===id))throw new Error('Refusing to reuse a measured profile/case: '+id);
+    active={id,tool,override,url:`http://127.0.0.1:${A}/?run=${id}`,permissionCommands:[],targetRequests:[]};
+    console.log('START '+id);
+    try{await fn();}catch(e){active.error=String(e);console.error(id+': '+e);await stopChrome(pipeChrome);pipeChrome=undefined;}
+    runs.push(active);save('runs.json',runs);
+    console.log(JSON.stringify({id,page:active.pageObserved,reached:active.targetRequests.map(x=>x.method+' '+x.path),error:active.error}));
+    active=undefined;
+  }
+}
+async function cleanup(){
+  for(const p of children)await stopChrome(p);
+  wsPeer?.terminate();wss.close();pageServer.closeAllConnections();targetServer.closeAllConnections();
+  await Promise.all([new Promise(r=>pageServer.close(r)),new Promise(r=>targetServer.close(r))]);
+}
+main().catch(e=>{console.error(e);process.exitCode=1;}).finally(cleanup);

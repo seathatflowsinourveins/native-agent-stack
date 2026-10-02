@@ -6,7 +6,9 @@ embedded because Codex runs read-only in an empty directory and cannot read the 
   make_prompt.py [--work-dir DIR] fit      <layer-input.json> <proposals.json>
 
 The templates are <work-dir>/templates.json, which build_args.py wrote with the run's date, layer count and
-skills-manifest date filled in; the repository copy, whose <<DATE>> is still open, is refused. Placeholders are
+skills-manifest date filled in and its modality resolved (a skills run's discover and critic are the skills templates,
+and facts and fit end in the skills refuter text); the repository copy, whose <<DATE>> is still open, is refused. So
+a GPT-6 prompt is the run's modality's without reading the layer input's modality. Placeholders are
 filled in one pass, so text inside a value (a proposal quoting "$&" or "<<LAYER_ID>>") is never expanded again.
 Work dir resolution is codex_job.py's: --work-dir, else this file's directory when staged, else $SWEEP_WORK_DIR.
 """
@@ -22,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from codex_job import UsageError, resolve_work_dir  # noqa: E402
 
 PLACEHOLDER = re.compile(r"<<([A-Z_]+)>>")
-BUILD_PLACEHOLDERS = ("DATE", "LAYER_COUNT", "SKILLS_CHECKED_AT")
+BUILD_PLACEHOLDERS = ("DATE", "LAYER_COUNT", "SKILLS_CHECKED_AT", "MODALITY")
 RUNTIME_PLACEHOLDERS = {
     "common": set(),
     "discover": {"LAYER_INPUT", "STARS_NOTE", "LAYER_ID"},

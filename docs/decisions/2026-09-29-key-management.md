@@ -787,6 +787,441 @@ This section is the record of what stands, what does not, and why; the sections 
 3. **Canary proof harness (branch `claude/key-canary-20260929`, not merged).** Two review rounds and one repair round: the second GPT-6 review still found false-zero paths (evidence reused after a failed rerun, a failed scan retry leaving an older pass authoritative, missing or partial captures, an unenforced restart gate, undecoded compression framings, SQLite WAL and extensionless databases, filename and symlink coverage, exclusions wider than the protected paths, malformed Loki pages, sampling that drops other consumers' hits). A harness whose zero can be produced by a broken scan is worse than none, so no proof claim is made. Next step: a much smaller tool for exactly the acceptance the user set (a per-consumer canary and a zero-hit grep with positive controls over the named sinks) with one classifier that refuses unless every required check has a fresh result bound to the run.
 4. **Restart acceptance.** The procedure is "Restart check" in `docs/secret-storage.md`; the R0 baseline receipt exists. The restart is the user's action, after 20:00 ET and with the trading lane's confirmation.
 5. **Codex profile hardening** (`ignore_default_excludes = false`, shell snapshots off) is not done; it is measured (Codex 0.157.1: credential-named variables reach the shell tool by default).
-6. **OmniRoute** returns decrypted provider credentials to an unauthenticated loopback caller on `GET /api/providers/client` and `GET /api/settings` when `requireLogin=false` (source-read by the gateway lane at builds `5fc47d970` and `c3fa5a15e`, not executed). The real fix belongs to the gateway lane; the guard rule is part of item 2 and only covers Claude's Bash tool.
+6. **OmniRoute** returns decrypted provider credentials to an unauthenticated loopback caller on `GET /api/providers/client` and `GET /api/settings` when `requireLogin=false` (source-read by the gateway lane at builds `5fc47d970` and `c3fa5a15e`, not executed). The real fix belongs to the gateway lane; the guard rule is part of item 2 and only covers Claude's Bash tool. Superseded on 2026-09-30 by "OmniRoute management API (decision, 2026-09-30)" below: `/api/settings` returns settings secrets rather than provider connections, the anonymous surface is much wider than these two routes, and containers on this host reach it.
 
 **Selections that stand, with the comparison that would overturn each.** Store of record: the `0600` files (overturn: a keychain or sealed store that needs no unlock and survives the restart, measured on both workstations). Injector: built from cited reference designs (dotenvx `278101db`, actions/runner `15231bed`, buildkite/agent `3345ee60`, varlock `1b880652`, ironrun `b611c7ce`) after mise v2026.9.16 and agentself v0.2.4 failed the same measured requirements (Part 4). Effort: the launcher flag, not an environment variable or a saved level (overturn conditions in `2026-09-29-max-default-effort.md`). Proof tooling: none accepted yet (item 3).
+
+## OmniRoute management API (decision, 2026-09-30)
+
+**Finding.** Source reads only; no request was sent to either gateway. Four independent checks confirmed it: three claim-verification slices and one control-coverage review. Both gateways run upstream `release/v3.8.51` at `2f42a9ac1` plus local carries. The carries touch none of the files cited here, whose blobs are identical to upstream, so every citation below is `diegosouzapw/OmniRoute@2f42a9ac1`.
+
+With `requireLogin=false`, the management policy admits an anonymous `auth-disabled` subject on every management path that is not always-protected (`src/server/authz/policies/management.ts:261-266`; `src/shared/utils/apiAuth.ts:472`). On those paths `requireManagementAuth` returns no error (`src/lib/api/requireManagementAuth.ts:59-61`). An anonymous loopback caller then gets:
+
+- **Reads:**
+  - `GET /api/providers/client` returns every connection with its decrypted `apiKey`, `accessToken`, `refreshToken` and `idToken`, and with unsanitized `providerSpecificData` (`src/app/api/providers/client/route.ts:5-15`; `src/lib/db/providers/lazyConnectionView.ts:149,177-189`).
+  - `GET /api/settings` returns every stored non-internal setting (keys starting with `_` are skipped, `settings.ts:287`) except the password and two session keys. That includes the decrypted `oidcClientSecret`, and `skillsmpApiKey`, `cliproxyapi_api_key`, `qdrantApiKey`, `quotaStore.redisUrl` and `deepHealthToken` whenever they are set (`src/app/api/settings/route.ts:230-289`; `src/lib/db/settings.ts:154,287,295-297`).
+  - `GET /api/settings/cache-config` returns the semantic-cache embedding API key and the Redis URL (`src/app/api/settings/cache-config/route.ts:50-51,86,109`). Upstream open issue #14484 reports the same echo.
+  - `POST /api/sync/tokens` followed by `GET /api/sync/bundle` returns the whole decrypted credential bundle (`src/app/api/sync/tokens/route.ts:28-29,77-79`; `src/lib/sync/bundle.ts:68-89,112-127`).
+  - `GET /api/cli-tools/keys` returns the raw OmniRoute keys.
+  - `GET /api/oauth/cursor/auto-import` returns the host's Cursor OAuth tokens (`src/app/api/oauth/cursor/auto-import/route.ts:15,22-25`).
+  - Several `cli-tools/*-settings` readers return whole client configurations: `claude-settings` returns `~/.claude/settings.json` including `env` (`src/app/api/cli-tools/claude-settings/route.ts:56,66`) and `codex-settings` the raw `config.toml` text (`codex-settings/route.ts:120,171`); `omp-settings` returns an API key (`omp-settings/route.ts:91`). Not every reader does: `cline-settings` returns five selected fields (`cline-settings/route.ts:77-83`).
+  - The `providerSpecificData` keys `cookie`, `cookies`, `access_token`, `clientSecret` and `token` pass even upstream's own sanitizer for `/api/providers` (`src/lib/providers/requestDefaults.ts:327-371`).
+- **Writes:**
+  - `POST /api/keys`, `POST /api/keys/[id]/regenerate`, `POST /api/cli/tokens` and `POST /api/relay/tokens` mint credentials, manage-scope ones included, and return them.
+  - `PATCH /api/providers/[id]` can set a provider's `baseUrl`. The gateway then sends that provider's stored credential to the new host (`open-sse/executors/base.ts:417-418`; upstream's own comment at `:428-430` names the keyless case).
+  - With login off, `POST /api/settings/require-login` stores a password hash of the caller's choosing, which locks the operator out (`src/app/api/settings/require-login/route.ts:92,125-127`).
+
+**Correction to item 6.** `/api/settings` returns settings secrets, not provider connections; the provider credentials are on `/api/providers/client`. The builds item 6 cites, `5fc47d970` and `c3fa5a15e`, resolve neither locally nor upstream, so the finding is re-confirmed at `2f42a9ac1`.
+
+**Who can reach the API:**
+
+- **Same-uid processes.** This includes:
+  - Claude's Bash tool.
+  - Codex shells: the host Codex configuration runs `sandbox_mode = "danger-full-access"`.
+  - Windows processes. With mirrored networking they reach WSL's `localhost`: on this host `wslinfo --networking-mode` prints `mirrored` (<https://learn.microsoft.com/en-us/windows/wsl/networking>). Through `\\wsl$` they also read distribution files as the default user (<https://learn.microsoft.com/en-us/windows/wsl/file-permissions>).
+
+  Every such process can already read the gateway's data directory: the store, `server.env` and the CLI token salt. No HTTP control changes what they can reach.
+- **Containers.** Rootless Docker on this host runs with `DOCKERD_ROOTLESS_ROOTLESSKIT_DISABLE_HOST_LOOPBACK=false`, set in the user unit `docker.service` at line 33. Upstream's default in `dockerd-rootless.sh` is `true` (moby/moby@a46e6fa7 `contrib/dockerd-rootless.sh:23-24,170-173`). So every container whose network routes through the rootless daemon's RootlessKit network, and that has no separate isolation, reaches host-loopback ports as `10.0.2.2` ([OpenHands isolation record](2026-09-28-openhands-resolver-isolation.md)); a container with network mode `none`, such as the OpenHands grader, does not. On 2026-09-30 the Harbor benchmark lane reported reproducing this with a canary listener on another loopback port; that is a peer report, and this record retains no receipt of it. A container that runs model-written or third-party code is an untrusted local process, which meets the overturn condition of the keyless posture in [the account-pool record](2026-09-27-omniroute-account-pool.md), decision 5.
+- **Agent browsers.** The browsers this ecosystem runs are agent tools, not a person's desktop browser: agent-browser 0.38.1 (vercel-labs/agent-browser, `manifests/stack.json` row `agent-browser`), and playwright-cli 0.1.21 on Playwright 1.64.0-alpha and playwright-test 1.63.0 (microsoft/playwright-cli, microsoft/playwright; rows `playwright-cli` and `playwright-test`), which drive Chrome for Testing from the Playwright cache on this host. They run as same-uid processes, but a page they load is third-party code, and under WSL's mirrored networking that page can address the gateway at `localhost`.
+  - Measured on 2026-09-30 (receipt `agent-browser-lna-20260930`): Chrome for Testing 153.0.8010.12, launched by agent-browser 0.38.1, by Playwright 1.63.0 and directly, refused fetch, image and iframe requests from a page placed in the public address space to a loopback listener, with no permission grant, in all six launch configurations; with the override off, or with Local Network Access disabled, the same requests arrived. A public third-party page opened by these agent browsers therefore cannot send a request to the gateway, so agent browsing of public pages stays within the same-uid boundary.
+  - Not covered by that measurement: main-frame navigations and popups (Chromium's Local Network Access does not gate them), pages in the private address space, a tool or user that grants the permission, a launch that disables `LocalNetworkAccessChecks`, other Chromium versions, and the manifest pin playwright-cli 0.1.21 on Playwright 1.64.0-alpha, which was not found installed.
+  - Upstream's origin validator rejects cross-site and DNS-rebinding origins, but only for dashboard-session subjects (`src/server/authz/pipeline.ts:418-421`; `src/server/origin/publicOrigin.ts:177-179,243-245`).
+
+**Options compared:**
+
+- **(a) Upstream's control, `requireLogin=true`.**
+  - It is the only control that closes the whole management surface for every caller.
+  - It needs a stored password, `INITIAL_PASSWORD` or OIDC. Without one, a loopback caller can still write `requireLogin: false` (`src/shared/utils/apiAuth.ts:474-478,511-515`; `src/app/api/settings/require-login/route.ts:90-122`), and the dashboard login needs a stored hash.
+  - The user ruled out a login or password on 2026-09-28 ("passwordless ... use the env key if needed"). The same instruction said to close container exposure without one.
+- **(b) A local redaction carry.**
+  - It removes direct reads on the patched routes only, and cannot close the writes above for a loopback caller.
+  - The surface spans about fifteen routes, in files upstream edits weekly: `routeGuard.ts` three times and `settings/route.ts` once in the week to 2026-09-29.
+  - For same-uid callers it adds nothing beyond accident prevention.
+- **(c) A command-guard rule.** Accident prevention for Claude's Bash tool only.
+- **(d) A documented posture.** It states the boundary and its residuals.
+- **An origin-validator carry.** Upstream's validator would be widened to anonymous subjects on unsafe methods, with a Host check added on reads. It is a small carry built from in-repo references. It closes browser writes, plus rebinding reads from older browsers and from navigations, but does nothing for containers or same-uid callers.
+
+**Decision.** (d) plus (c), with one load-bearing rule and no gateway change now.
+
+1. **Trust boundary.** The anonymous management API is accepted only while every process that can reach host loopback is a same-uid process the user runs, and every workload that runs model-written or third-party code is either stopped or has verified isolation (rule 2). An exposed untrusted workload invalidates the boundary at once, whether or not it could adopt isolation later: it is stopped until it is isolated. Within the boundary, the reads and writes above are same-uid residuals, like the data directory itself.
+2. **Container rule (load-bearing).**
+   - A container that runs model-written or third-party code must have no route to `10.0.2.2`, nor to any other host address that reaches the gateway ports.
+   - If it needs a model, it reaches the gateway only through a proxy that passes the client API and refuses `/api/*`.
+   - References: the OpenHands lane's O1 (a Docker `internal: true` network plus a proxy; [isolation record](2026-09-28-openhands-resolver-isolation.md)), and Harbor v0.23.0's own egress control (`[environment] network_mode = "allowlist"`: a sidecar proxy plus nftables with an allowlist of public hosts; harbor-framework/harbor@v0.23.0 `src/harbor/environments/docker/docker.py`). The Harbor benchmark lane reported applying it on 2026-09-30; that is a peer report without a retained receipt here, and the lane's own records carry its acceptance.
+   - Daemon-wide `DISABLE_HOST_LOOPBACK=true` is not chosen, for the isolation record's reasons: it cuts off the proxy and the memory services, and binding the gateway elsewhere would expose it beyond loopback.
+   - Each container lane applies the rule to its own workloads.
+3. **Guard rule (planned in K4; not yet built, accepted or installed).** Once K4 is built, accepted and installed after window W, Claude's command guard refuses:
+   - a command that sends a request under `/api/` to the gateway ports (`20128`, `20129`) on `127.0.0.1`, `localhost`, `[::1]`, `10.0.2.2` or `host.docker.internal`, except an allowlist of read-only paths the repository documents. The allowlist is derived so that the documented-command replay stays at 0 newly blocked;
+   - the matching `omniroute api ...` and `omniroute sync ...` CLI forms.
+
+   It will also treat both live data directories, `~/.local/share/omniroute` and `~/.local/share/omniroute-fw`, as credential stores. Until then the installed guard covers neither (`scripts/hooks/secret_path_guard.py`, `HOME_CREDENTIAL_STORE`).
+4. **No gateway change now.** Neither carry is applied, and the gateway operator keeps the current settings. Any gateway apply stays on the Gate A owner's timing.
+5. **Operator hygiene after window W, at the gateway operator's discretion.**
+   - Take a metadata-only inventory of the OmniRoute keys, `oma_` tokens, sync tokens and relay tokens created while management was anonymous.
+   - Use the OmniRoute CLI on the host, not `curl` from an agent shell: `GET /api/keys` shows the first 8 and last 4 characters of each key.
+   - Revoke any the operator does not recognise.
+
+**Verification.**
+- For the container rule: a canary listener on a host loopback port (never a gateway port) must record no connection from a task container that tries `10.0.2.2` and the host's other addresses on that port, observed on the listener side, because a transparent egress proxy may accept a TCP connection before it enforces its policy; the proxy's refusal of `/api/*` is checked against a throwaway upstream, never a live gateway; and a model call through the proxy must succeed.
+- Never verify with an HTTP request to `/api/*` of a live gateway. The OpenHands probe P0 (`blueprints/runtime-workers/openhands/e2e/netprobe.py:90-94`) sends one to `/api/settings`; it should become a TCP-only probe or target a throwaway instance.
+- For the guard rule: K4's oracle phase `routes` and the documented-command replay.
+
+**Residual exposure:**
+- Every same-uid process, including Windows processes of the user's account, holds full administrative control of both gateways and every stored provider credential.
+- The agent browsers' Local Network Access was measured for public-address-space pages only; main-frame navigations, private-address-space pages and permission grants are not covered.
+- Until the container rule is verified for a workload, that workload must not run model-written or third-party code.
+
+**Overturn:**
+- A workload that runs model-written or third-party code found without verified isolation: it is stopped at once. If it cannot be isolated, `requireLogin=true` with a password is the only close; that reverses the user's 2026-09-28 direction, so it is the user's decision.
+- Upstream ships a non-interactive management credential that an anonymous loopback caller cannot disable, for example key-only management with the bootstrap write closed: adopt it.
+- An agent-browser, Playwright or Chromium change, a launch that disables `LocalNetworkAccessChecks` or grants the loopback permission, or a measured request from an untrusted page (including a navigation or a private-address-space page) reaching a loopback listener: re-measure, and if a request reaches the listener, apply the origin-validator carry, which closes rebinding reads and cross-site writes for every browser.
+- A gateway port bound beyond loopback, a second OS user on the host, or a gateway reachable from the LAN: the posture no longer holds.
+
+## Codex shell snapshots that recorded the messaging token (done, 2026-09-30)
+
+On 2026-09-29 the sink inventory found 19 files under `~/.codex/shell_snapshots` that each declared `CLAUDE_CODE_MESSAGING_TOKEN`. The scan read names only. Codex writes the exported environment of the process that launched it into these files (`codex-rs/shell-command/src/shell_snapshot_exports.rs` at `rust-v0.157.1`).
+
+At 2026-09-30T03:00Z a names-only rescan walked `~/.codex`, `~/.local/state`, `~/.local/share`, `~/code`, `/tmp` and `/var/tmp`, without following symlinked directories and skipping `node_modules`, `.git`, `__pycache__`, `.venv`, `venv`, `site-packages` and Claude's own `shell-snapshots`; directories or files it could not read were skipped without a count. It found 222 `shell_snapshots` directories holding 12 files it could read.
+- Only 2 of those files still declared the variable, both in `~/.codex/shell_snapshots`, with modification times of 2026-09-27T02:19Z and 04:45Z (an earlier scan of that one directory printed both). No open descriptor to either was observed among the processes whose descriptors were readable.
+- The other 17 were already gone. Codex's own three-day snapshot retention is the likely remover (`codex-rs/core/src/shell_snapshot.rs:105` at `rust-v0.157.1`), but the removal was not observed.
+
+After an announcement to the live peers, the enumerated path list was compared byte for byte (`cmp`) with the two literal paths, and the two files were deleted by their literal paths at 03:02:25Z.
+- A rescan found 0 files declaring the variable among the files it could read.
+- A names-only listing of `~/.codex` taken before and after showed exactly those two entries removed.
+- No file content was printed.
+
+Where to act next:
+- Codex's `shell_snapshot` feature is on by default (`codex-rs/features/src/lib.rs:1008-1011` at `rust-v0.157.1`).
+- The host's base configuration and its OmniRoute profile turn it off, and so does the packaged GPT-6 lane home.
+- A Codex home whose configuration leaves it unset still writes snapshots. Item 5 above (Codex profile hardening) covers the repository templates after window W.
+
+Overturn: any new snapshot file with a credential-named `declare -x` line. That moves the Codex profile change ahead of window W, subject to the Gate A owner.
+
+## Status update (2026-09-30)
+
+- **Guard tightening** (item 1, PR #511, not merged).
+  - Head `dc33b48a`; guard sha256 `a70a056f`, equal to its `SHA256SUMS` pin.
+  - The third GPT-6 verification ran at the pre-repair head. It found one blocking regression, a procps personality selector passing the clustered `ps` loosening. It also found one high finding, inherited from the installed guard: four store-path patterns backtracked and timed out the hook at 10 s.
+  - One repair round followed:
+    - it removed the `ps` loosening;
+    - every command is also read as the installed guard reads it, and is refused when either reading refuses;
+    - the four patterns became linear scans.
+  - A fourth verification found no command the installed guard refuses that the new guard allows.
+  - Its two remaining findings go to the next guard change, because only one repair round is allowed:
+    - a descriptor-deduplication case that the installed guard also allows;
+    - a documentation note.
+  - Receipt: `guard-k3-verification-20260930`.
+  - The merge and the host reinstall wait for the Gate A owner to close window W, because the frozen check `hooks.carriers_match_repo` compares the installed hooks with main.
+- **K4** (item 2). These counts are status reports from the lane's review records, which are not retained in this repository; each PR carries its own receipt. The build contract had its first independent review, by GPT-6: 1 blocking and 6 high findings. The largest were a delimiter-suffix gap in the interpreter here-document form, a second loosening the amendments had not authorised, and an unbounded gateway matrix. Version 2 is being written with one gateway matrix, one loosening and an independent reference recognizer for the tests.
+- **Canary proof tool** (item 3). Draft 2 of the contract took one Opus review round (4 blocking findings, fixed). A GPT-6 review then found 7 more blocking false-clean paths:
+  - sink bytes reaching the coordinator's memory;
+  - a pass still standing after a failed retry;
+  - an unstable file set;
+  - a Git metadata gap;
+  - a gzip-plus-BOM gap;
+  - SQLite schema text;
+  - SQLite URI parsing.
+
+  Draft 3 is being written with a two-process boundary and a stable-file-set rule.
+- **Claude OAuth token for headless runs.**
+  - A credential window stores the token from `claude setup-token` in the kernel keyring as `claude-oauth-token` (transport only; a kernel restart erases it). Commands receive it through `kernel_keyring.py exec claude-oauth-token CLAUDE_CODE_OAUTH_TOKEN -- <command>`.
+  - Its variable is not yet a secret name in the guard, so K4 adds it and an inventory entry. `set_credential.py` can then persist it.
+
+## Part 5 — Canary proof continuation (2026-09-30)
+
+The earlier parked harness remains unaccepted. The replacement is
+`canary_proof.py` plus a contained `canary_scan_worker.py`, isolated probe,
+native two-stage workflow and null-output packaged lane wrapper. This is a
+build and synthetic qualification, not a production proof. The operational
+procedure is [Canary proof](../secret-storage.md#canary-proof). Acceptance of
+the window still requires K4 installed, explicit Gate A window closure,
+independent final Astra/Opus review, workstation containment and P5 rehearsal.
+No production canary, credential, transcript, journal or database was used by
+this build. The coordinator registers evidence pins separately.
+
+The selected scanner remains upstream ripgrep 14.1.0, commit
+[`e50df40a1967708b9781486b1c017e48040bceb0`](https://github.com/BurntSushi/ripgrep/tree/e50df40a1967708b9781486b1c017e48040bceb0).
+Its standard printer's only-matching records carry exact matched literal
+bytes behind a known label/NUL; its stats count completed file searches.
+`crates/printer/src/standard.rs:837,923,1064,1698,1760`,
+`crates/core/main.rs:94,126,461` and `flags/hiargs.rs:232,728` establish the
+failure/count/encoding assumptions. Quiet mode has a documented match/error
+exception, so this tool never uses quiet mode. Installed `/usr/bin/rg` is
+14.1.0; the PATH scanner can be newer, so resolve/hash absolute executables.
+15.2.0 (`e89fff89ac9af12e8d4ce9d5fd07beb408ca730f`) is a source-reviewed output
+grammar, not executed: the runtime accepts it with its own stats terminator, and
+its only test is a hand-written stats fixture. The executed version is 14.1.0.
+A release lookup is currency evidence, not scanner acceptance.
+
+Compression uses GNU gzip 1.12, bzip2 1.0.8 and xz 5.4.5 producers reading
+held descriptors through their supported `-d -c` interfaces; lzma uses xz's
+explicit `--format=lzma`. These versions are encoded in setup FACT records.
+No implicit package installation or ripgrep --search-zip path is adopted.
+The supplied scanner comparison considered grep/ripgrep, gitleaks, TruffleHog
+and detect-secrets; it favored exact literals with explicit controls and
+failure accounting for this known synthetic corpus. That comparison is
+supplied research, not a new benchmark. Kingfisher/Titus were not evaluated
+and are not asserted inferior.
+
+Containment reuses `adoption/tools/ecosystem-bounded-run` unchanged, with its
+enforced memory/pids/CPU scope and finite RuntimeMaxSec/TimeoutStopSec backstop.
+Upstream systemd v255 is
+[`db11bab38ccf1ed257f310d29070843d4c58ea01`](https://github.com/systemd/systemd/tree/db11bab38ccf1ed257f310d29070843d4c58ea01):
+`src/run/run.c:620,962,1721` and `man/systemd.scope.xml:113` document inherited
+scope descriptors and lifetime semantics. A scope cannot use --pipe/--pty.
+Util-linux v2.39.3
+[`2da5c904e18fdcffd2b252d641e6f76374c7b406`](https://github.com/util-linux/util-linux/blob/2da5c904e18fdcffd2b252d641e6f76374c7b406/sys-utils/setpriv.c#L1055)
+arms PR_SET_PDEATHSIG before exec. Each upstream executable started by the
+worker uses setpriv; stdin is DEVNULL, a held descriptor or an owned pipe.
+No lifeline pipe is used (C13): parent death reaches each child through
+PR_SET_PDEATHSIG, and whatever a signal misses through the scope's
+RuntimeMaxSec plus TimeoutStopSec. The pre-arming race and setsid/TERM-ignoring
+descendants rely on that verified finite scope backstop. CI's exec stub tests
+direct process death only and cannot establish cgroup/grandchild acceptance.
+
+Repository reuse is explicit: credential_run's encoded_forms, Masker,
+Command/end_group, inventory and core checks; set_credential's encode and
+create_exclusively; credential_status's inventory/metadata/guard pin helpers;
+and credential_boot_receipt's private directory and create-only publisher.
+The store-worktree helper performs ancestor metadata checks, not an external
+Git call. Guard pin checking stays inside a setup child and never uses the
+client_guards reader. Forbidden upstream/repository files stay unchanged.
+
+Git v2.43.0 `Documentation/git-cat-file.txt`, `git-verify-pack.txt`,
+`git-fsck.txt`, `gitrepository-layout.txt` and setup.c provide the logical
+framing/physical verification interfaces. SQLite's
+[URI filenames](https://www.sqlite.org/uri.html),
+[schema table](https://www.sqlite.org/schematab.html),
+[read-only WAL](https://www.sqlite.org/wal.html#read_only_databases) and
+[table_list](https://www.sqlite.org/pragma.html#pragma_table_list) provide the
+database interface. CPython's subprocess/os/struct/sqlite3 interfaces and
+POSIX/Linux no-follow/nonblocking descriptors complete the local integration.
+
+The seven draft-3 repairs have executable negative oracles:
+
+| Repair | Resulting contract / oracle |
+| --- | --- |
+| Parent byte exposure | Every raw channel stays in worker/dumper; unrelated header/name/target/diagnostic sentinels audit coordinator fds, payloads and artifacts |
+| Old pass survives setup crash | Fsynced request precedes mkdir/union/control/plan; SIGKILL and setup errors supersede old passes |
+| Unstable handoff/file set | Retain the original prewalk tuples/lists; held-fd and ctime/route/final-rewalk fixtures detect replacement and same-inode writes |
+| Git objects subtree exemption | Scan .keep/metadata raw; reconcile every loose/pack member with exact logical enumeration; unknown/orphan/index-only payload is incomplete |
+| Compression plus BOM | One decoder stream fans raw and BOM-first/encoded-control views; absent branch or decoder failure is incomplete |
+| SQLite schema hidden | Empty UTF-16/overflow schema/default/view/trigger/name canaries are found logically even when raw bytes miss |
+| Wrong SQLite URI/inode | Escape %, ?, #; verify PRAGMA path and actual opened main fd against held inode; replacement is incomplete |
+
+Continuation testing exposed another false-zero route: a regular file replaced
+by FIFO after held handoff could fail the first subpass but be called a harmless
+special on retry. Hard type failures now remain incomplete and are independently
+asserted by F-M1b/c. The scanner still reads the held original inode; that alone
+is not stability acceptance. Likewise, reading current scan metadata into the
+prewalk record could erase the original identity; ST1–ST5 retain and reconcile it.
+Mutation acceptance preserves each historical fault family and adds the draft-3
+repairs, nonce/ledger/branch/request obligations: `tests/canary_mutants.py`
+(amendment C3) holds draft 2's 65 rows adapted to this design, one row per G6
+repair, the protocol/branch/request rows and two continuation repairs. A kill
+requires a passing pristine named test followed by its actual assertion failure,
+never import, syntax or unrelated fixture failure. Where two layers guard the
+same fault (the worker and the coordinator, a hard-coded key path and the
+inventory, a post-walk and the END seal), a one-layer mutant survived its first
+run; each layer then got its own oracle or the row mutates the fault as a whole,
+and the table says which. Raw returned logs and patches are retained outside the
+repository until a future evidence PR.
+
+Evidence classes remain distinct: installed help/version, fresh pinned source
+retrieval, synthetic local integration, independent kernel process observation,
+workstation scope enforcement and live consumer/provider execution. The repair
+round used the first four inside its sandbox: 141 tests ran there, 128 passed
+and 13 skipped (12 native-scope cases and the then-uninstalled K4 guard rule),
+separate FIFO and boundary runs passed 9 and 12 tests, and all 135 mutants were
+killed by their named assertions after 88 passing pristine runs. Earlier fixture
+repairs and partial runs establish no scope acceptance. The coordinator's
+outside-sandbox runs on the workstation supply it. At `4d8404d5`,
+`python3 -I tests/test_canary_proof.py -v ContainmentRealScopeTests` ran 12
+tests in 79.171 s, OK, exit 0. At `a07b7a24` (every canary-named file
+byte-identical to `4d8404d5`, the tree stacked on the K4 guard and other merged
+changes) the full unit file ran 141 tests in 1059.136 s, OK, 0 skipped, and
+`python3 -I tests/canary_mutants.py --json` reported 135/135 killed after 88/88
+passing pristine runs, with the repository inputs unchanged. The credential and
+guard suites had one failure, by design: `test_host_profile_copy_is_verbatim`
+compares the installed host copy, which differs until reinstall. The whole
+repository suite remains with the coordinator. The 2026-10-01 re-check round's
+own run is recorded at the end of this part. This repair runs no upstream test
+suite and does not relabel these local fixtures as upstream
+acceptance. Network retrieval worked through the installed public context-mode
+channel despite shell-network failure. Returned source pins and hashes are
+retained with the build handoff; no credentials or host paths enter public
+evidence. Foreign shared /tmp metadata is preserved; the synthetic launcher
+limits worktree ancestry checking to its owned fixture, without a production
+environment override or credential-runner edit.
+
+Draft 3 estimates 650 coordinator lines, 1,150 worker lines, 1,800 aggregate
+and 2,800 test lines (probe/workflow/wrapper excluded from aggregate). After the
+2026-10-01 re-check repairs the implementation has 1,834 coordinator lines and
+2,114 worker lines, 3,948 combined. The coordinator accepted that deviation for
+the required coverage and containment logic in the one repair round. The
+3,632-line permanent test file also exceeds its original ceiling because the
+reviews require the missing cases, independent observations and paired mutants;
+that test-size deviation remains reported for coordinator disposition. The
+782-line mutation runner is allowed separately and excluded from the test-line
+ceiling.
+
+The repair corrects seven reviewed false-clean paths: discovered Git indirections
+and damaged Git layouts, WAL families without a logical main scan, incomplete END,
+selection-aware symlink coverage, the prepared cursor seal, final journal entry
+termination, and virtual shadow ownership. The damaged Git layouts corrected are
+exactly these, each refused as incomplete in `RepairTests`: a `.git` directory
+missing HEAD or missing refs stays a logical store by its name (as does a
+directory with `objects/` and one of HEAD or refs), so Git's own validation
+refuses it (`producer_stderr` in the fixtures); a discovered gitfile whose target
+is outside every covered root, or is not a logical store by those rules, refuses
+as `git_indirection_unplanned`; and, since the 2026-10-01 re-check, a directory
+the walk reaches directly with object-store shape but no logical store (a loose
+object `objects/<2 hex>/<38 or 62 hex>`, or a pack or index file in
+`objects/pack`, with no HEAD, refs, `*.git` name or gitfile) refuses the same
+way, whether or not its files are selected. Zlib data outside a Git store and
+outside that shape stays a stated residual. SQLite shadow ownership follows
+`sqlite/sqlite@version-3.45.1` `ext/fts5/fts5_main.c` (`fts5ShadowName`),
+`ext/fts3/fts3.c` (`fts3ShadowName`) and `ext/rtree/rtree.c` (`rtreeShadowName`).
+Unknown virtual modules refuse logical completeness.
+
+The cleanup design required Astra/Max review after a bounded Sol repair: native
+runner exit 143 alone cannot prove the scope was stopped because its trap
+suppresses stop errors. The accepted design keeps the worker alive after END,
+signals the still-owned runner group to invoke its scope-stop trap, releases
+the terminal acknowledgement pipe, and checks kernel cgroup emptiness before
+reaping. FACT 12 supplies only a worker PID and
+the numeric native scope suffix. The coordinator validates membership against
+its own runner PID and reads containment metadata only. This follows
+[systemd v255.4 cg_is_empty_recursive](https://github.com/systemd/systemd-stable/blob/v255.4/src/basic/cgroup-util.c#L927):
+`cgroup.events` populated 0 or disappearance is empty; all other failures refuse.
+Synthetic acceptance is distinct from native scope acceptance, which the
+coordinator's outside-sandbox runs supply on the workstation: 12
+`ContainmentRealScopeTests` OK at `4d8404d5`, and the full unit file (141 tests,
+0 skipped) OK at `a07b7a24`.
+
+Correction log for this round: the reviewed prior claims of complete acceptance
+were too broad. Header sentinels now plant exactly what the oracle checks; FIFO
+tests observe the intended child's open FIFO inode and sleeping reader through
+`/proc`. The installed kernel calls that wait channel `anon_pipe_read` (older
+kernels use `pipe_read`). Consolidating the journal parser initially collided
+with the scanner parser attribute; the independent export parser fixes that.
+Strict END rejection initially prevented legitimate stability retries; an
+incomplete END now retains a nonzero failure reason while inconsistent counts
+still fail the protocol. Removing M2 control reports exposed a missing format
+obligation; an explicit numeric routing check now binds per-format controls.
+An intermittent post-END shutdown timeout exposed reliance on signal delivery
+to the terminal worker; releasing its pipe after signalling the runner fixes
+that wait while retaining the cgroup-empty gate. A deterministic fixture also
+ignores TERM and requires pipe release. The version-stage FIFO fixture initially
+matched `--version` inside setpriv's nested command, blocking the outer wrapper
+before the native executable set PDEATHSIG. Exact argv matching fixes the
+fixture, and the observer checks the complete version-helper argv. Astra/Max
+confirmed this against [util-linux v2.39.3 setpriv.c](https://github.com/util-linux/util-linux/blob/v2.39.3/sys-utils/setpriv.c#L1055);
+the failed fixture is not evidence of a production parent-death regression.
+The pinned-leader review also found inherited `SIGCHLD=SIG_IGN` could automatically
+reap children before cleanup. Both parents now reset SIGCHLD immediately before
+their owned Popen, matching `credential_run.run_command`. Isolated regressions
+require two successful `waitid(WNOWAIT)` observations and the original exit status;
+both reset-removal mutants are killed. This follows Linux execve/wait semantics
+([man-pages 6.19](https://man7.org/linux/man-pages/man2/wait.2.html)). The first
+mutation run additionally exposed a cleanup fixture whose child accepted TERM
+and an equal-count rename caught too early by the held-file identity check.
+The child now ignores TERM before announcing readiness; the rename occurs just
+before the postwalk. Their dedicated mutants now exercise the intended oracles.
+The historical builder substitution under section 16/C14 remains a recorded
+deviation. Existing commit attribution is preserved, as the coordinator directed.
+
+One classifier selects latest requests, binds attempts/roots/ledgers, retains
+sticky hits and rejects missing/error/stale checks. Requested U/comparison
+become obligations until a fresh complete request replaces them. Cleanup's
+absence fact does not stale evidence. Loki always remains proxy_unverified
+inside tool receipts; equality is an external P5 window record only. Transcripts
+are excluded all-or-nothing unless confirmed at prepare. Every claim identifies
+absent roots, exclusions, application transformations, special content, remote
+copies, process memory and scanner-side children's memory, plus metadata
+quiescence limits (backward clocks, shared mappings, privileged/same-uid changes
+and writes after the check). No macOS port or restart canary is asserted.
+
+Reconsider the choice when a maintained scanner demonstrates equivalent failure
+propagation, descriptor/file-list inputs, logical SQLite coverage or decoder
+repairs against this same suite; when a supported runner test-store option
+removes the narrowly authorized synthetic production-store exception; or when
+P5 reveals a new required encoding/container. Installing zstd is a separately
+announced post-W host change plus a decoder contract/fixture update. Replacing
+the scanner based on popularity or a newer release alone is insufficient.
+
+### Re-check round (2026-10-01)
+
+An independent read-only Opus re-check of the repair round (code at `a07b7a24`)
+confirmed 37 of 42 dispositions. It found one remaining false-clean path, one
+record-validation defect and documents that claimed more than the code. This
+round repairs them:
+
+- Objects-only Git store reached directly (high). A directory with Git
+  object-store shape but no HEAD, refs, `*.git` name or gitfile got no Git
+  handling: its zlib loose objects went to the plain view, so a canary inside
+  them read as clean. `Walk.entry` now refuses that layout with the gitfile
+  refusal's reason, `git_indirection_unplanned` (`object_shaped` uses the names
+  `Store.payload` counts, so a 62-hex SHA-256 loose name qualifies too).
+  `RepairTests.test_objects_only_store_reached_directly_refuses` walks Git-made
+  loose objects (the run's canary inside one zlib object, in no raw form), an
+  index-only `objects/pack` and a packed store; mutant R-OBJONLY removes only
+  the check. The refusal is a second layer for damaged `.git` directories, so
+  R-02 (store recognition narrowed to HEAD, objects and refs together) survived
+  its first run. The damaged-store fixture now also asserts that such a
+  directory is still counted as a store (`git_stores` 1), and R-02 is killed by
+  that assertion.
+- Request-level `inventory_unreconciled` (medium). Sink rows accepted it, but
+  the request's reasons did not: when a busy root left it beside a hard error,
+  every later status, verdict and cleanup read the record as invalid (exit 4)
+  and cleanup kept all runtime files. The request's reasons now accept that one
+  row reason and nothing else. The S5 test asserts that `status` returns 3
+  after the pack hard-error branch; mutant R-S5-VALID reverts the acceptance.
+- M2 negative count (low). A decoded view that lost its in-band control
+  counted -1 negatives, which the unsigned field cannot carry; the worker failed
+  with a sequence gap (`protocol_error`). Each view now counts at least zero
+  (`max(0, matches - 1)`).
+  `test_m2_negative_count_stays_unsigned_without_inband_control` and mutant
+  R-M2-UNSIGNED cover it, and R-19's edit text follows the changed line.
+
+This round's own run was outside any sandbox on the workstation, with a fresh
+`TMPDIR` under `/var/tmp`, on `a07b7a24` plus this change. All three repairs
+were first reproduced on unmodified `a07b7a24`: the objects-only scan exited 0
+as complete, the S5 pack case's `status` returned 4, and the lost in-band M2
+control left `protocol_error`. `python3 -I tests/test_canary_proof.py -v` (PATH
+`python3` 3.13.15; the fixtures start workers with `/usr/bin/python3` 3.12.3)
+ran 143 tests in 1015.455 s, OK, 0 skipped. `python3 -I tests/canary_mutants.py
+--check --json` found all 138 mutants applying exactly once and compiling, and
+`python3 -I tests/canary_mutants.py --json` (artifacts kept under `--keep`)
+reported 138/138 killed after 90/90 passing pristine runs, with the repository
+inputs unchanged. The credential, guard and repository suites were not rerun;
+none of them imports the changed modules.
+
+Residuals from the re-check that this round does not fix:
+
+- `not_covered` labels a final that completed but is unusable (`final_too_early`
+  or `final_stale`) as `requested_incomplete`.
+  `test_stream_roots_and_failed_requests_are_described_truthfully` asserts that
+  label right after a complete A11 final; no mutant covers the
+  requested/not_requested split.
+- The `Walk.directory` guard for selected WAL/SHM files without a valid scanned
+  main (`sqlite_uri_identity`) has no test of its own: every fixture writes WAL
+  magic, so `Scan.file` refuses first, and R-03 removes both checks together.
+- `Walk.covered` has no regression test for its exclusion, time-selection,
+  special-file-type or symlinked-parent branches; only the tasks-depth branch
+  is tested.
+- O12: no test asserts the decoded cap in the plan, the shared Git deadline,
+  the SQLite family-bytes budget, the new claim fields, the 15-second shutdown
+  or the rows' `exits` field.
+- G03: the END count/aux check in `Session.outcome` has no mutant; R-04 covers
+  only the END status check.
+- G13: no mutant deletes `--text` from the scanner argv; D2-49 drops
+  `--encoding` and was only relabeled.
+- O07: no mutant replaces the set-based physical/logical Git reconcile with a
+  count-based one.
+- `Session.bind_scope`'s refusal paths and the real `Session.scope_populated`
+  parser are untested (`test_scope_stop_failure_cannot_complete` mocks the
+  parser); only the native success path ran.
+- The scan's own exit code comes from in-memory events that `Run.append` never
+  validates (`scan` returns `report(..., exit_only=True)`). This round removes
+  the one known disagreement (`inventory_unreconciled`), not the mechanism.

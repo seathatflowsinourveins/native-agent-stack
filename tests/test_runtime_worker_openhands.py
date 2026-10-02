@@ -380,9 +380,18 @@ class OpenHandsRecipeTests(unittest.TestCase):
 
     def test_runtime_model_override_and_native_tool_filter(self):
         helpers = load_recipe_module("recipe.py")
-        result = helpers.llm_config(self.read_json("config/worker.json"), "cx/gpt-6-sol-max")
-        self.assertEqual(result["model"], "openai/cx/gpt-6-sol-max")
-        self.assertEqual(result["base_url"], "http://gw:8081/v1")
+        for model in ("cx/gpt-6-sol-max", "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max"):
+            with self.subTest(model=model):
+                selection = helpers.environment_selection({"OPENHANDS_MODEL": model})
+                self.assertEqual(selection["requested_model"], model)
+                self.assertEqual(selection["gateway_model"], model.removeprefix("cx/"))
+                self.assertEqual(selection["gateway_port"], 20128)
+                self.assertEqual(selection["headers"], {})
+                result = helpers.llm_config(self.read_json("config/worker.json"), model)
+                self.assertEqual(result["model"], "openai/" + model)
+                self.assertEqual(result["base_url"], "http://gw:8081/v1")
+                self.assertEqual(result["reasoning_effort"], "max")
+                self.assertEqual(result["extra_headers"], {})
         pattern = re.compile(helpers.tool_filter(self.read_json("config/mcp-policy.json")))
         for name in ("terminal", "file_editor", "context-mode_ctx_execute", "serena_find_symbol", "qmd_query", "jcodemunch_order"):
             self.assertIsNotNone(pattern.fullmatch(name), name)
@@ -393,9 +402,40 @@ class OpenHandsRecipeTests(unittest.TestCase):
                      "headroom_headroom_compress", "memory_query", "qmd_query_evil"):
             self.assertIsNone(pattern.fullmatch(name), name)
 
+    def test_nested_max_survives_worker_configuration_and_oracle_controls(self):
+        helpers = load_recipe_module("recipe.py")
+        worker = load_recipe_module("worker.py")
+
+        def assert_nested_max(fields):
+            self.assertEqual(fields.get("litellm_extra_body", {}).get("reasoning"), {"effort": "max"})
+
+        for arm, model in (("control", "cx/gpt-6.1-sol"), ("control", "cx/gpt-6.1-sol-max"),
+                           ("control", "cx/gpt-6-astra-max"), ("engines-on", "sharedgw/gpt-6-astra-max")):
+            with self.subTest(arm=arm, model=model):
+                configured = helpers.llm_config(self.read_json("config/worker.json"), model, arm=arm)
+                assert_nested_max(configured)
+                fields = worker.worker_llm_config({"OPENHANDS_ARM": arm, "OPENHANDS_MODEL": model}, "dispatch-fixture")
+                assert_nested_max(fields)
+                self.assertEqual(fields["model"], "openai/" + model)
+                self.assertEqual(fields["reasoning_effort"], "max")
+                self.assertEqual(fields["base_url"], "http://gw:8081/v1")
+                self.assertEqual(fields["extra_headers"]["x-omniroute-session"], "dispatch-fixture")
+                self.assertEqual(fields["extra_headers"].get("x-omniroute-compression"),
+                                 "allow-lossy" if arm == "engines-on" else None)
+                for bad_body in (None, {}, {"reasoning": {}}, {"reasoning": {"effort": "high"}},
+                                 {"reasoning": {"effort": "xhigh"}}):
+                    invalid = dict(fields)
+                    if bad_body is None:
+                        invalid.pop("litellm_extra_body")
+                    else:
+                        invalid["litellm_extra_body"] = bad_body
+                    with self.subTest(bad_body=bad_body), self.assertRaises(AssertionError):
+                        assert_nested_max(invalid)
+
     def test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes(self):
         helpers = load_recipe_module("recipe.py")
-        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-5", "openai/cx/gpt-6-astra-max"):
+        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-5", "openai/cx/gpt-6-astra-max",
+                      "cx/gpt-6-unknown-max", "cx/gpt-6.1-sol-unknown"):
             with self.subTest(model=model), self.assertRaises(ValueError):
                 helpers.llm_config(self.read_json("config/worker.json"), model)
         for change in ({"temperature": 0.1}, {"response_format": {"type": "json_object"}}, {"native_tool_calling": False}):

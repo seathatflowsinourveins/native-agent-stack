@@ -115,6 +115,7 @@
       }
     ],
     "not_repin_targets": [
+      {"path": "catalogs/foundation/new-wsl-architecture-20261001.json", "class": "dated_record", "basis": "20261001", "reason": "The dated 2026-10-01 architecture edition names AgentsView 0.43.0 as an alternative of the observation layer, citing the landscape record; a dated edition is not rewritten by a re-pin."},
       {"path": "catalogs/landscape/foundation.json", "class": "dated_record", "basis": "\"checked_at\": \"2026-09-22\"", "reason": "The AgentsView why_not_default belongs to the grandfathered 2026-09-22 verdict wave (scripts/landscape.py:56-75); tools/sota-convergence/build_verdicts.py --check, run by .github/workflows/validate.yml:115, compares it with layer-verdicts-20260922.json."},
       {"path": "catalogs/sota-convergence/README.md", "class": "dated_record", "basis": "\"now\" is the GitHub latest release on 2026-09-22", "reason": "Dated 2026-09-22 convergence summary."},
       {"path": "catalogs/sota-convergence/layer-verdicts-20260922.json", "class": "dated_record", "basis": "20260922", "reason": "Hash-registered 2026-09-22 verdict wave."},

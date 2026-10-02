@@ -1,0 +1,69 @@
+"""Enumerate every Codex shell snapshot (any <CODEX_HOME>/shell_snapshots) that declares the Claude messaging-token
+variable, across the host's Codex homes; names and counts only, never a value or a file line.
+
+Usage: python3 -I snapshots_enum_all.py <list-file>
+Writes the literal paths of the matching files, sorted, one per line, to <list-file> (0600) and prints per-home counts,
+the total, the set's sha256 and any process that holds one of them open."""
+import hashlib
+import os
+import sys
+import time
+
+VAR = "CLAUDE_CODE_" + "MESSAGING_" + "TOKEN"  # built from parts so this file's text is not a secret-name line
+HOME = os.path.expanduser("~")
+ROOTS = [os.path.join(HOME, ".codex"), os.path.join(HOME, ".local", "state"), os.path.join(HOME, ".local", "share"),
+         os.path.join(HOME, "code"), "/tmp", "/var/tmp"]
+PRUNE = {"node_modules", ".git", "__pycache__", ".venv", "venv", "site-packages", "shell-snapshots"}
+PATTERNS = (f"declare -x {VAR}=".encode(), f"export {VAR}=".encode())
+
+matches, scanned, dirs_seen = [], 0, 0
+for root in ROOTS:
+    for current, subdirs, files in os.walk(root, onerror=lambda e: None):
+        subdirs[:] = [d for d in subdirs if d not in PRUNE and not os.path.islink(os.path.join(current, d))]
+        if os.path.basename(current) != "shell_snapshots":
+            continue
+        dirs_seen += 1
+        for name in files:
+            path = os.path.join(current, name)
+            try:
+                st = os.lstat(path)
+                if not os.path.isfile(path) or os.path.islink(path):
+                    continue
+                with open(path, "rb") as handle:
+                    data = handle.read()
+            except OSError:
+                continue
+            scanned += 1
+            if any(line.lstrip().startswith(PATTERNS) for line in data.splitlines()):
+                matches.append((path, st.st_size, st.st_mtime))
+        subdirs[:] = []
+
+matches.sort()
+per_home = {}
+for path, _, mtime in matches:
+    home = os.path.dirname(os.path.dirname(path))
+    count, newest = per_home.get(home, (0, 0))
+    per_home[home] = (count + 1, max(newest, mtime))
+print(f"shell_snapshots directories: {dirs_seen}; files scanned: {scanned}; files declaring the variable: {len(matches)}")
+for home, (count, newest) in sorted(per_home.items()):
+    print(f"  {count:3d}  newest {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(newest))}  {home.replace(HOME, '~', 1)}")
+digest = hashlib.sha256("\n".join(p for p, _, _ in matches).encode()).hexdigest()
+print("set sha256:", digest)
+fd = os.open(sys.argv[1], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+with os.fdopen(fd, "w") as out:
+    out.write("".join(p + "\n" for p, _, _ in matches))
+print("list written:", sys.argv[1])
+
+targets = {p for p, _, _ in matches}
+open_by = []
+for pid in filter(str.isdigit, os.listdir("/proc")):
+    try:
+        for fd_name in os.listdir(f"/proc/{pid}/fd"):
+            try:
+                if os.readlink(f"/proc/{pid}/fd/{fd_name}") in targets:
+                    open_by.append(pid)
+            except OSError:
+                pass
+    except OSError:
+        pass
+print("processes holding one open:", sorted(set(open_by)))

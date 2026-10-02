@@ -19,6 +19,21 @@ dated evidence.
 | [Alpaca paper smoke](../paper-e2e-20260921/paper-receipt.json) | One SPY long-to-flat roundtrip, two actual submissions/full fills, -$0.08 cash-matched gross PnL, zero final positions/open orders; a fresh completed-trial recovery added zero writes |
 | Broader native acceptance | SPY/LEAN parity, native in-flight faults, streaming reconciliation, IBKR, strategy merit and continuous service remain open |
 
+**Superseding note, 2026-10-01 (trading lane owner).** The table keeps its September 21 status. Since then:
+- On 2026-09-23 the frozen SPY comparison's `one_zero` case ran natively on 2.0.0rc5 and passed against the frozen
+  LEAN oracle ([`spy-parity/verdict-v2.json`](spy-parity/verdict-v2.json): verdict PASS, complete, 0 failed).
+- The other five cases have no mapping yet ([`spy-parity/mapping-manifest-v2.json`](spy-parity/mapping-manifest-v2.json),
+  `dependent_comparison_status`):
+  - `one_stress` is blocked by `costs_and_rounding_stress`;
+  - `two_zero`, `adaptive_stress` and `over_limit` by `margin_and_adaptive_state`;
+  - `two_stress` by both.
+  The gate `spy-lean-parity` (`catalogs/us-equities/gates-20260922.json`) records the `one_zero` PASS only.
+- IBKR acceptance step 1 (read-only, execution disabled) passed on the 2.0.0rc5 native adapter on 2026-09-23
+  ([`evidence/receipts/ibkr-readonly-acceptance-20260923.json`](../../../evidence/receipts/ibkr-readonly-acceptance-20260923.json)).
+  Steps 2-4 remain open.
+
+See [`docs/decisions/2026-10-01-trading-layer-verdicts.md`](../../../docs/decisions/2026-10-01-trading-layer-verdicts.md).
+
 The AAPL run uses retrospective same-close decisions and synthetic fill liquidity;
 known corporate-action dates were excluded. It does not implement the SPY
 converter or oracle below. The paper smoke observed full fills and recovery of an

@@ -1,0 +1,927 @@
+{
+ "layer_id": "observability-hosting",
+ "proposal": {
+  "layer_id": "observability-hosting",
+  "proposal": "add_candidates",
+  "summary": "All six components the researcher packet treated as \"current winners\" (otelcol-contrib, prometheus, loki, grafana, restic, sandbox-runtime) earn their place on freshly checked, mostly-native evidence -- but the catalog's own bookkeeping (layers.json / catalogs/landscape/us-equities.json, checked_at 2026-09-22) actually records \"winners\": [] and \"verdict_status\": \"pending_lanes\", not a clean six-item list. Reading the actual adjudication file (evidence/artifacts/layer-verdicts-20260922/adjudication/us-equities-observability-hosting-20260922.json) shows why: it was a forced choice between two 2-component additions to otelcol-contrib -- set A (prometheus+loki) vs set B (sandbox-runtime+restic) -- and all 4 judgments split exactly along presentation order (\"each... chose whichever return was shown as A\"), a documented order-bias artifact, not an evidence disagreement; every judge's own text calls all four candidates well-evidenced. Grafana was in neither contested set (both lanes already agreed on it). Since prometheus/loki (telemetry storage) and sandbox-runtime/restic (sandbox+backup) answer different, non-overlapping scope terms the requirement names, the merit-based resolution is to keep all four together rather than pick a pair -- that alone resolves the \"lanes disagreed\" open_gap without new evidence. Two independent-verification findings during this review change the substantive picture: (1) restic's proven scope is broader than the researcher packet says -- two dated 2026-09-19 native_cli_e2e receipts I read directly (state-recovery/memory and state-recovery/qdrant, already cited by landscape/us-equities.json but omitted by the researcher) show live ai-memory SQLite and live Qdrant backup+restore with full integrity verification, not just the 22 static files the packet cites; off-host durability and Loki/Prometheus/broker-journal backup remain the real, still-open pieces. (2) I re-read the sandbox-runtime network-denial receipt myself rather than trusting the adversarial stage's account, and it holds up (dated 2026-09-25, independent review by a separately identified claude-opus-5-5 session, both \"agree\") -- but it tests generic loopback-HTTP egress denial, not \"broker execution authority\" specifically, which is this layer's own requirement text and the one clause no candidate has yet demonstrated. Separately, this repo's own 2026-09-23 sweep already ran two adversarial-review lenses over three candidates this task's researcher packet never mentioned: Grafana Tempo (survived, not refuted -- a real gap, since Claude Code already emits OTLP trace spans nothing currently ingests) and Presidio / Vector.dev (both refuted, with concrete reasons). The researcher packet also omitted Langfuse entirely despite it already being tracked as an \"alternative\" in this repo's own catalog. Net proposal: keep all six winners; add Grafana Tempo as a bounded trial candidate for the undemonstrated tracing gap; run the two concrete tests still open (re-validate the existing fixture against Prometheus v3.15.0 before bumping the pin one point release; exercise broker-execution-authority denial specifically, the missing half of sandbox-runtime's own overturn arm); leave the LLM-trace-observability candidates (Opik/SigNoz/Langfuse/Phoenix) as watch-only since none has native evidence and none beats an incumbent on this layer's actual scope. None of this moves a paper-lane number (engines run / paper acts passed / paper fills) -- it is infrastructure for the research harness itself, not the trading path.",
+  "winner_status": [
+   {
+    "component_id": "opentelemetry-collector-contrib",
+    "status": "earns_it",
+    "note": "Pin v0.161.0 (2026-09-15) matches upstream latest exactly; repo active (pushed 2026-09-26), Apache-2.0, not archived -- per GitHub API. Native-proven: `otelcol-contrib validate` exits 0 and the collected usage histogram matches native Codex/Claude task totals (observability/receipt.json). Correction carried over from the adversarial stage: delivery to Loki is not via a dedicated lokiexporter component (absent from the v0.161.0 distribution manifest; deprecated upstream, issue #33916) but via the generic OTLP exporter into Loki's own OTLP/structured-metadata ingestion -- the single-binary claim holds, the named mechanism doesn't. Real open item, found in this repo's own 2026-09-23 sweep and independently confirmed by me reading observability/receipt.json directly: the collector's persistent spool has 'no automatic expiry' and 'no loss/recovery acceptance under full disk or extended backend outage.' Vector.dev was investigated as a fix and adversarially refuted (would duplicate the pipeline; its own docs say its disk buffers force-exit on disk-full) -- the correct next step is fault-testing the existing collector's own queue, not adopting a second tool. Also still missing: a trace backend (see Tempo below)."
+   },
+   {
+    "component_id": "prometheus",
+    "status": "earns_it",
+    "note": "Pin v3.14.0 is one point release behind upstream v3.15.0 (released 2026-09-25) -- routine drift on an actively maintained project (66k+ stars, pushed 2026-09-26), not a quality signal. Re-run the existing observability/backends fixture against 3.15.0 before moving the pin rather than assuming compatibility. Native-proven: usage-histogram total 40518 matched via Prometheus query; prometheus_historical_sample=true after a Collector/backend restart."
+   },
+   {
+    "component_id": "loki",
+    "status": "earns_it",
+    "note": "Pin v3.7.8 matches upstream latest exactly; no drift. AGPL-3.0 self-host-only constraint already accepted, not a new gap. Native-proven: loki_log=true after restart; LogQL sum 121288 exactly equals the receipt's own recorded arithmetic (80770 prior + 40518 fresh)."
+   },
+   {
+    "component_id": "grafana",
+    "status": "earns_it",
+    "note": "Notably absent from both contested sets in the 2026-09-22 adjudication (set A = otelcol-contrib+prometheus+loki, set B = otelcol-contrib+sandbox-runtime+restic) -- both lanes retained it without dispute, so the layer's empty-winners bookkeeping doesn't actually implicate Grafana. Pin v13.2.2 matches upstream latest exactly. Native-proven dashboard render plus post-restart datasource acceptance. One minor provenance note on file, not a functional gap: the installed packaged binary's build commit differs from the v13.2.2 git tag's commit (backends/receipt.json: grafana_tag_build_commit_equal=false) -- worth closing given this repo's security-supply-chain layer already flags unverified build provenance/signatures as an open item there."
+   },
+   {
+    "component_id": "restic",
+    "status": "earns_it",
+    "note": "The researcher/adversarial packet's framing ('covers static public files only -- no live SQLite/Qdrant/Loki/Prometheus database... backed up,' citing only blueprints/us-equities/hosting/backup/receipt.json) is stale. I independently found and read two further native_cli_e2e receipts on current main (git log: commit 8f1da517) that the packet never cited but that this repo's own landscape/us-equities.json (checked 2026-09-22) already cites for this exact candidate: state-recovery/memory/receipt.json (2026-09-19, live ai-memory SQLite online-backup through encrypted restic backup/check --read-data('no errors were found')/restore --verify plus an isolated bwrap-sandboxed application restore -- integrity_check ok, 0 FK violations, all 56 tables and FTS counts matching) and state-recovery/qdrant/receipt.json (2026-09-19, live Qdrant snapshot through the same restic chain, byte-identical, 'no errors were found,' isolated native restore reproducing 5/5 collections, 201/201 points and an exact query result). Live-database backup+restore is therefore established for ai-memory and Qdrant specifically, contrary to the packet's blanket claim. What remains genuinely open across all three restic receipts I read: off-host durability (off_host:false / repository and password share a host, in every one) and Loki/Prometheus/broker-order-journal live-state backup (covered by none)."
+   },
+   {
+    "component_id": "sandbox-runtime",
+    "status": "earns_it",
+    "note": "Pin v0.0.77 matches upstream latest exactly; repo active, Apache-2.0. I independently re-read evidence/hosts/nativestack-5975wx-20260925/...sandbox-runtime--use--20260925.json myself rather than only trusting the adversarial stage's account: filesystem allow/deny fully exercised (allowed write exit 0; denied read exit 1, 0 bytes leaked; denied write exit 2, host bytes unchanged; unlisted-path write exit 2, no file created) and network policy independently exercised against an owned loopback HTTP server (allow: curl exit 0, payload retrieved; explicit-deny and empty-allowlist: both proxy HTTP 403/curl exit 22; exactly 1 request reached the server), dated 2026-09-25, git-confirmed on current main (commit 6752ede5), with a self-review plus an independent_session review by a separately identified reviewer (model claude-opus-5-5), both 'agree'. So the candidate card's 'network denial not independently exercised' limitation is stale by one day -- confirmed by my own direct read. But the same receipt's own limitations say the test covered loopback HTTP only (no TLS/SOCKS/IPv6/DNS-rebinding/remote-host/escape testing) and nothing in it exercises 'broker execution authority' specifically. Since this layer's own requirement text is literally '...without granting research workers broker execution authority,' this is the single most requirement-central gap left anywhere in this layer, and it is real and still open."
+   }
+  ],
+  "challengers": [
+   {
+    "name": "Grafana Tempo",
+    "url": "https://github.com/grafana/tempo",
+    "why_better": "Not a replacement for any current winner -- it fills a capability gap none of the six winners cover: distributed tracing. Claude Code already emits beta OTLP trace spans (per this repo's own 2026-09-23 sweep and observability/receipt.json) that nothing in the current stack ingests. Tempo is single-binary and disk-based (no Kafka dependency) and shares the Grafana query surface already adopted for Loki/Prometheus, so it is a same-vendor, low-integration-cost addition. This repo's own 2026-09-23 sweep already ran two independent adversarial-review lenses against it and neither refuted it (disposition: targeted_candidate, survives:true) -- the strongest-evidenced 'new find' surfaced anywhere in this exercise, yet it never appeared in the researcher packet handed to me. I independently reconfirmed it today: AGPL-3.0, archived:false, pushed 2026-09-26, latest release still v3.0.3 (2026-08-13) -- unchanged and current since the 2026-09-23 check.",
+    "evidence_level": "source_review (repo-internal two-lens adversarial review, non-refuted; zero native execution on this stack)",
+    "trial_plan": "Install Tempo 3.0.3 single-binary locally (the pin already checked twice); point the existing otelcol-contrib distribution's OTLP trace pipeline at it (the receiver is already present in the manifest; only a traces exporter/pipeline stanza is new, no second collector). Re-run a Claude Code or Codex task that emits OTLP spans and confirm the same trace_id is queryable from the already-adopted Grafana instance, with span count/duration matching what the SDK itself reports -- the same usage-histogram-parity discipline this layer's overturn_protocol already applies to Prometheus/Loki. Overturned if Tempo's single-binary local-disk mode fails the same restart-persistence check Prometheus/Loki already passed, or if AGPL-3.0 conflicts with a constraint not currently on file (none is; Loki is already AGPL-3.0 and accepted).",
+    "paper_lane_impact": "none",
+    "sources": [
+     "catalogs/sota-convergence/manifest-20260923.json (grafana/tempo entry: disposition targeted_candidate, adversarial_verification.survives=true, both lenses not refuted)",
+     "https://github.com/grafana/tempo/releases/tag/v3.0.3",
+     "observability/receipt.json (local repo: spool/OTLP-span gap text)"
+    ]
+   }
+  ],
+  "rejected": [
+   {
+    "name": "Opik (Comet ML)",
+    "reason": "Independently confirmed today: Apache-2.0 (clean), active (2.2.81, released 2026-09-25, pushed same day) -- matches the researcher's claim exactly. But zero native execution anywhere in this repo, and it targets LLM/agent-trace observability, a different sub-scope from this layer's core (infra metrics/logs/sandbox/backup) already tagged 'alternative'/watch-only in this repo's own catalog. Not a verified advantage over any current winner."
+   },
+   {
+    "name": "SigNoz",
+    "reason": "Independently confirmed today: still active (v0.143.0, released 2026-09-23, matches the researcher's claim exactly), but the whole-repo license is genuinely ambiguous (GitHub reports NOASSERTION at the repo level, consistent with the researcher's own fetched MIT/ee split). Its pitch -- consolidate Prometheus+Loki+Grafana into one binary -- would require fully replacing, not supplementing, three already-native-proven components with zero head-to-head evidence on this stack's own acceptance criteria. Watch item, not a trial candidate."
+   },
+   {
+    "name": "Langfuse",
+    "reason": "Omitted entirely from the researcher packet despite already being tracked in this repo's own catalog (catalogs/us-equities/agents-operations.json: decision='alternative', pin v4.38.0/2026-09-17, license 'MIT core; separate enterprise license in ee'). I independently confirmed via gh api it is current and heavily active (latest v4.46.0 released 2026-09-25, 35k+ stars, pushed today; repo-level license also NOASSERTION, consistent with the split). Same conclusion as Opik/SigNoz: targets the LLM-trace sub-scope, zero native evidence on this stack, not a verified advantage over any of this layer's six winners -- flagged here as a real completeness gap in the packet, not as a candidate to adopt now."
+   },
+   {
+    "name": "Arize Phoenix",
+    "reason": "Unchanged from the adversarial stage's own finding: source_review only, ELv2 (source-available, not OSI-approved, forbids hosted-service resale), further behind upstream than at last check. Same LLM-trace sub-scope as Opik/Langfuse/SigNoz; the vendor-authored Opik-vs-Phoenix comparison the packet cites is correctly flagged there as vendor evidence, not neutral, and is excluded from this decision."
+   },
+   {
+    "name": "Daytona",
+    "reason": "Independently re-confirmed today, exactly matching the researcher's claims: license null (no SPDX), pushed_at 2026-07-24 (~2 months stale), latest tag v0.190.0 published 2026-06-23 (~3 months stale) -- despite 71,712 stars, the most of any candidate in this whole exercise. Retained only as the packet's own documented 'stars are not evidence' negative example, independently reproduced here; not a candidate for anything in this layer."
+   },
+   {
+    "name": "E2B",
+    "reason": "source_review only, no native run in this repo. A credible microVM escalation path if a future workload needs VM-grade isolation beyond sandbox-runtime's process/filesystem/network allow-list, but nothing in this layer's current requirement or open gaps calls for that escalation yet -- sandbox-runtime's own remaining gap (broker-authority-removal) is a test to run against the existing tool, not a reason to switch isolation models."
+   },
+   {
+    "name": "Modal (modal-client)",
+    "reason": "source_review only; hosted compute is closed/billed with no self-host path, fitting only as a paid escape valve, not this layer's self-hosted default. Off-requirement."
+   },
+   {
+    "name": "OpenSandbox",
+    "reason": "source_review only, zero native execution, and further behind its own upstream than at last check; an unexecuted alternative to an already-proven sandbox-runtime with no demonstrated advantage."
+   },
+   {
+    "name": "cua (trycua)",
+    "reason": "metadata only. Answers a broader/different problem -- full computer-use/GUI-level VM fleets -- than this layer's process-level research-worker isolation requirement."
+   },
+   {
+    "name": "OpenSRE (Tracer-Cloud)",
+    "reason": "metadata only, public-alpha with a calendar-versioned pre-1.0 release train, zero native evidence. Would sit atop the already-adopted Prometheus/Loki/Grafana stack rather than replace anything; a watch item, not a trial candidate."
+   },
+   {
+    "name": "Presidio (data-privacy-stack/presidio)",
+    "reason": "Already investigated and rejected by this repo's own 2026-09-23 sweep (disposition: refuted_targeted_candidate) -- confirmed org-transfer via matching repo id, MIT, 11,009 stars, still active -- but it is a Python PII-detection SDK with no OTel Collector component; the pipeline's existing transform plus redactionprocessor already drop bodies/allowlist keys, and Presidio's own README disclaims full detection. The gap it targeted (arbitrary-content DLP beyond the single synthetic canary in observability/receipt.json) remains open; Presidio specifically is not the fix."
+   },
+   {
+    "name": "Vector.dev",
+    "reason": "Already investigated and rejected by this repo's own 2026-09-23 sweep (disposition: refuted_targeted_candidate) -- would duplicate the existing single-collector pipeline, and Vector's own documentation states its disk buffers force-exit on disk-full, undermining its pitched advantage; the sweep also flagged that its raw releases/latest API return did not match the version claimed for it. The real gap it targeted (the collector's own persistent spool has no automatic expiry and no loss/recovery acceptance under full disk or an extended outage -- confirmed verbatim by me reading observability/receipt.json directly) is real and still open; the fix is to fault-test the existing otelcol-contrib queue, not add a second pipeline tool."
+   }
+  ]
+ },
+ "claude_verify_checks": [
+  {
+   "name": "otelcol-contrib: repo/license",
+   "claim": "Repo exists at github.com/open-telemetry/opentelemetry-collector-contrib, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api repos/open-telemetry/opentelemetry-collector-contrib confirms license.spdx_id=Apache-2.0, archived=false, pushed_at=2026-09-26T14:36:46Z, 4954 stars.",
+   "sources": [
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+   ]
+  },
+  {
+   "name": "otelcol-contrib: latest version/date",
+   "claim": "latest_version v0.161.0, latest_release_date 2026-09-15",
+   "verdict": "supported",
+   "note": "GitHub releases API tag v0.161.0 published_at 2026-09-15T15:05:47Z, exactly matching the tag path cited. Next-newest tag is v0.160.0 (2026-09-02).",
+   "sources": [
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0"
+   ]
+  },
+  {
+   "name": "otelcol-contrib: maintained / not archived",
+   "claim": "maintained true, no 12-month gap, not archived",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-26 (same day) and release 2026-09-15, both far inside 12 months; archived=false per API.",
+   "sources": [
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+   ]
+  },
+  {
+   "name": "otelcol-contrib: winners_upstream note (no drift)",
+   "claim": "'pin v0.161.0 matches upstream latest exactly... no new tag since pin' (checked 2026-09-26)",
+   "verdict": "supported",
+   "note": "Confirmed: v0.161.0 is still the newest tag/release in both -contrib and the opentelemetry-collector-releases repo (whose top tags are only nightly prereleases like v0.162.0-nightly.*, not a stable cut). Repo pushed_at is today, consistent with 'active main, no new release yet'.",
+   "sources": [
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+    "https://github.com/open-telemetry/opentelemetry-collector-releases/tags"
+   ]
+  },
+  {
+   "name": "otelcol-contrib: native-proven receipt claim",
+   "claim": "observability/receipt.json records 'otelcol-contrib validate' exit 0 and usage matching native Codex/Claude totals",
+   "verdict": "supported",
+   "note": "Read observability/receipt.json directly: commands[0] = otelcol-contrib validate, exit_code 0; native_client_acceptance.codex.collected_turn_histogram_matches_native_usage=true; .claude.collected_request_logs_and_metrics_match=true.",
+   "sources": [
+    "observability/receipt.json (local repo, lines 76-81, 163-202)"
+   ]
+  },
+  {
+   "name": "otelcol-contrib: receivers/redaction/exporters capability claim",
+   "claim": "'Adopted distribution supplies OTLP receivers, privacy/redaction transforms and exporters to Prometheus/Loki without running a second collector binary.'",
+   "verdict": "refuted",
+   "note": "Partly wrong as literally worded. Confirmed present in the pinned v0.161.0 build manifest: receiver/otlpreceiver (core) and processor/redactionprocessor, plus exporter/prometheusexporter + prometheusremotewriteexporter (all in opentelemetry-collector-contrib and the otelcol-contrib distribution manifest). But there is NO Loki-specific exporter component in this distribution: exporter/lokiexporter returns 404 at v0.161.0 and is absent from the full 46-entry exporter/ directory listing. Upstream CHANGELOG confirms it existed historically (present at v0.100.0) then was deprecated ('lokiexporter: Deprecate component', issue #33916) with guidance to 'migrate to using an OTLP exporter'. This repo's own receipt.json corroborates the real mechanism: Loki is configured to accept the generic OTLP exporter's structured-metadata output directly ('Final native Loki OTLP structured-metadata configuration accepted'; upstream_sources cites grafana.com/docs/loki/latest/send-data/otel/), not a dedicated lokiexporter. So delivery to Loki is real and single-binary, but not via a 'Loki exporter' component as the claim implies.",
+   "sources": [
+    "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/v0.161.0/distributions/otelcol-contrib/manifest.yaml",
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.161.0/exporter (lokiexporter absent)",
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33916",
+    "observability/receipt.json (local repo)"
+   ]
+  },
+  {
+   "name": "prometheus: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-26T14:51:01Z, 66247 stars.",
+   "sources": [
+    "https://github.com/prometheus/prometheus"
+   ]
+  },
+  {
+   "name": "prometheus: latest version/date",
+   "claim": "latest_version v3.15.0, latest_release_date 2026-09-25",
+   "verdict": "supported",
+   "note": "GitHub release tag v3.15.0 published_at 2026-09-25T08:56:22Z (release title internally says '3.15.0 / 2026-09-24', the changelog-header date, one day off from the GitHub publish timestamp; the 2026-09-25 date matches published_at).",
+   "sources": [
+    "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
+   ]
+  },
+  {
+   "name": "prometheus: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today, release yesterday; not archived.",
+   "sources": [
+    "https://github.com/prometheus/prometheus"
+   ]
+  },
+  {
+   "name": "prometheus: winners_upstream note (drift v3.14.0->v3.15.0)",
+   "claim": "'pin is v3.14.0 (2026-08-18) but upstream cut v3.15.0 on 2026-09-25 -- pin_behind_upstream should flip to true'",
+   "verdict": "supported",
+   "note": "Confirmed both dates directly: v3.14.0 published_at 2026-08-18T08:49:40Z; v3.15.0 published_at 2026-09-25T08:56:22Z. Drift is real and exactly one point release, as claimed.",
+   "sources": [
+    "https://github.com/prometheus/prometheus/releases/tag/v3.14.0",
+    "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
+   ]
+  },
+  {
+   "name": "prometheus: native-proven histogram claim",
+   "claim": "'observability/backends/receipt.json records prometheus_historical_sample true and a matching usage histogram (total 40518) after a Collector/backend restart'",
+   "verdict": "supported",
+   "note": "prometheus_historical_sample:true is directly confirmed in observability/backends/receipt.json's post-restart persistence checks. The total-40518 histogram is a real, exact figure, but it comes from a separate query recorded in observability/followup-receipt.json (native_histogram.matched_categories.total=40518, retained_histogram_query values.total='40518') rather than being itself part of the restart-persistence test. Both underlying facts are true and same-dated (2026-09-19); the claim's phrasing implies a tighter single-event linkage between the restart and the 40518 figure than what the two files separately show.",
+   "sources": [
+    "observability/backends/receipt.json (local repo, lines 85-98)",
+    "observability/followup-receipt.json (local repo, lines 96-125)"
+   ]
+  },
+  {
+   "name": "prometheus: fit-note re-run caveat",
+   "claim": "'no specific breaking change was read in this check, so re-run the existing fixture against 3.15.0 before moving the pin'",
+   "verdict": "supported",
+   "note": "Accurate framing: I likewise found no CHANGELOG evidence pulled for v3.15.0 in this check (not fetched), so the recommendation to re-validate rather than assume compatibility is the correct, unresolved posture.",
+   "sources": [
+    "https://github.com/prometheus/prometheus/releases/tag/v3.15.0"
+   ]
+  },
+  {
+   "name": "loki: repo/license",
+   "claim": "Repo exists, license AGPL-3.0",
+   "verdict": "supported",
+   "note": "gh api confirms license AGPL-3.0, archived=false, pushed_at 2026-09-26T15:17:33Z, 28951 stars.",
+   "sources": [
+    "https://github.com/grafana/loki"
+   ]
+  },
+  {
+   "name": "loki: latest version/date",
+   "claim": "latest_version v3.7.8, latest_release_date 2026-09-17",
+   "verdict": "supported",
+   "note": "Tag v3.7.8 published_at 2026-09-17T15:51:10Z. No newer release in the 3.7.x line since (next is older v3.7.7, 2026-08-27); a same-day v3.6.17 exists but is an older minor line.",
+   "sources": [
+    "https://github.com/grafana/loki/releases/tag/v3.7.8"
+   ]
+  },
+  {
+   "name": "loki: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today; not archived.",
+   "sources": [
+    "https://github.com/grafana/loki"
+   ]
+  },
+  {
+   "name": "loki: winners_upstream note (no drift)",
+   "claim": "'pin (v3.7.8) matches upstream latest; no drift'",
+   "verdict": "supported",
+   "note": "Confirmed, see version/date check above.",
+   "sources": [
+    "https://github.com/grafana/loki/releases/tag/v3.7.8"
+   ]
+  },
+  {
+   "name": "loki: native-proven log/LogQL claim",
+   "claim": "'loki_log true after restart; per-receipt_id LogQL sum matched Prometheus total (121288 = 80770+40518)'",
+   "verdict": "supported",
+   "note": "loki_log:true confirmed directly in observability/backends/receipt.json persistence checks. The 121288 figure is confirmed in observability/followup-receipt.json: sdk_receipts_6h LogQL query returned '121288', and receipt_arithmetic explicitly records prior_two_tasks 80770 + fresh_task 40518 = three_task_total 121288. Arithmetic and query result match exactly.",
+   "sources": [
+    "observability/backends/receipt.json (local repo)",
+    "observability/followup-receipt.json (local repo, lines 206-224)"
+   ]
+  },
+  {
+   "name": "grafana: repo/license",
+   "claim": "Repo exists, license AGPL-3.0",
+   "verdict": "supported",
+   "note": "gh api confirms license AGPL-3.0, archived=false, pushed_at 2026-09-26T14:50:07Z, 76925 stars.",
+   "sources": [
+    "https://github.com/grafana/grafana"
+   ]
+  },
+  {
+   "name": "grafana: latest version/date",
+   "claim": "latest_version v13.2.2, latest_release_date 2026-09-15",
+   "verdict": "supported",
+   "note": "Tag v13.2.2 published_at 2026-09-15T12:21:32Z; no newer release (same-day older-minor tags v13.1.6/v13.0.9 exist, both lower lines).",
+   "sources": [
+    "https://github.com/grafana/grafana/releases/tag/v13.2.2"
+   ]
+  },
+  {
+   "name": "grafana: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today; not archived.",
+   "sources": [
+    "https://github.com/grafana/grafana"
+   ]
+  },
+  {
+   "name": "grafana: winners_upstream note (no drift)",
+   "claim": "'pin matches upstream latest; no drift'",
+   "verdict": "supported",
+   "note": "Confirmed as above.",
+   "sources": [
+    "https://github.com/grafana/grafana/releases/tag/v13.2.2"
+   ]
+  },
+  {
+   "name": "grafana: native dashboard/query acceptance claim",
+   "claim": "'Native local dashboard/query acceptance over Prometheus/Loki (observability/receipt.json, observability/backends/receipt.json)'",
+   "verdict": "supported",
+   "note": "observability/receipt.json shows dashboard.rendered=true with an artifact screenshot; backends/receipt.json persistence.checks.grafana_dashboard=true and grafana_datasources=true after restart. Note (not in the candidate's claim but found in-file): grafana_tag_build_commit_equal=false -- the installed packaged binary's build commit differs from the v13.2.2 git tag's commit, a provenance nuance the repo itself already flags, not a contradiction of the version claim.",
+   "sources": [
+    "observability/receipt.json (local repo)",
+    "observability/backends/receipt.json (local repo, lines 73-74, 94-98)"
+   ]
+  },
+  {
+   "name": "restic: repo/license",
+   "claim": "Repo exists, license BSD-2-Clause",
+   "verdict": "supported",
+   "note": "gh api confirms license BSD-2-Clause, archived=false, pushed_at 2026-09-25T20:08:19Z, 36271 stars.",
+   "sources": [
+    "https://github.com/restic/restic"
+   ]
+  },
+  {
+   "name": "restic: latest version/date",
+   "claim": "latest_version v0.19.1, latest_release_date 2026-07-05",
+   "verdict": "supported",
+   "note": "Tag v0.19.1 published_at 2026-07-05T08:13:33Z -- matches both the candidate and this repo's own backup receipt exactly.",
+   "sources": [
+    "https://github.com/restic/restic/releases/tag/v0.19.1",
+    "blueprints/us-equities/hosting/backup/receipt.json (local repo)"
+   ]
+  },
+  {
+   "name": "restic: maintained (12-month rule) + cadence note",
+   "claim": "'maintained true... release cadence slower (2.5 months) than other candidates, not a 12-month flag'",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-25 (1 day old), latest release 2026-07-05 (~83 days / ~2.7 months old) -- both comfortably inside 12 months, so 'maintained:true' and 'not a 12-month flag' both hold. 'Roughly 2.5 months' is a slight understatement (closer to 2.7) but not materially wrong.",
+   "sources": [
+    "https://github.com/restic/restic"
+   ]
+  },
+  {
+   "name": "restic: backup/check/restore receipt claim",
+   "claim": "'check --read-data (no errors), restore --verify exit 0, 22 files/160642 bytes, matched sha256'",
+   "verdict": "supported",
+   "note": "Read blueprints/us-equities/hosting/backup/receipt.json directly: check_read_data.output_conclusion='no errors were found' exit 0; restore_verify exit 0; sha256sum_check.ok_lines=22; independent_byte_comparison matched_regular_files=22, matched_bytes=160642 -- exact match to the claim.",
+   "sources": [
+    "blueprints/us-equities/hosting/backup/receipt.json (local repo, lines 68-91)"
+   ]
+  },
+  {
+   "name": "restic: scope limitation claim",
+   "claim": "'covers static public files only -- no live DB/Qdrant/Loki/Prometheus/broker journal backed up; off-host destination not established'",
+   "verdict": "supported",
+   "note": "Confirmed verbatim in the same receipt: source.live_databases=0, limitations explicitly list no live SQLite/Qdrant/Loki/Prometheus/broker-journal backup, operational_status.off_host_destination=false.",
+   "sources": [
+    "blueprints/us-equities/hosting/backup/receipt.json (local repo, lines 36, 118, 122-127)"
+   ]
+  },
+  {
+   "name": "restic: winners_upstream note (no drift)",
+   "claim": "'pin matches upstream latest tag; no newer release'",
+   "verdict": "supported",
+   "note": "Confirmed as above (v0.19.1 remains latest; next tag down is v0.19.0, 2026-06-09).",
+   "sources": [
+    "https://github.com/restic/restic/releases/tag/v0.19.1"
+   ]
+  },
+  {
+   "name": "sandbox-runtime: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-26T13:09:44Z, 5347 stars.",
+   "sources": [
+    "https://github.com/anthropics/sandbox-runtime"
+   ]
+  },
+  {
+   "name": "sandbox-runtime: latest version/date",
+   "claim": "latest_version v0.0.77, latest_release_date 2026-09-18",
+   "verdict": "supported",
+   "note": "Tag v0.0.77 published_at 2026-09-18T22:09:16Z; next-newest is v0.0.76 (2026-09-10).",
+   "sources": [
+    "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77"
+   ]
+  },
+  {
+   "name": "sandbox-runtime: maintained",
+   "claim": "maintained true, pushed today, tag unchanged",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-26T13:09:44Z (today); no release since v0.0.77.",
+   "sources": [
+    "https://github.com/anthropics/sandbox-runtime"
+   ]
+  },
+  {
+   "name": "sandbox-runtime: filesystem allow/deny receipt claim",
+   "claim": "'evidence/receipts/runtime-tools.json shows allowed write exit 0, denied read/write exit 1, host_file_created false, child env reduced to HOME/PATH'",
+   "verdict": "supported",
+   "note": "Read the file directly: data.sandbox.allowed_write_exit=0, denied_read_exit=1, separate_denied_write_exit=1, host_file_created=false, clean_child_environment='HOME and PATH only' -- exact match.",
+   "sources": [
+    "evidence/receipts/runtime-tools.json (local repo, lines 25-32)"
+   ]
+  },
+  {
+   "name": "sandbox-runtime / winners_upstream note: 'network denial not independently exercised, gap unchanged'",
+   "claim": "Candidate: 'network denial is configured but not independently exercised; no broker-authority denial demonstrated yet... not a newly discovered gap.' Winners note: 'open item... unchanged, not newly discovered'",
+   "verdict": "refuted",
+   "note": "This is stale as of the 2026-09-26 check. This same repository's current main already contains evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--sandbox-runtime--use--20260925.json (git-tracked, committed in PR #262 'Record 26 independently reviewed host receipts on nativestack-5975wx-20260925', confirmed via `git merge-base --is-ancestor` to be an ancestor of current HEAD), dated 2026-09-25 -- one day before this check. That receipt runs sandbox-runtime 0.0.77 against an owned loopback HTTP server with allow/deny/empty-allowlist network policies: allowed request succeeds (exit 0, payload retrieved), explicit-deny and empty-allowlist both return proxy HTTP 403 (curl exit 22), and exactly one request reaches the server -- i.e. network denial WAS independently exercised, with both a 'self' review and a separate 'independent_session' review (different reviewer identity hash, model claude-opus-5-5) both recording verdict 'agree'. So both the candidate's capability_claims and the layer's own winners_upstream note repeat a limitation this repository had already closed the day before. The 'no research-worker broker-execution-authority denial demonstrated' half of the claim is NOT refuted -- I found only a declared policy (blueprints/us-equities/harness-contract.json: 'Recorded research workers receive no broker keys or order tools'), no native sandbox-runtime test specifically denying broker/order-tool access, so that part of the gap does appear to remain open.",
+   "sources": [
+    "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--sandbox-runtime--use--20260925.json (local repo, git commit 6752ede5, ancestor-of-HEAD confirmed)",
+    "blueprints/us-equities/harness-contract.json (local repo, line 34)"
+   ]
+  },
+  {
+   "name": "e2b: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-25T21:14:57Z, 13975 stars.",
+   "sources": [
+    "https://github.com/e2b-dev/E2B"
+   ]
+  },
+  {
+   "name": "e2b: latest version/date",
+   "claim": "latest_version e2b@2.51.0, latest_release_date 2026-09-18",
+   "verdict": "supported",
+   "note": "Release tag 'e2b@2.51.0' published_at 2026-09-18T12:07:13Z; sibling same-day tags for python-sdk/desktop-python confirm a coordinated multi-package release, no newer release since.",
+   "sources": [
+    "https://github.com/e2b-dev/E2B/releases/tag/e2b%402.51.0"
+   ]
+  },
+  {
+   "name": "e2b: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at yesterday relative to check; not archived.",
+   "sources": [
+    "https://github.com/e2b-dev/E2B"
+   ]
+  },
+  {
+   "name": "e2b: Firecracker microVM + 'openly self-hostable' claim",
+   "claim": "'Firecracker-microVM-isolated, Apache-2.0, openly self-hostable managed code-execution sandboxes; independent 2026 comparison pieces confirm the self-host claim'",
+   "verdict": "refuted",
+   "note": "Firecracker microVM isolation is confirmed by the candidate's own cited source (Northflank, opened directly): 'E2B... uses Firecracker microVMs' with 'hardware-level isolation.' But the same article contradicts 'openly self-hostable': it states 'E2B is open source, but running it at scale means operating their control plane yourself' and 'E2B operates primarily as a managed service' with 'BYOC capabilities [that] are not easily accessible or self-serve.' So the underlying code is open-source, but the specific 'openly self-hostable' framing is undercut by the very source cited to support it.",
+   "sources": [
+    "https://northflank.com/blog/daytona-vs-e2b-ai-code-execution-sandboxes"
+   ]
+  },
+  {
+   "name": "opik: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-26T13:42:43Z, 22249 stars.",
+   "sources": [
+    "https://github.com/comet-ml/opik"
+   ]
+  },
+  {
+   "name": "opik: latest version/date (GitHub + PyPI)",
+   "claim": "'2.2.81 on 2026-09-25, confirmed on both GitHub and PyPI'",
+   "verdict": "supported",
+   "note": "GitHub tag '2.2.81' published_at 2026-09-25T15:35:46Z. PyPI JSON (pypi.org/pypi/opik/json) independently confirms version 2.2.81, upload_time_iso_8601 2026-09-25T15:28:58Z. Both primary sources agree.",
+   "sources": [
+    "https://github.com/comet-ml/opik/releases/tag/2.2.81",
+    "https://pypi.org/pypi/opik/json"
+   ]
+  },
+  {
+   "name": "opik: maintained / near-daily cadence",
+   "claim": "maintained true, near-daily release cadence",
+   "verdict": "supported",
+   "note": "Top 3 releases: 2.2.81 (09-25), 2.2.80 (09-24 14:58), 2.2.79 (09-24 13:06) -- sub-daily cadence confirmed.",
+   "sources": [
+    "https://github.com/comet-ml/opik/releases"
+   ]
+  },
+  {
+   "name": "opik: native integrations claim",
+   "claim": "'native integrations for LangGraph, CrewAI, AutoGen, LlamaIndex and the OpenAI Agents SDK'",
+   "verdict": "supported",
+   "note": "Fetched raw README.md directly: all five are listed verbatim with individual doc links -- 'Autogen', 'CrewAI... Log traces for CrewAI calls', 'LangGraph... Log traces for LangGraph executions', 'LlamaIndex... Log traces for LlamaIndex LLM calls', 'OpenAI Agents... Log traces for OpenAI Agents SDK calls'.",
+   "sources": [
+    "https://raw.githubusercontent.com/comet-ml/opik/main/README.md"
+   ]
+  },
+  {
+   "name": "opik/phoenix: shared Comet benchmark-number claim",
+   "claim": "Opik: 'Comet's own comparison page claims ~23s vs Phoenix's ~170s and Langfuse's ~327s'. Phoenix fit-text: 'Comet's comparison page claims Phoenix is roughly 7x slower than Opik'",
+   "verdict": "refuted",
+   "note": "Opened the cited page two ways: (1) WebFetch summary -- 'no stated benchmark numbers... no specific latency measurements... no performance multipliers... no speed benchmarks of any kind'; (2) direct curl of the raw HTML (190KB) and regex search for '23s','170s','327s','7x','Nx faster/slower' patterns -- zero matches. Neither the ~23/~170/~327s figures nor a '7x' multiplier appear anywhere on the page as currently published. Both candidates' numeric claims about this specific source are unsupported by the source itself.",
+   "sources": [
+    "https://www.comet.com/site/products/opik/compare/phoenix-vs-opik/ (fetched directly, both rendered and raw HTML)"
+   ]
+  },
+  {
+   "name": "phoenix: repo/license (ELv2 confirmed)",
+   "claim": "'Elastic License 2.0 (ELv2) -- source-available, not OSI-approved; explicitly forbids offering it as a hosted/managed service'",
+   "verdict": "supported",
+   "note": "Fetched the LICENSE file's actual text directly: header reads 'Elastic License 2.0 (ELv2)', and the Limitations clause reads verbatim 'You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.' GitHub's license API reports license.key='other', spdx_id='NOASSERTION' (expected for a non-OSI license), archived=false, pushed_at 2026-09-26T14:51:55Z.",
+   "sources": [
+    "https://github.com/Arize-ai/phoenix/blob/main/LICENSE (fetched directly)"
+   ]
+  },
+  {
+   "name": "phoenix: latest version/date",
+   "claim": "latest_version arize-phoenix-v20.16.0, latest_release_date 2026-09-23",
+   "verdict": "supported",
+   "note": "Tag arize-phoenix-v20.16.0 published_at 2026-09-23T15:41:54Z.",
+   "sources": [
+    "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.16.0"
+   ]
+  },
+  {
+   "name": "phoenix: 'two more releases since pin v20.14.0' claim",
+   "claim": "'Upstream has shipped two more releases since the catalog's pin (arize-phoenix-v20.14.0): now at v20.16.0'",
+   "verdict": "supported",
+   "note": "Confirmed the exact release sequence via GitHub API arize-phoenix-v20.14.0 published_at 2026-09-18T02:52:36Z -> arize-phoenix-v20.15.0 published_at 2026-09-21T23:06:30Z -> arize-phoenix-v20.16.0 published_at 2026-09-23T15:41:54Z. Exactly two releases (v20.15.0, v20.16.0) between the stated pin and current.",
+   "sources": [
+    "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.14.0",
+    "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.15.0",
+    "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.16.0"
+   ]
+  },
+  {
+   "name": "phoenix: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today; not archived.",
+   "sources": [
+    "https://github.com/Arize-ai/phoenix"
+   ]
+  },
+  {
+   "name": "modal: repo/license + PyPI version correction claim",
+   "claim": "'Apache-2.0 (client SDK)...PyPI confirms 1.5.5 uploaded 2026-08-28, matching the catalog pin exactly -- corrects the prior packet's own latest v1.3.1 note'",
+   "verdict": "supported",
+   "note": "gh api confirms modal-labs/modal-client license Apache-2.0, archived=false, pushed_at 2026-09-26T13:51:39Z. Direct PyPI JSON fetch (pypi.org/pypi/modal/json) confirms info.version=1.5.5, upload_time_iso_8601=2026-08-28T19:51:32Z -- exact date match. Crucially, this also independently confirms the claimed git/PyPI mismatch is real: the repo's own git tags top out at v1.3.1, i.e. Modal ships PyPI releases well ahead of what it tags in git, exactly as the candidate describes.",
+   "sources": [
+    "https://pypi.org/pypi/modal/json",
+    "https://github.com/modal-labs/modal-client"
+   ]
+  },
+  {
+   "name": "modal: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-26T13:51:39Z (today), PyPI upload 2026-08-28 (~1 month old); not archived.",
+   "sources": [
+    "https://github.com/modal-labs/modal-client"
+   ]
+  },
+  {
+   "name": "modal: gVisor/pricing/no-self-host fit claim",
+   "claim": "'Weaker isolation (gVisor, non-preemptible) and materially higher per-vCPU price than E2B per independent 2026 comparisons, with no self-host path'",
+   "verdict": "unverifiable",
+   "note": "No source was cited by the candidate for this specific claim (only PyPI + the bare github repo are listed). I independently searched and found real 2026 comparison coverage (Northflank 'ai-sandbox-pricing', bex.co, superagent.sh, LogRocket) confirming Modal Sandboxes run on gVisor (not microVM) -- consistent with 'weaker isolation' -- and that Modal's raw list rate (~$0.071/vCPU-hr from $0.1419/2-vCPU-core-hr) is about 41% above E2B's $0.0504/vCPU-hr. But the same sources show this does not hold as a blanket 'materially higher price': because Modal bills to zero at idle while E2B/Daytona bill for full sandbox lifetime, a realistic idle-heavy workload example in these sources has Modal costing ~$36 vs ~$414 for E2B-style full-duration billing -- i.e. cheaper overall in that pattern. I found no confirmation either way on 'non-preemptible'. Marked unverifiable because the claim is a mixed bag depending on workload/billing model and the whole comparison is not attributable to a source the candidate actually opened.",
+   "sources": [
+    "https://northflank.com/blog/ai-sandbox-pricing (via search synthesis, not directly re-fetched)",
+    "https://bex.co/blog/2026/09/05/modal-gpu-sandbox-vs-daytona-e2b-cpu-isolation (via search synthesis)"
+   ]
+  },
+  {
+   "name": "signoz: repo/license split claim",
+   "claim": "'MIT (Expat) for the core repository; content under ee/ and cmd/enterprise/ is licensed separately per the repo's own ee/LICENSE... GitHub's license API reports NOASSERTION'",
+   "verdict": "supported",
+   "note": "Confirmed on all counts by reading the actual files: gh api repos/SigNoz/signoz reports license.key='other', spdx_id='NOASSERTION' exactly as claimed. Root LICENSE text states verbatim: 'All content that resides under the \\\"ee/\\\" and the \\\"cmd/enterprise/\\\" directory... is licensed under the license defined in \\\"ee/LICENSE\\\"... Content outside of the above... is available under the \\\"MIT Expat\\\" license.' Both directories exist (ee/ has 15 subdirectories including licensing/, authz/, subscription/; cmd/enterprise/ has its own Dockerfiles and main.go). ee/LICENSE is confirmed to be a genuinely proprietary Enterprise license requiring a paid subscription/Enterprise Terms for production use -- deeper confirmation than the candidate itself provided (it flagged ee/LICENSE as 'not reviewed here').",
+   "sources": [
+    "https://github.com/SigNoz/signoz/blob/main/LICENSE (fetched directly)",
+    "https://github.com/SigNoz/signoz/blob/main/ee/LICENSE (fetched directly)"
+   ]
+  },
+  {
+   "name": "signoz: latest version/date",
+   "claim": "latest_version v0.143.0, latest_release_date 2026-09-23",
+   "verdict": "supported",
+   "note": "Tag v0.143.0 published_at 2026-09-23T07:27:00Z.",
+   "sources": [
+    "https://github.com/SigNoz/signoz/releases/tag/v0.143.0"
+   ]
+  },
+  {
+   "name": "signoz: maintained + star count",
+   "claim": "'actively released; 32.2k stars'",
+   "verdict": "supported",
+   "note": "pushed_at 2026-09-26T04:56:29Z; stargazers_count=32204 (32.2k). Not archived.",
+   "sources": [
+    "https://github.com/SigNoz/signoz"
+   ]
+  },
+  {
+   "name": "signoz: single-binary/all-in-one description claim",
+   "claim": "'OpenTelemetry-native all-in-one logs+metrics+traces platform, pitched as a single-binary alternative to running Prometheus+Loki+Grafana as three separate services'",
+   "verdict": "supported",
+   "note": "SigNoz's own README opening line: 'SigNoz is an open-source observability platform built on OpenTelemetry. We're building an enterprise-grade alternative to fragmented monitoring stacks, with logs, metrics, traces, alerts, and dashboards in one place.' -- matches the framing closely.",
+   "sources": [
+    "https://raw.githubusercontent.com/SigNoz/signoz/main/README.md"
+   ]
+  },
+  {
+   "name": "cua: repo/license",
+   "claim": "Repo exists, license MIT",
+   "verdict": "supported",
+   "note": "gh api confirms license MIT, archived=false, pushed_at 2026-09-26T15:15:01Z, 26532 stars (matches claimed '26.5k').",
+   "sources": [
+    "https://github.com/trycua/cua"
+   ]
+  },
+  {
+   "name": "cua: latest version/date",
+   "claim": "latest_version sandbox-v0.8.0, latest_release_date 2026-09-15",
+   "verdict": "supported",
+   "note": "This is exactly what GitHub's /releases/latest flag returns (published_at 2026-09-15T16:48:28Z). Caveat found: this is a large monorepo with many independently-versioned release trains -- a non-prerelease 'cua-perception-v0.2.1' was published 2026-09-26 (more recent by date) plus same-day nightly prereleases, but GitHub's 'latest' flag is pinned to the sandbox-v0.8.0 release rather than the most recently created tag. The candidate's own text already discloses this monorepo structure ('a monorepo of separately versioned tracks'), so the version claim is accurate to what GitHub calls 'latest', with this nuance.",
+   "sources": [
+    "https://github.com/trycua/cua/releases/tag/sandbox-v0.8.0",
+    "https://github.com/trycua/cua/tags"
+   ]
+  },
+  {
+   "name": "cua: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today (very active, continuous nightly builds); not archived.",
+   "sources": [
+    "https://github.com/trycua/cua"
+   ]
+  },
+  {
+   "name": "cua: 'computer-use 2.0' description claim",
+   "claim": "\"'computer-use 2.0' -- VM/sandbox execution environments for agent training, evaluation and data generation\"",
+   "verdict": "supported",
+   "note": "README uses the literal phrase, linked to project docs: '[Computer-Use 2.0](https://cua.ai/docs/concepts/what-is-computer-use) describes an agent moving between code, APIs, and graphical interfaces within the same task.' Broader framing ('open-source desktop automation, isolated cloud desktops, local macOS VMs... benchmarks for evaluating computer-use agents') also confirmed in the README.",
+   "sources": [
+    "https://raw.githubusercontent.com/trycua/cua/main/README.md"
+   ]
+  },
+  {
+   "name": "opensre: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-26T14:48:27Z, 11231 stars (matches claimed '11.2k').",
+   "sources": [
+    "https://github.com/Tracer-Cloud/opensre"
+   ]
+  },
+  {
+   "name": "opensre: latest version/date (same-day calendar release)",
+   "claim": "latest_version v0.1.2026.9.26, latest_release_date 2026-09-26",
+   "verdict": "supported",
+   "note": "Tag v0.1.2026.9.26 published_at 2026-09-26T01:15:25Z (a genuine non-prerelease cut, distinct from a rolling 'main-build' prerelease tag dated 2026-06-28 that also appears in the repo's release list).",
+   "sources": [
+    "https://github.com/Tracer-Cloud/opensre/releases/tag/v0.1.2026.9.26"
+   ]
+  },
+  {
+   "name": "opensre: maintained / public-alpha framing",
+   "claim": "'Public-alpha, calendar-versioned releases... signals pre-1.0/continuous-build status'",
+   "verdict": "supported",
+   "note": "README explicitly states: 'Public Alpha: Core workflows are usable for early exploration, though not yet fully stable.' Calendar version scheme (v0.1.YYYY.M.D) is directly visible in the tag itself.",
+   "sources": [
+    "https://raw.githubusercontent.com/Tracer-Cloud/opensre/main/README.md",
+    "https://github.com/Tracer-Cloud/opensre/releases/tag/v0.1.2026.9.26"
+   ]
+  },
+  {
+   "name": "opensre: '60+ tools' claim",
+   "claim": "'connecting to 60+ observability/incident/cloud tools per its own README'",
+   "verdict": "supported",
+   "note": "README states verbatim in two places: 'Connect the 60+ tools you already run...' and 'OpenSRE connects to 60+ tools across LLMs, observability, cloud infrastructure, data platforms, incident management, and MCP.'",
+   "sources": [
+    "https://raw.githubusercontent.com/Tracer-Cloud/opensre/main/README.md"
+   ]
+  },
+  {
+   "name": "daytona: license field (null/no SPDX)",
+   "claim": "'No SPDX license currently reported by GitHub for this repository (license field returned null)'",
+   "verdict": "supported",
+   "note": "gh api repos/daytonaio/daytona returns license:null exactly as claimed.",
+   "sources": [
+    "https://github.com/daytonaio/daytona"
+   ]
+  },
+  {
+   "name": "daytona: stale pin / pushed_at / stars",
+   "claim": "'71.7k stars; repo pushed_at 2026-07-24; last tagged release v0.190.0 from 2026-06-23'",
+   "verdict": "supported",
+   "note": "All three figures confirmed exactly via gh api stargazers_count=71713 (71.7k), pushed_at='2026-07-24T07:12:07Z', latest release tag_name='v0.190.0' published_at='2026-06-23T13:25:53Z'. Gap from release to today is ~95 days (~3.1 months) -- 'roughly 2-3 months stale' is a slight understatement but directionally correct. Not GitHub-archived (archived=false), which is a distinct fact from the 'closed-source pivot' claim below -- worth being precise that the public repo itself is not formally archived, just frozen/unmaintained per upstream's own statement.",
+   "sources": [
+    "https://github.com/daytonaio/daytona",
+    "https://github.com/daytonaio/daytona/releases/tag/v0.190.0"
+   ]
+  },
+  {
+   "name": "daytona: maintained flag vs staleness (12-month rule)",
+   "claim": "maintained: true",
+   "verdict": "supported",
+   "note": "Per the task's own strict rule (unmaintained = no release/commit in 12 months), Daytona does NOT qualify as unmaintained: last commit 2 months ago, last release ~3 months ago, both inside 12 months. 'maintained:true' is technically accurate even though it is the most stale of all 15 candidates checked here -- staleness and the 12-month unmaintained threshold are correctly kept distinct.",
+   "sources": [
+    "https://github.com/daytonaio/daytona"
+   ]
+  },
+  {
+   "name": "daytona: closed-source pivot claim",
+   "claim": "\"Independent 2026 comparison pieces (Northflank, morphllm, HelixML) report Daytona pivoted to closed-source production infrastructure in June 2026, with the public repo now reading as a frozen pre-pivot snapshot\"",
+   "verdict": "supported",
+   "note": "Confirmed and exceeded what the candidate itself cited. I found and opened Daytona's own primary-source announcement, which is more authoritative than any third-party comparison: 'Daytona is going closed source. Here's why' states Daytona is 'moving production codebase to closed source' for security reasons ('AI can now be pointed at an open source repository and systematically search it for exploitable flaws'), with the existing OSS repo remaining public but receiving no further updates. Northflank (candidate's own cited source, opened directly) independently corroborates with an explicit date: 'In June 2026, Daytona moved its production codebase to closed source... the original open-source repository remains public but is no longer maintained.' HelixML's coverage of the same event was located and its content synthesized via search ('The public repo stays up... but it is frozen -- no further updates, fixes, or releases'). morphllm's specific article (morphllm.com/comparisons/daytona-alternative) was located and confirmed to exist/be about post-pivot alternatives, but the page itself could not be fetched in this session (HTTP 429 rate-limited) -- redundant corroboration from the other three sources makes this a minor gap, not a doubt about the underlying fact.",
+   "sources": [
+    "https://www.daytona.io/dotfiles/updates/daytona-is-going-closed-source (fetched directly)",
+    "https://northflank.com/blog/daytona-vs-e2b-ai-code-execution-sandboxes (fetched directly)",
+    "https://helix.ml/blog/self-hosted-agent-sandboxes (located via search, content quoted)"
+   ]
+  },
+  {
+   "name": "opensandbox: repo/license",
+   "claim": "Repo exists, license Apache-2.0",
+   "verdict": "supported",
+   "note": "gh api confirms license Apache-2.0, archived=false, pushed_at 2026-09-26T12:42:35Z, 15518 stars.",
+   "sources": [
+    "https://github.com/opensandbox-group/OpenSandbox"
+   ]
+  },
+  {
+   "name": "opensandbox: latest version/date",
+   "claim": "latest_version release-1.1.0, latest_release_date 2026-09-21",
+   "verdict": "supported",
+   "note": "Tag release-1.1.0 published_at 2026-09-21T07:46:25Z, named 'OpenSandbox 1.1.0'.",
+   "sources": [
+    "https://github.com/opensandbox-group/OpenSandbox/releases/tag/release-1.1.0"
+   ]
+  },
+  {
+   "name": "opensandbox: maintained",
+   "claim": "maintained true",
+   "verdict": "supported",
+   "note": "pushed_at today; not archived.",
+   "sources": [
+    "https://github.com/opensandbox-group/OpenSandbox"
+   ]
+  },
+  {
+   "name": "opensandbox: catalog pin + several-versions-behind claim",
+   "claim": "'Source-reviewed only (catalog pin server/v0.2.3 + Python SDK 0.1.16)... upstream has moved to release-1.1.0 -- the accepted pin is now several minor versions behind'",
+   "verdict": "supported",
+   "note": "This repository's own tracked file confirms the exact pin: evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json records from_pin='server v0.2.3; Python SDK 0.1.16', to_version='release-1.1.0 (server, CLI, all SDKs unified at 1.1.0)', release_published_at 2026-09-21T07:46:25Z (matching my own independent GitHub check exactly), and evidence_class marked from a source-review/help-output-only surface (functional sandbox-creation testing recorded as 'blocked' on that host, no Docker present) -- consistent with the candidate's own 'source_review, no native run' framing.",
+   "sources": [
+    "evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json (local repo)",
+    "https://github.com/opensandbox-group/OpenSandbox/releases/tag/release-1.1.0"
+   ]
+  },
+  {
+   "name": "opensandbox: 'canonical repo already moved once' claim",
+   "claim": "'canonical repo already moved once to opensandbox-group/OpenSandbox'",
+   "verdict": "supported",
+   "note": "Directly confirmed via GitHub API querying repos/alibaba/OpenSandbox returns HTTP 200 with full_name='opensandbox-group/OpenSandbox' -- GitHub's standard signature for a renamed/transferred repository (the old owner/name transparently resolves to the new canonical one). This independently confirms the repo moved from an Alibaba-owned repo to the current opensandbox-group org.",
+   "sources": [
+    "gh api repos/alibaba/OpenSandbox (fetched directly, resolves to opensandbox-group/OpenSandbox)"
+   ]
+  },
+  {
+   "name": "opensandbox: self-hostable sandbox platform description",
+   "claim": "'Self-hostable sandbox control API and SDKs'",
+   "verdict": "supported",
+   "note": "README (reviewed at the pinned commit, already on file in this repo's own source-review evidence) describes Kubernetes-native hybrid deployment ('Mix long-running, Kubernetes-native container workloads with short-lived microVM sandboxes in one cluster... from a laptop to a large cluster') and the release-1.1.0 README's own 'Getting Started > Requirements' section requires only Docker (local) or Kubernetes (cluster) -- consistent with a genuinely self-hostable control plane, not a hosted-only product. 'Self-hostable' itself is not a literally quoted phrase in the README excerpts reviewed, but is a fair characterization of what is described.",
+   "sources": [
+    "evidence/artifacts/source-review-20260923/opensandbox-group-opensandbox.json (local repo)",
+    "evidence/artifacts/sota-refresh-20260923/pins-tools/opensandbox.json (local repo, docker_requirement_source)"
+   ]
+  }
+ ],
+ "researched_candidates": [
+  {
+   "name": "OpenTelemetry Collector (contrib)",
+   "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Directly satisfies the 'retain scoped telemetry' requirement as the delivery layer already proven on this stack, and remains current (no version drift). Any challenger (SigNoz, OpenLLMetry) would have to pass the same six-category usage-histogram parity and restart-persistence checks already defined in this layer's overturn_protocol before displacing it."
+  },
+  {
+   "name": "Prometheus",
+   "url": "https://github.com/prometheus/prometheus",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Best-evidenced metrics store for this layer; the pin is now one point release behind as of this 2026-09-26 check -- the concrete 'notable change since pin' this sweep found. No specific breaking change was read; re-run the existing observability/backends fixture against 3.15.0 before moving the pin rather than assuming compatibility."
+  },
+  {
+   "name": "Loki",
+   "url": "https://github.com/grafana/loki",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Current and unchanged since pin; covers the log-retention half of 'scoped telemetry.' AGPL-3.0 is a self-host-only constraint already accepted by the current choice, not a new gap."
+  },
+  {
+   "name": "Grafana",
+   "url": "https://github.com/grafana/grafana",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Visualization layer over already-proven stores; current. Its fit is conditional on Prometheus/Loki remaining the retention layer -- it is not itself a telemetry store."
+  },
+  {
+   "name": "Restic",
+   "url": "https://github.com/restic/restic",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Confirmed as this task's 'already the adopted backup winner' input; current and maintained, but its proven scope (static files) does not yet cover the layer's actual state -- exactly the gap this layer's overturn_protocol arm (c) names."
+  },
+  {
+   "name": "sandbox-runtime (Anthropic)",
+   "url": "https://github.com/anthropics/sandbox-runtime",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "native_execution",
+   "fit": "Best-evidenced sandbox for this layer; current. Its open item (network-denial + broker-authority exercise) is the same one this layer's own overturn_protocol arm (d) already names, not a new finding."
+  },
+  {
+   "name": "OpenSandbox",
+   "url": "https://github.com/opensandbox-group/OpenSandbox",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "A genuine self-hosted alternative to sandbox-runtime for the 'sandbox' scope term, but still unexecuted here and further behind upstream than at last check. Worth a native trial only if sandbox-runtime's network-denial gap proves unclosable."
+  },
+  {
+   "name": "E2B",
+   "url": "https://github.com/e2b-dev/E2B",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Stronger isolation model (microVM) than sandbox-runtime's process-level allow-list, and unlike Daytona it remains genuinely open and self-hostable. A credible escalation path if a future workload needs VM-grade isolation rather than filesystem/network restriction."
+  },
+  {
+   "name": "Modal (modal-client)",
+   "url": "https://github.com/modal-labs/modal-client",
+   "modalities": [
+    "github_search",
+    "pypi"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Weaker isolation (gVisor, non-preemptible) and materially higher per-vCPU price than E2B per independent 2026 comparisons, with no self-host path, so it fits 'hosting' only as a paid escape valve, not a default."
+  },
+  {
+   "name": "Arize Phoenix",
+   "url": "https://github.com/Arize-ai/phoenix",
+   "modalities": [
+    "github_search"
+   ],
+   "evidence_level": "source_review",
+   "fit": "Overlaps this layer's 'retain telemetry' scope specifically for LLM/agent traces rather than infra metrics/logs, and is now further behind upstream than last checked. Directly comparable to Opik on the same job; Comet's own comparison page claims Phoenix trace-logging+eval is roughly 7x slower than Opik, which should be read as vendor-authored, not neutral."
+  },
+  {
+   "name": "Opik (Comet ML)",
+   "url": "https://github.com/comet-ml/opik",
+   "modalities": [
+    "star",
+    "github_search",
+    "pypi",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "The strongest new-find alternative for the LLM/agent-tracing slice of 'retain scoped telemetry, failed attempts.' It duplicates ground already covered by Phoenix/OTel-contrib rather than closing an open gap (sandbox, backup, broker-authority isolation), so it is a candidate for a future comparison arm, not a gap-closer today."
+  },
+  {
+   "name": "SigNoz",
+   "url": "https://github.com/SigNoz/signoz",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Consolidating three services into one would simplify the current stack's operational surface, but this layer's own overturn_protocol requires a candidate to reproduce the exact usage-histogram parity and restart-persistence checks the incumbent trio already passed -- untested here, so it stays a watch item."
+  },
+  {
+   "name": "cua (trycua)",
+   "url": "https://github.com/trycua/cua",
+   "modalities": [
+    "star",
+    "github_search"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Framed around full computer-use VM fleets (screen/OS-level control) rather than sandboxed code execution or research-worker process isolation, so it answers a broader/different problem than sandbox-runtime's filesystem/network allow-list. Worth watching only if the north star ever needs GUI-level agent execution."
+  },
+  {
+   "name": "OpenSRE (Tracer-Cloud)",
+   "url": "https://github.com/Tracer-Cloud/opensre",
+   "modalities": [
+    "star",
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Closest match found to an implicit 'incident response over the retained telemetry' need -- it could sit on top of the already-adopted Prometheus/Loki/Grafana stack rather than replace any of it. Alpha maturity and zero native evidence make it a research-only watch item, not a promotion candidate yet."
+  },
+  {
+   "name": "Daytona",
+   "url": "https://github.com/daytonaio/daytona",
+   "modalities": [
+    "github_search",
+    "docs"
+   ],
+   "evidence_level": "metadata",
+   "fit": "Explicit negative finding: the single highest-star sandbox/hosting project surfaced in this sweep is the weakest current candidate once checked against dated primary-source signals (stale tag, missing license, corroborated closed-source pivot). Retained as the concrete 'stars are not evidence' example for this layer, not as an adoption candidate."
+  }
+ ],
+ "gpt6_votes": [
+  {
+   "lens": "gpt-6-cached",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-cached.md"
+  },
+  {
+   "lens": "gpt-6-live",
+   "path": "evidence/artifacts/trading-convergence-20260926/gpt6-votes/observability-hosting--gpt-6-live.md"
+  }
+ ]
+}

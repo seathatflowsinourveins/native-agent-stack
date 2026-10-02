@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "kind": "independent_source_review_followup",
+  "reviewed_layer": "isolation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model": "gpt-6.1-sol", "effort": "max", "family": "Codex"},
+  "repository": "https://github.com/anthropics/sandbox-runtime",
+  "selected_pin": {"version": "0.0.77", "commit": "6fa731368807419ee157f9a3fac955fefe1019c6"},
+  "candidate_pin": {"version": "0.0.78", "commit": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b", "published_at": "2026-09-30"},
+  "upstream_diff": "https://github.com/anthropics/sandbox-runtime/compare/v0.0.77...v0.0.78",
+  "native_client_observation": "Installed package metadata remains 0.0.77. srt --help returned exit 0; settings, command-string and control-fd options were found, with no shell-selection option in that help. The settled version fallback was not rerun.",
+  "test_observability_changes": [
+    {"change": "Five macOS alias cases acquired assertions and explicit environment skips", "boundary": "Old observational logging did not detect leaks; these are macOS cases, not five missing Linux controls."},
+    {"change": "Three Linux tests no longer conditionally omit assertions; five additional integration guard returns were removed", "boundary": "A former green run could conceal missing dependencies or an unresolved seccomp helper."},
+    {"change": "Windows-path property corpus gained star/question-mark patterns", "boundary": "Prior idempotence cases exercised literals; helper coverage is distinct from a Windows backend."}
+  ],
+  "test_fix_source": "https://github.com/anthropics/sandbox-runtime/commit/181a3a688a205b933c21ae7d821854ac6da14d43",
+  "exit_status_fix": {
+    "scope": "Network-restricted inner Linux bridge when an SDK caller supplies zsh",
+    "behavior": "Capture payload status before the EXIT trap kills bridge processes",
+    "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/src/sandbox/linux-sandbox-utils.ts#L1377",
+    "regression_source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/test/sandbox/integration.test.ts#L1364",
+    "native_controls": "Payload exit 7 and success 0 across bash/zsh and seccomp-helper/eval paths",
+    "skip_conditions": "Network namespaces, socat or the named shell unavailable",
+    "retained_cli_boundary": "The selected CLI calls wrapWithSandbox without binShell; Linux explicitly defaults to bash.",
+    "cli_source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.77/src/cli.ts#L509",
+    "bash_default_source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.77/src/sandbox/linux-sandbox-utils.ts#L3296"
+  },
+  "historical_claim_reconciliation": [
+    {"receipt": "evidence/receipts/native-sandbox-network-20260920.json", "verdict": "Retain bounded CLI observation: allowed exit 0, denied exit 22 and exactly one owned-server request. The SDK/zsh defect does not refute the recorded bash-path outcome."},
+    {"scope": "September 25 filesystem observations", "verdict": "Retain inner denial exits, absent read canary, unchanged protected bytes and absence of an unlisted file. Outer recorder exit 0 means its assertions passed."},
+    {"receipt": "evidence/receipts/runtime-tools.json", "verdict": "Hidden-mount write returned 0 while host state stayed unchanged. This establishes recorded host outcome, not a directly refused write; the receipt also lacks an embedded runtime version."},
+    {"scope": "September 24 follow-up", "verdict": "Retained metadata validation explicitly records no fresh underlying execution."}
+  ],
+  "additional_race_control": {
+    "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/test/sandbox/deny-path-made-meanwhile.test.ts",
+    "boundary": "A filesystem spy and generated-bind check tests the absent-deny-path fix; it is not a live concurrency experiment."
+  },
+  "supported_native_recipe": {
+    "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/.github/workflows/integration-tests.yml#L147",
+    "ci_environment": "Node 20, Bun 1.4.2 and named Linux dependencies; current host configuration is separate from the CI recipe",
+    "commands": [
+      "npm install",
+      "npm run typecheck",
+      "npm run build:seccomp",
+      "npm run build:java-agent",
+      "npm run build",
+      "bwrap --unshare-pid --unshare-user --cap-drop ALL --ro-bind / / --proc /proc true",
+      "bwrap --unshare-pid --unshare-user --unshare-net --cap-drop ALL --ro-bind / / --proc /proc true",
+      "bun test ./test/sandbox/seccomp-filter.test.ts ./test/sandbox/write-through-links.test.ts ./test/sandbox/deny-path-made-meanwhile.test.ts ./test/sandbox/winsrt-paths.property.test.ts",
+      "bun test ./test/sandbox/integration.test.ts -t 'Exit status of a network-restricted wrap'",
+      "npm test"
+    ],
+    "status": "Source-reviewed only; no candidate installation or native negative control ran",
+    "conditions": "Preserve failures and skips. Namespace refusal and CI sysctl changes are distinct host decisions; do not conceal unavailable prerequisites.",
+    "write_controls_source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/test/sandbox/write-through-links.test.ts",
+    "write_controls_boundary": "Payload startup, refusal, host contents and allowed-write controls; upstream explicitly documents a pre-existing hard-link name inside the write root as writable.",
+    "namespace_probe_source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/test/helpers/bwrap-namespace.ts",
+    "filtering_source": "https://bun.com/docs/test#run-tests"
+  },
+  "failed_access_and_omissions": [
+    "rtk proxy bun test --help returned exit 1: Bun unavailable on current PATH.",
+    "Obsolete Bun documentation URL returned 404; recovered through current official documentation.",
+    "No upstream suite receipt was found in the specifically searched receipt/decision files; no broader absence claim follows.",
+    "No installs, provider/model calls or target-host negative controls were executed."
+  ],
+  "next_wave": "Qualify 0.0.78's native failure controls on the replacement WSL before changing the record pin; preserve selected bash-path evidence with its bounded scope.",
+  "new_host_acceptance": "unknown",
+  "closure": "Source distinctions resolved; broader failure detection, SDK/zsh parity, race and target-host acceptance remain open."
+}

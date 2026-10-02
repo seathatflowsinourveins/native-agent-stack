@@ -1,0 +1,230 @@
+{
+  "layers": [
+    {
+      "layer_id": "hosting-services",
+      "selection": [
+        {
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby",
+          "role": "C02: Runtime for the Docker Engine + Compose option. This pair and Podman/Quadlet are alternative shortlisted stacks.",
+          "install_command": "sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+          "install_source": "https://docs.docker.com/engine/install/ubuntu/ — complete the documented Docker APT repository setup first.",
+          "basis": [
+            {
+              "url": "https://github.com/moby/moby/blob/c8e265787b0a89d161f34c3920f73f136974744b/README.md",
+              "shows": "Moby supplies the components and binaries underlying Docker Engine; install the documented Engine distribution for a runnable host."
+            },
+            {
+              "url": "https://github.com/docker/docs/blob/4d3cbcd0f78327cfc6ec5f357e3af512fcbe53f3/content/manuals/engine/install/ubuntu.md",
+              "shows": "Official installation supports Ubuntu 22.04, 24.04 and 26.04 on amd64, documents version selection, and preserves stored state when packages are uninstalled."
+            },
+            {
+              "url": "https://github.com/docker/docs/blob/4d3cbcd0f78327cfc6ec5f357e3af512fcbe53f3/content/manuals/engine/security/rootless/_index.md",
+              "shows": "Rootless mode runs the daemon and containers inside a user namespace, with a user systemd service and explicit rootless CLI context."
+            },
+            {
+              "url": "https://github.com/moby/moby/actions/runs/36921991024/job/110597613802",
+              "shows": "Observed unit-test job: SUCCESS."
+            },
+            {
+              "url": "https://github.com/moby/moby/actions/runs/36921992179/job/110575011065",
+              "shows": "Observed AlmaLinux rootless integration job: SUCCESS; this does not qualify the target WSL2 host."
+            },
+            {
+              "url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2",
+              "shows": "Latest release published 2026-09-30, within 90 days."
+            },
+            {
+              "url": "https://github.com/moby/moby/commit/c8e265787b0a89d161f34c3920f73f136974744b",
+              "shows": "Default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/moby/moby/issues/51894",
+              "shows": "Dependency-dashboard activity updated 2026-10-02 UTC; activity alone does not establish maintainer response quality."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Docker Compose",
+          "repository": "https://github.com/docker/compose",
+          "role": "C08: Declarative application and supporting-service lifecycle for the Docker Engine + Compose option.",
+          "install_command": "sudo apt-get update\nsudo apt-get install docker-compose-plugin",
+          "install_source": "https://docs.docker.com/compose/install/linux/ — requires Docker Engine, Docker CLI and Docker's package repository.",
+          "basis": [
+            {
+              "url": "https://github.com/docker/compose/blob/4d994cc26d5e6e559d20971c1365aca90535104e/README.md",
+              "shows": "Dockerfile and compose.yaml describe reproducible application environments and services; docker compose up runs them together."
+            },
+            {
+              "url": "https://github.com/docker/docs/blob/4d3cbcd0f78327cfc6ec5f357e3af512fcbe53f3/content/manuals/compose/intro/compose-application-model.md",
+              "shows": "Explicit services, networks, persistent volumes, configurations, secrets and project names cover the requirement's state and deployment-scope concerns. Project names group resources; they are not account security boundaries."
+            },
+            {
+              "url": "https://github.com/docker/docs/blob/4d3cbcd0f78327cfc6ec5f357e3af512fcbe53f3/content/manuals/compose/how-tos/use-secrets.md",
+              "shows": "Secrets are file-mounted and granted per service, allowing credential access to be declared explicitly."
+            },
+            {
+              "url": "https://github.com/docker/compose/actions/runs/36892444874/job/110471131861",
+              "shows": "Observed plugin/stable/containerd end-to-end test: SUCCESS."
+            },
+            {
+              "url": "https://github.com/docker/compose/actions/runs/36892444874/job/110471131616",
+              "shows": "Observed lint job: FAILURE; passing end-to-end tests do not mean the head is entirely green."
+            },
+            {
+              "url": "https://github.com/docker/compose/releases/tag/v5.5.1",
+              "shows": "Latest release published 2026-09-03; assets include Linux x86_64 and macOS arm64 binaries. Compose still requires a compatible engine."
+            },
+            {
+              "url": "https://github.com/docker/compose/commit/4d994cc26d5e6e559d20971c1365aca90535104e",
+              "shows": "Default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/docker/compose/issues/11122",
+              "shows": "Closed issue updated 2026-10-01, documenting recent issue activity."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Podman / Quadlet",
+          "repository": "https://github.com/podman-container-tools/podman",
+          "role": "C09: Alternative runtime and declarative systemd service lifecycle, with explicit rootless user scope.",
+          "install_command": "sudo apt-get update\nsudo apt-get -y install podman",
+          "install_source": "https://github.com/containers/podman.io/blob/f4393d88e070c3df8473321cd8864086c0ada0ea/docs/installation.md",
+          "basis": [
+            {
+              "url": "https://github.com/podman-container-tools/podman/blob/ccc1e207757d7abd173e52980bdd19613166ac48/docs/source/markdown/podman-systemd.unit.5.md",
+              "shows": "Quadlet declares containers, networks, volumes and dependencies; exposes image digest pinning, users/user namespaces, secrets and registry authentication. Rootless unit paths make execution scope explicit. Requires systemd and cgroup v2."
+            },
+            {
+              "url": "https://github.com/containers/podman.io/blob/f4393d88e070c3df8473321cd8864086c0ada0ea/docs/installation.md",
+              "shows": "Documents the Ubuntu APT commands and macOS installation using a Podman-managed Linux VM."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/actions/runs/36874211952/job/110413628115",
+              "shows": "Observed rootless unit-test job: SUCCESS."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/actions/runs/36874211952/job/110413626077",
+              "shows": "Observed Windows WSL machine test: SUCCESS; this is not a measurement of the packet's Ubuntu workload."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/actions/runs/36874211952/job/110437545223",
+              "shows": "Observed aggregate Total Success job: FAILURE; the head cannot be described as entirely green."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3",
+              "shows": "Latest release published 2026-09-29; includes a macOS arm64 installer. Ubuntu's package version may differ."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/commit/ccc1e207757d7abd173e52980bdd19613166ac48",
+              "shows": "Default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/issues/29612",
+              "shows": "Secret-management issue updated 2026-10-02 UTC, documenting recent issue activity."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C12",
+          "name": "Dev Containers CLI",
+          "reason": "Strong reproducible development-environment tooling, but adds a narrower environment layer; its README marks stop/down unimplemented. [README](https://github.com/devcontainers/cli/blob/3e363f63a712d30a741174f6d1a7e75f47fe3fc1/README.md)"
+        },
+        {
+          "key": "C10",
+          "name": "nextjs",
+          "reason": "Strong typed full-stack application framework with documented WSL/macOS support; the packet does not specify a UI or application framework, and supporting-service hosting still needs a runtime. [Installation](https://github.com/vercel/next.js/blob/d5e4355756d59ebff0eb30296124bb7d4b45511d/docs/01-app/01-getting-started/01-installation.mdx)"
+        },
+        {
+          "key": "C06",
+          "name": "React",
+          "reason": "UI library with narrower coverage of service hosting, persistent state and deployment lifecycle. [README](https://github.com/react/react/blob/7c6ac13e19fef500b7f669a16bbd01ecc95965ca/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "FastAPI",
+          "reason": "Strong typed API framework with a documented local container path; API implementation is unspecified, and application/support-service orchestration remains a separate requirement. [Container deployment](https://github.com/fastapi/fastapi/blob/28a206107302ee20ce6a9a876d05a258c1c8d328/docs/en/docs/deployment/docker.md)"
+        },
+        {
+          "key": "C07",
+          "name": "PostgreSQL",
+          "reason": "Useful durable supporting service with explicit accounts and data directories, but a relational database is not specified; choose concrete services when defining the workload. [Server administration](https://github.com/postgres/postgres/blob/50d6e533e4d9a0f70d798c534254007c83c0d428/doc/src/sgml/runtime.sgml)"
+        },
+        {
+          "key": "C04",
+          "name": "BentoML",
+          "reason": "Capable local typed model-serving and container packaging, but no inference workload is specified; latest GitHub release is 2026-05-07, while its 2026-09-07 commit keeps it current under the frozen stale rule. [README](https://github.com/bentoml/BentoML/blob/517b343b81aeb0b01bbd908e58e53ad9c12ef7eb/README.md), [release](https://github.com/bentoml/BentoML/releases/tag/v1.4.39)"
+        },
+        {
+          "key": "C01",
+          "name": "microsoft/wsl",
+          "reason": "Current WSL includes its own Windows-host container CLI, but that Windows-specific deployment path provides less portability across the stated Linux and macOS hosts. [Official container documentation](https://github.com/MicrosoftDocs/WSL/blob/main/WSL/wsl-container.md)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Dockerized IB Gateway",
+          "criterion": "outside_requirement",
+          "fact": "Packages Interactive Brokers Gateway/TWS and broker-specific account configuration; the packet specifies no trading or brokerage service. [README](https://github.com/gnzsnz/ib-gateway-docker/blob/a7f587641dad6ca3deef704e4c9e3371da3f628b/README.md)"
+        },
+        {
+          "key": "C11",
+          "name": "Modal",
+          "criterion": "outside_requirement",
+          "fact": "Repository supplies SDKs for deploying to and interacting with the Modal platform, rather than a local application/support-service host. Paid-service necessity was not established. [README](https://github.com/modal-labs/modal-client/blob/0b5f9154e72ecb3998114c932a088664432b3828/README.md)"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Deployment scope: local development. The selection contains two alternative bundles: Docker Engine + Compose, and rootless Podman + Quadlet; no winner is forced. On the specified WSL2 Ubuntu x86_64 host, run the same digest-pinned typed application and supporting-service images with matched users, credentials, data, network exposure and resource limits. Measure clean setup/rebuild success, startup, throughput/latency, CPU, memory and disk use. Test persistence after restart, failed upgrades, image rollback and state restore separately. Repeat functional qualification on macOS arm64. Add GPU qualification only if the application requires it.",
+      "evidence_gaps": [
+        "The packet contains no comparison where both hosting bundles ran. Retrieved upstream evidence does not establish measured workload superiority.",
+        "All three shortlisted repositories had FAILURE overall head CI rollups despite successful component tests. Failures were not investigated; Moby's check-context retrieval was limited to the first 100 entries.",
+        "Ubuntu release and application workload are unspecified. Documented package commands do not guarantee the inspected release versions; package versions, image digests and application dependencies need explicit pins.",
+        "Docker Engine operation on the exact WSL2 host and its macOS arm64 hosting path were not qualified. Podman's published arm64 installer and machine tests do not establish application parity or VM overhead.",
+        "The requirement does not specify application language, UI/API shape or mandatory supporting services. Framework and database choices remain workload-dependent.",
+        "Agent access is through the documented CLIs. Claude Code/Codex-specific MCP, hooks and installed-client compatibility were not verified. RTX 4090 passthrough was not tested.",
+        "All 12 repositories were unarchived and had default-branch commits within 90 days. GitHub latestRelease was null for Dev Containers CLI, Modal and PostgreSQL; their package or official release currency was not verified.",
+        "Budget used: 30 GitHub API calls, including three GraphQL requests; six web searches; eight page-fetch URLs attempted, zero successfully fetched. ctx_fetch_and_index was rejected because approval policy is never. Original GitHub API documentation blobs were instead indexed with ctx_index and queried with ctx_search, so the prescribed webpage-fetch method could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/devcontainers/cli",
+        "https://api.github.com/repos/devcontainers/cli/commits?per_page=1",
+        "https://api.github.com/repos/vercel/next.js",
+        "https://api.github.com/repos/vercel/next.js/commits?per_page=1",
+        "https://api.github.com/repos/podman-container-tools/podman",
+        "https://api.github.com/repos/podman-container-tools/podman/commits?per_page=1",
+        "https://api.github.com/repos/docker/compose",
+        "https://api.github.com/repos/docker/compose/commits?per_page=1",
+        "https://api.github.com/repos/react/react",
+        "https://api.github.com/repos/react/react/commits?per_page=1",
+        "https://api.github.com/repos/gnzsnz/ib-gateway-docker",
+        "https://api.github.com/repos/gnzsnz/ib-gateway-docker/commits?per_page=1",
+        "https://api.github.com/repos/modal-labs/modal-client",
+        "https://api.github.com/repos/modal-labs/modal-client/commits?per_page=1",
+        "https://api.github.com/repos/fastapi/fastapi",
+        "https://api.github.com/repos/fastapi/fastapi/commits?per_page=1",
+        "https://api.github.com/repos/postgres/postgres",
+        "https://api.github.com/repos/postgres/postgres/commits?per_page=1",
+        "https://api.github.com/repos/moby/moby",
+        "https://api.github.com/repos/moby/moby/commits?per_page=1",
+        "https://api.github.com/repos/bentoml/BentoML",
+        "https://api.github.com/repos/bentoml/BentoML/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/WSL",
+        "https://api.github.com/repos/microsoft/WSL/commits?per_page=1",
+        "https://api.github.com/repos/docker/compose/releases/latest",
+        "https://api.github.com/repos/moby/moby/releases/latest",
+        "https://api.github.com/repos/podman-container-tools/podman/releases/latest",
+        "https://api.github.com/graphql — candidate README blobs, latest releases and head CI checks",
+        "https://api.github.com/graphql — upstream installation, deployment, Quadlet, PostgreSQL and WSL documentation",
+        "https://api.github.com/graphql — issue activity, official Podman installation, Docker scope/state documentation and refreshed CI checks"
+      ]
+    }
+  ]
+}

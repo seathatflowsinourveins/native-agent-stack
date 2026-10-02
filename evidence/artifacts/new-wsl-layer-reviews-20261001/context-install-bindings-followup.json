@@ -1,0 +1,423 @@
+{
+  "read_only": true,
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "root_files_edited": false,
+  "components": [
+    {
+      "layer_id": "code-navigation",
+      "component_id": "serena",
+      "command_of_record": "uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "source_of_record": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md",
+      "pin_source": "manifests/stack.json:880; adoption/pins-linux-x86_64.json:295,299",
+      "status": "generic_package_install_verified; cited_project_docs_do_not_document_git_recipe",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md",
+          "upstream_document_line": 23,
+          "upstream_document_line_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/010_installation.md#L23",
+          "upstream_documented_command": "uv tool install -p 3.13 serena-agent",
+          "source_sha256": "8b3348659ee09afa3a3e0beee15270bd189161e101503920f8dd0ed14a710443",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "Python 3.13 is explicitly upstream. Replacing the published serena-agent distribution with git+URL@commit is the local frozen recipe, not literal syntax documented by this installation page.",
+      "not_found_scope": "No uv tool install git+ recipe in the pinned installation page or README; no universal unsupported-Git claim."
+    },
+    {
+      "layer_id": "document-retrieval",
+      "component_id": "qmd",
+      "command_of_record": "npm install --global @tobilu/qmd@2.8.3",
+      "source_of_record": "https://github.com/tobi/qmd/blob/v2.8.3/README.md",
+      "pin_source": "manifests/stack.json:758; adoption/pins-linux-x86_64.json:87",
+      "status": "generic_upstream_install_verified_with_local_version_pin",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+          "upstream_document_line": 32,
+          "upstream_document_line_url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L32",
+          "upstream_documented_command": "npm install -g @tobilu/qmd",
+          "source_sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "--global aliases -g; @2.8.3 is the local recorded version specialization."
+    },
+    {
+      "layer_id": "document-retrieval",
+      "component_id": "markitdown",
+      "command_of_record": "uv tool install markitdown==0.1.8",
+      "source_of_record": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md",
+      "pin_source": "manifests/stack.json:575; adoption/pins-linux-x86_64.json:174",
+      "status": "generic_pip_install_verified; uv_tool_recipe_not_documented_by_cited_README",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/microsoft/markitdown/blob/b8f79c57ebc0044be41323d89b2a45d3fda8460e/README.md",
+          "upstream_document_line": 62,
+          "upstream_document_line_url": "https://github.com/microsoft/markitdown/blob/b8f79c57ebc0044be41323d89b2a45d3fda8460e/README.md#L62",
+          "upstream_documented_command": "pip install 'markitdown[all]'",
+          "source_sha256": "9f9dc0e582d066e8ac671a1f63b3a73c70a7be9909e8be51a7f5aeb5a7c04af2",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "uv tool install, ==0.1.8 and omission of [all] are the local recipe. Upstream README also documents selective extras at line 94; base-only acceptance does not qualify all formats.",
+      "not_found_scope": "No exact uv tool install markitdown recipe in the pinned README; do not label that literal recipe as documented there."
+    },
+    {
+      "layer_id": "document-retrieval",
+      "component_id": "poppler",
+      "command_of_record": "cmake .. -DCMAKE_INSTALL_PREFIX=\"$OWNED_PREFIX\" -DCMAKE_BUILD_TYPE=release && make && make install",
+      "source_of_record": "poppler-26.09.0/INSTALL:9-16 in the digest-verified official archive",
+      "pin_source": "manifests/stack.json:1809,1812; no poppler ID in frozen Linux tools pins",
+      "status": "official_archive_install_verified_with_local_prefix",
+      "bindings": [
+        {
+          "upstream_document_url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+          "archive_sha256": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+          "archive_bytes": 2041828,
+          "upstream_document_member": "poppler-26.09.0/INSTALL",
+          "upstream_document_lines": [
+            9,
+            10,
+            11,
+            16
+          ],
+          "upstream_documented_commands": [
+            "cmake ..",
+            "make",
+            "make install",
+            "cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=release"
+          ],
+          "member_sha256": "b09e10441115ec79987c06b3bf92d67ac76bfcd8e70f80f3ae33f57a7afc3193",
+          "binding_kind": "digest_bound_official_source_archive_member; no fabricated GitHub line URL"
+        }
+      ],
+      "specialization": "$OWNED_PREFIX replaces the documented /usr/local example; shell sequencing/owned directory belongs to the local native recipe. Official archive digest is the pin, not a Git commit."
+    },
+    {
+      "layer_id": "semantic-rag",
+      "component_id": "socraticode",
+      "command_of_record": "npm install --global --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
+      "source_of_record": "https://github.com/giancarloerra/SocratiCode/blob/v1.15.0/README.md; qualified dependency cutoff: adoption/pins-linux-x86_64.json:319",
+      "pin_source": "manifests/stack.json:962; adoption/pins-linux-x86_64.json:312",
+      "status": "native_MCP_registration_verified; global_install_flags_not_documented_by_cited_README",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+          "upstream_document_line": 266,
+          "upstream_document_line_url": "https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#L266",
+          "upstream_documented_command": "codex mcp add socraticode -- npx -y --prefer-online socraticode@latest",
+          "source_sha256": "64b046e75004bb96cc27fc1f0309e7b7e4f99d90d631f0cc6734e5633c94f1ca",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+          "upstream_document_line": 198,
+          "upstream_document_line_url": "https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#L198",
+          "upstream_documented_command": "\"SOCRATICODE_SPEC\": \"socraticode@1.14.0\"",
+          "source_sha256": "64b046e75004bb96cc27fc1f0309e7b7e4f99d90d631f0cc6734e5633c94f1ca",
+          "native_gh_exit_code": 0,
+          "binding_kind": "documented_engine_pin_example"
+        }
+      ],
+      "specialization": "Global npm installation, --ignore-scripts, --before dependency cutoff and @1.15.0 are local frozen recipe controls (cutoff source already given as adoption/pins-linux-x86_64.json:319).",
+      "not_found_scope": "No npm install --global/-g or --ignore-scripts/--before installation instruction in the pinned README. Bind the native registration and pin example separately; do not attach arbitrary README lines to the local global-install recipe."
+    },
+    {
+      "layer_id": "semantic-rag",
+      "component_id": "qdrant",
+      "command_of_record": "docker run -p 127.0.0.1:6333:6333 qdrant/qdrant:v1.19.1",
+      "source_of_record": "https://github.com/qdrant/qdrant/blob/v1.19.1/README.md",
+      "pin_source": "manifests/stack.json:727; no qdrant ID in frozen Linux tools pins",
+      "status": "generic_docker_deployment_verified_with_local_image_and_loopback_pins",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md",
+          "upstream_document_line": 49,
+          "upstream_document_line_url": "https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md#L49",
+          "upstream_documented_command": "docker run -p 6333:6333 qdrant/qdrant",
+          "source_sha256": "f1455d12252bf40235ad0128d8e98b2cd6d42583e441ac832b01f4daf08df2e4",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "127.0.0.1 and :v1.19.1 are the local loopback/image pin; this command starts a container, not evidence of deployment/recovery acceptance."
+    },
+    {
+      "layer_id": "semantic-rag",
+      "component_id": "vllm",
+      "command_of_record": "uv pip install vllm==0.30.0 --torch-backend=auto",
+      "source_of_record": "https://github.com/vllm-project/vllm/blob/v0.30.0/docs/getting_started/installation/gpu.cuda.inc.md",
+      "pin_source": "manifests/stack.json:1029; no vllm ID in frozen Linux tools pins",
+      "status": "generic_gpu_install_verified_with_local_version_pin",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/docs/getting_started/installation/gpu.cuda.inc.md",
+          "upstream_document_line": 25,
+          "upstream_document_line_url": "https://github.com/vllm-project/vllm/blob/ced6857afa0ea7b2e3f0846a62e1394e90f15607/docs/getting_started/installation/gpu.cuda.inc.md#L25",
+          "upstream_documented_command": "uv pip install vllm --torch-backend=auto",
+          "source_sha256": "6bc320bf273aa6bcfb9044a8d64e1d1e2898967333566b213cf40c50eb878f27",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "==0.30.0 is the local package version pin; no GPU, model, PyTorch/CUDA compatibility or new-host acceptance follows."
+    },
+    {
+      "layer_id": "web-research",
+      "component_id": "agent-browser",
+      "command_of_record": "npm install --global agent-browser@0.38.1 && agent-browser install",
+      "source_of_record": "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/README.md",
+      "pin_source": "manifests/stack.json:38; adoption/pins-linux-x86_64.json:219",
+      "status": "generic_package_and_browser_install_verified_with_local_version_pin",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/vercel-labs/agent-browser/blob/aff6125c023b810ea3f2e5deec5379e9a4270bdc/README.md",
+          "upstream_document_line": 20,
+          "upstream_document_line_url": "https://github.com/vercel-labs/agent-browser/blob/aff6125c023b810ea3f2e5deec5379e9a4270bdc/README.md#L20",
+          "upstream_documented_command": "npm install -g agent-browser",
+          "source_sha256": "f8ae1265daec0e982a1f08791538d4ede5f98aa4892f2609ab0da3acf074f02c",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/vercel-labs/agent-browser/blob/aff6125c023b810ea3f2e5deec5379e9a4270bdc/README.md",
+          "upstream_document_line": 21,
+          "upstream_document_line_url": "https://github.com/vercel-labs/agent-browser/blob/aff6125c023b810ea3f2e5deec5379e9a4270bdc/README.md#L21",
+          "upstream_documented_command": "agent-browser install",
+          "source_sha256": "f8ae1265daec0e982a1f08791538d4ede5f98aa4892f2609ab0da3acf074f02c",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "--global aliases -g and @0.38.1 is the local package pin. Browser-install execution/download is unperformed."
+    },
+    {
+      "layer_id": "web-research",
+      "component_id": "openresearch",
+      "command_of_record": "cargo install --git https://github.com/alphaXiv/OpenResearch --tag v0.2.7 --locked openresearch-cli",
+      "source_of_record": "https://github.com/alphaXiv/OpenResearch/blob/v0.2.7/Cargo.toml",
+      "pin_source": "manifests/stack.json:650; adoption/pins-linux-x86_64.json:204 (orx)",
+      "status": "correct_attribution; Cargo_manifest_is_not_install_documentation",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/alphaXiv/OpenResearch/blob/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0/README.md",
+          "upstream_document_line": 36,
+          "upstream_document_line_url": "https://github.com/alphaXiv/OpenResearch/blob/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0/README.md#L36",
+          "upstream_documented_command": "curl -LsSf https://openresearch.sh/install.sh | sh",
+          "source_sha256": "b427e53ca86a1f8ade399de72713c749a5e44475866ce6a2068a0536fc8a427d",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/alphaXiv/OpenResearch/blob/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0/Cargo.toml",
+          "upstream_document_line": 2,
+          "upstream_document_line_url": "https://github.com/alphaXiv/OpenResearch/blob/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0/Cargo.toml#L2",
+          "upstream_documented_command": "name = \"openresearch-cli\"",
+          "source_sha256": "69d5c2aed1cd7d65bb3fa6fea1480f02171a78dd6da03729701e9063a26412a7",
+          "native_gh_exit_code": 0,
+          "binding_kind": "package_identity_only"
+        }
+      ],
+      "specialization": "cargo install --git ... --tag v0.2.7 --locked openresearch-cli is a local pinned native Cargo recipe. Cargo.toml proves crate name/version, not project-documented install syntax.",
+      "not_found_scope": "No cargo install command in pinned README or Cargo.toml. Existing v0.2.7 install.sh 404 remains failed access; retain literal project installer binding unknown rather than assigning manifest line 2 as install support."
+    },
+    {
+      "layer_id": "web-research",
+      "component_id": "tavily-cli",
+      "command_of_record": "uv tool install tavily-cli==0.1.8",
+      "source_of_record": "tavily_cli-0.1.8/README.md:37 and pyproject.toml in the official digest-verified sdist",
+      "pin_source": "manifests/stack.json:1912; adoption/pins-linux-x86_64.json:189",
+      "status": "generic_pip_install_verified; uv_tool_recipe_is_local_specialization",
+      "bindings": [
+        {
+          "upstream_document_url": "https://files.pythonhosted.org/packages/bc/8a/bb8437105cc2d4794a344b6a4ed84b2fb0002e1973b06d33d7f882c14a76/tavily_cli-0.1.8.tar.gz",
+          "archive_sha256": "3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08",
+          "archive_bytes": 58125,
+          "upstream_document_member": "tavily_cli-0.1.8/README.md",
+          "upstream_document_lines": [
+            37
+          ],
+          "upstream_documented_commands": [
+            "pip install tavily-cli"
+          ],
+          "member_sha256": "5cb11939a5ffc7c2f65accc8aeafd6b92332cd04d123056dd6c2ae17dc69131e",
+          "binding_kind": "digest_bound_official_source_archive_member; no fabricated GitHub line URL"
+        },
+        {
+          "upstream_document_url": "https://files.pythonhosted.org/packages/bc/8a/bb8437105cc2d4794a344b6a4ed84b2fb0002e1973b06d33d7f882c14a76/tavily_cli-0.1.8.tar.gz",
+          "archive_sha256": "3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08",
+          "archive_bytes": 58125,
+          "upstream_document_member": "tavily_cli-0.1.8/pyproject.toml",
+          "upstream_document_lines": [
+            7
+          ],
+          "upstream_documented_commands": [
+            "version = \"0.1.8\""
+          ],
+          "member_sha256": "80263d19d4e832a4c33f516351527b09e3940780177ea79465ac5b7c73c497d6",
+          "binding_kind": "digest_bound_official_source_archive_member; no fabricated GitHub line URL"
+        }
+      ],
+      "specialization": "uv tool install and ==0.1.8 come from the frozen native recipe. README line 37 documents pip only; pyproject line 7 is package identity.",
+      "not_found_scope": "No uv tool install instruction in the official 0.1.8 README. Preserve a bounded literal-UV not-found scope and the published-package identity; do not substitute main 0.1.9."
+    },
+    {
+      "layer_id": "token-efficiency",
+      "component_id": "rtk",
+      "command_of_record": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
+      "source_of_record": "https://github.com/rtk-ai/rtk/blob/v0.50.0/README.md",
+      "pin_source": "manifests/stack.json:822; adoption/pins-linux-x86_64.json:102",
+      "status": "generic_git_install_verified_with_local_tag_and_lock_flags",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
+          "upstream_document_line": 106,
+          "upstream_document_line_url": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106",
+          "upstream_documented_command": "cargo install --git https://github.com/rtk-ai/rtk",
+          "source_sha256": "d51e56234265cc33279a0d98126d80159a74d9ac9f8e6e310ec160e32be0435f",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "--tag v0.50.0 and --locked are local pinned-recipe flags; README documents the Git installation route, not that exact full command."
+    },
+    {
+      "layer_id": "token-efficiency",
+      "component_id": "headroom",
+      "command_of_record": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+      "source_of_record": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md",
+      "pin_source": "manifests/stack.json:515; adoption/pins-linux-x86_64.json:279",
+      "status": "uv_tool_Python_route_and_mcp_extra_verified_separately",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/docs/content/docs/installation.mdx",
+          "upstream_document_line": 32,
+          "upstream_document_line_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/docs/content/docs/installation.mdx#L32",
+          "upstream_documented_command": "uv tool install --python 3.13 \"headroom-ai[all]\"",
+          "source_sha256": "43c43cb04e6df9107d985f0303e82db8ed3b5dba29883c38bfcc29e170fe8914",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/docs/content/docs/installation.mdx",
+          "upstream_document_line": 98,
+          "upstream_document_line_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/docs/content/docs/installation.mdx#L98",
+          "upstream_documented_command": "pip install \"headroom-ai[mcp]\"",
+          "source_sha256": "43c43cb04e6df9107d985f0303e82db8ed3b5dba29883c38bfcc29e170fe8914",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/pyproject.toml",
+          "upstream_document_line": 233,
+          "upstream_document_line_url": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/pyproject.toml#L233",
+          "upstream_documented_command": "mcp = [",
+          "source_sha256": "fbb7e23539cfb60a9afcc22bc9802fd2d6d5c1f24269a7ae82aa479801b2eaec",
+          "native_gh_exit_code": 0,
+          "binding_kind": "package_extra_declaration"
+        }
+      ],
+      "specialization": "Python 3.13/uv tool is explicitly upstream. [mcp] instead of [all] is separately supported by the pinned installation guide and pyproject; ==0.37.0 is the local version pin. Do not imply README [all] line alone documents the [mcp] literal command."
+    },
+    {
+      "layer_id": "token-efficiency",
+      "component_id": "ccusage",
+      "command_of_record": "npm install --global ccusage@20.0.26",
+      "source_of_record": "https://github.com/ccusage/ccusage/blob/v20.0.26/README.md",
+      "pin_source": "manifests/stack.json:164; adoption/pins-linux-x86_64.json:264",
+      "status": "correct_source_from_README_to_pinned_installation_guide",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/docs/guide/installation.md",
+          "upstream_document_line": 58,
+          "upstream_document_line_url": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/docs/guide/installation.md#L58",
+          "upstream_documented_command": "npm install -g ccusage",
+          "source_sha256": "0e6d2200bde886944d5145ec2c71fed15dad78f8947169285a5a9c411b16be4a",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "The cited README shows direct npx/pnpx use, whereas the pinned installation guide documents global npm install. --global and @20.0.26 are local alias/version specializations."
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "component_id": "promptfoo",
+      "command_of_record": "npm install --global promptfoo@0.123.1",
+      "source_of_record": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+      "pin_source": "manifests/stack.json:701; no promptfoo ID in frozen Linux tools pins",
+      "status": "generic_global_install_verified_with_local_version_pin",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+          "upstream_document_line": 31,
+          "upstream_document_line_url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md#L31",
+          "upstream_documented_command": "npm install -g promptfoo",
+          "source_sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "--global aliases -g and @0.123.1 is the local package pin; no evaluator/provider run occurred."
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "component_id": "playwright-test",
+      "command_of_record": "npm install --save-dev @playwright/test@1.63.0 && npx playwright install chromium",
+      "source_of_record": "https://playwright.dev/docs/intro#installing-playwright; pinned package metadata: https://registry.npmjs.org/@playwright%2ftest/1.63.0",
+      "pin_source": "manifests/stack.json:1857; no playwright-test ID in frozen Linux tools pins",
+      "status": "generic_manual_package_install_and_browser_selection_verified",
+      "bindings": [
+        {
+          "upstream_document_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/README.md",
+          "upstream_document_line": 36,
+          "upstream_document_line_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/README.md#L36",
+          "upstream_documented_command": "npm i -D @playwright/test",
+          "source_sha256": "d195f41bed2845ab708a213675900fd3f80084268a637214495444a1b96e8e7a",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/README.md",
+          "upstream_document_line": 37,
+          "upstream_document_line_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/README.md#L37",
+          "upstream_documented_command": "npx playwright install",
+          "source_sha256": "d195f41bed2845ab708a213675900fd3f80084268a637214495444a1b96e8e7a",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        },
+        {
+          "upstream_document_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/docs/src/browsers.md",
+          "upstream_document_line": 122,
+          "upstream_document_line_url": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/docs/src/browsers.md#L122",
+          "upstream_documented_command": "npx playwright install --with-deps chromium",
+          "source_sha256": "0ffcbc59af7337613aa2d79bdce462be1c6a6fa3032dc631b410eb18e8337bf4",
+          "native_gh_exit_code": 0,
+          "binding_kind": "installation_document"
+        }
+      ],
+      "specialization": "--save-dev aliases -D and @1.63.0 is the local pin. Chromium is an upstream-supported browser selector; dropping --with-deps does not establish that OS prerequisites are installed. Pinned intro-js.md:239 documents manual package installation; do not invent an intro.md GitHub path."
+    }
+  ],
+  "image_scope": {
+    "image_of_record": "Ubuntu 24.04.5 LTS (coordinator/PR569 instruction)",
+    "candidate_only": "Ubuntu 26.04.1 LTS",
+    "finding": "Neither version string appeared in the six reviewed root files at read time; do not promote 26.04.1 as selected. No new distro acceptance."
+  },
+  "failed_access": [
+    {
+      "source": "repos/microsoft/playwright/contents/docs/src/intro.md?ref=1b025d7e20a026371cd5f98ba0cdce48892737c8",
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/repos/contents#get-repository-content\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n",
+      "recovery": "https://github.com/microsoft/playwright/blob/1b025d7e20a026371cd5f98ba0cdce48892737c8/docs/src/intro-js.md"
+    }
+  ]
+}

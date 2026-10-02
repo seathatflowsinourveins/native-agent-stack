@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "id": "codex-shell-snapshot-cleanup-20260930",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "On this host on 2026-09-30 a names-only scan of the shell_snapshots directories under ~/.codex, ~/.local/state, ~/.local/share, ~/code, /tmp and /var/tmp (222 directories, 12 readable files; symlinked directories not followed, named tool directories skipped, unreadable entries skipped without a count) found 2 files that declared the Claude Code messaging-token variable, both in ~/.codex/shell_snapshots with modification times on 2026-09-27, of the 19 such files the 2026-09-29 sink inventory had counted there; no open descriptor to either was observed among the processes whose descriptors were readable. After an announcement to the live peer sessions, the enumerated path list was compared byte for byte with the two literal paths and the 2 files were deleted by those paths at 03:02:25Z. The same scan afterwards found 10 readable files and 0 declaring the variable, and a names-only listing of ~/.codex before and after (21,042 and 21,040 entries) showed exactly the 2 snapshot files removed and no entry added.",
+  "limitations": [
+    "Local observation on one host by names and counts only: no snapshot content or value was printed, and a match is a line that starts with the variable's declare or export form, so a file that holds the value in another form is not counted.",
+    "Coverage is the listed roots only: symlinked directories were not followed, node_modules, .git, __pycache__, .venv, venv, site-packages and Claude's own shell-snapshots were skipped, and entries the scan could not read were skipped without a count, so a zero means none among the readable files.",
+    "Why 17 of the 19 files counted on 2026-09-29 were already gone is inferred, not observed: Codex's own three-day snapshot retention (codex-rs/core/src/shell_snapshot.rs:105 at rust-v0.157.1) is the likely remover.",
+    "Deletion removes the files, not copies elsewhere: backups, a file-history snapshot or a sync of the home directory were not examined."
+  ],
+  "evidence_class": "independent observation: names-only scans of this host's Codex shell snapshot directories and a names-only listing of the Codex home before and after a literal-path deletion",
+  "recorded_at_utc": "2026-09-30T03:02:25Z",
+  "host_scope": {
+    "host": "nativestack-5975wx-20260925",
+    "platform": "NativeStack workstation, WSL2 Linux x86_64",
+    "identity": "one workstation; the user's own Codex homes"
+  },
+  "data": {
+    "tool_versions": {
+      "codex": "0.157.1"
+    },
+    "before": {
+      "scanned_at_utc": "2026-09-30T03:02Z (the set-assertion scan right before the deletion; a first scan at about 03:00Z gave the same counts)",
+      "shell_snapshots_directories": 222,
+      "snapshot_files": 12,
+      "files_declaring_the_variable": 2,
+      "codex_homes_with_matches": 1,
+      "processes_holding_a_match_open": "0 observed among processes whose descriptor tables were readable",
+      "count_on_2026_09_29": 19,
+      "matches_mtime_utc": [
+        "2026-09-27T02:19:31Z",
+        "2026-09-27T04:45:59Z"
+      ]
+    },
+    "deletion": {
+      "at_utc": "2026-09-30T03:02:25Z",
+      "set_assertion": "cmp -s of the enumerated path list against the two literal paths, exit 0, before rm",
+      "rm_exit_code": 0,
+      "announced_to": "the live peer sessions, including the Gate A owner, before the deletion"
+    },
+    "after": {
+      "shell_snapshots_directories": 222,
+      "snapshot_files": 10,
+      "files_declaring_the_variable": 0
+    },
+    "codex_home_listing": {
+      "entries_before": 21042,
+      "entries_after": 21040,
+      "removed": 2,
+      "added": 0
+    },
+    "configuration": "[features] shell_snapshot = false in the host's base Codex configuration and its OmniRoute profile; Codex's default is on (codex-rs/features/src/lib.rs:1008-1011 at rust-v0.157.1)",
+    "scan_scope": {
+      "roots": [
+        "~/.codex",
+        "~/.local/state",
+        "~/.local/share",
+        "~/code",
+        "/tmp",
+        "/var/tmp"
+      ],
+      "skipped_directory_names": [
+        "node_modules",
+        ".git",
+        "__pycache__",
+        ".venv",
+        "venv",
+        "site-packages",
+        "shell-snapshots"
+      ],
+      "symlinked_directories": "not followed",
+      "unreadable_entries": "skipped without a count"
+    }
+  },
+  "provenance": {
+    "commands": [
+      "python3 -I evidence/artifacts/codex-shell-snapshot-cleanup-20260930/snapshots_enum.py.txt   (the ~/.codex directory only; prints each match's size and modification time)",
+      "python3 -I evidence/artifacts/codex-shell-snapshot-cleanup-20260930/snapshots_enum_all.py.txt <private list file>",
+      "find ~/.codex -xdev -printf '%P\\t%y\\t%s\\t%T@\\n' | sort > <before listing>",
+      "cmp -s <literal path list> <enumerated path list> && rm -- <the two literal paths>",
+      "find ~/.codex -xdev -printf '%P\\t%y\\t%s\\t%T@\\n' | sort > <after listing>",
+      "python3 -I evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt <before listing> <after listing>"
+    ],
+    "withheld": "the snapshot file names (they carry session identifiers) and the list file; the published counts come from the scans' own output",
+    "decision_record": "docs/decisions/2026-09-29-key-management.md, section \"Codex shell snapshots that recorded the messaging token (done, 2026-09-30)\""
+  }
+}
