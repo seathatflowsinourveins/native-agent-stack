@@ -218,6 +218,10 @@ with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves 
 
 Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
 
+The example also carries two resume profiles, `WSL - Codex - resume` and `WSL - Claude - resume`, each right after the profile of its client. They run `exec codex resume` and `exec claude --resume`, which open the client's own session picker, and nothing resumes until you choose a row. Each picker starts with the sessions of the profile's `--cd` directory (Codex: the launch directory; Claude Code: the current worktree) and can be widened from inside it ([Codex `resume_picker.rs` at `rust-v0.159.3`](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/resume_picker.rs#L674-L687); [Claude Code sessions](https://code.claude.com/docs/en/sessions)), and the default profiles are unchanged and still start a new session.
+
+Windows Terminal re-saves `settings.json` in its own layout, written from its settings model with four-space indentation, and writes a single `bellSound` string back as a one-element array (`microsoft/terminal` `v1.24.11911.0`: `CascadiaSettingsSerialization.cpp` L1602 writes the file, and `JsonUtils.h` L359-L389 reads a lone string as a list of one while L549-L551 always writes an array), so a check that reads that file must accept both forms.
+
 ## Listeners and ports
 
 - All WSL 2 distributions share one network namespace
