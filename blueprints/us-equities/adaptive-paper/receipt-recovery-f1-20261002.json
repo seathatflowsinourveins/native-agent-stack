@@ -40,6 +40,7 @@
   },
   "limits": {
     "actual_paper_execution": "NOT_RUN; native authentication and paper admission required",
+    "historical_paper_source_binding": "One of six native-fault-behaviour bindings is stale: the historical runner SHA25634ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e differs from this corrected source. The historical receipt/release manifest remain unchanged; actual paper requalification must bind the new measured bytes.",
     "ibkr": "Upstream5007/5057/5060 remain open; no local IBKR adapter fix or recovery acceptance claimed",
     "callback_exception_loss": "Pinned rc5 reproducer still confirms upstream callback loss; the existing callback guard remains required",
     "whole_task_usage": "unknown"

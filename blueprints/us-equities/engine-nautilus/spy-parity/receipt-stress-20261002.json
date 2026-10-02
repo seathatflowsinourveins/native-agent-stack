@@ -8,6 +8,7 @@
     "version": "2.0.0rc5",
     "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
     "python": "3.13.16",
+    "official_container_image": "docker.io/library/python@sha256:110e8d1de526341568b8fcdb1773b0d47ad63309df21980c6028803226a2dab0",
     "platform": "Linux ARM64 in a task-owned macOS VM; not NativeStack WSL2 acceptance",
     "extension_sha256": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
   },

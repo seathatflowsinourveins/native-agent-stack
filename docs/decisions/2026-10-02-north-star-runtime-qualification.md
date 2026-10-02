@@ -20,20 +20,20 @@ This executor is not the surviving NativeStack WSL2 workstation.
 
 Two separate fresh processes each produced two fresh native BacktestEngine
 exports. Each independent strict comparison passed **142/142** checks:
-123 execution checks and19 preconditions, with no failures, skips or blocking
+123 execution checks and 19 preconditions, with no failures, skips or blocking
 mappings. The actual data files were rehashed at execution and comparison.
 All four declared UUID-normalized economic exports have the same SHA256.
 The [published receipt](../../blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json)
 contains the exact engine, review/source/data hashes, starts, original receipt
 digests and observed economics. Full raw returns remain in private task evidence.
 
-The native fills are304 SPY bought at324.227160 and sold at291.106620,
-at the frozen entry/exit timestamps. Fees are2.00 USD, dividends428.64 USD,
+The native fills are 304 SPY bought at 324.227160 and sold at 291.106620,
+at the frozen entry/exit timestamps. Fees are 2.00 USD, dividends 428.64 USD,
 and final quantity zero. Native cash is **90357.99 USD**, while exact Decimal
-reconciliation is90357.995840 USD. Per-order native Money rounding accounts
-for the difference from the prospective cent display90358.00. The unchanged
+reconciliation is 90357.995840 USD. Per-order native Money rounding accounts
+for the difference from the prospective cent display 90358.00. The unchanged
 0.01 USD cash tolerance passes; the oracle, deadline, mapping and tolerance
-were not changed after execution. Each engine processed725 bars, recorded
+were not changed after execution. Each engine processed 725 bars, recorded
 zero error log lines and ended with no open orders, positions or pending intents.
 
 The first two isolation attempts failed before any engine ran: C1 denied mount
@@ -54,17 +54,28 @@ the base source and pass after the constructor correction.
 
 The [recovery receipt](../../blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json)
 binds four exact source hashes and the official hash-locked macOS ARM64 runtime:
-Python3.13.15, Alpaca-py0.44.0 and Nautilus2.0.0rc5. Fourteen bounded runs
+Python 3.13.15, Alpaca-py 0.44.0 and Nautilus 2.0.0rc5. Fourteen bounded runs
 passed **523 unique tests**, with zero skips/failures and exit0 throughout.
 These exercise real SDK/native code against deterministic fake broker ports,
 including residual-only reconciliation, ambiguous submissions across reopen,
 durable STOP and callback/accounting guards. They do not call paper accounts.
 
-The initial415-test run carried133 dependency skips; it remains historical.
-Two later controller-limited runs were incomplete and are excluded from the523
+The initial 415-test run carried 133 dependency skips; it remains historical.
+Two later controller-limited runs were incomplete and are excluded from the 523
 total. The initial uv option conflict is retained; its correction kept
 binary-only, hash-locked official installation. The pinned engine's upstream
 callback-loss reproducer still requires the existing callback guard.
+
+The deterministic trading-ladder check exits 0 with no validation errors, but
+reports one stale native-paper source binding among six bound files. Its retained
+`native-fault-behaviour` receipt binds the old `runner.py` SHA256
+`34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e`;
+this correction has SHA256
+`d2c2944fe24a39c4304c976f49b09b553999d8f102ab08eeb0e28856c7e7ca7b`.
+The historical receipt and release hash manifest remain unchanged. The checker
+reports bindings without changing gate status, so its arithmetic ladder cannot
+qualify the corrected runner's native paper faults. A newly admitted paper run
+must rebind actual measured source; synthetic tests do not replace that step.
 
 ## Admission and case boundaries
 
@@ -76,7 +87,7 @@ callback-loss reproducer still requires the existing callback guard.
 | Frozen `two_zero`, `two_stress`, `adaptive_stress` | Blocked by pinned native maintenance-margin and liquidation mapping gaps | Reproduce frozen mark-to-market maintenance and partial-liquidation economics with an upstream-supported, reviewed mapping. No invented fills/cash or tolerance widening. |
 | Surviving NativeStack WSL2 | Destination/transport not enrolled in this task | Follow the [activation packet](2026-10-02-north-star-host-paper-activation.md); qualify the actual workstation and its platform artifact lock. Mac Linux simulation is insufficient. |
 | Alpaca paper | Required Keychain entries absent; no account call | Store credentials in the native Keychain, perform supported read-only preflight, then separately admit the paper/fault run. |
-| IBKR paper | Local native session absent; exact rc5 recovery harness gap persists | Qualify the single-account rc5 order/restart/fill-replay sequence. Historical1.231 lifecycle is insufficient; open upstream5007/5057/5060 remain visible. |
+| IBKR paper | Local native session absent; exact rc5 recovery harness gap persists | Qualify the single-account rc5 order/restart/fill-replay sequence. Historical 1.231 lifecycle is insufficient; open upstream 5007/5057/5060 remain visible. |
 | Historical data fitness | Frozen fixture source/provenance checked; production PIT/data entitlement acceptance unproved | Validate the intended provider's point-in-time records, adjustments, sessions and entitlement before research claims. |
 | Native memory/retrieval/provider lifecycle | Existing scoped receipts retained; broader gates remain partial/blocked | Respect the closed memory decision and current owners. No candidate trial or shared inference is queued by this offline execution. |
 
