@@ -29,7 +29,11 @@ What is stripped, and how each strip is recorded in
   the blind clean-install selection records they join (``selection.json``,
   ``ownership.json``, ``cross-family/selection-gpt.json`` and their two
   decision records), keeping that selection's frozen criteria, prompts and
-  packets.
+  packets; and the per-slot default records of the new-WSL definitive round
+  (``evidence/artifacts/new-wsl-definitive-defaults-*``: the definitive manifest,
+  the foundation, trading and memory-unit records, trading ownership, their
+  decision record and test), keeping its criteria, prompts, packets and
+  preregistrations.
 - **Ledger candidate order**: each ledger row's ``candidates`` list is sorted
   by lowercased ``(repository, name)`` before anything else is stripped (the
   checked-in order lists the selected incumbent first), so every recorded
@@ -229,6 +233,15 @@ REMOVE_GLOBS = (
     "evidence/artifacts/new-wsl-clean-install-selection-*/cross-family/selection-gpt.json",
     "docs/decisions/2026-10-01-final-catalog.md",
     "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
+    # The per-slot defaults of the new-WSL definitive round (#591) and the records that name them; its criteria, prompts,
+    # packets and preregistrations stay.
+    "evidence/artifacts/new-wsl-definitive-defaults-*/definitive-manifest.json",
+    "evidence/artifacts/new-wsl-definitive-defaults-*/foundation-definitive.compact.json",
+    "evidence/artifacts/new-wsl-definitive-defaults-*/gpt-memory-first-round-units.json",
+    "evidence/artifacts/new-wsl-definitive-defaults-*/trading/trading-definitive.compact.json",
+    "evidence/artifacts/new-wsl-definitive-defaults-*/trading/trading-ownership.json",
+    "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+    "tests/test_new_wsl_definitive_defaults.py",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/

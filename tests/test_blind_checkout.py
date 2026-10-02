@@ -173,6 +173,7 @@ class RemovedFilesTests(BlindCheckoutFixture):
 
     def test_final_catalog_edition_and_selection_records_are_removed_but_frozen_inputs_kept(self):
         selection = "evidence/artifacts/new-wsl-clean-install-selection-20261001"
+        definitive = "evidence/artifacts/new-wsl-definitive-defaults-20261001"
         removed = [
             "catalogs/foundation/new-wsl-architecture-20261001.json",
             "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -184,9 +185,18 @@ class RemovedFilesTests(BlindCheckoutFixture):
             f"{selection}/cross-family/selection-gpt.json",
             "docs/decisions/2026-10-01-final-catalog.md",
             "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
+            f"{definitive}/definitive-manifest.json",
+            f"{definitive}/foundation-definitive.compact.json",
+            f"{definitive}/gpt-memory-first-round-units.json",
+            f"{definitive}/trading/trading-definitive.compact.json",
+            f"{definitive}/trading/trading-ownership.json",
+            "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+            "tests/test_new_wsl_definitive_defaults.py",
         ]
         kept = [f"{selection}/criteria.txt", f"{selection}/judge-prompt.txt", f"{selection}/packets/durable-memory.json",
-                f"{selection}/cross-family/agreement-rule.txt"]
+                f"{selection}/cross-family/agreement-rule.txt", f"{definitive}/criteria.txt",
+                f"{definitive}/decide-prompt.txt", f"{definitive}/packets/memory-owner.order-1.json",
+                f"{definitive}/trading/round1-preregistration.json"]
         for relative in removed + kept:
             self.write(relative, "{}\n" if relative.endswith(".json") else "fixture\n")
         git(["add", "-A"], self.source)
