@@ -11,7 +11,8 @@ slots are still to come, and nothing here was installed.
 - `combine.py`: applies the rule. `python3 combine.py <repository checkout> sol-ultra-round <output folder> <git ref>`
   where the git ref holds pull request 595 (`claude/grand-catalog-final-20261001`, read at `025c4892`), from which the
   script reads `evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json`; the
-  Claude record is the merged definitive manifest on `origin/main`.
+  Claude record is the definitive manifest as merged at `8b51946e`, the commit the rule was written against (pinned in
+  the script, so the result does not move with later manifest versions).
 - `sol-ultra-round/order-1/` and `order-2/`: the 42 final messages of the GPT lane's blind round (GPT-6.1 Sol at
   ultra effort through `codex exec`, live web search, one process per layer, the same 21 packets in two seeded
   candidate orders). 10 units finished before the host restart on 2026-10-02; the other 31 ran afterwards with the

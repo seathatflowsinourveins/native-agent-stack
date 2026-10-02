@@ -3,15 +3,18 @@
 
 G1 = pull request 595's selection-gpt.json (read from git), G2/G3 = the two orders of the Sol-ultra round (last.json per
 layer), C = the merged definitive manifest's defaults. Prints one line per layer and writes combined.json.
-Usage: combine.py <repo checkout> <blind-run folder> <output folder> [<git ref of the peer's selection>]
+Usage: combine.py <repo checkout> <blind-run folder> <output folder> [<git ref of the peer's selection> [<manifest commit>]]
 """
 import json
 import pathlib
 import subprocess
 import sys
+from urllib.parse import urlsplit
 
 repo, blind, out = sys.argv[1], pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3])
-ref = sys.argv[4] if len(sys.argv) > 4 else "pr/595"
+ref = sys.argv[4] if len(sys.argv) > 4 else "025c48927f0fc08c70018150d282aec763f4701e"  # pull request 595's head when the rule was written
+# The Claude record is the definitive manifest as merged when the rule was written, not the moving main branch.
+MANIFEST_REF = sys.argv[5] if len(sys.argv) > 5 else "8b51946ee16e542e544936e19bb793114fea948e"
 
 
 def show(spec):
@@ -19,13 +22,15 @@ def show(spec):
 
 
 def norm(url):
+    """owner/name for a GitHub repository URL (the host is compared exactly), else the URL itself."""
     u = (url or "").strip().lower().rstrip("/")
-    if "github.com/" in u:
-        return "/".join(u.split("github.com/")[1].split("/")[:2])
+    parts = urlsplit(u)
+    if parts.netloc in ("github.com", "www.github.com"):
+        return "/".join(parts.path.strip("/").split("/")[:2])
     return u
 
 
-manifest = show("origin/main:evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json")
+manifest = show(f"{MANIFEST_REF}:evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json")
 g1 = show(f"{ref}:evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json")
 C, KEEP = {}, {}
 for s in manifest["slots"]:

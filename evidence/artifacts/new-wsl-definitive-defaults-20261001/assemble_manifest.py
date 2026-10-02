@@ -10,6 +10,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from urllib.parse import urlsplit
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
@@ -98,8 +99,9 @@ def apply_settlements(rows):
 def norm(url):
     # Repository matching follows convergence/combine.py and RULE.md, including the distribution's image URL.
     u = (url or "").strip().lower().rstrip("/")
-    if "github.com/" in u:
-        return "/".join(u.split("github.com/")[1].split("/")[:2])
+    parts = urlsplit(u)
+    if parts.netloc in ("github.com", "www.github.com"):
+        return "/".join(parts.path.strip("/").split("/")[:2])
     return u
 
 

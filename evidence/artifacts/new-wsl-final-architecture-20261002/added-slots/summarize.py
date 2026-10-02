@@ -5,6 +5,7 @@ Usage: summarize.py <gap-slots folder> [--json <out>]
 import json
 import pathlib
 import sys
+from urllib.parse import urlsplit
 
 root = pathlib.Path(sys.argv[1])
 spec = json.loads((root / "gap-slots.json").read_text())
@@ -13,10 +14,11 @@ spec = json.loads((root / "gap-slots.json").read_text())
 def ident(x):
     """One identity per candidate across orders: owner/name of its repository, else its name without the packet key."""
     url = (x.get("repository") or "").strip().lower().rstrip("/")
-    if "github.com/" in url:
-        return "/".join(url.split("github.com/")[1].split("/")[:2])
-    if "huggingface.co/" in url:
-        return "hf:" + "/".join(url.split("huggingface.co/")[1].split("/")[:2])
+    parts = urlsplit(url)
+    if parts.netloc in ("github.com", "www.github.com"):
+        return "/".join(parts.path.strip("/").split("/")[:2])
+    if parts.netloc in ("huggingface.co", "www.huggingface.co"):
+        return "hf:" + "/".join(parts.path.strip("/").split("/")[:2])
     if url:
         return url
     name = (x.get("name") or "").strip()

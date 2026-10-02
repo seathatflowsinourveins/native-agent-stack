@@ -10,6 +10,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
@@ -32,8 +33,9 @@ def sha(path):
 
 def repository_key(value):
     value = (value or "").strip().lower().rstrip("/")
-    if "github.com/" in value:
-        return "/".join(value.split("github.com/")[1].split("/")[:2])
+    parts = urlsplit(value)
+    if parts.netloc in ("github.com", "www.github.com"):
+        return "/".join(parts.path.strip("/").split("/")[:2])
     return value
 
 
