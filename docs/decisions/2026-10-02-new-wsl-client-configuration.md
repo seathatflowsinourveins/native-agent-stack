@@ -7,8 +7,15 @@ Codex role carriers, and let the builder edit the files that carried F9's old te
 of an existing Codex `config.toml` by a merge, kept a person's theme, declared one dependent sentence and asked where the
 guard runs for Codex. The fourth round, after the cross-family review of the pull request, made the four authorization
 settings opt-in, put the running-Codex refusal before both writes of `config.toml`, corrected F9's sentence about the
-instruction blocks and moved the scan of the rendered files into `--check`. This record states the result of the four
-rounds. Every web page named below was read on 2026-10-02.
+instruction blocks and moved the scan of the rendered files into `--check`. The fifth round, after the first hosted macOS
+run of the new tests, made the two that assumed Linux portable (the display width of a conflicting value, and the reading of
+a process's command line). The sixth, the last repair round, answers an independent read of the fourth and fifth: it
+corrected F9's sentence about the instruction blocks again (the filter's names come from the map and from the manifest rows
+that install nothing, so a unit that names a skill is still left out when it also names such a tool), told every outcome of
+the line `--apply` prints about the authorization settings apart in the code and the documents (adding `partly applied`, and
+a skipped step from a failed one), put the tool approval modes of an MCP server into the authorization class, made a
+`pgrep` that fails stop the Codex `config.toml` step, and fixed the strings and the records that lagged the code. This
+record states the result of the six rounds. Every web page named below was read on 2026-10-02.
 
 **Scope:** `tools/adoption/new_wsl_client_config.py`, `adoption/new-wsl/client-config-map.json`, the two generated blocks
 `adoption/new-wsl/claude-user-instructions.md` and `adoption/new-wsl/codex-user-instructions.md`, and
@@ -40,7 +47,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    role carriers; the two instruction blocks; and five steps of the tool itself (the launcher, the login-shell PATH block,
    the skills step and the two PATH directories). A piece goes to the first entry that matches it. A piece no entry
    matches, and an entry no piece reaches, fail the check. Today: 366 pieces, 246 wired (192 practice, 54 through a slot),
-   116 not wired (69 through a slot that does not install, 47 by their own entry) and 4 authorization settings, each
+   112 not wired (65 through a slot that does not install, 47 by their own entry) and 8 authorization pieces (the four
+   settings, and the four tool approval modes of Decision 14, which also wait for their slots), each
    listed below.
 3. **A piece follows its slot.** A piece mapped to a slot that does not install is not wired; it is wired when the manifest
    says the slot installs the owner its entry names. So the memory slot, once its head-to-head returns with ai-memory,
@@ -136,9 +144,11 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    sense with the one before it goes with it, when the map declares that (`dependent_sentences`, never inferred): `Check
    relevance; retry without pin priority or widen if needed...` refines the ai-memory query before it, so it is dropped in
    both blocks and listed with its reason; a test shows it stays where the sentence before it stays, and that it comes
-   back with the ai-memory sentence when the memory slot installs. Sentences that name a skill or a timer the map does not list stay as written, and
-   F9 says so: the filter works by the names the map declares as not wired, and whether a skill that a kept sentence
-   names exists on the host is not established by this step. They are the skills `search-first`, `find-skills` and
+   back with the ai-memory sentence when the memory slot installs. F9's sentence about what the blocks lose, which a
+   test holds against the dropped list below, reads: a unit is left out when it names a tool that is not wired, which is a name the map lists for an unwired piece or the former default of a manifest row that installs nothing; a unit is not left out merely for naming a skill or timer that neither lists, and whether those skills exist on the host is not established by this step. The Promptfoo unit shows why the second source is named: no map
+   entry lists Promptfoo, it is the former default of the manifest row `promptfoo`, and its unit (line 17 of the Claude
+   source, line 11 of the Codex source) also names `skill-creator` and is left out of both blocks. The units that stay and
+   name a skill or a timer name no tool that is not wired; they are the skills `search-first`, `find-skills` and
    `skill-creator` (line 5 of the Claude file, line 10 of the Codex file) and the "daily currency timer" (line 30 of the
    Claude file, line 15 of the Codex file). The plan installs six skills for both clients (`install.sh` L180: `tdd`,
    `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `writing-for-agents`, `setup-matt-pocock-skills`) and adds the
@@ -193,7 +203,7 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     nothing and makes no second backup. The running-Codex refusal comes before either write of `config.toml`: while a process named
     `codex` runs (`--codex-process-name`), nothing is written and the step says `close the Codex sessions, then run
     --apply again` (naming the app-server daemon and `codex app-server daemon stop` when one runs). The running processes are `pgrep -x`'s
-    finding (`apply_codex_lane.codex_processes`); the daemon is found by reading
+    finding (`running_codex_pids`, below); the daemon is found by reading
     the command line of each, from `/proc/<pid>/cmdline` where Linux has one (the arguments as passed, as before) and from
     `ps -ww -o command= -p <pid>` where there is none (macOS), whose words are the arguments joined by spaces, so an
     argument that holds a space is split, which does not matter for the word `app-server`. Neither reads the environment of
@@ -201,10 +211,18 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     an existing file and the creation of an absent one; `codex_home.py`'s own creation of a missing file has no such check,
     so the tool makes it first and `codex_home.py` is unchanged for its other callers (the first rounds checked only the
     merge). A file that needs nothing is not held up by it. An empty Codex home still gets the render through
-    `codex_home.py`, once the check has passed.
+    `codex_home.py`, once the check has passed. A `pgrep` that cannot run, or that exits with a status other than 0 (matched)
+    or 1 (none matched), is a failed check and not an empty list: `apply_codex_lane.codex_processes`, which this tool called
+    until the sixth round, drops the status, so a failing `pgrep` read as no Codex running and switched the refusal off. The
+    tool now makes the call itself (`running_codex_pids`), and any other status, or a `pgrep` that cannot be run, fails the
+    `codex-config` step before anything is written, with the status in the message, in a dry run too; a file that needs
+    nothing is still not held up. Both manuals document the statuses 0, 1, 2 and 3: procps-ng's `man/pgrep.1` (L294-311:
+    matched, none, syntax error, fatal error) and Apple's `pkill.1`, which documents `pgrep` as well (L258-273: matched,
+    none, invalid options, internal error), both read 2026-10-02.
     Evidence: unit tests (the destination's shape, a conflict, a trailing comment and no final newline, a comment-only
     file, look-alike lines, 80 seeded partial renders each completed to the whole and again to nothing, a failed writer, an
-    unexpected writer result, a running Codex before the merge and before the creation of an absent file, a dry run) and a
+    unexpected writer result, a running Codex before the merge and before the creation of an absent file, a dry run, and a
+    `pgrep` that fails: stand-ins that exit 2, 3 and by a signal, in both write paths, and one that cannot be run) and a
     run with the real Codex 0.159.3 in a temporary home with no
     credential: the destination's file merged, `codex mcp list` read the result and listed `qmd` and `serena`, the second run
     changed nothing.
@@ -256,12 +274,26 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     Codex's `approval_policy` (`never`: "Never ask the user to approve commands", `codex-rs/core/config.schema.json` at
     `rust-v0.160.0`, definition `AskForApproval` from L307, the sentence at L331) and `sandbox_mode`
     (`danger-full-access`, definition `SandboxMode` L3963-3970). The first rounds wired them as practice, so `--apply`
-    wrote them on a fresh host; the review of the pull request held that a tool must not do that by default.
+    wrote them on a fresh host; the review of the pull request held that a tool must not do that by default. The sixth
+    round added a second kind of piece to the class: Codex's tool approval modes. `default_tools_approval_mode = "approve"`
+    stands in the templates of four MCP servers (`context-mode`, `ai-memory`, `socraticode`, `headroom`) and makes Codex run
+    every tool of a server without asking; its values are `AppToolApproval` (`auto`, `prompt`, `writes`, `approve`, schema
+    L210-218), the key is on `RawMcpServerConfig` (L3641) and the per-tool `approval_mode` on `McpServerToolConfig`
+    (L2430), both read at `rust-v0.160.0`. The four servers' slots install nothing today, so nothing wrote the key, but a
+    plain `--apply` would have written it, with no check, the day one of those slots installed, and likewise for a wired
+    server such as `serena` whose template gained the key.
     - **The class.** One map entry gives the four their own wiring, `authorization:<reason>`. The tool knows which pieces
-      they are (`AUTHORIZATION_PIECES`, and any `permission/allow` rule, which would grant too), so a map that classes one
-      as practice or as a slot fails `--check`, and a map that classes another piece as authorization fails it too; a
-      piece classed `not_wired` is allowed (it is never written, with or without the option). The deny list stays
-      practice: it only restricts.
+      they are (`is_authorization_piece`: `AUTHORIZATION_PIECES`, any `permission/allow` rule, which would grant too, any
+      `default_tools_approval_mode` whatever its value, and any `approval_mode` whose value is `approve`), so a map that
+      classes one as practice or as a slot fails `--check`, and a map that classes another piece as authorization fails it
+      too; a piece classed `not_wired` is allowed (it is never written, with or without the option). The deny list stays
+      practice: it only restricts. An entry of this class may also name a `slot` and its `owner`, and the piece is then
+      written only with the option and only while that slot installs the owner (`slot_verdict`, the rule of every slot
+      piece): a bare `default_tools_approval_mode` would otherwise create half of a server's table for a server that is not
+      wired. The four tool approval modes have such entries, carry no `names` (a piece held back only by the option must not
+      add its server's name to the tools that are not wired while the slot installs it), and are not written today, with
+      or without the option, because none of the four slots installs. Eight pieces are in the class (`--check` counts
+      `authorization: 8`, and 112 pieces are not wired).
     - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
       person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
       and so does the Codex merge.
@@ -270,9 +302,16 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
       four like the theme (written only when the file has no value for the key, the nested `permissions.defaultMode`
       included), and the Codex merge keeps a differing value as a conflict. The option adds a missing grant and never
       changes a person's choice.
-    - **What is shown.** `--check` lists them apart, with the value the option would write, in its text, its JSON table
-      (wiring `authorization`) and the generated tables of this record; its counts line has a fourth number. `--apply`
-      prints one line: `left to the clients' own defaults`, `applied` (with what it added and what it kept) or `kept`.
+    - **What is shown.** `--check` lists them apart, with the value the option would write (and, for a tool approval mode,
+      the slot it also waits for), in its text, its JSON table (wiring `authorization`) and the generated tables of this
+      record (the second table has a fifth column, `Also needs`); its counts line has a fourth number. `--apply` prints
+      a line before the summary that starts `authorization settings:` and says `left to the clients' own defaults` when the option was not given and, when it was, `applied`, `partly applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry run), followed by what it added, kept, found already the same and did not reach, a skipped step and a failed step told apart. The head word is one of seven: `left to the clients' own defaults` (the option was not given); with the option,
+      `applied` (every wired setting was reached and one was added), `partly applied` (one was added and one was not
+      reached), `kept` (every one was reached and none was added) and `not applied` (none was added and one was not
+      reached, or none is wired), with `would be applied` and `would be partly applied` for a dry run. A setting is not
+      reached when the step that would write it did not finish: the line says `its step codex-config was skipped` or `its
+      step codex-config failed`, which are not the same thing. A test runs the seven and holds the code's list of them
+      (`AUTHORIZATION_OUTCOMES`) against the recipe, this record, the receipt example and the tool's docstring.
     - **F9 and the receipt.** The command block keeps the plain `--apply`. Its prose says the operator adds the option only
       on a host whose owner asked for the repository's permission practice, and that the receipt's `authorization_settings`
       records who asked: a new field of the receipt example, with its checklist line and a test that pins all three. That is
@@ -281,7 +320,10 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     - **Tests.** The default render has none of the four keys, the option's render has all four and differs in nothing
       else; an existing `defaultMode` or `approval_policy` survives a default apply and one with the option, with both
       values printed; a file with one setting and not the other gets only the missing one; the map refuses an
-      authorization piece classed practice or slot (for each of the four); and six deliberate breaks of the tool (the four
+      authorization piece classed practice or slot (for each of the eight); a wired server whose template gains an approving
+      mode (`serena`, whose slot installs) is caught, and with the entry the key is the option's; a server whose slot
+      installs (`ai-memory` in a scratch manifest) still has the key written only with the option, in the render and in a
+      plain and an optioned `--apply`; and six deliberate breaks of the tool (the four
       wired by default, no check before the creation of an absent file, no scan in `--check`, Claude not keeping its value,
       the option ignored, the class refusal removed) each fail the tests.
     No other wired piece grants: a scan of the default render finds only the `permissions` object that holds the deny
@@ -322,6 +364,11 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
 - **Authorization settings written by default, with a note.** What the first rounds did. Writing a grant is a decision of
   the host's owner, so the option decides, and the receipt records who asked.
 - **A prompt at run time for the four.** The recipe is meant to be followed end to end without prompts, so a flag decides.
+- **The tool approval modes in the class without their slot.** With the option the key would be written under
+  `[mcp_servers.<id>]` for a server that is not wired, a table with no command, and Codex would read half a server. The
+  entries name the slot and the owner, so the key waits for both the option and the server.
+- **Editing `apply_codex_lane.codex_processes` to raise on a failing `pgrep`.** The instruction was to leave that file as it
+  is, and its other callers keep the behavior they have; the tool makes the same call itself and checks the status.
 - **Merging Codex trust state, or wiring a Codex hook, so that the first session asks nothing.** Decision 13: there is no
   Codex hook in the design to wire.
 
@@ -406,21 +453,27 @@ implementation is the reference: `adoption/bootstrap.md` steps 2, 4 and 4a,
   a terminal is never cut, L441-442 the keyword `command` is "command and arguments"), for the flags of the `ps` reading.
   It is documentation of the flags; no `ps` ran on macOS.
 
+- For the sixth round (read 2026-10-02): the manuals of `pgrep`, procps-ng's
+  `https://gitlab.com/procps-ng/procps/-/raw/master/man/pgrep.1` (L294-311, the exit statuses) and Apple's
+  `https://raw.githubusercontent.com/apple-oss-distributions/adv_cmds/main/pkill/pkill.1` (L258-273); the Codex config
+  schema at `rust-v0.160.0`, `AppToolApproval` L210-218, `default_tools_approval_mode` on `RawMcpServerConfig` L3641 (also
+  `AppConfig` L129, `AppLinkConfig` L192, `AppsDefaultConfig` L283, `PluginMcpServerConfig` L3505) and `approval_mode` on
+  `McpServerToolConfig` L2430 (and `AppToolConfig` L223).
+
 What I ran, by evidence class. Unchanged upstream tests and my own checks are different things:
 
 - **Commands, run from the worktree with `nice -n 19` and a temporary directory under the scratch area** (exit code and last line of each):
-  - `python3 -B -m unittest tests.test_new_wsl_client_config`: exit 0 (Ran 127 tests in 23.979s); last line `OK`
+  - `python3 -B -m unittest tests.test_new_wsl_client_config`: exit 0 (Ran 145 tests in 34.731s); last line `OK`
   - `python3 -B tools/adoption/new_wsl_client_config.py --check`: exit 0; last line `check passed`
   - `python3 -B tools/adoption/new_wsl_client_config.py --render --host example --out <temporary dir>`: exit 0; last line `wrote <temporary dir>/wiring.json`
   - `python3 -B tools/adoption/new_wsl_client_config.py --apply --host example --home <empty temporary dir> --dry-run`: exit 0; last line `summary: claude-hooks planned; claude-agents planned; claude-mcp planned; claude-settings planned; claude-launcher planned; claude-md planned; codex-c`
-  - `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile tests.test_render_config tests.test_wsl_new_distro_recipe`: exit 0 (Ran 253 tests in 14.328s); last line `OK (skipped=5)`
+  - `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile tests.test_render_config tests.test_wsl_new_distro_recipe`: exit 0 (Ran 253 tests in 14.579s); last line `OK (skipped=5)`
   - `python3 -B scripts/validate.py`: exit 1; last line `tests/test_wsl_new_distro_recipe.py: byte count mismatch`
 
-  `scripts/validate.py` printed its header line and fourteen lines and nothing else: the SHA-256 and byte-count
-  mismatches of the seven changed files that `manifests/evidence.json` registers (`linux-wsl2-new-distro.md`, `stage1-receipt.example.json`,
-  `first-boot-checklist.md`, `2026-10-01-new-wsl-distro-recipe.md`, `test_wsl_new_distro_recipe.py`,
-  `install_claude_profile.py`, `managed_block.py`). The coordinator registers the new hashes. The record was filled in
-  after a first pass of these six commands, and a later pass gave the same exit codes and the same counts.
+  `scripts/validate.py` printed `Publication validation failed:` and 8 more lines, each a SHA-256 or byte-count mismatch,
+  for the 4 registered files that the sixth round changed: `adoption/platforms/linux-wsl2-new-distro.md`,
+  `adoption/templates/wsl/stage1-receipt.example.json`, `docs/decisions/2026-10-01-new-wsl-distro-recipe.md`,
+  `tests/test_wsl_new_distro_recipe.py`, and nothing else. The coordinator registers the new hashes.
 
 - **Real client binaries against a temporary home** (a fresh directory as `HOME`; the native Claude Code 2.1.287 and the
   workstation's Codex 0.159.x, not the 0.160.0 of the plan). `install_claude_profile.py --only mcp` registered `serena` and
@@ -495,6 +548,30 @@ What I ran, by evidence class. Unchanged upstream tests and my own checks are di
   early, `/proc` taken for absent where it exists), with the file put back and its hash checked afterwards. A first draft of
   the reader reused the name `command_words`, which the tool already uses for the practice-piece check: the module's tests
   failed on it (the practice-piece test and the new ones), and the function is now `process_command_line`.
+- **The sixth round's checks** (Linux; the clients are the stubs of the tests, and no real client ran in this round). Two
+  dry runs of `--apply --host example` into an empty temporary home, each of which created nothing and exited 0. With
+  `--with-authorization-settings` the line was `authorization settings: would be applied (--with-authorization-settings;
+  added: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex approval_policy, Codex
+  sandbox_mode)`; with `--with-authorization-settings --skip codex-config` it was `authorization settings: would be
+  partly applied (--with-authorization-settings; added: Claude Code permissions.defaultMode, Claude Code
+  skipDangerousModePermissionPrompt; not reached, its step codex-config was skipped: Codex approval_policy, Codex
+  sandbox_mode)`. The tests run each of the seven outcomes in a home of its own, a failed Codex step (a `config.toml` that
+  is not TOML) beside a skipped one, and values that are kept beside a step that is not reached. The tool approval modes
+  were run three ways in scratch catalogs: a template that gives the wired `serena` an approving mode is refused until its
+  key is classed authorization and tied to the slot, and then it is written only with the option, in the render and in a
+  plain and an optioned `--apply`; a per-tool `approval_mode` is caught when it approves and left alone when it asks; and a
+  manifest in which `memory-owner` installs `ai-memory` wires the server and still writes `default_tools_approval_mode`
+  into `stack-worker.config.toml` only with the option (the line then says `applied` and names the key). The failed check
+  was run with stand-in `pgrep` programs that exit 2 and 3 and one that kills itself, and with no `pgrep` on `PATH`, in
+  the merge and in the creation of an absent file, with a file that needs nothing and with a dry run. Ten deliberate breaks
+  of the new code each fail the new tests (a `pgrep` status never a failed check, status 3 let through, the guard calling
+  the helper that drops the status, `default_tools_approval_mode` not a key of the class, an `approval_mode` that counts
+  whatever its value, an authorization piece that ignores its slot, the profile's settings never recorded, a partial result
+  that still starts with `applied`, a skipped step and a failed step read alike, and six outcomes in the code's list), with
+  the file put back and its hash checked afterwards. The sentences that F9 shares with the records and the tool are searched
+  for with their line breaks ignored and read the same in every place (the blocks sentence in the recipe, this record, the
+  2026-10-01 record and the recipe test; the sentence about the authorization line in the recipe, this record, the tool's
+  docstring and the recipe test), and the seven outcome words are in all four places that name them.
 - **Codex's hook trust with the installed client** (the third round; Codex 0.159.3, `app-server` over stdio, `hooks/list`,
   temporary homes at different paths): the repository's currency-notice group in a user `hooks.json` gave the key
   `<home>/.codex/hooks.json:session_start:0:0` and one `currentHash` in two homes at different paths; a timeout of 6 for
@@ -549,6 +626,11 @@ the fifth round), but what `ps -ww -o command= -p <pid>` prints on macOS for a p
 and what `pgrep -x` makes of a `#!` script's name, were not observed (the one test that depends on the
 second is Linux-only, and says why). The first macOS hosted run after this change is the evidence.
 
+Not verified in the sixth round: a real `pgrep` that exits 2 or 3 (the stand-ins are programs of the tests; neither procps's nor
+Apple's `pgrep` can be made to fail that way on demand here, and the manuals above are what says they do); the tool approval
+modes with a Codex binary (the keys come from the schema at `rust-v0.160.0`, and Codex 0.159.3 was not asked to read a
+profile that carries them); and the authorization line on a real destination run.
+
 ## Contradictions met
 
 - **`slot:` targets** (accepted by the coordinator). The contract says `--check` fails when a `slot:` target "is not a row
@@ -580,9 +662,13 @@ second is Linux-only, and says why). The first macOS hosted run after this chang
   `permissions.defaultMode` and `skipDangerousModePermissionPrompt` and Codex's `approval_policy` and `sandbox_mode` as
   repository practice, which is true of the repository's own workstation and not a reason to write them on a host whose
   owner has not asked. Decision 14.
-- **F9's sentence about the instruction blocks** (resolved in the fourth round). F9 said every unit that names a tool the
-  manifest does not install is left out, and this record said that sentences naming `search-first`, `find-skills`,
-  `skill-creator` and the daily currency timer stay. F9 now says what is true (Decision 9).
+- **F9's sentence about the instruction blocks** (resolved in the fourth round, corrected in the sixth). F9 said every
+  unit that names a tool the manifest does not install is left out, and this record said that sentences naming
+  `search-first`, `find-skills`, `skill-creator` and the daily currency timer stay. The fourth round's replacement, a tool
+  "the map declares as not wired" and skills or timers "the map does not list", was contradicted by the dropped list
+  itself: the filter's names are the map's names for unwired pieces plus the former defaults of the manifest rows that
+  install nothing, and the Promptfoo unit (in no map entry; the manifest row `promptfoo`) also names `skill-creator` and is
+  left out of both blocks. F9 now says what the list shows (Decision 9), and a test holds the sentence against it.
 - **A path in the plan.** The `credential-guard` row of `install-plan.json` lists `adoption/codex.config.template.toml`,
   which does not exist (the template is `adoption/templates/codex.config.template.toml`).
 - **`jq`** (accepted). A practice hook may run python3 and `jq` besides the files the repository copies, because F4 installs
@@ -598,12 +684,17 @@ second is Linux-only, and says why). The first macOS hosted run after this chang
 
 ## Left for the coordinator
 
-- Regenerate the new WSL handbook (`scripts/build_new_wsl_handbook.py`): `docs/new-wsl-handbook.json` records the recipe page
-  by SHA-256, and this repair changed F9, so the handbook and its test are stale until it is regenerated (not done here).
+- Regenerate the new WSL handbook (`scripts/build_new_wsl_handbook.py --write`) and the receipt that records its output
+  digests (`evidence/artifacts/new-wsl-handbook-20261001/receipt.json`): `docs/new-wsl-handbook.json` records the recipe
+  page by SHA-256, and the sixth round changed F9 again, so the handbook and its test are stale until then (not done here).
 - Re-freeze the convergence record that pins the changed files (`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`
   holds the SHA-256 of the recipe page, the host template, the receipt example, the checklist, the 2026-10-01 record and
-  its test), regenerate the handbook (not on this base), and register the changed files in `manifests/evidence.json`
-  (the seven that `scripts/validate.py` names; the host template and the new files are not registered there).
+  its test), and register the changed files in `manifests/evidence.json` (the ones `scripts/validate.py` names in the run
+  above).
+- An observation outside this change: the Codex `projects.<path>.trust_level` and `hooks.state.<key>.trusted_hash` pieces
+  are `not_wired` (never carried over from another host) and `is_authorization_piece` does not name them, so a map that
+  later classed one of them practice or slot would write a trust grant by default. Adding them to the class is one pattern
+  each; I did not, because nothing writes them today and the instruction was exact.
 - Decide whether the filtered blocks are what the user wants. The list below is the whole difference from the source blocks. If a
   dropped sentence should stay, the way is a wired entry in the map (or a name removed from an unwired entry) and
   `--write-blocks`; if a kept sentence should go, the way is a name added to an unwired entry.
@@ -707,7 +798,6 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/config/mcp_servers.context-mode.command` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/config/mcp_servers.context-mode.args` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/config/mcp_servers.context-mode.startup_timeout_sec` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
-| `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/config/mcp_servers.context-mode.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/config/mcp_servers.context-mode.env.PATH` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/config/mcp_servers.context-mode.env.CONTEXT_MODE_PLATFORM` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
@@ -736,12 +826,9 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/stack-worker/shell_environment_policy.set.CHUB_TELEMETRY` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
 | `codex/stack-worker/shell_environment_policy.set.CHUB_FEEDBACK` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
 | `codex/stack-worker/mcp_servers.codebase-memory.startup_timeout_sec` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
-| `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
 | `codex/stack-worker/mcp_servers.ai-memory.enabled_tools` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
-| `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
 | `codex/stack-worker/mcp_servers.socraticode.enabled_tools` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
 | `codex/stack-worker/mcp_servers.socraticode.env.SOCRATICODE_WATCHER` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
-| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/stack-worker/mcp_servers.headroom.enabled_tools` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/stack-worker/mcp_servers.context-mode.disabled_tools` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
 | `codex/hooks/setting/description` | `not_wired` | the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print |
@@ -753,12 +840,16 @@ settings and the project agents' gaps) and the list of dropped units after them;
 | `codex/worker-role/semantic-evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
 | `step/skills` | `not_wired` | the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer |
 
-| Authorization setting | Value --with-authorization-settings writes | Written by default | Why it needs the option |
-| --- | --- | --- | --- |
-| `claude/settings/setting/permissions.defaultMode` | `"bypassPermissions"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
-| `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
-| `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
-| `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
+| Authorization setting | Value --with-authorization-settings writes | Written by default | Why it needs the option | Also needs |
+| --- | --- | --- | --- | --- |
+| `claude/settings/setting/permissions.defaultMode` | `"bypassPermissions"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `context-mode` |
+| `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
+| `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `SocratiCode` |
+| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `headroom` |
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |

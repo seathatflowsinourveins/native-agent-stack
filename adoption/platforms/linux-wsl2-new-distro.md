@@ -1011,10 +1011,11 @@ python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
 
 The `--apply` line is the plain one: it writes none of the authorization settings, which grant a permission or suppress
-a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's `approval_policy`
-and `sandbox_mode`), so each client keeps its own defaults and a value a person set is never touched. Add
-`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice (it
-adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
+a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's
+`approval_policy` and `sandbox_mode`, and the tool approval mode of a Codex MCP server, which no server wired here
+sets), so each client keeps its own defaults and a value a person set is never touched. Add
+`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice
+(it adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
 `authorization_settings` records who asked.
 
 After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
@@ -1026,14 +1027,17 @@ trusts its directory; Codex has no hook wired here.
 
 Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key
-it kept, with both values, for the person to decide), and its `verify` step lists what a login shell finds: `claude` is the
-launcher in the `bin` directory of the host file's `ECO_ROOT`, which starts an interactive session at `max` effort, and
-`codex` and the mise tools resolve as well; one line before the summary says whether the authorization settings were
-applied, kept or left to the clients' own defaults. The two instruction blocks
-([Claude](../new-wsl/claude-user-instructions.md), [Codex](../new-wsl/codex-user-instructions.md)) are installed with
-every unit that names a tool the map declares as not wired left out, and nothing is written in its place; sentences that
-name skills or timers the map does not list stay as written, and whether those skills exist on the host is not
-established by this step.
+it kept, with both values, for the person to decide), and its `verify` step lists what a login shell finds: `claude` is
+the launcher in the `bin` directory of the host file's `ECO_ROOT`, which starts an interactive session at `max` effort,
+and `codex` and the mise tools resolve as well; `--apply` prints a line before the summary that starts `authorization
+settings:` and says `left to the clients' own defaults` when the option was not given and, when it was, `applied`,
+`partly applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry run), followed by
+what it added, kept, found already the same and did not reach, a skipped step and a failed step told apart. The two
+instruction blocks ([Claude](../new-wsl/claude-user-instructions.md), [Codex](../new-wsl/codex-user-instructions.md))
+are installed as the filter leaves them, and nothing is written in place of a unit it leaves out: a unit is left out
+when it names a tool that is not wired, which is a name the map lists for an unwired piece or the former default of a
+manifest row that installs nothing; a unit is not left out merely for naming a skill or timer that neither lists, and
+whether those skills exist on the host is not established by this step.
 
 ### F10. Windows Terminal profiles and the PATH proof
 

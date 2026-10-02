@@ -12,14 +12,16 @@ configures the two clients for that distribution, and the rule that decides ever
 adoption/new-wsl/client-config-map.json names every piece of the client templates (each hook entry, plugin,
 marketplace, status line, group of variables, permission rule, MCP server, Codex key, copied hook or agent file,
 instruction block and step of this tool) and gives it one wiring: `slot:<manifest slot>` (wired while that slot
-installs and its default is the owner the entry names), `practice`, or `not_wired:<reason>`. The map is a closed world:
+installs and its default is the owner the entry names), `practice`, `not_wired:<reason>`, or `authorization:<reason>` (a
+setting that grants a permission or suppresses a confirmation: written only with --with-authorization-settings and,
+when the entry also names a `slot` and its `owner`, only while that slot installs the owner). The map is a closed world:
 a piece it does not name is an error. The tool does not read the old bootstrap profile
 (adoption/bootstrap-linux.sh --profile, --configure-full-profile).
 
   --check    reads the manifest, the map, the templates and the install plan; fails when a piece is unmapped, a map
              entry names no piece, a slot is unknown, a practice piece runs a tool outside the repository, a hook file
-             a wired hook runs is not one the repository copies, an authorization setting is classed practice, the plan's
-             two sources for a port disagree, or a file of the example host's render (without and with the authorization
+             a wired hook runs is not one the repository copies, an authorization setting is classed practice or as a
+             slot, the plan's two sources for a port disagree, or a file of the example host's render (without and with the authorization
              settings) names a tool that is not wired. Prints one line per piece (wired, not wired with the reason, or
              authorization, listed apart) and notes. --json prints the table; --markdown prints the tables of
              docs/decisions/2026-10-02-new-wsl-client-configuration.md.
@@ -29,7 +31,8 @@ a piece it does not name is an error. The tool does not read the old bootstrap p
              mcp-servers.json, codex.config.toml, codex.hooks.json and the two Codex profiles for that host value file,
              with wired pieces only; the authorization settings (the ones that grant a permission or suppress a
              confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy
-             and sandbox_mode) only with the option. Placeholders
+             and sandbox_mode, and the tool approval mode of a Codex MCP server, which also needs its server wired) only
+             with the option. Placeholders
              are filled by tools/adoption/render_config.py. The telemetry endpoint and the gateway port come from the
              install plan; HOST_PATH gains the directories of the wired path pieces.
   --write-blocks
@@ -49,10 +52,14 @@ a piece it does not name is an error. The tool does not read the old bootstrap p
              features.daemon_auto_start goes through Codex's own writer. A running Codex (`pgrep -x`) stops either write of
              config.toml, the merge and the creation of a file that is absent (close the sessions, run again; the message
              also names a running app-server daemon and how to stop it, read from /proc, or from `ps -ww -o command=`
-             where there is no /proc). A Claude setting the map marks keep_existing (the theme), and every authorization
-             setting, is written only when settings.json has no value for it. The authorization settings are not written
-             without --with-authorization-settings, and an existing value of them is then never touched; --apply prints
-             one line saying whether they were applied, kept or left to the clients' own defaults.
+             where there is no /proc), and so does a `pgrep` that cannot run or exits with a status other than 0 or 1:
+             whether a Codex runs is then not known, and the step fails. A Claude setting the map marks keep_existing
+             (the theme), and every authorization setting, is written only when settings.json has no value for it. The
+             authorization settings are not written without --with-authorization-settings, and an existing value of them
+             is then never touched; --apply prints a line before the summary that starts `authorization settings:` and
+             says `left to the clients' own defaults` when the option was not given and, when it was, `applied`, `partly
+             applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry run), followed by
+             what it added, kept, found already the same and did not reach, a skipped step and a failed step told apart.
 
 Reused, not rewritten: render_config.render_one (placeholders), install_claude_profile.py (hook and agent copies with
 their checksums, MCP registration), apply_claude_settings.py (settings merge and backup), managed_block.py (instruction
@@ -121,7 +128,8 @@ RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIEC
 STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims")
 # The settings that grant a permission or suppress a confirmation. A tool must not write them on a fresh host by default,
 # so the map classes them `authorization:<reason>`, and --with-authorization-settings is the one way to render and apply
-# them. The tool, not the map, says which pieces they are: the map cannot class one of them as practice.
+# them. The tool, not the map, says which pieces they are (is_authorization_piece): the map cannot class one of them as
+# practice or as a slot, whatever installs.
 AUTHORIZATION_PIECES = (
     "claude/settings/setting/permissions.defaultMode",
     "claude/settings/setting/skipDangerousModePermissionPrompt",
@@ -129,7 +137,19 @@ AUTHORIZATION_PIECES = (
     "codex/config/sandbox_mode",
 )
 AUTHORIZATION_PATTERNS = ("claude/*/permission/allow/*",)   # an allow rule grants a permission too
+# Codex's tool approval modes (config.schema.json at rust-v0.160.0, AppToolApproval: auto, prompt, writes, approve). The key
+# `default_tools_approval_mode` is an authorization piece whatever its value; `approval_mode` (one tool's) is one when the
+# value approves. They sit under the table of an MCP server, so the map ties them to the slot that wires the server too.
+APPROVAL_MODE_KEYS = ("default_tools_approval_mode", "approval_mode")
+APPROVING_MODES = ("approve",)
 AUTHORIZATION_OPTION = "--with-authorization-settings"
+# What the line --apply prints about the authorization settings starts with, and the words that follow it (documented in the
+# recipe, the decision record, the receipt example and above; tests/test_new_wsl_client_config.py pins every place).
+AUTHORIZATION_OUTCOMES = ("left to the clients' own defaults", "applied", "would be applied", "partly applied",
+                          "would be partly applied", "kept", "not applied")
+# The step of --apply that writes the authorization settings of each group of pieces.
+AUTHORIZATION_STEP = {"claude/settings": "claude-settings", "claude/overlay": "claude-settings",
+                      "codex/config": "codex-config", "codex/stack-worker": "codex-files", "codex/omniroute": "codex-files"}
 EXAMPLE_HOST = "example"   # the host value file whose render --check scans
 LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 # The steps --apply runs, in order; --skip names one.
@@ -156,6 +176,10 @@ CHANGE_REPORT = re.compile(r"\b(installed|registered|written|Wrote|created|set t
 
 class ConfigError(ValueError):
     """The map, a template, the manifest or the plan cannot be used as they are."""
+
+
+class ProcessCheckError(ConfigError):
+    """The check for a running Codex itself failed, so whether one runs is not known and the step must not write."""
 
 
 @dataclasses.dataclass(frozen=True)
@@ -187,6 +211,12 @@ class Entry:
         """A Claude setting that is a person's choice: written only when the settings file has no value for it."""
         return self.raw.get("keep_existing") is True
 
+    @property
+    def slot(self) -> str:
+        """The manifest slot an authorization entry is also tied to (with `owner`): the piece belongs to a tool's own
+        configuration, so it is written only when the option is given and that slot installs the owner."""
+        return self.raw.get("slot", "")
+
 
 @dataclasses.dataclass(frozen=True)
 class Verdict:
@@ -201,9 +231,13 @@ class Verdict:
         return self.entry.wiring.partition(":")[0] == "authorization"
 
 
-def is_authorization_piece(key: str) -> bool:
-    """A piece key that is a setting granting a permission or suppressing a confirmation."""
-    return key in AUTHORIZATION_PIECES or any(fnmatch.fnmatchcase(key, pattern) for pattern in AUTHORIZATION_PATTERNS)
+def is_authorization_piece(key: str, value=None) -> bool:
+    """Whether a piece is a setting that grants a permission or suppresses a confirmation: one of the settings named above,
+    an allow rule, a `default_tools_approval_mode` of any value, or an `approval_mode` that approves. `value` is the piece's
+    value (the template's), which only the last kind needs."""
+    leaf = key.rsplit(".", 1)[-1]
+    return (key in AUTHORIZATION_PIECES or any(fnmatch.fnmatchcase(key, pattern) for pattern in AUTHORIZATION_PATTERNS)
+            or leaf == APPROVAL_MODE_KEYS[0] or (leaf == APPROVAL_MODE_KEYS[1] and value in APPROVING_MODES))
 
 
 def authorization_label(key: str) -> str:
@@ -297,6 +331,10 @@ def load_map(root: Path) -> list:
                               "or authorization:<reason>")
         if kind == "slot" and not raw.get("owner"):
             raise ConfigError(f"map entry {index} ({match[0]}): a slot entry names the owner it wires")
+        if "slot" in raw and not (kind == "authorization" and isinstance(raw["slot"], str) and raw["slot"].strip()
+                                  and raw.get("owner")):
+            raise ConfigError(f"map entry {index} ({match[0]}): `slot` ties an authorization entry to the slot that "
+                              "installs its tool, and comes with the `owner` the entry names")
         if "keep_existing" in raw and raw["keep_existing"] is not True:
             raise ConfigError(f"map entry {index} ({match[0]}): keep_existing is true or absent")
         entries.append(Entry(index, tuple(match), raw["wiring"], raw))
@@ -435,26 +473,51 @@ def hook_files(command: str) -> list:
     return re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", command or "")
 
 
+def slot_verdict(piece: Piece, entry: Entry, slot: str, manifest: dict, plan: dict, errors: list, warnings: list) -> tuple:
+    """(wired, reason) of a piece that depends on a manifest slot installing the owner the entry names."""
+    row = manifest.get(slot)
+    if row is None:
+        errors.append(f"{piece.key}: slot {slot!r} is not a foundation slot of the manifest")
+        return False, f"unknown slot {slot}"
+    if not installs(row):
+        return False, why_not_installed(slot, row)
+    if entry.owner.casefold() not in str(row["default"]).casefold():
+        warnings.append(f"{piece.key}: slot {slot} installs {row['default']!r}; the map wires {entry.owner!r}")
+        return False, f"slot {slot} installs {row['default']!r}, not {entry.owner!r}"
+    if not plan["rows"].get(slot, {}).get("installed"):
+        warnings.append(f"{piece.key}: the manifest installs slot {slot}, the install plan does not")
+    return True, f"slot {slot} installs {row['default']}"
+
+
 def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorization: bool = False) -> tuple:
-    """(verdicts, errors, warnings). An authorization piece is wired only when `authorization` is true."""
+    """(verdicts, errors, warnings). An authorization piece is wired only when `authorization` is true, and, when its
+    entry names a slot, only while that slot installs the owner."""
     out, errors, warnings = [], [], []
     for piece in pieces:
         entry = taken.get(piece.key)
         if entry is None:
             continue
         kind, _, argument = entry.wiring.partition(":")
-        known = is_authorization_piece(piece.key)
+        known = is_authorization_piece(piece.key, piece.value)
         if known and kind in ("practice", "slot"):
             errors.append(f"{piece.key}: a setting that grants a permission or suppresses a confirmation is classed "
                           f"authorization:<reason>, not {kind}, which would write it by default; it is written only with "
-                          f"{AUTHORIZATION_OPTION}")
+                          f"{AUTHORIZATION_OPTION} (an entry that also names a `slot` and its `owner` keeps the piece "
+                          "with the tool it belongs to)")
         elif kind == "authorization" and not known:
             errors.append(f"{piece.key}: classed authorization, which this tool does not know as a setting that grants "
-                          "a permission or suppresses a confirmation (AUTHORIZATION_PIECES)")
+                          "a permission or suppresses a confirmation (is_authorization_piece)")
         if kind == "authorization":
-            wired = authorization
-            reason = (f"authorization setting, written because {AUTHORIZATION_OPTION} was given: {argument}" if wired else
-                      f"authorization setting, not written unless {AUTHORIZATION_OPTION} is given: {argument}")
+            slot_wired, slot_reason = ((True, "") if not entry.slot else
+                                       slot_verdict(piece, entry, entry.slot, manifest, plan, errors, warnings))
+            wired = authorization and slot_wired
+            tied = f"; {slot_reason}" if entry.slot else ""
+            if wired:
+                reason = f"authorization setting, written because {AUTHORIZATION_OPTION} was given: {argument}{tied}"
+            elif authorization:
+                reason = f"authorization setting, not written although {AUTHORIZATION_OPTION} was given: {slot_reason}"
+            else:
+                reason = f"authorization setting, not written unless {AUTHORIZATION_OPTION} is given: {argument}{tied}"
         elif kind == "practice":
             wired, reason = True, "repository practice"
             for word in command_words(piece.command or ""):
@@ -466,19 +529,7 @@ def verdicts(pieces: list, taken: dict, manifest: dict, plan: dict, authorizatio
         elif kind == "not_wired":
             wired, reason = False, argument
         else:
-            row = manifest.get(argument)
-            if row is None:
-                errors.append(f"{piece.key}: slot {argument!r} is not a foundation slot of the manifest")
-                wired, reason = False, f"unknown slot {argument}"
-            elif not installs(row):
-                wired, reason = False, why_not_installed(argument, row)
-            elif entry.owner.casefold() not in str(row["default"]).casefold():
-                wired, reason = False, f"slot {argument} installs {row['default']!r}, not {entry.owner!r}"
-                warnings.append(f"{piece.key}: slot {argument} installs {row['default']!r}; the map wires {entry.owner!r}")
-            else:
-                wired, reason = True, f"slot {argument} installs {row['default']}"
-                if not plan["rows"].get(argument, {}).get("installed"):
-                    warnings.append(f"{piece.key}: the manifest installs slot {argument}, the install plan does not")
+            wired, reason = slot_verdict(piece, entry, argument, manifest, plan, errors, warnings)
         out.append(Verdict(piece, entry, wired, reason))
     return out, errors, warnings
 
@@ -1060,13 +1111,14 @@ def markdown_tables(root: Path, results: list, plan: dict) -> str:
             reason = v.reason
             wiring = v.entry.wiring if not v.entry.wiring.startswith("not_wired") else "not_wired"
             rows.append(f"| {markdown_code(v.piece.key)} | `{wiring}` | {markdown_cell(reason)} |")
-    rows += ["", f"| Authorization setting | Value {AUTHORIZATION_OPTION} writes | Written by default | Why it needs the option |",
-             "| --- | --- | --- | --- |"]
+    rows += ["", f"| Authorization setting | Value {AUTHORIZATION_OPTION} writes | Written by default | Why it needs the "
+                 "option | Also needs |", "| --- | --- | --- | --- | --- |"]
     for v in results:
         if v.authorization:
             reason = v.entry.wiring.partition(":")[2]
+            also = f"slot `{v.entry.slot}` installing `{v.entry.owner}`" if v.entry.slot else "-"
             rows.append(f"| {markdown_code(v.piece.key)} | {markdown_code(json.dumps(v.piece.value))} | no | "
-                        f"{markdown_cell(reason)} |")
+                        f"{markdown_cell(reason)} | {also} |")
     gaps = agent_gaps(root, results, plan)
     rows += ["", "| Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |",
              "| --- | --- | --- |"]
@@ -1130,7 +1182,8 @@ def cmd_check(args: argparse.Namespace) -> int:
         print(f"authorization settings (not rendered and not written unless {AUTHORIZATION_OPTION} is given; an existing "
               "value of them is never changed), with the value the option would write:", file=out)
         for v in apart:
-            print(f"  {v.piece.key} = {json.dumps(v.piece.value)}", file=out)
+            also = f"  (and only while slot {v.entry.slot} installs {v.entry.owner})" if v.entry.slot else ""
+            print(f"  {v.piece.key} = {json.dumps(v.piece.value)}{also}", file=out)
         for reason in dict.fromkeys(v.entry.wiring.partition(":")[2] for v in apart):
             print(f"  why: {reason}", file=out)
     note = host_template_note(root, plan)
@@ -1414,6 +1467,29 @@ def merge_toml_text(text: str, plan: MergePlan) -> str:
     return result
 
 
+def running_codex_pids(name: str) -> list:
+    """The pids of the processes whose executable name is exactly `name`, from `pgrep -x`. `pgrep` exits 0 when it found
+    some and 1 when it found none; any other status means the check itself failed (an option it refuses, no /proc, a
+    signal), and the empty answer that comes with it would switch the refusal off, so this raises instead and the step
+    stops. apply_codex_lane.codex_processes makes the same call and drops the status, which is why it is not used here."""
+    command = f"pgrep -x {name}"
+    try:
+        done = subprocess.run(["pgrep", "-x", name], capture_output=True, text=True, errors="replace", check=False,
+                              stdin=subprocess.DEVNULL, timeout=30)
+    except (OSError, subprocess.SubprocessError) as error:
+        raise ProcessCheckError(f"the check for a running Codex could not run `{command}` ({error}), so whether one runs "
+                                "is not known; nothing is written; install pgrep (procps) and run `--apply` again") from None
+    if done.returncode not in (0, 1):
+        status = (f"was ended by signal {-done.returncode}" if done.returncode < 0
+                  else f"exited with status {done.returncode}")
+        detail = next((line.strip() for line in reversed(done.stderr.splitlines()) if line.strip()), "")
+        raise ProcessCheckError(f"the check for a running Codex failed: `{command}` {status}"
+                                f"{': ' + detail if detail else ''} (it exits 0 when it finds a process and 1 when it "
+                                "finds none), so whether one runs is not known; nothing is written; fix the check and "
+                                "run `--apply` again")
+    return done.stdout.split()
+
+
 def process_command_line(pid: str) -> list:
     """The words of the command line of process `pid` (the program first), or [] when it cannot be read. Where there is a
     /proc (Linux) they are the arguments exactly as they were passed, read from /proc/<pid>/cmdline. Where there is none
@@ -1584,26 +1660,41 @@ class Apply:
         return 1 if any(outcome == "failed" for _, outcome in self.outcomes) else 0
 
     def report_authorization(self) -> None:
-        """One line: the authorization settings were applied, kept, or left to the clients' own defaults."""
+        """One line before the summary. Without the option the authorization settings are left to the clients' own defaults.
+        With it the line starts with one of the words of AUTHORIZATION_OUTCOMES: `applied` (every wired setting reached and
+        one added), `partly applied` (one added, one not reached), `kept` (every one reached, none added), `not applied`
+        (none added and one not reached, or none wired), and `would be applied` and `would be partly applied` in a dry run.
+        Then it says what each setting came to: added, kept (the file's own value), already the same, or not reached
+        because its step was skipped or failed."""
         if not self.args.with_authorization_settings:
             print("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode and "
                   "skipDangerousModePermissionPrompt and Codex approval_policy and sandbox_mode are not written, and a "
                   f"value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file lacks)")
             return
-        wired = [v.piece.key for v in self.results if v.authorization and v.wired]
-        by_status = {status: [authorization_label(key) for key in wired if self.authorization.get(key) == status]
+        verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
+        by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
                      for status in ("added", "kept", "same")}
-        unreached = [authorization_label(key) for key in wired if key not in self.authorization]
         parts = ([f"added: {', '.join(by_status['added'])}"] if by_status["added"] else []) + (
             [f"kept your value: {', '.join(by_status['kept'])}"] if by_status["kept"] else []) + (
-            [f"already the same: {', '.join(by_status['same'])}"] if by_status["same"] else []) + (
-            [f"not reached, its step did not finish: {', '.join(unreached)}"] if unreached else [])
-        if by_status["added"]:
-            state = "would be applied" if self.dry else "applied"
-        elif by_status["kept"] or by_status["same"]:
-            state = "kept"
-        else:
+            [f"already the same: {', '.join(by_status['same'])}"] if by_status["same"] else [])
+        missed: dict = {}
+        for key, verdict in verdict_of.items():
+            if key in self.authorization:
+                continue
+            step = AUTHORIZATION_STEP.get(verdict.piece.group, verdict.piece.group)
+            outcome = next((o for s, o in reversed(self.outcomes) if s == step), None)
+            how = {"skipped": "was skipped", "failed": "failed", None: "did not run"}.get(outcome, f"ended {outcome}")
+            missed.setdefault((step, how), []).append(authorization_label(key))
+        parts += [f"not reached, its step {step} {how}: {', '.join(labels)}" for (step, how), labels in missed.items()]
+        if not verdict_of:
             state = "not applied"
+            parts = ["no authorization setting is wired: the map leaves each out, or its slot does not install"]
+        elif missed:
+            state = ("would be partly applied" if self.dry else "partly applied") if by_status["added"] else "not applied"
+        elif by_status["added"]:
+            state = "would be applied" if self.dry else "applied"
+        else:
+            state = "kept"
         print(f"authorization settings: {state} ({AUTHORIZATION_OPTION}; {'; '.join(parts)})")
 
     # -- Claude
@@ -1750,8 +1841,9 @@ class Apply:
     # -- Codex
     def codex_guard(self) -> tuple:
         """(the pids of the running Codex processes, what to do about them). A running Codex writes the same
-        config.toml, so neither write of this step may start while one runs."""
-        running = lane.codex_processes(self.args.codex_process_name)
+        config.toml, so neither write of this step may start while one runs, and none may start when the check for one
+        fails: ProcessCheckError ends the step as failed, in a dry run too."""
+        running = running_codex_pids(self.args.codex_process_name)
         daemons = app_server_pids(running)
         how = ("close the Codex sessions" + (f", stop the app-server daemon (pid {', '.join(daemons)}) with `codex "
                                               "app-server daemon stop`" if daemons else "") + ", then run `--apply` again")
@@ -1896,12 +1988,13 @@ class Apply:
 
     def step_codex_files(self) -> None:
         """The two profiles and the role carriers, created only when absent, as apply_codex_lane.py creates them."""
-        items = []
+        items, groups = [], {}
         for target_name, group, staged in (("stack-worker.config.toml", "codex/stack-worker",
                                             "codex.stack-worker.config.toml"),
                                            ("omniroute.config.toml", "codex/omniroute", "codex.omniroute.config.toml")):
             if any(v.wired and v.piece.group == group for v in self.results):
                 items.append((self.stage / staged, self.codex_home / target_name))
+                groups[self.codex_home / target_name] = group
         items += [(codex_roles.ROLES_SOURCE / name, self.codex_home / "agents" / name)
                   for name in self.wired_files("codex/role/")]  # none while the map leaves the carriers out
         states = []
@@ -1912,6 +2005,10 @@ class Apply:
                 target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
                 os.chmod(target.parent, 0o700)
                 lane.atomic_write(target, data, 0o600, None, create_only=True)
+            if target in groups:   # an authorization setting of the profile: added with the file, or the file's own stays
+                self.authorization.update({v.piece.key: {"create": "added", "same": "same", "differs": "kept"}[state]
+                                           for v in self.results if v.authorization and v.wired
+                                           and v.piece.group == groups[target]})
             states.append(state)
             shown = {"create": "would create" if self.dry else "created", "same": "already there",
                      "differs": "differs from the render and is never overwritten"}[state]
@@ -2017,20 +2114,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--with-authorization-settings", action="store_true",
                         help="--render and --apply: also render and write the authorization settings, the ones that grant "
                              "a permission or suppress a confirmation (Claude Code permissions.defaultMode and "
-                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode). By default they "
+                             "skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the tool "
+                             "approval mode of a Codex MCP server whose slot installs it). By default they "
                              "are neither rendered nor written and a value a file already has is never touched; with this "
                              "option a missing one is added and a differing one is kept and printed beside the render's. "
                              "Use it only on a host whose owner asked for the repository's permission practice.")
     parser.add_argument("--codex-process-name", default="codex",
-                        help="--apply: the executable name whose running processes stop a write to an existing Codex "
-                             "config.toml (default: codex, as codex_home.py and apply_codex_lane.py)")
+                        help="--apply: the executable name whose running processes stop either write of the Codex "
+                             "config.toml, the merge into an existing one and the creation of an absent one (default: "
+                             "codex, as codex_home.py and apply_codex_lane.py); a `pgrep -x` that cannot run or exits "
+                             "with a status other than 0 or 1 stops them too")
     parser.add_argument("--skip", action="append", choices=STEPS, default=[], help="--apply: leave this step out")
     parser.add_argument("--json", action="store_true", help="--check: print the piece table as JSON")
     parser.add_argument("--dropped", action="store_true",
                         help="--check or --write-blocks: print every unit the filter left out of the two blocks, in full")
     parser.add_argument("--markdown", action="store_true",
-                        help="--check: print the two Markdown tables of the decision record (the unwired pieces and "
-                             "the agents' gaps) and nothing else")
+                        help="--check: print the three Markdown tables of the decision record (the pieces that are not "
+                             "wired, the authorization settings and the agents' gaps), then the list of the units the "
+                             "filter left out, and nothing else")
     return parser
 
 

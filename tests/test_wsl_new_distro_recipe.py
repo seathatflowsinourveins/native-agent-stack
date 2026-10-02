@@ -83,8 +83,11 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
     suppress a confirmation) are written only with ``--with-authorization-settings``, which F9 names in prose, for a host
     whose owner asked for the repository's permission practice, and the receipt's ``authorization_settings`` records who
     asked;
-  - F9 says that the instruction blocks leave out the units that name a tool the map declares as not wired, that sentences
-    naming skills or timers the map does not list stay as written, and that this step does not establish those skills;
+  - F9 says that a unit of the instruction blocks is left out when it names a tool that is not wired (a name the map lists
+    for an unwired piece, or the former default of a manifest row that installs nothing), that a unit is not left out merely
+    for naming a skill or timer that neither lists, and that this step does not establish those skills;
+  - F9 says what the line ``--apply`` prints about the authorization settings says: every outcome, in the words the tool
+    prints;
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -230,7 +233,9 @@ F9_COMMANDS = [
 F9_SIGN_IN = "After the `--apply` line, run `codex login`, then `claude`, by hand"
 F9_AFTER_SIGN_IN = "accept.sh --only <slot> --stage after_sign_in"
 # The repair of 2026-10-02: the plain --apply writes no authorization setting, the option is prose, and F9's sentence about
-# the instruction blocks says what the filter does (by the names the map declares) and what it does not establish.
+# the instruction blocks says what the filter does (it goes by the names the map lists for unwired pieces and the former
+# defaults of the manifest rows that install nothing) and what it does not establish. The same words stand in the decision
+# records, and tests/test_new_wsl_client_config.py holds them against the tool's own dropped list and printed line.
 AUTHORIZATION_OPTION = "--with-authorization-settings"
 F9_AUTHORIZATION_PHRASES = (
     "writes none of the authorization settings",
@@ -238,10 +243,20 @@ F9_AUTHORIZATION_PHRASES = (
     "the receipt's `authorization_settings` records who asked",
     "F9's `authorization_settings`",
 )
-F9_BLOCKS_SENTENCE = ("every unit that names a tool the map declares as not wired left out, and nothing is written in its "
-                      "place; sentences that name skills or timers the map does not list stay as written, and whether "
-                      "those skills exist on the host is not established by this step")
+F9_BLOCKS_SENTENCE = ("a unit is left out when it names a tool that is not wired, which is a name the map lists for an "
+                      "unwired piece or the former default of a manifest row that installs nothing; a unit is not left out "
+                      "merely for naming a skill or timer that neither lists, and whether those skills exist on the host is "
+                      "not established by this step")
 F9_OLD_BLOCKS_CLAIM = "every unit that names a tool the manifest does not install left out"
+# The fourth round's wording, which the dropped list contradicts: the Promptfoo unit names no tool of any map entry (it is the
+# former default of the manifest row `promptfoo`) and names `skill-creator`, and it is left out of both blocks.
+F9_PREVIOUS_BLOCKS_CLAIM = "every unit that names a tool the map declares as not wired left out"
+# What F9 says of the line that --apply prints about the authorization settings: every outcome, as the tool prints it.
+AUTHORIZATION_LINE_SENTENCE = ("a line before the summary that starts `authorization settings:` and says `left to the "
+                               "clients' own defaults` when the option was not given and, when it was, `applied`, `partly "
+                               "applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry "
+                               "run), followed by what it added, kept, found already the same and did not reach, a skipped "
+                               "step and a failed step told apart")
 CLAUDE_MCP_PAGE = "https://code.claude.com/docs/en/mcp"
 # F5: Docker says 65,536 entries suffice for most images and names the error an image that needs more produces.
 DOCKER_TROUBLESHOOT = "https://docs.docker.com/engine/security/rootless/troubleshoot/"
@@ -767,6 +782,16 @@ def f9_errors(recipe: str) -> list[str]:
     return errors
 
 
+def reword(page: str, phrase: str, new: str) -> str:
+    """The page with `phrase` replaced once, found by its words whatever the line breaks, so that the page stays wrapped
+    and its sections still parse (a page joined into one line has no F9 section: every phrase would then read as missing,
+    and a mutant would fail for that reason and not for its own)."""
+    pattern = r"\s+".join(re.escape(word) for word in phrase.split())
+    changed, count = re.subn(pattern, lambda match: new, page, count=1)
+    assert count == 1, phrase
+    return changed
+
+
 def authorization_errors(recipe: str, checklist: str, receipt: dict) -> list[str]:
     """The plain `--apply` of F9 writes none of the authorization settings. The option that writes the missing ones is named in
     F9's prose, for a host whose owner asked for the repository's permission practice, and never in the command block; the
@@ -774,14 +799,15 @@ def authorization_errors(recipe: str, checklist: str, receipt: dict) -> list[str
     errors = []
     text = " ".join(section(recipe, "F9").split())
     whole = " ".join(recipe.split())
-    for phrase in F9_AUTHORIZATION_PHRASES[:3] + (F9_BLOCKS_SENTENCE,):
+    for phrase in F9_AUTHORIZATION_PHRASES[:3] + (F9_BLOCKS_SENTENCE, AUTHORIZATION_LINE_SENTENCE):
         if phrase not in text:
             errors.append(f"F9 lacks: {phrase}")
     if F9_AUTHORIZATION_PHRASES[3] not in whole:
         errors.append("the receipt contents list does not name F9's authorization_settings")
-    if F9_OLD_BLOCKS_CLAIM in text:
-        errors.append("F9 says every unit naming a tool the manifest does not install is left out; the filter works by the "
-                      "names the map declares")
+    for claim in (F9_OLD_BLOCKS_CLAIM, F9_PREVIOUS_BLOCKS_CLAIM):
+        if claim in text:
+            errors.append(f"F9 still says {claim!r}; the filter goes by the names the map lists for unwired pieces and by "
+                          "the former defaults of the manifest rows that install nothing")
     if any(AUTHORIZATION_OPTION in command for block in step_blocks(recipe, "F9") for command in block):
         errors.append(f"the F9 command block carries {AUTHORIZATION_OPTION}; the operator adds it, the page does not")
     line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **F9**")), "")
@@ -1435,8 +1461,17 @@ class StageTwoTests(unittest.TestCase):
             "the option in the command block": (
                 recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION), checklist, receipt),
             "the old claim about the instruction blocks": (
-                recipe.replace("every unit that names a tool the map declares as not wired left out", F9_OLD_BLOCKS_CLAIM),
-                checklist, receipt),
+                reword(recipe, F9_BLOCKS_SENTENCE, F9_OLD_BLOCKS_CLAIM), checklist, receipt),
+            "the fourth round's claim about the instruction blocks": (
+                reword(recipe, F9_BLOCKS_SENTENCE, F9_PREVIOUS_BLOCKS_CLAIM), checklist, receipt),
+            "no manifest row among the names that decide": (
+                reword(recipe, " or the former default of a manifest row that installs nothing", ""), checklist, receipt),
+            "a unit left out merely for naming a skill": (
+                reword(recipe, "a unit is not left out merely for naming a skill or timer that neither lists",
+                       "sentences that name skills or timers stay as written"), checklist, receipt),
+            "no sentence about the line --apply prints": (
+                reword(recipe, AUTHORIZATION_LINE_SENTENCE, "a line about the settings"), checklist, receipt),
+            "a line without the partial outcome": (reword(recipe, "`partly applied`, ", ""), checklist, receipt),
             "no word that the skills are not established": (
                 re.sub(r"whether those skills exist on the host is not\s+established by this step",
                        "those skills exist on the host", recipe), checklist, receipt),
@@ -1449,7 +1484,10 @@ class StageTwoTests(unittest.TestCase):
         }
         for name, mutant in mutants.items():
             with self.subTest(mutant=name):
-                self.assertNotEqual(mutant, (recipe, checklist, receipt))
+                # A mutant must differ from the page in what is read, and must still be a page whose F9 section parses:
+                # an unparsable page would fail every check for that reason alone.
+                self.assertNotEqual((" ".join(mutant[0].split()), *mutant[1:]), (" ".join(recipe.split()), checklist, receipt))
+                self.assertTrue(section(mutant[0], "F9").strip(), name)
                 self.assertTrue(authorization_errors(*mutant), name)
         # The command block is also pinned by f9_errors, so the option in it fails there too.
         self.assertTrue(f9_errors(recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION)))
