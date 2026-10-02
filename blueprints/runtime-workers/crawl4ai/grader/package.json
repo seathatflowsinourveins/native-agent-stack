@@ -4,5 +4,10 @@
   "private": true,
   "dependencies": {
     "promptfoo": "0.123.1"
+  },
+  "overrides": {
+    "get-uri@8.0.1": {
+      "basic-ftp": "6.2.1"
+    }
   }
 }

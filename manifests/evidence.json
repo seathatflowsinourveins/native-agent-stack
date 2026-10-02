@@ -9265,19 +9265,24 @@
       "bytes": 426
     },
     {
+      "path": "blueprints/runtime-workers/crawl4ai/evidence/grader-ftp-repair.json",
+      "sha256": "ae7b37ab537105bcd1bc2d20e6f0d85df3454e0f0ac18830f2a994a4e543b6eb",
+      "bytes": 11591
+    },
+    {
       "path": "blueprints/runtime-workers/crawl4ai/evidence/nltk-reachability.json",
       "sha256": "3ae7461b5852631d7fd9a8aad8ade3eddb71ed84e1f7c08599977202adae81ae",
       "bytes": 17876
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
-      "sha256": "b3577cbcf13a57c7a1e2e961f2b3db4d56e1990d765822c810ac8dbafbb12e1f",
-      "bytes": 468157
+      "sha256": "a64877fe75a939652e3d98277ca35a331935f45ddea5860535e20e1d24bf7a7a",
+      "bytes": 460880
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/grader/package.json",
-      "sha256": "79175f1717f9e414523b915b7b3a63d71876ffdc1a7090e6c98c47980ed4190f",
-      "bytes": 140
+      "sha256": "d61efc89d26319a63b58fbcd34e81802cba77dc203553d5f7259b7cb039ce929",
+      "bytes": 218
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/host.py",
@@ -9301,8 +9306,8 @@
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/pins.json",
-      "sha256": "828040419e4f5d03cc3ada9d19d56b6b559b2f0d5d5e9b9f751041fdf0f53cb3",
-      "bytes": 2675
+      "sha256": "4fb312399e032905487f49a7b5384d49dda52d88c66cc01be743e9eb3c302abb",
+      "bytes": 2764
     },
     {
       "path": "blueprints/runtime-workers/crawl4ai/registry-evidence.json",
@@ -47845,6 +47850,16 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/u11-part1-source-repair-20261001/integration-main-20261002.json",
+      "sha256": "6382ce9bc43e18e5797b0e0c7df0f2b76f2485ca6a908e3b7aba13ec1c1eb638",
+      "bytes": 2740
+    },
+    {
+      "path": "evidence/artifacts/u11-part1-source-repair-20261001/receipt.json",
+      "sha256": "f66f5ded077acdafc481cc3bdd5b701de20e800b90afda446867b82ba23c4664",
+      "bytes": 22739
+    },
+    {
       "path": "evidence/artifacts/ultracode-token-routing-20260921/audit-verifier-wf_d0d741b1-9c6.json",
       "sha256": "5e86863b7f6b6c94ec21c712de3f505f95b8a7b02a54ab693b5281e85dbe4fe5",
       "bytes": 25523
@@ -50541,8 +50556,8 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "353759a386bcd91d0b223ad7e3db2f9a01f1a527d5da30367488729c16395ff2",
-      "bytes": 77999
+      "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
+      "bytes": 110935
     },
     {
       "path": "scripts/skills_status.py",
@@ -51211,8 +51226,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "993339d425a502b1bfe5d461141c166582cf2c2cb47c71881ff1e5ee73000662",
-      "bytes": 241330
+      "sha256": "9039d3fce9dfe4ffb3193be0c7b5976bf95acd3545db5b4f1b8318a1391fb4c0",
+      "bytes": 277381
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -51526,8 +51541,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "cf9e205eb3972d74c682390f2260067492e7b84dec3eb655a761e3415f929aa6",
-      "bytes": 71816
+      "sha256": "c8722d0593398542b0b5be6675f9df1a658f40b5ac338b702270fcccba7756c0",
+      "bytes": 112371
     },
     {
       "path": "tests/test_sdk_usage_scope.py",
@@ -51936,18 +51951,18 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "07e51eef220819eb4f9d98fd706ad6969849f67e2057bb4f90267bab6f055fc6",
-      "bytes": 79308
+      "sha256": "5952807786a23be219e69ee7ed417b5141a1384dec02ec33df818ec06a6b3316",
+      "bytes": 94421
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "2b3a1901520c22a4fda1a69daee6b77cc91b132a4023970822212c57d9e50a46",
-      "bytes": 48385
+      "sha256": "fdc098c00c50bfd6f094edc19a5ccde3658c70853714101c38c814594950bcf2",
+      "bytes": 49765
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
-      "sha256": "ebb642db53e4ee1e53cb0a568ffa4468c843de95e670509f39fe29091388eee8",
-      "bytes": 32425
+      "sha256": "9a26ac63c854ddcaa107f2a892707cc5fccf2cf35f99cf3d3249a0d8c8fe097f",
+      "bytes": 62428
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_call.sh",
@@ -51961,8 +51976,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "18665bacf26e0bfa2a2dc4efbcd7761f60df4c109095d98e0b75fbcdb03f3572",
-      "bytes": 40343
+      "sha256": "37d4d396da385727ee6d571589e7aa162a030501660a37fac133caf8cbeebba3",
+      "bytes": 46424
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
@@ -51980,6 +51995,11 @@
       "bytes": 643
     },
     {
+      "path": "tools/sota-convergence/landscape-sweep/schemas/discover-v2.json",
+      "sha256": "69c41d2d3c0cfec78db8cfc1458e7181f19fc50f45543580344c5d07f76e793a",
+      "bytes": 2316
+    },
+    {
       "path": "tools/sota-convergence/landscape-sweep/schemas/discover.json",
       "sha256": "15b4b7d69f64f9b37e0c5b21a70dca4b499ece041674037fcc6009f59ab76dd0",
       "bytes": 2287
@@ -51988,6 +52008,11 @@
       "path": "tools/sota-convergence/landscape-sweep/schemas/probe.json",
       "sha256": "b01a366da7418dfcb78875a871850afc4f455689c54b8ce15a4d9de286d91dd8",
       "bytes": 303
+    },
+    {
+      "path": "tools/sota-convergence/landscape-sweep/schemas/votes-v2.json",
+      "sha256": "836ce89c050612722e3ae6b337c6228ec8781a30fbfb628d74c820c94c5574f9",
+      "bytes": 2294
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/schemas/votes.json",
@@ -52026,8 +52051,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
-      "sha256": "8c39f1d1f9f64735187920f6d5a39dd5a8b7fea4d459683fcc08b936add90c1b",
-      "bytes": 19540
+      "sha256": "d3790138e7c1752c8650e47fa92096397383a7ba7527514fa1252093bc894afd",
+      "bytes": 29883
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
