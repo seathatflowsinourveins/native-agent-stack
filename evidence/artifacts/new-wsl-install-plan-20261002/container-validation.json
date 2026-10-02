@@ -1,0 +1,452 @@
+{
+ "schema_version": 1,
+ "kind": "install_plan_container_validation",
+ "evidence_class": "local_integration",
+ "what_ran": "Each user-level owner installed by install.sh --only <slot> and then checked by accept.sh --only <slot>, as an unprivileged uid-1000 user with passwordless sudo in a disposable ubuntu:26.04 container on the workstation's rootless Docker. Round 2 passes --stage post_install to accept.sh.",
+ "what_it_does_not_show": [
+  "no systemd, no user bus, no user namespaces, no GPU and no running service inside the container",
+  "no sign-in: checks that need a sign-in or a provider are in the after_sign_in stage and did not run",
+  "service_health checks did not run",
+  "this is not the new distribution: the plan is still unrun on a real WSL distribution"
+ ],
+ "os": "Ubuntu 26.04.1 LTS",
+ "rounds": [
+  {
+   "round": 1,
+   "plan_commit": "66371165",
+   "finished_utc": "2026-10-02T03:21:06Z",
+   "slots": 34,
+   "passed_install_and_acceptance": 16,
+   "results": [
+    {
+     "slot": "mise",
+     "install_exit": 0,
+     "install_seconds": 12,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "git",
+     "install_exit": 1,
+     "install_seconds": 0,
+     "acceptance_exit": null
+    },
+    {
+     "slot": "claude-code",
+     "install_exit": 0,
+     "install_seconds": 11,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "codex",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "gh-github-cli",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "betterleaks",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "zizmor",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "syft",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "actionlint-kjanat",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "worktrunk",
+     "install_exit": 0,
+     "install_seconds": 8,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "difftastic",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "restic",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "chezmoi",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "mcporter",
+     "install_exit": 0,
+     "install_seconds": 8,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "sandbox-runtime-srt",
+     "install_exit": 0,
+     "install_seconds": 10,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "tobi-qmd",
+     "install_exit": 0,
+     "install_seconds": 14,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "playwright-cli",
+     "install_exit": 0,
+     "install_seconds": 34,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "ccusage",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "promptfoo",
+     "install_exit": 0,
+     "install_seconds": 65,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "gpt-gateway",
+     "install_exit": 0,
+     "install_seconds": 77,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "serena",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "trafilatura",
+     "install_exit": 0,
+     "install_seconds": 3,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "inspect-ai",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "harbor-containerized-agent-e2e-runner",
+     "install_exit": 1,
+     "install_seconds": 17,
+     "acceptance_exit": null
+    },
+    {
+     "slot": "claude-agent-sdk",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "codex-sdk-and-codex-exec-app-server",
+     "install_exit": 0,
+     "install_seconds": 9,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "agent-runtime-worker",
+     "install_exit": 0,
+     "install_seconds": 7,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "otel-collector-contrib",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "prometheus",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "loki",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "grafana",
+     "install_exit": 0,
+     "install_seconds": 13,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "dagu",
+     "install_exit": 1,
+     "install_seconds": 4,
+     "acceptance_exit": null
+    },
+    {
+     "slot": "local-model-server",
+     "install_exit": 0,
+     "install_seconds": 19,
+     "acceptance_exit": 1
+    },
+    {
+     "slot": "mineru",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    }
+   ]
+  },
+  {
+   "round": 2,
+   "plan_commit": "7cc2329d",
+   "finished_utc": "2026-10-02T04:24:17Z",
+   "slots": 34,
+   "passed_install_and_acceptance": 30,
+   "acceptance_stage": "post_install",
+   "results": [
+    {
+     "slot": "mise",
+     "install_exit": 0,
+     "install_seconds": 14,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "git",
+     "install_exit": 0,
+     "install_seconds": 3,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "claude-code",
+     "install_exit": 0,
+     "install_seconds": 9,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "codex",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "gh-github-cli",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "betterleaks",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "zizmor",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "syft",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "actionlint-kjanat",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "worktrunk",
+     "install_exit": 0,
+     "install_seconds": 7,
+     "acceptance_exit": 1,
+     "cause": "container limit: the checkout is mounted read-only without its shared git metadata, so `wt list` finds no repository"
+    },
+    {
+     "slot": "difftastic",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "restic",
+     "install_exit": 0,
+     "install_seconds": 7,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "chezmoi",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "mcporter",
+     "install_exit": 0,
+     "install_seconds": 9,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "sandbox-runtime-srt",
+     "install_exit": 0,
+     "install_seconds": 14,
+     "acceptance_exit": 1,
+     "cause": "container limit: bubblewrap cannot create a user namespace inside the container"
+    },
+    {
+     "slot": "tobi-qmd",
+     "install_exit": 0,
+     "install_seconds": 14,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "playwright-cli",
+     "install_exit": 0,
+     "install_seconds": 35,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "ccusage",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "promptfoo",
+     "install_exit": 0,
+     "install_seconds": 69,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "gpt-gateway",
+     "install_exit": 0,
+     "install_seconds": 80,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "serena",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "trafilatura",
+     "install_exit": 0,
+     "install_seconds": 4,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "inspect-ai",
+     "install_exit": 0,
+     "install_seconds": 7,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "harbor-containerized-agent-e2e-runner",
+     "install_exit": 1,
+     "install_seconds": 20,
+     "acceptance_exit": null,
+     "cause": "container limit: rootless Docker's prerequisites (kernel modules) are absent inside the container, so the container-engine stage refuses"
+    },
+    {
+     "slot": "claude-agent-sdk",
+     "install_exit": 0,
+     "install_seconds": 5,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "codex-sdk-and-codex-exec-app-server",
+     "install_exit": 0,
+     "install_seconds": 8,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "agent-runtime-worker",
+     "install_exit": 0,
+     "install_seconds": 8,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "otel-collector-contrib",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "prometheus",
+     "install_exit": 0,
+     "install_seconds": 6,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "loki",
+     "install_exit": 0,
+     "install_seconds": 3,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "grafana",
+     "install_exit": 0,
+     "install_seconds": 12,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "dagu",
+     "install_exit": 1,
+     "install_seconds": 3,
+     "acceptance_exit": null,
+     "cause": "container limit: no systemd user bus inside the container for the upstream user-service install"
+    },
+    {
+     "slot": "local-model-server",
+     "install_exit": 0,
+     "install_seconds": 20,
+     "acceptance_exit": 0
+    },
+    {
+     "slot": "mineru",
+     "install_exit": 0,
+     "install_seconds": 7,
+     "acceptance_exit": 0
+    }
+   ]
+  }
+ ],
+ "owed_on_the_real_distribution": [
+  "dagu",
+  "harbor-containerized-agent-e2e-runner",
+  "sandbox-runtime-srt",
+  "worktrunk"
+ ]
+}
