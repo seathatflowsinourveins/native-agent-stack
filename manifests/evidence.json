@@ -3880,6 +3880,43 @@
         "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
       ],
       "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "id": "catalog-freshness-20261002",
+      "kind": "upstream_provenance",
+      "component_ids": [
+        "affaan-m/ECC",
+        "agent-browser",
+        "ai-memory",
+        "apple-container",
+        "beads",
+        "claude-code",
+        "claude-hud",
+        "codex",
+        "dagu",
+        "fastapi",
+        "grafana",
+        "huggingface-hub-native",
+        "jcodemunch-mcp",
+        "mcp-inspector",
+        "mcporter",
+        "nextjs",
+        "omniroute",
+        "openresearch",
+        "opentelemetry-collector-contrib",
+        "rtk",
+        "sandbox-runtime",
+        "skfolio",
+        "syft"
+      ],
+      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37068599328) rebuilt the SOTA-convergence manifest and found 40 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "limitations": [
+        "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
+        "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
+        "Components with no reliable upstream data this run (an unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) have their upstream comparison excluded; a pin change on such a row is still reported as drift (the pin comes from the local catalogs), with its fresh upstream fields empty. A component fetched successfully but with no GitHub release or tag at all is also not counted as drift.",
+        "The rebuilt manifest and drift table are read from this run's own catalog-freshness workflow artifact; this receipt does not independently re-fetch upstream sources."
+      ],
+      "path": "evidence/receipts/catalog-freshness-20261002.json"
     }
   ],
   "files": [
@@ -16973,6 +17010,16 @@
       "path": "evidence/artifacts/catalog-freshness-20260923/manifest-20260923.json",
       "sha256": "ec6f40a94567c8f0a95a3d22688ec7cefc412ef97de94f99a2803676e6954290",
       "bytes": 166445
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20261002/drift.md",
+      "sha256": "a0e1e72dab2f36128da0f34ccac05c0dc14b4aa89051c39e244fb8fbd1d1e011",
+      "bytes": 26978
+    },
+    {
+      "path": "evidence/artifacts/catalog-freshness-20261002/manifest-20261002.json",
+      "sha256": "168850619ff036e756227573c0c7a6b2db1e6337b3dbedda02f1ce4b6ec63411",
+      "bytes": 166391
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -47298,6 +47345,11 @@
       "path": "evidence/receipts/catalog-freshness-20260923.json",
       "sha256": "8598a451bb1b3415528153293c3418e823b40e0d25a4eae160c2d8494494fc50",
       "bytes": 2090
+    },
+    {
+      "path": "evidence/receipts/catalog-freshness-20261002.json",
+      "sha256": "a9492cd31e155f18bd4fddd0e53e4f1dd203eda9743968ebe8d5fb929ff09405",
+      "bytes": 2411
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
