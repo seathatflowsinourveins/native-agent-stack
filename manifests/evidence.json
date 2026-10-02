@@ -15710,6 +15710,11 @@
       "bytes": 7563
     },
     {
+      "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
+      "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
+      "bytes": 6141
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -36338,6 +36343,86 @@
       "path": "evidence/artifacts/omniroute-gateway-20260927/upstream-tests-route-keepalive.txt",
       "sha256": "becee3cfc8f9a8aad31e779d437f01f0dda9417fb09c35d0dfdba6da42247f7a",
       "bytes": 141
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/README.md",
+      "sha256": "2d04b079ab92f00e42738f2ddda3041f0efcc3426584f6a90535b7df8abf4d34",
+      "bytes": 1341
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/build-manifest.json",
+      "sha256": "c11011d262d773ab7249bc9ed3b40f8fbefdf98912c541dd91a02b600bfc60e2",
+      "bytes": 1321
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/probe-after.json",
+      "sha256": "b3882d9346a29935df2ae4329ed674ed73ea446b69056930339e15ab5d49e49c",
+      "bytes": 719
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/probe-before.json",
+      "sha256": "5d74c6e09c8f7c0972b92577ec9211385b9e41a5aeb9ec89f1eb91d974557cac",
+      "bytes": 619
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/switch-1.log",
+      "sha256": "9c3f12954c43cbdf4a5419918840b095992ada6572c9b22ee3aec794b268a2df",
+      "bytes": 1059
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/switch-2.log",
+      "sha256": "92f5a9dc8704e7d526edc0e37d923abb97e08f09258bab204103e7dd930ab738",
+      "bytes": 557
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute-update-check.plist.json",
+      "sha256": "42927400b60db5e9a70a0957577c2dc0d68b947e3fb7b6ac58e18e5ef73197e8",
+      "bytes": 564
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute.before.plist.json",
+      "sha256": "a2d9d3b153b36ebe10c01c98bba201d0f0897244d2e3b8d1d423c8e7329e0291",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute.plist.json",
+      "sha256": "51bb7b82f9b390b49dd9cb33671a42d864e0a59895323b104d701e631752cb74",
+      "bytes": 1028
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/receipt.json",
+      "sha256": "e20b0a4e05f91c357d7c72f01c91d6908472fea9ee97c11902e07f96b198c185",
+      "bytes": 5469
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/build-release.sh.txt",
+      "sha256": "8a82ef0336f40f420e04dd9c68d9b0aaac4e034252bb3e08bac281e86e851104",
+      "bytes": 671
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/build.sh.txt",
+      "sha256": "d8f71f96df4eec0c6e42e44f81988dacb69922e7602ccf2de6317ab4bcbb8f01",
+      "bytes": 772
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-serve.sh.txt",
+      "sha256": "8e451183da50c6d5be3fd2130a5e57b7b75a8c5e49ceb92686f226acee4a44f8",
+      "bytes": 1091
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-update-check.py.txt",
+      "sha256": "42120a0f77da93698cc7e5a009ac6c3e345b7f7bd4afcd12ee37b4032fea5241",
+      "bytes": 4772
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/probe_gate.py.txt",
+      "sha256": "9c58750ee29c959998ceea0ebb249f232570b1c193473caa87a164dbc64ee322",
+      "bytes": 4257
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/switch_gateway.py.txt",
+      "sha256": "9d484f36c8c4605fa374335ca93ef708299ed9e866f0721325cc35f02bfcb2b1",
+      "bytes": 7455
     },
     {
       "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/README.md",
