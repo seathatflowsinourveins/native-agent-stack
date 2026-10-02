@@ -1,6 +1,6 @@
 {
   "schema": "native-agent-stack/new-wsl-client-config-map/v1",
-  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), or `not_wired:<reason>`. A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; the tool scans the rendered files and the instruction blocks for the names of every piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
+  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; the tool refuses such a setting classed practice or slot). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
   "dependent_sentences": [
     {
       "starts": "Check relevance; retry without pin priority",
@@ -230,10 +230,12 @@
     {
       "match": [
         "claude/settings/setting/permissions.defaultMode",
-        "claude/settings/setting/skipDangerousModePermissionPrompt"
+        "claude/settings/setting/skipDangerousModePermissionPrompt",
+        "codex/config/approval_policy",
+        "codex/config/sandbox_mode"
       ],
-      "wiring": "practice",
-      "note": "Permission settings."
+      "wiring": "authorization:they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has",
+      "note": "Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode. The deny list stays practice: it only restricts. Claude Code writes skipDangerousModePermissionPrompt itself when the person accepts its dialog (settings reference, skipDangerousModePermissionPrompt)."
     },
     {
       "match": [
@@ -468,8 +470,6 @@
       "match": [
         "codex/config/model",
         "codex/config/model_reasoning_effort",
-        "codex/config/approval_policy",
-        "codex/config/sandbox_mode",
         "codex/config/mcp_oauth_credentials_store",
         "codex/config/web_search",
         "codex/config/agents.*",

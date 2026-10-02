@@ -997,7 +997,8 @@ session a person starts. It merges into what the plan and the clients leave behi
 `codex plugin marketplace add` writes `~/.codex/config.toml`, so that file usually exists: every key and table in it stays
 as it is, what the render has and it lacks is added, and a value that differs stays, printed beside the render's, with
 the step ending `merged with conflicts kept`. Claude Code's `settings.json` is merged too: the template's values win,
-except the theme, which stays as the file has it. No step of `--apply` needs a signed-in client. The tool needs the host
+except the theme, which stays as the file has it, and the authorization settings, which are not written by default
+(below). No step of `--apply` needs a signed-in client. The tool needs the host
 file from F8, installs no tool, backs up what it changes and runs again to the same files; `--dry-run` shows its steps
 without writing.
 
@@ -1008,6 +1009,13 @@ bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
 python3 -B tools/adoption/new_wsl_client_config.py --check
 python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
+
+The `--apply` line is the plain one: it writes none of the authorization settings, which grant a permission or suppress
+a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's `approval_policy`
+and `sandbox_mode`), so each client keeps its own defaults and a value a person set is never touched. Add
+`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice (it
+adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
+`authorization_settings` records who asked.
 
 After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
@@ -1020,9 +1028,12 @@ Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key
 it kept, with both values, for the person to decide), and its `verify` step lists what a login shell finds: `claude` is the
 launcher in the `bin` directory of the host file's `ECO_ROOT`, which starts an interactive session at `max` effort, and
-`codex` and the mise tools resolve as well. The two instruction blocks are installed with every unit that names a tool
-the manifest does not install left out ([Claude](../new-wsl/claude-user-instructions.md),
-[Codex](../new-wsl/codex-user-instructions.md)); nothing is written in their place.
+`codex` and the mise tools resolve as well; one line before the summary says whether the authorization settings were
+applied, kept or left to the clients' own defaults. The two instruction blocks
+([Claude](../new-wsl/claude-user-instructions.md), [Codex](../new-wsl/codex-user-instructions.md)) are installed with
+every unit that names a tool the map declares as not wired left out, and nothing is written in its place; sentences that
+name skills or timers the map does not list stay as written, and whether those skills exist on the host is not
+established by this step.
 
 ### F10. Windows Terminal profiles and the PATH proof
 
@@ -1116,7 +1127,9 @@ transcript and the F outputs:
   - W1's `workstation_baseline`, W5's common-unit process ids and active user manager and its `paired_isolation`, any
     `w5_failure_export` with its `cause`, each removal's interop check and the records of any stop for review,
     F1's outcome (`running`, or `degraded` with its two proving outputs) and F3's rootless-container result or `owed`;
-  - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
+  - the clone's commit, the subordinate-id outcome, F9's `authorization_settings` (the plain `--apply`, or who asked for
+    `--with-authorization-settings`, when, and the line `--apply` printed about them) and F11's
+    `jcodemunch_registration`;
   - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
     W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
   - all five workstation values equal to `host.workstation_baseline`; its optional `getty_tty1_result` is present only

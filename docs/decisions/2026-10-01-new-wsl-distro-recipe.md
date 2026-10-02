@@ -1330,9 +1330,9 @@ check leaves the same decision-changing gaps: the corrected full run through F3,
 
 ## Stage 2 for the new distribution (2026-10-02)
 
-Added after `v2026.09.26.2`. The second and third instructions of 2026-10-02 for the client-configuration work changed F8
-and F9 of the recipe and the places that carried their old text, and made `--apply` merge into the files the plan and the
-clients leave. This section records what changed and why; it is not a host run, and no step below was run on the
+Added after `v2026.09.26.2`. The instructions of 2026-10-02 for the client-configuration work (three rounds and the repair after the
+cross-family review of the pull request) changed F8 and F9 of the recipe and the places that carried their old text, made
+`--apply` merge into the files the plan and the clients leave, and made the authorization settings opt-in. This section records what changed and why; it is not a host run, and no step below was run on the
 destination distribution. Earlier sections keep their dated text: the reading of
 `adoption/bootstrap-linux.sh` under "What stage 2 expects" and the ports that Decision 3 names describe the state of
 2026-10-01.
@@ -1369,8 +1369,8 @@ What changed:
    table exists on both sides only the missing keys are added; a value that differs stays as the file has it, is printed
    beside the render's, and the step ends `merged with conflicts kept` (exit 0). The file is backed up first, read back
    with `tomllib` after the write, and put back from the backup when it is not the merge; `features.daemon_auto_start`
-   goes through Codex's own writer, as `codex_home.py` does; a running Codex stops the write, and the message says to
-   close the sessions and run again. `~/.claude/settings.json` keeps the keys it has (on the destination
+   goes through Codex's own writer, as `codex_home.py` does; a running Codex stops either write of `config.toml`, the merge and the creation of an absent file, and the message says
+   to close the sessions and run again. `~/.claude/settings.json` keeps the keys it has (on the destination
    `extraKnownMarketplaces` and `theme`); the template's values win except the theme, which stays as the file has it.
 4. **One port truth.** Observed 2026-10-02 in the first real run of the recipe: the template's ports 24318 and 26333 had
    listeners on the workstation (its own collector and its Qdrant, in the shared network namespace), so F8's proof failed
@@ -1378,7 +1378,17 @@ What changed:
    of the plan's collector (`config/otel.yaml`), and `QDRANT_URL` is `127.0.0.1:21633`, a port no service of the plan uses.
    F8's `ss` probe checks `21318`, `29374`, `21633` and `28231`, and its exclusion set gains `24318` and `26333`. The
    tool takes the collector port from the plan, so the render and the host file agree.
-5. **Four places that carried the old text.** F7's first sentence gave `--configure-full-profile`'s refusal of a checkout
+5. **The authorization settings are written only on request.** Claude Code's `permissions.defaultMode`
+   (`bypassPermissions`) and `skipDangerousModePermissionPrompt` and Codex's `approval_policy` (`never`) and `sandbox_mode`
+   (`danger-full-access`) grant permissions and suppress confirmations, so the plain `--apply` of F9 writes none of them and
+   leaves any value a file has; `--with-authorization-settings`, added to that line only on a host whose owner asked for the
+   repository's permission practice, adds the ones a file lacks and still keeps a differing value, printed beside the
+   render's. The receipt's `authorization_settings` records who asked. The cross-family review of the pull request asked
+   for this; the first rounds had classed the four as practice.
+6. **F9's sentence about the instruction blocks.** It said every unit that names a tool the manifest does not install is left
+   out; the filter works by the names the map declares as not wired, and sentences that name skills or timers the map does not
+   list stay as written, so F9 now says that, and that whether those skills exist on the host is not established by the step.
+7. **Four places that carried the old text.** F7's first sentence gave `--configure-full-profile`'s refusal of a checkout
    that is not `origin/main` as the reason to clone `main`; it now says the plan and the tool are on `main`. The
    placeholder table loses `<id>`, which only the bootstrap's `--profile` took. F11's opening no longer says stage 2 copies
    the carrier blocks that name jCodeMunch tools. This record's command table, the receipt example's F8 and F9 rows and the

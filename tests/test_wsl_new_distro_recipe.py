@@ -77,6 +77,15 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
     neither the plan's nor the workstation's, and F8's exclusion set names the workstation's collector and Qdrant ports
     (24318 and 26333, observed listening 2026-10-02);
 
+- the repair of 2026-10-02 after the cross-family review of the client-configuration pull request, bound to the recipe, the
+  checklist and the receipt example:
+  - the command block of F9 keeps the plain ``--apply``; the authorization settings (the ones that grant a permission or
+    suppress a confirmation) are written only with ``--with-authorization-settings``, which F9 names in prose, for a host
+    whose owner asked for the repository's permission practice, and the receipt's ``authorization_settings`` records who
+    asked;
+  - F9 says that the instruction blocks leave out the units that name a tool the map declares as not wired, that sentences
+    naming skills or timers the map does not list stay as written, and that this step does not establish those skills;
+
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
 """
@@ -220,6 +229,19 @@ F9_COMMANDS = [
 ]
 F9_SIGN_IN = "After the `--apply` line, run `codex login`, then `claude`, by hand"
 F9_AFTER_SIGN_IN = "accept.sh --only <slot> --stage after_sign_in"
+# The repair of 2026-10-02: the plain --apply writes no authorization setting, the option is prose, and F9's sentence about
+# the instruction blocks says what the filter does (by the names the map declares) and what it does not establish.
+AUTHORIZATION_OPTION = "--with-authorization-settings"
+F9_AUTHORIZATION_PHRASES = (
+    "writes none of the authorization settings",
+    "`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice",
+    "the receipt's `authorization_settings` records who asked",
+    "F9's `authorization_settings`",
+)
+F9_BLOCKS_SENTENCE = ("every unit that names a tool the map declares as not wired left out, and nothing is written in its "
+                      "place; sentences that name skills or timers the map does not list stay as written, and whether "
+                      "those skills exist on the host is not established by this step")
+F9_OLD_BLOCKS_CLAIM = "every unit that names a tool the manifest does not install left out"
 CLAUDE_MCP_PAGE = "https://code.claude.com/docs/en/mcp"
 # F5: Docker says 65,536 entries suffice for most images and names the error an image that needs more produces.
 DOCKER_TROUBLESHOOT = "https://docs.docker.com/engine/security/rootless/troubleshoot/"
@@ -742,6 +764,32 @@ def f9_errors(recipe: str) -> list[str]:
     if named != owners:
         errors.append(f"F9 names the owners {sorted(named)} for the after-sign-in checks; the plan's rows with that stage "
                       f"are {sorted(owners)}")
+    return errors
+
+
+def authorization_errors(recipe: str, checklist: str, receipt: dict) -> list[str]:
+    """The plain `--apply` of F9 writes none of the authorization settings. The option that writes the missing ones is named in
+    F9's prose, for a host whose owner asked for the repository's permission practice, and never in the command block; the
+    receipt records who asked; and F9 says what the filter of the instruction blocks does and does not establish."""
+    errors = []
+    text = " ".join(section(recipe, "F9").split())
+    whole = " ".join(recipe.split())
+    for phrase in F9_AUTHORIZATION_PHRASES[:3] + (F9_BLOCKS_SENTENCE,):
+        if phrase not in text:
+            errors.append(f"F9 lacks: {phrase}")
+    if F9_AUTHORIZATION_PHRASES[3] not in whole:
+        errors.append("the receipt contents list does not name F9's authorization_settings")
+    if F9_OLD_BLOCKS_CLAIM in text:
+        errors.append("F9 says every unit naming a tool the manifest does not install is left out; the filter works by the "
+                      "names the map declares")
+    if any(AUTHORIZATION_OPTION in command for block in step_blocks(recipe, "F9") for command in block):
+        errors.append(f"the F9 command block carries {AUTHORIZATION_OPTION}; the operator adds it, the page does not")
+    line = next((line for line in checklist.splitlines() if line.startswith("- [ ] **F9**")), "")
+    if AUTHORIZATION_OPTION not in line or "authorization_settings" not in line:
+        errors.append("the checklist's F9 line does not name the option and the receipt's authorization_settings")
+    field = receipt.get("authorization_settings") if isinstance(receipt, dict) else None
+    if not isinstance(field, str) or not field.startswith("<F9:") or f"who asked for {AUTHORIZATION_OPTION}" not in field:
+        errors.append("the receipt example has no authorization_settings field that records who asked for the option")
     return errors
 
 
@@ -1368,6 +1416,43 @@ class StageTwoTests(unittest.TestCase):
             with self.subTest(mutant=name):
                 self.assertNotEqual(mutant, recipe)
                 self.assertTrue(f9_errors(mutant), name)
+
+    def test_f9_keeps_the_plain_apply_names_the_option_in_prose_and_the_receipt_records_who_asked(self):
+        recipe, checklist = read(RECIPE), read(CHECKLIST)
+        receipt = json.loads(read(RECEIPT_EXAMPLE))
+        self.assertEqual(authorization_errors(recipe, checklist, receipt), [])
+        self.assertEqual(step_blocks(recipe, "F9"), [F9_COMMANDS])
+        self.assertEqual(F9_COMMANDS[-1], "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'")
+        without_field = {key: value for key, value in receipt.items() if key != "authorization_settings"}
+        mutants = {
+            "no sentence about what the plain apply writes": (
+                recipe.replace("writes none of the authorization settings", "writes the settings"), checklist, receipt),
+            "no condition on the owner's request": (
+                recipe.replace("only on a host whose owner asked for the repository's permission practice",
+                               "on any host"), checklist, receipt),
+            "no word that the receipt records who asked": (
+                re.sub(r"and the receipt's\s+`authorization_settings` records who asked", "", recipe), checklist, receipt),
+            "the option in the command block": (
+                recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION), checklist, receipt),
+            "the old claim about the instruction blocks": (
+                recipe.replace("every unit that names a tool the map declares as not wired left out", F9_OLD_BLOCKS_CLAIM),
+                checklist, receipt),
+            "no word that the skills are not established": (
+                re.sub(r"whether those skills exist on the host is not\s+established by this step",
+                       "those skills exist on the host", recipe), checklist, receipt),
+            "a receipt contents list without the field": (
+                recipe.replace("F9's `authorization_settings`", "F9's settings"), checklist, receipt),
+            "a checklist without the option": (recipe, checklist.replace(AUTHORIZATION_OPTION, "--x"), receipt),
+            "a receipt without the field": (recipe, checklist, without_field),
+            "a receipt field that does not say who asked": (
+                recipe, checklist, dict(receipt, authorization_settings="<F9: none>")),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(mutant, (recipe, checklist, receipt))
+                self.assertTrue(authorization_errors(*mutant), name)
+        # The command block is also pinned by f9_errors, so the option in it fails there too.
+        self.assertTrue(f9_errors(recipe.replace(F9_COMMANDS[-1], F9_COMMANDS[-1] + " " + AUTHORIZATION_OPTION)))
 
     def test_the_record_and_the_receipt_example_carry_the_f9_rows_and_both_comparisons_read_them(self):
         recipe, record = read(RECIPE), read(RECORD)

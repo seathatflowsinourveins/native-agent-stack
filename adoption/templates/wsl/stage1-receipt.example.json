@@ -123,6 +123,7 @@
   "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
   "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
   "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
+  "authorization_settings": "<F9: left to the clients' own defaults (the plain --apply), or who asked for --with-authorization-settings, when, and the line --apply printed about them: applied, or kept with the values it kept>",
   "failed_attempt_export": {
     "file": "<W6, path B only: Z:\\WSL\\downloads\\<Name>-failed.tar; null on path A>",
     "sha256": "<W6: the Get-FileHash line's lower-case hash of that file; null on path A>",

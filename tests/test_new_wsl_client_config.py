@@ -120,6 +120,10 @@ else:
     sys.exit(2)
 """
 NO_PROCESS = "no-such-process-name-here"   # the Codex process guard looks for no running process of this name
+# The width of the display of a conflicting value, as the tool's docstring and Decision 11 of the decision record state it: a
+# longer value is cut to this many characters less three and `...`, in the display only. It is a number here, not the tool's
+# constant, so that a change of the constant has to change the documentation and this test with it.
+DOCUMENTED_WIDTH = 300
 
 
 def plan_marketplace() -> tuple:
@@ -216,14 +220,16 @@ class MapTests(unittest.TestCase):
         code, out, err = run_main("--check")
         self.assertEqual((code, err), (0, ""), out[-400:])
         self.assertIn("check passed", out)
-        self.assertRegex(out, r"pieces: 3\d\d; wired: \d+; not wired: \d+")
+        self.assertRegex(out, r"pieces: 3\d\d; wired: \d+; not wired: \d+; authorization: 4")
 
     def test_every_piece_has_one_line_and_every_unwired_one_says_why(self):
         results, *_ = cfg.analyse(ROOT)
         code, out, _ = run_main("--check")
-        lines = [line for line in out.splitlines() if line.startswith(("wired ", "not wired "))]
+        lines = [line for line in out.splitlines() if line.startswith(("wired ", "not wired ", "authorization  "))]
         self.assertEqual(len(lines), len(results))
-        self.assertEqual(sum(1 for line in lines if line.startswith("not wired")), sum(1 for v in results if not v.wired))
+        self.assertEqual(sum(1 for line in lines if line.startswith("not wired")),
+                         sum(1 for v in results if not v.wired and not v.authorization))
+        self.assertEqual(sum(1 for line in lines if line.startswith("authorization  ")), 4)
         for verdict in results:
             self.assertTrue(verdict.reason.strip(), verdict.piece.key)
 
@@ -234,7 +240,7 @@ class MapTests(unittest.TestCase):
         self.assertEqual([row["piece"] for row in rows], [p.key for p in cfg.collect_pieces(ROOT)])
         self.assertTrue(all(sorted(row) == ["piece", "reason", "wired", "wiring"] for row in rows))
         kinds = {row["wiring"].split(":")[0] for row in rows}
-        self.assertEqual(kinds, {"practice", "not_wired", "slot"})
+        self.assertEqual(kinds, {"practice", "not_wired", "slot", "authorization"})
 
     def test_a_piece_that_the_map_does_not_name_fails_the_check(self):
         cases = {
@@ -537,7 +543,8 @@ class RenderTests(unittest.TestCase):
         settings = json.loads(self.files["settings.json"])
         self.assertEqual(settings["model"], "opus[1m]")
         self.assertEqual(settings["effortLevel"], "xhigh")
-        self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
+        self.assertNotIn("defaultMode", settings["permissions"])        # an authorization setting: not by default
+        self.assertNotIn("skipDangerousModePermissionPrompt", settings)
         for gone in ("statusLine", "enabledPlugins", "extraKnownMarketplaces"):
             self.assertNotIn(gone, settings)
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
@@ -594,10 +601,16 @@ class RenderTests(unittest.TestCase):
         names = unwired_names_independently()
         self.assertTrue({"rtk", "ai-memory", "socraticode", "headroom", "codebase-memory", "context-mode",
                          "claude-hud", "openai-codex"} <= {n.lower() for n in names}, names)
-        for name, text in self.files.items():
-            if name == "wiring.json":
-                continue
-            self.assertEqual(name_hits(text, names), [], name)
+        with tempfile.TemporaryDirectory() as tmp:    # the render with the authorization settings is scanned too
+            self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, "--with-authorization-settings")[0], 0)
+            with_option = {path.name: path.read_text(encoding="utf-8") for path in Path(tmp).iterdir()}
+        self.assertIn("danger-full-access", with_option["codex.config.toml"])
+        for label, files in (("without", self.files), ("with", with_option)):
+            for name, text in files.items():
+                if name == "wiring.json":
+                    continue
+                # The scan is the tool's: --check runs the same function on the same renders, with the tool's names.
+                self.assertEqual(cfg.name_hits(text, names), [], f"{label} the option: {name}")
 
     def test_the_same_scan_finds_those_names_in_the_old_full_profile_render(self):
         # Negative control: the render of the old workstation profile (every template piece) is full of them.
@@ -1034,10 +1047,14 @@ def unwired_names_independently() -> list:
 
 
 def name_hits(text: str, names) -> list:
-    return [n for n in names if re.search(r"(?<![A-Za-z0-9])" + re.escape(n) + r"(?![A-Za-z0-9])", text, re.I)]
+    """The tool's own scan (--check uses it on the rendered files); the names the tests give it come from
+    unwired_names_independently, not from the tool."""
+    return cfg.name_hits(text, names)
 
 
-class ApplyTests(unittest.TestCase):
+class ApplyCase(unittest.TestCase):
+    """A temporary home, stub clients and an `--apply` that names them: the base of the apply tests."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -1066,6 +1083,8 @@ class ApplyTests(unittest.TestCase):
         write_exe(self.home / ".local/bin/mise", "#!/bin/sh\necho mise\n")
         write_exe(self.home / ".local/share/mise/shims/qmd", "#!/bin/sh\necho qmd\n")
 
+
+class ApplyTests(ApplyCase):
     def test_a_dry_run_writes_nothing_and_runs_no_client(self):
         self.installed_state()
         before = tree(self.home)
@@ -1322,7 +1341,7 @@ class ApplyTests(unittest.TestCase):
         self.assertIn('kept your theme: "auto" (the render has "dark")', out)
         for key in ("model", "effortLevel", "hooks", "permissions", "env"):
             self.assertIn(key, settings)
-        self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
+        self.assertNotIn("defaultMode", settings["permissions"])
         self.assertIn("PreToolUse", settings["hooks"])
         self.assertEqual(settings["env"]["PATH"].split(":")[0], f"{self.eco}/bin")
         backups = [p for p in claude.iterdir() if p.name.startswith("settings.json.bak.")]
@@ -1380,6 +1399,327 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("CLAUDE_CONFIG_DIR or CODEX_HOME is set", err)
         self.assertEqual(list(self.home.iterdir()), [])
+
+
+def leaves(node, prefix=()):
+    """{key path: JSON text of the value} of every leaf of a parsed settings or config tree."""
+    if isinstance(node, dict) and node:
+        found = {}
+        for key, value in node.items():
+            found.update(leaves(value, prefix + (key,)))
+        return found
+    return {prefix: json.dumps(node, sort_keys=True)}
+
+
+class AuthorizationTests(ApplyCase):
+    """The four settings that grant a permission or suppress a confirmation are written only on request."""
+
+    FOUR = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
+            "codex/config/approval_policy", "codex/config/sandbox_mode")
+    OPTION = "--with-authorization-settings"
+
+    def render(self, *extra: str):
+        with tempfile.TemporaryDirectory() as tmp:
+            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, *extra)
+            self.assertEqual(code, 0, err)
+            return (json.loads((Path(tmp) / "settings.json").read_text()),
+                    tomllib.loads((Path(tmp) / "codex.config.toml").read_text()))
+
+    def seed(self, settings=None, codex_text=None) -> None:
+        self.installed_state()
+        if settings is not None:
+            (self.home / ".claude").mkdir(exist_ok=True)
+            (self.home / ".claude" / "settings.json").write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+        if codex_text is not None:
+            (self.home / ".codex").mkdir(mode=0o700, exist_ok=True)
+            (self.home / ".codex" / "config.toml").write_text(codex_text, encoding="utf-8")
+            (self.home / ".codex" / "config.toml").chmod(0o600)
+
+    def authorization_line(self, out: str) -> str:
+        lines = [line for line in out.splitlines() if line.startswith("authorization settings:")]
+        self.assertEqual(len(lines), 1, lines)       # one line, once
+        return lines[0]
+
+    def test_the_map_classes_the_four_settings_as_authorization_and_the_deny_list_stays_practice(self):
+        results, *_ = cfg.analyse(ROOT)
+        by_key = {v.piece.key: v for v in results}
+        self.assertEqual({v.piece.key for v in results if v.authorization}, set(self.FOUR))
+        for key in self.FOUR:
+            self.assertFalse(by_key[key].wired, key)
+            self.assertIn("not written unless --with-authorization-settings is given", by_key[key].reason)
+            self.assertEqual(by_key[key].entry.wiring.partition(":")[0], "authorization")
+            self.assertTrue(by_key[key].entry.wiring.partition(":")[2].strip(), "a reason")
+        deny = [v for v in results if "/permission/deny/" in v.piece.key and v.entry.wiring == "practice"]
+        self.assertGreater(len(deny), 100)
+        self.assertTrue(all(v.wired for v in deny))
+        with_option, *_ = cfg.analyse(ROOT, authorization=True)
+        self.assertTrue(all(v.wired for v in with_option if v.authorization))
+        self.assertEqual({v.piece.key for v in with_option if v.wired} - {v.piece.key for v in results if v.wired},
+                         set(self.FOUR))
+
+    def test_the_default_render_has_none_of_the_four_keys_and_the_option_adds_those_four_and_nothing_else(self):
+        settings, codex = self.render()
+        self.assertNotIn("defaultMode", settings["permissions"])
+        self.assertNotIn("skipDangerousModePermissionPrompt", settings)
+        self.assertNotIn("approval_policy", codex)
+        self.assertNotIn("sandbox_mode", codex)
+        settings_on, codex_on = self.render(self.OPTION)
+        self.assertEqual(settings_on["permissions"]["defaultMode"], "bypassPermissions")
+        self.assertIs(settings_on["skipDangerousModePermissionPrompt"], True)
+        self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
+        # The two renders differ in those four keys and in nothing else; the deny list is in both.
+        for off, on in ((settings, settings_on), (codex, codex_on)):
+            self.assertEqual(sorted(set(leaves(on)) - set(leaves(off))), sorted(
+                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",)] if on is settings_on else
+                [("approval_policy",), ("sandbox_mode",)]))
+            self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
+            self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
+        self.assertEqual(settings["permissions"]["deny"], settings_on["permissions"]["deny"])
+        self.assertGreater(len(settings["permissions"]["deny"]), 100)
+
+    def test_a_fresh_apply_writes_none_by_default_and_all_four_with_the_option(self):
+        self.seed()
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads((self.home / ".claude/settings.json").read_text())
+        config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+        self.assertNotIn("defaultMode", settings["permissions"])
+        self.assertNotIn("skipDangerousModePermissionPrompt", settings)
+        self.assertEqual({"approval_policy", "sandbox_mode"} & set(config), set())
+        self.assertEqual(self.authorization_line(out),
+                         "authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode "
+                         "and skipDangerousModePermissionPrompt and Codex approval_policy and sandbox_mode are not "
+                         "written, and a value of theirs that a file has is not touched; --with-authorization-settings "
+                         "adds the ones a file lacks)")
+        # Negative control: the same home with the option gets all four, in both clients.
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads((self.home / ".claude/settings.json").read_text())
+        config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+        self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
+        self.assertIs(settings["skipDangerousModePermissionPrompt"], True)
+        self.assertEqual((config["approval_policy"], config["sandbox_mode"]), ("never", "danger-full-access"))
+        line = self.authorization_line(out)
+        self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; added: Claude Code "
+                                        "permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex "
+                                        "approval_policy, Codex sandbox_mode"), line)
+        # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertTrue(self.authorization_line(out).startswith("authorization settings: kept (--with-authorization-settings; "
+                                                                "already the same:"), out[-600:])
+
+    def test_the_destinations_files_gain_the_four_only_with_the_option(self):
+        self.seed(DESTINATION_CLAUDE, DESTINATION_CODEX)
+        for extra, present in (((), False), ((self.OPTION,), True)):
+            with self.subTest(option=bool(extra)):
+                code, out, _ = self.apply(*extra)
+                self.assertEqual(code, 0, out[-800:])
+                settings = json.loads((self.home / ".claude/settings.json").read_text())
+                config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+                self.assertEqual("defaultMode" in settings["permissions"], present)
+                self.assertEqual("skipDangerousModePermissionPrompt" in settings, present)
+                self.assertEqual("approval_policy" in config, present)
+                self.assertEqual("sandbox_mode" in config, present)
+                self.assertEqual(settings["theme"], "auto")                       # the destination's own keys stay
+                self.assertEqual(config["marketplaces"]["trailofbits"]["ref"], PLAN_COMMIT)
+
+    def test_an_existing_value_survives_a_default_apply_and_one_with_the_option_and_both_values_are_printed(self):
+        mine = {"permissions": {"defaultMode": "default", "deny": ["Read(~/mine)"]}, "skipDangerousModePermissionPrompt": False}
+        codex_text = 'approval_policy = "on-request"\nsandbox_mode = "workspace-write"\n'
+        self.seed(mine, codex_text)
+        for extra in ((), (self.OPTION,), ()):
+            with self.subTest(option=bool(extra)):
+                code, out, _ = self.apply(*extra)
+                self.assertEqual(code, 0, out[-800:])
+                settings = json.loads((self.home / ".claude/settings.json").read_text())
+                config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+                self.assertEqual(settings["permissions"]["defaultMode"], "default")
+                self.assertIs(settings["skipDangerousModePermissionPrompt"], False)
+                self.assertEqual((config["approval_policy"], config["sandbox_mode"]), ("on-request", "workspace-write"))
+                self.assertIn("Read(~/mine)", settings["permissions"]["deny"])   # the person's own rule stays beside ours
+                if extra:
+                    for expected in ('kept your permissions.defaultMode: "default" (the render has "bypassPermissions")',
+                                     "kept your skipDangerousModePermissionPrompt: false (the render has true)",
+                                     'conflict kept: approval_policy: the file has "on-request"; the render has "never"',
+                                     'conflict kept: sandbox_mode: the file has "workspace-write"; the render has '
+                                     '"danger-full-access"'):
+                        self.assertIn(expected, out)
+                    self.assertIn("codex-config merged with conflicts kept", out.split("summary: ")[1])
+                    self.assertTrue(self.authorization_line(out).startswith("authorization settings: kept (--with-"
+                                                                            "authorization-settings; kept your value: Claude "
+                                                                            "Code permissions.defaultMode"), out[-900:])
+                else:
+                    self.assertNotIn("kept your permissions.defaultMode", out)
+                    self.assertNotIn("conflict kept: approval_policy", out)
+                    self.assertTrue(self.authorization_line(out).startswith("authorization settings: left to the clients' "
+                                                                            "own defaults"))
+
+    def test_with_the_option_a_setting_one_file_has_and_another_lacks_is_added_only_where_it_is_missing(self):
+        self.seed({"permissions": {"defaultMode": "plan"}}, 'sandbox_mode = "read-only"\n')
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads((self.home / ".claude/settings.json").read_text())
+        config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+        self.assertEqual(settings["permissions"]["defaultMode"], "plan")                # kept
+        self.assertIs(settings["skipDangerousModePermissionPrompt"], True)              # added
+        self.assertEqual(config["sandbox_mode"], "read-only")                           # kept
+        self.assertEqual(config["approval_policy"], "never")                            # added
+        line = self.authorization_line(out)
+        self.assertIn("added: Claude Code skipDangerousModePermissionPrompt, Codex approval_policy", line)
+        self.assertIn("kept your value: Claude Code permissions.defaultMode, Codex sandbox_mode", line)
+
+    def test_a_dry_run_with_the_option_writes_nothing_and_says_what_would_be_applied(self):
+        self.seed()
+        before = tree(self.home)
+        code, out, _ = self.apply(self.OPTION, dry=True)
+        self.assertEqual(code, 0, out[-600:])
+        self.assertEqual(tree(self.home), before)
+        self.assertTrue(self.authorization_line(out).startswith("authorization settings: would be applied ("), out[-600:])
+
+    def test_the_apply_line_says_not_applied_when_the_steps_that_would_write_the_settings_are_skipped(self):
+        self.seed()
+        code, out, _ = self.apply(self.OPTION, "--skip", "claude-settings", "--skip", "codex-config")
+        self.assertEqual(code, 0, out[-600:])
+        line = self.authorization_line(out)
+        self.assertTrue(line.startswith("authorization settings: not applied ("), line)
+        self.assertIn("not reached, its step did not finish: Claude Code permissions.defaultMode", line)
+
+    def test_the_map_refuses_an_authorization_setting_classed_practice_or_slot(self):
+        for key in self.FOUR:
+            for wiring, owner in (("practice", None), ("slot:serena", "serena")):
+                with self.subTest(piece=key, wiring=wiring), tempfile.TemporaryDirectory() as tmp:
+                    root = make_catalog(Path(tmp))
+
+                    def reclass(data):
+                        entry = next(e for e in data["entries"] if key in e["match"])
+                        entry["match"].remove(key)
+                        data["entries"].insert(0, {"match": [key], "wiring": wiring, **({"owner": owner} if owner else {})})
+                    edit_json(root / cfg.MAP_REL, reclass)
+                    errors = cfg.analyse(root)[3]
+                    self.assertTrue(any(error.startswith(f"{key}: a setting that grants a permission or suppresses a "
+                                                         "confirmation is classed authorization:<reason>") for error in errors),
+                                    errors)
+                    self.assertEqual(run_main("--check", "--root", str(root))[0], 1)
+                    # --render and --apply refuse the map too, with and without the option.
+                    for extra in ((), (self.OPTION,)):
+                        out_dir = Path(tmp) / "out"
+                        code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", str(out_dir), "--root", str(root),
+                                                *extra)
+                        self.assertEqual(code, 1)
+                        self.assertIn("render refused", err)
+                        self.assertFalse(out_dir.exists())
+
+    def test_a_setting_that_is_not_an_authorization_one_is_refused_in_that_class_and_not_wired_is_allowed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
+                "match": ["claude/settings/setting/model"], "wiring": "authorization:a control"}))
+            errors = cfg.analyse(root)[3]
+        self.assertIn("claude/settings/setting/model: classed authorization, which this tool does not know as a setting "
+                      "that grants a permission or suppresses a confirmation (AUTHORIZATION_PIECES)", errors)
+        # Dropping one of the four altogether is allowed (it is then never written, with or without the option).
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def drop(data):
+                entry = next(e for e in data["entries"] if self.FOUR[2] in e["match"])
+                entry["match"].remove(self.FOUR[2])
+                data["entries"].insert(0, {"match": [self.FOUR[2]], "wiring": "not_wired:a decision to drop it"})
+            edit_json(root / cfg.MAP_REL, drop)
+            self.assertEqual(cfg.analyse(root)[3], [])
+            results, *_ = cfg.analyse(root, authorization=True)
+        self.assertFalse(next(v for v in results if v.piece.key == self.FOUR[2]).wired)
+        # An allow rule would grant too: the tool classes it as authorization whatever the map says.
+        self.assertTrue(cfg.is_authorization_piece("claude/settings/permission/allow/Bash(git status)"))
+        self.assertFalse(cfg.is_authorization_piece("claude/settings/permission/deny/Bash(git push -f *)"))
+        self.assertFalse(cfg.is_authorization_piece("claude/settings/setting/model"))
+
+    def test_check_lists_the_authorization_pieces_apart_in_its_text_json_and_markdown(self):
+        code, out, _ = run_main("--check")
+        self.assertEqual(code, 0)
+        self.assertIn("authorization: 4", out)
+        block = out.split("authorization settings (", 1)[1].split("\nwarning", 1)[0]
+        self.assertIn('claude/settings/setting/permissions.defaultMode = "bypassPermissions"', block)
+        self.assertIn('codex/config/sandbox_mode = "danger-full-access"', block)
+        self.assertEqual(len([line for line in block.splitlines() if line.startswith("  claude/") or line.startswith(
+            "  codex/")]), 4)
+        not_wired = [line for line in out.splitlines() if line.startswith("not wired")]
+        self.assertFalse([line for line in not_wired if any(key in line for key in self.FOUR)])
+        rows = {row["piece"]: row for row in json.loads(run_main("--check", "--json")[1])}
+        for key in self.FOUR:
+            self.assertEqual((rows[key]["wiring"], rows[key]["wired"]), ("authorization", False))
+        results, _, plan, _, _ = cfg.analyse(ROOT)
+        tables = cfg.markdown_tables(ROOT, results, plan).split("\n\n")
+        self.assertIn("Authorization setting", tables[1].splitlines()[0])
+        self.assertIn("Written by default", tables[1].splitlines()[0])
+        self.assertTrue(all(row.count("| no |") == 1 for row in tables[1].splitlines()[2:]))
+        self.assertEqual(sum(1 for key in self.FOUR for row in tables[1].splitlines() if key in row), 4)
+
+    def test_the_help_text_names_the_option_what_it_writes_and_who_it_is_for(self):
+        helped = " ".join(cfg.build_parser().format_help().split())
+        self.assertIn("--with-authorization-settings", helped)
+        for phrase in ("grant a permission or suppress a confirmation", "permissions.defaultMode",
+                       "skipDangerousModePermissionPrompt", "approval_policy", "sandbox_mode",
+                       "neither rendered nor written and a value a file already has is never touched",
+                       "a differing one is kept and printed beside the render's",
+                       "only on a host whose owner asked for the repository's permission practice"):
+            self.assertIn(phrase, helped)
+
+
+class RenderedScanTests(unittest.TestCase):
+    """--check renders the example host, without and with the authorization settings, and scans every file."""
+
+    def test_the_repository_render_names_no_tool_that_is_not_wired_either_way(self):
+        self.assertEqual(cfg.rendered_name_errors(ROOT), [])
+        code, out, err = run_main("--check")
+        self.assertEqual((code, err), (0, ""), out[-300:])
+
+    def test_a_name_in_a_rendered_file_fails_the_check_and_the_message_says_which_render(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use rtk here"))
+            edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
+                "match": ["claude/settings/env/SCAN_PROBE"], "wiring": "practice"}))
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names rtk, "
+                      "which is not wired", err)
+        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names rtk", err)
+
+    def test_a_name_that_only_an_authorization_setting_carries_is_found_in_the_render_with_the_option_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="rtk-default"))
+            errors = cfg.rendered_name_errors(root)
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
+                                  "names rtk, which is not wired"])
+        self.assertIn("with --with-authorization-settings: settings.json names rtk", err)
+
+    def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            path = root / cfg.TEMPLATES["codex/config"]
+            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "ai-memory"'),
+                            encoding="utf-8")
+            edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
+                "match": ["codex/config/probe_note"], "wiring": "practice"}))
+            errors = cfg.rendered_name_errors(root)
+        self.assertTrue(any("codex.config.toml names ai-memory" in error for error in errors), errors)
+
+    def test_a_render_that_fails_is_reported_and_not_taken_for_a_clean_scan(self):
+        with mock.patch.object(cfg, "render", side_effect=cfg.ConfigError("boom")):
+            errors = cfg.rendered_name_errors(ROOT)
+        self.assertEqual(len(errors), 2)
+        self.assertTrue(all("failed, so it was not scanned: boom" in error for error in errors), errors)
+
+    def test_the_scan_takes_whole_words_in_any_case_and_the_test_helper_is_the_tools(self):
+        self.assertEqual(cfg.name_hits("Use RTK here", ["rtk", "headroom"]), ["rtk"])
+        self.assertEqual(cfg.name_hits("artkb and rtks", ["rtk"]), [])
+        self.assertEqual(cfg.name_hits("rtk-default", ["rtk"]), ["rtk"])
+        self.assertEqual(name_hits("Use RTK here", ["rtk"]), cfg.name_hits("Use RTK here", ["rtk"]))
 
 
 ONLY_CODEX_CONFIG = tuple(arg for step in cfg.STEPS if step != "codex-config" for arg in ("--skip", step))
@@ -1453,6 +1793,20 @@ class CodexMergeTests(unittest.TestCase):
     def summary(self, out: str) -> str:
         return out.split("summary: ")[1]
 
+    def assert_conflict_display(self, out: str, key: str, have_text: str, render_value: str) -> str:
+        """The one conflict line of `key` names the key, shows the file's value (`have_text`) and shows the render's value
+        as the documented display makes it: the whole TOML text when that fits in DOCUMENTED_WIDTH characters, else its first
+        DOCUMENTED_WIDTH - 3 characters and `...`. The expectation is worked out here from the render's value, so it holds
+        whichever side of the width a host's temporary directory puts a path-valued key on. Returns what was shown."""
+        prefix = f"conflict kept: {key}: the file has {have_text}; the render has "
+        found = [line[line.index(prefix) + len(prefix):] for line in out.splitlines() if prefix in line]
+        self.assertEqual(len(found), 1, (prefix, found))
+        shown = found[0]
+        full = json.dumps(render_value, ensure_ascii=False)     # a TOML basic string: a path has nothing to escape
+        self.assertEqual(shown, full if len(full) <= DOCUMENTED_WIDTH else full[:DOCUMENTED_WIDTH - 3] + "...")
+        self.assertLessEqual(len(shown), DOCUMENTED_WIDTH)
+        return shown
+
     def test_the_destinations_two_files_are_rebuilt_from_the_plans_own_commands_at_the_observed_sizes(self):
         self.assertIn(f"--ref {PLAN_COMMIT}", (PLAN / "install.sh").read_text())
         self.assertIn(f"claude plugin marketplace add {PLAN_MARKETPLACE_URL}", (PLAN / "install.sh").read_text())
@@ -1506,8 +1860,11 @@ class CodexMergeTests(unittest.TestCase):
         self.assertIn('conflict kept: model: the file has "mine"; the render has "gpt-6.1-sol"', out)
         self.assertIn('conflict kept: tui.notifications: the file has ["x"]; the render has '
                       '["approval-requested", "plan-mode-prompt", "async-question"]', out)
-        self.assertIn(f'conflict kept: shell_environment_policy.set.PATH: the file has "/my/path"; the render has '
-                      f'"{rendered["shell_environment_policy"]["set"]["PATH"]}"', out)
+        # PATH holds the home three times, so the length of its render follows the host's temporary directory (a macOS
+        # runner's is the longer): what is asserted is the key, the file's value on the screen and in the file (above), and
+        # the render's value as the documented display makes it, whichever side of the width the host puts it on.
+        self.assert_conflict_display(out, "shell_environment_policy.set.PATH", '"/my/path"',
+                                     rendered["shell_environment_policy"]["set"]["PATH"])
         self.assertEqual(out.count("codex-config merged with conflicts kept"), 1)
         self.assertEqual(len(self.backups()), 1)
         # The second run writes nothing and makes no backup; the conflicts stay in view.
@@ -1518,6 +1875,48 @@ class CodexMergeTests(unittest.TestCase):
         self.assertEqual(len(self.backups()), 1)
         self.assertEqual(len([line for line in again.splitlines() if "conflict kept:" in line]), 3)
         self.assertIn("codex-config merged with conflicts kept", self.summary(again))
+
+    def test_the_display_of_a_value_is_cut_at_the_documented_width_and_no_sooner(self):
+        self.assertEqual(cfg.SHOWN_WIDTH, DOCUMENTED_WIDTH)
+        for length, cut in ((DOCUMENTED_WIDTH - 2, False), (DOCUMENTED_WIDTH - 1, True), (DOCUMENTED_WIDTH * 2, True)):
+            value = "x" * length
+            full = json.dumps(value)                               # two quotes more than the characters
+            with self.subTest(text_length=len(full)):
+                self.assertEqual(cfg.shown(("a", "b"), value),
+                                 full[:DOCUMENTED_WIDTH - 3] + "..." if cut else full)
+                self.assertLessEqual(len(cfg.shown(("a", "b"), value)), DOCUMENTED_WIDTH)
+        self.assertEqual(cfg.shown(("a", "b"), ["x", "y"]), '["x", "y"]')          # a short value is shown whole
+
+    def test_a_value_longer_than_the_documented_width_is_cut_in_the_display_and_never_in_the_file(self):
+        # A home with a long name makes the render's PATH longer than the width on any host, so the cut is exercised here
+        # whatever the temporary directory is; the conflict test above meets whichever side of the width the host's puts it.
+        home = self.base / ("long-home-" + "x" * 90) / "home"
+        codex_home = home / ".codex"
+        codex_home.mkdir(parents=True, mode=0o700)
+        config = codex_home / "config.toml"
+        results, manifest, plan, _, _ = cfg.analyse(ROOT)
+        values = cfg.host_values(EXAMPLE_HOST, plan, home, cfg.wired_path_dirs(results))
+        render_path = tomllib.loads(cfg.render(ROOT, results, plan, values, manifest)["codex.config.toml"])[
+            "shell_environment_policy"]["set"]["PATH"]
+        self.assertGreater(len(json.dumps(render_path)), DOCUMENTED_WIDTH)
+        for case, text in (("the file has its own PATH", '[shell_environment_policy.set]\nPATH = "/my/path"\n'),
+                           ("the file lacks PATH", "# nothing of ours\n")):
+            with self.subTest(case=case):
+                config.write_text(text, encoding="utf-8")
+                config.chmod(0o600)
+                code, out, _ = run_main("--apply", "--host", EXAMPLE_HOST, "--home", str(home), "--claude-bin",
+                                        str(self.claude), "--codex-bin", str(self.codex), "--codex-process-name", NO_PROCESS,
+                                        *ONLY_CODEX_CONFIG)
+                self.assertEqual(code, 0, out[-900:])
+                in_file = tomllib.loads(config.read_text())["shell_environment_policy"]["set"]["PATH"]
+                if "its own" in case:
+                    self.assertEqual(in_file, "/my/path")                     # the file's value stays, whole
+                    shown = self.assert_conflict_display(out, "shell_environment_policy.set.PATH", '"/my/path"', render_path)
+                    self.assertEqual((len(shown), shown[-3:]), (DOCUMENTED_WIDTH, "..."))   # cut, on every host
+                else:
+                    self.assertEqual(in_file, render_path)                    # a value that is added is written whole
+                    self.assertGreater(len(in_file), DOCUMENTED_WIDTH)
+                    self.assertNotIn("conflict kept: shell_environment_policy.set.PATH", out)
 
     def test_a_value_whose_key_looks_like_a_secret_is_never_printed(self):
         plan = cfg.plan_merge({"mcp_servers": {"x": {"env": {"API_TOKEN": "abc123-secret"}}}},
@@ -1649,9 +2048,46 @@ class CodexMergeTests(unittest.TestCase):
         self.assertIn("changed since it was read; nothing written", out)
         self.assertIn("codex-config failed", self.summary(out))
 
+    def start_app_server(self) -> subprocess.Popen:
+        """A process that looks like Codex's background app-server to a command-line reader: `app-server` is one of its
+        arguments (`codex app-server --listen unix://` is the real shape). It is a Python process that sleeps, with no
+        shell and no script in between, so that its command line is the same on every platform, and it is waited for until
+        that command line reads right: it reads empty for a moment while a new program is being set up."""
+        daemon = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(120)", "app-server", "--listen",
+                                   "unix://"])
+        self.addCleanup(lambda: (daemon.kill(), daemon.wait()))
+        for _ in range(100):
+            if cfg.app_server_pids([str(daemon.pid)]):
+                break
+            time.sleep(0.05)
+        return daemon
+
     def test_the_message_names_the_app_server_daemon_and_how_to_stop_it(self):
+        # Runs where /proc exists and where it does not (the command line is read through /proc or through `ps`). The
+        # guard's list of running processes is stood in for, so that no platform's naming of a process decides this test;
+        # a real `pgrep -x` is covered by the `sleep` tests above and, on Linux, by the script test below.
+        self.put(DESTINATION_CODEX)
+        daemon = self.start_app_server()
+        self.assertEqual(cfg.app_server_pids([str(daemon.pid), "1"]), [str(daemon.pid)])
+        with mock.patch.object(cfg.lane, "codex_processes", return_value=[str(daemon.pid)]):
+            code, out, _ = self.apply(name="fakecodex")
+            self.assertEqual(code, 1)
+            self.assertIn(f"close the Codex sessions, stop the app-server daemon (pid {daemon.pid}) with `codex app-server "
+                          "daemon stop`, then run `--apply` again", out)
+            self.assertEqual(self.config.read_text(), DESTINATION_CODEX)
+            self.assertEqual(self.backups(), [])
+            code, out, _ = self.apply(name="fakecodex", dry=True)
+            self.assertEqual(code, 0, out[-600:])
+            self.assertIn("stop the app-server daemon", out)
+        self.assertEqual(cfg.app_server_pids(["not-a-pid", "999999999"]), [])
+
+    @unittest.skipUnless(sys.platform.startswith("linux"),
+                         "the guard finds a #! script by its file name through `pgrep -x`, which is how Linux names the "
+                         "process of a script; what macOS makes of a script's name is not verified")
+    def test_the_guard_finds_a_script_named_like_codex_through_pgrep_and_names_its_app_server_daemon(self):
         # A script named like the process the guard looks for, started with `app-server` as an argument: the shape of
-        # Codex's background app-server (a `codex app-server --listen unix://` of the codex binary).
+        # Codex's background app-server (a `codex app-server --listen unix://` of the codex binary), found by the real
+        # `pgrep -x` and read through the real /proc.
         self.put(DESTINATION_CODEX)
         fake = write_exe(self.base / "bin" / "fakecodex", "#!/bin/sh\nsleep 120\n")
         daemon = subprocess.Popen([str(fake), "app-server", "--listen", "unix://"], start_new_session=True)
@@ -1667,10 +2103,55 @@ class CodexMergeTests(unittest.TestCase):
                       "daemon stop`, then run `--apply` again", out)
         self.assertEqual(self.config.read_text(), DESTINATION_CODEX)
         self.assertEqual(self.backups(), [])
-        code, out, _ = self.apply(name="fakecodex", dry=True)
+
+    def test_a_running_codex_refuses_the_creation_of_an_absent_file_and_nothing_is_written(self):
+        # No config.toml yet: the creation is a write too, and codex_home.py's own fresh-file path has no process check.
+        sleeper = subprocess.Popen(["sleep", "120"])
+        self.addCleanup(lambda: (sleeper.kill(), sleeper.wait()))
+        for _ in range(100):
+            if str(sleeper.pid) in cfg.lane.codex_processes("sleep"):
+                break
+            time.sleep(0.05)
+        calls = []
+        real_tool = cfg.Apply.tool
+
+        def recording(apply, step, argv):
+            calls.append(argv[0])
+            return real_tool(apply, step, argv)
+        for home_state in ("no Codex home", "a Codex home without config.toml"):
+            with self.subTest(state=home_state):
+                if home_state != "no Codex home":
+                    self.codex_home.mkdir(mode=0o700)
+                with mock.patch.object(cfg.Apply, "tool", recording):
+                    code, out, _ = self.apply(name="sleep")
+                self.assertEqual(code, 1)
+                self.assertIn("codex-config failed", self.summary(out))
+                self.assertIn("a running Codex writes the same config.toml: close the Codex sessions, then run `--apply` "
+                              "again", out)
+                self.assertFalse(self.config.exists())                 # nothing was created
+                self.assertEqual(list(self.codex_home.iterdir()) if self.codex_home.exists() else [], [])
+                self.assertEqual(self.backups() if self.codex_home.exists() else [], [])
+                self.assertFalse([c for c in calls if c.endswith("codex_home.py")], "codex_home.py ran before the check")
+        # A dry run writes nothing either, says why the real run would stop, and still shows what it would write.
+        code, out, _ = self.apply(name="sleep", dry=True)
         self.assertEqual(code, 0, out[-600:])
-        self.assertIn("stop the app-server daemon", out)
-        self.assertEqual(cfg.app_server_pids(["not-a-pid", "999999999"]), [])
+        self.assertIn("close the Codex sessions before the real run", out)
+        self.assertIn("would write the rendered user config", out)
+        self.assertFalse(self.config.exists())
+        # Control: with no such process the same state gets its file, so the refusal is the guard and nothing else.
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-600:])
+        self.assertTrue(self.config.is_file())
+        self.assertIn("codex-config applied", self.summary(out))
+
+    def test_the_refusal_for_an_absent_file_names_the_app_server_daemon_too(self):
+        daemon = self.start_app_server()
+        with mock.patch.object(cfg.lane, "codex_processes", return_value=[str(daemon.pid)]):   # as in the test above
+            code, out, _ = self.apply(name="fakecodex")
+        self.assertEqual(code, 1)
+        self.assertIn(f"stop the app-server daemon (pid {daemon.pid}) with `codex app-server daemon stop`, then run "
+                      "`--apply` again", out)
+        self.assertFalse(self.codex_home.exists())
 
     def test_a_dry_run_merges_nothing_and_runs_no_codex(self):
         self.put(DESTINATION_CODEX)
@@ -1756,6 +2237,102 @@ class CodexMergeTests(unittest.TestCase):
         self.assertEqual(len(plan.conflicts), 1)
         self.assertEqual(cfg.first_difference({"a": {"b": 1}}, {"a": {"b": True}}), ("a", "b"))
         self.assertIsNone(cfg.first_difference({"a": {"b": 1}}, {"a": {"b": 1}}))
+
+
+class CommandLineTests(unittest.TestCase):
+    """How the guard reads the command line of a process to find Codex's app-server: through /proc where Linux has one, and
+    through `ps` where there is none (macOS). Only the hint of the refusal depends on it; the refusal is `pgrep -x`'s."""
+
+    PROGRAM = [sys.executable, "-c", "import time; time.sleep(120)"]
+    ARGUMENTS = ("app-server", "--listen", "unix://", "two words")
+
+    def spawn(self, *words: str) -> subprocess.Popen:
+        process = subprocess.Popen([*self.PROGRAM, *words])
+        self.addCleanup(lambda: (process.kill(), process.wait()))
+        return process
+
+    def words_of(self, pid: int, word: str) -> list:
+        """The words of the command line once they hold `word`: they read empty for a moment while a new program is being
+        set up."""
+        words = []
+        for _ in range(100):
+            words = cfg.process_command_line(str(pid))
+            if word in words:
+                break
+            time.sleep(0.05)
+        return words
+
+    @contextlib.contextmanager
+    def no_proc(self):
+        """The tool's /proc pointed at a directory that does not exist, so that it reads command lines as it does on macOS."""
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(cfg, "PROC", Path(tmp) / "no-proc"):
+            yield
+
+    def test_a_process_with_app_server_among_its_arguments_is_found_and_one_without_is_not(self):
+        daemon, quiet = self.spawn(*self.ARGUMENTS), self.spawn("--listen", "unix://")
+        self.words_of(daemon.pid, "app-server")
+        self.words_of(quiet.pid, "--listen")
+        pids = [str(daemon.pid), str(quiet.pid), "1", str(os.getpid()), "999999999", "not-a-pid", ""]
+        self.assertEqual(cfg.app_server_pids(pids), [str(daemon.pid)])
+
+    def test_the_program_itself_is_not_taken_for_an_argument(self):
+        words = {"10": ["app-server"], "11": ["/x/codex", "app-server", "--listen", "unix://"], "12": ["/x/codex", "exec"],
+                 "13": [], "14": [""]}
+        with mock.patch.object(cfg, "process_command_line", side_effect=lambda pid: words[pid]):
+            self.assertEqual(cfg.app_server_pids(list(words)), ["11"])
+
+    def test_where_there_is_no_proc_the_command_line_comes_from_ps(self):
+        if shutil.which("ps") is None:
+            self.skipTest("no ps command on this host")
+        daemon = self.spawn(*self.ARGUMENTS)
+        with self.no_proc():
+            words = self.words_of(daemon.pid, "app-server")
+            self.assertTrue(words and words[0], words)
+            # ps joins the arguments with spaces, so the argument that holds a space comes back as two words.
+            self.assertEqual(words[-5:], ["app-server", "--listen", "unix://", "two", "words"])
+            self.assertEqual(cfg.app_server_pids([str(daemon.pid), "1", "999999999", "not-a-pid"]), [str(daemon.pid)])
+
+    def test_ps_is_asked_for_the_command_column_only_and_every_failure_leaves_the_hint_out(self):
+        listing = subprocess.CompletedProcess([], 0, "/x/codex app-server --listen unix://\n", "")
+        with self.no_proc():
+            with mock.patch.object(subprocess, "run", return_value=listing) as run:
+                self.assertEqual(cfg.process_command_line("123"), ["/x/codex", "app-server", "--listen", "unix://"])
+                self.assertEqual(cfg.app_server_pids(["123"]), ["123"])
+            # The environment of a process is never asked for: the one column is the command, and no option shows more.
+            self.assertEqual(run.call_args.args[0], ["ps", "-ww", "-o", "command=", "-p", "123"])
+            for failure in (FileNotFoundError("ps"), subprocess.TimeoutExpired("ps", 10), PermissionError("ps")):
+                with mock.patch.object(subprocess, "run", side_effect=failure):
+                    self.assertEqual(cfg.process_command_line("123"), [], failure)
+            with mock.patch.object(subprocess, "run", return_value=subprocess.CompletedProcess([], 1, "", "")):
+                self.assertEqual(cfg.process_command_line("123"), [])          # ps exits 1 for a process that is gone
+            with mock.patch.object(subprocess, "run", side_effect=AssertionError("ps run for a pid that is no number")):
+                self.assertEqual(cfg.process_command_line("not-a-pid"), [])
+                self.assertEqual(cfg.process_command_line("1; echo"), [])
+
+    @unittest.skipUnless(Path("/proc/self/cmdline").exists(), "no /proc on this platform: the ps reading above covers it")
+    def test_where_there_is_a_proc_the_words_are_the_arguments_as_passed_and_the_reading_is_the_one_before(self):
+        daemon, quiet = self.spawn(*self.ARGUMENTS), self.spawn("--listen", "unix://")
+        words = self.words_of(daemon.pid, "app-server")
+        self.assertEqual(words, [*self.PROGRAM, *self.ARGUMENTS])         # "two words" is one word here
+
+        def reading_before_ps_was_added(pids):
+            """What this tool did before the ps reading existed: the arguments of /proc/<pid>/cmdline, program left out."""
+            found = []
+            for pid in pids:
+                try:
+                    parts = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+                except OSError:
+                    continue
+                if b"app-server" in parts[1:]:
+                    found.append(pid)
+            return found
+        self.words_of(quiet.pid, "--listen")
+        pids = [str(daemon.pid), str(quiet.pid), "1", str(os.getpid()), "999999999", "not-a-pid", ""]
+        self.assertEqual(reading_before_ps_was_added(pids), [str(daemon.pid)])      # control: the reference finds it
+        self.assertEqual(cfg.app_server_pids(pids), reading_before_ps_was_added(pids))
+        if shutil.which("ps"):                                                       # and ps gives the same words, joined
+            with self.no_proc():
+                self.assertEqual(cfg.process_command_line(str(daemon.pid)), " ".join(words).split())
 
 
 class AdditiveOptionTests(unittest.TestCase):
@@ -1862,7 +2439,12 @@ class RecordTests(unittest.TestCase):
         # Control: a table whose row differs from the tool's is not in the record.
         self.assertNotIn(tables.replace("| `slot:context-supply` |", "| `slot:other` |", 1), text)
         piece_rows = tables.split("\n\n")[0].splitlines()[2:]
-        self.assertEqual(len(piece_rows), sum(1 for v in results if not v.wired))
+        self.assertEqual(len(piece_rows), sum(1 for v in results if not v.wired and not v.authorization))
+        # The authorization settings are a table of their own, and none of them is among the pieces that are not wired.
+        self.assertEqual(len(tables.split("\n\n")), 3)
+        authorization_rows = tables.split("\n\n")[1].splitlines()[2:]
+        self.assertEqual(len(authorization_rows), 4)
+        self.assertFalse([row for row in piece_rows if any(key in row for key in AuthorizationTests.FOUR)])
 
     def test_no_file_of_this_change_names_a_personal_path_or_an_address(self):
         for path in self.FILES:

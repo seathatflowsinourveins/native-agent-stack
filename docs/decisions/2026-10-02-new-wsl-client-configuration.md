@@ -5,16 +5,18 @@
 instruction of the same day changed the order of F9, the host template's ports, the two instruction blocks and the two
 Codex role carriers, and let the builder edit the files that carried F9's old text; the third round replaced the refusal
 of an existing Codex `config.toml` by a merge, kept a person's theme, declared one dependent sentence and asked where the
-guard runs for Codex. This record states the result of the three rounds. Every web page named below was read on
-2026-10-02.
+guard runs for Codex. The fourth round, after the cross-family review of the pull request, made the four authorization
+settings opt-in, put the running-Codex refusal before both writes of `config.toml`, corrected F9's sentence about the
+instruction blocks and moved the scan of the rendered files into `--check`. This record states the result of the four
+rounds. Every web page named below was read on 2026-10-02.
 
 **Scope:** `tools/adoption/new_wsl_client_config.py`, `adoption/new-wsl/client-config-map.json`, the two generated blocks
 `adoption/new-wsl/claude-user-instructions.md` and `adoption/new-wsl/codex-user-instructions.md`, and
 `tests/test_new_wsl_client_config.py` (all new); this record; F7 to F9 and F11 of
 [`adoption/platforms/linux-wsl2-new-distro.md`](../../adoption/platforms/linux-wsl2-new-distro.md) and its placeholder
 table; the ports of `adoption/templates/wsl/host.new-distro.json.template`; the command table and a dated section of
-[`2026-10-01-new-wsl-distro-recipe.md`](2026-10-01-new-wsl-distro-recipe.md); the F8 and F9 rows of
-`adoption/templates/wsl/stage1-receipt.example.json`; the F9 line of `adoption/templates/wsl/first-boot-checklist.md`;
+[`2026-10-01-new-wsl-distro-recipe.md`](2026-10-01-new-wsl-distro-recipe.md); the F8 and F9 rows and the `authorization_settings`
+field of `adoption/templates/wsl/stage1-receipt.example.json`; the F9 line of `adoption/templates/wsl/first-boot-checklist.md`;
 `tests/test_wsl_new_distro_recipe.py`; and options added to two existing tools, each with its default unchanged:
 `--hook`, `--agent` and `--mcp-template` in `tools/adoption/install_claude_profile.py`, and `profile-path --extra-dir`
 and `codex-md --template` in `tools/adoption/managed_block.py`. Not touched: `manifests/evidence.json`, the generated
@@ -30,14 +32,16 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    it names a default, installs something extra, is not split and is not resolved as not installed. A slot that is split,
    waits for a measurement or is resolved as not installed wires nothing. What the old workstation has decides nothing.
 2. **A map of every piece.** `adoption/new-wsl/client-config-map.json` names each piece of the client templates and gives
-   it one wiring: `slot:<manifest slot>` with the owner the entry means, `practice`, or `not_wired:<reason>`. The pieces
+   it one wiring: `slot:<manifest slot>` with the owner the entry means, `practice`, `not_wired:<reason>` or
+   `authorization:<reason>` (Decision 14). The pieces
    are each hook entry, plugin, marketplace, permission rule, variable and setting of the Claude settings template and the
    WSL overlay; each server of `adoption/mcp/claude-user.json`; each hook file and project agent that
    `install_claude_profile.py` copies; each key of the three Codex TOML templates, the Codex hooks template and the two
    role carriers; the two instruction blocks; and five steps of the tool itself (the launcher, the login-shell PATH block,
    the skills step and the two PATH directories). A piece goes to the first entry that matches it. A piece no entry
-   matches, and an entry no piece reaches, fail the check. Today: 366 pieces, 250 wired (196 practice, 54 through a slot)
-   and 116 not wired (69 through a slot that does not install, 47 by their own entry), each listed below.
+   matches, and an entry no piece reaches, fail the check. Today: 366 pieces, 246 wired (192 practice, 54 through a slot),
+   116 not wired (69 through a slot that does not install, 47 by their own entry) and 4 authorization settings, each
+   listed below.
 3. **A piece follows its slot.** A piece mapped to a slot that does not install is not wired; it is wired when the manifest
    says the slot installs the owner its entry names. So the memory slot, once its head-to-head returns with ai-memory,
    wires the ai-memory pieces, and brings back the sentences of the instruction blocks that name it, without an edit to the
@@ -47,14 +51,18 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
 4. **The tool**, `tools/adoption/new_wsl_client_config.py`: `--check` reads the manifest, the map, the templates and the
    plan, prints one line per piece and fails on an unmapped piece, an entry that matches nothing, an unknown slot, a
    practice piece that runs a tool outside the repository, a wired hook whose file is not a wired hook file, a name the
-   map lists that no text holds, a port that the plan states twice with two answers, or a committed instruction block that
-   is stale or missing. `--render --host NAME --out DIR` writes `settings.json`, the WSL overlay, `mcp-servers.json`,
+   map lists that no text holds, a port that the plan states twice with two answers, a committed instruction block that
+   is stale or missing, an authorization setting classed practice or slot, or a file of the example host's render, made
+   without and with the authorization settings, that names a tool that is not wired (the scan is the tool's `name_hits`,
+   which the tests call too, with the names the tests derive on their own). It prints the authorization settings apart.
+   `--render --host NAME --out DIR [--with-authorization-settings]` writes `settings.json`, the WSL overlay, `mcp-servers.json`,
    `codex.config.toml`, `codex.hooks.json`, the two Codex profiles and the two instruction blocks with wired pieces only,
    filling placeholders through `render_config.render_one`. `--write-blocks` writes the two filtered blocks, and
    `--dropped` prints every unit the filter left out, in full. `--apply --host NAME` puts the render in place in eleven
    steps, each its own repository tool, each skippable with `--skip`, and each reported as applied, current, planned, left
-   out, skipped, failed, verified or, for a Codex `config.toml` that exists, `merged with conflicts kept` (Decision 11). It
-   installs no tool and no pinned client, backs up what it changes, and a second run changes nothing. `--dry-run` runs no
+   out, skipped, failed, verified or, for a Codex `config.toml` that exists, `merged with conflicts kept` (Decision 11); a
+   line before the summary says whether the authorization settings were applied, kept or left to the clients' own
+   defaults. It installs no tool and no pinned client, backs up what it changes, and a second run changes nothing. `--dry-run` runs no
    client and writes nothing.
 5. **F9** now runs, from the clone:
 
@@ -77,7 +85,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    that lacks the key, exited 0 and wrote it; no credential file existed before or after. On an empty Codex home `--apply`
    starts Codex not at all, because the render carries the key; on the destination it starts it once, for that key,
    because the plan leaves a `config.toml` without it (`test_apply_runs_no_client_subcommand_that_needs_a_signed_in_client`
-   and the Codex merge tests record the stubs' calls).
+   and the Codex merge tests record the stubs' calls). The command block keeps the plain `--apply`: it writes no
+   authorization setting, and the prose after the block names the option for a host whose owner asked (Decision 14).
 6. **One port truth.** The render takes the collector's OTLP/HTTP port (21318) from the plan's `config/otel.yaml` and the
    gateway's port (21128) from `install-plan.json`, and refuses a plan whose two statements of a port differ (the
    collector's in `otel.yaml` and in the plan row, the gateway's in the plan row and in `config/omniroute.env.example`).
@@ -127,9 +136,34 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
    sense with the one before it goes with it, when the map declares that (`dependent_sentences`, never inferred): `Check
    relevance; retry without pin priority or widen if needed...` refines the ai-memory query before it, so it is dropped in
    both blocks and listed with its reason; a test shows it stays where the sentence before it stays, and that it comes
-   back with the ai-memory sentence when the memory slot installs. Sentences that name a tool the plan does not install but
-   the map does not list (the skills `search-first`, `find-skills` and `skill-creator`, and the Codex block's "daily
-   currency timer") stay.
+   back with the ai-memory sentence when the memory slot installs. Sentences that name a skill or a timer the map does not list stay as written, and
+   F9 says so: the filter works by the names the map declares as not wired, and whether a skill that a kept sentence
+   names exists on the host is not established by this step. They are the skills `search-first`, `find-skills` and
+   `skill-creator` (line 5 of the Claude file, line 10 of the Codex file) and the "daily currency timer" (line 30 of the
+   Claude file, line 15 of the Codex file). The plan installs six skills for both clients (`install.sh` L180: `tdd`,
+   `diagnosing-bugs`, `codebase-design`, `domain-modeling`, `writing-for-agents`, `setup-matt-pocock-skills`) and adds the
+   Trail of Bits marketplace to each client without installing a plugin from it (L171 and L173), so the plan installs none
+   of the three on either client. `skill-creator` differs by client. **Codex:** the source at `rust-v0.160.0` (commit
+   `a956835d020762cb2b570053af06f643a11c0ecc`, the plan's Codex release; read 2026-10-02) embeds a directory of sample
+   skills and installs it under `CODEX_HOME/skills/.system`: `codex-rs/skills/src/lib.rs` L55,
+   `include_dir!("$CARGO_MANIFEST_DIR/src/assets/samples")`, L57 and L62-67 (the `.system` directory name and
+   `system_cache_root_dir`) and L69-101 (`install_system_skills`: its doc comment, L69, reads "Installs embedded system
+   skills into `CODEX_HOME/skills/.system`", and L97 writes the embedded directory there), and the directory
+   `codex-rs/skills/src/assets/samples/` at that commit holds `imagegen`, `openai-docs`, `review-agent`, `skill-creator`
+   and `skill-installer`. That is source evidence, not activation on the host: no Codex 0.160.0 ran here, and the
+   repository's own note (`adoption/skills/lifecycle.md` L132 and L168-170) records the same bundled skill for
+   `rust-v0.159.2`. **Claude Code:** its skills page (`https://code.claude.com/docs/en/skills.md`, read 2026-10-02)
+   documents `skill-creator` as a plugin, installed with `/plugin install skill-creator@claude-plugins-official`
+   (L900-906), apart from its bundled skills (L21-35), and the commands reference
+   (`https://code.claude.com/docs/en/commands.md`, read 2026-10-02) marks 20 rows as bundled skills, none of them
+   `skill-creator` (the name appears nowhere on that page). The plan installs no plugin (`install.sh` L171 adds a
+   marketplace and L180 installs the six skills), so nothing the plan does provides a `skill-creator` for Claude Code. That
+   is read from the plan and those two pages: no destination host was built here, so it is not observed. The settings
+   template's `"skill-creator": "on"` (`adoption/templates/claude.settings.template.json` L407) then names a skill the plan
+   does not provide; the
+   settings reference (read 2026-10-02) describes `skillOverrides` as hiding or collapsing a skill and says nothing of a
+   name with no skill. The repository's own Claude-side record is a pinned trial copy of `anthropics/skills`
+   (`adoption/skills/manifest.json` L720-744), which the plan does not install.
 10. **The two Codex role carriers are not wired.** `adoption/agents/codex/stack-researcher.toml` and
     `stack-verifier.toml` name context-mode, ai-memory and qmd tools and carry the RTK block. They are byte-pinned in
     `adoption/agents/codex/SHA256SUMS` and ruled by `tools/adoption/codex_roles.py`. The filter was run on each carrier's
@@ -147,7 +181,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     With a `config.toml` present, the `codex-config` step merges: every key and table the file has stays as it is; each
     top-level key and each table the render has and the file lacks is added; where a table exists on both sides only the
     missing keys are added (`[tui]` gains `notifications`); a value that differs stays as the file has it, is printed
-    beside the render's (a key whose name looks like a secret is hidden), and the step ends `merged with conflicts kept`
+    beside the render's (a key whose name looks like a secret is hidden; each value is cut to 300 characters, the last three
+    being `...`, in the display only and never in the file), and the step ends `merged with conflicts kept`
     with exit 0, again on every later run while the difference stays. The file is backed up first; the merge is a text edit
     that adds lines and changes none (a key goes after the last statement of its table, a missing table at the end, a line
     that looks like a table inside a multi-line string or array is not taken for one, an inline table or dotted keys that
@@ -155,12 +190,22 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     after, and put back from the original bytes, with the step failed, when it is not exactly the expected merge.
     `features.daemon_auto_start` goes through Codex's own writer (`codex features disable daemon_auto_start`) when a
     `codex` binary is at hand, as `codex_home.py` does, and by the text edit when none is. A second `--apply` changes
-    nothing and makes no second backup. The guard of `codex_home.py` moves with it: while a process named `codex` runs
-    (`--codex-process-name`), nothing is written and the step says `close the Codex sessions, then run --apply again`; a
-    file that needs nothing is not held up by it. An empty Codex home still gets the render through `codex_home.py`.
+    nothing and makes no second backup. The running-Codex refusal comes before either write of `config.toml`: while a process named
+    `codex` runs (`--codex-process-name`), nothing is written and the step says `close the Codex sessions, then run
+    --apply again` (naming the app-server daemon and `codex app-server daemon stop` when one runs). The running processes are `pgrep -x`'s
+    finding (`apply_codex_lane.codex_processes`); the daemon is found by reading
+    the command line of each, from `/proc/<pid>/cmdline` where Linux has one (the arguments as passed, as before) and from
+    `ps -ww -o command= -p <pid>` where there is none (macOS), whose words are the arguments joined by spaces, so an
+    argument that holds a space is split, which does not matter for the word `app-server`. Neither reads the environment of
+    a process, and a command line that cannot be read leaves only that hint out, never the refusal. It covers the merge of
+    an existing file and the creation of an absent one; `codex_home.py`'s own creation of a missing file has no such check,
+    so the tool makes it first and `codex_home.py` is unchanged for its other callers (the first rounds checked only the
+    merge). A file that needs nothing is not held up by it. An empty Codex home still gets the render through
+    `codex_home.py`, once the check has passed.
     Evidence: unit tests (the destination's shape, a conflict, a trailing comment and no final newline, a comment-only
     file, look-alike lines, 80 seeded partial renders each completed to the whole and again to nothing, a failed writer, an
-    unexpected writer result, a running Codex, a dry run) and a run with the real Codex 0.159.3 in a temporary home with no
+    unexpected writer result, a running Codex before the merge and before the creation of an absent file, a dry run) and a
+    run with the real Codex 0.159.3 in a temporary home with no
     credential: the destination's file merged, `codex mcp list` read the result and listed `qmd` and `serena`, the second run
     changed nothing.
 12. **A Claude `settings.json` that exists keeps its keys, and the theme.** On the destination `~/.claude/settings.json`
@@ -169,7 +214,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     does not mention stay, objects merge, lists union, and a scalar of the template wins. So the marketplace stays, and the
     wired settings are added, but the template's `theme` ("dark") would have replaced a person's choice. The map now marks
     that one piece `keep_existing`: the template's value is written only when the file has none, and the step says
-    `kept your theme: "auto" (the render has "dark")` when they differ. Every other scalar of the template still wins, as
+    `kept your theme: "auto" (the render has "dark")` when they differ. The four authorization settings get the same treatment
+    (Decision 14). Every other scalar of the template still wins, as
     before (a change from the first round: the theme of an existing file was replaced).
 13. **Codex hooks and the secret-path guard.** (a) In this design the guard runs for Codex **nowhere**: not in user-level
     hooks, not in a project `.codex/hooks.json`, not in an exec-policy rule. `adoption/templates/codex.hooks.template.json`
@@ -203,7 +249,45 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     is invented: `codex.hooks.json` renders empty and the `[hooks.state]` and `[projects]` entries stay unwired, and F9 says
     so in one sentence. A Codex-side guard would be a new decision (a hook in Codex's own protocol, and the repository's
     `secret_path_guard.py` reads Claude's), which this record does not take.
-14. **Project agents are installed as repository practice** (the contract's call). Six of the eleven name MCP tools of
+14. **The authorization settings are written only on request.** Four pieces grant a permission or suppress a confirmation:
+    Claude Code's `permissions.defaultMode` (the template's `bypassPermissions`, which "runs everything without asking" (L1676);
+    Claude Code settings reference, the section is L1665-1679) and `skipDangerousModePermissionPrompt` (skips the dialog before
+    `bypassPermissions` mode; Claude Code writes it itself when the person accepts that dialog, same page L1726-1734), and
+    Codex's `approval_policy` (`never`: "Never ask the user to approve commands", `codex-rs/core/config.schema.json` at
+    `rust-v0.160.0`, definition `AskForApproval` from L307, the sentence at L331) and `sandbox_mode`
+    (`danger-full-access`, definition `SandboxMode` L3963-3970). The first rounds wired them as practice, so `--apply`
+    wrote them on a fresh host; the review of the pull request held that a tool must not do that by default.
+    - **The class.** One map entry gives the four their own wiring, `authorization:<reason>`. The tool knows which pieces
+      they are (`AUTHORIZATION_PIECES`, and any `permission/allow` rule, which would grant too), so a map that classes one
+      as practice or as a slot fails `--check`, and a map that classes another piece as authorization fails it too; a
+      piece classed `not_wired` is allowed (it is never written, with or without the option). The deny list stays
+      practice: it only restricts.
+    - **The default.** `--render` and `--apply` neither render nor write the four, and an existing value of those keys in a
+      person's files is never touched: the render lacks the keys, so the Claude merge leaves the file's keys as they are,
+      and so does the Codex merge.
+    - **The option.** `--with-authorization-settings`, on `--render` and `--apply`, renders and applies them. Even then an
+      existing differing value is kept and printed with both values, for Claude as for Codex: the Claude step handles the
+      four like the theme (written only when the file has no value for the key, the nested `permissions.defaultMode`
+      included), and the Codex merge keeps a differing value as a conflict. The option adds a missing grant and never
+      changes a person's choice.
+    - **What is shown.** `--check` lists them apart, with the value the option would write, in its text, its JSON table
+      (wiring `authorization`) and the generated tables of this record; its counts line has a fourth number. `--apply`
+      prints one line: `left to the clients' own defaults`, `applied` (with what it added and what it kept) or `kept`.
+    - **F9 and the receipt.** The command block keeps the plain `--apply`. Its prose says the operator adds the option only
+      on a host whose owner asked for the repository's permission practice, and that the receipt's `authorization_settings`
+      records who asked: a new field of the receipt example, with its checklist line and a test that pins all three. That is
+      why the receipt matters: with the option the tool writes `skipDangerousModePermissionPrompt`, a value Claude Code
+      itself writes when a person accepts its dialog, so the owner's request stands in for that acceptance.
+    - **Tests.** The default render has none of the four keys, the option's render has all four and differs in nothing
+      else; an existing `defaultMode` or `approval_policy` survives a default apply and one with the option, with both
+      values printed; a file with one setting and not the other gets only the missing one; the map refuses an
+      authorization piece classed practice or slot (for each of the four); and six deliberate breaks of the tool (the four
+      wired by default, no check before the creation of an absent file, no scan in `--check`, Claude not keeping its value,
+      the option ignored, the class refusal removed) each fail the tests.
+    No other wired piece grants: a scan of the default render finds only the `permissions` object that holds the deny
+    list, the overlay's `permission_prompt` bell matcher and Codex's `approval-requested` notification kind, and the wired
+    Codex servers (`serena`, `qmd`) carry no `default_tools_approval_mode`.
+15. **Project agents are installed as repository practice** (the contract's call). Six of the eleven name MCP tools of
     servers that are not wired, or skills the plan does not install; the second table below lists them. Nothing is
     installed to fill the gap and no agent file is edited.
 
@@ -235,6 +319,9 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
   stays with it. A round-trip TOML library (`tomlkit`) was not used: the tools under `tools/adoption/` are stdlib only,
   and the read-back proves the text edit.
 - **Keeping the first round's behaviour for the theme.** The template's `dark` would replace a person's choice.
+- **Authorization settings written by default, with a note.** What the first rounds did. Writing a grant is a decision of
+  the host's owner, so the option decides, and the receipt records who asked.
+- **A prompt at run time for the four.** The recipe is meant to be followed end to end without prompts, so a flag decides.
 - **Merging Codex trust state, or wiring a Codex hook, so that the first session asks nothing.** Decision 13: there is no
   Codex hook in the design to wire.
 
@@ -250,6 +337,8 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
   records: the manifest row changes first, then the tool follows.
 - Claude Code or Codex changing how a user-scope MCP server, a settings `env.PATH` or a custom launcher is read.
 - A change of `codex_roles.py` that lets a carrier be installed in a filtered form: Decision 10 would be taken again.
+- A decision of the repository's owner that its permission practice is the default of every new distribution: the entry's
+  class moves back to practice and `AUTHORIZATION_PIECES` changes with it.
 - A real run on the destination in which the merge's read-back fails on a file Codex itself wrote (a layout the scanner
   misreads): the merge would move to Codex's writers for the keys that have one, or to a round-trip library.
 - A Codex hook added to the templates (a guard in Codex's protocol): its trust entry can then be rendered (Decision 13).
@@ -301,15 +390,31 @@ implementation is the reference: `adoption/bootstrap.md` steps 2, 4 and 4a,
   `recipes/README.md` L158; `adoption/bootstrap.md` L353-372 (the trust-state warning); and for the files the plan leaves,
   `install.sh` L171-173 and the row `trail-of-bits-security-skills-trailofbits-skills` of `install-plan.json`.
 
+- For the fourth round (read 2026-10-02): the Claude Code settings reference, `permissions.defaultMode` (L1665-1679) and
+  `skipDangerousModePermissionPrompt` (L1726-1734); the Claude Code skills page (`https://code.claude.com/docs/en/skills.md`),
+  the bundled skills (L21-35) and the `skill-creator` plugin (L900-906); the commands reference
+  (`https://code.claude.com/docs/en/commands.md`, 20 rows marked as bundled skills, none `skill-creator`); the Codex config
+  schema at `rust-v0.160.0`
+  (`AskForApproval` from L307, its `never` sentence L331, `SandboxMode` L3963-3970); and, at commit
+  `a956835d020762cb2b570053af06f643a11c0ecc` (the commit `rust-v0.160.0` points to, checked through the GitHub tag and commit
+  endpoints), `codex-rs/skills/src/lib.rs` L55, L57, L62-67 and L69-101 and the listing of
+  `codex-rs/skills/src/assets/samples/` from the contents API.
+
+- For the fifth round (read 2026-10-02): the source of Apple's `ps(1)` manual,
+  `https://raw.githubusercontent.com/apple-oss-distributions/adv_cmds/main/ps/ps.1` (L195-196 `-p`, L181-194 `-o` with
+  empty headers writes no header line, L224-233 a repeated `-w` uses as many columns as necessary and an output that is not
+  a terminal is never cut, L441-442 the keyword `command` is "command and arguments"), for the flags of the `ps` reading.
+  It is documentation of the flags; no `ps` ran on macOS.
+
 What I ran, by evidence class. Unchanged upstream tests and my own checks are different things:
 
 - **Commands, run from the worktree with `nice -n 19` and a temporary directory under the scratch area** (exit code and last line of each):
-  - `python3 -B -m unittest tests.test_new_wsl_client_config`: exit 0 (Ran 99 tests in 15.801s); last line `OK`
+  - `python3 -B -m unittest tests.test_new_wsl_client_config`: exit 0 (Ran 127 tests in 23.979s); last line `OK`
   - `python3 -B tools/adoption/new_wsl_client_config.py --check`: exit 0; last line `check passed`
   - `python3 -B tools/adoption/new_wsl_client_config.py --render --host example --out <temporary dir>`: exit 0; last line `wrote <temporary dir>/wiring.json`
   - `python3 -B tools/adoption/new_wsl_client_config.py --apply --host example --home <empty temporary dir> --dry-run`: exit 0; last line `summary: claude-hooks planned; claude-agents planned; claude-mcp planned; claude-settings planned; claude-launcher planned; claude-md planned; codex-c`
-  - `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile tests.test_render_config tests.test_wsl_new_distro_recipe`: exit 0 (Ran 252 tests in 15.611s); last line `OK (skipped=5)`
-  - `python3 -B scripts/validate.py`: exit 1; last line `tools/adoption/managed_block.py: byte count mismatch`
+  - `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile tests.test_render_config tests.test_wsl_new_distro_recipe`: exit 0 (Ran 253 tests in 14.328s); last line `OK (skipped=5)`
+  - `python3 -B scripts/validate.py`: exit 1; last line `tests/test_wsl_new_distro_recipe.py: byte count mismatch`
 
   `scripts/validate.py` printed its header line and fourteen lines and nothing else: the SHA-256 and byte-count
   mismatches of the seven changed files that `manifests/evidence.json` registers (`linux-wsl2-new-distro.md`, `stage1-receipt.example.json`,
@@ -353,6 +458,43 @@ What I ran, by evidence class. Unchanged upstream tests and my own checks are di
   and `qmd`. The second run reported every step `current`; no file under `~/.claude`, `~/.codex` or the profile changed (the
   only new files were Claude Code's own MCP log files, written by its `mcp get`); `codex mcp list` read the merged file.
   No credential file existed before or after.
+- **The authorization settings with the real clients** (the fourth round; Claude Code 2.1.287 and Codex 0.159.3, three
+  temporary homes with no credential, the Codex process guard pointed at no process because `codex` runs on this
+  workstation). Home A, the destination's two files and the plain `--apply`: none of the four keys was written
+  (`defaultMode`, `skipDangerousModePermissionPrompt`, `approval_policy` and `sandbox_mode` absent), the 127 deny rules
+  were, and the line said `left to the clients' own defaults`. Home B, the same files and the option: all four were added
+  (`bypassPermissions`, `true`, `never`, `danger-full-access`) and the line said `applied`. Home C, files that held
+  `defaultMode: "default"`, `skipDangerousModePermissionPrompt: false`, `approval_policy = "on-request"` and
+  `sandbox_mode = "workspace-write"`, with the option: all four values stayed, each was printed beside the render's, the
+  Codex step ended `merged with conflicts kept` and the line said `kept`; a plain `--apply` of the same home then changed
+  nothing. `codex mcp list` read both merged files. No credential file existed.
+- **Negative controls on the tool** (the fourth round): six deliberate breaks, one at a time, each against the new tests,
+  with the file put back and its hash checked afterwards: the four wired by default (7 tests fail), no check before the
+  creation of an absent file (2 fail), no scan of the render in `--check` (2 fail), the Claude step not keeping its value
+  (3 fail), the option ignored by `--render` (1 fails) and the refusal of an authorization piece classed practice removed
+  (1 fails).
+- **Portability of the tests** (the fifth round: the hosted macOS run of `a372ab3b2` failed two tests of
+  `tests/test_new_wsl_client_config.py`; macOS itself was not available here). One compared the whole rendered `PATH`
+  with the conflict line, and the display is cut at 300 characters (Decision 11): the render holds the home three times, so
+  where a temporary directory is longer the value is cut. A temporary directory of 92 characters, which gives a home of 109,
+  reproduced the failure on Linux with the old assertion (it failed there, and passed with the usual directory of 25
+  characters, a home of 42). The assertion now works out the expected display
+  from the render's value and holds on either side of the width; a second test makes the cut certain on any host (a home
+  with a long name) and checks that a value that is added is written whole; a third pins the boundary (a text of exactly 300
+  characters is whole, one of 301 is cut). The other read `/proc/<pid>/cmdline`, which macOS has not: the tool now reads a
+  command line through `ps` where there is no `/proc` (Decision 11), the tests that name the daemon run on both, and the
+  one that needs `pgrep -x` to match a `#!` script by its file name is Linux-only, with that reason in its skip message. On
+  Linux the whole module (127 tests) passes with the usual temporary directory, with the one of 92 characters and with one reached through a symlink (the
+  shape of macOS's, where `/var` is a link); and, with
+  the tool's `/proc` pointed at nothing so that every command line is read through `ps`, 126 tests pass (one test that is
+  Linux-only by its own condition is left out, as a platform without `/proc` skips it). The Linux reading is the old one: a
+  test compares the new function with a copy of the old on a running daemon, a quiet process, pid 1, the test's own pid, an
+  absent pid, a word and an empty string. Nine deliberate breaks of the new code each fail the new tests (`ps` asked for
+  the wrong column, `ps` asked to show the environment, the program counted as an argument, the NUL that ends the last
+  argument kept, a pid that is no number handed to `ps`, the hint never given, the display cut at 200 and one character
+  early, `/proc` taken for absent where it exists), with the file put back and its hash checked afterwards. A first draft of
+  the reader reused the name `command_words`, which the tool already uses for the practice-piece check: the module's tests
+  failed on it (the practice-piece test and the new ones), and the function is now `process_command_line`.
 - **Codex's hook trust with the installed client** (the third round; Codex 0.159.3, `app-server` over stdio, `hooks/list`,
   temporary homes at different paths): the repository's currency-notice group in a user `hooks.json` gave the key
   `<home>/.codex/hooks.json:session_start:0:0` and one `currentHash` in two homes at different paths; a timeout of 6 for
@@ -384,7 +526,9 @@ What I ran, by evidence class. Unchanged upstream tests and my own checks are di
   found `claude` (the launcher), `codex`, `serena`, `qmd` and `mise` in the temporary home after `--apply` and none of
   them before it.
 
-Not verified: `model_reasoning_effort = "ultra"` against the schema (it lists no words for that key; the template
+Not verified: the authorization option with a Codex 0.160.0 binary and with the Claude Code of the destination (the runs
+above used Codex 0.159.3 and Claude Code 2.1.287); which of the four a host's owner wants, since that is the owner's call;
+`model_reasoning_effort = "ultra"` against the schema (it lists no words for that key; the template
 keeps the value its own comments source); any tool of the install plan installed or ran (the plan has not run on the
 destination distribution); Serena 1.7.0's or QMD 2.8.3's own start-up (the flags are read from their source at the tags);
 Codex 0.160.0; a real interactive session of either client on a new distribution, so that a client reads the filtered
@@ -398,6 +542,12 @@ sizes the coordinator observed, not copied from the destination; the Claude them
 value like the destination's, which is not the template's "dark"); and any Codex hook run or trusted on a new host (none
 is wired). F8's `ss` command was run once on this host (2026-10-02T16:42Z, the shared
 network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and listeners on `24318` and `26333`.
+
+Not verified on macOS: that the two repaired tests and the new `CommandLineTests` pass on a macOS runner. The `ps` reading ran
+through Linux's `ps` (procps), not BSD's. The flags are the ones Apple's manual source documents (see the sources read for
+the fifth round), but what `ps -ww -o command= -p <pid>` prints on macOS for a process with an argument that holds a space,
+and what `pgrep -x` makes of a `#!` script's name, were not observed (the one test that depends on the
+second is Linux-only, and says why). The first macOS hosted run after this change is the evidence.
 
 ## Contradictions met
 
@@ -422,8 +572,17 @@ network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and lis
   now carry the new rows and both comparisons read F9 again.
 - **The Codex references.** The contract names `docs/config.md` and a hooks documentation in the repository at the tag;
   at `rust-v0.160.0` they are the pointers and the schema folder described above.
-- **The handbook builder.** The contract names `scripts/build_new_wsl_handbook.py` and `docs/new-wsl-handbook.*`; neither
-  is on this base, so F9 keeps one fenced `sh` block without that check.
+- **The handbook builder** (changed by the merge of main). The first contract named `scripts/build_new_wsl_handbook.py` and
+  `docs/new-wsl-handbook.*`, which were not on the base then. They are on the branch now, and `docs/new-wsl-handbook.json`
+  records the recipe page by SHA-256 among its sources, so every edit of F9 makes the handbook stale until the coordinator
+  regenerates it; the rules of this work forbid regenerating it here.
+- **Authorization settings as practice** (resolved in the fourth round). The first rounds classed Claude Code's
+  `permissions.defaultMode` and `skipDangerousModePermissionPrompt` and Codex's `approval_policy` and `sandbox_mode` as
+  repository practice, which is true of the repository's own workstation and not a reason to write them on a host whose
+  owner has not asked. Decision 14.
+- **F9's sentence about the instruction blocks** (resolved in the fourth round). F9 said every unit that names a tool the
+  manifest does not install is left out, and this record said that sentences naming `search-first`, `find-skills`,
+  `skill-creator` and the daily currency timer stay. F9 now says what is true (Decision 9).
 - **A path in the plan.** The `credential-guard` row of `install-plan.json` lists `adoption/codex.config.template.toml`,
   which does not exist (the template is `adoption/templates/codex.config.template.toml`).
 - **`jq`** (accepted). A practice hook may run python3 and `jq` besides the files the repository copies, because F4 installs
@@ -439,6 +598,8 @@ network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and lis
 
 ## Left for the coordinator
 
+- Regenerate the new WSL handbook (`scripts/build_new_wsl_handbook.py`): `docs/new-wsl-handbook.json` records the recipe page
+  by SHA-256, and this repair changed F9, so the handbook and its test are stale until it is regenerated (not done here).
 - Re-freeze the convergence record that pins the changed files (`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`
   holds the SHA-256 of the recipe page, the host template, the receipt example, the checklist, the 2026-10-01 record and
   its test), regenerate the handbook (not on this base), and register the changed files in `manifests/evidence.json`
@@ -448,6 +609,10 @@ network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and lis
   `--write-blocks`; if a kept sentence should go, the way is a name added to an unwired entry.
 - Decide whether the two Codex role carriers stay out (Decision 10), and whether the Claude block's begin marker should name
   this tool (see Contradictions).
+- Decision 14 asks the coordinator one question it cannot settle alone: whether the repository's permission practice
+  (`bypassPermissions`, `never`, `danger-full-access`) should ever be the default of a new distribution. The tool now
+  writes it only on request, so a host that wants it needs the option on the `--apply` line and a receipt that names who
+  asked.
 - Decision 12 reads "keeps both" as keeping the theme's value too; every other scalar of the Claude template still wins
   over a file's value, as in the first round. If the Claude merge should also keep and report every differing value, as the
   Codex merge does, that is a larger change to `apply_claude_settings.py`'s rule and was not made.
@@ -466,8 +631,8 @@ network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and lis
 
 ## Pieces that are not wired
 
-`python3 -B tools/adoption/new_wsl_client_config.py --check --markdown` prints these two tables and the list of dropped
-units after them; the test `test_the_record_holds_the_tables_the_tool_prints` fails when this section and the tool disagree.
+`python3 -B tools/adoption/new_wsl_client_config.py --check --markdown` prints these three tables (the pieces that are not wired, the authorization
+settings and the project agents' gaps) and the list of dropped units after them; the test `test_the_record_holds_the_tables_the_tool_prints` fails when this section and the tool disagree.
 
 | Piece | Wiring | Why it is not wired |
 | --- | --- | --- |
@@ -587,6 +752,13 @@ units after them; the test `test_the_record_holds_the_tables_the_tool_prints` fa
 | `codex/worker-role/isolated-builder.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
 | `codex/worker-role/semantic-evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
 | `step/skills` | `not_wired` | the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer |
+
+| Authorization setting | Value --with-authorization-settings writes | Written by default | Why it needs the option |
+| --- | --- | --- | --- |
+| `claude/settings/setting/permissions.defaultMode` | `"bypassPermissions"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
+| `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
+| `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
+| `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has |
 
 | Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
 | --- | --- | --- |
