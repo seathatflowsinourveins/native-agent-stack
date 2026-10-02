@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "recorded_date_utc": "2026-10-02",
+  "goal_status": "active",
+  "base_revision": "18eea2c1de992b46c266d79ef0cc40f93c9fb943",
+  "scope": "Full user-requested foundation resolution serving the north star; the SDK oracle is one assigned unit, not a replacement objective.",
+  "requirements": [
+    {
+      "id": "github-practice",
+      "state": "partially_verified_followups_open",
+      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main.",
+      "remaining": ["Qualify the gh 2.102.0 security update through the installation owner", "Repair owned failing PR checks and require complete current-head coverage", "Address catalog-bot PR template/lane metadata with its workflow owner"],
+      "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md"]
+    },
+    {
+      "id": "maintained-layer-selections",
+      "state": "open",
+      "evidence": "Existing source catalogs and the current architecture edition name selections and open comparisons; catalog validation proves structure only.",
+      "remaining": ["Reconcile each required layer's current primary evidence and owned comparison", "Retain unresolved selection and host-lifecycle gates", "Independent review of the complete bounded candidate set"],
+      "sources": ["catalogs/foundation/manifest.json", "catalogs/foundation/new-wsl-architecture-20261001.json", "catalogs/landscape/research-state.json"]
+    },
+    {
+      "id": "native-clients-and-harness",
+      "state": "owned_runtime_qualification_open",
+      "evidence": "Legacy-host installed clients and selected target source revisions were observed; they have different scopes.",
+      "remaining": ["Builder's selected readiness and safe ownership handoff", "Native CLI useful-work, role, MCP and lifecycle qualification by existing owner"],
+      "sources": ["https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc", "https://github.com/anthropics/claude-code/blob/816ec211a648f17a411f63a45cfd44ddf8db00d9/CHANGELOG.md"]
+    },
+    {
+      "id": "sdk-workers-researchers-reviewers",
+      "state": "local_oracle_prepared_independent_review_and_native_execution_open",
+      "evidence": "Three local oracle-discrimination runs retained with source and result hashes; target SDK pin identities checked.",
+      "remaining": ["Independent acceptance-contract review", "Actual selected SDK tool task and result/usage capture", "Separately qualify resume, recovery, selected MCP integration and role boundaries"],
+      "sources": ["examples/native-sdk-acceptance/README.md", "blueprints/convergence-practice/clean-resolution-20261002/oracle-experiment.json"]
+    },
+    {
+      "id": "token-skills-orchestration",
+      "state": "owned_activation_and_measurement_open",
+      "evidence": "Read-only audit found selected discovery-skill content unchanged upstream, while legacy-host activation differs from the selected manifest. This is not a new-target observation.",
+      "remaining": ["Route host skill activation findings to its current owner", "Qualify RTK 0.51.0 and other decision-changing updates before changing pins", "Preserve complete per-attempt native usage and task-quality boundaries"],
+      "sources": ["adoption/skills/lifecycle.md", "docs/token-practice.md", "docs/token-native-saturation.md"]
+    },
+    {
+      "id": "upstream-e2e-and-final-architecture",
+      "state": "open",
+      "evidence": "Baseline repository/catalog checks and local oracle results are available; they do not establish full upstream or target-host E2E.",
+      "remaining": ["Execute selected unchanged upstream tests for concrete uncovered gaps", "Retain failed conditions and independent outcome observations", "Integrate reviewed architecture and acceptance evidence through the existing owner", "Update the public dashboard after accepted lane/worker/gate changes"],
+      "sources": ["docs/acceptance-evidence-policy.md", "docs/convergence-architecture.md", "observability/grand-dashboard/README.md"]
+    },
+    {
+      "id": "north-star-readiness",
+      "state": "foundation_preparation_in_progress",
+      "evidence": "The selected NautilusTrader destination and distinct broker-specific gates remain canonical; no trading qualification was performed in this unit.",
+      "remaining": ["Complete required foundation handoff", "Continue separately authorized broker-specific paper readiness under the trading lane's rules and owner"],
+      "sources": ["catalogs/us-equities/runtime-target.json", "docs/paper-lane-policy.md", "blueprints/us-equities/AGENTS.md"]
+    }
+  ],
+  "closure": "No full-goal completion claim. Each requirement needs direct evidence within its actual scope before the goal can close."
+}
