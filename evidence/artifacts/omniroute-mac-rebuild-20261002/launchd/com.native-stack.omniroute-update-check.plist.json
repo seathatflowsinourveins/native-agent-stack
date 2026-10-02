@@ -1,0 +1,17 @@
+{
+  "EnvironmentVariables": {
+    "PATH": "<HOME>/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+  },
+  "Label": "com.native-stack.omniroute-update-check",
+  "ProgramArguments": [
+    "/usr/bin/python3",
+    "<HOME>/.local/share/codex-ecosystem/tools/omniroute-3.8.52-528235175-pr13788-pr15167/omniroute-update-check.py"
+  ],
+  "RunAtLoad": false,
+  "StandardErrorPath": "<HOME>/.local/share/omniroute/logs/update-check.log",
+  "StandardOutPath": "<HOME>/.local/share/omniroute/logs/update-check.log",
+  "StartCalendarInterval": {
+    "Hour": 9,
+    "Minute": 17
+  }
+}

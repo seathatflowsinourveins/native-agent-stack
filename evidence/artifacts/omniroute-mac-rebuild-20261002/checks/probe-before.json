@@ -1,0 +1,25 @@
+{
+  "catalog": {
+    "status": 200,
+    "cx/gpt-6.1-sol": false,
+    "cx/gpt-6-astra": true,
+    "models": 591
+  },
+  "sol_max": {
+    "status": 400,
+    "error": "{\"error\":{\"message\":\"Model 'gpt-6.1-sol' is not available in the active live catalog for provider 'codex'.\",\"type\":\"invalid_request_error\",\"code\":\"bad_request\"}}"
+  },
+  "astra_max": {
+    "status": 200,
+    "model": "gpt-6-astra",
+    "reasoning": null,
+    "text": "OK"
+  },
+  "codex_exec_sol": {
+    "exit": 1,
+    "answer": null,
+    "search_events": 0,
+    "stderr_tail": "Reading additional input from stdin..."
+  },
+  "pass": false
+}

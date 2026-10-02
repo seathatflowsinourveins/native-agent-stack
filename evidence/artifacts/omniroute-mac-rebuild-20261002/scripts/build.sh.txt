@@ -1,0 +1,14 @@
+#!/bin/bash
+# Build the OmniRoute package from upstream release/v3.8.52 plus PRs 13788 and 15167, with upstream's own scripts.
+set -u
+B=<build-dir>
+export PATH="$HOME/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+cd "$B/src" || exit 2
+step() { local name="$1"; shift; local t0=$(date +%s); "$@" > "$B/$name.log" 2>&1; local rc=$?; echo "$name exit=$rc seconds=$(( $(date +%s) - t0 ))"; return $rc; }
+step npm-ci npm ci --no-audit --no-fund || exit 1
+step build-cli-api npm run build:cli-api || exit 1
+step build-cli npm run build:cli || exit 1
+step check-pack npm run check:pack-artifact || echo "check-pack failed (recorded; continuing to pack)"
+step pack npm pack --pack-destination "$B" || exit 1
+ls -la "$B"/*.tgz
+shasum -a 256 "$B"/*.tgz

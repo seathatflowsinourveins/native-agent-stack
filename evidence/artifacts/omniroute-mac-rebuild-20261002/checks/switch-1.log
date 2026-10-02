@@ -1,0 +1,10 @@
+{"step": "install", "at": "2026-10-02T03:34:31Z", "exit": 0, "prefix": "omniroute-3.8.52-528235175-pr13788-pr15167", "tail": null}
+{"step": "smoke", "at": "2026-10-02T03:34:35Z", "healthy": true}
+{"step": "plist", "at": "2026-10-02T03:34:35Z", "lint": "ok"}
+{"step": "switch", "at": "2026-10-02T03:34:38Z", "bootstrap_exit": 0}
+{"step": "health", "at": "2026-10-02T03:34:50Z", "healthy": true}
+{"step": "probe", "at": "2026-10-02T03:36:50Z", "attempt": 1, "passed": false, "catalog": null, "sol": null, "astra": null, "codex_exit": null}
+{"step": "probe", "at": "2026-10-02T03:37:51Z", "attempt": 2, "passed": false, "catalog": null, "sol": null, "astra": null, "codex_exit": null}
+{"step": "probe", "at": "2026-10-02T03:38:51Z", "attempt": 3, "passed": false, "catalog": null, "sol": null, "astra": null, "codex_exit": null}
+{"step": "probe", "at": "2026-10-02T03:39:51Z", "attempt": 4, "passed": false, "catalog": null, "sol": null, "astra": null, "codex_exit": null}
+{"step": "rollback", "at": "2026-10-02T03:40:49Z", "bootstrap_exit": 0, "healthy": true}
