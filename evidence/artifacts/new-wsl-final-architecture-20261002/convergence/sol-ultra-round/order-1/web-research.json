@@ -1,0 +1,184 @@
+{
+  "layers": [
+    {
+      "layer_id": "web-research",
+      "selection": [
+        {
+          "name": "Playwright CLI (C03)",
+          "repository": "https://github.com/microsoft/playwright-cli",
+          "role": "Unranked finalist for one browser-CLI slot: attributable page snapshots and bounded interaction through the existing coding agent.",
+          "install_command": "npm install -g @playwright/cli@0.1.22\nplaywright-cli --help",
+          "install_source": "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/README.md#installation",
+          "basis": [
+            {
+              "url": "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/README.md",
+              "shows": "Documents navigation, interaction, snapshots carrying Page URL and Page Title, targeted snapshot search, depth limits, configurable timeouts and session cleanup. Supports existing coding agents without a separate research harness; requires Node.js 18+."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/actions/runs/36497660606/job/109180892414",
+              "shows": "Current-head Ubuntu test job SUCCESS. This verifies its upstream test suite, not primary-source coverage or citation accuracy."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/actions/runs/36497660606/job/109180892596",
+              "shows": "Current-head macOS 15 test job SUCCESS; architecture-specific arm64 execution was not verified."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/.github/workflows/ci.yml",
+              "shows": "CI runs npm ci and npm run test on Ubuntu, macOS and Windows."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22",
+              "shows": "Release published 2026-09-28, with navigation, snapshot and session fixes."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+              "shows": "Latest default-branch commit dated 2026-09-28."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright-cli/issues/474",
+              "shows": "Recent maintenance activity: macOS session-path issue updated and closed on 2026-09-30."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "agent-browser (C06)",
+          "repository": "https://github.com/vercel-labs/agent-browser",
+          "role": "Unranked alternative for the same browser-CLI slot: direct URL reading and browser interaction with explicit output and domain bounds.",
+          "install_command": "npm install -g agent-browser@0.38.2\nagent-browser install --with-deps",
+          "install_source": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/README.md",
+              "shows": "Documents a native Rust CLI, direct URL reader, rendered-page interaction, URL/title retrieval, timeouts, maximum output and allowed-domain controls. Explicit Claude Code/Codex integration and Linux x64/macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/actions/runs/36919928752/job/110563252642",
+              "shows": "Current release's Linux x64 build SUCCESS."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/actions/runs/36919928752/job/110563252726",
+              "shows": "Current release's macOS arm64 build SUCCESS."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/actions/runs/36919928576/job/110565821942",
+              "shows": "Current-head Native E2E Tests FAILURE. Cause and affected scenarios remain unverified; this materially limits confidence."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/benchmarks/README.md",
+              "shows": "Reproducible command-latency/resource benchmark compares this project's Node and Rust daemons in a microVM; it does not compare packet candidates or measure citation correctness."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/evals/README.md",
+              "shows": "Provides Claude/Codex command-use evaluations and independently graded browser smoke scenarios; no paired research-quality result against Playwright CLI was retrieved."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+              "shows": "Release published 2026-10-01, addressing authentication controls, browser launch freezes and bounded browser-service timeouts."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+              "shows": "Latest default-branch commit dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/issues/2010",
+              "shows": "Recent maintenance activity: macOS arm64 packaging issue updated and closed on 2026-10-01."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C05",
+          "name": "Crawl4AI",
+          "reason": "Its local crwl CLI supports extraction and scripted browser interaction, but no recorded native-retrieval failure justifies adding a crawler; its README's speed claims lack a verified comparison relevant here. [Source](https://github.com/unclecode/crawl4ai/blob/e5d2e786d1a101225f3f6a3e6fd344d76eeb13af/README.md)"
+        },
+        {
+          "key": "C01",
+          "name": "Cua Driver",
+          "reason": "Its CLI/MCP supports browsers on Linux and macOS, but desktop-session integration brings additional setup without verified research-quality benefit over the browser finalists; WSL2 execution remains unverified. [Source](https://github.com/trycua/cua/blob/8d4e7a08618611453794035f7ff6187f99f0c1e9/libs/cua-driver/README.md)"
+        },
+        {
+          "key": "C07",
+          "name": "trafilatura",
+          "reason": "Strong extraction evidence—upstream's 2026-08-04 evaluation reports standard-mode F-score 0.924—and passing cross-platform CI; it does not establish the required page interaction or a retrieval gap warranting another extractor. [Evaluation](https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/evaluation.rst), [CI](https://github.com/adbar/trafilatura/actions/runs/36768089189)"
+        },
+        {
+          "key": "C08",
+          "name": "Browser Use",
+          "reason": "The current CLI can serve existing agents and documents Linux/WSL use, so it remains eligible; its linked agent benchmark does not establish CLI citation accuracy, and current CI includes an unexplained aggregate failure despite passing installation checks. [Source](https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/README.md)"
+        },
+        {
+          "key": "C04",
+          "name": "exa-mcp-server",
+          "reason": "Focused search/fetch MCP with anonymous hosted access and passing typecheck/tests, but no demonstrated coverage gap warrants adding its service dependency; chosen-page interaction was not established in the reviewed README. [Source](https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md), [Tests](https://github.com/exa-labs/exa-mcp-server/actions/runs/35802279228/job/106995094284)"
+        },
+        {
+          "key": "C09",
+          "name": "Firecrawl MCP",
+          "reason": "Documents search, scraping and browser interaction with hosted or separately self-hosted backends, but no measured native-retrieval gap justifies this additional backend; passing build checks do not establish research accuracy. [Source](https://github.com/firecrawl/firecrawl-mcp-server/blob/8fd13724c9da7a859d7bf95e735bb8b462de2c0c/README.md), [Build](https://github.com/firecrawl/firecrawl-mcp-server/actions/runs/36939633001/job/110627863661)"
+        },
+        {
+          "key": "C10",
+          "name": "Tavily CLI",
+          "reason": "Provides JSON search/extraction commands and Claude Code/Codex skills, including keyless access, but no measured coverage gap warrants its service dependency; retrieved CodeQL success is not functional research-quality evidence. [Source](https://github.com/tavily-ai/tavily-cli/blob/fd745230e6756933e3a190bfdc61ea1eb2db3993/README.md), [Analysis](https://github.com/tavily-ai/tavily-cli/actions/runs/36260073972/job/108454084843)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C02",
+          "name": "OpenResearch",
+          "criterion": "outside_requirement",
+          "fact": "Upstream describes a local research-agent workspace with a running service, independent parallel agent sessions and autonomous experiment loops—the additional standing research-agent stack this requirement excludes. https://github.com/alphaXiv/OpenResearch/blob/ee36ef0333ca3c533eace915f1bec322a1efde1c/README.md"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The selection contains unranked alternatives for one CLI slot, not a recommendation to install both. Playwright CLI has the cleaner observed cross-platform test snapshot; agent-browser documents broader reading and bounding controls. Neither establishes measured research superiority. On clean WSL2 Ubuntu x86_64, freeze primary-source URLs, expected passages and citation checks; use identical Claude Code/Codex models and command/output budgets. Measure source coverage, final-URL attribution, extraction completeness, link/form interaction success, timeout behavior, returned bytes/tokens, latency and cleanup. Include redirects, dynamic pages, authenticated fixtures and Markdown alternatives, then repeat the finalists on macOS arm64. Add a crawler or service only against reproducible failures of this baseline. Maintenance does not eliminate any candidate: all ten are unarchived, have default-branch commits within 90 days and recent issue activity. Seven have recent GitHub releases; Firecrawl MCP's latest GitHub release is from 2025, while Exa and Tavily returned no GitHub releases, despite recent commits.",
+      "evidence_gaps": [
+        "The mandated ctx_fetch_and_index route rejected all eight requested page fetches: “MCP tool call requires approval, but approval policy is never.” README and source evidence was retrieved through the explicitly permitted GitHub API instead; the requested ctx_fetch/ctx_search workflow could not be completed.",
+        "Budget used: zero web searches, eight rejected page-fetch requests and 30 GitHub API calls, including three GraphQL batches. No local project records were read beyond the supplied packet.",
+        "No packet comparison ran the finalists on the target host. No verified public comparison measured their primary-source coverage or citation correctness.",
+        "Agent-browser's E2E log request was rejected by gh because the response contained terminal escape sequences; its failure cause remains unknown. Different projects' CI suites are not comparable task-success benchmarks.",
+        "WSL2 clean installation was not tested. Playwright CLI's macOS arm64 execution was not specifically verified; agent-browser documents arm64 binaries and has a successful arm64 build.",
+        "Linux/macOS suitability for the Python/npm service clients is partly inferred from their runtimes, not architecture-specific testing. Basic browser retrieval does not document a GPU requirement; RTX 4090 performance was not evaluated.",
+        "External benchmark/paper pages could not be retrieved through the required tool. Trafilatura's numerical result comes from its upstream evaluation source; Browser Use's benchmark image scores were not verified.",
+        "The complete Linux browser/system-dependency procedure for Playwright CLI was not established by its README. Agent-browser explicitly documents install --with-deps.",
+        "No candidate was excluded for requiring payment: reviewed service-backed tools document keyless access or local/self-hosted alternatives."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/unclecode/crawl4ai",
+        "https://api.github.com/repos/unclecode/crawl4ai/commits?per_page=1",
+        "https://api.github.com/repos/trycua/cua",
+        "https://api.github.com/repos/trycua/cua/commits?per_page=1",
+        "https://api.github.com/repos/adbar/trafilatura",
+        "https://api.github.com/repos/adbar/trafilatura/commits?per_page=1",
+        "https://api.github.com/repos/browser-use/browser-use",
+        "https://api.github.com/repos/browser-use/browser-use/commits?per_page=1",
+        "https://api.github.com/repos/vercel-labs/agent-browser",
+        "https://api.github.com/repos/vercel-labs/agent-browser/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/playwright-cli",
+        "https://api.github.com/repos/microsoft/playwright-cli/commits?per_page=1",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server/commits?per_page=1",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server/commits?per_page=1",
+        "https://api.github.com/repos/tavily-ai/tavily-cli",
+        "https://api.github.com/repos/tavily-ai/tavily-cli/commits?per_page=1",
+        "https://api.github.com/repos/alphaXiv/OpenResearch",
+        "https://api.github.com/repos/alphaXiv/OpenResearch/commits?per_page=1",
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/vercel-labs/agent-browser/releases/latest",
+        "https://api.github.com/repos/microsoft/playwright-cli/releases/latest",
+        "https://api.github.com/repos/unclecode/crawl4ai/releases/latest",
+        "https://api.github.com/repos/adbar/trafilatura/releases/latest",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server/releases/latest",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server/releases/latest",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/tests.rst",
+        "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/package.json",
+        "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/playwright.config.ts",
+        "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/.github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

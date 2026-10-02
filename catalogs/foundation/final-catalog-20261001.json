@@ -30,7 +30,7 @@
   "inputs": {
     "catalogs/foundation/new-wsl-architecture-20261001.json": "84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6",
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json": "2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb",
-    "catalogs/landscape/new-host-grand-list.json": "6fda734fa9b42d93047a948a12c59762c0a6183dee4ade3fd37fd5495cca0582",
+    "catalogs/landscape/new-host-grand-list.json": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json": "dbe2e4d7780ec079cdd1c0e3e3ddb952a15507e7d4125680a719dcd8d88581f9",
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/": "c9087efc4e2099b36950e0b68aff502ed9dab2c8129793bd6d66b0543d83a353"
   },

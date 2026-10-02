@@ -1,0 +1,47 @@
+{
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["contract_version", "layer_id", "role", "votes", "skills_used", "judgment"],
+ "properties": {
+  "contract_version": {"type": "integer", "enum": [2]},
+  "layer_id": {"type": "string", "minLength": 1},
+  "role": {"type": "string", "enum": ["facts", "fit"]},
+  "judgment": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": ["judgment_id", "order_seed", "family", "model_route_requested", "model_route_actual", "source_field_sha256", "provider_sampling_seed_requested", "provider_sampling_seed_actual", "provider_sampling_seed_status"],
+   "properties": {
+    "judgment_id": {"type": "string", "minLength": 1},
+    "order_seed": {"type": "integer"},
+    "family": {"type": "string", "enum": ["claude", "gpt6"]},
+    "model_route_requested": {"type": "string", "minLength": 1},
+    "model_route_actual": {"type": ["string", "null"]},
+    "source_field_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "provider_sampling_seed_requested": {"type": ["integer", "null"]},
+    "provider_sampling_seed_actual": {"type": ["integer", "null"]},
+    "provider_sampling_seed_status": {"type": "string", "enum": ["unknown", "not_exposed", "recorded"]}
+   }
+  },
+  "votes": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["candidate_key", "repository", "evidence_key", "status", "criterion", "fact", "confidence", "reasoning", "refs", "requirement_fit"],
+    "properties": {
+     "candidate_key": {"type": "string", "minLength": 1},
+     "repository": {"type": "string", "minLength": 1},
+     "evidence_key": {"type": "string", "minLength": 1},
+     "status": {"type": "string", "enum": ["credible", "not_credible", "pending"]},
+     "criterion": {"type": ["string", "null"], "enum": [null, "target_host_incompatible", "outside_requirement", "paid_service_required"]},
+     "fact": {"type": ["string", "null"]},
+     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+     "reasoning": {"type": "string", "minLength": 1},
+     "refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+     "requirement_fit": {"type": ["string", "null"]}
+    }
+   }
+  },
+  "skills_used": {"type": "array", "items": {"type": "string"}}
+ }
+}

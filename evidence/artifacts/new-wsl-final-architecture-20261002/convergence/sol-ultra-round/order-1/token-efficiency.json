@@ -1,0 +1,110 @@
+{
+  "layers": [
+    {
+      "layer_id": "token-efficiency",
+      "selection": [],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Context Mode",
+          "reason": "Judgment deferred: default branch is active; latest GitHub release is v1.0.169, dated June 29, outside 90 days. Recovery, accounting, install instructions and evaluations remain unverified."
+        },
+        {
+          "key": "C02",
+          "name": "agent-console",
+          "reason": "Judgment deferred: active branch and September 27 release v0.4.1; Linux x64 and macOS arm64 release assets exist. Usage-accounting completeness, documented installation and tests remain unverified."
+        },
+        {
+          "key": "C04",
+          "name": "rtk-ai/rtk",
+          "reason": "Judgment deferred: active branch and September 24 release v0.50.0; Linux x86_64 and macOS arm64 assets exist. Recovery behavior and artifact-versus-provider accounting remain unverified."
+        },
+        {
+          "key": "C05",
+          "name": "Repomix",
+          "reason": "Judgment deferred: active branch and September 21 release v1.18.1. Context recovery, provider-usage integration, Linux installation and public evaluations remain unverified."
+        },
+        {
+          "key": "C06",
+          "name": "ccusage",
+          "reason": "Judgment deferred: active branch and September 27 release v20.0.26. Release notes cover Claude and Codex reporting, but complete provider accounting, installation and tests remain unverified."
+        },
+        {
+          "key": "C08",
+          "name": "Headroom",
+          "reason": "Judgment deferred: active branch and September 26 release v0.39.1; Linux x86_64 and macOS arm64 wheels exist. Recovery, matched-quality evaluations and accounting remain unverified."
+        },
+        {
+          "key": "C09",
+          "name": "paritok-4b-v1",
+          "reason": "Judgment deferred: September 26 default-branch commit; latest-release endpoint returned HTTP 404. Recovery, RTX 4090 suitability, macOS support, installation and measured evidence remain unverified."
+        },
+        {
+          "key": "C10",
+          "name": "sqz",
+          "reason": "Judgment deferred: active branch and September 23 release v1.9.0; target-platform assets exist. Release notes explicitly call replay savings estimates; recovery and complete provider accounting remain unverified."
+        },
+        {
+          "key": "C11",
+          "name": "TOON",
+          "reason": "Judgment deferred: active branch and August 5 release v4.1.1. Serialization benchmarks, recoverability, agent integration and contribution to the complete requirement remain unverified."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Claude Token Efficient",
+          "criterion": "stale_or_archived",
+          "fact": "The GitHub default-branch commits endpoint reports its latest commit as June 16, 2026, outside the required 90-day window. The repository is not archived."
+        },
+        {
+          "key": "C07",
+          "name": "Context Mode as an always-on default",
+          "criterion": "outside_requirement",
+          "fact": "The packet supplies no repository; this candidate describes a deployment policy rather than an open-source repository eligible for repository-quality judging."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "No winner is justified. On WSL2, compare baseline, Context Mode, RTK, Repomix, Headroom, sqz and paritok on matched Claude Code and Codex tasks; include TOON for structured-data tasks. Compare ccusage and agent-console against complete provider records. Require equal task quality and successful original-context recovery; include failures, retries and subagents. Report artifact bytes/token estimates separately from provider input, output and cache categories, without double-counting overlapping fields. Verify Linux installation, macOS arm64 operation and GPU requirements where applicable.",
+      "evidence_gaps": [
+        "close_call indicates insufficient verified evidence, not a demonstrated performance tie. Deferred candidates are not judged inferior.",
+        "All ten repositories received the same metadata, latest-release and default-branch commit checks: 30 GitHub API calls. Nine have recent default-branch commits; none is archived. No web searches or successful page fetches occurred.",
+        "README/documentation, benchmarks, papers, test suites and CI results could not be read through the required route. No install command or measured-superiority claim is therefore asserted.",
+        "Open issues/PRs reported by repository metadata: RTK 1567; Repomix 150; Claude Token Efficient 2; TOON 4; ccusage 12; Headroom 442; agent-console 5; sqz 4; paritok 9; Context Mode 309. Response and closure activity were not verified.",
+        "Automatic approval review rejected ctx_fetch_and_index with: \"MCP tool call requires approval, but approval policy is never.\" This blocked the required documentation and benchmark retrieval."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/rtk-ai/rtk",
+        "https://api.github.com/repos/rtk-ai/rtk/releases/latest",
+        "https://api.github.com/repos/rtk-ai/rtk/commits?per_page=1",
+        "https://api.github.com/repos/yamadashy/repomix",
+        "https://api.github.com/repos/yamadashy/repomix/releases/latest",
+        "https://api.github.com/repos/yamadashy/repomix/commits?per_page=1",
+        "https://api.github.com/repos/drona23/claude-token-efficient",
+        "https://api.github.com/repos/drona23/claude-token-efficient/releases/latest",
+        "https://api.github.com/repos/drona23/claude-token-efficient/commits?per_page=1",
+        "https://api.github.com/repos/toon-format/toon",
+        "https://api.github.com/repos/toon-format/toon/releases/latest",
+        "https://api.github.com/repos/toon-format/toon/commits?per_page=1",
+        "https://api.github.com/repos/ccusage/ccusage",
+        "https://api.github.com/repos/ccusage/ccusage/releases/latest",
+        "https://api.github.com/repos/ccusage/ccusage/commits?per_page=1",
+        "https://api.github.com/repos/headroomlabs-ai/headroom",
+        "https://api.github.com/repos/headroomlabs-ai/headroom/releases/latest",
+        "https://api.github.com/repos/headroomlabs-ai/headroom/commits?per_page=1",
+        "https://api.github.com/repos/lockedinlabs-ai/agent-console",
+        "https://api.github.com/repos/lockedinlabs-ai/agent-console/releases/latest",
+        "https://api.github.com/repos/lockedinlabs-ai/agent-console/commits?per_page=1",
+        "https://api.github.com/repos/ojuschugh1/sqz",
+        "https://api.github.com/repos/ojuschugh1/sqz/releases/latest",
+        "https://api.github.com/repos/ojuschugh1/sqz/commits?per_page=1",
+        "https://api.github.com/repos/paritok-official/paritok-4b-v1",
+        "https://api.github.com/repos/paritok-official/paritok-4b-v1/releases/latest",
+        "https://api.github.com/repos/paritok-official/paritok-4b-v1/commits?per_page=1",
+        "https://api.github.com/repos/mksglu/context-mode",
+        "https://api.github.com/repos/mksglu/context-mode/releases/latest",
+        "https://api.github.com/repos/mksglu/context-mode/commits?per_page=1"
+      ]
+    }
+  ]
+}

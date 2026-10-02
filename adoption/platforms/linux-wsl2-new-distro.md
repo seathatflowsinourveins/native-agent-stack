@@ -2,40 +2,64 @@
 
 Added after `v2026.09.26.2`, with its templates under [`adoption/templates/wsl/`](../templates/wsl/) and the record
 [`docs/decisions/2026-10-01-new-wsl-distro-recipe.md`](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md), which
-holds the decisions, their alternatives, the command table and every source. Status: documented, not run. No host has
-executed these steps; the first one that does starts with the rehearsal of R1 and records the stage-1 receipt described
-at the end.
+holds the decisions, their alternatives, the command table and every source. After the WSL 2.7.13 rehearsal stopped
+at F1 on shared cgroups, run 2 on WSL 3.0.1.0 passed stage 1 and W5's path-A proofs, showed distinct cgroup namespaces,
+and stopped at W5's paired rule on a shared-console collision. Run 3 (2026-10-02T10:54Z to 11:01Z) then completed P1 to
+F5 with the template's getty mask, the paired proof and a rootless container; the uv and Node probes and the
+rollback arm are still owed. Start with R1 and record the stage-1 receipt described at the end.
 
-This page creates a second WSL 2 distribution on the existing Windows host from Canonical's published
-`ubuntu-24.04.5-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
+This page creates a second WSL 2 distribution on the existing Windows host from the selected Canonical image,
+`ubuntu-<RELEASE>-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
 and the user bus before stage 2, the repository's bootstrap. The workstation's distribution keeps running, stays the
 default and is never shut down.
 
-The page runs twice on a host: first as a rehearsal on a throwaway name, which R1 then removes, and then for the real
+The page rehearses both image arms on separate throwaway names, which R1 then removes, before running for the real
 `<Name>` ([Rehearsal first](#rehearsal-first)). Each run starts with P1 to P3, `sh` checks in the workstation's
 distribution that change nothing on the host; it shares the kernel and already has Ubuntu's keyring and cloud-init.
 Stage 1 (W1 to W7) runs on the
 Windows host in PowerShell. A session inside the workstation's WSL distribution runs each
-PowerShell block as a `.ps1` file with `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
+PowerShell block as a `.ps1` file with
+`/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
 ([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Open each block's file with
 `Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append`, placed in W1 right after its first line
 (which creates that folder), and end the file with `Stop-Transcript`. That private transcript is the raw install log the
 receipt is cut from. The first boot (F1 to F11) runs inside the new
-distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a WSL session,
-`wsl.exe -d <Name> -- bash -s < steps.sh`. F2's idle observation and F10 run from the Windows side and F11 needs a login
-shell instead, as their sections say.
+distribution as `<WSL_USER>`, from an interactive `/mnt/c/Windows/System32/wsl.exe -d <Name>` or, from a WSL session,
+`/mnt/c/Windows/System32/wsl.exe -d <Name> -- bash -s < steps.sh`. F2's idle observation and F10 run from the Windows
+side and F11 needs a login shell instead, as their sections say.
 
 ## Names and inputs
 
+Canonical's [26.04 release notes](https://documentation.ubuntu.com/release-notes/26.04/) and Microsoft's
+[creation commands](https://learn.microsoft.com/en-us/windows/wsl/basic-commands) support the distribution and creation
+route. Microsoft's command documentation is pinned in the decision record at `MicrosoftDocs/WSL`
+`7b28cc1ee9b8ff672ada5e1c6c326d3573d703e5`, `WSL/basic-commands.md` and `WSL/build-custom-distro.md`.
+These sources do not establish full-stack compatibility for either arm.
+
 | Placeholder | Meaning | Rule |
 | --- | --- | --- |
+| `<RELEASE>` | `26.04.1` default or `24.04.5` rollback | the clean install uses 26.04.1; rollback applies only to a release-caused 26.04 failure with no in-release remedy; use the same release in W2, W4 and W6 |
 | `<Name>` | the new distribution's name (`--name`) and the user-data file's name | letters, digits, `.`, `_`, `-`; not already registered (W1); a throwaway name for the rehearsal (R1) |
+| `<Survivor>` | the already-running workstation distribution's name | W1's starred distribution; every removal checks interop there |
+| `<COMMON_UNIT>` | a system service unit active in both distributions | include `.service`; for example, `cron.service` when both run it; W5 verifies it before reading its cgroup |
 | `<WSL_USER>` | the Linux user cloud-init creates | `^[a-z_][a-z0-9_-]*$`, the rule of the image's `/usr/lib/wsl/wsl-setup` |
 | `Z:\WSL\<Name>` | the install location (`--location`); WSL puts `ext4.vhdx` there | must not exist yet (W1) |
 | `Z:\WSL\downloads` | the image, its checksum list and the private logs | outside the Windows profile, so its path names no user |
 | `<checkout>` | the Windows path of a checkout of `origin/main` holding these templates | from a WSL session: `wslpath -w .` in the checkout |
 | `<host>` | the host value file `adoption/hosts/<host>.json` | `^[A-Za-z0-9][A-Za-z0-9_.-]*$`, the bootstrap's `--host` rule |
 | `<id>` | the adoption profile stage 2 installs | a `profiles[].id` of `adoption/manifest.json` |
+
+The controlled release pins below come from Canonical's signed sums and Microsoft's catalog at
+`8bc98bc33b246fe66710eec9eaa1b24c323da987`. The merged
+[definitive manifest](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) names
+Ubuntu 26.04.1 LTS (Canonical WSL image) as the single default. Ubuntu 24.04.5 is the named rollback, used only for a
+release-caused 26.04 failure with no in-release remedy. The rehearsal's host cgroup failure is not such a release
+failure, and neither image has full new-host acceptance.
+
+| Release | Image file | Catalog entry | SHA-256 | Observed download bytes |
+| --- | --- | --- | --- | --- |
+| 26.04.1 | `ubuntu-26.04.1-wsl-amd64.wsl` | `Ubuntu-26.04` | `48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104` | 418,495,746; rehearsal run 2, 2026-10-02 |
+| 24.04.5 | `ubuntu-24.04.5-wsl-amd64.wsl` | `Ubuntu-24.04` | `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e` | 388,975,696; historical artifact check |
 
 ## Host-wide rules
 
@@ -44,17 +68,43 @@ shell instead, as their sections say.
   `Select-String`; no command here writes, copies or edits it.
 - The default distribution stays the workstation's: nothing here sets a default, W1 records the starred line of
   `wsl.exe --list --verbose` and W4 and W5 prove it unchanged.
-- No WSL update is needed to install: `wsl --install --from-file` needs WSL 2.4.4 or later (Microsoft), 2.4.8 (Ubuntu's
-  announcement) or 2.4.10 (Ubuntu's install guide), and the host runs 2.7.13. Later releases do change the first launch:
+- This recipe adopts stable WSL 3.0.1 or later for a second systemd distribution, and requires it before W4 or any W6
+  import. WSL 2.7.13, the release of the 2026-10-02 rehearsal, has a shared cgroup tree: equal user uids collide, and a
+  system-unit stop or restart can act on another distribution's processes.
+  Microsoft's [2.9.8 pre-release notes](https://github.com/microsoft/WSL/releases/tag/2.9.8) name
+  [PR #40519](https://github.com/microsoft/WSL/pull/40519), which isolates distro cgroups; the
+  [2.9.13 pre-release notes](https://github.com/microsoft/WSL/releases/tag/2.9.13) name
+  [PR #41512](https://github.com/microsoft/WSL/pull/41512), which creates their namespaces. Neither pre-release is
+  adopted: [3.0.1](https://github.com/microsoft/WSL/releases/tag/3.0.1) is the first stable release with both. The host
+  was updated to WSL 3.0.1.0 on 2026-10-02 and passed its check (rootless container, interop, user manager);
+  run 2 observed distinct cgroup namespaces, local process ids and two active user managers while both distributions
+  ran. W1 records the version; W5 must repeat the isolation proof before F1 changes anything.
+- An install with a single systemd distribution, with no second systemd distribution running, can still use WSL
+  2.4.10 or later. That is the conservative install-only minimum: Microsoft gives 2.4.4, Ubuntu's announcement
+  2.4.8 and Ubuntu's install guide 2.4.10. This page keeps the workstation running and therefore requires 3.0.1.
+  Later releases also change the first launch:
   microsoft/WSL#40941 (after the first-run setup, files created from Windows are owned by 0:0) is fixed by PR #40977,
-  which ships first in 2.9.8, a pre-release, and in 3.0.1; tags 2.7.13 and 2.7.14 lack it. On 2.7.13, W7 terminates
-  `<Name>` once after the first launch and probes a file's owner before anything else is written from Windows. Updating
-  WSL is the keys lane's decision, not this page's.
+  which ships first in 2.9.8, a pre-release, and in 3.0.1; tags 2.7.13 and 2.7.14 lack it. On 2.7.13, W7 terminated
+  `<Name>` once after the first launch and probed a file's owner before anything else was written from Windows. Updating
+  WSL is the keys lane's action, and the cgroup prerequisite must hold before this page proceeds.
 - `.wslconfig` is global, so the new distribution inherits the workstation's settings, among them
   `networkingMode=mirrored`, `swap` and the two idle keys that W1 reads and F2 observes.
 - WSL 2 distributions share one network namespace
   ([Listeners and ports](linux-wsl2.md#listeners-and-ports)): every listener of the new distribution competes with the
   workstation's for the same ports. F8 picks the host file's ports outside the workstation's set.
+- The VM console is shared: both distributions expose `/dev/tty1` as character device 4,1 of the same kernel.
+  Their enabled `getty@tty1.service` units use `TTYPath=/dev/tty1`, `TTYVHangup=yes`, `Restart=always` and
+  `RestartSec=0`, so competing gettys receive SIGHUP and restart until both hit the start limit.
+  Source review at microsoft/WSL tag `3.0.1`:
+  [`src/linux/init/init.cpp:363-365`](https://github.com/microsoft/WSL/blob/3.0.1/src/linux/init/init.cpp#L363-L365)
+  masks `console-getty.service` because the tty devices are shared
+  ([PR #14490](https://github.com/microsoft/WSL/pull/14490), merged 2026-04-09, "Fixes #13595");
+  [`validate-modern.py:27-40`](https://github.com/microsoft/WSL/blob/3.0.1/distributions/validate-modern.py#L27-L40)
+  discourages that unit but does not list `getty@tty1.service`; a maintainer in
+  [issue #13595](https://github.com/microsoft/WSL/issues/13595) recommends disabling getty and adjacent units in WSL.
+  The user-data masks `getty@tty1.service` in the new distribution before systemd starts it (W5); the workstation's
+  unit is never touched. A host whose other systemd distributions keep an unmasked getty will see both fail whenever
+  two of them run; masking it there is the host owner's decision, outside this page.
 - The official first launch writes to Windows by design. WSL adds a Start-menu shortcut and a Windows Terminal profile for
   the distribution, and the image's `wsl-setup` copies the Ubuntu Sans Mono font into
   `%LOCALAPPDATA%\Microsoft\Windows\Fonts` and registers it under `HKCU` when that file is missing. The generated
@@ -62,19 +112,68 @@ shell instead, as their sections say.
 
 ## Rehearsal first
 
+Run 2 on WSL 3.0.1 passed stage 1 and W5's path-A proofs and showed distinct cgroup namespaces, then stopped at W5's
+paired rule on the console collision. Probe E1 tested the template's getty mask once outside the recipe, and
+run 3 then completed P1 to F5 with it: the unit masked and inactive, the workstation equal to its baseline, the file
+owner `1000:1000` after one terminate, the distribution still listed in all twelve idle polls, a user-owned bus and
+`Hello from Docker!` from a rootless container. The uv and Node probes need stage 2 and are owed, as is the rollback
+arm.
+
 ### R1. Rehearse on a throwaway name, then remove it
 
 Run the page once on a throwaway distribution before the real one. For that run `<Name>` is a throwaway name that no
 other distribution uses, never the real `<Name>` and never the workstation's, and `Z:\WSL\<Name>` is its own new folder.
-Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, with the observations no host has
-made yet: P3's baseline and W5's second count of storage errors, W5's `cloud-init schema --system` (path A), W7's
-file-ownership probe and F2's idle observation. The first real reading of the storage rule thus comes from the throwaway
-distribution. Record the rehearsal's name, result, creation path and those observations in the receipt's `rehearsal`
-block. Every
-host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and unregisters only that literal
-name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
+Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, recording P3's baseline and W5's
+second count of storage errors, W5's `cloud-init schema --system` (path A), W7's file-ownership probe and F2's idle
+observation. Run 3 observed all of them on 3.0.1 with the corrected template. Record the rehearsal's name, result, creation path and those observations in the receipt's
+`rehearsal` block. Every host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and
+unregisters only that literal name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
 
-After the rehearsal's F3, read the list first and remove the throwaway distribution. When every proof held, no export is
+Rehearse both `26.04.1` default and `24.04.5` rollback on separate throwaway names, with the same checkout, user-data,
+profile, Windows driver and host-wide settings. 26.04.1 is the single default for the clean install; 24.04.5 returns
+only on a release-caused 26.04 failure with no in-release remedy. Comparison arms stay on throwaway distributions.
+Before removal, extend each successful run through F9 using the existing bootstrap and its native recipes, then run
+the comparison probes below from the workstation's second-instance session (the PowerShell block is launched through
+the same Windows-side route as W1). Each `wsl.exe -d` targets that arm's literal throwaway `<Name>` and its default user.
+F1 to F3 and the probes test first boot and the user manager from a second instance; they do not assume the 24.04.5
+historical receipts are acceptance on this new host.
+
+The following criteria are the preregistered ones for both arms with the amendments of 2026-10-02 made before any
+comparison ran, recorded in the [decision record](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md).
+Preserve a failed or skipped criterion with its returned output; neither a missing comparison nor a host version
+check qualifies an arm. Both arms' full new-host acceptance is owed; run 2 stopped at W5's paired rule.
+
+| Criterion | Same required observation for each arm | Primary source or accepted recipe |
+| --- | --- | --- |
+| `first_boot` | W5 exits 0 without the user/OOBE failure markers; default uid 1000, retained cloud-init results, the selected image's own schema check and F1's pass condition | W5, cloud-init tag 26.1; Microsoft creation docs pinned above; each image's inspected `wsl-setup` |
+| `systemd_user_from_second_instance` | F2 records linger and idle behavior; F3 and the second-instance probes show a user-owned directory/socket and user manager `running` | F1 to F3; Microsoft systemd guide at the pinned revision; systemd v255 references in the decision record; 259 lifecycle acceptance remains owed |
+| `wsl_gpu` | `/dev/dxg` is a character device and native `nvidia-smi` exits 0 with the Windows-provided GPU visible on the same driver; record limited WSL features and any failure | [Microsoft GPU guide](https://learn.microsoft.com/en-us/windows/wsl/tutorials/gpu-compute), [NVIDIA WSL guide](https://docs.nvidia.com/cuda/wsl-user-guide/index.html); no Linux driver installation |
+| `uv_cpython_3_13` | The bootstrap's uv runs a separate managed CPython 3.13 and prints `Python 3.13.x`, exit 0; the system Python version is recorded separately | F9 and `adoption/bootstrap.md`'s `uv run --no-project --python 3.13` prerequisite command; installed uv 0.12.17 `run --help` confirms both selectors |
+| `node_24` | The bootstrap's selected Node starts and prints `v24.21.0`, exit 0; retain any loader/package failure | F4, F9 and `adoption/pins-linux-x86_64.json`'s official Node 24.21.0 tarball |
+
+```powershell
+wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'
+wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait
+wsl.exe -d '<Name>' --exec test -c /dev/dxg
+wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi
+wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'
+wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'
+wsl.exe -d '<Name>' --exec bash -lc 'node --version'
+```
+
+The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. No command that a PowerShell block hands to
+`wsl.exe` carries a double quote inside its single-quoted argument: Windows PowerShell 5.1 does not escape it for a
+native program, and the argument breaks apart (run 3, 2026-10-02: the earlier `stat -c "%U %F"` form returned
+`stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`).
+
+Record these per-arm observations in `comparison_arms` alongside each rehearsal's schema, ownership, storage and idle
+observations. The inspected 26.04.1 system interpreter is Python 3.14.4-1ubuntu0.1 (its `python3` metapackage is
+3.14.3-0ubuntu2); it is not the toolkit's CPython 3.13 migration acceptance. uv selects 3.13 separately.
+GPU visibility and interpreter/version startup are bounded criteria; the full stack, GPU workloads and model behavior
+still require their own native acceptance. Complete every criterion for the default before accepting the clean install;
+the same criteria apply if a release-caused failure makes the rollback necessary.
+
+After F3 and the preregistered comparisons, read the list first and remove the throwaway distribution. When every proof held, no export is
 needed:
 
 ```powershell
@@ -82,6 +181,8 @@ $env:WSL_UTF8 = '1'
 wsl.exe --list --quiet
 wsl.exe --terminate '<Name>'
 wsl.exe --unregister '<Name>'
+wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'
+if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }
 wsl.exe --list --verbose
 ```
 
@@ -99,14 +200,40 @@ if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
 (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Hash.ToLowerInvariant()
 (Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Length
 wsl.exe --unregister '<Name>'
+wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'
+if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }
 wsl.exe --list --verbose
 ```
+
+After every `--unregister`, the check runs in `<Survivor>`: `/proc/sys/fs/binfmt_misc/WSLInterop` must exist and the
+Windows executable `/mnt/c/Windows/System32/cmd.exe /d /c ver` must launch with exit 0. Linux shells on this page call Windows executables by full path, because a distribution may set `appendWindowsPath=false` (the workstation does), and then a bare name is not found even when interop works. On WSL 2.7.13 the rehearsal's unregister removed this VM-wide
+registration on the surviving distribution, and `sudo systemctl restart systemd-binfmt` there restored it. That restart
+is no remedy on the adopted release: on 3.0.1 the registration survived both unregisters of 2026-10-02, in run 2 and
+probe E1. WSL mounts `/proc/sys/fs/binfmt_misc/status` read-only, so that one distribution
+cannot flush the VM-wide registrations ([PR #40621](https://github.com/microsoft/WSL/pull/40621)), and that restart
+itself exits 1 (F1 gives the reason). The guard stops the block when either observation fails. A failed check on 3.0.1
+is a finding for review, not a fault to repair: stop, do not import or provision another distribution, and record these
+observations from a native shell in the surviving distribution, after the new distribution has been removed:
+
+```sh
+test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver
+ls /proc/sys/fs/binfmt_misc
+systemctl status systemd-binfmt.service --no-pager
+```
+
+Proof: nothing here repairs anything. The first line repeats the check from a native shell, the second lists the
+registered formats, which shows whether `WSLInterop` is among them, and the third prints the unit's state and log
+lines. Record the returned output of all three, and of the failed check, in the receipt (`interop_after_unregister`),
+then stop for review: never restart, stop or start a unit, and never import or provision another distribution. W5's
+failed-proof removal and W6's removal use this same check and recovery. If W5 already removed a failed rehearsal,
+record its export and do not remove that name again in R1.
 
 Proof: the first `--list --quiet` names the throwaway distribution; the last `--list --verbose` no longer lists it, and
 its starred line is still W1's. A failed rehearsal's export goes into the `rehearsal` block with its SHA-256 and size,
 and the real run waits until the failure is understood. The rehearsal's private transcript and its user-data file under
 `%USERPROFILE%\.cloud-init` stay; record whether WSL's Start-menu entry and terminal profile for the throwaway name
-outlive `--unregister`. Then run the page again from P1 for the real `<Name>`, without R1.
+outlive `--unregister`. After the required comparison records, run the page again from P1 for the default real
+`<Name>`, or the qualified rollback, without R1.
 
 ## Pre-checks in the workstation distribution
 
@@ -124,25 +251,35 @@ the workstation's Ubuntu installs, from the `ubuntu-keyring` package, and `gpgv`
 an empty temporary directory, which is also `gpgv`'s home, so no GnuPG home of the user is read or written.
 
 ```sh
+for RELEASE in 26.04.1 24.04.5; do
 SUMS_DIR="$(mktemp -d)"
-curl -fsSL -o "$SUMS_DIR/SHA256SUMS" https://releases.ubuntu.com/24.04.5/SHA256SUMS
-curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS" || exit 1
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg" || exit 1
 gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" "$SUMS_DIR/SHA256SUMS"
-grep ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$' "$SUMS_DIR/SHA256SUMS"
+if [ "$?" -ne 0 ]; then exit 1; fi
+grep -F " *ubuntu-$RELEASE-wsl-amd64.wsl" "$SUMS_DIR/SHA256SUMS" || exit 1
+done
 ```
 
 Proof: both downloads exit 0; `gpgv` exits 0 and prints `using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092` and
-`Good signature from "Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>"`; `grep` prints
-`bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl`, the hash W2 pins. A
+`Good signature from "Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>"` for each release; `grep` prints
+each image's signed line with its exact hash from the release table. Both signed sums must pass, including the arm not
+selected for this run. The coordinator's preserved checks already passed for both (decision record, Evidence classes);
+reuse matching evidence for this authoring unit. A
 `BAD signature`, a missing key or any other nonzero exit stops the run with nothing installed.
 
 ### P2. The user-data schema
 
 Added after `v2026.09.26.2`: this renders `adoption/templates/wsl/cloud-init.user-data.template` with `<WSL_USER>`
 before any boot and validates it with cloud-init's own schema check. The render is F8's `string.Template` program, which
-writes the same bytes as W3's literal replace (W3 says why). Run it from the root of the checkout that `<checkout>` names.
-The workstation's cloud-init checks against its own version's schema, which `cloud-init --version` records; the image
-runs 26.1.
+writes the same bytes as W3's literal replace (W3 says why). Run it from the root of the checkout that `<checkout>` names,
+for the selected image's user-data. The workstation's cloud-init checks against its own version's schema, which
+`cloud-init --version` records. This host check is not image qualification. The inspected 26.04.1 image packages
+cloud-init 26.1-0ubuntu3~26.04.1; the historical 24.04.5 image packages 26.1-0ubuntu1~24.04.1. W5 records the selected
+image's version and validates the provisioned user-data with its own `cloud-init schema --system` on path A. Canonical's
+[cloud-init WSL guide](https://ubuntu.com/wsl/docs/stable/howto/cloud-init/) assumes 24.04 or 22.04; it does not qualify
+26.04. The 26.04.1 rehearsal's own schema check passed on both 2.7.13 and 3.0.1; each run must repeat it, and 24.04.5
+remains unrun.
 
 ```sh
 RENDER_DIR="$(mktemp -d)"
@@ -164,13 +301,15 @@ would meet. microsoft/WSL#41482 (https://github.com/microsoft/WSL/issues/41482, 
 (`/sbin/init failed to start within 10000ms`). Its workaround, `swap=0` in the global WSL configuration and a WSL
 shutdown, is outside this page. Without `sudo` the user cannot read the kernel journal, and `dmesg` holds only the
 recent ring buffer, so this reads the journal of the current boot. It searches for the driver's name, not a device id,
-and leaves out the driver's registration line, `hv_vmbus: registering driver hv_storvsc`, which every boot logs. A count
+and leaves out the driver's registration line, `hv_vmbus: registering driver hv_storvsc`, which every boot logs, and
+the kernel's command-line echo. Run 2's baseline of `2` contained only `Command line:` and `Kernel command line:`
+echoes naming `hv_storvsc.storvsc_max_hw_queues=4`; neither is a storage error. A count
 over the whole boot cannot tell errors that are happening now from an old burst, so the count is
 a baseline, not a verdict: the newest error line's age decides here, and W5 counts again after the first launch.
 
 ```sh
-sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
-sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1
+sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'
+sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -Ev 'registering driver hv_storvsc|[Cc]ommand line:' | tail -n 1
 cat /proc/uptime
 swapon --show
 ```
@@ -185,6 +324,11 @@ Proof:
   installed: record the count, the line's time and its shape without device ids, name microsoft/WSL#41482 and leave the
   next step to the user, because the workaround changes the global WSL configuration and shuts WSL down. An older line,
   or none, lets the run continue. The one-hour threshold is this recipe's choice, not an upstream figure.
+- One exception, added on 2026-10-02: a newest line whose kernel time an earlier run of this page already recorded as
+  its own attachment-window line (W5, `storage_errors.new_lines`) is known and does not stop the run; record that it
+  is the earlier run's line. Run 2 and probe E1 each left exactly one such line in their install windows (7118.5 s and
+  7678.6 s), so a second arm rehearsed within the hour would otherwise stop on its predecessor's line. A line that no
+  earlier receipt explains keeps the rule.
 - The kernel time decides, not the journal's wall-clock stamp: journald stamps a kernel line when it reads it, and a
   restart of the workstation distribution reads the kernel's ring buffer again and stamps old lines anew.
 - Record `swapon --show`: active swap is the issue's condition, not a failure by itself.
@@ -210,9 +354,48 @@ Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^
 Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free
 ```
 
+Then record this baseline natively in the already-running workstation distribution, as its default user and without
+`sudo`. It holds the same five observations that W5 reads from both distributions, taken before anything is imported:
+
+```sh
+id -u
+systemctl is-system-running
+systemctl --failed --no-legend --plain
+systemctl is-active "user@$(id -u).service"
+readlink /proc/self/ns/cgroup
+```
+
+Record each command's exit separately. `systemctl is-system-running` exits 1 for `degraded`, which is expected and
+recorded; the proof reads the printed values. The failed-unit value is the first column of each printed row.
+
 Proof, recorded in the receipt's `host` block:
 
-- `wsl.exe --version` starts with `WSL version:` and a version of 2.4.10 or later.
+- `wsl.exe --version` starts with `WSL version:` and a version of 3.0.1 or later for this second systemd distribution.
+  An older version stops the run before W4 or W6 imports anything. The reason is the shared cgroup tree on 2.7.x;
+  PR #40519 isolated distro cgroups and PR #41512 created their namespaces, first together in stable 3.0.1
+  (the release notes linked in Host-wide rules).
+- Record the five lines as the workstation's baseline (`workstation_baseline`): the uid, the system state, the names of
+  the failed units, the user manager's state and the cgroup namespace. `cgroup:[4026531835]` is the kernel's initial
+  cgroup namespace, `PROC_CGROUP_INIT_INO` in Linux's
+  [`include/linux/proc_ns.h`](https://github.com/torvalds/linux/blob/v6.18/include/linux/proc_ns.h).
+  A noninitial namespace is necessary but does not prove isolation. The shell's own
+  `/proc/self/ns/cgroup` needs no `sudo` and equals `/proc/1/ns/cgroup` on the updated host. W1's version
+  precondition and W5's paired check while both distributions run are required; record what the updated host actually
+  prints.
+- The workstation's baseline passes only when all four hold: its uid equals the new distribution's planned default
+  uid `1000`; its system state is `running` with no failed unit, or `degraded` with its failed set contained in
+  {`systemd-binfmt.service`, `getty@tty1.service`}; its user manager is `active`; and its cgroup namespace is not
+  `cgroup:[4026531835]`. Anything else stops the run before W4 and before any W6 import, because W5 compares the
+  workstation with this baseline and its proof could not hold.
+- `getty@tty1.service` is allowed in that failed set only as the leftover of an earlier collision on the shared
+  console. When it is there, also run the following read-only command and record it as `getty_tty1_result`;
+  `Result=start-limit-hit` is required, and another result stops the run. The workstation's unit messages are not
+  proved again here: it is compared with itself, and F1 proves the message for the new distribution.
+
+```sh
+systemctl show getty@tty1.service -p Result -p NRestarts
+```
+
 - The starred line of `--list --verbose` names the workstation's distribution (`default_distribution_before`).
 - `<Name>` is not a line of `--list --quiet`, and the first `Test-Path` prints `False`. WSL refuses a name or an install
   folder another registration already uses and creates the folder itself.
@@ -230,14 +413,16 @@ Proof, recorded in the receipt's `host` block:
   default 60000 ms) is the VM's. Without `instanceIdleTimeout=-1`, `<Name>` and its user services stop about
   `instanceIdleTimeout` after the last client exits (15 seconds by default), and issue reports say linger does not
   prevent it; F2 observes it. Changing either key is the user's decision, outside this page.
-- `Free` on `Z:` is recorded. The image unpacks to about 1.3 GB before stage 2 adds its tools.
+- `Free` on `Z:` is recorded. The historical 24.04.5 image unpacked to about 1.3 GB; the 26.04.1 unpacked size remains
+  unmeasured. Stage 2 adds its tools.
 
 Stop on any other result.
 
 ### W2. Download and verify the image
 
 The expected sha256 is published twice, by Canonical next to the image and by Microsoft's WSL distribution catalog.
-This block reads the catalog at the commit of 2026-09-14 (#41465), whose `Ubuntu-24.04` entry is this image. It is the
+This block reads the catalog at the commit of 2026-09-14 (#41465), choosing `Ubuntu-26.04` or `Ubuntu-24.04` for the selected
+release. It is the
 only hash check before W4 installs the file: at WSL 2.7.13, `wsl --install --from-file` checks no hash
 (`WslClient.cpp:500-537`). The online `wsl --install Ubuntu-24.04` does compare its download with the catalog entry's
 `Sha256` (`WslInstall.cpp:36-50`, `:315`), but it reads the catalog from WSL's `master` branch at install time; this
@@ -245,18 +430,30 @@ page installs a pinned file whose hash the operator sees, and P1 has tied that h
 
 ```powershell
 $ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl' -OutFile 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl'
-Invoke-WebRequest -UseBasicParsing -Uri 'https://releases.ubuntu.com/24.04.5/SHA256SUMS' -OutFile 'Z:\WSL\downloads\SHA256SUMS'
-$Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'
-$Published = (Select-String -LiteralPath 'Z:\WSL\downloads\SHA256SUMS' -Pattern ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$').Line.Split(' ')[0]
-$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq 'Ubuntu-24.04'
-$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl').Hash.ToLowerInvariant()
+$Release = '<RELEASE>'
+switch ($Release) {
+    '26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }
+    '24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }
+    default { throw 'unsupported release: do not download or install' }
+}
+$Image = "ubuntu-$Release-wsl-amd64.wsl"
+$ImagePath = "Z:\WSL\downloads\$Image"
+$ImageUrl = "https://releases.ubuntu.com/$Release/$Image"
+$SumsPath = "Z:\WSL\downloads\$Release-SHA256SUMS"
+Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath
+Invoke-WebRequest -UseBasicParsing -Uri "https://releases.ubuntu.com/$Release/SHA256SUMS" -OutFile $SumsPath
+$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]
+$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName
+$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()
 "computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)"
-if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected) { throw 'sha256 mismatch: do not install' }
+if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }
+(Get-Item -LiteralPath $ImagePath).Length
 ```
 
-Proof: the printed line shows one hash three times, `bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e`, and
-the URL `https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl`; the file is 388,975,696 bytes. A `throw`
+Proof: the printed line shows the selected release's exact hash three times and its actual release URL from the pinned
+catalog, as listed in the release table. `Get-FileHash` hashes the entire downloaded image. Record `Length` as this run's
+actual image size; run 2 measured 418,495,746 bytes for 26.04.1, while 24.04.5's historical stream measured
+388,975,696 bytes. A `throw`
 stops stage 1 with nothing installed. Record `.Hash` only: `Get-FileHash` also prints the file's path.
 
 ### W3. Render the user-data before any boot
@@ -285,12 +482,12 @@ the last command prints nothing. The file holds no secret: the user's password s
 
 ```powershell
 $env:WSL_UTF8 = '1'
-wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch
+wsl.exe --install --from-file 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --name '<Name>' --location 'Z:\WSL\<Name>' --no-launch
 $LASTEXITCODE
 wsl.exe --list --verbose
 ```
 
-Proof: the output is `Installing: Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl`, then
+Proof: the output is `Installing: Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl` with the selected release filled in, then
 `Distribution successfully installed. It can be launched via 'wsl.exe -d <Name>'`; `$LASTEXITCODE` prints `0`;
 `--list --verbose` shows `<Name>` as `Stopped` at version 2 with the starred line unchanged. `--install --from-file`
 registers the distribution with its first-run setup enabled and `--no-launch` boots nothing, so cloud-init has not run yet.
@@ -311,6 +508,9 @@ cmd.exe /d /c "wsl.exe -d <Name> < NUL"
 $LASTEXITCODE
 wsl.exe -d '<Name>' --exec id -un
 wsl.exe -d '<Name>' --exec id -u
+wsl.exe -d '<Name>' --exec systemctl is-enabled getty@tty1.service
+wsl.exe -d '<Name>' --exec systemctl show getty@tty1.service -p LoadState -p ActiveState -p NRestarts
+wsl.exe -d '<Name>' -u root --exec cloud-init --version
 wsl.exe -d '<Name>' -u root --exec cloud-init status --long
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
@@ -323,10 +523,28 @@ wsl.exe --list --verbose
 
 Proof (path A, cloud-init provisioned the instance):
 
+- `wsl: Failed to start the systemd user session` stops the run even when the launch exits 0. Record the warning
+  and use the failed-proof recovery below; do not continue to F1 or try W6 as a remedy for that warning.
 - The launch prints `Provisioning the new WSL instance <Name>` and `This might take a while...`, and `$LASTEXITCODE`
-  prints `0`. The image's `wsl-setup` prints both lines, not WSL: lines 117-118 at its version 0.5.10~24.04.2, Launchpad
+  prints `0`. The image's `wsl-setup` prints both lines, not WSL: for the historical 24.04.5 image, lines 117-118 at its version 0.5.10~24.04.2, Launchpad
   tag `import/0.5.10_24.04.2`, commit `74bfc89113bc7d46a4d9feb1e69cd6951fbc6908`.
+- For 26.04.1, the inspected image packages `wsl-setup` 0.6.3ubuntu~26.04.1, matched to upstream tag `0.6.3`, commit
+  `73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8` (`wsl-setup:122-123,155-156` and `ubuntu-insights.sh:15-19,114-142`).
+  Its Insights script preserves existing native Linux/Windows consent; it prompts only when stdin is a terminal
+  (`-t 0`). W5's NUL input takes its native noninteractive path. No command here invents consent or writes a global
+  consent registry value. This source review is not first-boot acceptance.
 - `id -un` prints `<WSL_USER>` and `id -u` prints `1000`.
+- `systemctl is-enabled getty@tty1.service` prints `masked`; exit 1 is that command's normal exit for a masked unit.
+  `systemctl show` prints `LoadState=masked`, `ActiveState=inactive` and `NRestarts=0`. The user-data's `bootcmd`
+  masks the unit in cloud-init's network stage, before systemd starts it: the 26.04.1 image's
+  `cloud-init-network.service` has `Before=systemd-user-sessions.service`, `getty@.service` has
+  `After=systemd-user-sessions.service`, and `/etc/cloud/cloud.cfg` lists `bootcmd` in `cloud_init_modules`.
+  These are source reviews of the pinned official image's own files, read for probe E1 on 2026-10-02, not a complete
+  recipe run. In that probe the unit was masked and inactive with no restarts, cloud-init finished without errors,
+  and the only failed unit was `systemd-binfmt.service`. The journal's `Failed to start getty@tty1.service.` line
+  was the refused job of a masked unit, which did not appear in the failed-unit list.
+- `cloud-init --version` records the selected image's packaged version before its own schema check; P2 recorded only
+  the workstation's version.
 - `cloud-init status --long` prints `status: disabled` and `boot_status_code: disabled-by-marker-file`. This line proves
   only that the marker is in place, because cloud-init 26.1 reports `disabled` once `/etc/cloud/cloud-init.disabled`
   exists, whatever its run did (`cloudinit/cmd/status.py:284-286` and `:385-386`).
@@ -335,6 +553,14 @@ Proof (path A, cloud-init provisioned the instance):
   - Exit 2 means recoverable errors (warnings) on that boot while the line still says `disabled`
     (`:158-163`, `:254-255`). Record them, as `status.json` below does.
   - `status: error` or exit 1 means that boot's run failed: stop.
+- With the template's `bootcmd`, one recoverable error is expected and `cloud-init status --long` exits 2: `Failed to
+  wait for network`, from `systemctl start systemd-networkd-wait-online.service`, with `Unit
+  systemd-networkd-wait-online.service is masked.` cloud-init waits for the network when the user-data holds a
+  `bootcmd` (26.1, `cloudinit/cmd/main.py:351-402` and `:522-528`; `cloudinit/net/activators.py:312-314`, read in
+  the 26.04.1 image), and WSL masks that unit because it configures the network itself (microsoft/WSL `3.0.1`,
+  `src/linux/init/init.cpp:356-358`). Run 3 recorded it in the `init` and `modules-config` stages with empty
+  `errors`, no delay (the stage took 0.54 s) and `result.json` without errors. Any other recoverable error is
+  recorded and reviewed as before.
 - `/var/lib/cloud/data/result.json` holds `"datasource": "DataSourceWSL"` and `"errors": []`. cloud-init writes this file
   only when its final stage ends, and it collects the errors of every stage (`cloudinit/cmd/main.py:1017-1030`). Its
   presence proves the run completed; its empty list proves the run had no errors.
@@ -348,27 +574,111 @@ Proof (path A, cloud-init provisioned the instance):
   (cloud-init 26.1, `cloudinit/config/schema.py:1388-1393`). With more than one data part a
   `Found cloud-config data types:` header comes first and the line is indented (`:1443-1458`, `:1492`); an invalid
   schema exits 1 (`:1493-1498`). The `schema` subcommand never reads the marker (`cloudinit/cmd/main.py:1240-1241`,
-  `:1286-1293`), but no new instance has run it after the marker yet. Record the output (`schema_system`).
+  `:1286-1293`). The 26.04.1 rehearsal returned `Valid schema user-data` after the marker on both host releases;
+  each run must repeat that observation. Record the output (`schema_system`).
 - `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
+
+After the first launch and before F1, prove cgroup isolation from the already-running workstation distribution,
+while both distributions run. Keep a client of `<Name>` open during the check. Choose `<COMMON_UNIT>` active in both
+distributions, for example `cron.service` when both run it. Run this block natively in the workstation's shell;
+the `wsl.exe -d` commands alone target the new distribution:
+
+```sh
+systemctl is-active '<COMMON_UNIT>'
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'
+cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'
+```
+
+Proof: both system-unit checks print `active` and exit 0; `cgroup.procs` contains local process ids and no `0` entry;
+the new distribution's `user@<uid>.service` prints `active` and exits 0, for its default user's uid 1000. A `0` entry
+is a process from another distribution's process namespace. An empty or unreadable file or a unit not active in both
+cannot prove isolation and stops the run. On path B, W6's manual-user relaunch must repeat this proof and the paired
+record below before W7 or F1; the initial OOBE prompt failure alone does not establish a default user's manager.
+Nothing on the updated host is assumed from its version or namespace value.
+
+Then record the same five observations from both running distributions at once, because a reading of one side does not
+show the same uid, distinct namespaces and two healthy managers. Run this block natively in the workstation's shell,
+after the cgroup block above and before F1. Its first five lines repeat W1's baseline commands, and its next five run
+the same commands inside `<Name>`. Record each command's output and exit in its own receipt entry:
+
+```sh
+id -u
+systemctl is-system-running
+systemctl --failed --no-legend --plain
+systemctl is-active "user@$(id -u).service"
+readlink /proc/self/ns/cgroup
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec id -u
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-system-running
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl --failed --no-legend --plain
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'
+/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec readlink /proc/self/ns/cgroup
+```
+
+Proof: both distributions print the same uid; both user managers print `active`; the new distribution's system state
+is `running` with no failed unit, or `degraded` with `systemd-binfmt.service` as its only failed unit (its message is
+proved at F1); the two `cgroup:[...]` values differ from each other and neither is `cgroup:[4026531835]`; and all five
+workstation values equal its own values recorded in W1 before the import, so the new distribution did not disturb it.
+A `getty@tty1.service` in the new distribution's failed set, or one that newly appears in the workstation's, fails the
+proof: the mask did not take effect before the unit started. Record all of it, with the WSL version and
+kernel from W1 and the image revision from W2, in the receipt's `paired_isolation`: one object for the workstation and
+one for `<Name>`, each with `uid`, `system_state`, `failed_units`, `user_manager` and `cgroup_namespace`.
+
+When any W5 proof fails, or the user-session warning appears, stop the run and never stop or restart a unit in either
+distribution. Terminate only the new distribution, export its failed state, and unregister only that name. Do not
+take path B for any such failure. Record its cause (`cgroup`, `tty` or a short text); this recovery block serves every
+failed W5 proof:
+
+```powershell
+$env:WSL_UTF8 = '1'
+wsl.exe --list --quiet
+wsl.exe --terminate '<Name>'
+wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-w5-failed.tar'
+$LASTEXITCODE
+if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
+(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-w5-failed.tar').Hash.ToLowerInvariant()
+(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-w5-failed.tar').Length
+wsl.exe --unregister '<Name>'
+wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'
+if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }
+wsl.exe --list --verbose
+```
+
+Proof: the export exits 0 before deletion, its cause, hash and size are recorded in `w5_failure_export`, and `<Name>` is
+gone with the starred line unchanged. The surviving distribution must retain `WSLInterop` and launch the Windows
+executable. If it does not, R1's interop recovery (its records, then a stop for review) applies only after the new
+distribution is removed. Keep the failure and stop for review; an upstream version claim does not replace the failed
+isolation observation.
 
 On both paths, right after the launch and before W6 or W7, count the storage errors again in the workstation
 distribution, where P3 ran:
 
 ```sh
-sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
+sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -Evc 'registering driver hv_storvsc|[Cc]ommand line:'
 ```
 
-Proof: the count equals P3's baseline; record it as `second_count`. A larger count means storage errors during W4 to
-W5. Record both counts and the new lines (P3's second line with `tail -n` set to the difference, without device ids),
-treat a failed W5 as exposure to microsoft/WSL#41482 rather than a cloud-init failure, and do not continue to stage 2
-(F9) until that is decided: its workaround changes the global WSL configuration and shuts WSL down, both outside this
-page.
+Proof: record both counts. On both paths, record P3's baseline before the import and `second_count` after the first launch.
+An increase confined to the window in which the new disk is attached, before cloud-init starts, is recorded with the
+new lines and does not stop the run. Any storage error after that window, or any provisioning step that fails with a
+storage cause, stops the run.
+
+Run 2 observed one real driver error (`cmd 0x2a`, `srb 0x4`, host `0xc00000a1`) at kernel time 7118.5 s, inside W4's
+install window: the new disk was unmounted at 7126.9 s and cloud-init's `init-local` started at 7134.15 s. The written
+window rule recorded that line without stopping the run; the second count of `3` also included the two command-line
+echoes that the corrected filter now drops.
+
+When the count increases, read the new lines with P3's second command and `tail -n` set to the difference, without
+device ids. Compare their kernel times with the attachment window and W5's retained `status.json` `init-local` start.
+If the window cannot be established, stop for review. Record the window and its lines in `storage_errors.new_lines`;
+apply the same stop rule to later provisioning. A failure with a storage cause is exposure to microsoft/WSL#41482 and
+stops the run before stage 2 (F9); its workaround changes the global WSL configuration and shuts WSL down, both
+outside this page. A failed W5 without a storage cause keeps its own diagnosis.
 
 How to tell that cloud-init did not provision the instance: the launch output contains
 `Create a default Unix user account:` and `OOBE command "/usr/lib/wsl/wsl-setup" failed, exiting`, and the exit code is
-not 0. WSL keeps the first-run setup pending. Go to W6.
+not 0. WSL keeps the first-run setup pending. Only that prompt failure, with no other failed W5 proof, permits W6.
 
 ### W6. Path B: import and a manual user (only after the W5 marker)
 
@@ -395,9 +705,15 @@ if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
 (Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Hash.ToLowerInvariant()
 (Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length
 wsl.exe --unregister '<Name>'
-wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-24.04.5-wsl-amd64.wsl' --version 2
+wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'
+if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }
+wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2
 wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long
 ```
+
+Before the import, the surviving distribution's `WSLInterop` registration must exist and its Windows executable must
+launch. If the guard throws, do not import: take R1's interop recovery there, which records the observations and stops
+for review. W1's WSL 3.0.1 precondition still applies to this import.
 
 An imported distribution starts as root and skips the first-run command. Whether cloud-init provisions it is not
 documented. The `cloud-init status` line therefore only records the import's first boot:
@@ -405,9 +721,14 @@ documented. The `cloud-init status` line therefore only records the import's fir
 - `disabled` with `boot_status_code: disabled-by-generator` when it found no datasource (`cloudinit/cmd/status.py:298-300`).
 
 The next commands skip what already exists. Run them as root inside `<Name>`: in a shell from
-`wsl.exe -d <Name> -u root`, or from a WSL session through `wsl.exe -d <Name> -u root -- bash -s < path-b.sh`.
+`/mnt/c/Windows/System32/wsl.exe -d <Name> -u root`, or from a WSL session through
+`/mnt/c/Windows/System32/wsl.exe -d <Name> -u root -- bash -s < path-b.sh`.
+
+An import's first boot starts the getty before the first line below can run. The paired proof after the relaunch
+decides: if the workstation's values differ from its baseline, stop and use W5's recovery block.
 
 ```sh
+systemctl mask --now getty@tty1.service
 id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'
 printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user
 chmod 0440 /etc/sudoers.d/90-wsl-default-user
@@ -425,8 +746,9 @@ wsl.exe --list --running
 wsl.exe -d '<Name>' --exec id -un
 ```
 
-Proof: `visudo` prints `parsed OK`; `<Name>` is absent from `--list --running`; `id -un` prints `<WSL_USER>`. Then repeat
-W5's checks from `id -u` on, with three differences:
+Proof: `visudo` prints `parsed OK`; `<Name>` is absent from `--list --running`; `id -un` prints `<WSL_USER>`. Repeat W5's
+cgroup-isolation proof and its paired record while both distributions run, before W7 or F1, with their same failure
+recovery. Then repeat W5's checks from `id -u` on, with three differences:
 - `cloud-init status --long` reports `boot_status_code: disabled-by-marker-file` because the root block wrote the marker.
 - `result.json` and `status.json` exist only if cloud-init ran on the import (open question 1). Record their contents, or
   their absence, instead of treating absence as a failure.
@@ -446,7 +768,7 @@ file created will be 0:0 until the next wsl --shutdown", a command this page nev
 complete. And this only recovers after a distro termination." It ships first in WSL 2.9.8, a pre-release, and in 3.0.1;
 tags 2.7.13 and 2.7.14 lack it. So this step terminates `<Name>` once, relaunches it for the F steps and reads the owner
 of an empty file created from Windows under the new user's home. Whether a terminate clears the state has not been
-observed anywhere; this probe is the first observation.
+observed on WSL 3.0.1 on this host; the 2.7.13 rehearsal returned `1000:1000`, and this run must repeat the probe.
 
 ```powershell
 $env:WSL_UTF8 = '1'
@@ -471,12 +793,40 @@ Run F1 to F8 as `<WSL_USER>` in `<Name>`, except F2's idle observation, which ru
 
 ```sh
 systemctl is-system-running --wait
-systemctl --failed --no-legend
+systemctl --failed --no-legend --plain
+journalctl -b 0 -t systemd-binfmt --no-pager -n 4
 systemctl list-unit-files --type=service --no-pager
 ```
 
-Proof: `running`, no failed unit, and the service list prints. Ubuntu's own setup tests require `running` for a new
-instance. On `degraded`, record `systemctl --failed` and stop for review.
+Proof: `running` with no failed unit, or `degraded` when `systemctl --failed --no-legend --plain` lists exactly
+`systemd-binfmt.service` and that unit's log, from the `journalctl` line, holds
+`Failed to flush binfmt_misc rules, ignoring: Read-only file system`;
+the service list prints. Ubuntu's own setup tests require `running` for a new instance, so `degraded` passes only in
+that one case. Any other failed unit stops the run: record `systemctl --failed` and stop for review. `<WSL_USER>` reads
+that log without `sudo` because it is in `adm` (the user-data's `groups`, and W6's `useradd --groups`), which systemd's
+tmpfiles rules give read access to the system journal. On `degraded`, if the `journalctl` line prints only
+`Hint: You are currently not seeing messages from other users and the system.` or `-- No entries --`, the user cannot
+read the journal: repeat that line once with `sudo`, record both outputs and judge the second.
+`getty@tty1.service` must not appear in `systemctl --failed` here.
+
+```sh
+sudo journalctl -b 0 -t systemd-binfmt --no-pager -n 4
+```
+
+The log line is selected by identifier (`-t systemd-binfmt`), not by unit: on the updated host
+`journalctl -u systemd-binfmt.service` returned only systemd's four lines about the unit, because the unit's own
+early-boot message is not attributed to it, while the identifier query returned the message.
+
+The exception has a reason. On the adopted release WSL mounts `/proc/sys/fs/binfmt_misc/status` read-only, so that one
+distribution cannot flush the VM-wide registrations ([PR #40621](https://github.com/microsoft/WSL/pull/40621)). It does
+so when the distribution's `[boot] protectBinfmt` setting is on, which is the default, and as a best-effort step whose
+failures are only logged (microsoft/WSL `3.0.1`: `src/linux/init/init.cpp` L2433 and L2916-L2923,
+`WslDistributionConfig.h` L27 and L62). Under that condition `systemd-binfmt.service` fails with that message and exit
+1; that is what every boot of the workstation and of the rehearsal distributions showed on 2026-10-02, not a guarantee
+for every configuration. A distribution that turns the setting off, or where the lock did not take, may print
+`running`, which F1 accepts as well. Upstream calls the error benign
+([issue #41226](https://github.com/microsoft/WSL/issues/41226), a contributor's answer of 2026-08-04: "The systemd error
+is benign and won't affect registration of user defined binfmt settings.").
 
 ### F2. Linger
 
@@ -516,6 +866,23 @@ Proof: `<WSL_USER> directory`, then `<WSL_USER> socket` (a symbolic link fails),
 `systemd --user` bus that the guarded runners require ([`adoption/tools/README.md`](../tools/README.md) and
 [`adoption/lifecycle.md`](../lifecycle.md)).
 
+Right after the bus proof, check that Docker Engine / Moby starts a rootless container as `<WSL_USER>`, without sudo.
+This check is owed on the first run after the WSL update: [microsoft/WSL#41492](https://github.com/microsoft/WSL/issues/41492)
+reports that rootless Docker and Podman cannot start a container after the cgroup hierarchy moved, and remains open.
+No new distribution has been observed on 3.0.1. Use Docker's
+[supported rootless setup](https://docs.docker.com/engine/security/rootless/) and its `rootless` context.
+If the engine is not installed yet, record `owed`, complete F4 and F5 and that setup, then return here before F9 or
+accepting R1. An owed check is not a pass.
+
+```sh
+docker --context rootless info --format '{{json .SecurityOptions}}'
+docker --context rootless run --rm hello-world
+```
+
+Proof: the first command exits 0 and includes `name=rootless` before the run command is attempted; the second exits
+0 and prints `Hello from Docker!`. Record both outputs. A missing rootless mode, a failed container start or a
+cgroup error stops the run; retain the failure with issue 41492 and do not accept the engine from its version alone.
+
 ### F4. Packages
 
 Changed after `v2026.09.26.2`: `adoption/bootstrap-linux.sh` installs `ca-certificates curl git tar gzip xz-utils jq` and
@@ -530,7 +897,8 @@ sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzi
 dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap
 ```
 
-Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages, which the image lacks.
+Proof: both apt commands exit 0, and `dpkg-query` prints a version for each of the three packages. The historical
+24.04.5 image lacked them; do not assume the selected 26.04.1 image has the same package gaps.
 
 ### F5. Subordinate ids
 
@@ -540,11 +908,13 @@ one only when the first `grep` prints nothing.
 
 ```sh
 grep "^$(id -un):" /etc/subuid /etc/subgid
-sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"
+grep -q "^$(id -un):" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"
 grep "^$(id -un):" /etc/subuid /etc/subgid
 ```
 
 Proof: `/etc/subuid:<WSL_USER>:100000:65536` and `/etc/subgid:<WSL_USER>:100000:65536`, or another range of 65,536.
+The second line adds a range only when `/etc/subuid` has none for the user, so running the block twice never adds a
+second range (run 3: `useradd` had allocated the range, and `usermod` did not run).
 Record whether the range came from `useradd` or from `usermod`.
 
 65,536 stays the stage-1 value. Docker's
@@ -626,15 +996,17 @@ Proof: as in [`adoption/bootstrap.md`](../bootstrap.md); stage 2 records its own
 
 After stage 2, install the profile example for `<Name>` as step 5 of
 [Windows Terminal profiles and the login shell](linux-wsl2.md#windows-terminal-profiles-and-the-login-shell) describes:
-`<DISTRO>` is `<Name>`, `<WSL_USER>` the new user and `<PROJECT>` `/home/<WSL_USER>/code/native-agent-stack`. Rename the
-three profiles, for example to `<Name> - Shell`, `<Name> - Codex` and `<Name> - Claude`, and save the file as
+`<DISTRO>` is `<Name>`, `<WSL_USER>` the new user and `<PROJECT>` `/home/<WSL_USER>/code/native-agent-stack`. Rename every
+profile of the example by replacing its `WSL` prefix with `<Name>`, for example `<Name> - Shell`, `<Name> - Codex` and
+`<Name> - Claude` (and the resume profiles when the example carries them), and save the file as
 `<Name>.json` in the same Fragments folder. Windows Terminal derives a fragment profile's identity from the folder name
 and the profile name, so the workstation's identically named profiles would collide with these. Then prove the profile
-launch shape from Windows:
+launch shape from Windows (the loop tests each path inside `[[ ]]`, which needs no quotes to keep a path with a space
+whole; see R1 for why these commands carry no double quote):
 
 ```powershell
 wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'
-wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'
+wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'
 ```
 
 Proof: the first line prints two absolute paths, and the second prints `executable:` followed by each of them.
@@ -711,9 +1083,18 @@ transcript and the F outputs:
   - the default distribution before and after;
   - `creation_path` (`A` or `B`), with the W5 markers when B was taken;
   - on path B, `failed_attempt_export`: the file name, SHA-256 and size of W6's export of the failed attempt;
+  - W1's `workstation_baseline`, W5's common-unit process ids and active user manager and its `paired_isolation`, any
+    `w5_failure_export` with its `cause`, each removal's interop check and the records of any stop for review,
+    F1's outcome (`running`, or `degraded` with its two proving outputs) and F3's rootless-container result or `owed`;
   - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
   - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
     W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
+  - all five workstation values equal to `host.workstation_baseline`; its optional `getty_tty1_result` is present only
+    when W1's extra command ran; and `getty_mask` under `first_launch`, with `is_enabled`, `load_state`, `active_state`
+    and `n_restarts` from W5's two proof commands.
+  - the selected release and actual image size, with the two fixed `supported_images` pins and both `comparison_arms`.
+    The checked-in example is a synthetic fixture with unrun comparison arms; fill actual results from the native logs
+    and replace the synthetic fixture labels in a contributed receipt only with the operations it actually observed.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
   `limitations` and its `path`. Its claim quotes only that run's output. Follow
@@ -728,12 +1109,16 @@ Kept open in the record, each with the observation that would settle it:
 - what keeps `<Name>` running with no client attached: with `instanceIdleTimeout=-1` the setting does, by WSL's source,
   and issue reports say linger alone does not (F2 records it; whether `wsl.exe --list --running` counts as a client is
   not verified);
-- whether binfmt registrations survive `wsl --terminate` (WSL's `protectBinfmt`);
-- whether `useradd` allocated the subordinate ids on 24.04.5 (F5 records it);
+- whether a rootless container starts in the new distribution on the updated host (F3; microsoft/WSL#41492 remains
+  open); run 2 observed cgroup isolation with both distributions running, and each run must repeat W5's paired record;
+  a binfmt loss after unregister has R1's required check and its stop-for-review recovery;
+- whether `useradd` allocated the subordinate ids on the selected release (F5 records it);
 - whether a terminate clears the 0:0 file owner of microsoft/WSL#40941 (W7 records it);
 - whether `hv_storvsc` errors break a first launch on this kernel (microsoft/WSL#41482; P3 records a baseline and
   stops on an error line less than one hour old, and W5 counts again after the first launch);
-- the bounded comparison against Ubuntu 26.04.1 LTS, WSL's current default `Ubuntu`.
+- completion of the preregistered comparison of Ubuntu 26.04.1 default and 24.04.5 rollback on throwaway names;
+  the default's run 3 passed P1 to F5 on 3.0.1 with the corrected template; stage 2, its two probes and the rollback
+  arm are owed.
 
 ## Boundaries
 

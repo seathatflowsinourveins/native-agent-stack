@@ -1,0 +1,185 @@
+{
+  "layers": [
+    {
+      "layer_id": "observation-inference",
+      "selection": [
+        {
+          "name": "C02: OTel Collector Contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "role": "Single local telemetry ingress and privacy boundary. Filter attributes, resources, names and bodies before exporting traces to OpenLIT and service metrics to Prometheus. This topology requires qualification.",
+          "install_command": "git clone --depth 1 --branch v0.162.0 https://github.com/open-telemetry/opentelemetry-collector-contrib.git\ncd opentelemetry-collector-contrib\nmake otelcontribcol",
+          "install_source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/CONTRIBUTING.md#local-testing",
+          "basis": [
+            {
+              "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/6e4d2c4bb7f4662ffa9d9e802a708f2e25fc3d10/processor/redactionprocessor/README.md",
+              "shows": "Attribute allowlisting and value masking; traces are beta, logs and metrics alpha. Attribute redaction alone does not establish complete content privacy."
+            },
+            {
+              "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/6e4d2c4bb7f4662ffa9d9e802a708f2e25fc3d10/processor/transformprocessor/README.md",
+              "shows": "Transforms resources and signal fields, including log bodies. error_mode=propagate drops payloads when processing fails."
+            },
+            {
+              "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md",
+              "shows": "Exposes processed metrics for Prometheus scraping, with controls over resource labels."
+            },
+            {
+              "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/d1f956e42a27d00992d89e4b7a5258734607c440/checks",
+              "shows": "Previous default-branch commit had a successful CI rollup, including processor tests and Darwin builds. Latest head CI was still pending; no claim that every latest-head check passed."
+            },
+            {
+              "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+              "shows": "Released 2026-09-29; default-branch commit observed 2026-10-02 UTC and recently updated issues. Linux x86_64 build instructions are explicit; Darwin CI supports secondary-host feasibility."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C07: OpenLIT",
+          "repository": "https://github.com/openlit/openlit",
+          "role": "Provisional native-agent capture and local trace/evaluation backend. Use one capture strategy per client, send events through the Collector, and avoid parallel session capture.",
+          "install_command": "git clone https://github.com/openlit/openlit.git\ncd openlit\ndocker compose up -d\ncurl -fsSL https://raw.githubusercontent.com/openlit/openlit/main/cli/scripts/install.sh | sh\nopenlit configure --endpoint http://127.0.0.1:4318\nopenlit coding install --vendor=claude-code\nopenlit coding install --vendor=codex\nopenlit doctor",
+          "install_source": "https://github.com/openlit/openlit/blob/897838a26e447f7f82dccfb59f7cbe0bfba3b694/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e447f7f82dccfb59f7cbe0bfba3b694/README.md#coding-agent-observability-claude-code-cursor-codex--windsurf",
+              "shows": "Documents macOS/Linux installation, endpoint configuration and hooks for both Claude Code and Codex. Captured events can include prompts, tools, tokens and costs."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e447f7f82dccfb59f7cbe0bfba3b694/README.md",
+              "shows": "Documents standard OTLP export, a Collector before the local backend for processing, dashboards and evaluation capabilities. This is the clearest documented whole-layer fit, not measured superiority."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/actions/runs/36825597668/job/110250469428",
+              "shows": "Linux-amd64 test completed successfully at the examined head."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/actions/runs/36825597705/job/110250822172",
+              "shows": "Darwin-arm64 build completed successfully; runtime behavior on macOS arm64 remains untested here."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/releases/tag/openlit-2.1.0",
+              "shows": "Released 2026-09-10; default-branch commit 2026-10-01 and recent issue updates establish currency. The release README and current README describe different Collector arrangements."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C09: Prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "role": "Local storage and queries for filtered service counters, latency and errors. Scrape the Collector's processed metrics rather than capture the same events independently.",
+          "install_command": "docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus:v3.15.0",
+          "install_source": "https://github.com/prometheus/prometheus/blob/7c741e2879db6b58b8d152f566a8112f0d642bb1/README.md#docker-images",
+          "basis": [
+            {
+              "url": "https://github.com/prometheus/prometheus/blob/7c741e2879db6b58b8d152f566a8112f0d642bb1/README.md",
+              "shows": "Autonomous time-series storage, scraping, PromQL, graphing and documented Docker installation; complements agent traces with service outcomes."
+            },
+            {
+              "url": "https://github.com/prometheus/prometheus/actions/runs/36936418181/job/110617634237",
+              "shows": "Go tests completed successfully at the examined default-branch head; compliance and upgrade/downgrade checks also succeeded."
+            },
+            {
+              "url": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+              "shows": "Released 2026-09-25 with Linux-amd64 and Darwin-arm64 binaries. Default-branch commit 2026-10-01 and recent issue updates establish currency."
+            }
+          ],
+          "confidence": "high"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C14",
+          "name": "otel-tui",
+          "reason": "Useful live OTLP inspection, but its bounded viewer adds less than retained metrics and trace evaluation for this requirement. [README](https://github.com/ymtdzzz/otel-tui/blob/253c5e35ab39d1472955eaeb0304c3cf501dbf7c/README.md)"
+        },
+        {
+          "key": "C12",
+          "name": "Loki",
+          "reason": "Adds log retention and querying; a separate log store is not required by the packet and does not provide native accounting or model qualification. [README](https://github.com/grafana/loki/blob/d6e3d1b96da1fdd56f54eee83666fee22541765a/README.md)"
+        },
+        {
+          "key": "C10",
+          "name": "AgentsView",
+          "reason": "Strong native usage and outcome auditing, but its session-to-SQLite archive lacks a documented shared Collector/service-metric path and would add another measurement store. [README](https://github.com/kenn-io/agentsview/blob/d37642206051dababc436635024676c17dddac45/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "Grafana",
+          "reason": "Adds capable general dashboards, but OpenLIT and Prometheus already provide views and queries; no distinct capture, privacy or qualification function is needed here. [README](https://github.com/grafana/grafana/blob/f89103a8dac3e24563d0ce43f83fd085676a92d6/README.md)"
+        },
+        {
+          "key": "C03",
+          "name": "Alertmanager",
+          "reason": "Alert routing, grouping and inhibition are useful downstream functions, but the requirement does not request notifications. [README](https://github.com/prometheus/alertmanager/blob/61ba43d505ca5867ddfee77fc7a64ee80b114454/README.md)"
+        },
+        {
+          "key": "C11",
+          "name": "vllm",
+          "reason": "Linux/WSL CUDA installation is documented, but no actual-task quality, privacy, latency, recovery or 24-GB VRAM result qualifies this optional route. [GPU guide](https://docs.vllm.ai/en/latest/getting_started/installation/gpu/)"
+        },
+        {
+          "key": "C04",
+          "name": "ntfy",
+          "reason": "Self-hosted notifications do not supply the required accounting, service observation or workload qualification. [README](https://github.com/binwiederhier/ntfy/blob/1e6305ccecc0af15b13d239c3281543bea27b960/README.md)"
+        },
+        {
+          "key": "C08",
+          "name": "Phoenix",
+          "reason": "Strong datasets, experiments, evaluations and MCP access; its documented coding-agent setup instruments applications rather than harvesting native CLI sessions, making OpenLIT the closer whole-layer fit. [README](https://github.com/Arize-ai/phoenix/blob/7ea5dc10be15a283f8a25b87b24516e0b66c7b7f/README.md)"
+        },
+        {
+          "key": "C13",
+          "name": "llama.cpp optional inference",
+          "reason": "CUDA, Metal and quantization provide plausible host fit, but no actual workload comparison qualifies an optional route; defer rather than infer superiority from portability. [README](https://github.com/ggml-org/llama.cpp/blob/5fc4f3c8c7103ffd0b7ff5ee4855bcc78a3ed5cd/README.md)"
+        },
+        {
+          "key": "C01",
+          "name": "SGLang",
+          "reason": "Serving benchmarks and metrics facilities are relevant, but no recorded RTX-4090 task-quality, privacy, memory or recovery comparison qualifies this route. [Benchmark guide](https://docs.sglang.ai/developer_guide/bench_serving)"
+        },
+        {
+          "key": "C06",
+          "name": "Claude HUD",
+          "reason": "Useful local Claude Code status display, but it does not provide cross-client accounting or a shared service-telemetry pipeline. [README](https://github.com/jarrodwatts/claude-hud/blob/33b51db6ceb5d0c91dc9c22404abcabacc8603b0/README.md)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Provisional selection based on documented capability fit. On WSL2, compare OpenLIT's single filtered pipeline against AgentsView native accounting and Phoenix workload evaluation, running every named arm on identical Claude Code and Codex tasks. Reconcile native token categories, tool/service outcomes and actual test results; inject prompt/tool-result privacy sentinels and inspect exported data and storage; measure overhead, restart/outage recovery, loss and duplicate events. Repeat the relevant checks on macOS arm64. Qualify optional inference separately by running llama.cpp, vLLM and SGLang on the RTX 4090 with comparable supported model/context settings, measuring actual task correctness, privacy, latency, peak VRAM and recovery. No runtime is selected before that qualification.",
+      "evidence_gaps": [
+        "The mandated ctx tools were blocked: they require approval, while this session's policy is never. No web pages were successfully fetched/indexed. Evidence instead came from GitHub API source blobs and primary-source search results; the requested page-reading workflow remains unmet.",
+        "Budget used: 30 GitHub API calls, including two batched GraphQL requests; six web searches; zero successful page fetches. Only the supplied packet was read from the workspace.",
+        "All 14 repositories were non-archived and had default-branch commits and releases within 90 days. Observed commit dates ranged from September 21 to October 2 UTC, releases from August 27 to October 2 UTC. Recent issue updates were present except Claude HUD, which had no open issues. Freshness therefore does not separate the field.",
+        "The packet contains no head-to-head results. Upstream CI establishes component testing, not native counter accuracy, complete privacy filtering or measured superiority on this workload.",
+        "OpenLIT captures potentially sensitive content. The proposed filter's coverage, fail-closed behavior, backend routing and absence of duplicate capture have not been tested. Current and release README topology differences also prevent calling the bootstrap commands a qualified integrated installation.",
+        "Linux and arm64 source/build evidence supports platform feasibility; the complete observation stack was not tested under WSL2 or macOS arm64. No optional model's workload fit on the 24-GB RTX 4090 was established."
+      ],
+      "sources_read": [
+        "GitHub REST repository metadata for all 14 packet repositories; latest-release and latest-commit endpoints for Collector Contrib, OpenLIT, Prometheus, Grafana, Phoenix, AgentsView and llama.cpp.",
+        "GitHub GraphQL upstream README blobs, default-branch commits and latest releases for all 14 candidates; recent issues and CI check conclusions for plausible selections.",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/CONTRIBUTING.md",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/6e4d2c4bb7f4662ffa9d9e802a708f2e25fc3d10/processor/redactionprocessor/README.md",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/6e4d2c4bb7f4662ffa9d9e802a708f2e25fc3d10/processor/transformprocessor/README.md",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/6e4d2c4bb7f4662ffa9d9e802a708f2e25fc3d10/processor/filterprocessor/README.md",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md",
+        "https://github.com/openlit/openlit/blob/897838a26e447f7f82dccfb59f7cbe0bfba3b694/README.md",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md",
+        "https://github.com/prometheus/prometheus/blob/7c741e2879db6b58b8d152f566a8112f0d642bb1/README.md",
+        "https://github.com/kenn-io/agentsview/blob/d37642206051dababc436635024676c17dddac45/README.md",
+        "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md",
+        "https://github.com/Arize-ai/phoenix/blob/7ea5dc10be15a283f8a25b87b24516e0b66c7b7f/README.md",
+        "https://github.com/grafana/grafana/blob/f89103a8dac3e24563d0ce43f83fd085676a92d6/README.md",
+        "https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/setup-grafana/installation/docker/index.md",
+        "https://github.com/grafana/loki/blob/d6e3d1b96da1fdd56f54eee83666fee22541765a/README.md",
+        "https://github.com/ymtdzzz/otel-tui/blob/253c5e35ab39d1472955eaeb0304c3cf501dbf7c/README.md",
+        "https://github.com/prometheus/alertmanager/blob/61ba43d505ca5867ddfee77fc7a64ee80b114454/README.md",
+        "https://github.com/binwiederhier/ntfy/blob/1e6305ccecc0af15b13d239c3281543bea27b960/README.md",
+        "https://github.com/jarrodwatts/claude-hud/blob/33b51db6ceb5d0c91dc9c22404abcabacc8603b0/README.md",
+        "https://github.com/ggml-org/llama.cpp/blob/5fc4f3c8c7103ffd0b7ff5ee4855bcc78a3ed5cd/README.md",
+        "https://github.com/vllm-project/vllm/blob/fcfacc3499b3f45978fc92a1b300f817cd17bb77/README.md",
+        "https://github.com/sgl-project/sglang/blob/6be84e1b72df81aa7edf40640de0d8e529d96c59/README.md",
+        "Primary search excerpts: OpenTelemetry processor/configuration documentation; Prometheus installation; AgentsView archive, usage and capture documentation; vLLM GPU installation; SGLang serving benchmarks and observability."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "layers": [
+    {
+      "layer_id": "web-search-provider",
+      "selection": [
+        {
+          "name": "free-search-mcp",
+          "repository": "https://github.com/sweetcornna/free-search-mcp",
+          "role": "C08: Standalone co-finalist. Offers a compact installation path, documented recovery from failed search engines, and relevant upstream ranking evaluations. Choose this deployment or the SearXNG-plus-adapter deployment below; the evidence does not establish a measured winner.",
+          "install_command": "uvx free-search-mcp==0.13.1",
+          "install_source": "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/INSTALL.md",
+          "basis": [
+            {
+              "url": "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/HOW_IT_WORKS.md",
+              "shows": "The default DuckDuckGo, Bing, AnySearch and Mojeek pool needs no API key or browser. Documents engine circuit breakers, off-topic filtering, reserve engines and bounded recovery. Technical categories include software registries, releases and papers. Optional account-backed engines are unnecessary for this requirement."
+            },
+            {
+              "url": "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/INSTALL.md",
+              "shows": "Documents uvx installation and MCP registration for both Claude Code and Codex. Python 3.11+ is required; Chromium is optional for additional browser engines. The upstream plugin pins the same package version."
+            },
+            {
+              "url": "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/evals/ranking/README.md",
+              "shows": "Reports an internal ranking comparison on a 14-query capture: native-category weighting improved hit@1 from 6 to 8, hit@3 from 9 to 13, and MRR from 0.605 to 0.747. A later 17-case capture reported three improvements and no regressions. These compare merge configurations within this repository, not competing providers. Full captures are untracked; four regression cases remain committed."
+            },
+            {
+              "url": "https://github.com/sweetcornna/free-search-mcp/actions/runs/36856462586",
+              "shows": "GitHub API reported this 2026-10-01 CI run successful at the latest default-branch commit. The upstream workflow tests Python 3.11–3.13 and fresh dependency resolution within the supported SDK range. Network tests are opt-in; the newest-SDK canary allows failure, so overall success does not establish live retrieval reliability or unrestricted SDK compatibility."
+            },
+            {
+              "url": "https://api.github.com/repos/sweetcornna/free-search-mcp",
+              "shows": "Unarchived, MIT licensed, with one open issue/PR according to the repository API. Latest default-branch commit: 2026-09-27, 98fdcbed6a75cb6f0943236aa038cc920e3e2ed9. Latest release: v0.13.1 on 2026-09-26. Both fall within the 90-day window."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "SearXNG",
+          "repository": "https://github.com/searxng/searxng",
+          "role": "C07: Search backend of the second co-finalist deployment, paired with mcp-searxng. Provides configurable metasearch and a JSON API using free engines, with more service setup than the standalone finalist.",
+          "install_command": "git clone https://github.com/searxng/searxng.git searxng\ncd searxng\ngit checkout a9d99003344ac3879ec45c56c661283482a92a39\nsudo -H ./utils/searxng.sh install all",
+          "install_source": "https://github.com/searxng/searxng/blob/a9d99003344a/docs/admin/installation-scripts.rst",
+          "basis": [
+            {
+              "url": "https://github.com/searxng/searxng/blob/a9d99003344a/docs/dev/search_api.rst",
+              "shows": "Documents HTTP search, JSON output, engine selection and category filters. The settings inventory includes technical sources and categories. JSON must be explicitly enabled; public instances may disable it. An operator-controlled deployment can use free engines without a paid search API."
+            },
+            {
+              "url": "https://github.com/searxng/searxng/blob/a9d99003344a/docs/admin/installation-docker.rst",
+              "shows": "Documents official container images and a recommended Compose installation, providing an alternative to the Linux installation script. Container operation on WSL2 and macOS is a platform-fit inference, not a verified target-host installation."
+            },
+            {
+              "url": "https://github.com/searxng/searxng/actions/runs/36674424361",
+              "shows": "GitHub API reported Integration successful on 2026-09-30 at the selected commit. The workflow tests Python 3.11–3.14 on Ubuntu; make ci.test includes unit tests, browser tests and lint checks. This verifies implementation behavior rather than technical-query recall."
+            },
+            {
+              "url": "https://github.com/searxng/searxng/actions/runs/36674678754",
+              "shows": "GitHub API reported the corresponding Container workflow successful. Its build-and-test matrix includes Linux amd64 and arm64, supporting the primary architecture and a container path for Apple Silicon."
+            },
+            {
+              "url": "https://api.github.com/repos/searxng/searxng",
+              "shows": "Unarchived, AGPL-3.0 licensed, with 193 open issues/PRs according to the repository API. Latest default-branch commit: 2026-09-30, a9d99003344ac3879ec45c56c661283482a92a39. The latest-release endpoint returned HTTP 404; recent integration and container publication activity establishes currency without a formal GitHub release."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "mcp-searxng",
+          "repository": "https://github.com/ihor-sokoliuk/mcp-searxng",
+          "role": "C04: Agent-client adapter for the SearXNG co-finalist deployment. Requires a separately installed SearXNG instance with JSON search enabled.",
+          "install_command": "npm install -g mcp-searxng@2.5.0",
+          "install_source": "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/README.md#installation",
+          "basis": [
+            {
+              "url": "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/README.md",
+              "shows": "Documents Node.js 22+, local STDIO and Streamable HTTP, filtered and paginated search, structured output, caching, replica failover and optional fan-out. Requires SEARXNG_URL and an existing JSON-enabled SearXNG service."
+            },
+            {
+              "url": "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/docs/client-configurations.md",
+              "shows": "Provides explicit Claude Code and Codex configuration recipes. These establish an upstream-supported integration path; the guide explicitly distinguishes recipe coverage from testing every client/version/OS combination."
+            },
+            {
+              "url": "https://github.com/ihor-sokoliuk/mcp-searxng/actions/runs/36630837577",
+              "shows": "GitHub API reported CI successful on 2026-09-29 at the latest default-branch commit. The upstream package enforces 90% line and 85% branch coverage, and CI invokes coverage and E2E tests across Node 22, 24 and 26.7.0. Live-SearXNG E2E suites skip when their live URL is unset."
+            },
+            {
+              "url": "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/docs/deployment-profiles.md",
+              "shows": "Publishes historical adapter-only measurements using deterministic mock SearXNG replicas: the eight-session sample completed 960 tool calls in 6.06 seconds, with observed memory of 53.63–254.40 MiB. It excludes real search-engine throttling, uses version 1.12.1, and retains neither the harness nor raw measurements. It cannot establish ten-query live search capacity."
+            },
+            {
+              "url": "https://github.com/ihor-sokoliuk/mcp-searxng/releases/tag/v2.5.0",
+              "shows": "Released 2026-09-29, including fixes that distinguish degraded empty searches from genuine empty results and preserve engine-failure diagnostics. Latest default-branch commit was also 2026-09-29. Repository API reports unarchived status, MIT licensing and four open issues/PRs. Release notes show work on reported search degradation."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Open-WebSearch",
+          "reason": "Fits with keyless multi-engine MCP, CLI and daemon interfaces, and has upstream test scripts; the reviewed workflow builds containers, while the shortlist has verified test CI and more relevant published evaluation evidence. No applicable recall/concurrency comparison was found in the reviewed README and release notes. Unarchived; commit 2026-09-30, v2.2.0 release 2026-09-28, 12 open issues/PRs. [README](https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/README.md), [test commands](https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/package.json), [workflow](https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/.github/workflows/docker.yml)."
+        },
+        {
+          "key": "C02",
+          "name": "ddgs",
+          "reason": "A strong low-setup alternative with Python, CLI, HTTP API and native MCP support; this is broader than a DuckDuckGo-only library. No applicable recall or ten-query measurement was found in the reviewed v9.16.0 README and release notes, leaving less public evidence than the shortlist. Unarchived; commit and v9.16.0 release 2026-08-26, 33 open issues/PRs. [README](https://github.com/deedy5/ddgs/blob/v9.16.0/README.md), [release](https://github.com/deedy5/ddgs/releases/tag/v9.16.0)."
+        },
+        {
+          "key": "C03",
+          "name": "Exa Python SDK",
+          "reason": "Its documented SDK path requires an Exa API key, and no sustained no-cost allowance was verified from the reviewed sources; the finalists establish a clearer no-paid-service path. API-key requirements alone do not justify a needs_paid_service exclusion. Unarchived; commit and v2.25.0 release 2026-10-01, 46 open issues/PRs. [README](https://github.com/exa-labs/exa-py/blob/v2.25.0/README.md), [client constructor](https://github.com/exa-labs/exa-py/blob/v2.25.0/exa_py/api.py)."
+        },
+        {
+          "key": "C05",
+          "name": "DuckDuckGo MCP Server",
+          "reason": "Fits free MCP search and documents configurable rate limiting plus a recommended TLS-impersonation fallback, but relies on one search provider instead of cross-engine recovery. Its default 30 searches/minute is a local control, not measured upstream capacity. Unarchived; commit and v0.7.0 release 2026-09-04, two open issues/PRs. [README](https://github.com/nickclyde/duckduckgo-mcp-server/blob/v0.7.0/README.md), [release](https://github.com/nickclyde/duckduckgo-mcp-server/releases/tag/v0.7.0)."
+        },
+        {
+          "key": "C06",
+          "name": "Parallel Search MCP",
+          "reason": "Anonymous free search/fetch satisfies the cost requirement, so it is not excluded as paid-only. However, the repository contains client packages and configuration rather than the search implementation; anonymous requests ignore search customization, and ten-query capacity remains unmeasured. Unarchived; commit 2026-09-25, v0.1.1 release 2026-09-21, one open issue/PR. [README](https://github.com/parallel-web/search-mcp/blob/be25b8fa45b3/README.md)."
+        },
+        {
+          "key": "C09",
+          "name": "Tavily Python SDK",
+          "reason": "Current upstream documents keyless search/extract and free personal usage, so it is not excluded as paid-only. It requires Python harness integration, whereas the finalists provide documented MCP deployments; no comparable keyless recall/concurrency evaluation was found in the reviewed README. Unarchived; commit 2026-09-18, latest-release endpoint HTTP 404, 22 open issues/PRs. [README](https://github.com/tavily-ai/tavily-python/blob/1aeb9db64cf5/README.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "No measured winner is established between standalone free-search-mcp@0.13.1 and SearXNG@a9d99003344ac3879ec45c56c661283482a92a39 plus mcp-searxng@2.5.0. Run both on the new WSL2 Ubuntu x86_64 host against the same frozen technical queries and known-relevant URLs. Measure recall@10, empty/off-topic results, and failures, throttling and latency under repeated bursts of ten distinct parallel queries. Separate cold-cache and warm-cache runs, randomize arm order, and record clean-install time, manual configuration and runtime dependencies. Use the same network and locale and only free backends. Neither finalist requires the RTX 4090. Repeat installation and MCP smoke checks on macOS arm64; retain a tie if the results do not separate the deployments.",
+      "evidence_gaps": [
+        "Judgment date: 2026-10-02 UTC; the 90-day cutoff is 2026-07-04. All nine repositories were unarchived and had a default-branch commit within that window. Currency alone therefore excludes none.",
+        "The packet contains no comparison where all named arms ran. The published ranking results and adapter resource measurements concern different workloads and cannot establish cross-repository superiority.",
+        "No verified live ten-parallel-query comparison was obtained. Successful offline or mocked CI must not be interpreted as measured search availability, recall or resistance to upstream blocking.",
+        "No actual WSL2 or macOS arm64 clean installation was performed. Platform fit rests on upstream Linux installation paths, Ubuntu CI, container architecture matrices and runtime portability; macOS arm64 end-to-end behavior remains unverified.",
+        "Open issue/PR counts were obtained uniformly from repository metadata. Issue response times, recent closure rates and maintainer responsiveness were not audited; counts were not treated as quality scores. License information did not affect selection.",
+        "The requested ctx_fetch_and_index tool rejected both page-fetch attempts because approval was required while the environment's approval policy was never. Public upstream repositories were instead cloned into /tmp, their documents indexed with ctx_index, and relevant passages read with ctx_search. Only the named packet was read under the local working directory.",
+        "Research stayed within 30 GitHub API calls, three attempted web-search queries and two rejected page-fetch attempts. The web search returned an upstream timeout, so it supplied no evidence. No stars, downloads, installed project choices or candidate ordering informed the judgment."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/Aas-ee/open-webSearch",
+        "https://api.github.com/repos/Aas-ee/open-webSearch/releases/latest",
+        "https://api.github.com/repos/Aas-ee/open-webSearch/commits?per_page=1",
+        "https://api.github.com/repos/ihor-sokoliuk/mcp-searxng",
+        "https://api.github.com/repos/ihor-sokoliuk/mcp-searxng/releases/latest",
+        "https://api.github.com/repos/ihor-sokoliuk/mcp-searxng/commits?per_page=1",
+        "https://api.github.com/repos/sweetcornna/free-search-mcp",
+        "https://api.github.com/repos/sweetcornna/free-search-mcp/releases/latest",
+        "https://api.github.com/repos/sweetcornna/free-search-mcp/commits?per_page=1",
+        "https://api.github.com/repos/exa-labs/exa-py",
+        "https://api.github.com/repos/exa-labs/exa-py/releases/latest",
+        "https://api.github.com/repos/exa-labs/exa-py/commits?per_page=1",
+        "https://api.github.com/repos/parallel-web/search-mcp",
+        "https://api.github.com/repos/parallel-web/search-mcp/releases/latest",
+        "https://api.github.com/repos/parallel-web/search-mcp/commits?per_page=1",
+        "https://api.github.com/repos/nickclyde/duckduckgo-mcp-server",
+        "https://api.github.com/repos/nickclyde/duckduckgo-mcp-server/releases/latest",
+        "https://api.github.com/repos/nickclyde/duckduckgo-mcp-server/commits?per_page=1",
+        "https://api.github.com/repos/tavily-ai/tavily-python",
+        "https://api.github.com/repos/tavily-ai/tavily-python/releases/latest",
+        "https://api.github.com/repos/tavily-ai/tavily-python/commits?per_page=1",
+        "https://api.github.com/repos/deedy5/ddgs",
+        "https://api.github.com/repos/deedy5/ddgs/releases/latest",
+        "https://api.github.com/repos/deedy5/ddgs/commits?per_page=1",
+        "https://api.github.com/repos/searxng/searxng",
+        "https://api.github.com/repos/searxng/searxng/releases/latest",
+        "https://api.github.com/repos/searxng/searxng/commits?per_page=1",
+        "https://api.github.com/repos/ihor-sokoliuk/mcp-searxng/actions/runs?branch=main&head_sha=bfe400fd0c0be20fea156713217ea87d3f3942c6&per_page=20",
+        "https://api.github.com/repos/searxng/searxng/actions/runs?branch=master&head_sha=a9d99003344ac3879ec45c56c661283482a92a39&per_page=20",
+        "https://api.github.com/repos/sweetcornna/free-search-mcp/actions/runs?branch=main&head_sha=98fdcbed6a75cb6f0943236aa038cc920e3e2ed9&per_page=20",
+        "https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/README.md",
+        "https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/package.json",
+        "https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/.github/workflows/docker.yml",
+        "https://github.com/deedy5/ddgs/blob/v9.16.0/README.md",
+        "https://github.com/deedy5/ddgs/blob/v9.16.0/ddgs/ddgs.py",
+        "https://github.com/deedy5/ddgs/blob/v9.16.0/.github/workflows/python-package.yml",
+        "https://github.com/exa-labs/exa-py/blob/v2.25.0/README.md",
+        "https://github.com/exa-labs/exa-py/blob/v2.25.0/exa_py/api.py",
+        "https://github.com/parallel-web/search-mcp/blob/be25b8fa45b3/README.md",
+        "https://github.com/nickclyde/duckduckgo-mcp-server/blob/v0.7.0/README.md",
+        "https://github.com/nickclyde/duckduckgo-mcp-server/blob/v0.7.0/.github/workflows/test.yml",
+        "https://github.com/tavily-ai/tavily-python/blob/1aeb9db64cf5/README.md",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/README.md",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/docs/client-configurations.md",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/docs/self-hosted-searxng.md",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/docs/deployment-profiles.md",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/package.json",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/.github/workflows/ci.yml",
+        "https://github.com/ihor-sokoliuk/mcp-searxng/blob/v2.5.0/__tests__/e2e/run-e2e.ts",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/README.rst",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/docs/dev/search_api.rst",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/docs/admin/installation-scripts.rst",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/docs/admin/installation-docker.rst",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/.github/workflows/integration.yml",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/.github/workflows/container.yml",
+        "https://github.com/searxng/searxng/blob/a9d99003344a/searx/settings.yml",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/README.md",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/INSTALL.md",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/HOW_IT_WORKS.md",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/docs/CONFIGURATION.md",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/evals/ranking/README.md",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/evals/ranking/replay.py",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/.github/workflows/ci.yml",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/pyproject.toml",
+        "https://github.com/sweetcornna/free-search-mcp/blob/v0.13.1/plugins/free-search/.mcp.json"
+      ]
+    }
+  ]
+}

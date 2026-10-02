@@ -1,0 +1,27 @@
+test_average_preserves_normal_result (test_utils.QuickstartContract.test_average_preserves_normal_result) ... FAIL
+test_empty_average_does_not_crash (test_utils.QuickstartContract.test_empty_average_does_not_crash) ... ok
+test_name_preserves_normal_result (test_utils.QuickstartContract.test_name_preserves_normal_result) ... FAIL
+test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash) ... ok
+
+======================================================================
+FAIL: test_average_preserves_normal_result (test_utils.QuickstartContract.test_average_preserves_normal_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/test_utils.py", line 32, in test_average_preserves_normal_result
+    self.assertEqual(UTILS.calculate_average([2, 4, 6]), 4)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 4
+
+======================================================================
+FAIL: test_name_preserves_normal_result (test_utils.QuickstartContract.test_name_preserves_normal_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<checkout>/examples/native-sdk-acceptance/claude-quickstart/test_utils.py", line 35, in test_name_preserves_normal_result
+    self.assertEqual(UTILS.get_user_name({"name": "Alice"}), "ALICE")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'ALICE'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (failures=2)

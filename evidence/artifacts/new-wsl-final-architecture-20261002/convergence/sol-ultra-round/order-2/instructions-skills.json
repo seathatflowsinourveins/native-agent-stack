@@ -1,0 +1,229 @@
+{
+  "layers": [
+    {
+      "layer_id": "instructions-skills",
+      "selection": [
+        {
+          "name": "C13: skills (mattpocock)",
+          "repository": "https://github.com/mattpocock/skills",
+          "role": "Preferred general engineering procedure source. Install individual matching skills; use writing-for-agents for concise canonical rules.",
+          "install_command": "npx skills@latest add mattpocock/skills",
+          "install_source": "Upstream README at d81f3a183412e71a5b1e84ca21bc1a35eea03a60 documents interactive selection of individual skills and target agents, including Claude Code and Codex.",
+          "basis": [
+            {
+              "url": "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/productivity/writing-for-agents/SKILL.md",
+              "shows": "Direct requirement fit: one authoritative location per meaning, removal of ineffective instructions, concise conditional pointers, and disclosure of references only when their task branch needs them."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/README.md",
+              "shows": "Documented individual-skill installation for both clients. Avoiding collection-wide installation is a supported choice."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/issues/514",
+              "shows": "Published evaluation of a proposed TDD revision: four features, mutation kills 22/24 versus 24/24, approximately 25% more builder tokens. Explicit limitations include n=1 and one model family; this establishes neither current-pin effectiveness nor superiority over another repository."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/actions/runs/36569384257",
+              "shows": "Successful release workflow at the reviewed commit. Its Version check is release automation, not behavioral testing."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/commit/d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+              "shows": "Default-branch commit dated 2026-09-29, within 90 days."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/releases/tag/v1.2.3",
+              "shows": "Latest published release dated 2026-08-06, within 90 days."
+            },
+            {
+              "url": "https://github.com/mattpocock/skills/issues/1150",
+              "shows": "Issue closed with activity on 2026-10-01; maintenance activity extends beyond releases."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C11: Trail of Bits security skills",
+          "repository": "https://github.com/trailofbits/skills",
+          "role": "Complementary procedures for matching security, testing and development tasks. Install only the relevant plugin.",
+          "install_command": "codex plugin marketplace add trailofbits/skills\ncodex plugin add <plugin-name>@trailofbits",
+          "install_source": "Upstream README at 82fe8226252622fa807643bdca1710901198553a documents plugin selection in Codex and Claude Code. Claude Code uses /plugin marketplace add trailofbits/skills followed by /plugin menu.",
+          "basis": [
+            {
+              "url": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md",
+              "shows": "Separately selectable plugins provide concrete security, testing and development procedures; installation is documented for both clients."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/AGENTS.md",
+              "shows": "Authoring standards require short entry instructions, quick-start-first progressive disclosure, SKILL.md under 500 lines, and direct reference links."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/.github/workflows/validate.yml",
+              "shows": "Ubuntu CI validates metadata and checks Claude Code and Codex plugin loadability; Codex is pinned to 0.146.0."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/actions/runs/36462884188",
+              "shows": "Successful plugin and skill validation at the reviewed default-branch commit."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/.github/workflows/lint.yml",
+              "shows": "Executed test infrastructure includes Python, JavaScript and Bats suites, with validator and evaluation-harness self-tests."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/actions/runs/36462884211",
+              "shows": "Successful upstream lint and script-test run at the reviewed commit; this supports implementation quality, not measured downstream task superiority."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/commit/82fe8226252622fa807643bdca1710901198553a",
+              "shows": "Default-branch commit dated 2026-09-28, within 90 days."
+            },
+            {
+              "url": "https://api.github.com/repos/trailofbits/skills/releases/latest",
+              "shows": "Latest-release endpoint returned 404. Current default-branch activity satisfies the frozen maintenance rule despite no latest published release."
+            },
+            {
+              "url": "https://github.com/trailofbits/skills/issues/298",
+              "shows": "Concrete scanner omission was fixed and the issue closed on 2026-09-28."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C10",
+          "name": "skills-ref",
+          "reason": "Useful specification and validator, but upstream explicitly labels the reference library demonstration-only; it supplies less production task-procedure coverage than the selections. Default-branch commit: August 9. [README](https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref/README.md)"
+        },
+        {
+          "key": "C09",
+          "name": "skill:typesafe-ai (typesafe-ai)",
+          "reason": "A maintained procedure source specifically for TypeSafe’s System One API; reserve it for that matching integration rather than the general instructions baseline. Default-branch commit: September 12. [README](https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "affaan-m/ecc",
+          "reason": "Closest broad alternative: successful Ubuntu/Windows/macOS CI and an October 1 release, but its minimal profile still installs five module families, including rules and platform configuration; the selections offer narrower procedure installation. [Profiles](https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/manifests/install-profiles.json), [CI](https://github.com/affaan-m/ECC/actions/runs/36953667925)"
+        },
+        {
+          "key": "C02",
+          "name": "VoltAgent subagent collection",
+          "reason": "Selective agent installation is documented, but its principal deliverable is specialized Claude Code worker roles rather than canonical task rules and skill procedures across both requested clients. Default-branch commit: September 21. [README](https://github.com/VoltAgent/awesome-claude-code-subagents/blob/82b73821baa7a911d5b14cfb6da238b7f0db6b42/README.md)"
+        },
+        {
+          "key": "C07",
+          "name": "Anthropic webapp-testing skill",
+          "reason": "Good scoped Playwright procedure with black-box helpers; the documented Claude installation installs the example-skills bundle, while an isolated Linux/Codex installation was not verified. Retain for matching web-testing tasks. Default-branch commit: September 29. [Skill](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/SKILL.md), [README](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/README.md)"
+        },
+        {
+          "key": "C04",
+          "name": "Shan Claude best practice",
+          "reason": "Current guidance and examples are useful references, but the reviewed README is a broad Claude practices catalog rather than a comparably documented individual-procedure installer for both clients. Default-branch commit: October 2 UTC. [README](https://github.com/shanraisshan/claude-code-best-practice/blob/f328456eee464d6de86f90c213a685b18a4461e9/README.md)"
+        },
+        {
+          "key": "C12",
+          "name": "Claude Code Templates",
+          "reason": "Maintained component installer with selective installation, configuration and monitoring features; those additional responsibilities offer less direct fit than the selected procedure sources. Default-branch commit: October 2 UTC; latest release: September 17. [README](https://github.com/davila7/claude-code-templates/blob/f41d5837cfec311b8e6357440adda498d775003f/README.md)"
+        },
+        {
+          "key": "C14",
+          "name": "Vercel frontend skills",
+          "reason": "Useful frontend-specific addition with individual rule references and successful validation/build checks; the evidence does not establish a stronger general engineering baseline. Default-branch commit and release: August 28. [Skill](https://github.com/vercel-labs/agent-skills/blob/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices/SKILL.md), [CI](https://github.com/vercel-labs/agent-skills/actions/runs/33176142343)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C01",
+          "name": "Trail of Bits skills",
+          "criterion": "duplicate",
+          "fact": "Resolved by name to the same official Trail of Bits skills marketplace already evaluated; the packet supplies no separate repository. [Official repository](https://github.com/trailofbits/skills)"
+        },
+        {
+          "key": "C05",
+          "name": "Vercel agent-skills",
+          "criterion": "duplicate",
+          "fact": "Resolved by name to vercel-labs/agent-skills, already evaluated as Vercel frontend skills; no separate repository is supplied. [Official repository](https://github.com/vercel-labs/agent-skills)"
+        },
+        {
+          "key": "C08",
+          "name": "Anthropic skills (webapp-testing)",
+          "criterion": "duplicate",
+          "fact": "Names the same anthropics/skills webapp-testing procedure already evaluated. [Upstream skill](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/SKILL.md)"
+        },
+        {
+          "key": "C03",
+          "name": "skill:openai-curated (openai)",
+          "criterion": "stale_or_archived",
+          "fact": "Latest default-branch commit is 49f948faa9258a0c61caceaf225e179651397431, dated 2026-06-24, outside the 90-day window. September push activity does not establish a newer default-branch commit. [Commit](https://github.com/openai/skills/commit/49f948faa9258a0c61caceaf225e179651397431)"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Compare the selected task-matched procedures against ECC minimal and no-skill baselines in clean WSL2 Ubuntu x86_64 sessions, using identical pinned models and clients. Include instruction-writing, coding/TDD, debugging and security/testing tasks. Retain discovery traces, loaded sections, concrete findings, instruction conflicts, task success, tokens, elapsed time and installation effort. Repeat on macOS arm64. Add a second procedure source only after measuring its incremental benefit. No verified cross-repository evaluation currently establishes an efficacy winner.",
+      "evidence_gaps": [
+        "Selections are preferred procedure sources based on documented fit and validation infrastructure, not proven repository-wide performance winners.",
+        "Selected-source WSL2 and macOS arm64 execution was not verified. Trail’s Ubuntu CI supports Linux suitability; ECC has passing macOS CI, but runner architecture was not established. These instruction procedures do not require the RTX 4090.",
+        "Documented installation commands track upstream rather than guaranteeing the reviewed commit pins; installers were not executed on a clean host.",
+        "The packet records no completed head-to-head. Matt’s proposed-revision experiment cannot be transferred to its current default branch or used to rank repositories.",
+        "Null repository entries were resolved as name aliases of the corresponding official repositories; independent repository identities were not supplied.",
+        "Research used 6 web searches and 30 GitHub API calls. Seven page URLs were attempted through the required fetch tool, with zero successful fetches. Primary documents were recovered through GitHub GraphQL, indexed with ctx_index and read with ctx_search.",
+        "The required ctx_fetch_and_index action was rejected: “MCP tool call requires approval, but approval policy is never.” Consequently, the requested page-fetch route could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/mattpocock/skills",
+        "https://api.github.com/repos/mattpocock/skills/commits?per_page=1",
+        "https://api.github.com/repos/agentskills/agentskills",
+        "https://api.github.com/repos/agentskills/agentskills/commits?per_page=1",
+        "https://api.github.com/repos/typesafe-ai/skills",
+        "https://api.github.com/repos/typesafe-ai/skills/commits?per_page=1",
+        "https://api.github.com/repos/affaan-m/ECC",
+        "https://api.github.com/repos/affaan-m/ECC/commits?per_page=1",
+        "https://api.github.com/repos/voltagent/awesome-claude-code-subagents",
+        "https://api.github.com/repos/voltagent/awesome-claude-code-subagents/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/skills",
+        "https://api.github.com/repos/anthropics/skills/commits?per_page=1",
+        "https://api.github.com/repos/shanraisshan/claude-code-best-practice",
+        "https://api.github.com/repos/shanraisshan/claude-code-best-practice/commits?per_page=1",
+        "https://api.github.com/repos/trailofbits/skills",
+        "https://api.github.com/repos/trailofbits/skills/commits?per_page=1",
+        "https://api.github.com/repos/davila7/claude-code-templates",
+        "https://api.github.com/repos/davila7/claude-code-templates/commits?per_page=1",
+        "https://api.github.com/repos/vercel-labs/agent-skills",
+        "https://api.github.com/repos/vercel-labs/agent-skills/commits?per_page=1",
+        "https://api.github.com/repos/openai/skills",
+        "https://api.github.com/repos/openai/skills/commits?per_page=1",
+        "https://api.github.com/repos/mattpocock/skills/releases/latest",
+        "https://api.github.com/repos/trailofbits/skills/releases/latest",
+        "https://api.github.com/repos/affaan-m/ECC/releases/latest",
+        "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/README.md",
+        "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/productivity/writing-for-agents/SKILL.md",
+        "https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.github/workflows/release.yml",
+        "https://github.com/mattpocock/skills/issues/514",
+        "https://github.com/mattpocock/skills/issues/722",
+        "https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref/README.md",
+        "https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref/pyproject.toml",
+        "https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/docs/specification.mdx",
+        "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/README.md",
+        "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/README.md",
+        "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/manifests/install-profiles.json",
+        "https://github.com/affaan-m/ECC/blob/ef648e01899ba3e8dc6371642deaaf64b4477775/.github/workflows/reusable-test.yml",
+        "https://github.com/VoltAgent/awesome-claude-code-subagents/blob/82b73821baa7a911d5b14cfb6da238b7f0db6b42/README.md",
+        "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/README.md",
+        "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/SKILL.md",
+        "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/scripts/with_server.py",
+        "https://github.com/shanraisshan/claude-code-best-practice/blob/f328456eee464d6de86f90c213a685b18a4461e9/README.md",
+        "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md",
+        "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/AGENTS.md",
+        "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/.github/workflows/validate.yml",
+        "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/.github/workflows/lint.yml",
+        "https://github.com/davila7/claude-code-templates/blob/f41d5837cfec311b8e6357440adda498d775003f/README.md",
+        "https://github.com/vercel-labs/agent-skills/blob/063bee94c3f4df8453406c830b0a7df0f2860278/README.md",
+        "https://github.com/vercel-labs/agent-skills/blob/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices/SKILL.md",
+        "https://github.com/vercel-labs/agent-skills/blob/063bee94c3f4df8453406c830b0a7df0f2860278/.github/workflows/react-best-practices-ci.yml",
+        "https://github.com/mattpocock/skills/actions/runs/36569384257",
+        "https://github.com/trailofbits/skills/actions/runs/36462884211",
+        "https://github.com/trailofbits/skills/actions/runs/36462884188",
+        "https://github.com/affaan-m/ECC/actions/runs/36953667925",
+        "https://github.com/vercel-labs/agent-skills/actions/runs/33176142343"
+      ]
+    }
+  ]
+}

@@ -191,6 +191,31 @@
   },
   "profiles": [
     {
+      "id": "new-wsl-clean-foundation",
+      "label": "Clean replacement WSL: minimal native foundation; source-review recommendations only",
+      "source_profile": "adoption/new-wsl-profile.json",
+      "required_commands": [
+        "git",
+        "python3",
+        "node",
+        "npm",
+        "uv",
+        "gh",
+        "codex",
+        "claude"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "recipe_paths": [
+        "adoption/new-wsl-profile.json",
+        "adoption/new-wsl-profile.md",
+        "adoption/bootstrap.md",
+        "recipes/README.md"
+      ]
+    },
+    {
       "id": "foundation-cpu",
       "label": "Native clients, context and lexical memory foundation",
       "required_commands": [

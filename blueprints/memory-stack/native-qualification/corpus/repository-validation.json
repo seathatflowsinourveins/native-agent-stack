@@ -1,0 +1,23 @@
+{
+  "attempts": [
+    {
+      "exit_code": 1,
+      "stderr": "",
+      "stdout": "Publication validation failed:\nblueprints/memory-stack/native-qualification/corpus/holdout.sealed.tar.gz: cannot inspect as UTF-8 publication text\n"
+    },
+    {
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "{\"components\": 69, \"hashed_files\": 8993, \"profiles\": 4, \"receipts\": 186, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+    }
+  ],
+  "command": [
+    "python3",
+    "scripts/validate.py"
+  ],
+  "diagnosis": "Repository publication requires UTF-8; binary holdout packaged in ASCII base64, with decoded archive/member integrity retained. No validator policy changed.",
+  "evidence_class": "structural_validation",
+  "observed_at": "2026-10-02T05:57:35.042773+00:00",
+  "runtime_model_calls": 0,
+  "source_revision": "231eed43e17cc7953751b7caf90376b01cb5feec"
+}
