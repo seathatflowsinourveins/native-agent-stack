@@ -1,5 +1,18 @@
 {
   "schema": "spy-parity-qualified-summary/1",
+  "schema_version": 1,
+  "id": "nautilus-spy-initial-margin-refusal-two-processes-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Prospectively reviewed source deff844 passes 86/86 strict frozen over_limit checks in each of two fresh isolated native rc5 processes; four matching UUID-normalized exports. Native initial-margin risk denies the 1217-share MARKET request with its original DENIED event/reason, no fills/fees/positions and 100000.00 USD free/total cash.",
+  "limitations": [
+    "Frozen economic refusal only; no general MOO execution, maintenance/liquidation/adaptive, strategy merit, production data fitness or paper acceptance.",
+    "Task-owned Linux ARM64 VM on the Mac; surviving NativeStack WSL2 is not enrolled by this receipt.",
+    "Original first native callback failure at473b7282/exit1 and its prospective review are preserved. The one-line compiled Strategy API repair passes15 targeted tests; accepted replay/compare exits0 and sleeping-controller timeout exits137 are distinguished.",
+    "No model/account/provider call by these offline replay procedures; full-stack readiness false and whole-task usage/savings unknown."
+  ],
   "case": "over_limit",
   "evidence_class": "HIST: actual pinned native BacktestEngine; offline frozen-data simulation",
   "harness_commit": "deff844fb7803c11ad5f16ab7d7db8d87f14ca4a",

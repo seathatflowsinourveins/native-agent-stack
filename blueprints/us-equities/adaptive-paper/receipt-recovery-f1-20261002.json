@@ -1,5 +1,20 @@
 {
   "schema": "adaptive-paper-source-acceptance/1",
+  "schema_version": 1,
+  "id": "adaptive-recovery-f1-sdk-contracts-20261002",
+  "kind": "compatibility_attempt",
+  "component_ids": [
+    "nautilus-trader",
+    "alpaca-py"
+  ],
+  "claim": "Source2c669e18 fixes explicit/forced recovery quote admission; official hash-locked native SDK runtime passed523 unique source-contract tests in14 bounded complete runs with zero skips/failures.",
+  "limitations": [
+    "Deterministic fake broker ports; actual SDK/native execution is not paper-account or native broker-fault acceptance.",
+    "Initial133 dependency skips, two incomplete controller-limited runs, fail-before-fix tests and corrected uv flag conflict are preserved and excluded from the final unique-test total.",
+    "Pinned rc5 upstream callback loss still requires the existing guard; IBKR5007/5057/5060 and exact rc5 recovery qualification remain open.",
+    "No global, model, account or provider mutation; whole-task usage and net savings unknown.",
+    "The retained native-fault paper receipt still binds the old runner; the corrected runner requires a new native paper fault qualification."
+  ],
   "generated_utc": "2026-10-02T19:39:36.425139+00:00",
   "source_commit": "2c669e18f705212f6f407b80f668d2a253591167",
   "evidence_class": "SYN: actual selected SDKs/native engine with deterministic fake broker ports; no paper-broker acceptance",

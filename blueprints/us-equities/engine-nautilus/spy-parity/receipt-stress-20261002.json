@@ -1,5 +1,19 @@
 {
   "schema": "spy-parity-qualified-summary/1",
+  "schema_version": 1,
+  "id": "nautilus-spy-stress-two-processes-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Prospectively reviewed frozen one_stress source648228d passed142/142 strict checks in each of two fresh isolated native rc5 processes; four matching declared UUID-normalized exports, zero skipped/failed checks and unchanged cash tolerance.",
+  "limitations": [
+    "Task-owned Linux ARM64 simulation on the Mac, not NativeStack WSL2 or broker acceptance.",
+    "Native per-order Money rounding produces90357.99USD versus Decimal90357.995840; the unchanged0.01USD tolerance passes.",
+    "One frozen case; maintenance-margin, adaptive, data-fitness and paper gates remain separate.",
+    "C1/C2 isolation failures and controller exit137 after successful engine exit0 remain in private original evidence; original receipt/review digests are published.",
+    "No model, account or provider call; full-stack readiness is false and whole-task usage/savings unknown."
+  ],
   "case": "one_stress",
   "evidence_class": "HIST: actual pinned native BacktestEngine; offline frozen-data simulation",
   "harness_commit": "648228d3252d1e82b7e0378bfd90210d1e1aacd3",
