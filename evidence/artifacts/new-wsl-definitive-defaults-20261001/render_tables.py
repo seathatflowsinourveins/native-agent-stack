@@ -68,7 +68,11 @@ def render():
             if slot["row_kind"] == "judged":
                 fam = slot["families"]
                 row = rows[slot["slot_id"]]
-                lines.append(f"| {slot['slot_id']} | {row['default']} | {row['label']} | {fam['claude']['status']} | {fam['gpt']['status']} | "
+                statuses = {family: fam[family]["status"] for family in ("claude", "gpt")}
+                if slot.get("split") and row["measurement"] and row["measurement"]["returned"]:
+                    for pick in slot["split_between"]:
+                        statuses[pick["family"]] += f" on {pick['name']} in the blind round"
+                lines.append(f"| {slot['slot_id']} | {row['default']} | {row['label']} | {statuses['claude']} | {statuses['gpt']} | "
                              f"{'yes' if row['definitive'] else 'no'} |")
                 if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
                     lines.append(f"| | | {slot['split_note']} | | | |")

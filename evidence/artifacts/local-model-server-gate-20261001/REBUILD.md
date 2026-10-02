@@ -1,8 +1,7 @@
 # First gate recovery
 
-Rebuilt on 2026-10-02 from the retained raw runs after a host restart at 2026-10-02T00:49:51Z emptied the scratch directory that held this folder. The original receipt (sha256 93789091c83be9672a1b9c04b7d92cea4864da0dc5f85ae4e3683efc185cb61e) is lost; the time stamp is the rebuild's.
+Rebuilt on 2026-10-02 from the retained raw runs after a host restart at 2026-10-02T00:49:51Z emptied the scratch directory that held this folder. The supplied restart note identifies the lost original confirmatory receipt by sha256 93789091c83be9672a1b9c04b7d92cea4864da0dc5f85ae4e3683efc185cb61e. The receipt in this folder is a rebuild of the first gate's receipt; its time stamp records reconstruction.
 
-The receipt hash in the supplied restart note identifies the lost confirmatory receipt.
 The first builder has no notes argument. Both builders use retained summaries and PID checks;
 their new timestamps record reconstruction, not new model runs or shutdown observations.
 All eight supplied hash checks passed before copying; the six script/template checks match
@@ -17,12 +16,12 @@ Repository validation still needs the root-manifest registration, which the foll
 | file | provenance |
 | --- | --- |
 | PREREGISTRATION.md | original bytes, verified by the preregistered hash |
-| gate_env.sh | original bytes, verified by the hash the worker printed |
-| gate_setup.sh | original bytes, verified by the hash the worker printed |
-| gate_run.sh | original bytes, verified by the hash the worker printed |
-| gate_score.py | original bytes, verified by the hash the worker printed |
-| gate_collect.py | original bytes, verified by the hash the worker printed |
-| codex-config/config.toml.tmpl | original bytes verified by the hash the worker printed, plus the one-line comment correction the worker made at 2026-10-01T23:12:33Z (replayed from its transcript) |
+| gate_env.sh | original bytes, verified by the hash prefix the worker printed |
+| gate_setup.sh | original bytes, verified by the hash prefix the worker printed |
+| gate_run.sh | original bytes, verified by the hash prefix the worker printed |
+| gate_score.py | original bytes, verified by the hash prefix the worker printed |
+| gate_collect.py | original bytes, verified by the hash prefix the worker printed |
+| codex-config/config.toml.tmpl | original bytes verified by the hash prefix the worker printed, plus a replay of the worker's one-line comment correction from its transcript (2026-10-01T23:12:33Z) |
 | README.md | replayed from the worker's transcript, not verified |
 | Modelfile | re-made copy by rebuild_20261002.py |
 | codex-config/ollama-launch.config.toml | re-made copy by rebuild_20261002.py |

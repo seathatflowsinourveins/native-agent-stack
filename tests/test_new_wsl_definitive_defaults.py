@@ -176,7 +176,7 @@ class Manifest(unittest.TestCase):
         exceptions = set()
         for catalog, layer, sid, slot in self.source_slots():
             # The user took memory out of the blind round; its measurement decides the install.
-            if slot.get("decided_by_measurement_at_user_request") or not converged_key(slot):
+            if sid == "memory-owner" or not converged_key(slot):
                 continue
             rows = [row for row in self.rows if row["catalog"] == catalog and row["layer_id"] == layer
                     and (row["slot_id"] == sid or row["slot_id"].startswith(sid + "/"))]
@@ -185,6 +185,9 @@ class Manifest(unittest.TestCase):
         self.assertEqual(exceptions, {("us-equities", "market-data-provider")})
 
     def test_settled_rows_are_measurements_with_verified_receipts(self):
+        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, {"local-model-server"})
+        self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
+                         {"local-model-server"})
         for settlement in self.settlements:
             rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
             self.assertEqual(len(rows), 1, settlement["slot_id"])
@@ -207,6 +210,19 @@ class Manifest(unittest.TestCase):
                 self.assertTrue(path.is_file(), receipt["path"])
                 self.assertEqual(sha(path), receipt["sha256"], receipt["path"])
             self.assertEqual(settlement["limits"], load(ROOT / settlement["receipts"][-1]["path"])["limitations"])
+
+    def test_settled_split_tables_preserve_the_blind_picks(self):
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
+        for settlement in self.settlements:
+            slot = slots[settlement["slot_id"]]
+            if slot.get("split"):
+                line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[1], settlement["default"]["name"])
+                self.assertEqual(cells[2], settlement["label"])
+                for pick in slot["split_between"]:
+                    self.assertIn(pick["name"], cells[3 if pick["family"] == "claude" else 4])
 
     def test_memory_and_code_search_measurements_have_not_returned(self):
         rows = {row["slot_id"]: row for row in self.rows if row["catalog"] == "foundation"}

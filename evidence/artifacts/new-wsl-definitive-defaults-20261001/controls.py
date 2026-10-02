@@ -20,6 +20,7 @@ CASES = [
     ("a converged slot not marked definitive", "test_converged_slots_are_definitive_except_the_known_trading_slot", None),
     ("a row without state", "test_every_row_has_state_and_measurement", None),
     ("the memory row marked as returned", "test_memory_and_code_search_measurements_have_not_returned", None),
+    ("an empty settlements file", "test_settled_rows_are_measurements_with_verified_receipts", None),
 ]
 
 
@@ -28,19 +29,15 @@ def run(root, *args):
 
 
 def mutate(root, case):
-    if case in (CASES[1][0], CASES[2][0]):
+    if case in (CASES[1][0], CASES[2][0], CASES[6][0]):
         path = root / ART / "settlements.json"
         doc = json.loads(path.read_text(encoding="utf-8"))
         if case == CASES[1][0]:
             doc[0]["receipts"][0]["sha256"] = "0" * 64
-        else:
+        elif case == CASES[2][0]:
             doc[0]["slot_id"] = "container-engine"
-        path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    elif case == CASES[3][0]:
-        path = root / ART / "foundation-definitive.compact.json"
-        doc = json.loads(path.read_text(encoding="utf-8"))
-        slot = next(slot for layer in doc["layers"] for slot in layer["slots"] if slot["slot_id"] == "container-engine")
-        slot["definitive"] = False
+        else:
+            doc = []
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     else:
         path = root / ART / "assemble_manifest.py"
@@ -50,6 +47,7 @@ def mutate(root, case):
             raise ValueError("the assembler's mutation anchor is missing or ambiguous")
         defect = {
             CASES[0][0]: '    next(row for row in rows if row["slot_id"] == "local-model-server")["definitive"] = True\n',
+            CASES[3][0]: '    next(row for row in rows if row["slot_id"] == "container-engine")["definitive"] = False\n',
             CASES[4][0]: '    del rows[0]["state"]\n',
             CASES[5][0]: '    next(row for row in rows if row["slot_id"] == "memory-owner")["measurement"]["returned"] = True\n',
         }[case]
@@ -61,8 +59,7 @@ def main():
         print("usage: controls.py <worktree root>")
         return 2
     root = Path(sys.argv[1]).resolve()
-    paths = [root / ART / name for name in ("assemble_manifest.py", "foundation-definitive.compact.json",
-                                           "settlements.json", "definitive-manifest.json")]
+    paths = [root / ART / name for name in ("assemble_manifest.py", "settlements.json", "definitive-manifest.json")]
     paths.append(root / RECORD)
     originals = {path: path.read_bytes() for path in paths}
 

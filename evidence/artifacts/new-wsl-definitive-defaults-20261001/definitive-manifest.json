@@ -18,7 +18,7 @@
   },
   "settlements": {
    "file": "settlements.json",
-   "sha256": "8ebe354114a995cfc93e2d2efab0a1f4175307ea630a5bbae9e0232daf66c168"
+   "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
   }
  },
  "counts": {
@@ -867,7 +867,7 @@
    "repository": "https://github.com/ollama/ollama",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "settled by the preregistered gate: at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
+   "label": "settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
    "state": "measurement",
    "measurement": {
     "returned": true,
