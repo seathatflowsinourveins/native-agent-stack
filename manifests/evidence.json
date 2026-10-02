@@ -36540,6 +36540,336 @@
       "bytes": 10505
     },
     {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/copy-notes.json",
+      "sha256": "9827d2a034b8e266877a146994cecb5e08fc54410911c3a71672c32dfea558d0",
+      "bytes": 6433
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/agent-messaging.json",
+      "sha256": "c2801268a9c055e5124aeb148a3520be825dfbc316c97cfe9abd2d23c6b6950c",
+      "bytes": 5488
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/agents-in-ci.json",
+      "sha256": "53c9de6d988c33b21e46546a94dbecf4174a436867daff83824ce14b98669d44",
+      "bytes": 5437
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/alerting-notification.json",
+      "sha256": "b4180a04e93db3129198a23efc14c976f30aee48cd5e55098087f20db315f2fe",
+      "bytes": 5753
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/embedding-model.json",
+      "sha256": "04371459856db8d08a8a58df7084c5f853a614ba647b743cf63e1775799a5873",
+      "bytes": 3471
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/gpu-container-runtime.json",
+      "sha256": "450f32f84df66df1f7b4b6e98148e888c5c960b74094a598e5abafd606cbaab0",
+      "bytes": 6182
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/llm-tracing.json",
+      "sha256": "8f4c60f4f168d554d0f4d9713ccfd49f857cde5a8d60aa42d9a6c7c8795eebee",
+      "bytes": 5127
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/local-generation-model.json",
+      "sha256": "4bf379a6639688b358713460ebfed14efe49329a118aeb944b118ebf5261fd25",
+      "bytes": 4249
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/reranker-model.json",
+      "sha256": "0813b3515e687f2a5063158737c77af5f4536285f235a0aa1019abec076d47cb",
+      "bytes": 5219
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/secret-scanning.json",
+      "sha256": "fe9acd7467eda5bef7296fe45933dcbabc98c1056b5ce78550e48c0ec284d8bb",
+      "bytes": 5356
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/session-analytics.json",
+      "sha256": "02a3df5cddf42dd32488203979593a58a9d9251743904f0ca2d029ec0a83c32c",
+      "bytes": 5833
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/structural-code-search.json",
+      "sha256": "352cd605ddd9ac760e5aa659f1d6754b57d61c512fc8acbf3c1266eea074de24",
+      "bytes": 4393
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/discover/web-search-provider.json",
+      "sha256": "096ac9e37606a86ae118c7ff1cc96b0ca34aeb523ee4fda2d78f9bb52ffa6aa5",
+      "bytes": 4464
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/make_gap_units.py",
+      "sha256": "1784d408dcbea465748f98c4e35a950658ba137c3514d34589e2c854098c69b2",
+      "bytes": 5633
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/make_packets.py",
+      "sha256": "0a6c2a6758558427f27c2de762d943211b905074ec8521981e0224567b6c3aa9",
+      "bytes": 1779
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/agent-messaging.json",
+      "sha256": "110e2c5fde1b77332caa5e0e28853aa7e8d677e08e509406cf90fdef860b37c5",
+      "bytes": 17390
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/agents-in-ci.json",
+      "sha256": "2decead84a36ac61208418a86cbabca0bd6b2335e1536038b83959c9fe1d6c5e",
+      "bytes": 17777
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/alerting-notification.json",
+      "sha256": "c73228f1c72f9e7b07af8f07bad739cf8381bcbcb6a6a12d69d38e865ec6d2fa",
+      "bytes": 18000
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/embedding-model.json",
+      "sha256": "d3f74a2e823097f0bc0d123c3cb010d0e343903eb68576c17fc977c2c7063d31",
+      "bytes": 13179
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/gpu-container-runtime.json",
+      "sha256": "b979f3fdd4321b20f219a6ed57a1b06064b68332da30196bbd1085f19713fd28",
+      "bytes": 17189
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/llm-tracing.json",
+      "sha256": "75e4db804a04529d63d75cef647e827693e6befb857b5fe82b71b394193c22dd",
+      "bytes": 17984
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/local-generation-model.json",
+      "sha256": "1414315107dd2d4ec176baec413be25774bf247605088b0ae792ac66944881a7",
+      "bytes": 12862
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/reranker-model.json",
+      "sha256": "3b5678dc47e3a570c9067c6fdc47c3bff7fe927e779cf0b310038a9b9cfccc58",
+      "bytes": 16489
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/secret-scanning.json",
+      "sha256": "91a1a18ff5d4ac0f56a06cdaa99af26b5980f949dcde61edd5e2a6dceaa6bbc4",
+      "bytes": 17825
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/session-analytics.json",
+      "sha256": "cc6d48c1ebc15e0d18e5628460dab3bd33cf6799a111b32ade6ca16b0ae276f1",
+      "bytes": 17750
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/structural-code-search.json",
+      "sha256": "5b4a4e0665836ba92cbf73d576a1a088caedb670ce7077de372c6f4c882a10d4",
+      "bytes": 16935
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-1/web-search-provider.json",
+      "sha256": "c9ecb895978e47934e4d040c7cb922944551b40a6e88a17809afa716c56557c9",
+      "bytes": 20436
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/agent-messaging.json",
+      "sha256": "0b1bf610cef549215d93dfc3686bb0061a94ecc4c186dc6bdada0c3a89971df4",
+      "bytes": 20480
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/agents-in-ci.json",
+      "sha256": "0de4b764cb942df4c058e442f44eb3c2a404b61784316b370fc71d3ad1550d45",
+      "bytes": 17657
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/alerting-notification.json",
+      "sha256": "80c3924fb228abce2fd627301336d83ff864e2538bd647ae0e981d1e1f337fc7",
+      "bytes": 19295
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/embedding-model.json",
+      "sha256": "f69158c4a8d51d60166c59f76c782af1c1f7d9a15c23ffe5bb6e48978eaae63a",
+      "bytes": 17487
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/gpu-container-runtime.json",
+      "sha256": "5dbdd630b08efac05d9360f9840f2f87326b7ec47482df45e5f5d445b3c651b9",
+      "bytes": 18735
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/llm-tracing.json",
+      "sha256": "759642df4772e1763546df4bc9fccb902fea347a92f9fd55a48b40d31c018a48",
+      "bytes": 18447
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/local-generation-model.json",
+      "sha256": "85f632b79333068e7835a31d5a32478c3b8c04fd648ac2edccb01712e9a50e74",
+      "bytes": 14987
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/reranker-model.json",
+      "sha256": "05ff19d34b76d84d56a1b3e8132e19b9bf74b72d3d91b7933cfc20a2bb7d2c33",
+      "bytes": 16370
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/secret-scanning.json",
+      "sha256": "33f0362511b2489d09760e477ddd878dbf35371d4e622d2db0acbfd8f585861e",
+      "bytes": 19278
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/session-analytics.json",
+      "sha256": "f5daa3ef317e4ee6e561f6525732a0ccdc560543abbfe260e63f469ca7747b01",
+      "bytes": 17303
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/structural-code-search.json",
+      "sha256": "7f7b0ed5f5eab6e4fe3e1efe980a50fa7ca65af1f2f2272550c64f1fcd4b9325",
+      "bytes": 14406
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/order-2/web-search-provider.json",
+      "sha256": "c5c3689b96bd739b8723172f68a5618ec3695ff7d47025afc06efa3c5e245611",
+      "bytes": 19206
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/agent-messaging.json",
+      "sha256": "27fc22ad5613cf406debd66425c34dad2ab72e9f1da41b899f46f9195334cd84",
+      "bytes": 1668
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/agents-in-ci.json",
+      "sha256": "ab583bbe2934f48d506f7eda7ace897c189c886f3414e224c1b276d99c0e8176",
+      "bytes": 1812
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/alerting-notification.json",
+      "sha256": "04a6ad6a6cab1dac9fac9ebb6dac3032cc20013ac6f91d56939628b177b3771c",
+      "bytes": 1696
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/embedding-model.json",
+      "sha256": "39518dd18e693deedbdf1df5b0d604b55c071ec32f0dc5f75a15b4499820093b",
+      "bytes": 1208
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/gpu-container-runtime.json",
+      "sha256": "d65a7c1f11ddf9c5c8569c845a108ceca40204cadcf55c9ac3c75a6ded7ad431",
+      "bytes": 1906
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/llm-tracing.json",
+      "sha256": "f04c8bfc0f8b2f4a4c5c71ebf127eb93ffdb36b6a6baece9e715a71f6fc6a1ce",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/local-generation-model.json",
+      "sha256": "6c0ab1c3e0b33a146525abfd931fa210f5621637ad82d02da76e5d6d2e41860e",
+      "bytes": 1601
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/reranker-model.json",
+      "sha256": "84b288124bb46179704266f28ffc277e9a5c7702e7c043de335f4afda5622a46",
+      "bytes": 1705
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/secret-scanning.json",
+      "sha256": "d1fde82489f61794c1434ec40bf14cc8b003a850e8c0230bda287e9ba77fdaca",
+      "bytes": 1533
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/session-analytics.json",
+      "sha256": "40f8ab110cccfa3230ae88c22e1b1f2ac670fae3f80d11b00df77756d16f91ce",
+      "bytes": 1803
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/structural-code-search.json",
+      "sha256": "f9197adb25f8c4f9d4713d0f821c749813adccc5809cd63b60458f8e7dfe7172",
+      "bytes": 1540
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-1/web-search-provider.json",
+      "sha256": "8639f72d4b83a3ab110c115354e1a9eecd258cacaf2f02d14a98db561725c42f",
+      "bytes": 1597
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/agent-messaging.json",
+      "sha256": "acd28ead4ba1b428449fd48d0f7790d07b5d5aa8e18f63df48a956271f207ec1",
+      "bytes": 1668
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/agents-in-ci.json",
+      "sha256": "dff8ce372b8b985bfe27d6780b8923e63d3676ad98c2672ae85dc9a01c1af3dd",
+      "bytes": 1812
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/alerting-notification.json",
+      "sha256": "e0a23e0d2f38e2795c9d4c39bdd24354d529b68bb604df843e0dda83c70bfc83",
+      "bytes": 1696
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/embedding-model.json",
+      "sha256": "2e001c3116f65d000f7282a3df24bc4c949d5e47c55d9a8d8f8ad5d71d9d87ea",
+      "bytes": 1208
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/gpu-container-runtime.json",
+      "sha256": "75ed19c6b64ade3e3607e588e7de2e96964e7c18f2771f0d65b24a0f33dc8887",
+      "bytes": 1906
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/llm-tracing.json",
+      "sha256": "d765aca5a7fcbeebe32ff7143752cb1c528574ffe0a2214fd51d8fe53ac84ffd",
+      "bytes": 1613
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/local-generation-model.json",
+      "sha256": "386566d1940a89b4eba68492b410d0785a80a8775d47f98235ea344aae87647e",
+      "bytes": 1601
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/reranker-model.json",
+      "sha256": "667c9b555506dde310e7c087864fbc60476002c0fcf6ab70595f55c162364c39",
+      "bytes": 1705
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/secret-scanning.json",
+      "sha256": "fe18e6f7a9f2099a1190c53a6584e3dc61e3159c26a11053d434f6562fa17848",
+      "bytes": 1533
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/session-analytics.json",
+      "sha256": "6803f05dc48c373a22158be62a9a98bc2726082c8034c52b8147663f83a2e948",
+      "bytes": 1803
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/structural-code-search.json",
+      "sha256": "715de6412a350a7d2b00bb1487782915e6d1b28eaba854e6d1bc7e88727ae621",
+      "bytes": 1540
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/packets/order-2/web-search-provider.json",
+      "sha256": "6c3e9d66f77c2f72c8a87a979c077124e5210781e54dd57a271cd085746abbbd",
+      "bytes": 1597
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/slots.json",
+      "sha256": "087bcbec8409385359cccefd8bd49862f2099285a13e7cfcbc22c3143c208701",
+      "bytes": 9061
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/summarize.py",
+      "sha256": "699a574e05922fc0a5e0215e6ab075f92a8592e2c61e80942b1695888576f091",
+      "bytes": 2613
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/summary.json",
+      "sha256": "9c7e0202cfd9a44ee9bf2156b53d8f1d6ae54b4285d06934bf2e56606c611b14",
+      "bytes": 3647
+    },
+    {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/README.md",
       "sha256": "47d4062179f3c4044d6394df45c9a1f960b5798ce6d5159f69e307cd08de1fc9",
       "bytes": 3201
@@ -36768,6 +37098,21 @@
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/workers.json",
       "sha256": "af7166721da695c93feabf46158a5f377c6fb0ed3974d9b269f0b6a2628b1fbc",
       "bytes": 16618
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+      "bytes": 992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
+      "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e",
+      "bytes": 53147
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-summary.md",
+      "sha256": "2a9843e0e464c9b18b9d23bbe97b73adbff3756299c0f3395441b30ddf859557",
+      "bytes": 3939
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",

@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "name": "Agent Console",
+      "repository": "https://github.com/LockedinLabs-AI/agent-console",
+      "why_candidate": "Local browser console for Claude Code and Codex session activity, tool-call counts, tokens and estimated cost ([README](https://github.com/LockedinLabs-AI/agent-console#readme)); latest release [v0.4.1](https://github.com/LockedinLabs-AI/agent-console/releases/tag/v0.4.1), 2026-09-27."
+    },
+    {
+      "name": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "why_candidate": "Local browser and CLI for Claude Code and Codex transcripts, tool activity and per-session token/cost statistics ([README](https://github.com/kenn-io/agentsview#readme)); latest release [v0.44.0](https://github.com/kenn-io/agentsview/releases/tag/v0.44.0), 2026-09-21."
+    },
+    {
+      "name": "agtop",
+      "repository": "https://github.com/MBrassey/agtop",
+      "why_candidate": "Terminal monitor reading Claude Code and Codex processes and local transcripts, with tool activity, tokens and estimated session cost ([README](https://github.com/MBrassey/agtop#readme)); latest release [v2.5.0](https://github.com/MBrassey/agtop/releases/tag/v2.5.0), 2026-08-13."
+    },
+    {
+      "name": "ccx",
+      "repository": "https://github.com/thevibeworks/ccx",
+      "why_candidate": "Local Go session viewer for Claude Code and Codex with conversation browsing, tool-call evidence, token counts and cost reporting ([README](https://github.com/thevibeworks/ccx#readme)); latest release [v0.17.0](https://github.com/thevibeworks/ccx/releases/tag/v0.17.0), 2026-09-15."
+    },
+    {
+      "name": "Claude Code Agent Monitor",
+      "repository": "https://github.com/hoangsonww/Claude-Code-Agent-Monitor",
+      "why_candidate": "Local Node.js/SQLite dashboard importing Claude Code and Codex transcripts, replaying tool calls and tracking per-session tokens and estimated cost ([README](https://github.com/hoangsonww/Claude-Code-Agent-Monitor#readme)); latest release [v2.2.4](https://github.com/hoangsonww/Claude-Code-Agent-Monitor/releases/tag/v2.2.4), 2026-09-27."
+    },
+    {
+      "name": "Claude Code History Viewer",
+      "repository": "https://github.com/jhlee0409/claude-code-history-viewer",
+      "why_candidate": "Offline desktop and headless web viewer for Claude Code and Codex histories, with conversation inspection, tool rendering and token/cost analytics ([README](https://github.com/jhlee0409/claude-code-history-viewer#readme)); latest release [v1.30.0](https://github.com/jhlee0409/claude-code-history-viewer/releases/tag/v1.30.0), 2026-10-01."
+    },
+    {
+      "name": "Confabulous",
+      "repository": "https://github.com/ConfabulousDev/confab-web",
+      "why_candidate": "Self-hosted Docker session archive and analytics dashboard for Claude Code and Codex, ingesting local transcripts through the Confab CLI ([README](https://github.com/ConfabulousDev/confab-web#readme)); latest release [v0.7.3](https://github.com/ConfabulousDev/confab-web/releases/tag/v0.7.3), 2026-09-26."
+    },
+    {
+      "name": "Sessions Viewer",
+      "repository": "https://github.com/jerrywu001/cc-sessions-viewer",
+      "why_candidate": "Linux/macOS desktop browser for local Claude Code and Codex transcripts, with tool-call replay and token/cost statistics ([README](https://github.com/jerrywu001/cc-sessions-viewer#readme)); latest release [v0.5.2](https://github.com/jerrywu001/cc-sessions-viewer/releases/tag/v0.5.2), 2026-09-17."
+    },
+    {
+      "name": "Sidekick Agent Hub",
+      "repository": "https://github.com/cesarandreslopez/sidekick-agent-hub",
+      "why_candidate": "CLI/TUI and VS Code session monitor reading local Claude Code and Codex logs, with conversation/tool views and per-session token/cost reports ([README](https://github.com/cesarandreslopez/sidekick-agent-hub#readme)); latest release [v0.27.6](https://github.com/cesarandreslopez/sidekick-agent-hub/releases/tag/v0.27.6), 2026-09-27."
+    },
+    {
+      "name": "tokview",
+      "repository": "https://github.com/headroomlabs-ai/tokview",
+      "why_candidate": "Local Claude Code/Codex log importer and proxy providing session tokens, estimated cost and tool-level accounting ([README](https://github.com/headroomlabs-ai/tokview#readme)); latest release [v0.0.7](https://github.com/headroomlabs-ai/tokview/releases/tag/v0.0.7), 2026-06-01; default-branch commit verified on 2026-07-09."
+    }
+  ],
+  "search_notes": "Alphabetical, unranked snapshot verified on 2026-10-02. Every included repository passed gh api repos/OWNER/REPO and repos/OWNER/REPO/releases/latest checks: public, archived=false, and a release or verified default-branch commit within the 90-day window beginning 2026-07-04. README install paths or release assets establish Linux x86_64 and macOS arm64 routes; WSL2 suitability is inferred from Linux support. The agentsview seed redirects to the canonical kenn-io repository. Excluded seeds: Phoenix's [README](https://github.com/Arize-ai/phoenix#copyright-patent-and-license) specifies ELv2 licensing; claude-code-otel has no latest release and its [default-branch commit](https://github.com/ColeMurray/claude-code-otel/commit/43263654a369) dates to 2025-06-17; ccusage's [README](https://github.com/ccusage/ccusage/blob/main/apps/ccusage/README.md) establishes billing reports, while full session/tool-call inspection was not established. coding_agent_session_search was excluded because its [license](https://github.com/Dicklesworthstone/coding_agent_session_search/blob/main/LICENSE) restricts specified parties. Used 30 GitHub API calls, 3 web-search attempts and 6 page-fetch attempts; web search failed, so discovery used GitHub repository search. No working-directory files were opened. Coverage is bounded by the requested research budget."
+}

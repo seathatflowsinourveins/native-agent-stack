@@ -1,0 +1,45 @@
+{
+  "candidates": [
+    {
+      "name": "BCEmbedding — bce-reranker-base_v1",
+      "repository": "https://github.com/netease-youdao/BCEmbedding",
+      "why_candidate": "English/Chinese cross-encoder reranking model documented in the [README](https://github.com/netease-youdao/BCEmbedding#readme); latest-release API returned 404, with a [default-branch commit dated 2026-09-03](https://github.com/netease-youdao/BCEmbedding/commit/1aa07ea64f94)."
+    },
+    {
+      "name": "Bekko System One v0",
+      "repository": "https://github.com/hotchpotch/bekko-system-one",
+      "why_candidate": "Public 17M, 68M and 400M decision models supporting document reranking and CPU/CUDA/ONNX inference in the [README](https://github.com/hotchpotch/bekko-system-one#readme); latest-release API returned 404, with a [default-branch commit dated 2026-10-01](https://github.com/hotchpotch/bekko-system-one/commit/0fccbb8568b6)."
+    },
+    {
+      "name": "FlagEmbedding — BGE reranker models",
+      "repository": "https://github.com/FlagOpen/FlagEmbedding",
+      "why_candidate": "Public cross-encoder models include bge-reranker-v2-m3, v2-gemma, v2-minicpm-layerwise, v2.5-gemma2-lightweight, base and large in the [README](https://github.com/FlagOpen/FlagEmbedding#readme); latest project release is [v1.4.2, published 2026-08-24](https://github.com/FlagOpen/FlagEmbedding/releases/tag/v1.4.2)."
+    },
+    {
+      "name": "jina-reranker-v3.5 — local reference integration",
+      "repository": "https://github.com/hanxiao/jina-reranker-v3.5-in-page-search",
+      "why_candidate": "A 0.6B multilingual listwise reranker with Transformers, GGUF and MLX weights under CC BY-NC 4.0 in its [model card](https://huggingface.co/jinaai/jina-reranker-v3.5); the reference repository's latest-release API returned 404, with a [default-branch commit dated 2026-08-10](https://github.com/hanxiao/jina-reranker-v3.5-in-page-search/commit/721a8f5ceb1c)."
+    },
+    {
+      "name": "NeMo Retriever — llama-nemotron-rerank-1b-v2",
+      "repository": "https://github.com/NVIDIA/NeMo-Retriever",
+      "why_candidate": "A public 1B multilingual cross-encoder with an 8,192-token input limit and local Transformers/CUDA inference in its [model card](https://huggingface.co/nvidia/llama-nemotron-rerank-1b-v2); latest NeMo Retriever project release is [26.8.2, published 2026-09-30](https://github.com/NVIDIA/NeMo-Retriever/releases/tag/26.8.2)."
+    },
+    {
+      "name": "RAG-Retrieval — local reranker runtime",
+      "repository": "https://github.com/NovaSearch-Team/RAG-Retrieval",
+      "why_candidate": "MIT-licensed training and inference code supporting local BGE, BCE and GTE reranking models in the [README](https://github.com/NovaSearch-Team/RAG-Retrieval#readme); latest-release API returned 404, with a [default-branch commit dated 2026-08-28](https://github.com/NovaSearch-Team/RAG-Retrieval/commit/7a7a8938b740)."
+    },
+    {
+      "name": "RankLLM — open-weight reranker models",
+      "repository": "https://github.com/castorini/rank_llm",
+      "why_candidate": "Local MonoT5, DuoT5, MonoELECTRA, LiT5, RankZephyr, RankVicuna and FirstMistral rerankers are documented in the [README](https://github.com/castorini/rank_llm#readme); latest-release API returned 404, with a [default-branch commit dated 2026-10-02](https://github.com/castorini/rank_llm/commit/a2d711e9197a)."
+    },
+    {
+      "name": "No additional component",
+      "repository": "",
+      "why_candidate": "Retain the existing retrieval scores or fusion without adding a reranking model; release and release date are not applicable."
+    }
+  ],
+  "search_notes": "Unranked, grouped by canonical project repository. Checked on 2026-10-02 UTC against the 90-day activity cutoff of 2026-07-04. Every listed GitHub repository exists and returned archived=false through gh api repos/OWNER/REPO; every corresponding releases/latest endpoint was checked. Where that endpoint returned 404, GitHub GraphQL through gh api verified the default-branch commit. Dates describe project releases or repository activity, and do not imply that older model weights were newly released. RAG-Retrieval is a runtime candidate using existing weights; the Jina entry is the maintained reference integration for v3.5. Seed exclusions: [Qwen3-Embedding](https://github.com/QwenLM/Qwen3-Embedding/commit/44548aa5f0a0) had no latest release and its default-branch commit was 2025-09-30; [mxbai-rerank](https://github.com/mixedbread-ai/mxbai-rerank/commit/8e709dca09e0) had a default-branch commit dated 2025-09-17 and latest release v0.1.0 dated 2025-03-13; both required API endpoints for jina-ai/jina-reranker-v3 returned 404. Budget used: 5 web search queries submitted, 8 page fetches including one failed fetch, and 29 GitHub API calls including six repository-discovery searches. Web searches failed at the search provider, so exhaustive ecosystem coverage could not be established. Host eligibility is based on documented local inference paths; macOS portability and retrieval quality over the specific code/document/session corpus were not benchmarked. The zero-component entry is an evaluation option, not an established finding that reranking is unnecessary."
+}

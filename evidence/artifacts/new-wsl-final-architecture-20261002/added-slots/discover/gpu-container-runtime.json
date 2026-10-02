@@ -1,0 +1,65 @@
+{
+  "candidates": [
+    {
+      "name": "Apptainer",
+      "repository": "https://github.com/apptainer/apptainer",
+      "why_candidate": "Linux application container engine with host GPU integration ([README](https://github.com/apptainer/apptainer/blob/main/README.md)); latest release [v1.5.4](https://github.com/apptainer/apptainer/releases/tag/v1.5.4), 2026-09-22."
+    },
+    {
+      "name": "Container Device Interface (CDI)",
+      "repository": "https://github.com/cncf-tags/container-device-interface",
+      "why_candidate": "Device injection specification, library, and inspection CLI for container runtimes ([README](https://github.com/cncf-tags/container-device-interface/blob/main/README.md)); latest release [v1.1.1](https://github.com/cncf-tags/container-device-interface/releases/tag/v1.1.1), 2026-09-04."
+    },
+    {
+      "name": "containerd",
+      "repository": "https://github.com/containerd/containerd",
+      "why_candidate": "Container runtime used by rootless nerdctl stacks and supporting CDI device configuration ([README](https://github.com/containerd/containerd/blob/main/README.md), [CDI integration](https://github.com/cncf-tags/container-device-interface/blob/main/README.md#containerd-configuration)); latest release [v2.4.1](https://github.com/containerd/containerd/releases/tag/v2.4.1), 2026-09-24."
+    },
+    {
+      "name": "crun",
+      "repository": "https://github.com/containers/crun",
+      "why_candidate": "OCI execution runtime used by Podman for configured containers ([README](https://github.com/containers/crun/blob/main/README.md)); latest release [1.30.1](https://github.com/containers/crun/releases/tag/1.30.1), 2026-09-25."
+    },
+    {
+      "name": "libnvidia-container",
+      "repository": "https://github.com/NVIDIA/libnvidia-container",
+      "why_candidate": "Library and CLI for configuring Linux containers to access NVIDIA hardware ([README](https://github.com/NVIDIA/libnvidia-container/blob/main/README.md)); latest release [v1.20.1](https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.20.1), 2026-09-28."
+    },
+    {
+      "name": "Moby (Docker Engine)",
+      "repository": "https://github.com/moby/moby",
+      "why_candidate": "Docker Engine’s upstream container platform, with CDI device support ([README](https://github.com/moby/moby/blob/master/README.md), [CDI integration](https://github.com/cncf-tags/container-device-interface/blob/main/README.md#docker-and-podman-configuration)); latest release [docker-v29.8.2](https://github.com/moby/moby/releases/tag/docker-v29.8.2), 2026-09-30."
+    },
+    {
+      "name": "nerdctl",
+      "repository": "https://github.com/containerd/nerdctl",
+      "why_candidate": "Docker-compatible CLI supporting rootless containerd and Linux containers on WSL2 ([README](https://github.com/containerd/nerdctl/blob/main/README.md)); latest release [v2.4.0](https://github.com/containerd/nerdctl/releases/tag/v2.4.0), 2026-09-20."
+    },
+    {
+      "name": "No additional component",
+      "repository": "",
+      "why_candidate": "A configuration where containers perform CPU-only work and access remote model APIs; latest release and date are not applicable."
+    },
+    {
+      "name": "NVIDIA Container Toolkit",
+      "repository": "https://github.com/NVIDIA/nvidia-container-toolkit",
+      "why_candidate": "NVIDIA GPU configuration utilities and runtime integration for containers ([README](https://github.com/NVIDIA/nvidia-container-toolkit/blob/main/README.md)); latest release [v1.20.1](https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.20.1), 2026-09-19."
+    },
+    {
+      "name": "Podman CDI",
+      "repository": "https://github.com/podman-container-tools/podman",
+      "why_candidate": "Container engine supporting rootless execution and CDI device injection ([README](https://github.com/podman-container-tools/podman/blob/main/README.md), [CDI integration](https://github.com/cncf-tags/container-device-interface/blob/main/README.md#podman)); latest release [v6.1.3](https://github.com/podman-container-tools/podman/releases/tag/v6.1.3), 2026-09-29."
+    },
+    {
+      "name": "runc",
+      "repository": "https://github.com/opencontainers/runc",
+      "why_candidate": "OCI container execution runtime supporting rootless operation ([README](https://github.com/opencontainers/runc/blob/main/README.md)); latest release [v1.5.2](https://github.com/opencontainers/runc/releases/tag/v1.5.2), 2026-09-25."
+    },
+    {
+      "name": "SingularityCE",
+      "repository": "https://github.com/sylabs/singularity",
+      "why_candidate": "Linux application container platform with host GPU integration ([README](https://github.com/sylabs/singularity/blob/main/README.md)); latest release [v4.5.1](https://github.com/sylabs/singularity/releases/tag/v4.5.1), 2026-08-20."
+    }
+  ],
+  "search_notes": "Alphabetical and unranked. Checked on 2026-10-01 America/New_York (2026-10-02 UTC): every repository listed is public, not archived, and has a latest stable release within 90 days, verified using the required gh api repository and releases/latest endpoints plus its README. GitHub resolves the Podman seed to the canonical repository shown. Runtime, library, and CDI entries are complementary components of GPU-enabled stacks and require NVIDIA device/library configuration. Apptainer and SingularityCE are conditional candidates: their upstream Linux GPU integration is documented, but WSL2-specific GPU operation was not established from the retrieved sources. NVIDIA passthrough eligibility concerns the primary WSL2 host; Apple GPU access on macOS arm64 was not established. No additional component is conditional on CPU-only workloads; the supplied host description does not establish that its containers need no GPU. Enroot was excluded because its [latest release](https://github.com/NVIDIA/enroot/releases/tag/v4.2.1) dates to 2026-06-09 and its [default-branch commit](https://github.com/NVIDIA/enroot/commit/ead3a25ed974) to 2026-05-19. Used 30 GitHub API calls, six search queries, and eight direct page-fetch attempts. Some search and documentation retrievals failed, so exhaustive discovery could not be established."
+}
