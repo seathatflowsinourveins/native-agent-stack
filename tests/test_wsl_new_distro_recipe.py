@@ -155,8 +155,9 @@ HOST_UPDATE = ("The host was updated to WSL 3.0.1.0 on 2026-10-02 and passed its
                "managers while both distributions ran.")
 OLD_ADOPTED_TARGET = "A second systemd distribution requires WSL 3.0.1 or later before W4 or any W6 import."
 OLD_HOST_UPDATE = "The host's 2.7.13 must be updated outside this page before this second-distribution run."
-# Change 3: on the adopted release WSL mounts the binfmt status file read-only (microsoft/WSL#40621), so
-# systemd-binfmt.service fails at every boot, which upstream calls benign (#41226). F1 accepts that one failed unit.
+# Change 3: on the adopted release WSL mounts the binfmt status file read-only (microsoft/WSL#40621) while the
+# distribution's protectBinfmt setting is on (its default; a best-effort step), and systemd-binfmt.service then fails,
+# which upstream calls benign (#41226). F1 accepts that one failed unit.
 BINFMT_UNIT = "systemd-binfmt.service"
 F1_FAILED = "systemctl --failed --no-legend --plain"
 F1_LOG = "journalctl -b 0 -t systemd-binfmt --no-pager -n 4"
@@ -1939,8 +1940,8 @@ def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: d
 
 def binfmt_unit_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
     """Change 3 of the follow-up of 2026-10-02, the unit. On the adopted release WSL mounts the binfmt status file
-    read-only (microsoft/WSL#40621), so ``systemd-binfmt.service`` fails at every boot with ``Failed to flush binfmt_misc
-    rules, ignoring: Read-only file system``, which upstream calls benign (#41226). F1 passes on ``running``, or on
+    read-only (microsoft/WSL#40621) while ``protectBinfmt`` is on, its default, so ``systemd-binfmt.service`` then fails
+    with ``Failed to flush binfmt_misc rules, ignoring: Read-only file system``, which upstream calls benign (#41226). F1 passes on ``running``, or on
     ``degraded`` only when ``systemctl --failed --no-legend --plain`` lists exactly that unit and its log holds the
     message; any other failed unit stops the run. A text that accepts every ``degraded`` state, or stops at every one, fails."""
     errors = []

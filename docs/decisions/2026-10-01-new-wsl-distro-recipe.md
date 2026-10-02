@@ -371,8 +371,8 @@ Alternatives, each rejected against that evidence:
   `protectBinfmt` setting, so no run on this host could pass F1.
 - **Accepting any `degraded`**: it would hide a real failed unit. The pass condition names the one unit and its log
   message.
-- **Keeping the restart as the interop recovery**: it exits 1 on the adopted release, where PR #40621 protects the
-  registration on purpose.
+- **Keeping the restart as the interop recovery**: it exited 1 on this host on the adopted release, where PR #40621
+  protects the registration on purpose while `protectBinfmt` is on (its default).
 
 The conditions that would overturn these decisions are in Overturn condition, items 3 and 4.
 

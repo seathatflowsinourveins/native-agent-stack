@@ -90,7 +90,7 @@
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "0f7c42f8fd2618b6b1393086a44e56b8a98b1145bc0f99da267a2aac6e08b3a4"
+        "sha256": "0fb3f1fd31e1cfea0b49923486eb705d29e51c4da00c9cc24bfed959235fed7a"
       }
     ],
     "inputs": [
@@ -110,7 +110,7 @@
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "b726b6a054d03f7f88ae567222826ee06069691980cb819922de85a88e48c551"
+        "sha256": "ba9046d7730bb72f95b52408271c26c13151085a855db00132eb740571d061cb"
       }
     ]
   },
