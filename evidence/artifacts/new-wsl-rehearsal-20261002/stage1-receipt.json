@@ -1,0 +1,1141 @@
+{
+  "schema_version": 1,
+  "artifact_class": "local_integration_check",
+  "id": "wsl-new-distro-stage1-stack-rehearsal-2604-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "claim": "P1 printed 'Good signature' by RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 for 26.04.1 and 24.04.5, P2 printed 'Valid schema', W2 printed one hash 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 three times for a 418495746-byte image, W4 and W5 exited 0, cloud-init created <WSL_USER> (uid 1000) with 'cloud-init schema --system' printing 'Valid schema user-data', and W7 read 1000:1000. The hv_storvsc count rose from 7 (P3) to 13 (W5), and F1 printed 'degraded' with user@1000.service failed ('Failed to spawn executor: Device or resource busy'), which stopped the run before F2; F2 to F8 and the comparison probes did not run.",
+  "limitations": [
+    "One run on one Windows host: a new distribution on the existing WSL kernel and Windows installation, not a new physical machine.",
+    "Stopped at F1 on its recipe stop (`degraded`): F2 to F8, the seven comparison probes and R1's removal block did not run, and stage 2 (F9), the Windows Terminal PATH proof (F10) and F11 are outside this run; native sign-in, services and model-mediated behavior are not covered.",
+    "The 24.04.5 arm did not run (null and \"not run\"). This run is the 26.04.1 rehearsal arm only: no real <Name> run exists and the throwaway name stays registered, which is the recorded deviation from R1.",
+    "Sanitized: Windows and Linux user names, home and profile paths, the checkout path, the machine host name and device ids are replaced by placeholders; the raw transcript and outputs stay private on the host.",
+    "jcodemunch_registration is skipped: stage 2 did not run, and a registration would not show that a session or subagent uses jCodeMunch.",
+    "PowerShell cmdlet lines record exit 0 when the cmdlet completed without a terminating error (the script exited 0); native commands record their own exit code. Per-line exits inside P1's loop are derived from its exit-on-failure structure and the script exit code 0.",
+    "The F1-diag entries and the workstation-side cgroup read are read-only checks outside the recipe, run after the stop. The statement that both distributions' user@1000.service resolve to one cgroup is an inference from equal accounting counters (Tasks, Memory, CPU), not a reproduced mechanism.",
+    "Local integration check of our recipe with actual native returned output; not an upstream test, new-host acceptance, or a fresh model or GPU run."
+  ],
+  "recorded_at_utc": "2026-10-02T02:36:13Z",
+  "recipe": {
+    "path": "adoption/platforms/linux-wsl2-new-distro.md",
+    "recipe_commit": "9bfe2d577e9b4997412112635393e3c72ef96292 (branch foundation/new-wsl-rehearsal-20261002, pull request 593 head)",
+    "catalog_revision": null,
+    "creation_path": "A"
+  },
+  "supported_images": {
+    "26.04.1": {
+      "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+      "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+      "catalog_name": "Ubuntu-26.04",
+      "bytes": null
+    },
+    "24.04.5": {
+      "file": "ubuntu-24.04.5-wsl-amd64.wsl",
+      "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+      "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+      "catalog_name": "Ubuntu-24.04",
+      "bytes": 388975696
+    }
+  },
+  "rehearsal": {
+    "name": "StackRehearsal2604",
+    "release": "26.04.1",
+    "result": "stopped at F1: systemctl is-system-running --wait printed degraded (exit 1) and systemctl --failed listed user@1000.service. P1 to P3, W1 to W5 and W7 proofs held, except W5's second storage count (13, baseline 7). Deviation from R1: the removal block (terminate, unregister) and the export were not run; StackRehearsal2604 stays registered for the coordinator. F2 to F8 and the seven comparison probes did not run.",
+    "creation_path": "A",
+    "schema_system": "Valid schema user-data (exit 0)",
+    "ownership_probe": "1000:1000 (W7, after one terminate; exit 0)",
+    "idle_observation": "not run: stopped at F1 before F2 (instanceIdleTimeout=-1, vmIdleTimeout=-1 in the global configuration)",
+    "storage_readings": "P3 baseline 7; newest line at kernel time 336.821467 s, 5022.79 s (83.7 min) old at /proc/uptime 5359.61 s; swap /dev/sdc 24G, 0B used; W5 second count 13 (+6: six lines at kernel 5542.98 to 5543.03 s)",
+    "export": {
+      "file": null,
+      "sha256": null,
+      "bytes": null
+    }
+  },
+  "pre_checks": {
+    "signed_sums": "P1 exit 0, no key import. 26.04.1: 'using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092', 'Good signature from \"Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>\"', signed line '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 *ubuntu-26.04.1-wsl-amd64.wsl'. 24.04.5: the same key and Good signature, signed line 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl'.",
+    "user_data_schema": "P2 exit 0 in the workstation distribution (/usr/bin/cloud-init 26.1-0ubuntu1~24.04.1): 'Valid schema $RENDER_DIR/StackRehearsal2604.user-data' after the warning 'schema.py[WARNING]: datasource not detected, using default instance-data/user-data paths.'; render sha256 c7573fcd5ef1ea52dda89630565956c657c665f17d3b36733faacce4f7e7c3df, equal to W3's."
+  },
+  "storage_errors": {
+    "baseline": 7,
+    "newest_line_time": "336.821467 s since boot (P3 second line, device id dropped: [  336.821467] kernel: hv_storvsc <device-id>: tag#543 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1); /proc/uptime read right after: 5359.61 251121.92; age 5022.79 s (83.7 min), not under 3600 s, so the run continued",
+    "swap": [
+      "NAME     TYPE      SIZE USED PRIO",
+      "/dev/sdc partition  24G   0B   -2"
+    ],
+    "second_count": 13,
+    "new_lines": [
+      "[ 5542.982850] kernel: hv_storvsc <device-id>: tag#1026 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "[ 5542.989792] kernel: hv_storvsc <device-id>: tag#1058 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "[ 5542.996906] kernel: hv_storvsc <device-id>: tag#1055 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "[ 5543.018069] kernel: hv_storvsc <device-id>: tag#1087 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "[ 5543.024662] kernel: hv_storvsc <device-id>: tag#1055 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1",
+      "[ 5543.032208] kernel: hv_storvsc <device-id>: tag#1087 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1"
+    ],
+    "new_lines_placement": "Derived, not measured: /proc/uptime 5620.12 s was read at about 02:23:30Z, which puts kernel time 5543.0 s at about 02:22:13Z, the start of W4 (02:22:13Z to 02:22:22Z), 15.5 s before cloud-init init-local started at kernel 5558.52 s (W5 launch 02:22:28Z).",
+    "wsl_41482_decision": "not taken by this run: the workaround (swap=0 in the global WSL configuration and a WSL shutdown) is outside the recipe and forbidden here; left to the coordinator. W5 itself exited 0 and its proofs held; stage 2 (F9) was not in scope."
+  },
+  "host": {
+    "wsl_version": [
+      "WSL version: 2.7.13.0",
+      "Kernel version: 6.18.33.2-2",
+      "WSLg version: 1.0.73.2",
+      "MSRDC version: 1.2.7214",
+      "Direct3D version: 1.611.1-81528511",
+      "DXCore version: 10.0.26100.1-240331-1435.ge-release",
+      "Windows version: 10.0.26200.9168"
+    ],
+    "default_distribution_before": "* NativeStack Running 2",
+    "default_distribution_after": "* NativeStack Running 2 (whitespace normalized; the NAME column widened with the new distribution)",
+    "z_free_bytes": 2505999912960,
+    "idle_keys": "instanceIdleTimeout=-1 ([general]); vmIdleTimeout=-1 ([wsl2]); line 27: [wsl2] | line 165: vmIdleTimeout=-1 | line 192: [experimental] | line 234: [general] | line 265: instanceIdleTimeout=-1"
+  },
+  "image": {
+    "release": "26.04.1",
+    "file": "ubuntu-26.04.1-wsl-amd64.wsl",
+    "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+    "bytes": 418495746,
+    "sha256_published": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_distributioninfo": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "sha256_computed": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+  },
+  "first_launch": {
+    "user_prompt_marker": false,
+    "oobe_failed_marker": false,
+    "schema_system": "Valid schema user-data (exit 0)",
+    "cloud_init_version": "/bin/cloud-init 26.1-0ubuntu3~26.04.1 (exit 0)",
+    "wsl_warnings": [
+      "wsl: Failed to start the systemd user session for '<WSL_USER>'. See journalctl for more details. (W5 launch output)",
+      "wsl: Failed to start the systemd user session for 'root'. See journalctl for more details. (first --exec call as root, W5 cloud-init --version)",
+      "wsl: Failed to start the systemd user session for '<WSL_USER>'. See journalctl for more details. (W7, first --exec call after the terminate)"
+    ]
+  },
+  "ownership_probe": "1000:1000 (W7: stat -c %u:%g of an empty file created from Windows under the user's home after one terminate; exit 0)",
+  "idle_observation": "not run: stopped at F1 before F2",
+  "subordinate_ids": "not run: stopped at F1 before F5",
+  "jcodemunch_registration": "skipped: stage 2 did not run (outside this run's scope)",
+  "failed_attempt_export": {
+    "file": null,
+    "sha256": null,
+    "bytes": null
+  },
+  "steps": [
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec bash -lc 'stat -c \"%U %F\" \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec systemctl --user is-system-running --wait",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec test -c /dev/dxg",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec /usr/lib/wsl/lib/nvidia-smi",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec bash -lc 'python3 --version'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec bash -lc 'uv run --no-project --python 3.13 python --version'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec bash -lc 'node --version'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded) before the comparison probes"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --terminate 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --export 'StackRehearsal2604' 'Z:\\WSL\\downloads\\StackRehearsal2604-rehearsal.tar'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\StackRehearsal2604-rehearsal.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\StackRehearsal2604-rehearsal.tar').Length",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --unregister 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "R1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": null,
+      "output_excerpt": "not run: recorded deviation from R1; the removal block is skipped and StackRehearsal2604 stays registered for the coordinator"
+    },
+    {
+      "step": "P1",
+      "cmd": "for RELEASE in 26.04.1 24.04.5; do",
+      "exit": 0,
+      "output_excerpt": "loop ran for 26.04.1 and 24.04.5; the script exited 0 (P1 rc=0)"
+    },
+    {
+      "step": "P1",
+      "cmd": "SUMS_DIR=\"$(mktemp -d)\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "(no output); a nonzero curl exits the script with 1, and the script exited 0"
+    },
+    {
+      "step": "P1",
+      "cmd": "curl -fsSL -o \"$SUMS_DIR/SHA256SUMS.gpg\" \"https://releases.ubuntu.com/$RELEASE/SHA256SUMS.gpg\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "(no output); a nonzero curl exits the script with 1, and the script exited 0"
+    },
+    {
+      "step": "P1",
+      "cmd": "gpgv --homedir \"$SUMS_DIR\" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg \"$SUMS_DIR/SHA256SUMS.gpg\" \"$SUMS_DIR/SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "26.04.1: using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 | Good signature from \"Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>\"\n24.04.5: using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092 | Good signature from \"Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>\""
+    },
+    {
+      "step": "P1",
+      "cmd": "if [ \"$?\" -ne 0 ]; then exit 1; fi",
+      "exit": 0,
+      "output_excerpt": "(no output); did not exit, so gpgv exited 0 for both releases"
+    },
+    {
+      "step": "P1",
+      "cmd": "grep -F \" *ubuntu-$RELEASE-wsl-amd64.wsl\" \"$SUMS_DIR/SHA256SUMS\" || exit 1",
+      "exit": 0,
+      "output_excerpt": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 *ubuntu-26.04.1-wsl-amd64.wsl\nbb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl"
+    },
+    {
+      "step": "P1",
+      "cmd": "done",
+      "exit": 0,
+      "output_excerpt": "script exit 0"
+    },
+    {
+      "step": "P2",
+      "cmd": "RENDER_DIR=\"$(mktemp -d)\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "P2",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > \"$RENDER_DIR/StackRehearsal2604.user-data\"",
+      "exit": 0,
+      "output_excerpt": "(no output; render exit 0)"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init --version",
+      "exit": 0,
+      "output_excerpt": "/usr/bin/cloud-init 26.1-0ubuntu1~24.04.1 (the workstation distribution)"
+    },
+    {
+      "step": "P2",
+      "cmd": "cloud-init schema -c \"$RENDER_DIR/StackRehearsal2604.user-data\"",
+      "exit": 0,
+      "output_excerpt": "schema.py[WARNING]: datasource not detected, using default instance-data/user-data paths. | Valid schema $RENDER_DIR/StackRehearsal2604.user-data"
+    },
+    {
+      "step": "P2",
+      "cmd": "sha256sum \"$RENDER_DIR/StackRehearsal2604.user-data\"",
+      "exit": 0,
+      "output_excerpt": "c7573fcd5ef1ea52dda89630565956c657c665f17d3b36733faacce4f7e7c3df  $RENDER_DIR/StackRehearsal2604.user-data"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "exit": 0,
+      "output_excerpt": "7"
+    },
+    {
+      "step": "P3",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1",
+      "exit": 0,
+      "output_excerpt": "[  336.821467] kernel: hv_storvsc <device-id>: tag#543 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1 (kernel time 336.821467 s)"
+    },
+    {
+      "step": "P3",
+      "cmd": "cat /proc/uptime",
+      "exit": 0,
+      "output_excerpt": "5359.61 251121.92 (first number: 5359.61 s since boot, so the newest line was 5022.79 s old, 83.7 min; at least 3600 s, so the run continued)"
+    },
+    {
+      "step": "P3",
+      "cmd": "swapon --show",
+      "exit": 0,
+      "output_excerpt": "NAME     TYPE      SIZE USED PRIO\n/dev/sdc partition  24G   0B   -2"
+    },
+    {
+      "step": "W1",
+      "cmd": "New-Item -ItemType Directory -Force -Path 'Z:\\WSL\\downloads'",
+      "exit": 0,
+      "output_excerpt": "Directory: Z:\\WSL | d----- downloads"
+    },
+    {
+      "step": "W1",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --version",
+      "exit": 0,
+      "output_excerpt": "WSL version: 2.7.13.0\nKernel version: 6.18.33.2-2\nWSLg version: 1.0.73.2\nMSRDC version: 1.2.7214\nDirect3D version: 1.611.1-81528511\nDXCore version: 10.0.26100.1-240331-1435.ge-release\nWindows version: 10.0.26200.9168"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                STATE           VERSION\n* NativeStack         Running         2\n  NoesisFoundation    Running         2"
+    },
+    {
+      "step": "W1",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": 0,
+      "output_excerpt": "NativeStack\nNoesisFoundation"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath 'Z:\\WSL\\StackRehearsal2604'",
+      "exit": 0,
+      "output_excerpt": "False"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\StackRehearsal2604.user-data')",
+      "exit": 0,
+      "output_excerpt": "False"
+    },
+    {
+      "step": "W1",
+      "cmd": "Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml')",
+      "exit": 0,
+      "output_excerpt": "False"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\\.cloud-init\\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue",
+      "exit": 0,
+      "output_excerpt": "(prints nothing: agent.yaml is absent and the error is suppressed by -ErrorAction SilentlyContinue)"
+    },
+    {
+      "step": "W1",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', '^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue",
+      "exit": 0,
+      "output_excerpt": "line 27: [wsl2] | line 165: vmIdleTimeout=-1 | line 192: [experimental] | line 234: [general] | line 265: instanceIdleTimeout=-1"
+    },
+    {
+      "step": "W1",
+      "cmd": "Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free",
+      "exit": 0,
+      "output_excerpt": "Name Z; Used 1494768410624; Free 2505999912960"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ProgressPreference = 'SilentlyContinue'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Release = '26.04.1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "switch ($Release) {",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "'26.04.1' { $Expected = '48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104'; $CatalogName = 'Ubuntu-26.04' }",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "'24.04.5' { $Expected = 'bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e'; $CatalogName = 'Ubuntu-24.04' }",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "default { throw 'unsupported release: do not download or install' }",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "}",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Image = \"ubuntu-$Release-wsl-amd64.wsl\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImagePath = \"Z:\\WSL\\downloads\\$Image\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$ImageUrl = \"https://releases.ubuntu.com/$Release/$Image\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "$SumsPath = \"Z:\\WSL\\downloads\\$Release-SHA256SUMS\"",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri $ImageUrl -OutFile $ImagePath",
+      "exit": 0,
+      "output_excerpt": "(no output); image downloaded to Z:\\WSL\\downloads (progress output off)"
+    },
+    {
+      "step": "W2",
+      "cmd": "Invoke-WebRequest -UseBasicParsing -Uri \"https://releases.ubuntu.com/$Release/SHA256SUMS\" -OutFile $SumsPath",
+      "exit": 0,
+      "output_excerpt": "(no output); signed sums list downloaded"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Published = (Select-String -LiteralPath $SumsPath -Pattern (' \\*' + [regex]::Escape($Image) + '$')).Line.Split(' ')[0]",
+      "exit": 0,
+      "output_excerpt": "(no output); $Published = 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Listed = ((Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/microsoft/WSL/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json').Content | ConvertFrom-Json).ModernDistributions.Ubuntu | Where-Object Name -eq $CatalogName",
+      "exit": 0,
+      "output_excerpt": "(no output); the catalog entry Ubuntu-26.04 was found at the pinned commit"
+    },
+    {
+      "step": "W2",
+      "cmd": "$Actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $ImagePath).Hash.ToLowerInvariant()",
+      "exit": 0,
+      "output_excerpt": "(no output); $Actual = 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
+    },
+    {
+      "step": "W2",
+      "cmd": "\"computed $Actual published $Published listed $($Listed.Amd64Url.Sha256) url $($Listed.Amd64Url.Url)\"",
+      "exit": 0,
+      "output_excerpt": "computed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 published 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 listed 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104 url https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl"
+    },
+    {
+      "step": "W2",
+      "cmd": "if ($Actual -ne $Expected -or $Published -ne $Expected -or $Listed.Amd64Url.Sha256 -ne $Expected -or $Listed.Amd64Url.Url -ne $ImageUrl) { throw 'sha256 mismatch: do not install' }",
+      "exit": 0,
+      "output_excerpt": "no throw: all four values equal the expected hash and the catalog URL equals the release URL"
+    },
+    {
+      "step": "W2",
+      "cmd": "(Get-Item -LiteralPath $ImagePath).Length",
+      "exit": 0,
+      "output_excerpt": "418495746"
+    },
+    {
+      "step": "W3",
+      "cmd": "New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')",
+      "exit": 0,
+      "output_excerpt": "Directory: %USERPROFILE% | d----- .cloud-init"
+    },
+    {
+      "step": "W3",
+      "cmd": "$Text = [System.IO.File]::ReadAllText('<checkout>\\adoption\\templates\\wsl\\cloud-init.user-data.template').Replace('${WSL_USER}', '<WSL_USER>')",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W3",
+      "cmd": "[System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\\StackRehearsal2604.user-data'), $Text)",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W3",
+      "cmd": "Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\StackRehearsal2604.user-data') -TotalCount 1",
+      "exit": 0,
+      "output_excerpt": "#cloud-config"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\StackRehearsal2604.user-data') -Pattern '^- name: ', '^    default='",
+      "exit": 0,
+      "output_excerpt": "line 13: - name: <WSL_USER>\nline 25:     default=<WSL_USER>"
+    },
+    {
+      "step": "W3",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\StackRehearsal2604.user-data')).Hash.ToLowerInvariant()",
+      "exit": 0,
+      "output_excerpt": "c7573fcd5ef1ea52dda89630565956c657c665f17d3b36733faacce4f7e7c3df (equals P2 sha256sum)"
+    },
+    {
+      "step": "W3",
+      "cmd": "Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\\StackRehearsal2604.user-data') -SimpleMatch -Pattern '${'",
+      "exit": 0,
+      "output_excerpt": "(prints nothing)"
+    },
+    {
+      "step": "W4",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --install --from-file 'Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl' --name 'StackRehearsal2604' --location 'Z:\\WSL\\StackRehearsal2604' --no-launch",
+      "exit": 0,
+      "output_excerpt": "Installing: Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl | Distribution successfully installed. It can be launched via 'wsl.exe -d StackRehearsal2604'"
+    },
+    {
+      "step": "W4",
+      "cmd": "$LASTEXITCODE",
+      "exit": 0,
+      "output_excerpt": "0"
+    },
+    {
+      "step": "W4",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Stopped         2"
+    },
+    {
+      "step": "W5",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W5",
+      "cmd": "cmd.exe /d /c \"wsl.exe -d StackRehearsal2604 < NUL\"",
+      "exit": 0,
+      "output_excerpt": "Provisioning the new WSL instance StackRehearsal2604\nThis might take a while...\nwsl: Failed to start the systemd user session for '<WSL_USER>'. See journalctl for more details."
+    },
+    {
+      "step": "W5",
+      "cmd": "$LASTEXITCODE",
+      "exit": 0,
+      "output_excerpt": "0"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "<WSL_USER>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec id -u",
+      "exit": 0,
+      "output_excerpt": "1000"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cloud-init --version",
+      "exit": 0,
+      "output_excerpt": "wsl: Failed to start the systemd user session for 'root'. See journalctl for more details.\n/bin/cloud-init 26.1-0ubuntu3~26.04.1"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cloud-init status --long",
+      "exit": 0,
+      "output_excerpt": "status: disabled\nextended_status: disabled\nboot_status_code: disabled-by-marker-file\nlast_update: Thu, 01 Jan 1970 01:32:40 +0000\ndetail: DataSourceWSL\nerrors: []\nrecoverable_errors: {}"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cat /var/lib/cloud/data/result.json",
+      "exit": 0,
+      "output_excerpt": "{\"v1\": {\"datasource\": \"DataSourceWSL\", \"errors\": []}}"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cat /var/lib/cloud/data/status.json",
+      "exit": 0,
+      "output_excerpt": "init-local: errors [] recoverable_errors {} start 5558.52 finished 5559.14; init: errors [] recoverable_errors {} start 5559.2 finished 5559.81; modules-config: errors [] recoverable_errors {} start 5560.0 finished 5560.06; modules-final: errors [] recoverable_errors {} start 5560.78 finished 5560.85 (times are seconds since kernel boot, not wall clock)"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cloud-init schema --system",
+      "exit": 0,
+      "output_excerpt": "Valid schema user-data"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cat /etc/wsl.conf",
+      "exit": 0,
+      "output_excerpt": "[boot]\nsystemd=true\n[user]\ndefault=<WSL_USER>"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec ls -l /etc/cloud/cloud-init.disabled",
+      "exit": 0,
+      "output_excerpt": "-rw-r--r-- 1 root root 0 Oct  1 22:22 /etc/cloud/cloud-init.disabled"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec sudo -l -U '<WSL_USER>'",
+      "exit": 0,
+      "output_excerpt": "User <WSL_USER> may run the following commands on <hostname>:\n    (ALL : ALL) ALL\n    (ALL) NOPASSWD: ALL"
+    },
+    {
+      "step": "W5",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Running         2"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'",
+      "exit": 0,
+      "output_excerpt": "13 (P3 baseline 7; +6: the 'count equals the baseline' proof did not hold)"
+    },
+    {
+      "step": "W5",
+      "cmd": "sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 6",
+      "exit": 0,
+      "output_excerpt": "[ 5542.982850] kernel: hv_storvsc <device-id>: tag#1026 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 5542.989792] kernel: hv_storvsc <device-id>: tag#1058 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 5542.996906] kernel: hv_storvsc <device-id>: tag#1055 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 5543.018069] kernel: hv_storvsc <device-id>: tag#1087 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 5543.024662] kernel: hv_storvsc <device-id>: tag#1055 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n[ 5543.032208] kernel: hv_storvsc <device-id>: tag#1087 cmd 0x2a status: scsi 0x0 srb 0x4 host 0xc00000a1\n(recipe: new lines when the count grew; tail -n set to the difference of 6)"
+    },
+    {
+      "step": "W6",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --quiet",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --export 'StackRehearsal2604' 'Z:\\WSL\\downloads\\StackRehearsal2604-failed.tar'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "$LASTEXITCODE",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\\WSL\\downloads\\StackRehearsal2604-failed.tar').Hash.ToLowerInvariant()",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "(Get-Item -LiteralPath 'Z:\\WSL\\downloads\\StackRehearsal2604-failed.tar').Length",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --unregister 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --import 'StackRehearsal2604' 'Z:\\WSL\\StackRehearsal2604' 'Z:\\WSL\\downloads\\ubuntu-26.04.1-wsl-amd64.wsl' --version 2",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u root --exec cloud-init status --wait --long",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "id -u '<WSL_USER>' || useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "printf '%s ALL=(ALL) NOPASSWD:ALL\\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "chmod 0440 /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "visudo -cf /etc/sudoers.d/90-wsl-default-user",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "grep -q '^\\[user\\]' /etc/wsl.conf || printf '\\n[user]\\ndefault=%s\\n' '<WSL_USER>' >> /etc/wsl.conf",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "touch /etc/cloud/cloud-init.disabled",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --terminate 'StackRehearsal2604'",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe --list --running",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W6",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec id -un",
+      "exit": null,
+      "output_excerpt": "not run: W5 showed neither path-B marker, so creation_path is A"
+    },
+    {
+      "step": "W7",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": 0,
+      "output_excerpt": "(no output)"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --terminate 'StackRehearsal2604'",
+      "exit": 0,
+      "output_excerpt": "The operation completed successfully."
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe --list --running --quiet",
+      "exit": 0,
+      "output_excerpt": "NativeStack\nNoesisFoundation (StackRehearsal2604 absent)"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec id -un",
+      "exit": 0,
+      "output_excerpt": "wsl: Failed to start the systemd user session for '<WSL_USER>'. See journalctl for more details.\n<WSL_USER>"
+    },
+    {
+      "step": "W7",
+      "cmd": "New-Item -ItemType File -Path '\\\\wsl.localhost\\StackRehearsal2604\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "created \\\\wsl.localhost\\StackRehearsal2604\\home\\<WSL_USER>\\wsl-owner-probe (0 bytes)"
+    },
+    {
+      "step": "W7",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "1000:1000"
+    },
+    {
+      "step": "W7",
+      "cmd": "Remove-Item -LiteralPath '\\\\wsl.localhost\\StackRehearsal2604\\home\\<WSL_USER>\\wsl-owner-probe'",
+      "exit": 0,
+      "output_excerpt": "(prints nothing)"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl is-system-running --wait",
+      "exit": 1,
+      "output_excerpt": "degraded"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl --failed --no-legend",
+      "exit": 0,
+      "output_excerpt": "● user@1000.service loaded failed failed User Manager for UID 1000"
+    },
+    {
+      "step": "F1",
+      "cmd": "systemctl list-unit-files --type=service --no-pager",
+      "exit": 0,
+      "output_excerpt": "199 unit files listed."
+    },
+    {
+      "step": "F2",
+      "cmd": "sudo loginctl enable-linger \"$(id -un)\"",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F2",
+      "cmd": "loginctl show-user \"$(id -un)\" --property=Linger --value",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F2",
+      "cmd": "$env:WSL_UTF8 = '1'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F2",
+      "cmd": "foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F3",
+      "cmd": "stat -c '%U %F' \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F3",
+      "cmd": "systemctl --user is-system-running --wait",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get update",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F4",
+      "cmd": "sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F4",
+      "cmd": "dpkg-query -W -f='${Package} ${Version}\\n' jq libatomic1 uidmap",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F5",
+      "cmd": "sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F5",
+      "cmd": "grep \"^$(id -un):\" /etc/subuid /etc/subgid",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F6",
+      "cmd": "test -e ~/.bash_profile || printf '%s\\n' 'if [ -r \"$HOME/.profile\" ]; then . \"$HOME/.profile\"; fi' > ~/.bash_profile",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F6",
+      "cmd": "cat ~/.bash_profile",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F7",
+      "cmd": "mkdir -p ~/code",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F7",
+      "cmd": "git clone https://github.com/seathatflowsinourveins/native-agent-stack.git ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack rev-parse HEAD",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F7",
+      "cmd": "git -C ~/code/native-agent-stack ls-remote origin refs/heads/main",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F8",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F8",
+      "cmd": "ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding=\"utf-8\").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template \"$(id -un)\" > 'adoption/hosts/stack-rehearsal-2604.json'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F8",
+      "cmd": "python3 -m json.tool 'adoption/hosts/stack-rehearsal-2604.json'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F8",
+      "cmd": "git check-ignore 'adoption/hosts/stack-rehearsal-2604.json'",
+      "exit": null,
+      "output_excerpt": "not run: stopped at F1 (degraded)"
+    },
+    {
+      "step": "F9",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F9",
+      "cmd": "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host 'stack-rehearsal-2604'",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F10",
+      "cmd": "wsl.exe -d 'StackRehearsal2604' -u '<WSL_USER>' --exec /bin/bash -lc 'for p in $(type -P claude codex); do test -f $p && test -x $p && echo executable: $p; done'",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F11",
+      "cmd": "test -x \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F11",
+      "cmd": "cd ~/code/native-agent-stack",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp add --scope local jcodemunch -e \"CODE_INDEX_PATH=$HOME/.code-index\" -e JCODEMUNCH_SHARE_SAVINGS=0 -- \"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\"",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F11",
+      "cmd": "claude mcp get jcodemunch",
+      "exit": null,
+      "output_excerpt": "not run: outside the scope of this run (stage 2 and later)"
+    },
+    {
+      "step": "F1-diag (not in the recipe)",
+      "cmd": "systemctl status user@1000.service --no-pager -l",
+      "exit": 3,
+      "output_excerpt": "Active: failed (Result: resources); Tasks: 1841; Memory: 16.4G (peak: 47.4G); CPU: 21min 29.225s; CGroup: /user.slice/user-1000.slice/user@1000.service; journal: \"Failed to spawn executor: Device or resource busy\" | \"Failed to spawn 'start' task: Device or resource busy\" | \"Failed with result 'resources'\" | \"Start request repeated too quickly\"; attempts at 22:22:33, 22:22:34 and 22:27:38 EDT (W5 launch, W7 relaunch)"
+    },
+    {
+      "step": "F1-diag (not in the recipe)",
+      "cmd": "journalctl -b --no-pager -u user@1000.service",
+      "exit": 0,
+      "output_excerpt": "attempts at 22:22:33, 22:22:34 and 22:27:38 EDT, each ending \"Failed to start user@1000.service - User Manager for UID 1000.\""
+    },
+    {
+      "step": "F1-diag (not in the recipe)",
+      "cmd": "systemctl status user-runtime-dir@1000.service --no-pager -l",
+      "exit": 0,
+      "output_excerpt": "Active: active (exited) since Thu 2026-10-01 22:27:38 EDT; ExecStart systemd-user-runtime-dir start 1000 (code=exited, status=0/SUCCESS)"
+    },
+    {
+      "step": "F1-diag (not in the recipe)",
+      "cmd": "workstation distribution, run natively, not via wsl.exe -d: read pids.current, memory.current and systemctl status of its own user@1000.service",
+      "exit": 0,
+      "output_excerpt": "running since Thu 2026-10-01 20:55:58 EDT; Tasks: 1843; Memory: 16.5G (peak: 47.4G); CPU: 21min 32.766s; cgroup pids.current 1843"
+    },
+    {
+      "step": "final-state (not in the recipe)",
+      "cmd": "wsl.exe --list --verbose",
+      "exit": 0,
+      "output_excerpt": "  NAME                  STATE           VERSION\n* NativeStack           Running         2\n  NoesisFoundation      Running         2\n  StackRehearsal2604    Running         2"
+    }
+  ],
+  "comparison_arms": {
+    "26.04.1": {
+      "status": "partial: stopped at F1 (degraded); the comparison probes did not run",
+      "name": "StackRehearsal2604",
+      "first_boot": "W5 exit 0 without the user or OOBE markers; id -un <WSL_USER>, id -u 1000; cloud-init 26.1-0ubuntu3~26.04.1; status disabled / disabled-by-marker-file; result.json DataSourceWSL errors []; status.json four stages finished with empty errors; schema --system 'Valid schema user-data' exit 0; F1 printed degraded with user@1000.service failed",
+      "systemd_user_from_second_instance": "F1 printed degraded: user@1000.service failed (Result: resources; 'Failed to spawn executor: Device or resource busy'); F3 and probes 1 and 2 did not run",
+      "wsl_gpu": "not run",
+      "uv_cpython_3_13": "not run",
+      "node_24": "not run"
+    },
+    "24.04.5": {
+      "status": "not run",
+      "name": null,
+      "first_boot": null,
+      "systemd_user_from_second_instance": null,
+      "wsl_gpu": null,
+      "uv_cpython_3_13": null,
+      "node_24": null
+    }
+  },
+  "stop": {
+    "step": "F1",
+    "proof_required": "systemctl is-system-running --wait prints running and systemctl --failed lists no unit",
+    "returned": "degraded (exit 1); systemctl --failed --no-legend: ● user@1000.service loaded failed failed User Manager for UID 1000",
+    "recipe_rule": "On degraded, record systemctl --failed and stop for review."
+  },
+  "diagnostics_outside_recipe": {
+    "status": "read-only, run after the stop; no repair attempted",
+    "failed_unit": "user@1000.service: Active failed (Result: resources); journal 'Failed to spawn executor: Device or resource busy', 'Failed to spawn 'start' task: Device or resource busy', 'Start request repeated too quickly'; attempts at 22:22:33 to 22:22:34 EDT (W5 launch) and 22:27:38 EDT (W7 relaunch); user-runtime-dir@1000.service active (exited)",
+    "shared_cgroup_inference": "The failed unit's accounting in the new distribution (Tasks 1841, Memory 16.4G peak 47.4G, CPU 21min 29.225s) equals the workstation's running user@1000.service read about 40 s later (Tasks 1843, Memory 16.5G peak 47.4G, CPU 21min 32.766s): a freshly provisioned distribution cannot have accumulated those counters, so both distributions' user@1000.service point at one cgroup, /user.slice/user-1000.slice/user@1000.service, and both users have uid 1000. Inference only."
+  },
+  "deviations": [
+    "R1 removal block not run: StackRehearsal2604 stays registered (terminate, export and unregister skipped) because the coordinator uses it next.",
+    "Run stopped at F1 on its recipe stop; F2 to F8 and the seven comparison probes were not run.",
+    "Added instrumentation only: exit-code markers after commands and a transcript per PowerShell block; no recipe command was altered."
+  ]
+}
