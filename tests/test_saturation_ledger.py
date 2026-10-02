@@ -23,6 +23,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -1207,6 +1208,630 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("--freshness-status", job)
         # The unit tests run in validate.yml; running them here would block the report.
         self.assertNotIn("unittest", job)
+
+
+class V2PendingCliTests(FixtureCase):
+    """U11V4 pending behavior through the converter and ledger command interfaces."""
+
+    def setUp(self):
+        super().setUp()
+        self.work = self.root / "v2-work"
+        self.converted = self.root / "v2-converted"
+        scope = sl.scope_hashes(self.root)
+        write(self.work, "scope.json", scope)
+        self.field_input = {
+            "contract_version": 2, "catalog": "foundation", "layer_id": "alpha",
+            "requirement": "A portable local tool on Linux without a mandatory paid service.",
+            "requirement_sha256": scope["requirement_sha256"]["foundation/alpha"],
+            "platform_profiles_sha256": scope["platform_profiles_sha256"],
+            "eligible_field": [
+                {"candidate_key": "foundation/alpha/o/surv", "repository": SURV,
+                 "disposition": "admit_pending", "pending_reason": "awaiting_v2_screen",
+                 "exclusion_reason": None, "evidence_key": "foundation/alpha/o/surv",
+                 "evidence_refs": ["catalogs/landscape/foundation.json#/alpha/0"], "material": True},
+                {"candidate_key": "foundation/alpha/o/ref", "repository": REF,
+                 "disposition": "admit_pending", "pending_reason": "legacy_v1_refutation",
+                 "exclusion_reason": None, "evidence_key": "foundation/alpha/o/ref",
+                 "evidence_refs": ["catalogs/saturation/ledger.json#/sweeps/0"], "material": True},
+            ],
+        }
+        binding = {key: self.field_input[key] for key in (
+            "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+        binding["members"] = [
+            {"candidate_key": "foundation/alpha/o/ref", "repository": REF},
+            {"candidate_key": "foundation/alpha/o/surv", "repository": SURV},
+        ]
+        self.field_input["field_sha256"] = hashlib.sha256(
+            json.dumps(binding, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write(self.work, "inputs/alpha.json", self.field_input)
+
+    def convert_cli(self, run, expected_code=0):
+        write(self.work, "workflow.json", run)
+        command = [sys.executable, str(ROOT / "tools/sota-convergence/landscape-sweep/convert.py"),
+                   "--workflow-output", str(self.work / "workflow.json"), "--out", str(self.converted),
+                   "--work-dir", str(self.work), "--repo-root", str(ROOT)]
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        self.assertEqual(completed.returncode, expected_code, completed.stderr)
+        if expected_code:
+            return completed
+        return {name: json.loads((self.converted / (name + ".json")).read_text())
+                for name in ("returns", "layers", "lanes", "survivors")}
+
+    def test_lost_v2_round_retains_frozen_material_field(self):
+        converted = self.convert_cli({
+            "contract_version": 2, "sweep": LANE,
+            "first": [{"catalog": "foundation", "layer_id": "alpha", "round": "first", "lost": True}],
+        })
+        self.assertEqual(converted["returns"]["contract_version"], 2)
+        pending = {row["candidate_key"]: row for row in converted["layers"][0]["pending"]}
+        self.assertEqual(set(pending), {"foundation/alpha/o/surv", "foundation/alpha/o/ref"})
+        self.assertEqual(pending["foundation/alpha/o/ref"]["pending_reason"], "legacy_v1_refutation")
+        self.assertEqual(pending["foundation/alpha/o/surv"]["pending_reason"], "awaiting_v2_screen")
+        self.assertTrue(all(row["material"] and row["evidence_key"] == key for key, row in pending.items()))
+        self.assertEqual(converted["layers"][0]["refuted"], [])
+        self.assertEqual(converted["survivors"], [])
+
+    def test_unsupported_discovery_identity_stays_pending_and_later_layer_converts(self):
+        scope = sl.scope_hashes(self.root)
+        gamma = dict(self.field_input, layer_id="gamma", eligible_field=[],
+                     requirement_sha256=scope["requirement_sha256"]["foundation/gamma"])
+        gamma["field_sha256"] = sl.v2_field_sha256(gamma)
+        write(self.work, "inputs/gamma.json", gamma)
+        proposals = [{"repository": value} for value in (
+            "https://gitlab.com/org/project", "https://codeberg.org/org/project",
+            "https://docs.example.org/guide", None, {"unexpected": "object"})]
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append({"catalog": "foundation", "layer_id": "gamma", "lost": True})
+        converted = self.convert_cli(run)
+        self.assertEqual([row["layer_id"] for row in converted["layers"]], ["alpha", "gamma"])
+        pending = converted["layers"][0]["pending"]
+        self.assertEqual(len(pending), len(proposals))
+        self.assertTrue(all(row["material"] and row["pending_reason"] ==
+                            "unsupported_discovery_identity" for row in pending))
+        self.assertEqual(converted["returns"]["raw"]["alpha"][0]["claude_discover"]["proposed"], proposals)
+        failures = converted["returns"]["failures"]["alpha"]
+        self.assertEqual(len(failures), len(proposals))
+        self.assertTrue(all(row["cause"] == "unsupported_discovery_identity" for row in failures))
+        self.assertTrue(converted["layers"][0]["reopen"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        self.assertEqual(self.ledger_cli("--check").returncode, 0)
+
+    def healthy_later_round(self):
+        """An independently asserted later layer must produce a credible member, not just exist."""
+        scope = sl.scope_hashes(self.root)
+        repository, key = sl.v2_identity("foundation", "gamma", OTHER)
+        member = {"candidate_key": key, "repository": repository, "evidence_key": key,
+                  "disposition": "admit_pending", "pending_reason": "awaiting_v2_screen",
+                  "exclusion_reason": None, "material": True, "evidence_refs": []}
+        frozen = dict(self.field_input, layer_id="gamma", eligible_field=[member],
+                      requirement_sha256=scope["requirement_sha256"]["foundation/gamma"])
+        frozen["field_sha256"] = sl.v2_field_sha256(frozen)
+        write(self.work, "inputs/gamma.json", frozen)
+
+        def judgment(family, role, number):
+            doc = self.judgment(family, role, "credible", number)
+            doc["layer_id"] = "gamma"
+            doc["judgment"].update(judgment_id=f"gamma-{family}-{role}-{number}",
+                                   source_field_sha256=frozen["field_sha256"])
+            doc["votes"] = [dict(doc["votes"][0], candidate_key=key, repository=repository, evidence_key=key)]
+            return doc
+
+        return {"catalog": "foundation", "layer_id": "gamma", "round": "first", "merged": [],
+                "claude_discover": {"contract_version": 2, "layer_id": "gamma", "proposed": []},
+                "gpt6_discover": {"status": "ok", "output": {
+                    "contract_version": 2, "layer_id": "gamma", "proposed": []}},
+                "facts": [judgment("claude", "facts", n) for n in range(2)],
+                "facts_gpt6": [judgment("gpt6", "facts", n) for n in range(2)],
+                "fit_claude": [judgment("claude", "fit", n) for n in range(2)],
+                "fit_gpt6": [judgment("gpt6", "fit", n) for n in range(2)]}
+
+    def assert_healthy_later_layer(self, converted):
+        self.assertEqual([row["layer_id"] for row in converted["layers"]], ["alpha", "gamma"])
+        gamma_layer = converted["layers"][1]
+        self.assertEqual(gamma_layer["pending"], [])
+        self.assertEqual(gamma_layer["refuted"], [])
+        self.assertEqual([row["repo"] for row in gamma_layer["survived"]], [OTHER])
+        self.assertEqual(converted["returns"]["failures"]["gamma"], [])
+
+    def next_v2_field(self):
+        sys.path.insert(0, str(ROOT / "tools/sota-convergence/landscape-sweep"))
+        import build_inputs
+
+        layer = {"layer_id": "alpha", "candidates": [], "winners": [], "alternatives": []}
+        members = build_inputs.eligible_field("foundation", layer, {}, {}, self.ledger(), [], [])
+        self.field_input = dict(self.field_input, eligible_field=members)
+        self.field_input["field_sha256"] = sl.v2_field_sha256(self.field_input)
+        write(self.work, "inputs/alpha.json", self.field_input)
+        return {row["candidate_key"]: row for row in members}
+
+    def assert_second_native_round(self, prior, pending_keys):
+        rebuilt = self.next_v2_field()
+        self.assertEqual(set(rebuilt), set(prior), "the next source field dropped an earlier V2 identity")
+        for key, row in prior.items():
+            self.assertEqual(rebuilt[key]["evidence_key"], row["evidence_key"])
+            returns_ref = self.ledger()["sweeps"][0]["returns_ref"]
+            expected_refs = {returns_ref + ref if ref.startswith("#") else ref for ref in row["evidence_refs"]}
+            self.assertTrue(expected_refs.issubset(rebuilt[key]["evidence_refs"]))
+        run = self.screen_run(copies=2)
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual({row["candidate_key"] for row in converted["layers"][0]["pending"]}, pending_keys)
+        for row in converted["layers"][0]["pending"]:
+            self.assertEqual(row["pending_reason"], prior[row["candidate_key"]]["pending_reason"])
+            self.assertTrue(row["material"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(
+            converted, sweep_id="fx-2", day="2026-10-02")))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assertEqual(len(self.ledger()["sweeps"]), 2)
+        self.assertEqual({row["candidate_key"] for row in self.ledger()["sweeps"][1]["layers"][0]["eligible_field"]},
+                         set(prior))
+
+    def test_supported_discovery_survives_two_native_round_trips(self):
+        repository = "https://github.com/org/newrepo"
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = [{"repository": repository, "evidence": [repository]}]
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual(converted["returns"]["failures"]["alpha"], [])
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        self.assertIn(repository, prior["foundation/alpha/org/newrepo"]["evidence_refs"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, set())
+
+    def test_unsupported_discovery_survives_two_native_round_trips(self):
+        proposals = [{"repository": value} for value in (
+            "https://gitlab.com/org/project", "https://codeberg.org/org/project",
+            "https://docs.example.org/guide", None, {"unexpected": "object"})]
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        pending_keys = {row["candidate_key"] for row in converted["layers"][0]["pending"]}
+        self.assertEqual(len(pending_keys), len(proposals))
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, pending_keys)
+
+    def test_frozen_opaque_key_is_accepted_and_cannot_be_replaced(self):
+        repo, key, supported = sl.v2_discovery_identity("foundation", "alpha", "https://gitlab.com/org/project")
+        self.assertFalse(supported)
+        member = {"candidate_key": key, "repository": repo, "evidence_key": key,
+                  "disposition": "admit_pending", "pending_reason": "unsupported_discovery_identity",
+                  "exclusion_reason": None, "material": True,
+                  "evidence_refs": ["retained-returns.json#/raw/alpha/0/claude_discover/proposed/0"]}
+        frozen = dict(self.field_input, eligible_field=[member])
+        self.assertEqual(sl.v2_expand_field(frozen, []), [member])
+        for changed in (dict(member, candidate_key=key + "-changed"), dict(member, evidence_key=key + "-changed")):
+            with self.subTest(changed=changed):
+                with self.assertRaisesRegex(ValueError, "mismatched identity"):
+                    sl.v2_expand_field(dict(frozen, eligible_field=[changed]), [])
+        repository, opaque_key = sl.v2_opaque_identity("foundation", "alpha", SURV)
+        renamed = dict(member, repository=repository, candidate_key=opaque_key, evidence_key=opaque_key)
+        with self.assertRaisesRegex(ValueError, "cannot replace a supported canonical identity"):
+            sl.v2_expand_field(dict(frozen, eligible_field=[renamed]), [])
+
+    def assert_malformed_proposal_round_trips(self, proposals, cause):
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual(converted["returns"]["raw"]["alpha"][0]["claude_discover"]["proposed"], proposals)
+        pending = converted["layers"][0]["pending"]
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(pending[0]["pending_reason"], cause)
+        if cause == "malformed_discovery_proposal":
+            self.assertTrue(pending[0]["candidate_key"].startswith("foundation/alpha/unsupported-identity-"))
+        self.assertTrue(pending[0]["material"])
+        self.assertEqual(pending[0]["evidence_refs"], ["#/raw/alpha/0/claude_discover/proposed" +
+                                                    ("/0" if isinstance(proposals, list) else "")])
+        failures = converted["returns"]["failures"]["alpha"]
+        self.assertTrue(any(row["cause"] == cause and row["ref"] == pending[0]["evidence_refs"][0]
+                            for row in failures), failures)
+        self.assertTrue(converted["layers"][0]["reopen"])
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, {pending[0]["candidate_key"]})
+
+    def test_null_discovery_evidence_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": None}], "malformed_discovery_evidence")
+
+    def test_integer_discovery_evidence_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": 5}], "malformed_discovery_evidence")
+
+    def test_string_discovery_evidence_never_becomes_character_refs(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": "abc"}], "malformed_discovery_evidence")
+
+    def test_mixed_discovery_evidence_list_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": ["https://example.org", 5]}],
+            "malformed_discovery_evidence")
+
+    def test_missing_repository_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"name": "x", "url": "https://github.com/org/newrepo"}], "malformed_discovery_proposal")
+
+    def test_nonobject_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            ["https://github.com/org/newrepo"], "malformed_discovery_proposal")
+
+    def test_null_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips([None], "malformed_discovery_proposal")
+
+    def test_nonlist_proposed_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips("https://github.com/org/newrepo", "malformed_discovery_proposal")
+
+    def test_null_proposed_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(None, "malformed_discovery_proposal")
+
+    def test_nonlist_proposed_object_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            {"repository": "https://github.com/org/newrepo", "evidence": []}, "malformed_discovery_proposal")
+
+    def test_facts_role_outside_requirement_cannot_exclude(self):
+        run = self.screen_run(copies=2)
+        run["first"][0]["facts"] = [
+            self.judgment(family, "facts", "not_credible", n, "outside_requirement",
+                          "The source implements another task.")
+            for family in ("claude", "gpt6") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(converted["layers"][0]["refuted"], [])
+        self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+        self.assertEqual(converted["returns"]["votes"]["alpha"][0]["facts"]["status"], "pending")
+
+    def test_fit_role_supported_outside_requirement_can_exclude(self):
+        run = self.screen_run(copies=2)
+        for family, slot in (("claude", "fit_claude"), ("gpt6", "fit_gpt6")):
+            run["first"][0][slot] = [
+                self.judgment(family, "fit", "not_credible", n, "outside_requirement",
+                              "The source implements another task.") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(len(converted["layers"][0]["refuted"]), 2)
+        self.assertEqual(converted["layers"][0]["pending"], [])
+
+    def test_facts_role_supported_platform_exclusion_stands_with_pending_fit(self):
+        run = self.screen_run(copies=2, status="pending")
+        run["first"][0]["facts"] = [
+            self.judgment(family, "facts", "not_credible", n, "target_host_incompatible",
+                          "The upstream binary requires a different operating system.")
+            for family in ("claude", "gpt6") for n in range(2)]
+        converted = self.convert_cli(run)
+        self.assertEqual(len(converted["layers"][0]["refuted"]), 2)
+        self.assertEqual(converted["layers"][0]["pending"], [])
+        self.assertEqual({row["exclusion_reason"] for row in converted["layers"][0]["refuted"]},
+                         {"target_host_incompatible"})
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        self.assertEqual(self.ledger_cli("--check").returncode, 0)
+
+    def ledger_cli(self, *arguments):
+        return subprocess.run([sys.executable, str(ROOT / "scripts/saturation_ledger.py"),
+                               "--root", str(self.root), *arguments],
+                              capture_output=True, text=True, timeout=30)
+
+    def retain_v2_result(self, converted, sweep_id="fx-1", day="2026-10-01", status="completed"):
+        manifest_ref, usage_ref, returns_ref = paths(sweep_id)
+        manifest = json.loads((self.root / MANIFEST).read_text())
+        manifest["checked_at"] = day
+        write(self.root, manifest_ref, manifest)
+        write(self.root, usage_ref, usage_of("wf_" + sweep_id, COMPLETE_CHILDREN))
+        write(self.root, returns_ref, dict(converted["returns"], workflow_run="wf_" + sweep_id))
+        layers = json.loads(json.dumps(converted["layers"]).replace("@RETURNS@", returns_ref))
+        retained = result(sweep_id, day, contract_version=2, status=status,
+                          lower_bound_usage=status != "completed", layers=layers)
+        write(self.root, "v2-result.json", retained)
+        register(self.root)
+        return self.root / "v2-result.json"
+
+    def judgment(self, family, role, status, number, criterion=None, fact=None):
+        return {
+            "contract_version": 2, "layer_id": "alpha", "role": role, "skills_used": [],
+            "judgment": {
+                "judgment_id": f"{family}-{role}-{number}", "order_seed": number,
+                "family": family, "model_route_requested": "synthetic/" + family,
+                "model_route_actual": None, "source_field_sha256": self.field_input["field_sha256"],
+                "provider_sampling_seed_requested": None, "provider_sampling_seed_actual": None,
+                "provider_sampling_seed_status": "not_exposed",
+            },
+            "votes": [
+                {"candidate_key": row["candidate_key"], "repository": row["repository"],
+                 "evidence_key": row["evidence_key"], "status": status, "criterion": criterion,
+                 "fact": fact, "confidence": 0.9, "reasoning": "Synthetic offline screen judgment.",
+                 "refs": ["https://example.org/source"],
+                 "requirement_fit": "Conflicts with the frozen portable local requirement." if criterion else None}
+                for row in self.field_input["eligible_field"]
+            ],
+        }
+
+    def screen_run(self, copies=1, status="credible", criterion=None, fact=None):
+        return {
+            "contract_version": 2, "sweep": LANE,
+            "first": [{
+                "catalog": "foundation", "layer_id": "alpha", "round": "first", "merged": [],
+                "claude_discover": {"contract_version": 2, "layer_id": "alpha", "proposed": []},
+                "gpt6_discover": {"status": "ok", "output": {"contract_version": 2, "layer_id": "alpha", "proposed": []}},
+                "facts": [self.judgment(family, "facts", status, n, criterion, fact)
+                          for family in ("claude", "gpt6") for n in range(copies)],
+                "fit_claude": [self.judgment("claude", "fit", status, n, criterion, fact) for n in range(copies)],
+                "fit_gpt6": [self.judgment("gpt6", "fit", status, n, criterion, fact) for n in range(copies)],
+            }],
+        }
+
+    def test_one_judgment_per_family_retains_votes_but_is_pending(self):
+        converted = self.convert_cli(self.screen_run(
+            status="not_credible", criterion="outside_requirement", fact="Does not implement the frozen task."))
+        self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+        self.assertEqual(converted["layers"][0]["refuted"], [])
+        retained = converted["returns"]["votes"]["alpha"][0]
+        self.assertEqual(len(retained["facts"]["judgments"]), 2)
+        self.assertEqual({doc["judgment"]["family"] for doc in retained["fit"]["judgments"]}, {"claude", "gpt6"})
+        self.assertEqual(retained["fit"]["status"], "pending")
+        self.assertTrue(all(doc["votes"][0]["status"] == "not_credible" for doc in retained["fit"]["judgments"]))
+        self.assertNotIn("refuted", retained["fit"])
+
+    def test_two_independent_judgments_per_family_admit_on_agreeing_majorities(self):
+        converted = self.convert_cli(self.screen_run(copies=2))
+        self.assertEqual(converted["layers"][0]["pending"], [])
+        self.assertEqual({row["status"] for row in converted["layers"][0]["eligible_field"]}, {"credible"})
+        self.assertEqual({row["candidate_key"] for row in converted["layers"][0]["survived"]},
+                         {"foundation/alpha/o/surv", "foundation/alpha/o/ref"})
+        retained = converted["returns"]["votes"]["alpha"][0]
+        self.assertEqual(retained["facts"]["status"], "credible")
+        self.assertEqual(retained["fit"]["status"], "credible")
+        self.assertEqual(len(retained["facts"]["judgments"]), 4)
+
+    def test_same_criterion_supported_two_family_exclusion_is_retained_and_checked(self):
+        converted = self.convert_cli(self.screen_run(
+            copies=2, status="not_credible", criterion="outside_requirement",
+            fact="The source implements another task and not the frozen portable local task."))
+        self.assertEqual(converted["layers"][0]["pending"], [])
+        self.assertEqual(len(converted["layers"][0]["refuted"]), 2)
+        self.assertEqual({row["exclusion_reason"] for row in converted["layers"][0]["refuted"]},
+                         {"outside_requirement"})
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        report = self.ledger_cli("--report", "--json")
+        alpha = next(row for row in json.loads(report.stdout)["layers"] if row["layer_id"] == "alpha")
+        self.assertEqual(alpha["clean_count"], 1)
+
+    def test_material_pending_v2_cannot_advance_clean_count(self):
+        converted = self.convert_cli({
+            "contract_version": 2, "sweep": LANE,
+            "first": [{"catalog": "foundation", "layer_id": "alpha", "round": "first", "lost": True}],
+        })
+        path = self.retain_v2_result(converted)
+        appended = self.ledger_cli("--append", str(path))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        report = self.ledger_cli("--report", "--json")
+        self.assertEqual(report.returncode, 0, report.stderr)
+        alpha = next(row for row in json.loads(report.stdout)["layers"] if row["layer_id"] == "alpha")
+        self.assertEqual(alpha["clean_count"], 0)
+        self.assertFalse(alpha["saturation_candidate"])
+        self.assertTrue(alpha["due"])
+        self.assertEqual({row["candidate_key"] for row in self.ledger()["sweeps"][0]["layers"][0]["pending"]},
+                         {"foundation/alpha/o/surv", "foundation/alpha/o/ref"})
+
+    def test_discovery_expands_whole_field_including_hub_and_rejected_over_budget_rows(self):
+        run = self.screen_run(copies=2)
+        repositories = [f"https://github.com/new/tool-{n}" for n in range(8)] + ["https://huggingface.co/Org/Model"]
+        proposals = [{"repository": repo, "candidate_key": "untrusted-discovery-key",
+                      "evidence_key": "untrusted-discovery-key", "proposed_label": "not_admitted",
+                      "admission_reason": "outside_requirement", "pending_reason": "needs_primary_source",
+                      "evidence": [repo], "requirement_fit": "Synthetic discovery only."} for repo in repositories]
+        run["first"][0]["claude_discover"] = {"contract_version": 2, "layer_id": "alpha", "proposed": proposals}
+        run["first"][0]["gpt6_discover"] = {"status": "ok", "output": {
+            "contract_version": 2, "layer_id": "alpha", "proposed": [dict(proposals[-1], repository="https://huggingface.co/Org/Model/")]}}
+        run["first"][0]["merged"] = proposals[:1]
+        run["first"][0]["dropped"] = proposals[1:]
+        converted = self.convert_cli(run)
+        layer = converted["layers"][0]
+        self.assertEqual(len(layer["eligible_field"]), 11)
+        self.assertEqual(len(layer["pending"]), 9)
+        self.assertEqual({row["repo"] for row in layer["pending"]}, set(repositories))
+        self.assertEqual(layer["source_field_sha256"], self.field_input["field_sha256"])
+        self.assertNotEqual(layer["field_sha256"], layer["source_field_sha256"])
+        hf = next(row for row in layer["pending"] if urlparse(row["repository"]).hostname == "huggingface.co")
+        self.assertEqual(hf["candidate_key"], "foundation/alpha/https://huggingface.co/org/model")
+        self.assertEqual(hf["evidence_key"], hf["candidate_key"])
+        self.assertEqual(hf["pending_reason"], "needs_primary_source")
+        self.assertEqual(converted["returns"]["raw"]["alpha"][0]["claude_discover"]["proposed"], proposals)
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        self.assertEqual(self.ledger_cli("--check").returncode, 0)
+
+    def test_incomplete_or_contradictory_sampling_provenance_stays_pending(self):
+        for status, requested, actual in (("recorded", 7, None), ("unknown", None, 7),
+                                           ("not_exposed", None, 7), ("recorded", 7, 8)):
+            with self.subTest(status=status, requested=requested, actual=actual):
+                run = self.screen_run(copies=2)
+                run["first"][0]["facts"][0]["judgment"].update(
+                    provider_sampling_seed_status=status, provider_sampling_seed_requested=requested,
+                    provider_sampling_seed_actual=actual)
+                converted = self.convert_cli(run)
+                self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+                raw = converted["returns"]["votes"]["alpha"][0]["facts"]["judgments"][0]["judgment"]
+                self.assertEqual(raw["provider_sampling_seed_actual"], actual)
+                self.assertEqual(raw["provider_sampling_seed_requested"], requested)
+
+    def test_stopped_v2_cutoff_reopens_previously_clean_layer(self):
+        clean = self.convert_cli(self.screen_run(copies=2, status="not_credible", criterion="outside_requirement",
+                                                fact="The primary source implements another requirement."))
+        for number, day in enumerate(("2026-10-01", "2026-10-08", "2026-10-15"), 1):
+            appended = self.ledger_cli("--append", str(self.retain_v2_result(clean, f"fx-{number}", day)))
+            self.assertEqual(appended.returncode, 0, appended.stderr)
+        before = json.loads(self.ledger_cli("--report", "--json").stdout)
+        self.assertTrue(next(row for row in before["layers"] if row["layer_id"] == "alpha")["saturation_candidate"])
+        cutoff = self.convert_cli({"contract_version": 2, "sweep": LANE,
+                                   "first": [{"catalog": "foundation", "layer_id": "alpha", "lost": True}]})
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(cutoff, "fx-cutoff", "2026-10-16", "stopped")))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        after = json.loads(self.ledger_cli("--report", "--json").stdout)
+        alpha = next(row for row in after["layers"] if row["layer_id"] == "alpha")
+        self.assertEqual(alpha["clean_count"], 0)
+        self.assertFalse(alpha["saturation_candidate"])
+        self.assertTrue(alpha["due"])
+
+    def test_lost_followup_never_borrows_earlier_resolved_votes(self):
+        run = self.screen_run(copies=2)
+        run["followups"] = [{"catalog": "foundation", "layer_id": "alpha", "round": "followup", "lost": True}]
+        converted = self.convert_cli(run)
+        self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+        self.assertEqual(converted["layers"][0]["survived"], [])
+        self.assertEqual(len(converted["returns"]["raw"]["alpha"][0]["facts"]), 4)
+        self.assertEqual(converted["returns"]["discovery"]["alpha"]["screen_judgments"], {"facts": [], "fit": []})
+
+    def test_ledger_rejects_resolved_screens_not_present_in_raw_return(self):
+        pending = self.convert_cli(self.screen_run(copies=1))
+        forged = self.convert_cli(self.screen_run(copies=2))
+        forged["returns"]["raw"] = pending["returns"]["raw"]
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(forged)))
+        self.assertNotEqual(appended.returncode, 0)
+        self.assertIn("raw", appended.stderr)
+        self.assertEqual(self.ledger()["sweeps"], [])
+
+    def test_a_later_frozen_field_cannot_forget_prior_material_pending_identities(self):
+        pending = self.convert_cli(self.screen_run(copies=1))
+        self.assertEqual(self.ledger_cli("--append", str(self.retain_v2_result(pending))).returncode, 0)
+        self.field_input["eligible_field"] = []
+        binding = {key: self.field_input[key] for key in (
+            "contract_version", "catalog", "layer_id", "requirement_sha256", "platform_profiles_sha256")}
+        binding["members"] = []
+        self.field_input["field_sha256"] = hashlib.sha256(
+            json.dumps(binding, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write(self.work, "inputs/alpha.json", self.field_input)
+        truncated = self.convert_cli(self.screen_run(copies=2))
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(truncated, "fx-2", "2026-10-08")))
+        self.assertNotEqual(appended.returncode, 0)
+        self.assertIn("prior", appended.stderr)
+        self.assertEqual(len(self.ledger()["sweeps"]), 1)
+
+    def test_uncertain_screens_retain_identity_and_each_original_vote_as_pending(self):
+        cases = ("tie", "families_disagree", "different_criteria", "one_family", "duplicate_id", "duplicate_seed",
+                 "wrong_field", "missing_provenance", "missing_vote", "wrong_evidence_key", "unsupported_health",
+                 "health_relabelled", "unsupported_paid_rule", "credentials_absent", "source_reference_absent",
+                 "selection_exposure")
+        for case in cases:
+            with self.subTest(case=case):
+                run = self.screen_run(copies=2)
+                first = run["first"][0]
+                doc = first["facts"][0]
+                if case in ("tie", "families_disagree", "different_criteria"):
+                    affected = [doc] if case == "tie" else first["facts"][:2]
+                    if case == "different_criteria":
+                        affected = first["facts"]
+                    for item in affected:
+                        for row in item["votes"]:
+                            row.update(status="not_credible", criterion="outside_requirement",
+                                       fact="The primary source implements another requirement.", requirement_fit="Wrong task.")
+                    if case == "different_criteria":
+                        for item in first["facts"][2:]:
+                            for row in item["votes"]:
+                                row["criterion"] = "target_host_incompatible"
+                elif case == "one_family":
+                    first["facts"] = first["facts"][:2]
+                elif case == "duplicate_id":
+                    first["facts"][1]["judgment"]["judgment_id"] = doc["judgment"]["judgment_id"]
+                elif case == "duplicate_seed":
+                    first["facts"][1]["judgment"]["order_seed"] = doc["judgment"]["order_seed"]
+                elif case == "wrong_field":
+                    doc["judgment"]["source_field_sha256"] = "0" * 64
+                elif case == "missing_provenance":
+                    del doc["judgment"]["model_route_requested"]
+                elif case == "missing_vote":
+                    doc["votes"] = []
+                elif case == "wrong_evidence_key":
+                    for row in doc["votes"]:
+                        row["evidence_key"] = "some-other-evidence"
+                elif case == "selection_exposure":
+                    doc["selection_of_record"] = SURV
+                else:
+                    for item in first["facts"]:
+                        for row in item["votes"]:
+                            row.update(status="not_credible", criterion="outside_requirement", fact="The source is another task.",
+                                       requirement_fit="Conflicts with the frozen requirement.")
+                            if case == "unsupported_health":
+                                row.update(criterion="archived_or_stale", fact="The repository is archived.")
+                            elif case == "health_relabelled":
+                                row["fact"] = "The repository is archived."
+                            elif case == "unsupported_paid_rule":
+                                row.update(criterion="paid_service_required", fact="The source requires a paid subscription.")
+                            elif case == "credentials_absent":
+                                row["fact"] = "Native credentials are missing on this host."
+                            elif case == "source_reference_absent":
+                                row["refs"] = []
+                    if case == "unsupported_paid_rule":
+                        self.field_input["requirement"] = "A portable local tool."
+                        write(self.work, "inputs/alpha.json", self.field_input)
+                converted = self.convert_cli(run)
+                self.assertEqual(len(converted["layers"][0]["pending"]), 2)
+                self.assertEqual(converted["layers"][0]["refuted"], [])
+                self.assertEqual(converted["returns"]["raw"]["alpha"][0], first)
+                self.assertEqual({row["evidence_key"] for row in converted["layers"][0]["pending"]},
+                                 {"foundation/alpha/o/surv", "foundation/alpha/o/ref"})
+
+    def test_a_missing_discovery_family_cannot_make_a_resolved_field_clean(self):
+        run = self.screen_run(copies=2, status="not_credible", criterion="outside_requirement",
+                              fact="The primary source implements another requirement.")
+        run["first"][0]["claude_discover"] = {"contract_version": 2, "layer_id": "alpha", "proposed": []}
+        run["first"][0]["gpt6_discover"] = {"status": "unavailable", "output": None}
+        converted = self.convert_cli(run)
+        self.assertEqual(converted["layers"][0]["pending"], [])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        alpha = next(row for row in json.loads(self.ledger_cli("--report", "--json").stdout)["layers"]
+                     if row["layer_id"] == "alpha")
+        self.assertEqual(alpha["clean_count"], 0)
+        self.assertTrue(converted["layers"][0]["reopen"])
+
+    def test_ledger_cannot_drop_a_whole_pending_layer_from_retained_returns(self):
+        converted = self.convert_cli(self.screen_run(copies=1))
+        converted["layers"] = []
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertNotEqual(appended.returncode, 0)
+        self.assertIn("every retained", appended.stderr)
+        self.assertEqual(self.ledger()["sweeps"], [])
+
+    def test_contract_version_must_be_explicit_supported_integer_without_binary_fallback(self):
+        for version in (2.0, "2", 3, None, True):
+            with self.subTest(version=version):
+                run = self.screen_run(copies=2)
+                run["contract_version"] = version
+                rejected = self.convert_cli(run, expected_code=2)
+                self.assertIn("contract_version", rejected.stderr)
+                self.assertFalse((self.converted / "layers.json").exists())
+
+    def test_paid_policy_is_pending_until_part2_frozen_owner_field(self):
+        for fact, expected in (("The source requires a paid subscription.", "pending"),
+                               ("The source does not require a paid subscription.", "pending"),
+                               ("No credentials are configured; the source requires a paid subscription.", "pending")):
+            with self.subTest(fact=fact):
+                converted = self.convert_cli(self.screen_run(copies=2, status="not_credible",
+                    criterion="paid_service_required", fact=fact))
+                self.assertEqual({row["status"] for row in converted["layers"][0]["eligible_field"]}, {expected})
+                self.assertEqual({row["pending_reason"] for row in converted["layers"][0]["pending"]},
+                                 {"the paid-service policy field arrives in part 2"})
+                self.assertEqual(converted["layers"][0]["refuted"], [])
 
 
 if __name__ == "__main__":

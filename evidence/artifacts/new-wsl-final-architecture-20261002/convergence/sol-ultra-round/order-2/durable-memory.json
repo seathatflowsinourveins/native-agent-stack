@@ -1,0 +1,280 @@
+{
+  "layers": [
+    {
+      "layer_id": "durable-memory",
+      "selection": [
+        {
+          "name": "ai-memory (C02)",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "role": "Alternative sole memory owner; strongest documented operational fit for scoped decisions and explicit handoffs.",
+          "install_command": "mise use -g github:akitaonrails/ai-memory@2.5.2",
+          "install_source": "Upstream installation cookbook documents the GitHub release backend and version pinning; v2.5.2 was reviewed.",
+          "basis": [
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/README.md",
+              "shows": "Released Claude Code/Codex hooks and MCP integration, scoped capture, inspectable Markdown and explicit cross-agent handoffs; optional LLM processing."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/lifecycle-ops.md",
+              "shows": "Scoped purge, consistent SQLite backup with wiki/config, stopped-server restore and checkpoint page recovery. Complete recovery requires the database backup; purge retains Git history and earlier backups."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/install.md",
+              "shows": "Documented Linux installation and native-client wiring."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/support-matrix.md",
+              "shows": "Explicit WSL2 support, Linux x86_64 installation and macOS arm64 release binaries. Its default operation requires no GPU."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/benchmarks/README.md",
+              "shows": "Upstream September 21 evaluation reports LongMemEval-S hit@5 of 0.815 with local embeddings and 0.666 with FTS, using 470 scored questions. These are retrieval measurements, not a matched comparison against the other candidates."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3/.github/workflows/ci.yml",
+              "shows": "Workspace tests, source-install checks and Docker packaging smoke tests; macOS coverage is conditional."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/actions/runs/36913374060/job/110541286658",
+              "shows": "GitHub API reports SUCCESS for the Ubuntu test job at the inspected default-branch commit."
+            },
+            {
+              "url": "https://api.github.com/repos/akitaonrails/ai-memory",
+              "shows": "Unarchived; 15 open issues in the inspected snapshot. Recently updated issues demonstrate ongoing activity, without establishing a responsiveness rate."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+              "shows": "Release published October 1, 2026, including Linux x86_64 and macOS arm64 assets."
+            },
+            {
+              "url": "https://github.com/akitaonrails/ai-memory/commit/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3",
+              "shows": "Latest inspected default-branch commit dated October 1, 2026."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Hindsight (C05)",
+          "repository": "https://github.com/vectorize-io/hindsight",
+          "role": "Alternative sole memory owner; substantial published memory evaluation and documented automated capture and recovery.",
+          "install_command": "npx @vectorize-io/hindsight-coding-agents install claude-code --server daemon\nnpx @vectorize-io/hindsight-coding-agents install codex --server daemon",
+          "install_source": "Current unified coding-agents installation guide at commit 0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b; core release v0.10.2 reviewed.",
+          "basis": [
+            {
+              "url": "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs-integrations/coding-agents.md",
+              "shows": "Shared Claude/Codex repository banks, automatic conversation/git ingestion, curated knowledge pages, capture controls and diagnostics. Explicit daemon mode avoids the default Cloud deployment; extraction requires a configured model provider."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/api/memory-banks.mdx",
+              "shows": "Cross-instance bank export/import carries documents, facts, observations, attachments and knowledge pages. Audit history is optional; fact/entity identifiers change on transfer."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/api/memories.mdx",
+              "shows": "Inspectable memory provenance, editing, invalidation and restoration. Complete hard-deletion propagation through generated prose remains unverified."
+            },
+            {
+              "url": "https://arxiv.org/abs/2512.12818",
+              "shows": "The primary paper's search-indexed abstract reports 83.6% accuracy with a 20B model versus 39% for its same-backbone full-context baseline. This does not establish superiority over the shortlisted native-client installations."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/.github/workflows/test.yml",
+              "shows": "Upstream API and client-integration test suites. The inspected recent commit checks did not establish a passing full test run."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/README.md",
+              "shows": "Documented Linux x86_64 and macOS arm64 support, self-hosting and local model providers. The coding-agent daemon guide additionally requires a current Rust toolchain on macOS."
+            },
+            {
+              "url": "https://api.github.com/repos/vectorize-io/hindsight",
+              "shows": "Unarchived with ongoing issue activity; sampled capture-related reports remain reports rather than verified defects."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+              "shows": "Release published September 29, 2026."
+            },
+            {
+              "url": "https://github.com/vectorize-io/hindsight/commit/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b",
+              "shows": "Latest inspected default-branch commit dated October 1, 2026."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "agentmemory (rohitg00) (C08)",
+          "repository": "https://github.com/rohitg00/agentmemory",
+          "role": "Alternative sole memory owner; broad native-client capture, handoff, inspection and lifecycle tooling.",
+          "install_command": "npx @agentmemory/agentmemory@0.9.29",
+          "install_source": "Upstream release README documents the npx setup and native-client selection; keep its iii-engine v0.11.2 dependency separate from newer default-branch instructions.",
+          "basis": [
+            {
+              "url": "https://github.com/rohitg00/agentmemory/blob/v0.9.29/README.md",
+              "shows": "Claude/Codex integration, scoped memory, handoff/lesson tooling, inspection UI, audited deletion, Git snapshots and export/import. WSL2 is documented as the preferred Windows path; exact macOS arm64 installation remains unverified."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/benchmark/COMPARISON.md",
+              "shows": "Upstream reports LongMemEval-S R@5 of 95.2%, R@10 of 98.6% and MRR of 88.2%; the page expressly disclaims a measured head-to-head against the other listed projects."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/docs/benchmarks/2026-05-20-coding-agent-life-v1.md",
+              "shows": "A separate 15-question coding evaluation explicitly limits headline interpretation."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/.github/workflows/ci.yml",
+              "shows": "Build, skills checks and npm tests across Ubuntu/macOS and multiple Node versions."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/actions/runs/36855583061",
+              "shows": "Inspected GitHub check records report SUCCESS for Ubuntu and macOS test jobs at the reviewed default-branch commit."
+            },
+            {
+              "url": "https://api.github.com/repos/rohitg00/agentmemory",
+              "shows": "Unarchived with active issues; the sampled recently updated issues were closed. This sample does not establish overall responsiveness."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29",
+              "shows": "Release published August 16, 2026, within 90 days."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory/commit/b3d6cf50026655233f11c2273b898af0ca82cf03",
+              "shows": "Latest inspected default-branch commit dated October 1, 2026."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Mem0",
+          "reason": "Native-session capture and recovery are less established in the inspected source; its headline results explicitly measure proprietary managed-platform optimizations. [README](https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/README.md)"
+        },
+        {
+          "key": "C03",
+          "name": "MemPalace",
+          "reason": "Credible native hooks and retrieval evaluations, but less established deletion and complete-store recovery than the shortlist. [README](https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/README.md)"
+        },
+        {
+          "key": "C04",
+          "name": "agent-memory (tigerless-labs)",
+          "reason": "Strong Markdown inspection and shared hooks, but source-checkout installation and less complete recovery evidence weaken the clean-install case; no GitHub release was returned. [README](https://github.com/tigerless-labs/agent-memory/blob/6613670d1194c2a8f77e3942ebeeaa653f4bed11/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "Graphiti",
+          "reason": "Strong temporal provenance and MCP operations, but native capture, handoff management and recovery require more assembly; inspected database-integration CI failed. [README](https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/README.md), [CI](https://github.com/getzep/graphiti/actions/runs/36687254536)"
+        },
+        {
+          "key": "C07",
+          "name": "Claude-mem",
+          "reason": "Strong capture and passing component CI, but cross-harness startup sharing requires opt-in and deletion/recovery are less established in the inspected README. [README](https://github.com/thedotmack/claude-mem/blob/039c6160f0ff26e9fab37cae7f50b994ba68f7ff/README.md), [CI](https://github.com/thedotmack/claude-mem/actions/runs/36954955233)"
+        },
+        {
+          "key": "C09",
+          "name": "langmem",
+          "reason": "A capable memory-management library requiring durable storage and native-client integration to be assembled around it; no GitHub release was returned. [README](https://github.com/langchain-ai/langmem/blob/9d033b47d9ce53e37e92c92241b0496c0278932e/README.md)"
+        },
+        {
+          "key": "C10",
+          "name": "deja-vu",
+          "reason": "Strong lightweight history, curated notes, persistent forget and explicit handoffs; full-store backup/restore semantics are less established in the examined source. [README](https://github.com/vshulcz/deja-vu/blob/dd67a6200b67c840f7a090bfe50eff42851f7250/README.md)"
+        },
+        {
+          "key": "C11",
+          "name": "Letta Code",
+          "reason": "Useful inspected and exportable memory, but its principal product is its own stateful agent harness; shared memory across the two required native clients is less established. [README](https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md)"
+        },
+        {
+          "key": "C12",
+          "name": "memos",
+          "reason": "Documented local plugins target other agent runtimes; Claude/Codex integration and isolated recovery remain less substantiated. [README](https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/README.md)"
+        },
+        {
+          "key": "C14",
+          "name": "Supermemory",
+          "reason": "Current source supports local hosting and both clients, but scoped capture, deletion and recovery contracts are less established than the shortlist. [README](https://github.com/supermemoryai/supermemory/blob/bce2d0dc16fdb2bc47e83cf702bdca44f74041e1/README.md)"
+        },
+        {
+          "key": "C15",
+          "name": "Basic Memory",
+          "reason": "Excellent inspectable Markdown and shared MCP access with passing lifecycle CI, but local backups are explicitly user-managed and complete native capture is less established. [README](https://github.com/basicmachines-co/basic-memory/blob/194afe165b3e7676496aaa53b70e39a78ea5aa4f/README.md), [CI](https://github.com/basicmachines-co/basic-memory/actions/runs/36954812049)"
+        },
+        {
+          "key": "C16",
+          "name": "OpenViking",
+          "reason": "Strong native integration, directory scoping and readable session-derived memory, but deletion propagation and isolated restore are less established in the inspected source. [README](https://github.com/volcengine/OpenViking/blob/df32bf6e50a40843438f9491a26069ca4bd08f1f/README.md)"
+        },
+        {
+          "key": "C17",
+          "name": "Cognee",
+          "reason": "Strong native-client plugins, scoped lessons and inspection, but complete deletion/restore evidence is weaker; its reported benchmark settings do not establish a matched win. [README](https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/README.md)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C13",
+          "name": "letta",
+          "criterion": "duplicate",
+          "fact": "Its current README redirects current development and installation to letta-code; the former V1 server remains on an archive branch. The repository itself is unarchived. [Pinned README](https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md)"
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The three selections are mutually exclusive sole-owner alternatives; evidence does not establish one overall winner. All 17 repositories were unarchived and had default-branch commits within 90 days at the October 1 EDT audit. On WSL2 x86_64, run version-pinned ai-memory, Hindsight and agentmemory separately over identical source-grounded decisions, conflicting project scopes, Claude-to-Codex handoffs, abstention cases, interrupted capture and compaction. Measure useful-write quality, capture loss, recall correctness, provenance, scope leakage, deletion surviving rebuild/re-ingestion, and restoration into an empty isolated store, plus latency, model cost and operator steps. Compare each complete documented deployment and hold models constant where supported.",
+      "evidence_gaps": [
+        "No reviewed comparison measures the entire requirement across the shortlisted native-client installations. The packet's Mac retrieval comparison used different capture amounts and embedders and did not run every shortlisted system.",
+        "WSL2 execution, isolated restore fidelity and RTX 4090 inference performance were not tested. The requirement permits CPU or service-backed operation; exact agentmemory macOS arm64 installation remains unverified.",
+        "ai-memory purge is logical: Git history and prior backups retain content. Hindsight transfer changes fact/entity identifiers, while complete hard-delete propagation remains unverified. agentmemory release and default-branch engine versions differ.",
+        "Published metrics use incompatible retrieval versus answer-accuracy protocols. Managed-platform results were not transferred to open-source implementations; misleading cross-project feature matrices were checked against each repository's own source.",
+        "Budget used: 30 GitHub API requests, including one failed HTTP 502 request; one web search; zero successful webpage fetches. README and documentation evidence was obtained from GitHub source and read through ctx_search.",
+        "The required ctx_fetch_and_index call was rejected with: 'MCP tool call requires approval, but approval policy is never'. Full webpage and paper inspection therefore remains incomplete; no permission workaround was attempted."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/akitaonrails/ai-memory",
+        "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+        "https://api.github.com/repos/vectorize-io/hindsight",
+        "https://api.github.com/repos/vectorize-io/hindsight/releases/latest",
+        "https://api.github.com/repos/rohitg00/agentmemory",
+        "https://api.github.com/repos/rohitg00/agentmemory/releases/latest",
+        "https://api.github.com/repos/basicmachines-co/basic-memory",
+        "https://api.github.com/repos/basicmachines-co/basic-memory/releases/latest",
+        "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/README.md",
+        "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/install.md",
+        "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/lifecycle-ops.md",
+        "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/support-matrix.md",
+        "https://github.com/akitaonrails/ai-memory/blob/v2.5.2/docs/benchmarks/README.md",
+        "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3/.github/workflows/ci.yml",
+        "https://github.com/akitaonrails/ai-memory/actions/runs/36913374060/job/110541286658",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/README.md",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs-integrations/coding-agents.md",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/api/memory-banks.mdx",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/docs/developer/api/memories.mdx",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/hindsight-docs/blog/2026-09-22-move-a-memory-bank.md",
+        "https://github.com/vectorize-io/hindsight/blob/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b/.github/workflows/test.yml",
+        "https://arxiv.org/abs/2512.12818",
+        "https://github.com/rohitg00/agentmemory/blob/v0.9.29/README.md",
+        "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/benchmark/COMPARISON.md",
+        "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/docs/benchmarks/2026-05-20-coding-agent-life-v1.md",
+        "https://github.com/rohitg00/agentmemory/blob/b3d6cf50026655233f11c2273b898af0ca82cf03/.github/workflows/ci.yml",
+        "https://github.com/rohitg00/agentmemory/actions/runs/36855583061",
+        "https://github.com/mem0ai/mem0/blob/abb81c88e1f738a8117d8293530fbc31a5ef8fd9/README.md",
+        "https://github.com/MemPalace/mempalace/blob/5ea40d30caf0ed2ff6e49623e386a0863b28edaa/README.md",
+        "https://github.com/tigerless-labs/agent-memory/blob/6613670d1194c2a8f77e3942ebeeaa653f4bed11/README.md",
+        "https://github.com/getzep/graphiti/blob/3c427640abf909f12f71f963fce15eb514a3c493/README.md",
+        "https://github.com/getzep/graphiti/actions/runs/36687254536",
+        "https://github.com/thedotmack/claude-mem/blob/039c6160f0ff26e9fab37cae7f50b994ba68f7ff/README.md",
+        "https://github.com/thedotmack/claude-mem/actions/runs/36954955233",
+        "https://github.com/langchain-ai/langmem/blob/9d033b47d9ce53e37e92c92241b0496c0278932e/README.md",
+        "https://github.com/vshulcz/deja-vu/blob/dd67a6200b67c840f7a090bfe50eff42851f7250/README.md",
+        "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md",
+        "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "https://github.com/MemTensor/MemOS/blob/a7367d07e55db61099f7b4e2c1108bc5831a24f3/README.md",
+        "https://github.com/supermemoryai/supermemory/blob/bce2d0dc16fdb2bc47e83cf702bdca44f74041e1/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/194afe165b3e7676496aaa53b70e39a78ea5aa4f/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/194afe165b3e7676496aaa53b70e39a78ea5aa4f/.github/workflows/sqlite-lifecycle.yml",
+        "https://github.com/basicmachines-co/basic-memory/actions/runs/36954812049",
+        "https://github.com/volcengine/OpenViking/blob/df32bf6e50a40843438f9491a26069ca4bd08f1f/README.md",
+        "https://github.com/topoteretes/cognee/blob/b32d8afc59e1064d9291b9828a8a147be9cc8bab/README.md"
+      ]
+    }
+  ]
+}

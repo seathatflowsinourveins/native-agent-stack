@@ -1,0 +1,192 @@
+{
+  "layers": [
+    {
+      "layer_id": "alerting-notification",
+      "selection": [
+        {
+          "name": "C10: Alertmanager",
+          "repository": "https://github.com/prometheus/alertmanager",
+          "role": "Provisional routing component, pinned to v0.34.1. Receives firing and resolved alerts from local metric and log evaluators, groups and deduplicates notifications, and applies silences and inhibition. Its email receiver can deliver to ntfy's local SMTP listener. The documented amtool CLI gives agent sessions an interface for inspecting alerts and managing silences.",
+          "install_command": "git clone --depth 1 --branch v0.34.1 https://github.com/prometheus/alertmanager.git\ncd alertmanager\nmake build",
+          "install_source": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md#install",
+          "basis": [
+            {
+              "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+              "shows": "Documents grouping, deduplication, routing, silencing, inhibition, email receivers and amtool. The install command is the documented source-build procedure with the verified release tag added; it requires Go and Node.js. Upstream recommends production release binaries."
+            },
+            {
+              "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/notify/notify_test.go",
+              "shows": "TestDedupStageNeedsUpdate and related tests exercise firing/resolved alert sets, repeat intervals and notification suppression. This is relevant functional evidence, not a comparative device-delivery benchmark."
+            },
+            {
+              "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/dispatch/dispatch_test.go",
+              "shows": "Tests cover aggregation groups, grouping labels, resolved alerts and a first-notification race when group_wait is zero."
+            },
+            {
+              "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/nflog/nflog_test.go",
+              "shows": "TestLogSnapshot checks notification-log snapshot restoration into a new instance."
+            },
+            {
+              "url": "https://github.com/prometheus/alertmanager/blob/v0.34.1/silence/silence_test.go",
+              "shows": "TestSilencesSnapshot checks silence snapshot restoration; other tests cover silence matching, updates and expiry."
+            },
+            {
+              "url": "https://github.com/prometheus/alertmanager/actions/runs/36895170538",
+              "shows": "GitHub reports CI success on 2026-10-01 for a pull-request revision. The sampled run does not establish that the recommended release passed an end-to-end workstation delivery test."
+            },
+            {
+              "url": "https://api.github.com/repos/prometheus/alertmanager/releases/latest",
+              "shows": "Latest release is v0.34.1, published 2026-09-17. Assets include Linux amd64 and Darwin arm64 binaries. The release fixes inhibition problems directly relevant to notification suppression."
+            },
+            {
+              "url": "https://api.github.com/repos/prometheus/alertmanager/commits?per_page=1",
+              "shows": "Latest default-branch commit is 61ba43d505ca5867ddfee77fc7a64ee80b114454, dated 2026-09-29, inside the 90-day window."
+            },
+            {
+              "url": "https://api.github.com/repos/prometheus/alertmanager",
+              "shows": "Repository is unarchived; GitHub identifies Apache-2.0 licensing. Issue activity was separately verified through the GraphQL API, with an issue updated 2026-10-01. License was not used to rank candidates."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C01: ntfy",
+          "repository": "https://github.com/binwiederhier/ntfy",
+          "role": "Provisional device-delivery component, pinned to v2.28.0. Its documented SMTP listener accepts Alertmanager email notifications and publishes them to a subscribed topic, using configuration rather than a custom receiver adapter. Enable an on-disk cache for restart recovery. Browser notifications and the CLI serve workstation and laptop users; mobile delivery has additional platform conditions.",
+          "install_command": "wget https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/ntfy_2.28.0_linux_amd64.deb\nsudo dpkg -i ntfy_2.28.0_linux_amd64.deb",
+          "install_source": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+          "basis": [
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/install.md",
+              "shows": "Documents Ubuntu/Debian packages, Linux binaries, Docker images and macOS CLI installation. The Linux amd64 package command is documented upstream. Homebrew supplies the publish/subscribe CLI rather than the server."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/config.md",
+              "shows": "Documents local SMTP publishing without external mail delivery or DNS setup, topic-address mapping and subject/body conversion. Combining this with Alertmanager's documented email receiver is an integration inference; the pair was not exercised here."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/server/smtp_server_test.go",
+              "shows": "Tests assert SMTP recipient-to-topic mapping and subject/body conversion, including plain text, encoded content and HTML."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/server/server_test.go",
+              "shows": "TestServer_PublishAndSubscribe, TestServer_PublishAndMultiPoll and cursor tests exercise publication, subscription and cached replay with SQLite and PostgreSQL backends."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/actions/runs/33695102928",
+              "shows": "GitHub reports test-workflow success on 2026-09-02 for a pull-request revision. The release-tag workflow runs checks and coverage on Ubuntu; this sampled result is not a device-delivery comparison."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/subscribe/web.md",
+              "shows": "Documents desktop system notifications, browser background-delivery conditions and macOS Safari support. This provides a delivery path outside the WSL2 Linux desktop."
+            },
+            {
+              "url": "https://github.com/binwiederhier/ntfy/blob/v2.28.0/docs/subscribe/cli.md",
+              "shows": "Documents a callable subscription CLI and macOS client configuration. Agent use of that CLI is a capability inference, not a verified Claude Code or Codex integration."
+            },
+            {
+              "url": "https://api.github.com/repos/binwiederhier/ntfy/releases/latest",
+              "shows": "Latest release is v2.28.0, published 2026-08-27, with Linux amd64 packages and a Darwin archive. Release notes describe replay-order and replay-size fixes relevant to notification recovery."
+            },
+            {
+              "url": "https://api.github.com/repos/binwiederhier/ntfy/commits?per_page=1",
+              "shows": "Latest default-branch commit is 1e6305ccecc0af15b13d239c3281543bea27b960, dated 2026-09-29. The repository is unarchived, and an issue update on 2026-10-01 was verified through GraphQL."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C05",
+          "name": "Grafana Alerting",
+          "reason": "Closest unresolved alternative: its built-in Alertmanager provides notification policies, grouping and silences, alongside metric/log rule evaluation; the evidence does not establish inferior delivery or restart behavior, so the focused router is only provisionally preferred. [Notification architecture](https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/alerting/configure-notifications/_index.md), [policies](https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/alerting/configure-notifications/create-notification-policy.md), [successful sampled CI](https://github.com/grafana/grafana/actions/runs/36886580801). Commit 2026-10-02; release v13.2.3 on 2026-09-29; issue update 2026-10-02."
+        },
+        {
+          "key": "C07",
+          "name": "Keep",
+          "reason": "Its deduplication, correlation and workflow capabilities make it a plausible router, but grouped firing/resolved delivery and restart evidence sufficient to displace the provisional pair was not verified in this bounded review. [Upstream README](https://github.com/keephq/keep/blob/465e99152e75/README.md). Commit 2026-09-28; release v0.54.3 on 2026-09-09; issue update 2026-09-29."
+        },
+        {
+          "key": "C03",
+          "name": "Nightingale",
+          "reason": "Supports existing metric/log data sources, mute rules and multiple notification media; grouped device delivery and restart behavior remain insufficiently verified to displace the provisional router. [Upstream README](https://github.com/ccfos/nightingale/blob/6392c79de4bf/README.md). Commit 2026-09-21; release v9.1.1 on 2026-08-18; issue update 2026-10-01."
+        },
+        {
+          "key": "C02",
+          "name": "Apprise",
+          "reason": "A useful notification library and CLI, but its documented transport abstraction supplies less of the required routing and persistent receiving role than the selected pair; no comparative delivery advantage was established. [Upstream README](https://github.com/caronc/apprise/blob/57f05eeeabe1/README.md). Commit 2026-10-02; release v2.0.0 on 2026-09-26; issue update 2026-10-02."
+        },
+        {
+          "key": "C04",
+          "name": "Gotify",
+          "reason": "A plausible REST/WebSocket delivery server with documented web and Android clients; ntfy's documented SMTP ingestion provides the more directly evidenced connection to the provisional router. This is integration fit, not measured delivery superiority. [Upstream README](https://github.com/gotify/server/blob/f77d8a0ce897/README.md). Commit 2026-09-30; release v3.1.1 on 2026-09-15; issue update 2026-10-01."
+        },
+        {
+          "key": "C06",
+          "name": "ElastAlert 2",
+          "reason": "Its documented focus is rule evaluation over Elasticsearch/OpenSearch data, making it a less general fit for routing alerts from unspecified local metric and log producers. [Upstream README](https://github.com/jertel/elastalert2/blob/b6c9f192822d/README.md). Commit 2026-09-03; release elastalert2-2.31.0 on 2026-07-22; most recently updated issue returned by the API was dated 2026-05-13, although commits and releases satisfy the currency criterion."
+        },
+        {
+          "key": "C08",
+          "name": "OneUptime",
+          "reason": "Its self-hosted monitoring, observability and incident-response platform includes alerting, but that additional scope supplies little required capability for this narrow routing layer, and reviewed evidence establishes no delivery/restart advantage. [Upstream README](https://github.com/OneUptime/oneuptime/blob/0f9dd0c5e57e/README.md). Commit 2026-10-02; release 14.0.11 on 2026-10-01; issue update 2026-10-01."
+        },
+        {
+          "key": "C09",
+          "name": "OpenObserve",
+          "reason": "Offers alerting within a unified telemetry ingestion/query platform; the reviewed evidence does not establish an advantage for routing already generated alerts to devices with grouping, silencing and restart recovery. [Upstream README](https://github.com/openobserve/openobserve/blob/3e15abc94719/README.md). Commit 2026-10-01; latest release entry v1.1.0-rc1 on 2026-09-30; issue update 2026-10-01."
+        },
+        {
+          "key": "C11",
+          "name": "SigNoz",
+          "reason": "Provides alerting alongside OpenTelemetry-based metrics, logs and traces; its broader telemetry platform is less directly aligned with this routing-only requirement, and reviewed evidence establishes no grouped delivery/restart advantage. [Upstream README](https://github.com/SigNoz/signoz/blob/1643df620bbe/README.md). Commit 2026-10-01; release v0.144.0 on 2026-09-29; issue update 2026-10-01."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selection is provisional, not a measured winner. Compare Alertmanager v0.34.1 plus ntfy v2.28.0 against Grafana Alerting v13.2.3 plus the same ntfy endpoint on the new WSL2 host. Feed identical labeled metric-origin and log-origin firing/resolved events, including duplicates, simultaneous groups and silenced alerts, with matched grouping and repeat intervals. Measure notifications actually received by the Windows workstation and macOS arm64 laptop, missing and duplicate notifications, resolution delivery, and latency. Repeat with disconnected clients, graceful restarts and abrupt termination using durable storage. Keep and Nightingale remain additional plausible challengers. The packet contains no recorded comparison where these arms ran, and the retrieved upstream tests do not settle this head-to-head.",
+      "evidence_gaps": [
+        "Assessment window ends 2026-10-02T03:26:28Z, corresponding to 2026-10-01 in the workstation timezone. All eleven repositories were unarchived and had a default-branch commit within the preceding 90 days; all latest release entries were also within that window. No stale exclusion is justified.",
+        "Routing is interpreted as receiving alerts produced by local metric/log evaluators. The packet does not specify those evaluators or their protocols. Compatibility must be checked before installation; including rule creation over raw telemetry could strengthen Grafana's capability fit.",
+        "No relevant comparative device-delivery and restart benchmark was obtained. Functional tests support documented behavior but do not establish comparative reliability, latency or resource use.",
+        "Linux x86_64 and macOS arm64 fit is supported by upstream packages, binaries and client documentation. Actual WSL2 installation and Windows/macOS notification delivery were not exercised. This layer does not require the RTX 4090.",
+        "ntfy's default in-memory cache loses cached messages on restart; configure cache-file or database-url. Instant iOS notifications require an APNS-connected upstream relay, while other documented delivery paths can be self-hosted. No paid-service exclusion was inferred from optional hosted features.",
+        "CI evidence is sampled and belongs to the revisions identified by each run. The newest sampled Alertmanager run required action, and the two newest sampled ntfy runs required action; these are not passing test results. Workflow success alone also does not prove every test job executed or establish release-pin delivery correctness.",
+        "Installation, platform and routing-specific test evidence for the remaining contenders was not exhaustively verified within the budget. Their not-selected status expresses the provisional fit judgment and evidence limits, not a finding that they cannot satisfy the requirement.",
+        "Collection used 30 GitHub API calls, including two batched GraphQL calls. Five page-fetch attempts through ctx_fetch_and_index were denied because the environment's approval policy is never. Three web-search queries were attempted, but the search request failed with HTTP 502. Upstream README, documentation and test blobs were instead retrieved through GitHub API, indexed and read with ctx_search; the requested page-fetch procedure therefore could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/jertel/elastalert2",
+        "https://api.github.com/repos/jertel/elastalert2/commits?per_page=1",
+        "https://api.github.com/repos/grafana/grafana",
+        "https://api.github.com/repos/grafana/grafana/commits?per_page=1",
+        "https://api.github.com/repos/keephq/keep",
+        "https://api.github.com/repos/keephq/keep/commits?per_page=1",
+        "https://api.github.com/repos/prometheus/alertmanager",
+        "https://api.github.com/repos/prometheus/alertmanager/commits?per_page=1",
+        "https://api.github.com/repos/OneUptime/oneuptime",
+        "https://api.github.com/repos/OneUptime/oneuptime/commits?per_page=1",
+        "https://api.github.com/repos/caronc/apprise",
+        "https://api.github.com/repos/caronc/apprise/commits?per_page=1",
+        "https://api.github.com/repos/openobserve/openobserve",
+        "https://api.github.com/repos/openobserve/openobserve/commits?per_page=1",
+        "https://api.github.com/repos/binwiederhier/ntfy",
+        "https://api.github.com/repos/binwiederhier/ntfy/commits?per_page=1",
+        "https://api.github.com/repos/ccfos/nightingale",
+        "https://api.github.com/repos/ccfos/nightingale/commits?per_page=1",
+        "https://api.github.com/repos/SigNoz/signoz",
+        "https://api.github.com/repos/SigNoz/signoz/commits?per_page=1",
+        "https://api.github.com/repos/gotify/server",
+        "https://api.github.com/repos/gotify/server/commits?per_page=1",
+        "https://api.github.com/repos/prometheus/alertmanager/releases/latest",
+        "https://api.github.com/repos/binwiederhier/ntfy/releases/latest",
+        "https://api.github.com/repos/grafana/grafana/releases/latest",
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/prometheus/alertmanager/actions/workflows/ci.yml/runs?status=completed&per_page=3",
+        "https://api.github.com/repos/binwiederhier/ntfy/actions/workflows/test.yaml/runs?status=completed&per_page=3",
+        "https://api.github.com/repos/grafana/grafana/actions/workflows/backend-unit-tests.yml/runs?status=completed&per_page=3"
+      ]
+    }
+  ]
+}

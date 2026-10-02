@@ -1,0 +1,227 @@
+{
+  "layers": [
+    {
+      "layer_id": "gpu-container-runtime",
+      "selection": [
+        {
+          "name": "C09 — NVIDIA Container Toolkit",
+          "repository": "https://github.com/NVIDIA/nvidia-container-toolkit",
+          "role": "Shared NVIDIA GPU enablement component, evaluated at v1.20.1. Combine it with one of the two shortlisted engines below. The engine choice remains unresolved; this is not a recommendation to install both engines.",
+          "install_command": "sudo apt-get update\nsudo apt-get install -y nvidia-container-toolkit",
+          "install_source": "https://github.com/apptainer/apptainer-admindocs/blob/7c3e09893348/installation.rst — reproduces the NVIDIA apt-repository setup and installation command. NVIDIA's own linked installation page could not be fetched in this session.",
+          "basis": [
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/README.md",
+              "shows": "Provides the runtime library and utilities that configure containers for NVIDIA GPUs; a more complete vendor enablement package than selecting libnvidia-container alone."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/pkg/nvcdi/device-wsl.go",
+              "shows": "Released WSL2-specific CDI code discovers /dev/dxg. The accompanying lib-wsl.go and driver-wsl.go generate GPU device edits and discover WSL driver libraries. This establishes implementation fit, not a successful run on the target host."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/pkg/nvcdi/driver-wsl_test.go",
+              "shows": "Contains table-driven tests for WSL nvidia-smi symlink-hook generation. These are unit tests rather than WSL2 inference measurements."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/actions/runs/36937879297/job/110622294125",
+              "shows": "The inspected default-branch head reports a successful unit-test check. All 16 reported checks at that head succeeded."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/actions/runs/36937879297/job/110625915576",
+              "shows": "GPU end-to-end CI succeeded for driver branch 580; the inspected branch-595 job also succeeded. The published workflow provisions Linux GPU hosts, so these results do not establish rootless WSL2/RTX 4090 success."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.20.1",
+              "shows": "Published 2026-09-19, within 90 days. Documents WSL2 device-injection fixes, CDI refresh fixes and a crun user-namespace permission fix; publishes Linux amd64 packages."
+            },
+            {
+              "url": "https://github.com/NVIDIA/nvidia-container-toolkit/commit/a672e378ef91",
+              "shows": "Default-branch commit dated 2026-10-01. Repository metadata reports archived=false, and inspected issues show recent activity."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C11 — Podman CDI",
+          "repository": "https://github.com/podman-container-tools/podman",
+          "role": "Alternative rootless container engine, evaluated at v6.1.3. Agent sessions can invoke its documented CLI. Shortlisted alongside nerdctl without declaring a measured winner.",
+          "install_command": "sudo apt-get update\nsudo apt-get -y install podman",
+          "install_source": "https://github.com/podman-container-tools/podman.io/blob/f4393d88e070/docs/installation.md",
+          "basis": [
+            {
+              "url": "https://github.com/podman-container-tools/podman/blob/v6.1.3/README.md",
+              "shows": "Documents unprivileged container execution, a Docker-compatible CLI and container lifecycle management without a manager daemon. Windows and macOS operation uses podman machine VMs."
+            },
+            {
+              "url": "https://github.com/cncf-tags/container-device-interface/blob/cb98bcf66dc6/README.md",
+              "shows": "Documents Podman's direct handling of CDI device selectors and states that Podman requires no specific configuration to enable CDI support. The NVIDIA-specific specification still comes from vendor tooling."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/blob/v6.1.3/test/e2e/run_device_test.go",
+              "shows": "Contains CDI injection tests, including a configurable CDI specification-directory case. The default /etc/cdi test skips rootless execution because it creates files there; that skip is not evidence that rootless CDI is unsupported."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/actions/runs/36874211952/job/110413629158",
+              "shows": "An inspected rootless Debian integration check succeeded. Other inspected rootless system and integration checks also succeeded; these are general runtime tests rather than NVIDIA WSL2 inference results."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/actions/runs/36874211633/job/110409358763",
+              "shows": "The current head's aggregate CI state is FAILURE. Among the first 50 of 88 contexts inspected, 48 succeeded, Zizmor failed and one job was cancelled. The remaining contexts were not retrieved."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3",
+              "shows": "Published 2026-09-29, within 90 days, and includes a security fix. Supplies a macOS arm64 installer; this supports the client/VM route, not NVIDIA GPU acceleration on Apple Silicon."
+            },
+            {
+              "url": "https://github.com/podman-container-tools/podman/commit/ccc1e207757d",
+              "shows": "Default-branch commit dated 2026-10-01; archived=false. Inspected issues were updated on 2026-10-02."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C05 — nerdctl",
+          "repository": "https://github.com/containerd/nerdctl",
+          "role": "Alternative rootless CLI and containerd installation, evaluated at v2.4.0. Its full distribution supplies the supporting runtime components. Shortlisted alongside Podman pending the target-host comparison.",
+          "install_command": "curl -fLO https://github.com/containerd/nerdctl/releases/download/v2.4.0/nerdctl-full-2.4.0-linux-amd64.tar.gz\nsudo tar Cxzvvf /usr/local nerdctl-full-2.4.0-linux-amd64.tar.gz\ncontainerd-rootless-setuptool.sh install",
+          "install_source": "https://github.com/containerd/nerdctl/releases/tag/v2.4.0",
+          "basis": [
+            {
+              "url": "https://github.com/containerd/nerdctl/blob/v2.4.0/docs/gpu.md",
+              "shows": "Documents NVIDIA GPU invocation, CDI specification requirements and unresolved-device troubleshooting. Recommends NVIDIA Container Toolkit v1.18.0 or later."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/blob/v2.4.0/docs/rootless.md",
+              "shows": "Documents containerd-rootless-setuptool.sh install and unprivileged daemon operation. Resource-limit functionality requires systemd and cgroup v2."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/releases/tag/v2.4.0",
+              "shows": "Published 2026-09-20, within 90 days. Provides the documented Linux amd64 archive installation and rootless quick start. The full bundle includes containerd v2.4.0, runc v1.5.1, CNI and RootlessKit."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/actions/runs/36952716378/job/110670131423",
+              "shows": "The standard Linux rootless integration job succeeded at the inspected default-branch head."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/actions/runs/36952716378/job/110670131571",
+              "shows": "The nerdctl.gomodjail rootless job failed at the same head. Its complete check rollup contains 37 successful checks and one failure; this is not an all-green CI snapshot."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/blob/v2.4.0/README.md",
+              "shows": "Provides agent-callable CLI examples and documents macOS use through Lima. Linux arm64 archives are also published; target-specific macOS arm64 execution was not measured here."
+            },
+            {
+              "url": "https://github.com/containerd/nerdctl/commit/35a81ab10e66",
+              "shows": "Default-branch commit dated 2026-10-02; archived=false. Inspected issues show recent release planning and maintenance activity."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C08",
+          "name": "libnvidia-container",
+          "reason": "Active: default commit 2026-09-08 and release v1.20.1 on 2026-09-28. Its GPU library/CLI is included in the Toolkit's unified installation; the Toolkit adds the higher-level configuration and CDI path. [README](https://github.com/NVIDIA/libnvidia-container/blob/24a848d9f0f3/README.md)."
+        },
+        {
+          "key": "C03",
+          "name": "Container Device Interface (CDI)",
+          "reason": "Active: default commit and specs-go/v1.1.1 release on 2026-09-04. Useful specification, library and inspection/injection CLI, but the selected engines already consume CDI and the Toolkit supplies NVIDIA WSL discovery. [README](https://github.com/cncf-tags/container-device-interface/blob/cb98bcf66dc6/README.md)."
+        },
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet provides no workload evidence establishing that containers do not need the GPU, so this permitted branch of the requirement remains unproven."
+        },
+        {
+          "key": "C06",
+          "name": "crun",
+          "reason": "Active: default commit 2026-10-01 and release 1.30.1 on 2026-09-25. An OCI executor is a supporting component rather than the complete vendor-discovery and user-facing GPU-container installation selected here. [README](https://github.com/containers/crun/blob/ca7879f42ad5/README.md)."
+        },
+        {
+          "key": "C12",
+          "name": "SingularityCE",
+          "reason": "Active: default commit 2026-09-30 and release v4.5.1 on 2026-08-20. Documents a WSL2 GPU route, but its required --nvccli path is labeled experimental; retained as a viable alternative rather than excluded. [GPU guide](https://github.com/sylabs/singularity-userdocs/blob/cf7a7b4e5a88/gpu.rst)."
+        },
+        {
+          "key": "C02",
+          "name": "Apptainer",
+          "reason": "Active: default commit 2026-10-01 and release v1.5.4 on 2026-09-22. Documents non-setuid installation and WSL2 GPU access, with user-namespace GPU tests, but labels --nvccli experimental; the CDI runners offer stronger maturity evidence for this path. [GPU guide](https://github.com/apptainer/apptainer-userdocs/blob/05b31ea6b689/gpu.rst), [tests](https://github.com/apptainer/apptainer/blob/v1.5.4/e2e/gpu/gpu.go)."
+        },
+        {
+          "key": "C07",
+          "name": "Moby (Docker Engine)",
+          "reason": "Active: default commit and release-candidate activity on 2026-10-01; CDI-capable. Its repository emphasizes assembling container systems, while the shortlisted frontends provide more direct documented CLI installation and rootless setup for a clean host. [README](https://github.com/moby/moby/blob/c8e265787b0a/README.md)."
+        },
+        {
+          "key": "C10",
+          "name": "runc",
+          "reason": "Active: default commit 2026-09-29 and release v1.5.2 on 2026-09-25. Its documented OCI-bundle/configuration workflow is a lower-level building block; a frontend plus vendor tooling better covers the complete installation requirement. [README](https://github.com/opencontainers/runc/blob/97f76a9b4601/README.md)."
+        },
+        {
+          "key": "C04",
+          "name": "containerd",
+          "reason": "Active: default commit 2026-10-01 and release v2.4.1 on 2026-09-24. Designed for embedding into a larger system; nerdctl supplies the documented user-facing rootless/GPU route and a bundled installation. [README](https://github.com/containerd/containerd/blob/eb4dbd872d92/README.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Compare rootless Podman v6.1.3 plus NVIDIA Container Toolkit v1.20.1 against rootless nerdctl v2.4.0 plus the same Toolkit on the actual WSL2 Ubuntu/RTX 4090 host. Run nvidia-smi and the same inference image digest, model weights and workload settings as an ordinary host user. Record resolved package versions, setup commands, host privileges, device/library visibility, inference correctness, throughput, GPU memory use and failures after a WSL restart. Apptainer v1.5.4 and SingularityCE v4.5.1 with --nv --nvccli remain useful additional arms. No measured superiority between the two shortlisted engines is established.",
+      "evidence_gaps": [
+        "The packet contains no comparison where all named arms ran. Reviewed source, unit tests and Linux CI do not replace the required rootless WSL2 nvidia-smi plus inference experiment.",
+        "The exact Ubuntu release, WSL release, Windows NVIDIA driver and user-namespace/systemd configuration are unspecified. Source-level WSL support does not guarantee that complete combination.",
+        "Ubuntu's documented apt command can install a distribution version of Podman rather than the evaluated v6.1.3. The clean-host comparison must record and validate the resolved version and CDI support.",
+        "The nerdctl v2.4.0 full bundle pins containerd v2.4.0 and runc v1.5.1, while release activity was observed for containerd v2.4.1 and runc v1.5.2. Those later patch changelogs were not inspected.",
+        "Podman's CI inspection retrieved 50 of 88 contexts. Its aggregate FAILURE was recorded; the remaining contexts were not inspected. CI job counts were not treated as comparative performance scores.",
+        "macOS support here means a client and Linux-VM route. The evidence does not establish NVIDIA GPU acceleration on macOS arm64.",
+        "All eleven repositories were verified unarchived with default-branch commits inside 90 days, plus recent release and issue activity. Currency therefore supplies no stale-or-archived exclusion.",
+        "Research used 30 GitHub API calls, two attempted web searches and four attempted page fetches. The searches failed with HTTP 502. Required ctx_fetch_and_index requests were rejected because they require approval and the session approval policy is never; NVIDIA's installation, CDI and WSL page bodies were therefore not read. Public upstream source/documentation retrieved through the GitHub API was indexed with ctx_index and read through ctx_search."
+      ],
+      "sources_read": [
+        "User-provided gpu-container-runtime packet.json",
+        "https://api.github.com/repos/NVIDIA/libnvidia-container",
+        "https://api.github.com/repos/NVIDIA/libnvidia-container/commits?per_page=1",
+        "https://api.github.com/repos/cncf-tags/container-device-interface",
+        "https://api.github.com/repos/cncf-tags/container-device-interface/commits?per_page=1",
+        "https://api.github.com/repos/containers/crun",
+        "https://api.github.com/repos/containers/crun/commits?per_page=1",
+        "https://api.github.com/repos/NVIDIA/nvidia-container-toolkit",
+        "https://api.github.com/repos/NVIDIA/nvidia-container-toolkit/commits?per_page=1",
+        "https://api.github.com/repos/NVIDIA/nvidia-container-toolkit/releases/latest",
+        "https://api.github.com/repos/sylabs/singularity",
+        "https://api.github.com/repos/sylabs/singularity/commits?per_page=1",
+        "https://api.github.com/repos/containerd/nerdctl",
+        "https://api.github.com/repos/containerd/nerdctl/commits?per_page=1",
+        "https://api.github.com/repos/containerd/nerdctl/releases/latest",
+        "https://api.github.com/repos/apptainer/apptainer",
+        "https://api.github.com/repos/apptainer/apptainer/commits?per_page=1",
+        "https://api.github.com/repos/moby/moby",
+        "https://api.github.com/repos/moby/moby/commits?per_page=1",
+        "https://api.github.com/repos/opencontainers/runc",
+        "https://api.github.com/repos/opencontainers/runc/commits?per_page=1",
+        "https://api.github.com/repos/containerd/containerd",
+        "https://api.github.com/repos/containerd/containerd/commits?per_page=1",
+        "https://api.github.com/repos/podman-container-tools/podman",
+        "https://api.github.com/repos/podman-container-tools/podman/commits?per_page=1",
+        "https://api.github.com/repos/podman-container-tools/podman/releases/latest",
+        "https://api.github.com/graphql — five requests for upstream README/documentation blobs, releases, recent issues, source trees and commit check rollups",
+        "https://github.com/NVIDIA/nvidia-container-toolkit/tree/v1.20.1/pkg/nvcdi",
+        "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/.github/workflows/e2e.yaml",
+        "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/tests/e2e/nvidia-container-toolkit_test.go",
+        "https://github.com/NVIDIA/nvidia-container-toolkit/blob/v1.20.1/tests/e2e/installer.go",
+        "https://github.com/podman-container-tools/podman.io/blob/f4393d88e070/docs/installation.md",
+        "https://github.com/podman-container-tools/podman/blob/v6.1.3/docs/tutorials/rootless_tutorial.md",
+        "https://github.com/podman-container-tools/podman/blob/v6.1.3/test/e2e/run_device_test.go",
+        "https://github.com/containerd/nerdctl/blob/v2.4.0/docs/gpu.md",
+        "https://github.com/containerd/nerdctl/blob/v2.4.0/docs/rootless.md",
+        "https://github.com/apptainer/apptainer-admindocs/blob/7c3e09893348/installation.rst",
+        "https://github.com/apptainer/apptainer-userdocs/blob/05b31ea6b689/gpu.rst",
+        "https://github.com/apptainer/apptainer/blob/v1.5.4/e2e/gpu/gpu.go",
+        "https://github.com/sylabs/singularity-admindocs/blob/41277e1b44a7/installation.rst",
+        "https://github.com/sylabs/singularity-userdocs/blob/cf7a7b4e5a88/gpu.rst",
+        "https://github.com/sylabs/singularity/blob/v4.5.1/e2e/gpu/gpu.go"
+      ]
+    }
+  ]
+}
