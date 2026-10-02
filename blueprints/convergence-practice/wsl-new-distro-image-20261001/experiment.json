@@ -68,8 +68,8 @@
   ],
   "license_and_compatibility": "Existing Microsoft/Canonical creation commands remain the source; no custom installer or license assessment. The earlier installed WSL 2.7.13 capability read is historical, not a new version check. Canonical 26.04 release notes and Microsoft creation docs support creation, not full-stack compatibility. Canonical cloud-init WSL guidance assumes 24.04/22.04 and does not qualify 26.04. Actual 26.04.1 packages: cloud-init 26.1-0ubuntu3~26.04.1, systemd 259.5-0ubuntu3.4, Python interpreter 3.14.4-1ubuntu0.1 (python3 metapackage 3.14.3-0ubuntu2), sudo-rs 0.2.13-0ubuntu1 and wsl-setup 0.6.3ubuntu~26.04.1. System Python 3.14 is not toolkit CPython 3.13 migration acceptance; uv installs/selects managed 3.13 separately. Neither arm has new-host compatibility acceptance.",
   "baseline_and_candidate": {
-    "baseline": "Provisional 24.04.5 fallback arm, ubuntu-24.04.5-wsl-amd64.wsl, exact SHA-256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e. Historical artifact/native receipts keep their original class and scope; they do not qualify this new distribution. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the trial; no merit precedence.",
-    "candidate": "Provisional 26.04.1 trial arm, ubuntu-26.04.1-wsl-amd64.wsl, exact SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. Signature, whole-image hash and packaged source facts observed only; size unknown. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the fallback; no merit precedence. Both acceptance comparisons unrun."
+    "baseline": "Provisional 24.04.5 rollback arm, ubuntu-24.04.5-wsl-amd64.wsl, exact SHA-256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e. Historical artifact/native receipts keep their original class and scope; they do not qualify this new distribution. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the default; it replaces the default only on a release-caused 26.04 failure with no in-release remedy.",
+    "candidate": "Provisional 26.04.1 default arm, ubuntu-26.04.1-wsl-amd64.wsl, exact SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. Signature, whole-image hash and packaged source facts observed only; size unknown. Same P1-P3/W1-W7/F1-F9/R1 criteria and paths A/B as the rollback. Both acceptance comparisons unrun."
   },
   "frozen_inputs": {
     "base_revision": "798ac445307e2cd8eba6e74d7722ac0e16da02c7",
@@ -82,15 +82,15 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "53028b56ed6d199ca9a943ce28b87b6eeb13e5d1b210389aa876feb75b604fe5"
+        "sha256": "a00b3290ef70debf39eaf5ef8a720d5bf30a9804ad4eec30a9b6042863992dd5"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
-        "sha256": "5bc2ecf8dbac015698b842204e204f1d13df899bb94ad15f68232381b2ca8e63"
+        "sha256": "02b720318bed396bc1132ef6a68582a23359ffb61e08f58dc6c575bd108753ac"
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "18e350dc9543ccece9a6bc3b76afa2a55392d81b3c3879480535e3f26fa72bfd"
+        "sha256": "b24431aae4e18a16d9fd6ea5a608de22359fc981583a6014f7b0f50d045e19f4"
       }
     ],
     "inputs": [
@@ -102,15 +102,15 @@
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "4c3913da54820a1e526f76bce0d3f0c4b1002943b4ec043052f8562d5867af1a"
+        "sha256": "6a556d21bb2d8599928089644eebe4c74941ddd7b2e642b2f12b55d7c11225a5"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "17a2de88c8af4fd25407c4470d4e364925fae94b4bfc682764a49f5e3f352df4"
+        "sha256": "0a12f732b05b0ec954578c5f5a668dd8a323d5e6382a38271e3bf6d42bbd1d75"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "8ce2d60601a25e946dba7d9a2995d09d6473bd3af27225fefd9b0706c1ad377d"
+        "sha256": "890d8e4cd92c55bade5a1f189454d4374737db41b5430c16193bf2307eb60f29"
       }
     ]
   },
@@ -151,8 +151,8 @@
   "observations": [],
   "failures_and_skips": [],
   "limitations": [
-    "Recipe parameterization only. Both arms are provisional with no merit precedence; neither new-host acceptance comparison has run.",
-    "Status planned describes the host comparison, not the preserved artifact inspections. No qualifying host observation. Both creation paths A/B are documented, not run. Import provisioning remains open.",
+    "Recipe parameterization only. Ubuntu 26.04.1 is the single default named by the merged definitive manifest and 24.04.5 the named rollback for a release-caused 26.04 failure; neither new-host acceptance comparison has run.",
+    "Status planned describes the host comparison, not the preserved artifact inspections. No qualifying host observation: one 26.04.1 rehearsal ran on WSL 2.7.13 on 2026-10-02 as a host check, not as one of the two preregistered comparisons. Stage 1 held and the first boot stopped at F1 because distributions share one cgroup tree on that release (evidence/artifacts/new-wsl-rehearsal-20261002/). It qualifies nothing; it is the reason for the recipe's WSL 3.0.1 precondition, its cgroup proof in W5 and the interop check after every unregister. Both creation paths A/B are documented, not run. Import provisioning remains open.",
     "The research unit read the sources, and the decision record cites them as it reported them. The review-repair unit re-read only Microsoft's Basic commands page and Canonical's cloud-init page on 2026-10-01; neither documents an in-place repair of a failed provisioning.",
     "Usage unknown: the research unit's model and token usage was not recorded.",
     "A new distribution on the existing WSL kernel and Windows installation is not a new physical machine, and it inherits the host-wide WSL settings.",
@@ -165,11 +165,11 @@
   ],
   "decision_and_scope": {
     "decision": "trial",
-    "scope": "Accepted W-IMG recipe parameterization only, Ubuntu 26.04.1 trial and 24.04.5 fallback as symmetric provisional arms with no merit precedence; source/signature/image facts retained. No host-scope adoption before both preregistered throwaway comparisons and independently observed native outputs.",
+    "scope": "Accepted W-IMG recipe parameterization only, Ubuntu 26.04.1 as the single default and 24.04.5 as the named rollback, both provisional; source/signature/image facts retained. No host-scope adoption before both preregistered throwaway comparisons and independently observed native outputs.",
     "qualification_run_ids": []
   },
   "rollback": "Nothing on a host changed for this record. A host run that stops before W4 installs nothing. After W4, W6 keeps the failed attempt as an export, and wsl --unregister on the literal <Name> removes the new distribution; R1 removes the rehearsal's throwaway name the same way, after an export when the rehearsal failed. The workstation's distribution, the default and .wslconfig are never touched. Reverting the recipe's commits removes the documentation.",
-  "next_decision_changing_test": "Run both R1 throwaway rehearsals with identical host/kernel/driver, checkout, user-data and profile. For each selected release verify P1-P3, W1-W7, F1-F3 and its own cloud-init version/schema, storage readings and Windows-file owner; extend through F9 via the accepted bootstrap, then compare the preregistered first_boot, systemd_user_from_second_instance, wsl_gpu, uv_cpython_3_13 and node_24 criteria. Record per-arm native results and all failed/skipped criteria without merit precedence; export each failed rehearsal before unregistering its literal name. Both new-host acceptance runs remain unrun; only complete independently observed comparisons permit a scoped image decision, followed by the real selected distribution and separate full-stack acceptance.",
+  "next_decision_changing_test": "On WSL 3.0.1 or later, run both R1 throwaway rehearsals with identical host/kernel/driver, checkout, user-data and profile. For each selected release verify P1-P3, W1-W7, F1-F3 and its own cloud-init version/schema, storage readings and Windows-file owner; extend through F9 via the accepted bootstrap, then compare the preregistered first_boot, systemd_user_from_second_instance, wsl_gpu, uv_cpython_3_13 and node_24 criteria. Record per-arm native results and all failed/skipped criteria, with 26.04.1 as the default and 24.04.5 as the rollback; export each failed rehearsal before unregistering its literal name. Both new-host acceptance runs remain unrun; only complete independently observed comparisons permit a scoped image decision, followed by the real selected distribution and separate full-stack acceptance.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",
