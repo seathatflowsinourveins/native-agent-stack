@@ -3,14 +3,15 @@
   "recorded_date_utc": "2026-10-02",
   "goal_status": "active",
   "base_revision": "18eea2c1de992b46c266d79ef0cc40f93c9fb943",
+  "status_assessed_at_revision": "73ca1e8b53383f5bd5e1a59a06eade50a0086370",
   "scope": "Full user-requested foundation resolution serving the north star; the SDK oracle is one assigned unit, not a replacement objective.",
   "requirements": [
     {
       "id": "github-practice",
       "state": "partially_verified_followups_open",
-      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main.",
-      "remaining": ["Qualify the gh 2.102.0 security update through the installation owner", "Repair owned failing PR checks and require complete current-head coverage", "Review catalog-bot metadata repair in PR611 and observe its next authorized hosted proposal"],
-      "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md"]
+      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main. Isolated legacy-host qualification of gh 2.102.0 passed the unchanged upstream race/integration command (250 packages: 245 native cached results and five fresh executions; 60 packages without tests), native build and local binary smoke. Original failed conditions and source/output bindings were retained and independently reviewed. Catalog metadata source review is accepted; hosted behavior and current-head publication gates remain separate.",
+      "remaining": ["Integrate the gh 2.102.0 source qualification through the installation owner without inferring host adoption", "Require complete current-head coverage before landing the catalog metadata fix", "Observe the next authorized hosted catalog proposal and its source/lane metadata"],
+      "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/607#issuecomment-5959705875", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/611#issuecomment-5959596846"]
     },
     {
       "id": "maintained-layer-selections",
@@ -28,10 +29,10 @@
     },
     {
       "id": "sdk-workers-researchers-reviewers",
-      "state": "oracle_and_architecture_reviewed_final_binding_and_native_execution_open",
-      "evidence": "Three local oracle-discrimination runs retained with source and result hashes; target SDK pin identities checked. Scoped Claude and Astra reviews at 6537a17a1 accept the oracle and cross-runtime architecture; the requested evidence-wording correction is incorporated for final binding review.",
-      "remaining": ["Final evidence/head binding review", "Actual selected SDK tool task and result/usage capture", "Separately qualify resume, recovery, selected MCP integration and role boundaries"],
-      "sources": ["examples/native-sdk-acceptance/README.md", "blueprints/convergence-practice/clean-resolution-20261002/oracle-experiment.json"]
+      "state": "source_preparation_accepted_and_published_native_execution_open",
+      "evidence": "Three local oracle-discrimination runs retained with source and result hashes; target SDK pin identities checked. Scoped Claude and Astra reviews accepted the oracle and cross-runtime preparation. Final source/evidence binding accepted 45ffc7d4ec0e5063278299ad736c36c497732ec3 with all seven frozen artifacts unchanged; publication merged as 73ca1e8b53383f5bd5e1a59a06eade50a0086370 after all eight required checks passed. This is source preparation, not target SDK execution.",
+      "remaining": ["Builder's selected readiness and safe ownership handoff", "Actual selected SDK tool task with run-specific source/route binding and result/usage capture", "Separately qualify resume, recovery, selected MCP integration and role boundaries"],
+      "sources": ["examples/native-sdk-acceptance/README.md", "blueprints/convergence-practice/clean-resolution-20261002/oracle-experiment.json", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5958803761", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5959596671"]
     },
     {
       "id": "token-skills-orchestration",
