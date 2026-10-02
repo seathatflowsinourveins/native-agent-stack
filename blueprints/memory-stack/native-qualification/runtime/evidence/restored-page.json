@@ -1,0 +1,16 @@
+{
+  "path": "decisions/restore-probe.md",
+  "workspace": "qualification",
+  "project": "control",
+  "title": "Isolated restore probe",
+  "body": "Synthetic qualification fixture. Current route is cedar; retired route is birch. Source: restore-probe-v1.",
+  "frontmatter": {
+    "title": "Isolated restore probe",
+    "tier": "semantic",
+    "type": "Decision",
+    "generated": {
+      "by": "process:ai-memory/2.5.2",
+      "at": "2026-10-02T05:41:06Z"
+    }
+  }
+}
