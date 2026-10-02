@@ -1,0 +1,186 @@
+{
+ "slot_id": "code-search",
+ "layer_id": "semantic-rag",
+ "title": "Semantic code retrieval",
+ "requirement": "Answer conceptual code questions using a scoped local index and a compatible embedding service, with recoverable state.",
+ "slot_question": "Which single engine answers conceptual code questions for Claude Code and Codex sessions on the new host?",
+ "a_deciding_comparison_would_measure": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "An engine that needs an embedding service makes the host install and run that service as well; the local model server is decided in a separate slot.",
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "A sealed 35-query code-retrieval set on this project's repository: SocratiCode answered 30 of 35 and a traversal-ordered ripgrep baseline 20 of 35; the run's own record says it does not show general superiority."
+ ],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "SocratiCode",
+    "first_round_status": "selected",
+    "note": "C10. Primary code-RAG engine. It builds a scoped per-project hybrid index (dense vectors plus BM25, fused with reciprocal rank fusion) in a local Qdrant and gets embeddings from Ollama. Indexing is checkpointed so it resumes after interruption, a file watcher keeps the index current, and it ships plugins for Claude Code and Codex.",
+    "cited_facts": [
+     {
+      "url": "packet: comparisons_on_record_where_every_named_arm_ran",
+      "shows": "measured on record: on a sealed 35-query code-retrieval set from this project's repository, SocratiCode answered 30 of 35 and a traversal-ordered ripgrep baseline 20 of 35. The run's own record says this does not show general superiority."
+     },
+     {
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "shows": "documented (README 'Features'): hybrid Qdrant search (dense plus BM25 sparse vectors, fused with reciprocal rank fusion). Files are indexed in batches of 50, with progress checkpointed to Qdrant after each batch, and content hashes are persisted in Qdrant so state survives restarts. On startup, interrupted indexing resumes from the last checkpoint, and a complete index gets an incremental catch-up plus the watcher. Indexing is branch-aware."
+     },
+     {
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "shows": "documented (README 'Environment Variables'): EMBEDDING_PROVIDER defaults to ollama, and EMBEDDING_MODEL defaults to nomic-embed-text (768 dimensions). OLLAMA_MODE=auto uses a native Ollama on :11434 when one is running and otherwise manages a Docker container. QDRANT_MODE=managed runs a local Qdrant under Docker."
+     },
+     {
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "shows": "vendor-measured agent throughput against grep, not retrieval accuracy: on VS Code (2.45M lines) it used 61% less context, 84% fewer tool calls and was 37x faster (Claude Opus 4.6)."
+     },
+     {
+      "url": "https://api.github.com/graphql (repository giancarloerra/SocratiCode, queried 2026-10-01)",
+      "shows": "observed now: v1.16.0 (2026-09-28). HEAD 155ba9325f (2026-09-30), with 381 commits since 2026-07-03. 1 open and 71 closed issues. All 10 checks on HEAD passed. AGPL-3.0 (information only)."
+     }
+    ]
+   },
+   {
+    "about": "semble",
+    "first_round_status": "selected",
+    "note": "C04. Co-finalist: CPU-only code search that needs no separate service. It chunks code with tree-sitter and fuses potion-code-16M-v2 static embeddings with BM25 (reciprocal rank fusion), and exposes this to Claude Code and Codex over MCP. Recovery works by rebuilding the cached index from source when files change; there is no checkpoint/resume, and the vendor reports about 0.3 s to index a repo.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/MinishLab/semble/blob/main/benchmarks/README.md",
+      "shows": "vendor-measured: NDCG@10 of 0.854, against CodeRankEmbed 0.839, ColGREP (LateOn-Code-edge) 0.693, BM25 0.673, codebase-memory-mcp 0.630 and ripgrep 0.126. Indexing takes 306 ms and warm query p50 is 0.91 ms, on CPU. The set is about 1,250 queries over 63 repos in 19 languages; Claude Sonnet 4.6 generated the queries and relevance labels and also served as judge."
+     },
+     {
+      "url": "https://github.com/MinishLab/semble",
+      "shows": "documented (README): runs on CPU with no API keys, GPU or external services. MCP tools are `search` and `find_related`. In MCP mode the index refreshes automatically as files change. Indexes are cached in ~/.cache/semble on Linux and ~/Library/Caches/semble on macOS. `semble install` detects Claude Code, Codex and OpenCode."
+     },
+     {
+      "url": "https://lightonai.github.io/next-plaid/",
+      "shows": "vendor-measured by a competitor (LightOn) on the same Semble bench: semble 0.853, ColGREP with LateOn-Code-edge 0.846, ColGREP with LateOn-Code 0.859."
+     },
+     {
+      "url": "https://api.github.com/graphql (repository MinishLab/semble, queried 2026-10-01)",
+      "shows": "observed now: v0.6.1 (2026-09-25). HEAD aa634b14dc (2026-09-30), with 33 commits since 2026-07-03. 2 open and 99 closed issues. All 16 checks on HEAD passed. MIT."
+     }
+    ]
+   },
+   {
+    "about": "ollama",
+    "first_round_status": "selected",
+    "note": "C03. Embedding service for SocratiCode, which uses it as its documented default provider (nomic-embed-text, 768 dimensions) and auto-detects it on :11434 with OLLAMA_MODE=auto. A native install is the documented way to use the NVIDIA GPU on the RTX 4090. semble does not need it.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/ollama/ollama",
+      "shows": "documented (README 'Linux' and docs/api.md): installs on Linux with `curl -fsSL https://ollama.com/install.sh | sh`. Embeddings are served at `POST /api/embed`, which supersedes /api/embeddings."
+     },
+     {
+      "url": "https://docs.ollama.com/gpu",
+      "shows": "documented: supports NVIDIA GPUs with compute capability 5.0+ and driver 550 or newer; the RTX 4090 is listed at compute capability 8.9."
+     },
+     {
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "shows": "documented: SocratiCode's default EMBEDDING_PROVIDER is ollama, and OLLAMA_MODE=auto prefers a native Ollama. The README notes that Docker on macOS and Windows cannot use the GPU. not verified: whether the managed container gets GPU access under WSL2."
+     },
+     {
+      "url": "https://api.github.com/graphql (repository ollama/ollama, queried 2026-10-01)",
+      "shows": "observed now: v0.35.0 (2026-09-28). HEAD 1abe35e6e6 (2026-09-30), with 296 commits since 2026-07-03. The check on HEAD passed. MIT. macOS: the README documents a macOS download; not verified: Metal acceleration (absent from the pages fetched)."
+     }
+    ]
+   },
+   {
+    "about": "next-plaid",
+    "first_round_status": "not selected",
+    "note": "ColGREP is a quality co-finalist, but the vendor numbers conflict: semble's table puts it at 0.693, while LightOn reports 0.846 (LateOn-Code-edge) and 0.859 (LateOn-Code, above semble's 0.853). semble was preferred on criteria 3 and 7, not on quality: its HEAD is 2026-09-30 against ColGREP's 2026-08-18 (still inside 90 days), and LightOn calls ColGREP's Codex integration 'basic for now'. It is an arm of the deciding head-to-head."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "SocratiCode facts hold. v1.16.0 (2026-09-28), HEAD 155ba9325f (2026-09-30) with all 10 check runs passing, 381 commits, 1 open issue, AGPL-3.0. README lines that match: 83 and 147 (Node 18.17+, Docker for the default stack), 166-167 and 231-232 (Claude Code and Codex plugin installs), 560 (dense plus BM25 vectors in Qdrant fused with RRF), 46 and 129 (batched, resumable checkpoints; resume on startup), 125 (OLLAMA_MODE=auto reuses a native Ollama), 135 (Docker containers can't use the GPU on macOS or Windows) and 54 (vendor result against grep: 61% less context, 84% fewer tool calls, 37x faster, with Opus 4.6).",
+    "semble facts hold. v0.6.1 (2026-09-25), HEAD aa634b14dc (2026-09-30), 33 commits, 2 open issues, checks SUCCESS, MIT. README lines 41-42 (uv tool install semble; semble install), 27 and 83 (CPU only, no API keys, GPU or services), 45 (detects Claude Code, Codex and OpenCode) and 89 (cache invalidated automatically) match. Its benchmark README gives NDCG@10 0.854 for semble, 0.839 CodeRankEmbed, 0.693 ColGREP, 0.673 BM25, 0.630 codebase-memory-mcp and 0.126 ripgrep, with 306 ms to index and 0.91 ms p50 query latency. The set is about 1,250 queries over 63 repos in 19 languages; Claude Sonnet 4.6 generated the queries and labels and judged label quality (lines 123, 136).",
+    "The ColGREP conflict is confirmed. On the same Semble public bench, LightOn's page reports ColGREP with LateOn-Code at 0.859, semble at 0.853 and ColGREP with LateOn-Code-edge at 0.846 (FP32). semble's table gives LateOn-Code-edge 0.693 (line 145 names that model). The two have not been reconciled. LightOn calls ColGREP's Codex integration 'basic for now'.",
+    "ollama facts hold. v0.35.0 (2026-09-28), HEAD 1abe35e6e6 (2026-09-30), 296 commits, MIT. README line 32 gives the Linux curl install and line 16 the same command for macOS. The GPU docs require compute capability 5.0+ and driver 550+, and list the RTX 4090 at 8.9.",
+    "Why undetermined: the judge's 'primary' label for SocratiCode rests on the on-record 30/35 against a traversal-ordered ripgrep baseline (20/35). ripgrep is the weakest baseline on semble's public bench (0.126, against BM25 0.673), and neither semble nor ColGREP ran on that query set. semble's and ColGREP's own numbers are vendor-run with LLM-generated labels. Nothing measured separates the three on retrieval quality.",
+    "Capability fit cuts both ways. SocratiCode literally matches 'compatible embedding service' and checkpointed recoverable state. semble has no service and recovers by rebuilding its cache from source, sub-second per the vendor. Install footprint differs: Docker, Node, Qdrant and Ollama for SocratiCode; one uv tool for semble; one binary for ColGREP.",
+    "Ollama is needed only if SocratiCode wins; semble and ColGREP embed in-process. No popularity reasoning found. The ollama GPU and LightOn pages were fetched with ctx_fetch_and_index and matched same-day index entries from an earlier lane."
+   ],
+   "checked_facts": [
+    {
+     "claim": "SocratiCode release v1.16.0 on 2026-09-28; HEAD 155ba9325f on 2026-09-30; all 10 check runs passed",
+     "url": "https://api.github.com/repos/giancarloerra/SocratiCode/commits/155ba9325f/check-runs",
+     "holds": true
+    },
+    {
+     "claim": "SocratiCode: hybrid dense + BM25 search fused with RRF; batched resumable indexing checkpoints",
+     "url": "https://github.com/giancarloerra/SocratiCode/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "SocratiCode Codex install: codex plugin marketplace add giancarloerra/socraticode --ref main && codex plugin add socraticode@socraticode",
+     "url": "https://github.com/giancarloerra/SocratiCode/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "semble release v0.6.1 on 2026-09-25; HEAD aa634b14dc on 2026-09-30",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "semble bench: NDCG@10 0.854 vs CodeRankEmbed 0.839, ColGREP 0.693, BM25 0.673, codebase-memory-mcp 0.630, ripgrep 0.126; index 306 ms",
+     "url": "https://github.com/MinishLab/semble/blob/main/benchmarks/README.md",
+     "holds": true
+    },
+    {
+     "claim": "semble bench queries and relevance labels generated by Claude Sonnet 4.6, also used as judge",
+     "url": "https://github.com/MinishLab/semble/blob/main/benchmarks/README.md",
+     "holds": true
+    },
+    {
+     "claim": "LightOn reports ColGREP LateOn-Code 0.859, semble 0.853, ColGREP LateOn-Code-edge 0.846 on the Semble public bench",
+     "url": "https://lightonai.github.io/next-plaid/",
+     "holds": true
+    },
+    {
+     "claim": "semble install: uv tool install semble && semble install",
+     "url": "https://github.com/MinishLab/semble/blob/main/README.md",
+     "holds": true
+    },
+    {
+     "claim": "Ollama v0.35.0 released 2026-09-28; HEAD 1abe35e6e6 on 2026-09-30",
+     "url": "https://api.github.com/graphql",
+     "holds": true
+    },
+    {
+     "claim": "Ollama supports NVIDIA GPUs with compute capability 5.0+ and driver 550+; RTX 4090 listed at 8.9",
+     "url": "https://docs.ollama.com/gpu",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "Re-run the sealed 35-query set with expected source spans on the WSL2 host. Arms: SocratiCode (native Ollama on the RTX 4090, default nomic-embed-text), semble (CPU), ColGREP with LateOn-Code-edge and with LateOn-Code, BM25 and ripgrep. Also run semble's public 1,251-query bench under one harness to settle 0.693 vs 0.846. Measure span hits and NDCG@10, watcher correctness after edits and branch switches, p50/p95 latency, RSS and VRAM, cold index time, and restore after kill -9 and after cache deletion. Name the primary engine from the result, and install Ollama only if SocratiCode wins."
+  },
+  "evidence_gaps": [
+   "ColGREP conflict: semble's table reports ColGREP (LateOn-Code-edge) at 0.693 NDCG@10, while LightOn's chart reports 0.846 (edge) and 0.859 (LateOn-Code) on what it calls the same 1,251-query bench (file-level NDCG@10). The versions and scoring behind the two numbers are not reconciled.",
+   "semble's bench was run by the vendor, with queries, labels and judging all by Claude Sonnet 4.6. No independent replication was found.",
+   "SocratiCode appears in no public retrieval-quality benchmark found. Its only measured results are its vendor throughput benchmark against grep and the on-record 30/35 vs ripgrep 20/35, in which no other engine was an arm.",
+   "Whether SocratiCode's managed Ollama container gets GPU access under WSL2 is not verified. A native Ollama install is the documented GPU path.",
+   "Restore behavior (kill and restart, cache loss) has not been measured on the target hardware for any arm.",
+   "Nemotron-3-Embed-1B-BF16: the card sections retrieved show only general text-retrieval results. Code-specific results were not found in the sections searched; the whole card was not read.",
+   "Using vLLM as SocratiCode's provider would need an OpenAI-compatible path (lmstudio or litellm) that neither project documents.",
+   "The web search returned only vendor pages (semble, LightOn, SocratiCode forks); no independent evaluation was found."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F1",
+   "name": "ColGREP (next-plaid), with LateOn-Code or LateOn-Code-edge",
+   "repository": "https://github.com/lightonai/next-plaid"
+  },
+  {
+   "key": "F3",
+   "name": "SocratiCode",
+   "repository": "https://github.com/giancarloerra/SocratiCode"
+  },
+  {
+   "key": "F2",
+   "name": "semble",
+   "repository": "https://github.com/minishlab/semble"
+  }
+ ]
+}

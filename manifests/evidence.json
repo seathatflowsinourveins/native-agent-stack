@@ -15720,6 +15720,11 @@
       "bytes": 20693
     },
     {
+      "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+      "sha256": "65e5dd299b3ed7f5fb533d2e61634d409968de1d2f804e862e77ba749019f6cd",
+      "bytes": 33018
+    },
+    {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
       "sha256": "18e350dc9543ccece9a6bc3b76afa2a55392d81b3c3879480535e3f26fa72bfd",
       "bytes": 95559
@@ -15856,8 +15861,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "6cdbf83785a788bbae6fe46c36a8df156b605d80d10024403fc62642bbed7de8",
-      "bytes": 126065
+      "sha256": "bcfd68430f325a4395ad02e4a0bfbeeb3cd18722b12d6fcd87763b988f69075b",
+      "bytes": 129343
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -35633,6 +35638,166 @@
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
       "sha256": "2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb",
       "bytes": 79538
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/README.md",
+      "sha256": "7f8ff105e4a573021afc32ea068993a491ebafcaf6920b0c357ceb7f77a8ec34",
+      "bytes": 4337
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_foundation_definitive.py",
+      "sha256": "9781d344f98a56bd3bc1e77530ffa78d346d92c791095461add6a2d56704d08b",
+      "bytes": 31537
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
+      "sha256": "882dee00ef856aba9f126eba89e2bbadee54f2de7f1e2458dfd6dd163fe8efc9",
+      "bytes": 6376
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
+      "sha256": "4c54bd2f866cc53b3beca465fd23e5178472d8f58c04d8b61ed0f167fcbe2411",
+      "bytes": 12719
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/claude-decision-round-run.json",
+      "sha256": "65d97cbf4c24149e5a8810bcb869fd889c5475adffa92f4a7eb5e27f7bd71f0b",
+      "bytes": 749
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
+      "sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+      "bytes": 992
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-critic-prompt.txt",
+      "sha256": "5300306720bd7c5507e8baf828fa57adbadd9efe7c410a33940cf53d501f1507",
+      "bytes": 2128
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-prompt.txt",
+      "sha256": "39b2bff604833badfd2c46647a1bd26651f3b2e2ddb8f06cef1b98bf3bd86086",
+      "bytes": 2557
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/decide-workflow.js",
+      "sha256": "2c94d902ea8e161e951187595c52fc964d7a663f7b33bd4d2a17d082cff78f48",
+      "bytes": 4508
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "sha256": "16eaf725e0bb616fcf2e4dc838f2482ebb272e2b3fcb585b3b4e01437edef42f",
+      "bytes": 53054
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
+      "sha256": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2",
+      "bytes": 320806
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/gpt-memory-first-round-units.json",
+      "sha256": "ba62499255776f3797487f9a60f9381fd5c47ee3c02d8dfdd533c4b870205935",
+      "bytes": 2044
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/code-search.order-1.json",
+      "sha256": "2f7aac38e186e549645cb3e4fd943f25a9145c82aee336121d8c6608e3a49ff1",
+      "bytes": 15272
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/code-search.order-2.json",
+      "sha256": "8e9fafa5189138325517e995bab227e8888a6306cb3985e06c6bae9b8a2e73c6",
+      "bytes": 15272
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/container-engine.order-1.json",
+      "sha256": "ecd521616f2a6a6e4036b9dc82b3e2b27132b5e01ac09f279912c8f64feb69ec",
+      "bytes": 19549
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/container-engine.order-2.json",
+      "sha256": "a953209b28a56a708127c3bc57fe18b8648548c45847c9274b50138dcdc3979b",
+      "bytes": 19549
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/context-supply.order-1.json",
+      "sha256": "4fbce0ce7c889bcd38648ae04dc898dbcf6d3531da8c8b0c68b3ccb77b1a7990",
+      "bytes": 15880
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/context-supply.order-2.json",
+      "sha256": "22a6275c33a05cff1ce2e81102ed5709d6d0396143cf5b739638467bd7798cb5",
+      "bytes": 15880
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/isolation-container-boundary.order-1.json",
+      "sha256": "ce69a582ec5328a4a3c3db7ce0b07676471d77b083266fc168c301707b6e4eb0",
+      "bytes": 14672
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/isolation-container-boundary.order-2.json",
+      "sha256": "1179d213a9872c1226f86e2098a5dfbfc35cd47f4c29b57b68caaaf4722ba76a",
+      "bytes": 14672
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/local-model-server.order-1.json",
+      "sha256": "acf0dc2ccfbfe7cfbd2584a955654bc268f0f092885ffceed5adb681cae1378c",
+      "bytes": 14196
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/local-model-server.order-2.json",
+      "sha256": "02059ce01081b5696ee832cc36fb61581c180a87e7ba9720cb8c2d1ab497e293",
+      "bytes": 14196
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/memory-owner.order-1.json",
+      "sha256": "4570b6493df94bfa3f2c925d0619c77259e0a9fd0bf1e2723ab1768e40a1bfd7",
+      "bytes": 30991
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/packets/memory-owner.order-2.json",
+      "sha256": "1acb10449dcaf49dcb6db6abef37ec530a83d9613ddb154d7d3e39e0566cc43d",
+      "bytes": 30991
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/preregistration.json",
+      "sha256": "197d27b9714743e1c4d686ab091a6bf3ce7f63710ac2316497e90c276d730963",
+      "bytes": 2990
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
+      "sha256": "fdc9aa3fd7138fccb727a6f3ea0581557b4428a592255077619801e88dcf683e",
+      "bytes": 4118
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
+      "sha256": "4f57ef59740602131f90c7158bbc7b2c6744dc8d73c580b398ecf0f9e52f31ce",
+      "bytes": 1841
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
+      "sha256": "8bc7685af13c56284923b61fc1a1baadd336dd5f3e4e7db4c284dee023c1a30a",
+      "bytes": 23936
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/round1-preregistration.json",
+      "sha256": "de0192442f8317fa97f185974109e1a8835fc5122154f3c77ab4dbd33f00fef4",
+      "bytes": 4960
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/round2-preregistration.json",
+      "sha256": "e965175236e0601065c6572e205eaa30671752621e260eca4fe5873bceb69fa5",
+      "bytes": 3342
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-definitive.compact.json",
+      "sha256": "dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081",
+      "bytes": 115484
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/trading-ownership.json",
+      "sha256": "4424d1abb1208518fb27ecec6219bec7f101b25b4d01f4b8d4c3e0ea0e76cf57",
+      "bytes": 10505
     },
     {
       "path": "evidence/artifacts/new-wsl-dual-image-20261001/receipt.json",
