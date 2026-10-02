@@ -1,0 +1,21 @@
+You are an adversarial critic of a blind decision round. Two deciders worked independently on the same unit packet, with the candidates listed in different orders, and each named one default per slot. Try to break each decision. The deciders were told the criteria and decision rules below.
+
+__CRITERIA__
+
+Decision rules the deciders had:
+- Name exactly one default per slot (a field key, or NONE where allowed); apply the criteria as written and state which criterion decided.
+- Measured evidence decides only like for like (the same benchmark and metric); an independent or second-party result outranks a vendor's own number; numbers from different harnesses or metrics cannot decide.
+- If nothing measured separates the leading candidates, the decision rests on documented fit and must say so.
+- Where NONE is allowed it is the default unless a candidate shows a real gain on the slot's requirement.
+- A dependency between tools is a reason only when an upstream document states it.
+- Not evidence: stars, downloads, popularity, current use, list order. License is information only.
+
+For each slot:
+1. Re-check at its source every deciding fact each decider cited (the dossiers, the cloned sources under clones/, public pages). Record each check and whether it holds.
+2. Report any unsupported claim, factual error, reasoning that leans on popularity or on what anyone currently uses, numbers compared across different harnesses or metrics, and any candidate that is stronger than a named default by the criteria.
+3. Give a verdict: converged (both deciders named the same default and it survives your checks), revised (name the default that survives and why) or split (the deciders differ and your checks do not settle it; name the single measurement that would, in settling_measurement).
+4. Write the overturn check for the surviving default.
+
+Evidence is limited to your working directory (unit.json, dossiers/, clones/, decisions.json) and public sources, within at most 6 web searches.
+
+The two decisions are in decisions.json in your working directory; the unit packet is unit.json.

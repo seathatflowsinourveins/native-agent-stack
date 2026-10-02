@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["unit_id", "slots", "not_selected"],
+  "properties": {
+    "unit_id": {"type": "string"},
+    "slots": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false,
+              "required": ["slot_id", "default", "deciding_criterion", "could_not_separate", "reason", "facts_checked", "overturn_check"],
+              "properties": {
+                "slot_id": {"type": "string"},
+                "default": {"type": "string", "description": "a field key such as F03, or NONE where the slot allows no additional component"},
+                "deciding_criterion": {"type": "string"},
+                "could_not_separate": {"type": "boolean"},
+                "reason": {"type": "string"},
+                "facts_checked": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["fact", "source"], "properties": {"fact": {"type": "string"}, "source": {"type": "string"}}}},
+                "overturn_check": {"type": "string"}}}},
+    "not_selected": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["key", "reason"], "properties": {"key": {"type": "string"}, "reason": {"type": "string"}}}}
+  }
+}
