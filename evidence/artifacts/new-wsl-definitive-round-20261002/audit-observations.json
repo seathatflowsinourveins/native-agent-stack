@@ -1,0 +1,5403 @@
+{
+  "collected_at": "2026-10-02T01:19:12+00:00",
+  "final_catalog": "catalogs/foundation/final-catalog-20261001.json",
+  "final_catalog_sha256": "ca28926d34e920cb0ee6f0fc03d80154007416c0a40a1bae47957a9a4a0856da",
+  "kind": "upstream_audit_observations",
+  "repositories": {
+    "actions/attest": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 100
+        },
+        "total": 1000
+      },
+      "created_at": "2024-02-20T19:22:19Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "actions/attest",
+      "head": {
+        "date": "2026-09-24T18:16:26Z",
+        "sha": "a0eb68d51f3a5d373e107cfa9c8455ba800479cd"
+      },
+      "html_url": "https://github.com/actions/attest",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-04T20:36:29Z",
+        "tag": "v4.2.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:28.928335+00:00",
+      "pushed_at": "2026-09-29T22:05:21Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-04T20:36:29Z",
+        "tag": "v4.2.2"
+      },
+      "renamed_to": null,
+      "slug": "actions/attest",
+      "updated_at": "2026-10-01T23:35:45Z"
+    },
+    "adbar/trafilatura": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 13
+        },
+        "total": 13
+      },
+      "created_at": "2019-04-08T11:38:48Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "adbar/trafilatura",
+      "head": {
+        "date": "2026-09-30T19:47:15Z",
+        "sha": "96e19b949c3ac4a9e193b41fe2fb352e7150db86"
+      },
+      "html_url": "https://github.com/adbar/trafilatura",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-07-31T16:07:10Z",
+        "tag": "v2.2.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:28.930278+00:00",
+      "pushed_at": "2026-09-30T19:49:16Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-07-31T16:07:10Z",
+        "tag": "v2.2.0"
+      },
+      "renamed_to": null,
+      "slug": "adbar/trafilatura",
+      "updated_at": "2026-10-01T20:25:07Z"
+    },
+    "akitaonrails/ai-memory": {
+      "advisories": [
+        "low",
+        "low"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 23
+        },
+        "total": 23
+      },
+      "created_at": "2026-05-21T23:23:51Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "akitaonrails/ai-memory",
+      "head": {
+        "date": "2026-10-01T19:18:44Z",
+        "sha": "e2d7d17d906dbe5a85ac83bc041a5a150268a2f3"
+      },
+      "html_url": "https://github.com/akitaonrails/ai-memory",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T07:40:18Z",
+        "tag": "v2.5.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:28.932720+00:00",
+      "pushed_at": "2026-10-01T21:58:38Z",
+      "release": {
+        "assets": 24,
+        "assets_with_digest": 24,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "ai-memory-2.5.2-1.aarch64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "ai-memory-2.5.2-1.aarch64.rpm.sha256"
+          },
+          {
+            "attestations": 0,
+            "name": "ai-memory-2.5.2-1.x86_64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "ai-memory-2.5.2-1.x86_64.rpm.sha256"
+          },
+          {
+            "attestations": 0,
+            "name": "ai-memory-hooks.tar.gz"
+          }
+        ],
+        "published_at": "2026-10-01T07:40:18Z",
+        "tag": "v2.5.2"
+      },
+      "renamed_to": null,
+      "slug": "akitaonrails/ai-memory",
+      "updated_at": "2026-10-02T00:14:24Z"
+    },
+    "alpacahq/alpaca-py": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 14
+        },
+        "total": 14
+      },
+      "created_at": "2022-02-19T23:10:34Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "http_status": 404,
+        "status": "not_covered"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "alpacahq/alpaca-py",
+      "head": {
+        "date": "2026-09-28T15:37:46Z",
+        "sha": "c85707ba0a381239b593fd1ce208839accc01fec"
+      },
+      "html_url": "https://github.com/alpacahq/alpaca-py",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-11T10:11:55Z",
+        "tag": "v0.44.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:28.934338+00:00",
+      "pushed_at": "2026-09-29T11:14:28Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-11T10:11:55Z",
+        "tag": "v0.44.0"
+      },
+      "renamed_to": null,
+      "slug": "alpacahq/alpaca-py",
+      "updated_at": "2026-10-01T16:49:21Z"
+    },
+    "anchore/grype": {
+      "advisories": [
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 2,
+          "success": 12
+        },
+        "total": 14
+      },
+      "created_at": "2020-05-26T13:44:38Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8.2
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anchore/grype",
+      "head": {
+        "date": "2026-10-01T21:45:14Z",
+        "sha": "2756979af9301b498aadd35ac55c6aae942543e0"
+      },
+      "html_url": "https://github.com/anchore/grype",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-17T16:45:23Z",
+        "tag": "v0.119.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:28.937322+00:00",
+      "pushed_at": "2026-10-01T21:47:52Z",
+      "release": {
+        "assets": 18,
+        "assets_with_digest": 18,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "grype_0.119.0_checksums.txt"
+          },
+          {
+            "attestations": 1,
+            "name": "grype_0.119.0_checksums.txt.pem"
+          },
+          {
+            "attestations": 1,
+            "name": "grype_0.119.0_checksums.txt.sig"
+          },
+          {
+            "attestations": 1,
+            "name": "grype_0.119.0_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "grype_0.119.0_darwin_arm64.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-17T16:45:23Z",
+        "tag": "v0.119.0"
+      },
+      "renamed_to": null,
+      "slug": "anchore/grype",
+      "updated_at": "2026-10-01T21:45:20Z"
+    },
+    "anchore/syft": {
+      "advisories": [
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 2,
+          "success": 11
+        },
+        "total": 13
+      },
+      "created_at": "2020-05-07T18:19:29Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anchore/syft",
+      "head": {
+        "date": "2026-10-01T21:21:09Z",
+        "sha": "c33fa32cf100ae1094f13dd977ce7520717b486b"
+      },
+      "html_url": "https://github.com/anchore/syft",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T20:54:29Z",
+        "tag": "v1.54.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:28.939095+00:00",
+      "pushed_at": "2026-10-01T21:21:13Z",
+      "release": {
+        "assets": 30,
+        "assets_with_digest": 30,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "syft_1.54.0_checksums.txt"
+          },
+          {
+            "attestations": 1,
+            "name": "syft_1.54.0_checksums.txt.sigstore.json"
+          },
+          {
+            "attestations": 1,
+            "name": "syft_1.54.0_darwin_amd64.sbom"
+          },
+          {
+            "attestations": 1,
+            "name": "syft_1.54.0_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "syft_1.54.0_darwin_arm64.sbom"
+          }
+        ],
+        "published_at": "2026-10-01T20:54:29Z",
+        "tag": "v1.54.0"
+      },
+      "renamed_to": null,
+      "slug": "anchore/syft",
+      "updated_at": "2026-10-01T21:21:20Z"
+    },
+    "anthropics/claude-agent-sdk-python": {
+      "advisories": [
+        "critical"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 2,
+          "failure": 2,
+          "skipped": 4,
+          "success": 6
+        },
+        "total": 14
+      },
+      "created_at": "2025-06-11T21:33:43Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anthropics/claude-agent-sdk-python",
+      "head": {
+        "date": "2026-10-01T18:01:46Z",
+        "sha": "bfb895c6ef46e095191938b4eda798a025957c09"
+      },
+      "html_url": "https://github.com/anthropics/claude-agent-sdk-python",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T19:47:45Z",
+        "tag": "v0.2.163"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:31.028359+00:00",
+      "pushed_at": "2026-10-01T18:01:48Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-30T19:47:45Z",
+        "tag": "v0.2.163"
+      },
+      "renamed_to": null,
+      "slug": "anthropics/claude-agent-sdk-python",
+      "updated_at": "2026-10-01T18:02:00Z"
+    },
+    "anthropics/claude-code": {
+      "advisories": [
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "low",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 4,
+          "in_progress": 1,
+          "skipped": 42,
+          "success": 53
+        },
+        "total": 585
+      },
+      "created_at": "2025-02-22T17:41:21Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anthropics/claude-code",
+      "head": {
+        "date": "2026-10-01T18:43:08Z",
+        "sha": "52c76441cae91f6891e4712306bffb057ff6fec5"
+      },
+      "html_url": "https://github.com/anthropics/claude-code",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T18:00:22Z",
+        "tag": "v2.1.287"
+      },
+      "license": null,
+      "observed_at": "2026-10-02T01:18:31.064037+00:00",
+      "pushed_at": "2026-10-01T18:43:10Z",
+      "release": {
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "claude-darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "claude-darwin-x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "claude-linux-arm64-musl.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "claude-linux-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "claude-linux-x64-musl.tar.gz"
+          }
+        ],
+        "published_at": "2026-10-01T18:00:22Z",
+        "tag": "v2.1.287"
+      },
+      "renamed_to": null,
+      "slug": "anthropics/claude-code",
+      "updated_at": "2026-10-02T01:05:27Z"
+    },
+    "anthropics/claude-code-action": {
+      "advisories": [
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 1,
+          "success": 22
+        },
+        "total": 23
+      },
+      "created_at": "2025-05-19T15:26:50Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anthropics/claude-code-action",
+      "head": {
+        "date": "2026-10-01T18:01:56Z",
+        "sha": "97c53473391bff1901034d4b454b5bac7ab7a029"
+      },
+      "html_url": "https://github.com/anthropics/claude-code-action",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2025-08-26T17:01:10Z",
+        "tag": "v1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:32.730263+00:00",
+      "pushed_at": "2026-10-01T18:05:26Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2025-08-26T17:01:10Z",
+        "tag": "v1"
+      },
+      "renamed_to": null,
+      "slug": "anthropics/claude-code-action",
+      "updated_at": "2026-10-02T01:14:00Z"
+    },
+    "anthropics/claude-plugins-official": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 6,
+          "success": 1
+        },
+        "total": 7
+      },
+      "created_at": "2025-11-20T18:36:20Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anthropics/claude-plugins-official",
+      "head": {
+        "date": "2026-09-30T20:11:48Z",
+        "sha": "ab024cdcfa7ca80be204acd4907656ba5a968589"
+      },
+      "html_url": "https://github.com/anthropics/claude-plugins-official",
+      "latest_tag": null,
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:32.833311+00:00",
+      "pushed_at": "2026-10-01T21:39:47Z",
+      "release": null,
+      "renamed_to": null,
+      "slug": "anthropics/claude-plugins-official",
+      "updated_at": "2026-10-02T01:16:12Z"
+    },
+    "anthropics/sandbox-runtime": {
+      "advisories": [
+        "low"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 8
+        },
+        "total": 8
+      },
+      "created_at": "2025-10-20T02:52:10Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "anthropics/sandbox-runtime",
+      "head": {
+        "date": "2026-10-01T11:58:43Z",
+        "sha": "117eb928202b53c80d3cb6527d88d1b90e4ca7a9"
+      },
+      "html_url": "https://github.com/anthropics/sandbox-runtime",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T01:09:22Z",
+        "tag": "v0.0.78"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:32.966320+00:00",
+      "pushed_at": "2026-10-01T14:23:34Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-30T01:09:22Z",
+        "tag": "v0.0.78"
+      },
+      "renamed_to": null,
+      "slug": "anthropics/sandbox-runtime",
+      "updated_at": "2026-10-02T01:15:39Z"
+    },
+    "arize-ai/phoenix": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 26,
+          "success": 24
+        },
+        "total": 50
+      },
+      "created_at": "2022-11-09T23:44:35Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "Arize-ai/phoenix",
+      "head": {
+        "date": "2026-10-02T01:08:17Z",
+        "sha": "7ea5dc10be15a283f8a25b87b24516e0b66c7b7f"
+      },
+      "html_url": "https://github.com/Arize-ai/phoenix",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T22:59:10Z",
+        "tag": "arize-phoenix-v20.19.0"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:33.124962+00:00",
+      "pushed_at": "2026-10-02T01:08:19Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-10-01T22:59:10Z",
+        "tag": "arize-phoenix-v20.19.0"
+      },
+      "renamed_to": null,
+      "slug": "arize-ai/phoenix",
+      "updated_at": "2026-10-02T01:08:29Z"
+    },
+    "ast-grep/ast-grep": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 9,
+          "success": 85
+        },
+        "total": 94
+      },
+      "created_at": "2022-07-01T19:21:00Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "ast-grep/ast-grep",
+      "head": {
+        "date": "2026-09-28T14:22:46Z",
+        "sha": "25334496c105c9c728f0a6024f3d164aed40cacc"
+      },
+      "html_url": "https://github.com/ast-grep/ast-grep",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-31T01:42:23Z",
+        "tag": "0.45.3"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:33.310930+00:00",
+      "pushed_at": "2026-10-01T19:31:47Z",
+      "release": {
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "app-aarch64-apple-darwin.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "app-aarch64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "app-aarch64-unknown-linux-gnu.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "app-i686-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "app-x86_64-apple-darwin.zip"
+          }
+        ],
+        "published_at": "2026-08-31T01:42:23Z",
+        "tag": "0.45.3"
+      },
+      "renamed_to": null,
+      "slug": "ast-grep/ast-grep",
+      "updated_at": "2026-10-01T19:24:00Z"
+    },
+    "ataraxy-labs/sem": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 3
+        },
+        "total": 3
+      },
+      "created_at": "2026-02-05T19:49:35Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "Ataraxy-Labs/sem",
+      "head": {
+        "date": "2026-10-01T18:15:47Z",
+        "sha": "dfcb3de6c8bb32eda4005b0b3260b2b437f256db"
+      },
+      "html_url": "https://github.com/Ataraxy-Labs/sem",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-13T17:47:03Z",
+        "tag": "v0.25.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:34.877462+00:00",
+      "pushed_at": "2026-10-01T18:15:47Z",
+      "release": {
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "sem-darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sem-darwin-x86_64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sem-linux-arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sem-linux-x86_64.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-13T17:47:03Z",
+        "tag": "v0.25.0"
+      },
+      "renamed_to": null,
+      "slug": "ataraxy-labs/sem",
+      "updated_at": "2026-10-01T18:15:54Z"
+    },
+    "basicmachines-co/basic-memory": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 31
+        },
+        "total": 31
+      },
+      "created_at": "2024-12-02T22:40:43Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "AGPL-3.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "basicmachines-co/basic-memory",
+      "head": {
+        "date": "2026-10-01T22:56:06Z",
+        "sha": "bf3dbd261e42819ccca0532098f0a4297f93096a"
+      },
+      "html_url": "https://github.com/basicmachines-co/basic-memory",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-25T20:44:29Z",
+        "tag": "v0.23.2"
+      },
+      "license": "AGPL-3.0",
+      "observed_at": "2026-10-02T01:18:35.086034+00:00",
+      "pushed_at": "2026-10-01T22:56:08Z",
+      "release": {
+        "assets": 2,
+        "assets_with_digest": 2,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "basic_memory-0.23.2-py3-none-any.whl"
+          },
+          {
+            "attestations": 0,
+            "name": "basic_memory-0.23.2.tar.gz"
+          }
+        ],
+        "published_at": "2026-08-25T20:44:29Z",
+        "tag": "v0.23.2"
+      },
+      "renamed_to": null,
+      "slug": "basicmachines-co/basic-memory",
+      "updated_at": "2026-10-01T23:22:57Z"
+    },
+    "betterleaks/betterleaks": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 2
+        },
+        "total": 2
+      },
+      "created_at": "2026-02-03T18:21:41Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "betterleaks/betterleaks",
+      "head": {
+        "date": "2026-09-30T19:05:13Z",
+        "sha": "c4c0ffda3a148c209a1c77a437572aba004c10d1"
+      },
+      "html_url": "https://github.com/betterleaks/betterleaks",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T20:08:06Z",
+        "tag": "v1.9.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:35.242837+00:00",
+      "pushed_at": "2026-09-30T19:05:13Z",
+      "release": {
+        "assets": 8,
+        "assets_with_digest": 8,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "betterleaks_1.9.0_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "betterleaks_1.9.0_darwin_x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "betterleaks_1.9.0_linux_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "betterleaks_1.9.0_linux_x64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "betterleaks_1.9.0_windows_arm64.zip"
+          }
+        ],
+        "published_at": "2026-09-29T20:08:06Z",
+        "tag": "v1.9.0"
+      },
+      "renamed_to": null,
+      "slug": "betterleaks/betterleaks",
+      "updated_at": "2026-10-01T21:05:09Z"
+    },
+    "ccusage/ccusage": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 3
+        },
+        "total": 3
+      },
+      "created_at": "2025-05-29T16:56:50Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "ccusage/ccusage",
+      "head": {
+        "date": "2026-10-02T00:51:47Z",
+        "sha": "f87d0c244ffc4fa197a5661a4f2b4a3b1a725a34"
+      },
+      "html_url": "https://github.com/ccusage/ccusage",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-27T16:26:00Z",
+        "tag": "v20.0.26"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:35.323517+00:00",
+      "pushed_at": "2026-10-02T00:51:50Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-27T16:26:00Z",
+        "tag": "v20.0.26"
+      },
+      "renamed_to": null,
+      "slug": "ccusage/ccusage",
+      "updated_at": "2026-10-02T00:51:55Z"
+    },
+    "cli/cli": {
+      "advisories": [
+        "high",
+        "high",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 1,
+          "skipped": 42,
+          "success": 57
+        },
+        "total": 755
+      },
+      "created_at": "2019-10-03T15:24:53Z",
+      "default_branch": "trunk",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 6.8
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "cli/cli",
+      "head": {
+        "date": "2026-09-30T02:18:02Z",
+        "sha": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd"
+      },
+      "html_url": "https://github.com/cli/cli",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T02:40:02Z",
+        "tag": "v2.102.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:36.226435+00:00",
+      "pushed_at": "2026-10-01T16:57:11Z",
+      "release": {
+        "assets": 22,
+        "assets_with_digest": 22,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "gh_2.102.0_checksums.txt"
+          },
+          {
+            "attestations": 2,
+            "name": "gh_2.102.0_linux_386.deb"
+          },
+          {
+            "attestations": 2,
+            "name": "gh_2.102.0_linux_386.rpm"
+          },
+          {
+            "attestations": 2,
+            "name": "gh_2.102.0_linux_386.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "name": "gh_2.102.0_linux_amd64.deb"
+          }
+        ],
+        "published_at": "2026-09-30T02:40:02Z",
+        "tag": "v2.102.0"
+      },
+      "renamed_to": null,
+      "slug": "cli/cli",
+      "updated_at": "2026-10-02T00:16:06Z"
+    },
+    "dagucloud/dagu": {
+      "advisories": [
+        "critical",
+        "high",
+        "high",
+        "low",
+        "low",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 1,
+          "skipped": 2,
+          "success": 23
+        },
+        "total": 26
+      },
+      "created_at": "2022-04-22T13:00:42Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "GPL-3.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "dagucloud/dagu",
+      "head": {
+        "date": "2026-10-02T00:26:02Z",
+        "sha": "be1e6f3d5344540ceabaa6e13b35c6d916c4c553"
+      },
+      "html_url": "https://github.com/dagucloud/dagu",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T15:24:51Z",
+        "tag": "v2.18.1"
+      },
+      "license": "GPL-3.0",
+      "observed_at": "2026-10-02T01:18:37.207669+00:00",
+      "pushed_at": "2026-10-02T00:26:03Z",
+      "release": {
+        "assets": 15,
+        "assets_with_digest": 15,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "dagu-2.18.1-setup.exe"
+          },
+          {
+            "attestations": 1,
+            "name": "dagu_2.18.1_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "dagu_2.18.1_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "dagu_2.18.1_linux_386.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-29T15:24:51Z",
+        "tag": "v2.18.1"
+      },
+      "renamed_to": null,
+      "slug": "dagucloud/dagu",
+      "updated_at": "2026-10-02T00:42:49Z"
+    },
+    "dependabot/dependabot-core": {
+      "advisories": [
+        "low"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 83
+        },
+        "total": 83
+      },
+      "created_at": "2017-06-02T12:23:31Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "dependabot/dependabot-core",
+      "head": {
+        "date": "2026-10-01T23:02:29Z",
+        "sha": "1cba13eb9dd75447fcb6e2d11541b0aab1f4490a"
+      },
+      "html_url": "https://github.com/dependabot/dependabot-core",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T03:51:27Z",
+        "tag": "v0.398.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:37.660625+00:00",
+      "pushed_at": "2026-10-02T00:17:33Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-28T03:51:27Z",
+        "tag": "v0.398.0"
+      },
+      "renamed_to": null,
+      "slug": "dependabot/dependabot-core",
+      "updated_at": "2026-10-01T23:02:41Z"
+    },
+    "dgunning/edgartools": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 11
+        },
+        "total": 11
+      },
+      "created_at": "2022-12-24T17:07:26Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "dgunning/edgartools",
+      "head": {
+        "date": "2026-10-01T23:32:01Z",
+        "sha": "16a828b1130705ee4cb8533571e8982de10859ae"
+      },
+      "html_url": "https://github.com/dgunning/edgartools",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-26T13:11:28Z",
+        "tag": "v5.59.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:38.438365+00:00",
+      "pushed_at": "2026-10-01T23:32:03Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-26T13:11:28Z",
+        "tag": "v5.59.1"
+      },
+      "renamed_to": null,
+      "slug": "dgunning/edgartools",
+      "updated_at": "2026-10-02T01:16:35Z"
+    },
+    "diegosouzapw/omniroute": {
+      "advisories": [
+        "critical"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "in_progress": 4,
+          "neutral": 2,
+          "queued": 38,
+          "skipped": 12,
+          "success": 10
+        },
+        "total": 67
+      },
+      "created_at": "2026-02-13T12:38:31Z",
+      "default_branch": "release/v3.8.52",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "diegosouzapw/OmniRoute",
+      "head": {
+        "date": "2026-10-02T01:12:31Z",
+        "sha": "0577ac4060d82f69f70fa74298556a115b0ec895"
+      },
+      "html_url": "https://github.com/diegosouzapw/OmniRoute",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T01:41:50Z",
+        "tag": "v3.8.51"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:38.783342+00:00",
+      "pushed_at": "2026-10-02T01:12:31Z",
+      "release": {
+        "assets": 17,
+        "assets_with_digest": 17,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "CHANGELOG-v3.8.51.md"
+          },
+          {
+            "attestations": 0,
+            "name": "latest-linux-arm64.yml"
+          },
+          {
+            "attestations": 0,
+            "name": "latest-linux.yml"
+          },
+          {
+            "attestations": 0,
+            "name": "latest-mac.yml"
+          },
+          {
+            "attestations": 0,
+            "name": "latest.yml"
+          }
+        ],
+        "published_at": "2026-09-30T01:41:50Z",
+        "tag": "v3.8.51"
+      },
+      "renamed_to": null,
+      "slug": "diegosouzapw/omniroute",
+      "updated_at": "2026-10-02T01:12:37Z"
+    },
+    "docker/compose": {
+      "advisories": [
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 8,
+          "skipped": 4,
+          "success": 59
+        },
+        "total": 71
+      },
+      "created_at": "2013-12-09T11:40:58Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "docker/compose",
+      "head": {
+        "date": "2026-10-01T16:29:51Z",
+        "sha": "4d994cc26d5e6e559d20971c1365aca90535104e"
+      },
+      "html_url": "https://github.com/docker/compose",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-03T15:53:28Z",
+        "tag": "v5.5.1"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:38.971603+00:00",
+      "pushed_at": "2026-10-01T16:29:56Z",
+      "release": {
+        "assets": 56,
+        "assets_with_digest": 56,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "docker-compose-darwin-aarch64"
+          },
+          {
+            "attestations": 0,
+            "name": "docker-compose-darwin-aarch64.provenance.json"
+          },
+          {
+            "attestations": 0,
+            "name": "docker-compose-darwin-aarch64.sbom.json"
+          },
+          {
+            "attestations": 0,
+            "name": "docker-compose-darwin-aarch64.sha256"
+          }
+        ],
+        "published_at": "2026-09-03T15:53:28Z",
+        "tag": "v5.5.1"
+      },
+      "renamed_to": null,
+      "slug": "docker/compose",
+      "updated_at": "2026-10-01T20:01:51Z"
+    },
+    "duckdb/duckdb": {
+      "advisories": [
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 6,
+          "in_progress": 10,
+          "skipped": 18,
+          "success": 26
+        },
+        "total": 60
+      },
+      "created_at": "2018-06-26T15:04:45Z",
+      "default_branch": "v2.0-cyanoptera",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "duckdb/duckdb",
+      "head": {
+        "date": "2026-10-01T18:52:46Z",
+        "sha": "2866f801f73d3da323991c2b833e3449b93ac7a1"
+      },
+      "html_url": "https://github.com/duckdb/duckdb",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T13:35:11Z",
+        "tag": "v1.5.6"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:40.158674+00:00",
+      "pushed_at": "2026-10-01T19:14:08Z",
+      "release": {
+        "assets": 29,
+        "assets_with_digest": 29,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "duckdb_cli-linux-amd64-musl.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "duckdb_cli-linux-amd64-musl.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "duckdb_cli-linux-amd64.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "duckdb_cli-linux-amd64.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "duckdb_cli-linux-arm64-musl.gz"
+          }
+        ],
+        "published_at": "2026-09-28T13:35:11Z",
+        "tag": "v1.5.6"
+      },
+      "renamed_to": null,
+      "slug": "duckdb/duckdb",
+      "updated_at": "2026-10-02T01:15:40Z"
+    },
+    "eyuansu62/agent-retrieval-bench": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {},
+        "total": 0
+      },
+      "created_at": "2026-04-27T07:24:35Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "http_status": 404,
+        "status": "not_covered"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "eyuansu62/agent-retrieval-bench",
+      "head": {
+        "date": "2026-08-04T04:00:58Z",
+        "sha": "07014c986f3deadb1548c62b32c0ffbe6a81465d"
+      },
+      "html_url": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-07-26T01:08:48Z",
+        "tag": "v0.2.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:40.167432+00:00",
+      "pushed_at": "2026-08-04T04:01:12Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-07-26T01:08:48Z",
+        "tag": "v0.2.1"
+      },
+      "renamed_to": null,
+      "slug": "eyuansu62/agent-retrieval-bench",
+      "updated_at": "2026-09-21T23:43:27Z"
+    },
+    "fastapi/fastapi": {
+      "advisories": [
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 3,
+          "success": 23
+        },
+        "total": 26
+      },
+      "created_at": "2018-12-08T08:21:47Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "fastapi/fastapi",
+      "head": {
+        "date": "2026-10-01T18:55:02Z",
+        "sha": "28a206107302ee20ce6a9a876d05a258c1c8d328"
+      },
+      "html_url": "https://github.com/fastapi/fastapi",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T09:50:53Z",
+        "tag": "0.142.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:41.106198+00:00",
+      "pushed_at": "2026-10-01T19:58:50Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-30T09:50:53Z",
+        "tag": "0.142.2"
+      },
+      "renamed_to": null,
+      "slug": "fastapi/fastapi",
+      "updated_at": "2026-10-01T21:26:22Z"
+    },
+    "gerrymanoim/exchange_calendars": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "success": 21
+        },
+        "total": 22
+      },
+      "created_at": "2020-10-30T15:43:44Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 4.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": true,
+      "full_name": "gerrymanoim/exchange_calendars",
+      "head": {
+        "date": "2026-09-15T09:27:58Z",
+        "sha": "bbda29fed902374bdb75acab008f421fbd567823"
+      },
+      "html_url": "https://github.com/gerrymanoim/exchange_calendars",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-03-10T03:24:04Z",
+        "tag": "4.13.2"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:41.176261+00:00",
+      "pushed_at": "2026-09-24T06:22:30Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-03-10T03:24:04Z",
+        "tag": "4.13.2"
+      },
+      "renamed_to": null,
+      "slug": "gerrymanoim/exchange_calendars",
+      "updated_at": "2026-09-29T10:09:30Z"
+    },
+    "ggml-org/llama.cpp": {
+      "advisories": [
+        "critical",
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "in_progress": 34,
+          "queued": 20,
+          "success": 15
+        },
+        "total": 70
+      },
+      "created_at": "2023-03-10T18:58:00Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "ggml-org/llama.cpp",
+      "head": {
+        "date": "2026-10-02T01:12:25Z",
+        "sha": "159c651f5798e7b98e7afc29c485b96137aa9ada"
+      },
+      "html_url": "https://github.com/ggml-org/llama.cpp",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-23T20:50:06Z",
+        "tag": "v0.5.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:41.879663+00:00",
+      "pushed_at": "2026-10-02T01:12:26Z",
+      "release": {
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "nightly-tag.txt"
+          }
+        ],
+        "published_at": "2026-09-23T20:50:06Z",
+        "tag": "v0.5.0"
+      },
+      "renamed_to": null,
+      "slug": "ggml-org/llama.cpp",
+      "updated_at": "2026-10-02T01:15:09Z"
+    },
+    "giancarloerra/socraticode": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 10
+        },
+        "total": 10
+      },
+      "created_at": "2026-02-26T16:12:26Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "http_status": 404,
+        "status": "not_covered"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "giancarloerra/SocratiCode",
+      "head": {
+        "date": "2026-09-30T17:24:14Z",
+        "sha": "155ba9325f43a65c78a09930735b378f91651cf5"
+      },
+      "html_url": "https://github.com/giancarloerra/SocratiCode",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T12:19:47Z",
+        "tag": "v1.16.0"
+      },
+      "license": "AGPL-3.0",
+      "observed_at": "2026-10-02T01:18:42.777413+00:00",
+      "pushed_at": "2026-09-30T17:24:14Z",
+      "release": {
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "socraticode-1.16.0.vsix"
+          }
+        ],
+        "published_at": "2026-09-28T12:19:47Z",
+        "tag": "v1.16.0"
+      },
+      "renamed_to": null,
+      "slug": "giancarloerra/socraticode",
+      "updated_at": "2026-10-01T19:09:50Z"
+    },
+    "git/git": {
+      "advisories": [
+        "critical",
+        "critical",
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 4,
+          "success": 45
+        },
+        "total": 49
+      },
+      "created_at": "2008-07-23T14:21:26Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.2
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "git/git",
+      "head": {
+        "date": "2026-10-01T18:28:16Z",
+        "sha": "c46c1e37724f0478939de636ab8ea5a89086d532"
+      },
+      "html_url": "https://github.com/git/git",
+      "latest_tag": "v2.56.0",
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:43.138948+00:00",
+      "pushed_at": "2026-10-01T22:01:02Z",
+      "release": null,
+      "renamed_to": null,
+      "slug": "git/git",
+      "updated_at": "2026-10-01T23:22:56Z"
+    },
+    "github/codeql-action": {
+      "advisories": [
+        "high",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 98,
+          "success": 2
+        },
+        "total": 1352
+      },
+      "created_at": "2020-04-27T20:36:30Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "github/codeql-action",
+      "head": {
+        "date": "2026-09-29T17:31:06Z",
+        "sha": "61817fadad823920a8924645dd5f67985d6a1d94"
+      },
+      "html_url": "https://github.com/github/codeql-action",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-22T17:10:11Z",
+        "tag": "codeql-bundle-v2.27.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:43.195649+00:00",
+      "pushed_at": "2026-10-02T00:27:54Z",
+      "release": {
+        "assets": 34,
+        "assets_with_digest": 34,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "cli-version-2.27.1.txt"
+          },
+          {
+            "attestations": 1,
+            "name": "codeql-bundle-actions-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "name": "codeql-bundle-cpp-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "name": "codeql-bundle-csharp-linux64.tar.zst"
+          },
+          {
+            "attestations": 1,
+            "name": "codeql-bundle-go-linux64.tar.zst"
+          }
+        ],
+        "published_at": "2026-09-22T17:10:11Z",
+        "tag": "codeql-bundle-v2.27.1"
+      },
+      "renamed_to": null,
+      "slug": "github/codeql-action",
+      "updated_at": "2026-10-02T00:42:44Z"
+    },
+    "gitleaks/gitleaks": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 33
+        },
+        "total": 33
+      },
+      "created_at": "2018-01-27T18:19:31Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "gitleaks/gitleaks",
+      "head": {
+        "date": "2026-07-22T16:50:33Z",
+        "sha": "b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b"
+      },
+      "html_url": "https://github.com/gitleaks/gitleaks",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-03-21T02:17:58Z",
+        "tag": "v8.30.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:43.317399+00:00",
+      "pushed_at": "2026-09-30T04:14:02Z",
+      "release": {
+        "assets": 11,
+        "assets_with_digest": 11,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "gitleaks_8.30.1_checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "gitleaks_8.30.1_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "gitleaks_8.30.1_darwin_x64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "gitleaks_8.30.1_linux_arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "gitleaks_8.30.1_linux_armv6.tar.gz"
+          }
+        ],
+        "published_at": "2026-03-21T02:17:58Z",
+        "tag": "v8.30.1"
+      },
+      "renamed_to": null,
+      "slug": "gitleaks/gitleaks",
+      "updated_at": "2026-10-02T00:25:13Z"
+    },
+    "grafana/grafana": {
+      "advisories": [
+        "critical",
+        "critical",
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 100
+        },
+        "total": 281
+      },
+      "created_at": "2013-12-11T15:59:56Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "AGPL-3.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 6.8
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "grafana/grafana",
+      "head": {
+        "date": "2026-10-02T00:41:45Z",
+        "sha": "f89103a8dac3e24563d0ce43f83fd085676a92d6"
+      },
+      "html_url": "https://github.com/grafana/grafana",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T09:02:18Z",
+        "tag": "v13.2.3"
+      },
+      "license": "AGPL-3.0",
+      "observed_at": "2026-10-02T01:18:44.047825+00:00",
+      "pushed_at": "2026-10-02T00:41:49Z",
+      "release": {
+        "assets": 13,
+        "assets_with_digest": 13,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "grafana-enterprise-rpi_13.2.3_36482603486_linux_arm-6.deb"
+          },
+          {
+            "attestations": 0,
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_amd64.deb"
+          },
+          {
+            "attestations": 0,
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_amd64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_arm-7.deb"
+          },
+          {
+            "attestations": 0,
+            "name": "grafana-enterprise_13.2.3_36482603486_linux_arm64.deb"
+          }
+        ],
+        "published_at": "2026-09-29T09:02:18Z",
+        "tag": "v13.2.3"
+      },
+      "renamed_to": null,
+      "slug": "grafana/grafana",
+      "updated_at": "2026-10-02T00:43:09Z"
+    },
+    "grafana/loki": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 25,
+          "pending": 6,
+          "skipped": 4,
+          "success": 42
+        },
+        "total": 77
+      },
+      "created_at": "2018-04-16T09:22:48Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "AGPL-3.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "grafana/loki",
+      "head": {
+        "date": "2026-10-02T01:15:02Z",
+        "sha": "d6e3d1b96da1fdd56f54eee83666fee22541765a"
+      },
+      "html_url": "https://github.com/grafana/loki",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-17T15:51:10Z",
+        "tag": "v3.7.8"
+      },
+      "license": "AGPL-3.0",
+      "observed_at": "2026-10-02T01:18:44.684083+00:00",
+      "pushed_at": "2026-10-02T01:15:06Z",
+      "release": {
+        "assets": 47,
+        "assets_with_digest": 47,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "logcli-3.7.8-1.aarch64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "logcli-3.7.8-1.arm.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "logcli-3.7.8-1.x86_64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "logcli-darwin-amd64.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "logcli-darwin-arm64.zip"
+          }
+        ],
+        "published_at": "2026-09-17T15:51:10Z",
+        "tag": "v3.7.8"
+      },
+      "renamed_to": null,
+      "slug": "grafana/loki",
+      "updated_at": "2026-10-02T01:15:09Z"
+    },
+    "harbor-framework/harbor": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 1,
+          "skipped": 19,
+          "success": 3
+        },
+        "total": 23
+      },
+      "created_at": "2025-08-04T23:28:26Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "harbor-framework/harbor",
+      "head": {
+        "date": "2026-10-01T06:31:25Z",
+        "sha": "bf991e490394ef9c3250a6db2bc5cbda903cb4c3"
+      },
+      "html_url": "https://github.com/harbor-framework/harbor",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-12T04:55:17Z",
+        "tag": "v0.23.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:44.832471+00:00",
+      "pushed_at": "2026-10-01T15:35:19Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-12T04:55:17Z",
+        "tag": "v0.23.0"
+      },
+      "renamed_to": null,
+      "slug": "harbor-framework/harbor",
+      "updated_at": "2026-10-01T22:06:26Z"
+    },
+    "jdx/mise": {
+      "advisories": [
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 3,
+          "queued": 3,
+          "skipped": 2,
+          "success": 5
+        },
+        "total": 13
+      },
+      "created_at": "2023-01-09T14:44:21Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "jdx/mise",
+      "head": {
+        "date": "2026-10-02T00:38:43Z",
+        "sha": "c2e90eb639d4d3db46ef7a4cd72f0371788d61b3"
+      },
+      "html_url": "https://github.com/jdx/mise",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T12:51:01Z",
+        "tag": "v2026.9.18"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:45.885279+00:00",
+      "pushed_at": "2026-10-02T00:56:56Z",
+      "release": {
+        "assets": 52,
+        "assets_with_digest": 52,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "install.sh"
+          },
+          {
+            "attestations": 1,
+            "name": "install.sh.minisig"
+          },
+          {
+            "attestations": 1,
+            "name": "install.sh.sig"
+          },
+          {
+            "attestations": 2,
+            "name": "mise-v2026.9.18-linux-arm64"
+          },
+          {
+            "attestations": 2,
+            "name": "mise-v2026.9.18-linux-arm64-musl"
+          }
+        ],
+        "published_at": "2026-09-30T12:51:01Z",
+        "tag": "v2026.9.18"
+      },
+      "renamed_to": null,
+      "slug": "jdx/mise",
+      "updated_at": "2026-10-02T00:38:48Z"
+    },
+    "kjanat/actionlint": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "success": 51
+        },
+        "total": 52
+      },
+      "created_at": "2026-08-07T03:31:46Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": true,
+      "full_name": "kjanat/actionlint",
+      "head": {
+        "date": "2026-09-25T14:28:28Z",
+        "sha": "f45fbd2f408424ef20fa300d6b8386ba92a3d3d7"
+      },
+      "html_url": "https://github.com/kjanat/actionlint",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-13T16:07:47Z",
+        "tag": "v1.17.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:46.883057+00:00",
+      "pushed_at": "2026-10-01T14:47:26Z",
+      "release": {
+        "assets": 24,
+        "assets_with_digest": 24,
+        "attested_assets": [
+          {
+            "attestations": 2,
+            "name": "actionlint-1.17.0.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "actionlint_1.17.0_checksums.txt"
+          },
+          {
+            "attestations": 2,
+            "name": "actionlint_1.17.0_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "name": "actionlint_1.17.0_darwin_amd64.tar.gz.sbom.json"
+          },
+          {
+            "attestations": 2,
+            "name": "actionlint_1.17.0_darwin_arm64.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-13T16:07:47Z",
+        "tag": "v1.17.0"
+      },
+      "renamed_to": null,
+      "slug": "kjanat/actionlint",
+      "updated_at": "2026-09-30T11:41:40Z"
+    },
+    "mattpocock/skills": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 1
+        },
+        "total": 1
+      },
+      "created_at": "2026-02-03T11:15:53Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "mattpocock/skills",
+      "head": {
+        "date": "2026-09-29T12:37:40Z",
+        "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+      },
+      "html_url": "https://github.com/mattpocock/skills",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-06T14:05:28Z",
+        "tag": "v1.2.3"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:47.401025+00:00",
+      "pushed_at": "2026-09-29T12:38:37Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-06T14:05:28Z",
+        "tag": "v1.2.3"
+      },
+      "renamed_to": null,
+      "slug": "mattpocock/skills",
+      "updated_at": "2026-10-02T01:15:04Z"
+    },
+    "max-sixty/worktrunk": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 1,
+          "skipped": 8,
+          "success": 35
+        },
+        "total": 44
+      },
+      "created_at": "2025-10-17T22:13:14Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "max-sixty/worktrunk",
+      "head": {
+        "date": "2026-10-01T20:01:12Z",
+        "sha": "85e685e313f7fbc0612c0e055e655c3917e39f29"
+      },
+      "html_url": "https://github.com/max-sixty/worktrunk",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-27T21:18:46Z",
+        "tag": "v0.80.0"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:48.423976+00:00",
+      "pushed_at": "2026-10-02T01:15:25Z",
+      "release": {
+        "assets": 18,
+        "assets_with_digest": 18,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "dist-manifest.json"
+          },
+          {
+            "attestations": 1,
+            "name": "packslip.sigstore.json"
+          },
+          {
+            "attestations": 1,
+            "name": "sha256.sum"
+          },
+          {
+            "attestations": 1,
+            "name": "source.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "source.tar.gz.sha256"
+          }
+        ],
+        "published_at": "2026-09-27T21:18:46Z",
+        "tag": "v0.80.0"
+      },
+      "renamed_to": null,
+      "slug": "max-sixty/worktrunk",
+      "updated_at": "2026-10-02T00:57:54Z"
+    },
+    "mcpjam/inspector": {
+      "advisories": [
+        "critical",
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 3,
+          "in_progress": 1,
+          "queued": 1,
+          "skipped": 20,
+          "success": 51
+        },
+        "total": 76
+      },
+      "created_at": "2025-05-23T15:56:00Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "MCPJam/inspector",
+      "head": {
+        "date": "2026-10-01T23:57:08Z",
+        "sha": "b8eceadc2cc4edfa6736369250d52cf7eb24e074"
+      },
+      "html_url": "https://github.com/MCPJam/inspector",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T09:53:48Z",
+        "tag": "v3.12.8"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:48.840900+00:00",
+      "pushed_at": "2026-10-02T01:09:48Z",
+      "release": {
+        "assets": 6,
+        "assets_with_digest": 6,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "mcpjam-inspector-3.12.8-full.nupkg"
+          },
+          {
+            "attestations": 1,
+            "name": "MCPJam-Inspector-Setup.exe"
+          },
+          {
+            "attestations": 1,
+            "name": "MCPJam.Inspector-darwin-arm64-3.12.8.zip"
+          },
+          {
+            "attestations": 1,
+            "name": "MCPJam.Inspector-stapled.zip"
+          },
+          {
+            "attestations": 1,
+            "name": "MCPJam.Inspector.dmg"
+          }
+        ],
+        "published_at": "2026-10-01T09:53:48Z",
+        "tag": "v3.12.8"
+      },
+      "renamed_to": null,
+      "slug": "mcpjam/inspector",
+      "updated_at": "2026-10-01T23:57:13Z"
+    },
+    "microsoft/playwright": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 6,
+          "in_progress": 3,
+          "skipped": 6,
+          "success": 71
+        },
+        "total": 86
+      },
+      "created_at": "2019-11-15T18:32:42Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.6
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "microsoft/playwright",
+      "head": {
+        "date": "2026-10-01T23:37:31Z",
+        "sha": "b630e71fcda7885885c459bcbb88e5bfa7c0a1ac"
+      },
+      "html_url": "https://github.com/microsoft/playwright",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-04T22:40:31Z",
+        "tag": "v1.63.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:49.186900+00:00",
+      "pushed_at": "2026-10-01T23:37:31Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-04T22:40:31Z",
+        "tag": "v1.63.0"
+      },
+      "renamed_to": null,
+      "slug": "microsoft/playwright",
+      "updated_at": "2026-10-02T00:30:13Z"
+    },
+    "microsoft/playwright-cli": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 6
+        },
+        "total": 6
+      },
+      "created_at": "2020-06-19T18:34:03Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 6.4
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "microsoft/playwright-cli",
+      "head": {
+        "date": "2026-09-28T23:22:31Z",
+        "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871"
+      },
+      "html_url": "https://github.com/microsoft/playwright-cli",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T23:23:13Z",
+        "tag": "v0.1.22"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:49.235858+00:00",
+      "pushed_at": "2026-09-28T23:23:12Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-28T23:23:13Z",
+        "tag": "v0.1.22"
+      },
+      "renamed_to": null,
+      "slug": "microsoft/playwright-cli",
+      "updated_at": "2026-10-02T01:18:05Z"
+    },
+    "minishlab/semble": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 15
+        },
+        "total": 15
+      },
+      "created_at": "2026-04-06T14:56:45Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "MinishLab/semble",
+      "head": {
+        "date": "2026-09-30T06:56:09Z",
+        "sha": "aa634b14dc81ba6925a130cb999081f3240e2a3c"
+      },
+      "html_url": "https://github.com/MinishLab/semble",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-25T07:16:03Z",
+        "tag": "v0.6.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:50.593992+00:00",
+      "pushed_at": "2026-09-30T06:56:12Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-25T07:16:03Z",
+        "tag": "v0.6.1"
+      },
+      "renamed_to": null,
+      "slug": "minishlab/semble",
+      "updated_at": "2026-10-01T17:19:50Z"
+    },
+    "mksglu/context-mode": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 1
+        },
+        "total": 1
+      },
+      "created_at": "2026-02-23T05:56:28Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "mksglu/context-mode",
+      "head": {
+        "date": "2026-10-02T00:13:30Z",
+        "sha": "928bdf104bca04da977fc6e6095dc3d0328939df"
+      },
+      "html_url": "https://github.com/mksglu/context-mode",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-06-29T18:18:53Z",
+        "tag": "v1.0.169"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:50.789797+00:00",
+      "pushed_at": "2026-10-02T00:13:31Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-06-29T18:18:53Z",
+        "tag": "v1.0.169"
+      },
+      "renamed_to": null,
+      "slug": "mksglu/context-mode",
+      "updated_at": "2026-10-02T01:17:40Z"
+    },
+    "mlflow/mlflow": {
+      "advisories": [
+        "critical",
+        "critical",
+        "high",
+        "high",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 25,
+          "skipped": 5,
+          "success": 9
+        },
+        "total": 39
+      },
+      "created_at": "2018-06-05T16:05:58Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.5
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "mlflow/mlflow",
+      "head": {
+        "date": "2026-10-02T01:14:13Z",
+        "sha": "feb88a542b4220c9f121a2a13d2dff8d7f5601b1"
+      },
+      "html_url": "https://github.com/mlflow/mlflow",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-17T02:40:08Z",
+        "tag": "v3.16.1"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:51.302284+00:00",
+      "pushed_at": "2026-10-02T01:17:43Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-17T02:40:08Z",
+        "tag": "v3.16.1"
+      },
+      "renamed_to": null,
+      "slug": "mlflow/mlflow",
+      "updated_at": "2026-10-02T01:16:29Z"
+    },
+    "moby/moby": {
+      "advisories": [
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "high",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 1,
+          "success": 99
+        },
+        "total": 247
+      },
+      "created_at": "2013-01-18T18:10:57Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 9.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "moby/moby",
+      "head": {
+        "date": "2026-10-01T20:29:45Z",
+        "sha": "c8e265787b0a89d161f34c3920f73f136974744b"
+      },
+      "html_url": "https://github.com/moby/moby",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T20:28:33Z",
+        "tag": "docker-v29.8.2"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:51.731025+00:00",
+      "pushed_at": "2026-10-01T20:55:12Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-30T20:28:33Z",
+        "tag": "docker-v29.8.2"
+      },
+      "renamed_to": null,
+      "slug": "moby/moby",
+      "updated_at": "2026-10-01T20:29:53Z"
+    },
+    "modelcontextprotocol/inspector": {
+      "advisories": [
+        "critical",
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 8,
+          "success": 14
+        },
+        "total": 22
+      },
+      "created_at": "2024-10-03T21:47:42Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "modelcontextprotocol/inspector",
+      "head": {
+        "date": "2026-09-30T22:23:03Z",
+        "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184"
+      },
+      "html_url": "https://github.com/modelcontextprotocol/inspector",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T22:23:56Z",
+        "tag": "2.9.0"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:52.199525+00:00",
+      "pushed_at": "2026-10-02T01:14:03Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-30T22:23:56Z",
+        "tag": "2.9.0"
+      },
+      "renamed_to": null,
+      "slug": "modelcontextprotocol/inspector",
+      "updated_at": "2026-10-01T19:15:48Z"
+    },
+    "nautechsystems/nautilus_trader": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 1,
+          "skipped": 10,
+          "success": 9
+        },
+        "total": 20
+      },
+      "created_at": "2018-06-25T06:26:16Z",
+      "default_branch": "develop",
+      "deps_dev": {
+        "license": "LGPL-3.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8.3
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "nautechsystems/nautilus_trader",
+      "head": {
+        "date": "2026-10-02T00:35:00Z",
+        "sha": "fb48509e8018df12d814b81a859b5b939663240e"
+      },
+      "html_url": "https://github.com/nautechsystems/nautilus_trader",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-02T18:53:49Z",
+        "tag": "v1.231.0"
+      },
+      "license": "LGPL-3.0",
+      "observed_at": "2026-10-02T01:18:52.443952+00:00",
+      "pushed_at": "2026-10-02T00:41:23Z",
+      "release": {
+        "assets": 55,
+        "assets_with_digest": 55,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "crates-manifest.json"
+          },
+          {
+            "attestations": 1,
+            "name": "dist-manifest.json"
+          },
+          {
+            "attestations": 2,
+            "name": "nautilus_trader-1.231.0-cp312-cp312-macosx_26_0_arm64.whl"
+          },
+          {
+            "attestations": 12,
+            "name": "nautilus_trader-1.231.0-cp312-cp312-macosx_26_0_arm64.whl.intoto.jsonl"
+          },
+          {
+            "attestations": 1,
+            "name": "nautilus_trader-1.231.0-cp312-cp312-macosx_26_0_arm64.whl.sha256"
+          }
+        ],
+        "published_at": "2026-08-02T18:53:49Z",
+        "tag": "v1.231.0"
+      },
+      "renamed_to": null,
+      "slug": "nautechsystems/nautilus_trader",
+      "updated_at": "2026-10-02T00:58:13Z"
+    },
+    "ojuschugh1/sqz": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 8
+        },
+        "total": 8
+      },
+      "created_at": "2026-04-12T07:23:52Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "ojuschugh1/sqz",
+      "head": {
+        "date": "2026-09-24T06:35:39Z",
+        "sha": "e66e717dc08d74977d6b991b071aac220046ed0d"
+      },
+      "html_url": "https://github.com/ojuschugh1/sqz",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-23T18:25:35Z",
+        "tag": "v1.9.0"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:52.547112+00:00",
+      "pushed_at": "2026-09-24T06:35:44Z",
+      "release": {
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "sqz-mcp-v1.9.0-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sqz-mcp-v1.9.0-aarch64-unknown-linux-musl.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sqz-mcp-v1.9.0-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "sqz-mcp-v1.9.0-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "sqz-mcp-v1.9.0-x86_64-unknown-linux-musl.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-23T18:25:35Z",
+        "tag": "v1.9.0"
+      },
+      "renamed_to": null,
+      "slug": "ojuschugh1/sqz",
+      "updated_at": "2026-10-01T08:16:41Z"
+    },
+    "ollama/ollama": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 8,
+          "skipped": 1,
+          "success": 13
+        },
+        "total": 22
+      },
+      "created_at": "2023-06-26T19:39:32Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "ollama/ollama",
+      "head": {
+        "date": "2026-10-02T01:05:01Z",
+        "sha": "b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce"
+      },
+      "html_url": "https://github.com/ollama/ollama",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T21:23:22Z",
+        "tag": "v0.35.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:53.131638+00:00",
+      "pushed_at": "2026-10-02T01:05:28Z",
+      "release": {
+        "assets": 17,
+        "assets_with_digest": 17,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "install.ps1"
+          },
+          {
+            "attestations": 0,
+            "name": "install.sh"
+          },
+          {
+            "attestations": 0,
+            "name": "ollama-darwin.tgz"
+          },
+          {
+            "attestations": 0,
+            "name": "Ollama-darwin.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "ollama-linux-amd64-mlx.tar.zst"
+          }
+        ],
+        "published_at": "2026-09-28T21:23:22Z",
+        "tag": "v0.35.0"
+      },
+      "renamed_to": null,
+      "slug": "ollama/ollama",
+      "updated_at": "2026-10-02T01:15:01Z"
+    },
+    "open-telemetry/opentelemetry-collector-contrib": {
+      "advisories": [
+        "high",
+        "high",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "queued": 1,
+          "skipped": 29,
+          "success": 70
+        },
+        "total": 292
+      },
+      "created_at": "2019-07-11T14:54:32Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 7.7
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "open-telemetry/opentelemetry-collector-contrib",
+      "head": {
+        "date": "2026-10-01T20:45:08Z",
+        "sha": "d1f956e42a27d00992d89e4b7a5258734607c440"
+      },
+      "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T10:11:33Z",
+        "tag": "v0.162.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:53.586138+00:00",
+      "pushed_at": "2026-10-01T20:45:11Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-29T10:11:33Z",
+        "tag": "v0.162.0"
+      },
+      "renamed_to": null,
+      "slug": "open-telemetry/opentelemetry-collector-contrib",
+      "updated_at": "2026-10-01T23:25:39Z"
+    },
+    "openai/codex": {
+      "advisories": [
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 10,
+          "in_progress": 3,
+          "skipped": 21,
+          "success": 66
+        },
+        "total": 201
+      },
+      "created_at": "2025-04-13T05:37:54Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.9
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "openai/codex",
+      "head": {
+        "date": "2026-10-02T00:46:14Z",
+        "sha": "8d44977aa2fb9ae1b128660668dc5b36966613fa"
+      },
+      "html_url": "https://github.com/openai/codex",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T20:19:13Z",
+        "tag": "rust-v0.160.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:54.248602+00:00",
+      "pushed_at": "2026-10-02T00:51:49Z",
+      "release": {
+        "assets": 176,
+        "assets_with_digest": 176,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "argument-comment-lint"
+          },
+          {
+            "attestations": 0,
+            "name": "argument-comment-lint-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "argument-comment-lint-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "argument-comment-lint-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz"
+          }
+        ],
+        "published_at": "2026-10-01T20:19:13Z",
+        "tag": "rust-v0.160.0"
+      },
+      "renamed_to": null,
+      "slug": "openai/codex",
+      "updated_at": "2026-10-02T01:09:16Z"
+    },
+    "openclaw/mcporter": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 7
+        },
+        "total": 7
+      },
+      "created_at": "2025-11-05T03:29:59Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "openclaw/mcporter",
+      "head": {
+        "date": "2026-10-01T18:43:09Z",
+        "sha": "9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392"
+      },
+      "html_url": "https://github.com/openclaw/mcporter",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-10-01T18:24:07Z",
+        "tag": "v0.14.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:54.514524+00:00",
+      "pushed_at": "2026-10-01T18:43:11Z",
+      "release": {
+        "assets": 5,
+        "assets_with_digest": 5,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "mcporter-0.14.2.tgz"
+          },
+          {
+            "attestations": 0,
+            "name": "mcporter_0.14.2_darwin_arm64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "mcporter_0.14.2_darwin_x86_64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "provenance.json"
+          }
+        ],
+        "published_at": "2026-10-01T18:24:07Z",
+        "tag": "v0.14.2"
+      },
+      "renamed_to": null,
+      "slug": "openclaw/mcporter",
+      "updated_at": "2026-10-01T18:43:14Z"
+    },
+    "opendatalab/mineru": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 1,
+          "success": 10
+        },
+        "total": 11
+      },
+      "created_at": "2024-02-29T08:52:34Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "opendatalab/MinerU",
+      "head": {
+        "date": "2026-09-29T07:16:39Z",
+        "sha": "ed50cc15bc2c9bfb00520dadfe61979866e62236"
+      },
+      "html_url": "https://github.com/opendatalab/MinerU",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T07:18:10Z",
+        "tag": "mineru-4.0.10-released"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:55.913132+00:00",
+      "pushed_at": "2026-09-30T09:13:37Z",
+      "release": {
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "mineru-4.0.10-py3-none-any.whl"
+          }
+        ],
+        "published_at": "2026-09-29T07:18:10Z",
+        "tag": "mineru-4.0.10-released"
+      },
+      "renamed_to": null,
+      "slug": "opendatalab/mineru",
+      "updated_at": "2026-10-02T00:52:53Z"
+    },
+    "openhands/software-agent-sdk": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 9,
+          "success": 56
+        },
+        "total": 65
+      },
+      "created_at": "2025-08-23T20:34:39Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "OpenHands/software-agent-sdk",
+      "head": {
+        "date": "2026-10-01T22:58:18Z",
+        "sha": "53a4bc5014902ca84bb21fff30eac606ff4905aa"
+      },
+      "html_url": "https://github.com/OpenHands/software-agent-sdk",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T19:31:33Z",
+        "tag": "v1.50.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:56.263450+00:00",
+      "pushed_at": "2026-10-02T00:46:58Z",
+      "release": {
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "agent-server-1.50.1-linux-arm64"
+          },
+          {
+            "attestations": 0,
+            "name": "agent-server-1.50.1-linux-x86_64"
+          },
+          {
+            "attestations": 0,
+            "name": "agent-server-1.50.1-macos-arm64"
+          },
+          {
+            "attestations": 0,
+            "name": "agent-server-1.50.1-macos-x86_64"
+          },
+          {
+            "attestations": 0,
+            "name": "agent-server-1.50.1-windows-x86_64.exe"
+          }
+        ],
+        "published_at": "2026-09-30T19:31:33Z",
+        "tag": "v1.50.1"
+      },
+      "renamed_to": null,
+      "slug": "openhands/software-agent-sdk",
+      "updated_at": "2026-10-01T23:10:14Z"
+    },
+    "openlit/openlit": {
+      "advisories": [
+        "critical"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "skipped": 2,
+          "success": 31
+        },
+        "total": 34
+      },
+      "created_at": "2024-01-23T17:40:59Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "openlit/openlit",
+      "head": {
+        "date": "2026-10-01T06:35:33Z",
+        "sha": "897838a26e447f7f82dccfb59f7cbe0bfba3b694"
+      },
+      "html_url": "https://github.com/openlit/openlit",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-10T10:55:59Z",
+        "tag": "openlit-2.1.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:56.728859+00:00",
+      "pushed_at": "2026-10-01T23:48:45Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-10T10:55:59Z",
+        "tag": "openlit-2.1.0"
+      },
+      "renamed_to": null,
+      "slug": "openlit/openlit",
+      "updated_at": "2026-10-01T19:16:48Z"
+    },
+    "oraios/serena": {
+      "advisories": [
+        "critical",
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 1,
+          "failure": 1,
+          "success": 26
+        },
+        "total": 28
+      },
+      "created_at": "2025-03-23T22:35:24Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "oraios/serena",
+      "head": {
+        "date": "2026-09-30T18:53:23Z",
+        "sha": "d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809"
+      },
+      "html_url": "https://github.com/oraios/serena",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-09T18:38:06Z",
+        "tag": "v1.7.0"
+      },
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:57.329357+00:00",
+      "pushed_at": "2026-09-30T21:03:51Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-09T18:38:06Z",
+        "tag": "v1.7.0"
+      },
+      "renamed_to": null,
+      "slug": "oraios/serena",
+      "updated_at": "2026-10-02T00:49:58Z"
+    },
+    "podman-container-tools/podman": {
+      "advisories": [
+        "critical",
+        "high",
+        "high",
+        "high",
+        "high",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "cancelled": 1,
+          "failure": 1,
+          "skipped": 18,
+          "success": 80
+        },
+        "total": 110
+      },
+      "created_at": "2017-11-01T15:01:27Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "podman-container-tools/podman",
+      "head": {
+        "date": "2026-10-01T14:09:59Z",
+        "sha": "ccc1e207757d7abd173e52980bdd19613166ac48"
+      },
+      "html_url": "https://github.com/podman-container-tools/podman",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T15:34:46Z",
+        "tag": "v6.1.3"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:58.045260+00:00",
+      "pushed_at": "2026-10-02T00:23:19Z",
+      "release": {
+        "assets": 9,
+        "assets_with_digest": 9,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "podman-installer-macos-arm64.pkg"
+          },
+          {
+            "attestations": 0,
+            "name": "podman-installer-windows-amd64.msi"
+          },
+          {
+            "attestations": 0,
+            "name": "podman-installer-windows-arm64.msi"
+          },
+          {
+            "attestations": 0,
+            "name": "podman-remote-release-darwin_arm64.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "podman-remote-release-windows_amd64.zip"
+          }
+        ],
+        "published_at": "2026-09-29T15:34:46Z",
+        "tag": "v6.1.3"
+      },
+      "renamed_to": null,
+      "slug": "podman-container-tools/podman",
+      "updated_at": "2026-10-01T21:51:51Z"
+    },
+    "postgres/postgres": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 1,
+          "success": 10
+        },
+        "total": 11
+      },
+      "created_at": "2010-09-21T11:35:45Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 6.1
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "postgres/postgres",
+      "head": {
+        "date": "2026-10-01T22:29:22Z",
+        "sha": "1378aa13430e264a990a18597e9d8fdae740927e"
+      },
+      "html_url": "https://github.com/postgres/postgres",
+      "latest_tag": "release-6-3",
+      "license": "NOASSERTION",
+      "observed_at": "2026-10-02T01:18:58.263075+00:00",
+      "pushed_at": "2026-10-01T22:31:11Z",
+      "release": null,
+      "renamed_to": null,
+      "slug": "postgres/postgres",
+      "updated_at": "2026-10-01T22:31:16Z"
+    },
+    "prometheus/prometheus": {
+      "advisories": [
+        "high",
+        "high",
+        "high",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 7,
+          "success": 33
+        },
+        "total": 40
+      },
+      "created_at": "2012-11-24T11:14:12Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 8.5
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "prometheus/prometheus",
+      "head": {
+        "date": "2026-10-01T22:39:54Z",
+        "sha": "7c741e2879db6b58b8d152f566a8112f0d642bb1"
+      },
+      "html_url": "https://github.com/prometheus/prometheus",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-25T08:56:22Z",
+        "tag": "v3.15.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:58.975009+00:00",
+      "pushed_at": "2026-10-01T23:18:49Z",
+      "release": {
+        "assets": 37,
+        "assets_with_digest": 37,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "prometheus-3.15.0.aix-ppc64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "prometheus-3.15.0.darwin-amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "prometheus-3.15.0.darwin-arm64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "prometheus-3.15.0.dragonfly-amd64.tar.gz"
+          },
+          {
+            "attestations": 1,
+            "name": "prometheus-3.15.0.freebsd-386.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-25T08:56:22Z",
+        "tag": "v3.15.0"
+      },
+      "renamed_to": null,
+      "slug": "prometheus/prometheus",
+      "updated_at": "2026-10-02T01:01:46Z"
+    },
+    "promptfoo/promptfoo": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 8,
+          "success": 79
+        },
+        "total": 87
+      },
+      "created_at": "2023-04-28T15:48:49Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "promptfoo/promptfoo",
+      "head": {
+        "date": "2026-10-01T22:53:00Z",
+        "sha": "94119b67648756bf475a950885b2799c1694f1c2"
+      },
+      "html_url": "https://github.com/promptfoo/promptfoo",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-18T01:07:54Z",
+        "tag": "0.123.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:18:59.393942+00:00",
+      "pushed_at": "2026-10-01T22:53:03Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-18T01:07:54Z",
+        "tag": "0.123.1"
+      },
+      "renamed_to": null,
+      "slug": "promptfoo/promptfoo",
+      "updated_at": "2026-10-01T23:45:06Z"
+    },
+    "qdrant/qdrant": {
+      "advisories": [
+        "high"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 3,
+          "in_progress": 1,
+          "skipped": 1,
+          "success": 95
+        },
+        "total": 214
+      },
+      "created_at": "2020-05-30T21:37:01Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "qdrant/qdrant",
+      "head": {
+        "date": "2026-09-03T12:36:18Z",
+        "sha": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+      },
+      "html_url": "https://github.com/qdrant/qdrant",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-04T07:59:14Z",
+        "tag": "v1.19.1"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:59.666430+00:00",
+      "pushed_at": "2026-10-01T23:24:33Z",
+      "release": {
+        "assets": 8,
+        "assets_with_digest": 8,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "qdrant-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "qdrant-aarch64-unknown-linux-musl.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "qdrant-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "qdrant-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "qdrant-x86_64-unknown-linux-gnu.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-04T07:59:14Z",
+        "tag": "v1.19.1"
+      },
+      "renamed_to": null,
+      "slug": "qdrant/qdrant",
+      "updated_at": "2026-10-02T01:05:26Z"
+    },
+    "quantconnect/lean": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 3,
+          "success": 14
+        },
+        "total": 17
+      },
+      "created_at": "2014-11-28T04:20:19Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "QuantConnect/Lean",
+      "head": {
+        "date": "2026-10-01T14:23:47Z",
+        "sha": "33e3945f2faa95308d972dfd3d7b762f7743d1d5"
+      },
+      "html_url": "https://github.com/QuantConnect/Lean",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2017-08-08T20:57:57Z",
+        "tag": "v2.4.0.1"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:18:59.918290+00:00",
+      "pushed_at": "2026-10-01T16:43:56Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2017-08-08T20:57:57Z",
+        "tag": "v2.4.0.1"
+      },
+      "renamed_to": null,
+      "slug": "quantconnect/lean",
+      "updated_at": "2026-10-02T00:55:09Z"
+    },
+    "restic/restic": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 20
+        },
+        "total": 20
+      },
+      "created_at": "2014-04-27T14:07:58Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 7.3
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "restic/restic",
+      "head": {
+        "date": "2026-09-25T20:08:18Z",
+        "sha": "5127c4abf921857fde4ae51f566c86028c8c2911"
+      },
+      "html_url": "https://github.com/restic/restic",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-07-05T08:13:33Z",
+        "tag": "v0.19.1"
+      },
+      "license": "BSD-2-Clause",
+      "observed_at": "2026-10-02T01:19:00.495927+00:00",
+      "pushed_at": "2026-10-01T01:44:09Z",
+      "release": {
+        "assets": 29,
+        "assets_with_digest": 29,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "restic-0.19.1.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "restic-0.19.1.tar.gz.asc"
+          },
+          {
+            "attestations": 0,
+            "name": "restic_0.19.1_aix_ppc64.bz2"
+          },
+          {
+            "attestations": 0,
+            "name": "restic_0.19.1_darwin_amd64.bz2"
+          },
+          {
+            "attestations": 0,
+            "name": "restic_0.19.1_darwin_arm64.bz2"
+          }
+        ],
+        "published_at": "2026-07-05T08:13:33Z",
+        "tag": "v0.19.1"
+      },
+      "renamed_to": null,
+      "slug": "restic/restic",
+      "updated_at": "2026-10-01T21:33:35Z"
+    },
+    "rohitg00/agentmemory": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 8
+        },
+        "total": 8
+      },
+      "created_at": "2026-02-25T07:32:52Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "http_status": 404,
+        "status": "not_covered"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "rohitg00/agentmemory",
+      "head": {
+        "date": "2026-10-01T11:28:24Z",
+        "sha": "b3d6cf50026655233f11c2273b898af0ca82cf03"
+      },
+      "html_url": "https://github.com/rohitg00/agentmemory",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-16T13:56:45Z",
+        "tag": "v0.9.29"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:19:01.825603+00:00",
+      "pushed_at": "2026-10-01T18:53:49Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-16T13:56:45Z",
+        "tag": "v0.9.29"
+      },
+      "renamed_to": null,
+      "slug": "rohitg00/agentmemory",
+      "updated_at": "2026-10-02T00:23:21Z"
+    },
+    "rtk-ai/rtk": {
+      "advisories": [
+        "high",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 8,
+          "success": 30
+        },
+        "total": 38
+      },
+      "created_at": "2026-01-22T16:54:16Z",
+      "default_branch": "develop",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "rtk-ai/rtk",
+      "head": {
+        "date": "2026-10-01T14:34:47Z",
+        "sha": "3a12dfe3773603e55099e2a8bb0c58d9a92c2822"
+      },
+      "html_url": "https://github.com/rtk-ai/rtk",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-24T10:02:31Z",
+        "tag": "v0.50.0"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:19:02.183232+00:00",
+      "pushed_at": "2026-10-01T18:32:57Z",
+      "release": {
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "rtk-0.50.0-1.x86_64.rpm"
+          },
+          {
+            "attestations": 0,
+            "name": "rtk-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "rtk-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "rtk-x86_64-apple-darwin.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-24T10:02:31Z",
+        "tag": "v0.50.0"
+      },
+      "renamed_to": null,
+      "slug": "rtk-ai/rtk",
+      "updated_at": "2026-10-02T01:11:15Z"
+    },
+    "seathatflowsinourveins/native-agent-stack": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 2,
+          "success": 21
+        },
+        "total": 23
+      },
+      "created_at": "2026-09-19T05:26:55Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "http_status": 404,
+        "status": "not_covered"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "seathatflowsinourveins/native-agent-stack",
+      "head": {
+        "date": "2026-10-02T00:03:12Z",
+        "sha": "8b51946ee16e542e544936e19bb793114fea948e"
+      },
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-26T16:04:55Z",
+        "tag": "v2026.09.26.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:02.601296+00:00",
+      "pushed_at": "2026-10-02T00:34:31Z",
+      "release": {
+        "assets": 2,
+        "assets_with_digest": 2,
+        "attested_assets": [
+          {
+            "attestations": 2,
+            "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.spdx.json"
+          },
+          {
+            "attestations": 2,
+            "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-26T16:04:55Z",
+        "tag": "v2026.09.26.2"
+      },
+      "renamed_to": null,
+      "slug": "seathatflowsinourveins/native-agent-stack",
+      "updated_at": "2026-10-02T00:03:18Z"
+    },
+    "skfolio/skfolio": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 19
+        },
+        "total": 19
+      },
+      "created_at": "2023-12-14T22:24:42Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "BSD-3-Clause",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "skfolio/skfolio",
+      "head": {
+        "date": "2026-10-01T11:47:39Z",
+        "sha": "5b657bda012deb44dedaaf1880fa2e69eb7cba1d"
+      },
+      "html_url": "https://github.com/skfolio/skfolio",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-30T22:15:00Z",
+        "tag": "v1.4.10"
+      },
+      "license": "BSD-3-Clause",
+      "observed_at": "2026-10-02T01:19:03.206253+00:00",
+      "pushed_at": "2026-10-01T11:47:39Z",
+      "release": {
+        "assets": 4,
+        "assets_with_digest": 4,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "skfolio-1.4.10-py3-none-any.whl"
+          },
+          {
+            "attestations": 0,
+            "name": "skfolio-1.4.10-py3-none-any.whl.publish.attestation"
+          },
+          {
+            "attestations": 0,
+            "name": "skfolio-1.4.10.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "skfolio-1.4.10.tar.gz.publish.attestation"
+          }
+        ],
+        "published_at": "2026-09-30T22:15:00Z",
+        "tag": "v1.4.10"
+      },
+      "renamed_to": null,
+      "slug": "skfolio/skfolio",
+      "updated_at": "2026-10-01T16:00:38Z"
+    },
+    "systemd/systemd": {
+      "advisories": [
+        "low",
+        "low",
+        "low",
+        "low",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium",
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "in_progress": 1,
+          "skipped": 24,
+          "success": 28
+        },
+        "total": 54
+      },
+      "created_at": "2015-03-25T15:27:27Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "GPL-2.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 7.8
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "systemd/systemd",
+      "head": {
+        "date": "2026-10-01T14:03:46Z",
+        "sha": "b43fed88efe34889a49a7710a92141849dc4906d"
+      },
+      "html_url": "https://github.com/systemd/systemd",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-22T13:19:16Z",
+        "tag": "v262"
+      },
+      "license": "GPL-2.0",
+      "observed_at": "2026-10-02T01:19:03.452162+00:00",
+      "pushed_at": "2026-10-01T22:08:53Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-22T13:19:16Z",
+        "tag": "v262"
+      },
+      "renamed_to": null,
+      "slug": "systemd/systemd",
+      "updated_at": "2026-10-02T00:25:35Z"
+    },
+    "tobi/qmd": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 12
+        },
+        "total": 12
+      },
+      "created_at": "2025-12-08T14:22:57Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "tobi/qmd",
+      "head": {
+        "date": "2026-10-02T00:41:53Z",
+        "sha": "26b703c5daa8037df089a8104cbf7eeab4e51874"
+      },
+      "html_url": "https://github.com/tobi/qmd",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-08-16T22:30:34Z",
+        "tag": "v2.8.3"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:04.193602+00:00",
+      "pushed_at": "2026-10-02T00:41:53Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-08-16T22:30:34Z",
+        "tag": "v2.8.3"
+      },
+      "renamed_to": null,
+      "slug": "tobi/qmd",
+      "updated_at": "2026-10-02T00:42:00Z"
+    },
+    "trailofbits/skills": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 11
+        },
+        "total": 11
+      },
+      "created_at": "2026-01-14T18:23:21Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "non-standard",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "trailofbits/skills",
+      "head": {
+        "date": "2026-09-28T18:06:37Z",
+        "sha": "82fe8226252622fa807643bdca1710901198553a"
+      },
+      "html_url": "https://github.com/trailofbits/skills",
+      "latest_tag": null,
+      "license": "CC-BY-SA-4.0",
+      "observed_at": "2026-10-02T01:19:04.645726+00:00",
+      "pushed_at": "2026-09-28T18:06:38Z",
+      "release": null,
+      "renamed_to": null,
+      "slug": "trailofbits/skills",
+      "updated_at": "2026-10-01T19:46:19Z"
+    },
+    "treeverse/dvc": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 6,
+          "skipped": 3,
+          "success": 91
+        },
+        "total": 2429
+      },
+      "created_at": "2017-03-04T08:16:33Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "Apache-2.0",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "treeverse/dvc",
+      "head": {
+        "date": "2026-08-06T04:17:40Z",
+        "sha": "56e59829512ff134aa269099a2099587b810b4dd"
+      },
+      "html_url": "https://github.com/treeverse/dvc",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-03-31T05:06:44Z",
+        "tag": "3.67.1"
+      },
+      "license": "Apache-2.0",
+      "observed_at": "2026-10-02T01:19:05.592263+00:00",
+      "pushed_at": "2026-09-28T19:13:12Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-03-31T05:06:44Z",
+        "tag": "3.67.1"
+      },
+      "renamed_to": null,
+      "slug": "treeverse/dvc",
+      "updated_at": "2026-10-01T20:28:21Z"
+    },
+    "trufflesecurity/trufflehog": {
+      "advisories": [
+        "low"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 1,
+          "success": 4
+        },
+        "total": 5
+      },
+      "created_at": "2016-12-31T05:08:12Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "AGPL-3.0",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 7.4
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "trufflesecurity/trufflehog",
+      "head": {
+        "date": "2026-10-01T20:44:10Z",
+        "sha": "e28360875917c9c730f9c64aae29fb93aa6c359e"
+      },
+      "html_url": "https://github.com/trufflesecurity/trufflehog",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-24T09:11:59Z",
+        "tag": "v3.97.9"
+      },
+      "license": "AGPL-3.0",
+      "observed_at": "2026-10-02T01:19:05.850112+00:00",
+      "pushed_at": "2026-10-01T20:50:26Z",
+      "release": {
+        "assets": 9,
+        "assets_with_digest": 9,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "trufflehog_3.97.9_checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "trufflehog_3.97.9_checksums.txt.pem"
+          },
+          {
+            "attestations": 0,
+            "name": "trufflehog_3.97.9_checksums.txt.sig"
+          },
+          {
+            "attestations": 0,
+            "name": "trufflehog_3.97.9_darwin_amd64.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "trufflehog_3.97.9_darwin_arm64.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-24T09:11:59Z",
+        "tag": "v3.97.9"
+      },
+      "renamed_to": null,
+      "slug": "trufflesecurity/trufflehog",
+      "updated_at": "2026-10-01T21:02:19Z"
+    },
+    "twpayne/chezmoi": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 10,
+          "success": 90
+        },
+        "total": 103
+      },
+      "created_at": "2018-11-12T16:45:43Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 6.6
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "twpayne/chezmoi",
+      "head": {
+        "date": "2026-09-28T18:53:18Z",
+        "sha": "24b71e4cf9d98cce0801cfc68e7553355efeaff7"
+      },
+      "html_url": "https://github.com/twpayne/chezmoi",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-28T19:52:37Z",
+        "tag": "v2.73.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:05.950895+00:00",
+      "pushed_at": "2026-09-28T19:54:07Z",
+      "release": {
+        "assets": 111,
+        "assets_with_digest": 111,
+        "attested_assets": [
+          {
+            "attestations": 1,
+            "name": "chezmoi-2.73.0-aarch64.rpm"
+          },
+          {
+            "attestations": 1,
+            "name": "chezmoi-2.73.0-armhfp.rpm"
+          },
+          {
+            "attestations": 1,
+            "name": "chezmoi-2.73.0-armv5l.rpm"
+          },
+          {
+            "attestations": 1,
+            "name": "chezmoi-2.73.0-i686.rpm"
+          },
+          {
+            "attestations": 1,
+            "name": "chezmoi-2.73.0-loong64.rpm"
+          }
+        ],
+        "published_at": "2026-09-28T19:52:37Z",
+        "tag": "v2.73.0"
+      },
+      "renamed_to": null,
+      "slug": "twpayne/chezmoi",
+      "updated_at": "2026-10-02T01:10:42Z"
+    },
+    "ukgovernmentbeis/inspect_ai": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "skipped": 7,
+          "success": 13
+        },
+        "total": 20
+      },
+      "created_at": "2023-11-14T14:53:11Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "UKGovernmentBEIS/inspect_ai",
+      "head": {
+        "date": "2026-10-01T20:33:10Z",
+        "sha": "617d06c72bcde8d6988e200f98946797614e29c2"
+      },
+      "html_url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "latest_tag": "release/2025-11-28",
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:06.059999+00:00",
+      "pushed_at": "2026-10-01T23:41:46Z",
+      "release": null,
+      "renamed_to": null,
+      "slug": "ukgovernmentbeis/inspect_ai",
+      "updated_at": "2026-10-01T20:58:18Z"
+    },
+    "unionai-oss/pandera": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 100
+        },
+        "total": 339
+      },
+      "created_at": "2018-11-01T02:18:34Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 5.6
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "unionai-oss/pandera",
+      "head": {
+        "date": "2026-09-26T16:29:55Z",
+        "sha": "6e23433b4f010fdadc2e11b6229a43afd792abed"
+      },
+      "html_url": "https://github.com/unionai-oss/pandera",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-01T15:20:20Z",
+        "tag": "v0.33.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:06.486910+00:00",
+      "pushed_at": "2026-09-26T16:31:24Z",
+      "release": {
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": [],
+        "published_at": "2026-09-01T15:20:20Z",
+        "tag": "v0.33.1"
+      },
+      "renamed_to": null,
+      "slug": "unionai-oss/pandera",
+      "updated_at": "2026-09-30T18:07:20Z"
+    },
+    "vectorize-io/hindsight": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 3,
+          "success": 2
+        },
+        "total": 5
+      },
+      "created_at": "2025-10-30T11:49:48Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "vectorize-io/hindsight",
+      "head": {
+        "date": "2026-10-01T19:01:22Z",
+        "sha": "0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b"
+      },
+      "html_url": "https://github.com/vectorize-io/hindsight",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T10:06:40Z",
+        "tag": "v0.10.2"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:07.191269+00:00",
+      "pushed_at": "2026-10-01T21:37:15Z",
+      "release": {
+        "assets": 34,
+        "assets_with_digest": 34,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "hindsight-0.10.2.tgz"
+          },
+          {
+            "attestations": 0,
+            "name": "hindsight-darwin-amd64"
+          },
+          {
+            "attestations": 0,
+            "name": "hindsight-darwin-arm64"
+          },
+          {
+            "attestations": 0,
+            "name": "hindsight-linux-amd64"
+          },
+          {
+            "attestations": 0,
+            "name": "hindsight-linux-arm64"
+          }
+        ],
+        "published_at": "2026-09-29T10:06:40Z",
+        "tag": "v0.10.2"
+      },
+      "renamed_to": null,
+      "slug": "vectorize-io/hindsight",
+      "updated_at": "2026-10-02T01:14:13Z"
+    },
+    "vshulcz/deja-vu": {
+      "advisories": [
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "failure": 1,
+          "skipped": 1,
+          "success": 30
+        },
+        "total": 32
+      },
+      "created_at": "2026-07-14T07:45:44Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "vshulcz/deja-vu",
+      "head": {
+        "date": "2026-10-02T00:46:04Z",
+        "sha": "dd67a6200b67c840f7a090bfe50eff42851f7250"
+      },
+      "html_url": "https://github.com/vshulcz/deja-vu",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-29T10:12:08Z",
+        "tag": "v0.21.4"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:08.187507+00:00",
+      "pushed_at": "2026-10-02T01:15:08Z",
+      "release": {
+        "assets": 25,
+        "assets_with_digest": 25,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "checksums.txt"
+          },
+          {
+            "attestations": 0,
+            "name": "checksums.txt.pem"
+          },
+          {
+            "attestations": 0,
+            "name": "checksums.txt.sig"
+          },
+          {
+            "attestations": 0,
+            "name": "deja-vu.json"
+          },
+          {
+            "attestations": 0,
+            "name": "deja-vu_0.21.4_darwin.mcpb"
+          }
+        ],
+        "published_at": "2026-09-29T10:12:08Z",
+        "tag": "v0.21.4"
+      },
+      "renamed_to": null,
+      "slug": "vshulcz/deja-vu",
+      "updated_at": "2026-10-02T00:46:10Z"
+    },
+    "wilfred/difftastic": {
+      "advisories": [],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "success": 17
+        },
+        "total": 17
+      },
+      "created_at": "2018-12-18T11:19:45Z",
+      "default_branch": "master",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": {
+          "date": "2026-08-24T00:00:00Z",
+          "overall_score": 3.9
+        },
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "Wilfred/difftastic",
+      "head": {
+        "date": "2026-09-22T08:39:45Z",
+        "sha": "e2e1e3b7f5be18290135cc16ec521c16284eb21b"
+      },
+      "html_url": "https://github.com/Wilfred/difftastic",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-18T22:57:29Z",
+        "tag": "0.71.0"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:08.301024+00:00",
+      "pushed_at": "2026-09-22T08:42:53Z",
+      "release": {
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": [
+          {
+            "attestations": 0,
+            "name": "difft-0.71.0-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "difft-0.71.0-aarch64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 0,
+            "name": "difft-0.71.0-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "difft-0.71.0-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 0,
+            "name": "difft-0.71.0-x86_64-pc-windows-msvc.zip"
+          }
+        ],
+        "published_at": "2026-09-18T22:57:29Z",
+        "tag": "0.71.0"
+      },
+      "renamed_to": null,
+      "slug": "wilfred/difftastic",
+      "updated_at": "2026-10-01T12:53:54Z"
+    },
+    "zizmorcore/zizmor": {
+      "advisories": [
+        "medium"
+      ],
+      "archived": false,
+      "check_runs": {
+        "conclusions": {
+          "in_progress": 12,
+          "success": 9
+        },
+        "total": 21
+      },
+      "created_at": "2024-08-19T18:26:28Z",
+      "default_branch": "main",
+      "deps_dev": {
+        "license": "MIT",
+        "scorecard": null,
+        "status": "ok"
+      },
+      "disabled": false,
+      "fork": false,
+      "full_name": "zizmorcore/zizmor",
+      "head": {
+        "date": "2026-10-02T01:14:39Z",
+        "sha": "8478e51302f63dde6c405e1c552477bef8b30aba"
+      },
+      "html_url": "https://github.com/zizmorcore/zizmor",
+      "latest_release": {
+        "prerelease": false,
+        "published_at": "2026-09-09T05:34:10Z",
+        "tag": "v1.30.1"
+      },
+      "license": "MIT",
+      "observed_at": "2026-10-02T01:19:08.512304+00:00",
+      "pushed_at": "2026-10-02T01:14:43Z",
+      "release": {
+        "assets": 5,
+        "assets_with_digest": 5,
+        "attested_assets": [
+          {
+            "attestations": 2,
+            "name": "zizmor-aarch64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "name": "zizmor-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "name": "zizmor-x86_64-apple-darwin.tar.gz"
+          },
+          {
+            "attestations": 2,
+            "name": "zizmor-x86_64-pc-windows-msvc.zip"
+          },
+          {
+            "attestations": 2,
+            "name": "zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          }
+        ],
+        "published_at": "2026-09-09T05:34:10Z",
+        "tag": "v1.30.1"
+      },
+      "renamed_to": null,
+      "slug": "zizmorcore/zizmor",
+      "updated_at": "2026-10-02T01:14:45Z"
+    }
+  },
+  "schema_version": 1,
+  "sources": [
+    "gh api (GitHub REST)",
+    "https://api.deps.dev/v3/projects/"
+  ],
+  "targets": {
+    "actions/attest": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "standing_pick"
+      }
+    ],
+    "adbar/trafilatura": [
+      {
+        "layer_id": "web-research",
+        "role": "challenger"
+      }
+    ],
+    "akitaonrails/ai-memory": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "durable-memory",
+        "role": "standing_pick"
+      }
+    ],
+    "alpacahq/alpaca-py": [
+      {
+        "layer_id": "backtesting-engine",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "execution-broker",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "identity-provenance",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "market-data-reference",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "portfolio-risk",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "storage-compute",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "anchore/grype": [
+      {
+        "layer_id": "security-supply-chain",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "anchore/syft": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "security-supply-chain",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "anthropics/claude-agent-sdk-python": [
+      {
+        "layer_id": "agent-sdks",
+        "role": "standing_pick"
+      }
+    ],
+    "anthropics/claude-code": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "native-clients",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "workers",
+        "role": "challenger"
+      }
+    ],
+    "anthropics/claude-code-action": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "challenger"
+      }
+    ],
+    "anthropics/claude-plugins-official": [
+      {
+        "layer_id": "code-navigation",
+        "role": "challenger"
+      }
+    ],
+    "anthropics/sandbox-runtime": [
+      {
+        "layer_id": "isolation",
+        "role": "standing_pick"
+      }
+    ],
+    "arize-ai/phoenix": [
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "ast-grep/ast-grep": [
+      {
+        "layer_id": "code-navigation",
+        "role": "challenger"
+      }
+    ],
+    "ataraxy-labs/sem": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "standing_pick"
+      }
+    ],
+    "basicmachines-co/basic-memory": [
+      {
+        "layer_id": "durable-memory",
+        "role": "challenger"
+      }
+    ],
+    "betterleaks/betterleaks": [
+      {
+        "layer_id": "secrets-credentials",
+        "role": "standing_pick"
+      }
+    ],
+    "ccusage/ccusage": [
+      {
+        "layer_id": "token-efficiency",
+        "role": "standing_pick"
+      }
+    ],
+    "cli/cli": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "standing_pick"
+      }
+    ],
+    "dagucloud/dagu": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "scheduling-supervision",
+        "role": "standing_pick"
+      }
+    ],
+    "dependabot/dependabot-core": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "standing_pick"
+      }
+    ],
+    "dgunning/edgartools": [
+      {
+        "layer_id": "identity-provenance",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "market-data-reference",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "research-factors-ml",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "storage-compute",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "diegosouzapw/omniroute": [
+      {
+        "layer_id": "cross:gpt6-harnesses",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "docker/compose": [
+      {
+        "layer_id": "hosting-services",
+        "role": "standing_pick"
+      }
+    ],
+    "duckdb/duckdb": [
+      {
+        "layer_id": "identity-provenance",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "market-data-reference",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "storage-compute",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "eyuansu62/agent-retrieval-bench": [
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "fastapi/fastapi": [
+      {
+        "layer_id": "hosting-services",
+        "role": "challenger"
+      }
+    ],
+    "gerrymanoim/exchange_calendars": [
+      {
+        "layer_id": "identity-provenance",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "market-data-reference",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "storage-compute",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "ggml-org/llama.cpp": [
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "giancarloerra/socraticode": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "semantic-rag",
+        "role": "standing_pick"
+      }
+    ],
+    "git/git": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "standing_pick"
+      }
+    ],
+    "github/codeql-action": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "challenger"
+      }
+    ],
+    "gitleaks/gitleaks": [
+      {
+        "layer_id": "security-supply-chain",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "grafana/grafana": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "grafana/loki": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "harbor-framework/harbor": [
+      {
+        "layer_id": "quality-evaluation",
+        "role": "standing_pick"
+      }
+    ],
+    "jdx/mise": [
+      {
+        "layer_id": "recovery-portability",
+        "role": "standing_pick"
+      }
+    ],
+    "kjanat/actionlint": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "standing_pick"
+      }
+    ],
+    "mattpocock/skills": [
+      {
+        "layer_id": "instructions-skills",
+        "role": "challenger"
+      }
+    ],
+    "max-sixty/worktrunk": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "isolation",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "workers",
+        "role": "standing_pick"
+      }
+    ],
+    "mcpjam/inspector": [
+      {
+        "layer_id": "mcp-surfaces",
+        "role": "challenger"
+      }
+    ],
+    "microsoft/playwright": [
+      {
+        "layer_id": "quality-evaluation",
+        "role": "challenger"
+      }
+    ],
+    "microsoft/playwright-cli": [
+      {
+        "layer_id": "web-research",
+        "role": "standing_pick"
+      }
+    ],
+    "minishlab/semble": [
+      {
+        "layer_id": "semantic-rag",
+        "role": "challenger"
+      }
+    ],
+    "mksglu/context-mode": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "token-efficiency",
+        "role": "challenger"
+      }
+    ],
+    "mlflow/mlflow": [
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "moby/moby": [
+      {
+        "layer_id": "hosting-services",
+        "role": "standing_pick"
+      }
+    ],
+    "modelcontextprotocol/inspector": [
+      {
+        "layer_id": "mcp-surfaces",
+        "role": "standing_pick"
+      }
+    ],
+    "nautechsystems/nautilus_trader": [
+      {
+        "layer_id": "backtesting-engine",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "execution-broker",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "portfolio-risk",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "ojuschugh1/sqz": [
+      {
+        "layer_id": "token-efficiency",
+        "role": "challenger"
+      }
+    ],
+    "ollama/ollama": [
+      {
+        "layer_id": "semantic-rag",
+        "role": "standing_pick"
+      }
+    ],
+    "open-telemetry/opentelemetry-collector-contrib": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observation-inference",
+        "role": "standing_pick"
+      }
+    ],
+    "openai/codex": [
+      {
+        "layer_id": "agent-sdks",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "cross:gpt6-harnesses",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "native-clients",
+        "role": "standing_pick"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "workers",
+        "role": "standing_pick"
+      }
+    ],
+    "openclaw/mcporter": [
+      {
+        "layer_id": "mcp-surfaces",
+        "role": "standing_pick"
+      }
+    ],
+    "opendatalab/mineru": [
+      {
+        "layer_id": "document-retrieval",
+        "role": "standing_pick"
+      }
+    ],
+    "openhands/software-agent-sdk": [
+      {
+        "layer_id": "cross:runtime-workers",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "openlit/openlit": [
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "oraios/serena": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "code-navigation",
+        "role": "standing_pick"
+      }
+    ],
+    "podman-container-tools/podman": [
+      {
+        "layer_id": "hosting-services",
+        "role": "challenger"
+      },
+      {
+        "layer_id": "isolation",
+        "role": "challenger"
+      }
+    ],
+    "postgres/postgres": [
+      {
+        "layer_id": "hosting-services",
+        "role": "challenger"
+      }
+    ],
+    "prometheus/prometheus": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observation-inference",
+        "role": "challenger"
+      }
+    ],
+    "promptfoo/promptfoo": [
+      {
+        "layer_id": "quality-evaluation",
+        "role": "challenger"
+      }
+    ],
+    "qdrant/qdrant": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "semantic-rag",
+        "role": "challenger"
+      }
+    ],
+    "quantconnect/lean": [
+      {
+        "layer_id": "backtesting-engine",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "execution-broker",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "portfolio-risk",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "restic/restic": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "observability-hosting",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "recovery-portability",
+        "role": "standing_pick"
+      }
+    ],
+    "rohitg00/agentmemory": [
+      {
+        "layer_id": "durable-memory",
+        "role": "challenger"
+      }
+    ],
+    "rtk-ai/rtk": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "token-efficiency",
+        "role": "challenger"
+      }
+    ],
+    "seathatflowsinourveins/native-agent-stack": [
+      {
+        "layer_id": "cross:convergence-practice",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "cross:credential-practice",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "execution-broker",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "skfolio/skfolio": [
+      {
+        "layer_id": "portfolio-risk",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "research-factors-ml",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "systemd/systemd": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "scheduling-supervision",
+        "role": "standing_pick"
+      }
+    ],
+    "tobi/qmd": [
+      {
+        "layer_id": "agents-models-workers",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "document-retrieval",
+        "role": "standing_pick"
+      }
+    ],
+    "trailofbits/skills": [
+      {
+        "layer_id": "instructions-skills",
+        "role": "standing_pick"
+      }
+    ],
+    "treeverse/dvc": [
+      {
+        "layer_id": "identity-provenance",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "trufflesecurity/trufflehog": [
+      {
+        "layer_id": "secrets-credentials",
+        "role": "challenger"
+      }
+    ],
+    "twpayne/chezmoi": [
+      {
+        "layer_id": "recovery-portability",
+        "role": "challenger"
+      }
+    ],
+    "ukgovernmentbeis/inspect_ai": [
+      {
+        "layer_id": "evaluation-experiments",
+        "role": "unjudged_incumbent"
+      },
+      {
+        "layer_id": "quality-evaluation",
+        "role": "standing_pick"
+      }
+    ],
+    "unionai-oss/pandera": [
+      {
+        "layer_id": "data-quality-orchestration",
+        "role": "unjudged_incumbent"
+      }
+    ],
+    "vectorize-io/hindsight": [
+      {
+        "layer_id": "durable-memory",
+        "role": "challenger"
+      }
+    ],
+    "vshulcz/deja-vu": [
+      {
+        "layer_id": "durable-memory",
+        "role": "challenger"
+      }
+    ],
+    "wilfred/difftastic": [
+      {
+        "layer_id": "git-github-automation",
+        "role": "challenger"
+      }
+    ],
+    "zizmorcore/zizmor": [
+      {
+        "layer_id": "ci-supply-chain",
+        "role": "standing_pick"
+      }
+    ]
+  }
+}

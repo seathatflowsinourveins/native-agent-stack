@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_preregistration_amendment",
+  "amendment": 2,
+  "recorded_at_utc": "2026-10-02T19:25:27+00:00",
+  "before_any": "packet, decision, critic or adjudication of the round. The dossier stage is running; it reads none of the changed code paths (AUDIT and audit_block are read only by the packets stage).",
+  "why": "The definitive manifest's next version merged (#602, merge commit 675bdd51c96af28aa98012d9e4ff772a77a38f3d) after this round was preregistered against #591. It is the install record on main and has one owner. This round therefore stops being a selection of its own: it becomes a clean-room audit of that manifest on the 43 slots plus the verified dossiers, and publishes no architecture document (scripts/definitive_architecture.py, never committed, is withdrawn).",
+  "comparison": {
+    "script": "compare.py",
+    "manifest": {
+      "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+      "ref": "675bdd51c96af28aa98012d9e4ff772a77a38f3d",
+      "sha256": "894dff866e2e6f332d6927879ca89b81a7da67d066664122f163e23707c4205b"
+    },
+    "rule": "Per round slot, the manifest row named by the slot's source_slot. agree/contest: the row is resolved for the install (state definitive or resolved) and the round reached a definitive pick; agree when the pick is the row's repository, or NONE on a row that installs nothing. nominates: the row waits for its named measurement (state split). cross_check: a measurement row; the measurement stands. pin_agree / pin_conflict: a row the owner pinned; a conflict goes to the user and the pin stays. not_settled: the round left the slot unsettled after adjudication. The decision rule (decision-rule.txt) is unchanged; selection.json from assemble.py is compare.py's input.",
+    "consequences": "A contest is a hand-off to the manifest's owner and changes no row by itself. Memory: a convergence nominates a candidate for the head-to-head (#526) and replaces nothing. Local model server: the gate of #598 stands; the round's pick is a cross-check.",
+    "alias": {
+      "releases.ubuntu.com/26.04.1": "page:ubuntu-26-04-1-lts-canonical-wsl-image"
+    }
+  },
+  "mapping": {
+    "rule": "each unit slot's source_slot is a row of the pinned manifest",
+    "matched": 43,
+    "of": 43,
+    "slots": [
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "workflow-policy-audit",
+        "manifest_row": "zizmor",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "build-provenance",
+        "manifest_row": "attest",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "sbom-generation",
+        "manifest_row": "syft",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "dependency-updates",
+        "manifest_row": "dependabot",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "findings-publication",
+        "manifest_row": "codeql-sarif",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "ci-supply-chain",
+        "slot_id": "workflow-correctness-lint",
+        "manifest_row": "actionlint-kjanat",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "code-navigation",
+        "slot_id": "language-server-navigation",
+        "manifest_row": "serena",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "code-navigation",
+        "slot_id": "client-native-lsp",
+        "manifest_row": "claude-plugins-official-code-intelligence-lsp-pl",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "cross:gpt6-harnesses",
+        "slot_id": "gpt-gateway",
+        "manifest_row": "gpt-gateway",
+        "manifest_state": "pinned"
+      },
+      {
+        "unit_id": "cross:runtime-workers",
+        "slot_id": "agent-runtime-worker",
+        "manifest_row": "agent-runtime-worker",
+        "manifest_state": "pinned"
+      },
+      {
+        "unit_id": "cross:runtime-workers",
+        "slot_id": "deep-research-harness",
+        "manifest_row": "research-harnesses",
+        "manifest_state": "pinned"
+      },
+      {
+        "unit_id": "cross:wsl-distro",
+        "slot_id": "base-distribution",
+        "manifest_row": "base-distribution",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "document-retrieval",
+        "slot_id": "markdown-collection-retrieval",
+        "manifest_row": "tobi-qmd",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "document-retrieval",
+        "slot_id": "document-ingestion",
+        "manifest_row": "mineru",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "durable-memory",
+        "slot_id": "memory-owner",
+        "manifest_row": "memory-owner",
+        "manifest_state": "measurement"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "version-control",
+        "manifest_row": "git",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "github-cli",
+        "manifest_row": "gh-github-cli",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "worktree-manager",
+        "manifest_row": "worktrunk",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "review-structural-diff",
+        "manifest_row": "difftastic",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "github-side-agent-review",
+        "manifest_row": "claude-code-action",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "git-github-automation",
+        "slot_id": "agent-structural-diff",
+        "manifest_row": "agent-structural-diff",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "hosting-services",
+        "slot_id": "multi-service-definition",
+        "manifest_row": "docker-compose",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "instructions-skills",
+        "slot_id": "task-scoped-skill-pack",
+        "manifest_row": "trail-of-bits-security-skills-trailofbits-skills",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "isolation",
+        "slot_id": "enforced-command-boundary",
+        "manifest_row": "sandbox-runtime-srt",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "telemetry-ingest",
+        "manifest_row": "otel-collector-contrib",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "metrics-store",
+        "manifest_row": "prometheus",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "events-store",
+        "manifest_row": "loki",
+        "manifest_state": "split"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "dashboards",
+        "manifest_row": "grafana",
+        "manifest_state": "split"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "route-qualification",
+        "manifest_row": "phoenix",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "observation-inference",
+        "slot_id": "local-model-server",
+        "manifest_row": "local-model-server",
+        "manifest_state": "measurement"
+      },
+      {
+        "unit_id": "quality-evaluation",
+        "slot_id": "labeled-evaluation",
+        "manifest_row": "inspect-ai",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "quality-evaluation",
+        "slot_id": "containerized-agent-e2e",
+        "manifest_row": "harbor-containerized-agent-e2e-runner",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "quality-evaluation",
+        "slot_id": "ci-regression-gate",
+        "manifest_row": "promptfoo",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "recovery-portability",
+        "slot_id": "toolchain-reproduction",
+        "manifest_row": "mise",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "recovery-portability",
+        "slot_id": "state-backup",
+        "manifest_row": "restic",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "recovery-portability",
+        "slot_id": "dotfiles-reproduction",
+        "manifest_row": "chezmoi",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "scheduling-supervision",
+        "slot_id": "workflow-engine",
+        "manifest_row": "dagu",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "secrets-credentials",
+        "slot_id": "secret-scanner",
+        "manifest_row": "betterleaks",
+        "manifest_state": "definitive"
+      },
+      {
+        "unit_id": "secrets-credentials",
+        "slot_id": "credential-verification",
+        "manifest_row": "trufflehog",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "semantic-rag",
+        "slot_id": "semantic-code-search",
+        "manifest_row": "code-search",
+        "manifest_state": "split"
+      },
+      {
+        "unit_id": "token-efficiency",
+        "slot_id": "usage-meter",
+        "manifest_row": "ccusage",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "web-research",
+        "slot_id": "page-text-extraction",
+        "manifest_row": "trafilatura",
+        "manifest_state": "resolved"
+      },
+      {
+        "unit_id": "web-research",
+        "slot_id": "browser-interaction",
+        "manifest_row": "playwright-cli",
+        "manifest_state": "split"
+      }
+    ]
+  },
+  "not_covered": {
+    "rows": [
+      "agent-messaging",
+      "alerting",
+      "claude-agent-sdk",
+      "claude-code",
+      "codex",
+      "codex-sdk-and-codex-exec-app-server",
+      "container-engine",
+      "context-supply",
+      "convergence-validators",
+      "credential-guard",
+      "embedding-model",
+      "engineering-process-skills",
+      "gpu-container-runtime",
+      "isolation-container-boundary",
+      "local-generation-model",
+      "mcp-inspector",
+      "mcporter",
+      "reranker-model",
+      "session-analytics",
+      "structural-search",
+      "web-search-provider"
+    ],
+    "why": "rows with no slot in this round: the slots #602 added (no field, no dossiers), the rows already definitive before this round, the project-practice rows and the trading rows (not in the foundation set)"
+  },
+  "gpt_model": "cx/gpt-6-astra at effort max stays for every GPT role, as frozen. GPT-6.1 Sol has been in the gateway's catalog since #599, but #602's GPT samples are GPT-6.1 Sol; keeping Astra keeps this round's GPT half a different model from the samples it is compared with.",
+  "audit_labels": {
+    "change": "audit_block states the audit's sampling limits: attestations as assets queried and attested (the first five digest-carrying assets only), and check runs with the observed count and coverage (one page of 100).",
+    "check_runs_first_page_only": [
+      "actions/attest",
+      "anthropics/claude-code",
+      "cli/cli",
+      "github/codeql-action",
+      "grafana/grafana",
+      "moby/moby",
+      "open-telemetry/opentelemetry-collector-contrib",
+      "openai/codex",
+      "podman-container-tools/podman",
+      "qdrant/qdrant",
+      "treeverse/dvc",
+      "twpayne/chezmoi",
+      "unionai-oss/pandera"
+    ],
+    "partial_errors_in_frozen_observations": [],
+    "observations_copy": {
+      "file": "audit-observations.json",
+      "sha256": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b",
+      "identical_to": "evidence/artifacts/upstream-audit-20261002/observations.json as frozen"
+    }
+  },
+  "changes": [
+    {
+      "file": "run_round.py",
+      "sha256_before": "411c7f0e3bc5fc3391b783f83f150929aa8800e6a9a53d131bb748d151ab614f",
+      "sha256_after": "733112de3f739dfb2c9a17258a3b1835c40a17ae80a589f69996599e4ecc5d00",
+      "what": "AUDIT reads audit-observations.json; audit_block states the sampling limits"
+    }
+  ],
+  "added": [
+    {
+      "file": "compare.py",
+      "sha256": "4f6d4513362d4d40d33c04c3b24d74d6d8b2ce30067a8c8cb88e1e750fc6e32b"
+    },
+    {
+      "file": "audit-observations.json",
+      "sha256": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b"
+    }
+  ],
+  "relocated_upstream": [
+    {
+      "file": "evidence/artifacts/upstream-audit-20261002/observations.json",
+      "copy": "audit-observations.json"
+    }
+  ],
+  "tooling": [
+    {
+      "file": "freeze.py",
+      "sha256_before": "f7f1e60011559e8e01cd74f7f3e8e28b39cb7d35d237962c0942a032b0d23e97",
+      "sha256_after": "856057bcff046a83edf947d303858e09fdad5ed830e093ebf67b735f7f0d94ab",
+      "what": "--check applies the amendment chain"
+    },
+    {
+      "file": "README.md",
+      "what": "describes the retargeted round"
+    },
+    {
+      "file": "tests/test_definitive_round_compare.py",
+      "sha256": "a02358040c0b533a9f4b83b89b9a15a9673acf34d32aa0514af20284da6d157f"
+    }
+  ],
+  "run_notes": [
+    "41 dossiers were complete when the dossier stage stopped at a usage limit on 2026-10-02 at about 04:40Z. The stop left 135 records with no dossier; they were deleted so the stage would redo those contenders, and their attempt history is not kept.",
+    "The stage restarted at 19:14:29Z after a re-login, with the same models, flags and prompts and 16 parallel writers. An earlier second runner (04:13Z) had started no work: the shell passed its contender list as one argument."
+  ]
+}

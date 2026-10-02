@@ -38,7 +38,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
-AUDIT = ROOT / "evidence/artifacts/upstream-audit-20261002/observations.json"
+# Amendment 2: a byte-identical copy of the audit observations frozen in preregistration.json, so the round no longer
+# reads the upstream audit's folder (that pull request is repaired separately).
+AUDIT = HERE / "audit-observations.json"
 WRITER_MODEL, JUDGE_MODEL = "claude-sonnet-5-5", "claude-opus-5-5"
 GPT_MODEL, GPT_EFFORT = "cx/gpt-6-astra", "max"
 GATEWAY = "http://127.0.0.1:20128/v1"
@@ -314,9 +316,19 @@ def audit_block(cid: str, audit: dict) -> dict | None:
     if not obs:
         return None
     rel = obs.get("release") or {}
+    queried = rel.get("attested_assets") or []
+    runs = obs.get("check_runs") or {}
+    observed, total = sum((runs.get("conclusions") or {}).values()), runs.get("total")
+    # Amendment 2: the audit queried attestations for at most the first five digest-carrying assets and read one page
+    # (100) of the head commit's check runs; both limits are stated so that a sample is not read as the whole.
     return {"latest_release": rel.get("tag"), "released": rel.get("published_at"),
-            "attested_assets": len([a for a in rel.get("attested_assets") or [] if a.get("attestations")]),
-            "assets": rel.get("assets"), "advisories": obs.get("advisories"), "check_runs": obs.get("check_runs"),
+            "attestations": {"assets_queried": len(queried),
+                             "assets_attested": len([a for a in queried if a.get("attestations")]),
+                             "query_cap": "the first five digest-carrying assets"},
+            "assets": rel.get("assets"), "advisories": obs.get("advisories"),
+            "check_runs": dict(runs, observed=observed, coverage=(
+                "all" if total is None or observed >= total else
+                f"first page only: conclusions of {observed} of {total} check runs; the rest were not read")),
             "archived": obs.get("archived"), "last_commit": (obs.get("head") or {}).get("date"),
             "scorecard": ((obs.get("deps_dev") or {}).get("scorecard")), "observed_at": obs.get("observed_at")}
 
