@@ -67,6 +67,6 @@ readlink /proc/self/ns/cgroup
 - [ ] **F6** `~/.bash_profile` is exactly the hand-off line.
 - [ ] **F7** The clone's `HEAD` equals `origin` `main`; the commit is recorded.
 - [ ] **F8** `ss` shows no listener on the four ports; the host file parses with the nine keys and is git-ignored.
-- [ ] **F9** Stage 2 runs from this clone with `--profile <id>`; its own receipts cover it.
+- [ ] **F9** Stage 2 runs from this clone, before either sign-in: the install plan's `install.sh` and `accept.sh` exit 0, the client-configuration tool's `--check` ends with `check passed`, and its `--apply` ends with a `summary:` line in which no step is `failed` (a step that says `merged with conflicts kept` lists the values it left as the file has them). Then `codex login` and `claude` by hand, then `accept.sh --only <slot> --stage after_sign_in` for each owner whose plan row has that stage.
 - [ ] **F10** The fragment profiles carry `<Name>` in their names; `type -P claude codex` prints two absolute paths, and the per-path `[[ -f ... && -x ... ]]` line prints `executable:` for both (no double quote inside a command that PowerShell hands to `wsl.exe`).
 - [ ] **F11** In a login shell, after F9 and F10: when `test -x` finds `jcodemunch-mcp`, `claude mcp add` run from the clone's root prints `Added ...` and `claude mcp get jcodemunch` names the local scope and the command; when it does not, `not installed` is recorded, and a step not run is recorded as `skipped` with the reason. `jcodemunch_registration` holds the outcome.

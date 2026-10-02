@@ -1283,7 +1283,7 @@
     },
     {
       "step": "F8",
-      "cmd": "ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'",
+      "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
@@ -1313,13 +1313,25 @@
     },
     {
       "step": "F9",
-      "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
     {
       "step": "F9",
-      "cmd": "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },

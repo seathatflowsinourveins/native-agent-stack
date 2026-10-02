@@ -1,0 +1,707 @@
+# Decision: the new distribution's Claude Code and Codex configuration comes from the definitive manifest (2026-10-02)
+
+**Decided by:** the isolated builder of the client-configuration contract of 2026-10-02, on branch
+`foundation/new-wsl-client-config-20261002`, for the coordinator, who integrates it. The coordinator's second-round
+instruction of the same day changed the order of F9, the host template's ports, the two instruction blocks and the two
+Codex role carriers, and let the builder edit the files that carried F9's old text; the third round replaced the refusal
+of an existing Codex `config.toml` by a merge, kept a person's theme, declared one dependent sentence and asked where the
+guard runs for Codex. This record states the result of the three rounds. Every web page named below was read on
+2026-10-02.
+
+**Scope:** `tools/adoption/new_wsl_client_config.py`, `adoption/new-wsl/client-config-map.json`, the two generated blocks
+`adoption/new-wsl/claude-user-instructions.md` and `adoption/new-wsl/codex-user-instructions.md`, and
+`tests/test_new_wsl_client_config.py` (all new); this record; F7 to F9 and F11 of
+[`adoption/platforms/linux-wsl2-new-distro.md`](../../adoption/platforms/linux-wsl2-new-distro.md) and its placeholder
+table; the ports of `adoption/templates/wsl/host.new-distro.json.template`; the command table and a dated section of
+[`2026-10-01-new-wsl-distro-recipe.md`](2026-10-01-new-wsl-distro-recipe.md); the F8 and F9 rows of
+`adoption/templates/wsl/stage1-receipt.example.json`; the F9 line of `adoption/templates/wsl/first-boot-checklist.md`;
+`tests/test_wsl_new_distro_recipe.py`; and options added to two existing tools, each with its default unchanged:
+`--hook`, `--agent` and `--mcp-template` in `tools/adoption/install_claude_profile.py`, and `profile-path --extra-dir`
+and `codex-md --template` in `tools/adoption/managed_block.py`. Not touched: `manifests/evidence.json`, the generated
+handbook, any convergence record, and every step of the recipe except F7 to F9 and F11.
+
+## Decision
+
+1. **The rule.** A client is wired to a tool only if the
+   [definitive manifest](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) installs
+   that tool, or if the piece is repository practice that needs no tool outside the repository. A manifest row installs
+   by the install plan's own rule (`check_plan.py` L149-160 in
+   [`evidence/artifacts/new-wsl-install-plan-20261002/`](../../evidence/artifacts/new-wsl-install-plan-20261002/README.md)):
+   it names a default, installs something extra, is not split and is not resolved as not installed. A slot that is split,
+   waits for a measurement or is resolved as not installed wires nothing. What the old workstation has decides nothing.
+2. **A map of every piece.** `adoption/new-wsl/client-config-map.json` names each piece of the client templates and gives
+   it one wiring: `slot:<manifest slot>` with the owner the entry means, `practice`, or `not_wired:<reason>`. The pieces
+   are each hook entry, plugin, marketplace, permission rule, variable and setting of the Claude settings template and the
+   WSL overlay; each server of `adoption/mcp/claude-user.json`; each hook file and project agent that
+   `install_claude_profile.py` copies; each key of the three Codex TOML templates, the Codex hooks template and the two
+   role carriers; the two instruction blocks; and five steps of the tool itself (the launcher, the login-shell PATH block,
+   the skills step and the two PATH directories). A piece goes to the first entry that matches it. A piece no entry
+   matches, and an entry no piece reaches, fail the check. Today: 366 pieces, 250 wired (196 practice, 54 through a slot)
+   and 116 not wired (69 through a slot that does not install, 47 by their own entry), each listed below.
+3. **A piece follows its slot.** A piece mapped to a slot that does not install is not wired; it is wired when the manifest
+   says the slot installs the owner its entry names. So the memory slot, once its head-to-head returns with ai-memory,
+   wires the ai-memory pieces, and brings back the sentences of the instruction blocks that name it, without an edit to the
+   map (a test changes the manifest and shows it); a slot that installs a different owner (the code-search slot
+   installing semble) leaves the SocratiCode pieces out. `--check` reports a slot id the manifest lacks as an error and a
+   slot that installs another owner as a warning.
+4. **The tool**, `tools/adoption/new_wsl_client_config.py`: `--check` reads the manifest, the map, the templates and the
+   plan, prints one line per piece and fails on an unmapped piece, an entry that matches nothing, an unknown slot, a
+   practice piece that runs a tool outside the repository, a wired hook whose file is not a wired hook file, a name the
+   map lists that no text holds, a port that the plan states twice with two answers, or a committed instruction block that
+   is stale or missing. `--render --host NAME --out DIR` writes `settings.json`, the WSL overlay, `mcp-servers.json`,
+   `codex.config.toml`, `codex.hooks.json`, the two Codex profiles and the two instruction blocks with wired pieces only,
+   filling placeholders through `render_config.render_one`. `--write-blocks` writes the two filtered blocks, and
+   `--dropped` prints every unit the filter left out, in full. `--apply --host NAME` puts the render in place in eleven
+   steps, each its own repository tool, each skippable with `--skip`, and each reported as applied, current, planned, left
+   out, skipped, failed, verified or, for a Codex `config.toml` that exists, `merged with conflicts kept` (Decision 11). It
+   installs no tool and no pinned client, backs up what it changes, and a second run changes nothing. `--dry-run` runs no
+   client and writes nothing.
+5. **F9** now runs, from the clone:
+
+   ```sh
+   cd ~/code/native-agent-stack
+   bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh
+   bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
+   python3 -B tools/adoption/new_wsl_client_config.py --check
+   python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
+   ```
+
+   then, by hand, `codex login` and `claude`, then `accept.sh --only <slot> --stage after_sign_in` for the six owners
+   whose plan row has that stage (`codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`,
+   `local-model-server`, `agent-runtime-worker`, `research-harnesses`). **The configuration comes before the sign-ins**,
+   as the coordinator decided, so that the guard hooks are active in the first session a person starts. (The first reason
+   given for the order, that `codex_home.py` never rewrites an existing `config.toml`, was incomplete: the install plan
+   leaves one in either order, see Decision 11.) **No step of `--apply` needs a signed-in client.** Checked with the real
+   clients, not the stubs, in temporary homes that held no credential file: Claude Code 2.1.287 ran `mcp add` and `mcp get`
+   and every step applied; the one Codex call, `codex features disable daemon_auto_start` for an existing `config.toml`
+   that lacks the key, exited 0 and wrote it; no credential file existed before or after. On an empty Codex home `--apply`
+   starts Codex not at all, because the render carries the key; on the destination it starts it once, for that key,
+   because the plan leaves a `config.toml` without it (`test_apply_runs_no_client_subcommand_that_needs_a_signed_in_client`
+   and the Codex merge tests record the stubs' calls).
+6. **One port truth.** The render takes the collector's OTLP/HTTP port (21318) from the plan's `config/otel.yaml` and the
+   gateway's port (21128) from `install-plan.json`, and refuses a plan whose two statements of a port differ (the
+   collector's in `otel.yaml` and in the plan row, the gateway's in the plan row and in `config/omniroute.env.example`).
+   The Claude settings endpoint, both Codex OTLP exporters and the `omniroute` profile's `base_url` carry those ports; the
+   workstation's literals (14318, 24318, 20128) do not appear in the render. The host template now agrees: its
+   `OTEL_ENDPOINT` is `127.0.0.1:21318` and its `QDRANT_URL` `127.0.0.1:21633`, F8's `ss` probe checks `21318`, `29374`,
+   `21633` and `28231`, and F8 excludes the workstation's own collector and Qdrant ports, `24318` and `26333` (observed
+   listening 2026-10-02, when the first real run of the recipe failed F8's proof on them). A test in
+   `tests/test_wsl_new_distro_recipe.py` reads the plan's `otel.yaml` and requires the template's collector port to equal
+   its OTLP/HTTP port and the template's other ports to be neither the plan's nor the workstation's; another renders the
+   template's `OTEL_ENDPOINT` and the settings from one run and requires both to carry the same port.
+7. **The max-effort launcher.** The launcher is the text of `install_native` in `adoption/bootstrap-linux.sh`, cut out of
+   the script and run in a scratch directory beside a stub client with a version floor of 0.0.0, so it keeps the client
+   it finds and its download branch is never reached (the stub `fetch` fails if anything asks). The tool writes the
+   result to the `bin` directory of the host file's `ECO_ROOT`, with a backup of a differing file. It is not written to
+   `~/.local/bin/claude`: the text ends in `exec "$HOME/.local/bin/claude" "$@"`, so there it would run itself, and
+   `install_native` refuses that placement for the same reason (`adoption/bootstrap-linux.sh` L470-475).
+   [Claude Code's setup page](https://code.claude.com/docs/en/setup) (L205-209) says that auto-update leaves a custom
+   launcher at `~/.local/bin/claude` in place and that `claude doctor` reports one the installer did not create; neither
+   applies to a launcher in another directory.
+8. **PATH for a login shell.** `managed_block.py profile-path` gains `--extra-dir`. The block puts the ecosystem's `bin`
+   first, then `~/.local/bin` (Claude Code's and Codex's native installers, `uv tool install`, the release binaries) and
+   mise's shims directory (`~/.local/share/mise/shims`), each added only if it is not on PATH yet, in `~/.profile`
+   between the markers. The plan prescribes no shell change and installs its npm tools through mise's Node, whose
+   `npm` wrapper reshims after `npm install -g` by default at the commit the plan cites. The same directories lead the
+   `PATH` of the Claude settings and of the Codex config, because both replace the session's PATH.
+9. **The instruction blocks are filtered, never rewritten.** Each block of the repository (`examples/claude-native/CLAUDE.md`,
+   `adoption/templates/codex.AGENTS.template.md`) goes through one filter, and the result is committed as
+   `adoption/new-wsl/claude-user-instructions.md` and `adoption/new-wsl/codex-user-instructions.md`; `--apply` installs
+   those through `managed_block.py` (`claude-md --example`, `codex-md --template`), which keeps every line outside its
+   markers. The filter takes the names of every tool that is not wired (the names the map lists for unwired pieces, and
+   the former defaults of the manifest rows that install nothing) and leaves out: a single-line bullet whose first sentence
+   names one (the bullet would lose its marker) or whose every sentence does; any other sentence of a single-line
+   paragraph or bullet that names one; a paragraph or bullet wrapped over several lines that names one, whole (a sentence
+   cannot leave wrapped lines without cutting a line); a heading or comment line that names one; and then each heading
+   with nothing kept under it. It writes no new text. Every other line is kept byte for byte, a line that loses a
+   sentence keeps the others word for word, and a numbered item that goes leaves the other numbers as the source has
+   them. Tests: the committed files equal what the filter makes of the
+   sources, the map and the manifest (`--check` fails on a stale or missing file, and `--apply` refuses); every kept line
+   is in the source verbatim (a whole line, or whole sentences of one in order); no name of an unwired tool, derived
+   again independently of the tool, remains in either file; the kept and the dropped text together are the whole source
+   (a word count); and each dropped unit names a tool, or is a heading left with nothing. **The units left out are listed
+   in full at the end of this record, and `new_wsl_client_config.py --check --dropped` prints them.** Two things the list
+   shows. The filter is by name, so a sentence that names a wired tool beside an unwired one goes too: the Codex "Token
+   lanes" sentence names `serena` and `qmd` (wired) with `socraticode`, `codebase-memory`, `ai-memory`, `context-mode` and
+   `headroom`, and the Promptfoo bullet also names Harbor, Inspect and `skill-creator`. And a sentence that only made
+   sense with the one before it goes with it, when the map declares that (`dependent_sentences`, never inferred): `Check
+   relevance; retry without pin priority or widen if needed...` refines the ai-memory query before it, so it is dropped in
+   both blocks and listed with its reason; a test shows it stays where the sentence before it stays, and that it comes
+   back with the ai-memory sentence when the memory slot installs. Sentences that name a tool the plan does not install but
+   the map does not list (the skills `search-first`, `find-skills` and `skill-creator`, and the Codex block's "daily
+   currency timer") stay.
+10. **The two Codex role carriers are not wired.** `adoption/agents/codex/stack-researcher.toml` and
+    `stack-verifier.toml` name context-mode, ai-memory and qmd tools and carry the RTK block. They are byte-pinned in
+    `adoption/agents/codex/SHA256SUMS` and ruled by `tools/adoption/codex_roles.py`. The filter was run on each carrier's
+    `developer_instructions` (`CarrierTests`): it leaves out 29 and 26 units, among them each carrier's own working-rule
+    bullets (large output, exact command shapes, and for the verifier its acceptance commands), and the filtered text
+    fails three of the repository's own rules for the carrier (`cwd_rule`, `exact_shapes` and `f4_block`, which require
+    the context-mode working-directory bullet, the exact-command-shapes bullet and the RTK block) and no longer matches
+    its hash. A carrier could be installed only whole, with the tools it names missing, so the map leaves both out
+    (`not_wired`, one entry), and `~/.codex/agents` is not created.
+11. **An existing Codex `config.toml` is merged, never rewritten.** The install plan itself leaves one: its line
+    `codex plugin marketplace add trailofbits/skills --ref <commit>` (row `trail-of-bits-security-skills-trailofbits-skills`
+    of `install-plan.json`, `install.sh` L173) writes `[marketplaces.trailofbits]`. On the destination, after the plan and
+    the sign-ins, the file is 192 bytes with that table (`source_type`, `source`, `ref`) and `[tui]` with
+    `screen_reader_detection_done`; the tests rebuild that file from the plan's own command and it is exactly 192 bytes.
+    With a `config.toml` present, the `codex-config` step merges: every key and table the file has stays as it is; each
+    top-level key and each table the render has and the file lacks is added; where a table exists on both sides only the
+    missing keys are added (`[tui]` gains `notifications`); a value that differs stays as the file has it, is printed
+    beside the render's (a key whose name looks like a secret is hidden), and the step ends `merged with conflicts kept`
+    with exit 0, again on every later run while the difference stays. The file is backed up first; the merge is a text edit
+    that adds lines and changes none (a key goes after the last statement of its table, a missing table at the end, a line
+    that looks like a table inside a multi-line string or array is not taken for one, an inline table or dotted keys that
+    would need a new key are refused); the result is parsed before it is written and the file is read back with `tomllib`
+    after, and put back from the original bytes, with the step failed, when it is not exactly the expected merge.
+    `features.daemon_auto_start` goes through Codex's own writer (`codex features disable daemon_auto_start`) when a
+    `codex` binary is at hand, as `codex_home.py` does, and by the text edit when none is. A second `--apply` changes
+    nothing and makes no second backup. The guard of `codex_home.py` moves with it: while a process named `codex` runs
+    (`--codex-process-name`), nothing is written and the step says `close the Codex sessions, then run --apply again`; a
+    file that needs nothing is not held up by it. An empty Codex home still gets the render through `codex_home.py`.
+    Evidence: unit tests (the destination's shape, a conflict, a trailing comment and no final newline, a comment-only
+    file, look-alike lines, 80 seeded partial renders each completed to the whole and again to nothing, a failed writer, an
+    unexpected writer result, a running Codex, a dry run) and a run with the real Codex 0.159.3 in a temporary home with no
+    credential: the destination's file merged, `codex mcp list` read the result and listed `qmd` and `serena`, the second run
+    changed nothing.
+12. **A Claude `settings.json` that exists keeps its keys, and the theme.** On the destination `~/.claude/settings.json`
+    is 194 bytes with `extraKnownMarketplaces` (one entry, from the plan's `claude plugin marketplace add`) and `theme`;
+    the test rebuilds that from the plan's command. `apply_claude_settings.py` merges by its own rule: keys the template
+    does not mention stay, objects merge, lists union, and a scalar of the template wins. So the marketplace stays, and the
+    wired settings are added, but the template's `theme` ("dark") would have replaced a person's choice. The map now marks
+    that one piece `keep_existing`: the template's value is written only when the file has none, and the step says
+    `kept your theme: "auto" (the render has "dark")` when they differ. Every other scalar of the template still wins, as
+    before (a change from the first round: the theme of an existing file was replaced).
+13. **Codex hooks and the secret-path guard.** (a) In this design the guard runs for Codex **nowhere**: not in user-level
+    hooks, not in a project `.codex/hooks.json`, not in an exec-policy rule. `adoption/templates/codex.hooks.template.json`
+    carries one SessionStart group, the currency notice, and says "a template only, not applied by any installer; B1
+    applies no Codex hook" (L2); `docs/secret-storage.md` L185-187 says "K4's guard hook inspects the runner's started
+    command in Claude's Bash tool. Codex, OmniRoute lanes and units do not automatically run this hook", and its guard
+    table (L1610-1611) puts `secret_path_guard.py` under "project settings and, through the profile installer, user
+    settings" of Claude, and gives Codex only `[shell_environment_policy] inherit = "none"`, which no template carries (a
+    search of the three Codex templates finds no `inherit` key; `credential_status.py --client-guards` counts it); the
+    repository tracks no `.codex/hooks.json` (the history of that path is empty) and no Codex rules file; and
+    `docs/token-session-handbook.md` L372 and `recipes/README.md` L158 decline the one Codex PreToolUse hook on offer
+    (`rtk init --global --codex`). So a Codex session has no guard hook inside the repository or outside it, and the
+    secret-path hook of Claude's user settings is the only copy. (b) Whether the trust of a wired Codex hook can be
+    rendered for a new host: **yes, for a hook whose definition is the same on every host.** At `rust-v0.160.0` the
+    recorded `trusted_hash` is `version_for_toml` of a normalized identity of the hook, its event name, matcher and handler
+    (`codex-rs/hooks/src/engine/discovery.rs` L766-792, `codex-rs/config/src/fingerprint.rs` L54-79: SHA-256 over canonical
+    JSON with sorted keys), not of the file's path or the host; a hook is run only when its recorded hash equals the
+    current one (`discovery.rs` L794-811 and L713-718). The key it is recorded under, `[hooks.state."<key>"]`, is
+    `<source>:<event>:<group>:<handler>` (`codex-rs/hooks/src/lib.rs` L112-123) with the absolute path of the hooks file as
+    `<source>` for a user or project file (`discovery.rs` L174 and L229), which is why the template's keys carry `${HOME}`,
+    and `<plugin id>:<relative path>` for a plugin's hook (`codex-rs/hooks/src/declarations.rs` L35-37), which is host
+    independent. Run with the installed Codex 0.159.3 in temporary homes (`app-server`, `hooks/list`): the same group in
+    homes at three different paths gave the same `currentHash` (`sha256:f5bab0c6…`) and a key that differed only by the
+    path; a changed timeout gave another hash; the same group as the second group kept its hash and became
+    `…:session_start:1:0`; and a `trusted_hash` rendered from the first home's hash under the third home's own key made
+    Codex report that hook `trusted`. So nothing stops a trust entry being rendered for a wired hook (new home path in the
+    key, the hash of the definition as the value), but **no Codex hook is wired in this design**: the guard is not a Codex
+    hook, the currency notice stays unwired (its timer is not installed), the ai-memory and context-mode hooks that the
+    template's `[hooks.state]` entries approve belong to tools the manifest does not install, and the template's
+    `${PROJECT_ROOT}/.codex/hooks.json:pre_tool_use:0:0` entry approves a hook file that the repository does not carry. Nothing
+    is invented: `codex.hooks.json` renders empty and the `[hooks.state]` and `[projects]` entries stay unwired, and F9 says
+    so in one sentence. A Codex-side guard would be a new decision (a hook in Codex's own protocol, and the repository's
+    `secret_path_guard.py` reads Claude's), which this record does not take.
+14. **Project agents are installed as repository practice** (the contract's call). Six of the eleven name MCP tools of
+    servers that are not wired, or skills the plan does not install; the second table below lists them. Nothing is
+    installed to fill the gap and no agent file is edited.
+
+## Alternatives not taken
+
+- **`adoption/bootstrap-linux.sh --profile <id>` and `--configure-full-profile`.** Every profile of `adoption/manifest.json`
+  names components the manifest does not install: `foundation-cpu` has `context-mode`, `rtk` and `ai-memory`;
+  `token-efficiency` adds `repomix`, `headroom`, `toon` and `ccusage`; `semantic-rag` has `vllm`, `qdrant` and
+  `socraticode`; the others name further tools. The profile's client pins would also sit beside the clients the plan
+  installs with their native installers. `--configure-full-profile` then wires the whole old profile: the settings
+  template's `rtk`, `ai-memory`, context-mode and token-lane hooks, the `context-mode`, `claude-hud` and `codex`
+  plugins, the status line, and Codex entries for `context-mode` and `ai-memory`, and `apply_codex_lane.py` (its owned
+  edits are the context-mode entry). The tool does not run it.
+- **A new profile id in `adoption/manifest.json`.** It would copy the manifest's install decisions into a third file next
+  to the manifest and the plan, with pins and platform fields to keep in step with both. The map derives the wiring from
+  the manifest on every run instead.
+- **`apply_codex_lane.py` as the Codex step.** Its configuration write is the `[mcp_servers.context-mode]` entry and the
+  plugin's server switch, which this distribution does not wire. The tool uses the lane's create-only write and
+  `codex_roles.py`'s source checks for the profiles, and `codex_home.py` for `config.toml`.
+- **A launcher at `~/.local/bin/claude`.** See Decision 7.
+- **Instruction blocks written for this distribution.** The coordinator's rule is to filter and not to rewrite, so that
+  no sentence reaches a client that the repository's blocks do not hold.
+- **Sign in first, then configure.** The first version of F9 did, with the tool last. The guard hooks would be missing
+  from the first session; the Codex `config.toml` does not decide the order, since the plan leaves one either way.
+- **A filtered role carrier.** See Decision 10.
+- **Codex's own writer for every key.** `codex features enable|disable`, `codex mcp add` and `codex plugin marketplace add`
+  each write some keys, but not the rest (`model`, `otel`, `shell_environment_policy.set`, the profiles), so the merge
+  would still need a text edit; the one key `codex_home.py` already hands to Codex's writer, `features.daemon_auto_start`,
+  stays with it. A round-trip TOML library (`tomlkit`) was not used: the tools under `tools/adoption/` are stdlib only,
+  and the read-back proves the text edit.
+- **Keeping the first round's behaviour for the theme.** The template's `dark` would replace a person's choice.
+- **Merging Codex trust state, or wiring a Codex hook, so that the first session asks nothing.** Decision 13: there is no
+  Codex hook in the design to wire.
+
+## What would overturn it
+
+- A real run on the destination distribution in which `serena` or `qmd` does not resolve from the settings `PATH`, or in
+  which a login shell does not find `claude`, `codex` or a mise tool after `--apply`: the PATH design would change.
+- A real run in which a step of `--apply` fails because a client is not signed in: F9 would put the sign-ins first again.
+- The memory head-to-head, the code-search measurement or the context-supply decision returning a default: the pieces
+  of the slot's owner wire themselves and the blocks regain the sentences that name it; a different owner needs entries
+  in the map.
+- A measured gain from wiring a piece listed below as not wired (for example the context-mode pieces) that the manifest
+  records: the manifest row changes first, then the tool follows.
+- Claude Code or Codex changing how a user-scope MCP server, a settings `env.PATH` or a custom launcher is read.
+- A change of `codex_roles.py` that lets a carrier be installed in a filtered form: Decision 10 would be taken again.
+- A real run on the destination in which the merge's read-back fails on a file Codex itself wrote (a layout the scanner
+  misreads): the merge would move to Codex's writers for the keys that have one, or to a round-trip library.
+- A Codex hook added to the templates (a guard in Codex's protocol): its trust entry can then be rendered (Decision 13).
+
+## Evidence
+
+Sources read (line numbers are those of the `.md` form of each page or file as fetched; the repository's own
+implementation is the reference: `adoption/bootstrap.md` steps 2, 4 and 4a,
+`adoption/bootstrap-linux.sh`'s `full_profile_*` functions and `install_native`, and the tools named in the scope):
+
+- Claude Code, read 2026-10-02: [settings](https://code.claude.com/docs/en/settings) (L405: the user file is
+  `~/.claude/settings.json`), [settings reference](https://code.claude.com/docs/en/settings-reference) (`env` L2873,
+  `statusLine` L3523, `hooks` L4099, `skillOverrides` L4229, `enabledPlugins` L4620, `extraKnownMarketplaces` L4651),
+  [hooks](https://code.claude.com/docs/en/hooks) (command hooks, `timeout` L426),
+  [MCP](https://code.claude.com/docs/en/mcp) (L135 the `--` separator, L535 local scope is the default, L598-604 user
+  scope is stored in `~/.claude.json`), [setup](https://code.claude.com/docs/en/setup) (L205-209 the launcher) and
+  [environment variables](https://code.claude.com/docs/en/env-vars).
+- Codex at tag `rust-v0.160.0` (the tag, not `main`): `docs/config.md` and `docs/example-config.md` are pointers to
+  developers.openai.com (726 and 134 bytes), and `codex-rs/hooks/` holds `schema/` and `src/` with no prose, so the
+  reference read is `codex-rs/core/config.schema.json`; `scripts/install/install.sh` L16 (the binary goes to
+  `~/.local/bin`) and L597-630 (it edits a shell profile only when its directory is not on PATH, which the plan's
+  `export PATH` prevents).
+- Serena `v1.7.0`: `docs/02-usage/030_clients.md` L134 (Claude Code: `claude mcp add --scope user serena -- serena
+  start-mcp-server --context claude-code --project-from-cwd`) and L308-313 (Codex: `command = "serena"`), and
+  `src/serena/cli.py` L233-317 (every flag of the template's entry is an option of `start-mcp-server`).
+- QMD `v2.8.3`: `README.md` L99-130 (`command` `qmd`, `args` `["mcp"]`) and `src/cli/qmd.ts` L3022, L3645 and L4739
+  (`--index` is a global option read before the `mcp` command; the template's `--index native-agent-stack-catalog`
+  is that option).
+- uv 0.12.22 `docs/reference/storage.md` L87-96 and L160-164 (tool executables go to `$XDG_BIN_HOME`, else
+  `$XDG_DATA_HOME/../bin`, else `~/.local/bin`); mise at the plan's commit `bc11f90c`: `docs/dev-tools/shims.md` L60-80
+  and L242-254, `settings.toml` L2112-2115 (`node.npm_shim`, true by default); MCP Inspector 2.9.0
+  `clients/web/server/web-server-config.ts` L530-542 (`MCP_AUTO_OPEN_ENABLED=false` never opens the browser).
+- The install plan's own files (`install-plan.json`, `accept.sh` L12-30 and its `README.md` L30-36): the six rows whose
+  acceptance has an `after_sign_in` stage, the `--only` and `--stage` options, and the stage's description (native-client
+  diagnostics that need credentials and upstream model examples; the local model server needs no remote account).
+- `tools/adoption/codex_home.py` (L181-211: the only place a Codex binary is run, `codex features disable
+  daemon_auto_start`, only for an existing `config.toml` that lacks the key, and only when no Codex process runs) and
+  `tools/adoption/managed_block.py` L104-179 (what the two block installs keep and refuse).
+- Codex at tag `rust-v0.160.0`, fetched with `curl` from raw.githubusercontent.com on 2026-10-02 (the third round, hook
+  trust): `codex-rs/hooks/src/engine/discovery.rs` (L174 and L229 `key_source` is the hooks file's path, L279-282 a plugin's
+  `plugin_id:relative path`, L664-679 the hash, the key and the trust status of each handler, L713-718 only a trusted or
+  managed handler runs, L766-811 `hook_hash` and `hook_trust_status`), `codex-rs/hooks/src/lib.rs` L95-110 and L112-123
+  (`hook_event_key_label`, `hook_key`), `codex-rs/hooks/src/declarations.rs` L35-37, `codex-rs/config/src/fingerprint.rs`
+  L54-79 (`version_for_toml`, `canonical_json`) and `codex-rs/core/config.schema.json` L2125-2135 (`HookStateToml`:
+  `enabled`, `trusted_hash`).
+- Repository files read for the same question: `adoption/templates/codex.hooks.template.json`;
+  `adoption/templates/codex.config.template.toml` L144-200 (the `[projects]` grants and the `[hooks.state]` approvals of
+  the source host); `docs/secret-storage.md` L185-187, L1610-1611 and L2014-2056; `docs/token-session-handbook.md` L372;
+  `recipes/README.md` L158; `adoption/bootstrap.md` L353-372 (the trust-state warning); and for the files the plan leaves,
+  `install.sh` L171-173 and the row `trail-of-bits-security-skills-trailofbits-skills` of `install-plan.json`.
+
+What I ran, by evidence class. Unchanged upstream tests and my own checks are different things:
+
+- **Commands, run from the worktree with `nice -n 19` and a temporary directory under the scratch area** (exit code and last line of each):
+  - `python3 -B -m unittest tests.test_new_wsl_client_config`: exit 0 (Ran 99 tests in 15.801s); last line `OK`
+  - `python3 -B tools/adoption/new_wsl_client_config.py --check`: exit 0; last line `check passed`
+  - `python3 -B tools/adoption/new_wsl_client_config.py --render --host example --out <temporary dir>`: exit 0; last line `wrote <temporary dir>/wiring.json`
+  - `python3 -B tools/adoption/new_wsl_client_config.py --apply --host example --home <empty temporary dir> --dry-run`: exit 0; last line `summary: claude-hooks planned; claude-agents planned; claude-mcp planned; claude-settings planned; claude-launcher planned; claude-md planned; codex-c`
+  - `python3 -B -m unittest tests.test_adoption_docs_consistency tests.test_install_claude_profile tests.test_render_config tests.test_wsl_new_distro_recipe`: exit 0 (Ran 252 tests in 15.611s); last line `OK (skipped=5)`
+  - `python3 -B scripts/validate.py`: exit 1; last line `tools/adoption/managed_block.py: byte count mismatch`
+
+  `scripts/validate.py` printed its header line and fourteen lines and nothing else: the SHA-256 and byte-count
+  mismatches of the seven changed files that `manifests/evidence.json` registers (`linux-wsl2-new-distro.md`, `stage1-receipt.example.json`,
+  `first-boot-checklist.md`, `2026-10-01-new-wsl-distro-recipe.md`, `test_wsl_new_distro_recipe.py`,
+  `install_claude_profile.py`, `managed_block.py`). The coordinator registers the new hashes. The record was filled in
+  after a first pass of these six commands, and a later pass gave the same exit codes and the same counts.
+
+- **Real client binaries against a temporary home** (a fresh directory as `HOME`; the native Claude Code 2.1.287 and the
+  workstation's Codex 0.159.x, not the 0.160.0 of the plan). `install_claude_profile.py --only mcp` registered `serena` and
+  `qmd` through `claude mcp add --scope user`, and `claude mcp get` printed each back with its bare command. In the
+  default environment the client behaved as if it launched the stdio servers with the `env.PATH` of the rendered
+  `settings.json`: `serena`, which exists nowhere in the temporary home, printed `ENOENT: Executable not found in $PATH`,
+  and `qmd`, a stub that exits at once, placed only in the temporary home's mise shims directory, was found and started
+  and printed `CONNECTION_CLOSED`. With `CLAUDE_CONFIG_DIR` set to an empty string the outcome was the shell's own PATH:
+  both printed `Connected`, answered by copies installed on this workstation whose versions were not read. So the runs
+  show how the command is resolved; they do not show that Serena 1.7.0 or QMD 2.8.3 start. Codex, run with `CODEX_HOME`
+  in the temporary home, printed `qmd` and `serena` as `enabled` in `codex mcp list` from the rendered `config.toml`.
+- **`--apply` with the real clients and no credential** (the second round). A full `--apply --host example --home <empty
+  temporary home>` with the native Claude Code and a Codex binary: every step applied (hooks, agents, `mcp add` of the two
+  servers, settings, launcher, both instruction blocks, the two Codex profiles, the PATH block) and `verify` resolved
+  `claude` to the launcher (the other tools are not installed in a bare home, and it said so); `codex-config` was refused
+  on this workstation because two Codex processes run here, which is the guard of `codex_home.py` and not a need for a
+  sign-in; no `auth.json` or `.credentials.json` existed before or after. The Codex path that does run the binary was run separately with that guard's process name pointed at
+  nothing: `codex features disable daemon_auto_start` exited 0, wrote the key and one backup, and no credential file
+  appeared.
+- **The Codex merge with the real binary** (the third round; Codex 0.159.3, a temporary home with no credential): a
+  `config.toml` rebuilt from the plan's `codex plugin marketplace add` line, 192 bytes, then `--apply` with only the
+  `codex-config` step. The first run added seven tables, six top-level keys and `tui.notifications`, took one backup, and
+  `features.daemon_auto_start = false` came from `codex features disable daemon_auto_start` (Codex's own writer, exit 0);
+  the second run printed `current` and changed nothing; `codex mcp list` read the file and listed `qmd` and `serena` as
+  `enabled`; no credential file existed. The guard of a running Codex was exercised against this workstation's real process list: with its three `codex`
+  processes the same run stopped at the step with `close the Codex sessions, then run `--apply` again`, wrote nothing and
+  made no backup (the unit tests start a `sleep` and name it).
+- **Both merges and every other step together, with the real clients** (the third round; Claude Code 2.1.287 and Codex
+  0.159.3, one temporary home with no credential, seeded with the destination's two files rebuilt from the plan's
+  commands: `config.toml` 192 bytes and `settings.json` 194 bytes with the theme "auto", and the Codex process guard
+  pointed at no process because `codex` runs on this workstation). `--apply` exited 0 and every step applied: the
+  Claude settings kept the marketplace and the theme (`kept your theme: "auto" (the render has "dark")`) and gained the
+  wired settings, the Codex config kept its marketplace table and `screen_reader_detection_done` and gained the render
+  (`features.daemon_auto_start` through Codex's writer), each file with one backup, `claude mcp add` registered `serena`
+  and `qmd`. The second run reported every step `current`; no file under `~/.claude`, `~/.codex` or the profile changed (the
+  only new files were Claude Code's own MCP log files, written by its `mcp get`); `codex mcp list` read the merged file.
+  No credential file existed before or after.
+- **Codex's hook trust with the installed client** (the third round; Codex 0.159.3, `app-server` over stdio, `hooks/list`,
+  temporary homes at different paths): the repository's currency-notice group in a user `hooks.json` gave the key
+  `<home>/.codex/hooks.json:session_start:0:0` and one `currentHash` in two homes at different paths; a timeout of 6 for
+  5 gave another hash; the same group as the second group kept the hash and took the key `…:session_start:1:0`; a
+  `trusted_hash` equal to the first home's hash, written under another home's own key, made Codex list that hook as
+  `trusted`. This is the installed client at 0.159.3; the source read for the same logic is at `rust-v0.160.0`.
+- **Launcher.** The generated launcher is 1,810 bytes with sha256 `f48eb134…`, byte for byte the file that
+  `docs/decisions/2026-09-29-max-default-effort.md` records for the workstation's launcher (`f48eb134…0a2cd5`) and the one
+  installed there. It passes the repository's own 27-case pseudo-terminal table
+  (`tests/test_adoption_bootstrap.py`, `InteractiveEffortLauncherTests.CASES`), run against it in the new tests.
+- **Codex keys.** Every key of the three rendered Codex files exists in `codex-rs/core/config.schema.json` at
+  `rust-v0.160.0`, and the words `never`, `danger-full-access`, `live` and `file` are in the schema's lists. This is a
+  read of the schema, not a Codex 0.160.0 run.
+- **The filter's own checks** (round 2): the committed blocks, the kept-lines test, the name scan, the word-count
+  partition and the dropped-unit test run against the real sources; synthetic texts show each rule (a sentence, a bullet
+  whose first sentence names a tool, a wrapped paragraph, a heading left empty, a numbered item, a comment line, a code
+  fence refused, a declared dependent sentence that goes with the one before it and one that stays) and that a second
+  pass changes nothing. A bug the numbered-item test found is fixed: the item's own number was taken for a sentence, so
+  `2. Second names beta.` would have left `2.` behind.
+- **The merge's own checks** (the third round): the pure functions (`plan_merge`, `scan_toml`, `merge_toml_text`) on 80
+  seeded partial renders, with and without a final newline, each completed to the whole render and, planned again, to
+  nothing; the destination's shape; conflicts; a comment-only file; look-alike lines inside arrays and multi-line
+  strings; an inline table and dotted keys refused; a writer that fails and one that writes more than it should (the file
+  is put back and the step fails); a running Codex (a real `sleep` named as the process); a dry run; and a first run found
+  a real defect that is fixed: keys that belong to the file's last table came after a table added at the end, and landed
+  under the wrong header.
+- **Synthetic stub clients** stand in for `claude` and `codex` in the unit tests; they answer in the shape of Claude Code
+  2.1.287's `claude mcp get`. A real bash login shell, started as a Windows Terminal profile's `bash -lc` starts one,
+  found `claude` (the launcher), `codex`, `serena`, `qmd` and `mise` in the temporary home after `--apply` and none of
+  them before it.
+
+Not verified: `model_reasoning_effort = "ultra"` against the schema (it lists no words for that key; the template
+keeps the value its own comments source); any tool of the install plan installed or ran (the plan has not run on the
+destination distribution); Serena 1.7.0's or QMD 2.8.3's own start-up (the flags are read from their source at the tags);
+Codex 0.160.0; a real interactive session of either client on a new distribution, so that a client reads the filtered
+blocks or that a model follows them; whether `npm install -g` through mise's Node reshims `qmd` on the destination; the
+F10 proof from Windows; the launcher in a real terminal on the new distribution; that a model uses any wired piece; the
+after-sign-in checks of `agent-runtime-worker` and `research-harnesses`, which run upstream model examples (the plan's
+README, L34), so whether the two native sign-ins suffice for them was not read from their sources and not run; and F8's
+proof on the destination distribution; the merge with a Codex 0.160.0 binary and on a `config.toml` that a Codex of that
+version wrote itself after an interactive start (the 192 and 194 bytes are rebuilt from the plan's two commands, with the
+sizes the coordinator observed, not copied from the destination; the Claude theme in the test is "auto", a four-character
+value like the destination's, which is not the template's "dark"); and any Codex hook run or trusted on a new host (none
+is wired). F8's `ss` command was run once on this host (2026-10-02T16:42Z, the shared
+network namespace): no listener on `21318`, `29374`, `21633` or `28231`, and listeners on `24318` and `26333`.
+
+## Contradictions met
+
+- **`slot:` targets** (accepted by the coordinator). The contract says `--check` fails when a `slot:` target "is not a row
+  that installs", and also says the pieces of ai-memory, SocratiCode and the others are not wired because their slots are
+  open, split or resolved as not installed, and asks for a test in which a split slot becomes installing and wires its
+  piece. The three cannot all hold on one map. I followed the second and third: a piece mapped to a slot that does not
+  install is reported as not wired, and `--check` fails only on a slot id that the manifest does not have.
+- **The launcher's place** (accepted). The contract cites the setup page for a custom launcher at `~/.local/bin/claude`
+  and asks to reuse the bootstrap's text. The text would run itself there (Decision 7), so the launcher is in `ECO_ROOT/bin`,
+  as the bootstrap and `scripts/adoption_status.py --launcher-resolution` already have it.
+- **The collector port and the host template** (resolved in the second round). The template carried `OTEL_ENDPOINT`
+  127.0.0.1:24318 and the plan's collector listens on 127.0.0.1:21318. The template, F8's probe and its exclusion set now
+  agree with the plan (Decision 6). The tool still takes the plan's port when a host file names another, and `--check`
+  prints a note that names both when the template and the plan differ.
+- **A refusal where a merge was needed** (resolved in the third round). The second round decided that no merge path was
+  needed, on the premise that `codex login` or a first start might leave a `config.toml` and that configuring first
+  would avoid it. The install plan itself leaves one (`codex plugin marketplace add`), so the file exists in either
+  order; Decision 11 is the merge, and the order of F9 rests on the guard hooks alone.
+- **F9 was pinned outside its section** (resolved). The command table and prose of the 2026-10-01 record, the receipt
+  example and the checklist held the old bootstrap commands, and the tests compared them with the recipe. The three files
+  now carry the new rows and both comparisons read F9 again.
+- **The Codex references.** The contract names `docs/config.md` and a hooks documentation in the repository at the tag;
+  at `rust-v0.160.0` they are the pointers and the schema folder described above.
+- **The handbook builder.** The contract names `scripts/build_new_wsl_handbook.py` and `docs/new-wsl-handbook.*`; neither
+  is on this base, so F9 keeps one fenced `sh` block without that check.
+- **A path in the plan.** The `credential-guard` row of `install-plan.json` lists `adoption/codex.config.template.toml`,
+  which does not exist (the template is `adoption/templates/codex.config.template.toml`).
+- **`jq`** (accepted). A practice hook may run python3 and `jq` besides the files the repository copies, because F4 installs
+  `jq` and the bootstrap requires it. The Windows Terminal bell hook of the overlay runs `jq`; it is wired on that reading.
+  Moving it to `not_wired` is one map entry.
+- **`MCP_AUTO_OPEN_ENABLED`** (accepted). The manifest installs MCP Inspector (the variable is its) but the plan runs it on
+  demand with `npx`, so `--check` warns that the manifest installs the slot and the plan does not; the variable is wired.
+- **The Claude begin marker.** `managed_block.py` writes the marker line of the Claude block itself, and that line says
+  the block was written by `adoption/bootstrap-linux.sh --configure-full-profile`. On this distribution `--apply` writes
+  it. I did not change the marker (it is a constant of an existing tool, and the block's text is the point of the rule);
+  changing it is one additive option of `managed_block.py`. The Codex block's begin marker comes from the template and
+  names the template. The login-shell PATH block's marker says the same of the bootstrap.
+
+## Left for the coordinator
+
+- Re-freeze the convergence record that pins the changed files (`blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json`
+  holds the SHA-256 of the recipe page, the host template, the receipt example, the checklist, the 2026-10-01 record and
+  its test), regenerate the handbook (not on this base), and register the changed files in `manifests/evidence.json`
+  (the seven that `scripts/validate.py` names; the host template and the new files are not registered there).
+- Decide whether the filtered blocks are what the user wants. The list below is the whole difference from the source blocks. If a
+  dropped sentence should stay, the way is a wired entry in the map (or a name removed from an unwired entry) and
+  `--write-blocks`; if a kept sentence should go, the way is a name added to an unwired entry.
+- Decide whether the two Codex role carriers stay out (Decision 10), and whether the Claude block's begin marker should name
+  this tool (see Contradictions).
+- Decision 12 reads "keeps both" as keeping the theme's value too; every other scalar of the Claude template still wins
+  over a file's value, as in the first round. If the Claude merge should also keep and report every differing value, as the
+  Codex merge does, that is a larger change to `apply_claude_settings.py`'s rule and was not made.
+- Decision 13 found no Codex guard hook in the design and wired none. If a guard for Codex is wanted it is a new decision
+  (a hook in Codex's protocol; its trust entry can be rendered, as the decision shows). Also seen while reading: no
+  template sets `[shell_environment_policy] inherit = "none"`, the one Codex-side measure `docs/secret-storage.md` names
+  and `credential_status.py --client-guards` checks, so the rendered Codex config does not have it either.
+- An observation outside this change: at the `ss` run named under "Not verified", 127.0.0.1:21434, the port of the plan's `local-model-server` row
+  (`OLLAMA_HOST=127.0.0.1:21434`), had a listener on this host. F8 checks only the template's four ports, not the plan's
+  own, and WSL 2 distributions share one network namespace.
+- Nothing is committed. `tests/test_adoption_docs_consistency.py` reads `git ls-files` and F9 names the new tool, so the
+  new files carry `git add --intent-to-add` in the worktree's index (no content staged, no commit); commit them with the
+  rest.
+- The upstream-recommended Serena hooks (`serena-hooks`, Serena `docs/02-usage/030_clients.md` L149-226 and L321-387) are
+  not in any template and are not wired.
+
+## Pieces that are not wired
+
+`python3 -B tools/adoption/new_wsl_client_config.py --check --markdown` prints these two tables and the list of dropped
+units after them; the test `test_the_record_holds_the_tables_the_tool_prints` fails when this section and the tool disagree.
+
+| Piece | Wiring | Why it is not wired |
+| --- | --- | --- |
+| `claude/settings/env/RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Agent(codex:codex-rescue)` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `claude/settings/permission/deny/Bash(rtk git push --force *)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Bash(rtk git push * --force)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Bash(rtk git push * --force *)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Bash(rtk git push -f *)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Bash(rtk git push * -f)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/permission/deny/Bash(rtk git push * -f *)` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/hook/PreToolUse/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event pre-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/SessionStart/matcher=-/"${HOME}/.claude/hooks/context-mode-cache-heal.mjs"` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/hook/SessionStart/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event session-start --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/SessionStart/matcher=startup/python3 "${HOME}/.claude/hooks/currency-due-notice.py" 2>/dev/null \|\| true` | `not_wired` | the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print |
+| `claude/settings/hook/SubagentStop/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-stop --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/PostToolUse/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event post-tool-use --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/PreCompact/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event pre-compact --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/Stop/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event stop --agent claude-code --server-url http://${AI_MEMORY_URL}${AI_MEMORY_CAPTURE_ASSISTANT}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/SessionEnd/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event session-end --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/SubagentStart/matcher=/${AI_MEMORY_BIN} --data-dir ${HOME}/.local/share/ai-memory hook --event subagent-start --agent claude-code --server-url http://${AI_MEMORY_URL}` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/settings/hook/SubagentStart/matcher=/python3 "${HOME}/.claude/hooks/token-lanes-subagent-start.py" 2>/dev/null \|\| true` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/settings/setting/statusLine` | `not_wired` | claude-hud is not a slot of the manifest, and the status line runs it |
+| `claude/settings/plugin/context-mode@context-mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/plugin/claude-hud@claude-hud` | `not_wired` | claude-hud is not a slot of the manifest, and the status line runs it |
+| `claude/settings/plugin/codex@openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `claude/settings/marketplace/context-mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/settings/marketplace/claude-hud` | `not_wired` | claude-hud is not a slot of the manifest, and the status line runs it |
+| `claude/settings/marketplace/openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `claude/mcp/server/ai-memory` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `claude/mcp/server/socraticode` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `claude/mcp/server/headroom` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `claude/mcp/server/codebase-memory` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
+| `claude/profile/hook-file/currency-due-notice.py` | `not_wired` | the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print |
+| `claude/profile/hook-file/token-lanes-block.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-block.builder.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-block.researcher.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-block.reviewer.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-block.scout.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-block.verifier.md` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `claude/profile/hook-file/token-lanes-subagent-start.py` | `not_wired` | the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire |
+| `codex/config/check_for_update_on_startup` | `not_wired` | the template sets it false because the client is pinned and updated by the stack, and the install plan installs Codex with its self-updating native installer, so Codex keeps its own update check |
+| `codex/config/mcp_servers.serena.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.ai-memory.url` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `codex/config/mcp_servers.socraticode.command` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.args` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.startup_timeout_sec` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.socraticode.env.PATH` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.QDRANT_MODE` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.QDRANT_URL` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_PROVIDER` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.LMSTUDIO_URL` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_MODEL` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DIMENSIONS` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_CONTEXT_LENGTH` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_QUERY_PREFIX` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_PREFIX` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.EMBEDDING_DOCUMENT_INCLUDE_PATH` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.RESPECT_GITIGNORE` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.INCLUDE_DOT_FILES` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.SOCRATICODE_WATCHER` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.socraticode.env.SEARCH_DEFAULT_LIMIT` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/config/mcp_servers.headroom.command` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.headroom.args` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.headroom.env.HEADROOM_OFFLINE` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.headroom.env.HF_HUB_OFFLINE` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.headroom.env.TRANSFORMERS_OFFLINE` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.headroom.env.DO_NOT_TRACK` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.codebase-memory.command` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
+| `codex/config/mcp_servers.context-mode.command` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.args` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.startup_timeout_sec` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.env.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.env.PATH` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/mcp_servers.context-mode.env.CONTEXT_MODE_PLATFORM` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/projects."${PROJECT_ROOT}".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
+| `codex/config/projects."${HOME}/code/native-agent-stack-publication".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
+| `codex/config/tui.model_availability_nux.gpt-6-astra` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
+| `codex/config/hooks.state."${PROJECT_ROOT}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:post_tool_use:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:pre_compact:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:session_start:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:session_end:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:user_prompt_submit:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:stop:0:0".trusted_hash` | `not_wired` | each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here |
+| `codex/config/marketplaces.context-mode.source_type` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/marketplaces.context-mode.source` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/plugins."context-mode@context-mode".enabled` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/plugins."context-mode@context-mode".mcp_servers.context-mode.enabled` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/config/shell_environment_policy.set.RTK_TELEMETRY_DISABLED` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/stack-worker/shell_environment_policy.set.CHUB_TELEMETRY` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
+| `codex/stack-worker/shell_environment_policy.set.CHUB_FEEDBACK` | `not_wired` | the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install |
+| `codex/stack-worker/mcp_servers.codebase-memory.startup_timeout_sec` | `not_wired` | no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena) |
+| `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `codex/stack-worker/mcp_servers.ai-memory.enabled_tools` | `slot:memory-owner` | slot memory-owner: it installs nothing extra (measurement): Not installed until the memory head-to-head returns (the blind round's documente |
+| `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/stack-worker/mcp_servers.socraticode.enabled_tools` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/stack-worker/mcp_servers.socraticode.env.SOCRATICODE_WATCHER` | `slot:code-search` | slot code-search: split, it waits for the deciding measurement: Not installed until the deciding measurement returns (the families split between |
+| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/stack-worker/mcp_servers.headroom.enabled_tools` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/stack-worker/mcp_servers.context-mode.disabled_tools` | `slot:context-supply` | slot context-supply: it installs nothing extra (definitive): No context-supply layer: the usage meter only |
+| `codex/hooks/setting/description` | `not_wired` | the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print |
+| `codex/hooks/hook/SessionStart/matcher=startup/python3 "$HOME/.claude/hooks/currency-due-notice.py" 2>/dev/null \|\| true` | `not_wired` | the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print |
+| `codex/role/stack-researcher.toml` | `not_wired` | the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py, whose rules cwd_rule, exact_shapes and f4_block require the context-mode working-directory bullet, the exact-command-shapes bullet and the RTK block, so a copy without the lines that name tools that are not wired breaks all three and its hash; they could be installed only whole |
+| `codex/role/stack-verifier.toml` | `not_wired` | the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py, whose rules cwd_rule, exact_shapes and f4_block require the context-mode working-directory bullet, the exact-command-shapes bullet and the RTK block, so a copy without the lines that name tools that are not wired breaks all three and its hash; they could be installed only whole |
+| `codex/worker-role/evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `codex/worker-role/isolated-builder.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `codex/worker-role/semantic-evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `step/skills` | `not_wired` | the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer |
+
+| Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
+| --- | --- | --- |
+| `evidence-reviewer.md` | `ai-memory`, `jcodemunch`, `plugin_context-mode_context-mode`, `socraticode` | - |
+| `isolated-builder.md` | `ai-memory`, `jcodemunch`, `plugin_context-mode_context-mode`, `socraticode` | `context-mode:context-mode` |
+| `security-reviewer.md` | `ai-memory`, `jcodemunch`, `plugin_context-mode_context-mode`, `socraticode` | `security-best-practices` |
+| `semantic-evidence-reviewer.md` | - | `typesafe-ai` |
+| `stack-researcher.md` | `ai-memory`, `jcodemunch`, `plugin_context-mode_context-mode` | - |
+| `stack-verifier.md` | `plugin_context-mode_context-mode` | - |
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (4 unit(s) left out; 52 of 53 lines stay):
+
+```text
+line 17, bullet; names Promptfoo
+- A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
+
+line 27, sentence; names ai-memory
+For maintained decisions, and before describing deployed architecture after compaction/resume, query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema.
+
+line 27, sentence; it depends on the sentence before it, which goes (declared in the map's dependent_sentences)
+Check relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify current canonical sources.
+
+line 29, sentence; names rtk
+Preserve the existing RTK-managed import when that component is installed.
+
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (26 unit(s) left out; 16 of 58 lines stay):
+
+```text
+line 8, sentence; names ai-memory
+For maintained decisions, and before describing deployed architecture after compaction/resume, query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema.
+
+line 8, sentence; it depends on the sentence before it, which goes (declared in the map's dependent_sentences)
+Check relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify current canonical sources.
+
+line 11, sentence; names Promptfoo
+A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
+
+line 17, sentence; names ai-memory, codebase-memory, context-mode, headroom, socraticode
+Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` for exact symbols and references, `socraticode` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
+
+line 19, marker; names rtk
+<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->
+
+line 20, heading; names rtk
+# RTK
+
+line 22, paragraph; names rtk; wrapped over several lines, so a sentence cannot leave without cutting a line
+Prefix every shell command with `rtk`: `rtk git status`, `rtk cargo test`,
+`rtk npm run build`, `rtk ls src/`. Keep the prefix inside chains:
+`rtk git add . && rtk git commit -m "msg"`. Commands RTK has no filter for
+run as-is, so the prefix is always safe.
+
+line 27, heading; nothing is kept under it
+# Command output
+
+line 29, paragraph; names rtk; wrapped over several lines, so a sentence cannot leave without cutting a line
+Command output here is condensed to save tokens, keeping every signal and
+dropping costly noise. Treat it as the complete result: run commands
+normally, and batch related commands into one call to avoid extra turns.
+Truncated results state their recovery path in their own output. Re-run a
+command as `rtk proxy <cmd>` only when its result is unusable: empty when
+output was clearly expected, contradicting its exit code, or garbled.
+
+line 36, heading; names rtk
+## About RTK
+
+line 38, paragraph; names rtk; wrapped over several lines, so a sentence cannot leave without cutting a line
+RTK (Rust Token Killer) is a CLI proxy that filters command output to save
+tokens; behavior and exit code are unchanged.
+
+line 41, bullet; names rtk
+- `rtk gain` / `rtk gain --history` — token savings, overall and per command.
+
+line 42, bullet; names rtk
+- `rtk proxy <cmd>` — run a command unfiltered, still tracked.
+
+line 43, bullet; names rtk
+- `RTK_DISABLED=1 <cmd>` — skip RTK for one command.
+
+line 44, bullet; names rtk
+- `rtk discover` — find past commands RTK could have condensed.
+
+line 46, marker; names rtk
+<!-- native-agent-stack:rtk-exceptions -->
+
+line 47, heading; names rtk
+## Exceptions to the RTK prefix rule (rtk 0.50.0)
+
+line 49, sentence; names rtk
+An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status.
+
+line 49, sentence; names rtk
+Run them natively, or as `rtk proxy <command>` to keep the call tracked:
+
+line 50, bullet; names rtk
+- `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
+
+line 51, bullet; names rtk
+- `diff`: on a missing file rtk exits 1, where diff exits 2.
+
+line 52, bullet; names rtk
+- `git branch`: rtk can list a branch checked out in another worktree as remote-only.
+
+line 53, bullet; names rtk
+- `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
+
+line 54, bullet; names rtk
+- `jq`: rtk keeps 40 lines of at most 120 characters.
+
+line 55, bullet; names rtk
+- `find` on a path that may not exist: rtk exits 0 with no output.
+
+line 57, sentence; names rtk
+Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+
+```

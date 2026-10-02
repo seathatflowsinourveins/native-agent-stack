@@ -1,0 +1,578 @@
+{
+  "schema": "native-agent-stack/new-wsl-client-config-map/v1",
+  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), or `not_wired:<reason>`. A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; the tool scans the rendered files and the instruction blocks for the names of every piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
+  "dependent_sentences": [
+    {
+      "starts": "Check relevance; retry without pin priority",
+      "on": "previous",
+      "why": "It refines the ai-memory query the sentence before it describes ('pin priority' is that query's `pin_first`), so without that sentence it points at nothing to check or retry."
+    }
+  ],
+  "entries": [
+    {
+      "match": [
+        "claude/settings/env/RTK_TELEMETRY_DISABLED",
+        "codex/*/shell_environment_policy.set.RTK_TELEMETRY_DISABLED",
+        "codex/*/mcp_servers.*.env.RTK_TELEMETRY_DISABLED"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "rtk",
+      "names": [
+        "RTK_TELEMETRY_DISABLED",
+        "rtk"
+      ],
+      "note": "rtk filters command output between the tools and the model, the job of the context-supply slot, which the manifest resolved as no layer."
+    },
+    {
+      "match": [
+        "claude/settings/env/MCP_AUTO_OPEN_ENABLED",
+        "codex/config/shell_environment_policy.set.MCP_AUTO_OPEN_ENABLED"
+      ],
+      "wiring": "slot:mcp-inspector",
+      "owner": "MCP Inspector",
+      "names": [
+        "MCP_AUTO_OPEN_ENABLED"
+      ],
+      "source": "modelcontextprotocol/inspector 2.9.0 clients/web/server/web-server-config.ts L530-542: MCP_AUTO_OPEN_ENABLED=false never opens the browser. The manifest installs the Inspector; the install plan runs it on demand with npx."
+    },
+    {
+      "match": [
+        "claude/settings/env/CLAUDE_CODE_ENABLE_TELEMETRY",
+        "claude/settings/env/OTEL_*",
+        "codex/config/otel.*",
+        "codex/config/analytics.*"
+      ],
+      "wiring": "slot:otel-collector-contrib",
+      "owner": "OTel Collector",
+      "source": "The install plan's collector listens on 127.0.0.1:21317 (gRPC) and 127.0.0.1:21318 (HTTP): evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml L8-12. The render fills the endpoint from the plan."
+    },
+    {
+      "match": [
+        "claude/settings/env/PATH"
+      ],
+      "wiring": "practice",
+      "note": "The launcher's directory, the native installers' directory and the wired path pieces, ahead of the host's own PATH."
+    },
+    {
+      "match": [
+        "claude/settings/env/CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS",
+        "claude/settings/env/CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH",
+        "claude/settings/env/CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK",
+        "claude/settings/env/CLAUDE_CODE_SUBAGENT_MODEL"
+      ],
+      "wiring": "practice",
+      "source": "Model and worker settings of AGENTS.md and examples/claude-native/CLAUDE.md. CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK is not in the environment-variable page of code.claude.com (read 2026-10-02); docs/decisions/2026-09-27-model-currency.md L103-109 records the binary read that found it."
+    },
+    {
+      "match": [
+        "claude/settings/env/MCP_TIMEOUT",
+        "claude/settings/env/BASH_MAX_TIMEOUT_MS",
+        "claude/settings/env/ENABLE_CLAUDEAI_MCP_SERVERS"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/env-vars (read 2026-10-02)"
+    },
+    {
+      "match": [
+        "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "rtk",
+      "names": [
+        "rtk"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*secret_path_guard.py*"
+      ],
+      "wiring": "practice",
+      "note": "The secret-path guard: scripts/hooks/secret_path_guard.py, copied with its checksum by install_claude_profile.py."
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*effort-default-guard.py*"
+      ],
+      "wiring": "practice",
+      "note": "The effort guard: adoption/hooks/claude/effort-default-guard.py, copied with its checksum by install_claude_profile.py."
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*${AI_MEMORY_BIN}*"
+      ],
+      "wiring": "slot:memory-owner",
+      "owner": "ai-memory",
+      "names": [
+        "ai-memory",
+        "AI_MEMORY_BIN",
+        "AI_MEMORY_URL",
+        "AI_MEMORY_CAPTURE_ASSISTANT"
+      ],
+      "note": "The memory slot waits for the head-to-head; ai-memory is its documented-fit pick, not its default."
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*context-mode-cache-heal.mjs*"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "context-mode",
+      "names": [
+        "context-mode"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*currency-due-notice.py*",
+        "claude/profile/hook-file/currency-due-notice.py",
+        "codex/hooks/hook/*",
+        "codex/hooks/setting/description"
+      ],
+      "wiring": "not_wired:the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print",
+      "names": [
+        "currency-due-notice"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/hook/*/*token-lanes-subagent-start.py*",
+        "claude/profile/hook-file/token-lanes-block.md",
+        "claude/profile/hook-file/token-lanes-block.builder.md",
+        "claude/profile/hook-file/token-lanes-block.researcher.md",
+        "claude/profile/hook-file/token-lanes-block.reviewer.md",
+        "claude/profile/hook-file/token-lanes-block.scout.md",
+        "claude/profile/hook-file/token-lanes-block.verifier.md",
+        "claude/profile/hook-file/token-lanes-subagent-start.py"
+      ],
+      "wiring": "not_wired:the token-lane carrier names retrieval and memory servers (SocratiCode, jCodeMunch, ai-memory, context-mode, headroom) that this distribution does not wire",
+      "names": [
+        "token-lanes",
+        "jcodemunch"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/plugin/context-mode@context-mode",
+        "claude/settings/marketplace/context-mode",
+        "codex/config/marketplaces.context-mode.*",
+        "codex/config/plugins.\"context-mode@context-mode\".*"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "context-mode",
+      "names": [
+        "context-mode"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/plugin/claude-hud@claude-hud",
+        "claude/settings/marketplace/claude-hud",
+        "claude/settings/setting/statusLine"
+      ],
+      "wiring": "not_wired:claude-hud is not a slot of the manifest, and the status line runs it",
+      "names": [
+        "claude-hud"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/plugin/codex@openai-codex",
+        "claude/settings/marketplace/openai-codex",
+        "claude/settings/permission/deny/Agent(codex:codex-rescue)"
+      ],
+      "wiring": "not_wired:the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin",
+      "names": [
+        "openai-codex",
+        "codex-plugin-cc",
+        "codex-rescue"
+      ]
+    },
+    {
+      "match": [
+        "claude/settings/permission/deny/Bash(rtk *"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "rtk",
+      "names": [
+        "rtk"
+      ],
+      "note": "The force-push rules for the rtk-prefixed form of git; the plain rules stay."
+    },
+    {
+      "match": [
+        "claude/settings/permission/deny/Agent(claude-code-guide)"
+      ],
+      "wiring": "practice"
+    },
+    {
+      "match": [
+        "claude/settings/permission/deny/Read(*",
+        "claude/settings/permission/deny/Edit(*",
+        "claude/settings/permission/deny/Bash(*"
+      ],
+      "wiring": "practice",
+      "note": "Secret-path, credential and history-rewrite rules, and the rules that keep skills out of the agent's reach."
+    },
+    {
+      "match": [
+        "claude/settings/setting/model",
+        "claude/settings/setting/advisorModel",
+        "claude/settings/setting/effortLevel",
+        "claude/settings/setting/modelSettings",
+        "claude/settings/setting/ultracode",
+        "claude/settings/setting/enableWorkflows",
+        "claude/settings/setting/workflowSizeGuideline",
+        "claude/settings/setting/switchModelsOnFlag",
+        "claude/settings/setting/autoContinueAtUsageLimit"
+      ],
+      "wiring": "practice",
+      "source": "Model, effort and workflow settings: docs/decisions/2026-09-29-max-default-effort.md, 2026-09-29-sonnet-5-5-dispatch.md and AGENTS.md."
+    },
+    {
+      "match": [
+        "claude/settings/setting/permissions.defaultMode",
+        "claude/settings/setting/skipDangerousModePermissionPrompt"
+      ],
+      "wiring": "practice",
+      "note": "Permission settings."
+    },
+    {
+      "match": [
+        "claude/settings/setting/theme"
+      ],
+      "wiring": "practice",
+      "keep_existing": true,
+      "note": "The colour theme is a person's choice, made at Claude Code's first start (which writes it to settings.json on a host the install plan has used): the template's value is written only when the file has none."
+    },
+    {
+      "match": [
+        "claude/settings/setting/$$schema",
+        "claude/settings/setting/autoUpdatesChannel",
+        "claude/settings/setting/verbose",
+        "claude/settings/setting/showThinkingSummaries",
+        "claude/settings/setting/cleanupPeriodDays",
+        "claude/settings/setting/syncClaudeAiSkills",
+        "claude/settings/setting/skillListingBudgetFraction",
+        "claude/settings/setting/skillOverrides"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/settings-reference (read 2026-10-02): skillOverrides applies to the skills that exist and says nothing of a name with no skill."
+    },
+    {
+      "match": [
+        "claude/overlay/setting/$schema",
+        "claude/overlay/setting/preferredNotifChannel"
+      ],
+      "wiring": "practice"
+    },
+    {
+      "match": [
+        "claude/overlay/hook/Notification/*"
+      ],
+      "wiring": "practice",
+      "note": "The Windows Terminal bell on a permission prompt. It runs jq, which F4 of the recipe installs and the bootstrap requires; the entry is practice only on that reading."
+    },
+    {
+      "match": [
+        "claude/mcp/server/serena"
+      ],
+      "wiring": "slot:serena",
+      "owner": "Serena",
+      "override": {
+        "command": "serena"
+      },
+      "source": "Serena v1.7.0 docs/02-usage/030_clients.md L134: claude mcp add --scope user serena -- serena start-mcp-server --context claude-code --project-from-cwd. The template's extra flags (--transport, the three dashboard and GUI flags) are options of start-mcp-server at that tag (src/serena/cli.py L258-317). uv tool install puts `serena` in ~/.local/bin (uv 0.12.22 docs/reference/storage.md L87-96)."
+    },
+    {
+      "match": [
+        "claude/mcp/server/qmd"
+      ],
+      "wiring": "slot:tobi-qmd",
+      "owner": "qmd",
+      "override": {
+        "command": "qmd"
+      },
+      "source": "tobi/qmd v2.8.3 README.md L119-130 (command qmd, args mcp) and src/cli/qmd.ts: --index is a global option read before the mcp command (L3022, L3645, L4739). The template names the catalog index of AGENTS.md."
+    },
+    {
+      "match": [
+        "claude/mcp/server/ai-memory"
+      ],
+      "wiring": "slot:memory-owner",
+      "owner": "ai-memory",
+      "names": [
+        "ai-memory"
+      ]
+    },
+    {
+      "match": [
+        "claude/mcp/server/socraticode"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "names": [
+        "socraticode"
+      ],
+      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement."
+    },
+    {
+      "match": [
+        "claude/mcp/server/headroom"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "headroom",
+      "names": [
+        "headroom"
+      ]
+    },
+    {
+      "match": [
+        "claude/mcp/server/codebase-memory",
+        "codex/*/mcp_servers.codebase-memory.*"
+      ],
+      "wiring": "not_wired:no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena)",
+      "names": [
+        "codebase-memory"
+      ]
+    },
+    {
+      "match": [
+        "claude/profile/hook-file/effort-default-guard.py",
+        "claude/profile/hook-file/secret_path_guard.py"
+      ],
+      "wiring": "practice"
+    },
+    {
+      "match": [
+        "claude/profile/agent/blind-adjudicator.md",
+        "claude/profile/agent/blind-judge.md",
+        "claude/profile/agent/blind-lane-reviewer.md",
+        "claude/profile/agent/evidence-reviewer.md",
+        "claude/profile/agent/isolated-builder.md",
+        "claude/profile/agent/landscape-sweep-worker.md",
+        "claude/profile/agent/security-reviewer.md",
+        "claude/profile/agent/semantic-evidence-reviewer.md",
+        "claude/profile/agent/source-scout.md",
+        "claude/profile/agent/stack-researcher.md",
+        "claude/profile/agent/stack-verifier.md"
+      ],
+      "wiring": "practice",
+      "note": "The project agents. Each frontmatter names skills and MCP tools that this distribution may not have; --check lists them per agent and nothing is installed to fill the gap."
+    },
+    {
+      "match": [
+        "claude/instructions/claude-md",
+        "codex/instructions/agents-md"
+      ],
+      "wiring": "practice",
+      "note": "Practice, installed as the filtered copies under adoption/new-wsl/: the block with every sentence, list item, paragraph and heading that names a tool that is not wired left out, and nothing written in its place (new_wsl_client_config.py --write-blocks, --dropped lists what goes)."
+    },
+    {
+      "match": [
+        "codex/config/check_for_update_on_startup"
+      ],
+      "wiring": "not_wired:the template sets it false because the client is pinned and updated by the stack, and the install plan installs Codex with its self-updating native installer, so Codex keeps its own update check",
+      "source": "adoption/templates/codex.config.template.toml L16-19; install plan row codex: native installer, reviewed release rust-v0.160.0, not a lock."
+    },
+    {
+      "match": [
+        "codex/config/projects.*"
+      ],
+      "wiring": "not_wired:trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host",
+      "source": "tools/adoption/codex_home.py L85-87"
+    },
+    {
+      "match": [
+        "codex/config/hooks.state*"
+      ],
+      "wiring": "not_wired:each entry approves the hash of a hook file of the source host (ai-memory's hooks.json, the context-mode plugin, a project), none of which exists here",
+      "source": "tools/adoption/codex_home.py L85-87"
+    },
+    {
+      "match": [
+        "codex/config/tui.model_availability_nux*"
+      ],
+      "wiring": "not_wired:a counter of how often Codex showed a model notice on the source host, which is client state and not configuration"
+    },
+    {
+      "match": [
+        "codex/config/mcp_servers.serena.command"
+      ],
+      "wiring": "slot:serena",
+      "owner": "Serena",
+      "override": "serena",
+      "source": "Serena v1.7.0 docs/02-usage/030_clients.md L308-313: [mcp_servers.serena] command = \"serena\", args start-mcp-server --project-from-cwd --context=codex."
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.serena.*"
+      ],
+      "wiring": "slot:serena",
+      "owner": "Serena"
+    },
+    {
+      "match": [
+        "codex/config/mcp_servers.qmd.command"
+      ],
+      "wiring": "slot:tobi-qmd",
+      "owner": "qmd",
+      "override": "qmd"
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.qmd.*"
+      ],
+      "wiring": "slot:tobi-qmd",
+      "owner": "qmd"
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.ai-memory.*"
+      ],
+      "wiring": "slot:memory-owner",
+      "owner": "ai-memory",
+      "names": [
+        "ai-memory"
+      ]
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.socraticode.*"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "names": [
+        "socraticode"
+      ]
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.headroom.*"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "headroom",
+      "names": [
+        "headroom"
+      ]
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.context-mode.*"
+      ],
+      "wiring": "slot:context-supply",
+      "owner": "context-mode",
+      "names": [
+        "context-mode"
+      ]
+    },
+    {
+      "match": [
+        "codex/config/model",
+        "codex/config/model_reasoning_effort",
+        "codex/config/approval_policy",
+        "codex/config/sandbox_mode",
+        "codex/config/mcp_oauth_credentials_store",
+        "codex/config/web_search",
+        "codex/config/agents.*",
+        "codex/config/skills.*",
+        "codex/config/tui.notifications",
+        "codex/config/features.*",
+        "codex/config/shell_environment_policy.set.PATH"
+      ],
+      "wiring": "practice",
+      "source": "Keys of the config schema at openai/codex rust-v0.159.2 and rust-v0.160.0 (codex-rs/core/config.schema.json). tools/adoption/codex_home.py needs features.daemon_auto_start = false and a PATH that starts with the ecosystem's bin directory."
+    },
+    {
+      "match": [
+        "codex/stack-worker/model",
+        "codex/stack-worker/model_reasoning_effort",
+        "codex/stack-worker/web_search"
+      ],
+      "wiring": "practice"
+    },
+    {
+      "match": [
+        "codex/stack-worker/shell_environment_policy.set.CHUB_*"
+      ],
+      "wiring": "not_wired:the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install",
+      "names": [
+        "chub",
+        "CHUB_TELEMETRY",
+        "CHUB_FEEDBACK"
+      ]
+    },
+    {
+      "match": [
+        "codex/omniroute/model_providers.omniroute.base_url"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "rewrite": [
+        {
+          "from": "127.0.0.1:20128",
+          "to": "127.0.0.1:{gateway_port}"
+        }
+      ],
+      "source": "The template carries the workstation's port 20128 as a literal. The install plan's gateway listens on 21128 (install-plan.json row gpt-gateway, config/omniroute.env.example)."
+    },
+    {
+      "match": [
+        "codex/omniroute/*"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute"
+    },
+    {
+      "match": [
+        "codex/role/stack-researcher.toml",
+        "codex/role/stack-verifier.toml"
+      ],
+      "wiring": "not_wired:the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py, whose rules cwd_rule, exact_shapes and f4_block require the context-mode working-directory bullet, the exact-command-shapes bullet and the RTK block, so a copy without the lines that name tools that are not wired breaks all three and its hash; they could be installed only whole",
+      "note": "tests/test_new_wsl_client_config.py filters both carriers by the unwired names and shows the three rules failing; the carriers stay out until the tools they name are wired."
+    },
+    {
+      "match": [
+        "codex/worker-role/*.toml"
+      ],
+      "wiring": "not_wired:installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open"
+    },
+    {
+      "match": [
+        "step/claude-launcher"
+      ],
+      "wiring": "slot:claude-code",
+      "owner": "Claude Code",
+      "source": "The launcher text is the heredoc of install_native in adoption/bootstrap-linux.sh; docs/decisions/2026-09-29-max-default-effort.md. https://code.claude.com/docs/en/setup (read 2026-10-02): auto-update leaves a custom launcher at ~/.local/bin/claude in place."
+    },
+    {
+      "match": [
+        "step/login-path-block"
+      ],
+      "wiring": "practice",
+      "note": "The managed PATH block of managed_block.py profile-path, in ~/.profile."
+    },
+    {
+      "match": [
+        "step/skills"
+      ],
+      "wiring": "not_wired:the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer"
+    },
+    {
+      "match": [
+        "path/local-bin"
+      ],
+      "wiring": "slot:claude-code",
+      "owner": "Claude Code",
+      "home_dir": ".local/bin",
+      "source": "The native installers put claude (https://code.claude.com/docs/en/setup) and codex (openai/codex rust-v0.160.0 scripts/install/install.sh L16) in ~/.local/bin, and uv tool install puts serena there."
+    },
+    {
+      "match": [
+        "path/mise-shims"
+      ],
+      "wiring": "slot:mise",
+      "owner": "mise",
+      "home_dir": ".local/share/mise/shims",
+      "source": "jdx/mise bc11f90c docs/dev-tools/shims.md L60-80 (default shims directory, PATH line) and settings.toml L2112-2115 (node.npm_shim, on by default, reshims after npm install -g)."
+    }
+  ]
+}
