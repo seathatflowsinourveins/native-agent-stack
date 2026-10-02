@@ -15996,8 +15996,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6f48997efed9e2e1271f2e21754e5b304f423e89faf45328951143c9a01a1fe4",
-      "bytes": 180968
+      "sha256": "66d2b5ee6df922390a32ddfbff48b78a07b1e8e2c09d0771c9c9dc12d64d5fe7",
+      "bytes": 181054
     },
     {
       "path": "docs/stack.md",
@@ -48051,8 +48051,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "27f37eab1c20b0be93153831a0d533d5d93b0c3daa638b5e4fb9f368d61f4d6e",
-      "bytes": 359232
+      "sha256": "1566d9d7c5bbd6c7a32529ca1b9f22c7123f6694e970782faeb813bb1a622c07",
+      "bytes": 360914
     },
     {
       "path": "tests/test_security_identity.py",
