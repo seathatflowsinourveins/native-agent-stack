@@ -18,7 +18,8 @@ halves judged also carries the class the rule's text gives as written. The rule'
 consequences to each class; this record does not carry them out. Sources:
 
 - ``catalogs/foundation/new-wsl-architecture-20261001.json``: the 37 rows, each winner (the source host's selection
-  of record, which is bookkeeping and not a merit result) with its pin, and the row's verdict;
+  of record, which is bookkeeping and not a merit result) with its pin (less the edition's note on what the new
+  distribution installs, ``EDITION_INSTALL_NOTE``), and the row's verdict;
 - ``evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json``: the blind Claude half for the 20
   foundation layers and the base distribution (picks, status, critic verdict, the comparison arms it recorded);
 - ``evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json`` when present: the
@@ -89,8 +90,11 @@ FOLD_NOTE = ("The rule's fold (its sixth line) attaches install and comparison c
              "does not carry them out: it reports what each half named and the class, and every slot's install "
              "decision is the definitive manifest's.")
 QUOTED_NOTE = ("The source host's record column quotes each winner's name and pin from the edition: bookkeeping, not a "
-               "merit result. Commentary inside a quoted pin, such as what the new distribution installs, is the "
-               "edition's wording, not this record's.")
+               "merit result. A quoted pin leaves out the edition's note on what the new distribution installs; that "
+               "is the definitive manifest's decision, not this record's.")
+# The edition's note inside four winners' pins (DVC, pandera, Inspect AI and MLflow). This record states no install,
+# so a quoted pin leaves out exactly this clause and keeps the rest of the edition's pin; the edition keeps the note.
+EDITION_INSTALL_NOTE = "; the new distribution installs the current upstream release"
 
 CLASSES = {
     "same_picks_both_recommended": "both halves named the same picks and both recommended them (agreement class "
@@ -120,7 +124,8 @@ EXTENSIONS = {
         "such a suffix are different picks"),
 }
 FIELDS = {
-    "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping)",
+    "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping); a quoted "
+                           "pin leaves out the edition's note on what the new distribution installs",
     "record_verdict": "the edition's verdict for the row, quoted as written (bookkeeping, not a decision of this "
                       "record)",
     "record_evidence_class": "the edition's evidence class for the row, quoted as written",
@@ -246,13 +251,19 @@ def display(pick: dict) -> str:
     return repo if repo else (pick.get("name") or "").strip()
 
 
+def quoted_pin(pin):
+    """The edition's pin as written, less the edition's note on what the new distribution installs."""
+    return pin.replace(EDITION_INSTALL_NOTE, "") if isinstance(pin, str) else pin
+
+
 def record_entry(winner: dict) -> dict:
-    """A winner of the source host's record: name, repository and pin only. Its upstream currency stays in the edition,
-    whose wording there speaks of switches and comparisons that are not this record's."""
+    """A winner of the source host's record: name, repository and pin only, the pin without the edition's install note.
+    Its upstream currency and install fields stay in the edition, whose wording there speaks of switches, comparisons
+    and installs that are not this record's."""
     return {
         "name": winner.get("component_id") or winner.get("name"),
         "repository": winner.get("repository"),
-        "pin": winner.get("pin"),
+        "pin": quoted_pin(winner.get("pin")),
     }
 
 

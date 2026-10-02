@@ -20,7 +20,8 @@ rows) the record carries:
 
 - the source host's selection of record at its pin of record, labelled as bookkeeping (program decision 5,
   `docs/decisions/2026-10-01-definitive-sota-wsl-program.md`), and as an unjudged incumbent where no blind record
-  exists;
+  exists; each pin is quoted from the edition without the edition's note on what the new distribution installs, which
+  four trading pins carry (DVC, pandera, Inspect AI and MLflow);
 - the blind Claude half of #589 and the blind GPT-6.1 Sol half recorded here
   (`evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/`): each half's status, critic verdict and
   picks, with the upstream facts captured for each pick before the GPT run;
@@ -36,7 +37,7 @@ named: at #602 (`675bdd51`) it installs nothing yet for durable memory (the memo
 head-to-head), for code search (split between semble and SocratiCode) or for the agent structural diff (sem not
 installed), although both halves named ai-memory, SocratiCode and sem.
 
-Result at main `58030172` plus this record, across 37 rows: `same_picks_both_recommended` 2,
+Result at main `99d5b122` plus this record, across 37 rows: `same_picks_both_recommended` 2,
 `same_picks_split_status` 3, `some_picks_shared` 16, `owner_lane_run_pending` 12 and `no_blind_record` 4. In the 21
 judged layers the generator's classes are agree 2 and overlap 19; the rule's text as written gives agree 2, overlap 16,
 differ 1 (cross:wsl-distro) and unclassified 2 (document-retrieval and scheduling-supervision). The GPT critics found
@@ -115,10 +116,13 @@ the text gives as written (`agreement_as_written`), with the extensions that cha
 
 Reducing a GitHub URL to owner/name is not a third extension: every pick URL in both records is a plain repository URL,
 where that reduction equals the rule's literal URL form (a test checks every pick). A Claude arm description names a
-pick only through the pick's full owner/name; a whole-word match on the repository name alone had dropped
-`mattpocock/skills` behind the arm `trailofbits/skills`. An arm described in words and the pick it describes can
-therefore both appear in the derived set, which the record keeps for reading the halves side by side and which
-schedules nothing.
+pick only through the pick's full owner/name. The earlier whole-word match on the repository name alone would read an
+arm `trailofbits/skills` as naming `mattpocock/skills`, but no recorded arm triggered that: the Claude half recorded
+no arms for instructions-skills, so neither version of the record dropped `mattpocock/skills`. On the two records, the
+change only adds to the derived set eight picks that arms described in words already name: semble (semantic-rag),
+agentmemory, Hindsight and deja-vu (durable-memory), RTK, sqz and Context Mode (token-efficiency) and Podman
+(hosting-services). Each now appears there twice, as the arm's words and as the pick's owner/name. The record keeps the
+derived set for reading the halves side by side; it schedules nothing.
 
 ## Revision of 2026-10-02
 
@@ -132,6 +136,14 @@ removes the install and comparison consequences, the gate ledger, the install co
 deciding-comparison texts from the record; discloses the two extensions and reports the class as written; hashes the
 rule; matches arm descriptions by full owner/name; and records the timing and inventory limits below. No judgment was
 redone and no pick changed.
+
+The review of that revision found two remaining faults, both corrected the same day. Four quoted pins still carried the
+edition's note on what the new distribution installs, which for pandera also contradicts the definitive manifest (its
+`market-data-validation` slot names Pointblank as the default, still open). The generator now leaves that note out of
+every quoted pin, and a test allows install wording in the outputs only in the disclaimers, the pointers to the install
+record, file names and the distribution row's title. And the account of the matcher above had claimed that the earlier
+matcher dropped `mattpocock/skills`; it never did on the recorded halves, and the paragraph now gives the change's
+actual effect.
 
 The reading of the overlap clause had changed once before, also without any judgment redone. The generator's first
 version, written while the judges ran and before any critic returned, held the shared picks as comparison arms wherever

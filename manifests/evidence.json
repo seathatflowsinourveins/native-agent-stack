@@ -14916,8 +14916,8 @@
     },
     {
       "path": "catalogs/foundation/final-catalog-20261001.json",
-      "sha256": "45532c73787bbec73f32a38e340e00543043073294365e56fc4d080c9734572c",
-      "bytes": 127399
+      "sha256": "4f74d22753200403e4929e0284fae83d8098f6f1cdd7599aa92e72a82125b96f",
+      "bytes": 127241
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -15726,8 +15726,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-final-catalog.md",
-      "sha256": "15fc4ad4d798a0bd86739229c95b055bbdd0e501f201be831d24515103ab1fe1",
-      "bytes": 32467
+      "sha256": "508aa01863a7178634b25f3e98f1c740cc5a67c9e991235040628be61536c4ce",
+      "bytes": 33785
     },
     {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
@@ -15831,8 +15831,8 @@
     },
     {
       "path": "docs/final-catalog-20261001.md",
-      "sha256": "38c0bd5fa7e708a808e59173843da6982b1520239451daa0341136ee409f268f",
-      "bytes": 20608
+      "sha256": "e0fdd8dfe7562e4f6cd27409804ee5dec797027253af0204b54341619774d4cc",
+      "bytes": 20392
     },
     {
       "path": "docs/foundation-closure-20260921.md",

@@ -21,7 +21,7 @@
     "no_blind_record": "a cross-cutting row outside the blind run: neither half judged it, and its selection of record is an unjudged incumbent (the source host's bookkeeping), not a merit result"
   },
   "fields": {
-    "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping)",
+    "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping); a quoted pin leaves out the edition's note on what the new distribution installs",
     "record_verdict": "the edition's verdict for the row, quoted as written (bookkeeping, not a decision of this record)",
     "record_evidence_class": "the edition's evidence class for the row, quoted as written",
     "blind": "the blind Claude Opus 5.5 half (#589): status, critic verdict, picks with captured upstream facts, and the comparison arms it recorded",
@@ -3056,7 +3056,7 @@
         {
           "name": "DVC",
           "repository": "https://github.com/treeverse/dvc",
-          "pin": "3.67.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)"
+          "pin": "3.67.1 (the 2026-09-22 verdict's baseline)"
         }
       ],
       "record_verdict": "comparison_required",
@@ -3188,7 +3188,7 @@
         {
           "name": "pandera",
           "repository": "https://github.com/unionai-oss/pandera",
-          "pin": "0.33.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)"
+          "pin": "0.33.1 (the 2026-09-22 verdict's baseline)"
         }
       ],
       "record_verdict": "selection_of_record_open",
@@ -3463,12 +3463,12 @@
         {
           "name": "Inspect AI",
           "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
-          "pin": "0.3.266 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)"
+          "pin": "0.3.266 (the 2026-09-22 verdict's baseline)"
         },
         {
           "name": "MLflow",
           "repository": "https://github.com/mlflow/mlflow",
-          "pin": "3.16.1 (the 2026-09-22 verdict's baseline; the new distribution installs the current upstream release)"
+          "pin": "3.16.1 (the 2026-09-22 verdict's baseline)"
         }
       ],
       "record_verdict": "selection_of_record_open",

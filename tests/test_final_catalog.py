@@ -1,5 +1,6 @@
 """Tests for scripts/final_catalog.py: the record names what each blind half picked in neutral evidence terms and is not
-an install list; pick normalization and the agreement classes follow the frozen rule except for the two disclosed
+an install list (no output states that anything installs or is installed, and quoted pins leave out the edition's
+install note); pick normalization and the agreement classes follow the frozen rule except for the two disclosed
 extensions, which the record reports next to the class the rule's text gives as written; an arm names a pick only by
 its full owner/name; the join covers every edition row once; and --check, run against real files, fails on a stale
 output or a changed agreement rule but only reports a grand-list move."""
@@ -156,8 +157,10 @@ class FoldTests(unittest.TestCase):
                          ("no_picks_shared", [], ["o/a"], ["x/c"], ["o/a", "x/c"]))
 
     def test_a_pick_sharing_only_a_repository_name_with_an_arm_is_kept(self):
-        # Regression (finding 4 of the #595 review): "mattpocock/skills" was dropped because the arm
-        # "trailofbits/skills (recommended)" contains the word "skills".
+        # Regression (finding 4 of the #595 review), on a synthetic arm: the earlier whole-word matcher read the arm
+        # "trailofbits/skills (recommended)" as naming "mattpocock/skills", because both repositories are named
+        # "skills". The collision was latent: the Claude half recorded no arms for instructions-skills, so the real
+        # record never lost mattpocock/skills.
         self.assertFalse(f.mentioned("mattpocock/skills", ["trailofbits/skills"]))
         c = [pick("t", "trailofbits/skills")]
         g = [pick("t", "trailofbits/skills"), pick("m", "mattpocock/skills")]
@@ -255,21 +258,64 @@ class BuildTests(unittest.TestCase):
         self.assertNotIn(f.INSTALL_RECORD["manifest"], self.data["inputs"])
         self.assertIn("not the rule applied exactly as written", md)
 
+    # Every install word the outputs may hold: the disclaimers, the pointers to the install record, the selection's
+    # name in titles and file paths, and the edition's title of the distribution row. None states an install.
+    INSTALL_WORDING_ALLOWED = (
+        "clean-install",
+        "install_record",
+        "not an install list",
+        "is an installed tool or a default",
+        "not an install decision",
+        "the install record is the definitive manifest",
+        "nothing here installs, accepts or authorizes",
+        "neither half installed or measured",
+        "attaches install and comparison consequences",
+        "every slot's install decision is the definitive manifest's",
+        "leaves out the edition's note on what the new distribution installs",
+        "first boot and install order",
+    )
+
     def test_no_row_reads_as_installed_standing_or_a_challenger(self):
         for text in self.texts:
             for word in ("standing", "challenger", "install_command", "install_source", "two_family_pick",
                          "partial_comparison", "gate_ledger", "stage-2"):
                 self.assertNotIn(word, text.lower(), word)
+            rest = text.lower()
+            for phrase in self.INSTALL_WORDING_ALLOWED:
+                rest = rest.replace(phrase, "")
+            left = [rest[max(0, m.start() - 60):m.end() + 60] for m in re.finditer("instal", rest)]
+            self.assertEqual(left, [], "install wording outside the disclaimers")
         for row in self.data["rows"]:
+            # No field of a row but the edition's title of the distribution row holds install wording.
+            fields = json.dumps({k: v for k, v in row.items() if k != "title"}, ensure_ascii=False).lower()
+            self.assertNotIn("instal", fields, row["layer_id"])
             for half in ("blind", "cross_family"):
                 for p in (row[half] or {}).get("picks", []):
                     self.assertEqual(set(p), {"name", "repository", "upstream"}, row["layer_id"])
 
-    def test_the_selection_of_record_is_carried_unchanged(self):
+    def test_the_selection_of_record_is_quoted_without_the_editions_install_note(self):
         by_id = {r["layer_id"]: r for r in self.edition["rows"]}
+        shortened = []
         for row in self.data["rows"]:
-            self.assertEqual([w["pin"] for w in row["selection_of_record"]],
-                             [w.get("pin") for w in by_id[row["layer_id"]]["winners"]])
+            winners = by_id[row["layer_id"]]["winners"]
+            self.assertEqual([(w["name"], w["repository"]) for w in row["selection_of_record"]],
+                             [(w.get("component_id") or w.get("name"), w.get("repository")) for w in winners])
+            for entry, winner in zip(row["selection_of_record"], winners):
+                if entry["pin"] == winner.get("pin"):
+                    continue
+                shortened.append((row["layer_id"], entry["name"]))
+                self.assertEqual(winner["pin"].replace(f.EDITION_INSTALL_NOTE, ""), entry["pin"])
+                self.assertTrue(entry["pin"].endswith(" (the 2026-09-22 verdict's baseline)"), entry["pin"])
+        # Exactly the four pins that carry the note; a new install clause in the edition fails the wording test above.
+        self.assertEqual(shortened, [("identity-provenance", "DVC"), ("data-quality-orchestration", "pandera"),
+                                     ("evaluation-experiments", "Inspect AI"), ("evaluation-experiments", "MLflow")])
+
+    def test_a_quoted_pin_leaves_out_only_the_editions_install_note(self):
+        self.assertEqual(f.quoted_pin("3.67.1 (the 2026-09-22 verdict's baseline; the new distribution installs the "
+                                      "current upstream release)"), "3.67.1 (the 2026-09-22 verdict's baseline)")
+        for pin in ("0.119.0 (archive sha256 3fa2dc4b)", "985ef30 with documented dependency remediation",
+                    "v0.2.1 at source commit b487f386 (the 2026-09-22 verdict's baseline)", "", None):
+            self.assertEqual(f.quoted_pin(pin), pin)
 
     def test_picks_of_packet_candidates_carry_the_captured_upstream_facts(self):
         facts = f.load_facts()
