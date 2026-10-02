@@ -3909,7 +3909,7 @@
         "skfolio",
         "syft"
       ],
-      "claim": "Scheduled catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37068599328) rebuilt the SOTA-convergence manifest and found 40 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
+      "claim": "Catalog-freshness run (https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37068599328) rebuilt the SOTA-convergence manifest and found 40 component(s) with pin/upstream drift against the currently published manifest. This receipt, and the branch/PR it is registered from, are report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* file was selected, evaluated, or changed by this run. A pin bump requires its own separately qualified receipt under evidence/artifacts/*/, produced by the existing SOTA-convergence lane review, not by this automation.",
       "limitations": [
         "This is drift detection only: it reports that a pin or upstream 'latest' value differs from the published manifest; it does not evaluate, select, or adopt any candidate, and it changes no catalog selection file.",
         "component_ids lists only this run's drifted rows whose id is also a manifests/stack.json component; it is not a claim that every drifted id in the full drift report was reviewed.",
@@ -14933,8 +14933,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "2d2956d1dd037480afaf4baebdfd7201141b9b6037017815ec3822864f69453e",
-      "bytes": 15250
+      "sha256": "74b65f1acb6712c431c8b0e7d5c5261efdff75e51a3952f9558db326526c1c6f",
+      "bytes": 15681
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -14953,8 +14953,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
+      "bytes": 26007
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15543,8 +15543,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "899e63f28a0463d344f771314edd2b73451c29f944a77a23ea2113cefdb9b400",
-      "bytes": 15350
+      "sha256": "1888656a0c4afcd630cb9fc861b05818de653e438bdb4780eaa91206380b401b",
+      "bytes": 15725
     },
     {
       "path": "docs/convergence-audit.md",
@@ -15787,9 +15787,19 @@
       "bytes": 7563
     },
     {
+      "path": "docs/decisions/2026-10-02-mac-claude-resolution.md",
+      "sha256": "d57056c63153f7ac7a7f0dcf7b6de8892a7bfdb95417a06f6163c178c433df9a",
+      "bytes": 4885
+    },
+    {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
       "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
       "bytes": 6141
+    },
+    {
+      "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
+      "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
+      "bytes": 16881
     },
     {
       "path": "docs/direct-results.md",
@@ -47348,8 +47358,8 @@
     },
     {
       "path": "evidence/receipts/catalog-freshness-20261002.json",
-      "sha256": "a9492cd31e155f18bd4fddd0e53e4f1dd203eda9743968ebe8d5fb929ff09405",
-      "bytes": 2411
+      "sha256": "e0a583c529705f5e67a9253afb48a93eabb78ea9b2930b62c00c73473b059b33",
+      "bytes": 2401
     },
     {
       "path": "evidence/receipts/catalog-runtime-review-20260921.json",
