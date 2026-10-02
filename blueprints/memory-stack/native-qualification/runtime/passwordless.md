@@ -1,5 +1,12 @@
 # Passwordless native integration boundary — 2026-10-02
 
+Closure: the ACP proposal below is **not adopted and not queued for testing**.
+The [final verdict](../VERDICT.md) retains native authentication. Separately owned
+evidence now establishes a completed Sol SDK call through OmniRoute with 27/27
+protocol checks; that route does not establish legacy CLI adapter compatibility
+or blind memory convergence. The earlier 401 and adapter observations remain
+historical evidence, not a general claim that OmniRoute cannot execute SDK work.
+
 Codex 0.160.0 reports a ChatGPT login and Claude 2.1.287 reports a native
 claude.ai/firstParty login. Both status commands exited zero. Native credential
 stores remain native. The operator does not need to supply a key for that

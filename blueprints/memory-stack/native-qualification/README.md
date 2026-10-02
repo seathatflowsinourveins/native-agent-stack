@@ -1,14 +1,21 @@
 # Native memory qualification
 
+**Closed deployment decision:** retain the existing native core and single
+ai-memory owner. No further candidate testing is queued by this unit. Read the
+[final architecture and verdict](VERDICT.md) and [machine-readable closure](closure.json).
+The commands below are archived reproducibility instructions, not pending work
+or authorization to restart the prospective comparison.
+
 This package implements the bounded evaluation workflow for `native_files`,
 `ai_memory` and `hindsight`. It uses **Inspect AI 0.3.275** for task execution,
 scoring and logs. Native Codex and Claude keep their own executor and login.
 No API bridge, replacement agent runner, global hook installer or production
 promotion runs automatically.
 
-The current production memory selection remains ai-memory. Hindsight is fully
-eligible to replace it after the measured gates; a Markdown source of truth is
-not an automatic quality preference. This package has not established a winner.
+The current production memory selection remains ai-memory. Hindsight is not
+selected for this deployment; its repository quality is not rejected. A Markdown
+source of truth is not an automatic quality preference. This package has not
+established a comparative winner.
 The [preregistration](PREREGISTRATION.md) defines the comparison, held-out data,
 operational gates and 20-session canary. The [runtime recipe](runtime/README.md)
 contains pinned upstream commands, rollback and the isolated restore result.

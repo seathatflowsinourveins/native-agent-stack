@@ -1,8 +1,12 @@
 # Native memory qualification preregistration
 
-Status: **draft specification; configuration and exposure gates are not closed**.
-This document registers a prospective local qualification procedure, not a passed
-experiment, an approved production replacement, or a published benchmark result.
+Status: **archived prospective specification; this decision unit is closed**.
+The unexecuted native comparison is not queued. [The final verdict](VERDICT.md)
+retains the existing core and marks replacements not selected for this deployment.
+This document preserves a prospective procedure, not a passed experiment,
+an approved production replacement or a published benchmark result. Reuse
+requires a new explicitly scoped decision unit and fresh configuration/exposure
+attestation; closure does not change any earlier failed or unexecuted result.
 
 The objective is to compare `native_files`, `ai_memory`, and `hindsight` on the
 same sanitized sources, and determine whether a challenger merits a broader

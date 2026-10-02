@@ -2,6 +2,8 @@
   "schema_version": 1,
   "evidence_class": "source_review_and_read_only_host_observation",
   "checked_on": "2026-10-02",
+  "unit_disposition": "closed_retain_existing_core",
+  "prerequisite_disposition": "historical_unmet_conditions_for_any_new_replacement_proposal; no test queued",
   "native_c_status": "NOT_RUN",
   "canary_sessions": 0,
   "blind_convergence_status": "NOT_RUN",
@@ -27,10 +29,10 @@
     "Freeze model/configuration/source hashes, budgets and exposure attestation before any held-out query.",
     "Run matching native lifecycle and representative quality/latency checks, blind cross-family review and genuine-session canary."
   ],
-  "owner_action": "Deliver the exact canary inventory and rollback proposal to the existing native configuration/source owner. Do not run the default user-scope installer as an isolation shortcut.",
+  "owner_action": "Archive this prerequisite record with the closed verdict. No canary or adapter experiment is queued. A new proposal must respect the existing configuration owner and must not use the default user-scope installer as an isolation shortcut.",
   "source_pins": {
     "coding_agents": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
     "repository_policy": "231eed43e17cc7953751b7caf90376b01cb5feec"
   },
-  "limits": "This is an open-gate record, not a completed convergence record or a rejection of any candidate's repository quality. Earlier Codex version receipts do not qualify the newly observed client version."
+  "limits": "This preserves unmet evidence conditions in a closed decision, not completed convergence or rejection of candidate repository quality. Earlier Codex version receipts do not qualify the newly observed client version. The separately completed OmniRoute SDK route does not qualify the legacy CLI adapters."
 }
