@@ -193,8 +193,9 @@ integrity/scope checks: 69 components, 9,315 hashed files, four profiles and
 186 receipts. In an owned clean checkout, with an owned sibling `TMPDIR`
 outside the repository,
 `python3 -m unittest tests.test_spy_parity -v` passed 179 tests, exit 0.
-These are repository/synthetic checks; no engine, broker, GPU or model request
-was run for this closeout.
+These are repository/synthetic checks. No separate engine, broker, GPU or
+candidate-model execution was launched; the research workers' provider activity
+is outside those check counts.
 
 Three bounded research workers returned useful interim source findings, then
 hit the provider usage limit before their final handoffs. This unit therefore
