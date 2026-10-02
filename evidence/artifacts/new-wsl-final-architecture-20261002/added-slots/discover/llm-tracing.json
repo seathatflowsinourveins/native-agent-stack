@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "name": "HyperDX / ClickStack",
+      "repository": "https://github.com/hyperdxio/hyperdx",
+      "why_candidate": "[Locally deployable OpenTelemetry trace storage and inspection through ClickStack’s all-in-one deployment](https://github.com/hyperdxio/hyperdx/blob/main/README.md); latest repository release [cli-v0.6.4](https://github.com/hyperdxio/hyperdx/releases/tag/cli-v0.6.4), 2026-10-01."
+    },
+    {
+      "name": "Jaeger",
+      "repository": "https://github.com/jaegertracing/jaeger",
+      "why_candidate": "[Distributed tracing platform with OTLP ingestion, storage, querying, and a local web UI](https://github.com/jaegertracing/jaeger/blob/main/README.md); latest release [v2.21.0](https://github.com/jaegertracing/jaeger/releases/tag/v2.21.0), 2026-09-14."
+    },
+    {
+      "name": "Langfuse",
+      "repository": "https://github.com/langfuse/langfuse",
+      "why_candidate": "[Self-hosted LLM and agent trace store with a web inspection interface](https://github.com/langfuse/langfuse/blob/main/README.md); latest release [v4.49.0](https://github.com/langfuse/langfuse/releases/tag/v4.49.0), 2026-10-01."
+    },
+    {
+      "name": "LangWatch",
+      "repository": "https://github.com/langwatch/langwatch",
+      "why_candidate": "[Self-hosted LLM and coding-agent observability platform with OpenTelemetry integration](https://github.com/langwatch/langwatch/blob/main/README.md); latest release [langwatch-3.20.0](https://github.com/langwatch/langwatch/releases/tag/langwatch-3.20.0), 2026-10-02."
+    },
+    {
+      "name": "MLflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "why_candidate": "[Local LLM and agent tracing server with an inspection UI and native OpenTelemetry integration](https://github.com/mlflow/mlflow/blob/master/README.md); latest release [v3.16.1](https://github.com/mlflow/mlflow/releases/tag/v3.16.1), 2026-09-17."
+    },
+    {
+      "name": "OpenLIT",
+      "repository": "https://github.com/openlit/openlit",
+      "why_candidate": "[Self-hosted agent and LLM trace store and dashboard with OTLP HTTP and gRPC receivers](https://github.com/openlit/openlit/blob/main/README.md); latest repository release [openlit-2.1.0](https://github.com/openlit/openlit/releases/tag/openlit-2.1.0), 2026-09-10."
+    },
+    {
+      "name": "OpenObserve",
+      "repository": "https://github.com/openobserve/openobserve",
+      "why_candidate": "[Locally deployable OpenTelemetry trace store with built-in trace and LLM inspection interfaces](https://github.com/openobserve/openobserve/blob/main/README.md); latest release [v1.1.0-rc1](https://github.com/openobserve/openobserve/releases/tag/v1.1.0-rc1), 2026-09-30."
+    },
+    {
+      "name": "Opik",
+      "repository": "https://github.com/comet-ml/opik",
+      "why_candidate": "[Self-hosted LLM and agent trace store and web UI supporting OpenTelemetry ingestion](https://github.com/comet-ml/opik/blob/main/README.md); latest release [2.2.87](https://github.com/comet-ml/opik/releases/tag/2.2.87), 2026-10-01."
+    },
+    {
+      "name": "SigNoz",
+      "repository": "https://github.com/SigNoz/signoz",
+      "why_candidate": "[Self-hosted OpenTelemetry observability platform with trace storage and LLM trace inspection](https://github.com/SigNoz/signoz/blob/main/README.md); latest release [v0.144.0](https://github.com/SigNoz/signoz/releases/tag/v0.144.0), 2026-09-29."
+    },
+    {
+      "name": "Uptrace",
+      "repository": "https://github.com/uptrace/uptrace",
+      "why_candidate": "[Locally deployable OpenTelemetry trace store with built-in querying and inspection UI](https://github.com/uptrace/uptrace/blob/master/README.md); latest release [v2.1.0-beta.8](https://github.com/uptrace/uptrace/releases/tag/v2.1.0-beta.8), 2026-08-13."
+    }
+  ],
+  "search_notes": "Checked 2026-10-02 UTC against the 90-day cutoff of 2026-07-04 UTC. Alphabetical order carries no ranking. For every listed repository, gh api repos/OWNER/REPO confirmed existence, canonical URL, and archived=false; gh api repos/OWNER/REPO/releases/latest confirmed a release inside the window. READMEs supplied deployment and functional evidence. OpenLLMetry was excluded because its [README](https://github.com/traceloop/openllmetry#readme) describes instrumentation extensions requiring a separate backend. Phoenix passed the maintenance checks but was excluded under an open-source license interpretation because its [README](https://github.com/Arize-ai/phoenix#copyright-patent-and-license) specifies Elastic License 2.0. Agenta passed maintenance checks, but OpenTelemetry ingestion was not established by its inspected [README](https://github.com/Agenta-AI/agenta#readme). The entries provide storage and inspection within one product deployment, including their storage dependencies. Suitability for the primary host is inferred from documented local deployments; native macOS arm64 deployment was not fully verified. Used 6 search requests, 8 successful README page fetches, and 30 GitHub API calls. This bounded discovery set does not establish exhaustive coverage of all public repositories."
+}
