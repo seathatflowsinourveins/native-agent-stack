@@ -1,0 +1,31 @@
+{
+  "codex_exit_code": 0,
+  "turn_status": "turn.completed",
+  "completed_item_types": {
+    "reasoning": 2,
+    "mcp_tool_call": 1,
+    "agent_message": 1
+  },
+  "non_json_lines": 0,
+  "mcp_tool_calls": [
+    {
+      "server": "time",
+      "tool": "get_current_time",
+      "status": "completed",
+      "arguments": {
+        "timezone": "UTC"
+      },
+      "error": null,
+      "result_datetime": "2026-10-02T00:17:24+00:00"
+    }
+  ],
+  "tool_call_completed": true,
+  "tool_result_datetimes": [
+    "2026-10-02T00:17:24+00:00"
+  ],
+  "final_answer": "2026-10-02T00:17:24+00:00",
+  "final_answer_contains_result": true,
+  "run_pass": true,
+  "reason": "pass",
+  "error_events": []
+}

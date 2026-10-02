@@ -1,0 +1,4 @@
+Reading additional input from stdin...
+2026-10-02T00:19:48.107266Z ERROR codex_core::tools::router: error=resources/read failed: resources/read failed for `time` (/get_current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters("")
+2026-10-02T00:20:41.832716Z ERROR codex_core::tools::router: error=resources/list failed: resources/list failed for `time`: Mcp error: -32601: Method not found
+2026-10-02T00:20:45.734634Z ERROR codex_core::tools::router: error=resources/templates/list failed: resources/templates/list failed for `time`: Mcp error: -32601: Method not found

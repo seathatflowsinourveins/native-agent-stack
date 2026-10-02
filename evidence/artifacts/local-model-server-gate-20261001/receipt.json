@@ -1,0 +1,823 @@
+{
+  "schema_version": 1,
+  "id": "local-model-server-gate-20261001",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "llama-cpp",
+    "codex"
+  ],
+  "evidence_class": "Local integration check",
+  "recorded_at_utc": "2026-10-02T02:21:30Z",
+  "claim": "On one WSL2 workstation, the same fixed Codex 0.159.3 task that must call one MCP tool was run three times against llama-server (llama.cpp release v0.5.0, build b11146) and three times against Ollama v0.35.0, both serving the same Qwen3-8B Q4_K_M GGUF on the CPU. Under the frozen pass rule neither arm passed the gate: llama-server passed 0 of 3 scored runs and Ollama passed 2 of 3, so the predicted result (llama-server fails, Ollama passes) did not occur as preregistered; the MCP tool call itself completed in 0 of 3 llama-server runs and in 3 of 3 Ollama runs, and the one Ollama run that failed (B3) had its tool call completed and then hit the wrapper's 300-second wall limit before the final answer.",
+  "gate": {
+    "definition": "First gate, pass or fail: Ollama replaces llama.cpp if the Codex MCP tool call fails on llama-server (its log shows 'unsupported Responses tool type 'namespace' skipped') and succeeds on Ollama.",
+    "arm_a_llama_server": "fail",
+    "arm_b_ollama": "fail",
+    "outcome": "Under the frozen pass rule neither arm passed the gate: llama-server passed 0 of 3 scored runs and Ollama passed 2 of 3, so the predicted result (llama-server fails, Ollama passes) did not occur as preregistered; the MCP tool call itself completed in 0 of 3 llama-server runs and in 3 of 3 Ollama runs, and the one Ollama run that failed (B3) had its tool call completed and then hit the wrapper's 300-second wall limit before the final answer.",
+    "predicted_result_occurred_under_frozen_rule": false,
+    "mcp_tool_call_completed_runs": {
+      "llama_server": "0 of 3",
+      "ollama": "3 of 3"
+    },
+    "tool_call_part_of_prediction_occurred": true,
+    "llama_server_log_line": "W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+    "llama_server_log_line_in_every_scored_arm_a_run": true
+  },
+  "preregistration": {
+    "path": "PREREGISTRATION.md",
+    "sha256": "c384f55794d72f3fa6e1a90586f0c191fb874588574388dc5c80d496b817d369",
+    "written_at_utc": "2026-10-01T23:12:24Z",
+    "first_model_call_utc": "2026-10-01T23:15:22Z",
+    "note": "The first model call was the unscored warm-up of arm A; the file was not changed after its hash was taken."
+  },
+  "host": {
+    "scope": "one workstation, WSL2 (Linux 6.18 microsoft-standard-WSL2, glibc 2.39), not the new machine",
+    "cpu": "AMD Ryzen Threadripper PRO 5975WX, 48 logical processors visible; llama-server reported 24 threads",
+    "gpu": "NVIDIA GeForce RTX 4090 present but not used by the gate (see deviations_from_brief)"
+  },
+  "pins": {
+    "llama_cpp": {
+      "release": "v0.5.0",
+      "release_published_utc": "2026-09-23T20:50:06Z",
+      "build_tag": "b11146",
+      "commit": "7fe450e19305b828c199d602c23a8337aaa1f03b",
+      "reported_version": "0.5.0-dev (build 11146, commit 7fe450e19)",
+      "artifacts": {
+        "llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz": "c2ab9e19838513ff69d1af8d999ad717dd3c7ee4714ac04c7ed5ab9077c50e4e",
+        "cudart-llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz": "1466daea60aad1144819e151b2bae19d54556cf1da6c129c4f55a5ded2637c25",
+        "nightly-tag.txt": "defb2cdfd758ca455a291fe3e37c0f9a442f5ed4fcafe4cbc179237cfb43374f"
+      },
+      "llama_server_binary_sha256": "376626f953efd7bbf16dee112747196d2b1de26717bcd1d37e203340dc5c043c",
+      "source_urls": [
+        "https://github.com/ggml-org/llama.cpp/releases/download/b11146/llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz",
+        "https://github.com/ggml-org/llama.cpp/releases/download/b11146/cudart-llama-b11146-bin-ubuntu-cuda-12.8-x64.tar.gz"
+      ],
+      "workstation_path_binary": "the llama-server already on PATH reports the same version and has the same sha256; it is the same build as the latest release, not an older one",
+      "newer_prereleases_not_run": "b11327 (published 2026-10-01T20:55:49Z, prerelease)",
+      "pr_23235": "open, not merged, last updated 2026-05-17T23:40:26Z"
+    },
+    "ollama": {
+      "release": "v0.35.0",
+      "release_published_utc": "2026-09-28T21:23:22Z",
+      "commit": "cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+      "artifacts": {
+        "ollama-linux-amd64.tar.zst": "1c114a6b220c5efca2ef2b1e5f01d1e535e26f6cd6d1678c8489325d2835e525"
+      },
+      "ollama_binary_sha256": "0b0650a962dda61ec0598141ea11e3b688d225e926c9c00bc2c299d0ed34c4f8",
+      "source_urls": [
+        "https://github.com/ollama/ollama/releases/download/v0.35.0/ollama-linux-amd64.tar.zst"
+      ],
+      "install": "tarball unpacked into the state directory without sudo; zstd stream decoded with Python zstandard 0.25.0"
+    },
+    "codex": {
+      "version": "codex-cli 0.159.3",
+      "tag": "rust-v0.159.3",
+      "commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "binary_sha256": "8bf204b36a2f6dd0dab73aa2f639892e67ef9ac8befccb4a05b1496ebf25c479",
+      "note": "the workstation's installed x86_64-unknown-linux-musl standalone binary, called directly"
+    },
+    "mcp_server": {
+      "package": "mcp-server-time",
+      "version": "2026.8.18",
+      "mcp_sdk": "1.30.0",
+      "python": "3.13.15",
+      "wheel_sha256": "1407583af42dc0163909d855c9ef20114a12b4981c3975033721a7906cdd212a",
+      "transport": "stdio, started by Codex",
+      "tool": "get_current_time",
+      "resolved_packages": "setup/mcp-venv-freeze.txt"
+    },
+    "ollama_library_template": {
+      "manifest": "https://registry.ollama.ai/v2/library/qwen3/manifests/8b",
+      "template_layer": "sha256:ae370d884f108d16e7cc8fd5259ebc5773a0afa6e078b11f4ed7e39a27e0dfc4",
+      "params_layer": "sha256:cff3f395ef3756ab63e58b0ad1b32bb6f802905cae1472e6a12034e4246fbbdb"
+    }
+  },
+  "model": {
+    "repository": "Qwen/Qwen3-8B-GGUF",
+    "revision": "7c41481f57cb95916b40956ab2f0b139b296d974",
+    "file": "Qwen3-8B-Q4_K_M.gguf",
+    "bytes": 5027783488,
+    "sha256": "d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785",
+    "source_url": "https://huggingface.co/Qwen/Qwen3-8B-GGUF/resolve/7c41481f57cb95916b40956ab2f0b139b296d974/Qwen3-8B-Q4_K_M.gguf",
+    "served_as": "gate-qwen3-8b on both servers; Ollama's blob has the same sha256 as the file given to llama-server",
+    "context_tokens_set": 32768,
+    "model_context_limit": 40960,
+    "slots": 1,
+    "sampling": {
+      "temperature": 0.6,
+      "top_k": 20,
+      "top_p": 0.95,
+      "repeat_penalty": 1
+    },
+    "device": "CPU on both servers"
+  },
+  "commands": {
+    "llama_server": "env -i ... CUDA_VISIBLE_DEVICES=-1 llama-server -m <STATE>/models/Qwen3-8B-Q4_K_M.gguf --alias gate-qwen3-8b --host 127.0.0.1 --port 20231 -c 32768 -np 1 --device none -ngl 0 --jinja --temp 0.6 --top-k 20 --top-p 0.95 --repeat-penalty 1.0 --verbose",
+    "ollama_serve": "env -i ... CUDA_VISIBLE_DEVICES=-1 OLLAMA_HOST=127.0.0.1:20232 OLLAMA_MODELS=<STATE>/ollama-models OLLAMA_NO_CLOUD=1 OLLAMA_CONTEXT_LENGTH=32768 OLLAMA_NUM_PARALLEL=1 OLLAMA_DEBUG=1 ollama serve",
+    "ollama_import": "ollama create gate-qwen3-8b -f Modelfile",
+    "ollama_codex_profile": "ollama launch codex --model gate-qwen3-8b --yes -- --version",
+    "codex_run": "env -i ... OPENAI_API_KEY=ollama timeout --signal=TERM --kill-after=20 300 codex exec --profile <llamacpp-gate|ollama-launch> --json --skip-git-repo-check -C <STATE>/work -o last-message.txt \"<prompt>\" </dev/null",
+    "prompt": "Use the MCP tool get_current_time from the MCP server named time, with the argument timezone set to \"UTC\". Do not run any shell command. After the tool returns, reply with exactly the datetime value it returned and nothing else.",
+    "wrappers": [
+      "gate_env.sh",
+      "gate_setup.sh",
+      "gate_run.sh",
+      "gate_score.py",
+      "gate_collect.py"
+    ],
+    "environment": "every process under env -i with HOME=<STATE>/scratch-home, CODEX_HOME=<STATE>/scratch-home/.codex, TZ=UTC, PATH=<STATE>/bin:/usr/bin:/bin"
+  },
+  "pass_rule": "A run passes when its codex exec --json event log has a completed mcp_tool_call item for server time, tool get_current_time, with a result carrying a datetime string, and the last agent_message contains that string. An arm passes when all three scored runs pass.",
+  "runs": [
+    {
+      "label": "warmup-A",
+      "arm": "A (llama-server)",
+      "scored": false,
+      "server_pid": 3306015,
+      "server_started_utc": "2026-10-01T23:15:11Z",
+      "server_ready_utc": "2026-10-01T23:15:22Z",
+      "codex_finished_utc": "2026-10-01T23:18:37Z",
+      "server_stopped_utc": "2026-10-01T23:18:39Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "mcp_tool_call": 2,
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "read_mcp_resource",
+          "status": "failed",
+          "arguments": {
+            "server": "time",
+            "uri": "get_current_time"
+          },
+          "error": "resources/read failed: resources/read failed for `time` (get_current_time): Mcp error: -32602: Invalid request parameters(\"\")",
+          "result_datetime": null
+        },
+        {
+          "server": "time",
+          "tool": "list_mcp_resources",
+          "status": "failed",
+          "arguments": {
+            "server": "time"
+          },
+          "error": "resources/list failed: resources/list failed for `time`: Mcp error: -32601: Method not found",
+          "result_datetime": null
+        }
+      ],
+      "target_tool_called": false,
+      "tool_call_completed": false,
+      "tool_result_datetimes": [],
+      "final_answer": "The MCP server \"time\" is not accessible or improperly configured. The error \"Method not found\" indicates the server name or resource might be invalid. Please verify the MCP server configuration and ensure the \"time\" server is correctly set up to provide the `get_current_time` resource. This task cannot proceed without a valid MCP server connection.",
+      "final_answer_contains_result": false,
+      "run_pass": false,
+      "reason": "tool_call_failed",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [
+          "5565: 0.10.934.528 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "5566: 0.10.934.555 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "21719: 1.59.073.942 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "21720: 1.59.073.973 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "30028: 2.46.114.058 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "30029: 2.46.114.091 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped"
+        ],
+        "function_tools_passed_to_model_first_request": [
+          "exec_command",
+          "write_stdin",
+          "list_mcp_resources",
+          "list_mcp_resource_templates",
+          "read_mcp_resource",
+          "request_user_input",
+          "view_image",
+          "get_goal",
+          "create_goal",
+          "update_goal"
+        ],
+        "parsed_responses_tools_lines": [],
+        "responses_http_lines": []
+      }
+    },
+    {
+      "label": "warmup-B",
+      "arm": "B (Ollama)",
+      "scored": false,
+      "server_pid": 3355352,
+      "server_started_utc": "2026-10-01T23:18:53Z",
+      "server_ready_utc": "2026-10-01T23:18:54Z",
+      "codex_finished_utc": "2026-10-01T23:21:15Z",
+      "server_stopped_utc": "2026-10-01T23:21:17Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "reasoning": 2,
+        "mcp_tool_call": 1,
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "get_current_time",
+          "status": "completed",
+          "arguments": {
+            "timezone": "UTC"
+          },
+          "error": null,
+          "result_datetime": "2026-10-01T23:20:46+00:00"
+        }
+      ],
+      "target_tool_called": true,
+      "tool_call_completed": true,
+      "tool_result_datetimes": [
+        "2026-10-01T23:20:46+00:00"
+      ],
+      "final_answer": "2026-10-01T23:20:46+00:00",
+      "final_answer_contains_result": true,
+      "run_pass": true,
+      "reason": "pass",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [],
+        "function_tools_passed_to_model_first_request": null,
+        "parsed_responses_tools_lines": [
+          "32: time=2026-10-01T23:18:55.255Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false",
+          "301: time=2026-10-01T23:20:47.190Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false"
+        ],
+        "responses_http_lines": [
+          "297: [GIN] 2026/10/01 - 23:20:47 | 200 |         1m51s |       127.0.0.1 | POST     \"/v1/responses\"",
+          "327: [GIN] 2026/10/01 - 23:21:15 | 200 | 28.190277318s |       127.0.0.1 | POST     \"/v1/responses\""
+        ]
+      }
+    },
+    {
+      "label": "A1",
+      "arm": "A (llama-server)",
+      "scored": true,
+      "server_pid": 3387559,
+      "server_started_utc": "2026-10-01T23:21:28Z",
+      "server_ready_utc": "2026-10-01T23:21:38Z",
+      "codex_finished_utc": "2026-10-01T23:26:38Z",
+      "server_stopped_utc": "2026-10-01T23:26:40Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 124,
+      "turn_status": null,
+      "completed_item_types": {
+        "mcp_tool_call": 4
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "read_mcp_resource",
+          "status": "failed",
+          "arguments": {
+            "server": "time",
+            "uri": "/get_current_time?timezone=UTC"
+          },
+          "error": "resources/read failed: resources/read failed for `time` (/get_current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters(\"\")",
+          "result_datetime": null
+        },
+        {
+          "server": "time",
+          "tool": "read_mcp_resource",
+          "status": "failed",
+          "arguments": {
+            "server": "time",
+            "uri": "/get_current_time?tz=UTC"
+          },
+          "error": "resources/read failed: resources/read failed for `time` (/get_current_time?tz=UTC): Mcp error: -32602: Invalid request parameters(\"\")",
+          "result_datetime": null
+        },
+        {
+          "server": "time",
+          "tool": "read_mcp_resource",
+          "status": "failed",
+          "arguments": {
+            "server": "time",
+            "uri": "/current_time?timezone=UTC"
+          },
+          "error": "resources/read failed: resources/read failed for `time` (/current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters(\"\")",
+          "result_datetime": null
+        },
+        {
+          "server": "time",
+          "tool": "read_mcp_resource",
+          "status": "failed",
+          "arguments": {
+            "server": "time",
+            "uri": "/current_time"
+          },
+          "error": "resources/read failed: resources/read failed for `time` (/current_time): Mcp error: -32602: Invalid request parameters(\"\")",
+          "result_datetime": null
+        }
+      ],
+      "target_tool_called": false,
+      "tool_call_completed": false,
+      "tool_result_datetimes": [],
+      "final_answer": null,
+      "final_answer_contains_result": false,
+      "run_pass": false,
+      "reason": "timeout",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [
+          "5565: 0.10.027.053 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "5566: 0.10.027.083 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "20473: 1.52.431.602 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "20474: 1.52.431.635 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "40315: 3.35.481.593 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "40316: 3.35.481.626 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "41330: 3.41.007.341 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "41331: 3.41.007.380 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "53699: 4.45.794.102 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "53700: 4.45.794.135 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped"
+        ],
+        "function_tools_passed_to_model_first_request": [
+          "exec_command",
+          "write_stdin",
+          "list_mcp_resources",
+          "list_mcp_resource_templates",
+          "read_mcp_resource",
+          "request_user_input",
+          "view_image",
+          "get_goal",
+          "create_goal",
+          "update_goal"
+        ],
+        "parsed_responses_tools_lines": [],
+        "responses_http_lines": []
+      }
+    },
+    {
+      "label": "B1",
+      "arm": "B (Ollama)",
+      "scored": true,
+      "server_pid": 3447247,
+      "server_started_utc": "2026-10-01T23:26:40Z",
+      "server_ready_utc": "2026-10-01T23:26:48Z",
+      "codex_finished_utc": "2026-10-01T23:30:13Z",
+      "server_stopped_utc": "2026-10-01T23:30:16Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "reasoning": 2,
+        "mcp_tool_call": 1,
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "get_current_time",
+          "status": "completed",
+          "arguments": {
+            "timezone": "UTC"
+          },
+          "error": null,
+          "result_datetime": "2026-10-01T23:29:06+00:00"
+        }
+      ],
+      "target_tool_called": true,
+      "tool_call_completed": true,
+      "tool_result_datetimes": [
+        "2026-10-01T23:29:06+00:00"
+      ],
+      "final_answer": "2026-10-01T23:29:06+00:00",
+      "final_answer_contains_result": true,
+      "run_pass": true,
+      "reason": "pass",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [],
+        "function_tools_passed_to_model_first_request": null,
+        "parsed_responses_tools_lines": [
+          "34: time=2026-10-01T23:26:48.848Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false",
+          "310: time=2026-10-01T23:29:07.140Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false"
+        ],
+        "responses_http_lines": [
+          "306: [GIN] 2026/10/01 - 23:29:07 | 200 |         2m18s |       127.0.0.1 | POST     \"/v1/responses\"",
+          "339: [GIN] 2026/10/01 - 23:30:13 | 200 |          1m6s |       127.0.0.1 | POST     \"/v1/responses\""
+        ]
+      }
+    },
+    {
+      "label": "A2",
+      "arm": "A (llama-server)",
+      "scored": true,
+      "server_pid": 3481685,
+      "server_started_utc": "2026-10-01T23:30:16Z",
+      "server_ready_utc": "2026-10-01T23:30:31Z",
+      "codex_finished_utc": "2026-10-01T23:35:09Z",
+      "server_stopped_utc": "2026-10-01T23:35:11Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [],
+      "target_tool_called": false,
+      "tool_call_completed": false,
+      "tool_result_datetimes": [],
+      "final_answer": "The function `get_current_time` is not available in the provided MCP tools. The available functions are `list_mcp_resources` and `read_mcp_resource`, which require knowing specific resource URIs to retrieve data. Without additional context or resource details, the request cannot be fulfilled.",
+      "final_answer_contains_result": false,
+      "run_pass": false,
+      "reason": "tool_not_called",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [
+          "5565: 0.15.423.905 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "5566: 0.15.423.938 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped"
+        ],
+        "function_tools_passed_to_model_first_request": [
+          "exec_command",
+          "write_stdin",
+          "list_mcp_resources",
+          "list_mcp_resource_templates",
+          "read_mcp_resource",
+          "request_user_input",
+          "view_image",
+          "get_goal",
+          "create_goal",
+          "update_goal"
+        ],
+        "parsed_responses_tools_lines": [],
+        "responses_http_lines": []
+      }
+    },
+    {
+      "label": "B2",
+      "arm": "B (Ollama)",
+      "scored": true,
+      "server_pid": 3518112,
+      "server_started_utc": "2026-10-01T23:35:11Z",
+      "server_ready_utc": "2026-10-01T23:35:13Z",
+      "codex_finished_utc": "2026-10-01T23:38:17Z",
+      "server_stopped_utc": "2026-10-01T23:38:20Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "reasoning": 2,
+        "mcp_tool_call": 1,
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "get_current_time",
+          "status": "completed",
+          "arguments": {
+            "server": "time",
+            "timezone": "UTC"
+          },
+          "error": null,
+          "result_datetime": "2026-10-01T23:37:39+00:00"
+        }
+      ],
+      "target_tool_called": true,
+      "tool_call_completed": true,
+      "tool_result_datetimes": [
+        "2026-10-01T23:37:39+00:00"
+      ],
+      "final_answer": "2026-10-01T23:37:39+00:00",
+      "final_answer_contains_result": true,
+      "run_pass": true,
+      "reason": "pass",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [],
+        "function_tools_passed_to_model_first_request": null,
+        "parsed_responses_tools_lines": [
+          "32: time=2026-10-01T23:35:14.115Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false",
+          "302: time=2026-10-01T23:37:39.578Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false"
+        ],
+        "responses_http_lines": [
+          "298: [GIN] 2026/10/01 - 23:37:39 | 200 |         2m25s |       127.0.0.1 | POST     \"/v1/responses\"",
+          "328: [GIN] 2026/10/01 - 23:38:17 | 200 | 37.837714317s |       127.0.0.1 | POST     \"/v1/responses\""
+        ]
+      }
+    },
+    {
+      "label": "A3",
+      "arm": "A (llama-server)",
+      "scored": true,
+      "server_pid": 3547072,
+      "server_started_utc": "2026-10-01T23:38:20Z",
+      "server_ready_utc": "2026-10-01T23:38:33Z",
+      "codex_finished_utc": "2026-10-01T23:42:04Z",
+      "server_stopped_utc": "2026-10-01T23:42:06Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 0,
+      "turn_status": "turn.completed",
+      "completed_item_types": {
+        "mcp_tool_call": 1,
+        "agent_message": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "list_mcp_resources",
+          "status": "failed",
+          "arguments": {
+            "server": "time"
+          },
+          "error": "resources/list failed: resources/list failed for `time`: Mcp error: -32601: Method not found",
+          "result_datetime": null
+        }
+      ],
+      "target_tool_called": false,
+      "tool_call_completed": false,
+      "tool_result_datetimes": [],
+      "final_answer": "The MCP server \"time\" does not have the `get_current_time` method available, and attempting to list its resources resulted in an error (`-32601: Method not found`). This indicates the server may be misconfigured or unavailable. Since no valid MCP resource or tool exists for this request, and shell commands are prohibited, I cannot fulfill this task further.",
+      "final_answer_contains_result": false,
+      "run_pass": false,
+      "reason": "tool_call_failed",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [
+          "5565: 0.13.917.356 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "5566: 0.13.917.388 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "30977: 2.46.267.171 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+          "30978: 2.46.267.210 W srv  server_chat_: unsupported Responses tool type 'namespace' skipped"
+        ],
+        "function_tools_passed_to_model_first_request": [
+          "exec_command",
+          "write_stdin",
+          "list_mcp_resources",
+          "list_mcp_resource_templates",
+          "read_mcp_resource",
+          "request_user_input",
+          "view_image",
+          "get_goal",
+          "create_goal",
+          "update_goal"
+        ],
+        "parsed_responses_tools_lines": [],
+        "responses_http_lines": []
+      }
+    },
+    {
+      "label": "B3",
+      "arm": "B (Ollama)",
+      "scored": true,
+      "server_pid": 3578403,
+      "server_started_utc": "2026-10-01T23:42:06Z",
+      "server_ready_utc": "2026-10-01T23:42:08Z",
+      "codex_finished_utc": "2026-10-01T23:47:08Z",
+      "server_stopped_utc": "2026-10-01T23:47:12Z",
+      "server_alive_after_stop": "no",
+      "codex_exit_code": 124,
+      "turn_status": null,
+      "completed_item_types": {
+        "reasoning": 1,
+        "mcp_tool_call": 1
+      },
+      "mcp_tool_calls": [
+        {
+          "server": "time",
+          "tool": "get_current_time",
+          "status": "completed",
+          "arguments": {
+            "timezone": "UTC"
+          },
+          "error": null,
+          "result_datetime": "2026-10-01T23:46:43+00:00"
+        }
+      ],
+      "target_tool_called": true,
+      "tool_call_completed": true,
+      "tool_result_datetimes": [
+        "2026-10-01T23:46:43+00:00"
+      ],
+      "final_answer": null,
+      "final_answer_contains_result": false,
+      "run_pass": false,
+      "reason": "timeout",
+      "error_events": [],
+      "server_log": {
+        "skipped_tool_type_lines": [],
+        "function_tools_passed_to_model_first_request": null,
+        "parsed_responses_tools_lines": [
+          "32: time=2026-10-01T23:42:08.897Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false",
+          "329: time=2026-10-01T23:46:44.317Z level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false"
+        ],
+        "responses_http_lines": [
+          "325: [GIN] 2026/10/01 - 23:46:44 | 200 |         4m35s |       127.0.0.1 | POST     \"/v1/responses\"",
+          "345: [GIN] 2026/10/01 - 23:47:08 | 200 | 24.116302818s |       127.0.0.1 | POST     \"/v1/responses\""
+        ]
+      }
+    }
+  ],
+  "arms": {
+    "A": {
+      "server": "llama-server (llama.cpp v0.5.0, b11146)",
+      "scored_runs": 3,
+      "runs_passed": 0,
+      "tool_call_completed_runs": 0,
+      "pass": false
+    },
+    "B": {
+      "server": "Ollama v0.35.0",
+      "scored_runs": 3,
+      "runs_passed": 2,
+      "tool_call_completed_runs": 3,
+      "pass": false
+    }
+  },
+  "server_tool_handling": {
+    "llama_server": {
+      "log_line": "W srv  server_chat_: unsupported Responses tool type 'namespace' skipped",
+      "per_request": "twice, once for each of the two namespace tools in the request",
+      "source": "llama.cpp 7fe450e1 tools/server/server-chat.cpp:277",
+      "function_tools_that_reached_the_model": [
+        "exec_command",
+        "write_stdin",
+        "list_mcp_resources",
+        "list_mcp_resource_templates",
+        "read_mcp_resource",
+        "request_user_input",
+        "view_image",
+        "get_goal",
+        "create_goal",
+        "update_goal"
+      ],
+      "note": "--verbose logs the request after its Responses to Chat Completions conversion, not the raw request; the converted request holds ten function tools and no get_current_time"
+    },
+    "ollama": {
+      "log_line": "level=DEBUG source=openai.go:1235 msg=\"parsed Responses tools\" count=12 web_search=false",
+      "source": "ollama cc406939 openai/responses.go:490-499,894-920 (a namespace tool is expanded into its member functions)",
+      "note": "twelve tools parsed where llama-server kept ten; Ollama's debug log does not print the request body"
+    }
+  },
+  "processes": {
+    "checked_at_utc": "2026-10-01T23:49:17Z",
+    "pids_file": "runs/pids.tsv",
+    "recorded_pids": [
+      3168250,
+      3194186,
+      3225036,
+      3239635,
+      3225038,
+      3250146,
+      3251283,
+      3306015,
+      3355352,
+      3387559,
+      3447247,
+      3481685,
+      3518112,
+      3547072,
+      3578403,
+      3173752,
+      3197353,
+      3203112,
+      3223908
+    ],
+    "all_recorded_pids_including_children": [
+      3168250,
+      3168252,
+      3173752,
+      3194186,
+      3194188,
+      3197353,
+      3203112,
+      3223908,
+      3225036,
+      3225038,
+      3239635,
+      3239637,
+      3250146,
+      3251283,
+      3306015,
+      3355352,
+      3355909,
+      3387559,
+      3447247,
+      3448747,
+      3481685,
+      3518112,
+      3518738,
+      3547072,
+      3578403,
+      3578995
+    ],
+    "alive_pids": [],
+    "processes_running_from_state_directory": [],
+    "listening_on_ports_20231_20232": [],
+    "all_stopped": true
+  },
+  "budget": {
+    "work_started_utc": "2026-10-01T22:38:16Z",
+    "downloads_bytes_release_and_model_artifacts": 7218842832,
+    "runs_finished_utc": "2026-10-01T23:47:12Z",
+    "wall_limit_minutes": 90,
+    "downloads_note": "plus about 0.25 GB of shallow source clones at the three pins and Python packages; under the 15 GB limit"
+  },
+  "deviations_from_preregistration": [
+    "The comment line of codex-config/config.toml.tmpl was corrected and the scratch config re-rendered nine seconds after the preregistration hash was taken and before the first model call; only a comment changed.",
+    "No scored run was repeated, excluded or re-scored; the prompt, the pass rule, the pins, the model and the serving settings were not changed after the preregistration.",
+    "The scorer's reason for arm A's runs can read tool_call_failed: the model called Codex's own function tools read_mcp_resource and list_mcp_resources, which Codex reports as mcp_tool_call items. The preregistered reason list did not foresee that; the field target_tool_called was added to the receipt to say whether get_current_time itself was ever called. The pass rule is unchanged."
+  ],
+  "run_notes": [
+    "B3: the first model call took 4m35s (prompt at 49.56 and generation at 3.30 tokens per second, against 93.38 and 8.20 in warm-up B on the same server and prompt), the MCP tool call then completed at 23:46:43Z, and the 300-second wall limit ended the run 24 seconds into the second model call, before a final answer. The gate ran one server at a time; the workstation is shared and what else loaded the CPU during B3 was not measured.",
+    "A1: the model, not having been given get_current_time, tried Codex's read_mcp_resource four times with guessed URIs until the 300-second wall limit.",
+    "A2 and A3: the model answered that get_current_time is not available (A3 after a failed list_mcp_resources call)."
+  ],
+  "deviations_from_brief": [
+    "CPU instead of GPU on both arms, decided before the first run: llama-server could not allocate more than about 4.5 GiB on the GPU although nvidia-smi reported about 16 GiB free (cudaMalloc out of memory in three attempts).",
+    "ollama launch codex was used only to write the Codex profile and model catalog (with -- --version); the scored runs call codex exec --profile ollama-launch directly, as upstream's profile-based setup documents.",
+    "Arm A uses the model catalog that Ollama's launcher wrote, so that Codex sends the same instructions and tool list to both servers.",
+    "The Codex config keys were read from the source at the tag, not from the hosted config reference."
+  ],
+  "limitations": [
+    "One workstation, CPU inference, one model (Qwen3-8B Q4_K_M), one prompt, three scored runs per arm; this is a local integration check, not a test on the new machine.",
+    "Only the function gate was measured: no speed, quality or GPU comparison.",
+    "Context was 32768 tokens on both arms; Ollama's Codex page asks for at least 64k, which this model cannot provide.",
+    "llama.cpp was tested at its latest release (v0.5.0, build b11146); later prerelease builds were not run and PR #23235 is still open.",
+    "llama-server's verbose log shows the converted request, not the raw one; that Codex sent two namespace tools rests on the server's own warning lines and on Ollama counting twelve tools where llama-server kept ten.",
+    "Ollama 0.35.0 itself runs the GGUF through a bundled llama-server (its log says so); the difference measured is in the Responses layer in front of it.",
+    "llama.cpp documents no Codex setup at this pin; arm A's Codex profile mirrors the one Ollama's launcher writes.",
+    "Sampling temperature was 0.6, so runs are not deterministic.",
+    "Two scored runs ended at the wrapper's 300-second wall limit (A1 and B3). On CPU each model call takes one to several minutes, so the limit, not the server, decided B3's verdict; the gate was not re-run with a longer limit.",
+    "manifests/stack.json has no Ollama component, so component_ids name llama-cpp and codex only; the receipt is not registered in manifests/evidence.json.",
+    "OLLAMA_NO_CLOUD=1 and loopback binding were set; outbound traffic was not captured."
+  ],
+  "files": {
+    "Modelfile": "990a6894869de3729bbf6e083dd69e9049d693208050b9eaffac9d37ef82e21c",
+    "PREREGISTRATION.md": "c384f55794d72f3fa6e1a90586f0c191fb874588574388dc5c80d496b817d369",
+    "README.md": "243c731a5118485175391e9a225242709d13bd28d25cad3b26778ead2d25dc65",
+    "REBUILD.md": "6bc6243585a2c1f5acc9427cb7a28ea12bde5fa58a3b9899d4fc32ee9e04e665",
+    "codex-config/config.toml.tmpl": "0cae58f671aedf1be0b861967587b84b8f5e61f87d687bd3b924d4304a062509",
+    "codex-config/llamacpp-gate.config.toml": "0e30ec70a75152ed9740d7abdbaf30fec9d09f8abdad2bd31bb9b2778fd61e88",
+    "codex-config/model.json": "ae70ac57340b8fd68c91efc88943cb60262fd2adf258c5beb348466bb1855b9f",
+    "codex-config/ollama-launch.config.toml": "cbb13d9b18494584adbd894d2215f97c1025a3762d1b0c5252b9d7d401df3e2c",
+    "gate_collect.py": "a5f2cddb88cbde0d5dd03f4334536b376d5f0f96b2a5ddaa684d27d8adbc5a75",
+    "gate_env.sh": "f9f6f9da5b04210ab24e2b5c60015b4f4f4cc5fa9220ffceb6040fa375b543d4",
+    "gate_run.sh": "18b12909589529f9426a6674f7168bf005860b05715e9563495011603de102da",
+    "gate_score.py": "44f19bcc4c43c5e40c2b737423adac6b1b0cd008dcfb4f06753049ca14672da8",
+    "gate_setup.sh": "36899094eef7e8e6e32e440a6f30de189204831773ac7051cf4cda3c52ea60bb",
+    "rebuild_20261002.py": "a931ac1ae3249b855e152944ddca23645aa9d6e78183b6fe55aaa8f1dd524575",
+    "runs/A1/codex-stderr.txt": "616aa7a2905942897699c71ba82f961c0704a1b9ad1608dc7c574e10472777f3",
+    "runs/A1/events.jsonl": "11c914c6f900ab216587715f6e0004763a189464bbdf1d428b7225eca6ab3bf8",
+    "runs/A1/run-meta.txt": "d4dad7986c69a84920af65ba62aa0dd3c6623390085c6f070dc589e78f32779a",
+    "runs/A1/score.json": "06bf586e3d6c297188c68457f9e677a6f704cd27ecabc20d86e2532a8da05886",
+    "runs/A1/server-log-excerpt.txt": "5f1d03616803b911198a1fdd51f925d9043779e4abeae489e7b33b8aa1efa4d5",
+    "runs/A2/codex-stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "runs/A2/events.jsonl": "9f03a9c30974630ec6cb865edd3e8082243df9f71ce98212bb95bbae900bb6e3",
+    "runs/A2/last-message.txt": "cbaddbe1a34644cbc37d9c5f9dfb5b4ded9deebf396e8fa46d47f59f189d36c0",
+    "runs/A2/run-meta.txt": "156224e0f10a2b02953e22a7744f8846225ff6780ae03c28ba90055387bb58a9",
+    "runs/A2/score.json": "ea0e6b2ceb3ef3a4585fe6826e0d18598f2b1852b91d321414c2abd12013864e",
+    "runs/A2/server-log-excerpt.txt": "be208ad4fb8ed8cd560eb7046ace88d7207560cb4325d25c7c512fd9a15cc0a3",
+    "runs/A3/codex-stderr.txt": "c5dd2b1132a1659347a5f235a18356ca35dad0c329e1f2f12bed73dc6a0a0180",
+    "runs/A3/events.jsonl": "414071027b82c2464087d5325155d40029227572a4fa97e77e11f520c12333c8",
+    "runs/A3/last-message.txt": "ee3f25f5d096330d7cc4d528caf0d7795f9d3d0442ba88462b9d4c7a4e47aad9",
+    "runs/A3/run-meta.txt": "28a8704daa8a7eae08b5ca416074a166c158c05f8c78811be061f393d42c5048",
+    "runs/A3/score.json": "30e8cf5d14a3054411a76b0b61111f03ccf0224f7bf6f54ed9f4e57f160564e1",
+    "runs/A3/server-log-excerpt.txt": "5827ebc32cd52881be2b6e28146d0ac45038fde8329854f694849c336d1b4e27",
+    "runs/B1/codex-stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "runs/B1/events.jsonl": "373e403276c6042185e6eaf424576e67ca8d7a8236390e9383ce80123a309242",
+    "runs/B1/last-message.txt": "3bab875f04b998239ceffaaea51783fd5cb6c90507c9ab981c2bcb64faa6ad39",
+    "runs/B1/run-meta.txt": "82e388ea25c3f3f72c816bb9365d64c1d619985c9369ef0ae5b4ff75f1a9ea49",
+    "runs/B1/score.json": "e6983ab41e9b809975652e1c93a00a7d7081115792f4ba67c21b9192e5b4b4f8",
+    "runs/B1/server-log-excerpt.txt": "dc08e0578fb88ecdd63096a5f18b1e8b27d2cc815e96de3184cf319ed5276245",
+    "runs/B2/codex-stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "runs/B2/events.jsonl": "0d860c7274bd2bc22c1d0fef0fa9edcd06abecf6c10bd9beaa26bd897b2e0c30",
+    "runs/B2/last-message.txt": "d5023ef75f79a551746c57642dde9e5ec4405174001e384932dcb5a53499abd3",
+    "runs/B2/run-meta.txt": "d4fbfddbe1e54ff4d2965f65abea07f65d2aa71d1ef526dbf3f615b5aa07eb6a",
+    "runs/B2/score.json": "78224ade2baaa982ba7ba3f838ff5b8650e8028be3a31d3883f505c6d6ee63d0",
+    "runs/B2/server-log-excerpt.txt": "358443425a9a1344ad18faa3d0e8499cce87dad1e8c4f8acfe09faf2fb5a8db5",
+    "runs/B3/codex-stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "runs/B3/events.jsonl": "99e73dfc850739ba257e9d826b0b5b83de39211fc445daf373d76c84aa8f2798",
+    "runs/B3/run-meta.txt": "05e62ca58625f66bad81f673a04f15f4c8ad787d00f62127576ef56c874fd347",
+    "runs/B3/score.json": "58cb37018fc96181980ebef1878df614195aa092d3626e3ad4b1810445695519",
+    "runs/B3/server-log-excerpt.txt": "598437b3b065910fa50c674cf00c24145f3ee0773d7a44ce67efde5202783324",
+    "runs/pids.tsv": "414a1b83e276e33a786e4b2d767c45a52a04d15a5a29a6479bb2f74f010509e3",
+    "runs/warmup-A/codex-stderr.txt": "07492586b7c202e5f66b5b4d56d4b8ff901d157d996f38f67a26e4b9b592bc50",
+    "runs/warmup-A/events.jsonl": "ae58324e9da67dd4ac89a548442f393d574c74ea340324c1a3bb854d508a9e87",
+    "runs/warmup-A/last-message.txt": "6866439933b20321cfce92c54aece43f1b0013c021511197df240e5eec40261d",
+    "runs/warmup-A/run-meta.txt": "6eda3336e2c8ccc934d0d294f1e5f1216f7ea5209003a8aa261b6b49cc8e2a9c",
+    "runs/warmup-A/score.json": "8d6f45e34d600f4abd8d837ea437f5c3abf9438c7ee34354a0afcb22f73e2570",
+    "runs/warmup-A/server-log-excerpt.txt": "3ac355b1f952ef3d1a19b17b7972e5ea2ce1e93232dcee9ba8f73e93477cf276",
+    "runs/warmup-B/codex-stderr.txt": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721",
+    "runs/warmup-B/events.jsonl": "7cc8d23789b147cdb7ed2692372be8ff1f8c8bf83fdcd6e230a16cb67768e79f",
+    "runs/warmup-B/last-message.txt": "73dc929da73ff063328ba6e1ff8e7e43d1b4179ea7391d3b4d64c4e8986963f0",
+    "runs/warmup-B/run-meta.txt": "f18e4af5d70d4ea84e2fff55a360f585a65528e244a484583a39ce0b2ef1940b",
+    "runs/warmup-B/score.json": "da549774b8d637f1558f88a1efc597a9506755844e242e9b2e566958eeb85770",
+    "runs/warmup-B/server-log-excerpt.txt": "0e77e90644c935c222bc877d52bf7710905dbbb5073a06a705d3557acc3638f9",
+    "setup/Modelfile": "990a6894869de3729bbf6e083dd69e9049d693208050b9eaffac9d37ef82e21c",
+    "setup/codex-mcp-list-llamacpp.txt": "e099018520d455f01a49c08d7fdf099ff10aa3a24e0146018060ce7c94c4bcee",
+    "setup/codex-mcp-list-ollama.txt": "e099018520d455f01a49c08d7fdf099ff10aa3a24e0146018060ce7c94c4bcee",
+    "setup/llama-props.json": "befd804dc6b1852b60440d2db8d14ba866c11b0bd3526f559a8086d3c982e1fb",
+    "setup/llama-v1-models.json": "4cd158df0f69e1df368c6cf22c5496e074957a70da2467aa6635ff8783347546",
+    "setup/mcp-venv-freeze.txt": "4ffd893c0fab92e430d3e026c7779d976d8b7b22c6f75e9ca8041b37f580e797",
+    "setup/ollama-api-version.json": "7a8970074153afcd377b267a4b57f116dc74ee49bfa48a899fa1318148f921cd",
+    "setup/ollama-launch-version.txt": "fa6edeb37e81ae3bdc30325e9deac91d5a41556a73aab6baa57f3444d43041e4",
+    "setup/ollama-list.txt": "62f66649a0b3d5134c9c921c43dffc59d4eec8075e9e70be23ac322f612f5d84",
+    "setup/ollama-show-modelfile.txt": "a4d240f78090b2fdbb8de06c38ff31167682814ad05358a52966fee16b760213",
+    "setup/ollama-show.txt": "a20b4e4d478b14313f3e9623c43b8826a198c57bc4c428c7278a37a53596f084"
+  }
+}
