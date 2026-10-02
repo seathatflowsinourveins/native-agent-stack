@@ -2443,14 +2443,15 @@ def main():
                             "baseline_cash": previous_metadata["baseline_cash"] if previous_metadata else baseline_cash,
                             "phase": "starting"}
                 save(metadata_path, metadata)
-            def fresh_port(recovering=False):
-                needed = sorted(set(ledger.positions()) | {i.symbol for i in ledger.unresolved()})
+            def fresh_port():
                 return controller.bind(AlpacaPaperTransport(key, secret, config["symbols"],
                     before_request=controller.before_request, before_submit=controller.before_submit,
                     sink_observation=controller.observe, sink_status=controller.trading_status,
                     request_observer=responses.append,
                     quote_timeout=config["quote_max_age_seconds"], feed=config["feed"],
-                    required_quote_symbols=needed if recovering and needed else config["benchmarks"],
+                    # Recovery gates each owned exit on its own fresh quote. A
+                    # quiet holding must not prevent other symbols from exiting.
+                    required_quote_symbols=config["benchmarks"],
                     history_start=datetime.fromtimestamp(metadata["started_at"], timezone.utc),
                     # This lane keeps its first checkpoint baseline and fee window; legacy
                     # metadata keeps started_at, which follows the original account read.
@@ -2463,7 +2464,7 @@ def main():
             async def execute():
                 from recovery import recover
                 if args.command == "recover":
-                    controller.port = fresh_port(True)
+                    controller.port = fresh_port()
                     return await recover(controller, metadata, config)
                 controller.port = fresh_port()
                 ca_refresh_state = {"in_flight": False}
@@ -2505,7 +2506,7 @@ def main():
                     # line runs can never be relabelled held_overnight.
                     is_final_boundary = _final_boundary_from_run_status(outcome)
                     if must_end_flat(session_policy, is_final_boundary=is_final_boundary):
-                        controller.port = fresh_port(True)
+                        controller.port = fresh_port()
                         recovery = await recover(controller, metadata, config)
                         outcome = _apply_forced_recovery_outcome(outcome, recovery)
                     else:

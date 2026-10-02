@@ -40,14 +40,11 @@ own fresh quote, and a failed exit still ends recovery. That includes the
 transport's pre-wire refusal (`not_sent`) when the chosen symbol's quote goes
 stale before the POST, so the other held symbols are not tried after it.
 
-This per-symbol handling holds end to end only on the mover's recovery ports
-(`mover_runner.py`: the forced recovery's port in `command_paper` and the port
-in `command_recover`), whose readiness waits on the benchmark quotes alone.
-`runner.py`'s recovery port, for the adaptive lane's `recover` command and
-forced recovery, still gates `start()` on every held symbol's quote until the F1
-follow-up: there a held symbol with no quote at start still ends recovery before
-any exit, and only a symbol whose quote goes stale after start is skipped as
-above.
+Both the mover and adaptive runner's recovery ports wait on the benchmark quotes
+alone at startup. A held symbol without a startup quote therefore does not block
+another held symbol's exit. Recovery and the transport's pre-wire guard still
+require each exit's own fresh quote; an unquoted residual stays owned and ends
+with `needs_attention` if it cannot be exited within the frozen cleanup window.
 
 Each exit is sized within the share cap the ledger applies to that sell at
 that bid (`RiskLimits.effective_max_order_qty`): `max_order_qty` in "fixed" mode,
@@ -76,7 +73,7 @@ performance or throughput acceptance.
 ## Verification
 
 ```sh
-python3 -m unittest tests.test_adaptive_paper_recovery -v
+python3 -m unittest tests.test_adaptive_paper_recovery tests.test_adaptive_paper_recovery_wiring -v
 ```
 
 The local fault checks use the real durable `Ledger` and a fake broker port.
