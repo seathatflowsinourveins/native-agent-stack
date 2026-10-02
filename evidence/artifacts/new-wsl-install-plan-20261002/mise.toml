@@ -1,0 +1,16 @@
+# SOURCE-ONLY, UNRUN. Intended global mise tool pins; install.sh merges with mise use -g.
+# Do not execute this manifest or install commands during source review.
+[tools]
+node = "24.21.0"
+python = "3.13.16"
+uv = "0.12.22"
+'ollama' = "0.35.0" # Ollama; UNRUN
+'zizmor' = "1.30.1" # zizmor; UNRUN
+'syft' = "1.54.0" # Syft; UNRUN
+'github:kjanat/actionlint' = "1.17.0" # actionlint (kjanat); UNRUN
+'betterleaks' = "1.9.0" # betterleaks; UNRUN
+'github-cli' = "2.102.0" # gh (GitHub CLI); UNRUN
+'worktrunk' = "0.80.0" # worktrunk; UNRUN
+'difftastic' = "0.71.0" # difftastic; UNRUN
+'restic' = "0.19.1" # Restic; UNRUN
+'chezmoi' = "2.73.0" # chezmoi; UNRUN
