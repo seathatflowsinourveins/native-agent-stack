@@ -35830,6 +35830,11 @@
       "bytes": 321
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
+      "sha256": "13ff53f8185c76732813ef1df3ed29c8dae1fe835cbf389c732005a017933159",
+      "bytes": 9927
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
       "sha256": "c03f9799c7f2392165fa93064aec1f5043355993b873f5d24e7e76b7f711a003",
       "bytes": 90524
