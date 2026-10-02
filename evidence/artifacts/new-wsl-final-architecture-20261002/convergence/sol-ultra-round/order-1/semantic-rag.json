@@ -1,0 +1,181 @@
+{
+  "layers": [
+    {
+      "layer_id": "semantic-rag",
+      "selection": [
+        {
+          "name": "SocratiCode",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "role": "C10 — Unranked finalist. Scoped MCP retrieval with compatible local embedding services and documented checkpoint recovery. Its default installation manages Qdrant and Ollama.",
+          "install_command": "npx -y --prefer-online socraticode@latest",
+          "install_source": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md",
+              "shows": "Project-scoped hybrid retrieval, configurable Ollama embeddings, Claude Code and Codex MCP integration, incremental refresh and interrupted-index checkpoint recovery. Default installation requires Node.js ≥18.17 and Docker."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/blob/155ba9325f43a65c78a09930735b378f91651cf5/README.md#real-world-benchmark-vs-code-245m-lines-of-code-with-claude-opus-46",
+              "shows": "Reports 61% less context, 84% fewer tool calls and 37× faster exploration versus grep on VS Code. This compares exploration workflows, not the other semantic-retrieval finalists."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.16.0",
+              "shows": "September 28 release includes Git-refresh fixes and tests covering restart recovery; passing CI results were not verified."
+            },
+            {
+              "url": "https://github.com/giancarloerra/SocratiCode/commit/155ba9325f43a65c78a09930735b378f91651cf5",
+              "shows": "Default-branch commit dated September 30, within 90 days."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "next-plaid",
+          "repository": "https://github.com/lightonai/next-plaid",
+          "role": "C07 — Unranked finalist. ColGREP supplies scoped agent-facing code search; NextPlaid supplies local indexing and compatible embedding/REST infrastructure.",
+          "install_command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/lightonai/next-plaid/releases/download/v1.7.0/colgrep-installer.sh | sh",
+          "install_source": "https://github.com/lightonai/next-plaid/releases/tag/v1.7.0",
+          "basis": [
+            {
+              "url": "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+              "shows": "Tree-sitter chunks, project-scoped semantic search, changed-file updates, disk-backed indexes and built-in encoding. Documents Claude Code hooks, basic Codex integration and CPU/CUDA server installations."
+            },
+            {
+              "url": "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+              "shows": "Reports NDCG@10 of 0.859 with LateOn-Code and 0.846 with default LateOn-Code-edge, versus older Semble potion-code-16M at 0.853, across 1,251 queries, 63 repositories and 19 languages. This does not establish superiority over current Semble."
+            },
+            {
+              "url": "https://github.com/lightonai/next-plaid/releases/tag/v1.7.0",
+              "shows": "August 18 release provides Linux x86_64 and macOS arm64 binaries with checksums."
+            },
+            {
+              "url": "https://github.com/lightonai/next-plaid/commit/00e26aae0006b322727db277672211d9a0e3ccec",
+              "shows": "Default-branch commit dated August 18, within 90 days."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "semble",
+          "repository": "https://github.com/minishlab/semble",
+          "role": "C04 — Unranked finalist for CPU retrieval through MCP/CLI. Supplies scoped, rebuildable indexes and local Model2Vec embeddings; exact fit to a separately served embedding service remains uncertain.",
+          "install_command": "uv tool install semble\nsemble install",
+          "install_source": "https://github.com/MinishLab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/MinishLab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/README.md",
+              "shows": "Scoped local retrieval combines potion-code-16M-v2 embeddings, BM25 and reranking. Documents Claude Code/Codex MCP installation, disk caching, automatic invalidation and Model2Vec-compatible model configuration."
+            },
+            {
+              "url": "https://github.com/MinishLab/semble/blob/aa634b14dc81ba6925a130cb999081f3240e2a3c/README.md#benchmarks",
+              "shows": "Reports retrieval-quality, latency and token-efficiency evaluations across approximately 1,250 queries, 63 repositories and 19 languages. Detailed methodology and current matched comparisons were not fetched."
+            },
+            {
+              "url": "https://github.com/MinishLab/semble/releases/tag/v0.6.1",
+              "shows": "September 25 release adds MCP cache management and further agent integrations."
+            },
+            {
+              "url": "https://github.com/MinishLab/semble/commit/aa634b14dc81ba6925a130cb999081f3240e2a3c",
+              "shows": "Default-branch commit dated September 30, within 90 days."
+            }
+          ],
+          "confidence": "low"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C03",
+          "name": "ollama",
+          "reason": "Documented compatible embedding dependency for SocratiCode; its independently verified install path covers serving rather than the full scoped-index workflow. [Upstream README](https://github.com/ollama/ollama/blob/b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce/README.md)."
+        },
+        {
+          "key": "C09",
+          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+          "reason": "The packet supplies a model identifier and no repository; compatible serving, recoverable indexing and target-host retrieval results were not verified."
+        },
+        {
+          "key": "C11",
+          "name": "huggingface-hub-native",
+          "reason": "Its verified scope is the Hugging Face Hub client and CLI; the finalists document the required code-question workflow more directly. [GitHub metadata](https://api.github.com/repos/huggingface/huggingface_hub)."
+        },
+        {
+          "key": "C05",
+          "name": "pgvector",
+          "reason": "Its verified scope is PostgreSQL vector similarity, making it a storage component with less direct capability fit than the integrated finalists. [GitHub metadata](https://api.github.com/repos/pgvector/pgvector)."
+        },
+        {
+          "key": "C01",
+          "name": "Qdrant",
+          "reason": "Strong persistent vector-store component with filtering and WAL; retained as SocratiCode's managed backend rather than an independent code-retrieval finalist. [Upstream README](https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "vLLM",
+          "reason": "Its verified repository scope is inference and serving; a complete scoped-code index and recovery workflow was not verified within budget. [GitHub metadata](https://api.github.com/repos/vllm-project/vllm)."
+        },
+        {
+          "key": "C08",
+          "name": "Haystack",
+          "reason": "An application-building framework; its verified description offers less direct clean-install fit than the finalists' documented code-search products. [GitHub metadata](https://api.github.com/repos/deepset-ai/haystack)."
+        },
+        {
+          "key": "C02",
+          "name": "LanceDB",
+          "reason": "Maintained embedded retrieval infrastructure, with less directly verified scoped-code and agent-install evidence than the finalists. [GitHub metadata](https://api.github.com/repos/lancedb/lancedb)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C12",
+          "name": "code-memory",
+          "criterion": "stale_or_archived",
+          "fact": "Latest default-branch commit is May 20, 2026, more than 90 days before October 1; the repository is unarchived. [Verified commit](https://github.com/kapillamba4/code-memory/commit/5a8db166ca11a90c093ba4a9a54d266cde756f54)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The selection is an unranked shortlist, not a measured winner. Compare SocratiCode 1.16.0 with its documented Qdrant/Ollama stack, ColGREP 1.7.0 and Semble 0.6.1 on WSL2/Linux x86_64 with the RTX 4090 available. Freeze questions, expected source spans and repository revisions; measure span recall, answer correctness, cold/warm latency, indexing time, RAM/VRAM, scope isolation, changed/deleted-file correctness, interrupted indexing and restoration to a fresh instance. Repeat platform checks on macOS arm64. The packet's 30/35 versus 20/35 SocratiCode/ripgrep result supports only that sealed comparison.",
+      "evidence_gaps": [
+        "Budget used: 6 web searches, 7 attempted page URLs and 30 GitHub API calls. No working-directory evidence was read beyond the explicitly supplied packet.",
+        "All 11 repository candidates were checked for archive status and latest default-branch commit. Latest releases were checked for the three finalists; issue responsiveness and release activity for the remaining repositories were not independently assessed.",
+        "No current matched evaluation compares all finalists on destination hardware. NextPlaid's comparison uses an older Semble configuration; published results do not establish current general superiority.",
+        "SocratiCode documents checkpoint recovery; Semble documents cache reconstruction; NextPlaid documents persisted indexes. Full backup/restore and end-to-end recovery correctness remain untested.",
+        "No passing CI outcomes were retrieved. SocratiCode's release names recovery tests, and its README links CI; these establish documented test activity rather than verified passing results.",
+        "ColGREP explicitly publishes Linux x86_64/macOS arm64 binaries. SocratiCode documents Linux CUDA/macOS Metal, and Semble documents CPU execution/macOS cache paths. Specific WSL2/RTX 4090 execution and Semble macOS arm64 execution remain unverified.",
+        "Semble's documented embedding backend runs in process. Compatibility with a separately served embedding API remains unverified.",
+        "Automatic approval review rejected ctx_fetch_and_index and execution-based context tools with: 'MCP tool call requires approval, but approval policy is never.' Public README content was obtained through GitHub API calls instead; ctx_index and ctx_search worked for the pinned alternative READMEs."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/ollama/ollama",
+        "https://api.github.com/repos/huggingface/huggingface_hub",
+        "https://api.github.com/repos/kapillamba4/code-memory",
+        "https://api.github.com/repos/pgvector/pgvector",
+        "https://api.github.com/repos/lightonai/next-plaid",
+        "https://api.github.com/repos/giancarloerra/SocratiCode",
+        "https://api.github.com/repos/minishlab/semble",
+        "https://api.github.com/repos/qdrant/qdrant",
+        "https://api.github.com/repos/vllm-project/vllm",
+        "https://api.github.com/repos/deepset-ai/haystack",
+        "https://api.github.com/repos/lancedb/lancedb",
+        "https://api.github.com/repos/ollama/ollama/commits?per_page=1",
+        "https://api.github.com/repos/huggingface/huggingface_hub/commits?per_page=1",
+        "https://api.github.com/repos/kapillamba4/code-memory/commits?per_page=1",
+        "https://api.github.com/repos/pgvector/pgvector/commits?per_page=1",
+        "https://api.github.com/repos/lightonai/next-plaid/commits?per_page=1",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/commits?per_page=1",
+        "https://api.github.com/repos/minishlab/semble/commits?per_page=1",
+        "https://api.github.com/repos/qdrant/qdrant/commits?per_page=1",
+        "https://api.github.com/repos/vllm-project/vllm/commits?per_page=1",
+        "https://api.github.com/repos/deepset-ai/haystack/commits?per_page=1",
+        "https://api.github.com/repos/lancedb/lancedb/commits?per_page=1",
+        "https://api.github.com/repos/ollama/ollama/readme?ref=b0c1ca4f7549d7acdfa52a7dcffc934bc63a43ce",
+        "https://api.github.com/repos/qdrant/qdrant/readme?ref=6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/readme",
+        "https://api.github.com/repos/lightonai/next-plaid/readme?ref=00e26aae0006b322727db277672211d9a0e3ccec",
+        "https://api.github.com/repos/minishlab/semble/readme?ref=aa634b14dc81ba6925a130cb999081f3240e2a3c",
+        "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+        "https://api.github.com/repos/minishlab/semble/releases/latest",
+        "https://api.github.com/repos/lightonai/next-plaid/releases/latest"
+      ]
+    }
+  ]
+}

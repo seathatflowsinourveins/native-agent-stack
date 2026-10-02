@@ -1,0 +1,9 @@
+label	role	pid	child_pids_at_stop
+warmup-A	llama-server	3716886	
+warmup-B	ollama-server	3816771	3817608
+A1	llama-server	3841266	
+B1	ollama-server	3865924	3866355
+A2	llama-server	3882385	
+B2	ollama-server	3907317	3907865
+A3	llama-server	3931480	
+B3	ollama-server	3951481	3951942

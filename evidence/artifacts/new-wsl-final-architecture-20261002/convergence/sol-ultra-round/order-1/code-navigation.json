@@ -1,0 +1,158 @@
+{
+  "layers": [
+    {
+      "layer_id": "code-navigation",
+      "selection": [
+        {
+          "name": "Serena (C02)",
+          "repository": "https://github.com/oraios/serena",
+          "role": "Primary semantic symbol and reference navigation. Use it when the question requires symbol identity or cross-file references.",
+          "install_command": "uv tool install -p 3.13 serena-agent\nserena init\nserena setup claude-code\nserena setup codex",
+          "install_source": "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/README.md",
+              "shows": "The free language-server backend provides symbol lookup, source navigation and referencing-symbol queries. This directly fits exact semantic navigation, subject to each language server's coverage."
+            },
+            {
+              "url": "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/02-usage/030_clients.md",
+              "shows": "Documents MCP setup for both Claude Code and Codex. Also reports Claude tool-use regressions and a workaround; successful configuration alone does not prove agents will call the server."
+            },
+            {
+              "url": "https://github.com/oraios/serena/actions/runs/36761901285",
+              "shows": "September 30 language-test run: all inspected Ubuntu batches succeeded. Several macOS batches succeeded, but native macOS was cancelled; one Windows batch failed."
+            },
+            {
+              "url": "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/04-evaluation/000_evaluation-intro.md",
+              "shows": "Published evaluations record calls, payloads and prerequisites for both toolsets, but agents select tasks and evaluate themselves. They do not establish independent measured superiority."
+            },
+            {
+              "url": "https://github.com/oraios/serena/commit/d0f7f92631c2",
+              "shows": "Default-branch commit on 2026-09-30, within 90 days. Repository metadata confirms it is not archived; issue activity continued on October 1."
+            },
+            {
+              "url": "https://github.com/oraios/serena/releases/tag/v1.7.0",
+              "shows": "Latest release published 2026-08-09, within 90 days."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "ast-grep (C09)",
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "role": "Complementary structural source search for questions expressed as AST patterns.",
+          "install_command": "npm install --global @ast-grep/cli",
+          "install_source": "https://github.com/ast-grep/ast-grep/blob/25334496c105c9c728f0a6024f3d164aed40cacc/README.md#installation",
+          "basis": [
+            {
+              "url": "https://github.com/ast-grep/ast-grep/blob/25334496c105c9c728f0a6024f3d164aed40cacc/README.md",
+              "shows": "Documents source-pattern search using tree-sitter ASTs, wildcards and structural rules. Its CLI supplies question-driven structural matching; syntax matches do not establish semantic reference identity."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+              "shows": "Release published 2026-08-31 includes Linux x86_64 GNU and macOS arm64 binaries. Linux binaries fit the WSL2 userspace target; WSL2 execution was not tested."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/actions/runs/36435558702",
+              "shows": "Coverage, formatting and NAPI lint jobs succeeded at the inspected default-branch commit. These checks support maintenance quality, not comparative navigation accuracy."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/commit/25334496c105",
+              "shows": "Default-branch commit on 2026-09-28, within 90 days. Repository metadata confirms it is not archived; issue activity continued on October 1."
+            }
+          ],
+          "confidence": "high"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "gitnexus",
+          "reason": "Active October 1, September stable release and passing platform checks; its indexed search, references and impact analysis are credible, but reviewed evidence does not establish exact-answer or total-cost superiority over selective semantic and structural navigation."
+        },
+        {
+          "key": "C03",
+          "name": "codebase-memory-mcp",
+          "reason": "Active October 1 with a September release and documented Linux/macOS arm64 builds; broad graph coverage is useful, but semantic refinement covers fewer languages, and its [published functionality benchmark](https://github.com/DeusData/codebase-memory-mcp/blob/cb7d937638f77fb67aacc39444f6a6709d217d51/docs/BENCHMARK.md) does not compare the selected approach."
+        },
+        {
+          "key": "C04",
+          "name": "Glean",
+          "reason": "Active October 1 with successful CI; its symbol facts, cross-references and Angle queries fit sophisticated structural analysis, but require indexer and client assembly beyond the selected repositories' documented agent workflows."
+        },
+        {
+          "key": "C05",
+          "name": "jCodeMunch",
+          "reason": "Active and released October 1 with successful Ubuntu harness checks; byte-exact retrieval and optional SCIP references are credible, but its [largest token comparison](https://github.com/jgravelle/jcodemunch-mcp/blob/5804d7e77b423f6dd22218adcba370d2ea0c7c9c/benchmarks/METHODOLOGY.md) omits answer quality and uses whole-file reads as the baseline."
+        },
+        {
+          "key": "C06",
+          "name": "token-savior",
+          "reason": "Active August 10 with a July release and passing checks; its [August remeasurement was withdrawn](https://github.com/Mibayy/token-savior/blob/73e9c7f56fd7cd40ecc72cdc4b032264018f8b4f/README.md) because only one of 143 sessions called its server, while older headline results lack a public harness."
+        },
+        {
+          "key": "C07",
+          "name": "scip, zoekt and universal-ctags",
+          "reason": "All three default branches are active; SCIP requires language indexers and a consumer, Zoekt provides indexed text search, and ctags supplies tags. The composite needs additional assembly to deliver the shared exact-reference agent workflow; ctags' latest stable release is older than 90 days."
+        },
+        {
+          "key": "C08",
+          "name": "CodeGraph",
+          "reason": "Active October 1 with a September release and both target-platform builds; its [corrected experiment](https://github.com/colbymchenry/codegraph/blob/ec738ec7a322a680dae39a904194ce9271e6873f/docs/benchmarks/residual-context-occupancy.md) measures workflow savings but increased resident retrieval context, without grading exact answers or measuring index costs."
+        },
+        {
+          "key": "C10",
+          "name": "claude-plugins-official",
+          "reason": "Active September 30; TypeScript and Pyright plugins provide genuine Claude Code language-server navigation, but Codex integration was not established in the reviewed repository and plugin READMEs. It remains a strong Claude-specific comparison arm."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selection is based on documented capability fit, not demonstrated performance superiority. On frozen representative WSL2 repositories, compare Serena plus ast-grep with jCodeMunch plus SCIP, codebase-memory-mcp, CodeGraph and GitNexus; include native source-read/search controls and Claude's official LSP plugins. Seal exact source and reference answers before running. Include known-source reads, aliases, shadowing, cross-file references, structural questions and edits that invalidate indexes. Measure precision/recall, task success, cold setup and indexing, incremental updates, latency and full-session tokens. Assert actual tool use in every enabled session. Repeat relevant checks on macOS arm64.",
+      "evidence_gaps": [
+        "No recorded comparison in the packet; reviewed upstream evidence does not separate the leading candidates on the complete requirement.",
+        "Target programming languages are unspecified, so language-server and semantic-index coverage remain material uncertainties.",
+        "No clean installation or target-host execution was performed. Serena's macOS native CI batch was cancelled; specific WSL2 and macOS arm64 backend combinations remain unverified.",
+        "Serena's evaluations are agent self-evaluations. Its documentation reports Claude tool-use regressions, making per-session tool-call verification essential.",
+        "jCodeMunch's separate Windows A/B report measured 18/25 native versus 20/25 enabled successes; it is useful evidence but does not compare these candidates on WSL2.",
+        "codebase-memory-mcp's 159-language evaluation document is a plan, not a completed comparative result. CodeGraph's corrected experiment does not establish exact-answer correctness or index amortization.",
+        "All candidates are nonarchived and have default-branch commits within 90 days. Recent issue activity was observed throughout; Glean, Zoekt and the plugin directory reported no GitHub releases. These facts do not by themselves rank navigation quality.",
+        "Research used 30 GitHub API calls: 26 REST and four GraphQL requests, with zero web searches. No GPU-dependent requirement was identified for the selected navigation tools."
+      ],
+      "sources_read": [
+        "https://github.com/oraios/serena",
+        "https://github.com/ast-grep/ast-grep",
+        "https://github.com/DeusData/codebase-memory-mcp",
+        "https://github.com/jgravelle/jcodemunch-mcp",
+        "https://github.com/abhigyanpatwari/GitNexus",
+        "https://github.com/colbymchenry/codegraph",
+        "https://github.com/Mibayy/token-savior",
+        "https://github.com/anthropics/claude-plugins-official",
+        "https://github.com/facebookincubator/Glean",
+        "https://github.com/scip-code/scip",
+        "https://github.com/sourcegraph/zoekt",
+        "https://github.com/universal-ctags/ctags",
+        "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/02-usage/030_clients.md",
+        "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/01-about/020_programming-languages.md",
+        "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/docs/04-evaluation/000_evaluation-intro.md",
+        "https://github.com/oraios/serena/blob/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/.github/workflows/pytest.yml",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/5804d7e77b423f6dd22218adcba370d2ea0c7c9c/benchmarks/METHODOLOGY.md",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/5804d7e77b423f6dd22218adcba370d2ea0c7c9c/benchmarks/ab-test-naming-audit-2026-03-18.md",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/cb7d937638f77fb67aacc39444f6a6709d217d51/docs/BENCHMARK.md",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/cb7d937638f77fb67aacc39444f6a6709d217d51/docs/EVALUATION_PLAN.md",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/cb7d937638f77fb67aacc39444f6a6709d217d51/docs/MEASURING_SAVINGS.md",
+        "https://github.com/colbymchenry/codegraph/blob/ec738ec7a322a680dae39a904194ce9271e6873f/docs/benchmarks/residual-context-occupancy.md",
+        "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/plugins/typescript-lsp/README.md",
+        "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/plugins/pyright-lsp/README.md",
+        "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/.claude-plugin/marketplace.json",
+        "https://github.com/scip-code/scip/blob/9c4a0a3a81504a82b00397f9ede47a4ff35321af/docs/CLI.md",
+        "https://github.com/oraios/serena/actions/runs/36761901285",
+        "https://github.com/ast-grep/ast-grep/actions/runs/36435558702",
+        "https://github.com/jgravelle/jcodemunch-mcp/actions/runs/36935907529",
+        "https://github.com/oraios/serena/releases/tag/v1.7.0",
+        "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+        "https://api.github.com/graphql"
+      ]
+    }
+  ]
+}

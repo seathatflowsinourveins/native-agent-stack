@@ -1,0 +1,161 @@
+{
+  "layers": [
+    {
+      "layer_id": "web-research",
+      "selection": [
+        {
+          "name": "agent-browser (C06)",
+          "repository": "https://github.com/vercel-labs/agent-browser",
+          "role": "Capability-fit choice for bounded URL retrieval and page interaction; measured superiority remains unresolved.",
+          "install_command": "npm install -g agent-browser@0.38.2\nagent-browser install --with-deps\nnpx skills add vercel-labs/agent-browser",
+          "install_source": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/README.md",
+              "shows": "Documents HTTP retrieval through read URL without launching Chrome, rendered-tab reading, browser interaction, URL/title inspection, output limits and timeouts. Explicitly documents Linux x64 and macOS arm64 binaries, Linux dependency installation, and Claude Code/Codex skills. This breadth supports the capability-fit preference."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/.github/workflows/ci.yml",
+              "shows": "Configures Rust tests, launcher tests, native browser E2E tests and installation checks. Current passing run results were not verified."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/benchmarks/README.md",
+              "shows": "Provides a reproducible latency, startup and memory benchmark comparing its Node and Rust daemons. It does not compare competing repositories or establish WSL2 research superiority."
+            },
+            {
+              "url": "https://api.github.com/repos/vercel-labs/agent-browser",
+              "shows": "Unarchived; Apache-2.0 license. Open-issue count includes pull requests and does not establish responsiveness."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081",
+              "shows": "Default-branch commit dated October 1, 2026, within 90 days."
+            },
+            {
+              "url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.2",
+              "shows": "Release published October 1, 2026, with issue-linked fixes supporting ongoing maintenance."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C03",
+          "name": "Playwright CLI",
+          "reason": "Very close alternative with navigation, interaction, URL/title output, snapshots and cross-platform CI; agent-browser additionally documents browser-free URL reading and explicit macOS arm64/Codex support. No measured head-to-head winner is established. [README](https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/README.md), [tests](https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/tests/integration.spec.ts), [CI](https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/.github/workflows/ci.yml)."
+        },
+        {
+          "key": "C08",
+          "name": "Browser Use",
+          "reason": "Credible local CLI/MCP alternative with regression tests; its caller-supplied Python/browser-harness interface is less direct for this requirement than the selected CLI's URL-reading and atomic interaction commands. Comparative coverage remains unmeasured. [CLI](https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/browser_use/cli.py), [tests](https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/tests/ci/test_browser_use_cli.py)."
+        },
+        {
+          "key": "C01",
+          "name": "Cua Driver",
+          "reason": "Offers a native CLI/MCP and documented desktop test matrix, but its OS-specific GUI focus provides weaker verified fit for attributable web retrieval; WSL2 operation remains unverified. [Driver README](https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/libs/cua-driver/README.md), [test matrix](https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/libs/cua-driver/docs/test-matrix.md)."
+        },
+        {
+          "key": "C07",
+          "name": "trafilatura",
+          "reason": "Strong conditional extractor: upstream reports F-score 0.924 for version 2.2.0 on 990 documents, but that measures text extraction, not source discovery, citation accuracy or interaction; no demonstrated native extraction failure warrants adding it. [Evaluation](https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/evaluation.rst), [method and limitations](https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/tests/README.rst)."
+        },
+        {
+          "key": "C05",
+          "name": "Crawl4AI",
+          "reason": "Its standalone CLI supports bounded crawling without a standing server, but the packet supplies no demonstrated native-source coverage miss justifying this additional crawler. [README](https://github.com/unclecode/crawl4ai/blob/e5d2e786d1a101225f3f6a3e6fd344d76eeb13af/README.md)."
+        },
+        {
+          "key": "C10",
+          "name": "Tavily CLI",
+          "reason": "Provides bounded search/extraction commands, keyless access and agent skills, but adds a research service without demonstrated native-coverage failure; its documented command set does not supply general page interaction. [README](https://github.com/tavily-ai/tavily-cli/blob/fd745230e6756933e3a190bfdc61ea1eb2db3993/README.md)."
+        },
+        {
+          "key": "C04",
+          "name": "exa-mcp-server",
+          "reason": "Documents search/fetch MCP tools and Claude Code/Codex integration, but service-backed discovery is conditional under the packet's deciding rule, and no native-coverage failure is established. [README](https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md)."
+        },
+        {
+          "key": "C09",
+          "name": "Firecrawl MCP",
+          "reason": "Capable scraping/search MCP with hosted and self-hosted paths, but no demonstrated native-coverage miss warrants the additional service. Free and self-hosted options prevent a paid-service exclusion. [README](https://github.com/firecrawl/firecrawl-mcp-server/blob/8fd13724c9da7a859d7bf95e735bb8b462de2c0c/README.md)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C02",
+          "name": "OpenResearch",
+          "criterion": "outside_requirement",
+          "fact": "The documented product manages parallel research-agent sessions, experiments, worktrees and a local dashboard through orx up; this conflicts with the requirement to avoid another standing research-agent stack. [README](https://github.com/alphaXiv/OpenResearch/blob/ee36ef0333ca3c533eace915f1bec322a1efde1c/README.md)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Compare agent-browser v0.38.2 against Playwright CLI v0.1.22 and Browser Use's inspected CLI at commit 302d8fcb245a7a63fb7531a4734c9ce3c7792779 on clean WSL2 Ubuntu x86_64. Freeze required primary-source URLs, citation checks and interactions, including static pages, redirects, long documents, authenticated pages and JavaScript-rendered content. Under equal command/time/output budgets, measure source coverage, correct final URL/title attribution, citation entailment, interaction completion, extraction fidelity, latency, agent-visible tokens and cleanup. Repeat essential cases on macOS arm64. Add a crawler or research service only when it remedies a reproducible native-coverage failure. The selection above is a documented capability-fit preference, not a measured performance victory.",
+      "evidence_gaps": [
+        "The packet contains no comparison where every named arm ran; inspected upstream benchmarks do not settle this requirement on the target hosts.",
+        "Upstream test suites and CI configurations were inspected, but current CI run conclusions were not verified.",
+        "Clean WSL2 and macOS arm64 execution was not performed. Agent-browser documents matching binaries; target-host reliability remains unmeasured. This browser/HTTP requirement does not require the RTX 4090.",
+        "All ten repositories were unarchived and had default-branch commits within 90 days as observed October 2, 2026. Issue response activity was not verified; open-issue counts were not used as quality scores.",
+        "Firecrawl MCP's latest GitHub release is September 26, 2025, despite active default-branch commits. Tavily CLI and Exa returned HTTP 404 from releases/latest, which does not establish absence of package releases. Cua's latest release belongs to Spaces rather than Driver.",
+        "The session approval policy rejected ctx_fetch_and_index with: 'MCP tool call requires approval, but approval policy is never'. Pinned public Git source files were instead indexed with ctx_index and read with ctx_search. Consequently, the requested webpage-fetch method could not be completed.",
+        "Budget used: 30 GitHub API calls, zero web searches, and one rejected batch requesting eight page fetches; no webpage content was returned."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/tavily-ai/tavily-cli",
+        "https://api.github.com/repos/tavily-ai/tavily-cli/releases/latest",
+        "https://api.github.com/repos/tavily-ai/tavily-cli/commits?per_page=1",
+        "https://api.github.com/repos/alphaXiv/OpenResearch",
+        "https://api.github.com/repos/alphaXiv/OpenResearch/releases/latest",
+        "https://api.github.com/repos/alphaXiv/OpenResearch/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/playwright-cli",
+        "https://api.github.com/repos/microsoft/playwright-cli/releases/latest",
+        "https://api.github.com/repos/microsoft/playwright-cli/commits?per_page=1",
+        "https://api.github.com/repos/vercel-labs/agent-browser",
+        "https://api.github.com/repos/vercel-labs/agent-browser/releases/latest",
+        "https://api.github.com/repos/vercel-labs/agent-browser/commits?per_page=1",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server/releases/latest",
+        "https://api.github.com/repos/exa-labs/exa-mcp-server/commits?per_page=1",
+        "https://api.github.com/repos/unclecode/crawl4ai",
+        "https://api.github.com/repos/unclecode/crawl4ai/releases/latest",
+        "https://api.github.com/repos/unclecode/crawl4ai/commits?per_page=1",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server/releases/latest",
+        "https://api.github.com/repos/firecrawl/firecrawl-mcp-server/commits?per_page=1",
+        "https://api.github.com/repos/browser-use/browser-use",
+        "https://api.github.com/repos/browser-use/browser-use/releases/latest",
+        "https://api.github.com/repos/browser-use/browser-use/commits?per_page=1",
+        "https://api.github.com/repos/trycua/cua",
+        "https://api.github.com/repos/trycua/cua/releases/latest",
+        "https://api.github.com/repos/trycua/cua/commits?per_page=1",
+        "https://api.github.com/repos/adbar/trafilatura",
+        "https://api.github.com/repos/adbar/trafilatura/releases/latest",
+        "https://api.github.com/repos/adbar/trafilatura/commits?per_page=1",
+        "https://github.com/tavily-ai/tavily-cli/blob/fd745230e6756933e3a190bfdc61ea1eb2db3993/README.md",
+        "https://github.com/alphaXiv/OpenResearch/blob/ee36ef0333ca3c533eace915f1bec322a1efde1c/README.md",
+        "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/README.md",
+        "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/.github/workflows/ci.yml",
+        "https://github.com/microsoft/playwright-cli/blob/b85c7a736bb473bf55b584e54a09ffa698d6d871/tests/integration.spec.ts",
+        "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/README.md",
+        "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/.github/workflows/ci.yml",
+        "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/benchmarks/README.md",
+        "https://github.com/vercel-labs/agent-browser/blob/39a74c70d7759d5a6de7a22c04570bb626bbd081/benchmarks/scenarios.ts",
+        "https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md",
+        "https://github.com/unclecode/crawl4ai/blob/e5d2e786d1a101225f3f6a3e6fd344d76eeb13af/README.md",
+        "https://github.com/firecrawl/firecrawl-mcp-server/blob/8fd13724c9da7a859d7bf95e735bb8b462de2c0c/README.md",
+        "https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/README.md",
+        "https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/browser_use/cli.py",
+        "https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/tests/ci/test_browser_use_cli.py",
+        "https://github.com/browser-use/browser-use/blob/302d8fcb245a7a63fb7531a4734c9ce3c7792779/.github/workflows/test.yaml",
+        "https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/README.md",
+        "https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/libs/cua-driver/README.md",
+        "https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/libs/cua-driver/docs/test-matrix.md",
+        "https://github.com/trycua/cua/blob/352507b6c03162ab286b21d5ed509125cc3daece/libs/cua-driver/docs/e2e-ci-reporting.md",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/README.md",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/installation.rst",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/evaluation.rst",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/tests/README.rst",
+        "https://github.com/adbar/trafilatura/blob/96e19b949c3ac4a9e193b41fe2fb352e7150db86/.github/workflows/tests.yml"
+      ]
+    }
+  ]
+}

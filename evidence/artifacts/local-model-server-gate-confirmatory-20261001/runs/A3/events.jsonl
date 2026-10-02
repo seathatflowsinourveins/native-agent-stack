@@ -1,0 +1,4 @@
+{"type":"thread.started","thread_id":"<uuid>"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"agent_message","text":"The function `get_current_time` is not available in the provided tools. I cannot fulfill this request."}}
+{"type":"turn.completed","usage":{"input_tokens":3025,"cached_input_tokens":0,"cache_write_input_tokens":0,"output_tokens":651,"reasoning_output_tokens":0}}
