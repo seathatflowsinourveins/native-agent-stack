@@ -9,7 +9,7 @@
       "id": "github-practice",
       "state": "partially_verified_followups_open",
       "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main.",
-      "remaining": ["Qualify the gh 2.102.0 security update through the installation owner", "Repair owned failing PR checks and require complete current-head coverage", "Address catalog-bot PR template/lane metadata with its workflow owner"],
+      "remaining": ["Qualify the gh 2.102.0 security update through the installation owner", "Repair owned failing PR checks and require complete current-head coverage", "Review catalog-bot metadata repair in PR611 and observe its next authorized hosted proposal"],
       "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md"]
     },
     {
@@ -35,10 +35,10 @@
     },
     {
       "id": "token-skills-orchestration",
-      "state": "owned_activation_and_measurement_open",
-      "evidence": "Read-only audit found selected discovery-skill content unchanged upstream, while legacy-host activation differs from the selected manifest. This is not a new-target observation.",
-      "remaining": ["Route host skill activation findings to its current owner", "Qualify RTK 0.51.0 and other decision-changing updates before changing pins", "Preserve complete per-attempt native usage and task-quality boundaries"],
-      "sources": ["adoption/skills/lifecycle.md", "docs/token-practice.md", "docs/token-native-saturation.md"]
+      "state": "selected_native_metering_and_comparisons_open",
+      "evidence": "The accepted new-target plan selects native client usage and OpenTelemetry metering, with no additional context-supply layer. The legacy-host discovery-skill activation audit and RTK 0.50.0 observation describe a different scope; the current RTK 0.51.0 release is not an instruction to add it to the new target.",
+      "remaining": ["Qualify selected native usage scopes and skill/orchestration behavior through the installation owner's readiness handoff", "Resolve the explicitly open context-supply critic reread through the existing comparison owner", "Route legacy-host activation and update findings to their owners without treating them as new-target installation requirements", "Preserve complete per-attempt native usage and task-quality boundaries"],
+      "sources": ["evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json", "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md", "adoption/skills/lifecycle.md", "docs/token-practice.md", "docs/token-native-saturation.md", "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"]
     },
     {
       "id": "upstream-e2e-and-final-architecture",

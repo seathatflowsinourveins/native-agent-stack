@@ -16,6 +16,14 @@ The official Claude Quickstart fixture now has a narrow independent local regres
 
 The required Astra/Max cross-runtime judgment and the assigned Sol/Max fixture worker failed at the account usage limit before a verdict or file writes. The coordinator completed local preparation; independent review remains required. No SDK/provider call, target entry or configuration change is inferred from these tests. The broader goal remains active.
 
+## Selected target and legacy scope
+
+The [remaining-work record](../../blueprints/convergence-practice/clean-resolution-20261002/open-work.json) now distinguishes the accepted new-target token decision from legacy-host observations. The [selected plan](../../evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json), `token-efficiency` entries, assigns usage metering to the clients and OpenTelemetry and selects no additional context-supply layer. The [accepted decision](2026-10-01-new-wsl-definitive-defaults.md), lines 271–285, retains a requested critic reread with page access. That open source-review condition stays with its comparison owner.
+
+Correction: the initial remaining-work list placed legacy RTK qualification beside target activation without making their different scopes explicit. Verification against those two accepted sources removes any implied requirement to install RTK on the new target. Installed legacy RTK returned `0.50.0`; the native upstream release API reports [v0.51.0](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0), including changed generic-runner argument handling and a diff exit-code fix. No update was installed or qualified; native `cargo --version` could not execute because Cargo is absent. A newer release alone does not overturn the accepted target selection.
+
+The separate [catalog metadata PR611](https://github.com/seathatflowsinourveins/native-agent-stack/pull/611) addresses the observed bot-description/lane gap. It retains its own local checks and failed-attempt correction; independent review and future authorized hosted proposal behavior remain separate gates.
+
 ## SOTA sources
 
 The envelope cites the fixed convergence reference, installed/version-specific Codex and Claude source and native collaboration documentation. Acceptance follows [the repository evidence policy](../acceptance-evidence-policy.md) and [convergence architecture](../convergence-architecture.md), with actual outcomes retained in the scoped record. Reuse the existing native runtimes and supported upstream commands; do not create an additional universal planner, router or test harness.
