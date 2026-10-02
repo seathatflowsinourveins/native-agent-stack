@@ -4300,8 +4300,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "0fcdcf3169f931d5ff3b6109c1421cf1c86adb17efab749aa5007f6d2726cbef",
-      "bytes": 81561
+      "sha256": "91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1",
+      "bytes": 82092
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -6486,7 +6486,7 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "9a9c26b438454d7c1767332fe82267d217412eb8edb59b1a99e672e3558c6210",
+      "sha256": "6321c0363eece6b033ab41f32d1f3ed56decfcc689178a3207f21a8d23a273ad",
       "bytes": 23065
     },
     {
@@ -15726,8 +15726,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-      "sha256": "c07bab0c84d3bf17625ddabfffdca74cda2f2e7ebb19d63c57b8965ac4b813c4",
-      "bytes": 137074
+      "sha256": "0f7c42f8fd2618b6b1393086a44e56b8a98b1145bc0f99da267a2aac6e08b3a4",
+      "bytes": 137499
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
