@@ -136,7 +136,7 @@ executor and released against the same configuration freeze. It is not present
 in this 72-case package. If unavailable, stop as inconclusive. This rule does not
 permit retraining, a second extension or changing the decision rule after results.
 
-Differences within ±5 percentage points are treated as practical ties and cannot
+Decision intervals entirely within ±5 percentage points are treated as practical ties and cannot
 justify promotion on accuracy. Report complete cost, latency and operational
 burden for ties; prefer the existing selection unless a separately authorized
 decision supports a change. Unknown usage, account charge, cache accounting or

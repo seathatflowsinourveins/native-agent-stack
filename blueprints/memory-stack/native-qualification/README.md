@@ -78,9 +78,12 @@ uv run --frozen python qualification.py \
   --output "$TASK_SCRATCH/decision.json"
 ```
 
-For the single preregistered extension, provide logs containing the original 60
-and 60 new cases, keep the same frozen settings, and add `--look extension
---previous "$TASK_SCRATCH/initial-decision.json"`. The comparison reports paired
+For the single preregistered extension, provide the original logs plus logs for
+60 new cases, keep the same frozen settings, and add `--look extension
+--previous "$TASK_SCRATCH/initial-decision.json"`. Freeze a separate extension
+manifest under the same corpus ID with `parent_manifest_sha256` pointing to the
+initial manifest. Pass the extension manifest's hash to
+`--corpus-manifest-sha256`; the prior decision binds the original 60. The comparison reports paired
 95% descriptive intervals and more conservative simultaneous decision intervals
 for the planned comparisons/looks. Common-retrieval results are diagnostic.
 
