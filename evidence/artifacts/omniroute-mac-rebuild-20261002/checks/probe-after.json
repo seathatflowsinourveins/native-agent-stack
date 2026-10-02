@@ -1,0 +1,27 @@
+{
+  "catalog": {
+    "status": 200,
+    "cx/gpt-6.1-sol": true,
+    "cx/gpt-6-astra": true,
+    "models": 618
+  },
+  "sol_max": {
+    "status": 200,
+    "model": "gpt-6.1-sol",
+    "reasoning": null,
+    "text": "OK"
+  },
+  "astra_max": {
+    "status": 200,
+    "model": "gpt-6-astra",
+    "reasoning": null,
+    "text": "OK"
+  },
+  "codex_exec_sol": {
+    "exit": 0,
+    "answer": "Unable to verify\u2014the web search timed out.",
+    "search_events": 0,
+    "stderr_tail": "error\\\"}}\")\n2026-10-02T03:48:30.681093Z ERROR codex_core::tools::router: error=Fatal error: http 400 Bad Request: Some(\"{\\\"error\\\":{\\\"message\\\":\\\"Unsupported operation for /v1/alpha/search: open\\\"}}\")"
+  },
+  "pass": true
+}
