@@ -36381,8 +36381,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "525df2b67edc3e402c4fe48340b42dc59030429d22b6b2a41dd566244c631e7a",
-      "bytes": 16745
+      "sha256": "5d11a14f497175e3a7528ee544e234c7dca2234600dbc140f593d7180be936df",
+      "bytes": 16829
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -36866,8 +36866,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/summarize.py",
-      "sha256": "699a574e05922fc0a5e0215e6ab075f92a8592e2c61e80942b1695888576f091",
-      "bytes": 2613
+      "sha256": "68dfcbb577a6a7b537681a1eabd69b53b73497cea70cb26996e32952c678a25d",
+      "bytes": 2717
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/added-slots/summary.json",
@@ -36876,8 +36876,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/README.md",
-      "sha256": "47d4062179f3c4044d6394df45c9a1f960b5798ce6d5159f69e307cd08de1fc9",
-      "bytes": 3201
+      "sha256": "097e2f4e99a2e373d65e08ad0846ffd33d9e48546bca960c305676316c345c57",
+      "bytes": 3325
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md",
@@ -36886,8 +36886,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combine.py",
-      "sha256": "9e849240e410b4091f37773bde9c986ca2524cf94bff4bf26beff1ff0e620ce2",
-      "bytes": 4919
+      "sha256": "6fe7a26adc6cb56f8f10db5a96d2df207a529167bdd37e04bd352a36ec019407",
+      "bytes": 5424
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json",
@@ -49321,8 +49321,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "f497cdfca1d4b8bd30c62b71d4cf5ce20ca396cbd424acc2b91549124a14d02c",
-      "bytes": 35532
+      "sha256": "4d5b0c3c203f1edac4690bb547d5d8cb44932135dcd86879621a35d8d84f6dcc",
+      "bytes": 35612
     },
     {
       "path": "tests/test_observability.py",
