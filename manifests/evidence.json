@@ -37431,13 +37431,18 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-rehearsal-20261002/coordinator-review.md",
-      "sha256": "33e010bf1a11c751126694f1bf472aa80681817a56f6a57b040d5c093f7d02d8",
-      "bytes": 3298
+      "sha256": "7bc9fdf96035fe2ca63ec5aacc8f9ac8fcd2ada94589ccafb6bbe1e094745526",
+      "bytes": 4199
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-rehearsal-20261002/runs-on-wsl-3.0.1.json",
+      "sha256": "dcac7abf8b9cca8ee931f592810217121cdc99e78b432f96d8d9a63ed481bc66",
+      "bytes": 41233
     },
     {
       "path": "evidence/artifacts/new-wsl-rehearsal-20261002/stage1-receipt.json",
-      "sha256": "1fba6490145c7b7de7d85b1968b52788c88eeb2b39a8db3758e94c541c0273b7",
-      "bytes": 51552
+      "sha256": "7a4c400decc6d5a4317ec36571377971c5c82c89fec4959ee18a605c379fa780",
+      "bytes": 51588
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
