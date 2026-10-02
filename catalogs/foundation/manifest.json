@@ -6,7 +6,10 @@
   "limitations": [
     "Historical receipts qualify their named host, input and operation only; this catalog does not run or certify a new host.",
     "Component pins and original evidence claims remain canonical; discoveries, source review, deployment and successful execution are distinct.",
-    "The broad repository union remains shared research inventory at catalogs/us-equities/decision-index.json; it is not an installation or adoption list."
+    "The broad repository union remains shared research inventory at catalogs/us-equities/decision-index.json; it is not an installation or adoption list.",
+    "The checked_at date remains the capability-decision baseline. Later dated execution dispositions are recorded in docs/decisions/2026-10-02-north-star-readiness-execution.md; no historical receipt is transferred to an observed newer version or another host.",
+    "Full-stack readiness remains false. All 21 maintained gate classes retain their dated evidence levels; selected host/lifecycle requirements remain open and excluding an optional candidate never marks its gate passed.",
+    "Public source records contain sanitized provenance only; personal host paths, authentication stores and raw native histories remain private. Source synchronization does not activate globals, sign-ins or services."
   ],
   "canonical_sources": {
     "components": "manifests/stack.json",
@@ -20,10 +23,10 @@
       "id": "native-clients",
       "title": "Native clients",
       "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
-      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction. Model routing and providers are not a separate layer here, and the catalogs/us-equities/models.json ledger remains a note on this native-clients selection. The user decided on 2026-09-27 to adopt a loopback OmniRoute gateway (component omniroute) for pooled GPT-6 access by gateway-routed Codex lanes such as the landscape sweep. It is a source build of release/v3.8.51 with an upstream fix (#14904) and an upstream feature (#13788); see docs/decisions/2026-09-27-omniroute-account-pool.md. Native Codex stays the max-quality default. The agent-sdks layer default stays pending the preregistered three-arm workers comparison (docs/grand-catalog-handbook.md, agent-sdks row), which remains its only acceptance gate. The terminal surface of these clients (tab titles, bell, colour depth, needed-only alerts) is settled by docs/decisions/2026-09-28-terminal-experience.md: AI-client (Claude, Codex) Windows Terminal profiles must not suppress application titles (static shell profiles may keep fixed titles), BEL is the only bell or notification signal Windows Terminal 1.24 and 1.25 act on (OSC 9;4 only sets progress state), and alerts are limited to pending decisions.",
-      "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
-      "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
-      "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
+      "selection": "Native Codex and Claude retain their own accounts, model selection, caching and compaction. For the October 2 two-host North Star task, GPT-6.1 Sol at native Ultra is the coordinator and default worker; bounded Astra escalation follows a recorded consequential decision, conflicting primary evidence or a hard failure unresolved by evidence-led Sol diagnosis. The historical model ledger remains part of this layer. Current native observations and older accepted component pins are distinct; see docs/decisions/2026-10-02-north-star-readiness-execution.md. SDK applications and gateway-routed lanes use the existing owner-controlled OmniRoute endpoint without silent direct-provider fallback. Terminal behavior retains the dated docs/decisions/2026-09-28-terminal-experience.md boundary.",
+      "activation": "Use the intended native client and inspect its effective project tools/model/effort on the target host; a fresh session is needed for new process defaults. Source sync and a version check do not activate a host.",
+      "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation retain their exact host/version/input scopes. Observed newer Mac binaries do not inherit older accepted runtime claims. Required Mac and surviving NativeStack WSL2 host/account/model/lifecycle acceptance remains unverified until actually executed.",
+      "next_gap": "Reconcile official artifact and compatibility provenance through the pin owner; qualify the selected host boundary without repeating matching accepted model trials. Carry G02-G04 and G18-G20 from docs/decisions/2026-10-02-north-star-readiness-execution.md."
     },
     {
       "id": "instructions-skills",
@@ -38,10 +41,10 @@
       "id": "workers",
       "title": "Workers and task ownership",
       "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
-      "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
-      "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
+      "selection": "Native Codex/Claude workers first; the October 2 two-host task selects native Sol Ultra by default with one bounded Astra question for a recorded escalation trigger. Beads is optional when a dependency-aware queue helps.",
+      "activation": "One coordinator integrates; each writing worker receives an objective, exact source revision, owned checkout/paths, acceptance check and compact evidence handoff. One writer owns each shared setting, account, service or history as well as each checkout.",
       "lifecycle_scope": "Native child repair and a same-child cancellation/crash/resume fixture passed; an owned systemd cgroup automatically removed the pending descendant and continuation produced one final effect. Separately, native Workflow selected-child stop, failed/null result preservation, replay and graceful same-session exit/resume/integration are qualified in native-workflow-graceful-recovery-20260921; hard-crash semantics are not transferred between these fixtures.",
-      "next_gap": "Qualify changed task effects, independent hosts and provider cancellation separately from the accepted same-host fixture."
+      "next_gap": "Qualify changed task effects, independent hosts and provider cancellation separately from the accepted same-host fixtures; child exit alone does not attest escaped descendants or provider settlement."
     },
     {
       "id": "isolation",
@@ -56,8 +59,8 @@
       "id": "code-navigation",
       "title": "Code navigation",
       "purpose": "Find exact implementations, symbols, references and structural relationships.",
-      "selection": "Known source or exact search first; Serena, ast-grep, static graph or scoped jCodeMunch when useful.",
-      "activation": "Choose one fitting retrieval lane and read original implementation before edits or correctness decisions.",
+      "selection": "Known source, rg and ast-grep first; covered codebase-memory graph, Serena, scoped jCodeMunch or SocratiCode when the structural or conceptual question benefits from it.",
+      "activation": "Choose one fitting retrieval lane, verify project/index scope and coverage, and read missed lines or original implementation before correctness decisions; no graph or semantic index activates unrelated projects.",
       "lifecycle_scope": "Recorded exact source/symbol checks passed; language coverage and index freshness stay project-specific.",
       "next_gap": "Test the actual target language and a changed/deleted symbol after moving to a new project."
     },
@@ -74,46 +77,46 @@
       "id": "semantic-rag",
       "title": "Semantic code retrieval",
       "purpose": "Retrieve conceptual code using the selected project index and local embeddings.",
-      "selection": "SocratiCode with Qdrant and the accepted local vLLM embedding runtime.",
-      "activation": "Activate only the selected project and models; do not index unrelated folders or change the accepted runtime for release novelty.",
+      "selection": "SocratiCode with scoped Qdrant and the historically accepted local embedding runtime where the intended host has qualified that workload; no current two-host runtime activation follows from catalog inclusion.",
+      "activation": "Activate only the selected project/models after actual-host compatibility and ownership checks. Retain accepted runtime evidence at its original scope; do not change it for release novelty or claim that static indexing establishes semantic retrieval.",
       "lifecycle_scope": "Native source retrieval and add/change/delete persistence passed; a newer GPU runtime startup failed and remains failed. Separate synthetic Qdrant off-host full-state restore and exact native queries passed.",
-      "next_gap": "Retain the accepted environment and collect changed-runtime/GPU acceptance only when a concrete need warrants it."
+      "next_gap": "Qualify the actual selected host/index/runtime when semantic retrieval is required. Preserve the failed newer GPU startup and keep GPU acceptance conditional on a workload using it."
     },
     {
       "id": "durable-memory",
       "title": "Durable memory",
       "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
-      "selection": "One ai-memory store as cross-harness memory of record.",
-      "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
-      "lifecycle_scope": "Native scoped retrieval, Codex/Claude session-end consolidation, bounded assistant capture and scheduled learning admission have separate dated evidence. Synthetic migration and off-host empty-target recovery remain separate; capture is not a full transcript.",
-      "next_gap": "Measure retrieval and learned-page quality on representative work; preserve once-per-session learning, all-project scheduler scope and separate lost-account/key recovery limits. See docs/memory-landscape-maintenance.md."
+      "selection": "Retain the existing single-owner official ai-memory shared control with verified project scope; Hindsight/coding-agents and other replacement candidates remain isolated and unpromoted. Current retained versions and all lifecycle gates are in docs/decisions/2026-10-02-north-star-readiness-execution.md.",
+      "activation": "Read relevant maintained decisions in the verified project scope. Durable writes require explicit intent, and recalled text never authorizes actions. Where a supported endpoint is unavailable, use versioned decisions and an outbox; never another host's localhost or a second capture engine.",
+      "lifecycle_scope": "Scoped API history/link/handoff acceptance, private capture/consolidation and earlier explicit-read/actual-compact/fresh-process/read proof retain separate dates and limits. Historical stale recall, synthesis, learning, capture, retrieval and latency failures remain. Effective production policy and representative native cross-client review/approval/recovery are not established by private API receipts.",
+      "next_gap": "Carry G03 and G05-G17 from docs/decisions/2026-10-02-north-star-readiness-execution.md. Qualify the selected native operation and representative lifecycle before wider claims; neutral current-control quality and blind cross-family convergence are required for replacement."
     },
     {
       "id": "web-research",
       "title": "Web research",
       "purpose": "Find current primary sources and inspect selected web content.",
-      "selection": "Native browser, bounded literature retrieval and the upstream Tavily CLI/skills for selected web research.",
-      "activation": "Use an existing authenticated route on demand; load only the research operation needed.",
+      "selection": "Free authorized native browser/search/fetch lanes and bounded primary-source literature retrieval first. Dated Tavily CLI/skill receipts remain historical reference; they do not select a paid keyed route for new work when a free native lane meets the task.",
+      "activation": "Use only the available authorized browser/account route on demand; load only the required research operation and retain primary-source provenance.",
       "lifecycle_scope": "Dated browser/paper retrieval and Tavily Search/Extract passed. Eight official skills were discovered in fresh Codex probes; broader operations and the active Desktop registry remain separate.",
-      "next_gap": "Qualify Map, Crawl or Research only for a concrete task; retain current Desktop discovery and account limits."
+      "next_gap": "Qualify the actual required search/page-open/research surface at the selected host/provider. Historical skill discovery and selected Search/Extract receipts do not prove full gateway web parity or every current operation."
     },
     {
       "id": "token-efficiency",
       "title": "Context and usage efficiency",
       "purpose": "Reduce task context only while preserving required facts, source recovery and answer quality.",
-      "selection": "Known focused reads, RTK, Context Mode, scoped jCodeMunch, guarded Headroom and selected representations.",
-      "activation": "Choose the cheapest sufficient lane for each artifact; preserve raw failure output and native caching.",
+      "selection": "Native caching/compaction, focused original reads, accepted RTK/Context Mode and scoped retrieval first; guarded Headroom and selected representations remain task-specific options.",
+      "activation": "Choose the smallest sufficient lane for each artifact while preserving full failure recovery. Retain source paths, exit codes and meaningful totals privately; publish sanitized provenance.",
       "lifecycle_scope": "Exact artifact comparisons and mixed native trial results are retained; heuristic counters and consumed usage are separate.",
-      "next_gap": "Measure complete matched attempts only for a decision-changing optimization; do not infer causal lifetime savings."
+      "next_gap": "G20 remains open: whole-task usage including children/retries, provider settlement, applied compression and net savings are unknown unless measured without overlapping counters. Changed RTK versions/hosts need failure-preservation acceptance."
     },
     {
       "id": "quality-evaluation",
       "title": "Quality and evaluation",
       "purpose": "Use deterministic oracles and independent review to accept the actual requested behavior.",
-      "selection": "Project tests, browser acceptance, promptfoo fixtures, shell review and structural diffs as applicable.",
+      "selection": "Existing project tests and independent deterministic oracles first; unchanged upstream promptfoo, Inspect or Harbor harnesses for applicable gateway/agent comparisons, and browser acceptance or structural diffs as needed.",
       "activation": "Freeze useful acceptance and negative cases before a substantive change; reuse matching passing evidence.",
       "lifecycle_scope": "Selected deterministic fixtures and browser flows passed; no universal model-quality or production guarantee follows.",
-      "next_gap": "Add a representative failure oracle when the next task exposes an untested behavior."
+      "next_gap": "Qualify changed behavior with its meaningful failure oracle. Preserve safe ownership/teardown and frozen statistical gates for comparisons; never run the frozen unsafe benchmark or treat source agreement as blind measured adoption."
     },
     {
       "id": "ci-supply-chain",
@@ -147,27 +150,27 @@
       "title": "Recovery and portability",
       "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
-      "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
+      "activation": "Use exact snapshots and empty restore targets with a designated owner. Keep native keys/accounts/sign-ins on the target host and separate from source; source sync cannot promote settings, services or histories.",
       "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes. Native Workflow graceful recovery has its own accepted local fixture and unresolved usage reconciliation; see docs/native-workflow-writing-recovery-20260921.md.",
-      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project. Packaging and distribution are not a separate layer here: adoption/lifecycle.md's install/update/roll-back stages remain the recovery-and-portability treatment of that concern."
+      "next_gap": "Reuse matching accepted recipes at their exact scope. G18 remains blocked for the surviving NativeStack WSL2 destination; qualify actual production data, native client rebinding, restart/cancellation, atomicity or physical recovery only when required. Removed throwaway-host receipts do not accept that destination."
     },
     {
       "id": "observation-inference",
       "title": "Observation and optional inference",
       "purpose": "Observe bounded native outcomes and usage; trial local inference or routing only against a concrete gap.",
-      "selection": "Loopback native telemetry and scoped history; local model and gateway remain optional trials.",
-      "activation": "Preserve writer/task attribution, account boundaries and native default routes; dashboards do not grant operator authority.",
-      "lifecycle_scope": "Recorded telemetry reconciles scoped usage; HUD live rendering and exact-model gateway inference remain incomplete.",
-      "next_gap": "Resolve only the selected unknown attribution, interactive rendering or provider compatibility condition before retrying."
+      "selection": "Loopback native telemetry and scoped history; optional local-model trials only for a concrete gap. The existing owner-controlled OmniRoute gateway is the required route for selected SDK applications and cross-family lanes, with no silent direct-provider fallback.",
+      "activation": "Preserve writer/task attribution, native account boundaries and explicit endpoint/provider/cache/session scope; dashboards and requested compression policy do not grant operator authority or prove applied policy.",
+      "lifecycle_scope": "Recorded telemetry and accepted scoped SDK protocol checks retain their own source/version/task scopes. Exact live gateway revision, complete web/search parity, provider settlement and whole-task billing remain unqualified; configuration/source readback is not an inference run.",
+      "next_gap": "Resolve only the selected attribution, rendering, provider compatibility or settlement condition. Keep local inference optional and retain the existing service owner; no gateway rebuild or promotion follows from this catalog."
     },
     {
       "id": "agent-sdks",
       "title": "Agent SDKs and runtime workers",
       "purpose": "Select the programmatic SDK or runtime that gives a worker structured events, custom tools or session control beyond the native CLI.",
-      "selection": "Retain native Codex CLI/SDK for session work. Use an explicitly configured OmniRoute SDK lane for application tools/events/handoffs; Pi remains an optional trial. The source-only 2026-10-02 two-host review is in docs/decisions/2026-10-02-two-host-north-star-architecture.md; it does not promote a new runtime.",
-      "activation": "Use the native CLI for ordinary work; reach for an official SDK only when an application needs structured events, custom tools or programmatic session control.",
-      "lifecycle_scope": "Retain each runtime's recorded host, version and task scope. Native Codex receipts, separate SDK protocol checks and the unmerged Pi trial are distinct; the 2026-10-02 source review supplies no new model, runtime or workstation lifecycle acceptance.",
-      "next_gap": "The 2026-10-02 source review distinguishes native Ultra from API reasoning enums and Pi 0.99.1 trial evidence from upstream 1.0.0. Qualify the actual application's endpoint, locked SDK, extensions, cancellation and resume before broader promotion; workstation activation remains host-specific."
+      "selection": "Native Codex CLI/SDK first for ordinary session work. Use the existing explicitly configured OmniRoute SDK lane when an application needs structured tools, events, handoffs or sessions. The accepted SDK lock remains selected; current upstream releases are source-review inputs. Pi remains an optional unpromoted trial. See docs/decisions/2026-10-02-north-star-readiness-execution.md.",
+      "activation": "Use native clients for ordinary work. An application SDK requires an explicit endpoint/provider, bounded deadlines, task cache/session scope and official locks; disable separate SDK tracing and request no duplicate gateway memory. No silent direct-provider fallback.",
+      "lifecycle_scope": "The accepted locked SDK protocol check, older native Codex receipts and Pi trial are separate evidence scopes. Preserve historical SDK timeouts, Pi token/cache limitations and unmerged trial status. October 2 release/source review adds no model/runtime/workstation acceptance.",
+      "next_gap": "Qualify only the affected application endpoint, official artifact/lock, tool/extension binding, cancellation/resume and provider settlement before an update or broader promotion. Native Ultra is not an API enum. Pi 1.0 package/runtime changes do not inherit 0.99.1 trial acceptance."
     },
     {
       "id": "mcp-surfaces",
@@ -183,7 +186,7 @@
       "title": "Secrets and credentials",
       "purpose": "Keep sign-ins and credentials off the checkout and detect accidental secret exposure before publication.",
       "selection": "Native per-client logins on the target host plus gitleaks detection; openbao remains an unused, unqualified candidate.",
-      "activation": "Sign in natively per client; run gitleaks before publishing and follow adoption/manifest.json's authentication_transfer policy (native_login_on_target_only) for any transferred credential.",
+      "activation": "Authenticate natively on each target host; follow adoption/manifest.json's native_login_on_target_only policy and run selected secret checks before publication. Keep credential values, authentication stores, personal host paths and raw native histories private; source synchronization carries none of them.",
       "lifecycle_scope": "gitleaks use is accepted within scope as the ci-supply-chain component referenced here; native login and openbao have no adoption lifecycle in this catalog.",
       "next_gap": "Qualify openbao only against a concrete secret-management gap; broker credential handling stays a trading gate, not a foundation selection."
     },

@@ -11,6 +11,23 @@ reconciles the macOS/workstation roles, current native Sol policy, SDK/gateway
 boundary and Pi release review for starting North Star R&D. Its dated source
 review does not promote a new runtime or replace the scoped receipts below.
 
+The [October 2 readiness execution record](../../docs/decisions/2026-10-02-north-star-readiness-execution.md)
+reconciles observed native versions with historical accepted pins and carries all
+21 maintained gate classes. Native Sol Ultra is the selected coordinator and
+worker policy for this two-host task; SDK applications use the existing
+owner-controlled OmniRoute route. The accepted SDK lock and retained
+ai-memory/Ollama control remain selected. Pi and other replacement candidates
+remain unpromoted. Full-stack readiness is false, and activation of the surviving
+NativeStack WSL2 destination remains unverified.
+
+The manifest's `checked_at` remains the September 21 capability-decision baseline;
+the October 2 record dates the later execution dispositions. A required selected
+capability needs acceptance at its intended host and operation. An optional
+candidate can be excluded from the starting profile without acquiring a passed
+status. Neither disposition transfers an earlier receipt to a newer version or
+another machine. Public source records contain sanitized provenance; personal
+host paths, authentication stores and raw native histories stay private.
+
 The [current layer comparisons](../landscape/foundation.json) explain why each
 choice is retained, what happened to named alternatives, and what evidence would
 change the decision. Open Choices & alternatives
@@ -18,7 +35,7 @@ change the decision. Open Choices & alternatives
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
 from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for the searchable offline view.
 
-The catalog references 61 selected components through 51 capability decisions. Its
+The catalog references 61 selected components through 54 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
