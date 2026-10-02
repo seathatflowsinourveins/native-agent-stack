@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["unit_id", "slots"],
+  "properties": {
+    "unit_id": {"type": "string"},
+    "slots": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false,
+              "required": ["slot_id", "verdict", "surviving_default", "checks", "issues", "settling_measurement", "overturn_check"],
+              "properties": {
+                "slot_id": {"type": "string"},
+                "verdict": {"type": "string", "enum": ["converged", "revised", "split"]},
+                "surviving_default": {"type": ["string", "null"], "description": "a field key or NONE; null only when the verdict is split"},
+                "checks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["fact", "source", "holds"], "properties": {"fact": {"type": "string"}, "source": {"type": "string"}, "holds": {"type": "boolean"}}}},
+                "issues": {"type": "array", "items": {"type": "string"}},
+                "settling_measurement": {"type": ["string", "null"]},
+                "overturn_check": {"type": "string"}}}}
+  }
+}

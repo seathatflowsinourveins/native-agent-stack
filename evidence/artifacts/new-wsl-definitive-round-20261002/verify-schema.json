@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contender", "checks", "verdict", "repairs"],
+  "properties": {
+    "contender": {"type": "string"},
+    "checks": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "object", "additionalProperties": false, "required": ["field", "statement", "citation", "holds", "note"],
+               "properties": {"field": {"type": "string"}, "statement": {"type": "string"}, "citation": {"type": "string"}, "holds": {"type": "boolean"}, "note": {"type": "string"}}}},
+    "verdict": {"type": "string", "enum": ["pass", "fail"]},
+    "repairs": {"type": "array", "items": {"type": "string"}}
+  }
+}

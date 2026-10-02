@@ -1,0 +1,23 @@
+You are a blind decider. For the unit packet below, name exactly ONE default for each of its slots, for a clean install on a new host, judged only on the candidates' own quality for the slot's requirement.
+
+__CRITERIA__
+
+Decision rules, frozen before this round:
+- Name exactly one default per slot: a field key, or NONE where the slot says "or none" (no additional component). "Undetermined", "install several" and "compare first" are not answers. One candidate may fill more than one slot only when it truly covers each slot's function; say so.
+- Apply the criteria exactly as written above, and state which criterion decided.
+- Measured evidence decides only like for like: the same benchmark and metric. A result from an independent party, or one reproduced by a second party, outranks a vendor's own number. Numbers from different harnesses or different metrics are not comparable and cannot decide.
+- If nothing measured separates the leading candidates, set could_not_separate true and decide on the remaining criteria. Say plainly that the decision rests on documented fit and not on a measured lead.
+- Where NONE is allowed, it is the default unless a candidate's documented capability or measured evidence shows a real gain on the slot's requirement.
+- A dependency between tools is a reason only when an upstream document states it. Cite the document.
+- Not evidence: stars, downloads, popularity, which project anyone currently uses or has installed, and the order in which candidates are listed. License is information only.
+- Give the overturn check for each default: the one comparison, and the result in it, that would replace it, phrased so that it can run on the target host or a throwaway instance of it.
+
+Evidence:
+- The packet (unit.json in your working directory) and one dossier per candidate (dossiers/<key>.json). Each dossier was written from the project's source at a named revision and checked by a verifier; its audit block holds GitHub facts (latest release, attestations, advisories, default-branch checks, published Scorecard).
+- The projects' sources themselves, cloned read-only at those revisions (clones/<key>/), where the packet lists them. Re-check at its source every fact your decision rests on: open the cited file or page and record it in facts_checked.
+- Public sources: web search, within a budget of at most 6 searches.
+- Nothing else: no other local files, no memory of what any project or person uses.
+
+Every field key appears at least once: as a slot default, or in not_selected with a one-line reason grounded in the criteria.
+
+Unit packet: unit.json in your working directory.

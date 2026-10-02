@@ -1,0 +1,22 @@
+You write a factual dossier about one open-source project for a later, separate decision. You do not decide anything and you do not compare it with other projects.
+
+Project:
+__CONTENDER__
+
+It will be considered for these needs (context only; do not judge fit, just make sure the facts below cover what these needs would ask):
+__UNITS__
+
+Your working directory holds the project's source at the revision named above (a shallow clone), unless the project is not a GitHub repository, in which case your working directory is empty and you read the listed pages with WebFetch. Rules:
+- Read README.md (or the main README) in full first, then the documentation and the code needed to fill every field. Prefer the code over the README when they differ, and say so in claim_checks.
+- Every citation is path:line (or path:start-end) inside the working directory, or a URL for a fetched page. Never cite something you did not open.
+- claims: the README's own statements that matter for the needs above, quoted or closely paraphrased, each with its citation.
+- install: only upstream-documented install methods for Linux (and macOS if documented), with the exact command and its citation.
+- platforms: for each field write yes, no or unknown, then the citation or the reason.
+- integrations: CLI, MCP server, SDK or HTTP API, and any documented Claude Code or Codex integration, each with a citation or "none found".
+- telemetry_and_network: what the code or docs say about telemetry, phoning home, required network services and accounts, with citations.
+- code: languages; entry points (binary, CLI module, server main); a short architecture summary naming the key modules by path; packaging and release (artifacts, checksums, signatures or attestations, with citations to release workflows); tests and CI (frameworks, test directories, an approximate test-file count, CI workflow files and what they run); dependencies (manifest paths and their direct dependency counts); the security policy file or "none".
+- claim_checks: up to ten README claims that matter for the needs above, each checked against the code: yes, partial, no or not_checkable, with the code citation.
+- benchmarks: published measurements the project or third parties report (what, metric, value, source, and whether the party is independent of the project). Do not invent numbers; leave the list empty when there are none.
+- risks: concrete, cited risks (maintenance, platform, security, licensing, scope).
+- Facts only. No stars, downloads, popularity or who uses it. Do not open anything outside your working directory except the listed pages.
+Return the dossier as the JSON object the schema requires.

@@ -1,0 +1,1612 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_contenders",
+  "contenders": [
+    {
+      "contender": "abhigyanpatwari/gitnexus",
+      "name": "gitnexus",
+      "repository": "https://github.com/abhigyanpatwari/gitnexus",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "actions/attest",
+      "name": "attest",
+      "repository": "https://github.com/actions/attest",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "adbar/trafilatura",
+      "name": "trafilatura",
+      "repository": "https://github.com/adbar/trafilatura",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "affaan-m/ecc",
+      "name": "affaan-m/ecc",
+      "repository": "https://github.com/affaan-m/ECC",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "agentgateway/agentgateway",
+      "name": "agentgateway",
+      "repository": "https://github.com/agentgateway/agentgateway",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "agentskills/agentskills",
+      "name": "skills-ref",
+      "repository": "https://github.com/agentskills/agentskills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "akitaonrails/ai-memory",
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "alphaxiv/openresearch",
+      "name": "OpenResearch",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "extra_repositories": [],
+      "units": [
+        "web-research",
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "anchore/grype",
+      "name": "Grype",
+      "repository": "https://github.com/anchore/grype",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "anchore/syft",
+      "name": "Syft",
+      "repository": "https://github.com/anchore/syft",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "andrewyng/context-hub",
+      "name": "Context Hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "anthropics/claude-agent-sdk-python",
+      "name": "Claude Agent SDK",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "anthropics/claude-code-action",
+      "name": "claude-code-action",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "extra_repositories": [],
+      "units": [
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "anthropics/claude-plugins-official",
+      "name": "claude-plugins-official",
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "anthropics/sandbox-runtime",
+      "name": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "anthropics/skills",
+      "name": "Anthropic webapp-testing skill",
+      "repository": "https://github.com/anthropics/skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "apple/container",
+      "name": "Apple Container",
+      "repository": "https://github.com/apple/container",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "aquasecurity/trivy",
+      "name": "Trivy",
+      "repository": "https://github.com/aquasecurity/trivy",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "arabold/docs-mcp-server",
+      "name": "docs-mcp-server",
+      "repository": "https://github.com/arabold/docs-mcp-server",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "arize-ai/phoenix",
+      "name": "Phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "assafelovic/gpt-researcher",
+      "name": "GPT Researcher",
+      "repository": "https://github.com/assafelovic/gpt-researcher",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "ast-grep/ast-grep",
+      "name": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "astral-sh/uv",
+      "name": "astral-sh/uv",
+      "repository": "https://github.com/astral-sh/uv",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "ataraxy-labs/sem",
+      "name": "ataraxy-labs/sem",
+      "repository": "https://github.com/ataraxy-labs/sem",
+      "extra_repositories": [],
+      "units": [
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "basicmachines-co/basic-memory",
+      "name": "Basic Memory",
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "benbjohnson/litestream",
+      "name": "Litestream",
+      "repository": "https://github.com/benbjohnson/litestream",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "bentoml/bentoml",
+      "name": "BentoML",
+      "repository": "https://github.com/bentoml/BentoML",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "berriai/litellm",
+      "name": "LiteLLM",
+      "repository": "https://github.com/BerriAI/litellm",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "betterleaks/betterleaks",
+      "name": "betterleaks",
+      "repository": "https://github.com/betterleaks/betterleaks",
+      "extra_repositories": [],
+      "units": [
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "binwiederhier/ntfy",
+      "name": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "boostsecurityio/poutine",
+      "name": "poutine",
+      "repository": "https://github.com/boostsecurityio/poutine",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "boxlite-ai/boxlite",
+      "name": "boxlite",
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "browser-use/browser-use",
+      "name": "Browser Use",
+      "repository": "https://github.com/browser-use/browser-use",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "bytedance/deer-flow",
+      "name": "DeerFlow",
+      "repository": "https://github.com/bytedance/deer-flow",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "ccusage/ccusage",
+      "name": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "cli/cli",
+      "name": "cli/cli",
+      "repository": "https://github.com/cli/cli",
+      "extra_repositories": [],
+      "units": [
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "colbymchenry/codegraph",
+      "name": "CodeGraph",
+      "repository": "https://github.com/colbymchenry/codegraph",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "conductor-oss/conductor",
+      "name": "conductor",
+      "repository": "https://github.com/conductor-oss/conductor",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "dagster-io/dagster",
+      "name": "Dagster",
+      "repository": "https://github.com/dagster-io/dagster",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "dagucloud/dagu",
+      "name": "Dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "davila7/claude-code-templates",
+      "name": "Claude Code Templates",
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "deepset-ai/haystack",
+      "name": "Haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "dependabot/dependabot-core",
+      "name": "Dependabot",
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "determinatesystems/nix-installer",
+      "name": "Determinate Nix installer",
+      "repository": "https://github.com/DeterminateSystems/nix-installer",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "deusdata/codebase-memory-mcp",
+      "name": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "devcontainers/cli",
+      "name": "Dev Containers CLI",
+      "repository": "https://github.com/devcontainers/cli",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "diegosouzapw/omniroute",
+      "name": "OmniRoute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "docker/compose",
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "docling-project/docling",
+      "name": "Docling",
+      "repository": "https://github.com/docling-project/docling",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "drona23/claude-token-efficient",
+      "name": "Claude Token Efficient",
+      "repository": "https://github.com/drona23/claude-token-efficient",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "e2b-dev/e2b",
+      "name": "e2b-dev/e2b",
+      "repository": "https://github.com/e2b-dev/E2B",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "exa-labs/exa-mcp-server",
+      "name": "exa-mcp-server",
+      "repository": "https://github.com/exa-labs/exa-mcp-server",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "facebookincubator/glean",
+      "name": "Glean",
+      "repository": "https://github.com/facebookincubator/Glean",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "fastapi/fastapi",
+      "name": "FastAPI",
+      "repository": "https://github.com/fastapi/fastapi",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "firecrawl/firecrawl-mcp-server",
+      "name": "Firecrawl MCP",
+      "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "getzep/graphiti",
+      "name": "Graphiti",
+      "repository": "https://github.com/getzep/graphiti",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "ggml-org/llama.cpp",
+      "name": "llama.cpp optional inference",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "giancarloerra/socraticode",
+      "name": "SocratiCode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "git/git",
+      "name": "native git worktree and git diff --no-index",
+      "repository": "https://github.com/git/git",
+      "extra_repositories": [],
+      "units": [
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "gitguardian/ggshield",
+      "name": "ggshield",
+      "repository": "https://github.com/gitguardian/ggshield",
+      "extra_repositories": [],
+      "units": [
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "github/codeql-action",
+      "name": "codeql-sarif",
+      "repository": "https://github.com/github/codeql-action",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "gitleaks/gitleaks",
+      "name": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain",
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "gnzsnz/ib-gateway-docker",
+      "name": "Dockerized IB Gateway",
+      "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "google/gvisor",
+      "name": "gVisor",
+      "repository": "https://github.com/google/gvisor",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "google/osv-scanner",
+      "name": "osv-scanner",
+      "repository": "https://github.com/google/osv-scanner",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "grafana/grafana",
+      "name": "Grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "grafana/loki",
+      "name": "Loki",
+      "repository": "https://github.com/grafana/loki",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "harbor-framework/harbor",
+      "name": "Harbor (containerized agent E2E runner)",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "headroomlabs-ai/headroom",
+      "name": "Headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "huggingface/huggingface_hub",
+      "name": "huggingface-hub-native",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "jarrodwatts/claude-hud",
+      "name": "Claude HUD",
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "jdx/mise",
+      "name": "mise",
+      "repository": "https://github.com/jdx/mise",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "jetify-com/devbox",
+      "name": "Devbox",
+      "repository": "https://github.com/jetify-com/devbox",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "jgravelle/jcodemunch-mcp",
+      "name": "jCodeMunch",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "kapillamba4/code-memory",
+      "name": "code-memory",
+      "repository": "https://github.com/kapillamba4/code-memory",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "kenn-io/agentsview",
+      "name": "AgentsView",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "kjanat/actionlint",
+      "name": "actionlint (kjanat)",
+      "repository": "https://github.com/kjanat/actionlint",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "koalaman/shellcheck",
+      "name": "ShellCheck",
+      "repository": "https://github.com/koalaman/shellcheck",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "lancedb/lancedb",
+      "name": "LanceDB",
+      "repository": "https://github.com/lancedb/lancedb",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "langchain-ai/deepagents",
+      "name": "Deep Agents",
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "langchain-ai/langgraph",
+      "name": "LangGraph",
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "langchain-ai/langmem",
+      "name": "langmem",
+      "repository": "https://github.com/langchain-ai/langmem",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "letta-ai/letta",
+      "name": "letta",
+      "repository": "https://github.com/letta-ai/letta",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "letta-ai/letta-code",
+      "name": "Letta Code",
+      "repository": "https://github.com/letta-ai/letta-code",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "lightonai/next-plaid",
+      "name": "next-plaid",
+      "repository": "https://github.com/lightonai/next-plaid",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "lockedinlabs-ai/agent-console",
+      "name": "agent-console",
+      "repository": "https://github.com/lockedinlabs-ai/agent-console",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "mattpocock/skills",
+      "name": "skills (mattpocock)",
+      "repository": "https://github.com/mattpocock/skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "max-sixty/worktrunk",
+      "name": "Worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "extra_repositories": [],
+      "units": [
+        "isolation",
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "maximhq/bifrost",
+      "name": "Bifrost",
+      "repository": "https://github.com/maximhq/bifrost",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "mem0ai/mem0",
+      "name": "Mem0",
+      "repository": "https://github.com/mem0ai/mem0",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "mempalace/mempalace",
+      "name": "MemPalace",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "memtensor/memos",
+      "name": "memos",
+      "repository": "https://github.com/MemTensor/MemOS",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "mibayy/token-savior",
+      "name": "token-savior",
+      "repository": "https://github.com/mibayy/token-savior",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "microsoft/agent-framework",
+      "name": "Microsoft Agent Framework",
+      "repository": "https://github.com/microsoft/agent-framework",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "microsoft/markitdown",
+      "name": "MarkItDown",
+      "repository": "https://github.com/microsoft/markitdown",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "microsoft/pg_durable",
+      "name": "pg_durable",
+      "repository": "https://github.com/microsoft/pg_durable",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "microsoft/playwright",
+      "name": "Playwright",
+      "repository": "https://github.com/microsoft/playwright",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "microsoft/playwright-cli",
+      "name": "Playwright CLI",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "microsoft/wsl",
+      "name": "microsoft/wsl",
+      "repository": "https://github.com/microsoft/WSL",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "minishlab/semble",
+      "name": "semble",
+      "repository": "https://github.com/minishlab/semble",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "mksglu/context-mode",
+      "name": "Context Mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "mlflow/mlflow",
+      "name": "MLflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "moby/moby",
+      "name": "Docker Engine / Moby",
+      "repository": "https://github.com/moby/moby",
+      "extra_repositories": [],
+      "units": [
+        "isolation",
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "modal-labs/modal-client",
+      "name": "Modal",
+      "repository": "https://github.com/modal-labs/modal-client",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "modelcontextprotocol/inspector",
+      "name": "MCP Inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "musistudio/claude-code-router",
+      "name": "claude-code-router",
+      "repository": "https://github.com/musistudio/claude-code-router",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "ojuschugh1/sqz",
+      "name": "sqz",
+      "repository": "https://github.com/ojuschugh1/sqz",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "ollama/ollama",
+      "name": "ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag",
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "open-telemetry/opentelemetry-collector-contrib",
+      "name": "OTel Collector Contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "openai/codex",
+      "name": "Codex SDK and codex exec",
+      "repository": "https://github.com/openai/codex",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "openai/codex-plugin-cc",
+      "name": "codex-for-claude",
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "extra_repositories": [],
+      "units": [
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "openai/openai-agents-python",
+      "name": "OpenAI Agents SDK",
+      "repository": "https://github.com/openai/openai-agents-python",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "openai/skills",
+      "name": "skill:openai-curated (openai)",
+      "repository": "https://github.com/openai/skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills",
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "openbao/openbao",
+      "name": "OpenBao",
+      "repository": "https://github.com/openbao/openbao",
+      "extra_repositories": [],
+      "units": [
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "opendatalab/mineru",
+      "name": "MinerU",
+      "repository": "https://github.com/opendatalab/mineru",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "openhands/software-agent-sdk",
+      "name": "OpenHands software-agent-sdk",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "openlit/openlit",
+      "name": "OpenLIT",
+      "repository": "https://github.com/openlit/openlit",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "oraios/serena",
+      "name": "Serena",
+      "repository": "https://github.com/oraios/serena",
+      "extra_repositories": [],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "page:arch-linux-wsl-distribution",
+      "name": "Arch Linux (WSL distribution)",
+      "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+      "extra_repositories": [],
+      "units": [
+        "cross:wsl-distro"
+      ]
+    },
+    {
+      "contender": "page:debian-13-wsl-distribution",
+      "name": "Debian 13 (WSL distribution)",
+      "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+      "extra_repositories": [],
+      "units": [
+        "cross:wsl-distro"
+      ]
+    },
+    {
+      "contender": "page:fedora-wsl-distribution",
+      "name": "Fedora (WSL distribution)",
+      "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+      "extra_repositories": [],
+      "units": [
+        "cross:wsl-distro"
+      ]
+    },
+    {
+      "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model",
+      "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+      "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image",
+      "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+      "repository": "https://ubuntu.com/download/server",
+      "extra_repositories": [],
+      "units": [
+        "cross:wsl-distro"
+      ]
+    },
+    {
+      "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image",
+      "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+      "repository": "https://ubuntu.com/download/server",
+      "extra_repositories": [],
+      "units": [
+        "cross:wsl-distro"
+      ]
+    },
+    {
+      "contender": "paritok-official/paritok-4b-v1",
+      "name": "paritok-4b-v1",
+      "repository": "https://github.com/paritok-official/paritok-4b-v1",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "pgvector/pgvector",
+      "name": "pgvector",
+      "repository": "https://github.com/pgvector/pgvector",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "podman-container-tools/podman",
+      "name": "Podman / Quadlet",
+      "repository": "https://github.com/podman-container-tools/podman",
+      "extra_repositories": [],
+      "units": [
+        "isolation",
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "portkey-ai/gateway",
+      "name": "Portkey AI Gateway",
+      "repository": "https://github.com/Portkey-AI/gateway",
+      "extra_repositories": [],
+      "units": [
+        "cross:gpt6-harnesses"
+      ]
+    },
+    {
+      "contender": "postgres/postgres",
+      "name": "PostgreSQL",
+      "repository": "https://github.com/postgres/postgres",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "praetorian-inc/noseyparker",
+      "name": "noseyparker",
+      "repository": "https://github.com/praetorian-inc/noseyparker",
+      "extra_repositories": [],
+      "units": [
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "prefecthq/prefect",
+      "name": "Prefect",
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "prometheus/alertmanager",
+      "name": "Alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "prometheus/prometheus",
+      "name": "Prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "promptfoo/promptfoo",
+      "name": "Promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "qdrant/qdrant",
+      "name": "Qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag"
+      ]
+    },
+    {
+      "contender": "react/react",
+      "name": "React",
+      "repository": "https://github.com/react/react",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "restatedev/restate",
+      "name": "Restate",
+      "repository": "https://github.com/restatedev/restate",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "restic/restic",
+      "name": "Restic",
+      "repository": "https://github.com/restic/restic",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "rhysd/actionlint",
+      "name": "actionlint (rhysd)",
+      "repository": "https://github.com/rhysd/actionlint",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    },
+    {
+      "contender": "rohitg00/agentmemory",
+      "name": "agentmemory (rohitg00)",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "rtk-ai/rtk",
+      "name": "rtk-ai/rtk",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "run-llama/llama_index",
+      "name": "LlamaIndex",
+      "repository": "https://github.com/run-llama/llama_index",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "scip-code/scip",
+      "name": "scip, zoekt and universal-ctags",
+      "repository": "https://github.com/scip-code/scip",
+      "extra_repositories": [
+        "https://github.com/sourcegraph/zoekt",
+        "https://github.com/universal-ctags/ctags"
+      ],
+      "units": [
+        "code-navigation"
+      ]
+    },
+    {
+      "contender": "sgl-project/sglang",
+      "name": "SGLang",
+      "repository": "https://github.com/sgl-project/sglang",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "shanraisshan/claude-code-best-practice",
+      "name": "Shan Claude best practice",
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "supermemoryai/supermemory",
+      "name": "Supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "superradcompany/microsandbox",
+      "name": "microsandbox",
+      "repository": "https://github.com/superradcompany/microsandbox",
+      "extra_repositories": [],
+      "units": [
+        "isolation"
+      ]
+    },
+    {
+      "contender": "swe-agent/mini-swe-agent",
+      "name": "mini-swe-agent",
+      "repository": "https://github.com/SWE-agent/mini-swe-agent",
+      "extra_repositories": [],
+      "units": [
+        "cross:runtime-workers"
+      ]
+    },
+    {
+      "contender": "systemd/systemd",
+      "name": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "tavily-ai/tavily-cli",
+      "name": "Tavily CLI",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "temporalio/temporal",
+      "name": "Temporal",
+      "repository": "https://github.com/temporalio/temporal",
+      "extra_repositories": [],
+      "units": [
+        "scheduling-supervision"
+      ]
+    },
+    {
+      "contender": "thedotmack/claude-mem",
+      "name": "Claude-mem",
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "tigerless-labs/agent-memory",
+      "name": "agent-memory (tigerless-labs)",
+      "repository": "https://github.com/tigerless-labs/agent-memory",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "tobi/qmd",
+      "name": "tobi/qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "toon-format/toon",
+      "name": "TOON",
+      "repository": "https://github.com/toon-format/toon",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "topoteretes/cognee",
+      "name": "Cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "trailofbits/skills",
+      "name": "Trail of Bits skills",
+      "repository": "https://github.com/trailofbits/skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "trufflesecurity/trufflehog",
+      "name": "trufflehog",
+      "repository": "https://github.com/trufflesecurity/trufflehog",
+      "extra_repositories": [],
+      "units": [
+        "secrets-credentials"
+      ]
+    },
+    {
+      "contender": "trycua/cua",
+      "name": "Cua Driver",
+      "repository": "https://github.com/trycua/cua",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "tsdgeos/poppler_mirror",
+      "name": "Poppler",
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "twpayne/chezmoi",
+      "name": "chezmoi",
+      "repository": "https://github.com/twpayne/chezmoi",
+      "extra_repositories": [],
+      "units": [
+        "recovery-portability"
+      ]
+    },
+    {
+      "contender": "typesafe-ai/skills",
+      "name": "skill:typesafe-ai (typesafe-ai)",
+      "repository": "https://github.com/typesafe-ai/skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills",
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "ukgovernmentbeis/inspect_ai",
+      "name": "Inspect AI",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation"
+      ]
+    },
+    {
+      "contender": "unclecode/crawl4ai",
+      "name": "Crawl4AI",
+      "repository": "https://github.com/unclecode/crawl4ai",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "vectifyai/pageindex",
+      "name": "pageindex",
+      "repository": "https://github.com/vectifyai/pageindex",
+      "extra_repositories": [],
+      "units": [
+        "document-retrieval"
+      ]
+    },
+    {
+      "contender": "vectorize-io/hindsight",
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "vercel-labs/agent-browser",
+      "name": "agent-browser",
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "extra_repositories": [],
+      "units": [
+        "web-research"
+      ]
+    },
+    {
+      "contender": "vercel-labs/agent-skills",
+      "name": "Vercel agent-skills",
+      "repository": "https://github.com/vercel-labs/agent-skills",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "vercel/next.js",
+      "name": "nextjs",
+      "repository": "https://github.com/vercel/next.js",
+      "extra_repositories": [],
+      "units": [
+        "hosting-services"
+      ]
+    },
+    {
+      "contender": "vllm-project/vllm",
+      "name": "vLLM",
+      "repository": "https://github.com/vllm-project/vllm",
+      "extra_repositories": [],
+      "units": [
+        "semantic-rag",
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "volcengine/openviking",
+      "name": "OpenViking",
+      "repository": "https://github.com/volcengine/OpenViking",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "voltagent/awesome-claude-code-subagents",
+      "name": "VoltAgent subagent collection",
+      "repository": "https://github.com/voltagent/awesome-claude-code-subagents",
+      "extra_repositories": [],
+      "units": [
+        "instructions-skills"
+      ]
+    },
+    {
+      "contender": "vshulcz/deja-vu",
+      "name": "deja-vu",
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "extra_repositories": [],
+      "units": [
+        "durable-memory"
+      ]
+    },
+    {
+      "contender": "wilfred/difftastic",
+      "name": "Difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "extra_repositories": [],
+      "units": [
+        "quality-evaluation",
+        "git-github-automation"
+      ]
+    },
+    {
+      "contender": "yamadashy/repomix",
+      "name": "Repomix",
+      "repository": "https://github.com/yamadashy/repomix",
+      "extra_repositories": [],
+      "units": [
+        "token-efficiency"
+      ]
+    },
+    {
+      "contender": "ymtdzzz/otel-tui",
+      "name": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "extra_repositories": [],
+      "units": [
+        "observation-inference"
+      ]
+    },
+    {
+      "contender": "zizmorcore/zizmor",
+      "name": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "extra_repositories": [],
+      "units": [
+        "ci-supply-chain"
+      ]
+    }
+  ]
+}

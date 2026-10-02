@@ -1,0 +1,15 @@
+Decision rule of the clean-room definitive round, frozen before any dossier or decision exists.
+
+Units and slots: units.json (19 units, 43 open foundation slots of the new-WSL definitive defaults, each asked as a neutral function question). Every candidate in a unit's field has one dossier written from its upstream source at a named revision and checked by a verifier (dossier-prompt.txt, verify-prompt.txt); a dossier that fails verification is repaired once and re-verified, and a second failure is recorded and the dossier is used with its failed checks attached.
+
+Per family (Claude: claude-opus-5-5 at effort max through `claude -p` in safe mode; GPT: cx/gpt-6-astra at effort max through codex exec on the OmniRoute gateway with an isolated CODEX_HOME), per unit: two deciders, one on the field in order 1 and one on the field in order 2 (order 2 is order 1 reversed), each naming one default per slot (decide-prompt.txt); then one critic over both decisions (critic-prompt.txt). The family's pick for a slot is the critic's surviving default when the verdict is converged or revised; a split verdict leaves the family undetermined on that slot.
+
+Definitive: a slot is definitive when both families' picks are the same field key, or both are NONE.
+
+Adjudication: for every slot where both families have a pick and the picks differ, or where one family is undetermined, two adjudicators decide (adjudicate-prompt.txt): one Claude (claude-opus-5-5, effort max) and one GPT (cx/gpt-6-astra, effort max), each seeing both returns anonymized as A and B, each run in both A/B orders. The slot is definitive when all four adjudications choose the same default.
+
+Measurement: a slot that adjudication does not settle keeps its two finalists, and the measurement the critics or adjudicators name settles it on the new WSL. For the durable-memory slot that measurement is the memory head-to-head of #526.
+
+User pins: for the three slots the user pinned by directive (gpt-gateway, agent-runtime-worker, deep-research-harness), a definitive result that differs from the pin is put to the user; the pin stays until the user confirms.
+
+Nothing here installs, accepts or authorizes a candidate: a definitive pick still installs by its upstream command and passes acceptance on the new host. No family's pick is preferred over the other's, and no selection of record is given precedence.

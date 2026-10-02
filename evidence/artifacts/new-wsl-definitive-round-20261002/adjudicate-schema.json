@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["unit_id", "slot_id", "choice", "default", "reason", "checks", "settling_measurement"],
+  "properties": {
+    "unit_id": {"type": "string"},
+    "slot_id": {"type": "string"},
+    "choice": {"type": "string", "enum": ["A", "B", "unsettled"]},
+    "default": {"type": ["string", "null"]},
+    "reason": {"type": "string"},
+    "checks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["fact", "source", "holds"], "properties": {"fact": {"type": "string"}, "source": {"type": "string"}, "holds": {"type": "boolean"}}}},
+    "settling_measurement": {"type": ["string", "null"]}
+  }
+}

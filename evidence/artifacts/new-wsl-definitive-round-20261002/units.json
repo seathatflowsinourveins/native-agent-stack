@@ -1,0 +1,2027 @@
+{
+  "schema_version": 1,
+  "kind": "definitive_round_units",
+  "seed": "new-wsl-definitive-round-20261002",
+  "inputs": {
+    "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json": "d2a4f0e015fbc8d9257994a6f1e5ab9d4eb910fc99bd6ed23954343b45ca85d2"
+  },
+  "units": [
+    {
+      "unit_id": "ci-supply-chain",
+      "title": "CI and supply chain",
+      "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Use a CI-repair skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "workflow-policy-audit",
+          "source_slot": "zizmor",
+          "question": "Which single tool audits GitHub Actions workflows for permission and pinning policy?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "build-provenance",
+          "source_slot": "attest",
+          "question": "Which single mechanism produces signed build-provenance or SBOM attestations for hosted outputs?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "sbom-generation",
+          "source_slot": "syft",
+          "question": "Which single tool generates SBOMs (CycloneDX or SPDX) for container images and directories?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "dependency-updates",
+          "source_slot": "dependabot",
+          "question": "Which single tool keeps pinned dependencies, including action references, current through pull requests?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "findings-publication",
+          "source_slot": "codeql-sarif",
+          "question": "Which single mechanism publishes static-analysis findings as code-scanning alerts tied to commit and tool, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "workflow-correctness-lint",
+          "source_slot": "actionlint-kjanat",
+          "question": "Which single linter checks workflow syntax, expressions, action inputs and outputs, and run: scripts?",
+          "no_additional_component_allowed": false
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "zizmor",
+          "repository": "https://github.com/zizmorcore/zizmor",
+          "extra_repositories": [],
+          "contender": "zizmorcore/zizmor"
+        },
+        {
+          "key": "F02",
+          "name": "actionlint (kjanat)",
+          "repository": "https://github.com/kjanat/actionlint",
+          "extra_repositories": [],
+          "contender": "kjanat/actionlint"
+        },
+        {
+          "key": "F03",
+          "name": "osv-scanner",
+          "repository": "https://github.com/google/osv-scanner",
+          "extra_repositories": [],
+          "contender": "google/osv-scanner"
+        },
+        {
+          "key": "F04",
+          "name": "attest",
+          "repository": "https://github.com/actions/attest",
+          "extra_repositories": [],
+          "contender": "actions/attest"
+        },
+        {
+          "key": "F05",
+          "name": "codeql-sarif",
+          "repository": "https://github.com/github/codeql-action",
+          "extra_repositories": [],
+          "contender": "github/codeql-action"
+        },
+        {
+          "key": "F06",
+          "name": "Syft",
+          "repository": "https://github.com/anchore/syft",
+          "extra_repositories": [],
+          "contender": "anchore/syft"
+        },
+        {
+          "key": "F07",
+          "name": "gitleaks",
+          "repository": "https://github.com/gitleaks/gitleaks",
+          "extra_repositories": [],
+          "contender": "gitleaks/gitleaks"
+        },
+        {
+          "key": "F08",
+          "name": "Trivy",
+          "repository": "https://github.com/aquasecurity/trivy",
+          "extra_repositories": [],
+          "contender": "aquasecurity/trivy"
+        },
+        {
+          "key": "F09",
+          "name": "poutine",
+          "repository": "https://github.com/boostsecurityio/poutine",
+          "extra_repositories": [],
+          "contender": "boostsecurityio/poutine"
+        },
+        {
+          "key": "F10",
+          "name": "Dependabot",
+          "repository": "https://github.com/dependabot/dependabot-core",
+          "extra_repositories": [],
+          "contender": "dependabot/dependabot-core"
+        },
+        {
+          "key": "F11",
+          "name": "actionlint (rhysd)",
+          "repository": "https://github.com/rhysd/actionlint",
+          "extra_repositories": [],
+          "contender": "rhysd/actionlint"
+        },
+        {
+          "key": "F12",
+          "name": "Grype",
+          "repository": "https://github.com/anchore/grype",
+          "extra_repositories": [],
+          "contender": "anchore/grype"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11",
+        "#589 packet C12"
+      ]
+    },
+    {
+      "unit_id": "code-navigation",
+      "title": "Code navigation",
+      "requirement": "Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "language-server-navigation",
+          "source_slot": "serena",
+          "question": "Which single tool gives both clients exact symbol definitions, references and symbol-level edits from language servers (for example over MCP)?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "client-native-lsp",
+          "source_slot": "claude-plugins-official-code-intelligence-lsp-pl",
+          "question": "Which single integration adds native language-server navigation and post-edit diagnostics inside Claude Code itself, or none beyond the language-server navigation slot?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Serena",
+          "repository": "https://github.com/oraios/serena",
+          "extra_repositories": [],
+          "contender": "oraios/serena"
+        },
+        {
+          "key": "F02",
+          "name": "token-savior",
+          "repository": "https://github.com/mibayy/token-savior",
+          "extra_repositories": [],
+          "contender": "mibayy/token-savior"
+        },
+        {
+          "key": "F03",
+          "name": "codebase-memory-mcp",
+          "repository": "https://github.com/DeusData/codebase-memory-mcp",
+          "extra_repositories": [],
+          "contender": "deusdata/codebase-memory-mcp"
+        },
+        {
+          "key": "F04",
+          "name": "jCodeMunch",
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "extra_repositories": [],
+          "contender": "jgravelle/jcodemunch-mcp"
+        },
+        {
+          "key": "F05",
+          "name": "scip, zoekt and universal-ctags",
+          "repository": "https://github.com/scip-code/scip",
+          "extra_repositories": [
+            "https://github.com/sourcegraph/zoekt",
+            "https://github.com/universal-ctags/ctags"
+          ],
+          "contender": "scip-code/scip"
+        },
+        {
+          "key": "F06",
+          "name": "ast-grep",
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "extra_repositories": [],
+          "contender": "ast-grep/ast-grep"
+        },
+        {
+          "key": "F07",
+          "name": "gitnexus",
+          "repository": "https://github.com/abhigyanpatwari/gitnexus",
+          "extra_repositories": [],
+          "contender": "abhigyanpatwari/gitnexus"
+        },
+        {
+          "key": "F08",
+          "name": "claude-plugins-official",
+          "repository": "https://github.com/anthropics/claude-plugins-official",
+          "extra_repositories": [],
+          "contender": "anthropics/claude-plugins-official"
+        },
+        {
+          "key": "F09",
+          "name": "CodeGraph",
+          "repository": "https://github.com/colbymchenry/codegraph",
+          "extra_repositories": [],
+          "contender": "colbymchenry/codegraph"
+        },
+        {
+          "key": "F10",
+          "name": "Glean",
+          "repository": "https://github.com/facebookincubator/Glean",
+          "extra_repositories": [],
+          "contender": "facebookincubator/glean"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10"
+      ]
+    },
+    {
+      "unit_id": "cross:gpt6-harnesses",
+      "title": "GPT-6 harnesses: the gateway",
+      "requirement": "Route the GPT-6 family (the Codex CLI lane, the Codex SDK and other OpenAI-compatible workers) through one local gateway that pools native accounts, preserves the requested model and reasoning effort, records usage and leaves request compression off unless chosen; or call the provider natively.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Run a fixed Codex task set through each arm and directly: requested versus upstream model and effort, success, latency, account failover on a 429, usage recorded once.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "gpt-gateway",
+          "source_slot": "gpt-gateway",
+          "question": "Which single gateway routes GPT-6-family calls from Codex and SDK workers (account pooling, routing, usage observation, request compression off unless chosen), or none (the native clients call the provider directly)?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "OmniRoute",
+          "repository": "https://github.com/diegosouzapw/OmniRoute",
+          "extra_repositories": [],
+          "contender": "diegosouzapw/omniroute"
+        },
+        {
+          "key": "F02",
+          "name": "Bifrost",
+          "repository": "https://github.com/maximhq/bifrost",
+          "extra_repositories": [],
+          "contender": "maximhq/bifrost"
+        },
+        {
+          "key": "F03",
+          "name": "LiteLLM",
+          "repository": "https://github.com/BerriAI/litellm",
+          "extra_repositories": [],
+          "contender": "berriai/litellm"
+        },
+        {
+          "key": "F04",
+          "name": "agentgateway",
+          "repository": "https://github.com/agentgateway/agentgateway",
+          "extra_repositories": [],
+          "contender": "agentgateway/agentgateway"
+        },
+        {
+          "key": "F05",
+          "name": "Portkey AI Gateway",
+          "repository": "https://github.com/Portkey-AI/gateway",
+          "extra_repositories": [],
+          "contender": "portkey-ai/gateway"
+        },
+        {
+          "key": "F06",
+          "name": "claude-code-router",
+          "repository": "https://github.com/musistudio/claude-code-router",
+          "extra_repositories": [],
+          "contender": "musistudio/claude-code-router"
+        }
+      ],
+      "field_sources": [
+        "written for this round"
+      ],
+      "sources": "catalogs/foundation/new-wsl-architecture-20261001.json (cross:gpt6-harnesses); the gateway alternatives the final-catalog completeness critic found on record (docs/decisions/2026-10-01-final-catalog.md, gap 5)"
+    },
+    {
+      "unit_id": "cross:runtime-workers",
+      "title": "Runtime workers",
+      "requirement": "Run autonomous coding, planning and research tasks as isolated, resumable workers driven by GPT-6.1 Sol (and Claude where needed) through a supported harness SDK, with sandboxing, persistence and bounded tool access; and gather cited research evidence for evaluation work.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Run a frozen task subset (Terminal-Bench or SWE-bench style, plus research questions with citation checks) through each arm with the same model and effort: resolution, citation precision, resume after a kill, isolation, complete usage.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "agent-runtime-worker",
+          "source_slot": "agent-runtime-worker",
+          "question": "Which single runtime worker runs autonomous coding and research tasks in an isolated sandbox, driven by GPT-6.1 Sol through its harness SDK, or none (the native clients' own workers suffice)?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "deep-research-harness",
+          "source_slot": "research-harnesses",
+          "question": "Which single deep-research harness gathers cited evidence for evaluation work, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Claude Agent SDK",
+          "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+          "extra_repositories": [],
+          "contender": "anthropics/claude-agent-sdk-python"
+        },
+        {
+          "key": "F02",
+          "name": "OpenHands software-agent-sdk",
+          "repository": "https://github.com/OpenHands/software-agent-sdk",
+          "extra_repositories": [],
+          "contender": "openhands/software-agent-sdk"
+        },
+        {
+          "key": "F03",
+          "name": "mini-swe-agent",
+          "repository": "https://github.com/SWE-agent/mini-swe-agent",
+          "extra_repositories": [],
+          "contender": "swe-agent/mini-swe-agent"
+        },
+        {
+          "key": "F04",
+          "name": "DeerFlow",
+          "repository": "https://github.com/bytedance/deer-flow",
+          "extra_repositories": [],
+          "contender": "bytedance/deer-flow"
+        },
+        {
+          "key": "F05",
+          "name": "LangGraph",
+          "repository": "https://github.com/langchain-ai/langgraph",
+          "extra_repositories": [],
+          "contender": "langchain-ai/langgraph"
+        },
+        {
+          "key": "F06",
+          "name": "GPT Researcher",
+          "repository": "https://github.com/assafelovic/gpt-researcher",
+          "extra_repositories": [],
+          "contender": "assafelovic/gpt-researcher"
+        },
+        {
+          "key": "F07",
+          "name": "Microsoft Agent Framework",
+          "repository": "https://github.com/microsoft/agent-framework",
+          "extra_repositories": [],
+          "contender": "microsoft/agent-framework"
+        },
+        {
+          "key": "F08",
+          "name": "Codex SDK and codex exec",
+          "repository": "https://github.com/openai/codex",
+          "extra_repositories": [],
+          "contender": "openai/codex"
+        },
+        {
+          "key": "F09",
+          "name": "Deep Agents",
+          "repository": "https://github.com/langchain-ai/deepagents",
+          "extra_repositories": [],
+          "contender": "langchain-ai/deepagents"
+        },
+        {
+          "key": "F10",
+          "name": "OpenResearch",
+          "repository": "https://github.com/alphaXiv/OpenResearch",
+          "extra_repositories": [],
+          "contender": "alphaxiv/openresearch"
+        },
+        {
+          "key": "F11",
+          "name": "OpenAI Agents SDK",
+          "repository": "https://github.com/openai/openai-agents-python",
+          "extra_repositories": [],
+          "contender": "openai/openai-agents-python"
+        }
+      ],
+      "field_sources": [
+        "written for this round"
+      ],
+      "sources": "catalogs/foundation/new-wsl-architecture-20261001.json (cross:runtime-workers); the runtime roster of PR #535 (blueprints/runtime-workers/README.md on codex/runtime-qualification-20260930); the agent-sdks and workers packets of #589"
+    },
+    {
+      "unit_id": "cross:wsl-distro",
+      "title": "WSL2 base distribution",
+      "requirement": "The base Linux distribution for a new WSL2 instance on this Windows host (WSL 2.7.13, kernel 6.18), installed from a vendor image whose checksum can be verified, with systemd user services, current toolchains for Python 3.13, Node 24 and Rust, NVIDIA GPU access through WSL for an RTX 4090, and long-term security support.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "A clean install of each candidate image with the project's bootstrap, then its first-boot, systemd, GPU and toolchain checks on the same host.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "base-distribution",
+          "source_slot": "base-distribution",
+          "question": "Which single base distribution image is installed on the new WSL2 host?",
+          "no_additional_component_allowed": false
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+          "repository": "https://ubuntu.com/download/server",
+          "extra_repositories": [],
+          "contender": "page:ubuntu-24-04-5-lts-canonical-wsl-image"
+        },
+        {
+          "key": "F02",
+          "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+          "repository": "https://ubuntu.com/download/server",
+          "extra_repositories": [],
+          "contender": "page:ubuntu-26-04-1-lts-canonical-wsl-image"
+        },
+        {
+          "key": "F03",
+          "name": "Debian 13 (WSL distribution)",
+          "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+          "extra_repositories": [],
+          "contender": "page:debian-13-wsl-distribution"
+        },
+        {
+          "key": "F04",
+          "name": "Arch Linux (WSL distribution)",
+          "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+          "extra_repositories": [],
+          "contender": "page:arch-linux-wsl-distribution"
+        },
+        {
+          "key": "F05",
+          "name": "Fedora (WSL distribution)",
+          "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+          "extra_repositories": [],
+          "contender": "page:fedora-wsl-distribution"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05"
+      ]
+    },
+    {
+      "unit_id": "document-retrieval",
+      "title": "Documents and ingestion",
+      "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus difficult-layout ingestion before changing defaults.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "markdown-collection-retrieval",
+          "source_slot": "tobi-qmd",
+          "question": "Which single tool searches controlled Markdown collections (lexical, vector or hybrid) and reads the original bodies back, for both clients?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "document-ingestion",
+          "source_slot": "mineru",
+          "question": "Which single tool converts difficult-layout documents (PDF, scans, Office formats, EPUB, HTML) into Markdown or JSON for ingestion, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "pageindex",
+          "repository": "https://github.com/vectifyai/pageindex",
+          "extra_repositories": [],
+          "contender": "vectifyai/pageindex"
+        },
+        {
+          "key": "F02",
+          "name": "MarkItDown",
+          "repository": "https://github.com/microsoft/markitdown",
+          "extra_repositories": [],
+          "contender": "microsoft/markitdown"
+        },
+        {
+          "key": "F03",
+          "name": "docs-mcp-server",
+          "repository": "https://github.com/arabold/docs-mcp-server",
+          "extra_repositories": [],
+          "contender": "arabold/docs-mcp-server"
+        },
+        {
+          "key": "F04",
+          "name": "Poppler",
+          "repository": "https://github.com/tsdgeos/poppler_mirror",
+          "extra_repositories": [],
+          "contender": "tsdgeos/poppler_mirror"
+        },
+        {
+          "key": "F05",
+          "name": "Docling",
+          "repository": "https://github.com/docling-project/docling",
+          "extra_repositories": [],
+          "contender": "docling-project/docling"
+        },
+        {
+          "key": "F06",
+          "name": "Context Hub",
+          "repository": "https://github.com/andrewyng/context-hub",
+          "extra_repositories": [],
+          "contender": "andrewyng/context-hub"
+        },
+        {
+          "key": "F07",
+          "name": "MinerU",
+          "repository": "https://github.com/opendatalab/mineru",
+          "extra_repositories": [],
+          "contender": "opendatalab/mineru"
+        },
+        {
+          "key": "F08",
+          "name": "tobi/qmd",
+          "repository": "https://github.com/tobi/qmd",
+          "extra_repositories": [],
+          "contender": "tobi/qmd"
+        },
+        {
+          "key": "F09",
+          "name": "LlamaIndex",
+          "repository": "https://github.com/run-llama/llama_index",
+          "extra_repositories": [],
+          "contender": "run-llama/llama_index"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09"
+      ]
+    },
+    {
+      "unit_id": "durable-memory",
+      "title": "Durable memory",
+      "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+      "comparisons_on_record": [
+        "LongMemEval-S, session-level retrieval, 470 questions, recall_all@5, on a Mac (descriptive): agentmemory 0.9.29 with the all-MiniLM-L6-v2 embedder over its REST path 0.821; ai-memory (a 2.5 pre-release build) with Qwen3-Embedding-4B and its LLM reranker turned off 0.570; plain BM25 0.747. Not run: ai-memory with its LLM reranker, agentmemory through its Claude Code hooks, Hindsight 0.10.1 and MemPalace 3.10.0. The two systems captured different amounts of each session and used different embedders.",
+        "LongMemEval-S, session-level retrieval, 470 questions, recall_all@5, on a Mac (descriptive), with the embedder matched (all-MiniLM-L6-v2): agentmemory 0.821; ai-memory 0.496; ai-memory full-text only 0.400; dense retrieval 0.753; plain BM25 0.747. ai-memory's production configuration with its LLM reranker did not run (evidence/artifacts/memory-stack-20260925/convergence.json, neutral_measurements)."
+      ],
+      "slots": [
+        {
+          "slot_id": "memory-owner",
+          "source_slot": "memory-owner",
+          "question": "Which single system owns durable memory for both Claude Code and Codex on the new host? Exactly one is installed.",
+          "no_additional_component_allowed": false
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "OpenViking",
+          "repository": "https://github.com/volcengine/OpenViking",
+          "extra_repositories": [],
+          "contender": "volcengine/openviking"
+        },
+        {
+          "key": "F02",
+          "name": "Cognee",
+          "repository": "https://github.com/topoteretes/cognee",
+          "extra_repositories": [],
+          "contender": "topoteretes/cognee"
+        },
+        {
+          "key": "F03",
+          "name": "agentmemory (rohitg00)",
+          "repository": "https://github.com/rohitg00/agentmemory",
+          "extra_repositories": [],
+          "contender": "rohitg00/agentmemory"
+        },
+        {
+          "key": "F04",
+          "name": "Claude-mem",
+          "repository": "https://github.com/thedotmack/claude-mem",
+          "extra_repositories": [],
+          "contender": "thedotmack/claude-mem"
+        },
+        {
+          "key": "F05",
+          "name": "Graphiti",
+          "repository": "https://github.com/getzep/graphiti",
+          "extra_repositories": [],
+          "contender": "getzep/graphiti"
+        },
+        {
+          "key": "F06",
+          "name": "MemPalace",
+          "repository": "https://github.com/MemPalace/mempalace",
+          "extra_repositories": [],
+          "contender": "mempalace/mempalace"
+        },
+        {
+          "key": "F07",
+          "name": "Supermemory",
+          "repository": "https://github.com/supermemoryai/supermemory",
+          "extra_repositories": [],
+          "contender": "supermemoryai/supermemory"
+        },
+        {
+          "key": "F08",
+          "name": "memos",
+          "repository": "https://github.com/MemTensor/MemOS",
+          "extra_repositories": [],
+          "contender": "memtensor/memos"
+        },
+        {
+          "key": "F09",
+          "name": "Basic Memory",
+          "repository": "https://github.com/basicmachines-co/basic-memory",
+          "extra_repositories": [],
+          "contender": "basicmachines-co/basic-memory"
+        },
+        {
+          "key": "F10",
+          "name": "Letta Code",
+          "repository": "https://github.com/letta-ai/letta-code",
+          "extra_repositories": [],
+          "contender": "letta-ai/letta-code"
+        },
+        {
+          "key": "F11",
+          "name": "langmem",
+          "repository": "https://github.com/langchain-ai/langmem",
+          "extra_repositories": [],
+          "contender": "langchain-ai/langmem"
+        },
+        {
+          "key": "F12",
+          "name": "Mem0",
+          "repository": "https://github.com/mem0ai/mem0",
+          "extra_repositories": [],
+          "contender": "mem0ai/mem0"
+        },
+        {
+          "key": "F13",
+          "name": "Hindsight",
+          "repository": "https://github.com/vectorize-io/hindsight",
+          "extra_repositories": [],
+          "contender": "vectorize-io/hindsight"
+        },
+        {
+          "key": "F14",
+          "name": "ai-memory",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "extra_repositories": [],
+          "contender": "akitaonrails/ai-memory"
+        },
+        {
+          "key": "F15",
+          "name": "agent-memory (tigerless-labs)",
+          "repository": "https://github.com/tigerless-labs/agent-memory",
+          "extra_repositories": [],
+          "contender": "tigerless-labs/agent-memory"
+        },
+        {
+          "key": "F16",
+          "name": "deja-vu",
+          "repository": "https://github.com/vshulcz/deja-vu",
+          "extra_repositories": [],
+          "contender": "vshulcz/deja-vu"
+        },
+        {
+          "key": "F17",
+          "name": "letta",
+          "repository": "https://github.com/letta-ai/letta",
+          "extra_repositories": [],
+          "contender": "letta-ai/letta"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11",
+        "#589 packet C12",
+        "#589 packet C13",
+        "#589 packet C14",
+        "#589 packet C15",
+        "#589 packet C16",
+        "#589 packet C17"
+      ]
+    },
+    {
+      "unit_id": "git-github-automation",
+      "title": "Git practice and GitHub automation",
+      "requirement": "Own Git worktrees, GitHub review/PR automation and structural diffs for changed code.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "version-control",
+          "source_slot": "git",
+          "question": "Which single version control system is the base, with native worktrees and diffs?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "github-cli",
+          "source_slot": "gh-github-cli",
+          "question": "Which single tool lets agents automate GitHub from the host (pull requests, checks, reviews, API)?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "worktree-manager",
+          "source_slot": "worktrunk",
+          "question": "Which single tool manages worktrees for agents working in parallel (create, list with CI status, merge, clean up), or none beyond native git?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "review-structural-diff",
+          "source_slot": "difftastic",
+          "question": "Which single tool gives structural, syntax-aware diffs for human review, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "github-side-agent-review",
+          "source_slot": "claude-code-action",
+          "question": "Which single automation runs agent pull-request review and mention-triggered tasks on the GitHub side, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "agent-structural-diff",
+          "source_slot": "agent-structural-diff",
+          "question": "Which single tool gives agents entity-level structural diffs, or none (line diffs suffice)?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "codex-for-claude",
+          "repository": "https://github.com/openai/codex-plugin-cc",
+          "extra_repositories": [],
+          "contender": "openai/codex-plugin-cc"
+        },
+        {
+          "key": "F02",
+          "name": "claude-code-action",
+          "repository": "https://github.com/anthropics/claude-code-action",
+          "extra_repositories": [],
+          "contender": "anthropics/claude-code-action"
+        },
+        {
+          "key": "F03",
+          "name": "Difftastic",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "extra_repositories": [],
+          "contender": "wilfred/difftastic"
+        },
+        {
+          "key": "F04",
+          "name": "worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "extra_repositories": [],
+          "contender": "max-sixty/worktrunk"
+        },
+        {
+          "key": "F05",
+          "name": "ataraxy-labs/sem",
+          "repository": "https://github.com/ataraxy-labs/sem",
+          "extra_repositories": [],
+          "contender": "ataraxy-labs/sem"
+        },
+        {
+          "key": "F06",
+          "name": "cli/cli",
+          "repository": "https://github.com/cli/cli",
+          "extra_repositories": [],
+          "contender": "cli/cli"
+        },
+        {
+          "key": "F07",
+          "name": "native git worktree and git diff --no-index",
+          "repository": "https://github.com/git/git",
+          "extra_repositories": [],
+          "contender": "git/git"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C09"
+      ]
+    },
+    {
+      "unit_id": "hosting-services",
+      "title": "Application and service hosting",
+      "requirement": "Run a local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "multi-service-definition",
+          "source_slot": "docker-compose",
+          "question": "Which single tool defines and runs a multi-service application (the app plus supporting services, volumes and networks) on the container engine?",
+          "no_additional_component_allowed": false
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Podman / Quadlet",
+          "repository": "https://github.com/podman-container-tools/podman",
+          "extra_repositories": [],
+          "contender": "podman-container-tools/podman"
+        },
+        {
+          "key": "F02",
+          "name": "PostgreSQL",
+          "repository": "https://github.com/postgres/postgres",
+          "extra_repositories": [],
+          "contender": "postgres/postgres"
+        },
+        {
+          "key": "F03",
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby",
+          "extra_repositories": [],
+          "contender": "moby/moby"
+        },
+        {
+          "key": "F04",
+          "name": "microsoft/wsl",
+          "repository": "https://github.com/microsoft/WSL",
+          "extra_repositories": [],
+          "contender": "microsoft/wsl"
+        },
+        {
+          "key": "F05",
+          "name": "Dev Containers CLI",
+          "repository": "https://github.com/devcontainers/cli",
+          "extra_repositories": [],
+          "contender": "devcontainers/cli"
+        },
+        {
+          "key": "F06",
+          "name": "nextjs",
+          "repository": "https://github.com/vercel/next.js",
+          "extra_repositories": [],
+          "contender": "vercel/next.js"
+        },
+        {
+          "key": "F07",
+          "name": "FastAPI",
+          "repository": "https://github.com/fastapi/fastapi",
+          "extra_repositories": [],
+          "contender": "fastapi/fastapi"
+        },
+        {
+          "key": "F08",
+          "name": "React",
+          "repository": "https://github.com/react/react",
+          "extra_repositories": [],
+          "contender": "react/react"
+        },
+        {
+          "key": "F09",
+          "name": "Dockerized IB Gateway",
+          "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+          "extra_repositories": [],
+          "contender": "gnzsnz/ib-gateway-docker"
+        },
+        {
+          "key": "F10",
+          "name": "BentoML",
+          "repository": "https://github.com/bentoml/BentoML",
+          "extra_repositories": [],
+          "contender": "bentoml/bentoml"
+        },
+        {
+          "key": "F11",
+          "name": "Modal",
+          "repository": "https://github.com/modal-labs/modal-client",
+          "extra_repositories": [],
+          "contender": "modal-labs/modal-client"
+        },
+        {
+          "key": "F12",
+          "name": "Docker Compose",
+          "repository": "https://github.com/docker/compose",
+          "extra_repositories": [],
+          "contender": "docker/compose"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11",
+        "#589 packet C12"
+      ]
+    },
+    {
+      "unit_id": "instructions-skills",
+      "title": "Instructions and skills",
+      "requirement": "Give each task concise canonical rules and useful upstream procedures without activating whole instruction or plugin catalogs.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Use a pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "task-scoped-skill-pack",
+          "source_slot": "trail-of-bits-security-skills-trailofbits-skills",
+          "question": "Which single third-party skills collection supplies task-scoped engineering and security procedures that Claude Code and Codex load per task (not the whole catalog), or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "VoltAgent subagent collection",
+          "repository": "https://github.com/voltagent/awesome-claude-code-subagents",
+          "extra_repositories": [],
+          "contender": "voltagent/awesome-claude-code-subagents"
+        },
+        {
+          "key": "F02",
+          "name": "Trail of Bits skills",
+          "repository": "https://github.com/trailofbits/skills",
+          "extra_repositories": [],
+          "contender": "trailofbits/skills"
+        },
+        {
+          "key": "F03",
+          "name": "Claude Code Templates",
+          "repository": "https://github.com/davila7/claude-code-templates",
+          "extra_repositories": [],
+          "contender": "davila7/claude-code-templates"
+        },
+        {
+          "key": "F04",
+          "name": "Anthropic webapp-testing skill",
+          "repository": "https://github.com/anthropics/skills",
+          "extra_repositories": [],
+          "contender": "anthropics/skills"
+        },
+        {
+          "key": "F05",
+          "name": "skills (mattpocock)",
+          "repository": "https://github.com/mattpocock/skills",
+          "extra_repositories": [],
+          "contender": "mattpocock/skills"
+        },
+        {
+          "key": "F06",
+          "name": "skills-ref",
+          "repository": "https://github.com/agentskills/agentskills",
+          "extra_repositories": [],
+          "contender": "agentskills/agentskills"
+        },
+        {
+          "key": "F07",
+          "name": "skill:typesafe-ai (typesafe-ai)",
+          "repository": "https://github.com/typesafe-ai/skills",
+          "extra_repositories": [],
+          "contender": "typesafe-ai/skills"
+        },
+        {
+          "key": "F08",
+          "name": "skill:openai-curated (openai)",
+          "repository": "https://github.com/openai/skills",
+          "extra_repositories": [],
+          "contender": "openai/skills"
+        },
+        {
+          "key": "F09",
+          "name": "Vercel agent-skills",
+          "repository": "https://github.com/vercel-labs/agent-skills",
+          "extra_repositories": [],
+          "contender": "vercel-labs/agent-skills"
+        },
+        {
+          "key": "F10",
+          "name": "affaan-m/ecc",
+          "repository": "https://github.com/affaan-m/ECC",
+          "extra_repositories": [],
+          "contender": "affaan-m/ecc"
+        },
+        {
+          "key": "F11",
+          "name": "Shan Claude best practice",
+          "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+          "extra_repositories": [],
+          "contender": "shanraisshan/claude-code-best-practice"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C12",
+        "#589 packet C13"
+      ]
+    },
+    {
+      "unit_id": "isolation",
+      "title": "Isolation",
+      "requirement": "Separate edits and apply a real filesystem/network boundary only where a task requires enforced restrictions.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "enforced-command-boundary",
+          "source_slot": "sandbox-runtime-srt",
+          "question": "Which single tool is the default enforced boundary for agent commands that need restrictions: OS-level filesystem read and write rules and deny-by-default network, on Linux under WSL2 (and macOS)?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "boxlite",
+          "repository": "https://github.com/boxlite-ai/boxlite",
+          "extra_repositories": [],
+          "contender": "boxlite-ai/boxlite"
+        },
+        {
+          "key": "F02",
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby",
+          "extra_repositories": [],
+          "contender": "moby/moby"
+        },
+        {
+          "key": "F03",
+          "name": "gVisor",
+          "repository": "https://github.com/google/gvisor",
+          "extra_repositories": [],
+          "contender": "google/gvisor"
+        },
+        {
+          "key": "F04",
+          "name": "microsandbox",
+          "repository": "https://github.com/superradcompany/microsandbox",
+          "extra_repositories": [],
+          "contender": "superradcompany/microsandbox"
+        },
+        {
+          "key": "F05",
+          "name": "e2b-dev/e2b",
+          "repository": "https://github.com/e2b-dev/E2B",
+          "extra_repositories": [],
+          "contender": "e2b-dev/e2b"
+        },
+        {
+          "key": "F06",
+          "name": "Apple Container",
+          "repository": "https://github.com/apple/container",
+          "extra_repositories": [],
+          "contender": "apple/container"
+        },
+        {
+          "key": "F07",
+          "name": "sandbox-runtime",
+          "repository": "https://github.com/anthropics/sandbox-runtime",
+          "extra_repositories": [],
+          "contender": "anthropics/sandbox-runtime"
+        },
+        {
+          "key": "F08",
+          "name": "Worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "extra_repositories": [],
+          "contender": "max-sixty/worktrunk"
+        },
+        {
+          "key": "F09",
+          "name": "Podman / Quadlet",
+          "repository": "https://github.com/podman-container-tools/podman",
+          "extra_repositories": [],
+          "contender": "podman-container-tools/podman"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09"
+      ]
+    },
+    {
+      "unit_id": "observation-inference",
+      "title": "Observation and optional inference",
+      "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "telemetry-ingest",
+          "source_slot": "otel-collector-contrib",
+          "question": "Which single collector is the local OTLP ingestion point and privacy filter for Claude Code and Codex telemetry?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "metrics-store",
+          "source_slot": "prometheus",
+          "question": "Which single store keeps the native usage metrics received over OTLP for local queries, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "events-store",
+          "source_slot": "loki",
+          "question": "Which single store keeps the native events and logs received over OTLP for local queries, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "dashboards",
+          "source_slot": "grafana",
+          "question": "Which single tool provides local dashboards and exploration over the metrics and events stores, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "route-qualification",
+          "source_slot": "phoenix",
+          "question": "Which single tool stores traces, datasets and experiments to qualify model routes by replaying a fixed workload, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "local-model-server",
+          "source_slot": "local-model-server",
+          "question": "Which single local model server provides optional local inference on the RTX 4090 host, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "OTel Collector Contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "extra_repositories": [],
+          "contender": "open-telemetry/opentelemetry-collector-contrib"
+        },
+        {
+          "key": "F02",
+          "name": "AgentsView",
+          "repository": "https://github.com/kenn-io/agentsview",
+          "extra_repositories": [],
+          "contender": "kenn-io/agentsview"
+        },
+        {
+          "key": "F03",
+          "name": "vllm",
+          "repository": "https://github.com/vllm-project/vllm",
+          "extra_repositories": [],
+          "contender": "vllm-project/vllm"
+        },
+        {
+          "key": "F04",
+          "name": "Loki",
+          "repository": "https://github.com/grafana/loki",
+          "extra_repositories": [],
+          "contender": "grafana/loki"
+        },
+        {
+          "key": "F05",
+          "name": "Phoenix",
+          "repository": "https://github.com/Arize-ai/phoenix",
+          "extra_repositories": [],
+          "contender": "arize-ai/phoenix"
+        },
+        {
+          "key": "F06",
+          "name": "Alertmanager",
+          "repository": "https://github.com/prometheus/alertmanager",
+          "extra_repositories": [],
+          "contender": "prometheus/alertmanager"
+        },
+        {
+          "key": "F07",
+          "name": "Claude HUD",
+          "repository": "https://github.com/jarrodwatts/claude-hud",
+          "extra_repositories": [],
+          "contender": "jarrodwatts/claude-hud"
+        },
+        {
+          "key": "F08",
+          "name": "ollama",
+          "repository": "https://github.com/ollama/ollama",
+          "extra_repositories": [],
+          "contender": "ollama/ollama"
+        },
+        {
+          "key": "F09",
+          "name": "llama.cpp optional inference",
+          "repository": "https://github.com/ggml-org/llama.cpp",
+          "extra_repositories": [],
+          "contender": "ggml-org/llama.cpp"
+        },
+        {
+          "key": "F10",
+          "name": "ntfy",
+          "repository": "https://github.com/binwiederhier/ntfy",
+          "extra_repositories": [],
+          "contender": "binwiederhier/ntfy"
+        },
+        {
+          "key": "F11",
+          "name": "Prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "extra_repositories": [],
+          "contender": "prometheus/prometheus"
+        },
+        {
+          "key": "F12",
+          "name": "OpenLIT",
+          "repository": "https://github.com/openlit/openlit",
+          "extra_repositories": [],
+          "contender": "openlit/openlit"
+        },
+        {
+          "key": "F13",
+          "name": "otel-tui",
+          "repository": "https://github.com/ymtdzzz/otel-tui",
+          "extra_repositories": [],
+          "contender": "ymtdzzz/otel-tui"
+        },
+        {
+          "key": "F14",
+          "name": "Grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "extra_repositories": [],
+          "contender": "grafana/grafana"
+        },
+        {
+          "key": "F15",
+          "name": "SGLang",
+          "repository": "https://github.com/sgl-project/sglang",
+          "extra_repositories": [],
+          "contender": "sgl-project/sglang"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11",
+        "#589 packet C12",
+        "#589 packet C13",
+        "#589 packet C14",
+        "the local-model-server split of #591 named it; it is in the semantic-rag packet"
+      ]
+    },
+    {
+      "unit_id": "quality-evaluation",
+      "title": "Quality and evaluation",
+      "requirement": "Verify the changed behavior using relevant upstream/project checks, independent observations and explicit failure-preserving evidence.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "labeled-evaluation",
+          "source_slot": "inspect-ai",
+          "question": "Which single framework runs labeled-case evaluations with several scorers whose values are kept per sample?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "containerized-agent-e2e",
+          "source_slot": "harbor-containerized-agent-e2e-runner",
+          "question": "Which single runner executes containerized end-to-end task suites for the real Claude Code and Codex CLIs, each trial graded by a verifier?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "ci-regression-gate",
+          "source_slot": "promptfoo",
+          "question": "Which single tool is the declarative CI regression gate for prompts, skills and agents, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "TypeSafe semantic skill",
+          "repository": "https://github.com/typesafe-ai/skills",
+          "extra_repositories": [],
+          "contender": "typesafe-ai/skills"
+        },
+        {
+          "key": "F02",
+          "name": "Inspect AI",
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "extra_repositories": [],
+          "contender": "ukgovernmentbeis/inspect_ai"
+        },
+        {
+          "key": "F03",
+          "name": "Playwright",
+          "repository": "https://github.com/microsoft/playwright",
+          "extra_repositories": [],
+          "contender": "microsoft/playwright"
+        },
+        {
+          "key": "F04",
+          "name": "Difftastic",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "extra_repositories": [],
+          "contender": "wilfred/difftastic"
+        },
+        {
+          "key": "F05",
+          "name": "ShellCheck",
+          "repository": "https://github.com/koalaman/shellcheck",
+          "extra_repositories": [],
+          "contender": "koalaman/shellcheck"
+        },
+        {
+          "key": "F06",
+          "name": "Promptfoo",
+          "repository": "https://github.com/promptfoo/promptfoo",
+          "extra_repositories": [],
+          "contender": "promptfoo/promptfoo"
+        },
+        {
+          "key": "F07",
+          "name": "MCP Inspector",
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "extra_repositories": [],
+          "contender": "modelcontextprotocol/inspector"
+        },
+        {
+          "key": "F08",
+          "name": "MLflow",
+          "repository": "https://github.com/mlflow/mlflow",
+          "extra_repositories": [],
+          "contender": "mlflow/mlflow"
+        },
+        {
+          "key": "F09",
+          "name": "Harbor (containerized agent E2E runner)",
+          "repository": "https://github.com/harbor-framework/harbor",
+          "extra_repositories": [],
+          "contender": "harbor-framework/harbor"
+        },
+        {
+          "key": "F10",
+          "name": "Official OpenAI CI and security skills",
+          "repository": "https://github.com/openai/skills",
+          "extra_repositories": [],
+          "contender": "openai/skills"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10"
+      ]
+    },
+    {
+      "unit_id": "recovery-portability",
+      "title": "Recovery and portability",
+      "requirement": "Reproduce the tools and recover actual application state on an explicitly chosen host without copying authentication stores or treating old receipts as new acceptance.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore application state and keys.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "toolchain-reproduction",
+          "source_slot": "mise",
+          "question": "Which single tool installs the pinned language runtimes and CLI tools from a committed manifest on Linux x86_64 and macOS arm64?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "state-backup",
+          "source_slot": "restic",
+          "question": "Which single tool makes encrypted, deduplicated, verifiable backups of application state and restores them?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "dotfiles-reproduction",
+          "source_slot": "chezmoi",
+          "question": "Which single tool reproduces configuration and dotfiles while keeping credentials out of the transferred state, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "chezmoi",
+          "repository": "https://github.com/twpayne/chezmoi",
+          "extra_repositories": [],
+          "contender": "twpayne/chezmoi"
+        },
+        {
+          "key": "F02",
+          "name": "Determinate Nix installer",
+          "repository": "https://github.com/DeterminateSystems/nix-installer",
+          "extra_repositories": [],
+          "contender": "determinatesystems/nix-installer"
+        },
+        {
+          "key": "F03",
+          "name": "astral-sh/uv",
+          "repository": "https://github.com/astral-sh/uv",
+          "extra_repositories": [],
+          "contender": "astral-sh/uv"
+        },
+        {
+          "key": "F04",
+          "name": "Restic",
+          "repository": "https://github.com/restic/restic",
+          "extra_repositories": [],
+          "contender": "restic/restic"
+        },
+        {
+          "key": "F05",
+          "name": "Litestream",
+          "repository": "https://github.com/benbjohnson/litestream",
+          "extra_repositories": [],
+          "contender": "benbjohnson/litestream"
+        },
+        {
+          "key": "F06",
+          "name": "Devbox",
+          "repository": "https://github.com/jetify-com/devbox",
+          "extra_repositories": [],
+          "contender": "jetify-com/devbox"
+        },
+        {
+          "key": "F07",
+          "name": "mise",
+          "repository": "https://github.com/jdx/mise",
+          "extra_repositories": [],
+          "contender": "jdx/mise"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07"
+      ]
+    },
+    {
+      "unit_id": "scheduling-supervision",
+      "title": "Scheduling and supervision",
+      "requirement": "Run local workflows with visible history, bounded process trees, cancellation and recoverable effects appropriate to the actual workload.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+      "comparisons_on_record": [
+        "A recovery comparison of Dagu, Prefect and Temporal on one maintenance workload, with material deviations and unequal recovery configuration between the arms; it named no winner."
+      ],
+      "slots": [
+        {
+          "slot_id": "workflow-engine",
+          "source_slot": "dagu",
+          "question": "Which single local workflow engine runs scheduled DAGs over existing commands with run history, retries and a UI, or none beyond the init system's timers?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Restate",
+          "repository": "https://github.com/restatedev/restate",
+          "extra_repositories": [],
+          "contender": "restatedev/restate"
+        },
+        {
+          "key": "F02",
+          "name": "Prefect",
+          "repository": "https://github.com/PrefectHQ/prefect",
+          "extra_repositories": [],
+          "contender": "prefecthq/prefect"
+        },
+        {
+          "key": "F03",
+          "name": "Temporal",
+          "repository": "https://github.com/temporalio/temporal",
+          "extra_repositories": [],
+          "contender": "temporalio/temporal"
+        },
+        {
+          "key": "F04",
+          "name": "Dagster",
+          "repository": "https://github.com/dagster-io/dagster",
+          "extra_repositories": [],
+          "contender": "dagster-io/dagster"
+        },
+        {
+          "key": "F05",
+          "name": "pg_durable",
+          "repository": "https://github.com/microsoft/pg_durable",
+          "extra_repositories": [],
+          "contender": "microsoft/pg_durable"
+        },
+        {
+          "key": "F06",
+          "name": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "extra_repositories": [],
+          "contender": "systemd/systemd"
+        },
+        {
+          "key": "F07",
+          "name": "conductor",
+          "repository": "https://github.com/conductor-oss/conductor",
+          "extra_repositories": [],
+          "contender": "conductor-oss/conductor"
+        },
+        {
+          "key": "F08",
+          "name": "Dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "extra_repositories": [],
+          "contender": "dagucloud/dagu"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08"
+      ]
+    },
+    {
+      "unit_id": "secrets-credentials",
+      "title": "Secrets and credentials",
+      "requirement": "Keep sign-ins and credentials off the checkout and detect accidental secret exposure before publication.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Qualify openbao, or a comparable secret manager, only against a concrete multi-host or multi-operator secret-sharing need; broker credential handling stays a trading gate, not a foundation selection.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "secret-scanner",
+          "source_slot": "betterleaks",
+          "question": "Which single tool is the main local and CI secret scanner (staged changes before each commit, history, directories)?",
+          "no_additional_component_allowed": false
+        },
+        {
+          "slot_id": "credential-verification",
+          "source_slot": "trufflehog",
+          "question": "Which single tool complements the secret scanner by verifying found credentials against provider APIs, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "betterleaks",
+          "repository": "https://github.com/betterleaks/betterleaks",
+          "extra_repositories": [],
+          "contender": "betterleaks/betterleaks"
+        },
+        {
+          "key": "F02",
+          "name": "trufflehog",
+          "repository": "https://github.com/trufflesecurity/trufflehog",
+          "extra_repositories": [],
+          "contender": "trufflesecurity/trufflehog"
+        },
+        {
+          "key": "F03",
+          "name": "OpenBao",
+          "repository": "https://github.com/openbao/openbao",
+          "extra_repositories": [],
+          "contender": "openbao/openbao"
+        },
+        {
+          "key": "F04",
+          "name": "ggshield",
+          "repository": "https://github.com/gitguardian/ggshield",
+          "extra_repositories": [],
+          "contender": "gitguardian/ggshield"
+        },
+        {
+          "key": "F05",
+          "name": "gitleaks",
+          "repository": "https://github.com/gitleaks/gitleaks",
+          "extra_repositories": [],
+          "contender": "gitleaks/gitleaks"
+        },
+        {
+          "key": "F06",
+          "name": "noseyparker",
+          "repository": "https://github.com/praetorian-inc/noseyparker",
+          "extra_repositories": [],
+          "contender": "praetorian-inc/noseyparker"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06"
+      ]
+    },
+    {
+      "unit_id": "semantic-rag",
+      "title": "Semantic code retrieval",
+      "requirement": "Answer conceptual code questions using a scoped local index and a compatible embedding service, with recoverable state.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+      "comparisons_on_record": [
+        "A sealed 35-query code-retrieval set on this project's repository: SocratiCode answered 30 of 35 and a traversal-ordered ripgrep baseline 20 of 35; the run's own record says it does not show general superiority."
+      ],
+      "slots": [
+        {
+          "slot_id": "semantic-code-search",
+          "source_slot": "code-search",
+          "question": "Which single system provides semantic code search over the project repositories (an embedding index and its queries) for both clients, or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "next-plaid",
+          "repository": "https://github.com/lightonai/next-plaid",
+          "extra_repositories": [],
+          "contender": "lightonai/next-plaid"
+        },
+        {
+          "key": "F02",
+          "name": "Haystack",
+          "repository": "https://github.com/deepset-ai/haystack",
+          "extra_repositories": [],
+          "contender": "deepset-ai/haystack"
+        },
+        {
+          "key": "F03",
+          "name": "vLLM",
+          "repository": "https://github.com/vllm-project/vllm",
+          "extra_repositories": [],
+          "contender": "vllm-project/vllm"
+        },
+        {
+          "key": "F04",
+          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+          "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+          "extra_repositories": [],
+          "contender": "page:nvidia-nemotron-3-embed-1b-bf16-embedding-model"
+        },
+        {
+          "key": "F05",
+          "name": "pgvector",
+          "repository": "https://github.com/pgvector/pgvector",
+          "extra_repositories": [],
+          "contender": "pgvector/pgvector"
+        },
+        {
+          "key": "F06",
+          "name": "huggingface-hub-native",
+          "repository": "https://github.com/huggingface/huggingface_hub",
+          "extra_repositories": [],
+          "contender": "huggingface/huggingface_hub"
+        },
+        {
+          "key": "F07",
+          "name": "semble",
+          "repository": "https://github.com/minishlab/semble",
+          "extra_repositories": [],
+          "contender": "minishlab/semble"
+        },
+        {
+          "key": "F08",
+          "name": "Qdrant",
+          "repository": "https://github.com/qdrant/qdrant",
+          "extra_repositories": [],
+          "contender": "qdrant/qdrant"
+        },
+        {
+          "key": "F09",
+          "name": "code-memory",
+          "repository": "https://github.com/kapillamba4/code-memory",
+          "extra_repositories": [],
+          "contender": "kapillamba4/code-memory"
+        },
+        {
+          "key": "F10",
+          "name": "LanceDB",
+          "repository": "https://github.com/lancedb/lancedb",
+          "extra_repositories": [],
+          "contender": "lancedb/lancedb"
+        },
+        {
+          "key": "F11",
+          "name": "ollama",
+          "repository": "https://github.com/ollama/ollama",
+          "extra_repositories": [],
+          "contender": "ollama/ollama"
+        },
+        {
+          "key": "F12",
+          "name": "SocratiCode",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "extra_repositories": [],
+          "contender": "giancarloerra/socraticode"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11",
+        "#589 packet C12"
+      ]
+    },
+    {
+      "unit_id": "token-efficiency",
+      "title": "Context and usage efficiency",
+      "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "usage-meter",
+          "source_slot": "ccusage",
+          "question": "Which single tool measures provider usage from the local logs Claude Code and Codex write (input, output, cache-creation and cache-read tokens), or none?",
+          "no_additional_component_allowed": true
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Context Mode",
+          "repository": "https://github.com/mksglu/context-mode",
+          "extra_repositories": [],
+          "contender": "mksglu/context-mode"
+        },
+        {
+          "key": "F02",
+          "name": "Claude Token Efficient",
+          "repository": "https://github.com/drona23/claude-token-efficient",
+          "extra_repositories": [],
+          "contender": "drona23/claude-token-efficient"
+        },
+        {
+          "key": "F03",
+          "name": "Headroom",
+          "repository": "https://github.com/headroomlabs-ai/headroom",
+          "extra_repositories": [],
+          "contender": "headroomlabs-ai/headroom"
+        },
+        {
+          "key": "F04",
+          "name": "rtk-ai/rtk",
+          "repository": "https://github.com/rtk-ai/rtk",
+          "extra_repositories": [],
+          "contender": "rtk-ai/rtk"
+        },
+        {
+          "key": "F05",
+          "name": "Repomix",
+          "repository": "https://github.com/yamadashy/repomix",
+          "extra_repositories": [],
+          "contender": "yamadashy/repomix"
+        },
+        {
+          "key": "F06",
+          "name": "agent-console",
+          "repository": "https://github.com/lockedinlabs-ai/agent-console",
+          "extra_repositories": [],
+          "contender": "lockedinlabs-ai/agent-console"
+        },
+        {
+          "key": "F07",
+          "name": "ccusage",
+          "repository": "https://github.com/ccusage/ccusage",
+          "extra_repositories": [],
+          "contender": "ccusage/ccusage"
+        },
+        {
+          "key": "F08",
+          "name": "paritok-4b-v1",
+          "repository": "https://github.com/paritok-official/paritok-4b-v1",
+          "extra_repositories": [],
+          "contender": "paritok-official/paritok-4b-v1"
+        },
+        {
+          "key": "F09",
+          "name": "sqz",
+          "repository": "https://github.com/ojuschugh1/sqz",
+          "extra_repositories": [],
+          "contender": "ojuschugh1/sqz"
+        },
+        {
+          "key": "F10",
+          "name": "TOON",
+          "repository": "https://github.com/toon-format/toon",
+          "extra_repositories": [],
+          "contender": "toon-format/toon"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10",
+        "#589 packet C11"
+      ]
+    },
+    {
+      "unit_id": "web-research",
+      "title": "Web research",
+      "requirement": "Retrieve attributable primary sources and interact with chosen pages through bounded native commands without another standing research-agent stack.",
+      "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+      "a_deciding_comparison_would_measure": "Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.",
+      "comparisons_on_record": [],
+      "slots": [
+        {
+          "slot_id": "page-text-extraction",
+          "source_slot": "trafilatura",
+          "question": "Which single tool fetches chosen URLs and extracts the main text with metadata (CLI or API) for bounded, attributable retrieval, or none?",
+          "no_additional_component_allowed": true
+        },
+        {
+          "slot_id": "browser-interaction",
+          "source_slot": "playwright-cli",
+          "question": "Which single tool gives agents bounded interaction with JavaScript-rendered pages (forms, sign-in flows, tabs, screenshots, PDF) as shell-callable steps?",
+          "no_additional_component_allowed": false
+        }
+      ],
+      "field": [
+        {
+          "key": "F01",
+          "name": "Tavily CLI",
+          "repository": "https://github.com/tavily-ai/tavily-cli",
+          "extra_repositories": [],
+          "contender": "tavily-ai/tavily-cli"
+        },
+        {
+          "key": "F02",
+          "name": "OpenResearch",
+          "repository": "https://github.com/alphaXiv/OpenResearch",
+          "extra_repositories": [],
+          "contender": "alphaxiv/openresearch"
+        },
+        {
+          "key": "F03",
+          "name": "Browser Use",
+          "repository": "https://github.com/browser-use/browser-use",
+          "extra_repositories": [],
+          "contender": "browser-use/browser-use"
+        },
+        {
+          "key": "F04",
+          "name": "trafilatura",
+          "repository": "https://github.com/adbar/trafilatura",
+          "extra_repositories": [],
+          "contender": "adbar/trafilatura"
+        },
+        {
+          "key": "F05",
+          "name": "Playwright CLI",
+          "repository": "https://github.com/microsoft/playwright-cli",
+          "extra_repositories": [],
+          "contender": "microsoft/playwright-cli"
+        },
+        {
+          "key": "F06",
+          "name": "Crawl4AI",
+          "repository": "https://github.com/unclecode/crawl4ai",
+          "extra_repositories": [],
+          "contender": "unclecode/crawl4ai"
+        },
+        {
+          "key": "F07",
+          "name": "Cua Driver",
+          "repository": "https://github.com/trycua/cua",
+          "extra_repositories": [],
+          "contender": "trycua/cua"
+        },
+        {
+          "key": "F08",
+          "name": "Firecrawl MCP",
+          "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+          "extra_repositories": [],
+          "contender": "firecrawl/firecrawl-mcp-server"
+        },
+        {
+          "key": "F09",
+          "name": "agent-browser",
+          "repository": "https://github.com/vercel-labs/agent-browser",
+          "extra_repositories": [],
+          "contender": "vercel-labs/agent-browser"
+        },
+        {
+          "key": "F10",
+          "name": "exa-mcp-server",
+          "repository": "https://github.com/exa-labs/exa-mcp-server",
+          "extra_repositories": [],
+          "contender": "exa-labs/exa-mcp-server"
+        }
+      ],
+      "field_sources": [
+        "#589 packet C01",
+        "#589 packet C02",
+        "#589 packet C03",
+        "#589 packet C04",
+        "#589 packet C05",
+        "#589 packet C06",
+        "#589 packet C07",
+        "#589 packet C08",
+        "#589 packet C09",
+        "#589 packet C10"
+      ]
+    }
+  ]
+}
