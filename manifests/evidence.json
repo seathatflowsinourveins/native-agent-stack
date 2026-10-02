@@ -15701,8 +15701,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "8c8865ce0aee73cc9029bc0fbd8bf93ae09fc7a7a34dd6847e4a246fd78554ba",
-      "bytes": 58079
+      "sha256": "05a91c908fa06195126cd8fb391dd5ce59028a0190bb2402146af62ff93562a3",
+      "bytes": 62100
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
@@ -36401,8 +36401,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json",
-      "sha256": "b7bce663fbef04d7bec83b3a2cf1b962062d07633d51c5a792d2af25c1832a04",
-      "bytes": 26636
+      "sha256": "7399b6b17b14b18f16b2ebab9c19fa61461b8affc1a2ba0e319a10cfd3188cd9",
+      "bytes": 36861
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
@@ -36426,8 +36426,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "6dd4b820b0e0b355abea383fd6fed3cd271dd746f84094b5ff2da1a1b1205598",
-      "bytes": 81247
+      "sha256": "5a65f3d7d6d4e40248720b9344709ac20ec432749b9ca2f644aebc94c686eb01",
+      "bytes": 93878
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -37103,6 +37103,16 @@
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/sol-ultra-round/order-2/workers.json",
       "sha256": "af7166721da695c93feabf46158a5f377c6fb0ed3974d9b269f0b6a2628b1fbc",
       "bytes": 16618
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
+      "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622",
+      "bytes": 53632
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-summary.md",
+      "sha256": "ce5016764a89e5c07d07590f82634259af6a31991581ed2328e97f73c4d3429d",
+      "bytes": 8471
     },
     {
       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/criteria.txt",
@@ -49321,8 +49331,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "4d5b0c3c203f1edac4690bb547d5d8cb44932135dcd86879621a35d8d84f6dcc",
-      "bytes": 35612
+      "sha256": "8db1c30272189632b2cece2469d31d91299e5e60d04af126c1c36659a7455bad",
+      "bytes": 36119
     },
     {
       "path": "tests/test_observability.py",
