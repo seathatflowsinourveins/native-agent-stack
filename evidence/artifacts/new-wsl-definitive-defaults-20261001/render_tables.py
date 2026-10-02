@@ -38,7 +38,7 @@ def layer_table(man, catalog):
         for row in rows:
             kind = STATUS[row["row_kind"]]
             if row.get("state") == "measurement":
-                kind = "measurement, at the user's request"
+                kind = row["label"] if row["measurement"]["returned"] else "measurement, at the user's request"
             elif row.get("state") == "split":
                 kind += ", split between the families: a measurement decides"
             elif row["row_kind"] == "judged":
@@ -62,13 +62,15 @@ def render():
     lines += layer_table(man, "us-equities")
     lines += ["", "### The six slots of the foundation's decision round", "",
               "| Slot | Default | Basis | Claude family | GPT family | Definitive |", "| --- | --- | --- | --- | --- | --- |"]
+    rows = {row["slot_id"]: row for row in man["slots"] if row["catalog"] == "foundation"}
     for layer in fnd["layers"]:
         for slot in layer["slots"]:
             if slot["row_kind"] == "judged":
                 fam = slot["families"]
-                lines.append(f"| {slot['slot_id']} | {slot['default']['name']} | {slot['label']} | {fam['claude']['status']} | {fam['gpt']['status']} | "
-                             f"{'yes' if slot['definitive'] else 'no'} |")
-                if slot.get("split_note"):
+                row = rows[slot["slot_id"]]
+                lines.append(f"| {slot['slot_id']} | {row['default']} | {row['label']} | {fam['claude']['status']} | {fam['gpt']['status']} | "
+                             f"{'yes' if row['definitive'] else 'no'} |")
+                if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
                     lines.append(f"| | | {slot['split_note']} | | | |")
     lines += ["", END]
     return "\n".join(lines)

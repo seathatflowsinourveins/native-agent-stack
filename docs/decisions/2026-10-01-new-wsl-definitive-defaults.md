@@ -58,7 +58,7 @@ across both catalogs. The tables below are generated from it.
 | web-research | trafilatura; Playwright CLI | first round |
 | durable-memory | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | measurement, at the user's request |
 | token-efficiency | ccusage; **No context-supply layer: the usage meter only** | first round; decision round, both families |
-| observation-inference | OTel Collector Contrib; Prometheus; Loki; Grafana; Phoenix; Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama) | first round; decision round, split between the families: a measurement decides |
+| observation-inference | OTel Collector Contrib; Prometheus; Loki; Grafana; Phoenix; Ollama | first round; settled by the preregistered gate: at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance |
 | quality-evaluation | Inspect AI; Harbor (containerized agent E2E runner); Promptfoo | first round |
 | ci-supply-chain | zizmor; attest; Syft; Dependabot; codeql-sarif; actionlint (kjanat) | first round |
 | scheduling-supervision | Dagu | first round |
@@ -98,8 +98,7 @@ across both catalogs. The tables below are generated from it.
 | | | the Claude family converged on semble and the GPT family converged on SocratiCode; until the measurement returns nothing is installed for this slot and the clients' built-in tools cover it | | | |
 | memory-owner | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent | converged | converged | no |
 | context-supply | No context-supply layer: the usage meter only | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | converged | converged | yes |
-| local-model-server | Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama) | split between the model families; the measurement the critics named decides, before the clean install | converged | converged | no |
-| | | the Claude family converged on llama.cpp optional inference and the GPT family converged on ollama; until the measurement returns nothing is installed for this slot and the clients' built-in tools cover it | | | |
+| local-model-server | Ollama | settled by the preregistered gate: at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance | converged | converged | no |
 | container-engine | Docker Engine / Moby | default on documented fit; nothing measured separates the finalists | converged | converged | yes |
 
 <!-- tables:end -->
@@ -240,17 +239,46 @@ The points a reader needs before trusting a row:
   SocratiCode appears in no public retrieval benchmark. Each critic's overturn rule keeps its own family's pick unless a
   challenger's paired interval excludes zero, so the measurement's preregistration has to state one symmetric rule and
   its tie-break before it runs, agreed by both lanes.
-- **Local model server: split between the families; nothing installs until the measurement returns.** The Claude
-  family converged on llama.cpp and the GPT family converged on Ollama, each with two deciders and a critic. The Claude
-  critic kept llama.cpp on a narrower margin after finding, in source, that llama-server's Responses endpoint drops
-  every tool whose type is not a function, which Codex sends by default, and that Ollama handles those tools; llama.cpp
-  keeps a native metrics endpoint and no cloud route. This record does not pick between the families. The route is
-  optional under the layer's requirement, so the slot's default is "not installed" until a measurement has run. The
-  two critics name different ones. The Claude critic names a first gate, pass or fail (a Codex task that must call a
-  tool from an MCP server, on each server), and then both servers on the RTX 4090 with the same 4-bit model and one
-  embedding model at one and four concurrent sessions. The GPT critic names a paired comparison of real Claude Code,
-  Codex and embedding workloads with total task completion time as the primary metric. The gate is running on the
-  workstation; its preregistration and receipt land with its result.
+- **Local model server: Ollama, settled by the preregistered gate.** The Claude family chose llama.cpp and the GPT
+  family chose Ollama, each with two deciders and a critic. The Claude critic's rule was "Ollama replaces llama.cpp
+  if the Codex MCP tool call fails on llama-server and succeeds on Ollama". The
+  [first receipt](../../evidence/artifacts/local-model-server-gate-20261001/receipt.json) and the
+  [confirmatory receipt](../../evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json) show:
+
+  | Result | First gate, 300-second wall limit | Confirmatory gate, 1,200-second wall limit |
+  | --- | --- | --- |
+  | llama-server scored runs passed | 0 of 3 | 0 of 3 |
+  | Ollama scored runs passed | 2 of 3 | 3 of 3 |
+  | llama-server MCP tool calls completed | 0 of 3 | 0 of 3 |
+  | Ollama MCP tool calls completed | 3 of 3 | 3 of 3 |
+
+  Neither arm passed the first gate's frozen rule. The third Ollama run completed its tool call and then hit the
+  300-second wall limit before its final answer. The confirmatory gate changed only the wall limit to 1,200 seconds
+  and returned the replacing result. The settlement follows the agreed order that an arm failing a gate cannot win.
+  The GPT family had already chosen Ollama; the GPT critic's own workload comparison has not run. This is a measured
+  install decision, not a merit acceptance or agreement between the families in the blind round.
+  The scope is function only: whether the server's Responses layer exposes Codex's namespaced MCP tools. It claims
+  no throughput or GPU result. Both gates ran on one shared workstation, on the CPU, with one model (Qwen3-8B
+  Q4_K_M), one prompt and three scored runs per arm; they are local integration checks, not tests on the new machine.
+  Both arms used 32768 tokens of context, below the at least 64k that Ollama's Codex page requests and this model
+  cannot provide. Sampling temperature was 0.6, so the runs are not deterministic. llama.cpp was release v0.5.0,
+  build b11146; later prerelease builds were not run, and PR #23235 was open when the first gate checked it.
+  Ollama 0.35.0 runs the GGUF through its bundled llama-server, so the measured difference is in the Responses layer
+  in front of it. llama-server logs the converted request rather than the raw one; the evidence for two namespace
+  tools is its warnings and Ollama counting twelve tools where llama-server kept ten. The llama-server Codex profile
+  mirrors Ollama's launcher profile, and both arms use that launcher's model catalog. `OLLAMA_NO_CLOUD=1` and loopback
+  binding were set, but outbound traffic was not captured. Load was recorded only in the confirmatory gate, so
+  tokens per second cannot be compared across the gates; wall times and token rates give context for the wall limit
+  and are not a speed comparison. The stack manifest has no Ollama component yet. Both artifact folders were rebuilt on 2026-10-02 from the retained raw
+  runs after a host restart emptied the directory that held them; `REBUILD.md` in each folder gives every file's
+  provenance, and the original confirmatory receipt (sha256 93789091…) is lost. No scored confirmatory run started
+  before the two measurement jobs on the host were pinned to separate processors; the load at each run's start is in
+  the receipt. The failure is not a client setting: at Codex rust-v0.159.3 a configured provider keeps the default
+  `namespace_tools: true` (`codex-rs/model-provider/src/provider.rs`, lines 60 to 64 and 421 to 433). Upstream,
+  llama.cpp issue 23229 on the dropped tool type was closed as not planned on 2026-07-04, and pull request 23235,
+  which would add it, is an open draft last updated 2026-05-17. `settlements.json` retains the confirmatory receipt's limitations verbatim and hashes both
+  receipts. A llama.cpp release that passes the same gate, or a throughput comparison once both arms pass, can
+  overturn the settlement.
 
 A slot that ends split is settled by the measurement its critics name, run on the workstation or a rehearsal
 distribution before the clean install. Until then nothing is installed for it and the clients' built-in tools cover its
@@ -327,12 +355,22 @@ retrieval adverse; medium-low confidence", and if the head-to-head installs ai-m
 ## What follows
 
 1. The GPT family's remaining returns; the manifest is re-assembled and a slot becomes definitive when the rule holds.
-2. For the two split slots, the measurement their critics name, preregistered with one symmetric decision rule and a
-   tie-break that both lanes accept, and run on the workstation. The model server's first gate (a Codex task that
-   must call one MCP tool, on each server) is running.
+2. For the one remaining split, code search, run the measurement its critics name on the workstation, preregistered
+   with one symmetric decision rule and a tie-break that both lanes accept.
 3. The install profile and the handbook take their rows from the manifest: one default per slot, never "one of".
 4. The rehearsal distribution checks the engine default on the WSL version the new host will run.
 5. Revision 5 of the U11 record and decision 6 of the program record, both in this change.
+
+## Amendment (2026-10-02)
+
+- The local model server now defaults to Ollama after the confirmatory gate; code search is the remaining split.
+  The earlier discussion of the blind round describes that round, before this measured settlement.
+- `settlements.json` records the basis, scope, receipt hashes, verbatim limits and overturn condition. The assembler
+  checks that settlements name eligible slots and that their receipt files exist with the recorded hashes.
+- Every manifest row now carries `state` and `measurement`. The returned model-server measurement is separate from
+  the pending memory and code-search measurements, and the manifest's counts keep their existing definition.
+- The tables use the settled default and label. Tests check both directions of the convergence rule, retain the
+  exact trading flag exception, and six negative controls regenerate, check their named failure and restore all files.
 
 ## Mistakes recorded
 

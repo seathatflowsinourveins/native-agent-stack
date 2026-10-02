@@ -1,0 +1,37 @@
+[
+ {
+  "slot_id": "local-model-server",
+  "default": {
+   "name": "Ollama",
+   "repository": "https://github.com/ollama/ollama"
+  },
+  "settled_by": "preregistered gate",
+  "receipts": [
+   {
+    "path": "evidence/artifacts/local-model-server-gate-20261001/receipt.json",
+    "sha256": "111802a9feca13139316187e206bf12dcee43fa1fba37be50dedee3994f3a0bf"
+   },
+   {
+    "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json",
+    "sha256": "79010a4c336a99ec34caa80062f5724982f91f899106de0da7692abc98b95b44"
+   }
+  ],
+  "label": "settled by the preregistered gate: at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
+  "basis": "The Claude critic named the rule: Ollama replaces llama.cpp if the Codex MCP tool call fails on llama-server and succeeds on Ollama. The first gate did not pass either arm under its frozen scoring rule: llama-server passed 0 of 3 and Ollama 2 of 3, with the third Ollama run completing its tool call before hitting the 300-second wall limit. The confirmatory gate changed only that limit to 1,200 seconds and returned llama-server 0 of 3 against Ollama 3 of 3. This settles the slot under the agreed order that an arm failing a gate cannot win. The GPT family had already chosen Ollama; the GPT critic's own workload comparison has not run.",
+  "scope": "Function only: whether the server's Responses layer exposes Codex's namespaced MCP tools. No claim about throughput or the GPU path.",
+  "limits": [
+   "One workstation, CPU inference, one model (Qwen3-8B Q4_K_M), one prompt, three scored runs per arm; this is a local integration check, not a test on the new machine.",
+   "Only the function gate was measured. Wall times and tokens per second are recorded as context for the wall limit; they are not a speed comparison (shared workstation, CPU, load recorded per run).",
+   "Context was 32768 tokens on both arms; Ollama's Codex page asks for at least 64k, which this model cannot provide.",
+   "llama.cpp was tested at its latest release (v0.5.0, build b11146); later prerelease builds were not run and PR #23235 was open when the first gate checked it.",
+   "llama-server's verbose log shows the converted request, not the raw one; that Codex sent two namespace tools rests on the server's own warning lines and on Ollama counting twelve tools where llama-server kept ten.",
+   "Ollama 0.35.0 itself runs the GGUF through a bundled llama-server (its log says so); the difference measured is in the Responses layer in front of it.",
+   "Arm A's Codex profile mirrors the one Ollama's launcher writes, and both arms use the model catalog that launcher wrote.",
+   "Sampling temperature was 0.6, so runs are not deterministic.",
+   "manifests/stack.json has no Ollama component, so component_ids name llama-cpp and codex only; the receipt is not registered in manifests/evidence.json.",
+   "OLLAMA_NO_CLOUD=1 and loopback binding were set; outbound traffic was not captured.",
+   "The load average was recorded only in this run; the first gate did not record it, so tokens per second are not comparable across the two gates."
+  ],
+  "overturn_condition": "A llama.cpp release that passes the same gate, or a throughput comparison once both arms pass, can overturn this settlement."
+ }
+]
