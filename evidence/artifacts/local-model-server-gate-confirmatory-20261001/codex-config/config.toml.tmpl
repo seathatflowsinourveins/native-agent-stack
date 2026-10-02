@@ -1,0 +1,14 @@
+# Scratch Codex config shared by both arms (rendered into <STATE>/scratch-home/.codex/config.toml).
+# <STATE> stands for the owned state directory. Nothing here comes from a user's own Codex home.
+approval_policy = "never"
+sandbox_mode = "read-only"
+web_search = "disabled"
+
+[analytics]
+enabled = false
+
+[mcp_servers.time]
+command = "<STATE>/mcp-venv/bin/mcp-server-time"
+args = ["--local-timezone", "UTC"]
+enabled_tools = ["get_current_time"]
+default_tools_approval_mode = "approve"

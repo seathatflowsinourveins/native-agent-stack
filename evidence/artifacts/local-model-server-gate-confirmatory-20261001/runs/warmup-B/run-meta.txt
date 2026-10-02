@@ -1,0 +1,10 @@
+label=warmup-B
+arm=ollama
+profile=ollama-launch
+server_pid=3816771
+server_started_utc=2026-10-02T00:10:24Z
+server_ready_utc=2026-10-02T00:10:26Z
+codex_exit=0
+codex_finished_utc=2026-10-02T00:12:46Z
+server_stopped_utc=2026-10-02T00:12:48Z
+server_alive_after_stop=no

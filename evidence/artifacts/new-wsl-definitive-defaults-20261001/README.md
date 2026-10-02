@@ -1,8 +1,9 @@
 # The new WSL's definitive defaults (2026-10-01)
 
 One default per slot for the clean install of the new WSL distribution. The decision and its limits are in
-`docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`. Nothing here was installed or measured: the evidence class is
-source review by model judges in two families, plus the published evaluations they cite.
+`docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`. The blind rounds' evidence class is source review by model
+judges in two families, plus the published evaluations they cite. The local model server's settlement adds measured
+function gates on one workstation, recorded in the first and confirmatory receipts linked from `settlements.json`.
 
 ## Files
 
@@ -11,6 +12,7 @@ source review by model judges in two families, plus the published evaluations th
 | `definitive-manifest.json` | One row per slot across both catalogs: layer, slot, row kind, default, whether it is definitive, each family's status. Built by `assemble_manifest.py`; `--check` fails when it is stale |
 | `foundation-definitive.compact.json` | The foundation's 21 layers and 4 cross rows: per slot the default, its label, alternatives, the Claude deciders' deciding facts, both critics' findings and corrections, the overturn checks and each family's status |
 | `trading/trading-definitive.compact.json` | The 12 us-equities layers, in the same shape. The trading lane's work, with its builder, its one-owner map and both rounds' preregistrations |
+| `settlements.json` | The model-server settlement's default, basis, scope, receipt paths and hashes, verbatim limits and overturn condition; read by `assemble_manifest.py` |
 | `criteria.txt` | The seven criteria of the first round, unchanged |
 | `decide-prompt.txt`, `decide-critic-prompt.txt` | The decision round's prompts, with the rules frozen before the round |
 | `decide-workflow.js` | The Claude family's workflow script (run `wf_c0e29ea4-90f`), with both output schemas inline |
@@ -18,6 +20,7 @@ source review by model judges in two families, plus the published evaluations th
 | `preregistration.json` | Hashes of the criteria, prompts, packets and first-round returns, written before launch |
 | `save_claude_returns.py`, `assemble_foundation_definitive.py` | Saves the Claude returns from the workflow journal; assembles the foundation documents from both families' returns |
 | `render_tables.py` | Writes the decision record's tables from the manifest; `--check` fails when they are stale |
+| `controls.py` | Negative controls that mutate inputs, regenerate the manifest and tables, require their named unittest failure and restore changed files |
 | `claude-decision-round-run.json` | Counts and times of the Claude family's decision round, read from its private journal |
 | `gpt-memory-first-round-units.json` | Counts, exit codes and usage of the GPT family's two first-round units for the memory layer (the first ran without shell network), read from their private event logs |
 
@@ -51,6 +54,7 @@ decision directory's host path appears in the documents as `<definitive-defaults
 
 ```
 python3 assemble_foundation_definitive.py <repository> <decision-directory> <output-directory>   # needs the private returns
-python3 assemble_manifest.py            # from the two committed compact documents
+python3 assemble_manifest.py            # from the two committed compact documents and settlements.json
 python3 render_tables.py --write ../../../docs/decisions/2026-10-01-new-wsl-definitive-defaults.md
+python3 -B controls.py ../../..         # regenerate and require each named unittest failure
 ```
