@@ -257,8 +257,10 @@ GETTY_ENABLED = "wsl.exe -d '<Name>' --exec systemctl is-enabled " + GETTY_UNIT
 GETTY_SHOW = "wsl.exe -d '<Name>' --exec systemctl show " + GETTY_UNIT + " -p LoadState -p ActiveState -p NRestarts"
 GETTY_RESULT = "systemctl show " + GETTY_UNIT + " -p Result -p NRestarts"
 F10_PROBE = ("wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc "
-             "'for n in claude codex; do p=\"$(type -P \"$n\")\"; "
-             "test -f \"$p\" && test -x \"$p\" && echo \"executable: $p\"; done'")
+             "'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'")
+R1_BUS_PROBE = "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'"
+F5_GUARDED = ('grep -q "^$(id -un):" /etc/subuid || sudo usermod --add-subuids 100000-165535 '
+              '--add-subgids 100000-165535 "$(id -un)"')
 IDLE_READ = ("Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\\s*\\[', "
              "'^\\s*instanceIdleTimeout\\s*=', '^\\s*vmIdleTimeout\\s*=' -ErrorAction SilentlyContinue")
 IDLE_POLL = ("foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); "
@@ -628,7 +630,22 @@ def path_proof_errors(recipe: str) -> list[str]:
     f10 = [command for step, _, command in recipe_rows(recipe) if step == "F10"]
     if F10_PROBE in f10:
         return []
-    return ["F10 does not obtain each path without word splitting and quote it in test -f, test -x and echo"]
+    return ["F10 does not obtain each path without word splitting and test it inside [[ -f ... && -x ... ]]"]
+
+
+def powershell_quote_errors(recipe: str) -> list[str]:
+    """Rehearsal run 3 (2026-10-02): Windows PowerShell 5.1 does not escape a double quote inside an argument it hands
+    to a native program, so `wsl.exe ... 'stat -c "%U %F" ...'` reached Bash as `stat -c %U` and returned
+    `stat: missing operand`. No single-quoted argument of a `wsl.exe` command in a PowerShell block holds one."""
+    errors = []
+    for step, shell, command in recipe_rows(recipe):
+        if shell != "powershell" or not command.startswith("wsl.exe"):
+            continue
+        for argument in re.findall(r"'([^']*)'", command):
+            if '"' in argument:
+                errors.append(f"{step}: a PowerShell command hands wsl.exe an argument with a double quote: {command}")
+                break
+    return errors
 
 
 def step_blocks(recipe: str, step: str) -> list[list[str]]:
@@ -1306,8 +1323,8 @@ class CrossFamilyReviewTests(unittest.TestCase):
 
     def test_the_path_proof_check_rejects_type_p_alone(self):
         recipe = read(RECIPE)
-        self.assertIn('test -x "$p" && ', recipe)
-        self.assertTrue(path_proof_errors(recipe.replace('test -x "$p" && ', "")))
+        self.assertIn("[[ -f $p && -x $p ]] && ", recipe)
+        self.assertTrue(path_proof_errors(recipe.replace("[[ -f $p && -x $p ]] && ", "")))
 
 
 class JCodeMunchStepTests(unittest.TestCase):
@@ -2743,9 +2760,30 @@ class Run2RepairTests(FollowUpCase):
         self.assertEqual(path_proof_errors(recipe), [])
         self.assertIn(("F10", "powershell", F10_PROBE), command_table(record))
         self.assertTrue(any(entry["step"] == "F10" and entry["cmd"] == F10_PROBE for entry in receipt["steps"]))
-        for old_probe in (F10_PROBE.replace('test -f "$p"', 'test -f $p'),
-                          F10_PROBE.replace('p="$(type -P "$n")"', 'p=$(type -P "$n")')):
+        for old_probe in (F10_PROBE.replace("[[ -f $p && -x $p ]]", "test -f $p && test -x $p"),
+                          F10_PROBE.replace("for n in claude codex; do p=$(type -P $n);", "for p in $(type -P claude codex); do")):
             self.assertTrue(path_proof_errors(recipe.replace(F10_PROBE, old_probe)))
+
+    def test_no_powershell_command_hands_wsl_an_argument_with_a_double_quote(self):
+        recipe, record, _, receipt = self.inputs()
+        self.assertEqual(powershell_quote_errors(recipe), [])
+        # the two forms that failed in rehearsal run 3 must be caught
+        quoted_stat = "wsl.exe -d '<Name>' --exec bash -lc 'stat -c \"%U %F\" \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"'"
+        quoted_loop = ("wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=\"$(type -P \"$n\")\"; "
+                       "test -f \"$p\" && test -x \"$p\" && echo \"executable: $p\"; done'")
+        self.assertIn(R1_BUS_PROBE, recipe)
+        self.assertTrue(powershell_quote_errors(recipe.replace(R1_BUS_PROBE, quoted_stat)))
+        self.assertTrue(powershell_quote_errors(recipe.replace(F10_PROBE, quoted_loop)))
+        self.assertIn(("R1", "powershell", R1_BUS_PROBE), command_table(record))
+        self.assertTrue(any(entry["cmd"] == R1_BUS_PROBE for entry in receipt["steps"]))
+
+    def test_f5_adds_a_range_only_when_none_exists(self):
+        recipe, record, _, receipt = self.inputs()
+        f5 = [command for step, _, command in recipe_rows(recipe) if step == "F5"]
+        self.assertIn(F5_GUARDED, f5)
+        self.assertNotIn(F5_GUARDED.split(" || ", 1)[1], f5, "the unguarded usermod line would add a second range")
+        self.assertIn(("F5", "sh", F5_GUARDED), command_table(record))
+        self.assertTrue(any(entry["step"] == "F5" and entry["cmd"] == F5_GUARDED for entry in receipt["steps"]))
 
     def test_release_table_and_receipt_hold_the_observed_image_size(self):
         recipe, _, _, receipt = self.inputs()

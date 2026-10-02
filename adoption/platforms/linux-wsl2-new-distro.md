@@ -4,8 +4,9 @@ Added after `v2026.09.26.2`, with its templates under [`adoption/templates/wsl/`
 [`docs/decisions/2026-10-01-new-wsl-distro-recipe.md`](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md), which
 holds the decisions, their alternatives, the command table and every source. After the WSL 2.7.13 rehearsal stopped
 at F1 on shared cgroups, run 2 on WSL 3.0.1.0 passed stage 1 and W5's path-A proofs, showed distinct cgroup namespaces,
-and stopped at W5's paired rule on a shared-console collision. The template's getty mask was probed once; a complete
-recipe run with it through F3 is still owed. Start with R1 and record the stage-1 receipt described at the end.
+and stopped at W5's paired rule on a shared-console collision. Run 3 (2026-10-02T10:54Z to 11:01Z) then completed P1 to
+F5 with the template's getty mask, the paired proof and a rootless container; the uv and Node probes and the
+rollback arm are still owed. Start with R1 and record the stage-1 receipt described at the end.
 
 This page creates a second WSL 2 distribution on the existing Windows host from the selected Canonical image,
 `ubuntu-<RELEASE>-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
@@ -112,8 +113,11 @@ failure, and neither image has full new-host acceptance.
 ## Rehearsal first
 
 Run 2 on WSL 3.0.1 passed stage 1 and W5's path-A proofs and showed distinct cgroup namespaces, then stopped at W5's
-paired rule on the console collision. Probe E1 tested the template's getty mask once outside the recipe; a complete
-recipe run with it through F3 is still owed.
+paired rule on the console collision. Probe E1 tested the template's getty mask once outside the recipe, and
+run 3 then completed P1 to F5 with it: the unit masked and inactive, the workstation equal to its baseline, the file
+owner `1000:1000` after one terminate, the distribution still listed in all twelve idle polls, a user-owned bus and
+`Hello from Docker!` from a rootless container. The uv and Node probes need stage 2 and are owed, as is the rollback
+arm.
 
 ### R1. Rehearse on a throwaway name, then remove it
 
@@ -121,8 +125,7 @@ Run the page once on a throwaway distribution before the real one. For that run 
 other distribution uses, never the real `<Name>` and never the workstation's, and `Z:\WSL\<Name>` is its own new folder.
 Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, recording P3's baseline and W5's
 second count of storage errors, W5's `cloud-init schema --system` (path A), W7's file-ownership probe and F2's idle
-observation. Run 2 observed the storage readings and image schema on 3.0.1; the corrected template and complete run
-through F3 remain owed. Record the rehearsal's name, result, creation path and those observations in the receipt's
+observation. Run 3 observed all of them on 3.0.1 with the corrected template. Record the rehearsal's name, result, creation path and those observations in the receipt's
 `rehearsal` block. Every host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and
 unregisters only that literal name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
 
@@ -149,7 +152,7 @@ check qualifies an arm. Both arms' full new-host acceptance is owed; run 2 stopp
 | `node_24` | The bootstrap's selected Node starts and prints `v24.21.0`, exit 0; retain any loader/package failure | F4, F9 and `adoption/pins-linux-x86_64.json`'s official Node 24.21.0 tarball |
 
 ```powershell
-wsl.exe -d '<Name>' --exec bash -lc 'stat -c "%U %F" "/run/user/$(id -u)" "/run/user/$(id -u)/bus"'
+wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'
 wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait
 wsl.exe -d '<Name>' --exec test -c /dev/dxg
 wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi
@@ -157,6 +160,11 @@ wsl.exe -d '<Name>' --exec bash -lc 'python3 --version'
 wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --version'
 wsl.exe -d '<Name>' --exec bash -lc 'node --version'
 ```
+
+The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. No command that a PowerShell block hands to
+`wsl.exe` carries a double quote inside its single-quoted argument: Windows PowerShell 5.1 does not escape it for a
+native program, and the argument breaks apart (run 3, 2026-10-02: the earlier `stat -c "%U %F"` form returned
+`stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`).
 
 Record these per-arm observations in `comparison_arms` alongside each rehearsal's schema, ownership, storage and idle
 observations. The inspected 26.04.1 system interpreter is Python 3.14.4-1ubuntu0.1 (its `python3` metapackage is
@@ -545,6 +553,14 @@ Proof (path A, cloud-init provisioned the instance):
   - Exit 2 means recoverable errors (warnings) on that boot while the line still says `disabled`
     (`:158-163`, `:254-255`). Record them, as `status.json` below does.
   - `status: error` or exit 1 means that boot's run failed: stop.
+- With the template's `bootcmd`, one recoverable error is expected and `cloud-init status --long` exits 2: `Failed to
+  wait for network`, from `systemctl start systemd-networkd-wait-online.service`, with `Unit
+  systemd-networkd-wait-online.service is masked.` cloud-init waits for the network when the user-data holds a
+  `bootcmd` (26.1, `cloudinit/cmd/main.py:351-402` and `:522-528`; `cloudinit/net/activators.py:312-314`, read in
+  the 26.04.1 image), and WSL masks that unit because it configures the network itself (microsoft/WSL `3.0.1`,
+  `src/linux/init/init.cpp:356-358`). Run 3 recorded it in the `init` and `modules-config` stages with empty
+  `errors`, no delay (the stage took 0.54 s) and `result.json` without errors. Any other recoverable error is
+  recorded and reviewed as before.
 - `/var/lib/cloud/data/result.json` holds `"datasource": "DataSourceWSL"` and `"errors": []`. cloud-init writes this file
   only when its final stage ends, and it collects the errors of every stage (`cloudinit/cmd/main.py:1017-1030`). Its
   presence proves the run completed; its empty list proves the run had no errors.
@@ -887,11 +903,13 @@ one only when the first `grep` prints nothing.
 
 ```sh
 grep "^$(id -un):" /etc/subuid /etc/subgid
-sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"
+grep -q "^$(id -un):" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"
 grep "^$(id -un):" /etc/subuid /etc/subgid
 ```
 
 Proof: `/etc/subuid:<WSL_USER>:100000:65536` and `/etc/subgid:<WSL_USER>:100000:65536`, or another range of 65,536.
+The second line adds a range only when `/etc/subuid` has none for the user, so running the block twice never adds a
+second range (run 3: `useradd` had allocated the range, and `usermod` did not run).
 Record whether the range came from `useradd` or from `usermod`.
 
 65,536 stays the stage-1 value. Docker's
@@ -978,11 +996,12 @@ profile of the example by replacing its `WSL` prefix with `<Name>`, for example 
 `<Name> - Claude` (and the resume profiles when the example carries them), and save the file as
 `<Name>.json` in the same Fragments folder. Windows Terminal derives a fragment profile's identity from the folder name
 and the profile name, so the workstation's identically named profiles would collide with these. Then prove the profile
-launch shape from Windows:
+launch shape from Windows (the loop tests each path inside `[[ ]]`, which needs no quotes to keep a path with a space
+whole; see R1 for why these commands carry no double quote):
 
 ```powershell
 wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'
-wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p="$(type -P "$n")"; test -f "$p" && test -x "$p" && echo "executable: $p"; done'
+wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'
 ```
 
 Proof: the first line prints two absolute paths, and the second prints `executable:` followed by each of them.
@@ -1093,7 +1112,8 @@ Kept open in the record, each with the observation that would settle it:
 - whether `hv_storvsc` errors break a first launch on this kernel (microsoft/WSL#41482; P3 records a baseline and
   stops on an error line less than one hour old, and W5 counts again after the first launch);
 - completion of the preregistered comparison of Ubuntu 26.04.1 default and 24.04.5 rollback on throwaway names;
-  the default's run 2 stopped at W5's paired rule on 3.0.1, and full acceptance with the corrected template is owed.
+  the default's run 3 passed P1 to F5 on 3.0.1 with the corrected template; stage 2, its two probes and the rollback
+  arm are owed.
 
 ## Boundaries
 

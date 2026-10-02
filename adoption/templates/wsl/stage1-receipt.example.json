@@ -131,7 +131,7 @@
   "steps": [
     {
       "step": "R1",
-      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c \"%U %F\" \"/run/user/$(id -u)\" \"/run/user/$(id -u)/bus\"'",
+      "cmd": "wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'",
       "exit": "<recorded exit code>",
       "output_excerpt": "<R1: returned output required by the selected recipe proof>"
     },
@@ -1229,7 +1229,7 @@
     },
     {
       "step": "F5",
-      "cmd": "sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
+      "cmd": "grep -q \"^$(id -un):\" /etc/subuid || sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 \"$(id -un)\"",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
@@ -1331,7 +1331,7 @@
     },
     {
       "step": "F10",
-      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=\"$(type -P \"$n\")\"; test -f \"$p\" && test -x \"$p\" && echo \"executable: $p\"; done'",
+      "cmd": "wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },

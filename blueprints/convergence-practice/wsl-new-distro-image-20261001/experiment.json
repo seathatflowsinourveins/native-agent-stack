@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "002989d1ac41eac8b0b3e4cb8538632c9f6107e802716f2a1b2a5dc475f9c006"
+        "sha256": "0fcdcf3169f931d5ff3b6109c1421cf1c86adb17efab749aa5007f6d2726cbef"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -90,7 +90,7 @@
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "c32906a00a804cb219384d331b1e6e5ca9403977875fad2497b9eb78efc7a30c"
+        "sha256": "c07bab0c84d3bf17625ddabfffdca74cda2f2e7ebb19d63c57b8965ac4b813c4"
       }
     ],
     "inputs": [
@@ -102,15 +102,15 @@
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "acda94791b59c45164f3e0944e00f002fc82173ccd11fc3957db1e1c346329c0"
+        "sha256": "2ecc17772416e39390a11d5cf30414bbc34540812114a6dfc44b9dc36eb7f23d"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "947a894bb19d495a078169aceffa995615a54377ed8519ef9fefb10b8cf096d2"
+        "sha256": "5dd17f19b447e92e1ecbbec82e5d38d219bd4cbc1f3402e03d9202c0afaa466d"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "585db3d8d04825f547c13b117ccf3ee76419c06ade70300541b5ea18e2b20f75"
+        "sha256": "b726b6a054d03f7f88ae567222826ee06069691980cb819922de85a88e48c551"
       }
     ]
   },
@@ -163,7 +163,7 @@
     "Canonical cloud-init WSL guide covers 24.04/22.04, not 26.04 qualification. The workstation's version/schema check is not selected-image qualification. Python 3.14.4 system packages do not establish toolkit CPython 3.13 migration.",
     "Completeness critic: no modality among the accepted two image arms was omitted from preregistration, but native execution of both arms and independent acceptance observation remain the decision-changing gap. GPU visibility and runtime startup are bounded checks; no full-stack, GPU workload, provider or model acceptance is claimed.",
     "Amendments of 2026-10-02, made before any comparison ran: the comparison still applies the same criteria to both images with no merit precedence between them; the merged definitive manifest names 26.04.1 as the clean-install default and 24.04.5 as the rollback; the original first_boot criterion's 'F1 running' and the first amendment's short form mean F1's complete pass condition, including the read-only flush message when degraded (microsoft/WSL issue 41226). The second amendment adds the getty mask and separate baseline/paired observations after run 2 and the accepted scoped read.",
-    "Probe E1 at 2026-10-02T08:42Z, outside the recipe, observed the amended template's masked, inactive getty with no restarts and no cloud-init errors; it was removed afterwards. The workstation's getty had already failed in run 2, so a live workstation getty surviving a first boot is inferred from the masked unit never starting, not observed. The 24.04.5 image's own unit files and path B's first boot were not read or observed. A complete recipe run with the amended template through F3 remains owed. Earlier planned/unrun and size-unknown fields retain the original record's scope and are superseded by these dated limitations only where stated."
+    "Probe E1 at 2026-10-02T08:42Z, outside the recipe, observed the amended template's masked, inactive getty with no restarts and no cloud-init errors; it was removed afterwards. The workstation's getty had already failed in run 2, so a live workstation getty surviving a first boot is inferred from the masked unit never starting, not observed. The 24.04.5 image's own unit files and path B's first boot were not read or observed. Run 3 on 2026-10-02T10:54Z to 11:01Z then completed P1 to F5 with the amended template on a third throwaway name, including the paired proof and a rootless container; it is a rehearsal and qualifies neither comparison arm. The uv and Node probes, stage 2 and the rollback arm remain owed. Earlier planned/unrun and size-unknown fields retain the original record's scope and are superseded by these dated limitations only where stated."
   ],
   "decision_and_scope": {
     "decision": "trial",

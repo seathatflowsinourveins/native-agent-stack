@@ -587,7 +587,7 @@ workstation distribution (Evidence classes).
 
 | Step | Shell | Command | Proof |
 | --- | --- | --- | --- |
-| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'stat -c "%U %F" "/run/user/$(id -u)" "/run/user/$(id -u)/bus"'` | R1: record the returned exit and output required by the recipe |
+| R1 | powershell | `wsl.exe -d '<Name>' --exec bash -lc 'stat -c %U,%F /run/user/$(id -u) /run/user/$(id -u)/bus'` | R1: record the returned exit and output required by the recipe |
 | R1 | powershell | `wsl.exe -d '<Name>' --exec systemctl --user is-system-running --wait` | R1: record the returned exit and output required by the recipe |
 | R1 | powershell | `wsl.exe -d '<Name>' --exec test -c /dev/dxg` | R1: record the returned exit and output required by the recipe |
 | R1 | powershell | `wsl.exe -d '<Name>' --exec /usr/lib/wsl/lib/nvidia-smi` | R1: record the returned exit and output required by the recipe |
@@ -770,7 +770,7 @@ workstation distribution (Evidence classes).
 | F4 | sh | `sudo apt-get install -y --no-install-recommends ca-certificates curl git tar gzip xz-utils jq libatomic1 uidmap` | exit 0 |
 | F4 | sh | `dpkg-query -W -f='${Package} ${Version}\n' jq libatomic1 uidmap` | three versions |
 | F5 | sh | `grep "^$(id -un):" /etc/subuid /etc/subgid` | a range in both files, or nothing |
-| F5 | sh | `sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"` | only when the first `grep` printed nothing |
+| F5 | sh | `grep -q "^$(id -un):" /etc/subuid \|\| sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 "$(id -un)"` | only when the first `grep` printed nothing |
 | F5 | sh | `grep "^$(id -un):" /etc/subuid /etc/subgid` | 65,536 ids in both files |
 | F6 | sh | `test -e ~/.bash_profile \|\| printf '%s\n' 'if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi' > ~/.bash_profile` | written only when absent |
 | F6 | sh | `cat ~/.bash_profile` | exactly the hand-off line |
@@ -787,7 +787,7 @@ workstation distribution (Evidence classes).
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>'` | stage 2 (bootstrap step 2) |
 | F9 | sh | `adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'` | stage 2, after native sign-in |
 | F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'type -P claude codex'` | two absolute paths |
-| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p="$(type -P "$n")"; test -f "$p" && test -x "$p" && echo "executable: $p"; done'` | `executable:` and each path: both are regular executable files |
+| F10 | powershell | `wsl.exe -d '<Name>' -u '<WSL_USER>' --exec /bin/bash -lc 'for n in claude codex; do p=$(type -P $n); [[ -f $p && -x $p ]] && echo executable: $p; done'` | `executable:` and each path: both are regular executable files |
 | F11 | sh | `test -x "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | exit 0; exit 1 means `not installed`: record it and skip the rest of F11 |
 | F11 | sh | `cd ~/code/native-agent-stack` | the clone, the project the local scope belongs to |
 | F11 | sh | `claude mcp add --scope local jcodemunch -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 -- "${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"` | an `Added ...` line; on a re-run the name already exists |
@@ -1240,6 +1240,29 @@ the initial cgroup namespace. Any failed W5 proof uses `w5_failure_export`, with
 text), and `<Name>-w5-failed.tar`; do not take path B for any such cause. Only the OOBE prompt failure permits W6.
 On path B the root block masks the getty after its first boot has already started it, so W5's paired proof after
 the relaunch decides whether the workstation changed; a difference stops and uses W5's recovery.
+
+**Run 3 (2026-10-02T10:54Z to 11:01Z, the repaired recipe, a third throwaway name).** P1 to P3, W1 to W5, W7 and F1
+to F5 passed. W5: launch exit 0; `systemctl is-enabled getty@tty1.service` printed `masked`; `LoadState=masked`,
+`ActiveState=inactive`, `NRestarts=0`; the paired values were `1000`, `degraded`, {`getty@tty1.service`,
+`systemd-binfmt.service`}, `active`, `cgroup:[4026532183]` for the workstation, equal to its W1 baseline, and `1000`,
+`degraded`, {`systemd-binfmt.service`}, `active`, `cgroup:[4026532408]` for the new distribution. W7's owner probe
+printed `1000:1000` on 3.0.1. F1's journal line printed the read-only flush message without `sudo`. F2: linger `yes`,
+and the distribution was listed in all twelve idle polls (`.wslconfig` has `instanceIdleTimeout=-1`). F3: a user-owned
+directory and socket, user manager `running`; after F4, F5 and Docker's rootless setup (Docker Engine 29.8.2),
+`docker --context rootless info` listed `name=rootless` and `docker --context rootless run --rm hello-world` printed
+`Hello from Docker!`: microsoft/WSL#41492 does not affect a new distribution on this host. The second storage count
+rose by one line inside W4's install window (15573.8 s), as in run 2 and the probe. Second-instance probes: user
+manager `running`, `/dev/dxg` present, `nvidia-smi` exit 0, system `Python 3.14.4`; uv and Node are not installed
+before stage 2, so those two probes are owed.
+
+Run 3 also found three command defects, each corrected and re-run on the same distribution. (1) With the `bootcmd`,
+cloud-init records one recoverable error, `Failed to wait for network`, and `cloud-init status --long` exits 2:
+cloud-init waits for the network when user-data holds a `bootcmd` (26.1, `cloudinit/cmd/main.py:351-402`), and WSL
+masks `systemd-networkd-wait-online.service` (`init.cpp:356-358`). It is harmless and now stated as expected in W5.
+(2) Windows PowerShell 5.1 does not escape a double quote inside an argument to a native program, so R1's first probe
+returned `stat: missing operand`, and the quoted F10 loop that this repair had introduced returned `unexpected EOF`;
+both now carry no double quote (`stat -c %U,%F ...`; `[[ -f $p && -x $p ]]`) and printed the expected lines. (3) F5's
+block ran `usermod` unconditionally although its text said otherwise; its second line now guards itself.
 
 **P3's age rule, one exception (added in the coordinator's review of this repair, 2026-10-02).** With the corrected
 filter the workstation's kernel journal holds two real driver errors of the same shape, at 7118.5 s (run 2's install)
