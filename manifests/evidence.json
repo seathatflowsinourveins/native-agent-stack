@@ -4020,8 +4020,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "c68243396cdee1415f1dab9dbacc85a7f917bf76d0762bcae7406d6d24cf933a",
-      "bytes": 38032
+      "sha256": "dedbb3b3a5863827634f4708257772ed376cbd42b72b566cfc3d77f92f4ca5de",
+      "bytes": 38174
     },
     {
       "path": ".gitignore",
@@ -14915,6 +14915,11 @@
       "bytes": 20383
     },
     {
+      "path": "catalogs/foundation/upstream-audit-20261002.json",
+      "sha256": "12f25a6dc7713514debf58d0302ada6ae080045edeb674ce4fe2184ae3bfa727",
+      "bytes": 99794
+    },
+    {
       "path": "catalogs/landscape/README.md",
       "sha256": "500e375204086fb808fab88afc5c7ec5198218e1e484ece9ec8c1fe90139f784",
       "bytes": 10292
@@ -15713,6 +15718,11 @@
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
       "sha256": "65e5dd299b3ed7f5fb533d2e61634d409968de1d2f804e862e77ba749019f6cd",
       "bytes": 33018
+    },
+    {
+      "path": "docs/decisions/2026-10-02-upstream-audit.md",
+      "sha256": "5919dd098dd406b0a4078eb4bc3f0d0ece99f1f287da1b401d240b99edfbd97f",
+      "bytes": 5927
     },
     {
       "path": "docs/direct-results.md",
@@ -44675,6 +44685,11 @@
       "bytes": 2803
     },
     {
+      "path": "evidence/artifacts/upstream-audit-20261002/observations.json",
+      "sha256": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b",
+      "bytes": 142516
+    },
+    {
       "path": "evidence/artifacts/usage-report.source.txt",
       "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
       "bytes": 11763
@@ -48596,8 +48611,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "03ddd57c1d21bd2dc07bb8a18eba38b6db85f3fc36850ff99153b47ad5a4c186",
-      "bytes": 58102
+      "sha256": "aa01e57cc139408b216ef3f34559c62cdd94613a82dc0711d78f258c67558dcb",
+      "bytes": 58384
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
