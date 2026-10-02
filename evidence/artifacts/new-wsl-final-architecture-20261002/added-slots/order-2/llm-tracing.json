@@ -1,0 +1,193 @@
+{
+  "layers": [
+    {
+      "layer_id": "llm-tracing",
+      "selection": [
+        {
+          "name": "LangWatch",
+          "repository": "https://github.com/langwatch/langwatch",
+          "role": "C05 — Provisional sole local trace store and agent-session inspector. Narrowly preferred for its documented local bootstrap and native OpenTelemetry integration with both named clients. No second tool has a distinct, necessary job in this packet.",
+          "install_command": "npx @langwatch/server",
+          "install_source": "https://github.com/langwatch/langwatch/blob/83d152e18926/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/README.md",
+              "shows": "Documents the local server command with Node.js as the stated prerequisite, plus CLI integrations for Claude Code and Codex. This establishes a supported install path, not lower resource consumption."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/docs/integration/opentelemetry/guide.mdx",
+              "shows": "Documents ingestion from OpenTelemetry-compatible instrumentation in any language into the platform's OTEL API."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/docs/coding-agents/claude-code.mdx",
+              "shows": "Documents Claude Code trace, log and metric exporters, content-capture controls, and routing to a self-hosted instance through /api/otel."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/docs/coding-agents/openai-codex.mdx",
+              "shows": "Documents Codex native OTLP/HTTP trace and event exporters, self-hosted endpoint paths, and CLI instrumentation. The manual native export supplies metadata; conversation capture requires the additional CLI capture described by the project."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/.github/workflows/npx-server-smoke.yml",
+              "shows": "Defines packaged-install smoke tests from a fresh sandbox on Ubuntu, Ubuntu arm64 and macOS, with service-health checks and a workflow execution test. I inspected the suite definition; I did not verify a passing execution of this suite."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/.github/workflows/langwatch-app-ci.yml",
+              "shows": "Defines unit, component and integration test lanes. These are public test-suite evidence, not a measured comparison against another candidate."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/.github/workflows/embedded-binaries-publish.yml",
+              "shows": "Includes Linux x86_64 and macOS arm64 build targets for bundled dependencies. Linux support makes WSL2 Ubuntu a plausible target; an actual WSL2 installation remains unverified. The trace-store requirement does not require the RTX 4090."
+            },
+            {
+              "url": "https://api.github.com/repos/langwatch/langwatch",
+              "shows": "Repository is unarchived and its default branch is main."
+            },
+            {
+              "url": "https://api.github.com/repos/langwatch/langwatch/commits?per_page=1",
+              "shows": "Latest default-branch commit was 83d152e18926d1e463c67aaf023647801ed14862 at 2026-10-02T00:01:57Z, within the 90-day window."
+            },
+            {
+              "url": "https://api.github.com/repos/langwatch/langwatch/releases/latest",
+              "shows": "Latest release was langwatch-3.20.0, published at 2026-10-02T00:31:27Z, within the 90-day window."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/issues/8397",
+              "shows": "GitHub API reported issue activity on 2026-10-01. This establishes activity, not response-time or resolution quality."
+            },
+            {
+              "url": "https://github.com/langwatch/langwatch/blob/83d152e18926/docs/self-hosting/licensing.mdx",
+              "shows": "Local traces, spans and inspection are available without an enterprise license or a paid hosted service. Optional licensed features are not necessary for this requirement."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C07",
+          "name": "OpenLIT",
+          "reason": "Close finalist: documents both client integrations, persistent local storage and OTLP HTTP/gRPC; its agent-hook fixtures and passing Go CI are strong evidence, but they do not establish superiority over LangWatch's native-client ingestion and local bootstrap. [Release README](https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md), [Codex fixtures](https://github.com/openlit/openlit/blob/openlit-2.1.0/cli/internal/coding/hook/codex/handle_test.go), [passing CLI test job](https://github.com/openlit/openlit/actions/runs/36825597705/job/110250469651)."
+        },
+        {
+          "key": "C06",
+          "name": "MLflow",
+          "reason": "Close contender with a simple local server, SQLite persistence, OTLP/HTTP ingestion and Claude Code hooks; consolidating experiment tracking could favor it, but that benefit has not been measured for this packet and its inspected OTLP endpoint requires experiment routing. [Local start](https://github.com/mlflow/mlflow/blob/5fb75a55ed41/README.md), [OTLP ingestion](https://github.com/mlflow/mlflow/blob/5fb75a55ed41/docs/docs/genai/tracing/opentelemetry/ingest-shared.mdx), [Claude Code integration](https://github.com/mlflow/mlflow/blob/5fb75a55ed41/docs/docs/genai/tracing/integrations/listing/claude_code.mdx)."
+        },
+        {
+          "key": "C03",
+          "name": "Jaeger",
+          "reason": "Strong generic OTLP trace-store control with passing unit and Badger storage tests; its inspected quickstart uses in-memory storage, while the selected project's client-specific session and conversation inspection more directly fits this layer. [Quickstart](https://github.com/jaegertracing/jaeger/blob/e95545457675/README.md), [unit tests](https://github.com/jaegertracing/jaeger/actions/runs/36954903126/job/110675619946), [Badger tests](https://github.com/jaegertracing/jaeger/actions/runs/36954903126/job/110675620766)."
+        },
+        {
+          "key": "C02",
+          "name": "HyperDX / ClickStack",
+          "reason": "Credible local OTLP store with an all-in-one install, MCP access and passing OTLP smoke tests; its general observability scope adds no demonstrated advantage over the selected client's documented coding-session workflows for this requirement. [Installation](https://github.com/hyperdxio/hyperdx/blob/b52adf718944/README.md), [MCP](https://github.com/hyperdxio/hyperdx/blob/b52adf718944/MCP.md), [OTLP smoke job](https://github.com/hyperdxio/hyperdx/actions/runs/36920517517/job/110565115653)."
+        },
+        {
+          "key": "C01",
+          "name": "Opik",
+          "reason": "Strong local LLM tracing, evaluation and MCP capabilities with passing SDK and end-to-end tests; the inspected material does not provide a deciding comparison against the selected tool's explicit native telemetry setups for both clients. [Capabilities and local installation](https://github.com/comet-ml/opik/blob/3de1c5e630ff/README.md), [SDK unit tests](https://github.com/comet-ml/opik/actions/runs/36891099628/job/110466635732), [end-to-end tests](https://github.com/comet-ml/opik/actions/runs/36891099668/job/110466634676)."
+        },
+        {
+          "key": "C04",
+          "name": "Langfuse",
+          "reason": "Capable self-hosted LLM observability platform; its documented Compose deployment has six services and offers no verified install or inspection advantage over the selected local bootstrap for this narrow requirement. Service count is not treated as a resource benchmark. [README](https://github.com/langfuse/langfuse/blob/9a29212e855c/README.md), [Compose deployment](https://github.com/langfuse/langfuse/blob/9a29212e855c/docker-compose.yml)."
+        },
+        {
+          "key": "C09",
+          "name": "SigNoz",
+          "reason": "Maintained OpenTelemetry-native APM with trace inspection, MCP integration and passing Go tests; its broader infrastructure-observation capabilities do not establish a better fit than the selected client's specific LLM and coding-agent workflows. [Capabilities](https://github.com/SigNoz/signoz/blob/1643df620bbe/README.md), [Go test job](https://github.com/SigNoz/signoz/actions/runs/36921838943/job/110569529369)."
+        },
+        {
+          "key": "C08",
+          "name": "OpenObserve",
+          "reason": "Credible single-binary, OpenTelemetry-native alternative with passing backend tests; its advertised Elasticsearch storage comparison does not decide ingestion and inspection of this packet's agent traces, and no matched workload result was verified. [README](https://github.com/openobserve/openobserve/blob/3e15abc94719/README.md), [backend test job](https://github.com/openobserve/openobserve/actions/runs/36939179164/job/110626604114)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C10",
+          "name": "Uptrace",
+          "criterion": "stale_or_archived",
+          "fact": "The repository is unarchived, but its latest default-branch commit was f617f6c76a035a1b2a83cc19cb2bc2802a68f0a6 on 2026-06-14, outside the 90-day window ending 2026-10-02. The August 13 release and recent issue activity do not override the frozen default-branch criterion. [Commit API](https://api.github.com/repos/uptrace/uptrace/commits?per_page=1), [commit](https://github.com/uptrace/uptrace/commit/f617f6c76a03), [August release](https://github.com/uptrace/uptrace/releases/tag/v2.1.0-beta.8)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The selection is a narrow capability-and-install preference, not a measured overall winner. Compare LangWatch, OpenLIT and MLflow on fresh WSL2 Ubuntu, with Jaeger as a generic OTLP control. Pin actual runtime artifacts and both client versions; ingest the same native OTLP output and fixed trace fixtures; measure preservation of trace IDs, parent links, events, token data and captured content, duplicate handling, fixed query and inspection tasks, restart persistence, cold-start time, ingestion/query latency, total CPU/RAM/disk use across every child service, and duplicated functionality or storage when experiment tracking is enabled. Keep workload and retention equal.",
+      "evidence_gaps": [
+        "Judged as of 2026-10-02, with a 90-day cutoff of 2026-07-04. Repository metadata, default-branch commits, recent releases, issue activity and head check summaries were inspected for all ten candidates. All ten were unarchived; the nine retained candidates had recent default-branch commits and recent releases.",
+        "The packet contains no completed all-arm comparison. No public benchmark of the exact two-client WSL2 ingestion, inspection and resource workload was verified in the inspected sources. No throughput, latency, storage-cost or memory superiority is claimed.",
+        "LangWatch's inspected default-branch head had only a successful Mintlify Deployment check. Its application and packaged-install suite definitions were inspected, but a passing execution of those suites was not verified. The head's SUCCESS rollup therefore does not establish that the application tests passed.",
+        "Jaeger's inspected head had passing unit/storage/build checks but a failed Scorecard analysis check; it is not reported as entirely green. MLflow's inspected head listed unit and end-to-end checks as skipped, so those checks are not counted as passing.",
+        "No clean installation or live client export was run. Linux x86_64 and macOS arm64 build/test targets support platform plausibility for the finalists; actual WSL2 and laptop operation remains unmeasured. Secondary-platform coverage for the other retained candidates was not verified in comparable depth.",
+        "The selected upstream npx command is unpinned. The GitHub source commit and release were verified, but the exact npm artifact version and runtime dependency digests were not independently verified.",
+        "OpenLIT's application release was recent, but the inspected published CLI release was cli-0.0.1 from 2026-06-10. Its repository remains maintained; compatibility of that downloaded CLI with the current client versions needs verification.",
+        "Correction during review: LangWatch's current README documents npx @langwatch/server with Node.js as the stated prerequisite. Its production Docker dependencies do not establish a disadvantage for the local quickstart. This correction was verified against the upstream README and packaged-install smoke workflow; the bootstrap command does not imply one process or lower RAM use.",
+        "The requested ctx_fetch_and_index route was blocked because the session's approval policy is never. Public upstream source files were instead retrieved through gh api, indexed with ctx_index and read with ctx_search. The web-search attempt failed with HTTP 502. Budget used: 30 GitHub API requests, three attempted search queries and one blocked page-fetch attempt. No local project file was opened beyond the supplied packet."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/jaegertracing/jaeger",
+        "https://api.github.com/repos/jaegertracing/jaeger/commits?per_page=1",
+        "https://api.github.com/repos/openlit/openlit",
+        "https://api.github.com/repos/openlit/openlit/commits?per_page=1",
+        "https://api.github.com/repos/openlit/openlit/releases/latest",
+        "https://api.github.com/repos/langfuse/langfuse",
+        "https://api.github.com/repos/langfuse/langfuse/commits?per_page=1",
+        "https://api.github.com/repos/uptrace/uptrace",
+        "https://api.github.com/repos/uptrace/uptrace/commits?per_page=1",
+        "https://api.github.com/repos/SigNoz/signoz",
+        "https://api.github.com/repos/SigNoz/signoz/commits?per_page=1",
+        "https://api.github.com/repos/mlflow/mlflow",
+        "https://api.github.com/repos/mlflow/mlflow/commits?per_page=1",
+        "https://api.github.com/repos/mlflow/mlflow/releases/latest",
+        "https://api.github.com/repos/langwatch/langwatch",
+        "https://api.github.com/repos/langwatch/langwatch/commits?per_page=1",
+        "https://api.github.com/repos/langwatch/langwatch/releases/latest",
+        "https://api.github.com/repos/openobserve/openobserve",
+        "https://api.github.com/repos/openobserve/openobserve/commits?per_page=1",
+        "https://api.github.com/repos/comet-ml/opik",
+        "https://api.github.com/repos/comet-ml/opik/commits?per_page=1",
+        "https://api.github.com/repos/hyperdxio/hyperdx",
+        "https://api.github.com/repos/hyperdxio/hyperdx/commits?per_page=1",
+        "https://github.com/langwatch/langwatch/blob/main/README.md",
+        "https://github.com/langwatch/langwatch/blob/main/docs/integration/opentelemetry/guide.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/coding-agents/claude-code.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/coding-agents/openai-codex.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/coding-agents/quickstart.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/self-hosting/overview.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/self-hosting/licensing.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/docs/self-hosting/deployment/docker-compose.mdx",
+        "https://github.com/langwatch/langwatch/blob/main/.github/workflows/npx-server-smoke.yml",
+        "https://github.com/langwatch/langwatch/blob/main/.github/workflows/npx-server-publish.yml",
+        "https://github.com/langwatch/langwatch/blob/main/.github/workflows/embedded-binaries-publish.yml",
+        "https://github.com/langwatch/langwatch/blob/main/.github/workflows/langwatch-app-ci.yml",
+        "https://github.com/openlit/openlit/blob/main/README.md",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/docker-compose.yml",
+        "https://github.com/openlit/openlit/blob/main/docs/latest/openlit/otlp-receiver.mdx",
+        "https://github.com/openlit/openlit/blob/main/docs/latest/openlit/coding-agents/setup-and-configure.mdx",
+        "https://github.com/openlit/openlit/blob/main/docs/latest/openlit/coding-agents/sessions.mdx",
+        "https://github.com/openlit/openlit/blob/main/docs/latest/cli/installation.mdx",
+        "https://github.com/openlit/openlit/blob/main/.github/workflows/ci-cli.yml",
+        "https://github.com/openlit/openlit/blob/main/cli/internal/coding/hook/codex/handle_test.go",
+        "https://github.com/openlit/openlit/blob/main/cli/internal/coding/hook/claudecode/handle_test.go",
+        "https://github.com/mlflow/mlflow/blob/master/README.md",
+        "https://github.com/mlflow/mlflow/blob/master/docs/docs/genai/tracing/opentelemetry/ingest.mdx",
+        "https://github.com/mlflow/mlflow/blob/master/docs/docs/genai/tracing/opentelemetry/ingest-shared.mdx",
+        "https://github.com/mlflow/mlflow/blob/master/docs/docs/genai/tracing/opentelemetry/attribute-mapping.mdx",
+        "https://github.com/mlflow/mlflow/blob/master/docs/docs/genai/tracing/integrations/listing/claude_code.mdx",
+        "https://github.com/jaegertracing/jaeger/blob/main/README.md",
+        "https://github.com/langfuse/langfuse/blob/main/README.md",
+        "https://github.com/langfuse/langfuse/blob/main/docker-compose.yml",
+        "https://github.com/uptrace/uptrace/blob/master/README.md",
+        "https://github.com/SigNoz/signoz/blob/main/README.md",
+        "https://github.com/openobserve/openobserve/blob/main/README.md",
+        "https://github.com/comet-ml/opik/blob/main/README.md",
+        "https://github.com/hyperdxio/hyperdx/blob/main/README.md",
+        "https://github.com/hyperdxio/hyperdx/blob/main/MCP.md",
+        "https://github.com/openai/codex/blob/main/codex-rs/otel/src/config.rs"
+      ]
+    }
+  ]
+}

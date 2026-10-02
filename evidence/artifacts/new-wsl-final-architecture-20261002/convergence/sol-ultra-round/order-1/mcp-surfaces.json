@@ -1,0 +1,129 @@
+{
+  "layers": [
+    {
+      "layer_id": "mcp-surfaces",
+      "selection": [
+        {
+          "name": "C01 — mcporter",
+          "repository": "https://github.com/openclaw/mcporter",
+          "role": "Provisional bridge and configuration CLI for agent sessions; evaluated release 0.14.2 and default-branch commit 9d3cf4f.",
+          "install_command": "npm install -g mcporter",
+          "install_source": "https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md",
+              "shows": "Imports Claude Code and Codex configurations; connects through stdio, Streamable HTTP and legacy SSE; provides tool/resource calls, generated CLIs and record/replay. Documents npm installation with Node 24+, Vitest tests and Linux/macOS/Windows CI."
+            },
+            {
+              "url": "https://github.com/openclaw/mcporter/actions/runs/36908921494",
+              "shows": "Successful CI on the inspected default-branch commit, completed October 1, 2026. This establishes upstream CI success, not measured superiority on WSL2."
+            },
+            {
+              "url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+              "shows": "Released October 1, 2026; documents OAuth refresh protection, installed-package verification and daemon fixes."
+            },
+            {
+              "url": "https://api.github.com/repos/openclaw/mcporter",
+              "shows": "Not archived; zero open issues/PRs at inspection. Default-branch API returned an October 1 commit. MIT license."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C02 — MCP Inspector",
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "role": "Provisional inspection companion with web, scriptable CLI and terminal interfaces; evaluated release 2.9.0 and default-branch commit ae865a19.",
+          "install_command": "npx @modelcontextprotocol/inspector",
+          "install_source": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+              "shows": "Documents web, CLI and TUI launch commands, Node >=22.19, server configuration guides and composable test servers. Its validation suite includes unit tests; the documented coverage gate is >=90% per file, which is a policy rather than a retrieved coverage measurement."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/actions/runs/36785256558",
+              "shows": "Successful CI on the inspected default-branch commit, completed September 30, 2026."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0",
+              "shows": "Released September 30, 2026, with community-reported fixes. Documents a shared-server OAuth-profile token-overwrite issue and a per-profile secret-store workaround."
+            },
+            {
+              "url": "https://api.github.com/repos/modelcontextprotocol/inspector",
+              "shows": "Not archived; 62 open issues/PRs at inspection. Default-branch API returned a September 30 commit."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C04",
+          "name": "inspector",
+          "reason": "A current, locally installable alternative with OAuth debugging and cross-client evaluations, but no reviewed head-to-head establishes an incremental advantage for this requirement over the provisional pair. [README](https://github.com/MCPJam/inspector/blob/6091586c4920898595e47d1672b3206c365e1751/README.md), [October 1 release](https://github.com/MCPJam/inspector/releases/tag/v3.12.8)."
+        },
+        {
+          "key": "C03",
+          "name": "microsoft/mcp-gateway, docker/mcp-registry, modelcontextprotocol/registry",
+          "reason": "All three are current; the gateway has published test results, but Kubernetes routing and registry operation address no concrete workstation surface gap established here, so defer this bundle. [Gateway validation](https://github.com/microsoft/mcp-gateway/commit/ce37788ae0719fd73a1707c9a7bc379a68dd775e), [Docker registry](https://api.github.com/repos/docker/mcp-registry), [MCP registry](https://api.github.com/repos/modelcontextprotocol/registry)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C06",
+          "name": "@wong2/mcp-cli 2.0.0",
+          "criterion": "stale_or_archived",
+          "fact": "Not archived, but its latest default-branch commit is June 8, 2026, outside the frozen 90-day window. The latest-release endpoint returned HTTP 404. [Commit](https://github.com/wong2/mcp-cli/commit/7d12b4648b1c3e2a7341113407002c1b0f700d1b)."
+        },
+        {
+          "key": "C05",
+          "name": "Awesome MCP servers registry",
+          "criterion": "outside_requirement",
+          "fact": "Upstream describes this repository as a collection of MCP servers: a discovery source rather than an executable bridge, inspector or configurator. No specific listed server has a demonstrated surface gap and completed examination here. [Repository metadata](https://api.github.com/repos/punkpeye/awesome-mcp-servers)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The complementary pair is provisional, without a measured winner. On clean WSL2 Ubuntu, compare mcporter 0.14.2, MCP Inspector 2.9.0 and MCPJam 3.12.8 using the same explicitly reviewed servers: Claude Code/Codex config handling, modern and legacy transports, OAuth isolation, tools/resources/prompts, lifecycle recovery, reproducible output, setup effort and resource use. Compare each inspector paired with mcporter as well as standalone operation. Review registry entries only when this exposes a concrete missing capability.",
+      "evidence_gaps": [
+        "The packet reports a 37/37 lifecycle tie between older mcporter and Inspector releases, plus a mcporter ps regression; it supplies no public harness URL, so this was not counted as independently verified public benchmark evidence.",
+        "Linux suitability is supported by the documented Node install paths and mcporter's stated CI platforms. WSL2-specific behavior and macOS arm64 validation were not established by the sources read. This layer has no GPU requirement.",
+        "CI conclusions were retrieved, but detailed logs, actual coverage figures and tagged-package target-host results were not. MCPJam's sampled runs were older preview/canary workflows and cannot establish its inspection-suite quality.",
+        "Issue counts include pull requests and do not measure responsiveness. Recent selected-project releases document fixes, but issue-response rates were not measured.",
+        "Budget used: 30 GitHub API calls and one web search. The bundled gateway/registry installation documentation was not verified.",
+        "Automatic approval review rejected ctx_fetch_and_index because approval is required and the session policy is never. A delegate then directly opened four READMEs in error; those reads were set aside. The leading tools' READMEs were reverified through GitHub API endpoints, so the requested ctx_fetch_and_index/ctx_search workflow could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openclaw/mcporter",
+        "https://api.github.com/repos/openclaw/mcporter/releases/latest",
+        "https://api.github.com/repos/openclaw/mcporter/commits?per_page=1",
+        "https://api.github.com/repos/openclaw/mcporter/readme",
+        "https://api.github.com/repos/openclaw/mcporter/actions/runs?branch=main&per_page=12",
+        "https://api.github.com/repos/modelcontextprotocol/inspector",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/releases/latest",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/commits?per_page=1",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/readme",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/actions/runs?branch=main&per_page=12",
+        "https://api.github.com/repos/MCPJam/inspector",
+        "https://api.github.com/repos/MCPJam/inspector/releases/latest",
+        "https://api.github.com/repos/MCPJam/inspector/commits?per_page=1",
+        "https://api.github.com/repos/MCPJam/inspector/readme",
+        "https://api.github.com/repos/MCPJam/inspector/actions/runs?branch=main&per_page=12",
+        "https://api.github.com/repos/wong2/mcp-cli",
+        "https://api.github.com/repos/wong2/mcp-cli/releases/latest",
+        "https://api.github.com/repos/wong2/mcp-cli/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/mcp-gateway",
+        "https://api.github.com/repos/microsoft/mcp-gateway/releases/latest",
+        "https://api.github.com/repos/microsoft/mcp-gateway/commits?per_page=1",
+        "https://api.github.com/repos/docker/mcp-registry",
+        "https://api.github.com/repos/docker/mcp-registry/releases/latest",
+        "https://api.github.com/repos/docker/mcp-registry/commits?per_page=1",
+        "https://api.github.com/repos/modelcontextprotocol/registry",
+        "https://api.github.com/repos/modelcontextprotocol/registry/releases/latest",
+        "https://api.github.com/repos/modelcontextprotocol/registry/commits?per_page=1",
+        "https://api.github.com/repos/punkpeye/awesome-mcp-servers",
+        "https://api.github.com/repos/punkpeye/awesome-mcp-servers/releases/latest",
+        "https://api.github.com/repos/punkpeye/awesome-mcp-servers/commits?per_page=1"
+      ]
+    }
+  ]
+}

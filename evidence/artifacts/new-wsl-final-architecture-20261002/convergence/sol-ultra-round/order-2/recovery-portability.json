@@ -1,0 +1,187 @@
+{
+  "layers": [
+    {
+      "layer_id": "recovery-portability",
+      "selection": [
+        {
+          "name": "Restic (C06)",
+          "repository": "https://github.com/restic/restic",
+          "role": "Application-state backup and selective restore. Pair with either tooling finalist below.",
+          "install_command": "sudo apt-get install restic",
+          "install_source": "https://github.com/restic/restic/blob/5127c4abf921857fde4ae51f566c86028c8c2911/doc/020_installation.rst",
+          "basis": [
+            {
+              "url": "https://github.com/restic/restic/blob/5127c4abf921857fde4ae51f566c86028c8c2911/README.md",
+              "shows": "Encrypted, verifiable backups across Linux and macOS; broader state coverage than SQLite-only replication. Applications still need consistent exports or quiesced files."
+            },
+            {
+              "url": "https://github.com/restic/restic/blob/5127c4abf921857fde4ae51f566c86028c8c2911/doc/040_backup.rst",
+              "shows": "Explicit backup paths and exclusion files support keeping authentication stores outside the recovery payload."
+            },
+            {
+              "url": "https://github.com/restic/restic/blob/5127c4abf921857fde4ae51f566c86028c8c2911/doc/050_restore.rst",
+              "shows": "Snapshot selection, host/path filters, explicit destination directories, and selective restores. These establish file recovery, not fresh application acceptance."
+            },
+            {
+              "url": "https://github.com/restic/restic/blob/5127c4abf921857fde4ae51f566c86028c8c2911/doc/070_encryption.rst",
+              "shows": "Repository passwords and access keys are managed explicitly; recovery requires independently available unlocking material."
+            },
+            {
+              "url": "https://github.com/restic/restic/actions/runs/29449071857",
+              "shows": "Successful upstream test workflow on July 15, 2026. Its suite covers Linux, macOS, race detection, and backend tests; this run is not for the current default-branch commit."
+            },
+            {
+              "url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+              "shows": "Release published July 5, 2026, with Linux amd64 and macOS arm64 binaries. The documented Ubuntu package command may install an older distribution version."
+            },
+            {
+              "url": "https://github.com/restic/restic/commit/5127c4abf921857fde4ae51f566c86028c8c2911",
+              "shows": "Default-branch commit dated September 25, 2026; repository is unarchived."
+            },
+            {
+              "url": "https://github.com/restic/restic/issues/4867",
+              "shows": "Restore include/exclude discussion updated October 1, 2026, demonstrating recent issue activity."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "mise (C03)",
+          "repository": "https://github.com/jdx/mise",
+          "role": "Tooling finalist: selectable host profiles, pinned tools, configuration bootstrap, and destination verification tasks.",
+          "install_command": "curl https://mise.run | sh",
+          "install_source": "https://github.com/jdx/mise/blob/b1b8d3e4aed6a0a610fdd1d845df11da470afd08/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/jdx/mise/blob/b1b8d3e4aed6a0a610fdd1d845df11da470afd08/docs/bootstrap.md",
+              "shows": "Explicit bootstrap, profile selection with -E, dry-run/status commands, managed machine configuration, and a final task. This closely fits choosing a small destination profile and performing new checks."
+            },
+            {
+              "url": "https://github.com/jdx/mise/blob/b1b8d3e4aed6a0a610fdd1d845df11da470afd08/docs/dev-tools/mise-lock.md",
+              "shows": "Recorded versions, platform artifacts, checksums, dependency sidecars, and strict mise install --locked. Coverage depends on the backend; application dependencies retain their own lockfiles."
+            },
+            {
+              "url": "https://github.com/jdx/mise/blob/b1b8d3e4aed6a0a610fdd1d845df11da470afd08/README.md",
+              "shows": "Linux/macOS installation and agent-callable mise exec and task commands. These CLI interfaces do not establish Claude Code or Codex sign-in acceptance."
+            },
+            {
+              "url": "https://github.com/jdx/mise/actions/runs/36959826699/job/110695133819",
+              "shows": "Successful test-ci check associated with the inspected default-branch commit. Another check remained in progress; the complete revision was not uniformly finished."
+            },
+            {
+              "url": "https://github.com/jdx/mise/blob/b1b8d3e4aed6a0a610fdd1d845df11da470afd08/.github/workflows/test-impl.yml",
+              "shows": "Upstream unit and end-to-end test definitions include Ubuntu and macOS arm64 runners."
+            },
+            {
+              "url": "https://github.com/jdx/mise/releases/tag/v2026.10.0",
+              "shows": "Release published October 2, 2026. Repository is unarchived; inspected default-branch commit b1b8d3e is also dated October 2."
+            },
+            {
+              "url": "https://github.com/jdx/mise/issues/13891",
+              "shows": "Environment interpolation issue updated October 2, 2026; recent issue activity is present."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Devbox (C05)",
+          "repository": "https://github.com/jetify-com/devbox",
+          "role": "Tooling co-finalist: isolated, reproducible package environments. The destination comparison must decide between Devbox and mise.",
+          "install_command": "curl -fsSL https://get.jetify.com/devbox | bash",
+          "install_source": "https://github.com/jetify-com/devbox/blob/1d9ea45e1e51826df32ef0db7035c4c00ae2c184/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/jetify-com/devbox/blob/1d9ea45e1e51826df32ef0db7035c4c00ae2c184/README.md",
+              "shows": "Declarative devbox.json package environments, isolated shells, and agent-callable devbox run. Nix is a prerequisite; mutable application state requires a separate recovery mechanism."
+            },
+            {
+              "url": "https://github.com/jetify-com/devbox/blob/1d9ea45e1e51826df32ef0db7035c4c00ae2c184/internal/lock/package.go",
+              "shows": "Lock entries record resolved package versions and per-system Nix output/store paths, providing a distinct reproducibility approach."
+            },
+            {
+              "url": "https://github.com/jetify-com/devbox/actions/runs/36493907950/job/109170972951",
+              "shows": "Successful aggregate test-result check associated with inspected commit 1d9ea45e, including successful Ubuntu project and other test shards."
+            },
+            {
+              "url": "https://github.com/jetify-com/devbox/blob/1d9ea45e1e51826df32ef0db7035c4c00ae2c184/.github/workflows/cli-tests.yaml",
+              "shows": "Package-environment tests, Nix installation tests, and Ubuntu/macOS coverage. Direct WSL2 acceptance was not verified."
+            },
+            {
+              "url": "https://github.com/jetify-com/devbox/releases/tag/0.18.4",
+              "shows": "Release published September 25, 2026, with Linux amd64 and macOS arm64 binaries. Repository is unarchived; latest default-branch commit is September 28."
+            },
+            {
+              "url": "https://github.com/jetify-com/devbox/issues/2862",
+              "shows": "Command-hook discussion updated October 1, 2026; recent issue activity is present."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C07",
+          "name": "chezmoi",
+          "reason": "Strong host-specific configuration and secret retrieval, with successful Ubuntu/macOS tests, but its configuration role overlaps mise bootstrap and it does not supply broad application-state recovery. Current and unarchived: v2.73.0 and default commit September 28; issue activity September 28; Linux amd64/macOS arm64 binaries and documented Linux installation. Sources: [capabilities](https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/assets/chezmoi.io/docs/what-does-chezmoi-do.md), [installation](https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/assets/chezmoi.io/docs/install.md.tmpl), [CI](https://github.com/twpayne/chezmoi/actions/runs/36468365638), [issue](https://github.com/twpayne/chezmoi/issues/5213)."
+        },
+        {
+          "key": "C01",
+          "name": "astral-sh/uv",
+          "reason": "Excellent Python tooling and locking, but narrower than the heterogeneous host-tool requirement. Current and unarchived: release 0.12.22 October 2, default commit October 1, and issue activity October 2; documented Linux/macOS installer and successful Linux/macOS test jobs. Sources: [README](https://github.com/astral-sh/uv/blob/70fe1196a546e49148a73b1c592b2f74c33af80e/README.md), [release](https://github.com/astral-sh/uv/releases/tag/0.12.22), [CI](https://github.com/astral-sh/uv/actions/runs/36941293761), [issue](https://github.com/astral-sh/uv/issues/2658)."
+        },
+        {
+          "key": "C04",
+          "name": "Determinate Nix installer",
+          "reason": "A capable installation prerequisite, rather than a complete tool-profile and application-state recovery solution. Current and unarchived: v3.22.5 September 17, default commit October 1, and issue activity October 1; explicitly documents WSL2 and macOS arm64 support and Linux installation, with successful Linux/macOS build checks. Sources: [README](https://github.com/DeterminateSystems/nix-installer/blob/6613dfc41d1b306620048688b4c04adf8f7a51b8/README.md), [release](https://github.com/DeterminateSystems/nix-installer/releases/tag/v3.22.5), [CI](https://github.com/DeterminateSystems/nix-installer/actions/runs/36915913183), [issue](https://github.com/DeterminateSystems/nix-installer/issues/1883)."
+        },
+        {
+          "key": "C02",
+          "name": "Litestream",
+          "reason": "Useful for live SQLite disaster recovery, but narrower than general application-state portability. Current and unarchived: v0.5.17 August 31 and default commit September 21, with Linux x86_64/macOS arm64 artifacts and successful unit/backend integration checks; a newer open issue reports a nightly soak failure. The official Linux install command was not verified. Sources: [README](https://github.com/benbjohnson/litestream/blob/3b911591668be6dcf39c0ae70d828d65a1453b27/README.md), [release](https://github.com/benbjohnson/litestream/releases/tag/v0.5.17), [CI](https://github.com/benbjohnson/litestream/actions/runs/35632004102), [nightly report](https://github.com/benbjohnson/litestream/issues/1522)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Compare mise+Restic against Devbox+Restic on reset instances of the explicitly chosen WSL2 Ubuntu x86_64 destination, using the same small tool profile and application-state payload. Measure locked-version reproduction, dependency completeness, install time, manual intervention, and useful Claude Code/Codex tasks after fresh native sign-ins and scoped tool calls. Independently restore consistent application exports/files and escrowed application/backup keys; verify records, content, permissions, and application behavior. Require zero copied authentication stores and newly generated acceptance results. Repeat portability checks on macOS arm64. The evidence supports both tooling finalists but does not establish a measured winner.",
+      "evidence_gaps": [
+        "The packet records no comparison where all named arms ran, and no shared destination-host recovery evaluation was verified. CI success is not measured superiority or destination acceptance.",
+        "The required ctx_fetch_and_index workflow was rejected because approval policy is never; ctx_search had no indexed documentation. Final source claims were verified through the GitHub API instead. This is a deviation from the requested fetch/read workflow.",
+        "Thirty GitHub API calls were used, with no web searches. Only packet.json was read under the working directory.",
+        "All seven repositories are unarchived and have releases and default-branch commits within the 90-day window. Recent issue updates were checked, but issue-resolution rates were not measured.",
+        "Application consistency, independent key escrow, authentication-store exclusion, and fresh acceptance remain profile-specific responsibilities. None of the cited upstream tests establishes the complete requested recovery exercise.",
+        "Documentation was inspected at the cited default-branch pins; binaries were not installed or tested on either target. Restic's verified full test run predates its current commit.",
+        "The layer itself requires no GPU. RTX 4090 compatibility must be checked separately for any GPU-dependent application included in the chosen profile."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/restic/restic",
+        "https://api.github.com/repos/restic/restic/releases/latest",
+        "https://api.github.com/repos/restic/restic/commits?per_page=1",
+        "https://api.github.com/repos/restic/restic/actions/runs?branch=master&per_page=5",
+        "https://api.github.com/repos/restic/restic/actions/workflows",
+        "https://api.github.com/repos/restic/restic/actions/workflows/tests.yml/runs?branch=master&per_page=5",
+        "https://api.github.com/repos/jdx/mise",
+        "https://api.github.com/repos/jdx/mise/releases/latest",
+        "https://api.github.com/repos/jdx/mise/commits?per_page=1",
+        "https://api.github.com/repos/jdx/mise/actions/runs?branch=main&per_page=10",
+        "https://api.github.com/repos/jdx/mise/actions/workflows/test.yml/runs?branch=main&per_page=5",
+        "https://api.github.com/repos/jetify-com/devbox",
+        "https://api.github.com/repos/jetify-com/devbox/releases/latest",
+        "https://api.github.com/repos/jetify-com/devbox/commits?per_page=1",
+        "https://api.github.com/repos/twpayne/chezmoi",
+        "https://api.github.com/repos/twpayne/chezmoi/releases/latest",
+        "https://api.github.com/repos/twpayne/chezmoi/commits?per_page=1",
+        "https://api.github.com/repos/astral-sh/uv",
+        "https://api.github.com/repos/astral-sh/uv/releases/latest",
+        "https://api.github.com/repos/astral-sh/uv/commits?per_page=1",
+        "https://api.github.com/repos/astral-sh/uv/actions/runs?branch=main&per_page=10",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer/releases/latest",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer/commits?per_page=1",
+        "https://api.github.com/repos/benbjohnson/litestream",
+        "https://api.github.com/repos/benbjohnson/litestream/releases/latest",
+        "https://api.github.com/repos/benbjohnson/litestream/commits?per_page=1",
+        "https://api.github.com/graphql"
+      ]
+    }
+  ]
+}

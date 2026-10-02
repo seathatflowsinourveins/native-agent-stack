@@ -1,0 +1,159 @@
+{
+  "layers": [
+    {
+      "layer_id": "reranker-model",
+      "selection": [
+        {
+          "name": "C08 — NeMo Retriever — llama-nemotron-rerank-1b-v2",
+          "repository": "https://github.com/NVIDIA/NeMo-Retriever",
+          "role": "Alternative finalist: nvidia/llama-nemotron-rerank-1b-v2. Strongest reviewed evidence directly measuring improvement in Recall@5 over its corresponding first stage. The evidence does not establish an overall winner for the target workload; deploy one model after the deciding comparison.",
+          "install_command": "python -m pip install 'transformers>=4.44'",
+          "install_source": "NVIDIA's model-card installation command, quoted to preserve the version constraint in the shell. Its inference example additionally requires CUDA-enabled PyTorch. Repository reviewed at 3a4162cfc6f58624b9ddfc1c292512b66e762c89; latest repository release 26.8.2. The repository release versions the retrieval library, not these model weights.",
+          "basis": [
+            {
+              "url": "https://huggingface.co/nvidia/llama-nemotron-rerank-1b-v2",
+              "shows": "Open-weight passage reranker with an upstream Transformers inference example and a vLLM /rerank serving path. NVIDIA reports average Recall@5 increasing from 68.60% to 73.64% on NQ, HotpotQA, FiQA and TechQA when adding this reranker to llama-nemotron-embed-1b-v2: a 5.04 percentage-point gain. MIRACL Recall@5 increases from 60.75% to 65.80%. These are upstream pipeline results, not measurements on the requested corpus or RTX 4090."
+            },
+            {
+              "url": "https://huggingface.co/nvidia/llama-nemotron-rerank-1b-v2#software-integration",
+              "shows": "The card documents Linux and NVIDIA Lovelace compatibility and evaluation with inputs up to 8192 tokens. This supports primary-host feasibility, although WSL2 execution, latency and memory alongside other models remain unverified. macOS arm64 inference was not established by the reviewed documentation. The model license is OpenMDW-1.1 with additional Llama terms; license did not determine selection."
+            },
+            {
+              "url": "https://github.com/NVIDIA/NeMo-Retriever/commit/3a4162cfc6f5",
+              "shows": "Default-branch commit dated 2026-09-30; repository metadata reports archived=false. It satisfies the frozen 90-day maintenance criterion."
+            },
+            {
+              "url": "https://github.com/NVIDIA/NeMo-Retriever/releases/tag/26.8.2",
+              "shows": "Latest published stable repository release dated 2026-09-30, within the judging window."
+            },
+            {
+              "url": "https://api.github.com/repos/NVIDIA/NeMo-Retriever/actions/runs?branch=main&status=completed&per_page=5",
+              "shows": "Recent runs at the reviewed head include successful nightly publishing, a failed Hugging Face nightly build, and failed Windows/macOS library integration tests. These concern the retrieval library and do not establish this reranker's correctness or performance on the target host."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C03 — FlagEmbedding — BGE reranker models",
+          "repository": "https://github.com/FlagOpen/FlagEmbedding",
+          "role": "Alternative finalist: BAAI/bge-reranker-v2-gemma. It has the strongest reported BEIR average among the configurations in the reviewed upstream figure. BAAI/bge-reranker-v2-m3 remains a useful alternative to measure if Gemma's latency or memory is excessive. Deploy one model after the deciding comparison.",
+          "install_command": "python -m pip install 'FlagEmbedding==1.4.2'",
+          "install_source": "The upstream README documents pip installation of FlagEmbedding; 1.4.2 is the reviewed published release. Source reviewed at fd1a2bdf69488ffebe0327999d4400d8c8058a0b. The inference documentation supplies FlagLLMReranker usage for BAAI/bge-reranker-v2-gemma.",
+          "basis": [
+            {
+              "url": "https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/examples/inference/reranker/README.md",
+              "shows": "Documented local inference for BGE rerankers, including the multilingual Gemma model, query/passage scoring, input-length controls and CUDA device selection. This supplies an upstream Python interface for a retrieval service; a dedicated Claude Code or Codex connector was not verified."
+            },
+            {
+              "url": "https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/research/llm_reranker/evaluation/BEIR-bge-en-v1.5.png",
+              "shows": "The upstream figure, read directly, reports a BEIR average of 54.31 for the bge-en-v1.5-large first stage, 60.71 after bge-reranker-v2-gemma, and 55.36 after bge-reranker-v2-m3. The accompanying README says these rerank the first stage's top 100 results. The figure's average column does not label its metric, and these scores must not be compared numerically with NVIDIA's Recall@5."
+            },
+            {
+              "url": "https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/research/llm_reranker/README.md",
+              "shows": "Published BEIR, LlamaIndex, Chinese retrieval and MIRACL evaluations, plus an evaluation command supporting MRR, recall, nDCG, MAP and precision. This is a documented evaluation path, not a verified target-host result."
+            },
+            {
+              "url": "https://github.com/FlagOpen/FlagEmbedding/blob/fd1a2bdf6948/FlagEmbedding/abc/inference/AbsReranker.py",
+              "shows": "The inference base explicitly selects CUDA, Apple MPS or CPU devices. This provides source-level platform support for the primary Linux GPU route and secondary Apple Silicon route; execution on either requested host was not tested."
+            },
+            {
+              "url": "https://github.com/FlagOpen/FlagEmbedding/releases/tag/v1.4.2",
+              "shows": "Latest published stable release dated 2026-08-24. The reviewed default-branch commit has the same date, and repository metadata reports archived=false. Repository license: MIT, treated as information only."
+            },
+            {
+              "url": "https://api.github.com/repos/FlagOpen/FlagEmbedding/actions/runs?branch=master&status=completed&per_page=5",
+              "shows": "Documentation and dependency-graph workflows succeeded at the reviewed head. The returned runs do not demonstrate numerical inference tests or GPU validation."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet contains no fixed-corpus baseline-versus-reranking comparison establishing that no model is needed; first-stage-only retrieval remains a required arm of the deciding comparison."
+        },
+        {
+          "key": "C06",
+          "name": "BCEmbedding — bce-reranker-base_v1",
+          "reason": "A current, locally runnable English/Chinese reranker with published evaluations, but its documented 512-token inference path and comparisons against older BGE base/large models do not establish the best fit for this mixed corpus. [Inference documentation](https://github.com/netease-youdao/BCEmbedding/blob/1aa07ea64f94/README.md), [evaluation results](https://github.com/netease-youdao/BCEmbedding/blob/1aa07ea64f94/Docs/EvaluationSummary/reranker_eval_summary.md)."
+        },
+        {
+          "key": "C02",
+          "name": "RankLLM — open-weight reranker models",
+          "reason": "Strong published RankZephyr evaluations and an explicit MCP server make this credible, but the reviewed evidence does not establish a better quality/latency/memory tradeoff for its 7B listwise model beside other models on a 24 GB GPU. This is not a finding that it cannot run. [Model zoo and MCP CLI](https://github.com/castorini/rank_llm/blob/a2d711e9197a/README.md), [RankZephyr paper](https://arxiv.org/html/2312.02724)."
+        },
+        {
+          "key": "C05",
+          "name": "Bekko System One v0",
+          "reason": "Current tooling, small models and documented CPU tests are attractive, but its own README warns of limited generalization and training/evaluation family overlap; the reviewed S1MB results do not establish top-five retrieval gains over code, documents and session text. [Upstream benchmarks, limitations and test command](https://github.com/hotchpotch/bekko-system-one/blob/0fccbb8568b6/README.md)."
+        },
+        {
+          "key": "C07",
+          "name": "RAG-Retrieval — local reranker runtime",
+          "reason": "Provides useful training and inference interfaces for other projects' reranker models, including long-document handling, but the reviewed evidence does not establish a distinct model-quality advantage that warrants selecting it for this model layer. [Upstream scope and inference documentation](https://github.com/NovaSearch-Team/RAG-Retrieval/blob/7a7a8938b740/README.md)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C04",
+          "name": "jina-reranker-v3.5 — local reference integration",
+          "criterion": "cannot_run_on_target",
+          "fact": "The repository's installation section explicitly requires Apple Silicon, and its local implementation uses MLX. It supports the secondary host but does not supply a documented local execution path for the primary Linux x86_64/RTX 4090 host. This exclusion concerns the named reference repository, not every possible runtime for Jina's model weights. [Installation requirement](https://github.com/hanxiao/jina-reranker-v3.5-in-page-search/blob/721a8f5ceb1c/README.md#install)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "No overall winner is established. On the new WSL2 Ubuntu instance with the RTX 4090, run the same first-stage retrieval alone, with nvidia/llama-nemotron-rerank-1b-v2, and with BAAI/bge-reranker-v2-gemma; include BAAI/bge-reranker-v2-m3 as the smaller-backbone alternative. Freeze the query set, relevance judgments, corpus, chunking and first-stage candidate lists before running every arm. Stratify queries across code, documents and session text. Measure paired changes in nDCG@5 and Recall@5, added p50/p95 query latency, peak and resident GPU memory, and behavior while the other local models remain resident. Report uncertainty and per-corpus regressions. Select one model only if the measured tradeoff separates it; select no additional component if reranking fails to improve top-five retrieval quality or cannot coexist within the available memory.",
+      "evidence_gaps": [
+        "There are no comparisons on record in the packet, and no target-host comparison was run. The upstream evaluations use different first stages, datasets and metrics, so they establish individual capability rather than measured superiority between the finalists.",
+        "Currency was checked as of 2026-10-02, using a 90-day cutoff of 2026-07-04. All seven repositories are unarchived and have qualifying default-branch commits: NeMo 2026-09-30; BCEmbedding 2026-09-03; RankLLM 2026-10-02; Bekko 2026-10-01; RAG-Retrieval 2026-08-28; FlagEmbedding 2026-08-24; Jina reference 2026-08-10. Documentation-only commits count under the frozen rule, but do not establish recent model-weight development.",
+        "The latest stable GitHub release endpoint returned releases for NeMo and FlagEmbedding and HTTP 404 for the other five repositories. Package releases, prereleases and model-weight release histories were not comprehensively audited.",
+        "Issue metadata was checked, but response and resolution activity were not measured. The API reported open issue/PR counts of 251 for NeMo, 32 for BCEmbedding, 39 for RankLLM, 0 for Bekko, 3 for RAG-Retrieval, 916 for FlagEmbedding and 0 for the Jina reference. These counts alone were not used to infer maintenance quality.",
+        "Fresh-host installation, dependency compatibility, model-weight revision pins, target-host inference tests and concurrent-model VRAM measurements remain unverified. NVIDIA's documented minimum Transformers install also requires the PyTorch dependency used by its example. FlagEmbedding's MPS device support is source evidence, not a macOS execution result.",
+        "Research used 30 GitHub API requests and eight direct public page/source/asset fetches. Three web-search queries were attempted, but the search service failed. The required ctx_fetch_and_index batch was rejected before fetching because tool approval is unavailable under this session's policy. README content was obtained through the GitHub API; other public sources were fetched directly, indexed with ctx_index and read with ctx_search. The BGE benchmark image was inspected directly."
+      ],
+      "sources_read": [
+        "packets/order-2/reranker-model.json",
+        "https://api.github.com/repos/NVIDIA/NeMo-Retriever",
+        "https://api.github.com/repos/NVIDIA/NeMo-Retriever/releases/latest",
+        "https://api.github.com/repos/NVIDIA/NeMo-Retriever/commits?per_page=1",
+        "https://api.github.com/repos/NVIDIA/NeMo-Retriever/readme",
+        "https://api.github.com/repos/netease-youdao/BCEmbedding",
+        "https://api.github.com/repos/netease-youdao/BCEmbedding/releases/latest",
+        "https://api.github.com/repos/netease-youdao/BCEmbedding/commits?per_page=1",
+        "https://api.github.com/repos/netease-youdao/BCEmbedding/readme",
+        "https://api.github.com/repos/castorini/rank_llm",
+        "https://api.github.com/repos/castorini/rank_llm/releases/latest",
+        "https://api.github.com/repos/castorini/rank_llm/commits?per_page=1",
+        "https://api.github.com/repos/castorini/rank_llm/readme",
+        "https://api.github.com/repos/hotchpotch/bekko-system-one",
+        "https://api.github.com/repos/hotchpotch/bekko-system-one/releases/latest",
+        "https://api.github.com/repos/hotchpotch/bekko-system-one/commits?per_page=1",
+        "https://api.github.com/repos/hotchpotch/bekko-system-one/readme",
+        "https://api.github.com/repos/NovaSearch-Team/RAG-Retrieval",
+        "https://api.github.com/repos/NovaSearch-Team/RAG-Retrieval/releases/latest",
+        "https://api.github.com/repos/NovaSearch-Team/RAG-Retrieval/commits?per_page=1",
+        "https://api.github.com/repos/NovaSearch-Team/RAG-Retrieval/readme",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/releases/latest",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/commits?per_page=1",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/readme",
+        "https://api.github.com/repos/hanxiao/jina-reranker-v3.5-in-page-search",
+        "https://api.github.com/repos/hanxiao/jina-reranker-v3.5-in-page-search/releases/latest",
+        "https://api.github.com/repos/hanxiao/jina-reranker-v3.5-in-page-search/commits?per_page=1",
+        "https://api.github.com/repos/hanxiao/jina-reranker-v3.5-in-page-search/readme",
+        "https://api.github.com/repos/FlagOpen/FlagEmbedding/actions/runs?branch=master&status=completed&per_page=5",
+        "https://api.github.com/repos/NVIDIA/NeMo-Retriever/actions/runs?branch=main&status=completed&per_page=5",
+        "https://huggingface.co/nvidia/llama-nemotron-rerank-1b-v2/raw/main/README.md",
+        "https://huggingface.co/BAAI/bge-reranker-v2-m3/raw/main/README.md",
+        "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/research/llm_reranker/README.md",
+        "https://raw.githubusercontent.com/netease-youdao/BCEmbedding/1aa07ea64f94523965c8672e93da47c3faf4d2cd/Docs/EvaluationSummary/reranker_eval_summary.md",
+        "https://arxiv.org/html/2312.02724",
+        "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/examples/inference/reranker/README.md",
+        "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/FlagEmbedding/abc/inference/AbsReranker.py",
+        "https://raw.githubusercontent.com/FlagOpen/FlagEmbedding/fd1a2bdf69488ffebe0327999d4400d8c8058a0b/research/llm_reranker/evaluation/BEIR-bge-en-v1.5.png"
+      ]
+    }
+  ]
+}

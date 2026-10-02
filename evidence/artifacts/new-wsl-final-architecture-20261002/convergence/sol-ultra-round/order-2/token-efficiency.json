@@ -1,0 +1,195 @@
+{
+  "layers": [
+    {
+      "layer_id": "token-efficiency",
+      "selection": [
+        {
+          "name": "sqz (C10)",
+          "repository": "https://github.com/ojuschugh1/sqz",
+          "role": "Provisional choice for recoverable shell and MCP context compression; report its artifact estimates separately from provider usage.",
+          "install_command": "curl -fsSL https://raw.githubusercontent.com/ojuschugh1/sqz/main/install.sh | sh",
+          "install_source": "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/README.md#install",
+          "basis": [
+            {
+              "url": "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/README.md",
+              "shows": "Claude Code hooks and a cross-client MCP proxy, including Codex; sqz_expand retrieves original content byte for byte. Documents Linux and macOS installation."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/docs/quality-benchmark.md",
+              "shows": "Published fixture results retain 76/76 selected facts and verify original recovery. The reported 55.5% reduction uses bytes/4 estimates, includes reporting overhead, and explicitly does not measure live agent task success or provider usage."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/blob/v1.9.0/sqz/tests/quality_bench.rs",
+              "shows": "Versioned regression tests exercise the real binary, fact preservation, sensitive-content passthrough and byte-exact expansion."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/actions/runs/35965252671",
+              "shows": "GitHub API reports successful benchmark gates on Linux, macOS and Windows, across stable Rust and Rust 1.85."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/releases/tag/v1.9.0",
+              "shows": "Released 2026-09-23; verified CLI and MCP assets for Linux x86_64 and macOS arm64. No GPU is required. Counterfactual transcript replay is explicitly labeled an estimate."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/commit/e66e717dc08d74977d6b991b071aac220046ed0d",
+              "shows": "Unarchived repository with a default-branch commit on 2026-09-24, within 90 days."
+            },
+            {
+              "url": "https://github.com/ojuschugh1/sqz/issues/41",
+              "shows": "Issue activity within 90 days: the database-scope question was closed on 2026-08-23."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "agent-console (C02)",
+          "repository": "https://github.com/lockedinlabs-ai/agent-console",
+          "role": "Independent Claude Code and Codex usage accounting, with cache classes, missing-data indicators and estimated costs kept separate from compressed artifacts.",
+          "install_command": "npx --yes https://github.com/LockedinLabs-AI/agent-console/releases/download/v0.4.1/lockedinlabs-agent-console-0.4.1.tgz --open",
+          "install_source": "https://github.com/LockedinLabs-AI/agent-console/releases/tag/v0.4.1",
+          "basis": [
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a8b183d43ca227bcf8e2e871b3b27/README.md",
+              "shows": "Reads local Claude Code and Codex transcripts, including archived Codex sessions. Client integration requires no modification to compression tools."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/blob/v0.4.1/docs/accounting.md",
+              "shows": "Defines disjoint input, output, cache-read and cache-write classes; avoids double-counting cached Codex input and reasoning output. Missing classes produce flagged floors, dropped records are counted, and prices remain estimates."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/blob/v0.4.1/test/conformance.test.js",
+              "shows": "Tests expected accounting totals, copied-transcript and forked-subagent deduplication, delivery-order invariance and disclosure of uncounted records."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/actions/runs/36468687934",
+              "shows": "GitHub API reports successful tests on Ubuntu, macOS and Windows with Node 22 and 24; separate parser-fuzz and performance-budget checks also succeeded."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/releases/tag/v0.4.1",
+              "shows": "Released 2026-09-27. The documented Node 22+ package archive and standalone Linux x86_64/macOS arm64 assets are actually attached, alongside SHA256SUMS."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/commit/d14755421d4a8b183d43ca227bcf8e2e871b3b27",
+              "shows": "Unarchived repository with a default-branch commit on 2026-09-28, within 90 days."
+            },
+            {
+              "url": "https://github.com/LockedinLabs-AI/agent-console/issues/60",
+              "shows": "Recent issue activity: a memory-counter integration request opened on 2026-10-01."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C11",
+          "name": "TOON",
+          "reason": "Lossless JSON serialization with published retrieval evaluations, but narrower context coverage than the selected shell/MCP tool and no session-usage accounting. [README](https://github.com/toon-format/toon/blob/b6494104074afa5f234037d04139e03541f1fe16/packages/toon/README.md)"
+        },
+        {
+          "key": "C04",
+          "name": "rtk-ai/rtk",
+          "reason": "Strong command filtering and passing platform tests; default original retention covers failures/truncation rather than every successful output, while gain remains an artifact estimate. [Configuration](https://github.com/rtk-ai/rtk/blob/v0.50.0/docs/guide/getting-started/configuration.md)"
+        },
+        {
+          "key": "C01",
+          "name": "Context Mode",
+          "reason": "Useful exact indexed retrieval, but sandbox summaries require deliberate original retention; its fixture reductions do not establish task parity, and its latest GitHub release is outside 90 days despite current commits. [Benchmark](https://github.com/mksglu/context-mode/blob/928bdf104bca04da977fc6e6095dc3d0328939df/BENCHMARK.md), [release](https://github.com/mksglu/context-mode/releases/tag/v1.0.169)"
+        },
+        {
+          "key": "C08",
+          "name": "Headroom",
+          "reason": "Close compression alternative with original retrieval, but its headline reproducible table disables recent-message protection and measures tool payloads rather than default agent outcomes or complete provider usage. [Proof script](https://github.com/headroomlabs-ai/headroom/blob/bb1ab6afd35a5c22b6c11b549aba4075fb7791ec/benchmarks/index_proof_table.py)"
+        },
+        {
+          "key": "C05",
+          "name": "Repomix",
+          "reason": "Strong repository-context packaging, but experimental compression removes implementation details; recovering them requires returning to the source repository, and packed-token counts are artifact measures. [README](https://github.com/yamadashy/repomix/blob/0b3f82b401bbc520fd1aca67c06d24e40a868d3e/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "ccusage",
+          "reason": "Capable Claude Code/Codex CLI reporting with JSON exports and cache separation; Agent Console's reviewed contract and conformance tests more explicitly address incomplete records and coverage, without proving more accurate real-world totals. [README](https://github.com/ccusage/ccusage/blob/ae114a16a850bb078cbb618f0714c503e81d4697/apps/ccusage/README.md)"
+        },
+        {
+          "key": "C09",
+          "name": "paritok-4b-v1",
+          "reason": "Self-hosting can use the 24 GB GPU and the gateway offers exact recall, but its raw-compressor SWE-bench comparison resolves 109/300 versus 122/300 without compression; nonsignificance does not establish equal quality, and recall-enabled gateway savings remain unmeasured. [README](https://github.com/Paritok-official/paritok-4b-v1/blob/2c913302073367f2402d8bc4bb1a929a3f70a030/README.md)"
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Claude Token Efficient",
+          "criterion": "stale_or_archived",
+          "fact": "The default branch's latest commit is 2026-06-16, outside the frozen 90-day window. Verified through repository metadata and commits?per_page=1: https://github.com/drona23/claude-token-efficient/commit/0d30a6db75af983b8ababf585f28faefdfc87895"
+        },
+        {
+          "key": "C07",
+          "name": "Context Mode as an always-on default",
+          "criterion": "duplicate",
+          "fact": "The packet supplies no repository; this is a deployment posture for the separately assessed Context Mode repository."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The selected pair leads on documented recovery tests and accounting transparency, not demonstrated end-to-end savings. On the target WSL2 host, compare sqz plus Agent Console against Headroom plus Agent Console and an uncompressed control using matched tasks, client/model versions and repository states. Blind-score task quality; test original recovery after successes, failures and truncation. Include retries, failed attempts, retrieval calls and elapsed time. Record complete provider-reported usage separately from cache subsets, artifact estimates and modeled costs. Separately compare Agent Console and ccusage against identical raw usage records. Repeat representative tasks on macOS arm64.",
+      "evidence_gaps": [
+        "The packet contains no comparison where every named arm ran; reviewed upstream evidence does not establish equal-quality full-provider savings for the recommended combination.",
+        "Client transcript accounting can remain incomplete. Agent Console exposes missing classes and dropped records; it does not turn incomplete logs into a complete provider ledger.",
+        "Linux and macOS assets and upstream CI were verified, but no clean-host WSL2 installation or live Claude Code/Codex task trial was performed.",
+        "The required ctx_fetch_and_index batch was blocked by the session approval policy. Primary documentation, benchmark code and tests were instead retrieved through GitHub API, indexed with ctx_index and read with ctx_search. Budget used: 30 GitHub API calls, zero web searches, eight requested page fetches with none completed.",
+        "Astra/Max review was triggered by conflicting RTK primary documentation. Accepted finding: v0.50.0 documents direct Codex rewriting, while its configuration guide conflicts; working integration on the target client remains unverified."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/toon-format/toon",
+        "https://api.github.com/repos/rtk-ai/rtk",
+        "https://api.github.com/repos/drona23/claude-token-efficient",
+        "https://api.github.com/repos/mksglu/context-mode",
+        "https://api.github.com/repos/headroomlabs-ai/headroom",
+        "https://api.github.com/repos/yamadashy/repomix",
+        "https://api.github.com/repos/ccusage/ccusage",
+        "https://api.github.com/repos/ojuschugh1/sqz",
+        "https://api.github.com/repos/lockedinlabs-ai/agent-console",
+        "https://api.github.com/repos/paritok-official/paritok-4b-v1",
+        "https://api.github.com/repos/toon-format/toon/commits?per_page=1",
+        "https://api.github.com/repos/rtk-ai/rtk/commits?per_page=1",
+        "https://api.github.com/repos/drona23/claude-token-efficient/commits?per_page=1",
+        "https://api.github.com/repos/mksglu/context-mode/commits?per_page=1",
+        "https://api.github.com/repos/headroomlabs-ai/headroom/commits?per_page=1",
+        "https://api.github.com/repos/yamadashy/repomix/commits?per_page=1",
+        "https://api.github.com/repos/ccusage/ccusage/commits?per_page=1",
+        "https://api.github.com/repos/ojuschugh1/sqz/commits?per_page=1",
+        "https://api.github.com/repos/lockedinlabs-ai/agent-console/commits?per_page=1",
+        "https://api.github.com/repos/paritok-official/paritok-4b-v1/commits?per_page=1",
+        "https://api.github.com/repos/rtk-ai/rtk/releases/latest",
+        "https://api.github.com/repos/ojuschugh1/sqz/releases/latest",
+        "https://api.github.com/repos/LockedinLabs-AI/agent-console/releases/latest",
+        "https://api.github.com/repos/ccusage/ccusage/releases/latest",
+        "https://api.github.com/repos/ccusage/ccusage/actions/runs?per_page=10&branch=main",
+        "https://github.com/toon-format/toon/blob/b6494104074afa5f234037d04139e03541f1fe16/packages/toon/README.md",
+        "https://github.com/rtk-ai/rtk/blob/3a12dfe3773603e55099e2a8bb0c58d9a92c2822/README.md",
+        "https://github.com/rtk-ai/rtk/blob/3a12dfe3773603e55099e2a8bb0c58d9a92c2822/docs/guide/resources/savings-explained.md",
+        "https://github.com/rtk-ai/rtk/blob/v0.50.0/docs/guide/getting-started/configuration.md",
+        "https://github.com/mksglu/context-mode/blob/928bdf104bca04da977fc6e6095dc3d0328939df/README.md",
+        "https://github.com/mksglu/context-mode/blob/928bdf104bca04da977fc6e6095dc3d0328939df/BENCHMARK.md",
+        "https://github.com/headroomlabs-ai/headroom/blob/bb1ab6afd35a5c22b6c11b549aba4075fb7791ec/README.md",
+        "https://github.com/headroomlabs-ai/headroom/blob/bb1ab6afd35a5c22b6c11b549aba4075fb7791ec/benchmarks/index_proof_table.py",
+        "https://github.com/yamadashy/repomix/blob/0b3f82b401bbc520fd1aca67c06d24e40a868d3e/README.md",
+        "https://github.com/ccusage/ccusage/blob/ae114a16a850bb078cbb618f0714c503e81d4697/apps/ccusage/README.md",
+        "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/README.md",
+        "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/docs/quality-benchmark.md",
+        "https://github.com/ojuschugh1/sqz/blob/e66e717dc08d74977d6b991b071aac220046ed0d/docs/benchmark.md",
+        "https://github.com/ojuschugh1/sqz/blob/v1.9.0/sqz/tests/quality_bench.rs",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a8b183d43ca227bcf8e2e871b3b27/README.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a8b183d43ca227bcf8e2e871b3b27/docs/MEASUREMENTS.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a8b183d43ca227bcf8e2e871b3b27/docs/standalone-install.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/v0.4.1/docs/accounting.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/v0.4.1/test/conformance.test.js",
+        "https://github.com/Paritok-official/paritok-4b-v1/blob/2c913302073367f2402d8bc4bb1a929a3f70a030/README.md",
+        "https://github.com/ojuschugh1/sqz/actions/runs/35965252671",
+        "https://github.com/LockedinLabs-AI/agent-console/actions/runs/36468687934"
+      ]
+    }
+  ]
+}

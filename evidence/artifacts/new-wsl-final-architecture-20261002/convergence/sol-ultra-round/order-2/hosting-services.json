@@ -1,0 +1,202 @@
+{
+  "layers": [
+    {
+      "layer_id": "hosting-services",
+      "selection": [
+        {
+          "name": "Docker Engine / Moby",
+          "repository": "https://github.com/moby/moby",
+          "role": "C02: Local container runtime for the supplied application and services.",
+          "install_command": "sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+          "install_source": "https://docs.docker.com/engine/install/ubuntu/",
+          "basis": [
+            {
+              "url": "https://docs.docker.com/engine/install/ubuntu/",
+              "shows": "Documents supported Ubuntu amd64 installation, repository setup required before this command, privileged runtime operation, persistent Docker data, and a hello-world smoke test."
+            },
+            {
+              "url": "https://api.github.com/repos/moby/moby/commits?per_page=1",
+              "shows": "Reviewed default-branch commit c8e265787b0a89d161f34c3920f73f136974744b dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2",
+              "shows": "Latest stable release returned by the REST endpoint, published 2026-09-30."
+            },
+            {
+              "url": "https://github.com/moby/moby/actions/runs/36921992179/job/110575011065",
+              "shows": "Successful rootless integration job at the reviewed commit; the overall commit check rollup was FAILURE."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Docker Compose",
+          "repository": "https://github.com/docker/compose",
+          "role": "C08: Declarative application and supporting-service orchestration; complements Engine.",
+          "install_command": "sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin",
+          "install_source": "https://docs.docker.com/engine/install/ubuntu/",
+          "basis": [
+            {
+              "url": "https://raw.githubusercontent.com/docker/compose/main/README.md",
+              "shows": "Defines an application through Dockerfile and compose.yaml, including services, ports and mounts, then starts it with docker compose up. Provides a shell-callable interface for agent sessions."
+            },
+            {
+              "url": "https://api.github.com/repos/docker/compose/commits?per_page=1",
+              "shows": "Reviewed default-branch commit 4d994cc26d5e6e559d20971c1365aca90535104e dated 2026-10-01."
+            },
+            {
+              "url": "https://github.com/docker/compose/releases/tag/v5.5.1",
+              "shows": "Stable release published 2026-09-03; release assets include Linux and macOS architectures."
+            },
+            {
+              "url": "https://github.com/docker/compose/actions/runs/36892444874",
+              "shows": "Relay test and Linux amd64/macOS arm64 binary builds succeeded; lint failed. The reviewed commit had eight failures among 71 check contexts."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Dev Containers CLI",
+          "repository": "https://github.com/devcontainers/cli",
+          "role": "C12: Reproducible development environment with explicit container user, environment and agent-callable execution.",
+          "install_command": "curl -fsSL https://raw.githubusercontent.com/devcontainers/cli/main/scripts/install.sh | sh",
+          "install_source": "https://raw.githubusercontent.com/devcontainers/cli/main/README.md",
+          "basis": [
+            {
+              "url": "https://raw.githubusercontent.com/devcontainers/cli/main/README.md",
+              "shows": "Documents devcontainer.json, remoteUser, environment handling, up/build/exec commands, Feature lockfiles and --frozen-lockfile. The bundled-runtime installer supports Linux and macOS, x64 and arm64."
+            },
+            {
+              "url": "https://api.github.com/repos/devcontainers/cli/commits?per_page=1",
+              "shows": "Reviewed default-branch commit 3e363f63a712d30a741174f6d1a7e75f47fe3fc1 dated 2026-09-29."
+            },
+            {
+              "url": "https://github.com/devcontainers/cli/actions/runs/36561660887",
+              "shows": "Successful feature E2E, CLI build/execution and Podman tests. The reviewed commit's complete 30-check rollup was SUCCESS; integration therefore does not establish a Docker-only preference."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "PostgreSQL",
+          "repository": "https://github.com/postgres/postgres",
+          "role": "C07: Recommended relational supporting service when the application needs a database, with explicit owner and persistent data directory.",
+          "install_command": "./configure\nmake\nmake check\nmake install",
+          "install_source": "https://www.postgresql.org/docs/current/install-make.html",
+          "basis": [
+            {
+              "url": "https://www.postgresql.org/docs/current/install-make.html",
+              "shows": "Documents source installation, regression testing, the postgres OS account, initdb, pg_ctl and the database directory. Assumes an existing source tree; run make check unprivileged and make install with installation permissions."
+            },
+            {
+              "url": "https://api.github.com/repos/postgres/postgres/commits?per_page=1",
+              "shows": "Reviewed default-branch commit 50d6e533e4d9a0f70d798c534254007c83c0d428 dated 2026-10-02 UTC."
+            },
+            {
+              "url": "https://github.com/postgres/postgres/actions/runs/36952661827",
+              "shows": "Linux Autoconf, Linux Meson and macOS Meson jobs succeeded; complete rollup contained ten successful checks and one skipped check. macOS runner architecture was not established."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "microsoft/wsl",
+          "reason": "Provides the stipulated host baseline; the selected tools add reproducible application and service definitions within that host. Repository activity is current."
+        },
+        {
+          "key": "C05",
+          "name": "FastAPI",
+          "reason": "Suitable typed Python application option, but the requirement leaves language and application shape unresolved; hosting the supplied application does not require choosing this framework. Its README documents local serving and an extra excluding the cloud CLI."
+        },
+        {
+          "key": "C04",
+          "name": "BentoML",
+          "reason": "Its documented model-serving and packaging capabilities fit an inference workload that the requirement does not establish; September commits show it remains maintained."
+        },
+        {
+          "key": "C10",
+          "name": "nextjs",
+          "reason": "Suitable self-hosted TypeScript web application option, but no API/UI contract separates it from FastAPI. The reviewed default branch and newest-created release were canary versions, rather than qualified stable install pins."
+        },
+        {
+          "key": "C09",
+          "name": "Podman / Quadlet",
+          "reason": "Close alternative with strong explicit rootless ownership, network, volume and systemd lifecycle controls; Compose more directly documents the proposed application-development workflow. No measured runtime winner was established."
+        },
+        {
+          "key": "C06",
+          "name": "React",
+          "reason": "Its stated role is a UI library; it adds no independently justified hosting role to the selected runtime, orchestration and development-environment set."
+        },
+        {
+          "key": "C11",
+          "name": "Modal",
+          "reason": "The examined metadata establishes an SDK, but does not qualify independent local hosting, account requirements or deployment boundaries; evidence is insufficient to select it or apply a closed exclusion."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Dockerized IB Gateway",
+          "criterion": "outside_requirement",
+          "fact": "Repository metadata describes an image incorporating IB Gateway/TWS and IBC; the requirement contains no brokerage gateway or trading-service need."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Interpret the deployment scope as local application development with persistent supporting services. The four selected repositories can run an existing typed application without imposing its framework; PostgreSQL is conditional on relational storage being needed. Docker/Compose versus Podman/Quadlet remains a close call, with the recommendation based on documented workflow fit, not measured superiority. On fresh WSL2 Ubuntu installations, run the same application images, database fixture, user permissions and loopback network policy through both stacks. Verify clean bootstrap, agent CLI execution, data survival after WSL shutdown, backup/restore, upgrade rollback and deployment scope. Measure startup time, workload throughput and p95 latency, CPU/RAM/storage cost, and recovery effort. Repeat functional checks on macOS arm64 with each required Linux runtime. If an application-framework choice is wanted, first fix its language and API/UI contract, then qualify FastAPI and Next.js against the same acceptance tests.",
+      "evidence_gaps": [
+        "The required ctx_fetch_and_index call was rejected by the environment's approval policy. Public pages were retrieved directly and processed outside the model; ctx_search was not used. Research used zero web searches, eight successful page fetches and 30 GitHub API calls.",
+        "All twelve repository metadata checks reported nonarchived repositories, and all twelve default-branch commits fell within 90 days. Issue updates were examined through GraphQL; open-issue counts were not treated as comparative maintenance scores. PostgreSQL's GitHub mirror exposed neither issues nor releases.",
+        "Stable REST release dates were verified for Engine, Compose, FastAPI and Podman. Dev Containers CLI's latest-release lookup failed and its GraphQL release list was empty; its current package version was not independently verified. Remaining GraphQL release observations do not substitute for stable-release qualification.",
+        "Latest-branch check rollups failed for Moby, Compose, Podman and Next.js. Only 100 of Moby's 247 and Next.js's 137 contexts were retrieved. Failure causes and stable-release CI were not investigated. FastAPI's three successful contexts were analysis jobs, not proof of a passing application test suite.",
+        "No benchmark in the examined sources establishes comparative superiority for this workload. FastAPI's linked benchmark results were not independently fetched, and unlike CI counts were not used as performance or reliability rankings.",
+        "No end-to-end WSL2 or macOS arm64 deployment was run. Dev Containers documents arm64 installation and Compose has a successful Darwin arm64 build; the macOS container-runtime path and PostgreSQL arm64 execution remain unqualified. This layer does not require GPU execution.",
+        "These are upstream install paths, not a completed locked bootstrap. Registry credentials, image digests, dependency locks, volume ownership, port binding and rollback configuration still require qualification. PostgreSQL's documentation identifies version 18, but a source artifact and release pin were not verified.",
+        "Agent integration is supported through documented CLIs; Claude Code/Codex-specific hooks or MCP integration were not established. Astra/Max architecture review accepted the framework-neutral four-tool recommendation while retaining the runtime close call."
+      ],
+      "sources_read": [
+        "https://docs.docker.com/engine/install/ubuntu/",
+        "https://raw.githubusercontent.com/docker/compose/main/README.md",
+        "https://raw.githubusercontent.com/devcontainers/cli/main/README.md",
+        "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html",
+        "https://raw.githubusercontent.com/fastapi/fastapi/master/README.md",
+        "https://www.postgresql.org/docs/current/install-make.html",
+        "https://nextjs.org/docs/app/guides/self-hosting",
+        "https://raw.githubusercontent.com/bentoml/BentoML/main/README.md",
+        "https://api.github.com/repos/postgres/postgres",
+        "https://api.github.com/repos/postgres/postgres/commits?per_page=1",
+        "https://api.github.com/repos/fastapi/fastapi",
+        "https://api.github.com/repos/fastapi/fastapi/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/WSL",
+        "https://api.github.com/repos/microsoft/WSL/commits?per_page=1",
+        "https://api.github.com/repos/devcontainers/cli",
+        "https://api.github.com/repos/devcontainers/cli/commits?per_page=1",
+        "https://api.github.com/repos/bentoml/BentoML",
+        "https://api.github.com/repos/bentoml/BentoML/commits?per_page=1",
+        "https://api.github.com/repos/vercel/next.js",
+        "https://api.github.com/repos/vercel/next.js/commits?per_page=1",
+        "https://api.github.com/repos/podman-container-tools/podman",
+        "https://api.github.com/repos/podman-container-tools/podman/commits?per_page=1",
+        "https://api.github.com/repos/moby/moby",
+        "https://api.github.com/repos/moby/moby/commits?per_page=1",
+        "https://api.github.com/repos/react/react",
+        "https://api.github.com/repos/react/react/commits?per_page=1",
+        "https://api.github.com/repos/docker/compose",
+        "https://api.github.com/repos/docker/compose/commits?per_page=1",
+        "https://api.github.com/repos/gnzsnz/ib-gateway-docker",
+        "https://api.github.com/repos/gnzsnz/ib-gateway-docker/commits?per_page=1",
+        "https://api.github.com/repos/modal-labs/modal-client",
+        "https://api.github.com/repos/modal-labs/modal-client/commits?per_page=1",
+        "https://api.github.com/repos/moby/moby/releases/latest",
+        "https://api.github.com/repos/docker/compose/releases/latest",
+        "https://api.github.com/repos/devcontainers/cli/releases/latest",
+        "https://api.github.com/repos/fastapi/fastapi/releases/latest",
+        "https://api.github.com/repos/podman-container-tools/podman/releases/latest",
+        "https://api.github.com/graphql"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+{
+  "layers": [
+    {
+      "layer_id": "recovery-portability",
+      "selection": [
+        {
+          "name": "mise (C03)",
+          "repository": "https://github.com/jdx/mise",
+          "role": "Reproduce the chosen tool and configuration profile. Reviewed release: v2026.10.0. Agent sessions can invoke its install, exec and task CLIs for fresh destination-host checks.",
+          "install_command": "curl https://mise.run | sh",
+          "install_source": "https://mise.jdx.dev/",
+          "basis": [
+            {
+              "url": "https://github.com/jdx/mise/blob/v2026.10.0/docs/bootstrap.md",
+              "shows": "Tagged documentation covers versioned tools, packages, dotfiles, repositories, services, environment modules, preview/status commands and secret inputs. Final tasks can perform fresh authentication checks; bootstrap history alone does not establish successful application recovery."
+            },
+            {
+              "url": "https://mise.jdx.dev/",
+              "shows": "Documents mise.toml, mise.lock, callable tasks and a Linux/macOS installer."
+            },
+            {
+              "url": "https://api.github.com/repos/jdx/mise",
+              "shows": "Repository is not archived."
+            },
+            {
+              "url": "https://api.github.com/repos/jdx/mise/commits?per_page=1",
+              "shows": "Default-branch commit observed at 2026-10-02 03:21 UTC, within 90 days."
+            },
+            {
+              "url": "https://github.com/jdx/mise/releases/tag/v2026.10.0",
+              "shows": "Release published 2026-10-02 01:42 UTC, still October 1 on the target host."
+            },
+            {
+              "url": "https://github.com/jdx/mise/actions/runs/24055263191",
+              "shows": "Inspected main-branch test run passed on April 6. This historical result does not validate October's bootstrap implementation."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Restic (C06)",
+          "repository": "https://github.com/restic/restic",
+          "role": "Recover selected application files independently of tool reproduction. Back up consistent application data, omit authentication stores, recover the repository password separately, and validate restored applications on the destination.",
+          "install_command": "mise use -g restic@0.19.1",
+          "install_source": "https://restic.readthedocs.io/en/stable/020_installation.html",
+          "basis": [
+            {
+              "url": "https://restic.readthedocs.io/en/stable/050_restore.html",
+              "shows": "Documents snapshot restoration into a chosen target, host/path selection, inclusion filters and dry runs. Its file recovery scope is broader than Litestream's SQLite replication."
+            },
+            {
+              "url": "https://restic.readthedocs.io/en/stable/020_installation.html",
+              "shows": "Documents mise installation using restic@latest; the proposed command substitutes the reviewed stable version. Also documents Linux packages, macOS installation and verifiable official binaries."
+            },
+            {
+              "url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+              "shows": "July 5 release supplies Linux amd64 and macOS arm64 binaries. Release notes link fixes for reported backup, restore-selection and backend issues."
+            },
+            {
+              "url": "https://api.github.com/repos/restic/restic",
+              "shows": "Repository is not archived."
+            },
+            {
+              "url": "https://api.github.com/repos/restic/restic/commits?per_page=1",
+              "shows": "Default-branch commit dated September 25; both commit and latest release meet the 90-day currency criterion."
+            },
+            {
+              "url": "https://github.com/restic/restic/actions/runs/36887174182",
+              "shows": "An October 1 pull-request test run passed. A separate Dependabot test run failed; neither result is a destination-host recovery evaluation."
+            }
+          ],
+          "confidence": "high"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "astral-sh/uv",
+          "reason": "Excellent Python lockfile, environment and tool reproduction, but narrower than the chosen general host profile and lacks application-state recovery in the reviewed documentation; active October 1 commit and release 0.12.22. Source: https://docs.astral.sh/uv/"
+        },
+        {
+          "key": "C07",
+          "name": "chezmoi",
+          "reason": "Strong machine-specific dotfile templates, preview/apply and separate secret-storage options, but this profile's configuration needs overlap mise bootstrap; no measured advantage established. Active September 28 commit and v2.73.0 release. Source: https://github.com/twpayne/chezmoi/blob/v2.73.0/assets/chezmoi.io/docs/user-guide/setup.md"
+        },
+        {
+          "key": "C04",
+          "name": "Determinate Nix installer",
+          "reason": "Explicit WSL2 x86_64 and macOS arm64 support, but installs the Nix substrate rather than supplying a complete application profile or state restore; its installation receipt serves uninstall. Active October 1 commit; v3.22.5 released September 17. Source: https://github.com/DeterminateSystems/nix-installer/blob/6613dfc41d1b306620048688b4c04adf8f7a51b8/README.md"
+        },
+        {
+          "key": "C05",
+          "name": "Devbox",
+          "reason": "Strong alternative for isolated, versioned development shells; mise covers more host configuration for this requirement, without demonstrated comparative superiority. Active September 28 commit; 0.18.4 released September 25. Source: https://www.jetify.com/docs/devbox/"
+        },
+        {
+          "key": "C02",
+          "name": "Litestream",
+          "reason": "Provides continuous SQLite replication and demonstrated restore/query instructions, but covers fewer application-state types than Restic; inspected nightly stability failures remain unexplained. Active September 21 commit; v0.5.17 released August 31. Sources: https://litestream.io/getting-started/ and https://github.com/benbjohnson/litestream/actions/runs/36808858975"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "On the destination WSL2 Ubuntu x86_64 host, compare mise plus Restic against Devbox plus Restic using identical pinned tools, configuration and application data; compare chezmoi against mise's configuration restoration where templating or secret handling matters. Measure dependency reproducibility, setup failures, manual interventions, restoration time, file equality and database integrity. Establish native Claude Code/Codex sign-ins, scoped tool calls and useful tasks anew. Independently recover the backup password and application state while excluding authentication stores; require fresh successful application operations rather than historical receipts. Repeat the portable subset on macOS arm64. No GPU is needed.",
+      "evidence_gaps": [
+        "Selection rests on complementary capability fit. No reviewed head-to-head evaluation establishes measured superiority, and the packet contains no comparisons.",
+        "All seven repositories are unarchived and have default-branch commits and releases within 90 days. Issue/PR totals were available, but response and resolution activity were not sampled consistently; totals were not used as merit scores.",
+        "Current mise bootstrap CI was not verified: the inspected test.yml endpoint returned successful April runs. Workflow listings establish test definitions, not passing October tests.",
+        "Restic CI included both a passing run and a failing Dependabot run. Litestream's recent nightly failures were inspected only as outcomes; their causes were not investigated.",
+        "Restic Linux amd64 and macOS arm64 assets were verified. Mise documents Linux/macOS support; explicit macOS arm64 artifacts and WSL2 test coverage were not verified.",
+        "Neither selected repository automatically enforces exclusion of authentication stores, fresh agent sign-ins, consistent live-database capture or independent key custody. Those remain acceptance conditions for the chosen profile.",
+        "Chezmoi and Devbox binary installation commands were not verified within the source budget. Mise's documented installer follows latest; a release-specific installer pin option was not verified.",
+        "Budget used: 30 GitHub API calls, 8 fetched pages and 0 web searches. No local project records or installed-tool observations informed the judgment.",
+        "Automatic approval review rejected the required ctx_fetch_and_index action because the MCP tool requires approval and this session's approval policy is never. Pages were retrieved directly instead; the requested ctx_fetch_and_index/ctx_search method could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/astral-sh/uv",
+        "https://api.github.com/repos/astral-sh/uv/releases/latest",
+        "https://api.github.com/repos/astral-sh/uv/commits?per_page=1",
+        "https://api.github.com/repos/twpayne/chezmoi",
+        "https://api.github.com/repos/twpayne/chezmoi/releases/latest",
+        "https://api.github.com/repos/twpayne/chezmoi/commits?per_page=1",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer/releases/latest",
+        "https://api.github.com/repos/DeterminateSystems/nix-installer/commits?per_page=1",
+        "https://api.github.com/repos/restic/restic",
+        "https://api.github.com/repos/restic/restic/releases/latest",
+        "https://api.github.com/repos/restic/restic/commits?per_page=1",
+        "https://api.github.com/repos/jetify-com/devbox",
+        "https://api.github.com/repos/jetify-com/devbox/releases/latest",
+        "https://api.github.com/repos/jetify-com/devbox/commits?per_page=1",
+        "https://api.github.com/repos/benbjohnson/litestream",
+        "https://api.github.com/repos/benbjohnson/litestream/releases/latest",
+        "https://api.github.com/repos/benbjohnson/litestream/commits?per_page=1",
+        "https://api.github.com/repos/jdx/mise",
+        "https://api.github.com/repos/jdx/mise/releases/latest",
+        "https://api.github.com/repos/jdx/mise/commits?per_page=1",
+        "https://api.github.com/repos/restic/restic/actions/runs?per_page=10",
+        "https://api.github.com/repos/benbjohnson/litestream/actions/runs?per_page=10",
+        "https://api.github.com/repos/jdx/mise/actions/workflows",
+        "https://api.github.com/repos/jetify-com/devbox/actions/workflows",
+        "https://api.github.com/repos/twpayne/chezmoi/git/trees/v2.73.0?recursive=1",
+        "https://github.com/twpayne/chezmoi/blob/v2.73.0/assets/chezmoi.io/docs/user-guide/setup.md",
+        "https://api.github.com/repos/jdx/mise/contents/docs/bootstrap.md?ref=v2026.10.0",
+        "https://api.github.com/repos/jdx/mise/actions/workflows/test.yml/runs?branch=main&status=completed&per_page=5",
+        "https://restic.readthedocs.io/en/stable/050_restore.html",
+        "https://restic.readthedocs.io/en/stable/020_installation.html",
+        "https://litestream.io/getting-started/",
+        "https://mise.jdx.dev/",
+        "https://docs.astral.sh/uv/",
+        "https://www.jetify.com/docs/devbox/",
+        "https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/README.md",
+        "https://github.com/DeterminateSystems/nix-installer/blob/6613dfc41d1b306620048688b4c04adf8f7a51b8/README.md"
+      ]
+    }
+  ]
+}
