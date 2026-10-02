@@ -94,6 +94,11 @@ explicitly as `default`; its writer was not attributed and that later setting
 was preserved. TOML parsing, the CLI read, file mode and targeted-byte checks
 were verified. This does not alter the model of an already-running session.
 
+The [Mac Claude deployment resolution](2026-10-02-mac-claude-resolution.md)
+records the separate canonical guard/launcher repairs and one bounded native
+retrieval check. Its scoped evidence preserves the historical read-only suite
+and does not establish complete upstream E2E or workstation acceptance.
+
 ## Current sources, accepted pins and upgrade decisions
 
 Fresh upstream metadata is a source-review input. Repository locks, dated host

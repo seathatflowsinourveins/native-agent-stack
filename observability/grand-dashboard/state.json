@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-02T20:12:51Z",
-  "meaning": "Source checkpoint adds the2026-10-02 frozen stress and pinned-SDK recovery receipts while preserving earlier records. Twenty foundation layers and21 carried gates remain represented; full-stack/two-host readiness is false. No new host, account, shared inference, timer emission or provider settlement is claimed.",
+  "recorded_at_utc": "2026-10-02T21:37:59Z",
+  "meaning": "Source checkpoint adds the 2026-10-02 frozen stress, native initial-margin refusal and pinned-SDK recovery receipts while preserving earlier records and failed attempts. Twenty foundation layers and 21 carried gates remain represented; full-stack/two-host readiness is false. No new destination, account, shared inference, timer emission or provider settlement is claimed.",
   "lanes": [
     {
       "kind": "lane",
@@ -30,14 +30,21 @@
       "kind": "gate",
       "id": "north-star-frozen-stress-20261002",
       "title": "Frozen cost and rounding stress",
-      "state": "two fresh processes each142 of142 strict checks / four matching normalized exports / margin adaptive and destination gates separate",
+      "state": "two fresh processes each 142 of 142 strict checks / four equal normalized exports / maintenance adaptive and destination gates separate",
       "evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json"
+    },
+    {
+      "kind": "gate",
+      "id": "north-star-initial-margin-refusal-20261002",
+      "title": "Frozen native initial-margin refusal",
+      "state": "two fresh processes each 86 of 86 strict checks / native margin denial / no fills or positions / maintenance adaptive and destination gates separate",
+      "evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-over-limit-20261002.json"
     },
     {
       "kind": "gate",
       "id": "north-star-recovery-f1-20261002",
       "title": "Recovery startup and durable source contracts",
-      "state": "523 unique pinned SDK native tests pass with zero skips / fake broker ports / new paper accounts and IBKR rc5 recovery unqualified",
+      "state": "523 unique pinned SDK tests pass with zero skips / fake broker ports / paper account and IBKR rc5 recovery remain unqualified",
       "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json"
     },
     {
@@ -382,7 +389,7 @@
       "kind": "worker",
       "id": "north-star-runtime-review-20261002",
       "title": "North Star bounded implementation and independent review",
-      "state": "Sol implementation and independent source review pass / two-process stress and523-test SDK receipts / remaining gates explicit",
+      "state": "Sol source review / stress 142/142 and refusal 86/86 in two fresh processes each / recovery 523 SDK tests / remaining gates explicit",
       "evidence_ref": "docs/decisions/2026-10-02-north-star-runtime-qualification.md"
     },
     {
