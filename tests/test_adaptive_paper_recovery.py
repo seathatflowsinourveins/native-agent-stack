@@ -521,6 +521,66 @@ class RecoveryTests(unittest.TestCase):
         result = self.recover()
         self.assertEqual(result["status"], "passed")
 
+    def test_ambiguous_exit_partial_fill_reconciles_after_journal_restart_without_duplicate_post(self):
+        self.original_buy(observed=True)
+        self.port.mode = "ambiguous_submit"
+        first = self.recover()
+        self.assertEqual(first["errors"], ["TimeoutError"])
+        attempted = self.port.submissions[0]
+        client_id = attempted["client_order_id"]
+        rows = dict(self.port.rows)
+        partial = Decimal("0.123456789")
+        rows[client_id] = {**attempted, "id": "broker-" + client_id,
+                          "status": "partially_filled", "filled_qty": str(partial),
+                          "filled_avg_price": "99.98", "updated_at_ns": time.time_ns()}
+        cash = self.port.cash + partial * Decimal("99.98")
+        self.ledger.close()
+        self.ledger = Ledger(Path(self.temp.name) / "ledger.sqlite", RiskLimits(cleanup_seconds=3))
+        self.controller = Controller(self.ledger)
+        self.port = self.controller.port = FakePort(self.controller)
+        self.port.rows, self.port.cash, self.port.qty = rows, cash, Decimal(1) - partial
+
+        # The attempted ID survived process state loss. Only the broker snapshot
+        # can advance its partial fill; recovery must cancel it before a new exit.
+        pending = self.ledger.unresolved()
+        self.assertEqual([(i.client_id, i.submit_attempted, i.filled_qty) for i in pending],
+                         [(client_id, True, Decimal(0))])
+        second = self.recover()
+        self.assertEqual((second["status"], second["flat"]), ("passed", True))
+        self.assertEqual(self.port.cancelled, [client_id])
+        self.assertEqual([(p["client_order_id"], p["qty"], p["side"]) for p in self.port.submissions],
+                         [("rec-fault-test-0000002", "0.876543211", "sell")])
+        self.assertEqual([i.client_id for i in self.ledger.intents()],
+                         ["entry-1", "rec-fault-test-0000001", "rec-fault-test-0000002"])
+        self.assertEqual(self.ledger.intents()[1].filled_qty, partial)
+
+    def test_stop_file_and_recovery_only_admission_survive_journal_restart(self):
+        import safety
+        stop = Path(self.temp.name) / "STOP"
+        stop.write_text("requested\n")
+        self.original_buy(observed=True)
+        with patch.object(safety, "DEFAULT_STOP", stop):
+            result = self.recover()
+            self.assertEqual((result["status"], result["flat"]), ("passed", True))
+            self.ledger.close()
+            self.ledger = Ledger(Path(self.temp.name) / "ledger.sqlite", RiskLimits(cleanup_seconds=3))
+            self.assertEqual(stop.read_text(), "requested\n")
+            self.assertEqual(self.ledger.accounting().halted_reason, "recovery_only")
+            now = time.time()
+            with self.assertRaisesRegex(SafetyError, "recovery_only_blocks_entry"):
+                self.ledger.reserve_intent("new-entry", "SPY", "buy", "1", "100.01",
+                    quote=Quote("SPY", "100", "100.01", now), now=now,
+                    market_open=True, session_close=now + 3600)
+            # Even a separately admitted next trial cannot erase the persistent
+            # kill switch when it clears the old trial's recovery-only marker.
+            self.ledger.begin_next_trial(now, "stopped-restart")
+            with self.assertRaisesRegex(SafetyError, "stop_blocks_entry"):
+                self.ledger.reserve_intent("next-entry", "SPY", "buy", "1", "100.01",
+                    quote=Quote("SPY", "100", "100.01", now), now=now,
+                    market_open=True, session_close=now + 3600)
+            self.assertEqual([i.client_id for i in self.ledger.intents()],
+                             ["entry-1", "rec-fault-test-0000001"])
+
 
 class PerSymbolRecoveryExits(unittest.TestCase):
     """#215: a held symbol without a fresh quote waits alone. Every other held symbol exits
