@@ -1,0 +1,586 @@
+{
+  "schema_version": 1,
+  "record": "openhands-1.50.0-reviewed-main-lock-reconciliation-2026-09-30",
+  "observed_utc": "2026-09-30T09:10:11Z",
+  "evidence_class": "local_integration",
+  "status": "reconciliation_checks_passed; runtime_candidate_not_accepted",
+  "scope": "Recipe wheel closure and bounded static caller review: Linux x86_64, CPython 3.13.15 only.",
+  "review_dispatch": {
+    "role": "Astra/max",
+    "trigger": "Consequential dependency/security boundary; one bounded Sol wheel-lock repair did not converge with reviewed main. Its candidate-before baseline did not establish that dependency downgrades were necessary.",
+    "acceptance_result": "The assigned lock reconciliation and scoped checks pass. The independent image, observer, isolation and task-quality gates remain open; coordinator owns the exact-lock CI guard and integration."
+  },
+  "evidence_classes_by_claim": {
+    "resolution_reproduction_hash_install_pip_check_imports_osv": "native: actual supported executable output, retained with exit codes",
+    "all_selected_versions_and_source_bytes": "local integration: Packaging marker API comparison and direct original-byte checks",
+    "installer_target_and_oauth_callers": "source: pinned source and bounded static scans, not runtime reachability proof",
+    "twelve_sdk_checks": "fixture: local tests using actual installed SDK objects and patched model calls",
+    "1208_upstream_tests_and_image_scan": "historical: retained original evidence, not rerun for this reconciliation"
+  },
+  "baselines": [
+    {
+      "role": "reviewed_main",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "f03f41c7",
+      "sha256": "14e57b8d947e62ed60e7bbc69c2e6cc55638a86fa8969d528cbdf591cd42ae64"
+    },
+    {
+      "role": "candidate_input",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "bb3d00dc1ed493726481d0d3d746f6b0b46ed8bd",
+      "sha256": "8d257833a90ad4096858d108a427e908a54850dee24d1036d37bd7b5e5d86676"
+    },
+    {
+      "role": "reconciled",
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "revision": "working_tree",
+      "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106"
+    }
+  ],
+  "baseline_correction": {
+    "earlier_candidate_before_sha256": "7dba097d34f83cab8585e49050505d5f836b8f8505ceedb7daff160af5e3ad16",
+    "historical_receipt": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930.json",
+    "correction": "That historical before hash is an earlier 1.50 candidate input, not reviewed main. This check separately binds main f03f41c7 (14e57b8d...) and the bb3d00dc candidate (8d257833...). Click 8.3.3, pypdf 6.16.1 and Soup Sieve 2.9 were unnecessary candidate downgrades from main and are corrected without changing the historical receipt.",
+    "verification": "The fresh native constrained compile succeeds and all 176 Linux-selected requirements are compared using the actual CPython 3.13.15 marker environment."
+  },
+  "resolution": {
+    "upstream_repository": "https://github.com/OpenHands/software-agent-sdk",
+    "upstream_commit": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "version": "1.50.0",
+    "source_archive": {
+      "url": "https://codeload.github.com/OpenHands/software-agent-sdk/tar.gz/dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+      "sha256": "643e171b9de5b55f948cf22ea698af4b0b05d2cb3e27867960ae9a0e47a9819c"
+    },
+    "upstream_lock": {
+      "url": "https://raw.githubusercontent.com/OpenHands/software-agent-sdk/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/uv.lock",
+      "sha256": "9ee1944f08b39760cbf502b546ec420fad84ed65caed5eb08fc9cceb68074801"
+    },
+    "native_tool": "uv 0.12.17",
+    "target": {
+      "implementation_name": "cpython",
+      "implementation_version": "3.13.15",
+      "os_name": "posix",
+      "platform_machine": "x86_64",
+      "platform_python_implementation": "CPython",
+      "platform_system": "Linux",
+      "python_full_version": "3.13.15",
+      "python_version": "3.13",
+      "sys_platform": "linux"
+    },
+    "upstream_policy": {
+      "exclude_newer": "7 days",
+      "litellm": "2026-07-20T00:00:00Z",
+      "lmnr": "2026-08-23T00:00:00Z"
+    },
+    "constraints": "All reviewed-main requirement declarations except the two SDK/tools wheel inputs, with original markers; uv resolves the published 1.50.0 wheel inputs under these version constraints.",
+    "selected_requirements": 176,
+    "unchanged_selected_versions_from_main": 174,
+    "changes_from_main": [
+      {
+        "name": "openhands-sdk",
+        "before": "1.49.6",
+        "after": "1.50.0"
+      },
+      {
+        "name": "openhands-tools",
+        "before": "1.49.6",
+        "after": "1.50.0"
+      }
+    ],
+    "preserved_main_versions": [
+      {
+        "name": "click",
+        "version": "8.5.0"
+      },
+      {
+        "name": "pypdf",
+        "version": "6.19.0"
+      },
+      {
+        "name": "soupsieve",
+        "version": "2.9.2"
+      }
+    ],
+    "selected_additions": [],
+    "selected_removals": [],
+    "selected_downgrades": [],
+    "source_required_downgrades": [],
+    "main_marker_excluded_requirements": 160,
+    "lock_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+    "fresh_source_extractions": [
+      {
+        "extraction": "source",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      },
+      {
+        "extraction": "source-repro",
+        "original_regular_files_compared": 1800,
+        "mismatches": []
+      }
+    ],
+    "native_compile_reproduction_byte_identical": true,
+    "relative_cutoff_limit": "Both native compiles ran on the recorded date. Future replay of a relative seven-day cutoff is a new dated resolution; the recorded inputs, output hashes and current byte-identical result remain explicit."
+  },
+  "downstream_install_trace": {
+    "claim_scope": "Source trace of supported entrypoints; no container execution in this repair.",
+    "image": {
+      "tag_observed": "1.50.0-python",
+      "ref": "ghcr.io/openhands/agent-server@sha256:6d91a74fd2b556107e4e15476680d1d8116eeadfc06879baf7193caa73314dfc",
+      "platform": "linux/amd64",
+      "manifest_sha256": "d322c0fa5bc0f95d36de0b1a3e9aeab1230e2daf44d66cc94e42aa4ad23129c7",
+      "config_sha256": "6b11dbc497b336e0bf02aeed538dc21d87e4eabe66cac21d1b289dadb86eb1ee",
+      "provenance": "GHCR returned manifest bytes SHA256; image config OPENHANDS_BUILD_GIT_SHA and OPENHANDS_BUILD_GIT_REF match the SDK tag."
+    },
+    "steps": [
+      {
+        "path": "blueprints/runtime-workers/openhands/install.sh",
+        "claim": "Invokes host.py install."
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/host.py",
+        "lines": [
+          324,
+          326,
+          425,
+          434,
+          614,
+          631,
+          645,
+          656,
+          664,
+          666
+        ],
+        "claim": "Verifies runtime/build hashes and pinned image identity/platform; pulls and runs the installer with the pinned linux/amd64 image."
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/install-container.sh",
+        "lines": [
+          7,
+          8,
+          11,
+          15,
+          18,
+          19,
+          20
+        ],
+        "claim": "Disables Python downloads and ambient uv config, creates the venv with /usr/local/bin/python inside the image, installs the build/runtime hash locks, then checks dependencies."
+      },
+      {
+        "url": "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/Dockerfile#L39",
+        "lines": [
+          6,
+          39,
+          45,
+          243,
+          358,
+          583
+        ],
+        "claim": "The default python-node runtime copies /usr/local from python:3.13.15-slim-trixie; the binary image inherits that runtime."
+      },
+      {
+        "path": "blueprints/runtime-workers/openhands/install-grader.sh",
+        "lines": [
+          29,
+          33,
+          34,
+          37
+        ],
+        "claim": "The separate grader uses its upstream uv.lock; it shares the build-prerequisite lock, not this runtime requirements.lock."
+      }
+    ],
+    "macos_boundary": "These supported entrypoints contain no native macOS consumer of the Linux runtime lock. The runtime requirements are installed inside the pinned Linux amd64 container, independently of the host OS. Native macOS/Windows interpreters and other Python versions are not qualified.",
+    "installer_code_change_required": false,
+    "installer_regression_rerun": "Not needed: installer code and target pins are unchanged; the assigned source trace establishes the existing target boundary."
+  },
+  "native_install": {
+    "owned_fresh_venv": true,
+    "target": "Linux x86_64 / CPython 3.13.15",
+    "hash_install_exit_code": 0,
+    "pip_check_exit_code": 0,
+    "import_exit_code": 0,
+    "installed_version_mismatches": [],
+    "fixture_command": "python -m unittest tests.test_openhands_150 -v",
+    "fixture_result": {
+      "exit_code": 0,
+      "tests": 12,
+      "failures": 0,
+      "skips": 0
+    },
+    "fixture_limit": "Actual installed SDK objects with patched model calls; no provider, server, isolation or task-quality acceptance."
+  },
+  "published_artifact_source_identity": {
+    "artifacts_checked": 10,
+    "python_sources_compared": 586,
+    "mismatches": [],
+    "provenance": "Ten freshly downloaded official artifacts. Four unchanged metadata descriptors are explicitly reused from the prior source receipt; SDK/tools descriptors are unchanged pins; four exact-version metadata documents were fetched fresh. Artifact bytes and source comparisons are fresh in all ten cases.",
+    "method": "Unchanged published_artifact_source_identity command from wheel-relock-20260930-sources.json, rerun against the fresh owned environment and freshly verified artifacts."
+  },
+  "osv": {
+    "version": "2.6.0",
+    "binary_url": "https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "pin_source": ".github/workflows/security-scan.yml",
+    "current_config": {
+      "path": ".github/osv-scanner.toml",
+      "sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8"
+    },
+    "lock_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+    "recognized_packages_reported_by_scanner": 174,
+    "recognition_limit": "The lock contains 176 Linux-selected requirements, including two direct published-wheel URLs. Preserve the scanner-reported 174 count rather than treating this as proof it scanned all 176 package identities.",
+    "ci_config_exit_code": 0,
+    "ci_config_remaining_findings": [],
+    "empty_config_exit_code": 1,
+    "empty_config_findings": [
+      {
+        "package": {
+          "name": "oauthlib",
+          "version": "3.3.1",
+          "ecosystem": "PyPI"
+        },
+        "ids": [
+          "GHSA-hj66-6f7g-4r5v",
+          "GHSA-xpv3-w29h-x7cv"
+        ]
+      }
+    ],
+    "exception_changes": "None: no new advisory ID, expiry or ignore was added. This source scan uses the existing current CI configuration; the coordinator owns rebinding its separate exact-lock guard."
+  },
+  "oauthlib_exact_target_source_review": {
+    "target": "Linux x86_64 / CPython 3.13.15 only",
+    "lock_sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106",
+    "maintained_jwt_script": {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30.jwt-callers.py.txt",
+      "sha256": "d4eb55d798102e5a6d64d4d629a3a994acfadff74daa971195b73592c2a77cff"
+    },
+    "alias_supplement": {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+      "sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960"
+    },
+    "fresh_runs": "Both scripts are unchanged and were rerun against this exact fresh environment and recipe.",
+    "alias_scan_sources": 10684,
+    "recipe_sources": 12,
+    "unhandled_parse_errors": 0,
+    "reviewed_text_only_exception": {
+      "path": "func_timeout/py2_raise.py",
+      "sha256": "19d989963807de3847a00bbe90337fd9100a79cee4327683b601e4bc96225b77",
+      "scope": "Unchanged Python 2-only helper included in the text sweep; the Python 3 branch selects py3_raise. It is not parsed as Python 3."
+    },
+    "observed_literal_importers": "Six requests_oauthlib files bind OAuthlib client classes, token errors and common helpers. The recipe scan reports no OAuthlib imports or advisory-related references. Authlib name matches refer to Authlib implementations, not OAuthlib imports.",
+    "reviewed_implementation": "OAuthlib oauth2 imports/re-exports server definitions, so loaded definitions are not evidence of authorization-server invocation. RevocationEndpoint defaults enable_jsonp=False; its preconfigured servers do not enable that option. The source windows retain the separate authorization-code/PKCE implementation.",
+    "limits": [
+      "The unchanged JWT sweep matches selected literal imports and decode-style names, not every alias or possible runtime caller.",
+      "The supplement retains literal aliases and from-import bindings, but its bound-call detector visits ast.Call only: class bases and bare attributes are not reported as calls.",
+      "The supplementary text sweep covers selected advisory names; it is not an exhaustive semantic reachability proof.",
+      "Dynamic imports, runtime-assembled names and non-Python callers remain unknown. No OAuth server endpoint or provider was invoked to establish runtime reachability."
+    ],
+    "conclusion": "This fresh exact-target static evidence supports review of the two existing exceptions within the stated limits. It does not establish blanket runtime unreachability or qualify macOS."
+  },
+  "sources": [
+    "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/pyproject.toml#L7",
+    "https://docs.astral.sh/uv/reference/cli/#uv-pip-compile",
+    "https://packaging.pypa.io/en/stable/requirements.html",
+    "https://packaging.pypa.io/en/stable/markers.html",
+    "https://google.github.io/osv-scanner/configuration/"
+  ],
+  "retained_historical_evidence": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930.json",
+      "sha256": "f49dda8891c4367c47495f767fd1b6366c0659c7ad84d3a0a1b16c68f57c46cf"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-sources.json",
+      "sha256": "7829c29474ff23ec7b50c957b03be75fca10935e974749ac054eb58ef8f2aad8"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-commands.json",
+      "sha256": "aa794a4a612821be38d62cf97faeb4b07814c772535ac83c6b9eb3bf17a34917"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-upstream-tests.txt",
+      "sha256": "99e1e2a7af20af37627b7d874533a61ed740bb03ec9a45f38b732f40554d7525"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json",
+      "sha256": "a5e9a112706a8822ca23e0f82199b3cbc3164982db80c8720b087c98335285d1"
+    }
+  ],
+  "remaining_gates": [
+    "The pinned image remains unaccepted with the historical 56 fixable High/Critical package/advisory matches; this recipe venv lock does not rebuild or repair its binary.",
+    "Independent trusted observation, native isolation/provider qualification and task-quality acceptance remain open.",
+    "Coordinator integration must register the new evidence/constraint fixture and bind the existing exact-target guard before final CI acceptance."
+  ],
+  "execution_boundary": {
+    "new_model_requests": 0,
+    "server_or_container_starts": 0,
+    "global_configuration_changes": 0,
+    "provider_usage": null,
+    "usage_note": "No new provider request was made; native provider token usage was not collected and remains unknown."
+  },
+  "raw_output_policy": {
+    "sanitization": "Only owned private/worktree/home path prefixes are replaced with placeholders; stdout/stderr content and whitespace are otherwise retained. Commands record SHA256 of the original private streams and point to the sanitized returned output.",
+    "new_raw_outputs_with_trailing_whitespace": [
+      {
+        "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-oauthlib-alias-callers.txt",
+        "sha256": "7e5fd6fc81d63c595e3083e01da2b700a184fcec7f7f9db6619732b494dd5083",
+        "lines_with_trailing_whitespace": 76
+      }
+    ],
+    "historical_raw_outputs": "Unchanged byte-for-byte; no earlier receipt, failed attempt or raw output was rewritten.",
+    "hash_format": "File hash inventories use arrays of path/sha256 records, not filename-keyed objects."
+  },
+  "checks": [
+    {
+      "id": "reviewed-main-blob",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-reviewed-main-blob.txt"
+    },
+    {
+      "id": "fresh-venv",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-venv.txt"
+    },
+    {
+      "id": "build-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-build-hash-install.txt"
+    },
+    {
+      "id": "native-compile",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile.txt"
+    },
+    {
+      "id": "fresh-extraction-reproduction",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-extraction-reproduction.txt"
+    },
+    {
+      "id": "runtime-hash-install",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-runtime-hash-install.txt"
+    },
+    {
+      "id": "native-pip-check",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-pip-check.txt"
+    },
+    {
+      "id": "native-imports",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-imports.txt"
+    },
+    {
+      "id": "actual-sdk-fixtures",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-actual-sdk-fixtures.txt"
+    },
+    {
+      "id": "maintained-jwt-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-maintained-jwt-callers.txt"
+    },
+    {
+      "id": "oauthlib-alias-callers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-oauthlib-alias-callers.txt"
+    },
+    {
+      "id": "published-artifact-source-identity",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifact-source-identity.txt"
+    },
+    {
+      "id": "osv-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-version.txt"
+    },
+    {
+      "id": "osv-ci-config",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.txt"
+    },
+    {
+      "id": "osv-empty-config",
+      "exit_code": 1,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.txt"
+    },
+    {
+      "id": "selected-dependency-comparison",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-selected-dependency-comparison.txt"
+    },
+    {
+      "id": "native-uv-version",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-uv-version.txt"
+    },
+    {
+      "id": "native-compile-help",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile-help.txt"
+    },
+    {
+      "id": "installer-lock-consumers",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-installer-lock-consumers.txt"
+    },
+    {
+      "id": "tagged-install-policy",
+      "exit_code": 0,
+      "returned_output": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-tagged-install-policy.txt"
+    }
+  ],
+  "bound_files": [
+    {
+      "path": "blueprints/runtime-workers/openhands/requirements.lock",
+      "sha256": "383ccc5b87702174e471732872f002f1621186710402d048acc2b1910306e106"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/pins.json",
+      "sha256": "2f87fb6e92f83c6afc52c804a25eec93d35deb08e16c767529de21195adbed3b"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
+      "sha256": "32cff7dc47659683a19936944a47123160731a2bdb711aee78a7d63fbab205e2"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/host.py",
+      "sha256": "00551430ef463323706866f65a91a3086af12299259cb6a619e651419e982e3f"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install.sh",
+      "sha256": "4163d3e0d8eda0d61d2e832d6ffd1690348f71ddf03d1a3c99651635b3b53815"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install-container.sh",
+      "sha256": "3824f5dbcfe4751884bcb1699faff3c994a6e17a77b81c5866d49b6565595051"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/install-grader.sh",
+      "sha256": "84c23ee6ab190562761d65aca61d50d8a4bf33e0285f180dc00a1df3a288a243"
+    },
+    {
+      "path": "tests/test_openhands_150.py",
+      "sha256": "920cbacf71beeb1fe470f3386c11ffa6401ddd73dbfd4d91455661edf81fffd3"
+    },
+    {
+      "path": ".github/workflows/security-scan.yml",
+      "sha256": "88a47e2cf7c16078331a4052c08bf88bc10ed9c70c167d863cd8e581c1a0ef14"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-actual-sdk-fixtures.txt",
+      "sha256": "9ee6941fd3b532f888b320a474ecb708381be64de27696ffb232a13c9128c942"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-build-hash-install.txt",
+      "sha256": "80895466bdc4ad6866212c83c305b8cf27487d8b9634b661a9b6e6301d129905"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-commands.json",
+      "sha256": "3bdf5759ab4cec5b673d610765b81510bafb5981a6c0428aba8515c3a865e9b5"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-compare.py.txt",
+      "sha256": "af2e609f21fb3e166d56362d1cc93899fdbf428421db7ee5560d5f730d22881f"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-constraints.txt",
+      "sha256": "b4e06f725855214b283cbcd92068cbb45dd3d272114079f1696a7542ab9a94dd"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-dependency-comparison.json",
+      "sha256": "b01a987646e5ba167193335d69c98455739825148d15b75fee1982669185831e"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-extraction-reproduction.txt",
+      "sha256": "5381b4f38ab482bd0d2fac4a7fb2dd41300cd2652aae4f660a343b58b8e2a639"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-venv.txt",
+      "sha256": "0f927255ceb258c775cc1b0ee5c567286601dd50baa798b4fc1e0b9e7a28fc91"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-installer-lock-consumers.txt",
+      "sha256": "aa2e7e6fee6e3182264dfbc735ab1b5ff13cb742533e8e36435fb4d9503e4e5a"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-maintained-jwt-callers.txt",
+      "sha256": "5296678744ff15c582c0a124b96a86269c42391a707eaff59ea6c28286e7030c"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile-help.txt",
+      "sha256": "8272c771ab3ecdc939cf410702e08d5ac8b59cd42191b509049b0663520edfcf"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile.txt",
+      "sha256": "fe3190bc61053e8e4fe48dde38b3b2f6ad2f402dfcfdd89d1ab3683e6cd3c39d"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-imports.txt",
+      "sha256": "477c405a25e4b1ef4ee5c76b1e550a0a34eefcc74bf861497ef8201a672dc713"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-pip-check.txt",
+      "sha256": "ab7fb266794b383e8a044606ea2e3ddc463349c485eab928a18d2ee997c093b6"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-uv-version.txt",
+      "sha256": "0b702db49c11107d0b91e82c5383951e017f1ae993fcf68a24841f5a8d5f6598"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-oauthlib-alias-callers.txt",
+      "sha256": "7e5fd6fc81d63c595e3083e01da2b700a184fcec7f7f9db6619732b494dd5083"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.txt",
+      "sha256": "83832fb09f1d62770d7d816582db36510d2555e61880880db0b41e35f91e3295"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.txt",
+      "sha256": "abec7ffb9d6114ead2d7093b4b52f889d96ee5ea98da3dd0f9d3fe0752174908"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-version.txt",
+      "sha256": "e1ecb1656b9241ee137b2610c19d972bdaba712570cc86a8883db7d2f295fb8f"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifact-source-identity.txt",
+      "sha256": "9622f25bfe5b9244dd4160b7c05bedce18cde7b2e5c7562eeed76ce9787b031d"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifacts.json",
+      "sha256": "b475ffaa58caaf803bbc600712484c8a2d905904f698d06da57b06d1d46c8d0b"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-reviewed-main-blob.txt",
+      "sha256": "9d780b5e01c1b2a36e7e2a42b12a929e97b76a0bfb9debbcbd0a8acc580c0f30"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-runtime-hash-install.txt",
+      "sha256": "e3e3d32e8e589d62680e772469f5820fa1e7e9077d457ba5c8d55f97adc5a475"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-selected-dependency-comparison.txt",
+      "sha256": "93799677e0177cfb784b6d3ce779efc5e2980a15ad71d225b627f72ffd349989"
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-tagged-install-policy.txt",
+      "sha256": "0c4c7d8e6ecf05add855a03004cd9921af7a03c97d20a026cb1066dccfb05542"
+    }
+  ]
+}

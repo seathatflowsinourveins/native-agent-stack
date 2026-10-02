@@ -1,0 +1,233 @@
+{
+  "name": "rw-deerflow",
+  "services": {
+    "redis": {
+      "image": "${IMAGE_REDIS}",
+      "pull_policy": "never",
+      "command": [],
+      "volumes": [],
+      "healthcheck": {
+        "test": [
+          "CMD-SHELL",
+          "REDISCLI_AUTH=$$(cat /run/secrets/redis-password) redis-cli -h \"$$(hostname -i)\" ping"
+        ],
+        "interval": "5s",
+        "timeout": "3s",
+        "retries": 10
+      },
+      "entrypoint": [
+        "/runtime/redis-start.sh"
+      ],
+      "container_name": "rw-deerflow-redis",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,nosuid,nodev,mode=1777"
+      ],
+      "networks": [
+        "default"
+      ],
+      "user": "0:0"
+    },
+    "gateway": {
+      "image": "${IMAGE_GATEWAY}",
+      "pull_policy": "never",
+      "init": true,
+      "working_dir": "/work",
+      "command": [
+        "/runtime/gateway-start.sh"
+      ],
+      "env_file": [],
+      "environment": {
+        "DEERFLOW_MODEL": "${DEERFLOW_MODEL}",
+        "DEERFLOW_BASE_URL": "${DEERFLOW_BASE_URL}",
+        "RUNTIME_WORKER_ARM": "${RUNTIME_WORKER_ARM}",
+        "DEER_FLOW_PROJECT_ROOT": "/work",
+        "DEER_FLOW_HOME": "/state/deerflow",
+        "DEERFLOW_SQLITE_DIR": "/state/deerflow/data",
+        "DEER_FLOW_CONFIG_PATH": "/config/config.yaml",
+        "DEER_FLOW_EXTENSIONS_CONFIG_PATH": "/config/extensions_config.json",
+        "DEER_FLOW_SKILLS_PATH": "/skills",
+        "DEER_FLOW_STREAM_BRIDGE_REDIS_URL": "redis://redis:6379/0",
+        "PYTHONPATH": "/runtime:/app/backend",
+        "HOME": "/state/mcp/home",
+        "XDG_CACHE_HOME": "/state/cache",
+        "XDG_CONFIG_HOME": "/state/config",
+        "XDG_STATE_HOME": "/state/mcp/state",
+        "UV_CACHE_DIR": "/state/cache/uv",
+        "LANGSMITH_TRACING": "false",
+        "LANGFUSE_TRACING": "false",
+        "MONOCLE_TRACING": "false",
+        "CHUB_TELEMETRY": "0",
+        "CHUB_FEEDBACK": "0",
+        "DO_NOT_TRACK": "1",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "HTTP_PROXY": "http://egress:3128",
+        "HTTPS_PROXY": "http://egress:3128",
+        "NO_PROXY": "localhost,127.0.0.1,redis,gateway,frontend"
+      },
+      "volumes": [],
+      "depends_on": {
+        "redis": {
+          "condition": "service_healthy"
+        }
+      },
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "/app/backend/.venv/bin/python",
+          "-c",
+          "import socket,urllib.request; urllib.request.urlopen('http://'+socket.gethostbyname(socket.gethostname())+':8001/health/ready',timeout=5)"
+        ],
+        "interval": "5s",
+        "timeout": "6s",
+        "retries": 30
+      },
+      "mem_limit": "6g",
+      "pids_limit": 512,
+      "container_name": "rw-deerflow-gateway",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,nosuid,nodev,mode=1777"
+      ],
+      "networks": [
+        "default"
+      ]
+    },
+    "frontend": {
+      "image": "${IMAGE_FRONTEND}",
+      "pull_policy": "never",
+      "command": [
+        "/runtime/frontend-start.sh"
+      ],
+      "env_file": [],
+      "environment": {
+        "DEER_FLOW_INTERNAL_GATEWAY_BASE_URL": "http://gateway:8001",
+        "DEER_FLOW_TRUSTED_ORIGINS": "http://127.0.0.1:3771",
+        "NEXT_TELEMETRY_DISABLED": "1"
+      },
+      "volumes": [],
+      "container_name": "rw-deerflow-frontend",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,nosuid,nodev,mode=1777"
+      ],
+      "networks": [
+        "default"
+      ]
+    },
+    "nginx": {
+      "user": "101:101",
+      "image": "${IMAGE_NGINX}",
+      "pull_policy": "never",
+      "command": [
+        "/runtime/nginx-start.sh"
+      ],
+      "ports": [
+        "127.0.0.1:3771:2026"
+      ],
+      "volumes": [],
+      "depends_on": {
+        "frontend": {
+          "condition": "service_started"
+        },
+        "gateway": {
+          "condition": "service_healthy"
+        }
+      },
+      "container_name": "rw-deerflow-nginx",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,nosuid,nodev,mode=1777",
+        "/var/cache/nginx:rw,nosuid,nodev,uid=101,gid=101",
+        "/var/run:rw,nosuid,nodev,uid=101,gid=101"
+      ],
+      "networks": [
+        "default"
+      ]
+    },
+    "egress": {
+      "image": "${IMAGE_NGINX}",
+      "pull_policy": "never",
+      "container_name": "rw-deerflow-egress",
+      "entrypoint": [
+        "nginx"
+      ],
+      "command": [
+        "-c",
+        "/config/egress.conf",
+        "-g",
+        "daemon off;"
+      ],
+      "networks": [
+        "default",
+        "egress"
+      ],
+      "volumes": [],
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "user": "101:101",
+      "cap_drop": [
+        "ALL"
+      ],
+      "security_opt": [
+        "no-new-privileges:true"
+      ],
+      "read_only": true,
+      "tmpfs": [
+        "/tmp:rw,nosuid,nodev,mode=1777"
+      ]
+    }
+  },
+  "networks": {
+    "default": {
+      "name": "rw-deerflow-network",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      },
+      "internal": true
+    },
+    "egress": {
+      "name": "rw-deerflow-egress-network",
+      "labels": {
+        "com.native-agent-stack.owner": "gpt6-omniroute-framework-integration"
+      }
+    }
+  }
+}

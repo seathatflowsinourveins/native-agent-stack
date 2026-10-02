@@ -1,0 +1,37 @@
+.......+----------------------------------------------------------------------+
+|  OpenHands SDK v1.50.0                                               |
+|                                                                      |
+|  Report a bug: github.com/OpenHands/software-agent-sdk/issues        |
+|  Get help: openhands.dev/joinslack                                   |
+|  Scale up: openhands.dev/product/sdk                                 |
+|                                                                      |
+|  Set OPENHANDS_SUPPRESS_BANNER=1 to hide this message                |
++----------------------------------------------------------------------+
+
+....E
+======================================================================
+ERROR: test_p3_native_tool_replay_and_query_denial_are_fixture_only (test_openhands_150.OpenHands150Transport.test_p3_native_tool_replay_and_query_denial_are_fixture_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_openhands_150.py", line 219, in test_p3_native_tool_replay_and_query_denial_are_fixture_only
+    first = Message(role="assistant", content=[], tool_calls=[{
+        "id": "call-p3-fixture", "type": "function",
+        "function": {"name": "route_probe", "arguments": '{"text":"P3_OK"}'},
+    }])
+  File "<UPSTREAM>/.venv/lib/python3.13/site-packages/pydantic/main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+pydantic_core._pydantic_core.ValidationError: 3 validation errors for Message
+tool_calls.0.name
+  Field required [type=missing, input_value={'id': 'call-p3-fixture',...s': '{"text":"P3_OK"}'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+tool_calls.0.arguments
+  Field required [type=missing, input_value={'id': 'call-p3-fixture',...s': '{"text":"P3_OK"}'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+tool_calls.0.origin
+  Field required [type=missing, input_value={'id': 'call-p3-fixture',...s': '{"text":"P3_OK"}'}}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+
+----------------------------------------------------------------------
+Ran 12 tests in 6.401s
+
+FAILED (errors=1)

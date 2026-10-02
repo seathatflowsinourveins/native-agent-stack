@@ -18,4 +18,4 @@ fi
 /bin/uv pip install --python "$prefix/venv/bin/python" --require-hashes --no-deps \
   --no-build-isolation --index-url https://pypi.org/simple -r /recipe/requirements.lock
 /bin/uv pip check --python "$prefix/venv/bin/python"
-"$prefix/venv/bin/python" -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.49.6"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print("SDK/tools 1.49.6 imports passed; no model request")'
+"$prefix/venv/bin/python" -c 'import importlib.metadata as m; assert m.version("openhands-sdk") == m.version("openhands-tools") == "1.50.0"; from openhands.sdk import LLM, Agent, Conversation; from openhands.tools.terminal import TerminalTool; from openhands.tools.file_editor import FileEditorTool; print("SDK/tools 1.50.0 imports passed; no model request")'

@@ -3925,13 +3925,13 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "97c35ece0b41e0ad3b06bc48857aa5c1eb0119862f35603920c33a7ea0244637",
-      "bytes": 10394
+      "sha256": "b83f592b45e963fdee3f829a14243dbf33fc24277ca6366a1579e39aa04ba757",
+      "bytes": 15772
     },
     {
       "path": ".github/osv-scanner.toml",
-      "sha256": "dc6c8e8a535f78314525b8845d64f12bb743457147c9db0cae6d84c9297f9f87",
-      "bytes": 7252
+      "sha256": "ddff1691844ce7c76d2d1860046074f46aac320f62f35278d508b948184849f8",
+      "bytes": 7630
     },
     {
       "path": ".github/pull_request_template.md",
@@ -5763,6 +5763,16 @@
       "path": "blueprints/convergence-practice/protocol.json",
       "sha256": "7176889bb4f8e3839c5230918c1e23ff89bdd3778a8f333db2ea881731a08e45",
       "bytes": 2595
+    },
+    {
+      "path": "blueprints/convergence-practice/runtime-image-browser-20260930/README.md",
+      "sha256": "3ccbeb353a113cc50679761d4a93cba3f2ac27f8b9fdf06c435b35beedb0cdeb",
+      "bytes": 7084
+    },
+    {
+      "path": "blueprints/convergence-practice/runtime-image-browser-20260930/experiment.json",
+      "sha256": "98a7d5ca589c22e02ea4b0ab2e5cebab196645d3abf8c566d3155498763a1d3f",
+      "bytes": 7949
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
@@ -9120,9 +9130,669 @@
       "bytes": 2690
     },
     {
+      "path": "blueprints/runtime-workers/README.md",
+      "sha256": "879a812f5b9845af723dfb1ef5e00ba65d2cae3ee57b8b2d4364f461b50be8ea",
+      "bytes": 6612
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/.gitignore",
+      "sha256": "6fa9c435f133f59f9198b520765a85fee8d71a16f1439e53fed49c95dc39158f",
+      "bytes": 24
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/README.md",
+      "sha256": "e041d8c146b204b02ca709acd68cc6f04370701aa891ec78272e5bffb359ce98",
+      "bytes": 44208
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/browser-artifacts.json",
+      "sha256": "2ccc245dc89b29d7586e8278d808301117d22740ad171810b06245201601da2d",
+      "bytes": 1052
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/common.sh",
+      "sha256": "0c9414dd3c52e78c0121e54a1d53e816278b6aea9b91483209334ac1e5cdf0dd",
+      "bytes": 877
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/compose.yaml",
+      "sha256": "611a731b9a83db7931e48dd38b2fe89a9761d0f820d6050debe91a95f6f42277",
+      "bytes": 3018
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/host.example.json",
+      "sha256": "e096e196c7324a67de265fb58371747b72ef94a4f4e445ea66e216b8c44ed9b4",
+      "bytes": 349
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/logging.ini",
+      "sha256": "b495284f90c1b328e98e7ab6dc48c7be37b7a35140a90e270ead4fef133098d8",
+      "bytes": 600
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/mcp-policy.json",
+      "sha256": "67334ba6a7a90116bd631a302b6f82a5691eac6a5d40771db866428fd210099a",
+      "bytes": 2681
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/server.yml",
+      "sha256": "2d77b444912fa70eac926a87b37ad4e5335f6953475a0702ecf52900972acac9",
+      "bytes": 320
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/supervisord.conf",
+      "sha256": "a145e5d4db3d7f659a74246eaabf5d11e547d4368008bb796afb2e7fbbb7a548",
+      "bytes": 1952
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/config/worker.json",
+      "sha256": "eb325aafc083225396b2d42cf470650342f77a56e3ad80bbd89477b0ca7ef848",
+      "bytes": 1693
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/container-entrypoint.sh",
+      "sha256": "591fd0c640d0ffef42e8071fd1ba3ec9bd118290181178157f1a40182bf2502f",
+      "bytes": 1258
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/container.sh",
+      "sha256": "a2e0f05358137487a31580558d576cf1e776b8b2ebc44987b12e50c611f27fee",
+      "bytes": 2627
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/dispatch.py",
+      "sha256": "bee97999774673725c878fceb5ae8f89ae930dd62c8182a1540bb117d21f8374",
+      "bytes": 10972
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/dispatch.sh",
+      "sha256": "449ad2bed799e1fe97f513160a6246e4beed9bb8bbdaa0d87f92aaf6e4bab913",
+      "bytes": 296
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/assertions.json",
+      "sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "bytes": 81
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/check.py",
+      "sha256": "7878f98bea665d4111e3ce76580b26b8d495e84651ed236f108492e381623dd7",
+      "bytes": 831
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/expected.json",
+      "sha256": "254d9c19cafb60b6352979a7e15d94019555aa28f82cb4e30b8748607cf07d64",
+      "bytes": 414
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/beacon.html",
+      "sha256": "d743937367e843d738223dc1dc7aac0db363ef5173c53d188a68136d63f8739e",
+      "bytes": 828
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/flask.html",
+      "sha256": "b643e3617fc0681d2775da7f53bced1c8b60235b5f940af712bcad44d9a1d852",
+      "bytes": 838
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/fixtures/lamp.html",
+      "sha256": "5d3e3fdc038def93ef353119fbbb06ed6fc8e311c89f1eed1785363b6256348f",
+      "bytes": 834
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/grade.py",
+      "sha256": "cefc9125e6d505778cdb9f25f09c3ae9c072894ad8902c612f52c3e61d7e348f",
+      "bytes": 5734
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/mcp_probe.py",
+      "sha256": "9f2f8e4e97c0ca59a6ed01338f000a1b9187edf9d8f71b8267e84801fb11a93d",
+      "bytes": 5078
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/receipt.py",
+      "sha256": "521fb9ada9ef128201300396cea1130f031356ce6f12600a41305f16178c3fa5",
+      "bytes": 14568
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/run.py",
+      "sha256": "49bbd9598e5ac6c271b268523ca6c223b497821b5ebd2d9fd0dfe57ba549ea4b",
+      "bytes": 9372
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/e2e/schema.json",
+      "sha256": "69747f245f545a29151f17cd4fcbe5dee1418f9176970a67b4ce9f6f094e4d36",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/evidence/grader-ftp-repair.json",
+      "sha256": "24eb2daf3a485a4d3244ce70ee876dea933625bd8bc0972486854279794390f4",
+      "bytes": 11580
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/evidence/nltk-reachability.json",
+      "sha256": "3ae7461b5852631d7fd9a8aad8ade3eddb71ed84e1f7c08599977202adae81ae",
+      "bytes": 17876
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package-lock.json",
+      "sha256": "a64877fe75a939652e3d98277ca35a331935f45ddea5860535e20e1d24bf7a7a",
+      "bytes": 460880
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/grader/package.json",
+      "sha256": "d61efc89d26319a63b58fbcd34e81802cba77dc203553d5f7259b7cb039ce929",
+      "bytes": 218
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/host.py",
+      "sha256": "38687eb528d63bb115654dbcb7c9d45c02f4f061625a198d1f9bb0363cbc47d8",
+      "bytes": 4270
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/install-browser.py",
+      "sha256": "7919165002ce74da8274c70ff294ff6eee11481bcbd6a1e45b8539fea9e25729",
+      "bytes": 2646
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/install.sh",
+      "sha256": "4e61aedd842faf0c920344ec1cffb06fd09d03705f604f8be41b006e29657078",
+      "bytes": 4177
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/mcp-config.py",
+      "sha256": "971c419bd49be9817684f9a04bda045c988ba540dee57f20272765870a3d8591",
+      "bytes": 1468
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/pins.json",
+      "sha256": "4fb312399e032905487f49a7b5384d49dda52d88c66cc01be743e9eb3c302abb",
+      "bytes": 2764
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/registry-evidence.json",
+      "sha256": "710dc54f473150f9209e76e0a5a889abda8c56c793b3f52b064b624e9a290d29",
+      "bytes": 645
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.in",
+      "sha256": "f922a5a3f6b978192899aa94a0b64a82e01dbb4782b4cc151ad8a7d2ca5f3d38",
+      "bytes": 157
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/requirements.lock",
+      "sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+      "bytes": 248729
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/research.md",
+      "sha256": "d274a10ab488bc1b03b3d50b64ab8da06241b4e85e3beecd26953b9e6b1001ec",
+      "bytes": 24368
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/run-e2e.sh",
+      "sha256": "18bcb24f04aa349cbeaa65e2d722fb214d06699ecd57d51da99f71aad571e039",
+      "bytes": 397
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/test-requirements.lock",
+      "sha256": "18802e44cb0fe166cbb229a3efdce7f83dfd8349d0bdc81c35c2e0ad98929b5a",
+      "bytes": 1000
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification-round2.json",
+      "sha256": "76c7dc531a0397c11dfaa97508d78eb383b8fef042533d9a0376723d3e533d97",
+      "bytes": 12483
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification-round3.json",
+      "sha256": "d6ca0f856c4711c5b85f3fcf94a2b3c3a4e3d8a02cba2e40f383e59e19806034",
+      "bytes": 32018
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/verification.json",
+      "sha256": "ca2b276cce40925a31242bed3f6949e3459aea4cdd7a6e1c53672d2c75c8d70e",
+      "bytes": 4893
+    },
+    {
+      "path": "blueprints/runtime-workers/crawl4ai/worker.py",
+      "sha256": "c663c3c0ed0f391a2c0b9703916b12db8476554ac4f1e06c9b3d79c1c99edafb",
+      "bytes": 8903
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/.gitignore",
+      "sha256": "e45917dd7b440fbd1c22bd736185121a7bee518481d164b2963f5c0075dc3edb",
+      "bytes": 30
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/README.md",
+      "sha256": "8de12bed89bdc3a12dabe4e3c7eded3028b66ad60d44b0c9cb65ffc079e5247b",
+      "bytes": 30690
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/compose.json.template",
+      "sha256": "736b75050339f8876a6b0f75336b453fe7d02ae98c5c91b4cd144c594cb0d7c8",
+      "bytes": 6128
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/config.yaml.template",
+      "sha256": "b9643186de7a2c48224d7dd03bfb654fcdbb7e6925774b12652d0df772da4940",
+      "bytes": 3551
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/deerflow-run",
+      "sha256": "d1cf1bfc2361d1c16df13dd59aba6236258edf1913746c8109d64f302cdbbc0b",
+      "bytes": 434
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/defaults.json",
+      "sha256": "18d1a1183471c110ea1ad0bb35468c1fe6ae08156a6d0d5e1e7d3d14b4602e96",
+      "bytes": 150
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/dispatch.py",
+      "sha256": "3133d1dbc1e21a286bcedf5e02a591039036d2fc87ba9c7265611110bd4ee18d",
+      "bytes": 15056
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/check.py",
+      "sha256": "f3915481b82f6f54cc37de0551010829dc14f71fd2df9607efdc92754a8cba3a",
+      "bytes": 2825
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/drive.py",
+      "sha256": "0b5ca3da35ac4fd30854a3558dd08dff0693f50360dadf835ac9202137524cb2",
+      "bytes": 1406
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/evaluate.py",
+      "sha256": "0a29a38366371c347290539ddc21aeae9cadcca47f5457ad97a129c96d58d988",
+      "bytes": 5250
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/expected.json",
+      "sha256": "e0ce9a88c8160152b3e1aa1e8d456dda690e6fbf155cb4260aaab04fc309fe41",
+      "bytes": 1269
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/gaia.py",
+      "sha256": "f651e12568e83fe3e23534dd99dc287127f21c887b08fa9fef6aeb975eb352ce",
+      "bytes": 1910
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/receipt.py",
+      "sha256": "d879be1df6adb2caadeabc8d0a35a880c6804f68816e4504ae3a570686e51ba9",
+      "bytes": 15883
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.lock",
+      "sha256": "388083f96839d48ab92b99ea7a3a8fe01f978e5d73374fd8d4ed4dc00adaa341",
+      "bytes": 221764
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/requirements.txt",
+      "sha256": "45495375bf4f4c0e4df3fb77c15e1ca030f38e6bd807fcfaf5bcf908b277275d",
+      "bytes": 126
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/run.py",
+      "sha256": "a3112e387bf6c9bfb7c39dd273f591dd78162f9e05f5e664d8c073f0939b7518",
+      "bytes": 7668
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/e2e/task.md",
+      "sha256": "4155ef3b6c83d5333cc63f9006845a2b0ab57b2161fdf7a3c8e31f695936680b",
+      "bytes": 1206
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/egress.conf.template",
+      "sha256": "7ddc16d3210178072f1f77ef5881896f3f832d081207a92bd97ba09284b3fb4e",
+      "bytes": 906
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/artifacts.txt",
+      "sha256": "f5b71a3d3a1347dbb03b6943218ba070c0f96a2ef71aa34f0c5cb407db362e36",
+      "bytes": 196
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/fail-first.json",
+      "sha256": "00b3442bbc17b12961402e6b756b7e650b09bc9f0294220057aca338af48c99a",
+      "bytes": 238
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/fail-first.txt",
+      "sha256": "14c46a6a37e7ff027eda6cede10421063037dfa50663bbacfb11c87dd48877fb",
+      "bytes": 14628
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/followup-checks.json",
+      "sha256": "6ee8a4dc183f7ce6861a2e648f5b1be5831e6b510b090a81a0dce5d686848fb1",
+      "bytes": 4418
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/repository.txt",
+      "sha256": "78a0346f79291fd2a46e1733990afe47f789101156ca3b17ac9cc8bf32c745c5",
+      "bytes": 162
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-cleanup-red.txt",
+      "sha256": "bb53b58b4c5256f7374366d1dc93083b5299cd1ff4e3a139df1f312a15e56af3",
+      "bytes": 1293
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-fail-first.json",
+      "sha256": "5227cfcd7c5fd75ae6a47daa6e2e483f49a747bd4606f00d97a4b3a2031dfe48",
+      "bytes": 4443
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-malformed-red.txt",
+      "sha256": "7a9f09071eec49d69564dfb3606aadeb214276ab4ff4f9bbb4ec6a12d589c4e6",
+      "bytes": 1744
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-repository.txt",
+      "sha256": "99690377fa19c747ba60d638a20ca8ea447ced7ecc56f8702b6e5c8139eadf2e",
+      "bytes": 2136
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-syntax.txt",
+      "sha256": "7d0e81027d9d2599a6f9bbce1a3f7aa2aa90f4666c1729a76017e096f036430c",
+      "bytes": 133
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-unit.txt",
+      "sha256": "28caed9cb3d4bc5101a2a88a7b1b53c38f05db4255b6a0363def8e945641c084",
+      "bytes": 3741
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/round2-verification.json",
+      "sha256": "71b5fb6c415d66d41b9f9803b8e07448898376c1b267b58eed648f7962e1c776",
+      "bytes": 2633
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/syntax.txt",
+      "sha256": "5b5bb0acadd5fcaae84ee069c582e528ee7d78f66bf3b1a1fa9a8fea80f406d5",
+      "bytes": 165
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/unit.txt",
+      "sha256": "4f70d173753c7a34e721db7e939bce534101339b17f335ee8fcc8b8a45fff2a3",
+      "bytes": 1754
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/evidence/verification.json",
+      "sha256": "84e7119b34d980a21751fc654fd514230416dbb5380177dffb86d29c9874b1ac",
+      "bytes": 7618
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/extensions_config.json.template",
+      "sha256": "2eac031a4ae268143a442c51ef1187fecc9d5ec98910d3ffe2561761880e9d28",
+      "bytes": 3345
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/host.json.example",
+      "sha256": "b01b6e7a14aecb58481f146a3182e985f3665f0a9f29605b294d9e5a75e987f5",
+      "bytes": 1270
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/install.sh",
+      "sha256": "55583f70dda2a84f33ed8d15fb1e3b2671fb2454b52cd5fd177bf174669d4fcf",
+      "bytes": 278
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/lifecycle.sh",
+      "sha256": "d975500081382db565b786c693df288defe4d7abca39c801daac7c78cb2a7f39",
+      "bytes": 286
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/pins.json",
+      "sha256": "ccaa5cbccc831eaf41f62462633dfdf01920ba4dd30ea42c4453a2b8825babd2",
+      "bytes": 2942
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/recipe.py",
+      "sha256": "59b39b72e42e7a96efe078caa79bf928ce5dd8da54e9447490bfee29c4abc4a0",
+      "bytes": 21511
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/research.json",
+      "sha256": "c401025560888ca978609f26bbb5eeaa8ff0f2f52279292ec9d5b02b97cc3281",
+      "bytes": 19999
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round2-research.json",
+      "sha256": "cb0c8b65a2ce00776f08b6fe0e180b3db8ff439b3d3bb7f72c31d8c2c0407d0e",
+      "bytes": 9611
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round3-verification.json",
+      "sha256": "549e7db9fa3897a58703b2a2d6899e39f7d15ee7ac10c64547a3d7502d285e8e",
+      "bytes": 104650
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/round3-verification.md",
+      "sha256": "ad8afdabfc7f943abbcc8215d627cf67fcf113ff323a352b596942926b24a8cc",
+      "bytes": 24134
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/run-e2e.sh",
+      "sha256": "38e542377e15b801836560cd26920394a99a0eb1a64f1d6754e4358e7c311ff3",
+      "bytes": 258
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/frontend-start.sh",
+      "sha256": "31c5523812bd6be031df233f1a31e84380a012a40b190b245a2ccf553d0f46ae",
+      "bytes": 159
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway-start.sh",
+      "sha256": "906bd7593e5318b66920921d30790dea51be38ed550c7137992d75ae03ba321e",
+      "bytes": 472
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway_headers.py",
+      "sha256": "e2915a83652467d89dfcb62fc5e9baa62641805d2965d7593bdb8e89c66470a5",
+      "bytes": 909
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/gateway_model.py",
+      "sha256": "fcd75cd69a542b07bf4e8f15910e87991e393c5c579fbd8ec93b6a5328f398ea",
+      "bytes": 2170
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/nginx-start.sh",
+      "sha256": "656d66f6dc7c715c014980701727b2bc8ac9d4c61f7bc7326a145ea74d98c21e",
+      "bytes": 421
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/preflight.py",
+      "sha256": "2a05cf1be2c29462afbcb542a5a95f14412a321e85d953d137d2e4bf007b4603",
+      "bytes": 2845
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/redis-start.sh",
+      "sha256": "1d5dabef9396f2dbb4cd23ecbba3442c6dd74b0fe6f0a123f8cdb8065c708c73",
+      "bytes": 534
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/stdio.sh",
+      "sha256": "c2574cf58651121a2280a7b220ab437213d15427c30b426f0e742ba3aaf6c659",
+      "bytes": 196
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/tool-policy.json",
+      "sha256": "a28ab9d1813028527671b19259de43a51cbc1af79f0d1c92b8f3d99a647a1b31",
+      "bytes": 1351
+    },
+    {
+      "path": "blueprints/runtime-workers/deerflow/runtime/worker_policy.py",
+      "sha256": "0d5a2f51a2ccdde7187cb43f9a172c22fb8ce9ddcdb52ee83bdf283674b183dc",
+      "bytes": 3036
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/README.md",
+      "sha256": "bf0bf4320e34cdab85aeffa1e07e899ce908c401d37490e72c4f95df5ef90a89",
+      "bytes": 20714
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.in",
+      "sha256": "fe1d3c1bcc3db9e25991e2d037db4f13b6830004f82e2e04448f1956b92f9b4c",
+      "bytes": 137
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/build-requirements.lock",
+      "sha256": "3e4bc4a4fdb884e03759d5eb0afdba46de547dce525b25bee17c63de3f1de57f",
+      "bytes": 748
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/cli_runner.py",
+      "sha256": "9aa7c94183f14c342b09070217446b3c6c811d47f106d7d02f14ba9825576194",
+      "bytes": 2710
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/config.template.json",
+      "sha256": "6602a06de958ed1e69ebe38243d9c9590592c124034f3f99384d7acecbc0d6d4",
+      "bytes": 1181
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.py",
+      "sha256": "5a6981a663ff10e929724c357b71eca5606176d2e08d0b5d9d7ca5754b1949d5",
+      "bytes": 15896
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/dispatch.sh",
+      "sha256": "51fcef07d220105e2e9d6f2d8427db17e8c7535fdb38bf797b2e471ae68ad821",
+      "bytes": 271
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/check.py",
+      "sha256": "a68e7b04c7448617f58038257e08aeedef7175cc870b3d5f4303f2afd46bc8d7",
+      "bytes": 1645
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/grader.py",
+      "sha256": "a015272a4a972279fbfc18bf9801c05c7171e89a2b8c97ca7291393319fc785b",
+      "bytes": 9857
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/offline-red.txt",
+      "sha256": "cc383b1910f9514b464f7fb52326093dc5a1854308411c9fee31e92f905e96f1",
+      "bytes": 968
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/offline-verification.json",
+      "sha256": "92c1ecdefb0fa4c0c4e49b4e00ec2f840254cef209c4a50d8b156adba5576938",
+      "bytes": 2166
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/receipt.py",
+      "sha256": "24a2c62d8fbb1971301e973fb2cbc741047b3a341836f006ee094f300f297da8",
+      "bytes": 14371
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/round2-red.txt",
+      "sha256": "5b021a742078aad24849101297006819a92c39b0b331688631db7c8901685c07",
+      "bytes": 9790
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/round2-verification.json",
+      "sha256": "5ab5fc42a70e134531f6e5cc3426cbe6c783bad1deea2f22f1fc02b7d56710a0",
+      "bytes": 10254
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/run.py",
+      "sha256": "370ec49b8f436df82500bcf08307f5bba99d7212943df0330009936edab0d7b9",
+      "bytes": 9646
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/e2e/task.json",
+      "sha256": "f0548f2477113f1eb107110b9bb31bbccab0f15eb37b2dd543f1edfc7bc878bc",
+      "bytes": 522
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/evidence/nltk-reachability.json",
+      "sha256": "6915dd28fc7cbaf0918ce64f939f1870d77d77e006d01b763d0a73ea850b8b7f",
+      "bytes": 19270
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/gateway.py",
+      "sha256": "cadb2e097a9ccbf0fdc609c5cba9a82645da46a2d9e2e6fcb59b10fcf5ba657c",
+      "bytes": 9613
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/host.template.json",
+      "sha256": "8a07054c702d98dcc613ad4e2b2396d0aeb3e32aae5ed83bf1efeb9f76ef10f3",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/install.sh",
+      "sha256": "7e5ef28773ced0cabc1959835a4da996b978d8f9cba25d63ed1a74cc22314280",
+      "bytes": 3107
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/install_support.py",
+      "sha256": "a18890c66862e077d50b239e7a6592061349ca85ac7757b25ae5974f128dd28d",
+      "bytes": 2426
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/mcp-policy.json",
+      "sha256": "de646e3bbddc1ff809537258bac0cac810be0b516149683a00c7d3c54333bf1b",
+      "bytes": 2386
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/mcp_proxy.py",
+      "sha256": "b07428bf921d0512ecbbaa2e1d67b925360fd707e813ac4d21448f08fad32058",
+      "bytes": 9409
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/pins.json",
+      "sha256": "fdf3e7bc7b4fa773923383734a68df75124e1b28a686c16d090fee763a545278",
+      "bytes": 4538
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.in",
+      "sha256": "e7e64a4f4b8b49b0c1640218f231efb7583c0677e011bf5fdec9b6cef9803197",
+      "bytes": 101
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/proxy-requirements.lock",
+      "sha256": "3a1ac1b2d53f345c151cfbf05ec8ef202578663469cf96bf0e84179774834754",
+      "bytes": 69181
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.in",
+      "sha256": "e023289c152a9cd6e55dfb3d245d316886e83001ea8297d6f331841117981be8",
+      "bytes": 2776
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/requirements.lock",
+      "sha256": "839e23f1a74dae155901fefbba2c1e53520f5fb468c4562222323e07e3d27774",
+      "bytes": 372179
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/research.md",
+      "sha256": "2f5f9b58f1241d45d16baf4d794a72d374ffbf8266a70fc2ddcbdf6c438a1d1b",
+      "bytes": 14575
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/round3-verification.json",
+      "sha256": "19d49dfcc4a4340f6a454873b1a5846360ec7ced2576e1e1de20a2c677c367f0",
+      "bytes": 85966
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/run-e2e.sh",
+      "sha256": "e65e0809bf490801064bbd79c75d3135e4e7b10f823a6cd3939fc798135241ed",
+      "bytes": 279
+    },
+    {
+      "path": "blueprints/runtime-workers/gpt-researcher/run-upstream-tests.sh",
+      "sha256": "138de01ee0c3eba85f2f65abeb7f2f02a24bd3796352baf89ef0841c68c25562",
+      "bytes": 1145
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "b3149ae282c6643371502edcff3a50ef2d48407893e8a7778bbf0db10f9d7033",
+      "bytes": 86342
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9145,6 +9815,11 @@
       "bytes": 3059
     },
     {
+      "path": "blueprints/runtime-workers/openhands/config/profiles.json",
+      "sha256": "7d5327765d5680df3038e3745cce8f57312198aa88e1aeca22e52a6b6ea754b7",
+      "bytes": 1463
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/config/proxy-nginx.conf",
       "sha256": "cbbb64f01eabbac149142e98a6697d54eabe2fad41a4f9095d782af64b1a5630",
       "bytes": 4358
@@ -9161,8 +9836,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/dispatch.py",
-      "sha256": "a579f6ce525ddffc05989c05425e485562c982ae9d0c78b92af97424691d8ca2",
-      "bytes": 19469
+      "sha256": "5d42ef710dd9c40d43c7b52bb019b86e96635a6deac603bc1624daf8650a277a",
+      "bytes": 22982
     },
     {
       "path": "blueprints/runtime-workers/openhands/e2e/check.py",
@@ -9176,8 +9851,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/e2e/netprobe.py",
-      "sha256": "52650f68e8c0ab48dcef57f2a7a82c4a29ea88d4ce691df83cc6219aa9e3ebcb",
-      "bytes": 21917
+      "sha256": "93cf45d663870ea326c098799ee03965739bdcd2ee7b90566e4bd34dbee39c8f",
+      "bytes": 26506
     },
     {
       "path": "blueprints/runtime-workers/openhands/e2e/task.py",
@@ -9200,6 +9875,356 @@
       "bytes": 8151
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json",
+      "sha256": "a5e9a112706a8822ca23e0f82199b3cbc3164982db80c8720b087c98335285d1",
+      "bytes": 4569
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stderr.txt",
+      "sha256": "7de52e31d1f445e1709affba57e0707156ad7825b3090a91e516fd1b334bbe1a",
+      "bytes": 3630
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-current-config.stdout.txt",
+      "sha256": "a92e835298713c688fe1cec4e6dce17342294e5d82500617f08adefdb6f81bc8",
+      "bytes": 37988
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stderr.txt",
+      "sha256": "5badffe477826da86e599f6e3b4eda2197a4ac0535ecf3be64cb255064198f73",
+      "bytes": 211
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-baseline-osv-empty-config.stdout.txt",
+      "sha256": "b7eedfbee6122774031a30c319f714d849c5c1cf23abb9dda493403524a30c7f",
+      "bytes": 57685
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-build-hash-install.stderr.txt",
+      "sha256": "667ac8b6b61cacb3f7b70aeebf1132d6f42c01b490a321e1c98ee89b651c8a69",
+      "bytes": 176
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stderr.txt",
+      "sha256": "35d74b0c8ef3cf64d2e349348d53bb5909907c1d1cc4d7996930118bdae5d31d",
+      "bytes": 3632
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-current-config.stdout.txt",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stderr.txt",
+      "sha256": "08bfcde0bd82cb1139676b96fbdd495ba84bcb5e0878999577290f4f2f8f3536",
+      "bytes": 213
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-candidate-osv-empty-config.stdout.txt",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-captured-inputs.json",
+      "sha256": "f04c3b1703d1912e77f5283563b177763ca75d6a774c2ccdec78c5adf6568f1b",
+      "bytes": 39834
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-commands.json",
+      "sha256": "eb262f0eea6eadadb761dc839ffe5829d4609385fc198122c8f8c30623e6d801",
+      "bytes": 56062
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stderr.txt",
+      "sha256": "f6f4156bf3e5e2da69a8f8f4c5d672a2433ce1376f8d467f018987a066078ed8",
+      "bytes": 658
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-exact-runtime-and-source-identities.stdout.txt",
+      "sha256": "a19f19834e68a4e713c95f509eabdf5664bb229929673d33973e6114ee15486d",
+      "bytes": 3168
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-focused-guard-tests.stderr.txt",
+      "sha256": "ffd5c73820b250090b14c6f778a819ae429a70504669d1752dd3f1c4cca483c0",
+      "bytes": 6323
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-fresh-venv.stderr.txt",
+      "sha256": "d2e3ddc5bdcd75429cb2739ee268afa3a10c09495378a8dbe0883a024ce97293",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-baseline-sdist-download.stdout.txt",
+      "sha256": "16d1439db3c81d8d096b074765b0c9d68a2fd17a7d792b17f7aa38d03e847988",
+      "bytes": 175
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-sdist-download.stdout.txt",
+      "sha256": "09e168d8c412e327fe5db70c2548469f1d09e255d56523c71947353fc702e321",
+      "bytes": 175
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-litellm-candidate-wheel-download.stdout.txt",
+      "sha256": "313610189e6eeecc35b64d34f9e0cd185e310f8b94dfb6cec5a9bd3a48eb8d38",
+      "bytes": 206
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers-after-test-tools.stdout.txt",
+      "sha256": "c2dca1cfb8bb6e6311f10ed2ff973ea8df6c900cd01092e99e1c421d7078d08e",
+      "bytes": 2926
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-maintained-jwt-callers.stdout.txt",
+      "sha256": "c59587e1bed345f844fa0d31947765e9a766027a2d41f1d22ea2ff5c71714065",
+      "bytes": 2926
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-capture.py.txt",
+      "sha256": "dcc64700c1d880ef495a3f414ed2ca8e806048a0e6dcd2a0dfdae65ba1504da8",
+      "bytes": 1435
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-download-source.py.txt",
+      "sha256": "c1dab7fc6e1e566391eb7a3ed1b29fbdca1c851ea53369bcc3d150ee068034b6",
+      "bytes": 603
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-run-upstream-url-tests.py.txt",
+      "sha256": "4dc5f72e660f22d6a89d7173d8be1dea2e95a4684f0f87517a02e844d8863b0a",
+      "bytes": 1202
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-method-verify.py.txt",
+      "sha256": "fb230089924a6e6dbafa15a6a4e2bb23f2ea8e5e49aa2d246fb482b6b95315b3",
+      "bytes": 6347
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-compile.stderr.txt",
+      "sha256": "75eac73e43f1bf7306faa2dec1657ec06f70d1fbe8c5b60e2f39973f4105c4cc",
+      "bytes": 31
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-candidate-no-config-recompile.stderr.txt",
+      "sha256": "bed33fec5250907e74380519d38f70bd2e5ba95edead33072d8d23ddacd77747",
+      "bytes": 30
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-control-compile.stderr.txt",
+      "sha256": "918ec0e68c8174d18812542792848a8b201a0e824dbb0e25d2f67f2262ef9b8e",
+      "bytes": 31
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check-after-test-tools.stderr.txt",
+      "sha256": "2919b108fe00735e79cd413a063e8699103a744b3765f4b963c1ad6f42a7f941",
+      "bytes": 127
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-pip-check.stderr.txt",
+      "sha256": "94b6dcbed09c7f53f08e003dbf72ddb250182edce8a877cb33af39ee798d18f2",
+      "bytes": 127
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-recipe-lock-compile.stderr.txt",
+      "sha256": "0478aad1ad8c8b08dc564a113be93d75d36f9385d680069c8d1ddaabcfe8f47d",
+      "bytes": 31
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-native-upstream-test-tools.stderr.txt",
+      "sha256": "32207d0e41826374f93e7912571a45efda0fb1a28f98e3fa3aa36a53da874b9d",
+      "bytes": 206
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers-after-test-tools.stdout.txt",
+      "sha256": "405e7b566f850c1e74df81980bab0f2ee513ab31bc2121e87a32e793af75494c",
+      "bytes": 37078
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-oauthlib-alias-callers.stdout.txt",
+      "sha256": "5b6328e2bd292afc13d4a4eaab9e85abf989eae7879e4630478a442a8e390813",
+      "bytes": 37078
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-pytest-qualification-tools.stderr.txt",
+      "sha256": "c30218aa1df2e8325dfac41e3314a642598d698a997cc01b9ab6ac66f694e66b",
+      "bytes": 172
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-runtime-hash-install.stderr.txt",
+      "sha256": "6dd5d8d9dac64dd1c3b67c010184f47057ec47086b69b4fcc191ddd31365c55a",
+      "bytes": 4518
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-scanner-version.stdout.txt",
+      "sha256": "e0bc7fa9d9b902f5179238abc870bc238c6f119e8c4c0b58b63fd26289fc5ea7",
+      "bytes": 134
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-sdk-fixtures.stderr.txt",
+      "sha256": "c9389e58b5cc13be9155ca3943fc8cb4d1b989b1e85256678d8948e92c4149a5",
+      "bytes": 2962
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-source-validation-before-index.stdout.txt",
+      "sha256": "485944c34511b8adc3b287efb2b90bf491442c05ef21b69649d072a6e3ba96c5",
+      "bytes": 489
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930-unchanged-upstream-url-tests.stdout.txt",
+      "sha256": "0704464298af960099ab7677cec20c3f8be9b9c40fe9942e05062c9ec356cb79",
+      "bytes": 7535
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930.json",
+      "sha256": "5d57e1ac7655d4ae772797268f308d9d8f8c6467f5932893338f38691174e752",
+      "bytes": 65895
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-actual-sdk-fixtures.txt",
+      "sha256": "9ee6941fd3b532f888b320a474ecb708381be64de27696ffb232a13c9128c942",
+      "bytes": 3085
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-build-hash-install.txt",
+      "sha256": "80895466bdc4ad6866212c83c305b8cf27487d8b9634b661a9b6e6301d129905",
+      "bytes": 465
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-commands.json",
+      "sha256": "3bdf5759ab4cec5b673d610765b81510bafb5981a6c0428aba8515c3a865e9b5",
+      "bytes": 17008
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-compare.py.txt",
+      "sha256": "af2e609f21fb3e166d56362d1cc93899fdbf428421db7ee5560d5f730d22881f",
+      "bytes": 5570
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-constraints.txt",
+      "sha256": "b4e06f725855214b283cbcd92068cbb45dd3d272114079f1696a7542ab9a94dd",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-dependency-comparison.json",
+      "sha256": "b01a987646e5ba167193335d69c98455739825148d15b75fee1982669185831e",
+      "bytes": 66742
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-extraction-reproduction.txt",
+      "sha256": "5381b4f38ab482bd0d2fac4a7fb2dd41300cd2652aae4f660a343b58b8e2a639",
+      "bytes": 248927
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-fresh-venv.txt",
+      "sha256": "0f927255ceb258c775cc1b0ee5c567286601dd50baa798b4fc1e0b9e7a28fc91",
+      "bytes": 424
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-installer-lock-consumers.txt",
+      "sha256": "aa2e7e6fee6e3182264dfbc735ab1b5ff13cb742533e8e36435fb4d9503e4e5a",
+      "bytes": 3028
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-maintained-jwt-callers.txt",
+      "sha256": "5296678744ff15c582c0a124b96a86269c42391a707eaff59ea6c28286e7030c",
+      "bytes": 3201
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile-help.txt",
+      "sha256": "8272c771ab3ecdc939cf410702e08d5ac8b59cd42191b509049b0663520edfcf",
+      "bytes": 12120
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-compile.txt",
+      "sha256": "fe3190bc61053e8e4fe48dde38b3b2f6ad2f402dfcfdd89d1ab3683e6cd3c39d",
+      "bytes": 248927
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-imports.txt",
+      "sha256": "477c405a25e4b1ef4ee5c76b1e550a0a34eefcc74bf861497ef8201a672dc713",
+      "bytes": 1536
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-pip-check.txt",
+      "sha256": "ab7fb266794b383e8a044606ea2e3ddc463349c485eab928a18d2ee997c093b6",
+      "bytes": 232
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-native-uv-version.txt",
+      "sha256": "0b702db49c11107d0b91e82c5383951e017f1ae993fcf68a24841f5a8d5f6598",
+      "bytes": 90
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-oauthlib-alias-callers.txt",
+      "sha256": "7e5fd6fc81d63c595e3083e01da2b700a184fcec7f7f9db6619732b494dd5083",
+      "bytes": 37362
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-ci-config.txt",
+      "sha256": "83832fb09f1d62770d7d816582db36510d2555e61880880db0b41e35f91e3295",
+      "bytes": 4245
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-empty-config.txt",
+      "sha256": "abec7ffb9d6114ead2d7093b4b52f889d96ee5ea98da3dd0f9d3fe0752174908",
+      "bytes": 20675
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-osv-version.txt",
+      "sha256": "e1ecb1656b9241ee137b2610c19d972bdaba712570cc86a8883db7d2f295fb8f",
+      "bytes": 214
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifact-source-identity.txt",
+      "sha256": "9622f25bfe5b9244dd4160b7c05bedce18cde7b2e5c7562eeed76ce9787b031d",
+      "bytes": 3770
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-published-artifacts.json",
+      "sha256": "b475ffaa58caaf803bbc600712484c8a2d905904f698d06da57b06d1d46c8d0b",
+      "bytes": 5923
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-reviewed-main-blob.txt",
+      "sha256": "9d780b5e01c1b2a36e7e2a42b12a929e97b76a0bfb9debbcbd0a8acc580c0f30",
+      "bytes": 106126
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-runtime-hash-install.txt",
+      "sha256": "e3e3d32e8e589d62680e772469f5820fa1e7e9077d457ba5c8d55f97adc5a475",
+      "bytes": 4636
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-selected-dependency-comparison.txt",
+      "sha256": "93799677e0177cfb784b6d3ce779efc5e2980a15ad71d225b627f72ffd349989",
+      "bytes": 66934
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930-tagged-install-policy.txt",
+      "sha256": "0c4c7d8e6ecf05add855a03004cd9921af7a03c97d20a026cb1066dccfb05542",
+      "bytes": 4223
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/main-reconcile-20260930.json",
+      "sha256": "bfc988b8d619dfc03b6a19632911f931e8e09b21b5c36703c27eaa683fc51163",
+      "bytes": 28085
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
       "sha256": "cbd76e3a31da13c27566b24f6c6c083b351d2cfe7e1b140a868419ff4334ec6f",
       "bytes": 34970
@@ -9215,6 +10240,11 @@
       "bytes": 50331
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/pins-1.49.6.json",
+      "sha256": "c857efa5c006c709dd99cc7d5f480f9dcef649248dde89f50f8265ca80008e9d",
+      "bytes": 4460
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/publication-first.txt",
       "sha256": "1f8791713a42ea92c498d4f1bd352f345b3a7c6f0d5a115462cad25fdc9527ed",
       "bytes": 114
@@ -9223,6 +10253,326 @@
       "path": "blueprints/runtime-workers/openhands/evidence/publication-pass.txt",
       "sha256": "4c6f58444061b23b0b40dc27ffb52e3f55ffdd02e3e4195407ec57992d1e5be2",
       "bytes": 212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-actual-sdk-fixtures.txt",
+      "sha256": "891d87ad2c8423f2b74ce8d3f1a63dcfe25294f13dd21fa7bbc5de66893cf6a3",
+      "bytes": 3212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-current-config.json",
+      "sha256": "fa640deeb033c5478b03f14ce6e439333656279405e5db055ab8281a430ad200",
+      "bytes": 14545
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-current-config.txt",
+      "sha256": "ce799e56e98ac45f51b1c2536282dc921dfcec14fbcc04af6035e3f26615a640",
+      "bytes": 18803
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-empty-config.json",
+      "sha256": "a3471eeaef017e913a4035e402a111943673a181fa2c245e9ea11bad57b6076b",
+      "bytes": 34242
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-baseline-osv-empty-config.txt",
+      "sha256": "77f9b9a07f51f9000c737006c19ade784dbb35c697e8853f3e6be66116424ffa",
+      "bytes": 35086
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-bd1-control-upstream-test-tools.txt",
+      "sha256": "569b4604483c76a31e210dcc97cd2762bc6a63b54df00762d0e68faab3902511",
+      "bytes": 630
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-build-hash-install.txt",
+      "sha256": "1a6a32e0927dc554a81fd1920756f2a67fe378f44fba225b69f187a81fb8ecca",
+      "bytes": 592
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-native-pytest-help.txt",
+      "sha256": "23b64656768de639ea6b8bc26b7118a9c7f853ec40f20d23fcd87eddaf995839",
+      "bytes": 19013
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-current-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-current-config.txt",
+      "sha256": "d98cab16adc610ef89904863dcf0242202ebfb70c1d2a12a23b2459b3999f038",
+      "bytes": 4380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-osv-empty-config.txt",
+      "sha256": "040d82f1a91b191c0623252b9dc95a575a24658ca1843e5fd5548075a3d54ec3",
+      "bytes": 20808
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-candidate-upstream-test-tools.txt",
+      "sha256": "b3e831ea6e1d1cc32ef492ee6bc5405e00c7345d1e65684672a41eaf30a42b12",
+      "bytes": 639
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-clock-cutoff-check.txt",
+      "sha256": "91392e5648d2ac348f910ed4bf3de46ddf5b19f213ee61ab623dad3b7341f394",
+      "bytes": 218
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-commands.json",
+      "sha256": "f2e62c61e9e917b5d6abe023f9f2f6334e8d0736a60027195a5151cb83d90c45",
+      "bytes": 78402
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-constraints.txt",
+      "sha256": "9be46e2d3628a47ece04c39048423874badadd13e379096f6303bfefebc8f041",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-dependency-comparison.json",
+      "sha256": "ec02602c7159345da3b0bb113e3b06cb13f66b9accb4bba733d60b2a82d3c631",
+      "bytes": 868
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-caller-and-pyjwt-static-delta.txt",
+      "sha256": "fc84c818132d1fab9531e0114177c3a7154960782b8eee59c80faae5364195bc",
+      "bytes": 13061
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-exact-lock-delta.txt",
+      "sha256": "7c8aefeb5429ebf15c4e54efafe083c59bde3f9b6a244b4f9328b5544e500573",
+      "bytes": 2666
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-fresh-venv.txt",
+      "sha256": "e29d9fd8ddf54224ea0c7c8347b3951f528f2616f4e7b399b74bb537433ac275",
+      "bytes": 551
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-frozen-inputs.json",
+      "sha256": "c475106cf7ce5a5de0a5db62a8b6938fd7c0d3dcad8bcfa5ffc9e1184417aa45",
+      "bytes": 2268
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-bd1-unchanged-regression-control.txt",
+      "sha256": "b1f890f09595dfb43f32ace636f378bc845f0c85e091f7050e03f22e86f5ff94",
+      "bytes": 8517
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-candidate-unchanged-regressions.txt",
+      "sha256": "927a12279ff97ecd9277dd408f5733c3238f80622cbdcd5ce4525f9fc5ec0e42",
+      "bytes": 2398
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-installed-runtime-version-inventory.txt",
+      "sha256": "8f312d726e1d7bfb76c38c350da2cc9ae529477124ddc816c381e97b06b37709",
+      "bytes": 1190
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-maintained-jwt-callers.txt",
+      "sha256": "ccfd1d7c537d400b7f430678043dda2b49b57a5bfb2adf09aedca37e2f1ae488",
+      "bytes": 3328
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-bd1-control-compile.txt",
+      "sha256": "28e67cda0191d8ec008e44cc14585ebd13f578d40d67a1829446081e3e7d41dd",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-imports.txt",
+      "sha256": "65ae38c5d5b78a9d49db1a9722d07680fe32934efd7cf8d47d4ea72f4e4f3ef8",
+      "bytes": 1982
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check-after-test-tools.txt",
+      "sha256": "5c255a24a423064be19e755f7dfafe0d18423467f13ad7d2a04caa04b047e3ed",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pip-check.txt",
+      "sha256": "066424201c71fcc7cd0f003da5a8758a4a1693936531aab0fd6f728793e5a3b9",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pristine-reproduction.txt",
+      "sha256": "ed94035165ae012bf277c5dc11ff04274242c070e875c8213a63cdde77165865",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-pyjwt-candidate-compile.txt",
+      "sha256": "fbca2580f1026ae7403e289361f558d98a6b3ae6bd74e508708fbeaf82dfe9ee",
+      "bytes": 249114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-driver-venv.txt",
+      "sha256": "9145a80b90bfd6a0e9f540022f3e8967985cf8be8624b168412f8c32d517d7d0",
+      "bytes": 613
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-run-help.txt",
+      "sha256": "d8df693a45f7f2a6da323c67f956472a41e052bb525566ac584411ff4893d68d",
+      "bytes": 5387
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-native-tox-version.txt",
+      "sha256": "b07c39e550def4290546d5b61054772b5f1f980ee09e1d9af040fe53d6ea2451",
+      "bytes": 517
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-oauthlib-alias-callers.txt",
+      "sha256": "32d23e1d2b4b6327b44e5fb4fbbfccc94c33133c296b911b5399844684de67d6",
+      "bytes": 37489
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-scanner-copy.txt",
+      "sha256": "e3eb88d9a28aa78000124b11ab613eb64ebd9f8a03fe7ce59ee5dc89bcab6b32",
+      "bytes": 240
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-osv-version.txt",
+      "sha256": "d99dc4aaa9ee2e777c40037e37ee43d8c9e70402b86da61753a46c36d6b7437f",
+      "bytes": 341
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-diff-check.txt",
+      "sha256": "d60bd830527dd82244afeae14cda196ce4cd07d9826e1a762aa8fd7fbc48486a",
+      "bytes": 186
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-owned-file-publication-scan.txt",
+      "sha256": "4a3e416fe09a7424d47dc7f9b13905b2910bcbf752037618b411722ef14691c8",
+      "bytes": 8127
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pristine-and-published-source-identities.txt",
+      "sha256": "108f4bfb77b3100e53cf6bdb03d080556267f98f58432d1f13e7427e03e40848",
+      "bytes": 4016
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0-py3-none-any.whl.txt",
+      "sha256": "8a5ea31cca7a21c9c96bf1068aa39a005c32d61acfea532b5455cf249c054e93",
+      "bytes": 424
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-file-pyjwt-2.15.0.tar.gz.txt",
+      "sha256": "540b3b8ed46e115f9927070df9c4492a0e8b3824853c29645c0697b50b1c99a8",
+      "bytes": 404
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-native-test-config.txt",
+      "sha256": "5522835655990357c7d10c209441f95b82271bbcbfd86d8eb56c4360837b9ebc",
+      "bytes": 1485
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-pypi.txt",
+      "sha256": "ceb456b980d874d3af84c01749e77ce8a47c3edfec26da57a57ca6d8948ef880",
+      "bytes": 5717
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-release.txt",
+      "sha256": "d4953c46b722691311d15842c8c9ac3f16e1ce4f0d3f3f0f240d71dac6ed2749",
+      "bytes": 521
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-sdist-extract.txt",
+      "sha256": "cc5f1fd77eac2cbe1bf60cab5b417c813413ba53261eff93d242388454f4c3af",
+      "bytes": 257
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-download.txt",
+      "sha256": "1ab4c361d45b723a1709a58777e9f32c9de80429936c983c827094eb65738385",
+      "bytes": 368
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-source-extract.txt",
+      "sha256": "acbaefe984ad11d1594074b01c826673b78b1b92c3fd4538d16332fdad71adda",
+      "bytes": 258
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-pyjwt-tag-object.txt",
+      "sha256": "bfeb9cf9d69bfb4090e650c6d32994b4f8fe33dc2aea7a21a0997a71d1edbe42",
+      "bytes": 920
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-repository-validation-before-integration.txt",
+      "sha256": "72a447135220f2e4e578cb81c327c7773a1c6bd6f85cfdc0f56473aa9d66784b",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-runtime-hash-install.txt",
+      "sha256": "5910f0b0cb4876ca4358ea444e6be0fd3c8e76dc8da7f0fbfb7f8acd10e15194",
+      "bytes": 4763
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-download.txt",
+      "sha256": "d0eef999df6805ca32d4cdecf335457d789cd2177db193d3a9dcb56b563fa697",
+      "bytes": 380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-extract.txt",
+      "sha256": "77321232e78b83b2b1d4ad3500df609400f60da4b35e51a47337eea92c383e59",
+      "bytes": 250
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-sdk-source-repro-extract.txt",
+      "sha256": "67632310e39072065210809179b3c7b1318bd44be2e11360c4dc629e8971c47d",
+      "bytes": 256
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-source-identities.json",
+      "sha256": "52569c39d4d241f9cd1cdde873d2f802a824213716d4e013ecb1371ba46980ea",
+      "bytes": 1895
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-source-policy-and-compatibility.txt",
+      "sha256": "a7c5c8fe6c4ae9a92d3f1aefef7702bb52de6685bf90feddfe77a1387742a2df",
+      "bytes": 2705
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-official-release.txt",
+      "sha256": "5e1e5defdbfd7d2cfc61863f0349fefa2d7d27d64c20362105549d4521281fc5",
+      "bytes": 918
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-tox-pypi-tool-source.txt",
+      "sha256": "71cbf8472151c7bd841b891003e29829749d350c919907ac1773d4c9cdf28726",
+      "bytes": 472562
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-unchanged-upstream-tox-regressions.txt",
+      "sha256": "d75d11056968ffb160194f8f9d1d318ceffb58e6e220215a71d81a4a2e24d40e",
+      "bytes": 2540
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-ci-tox-prerequisites.txt",
+      "sha256": "e2298547f6fdc7c5495eb67aa06eb5495780345b2374ab2dc477dc34e68629de",
+      "bytes": 3347
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-upstream-selected-file-hashes.txt",
+      "sha256": "a79d7e59d80e4b247a76031e5704ebae8128fff34fdffb25e0a8a73f299857df",
+      "bytes": 1908
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930-uv-version.txt",
+      "sha256": "a6bd49a719d9038dd76f1ba7f2ba806145fd613e5e518f71080ff0fac74b5bbc",
+      "bytes": 217
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/pyjwt-relock-20260930.json",
+      "sha256": "1ce7403ba115e59100dea0ca6d913b978aa0fc175386b656d0e04668095acb3b",
+      "bytes": 53585
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/receipt-red.txt",
@@ -9540,9 +10890,524 @@
       "bytes": 3013
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-artifact-hashes.json",
+      "sha256": "cb9f8c25ecc01899a88e9b0bb602e1c77394870967905a9e5252dca9cad4b69e",
+      "bytes": 5320
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-build-prerequisites.txt",
+      "sha256": "5b361c470e75522f982b4d09d44f186a69bb887ae0c92ec0b115233cfda181e2",
+      "bytes": 176
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-build.txt",
+      "sha256": "ca78b9132efc29e416bc87029698f00ac766a1051a2df9f678c3af4c37a43b19",
+      "bytes": 7760
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-commands.json",
+      "sha256": "3e928781af62f6e8b3af0257bbeca958f73bde5b2aa52f0911f6af24ecb937f4",
+      "bytes": 8184
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-integration-first.txt",
+      "sha256": "b36adb4cbaf5eee6f8cff2343cac6cef78cd2320479d3742500629f1bc92c8d3",
+      "bytes": 3453
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-integration-second.txt",
+      "sha256": "fc945989350d2b9eb8fd63f6836bf1c97ead5faba516c0962c979b6a93e0d01e",
+      "bytes": 2941
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-integration-tests.txt",
+      "sha256": "f2c6ae6e677838cd51300171aa6631841e38faeb7c1e53588744e85d68871fd3",
+      "bytes": 245
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-native-integration-tests.txt",
+      "sha256": "62be69533efcffb6dc5db2249c3bf116d78b43ffb68d1d332e08b744575aec30",
+      "bytes": 769
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-native-p3-first.txt",
+      "sha256": "ac16482bbce9a4b9542d27f310e722d2597fd341e678fd6653042391bc56cdd9",
+      "bytes": 2359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-native-profile-first.txt",
+      "sha256": "e0046aee002ef02746fc9c3ae5307ebe846a16c5d59419ec2cba61192482d276",
+      "bytes": 1639
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-profile-first.txt",
+      "sha256": "9b282f4dfc81a8e0233af6f28dbaf3f50e5d50931687a2db01d697ed6a0f7724",
+      "bytes": 992
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-publication-first.txt",
+      "sha256": "739e94ff5999e74fd8938b4792da68a9318657a9f26e5be84289c242ecfcdfb5",
+      "bytes": 1746
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-upstream-tests.txt",
+      "sha256": "99e1e2a7af20af37627b7d874533a61ed740bb03ec9a45f38b732f40554d7525",
+      "bytes": 4557
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-wheel-check.txt",
+      "sha256": "f1448b41f5b0d8460ab7363b70166d37b2cceeebd70559e11c2fd354d136c012",
+      "bytes": 127
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-wheel-imports.txt",
+      "sha256": "8af76c229b8bb3dab63b7a095985de90fd297236e29bbdffcc16c0a2d6aaad3d",
+      "bytes": 732
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/upgrade-150-wheel-install.txt",
+      "sha256": "db9db31f6adeccbff628352ba9d4fec94743fe21c08539bec78b4e8806c6b2f0",
+      "bytes": 4469
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-actual-sdk-fixtures.txt",
+      "sha256": "14cc0a8d1751d7300dae2524d4e7838ab8a33963b01a2427a5b58bc75fc388fd",
+      "bytes": 3212
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-8988-9cw3-xx77.txt",
+      "sha256": "fb052032fc980b4d4e96e650bc9585ade80c2e7e088af3e1247681ec71009cb4",
+      "bytes": 14310
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-gh4c-6fx4-qh6g.txt",
+      "sha256": "90b1332fe158159b948fd56dda80014bb4408909cd9959fa6471d7b8e51be5bf",
+      "bytes": 7091
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-advisory-GHSA-vxq7-64xx-v4gw.txt",
+      "sha256": "b1e45e31e0d04f1b1e8704cbbaf018f9e20567e74a4e12c598bab2f1e17f69df",
+      "bytes": 5773
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-ci-config.json",
+      "sha256": "217e7398c4f53af8f4d6cfd7eabc350b25885423bc05e519305e99795e3899f6",
+      "bytes": 23772
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-ci-config.txt",
+      "sha256": "40b41feb5e27a1f8e17d1e36e4c391aec18ceab3c076117b38ee0d4f41741a4d",
+      "bytes": 28026
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-empty-config.json",
+      "sha256": "5d40c9aca93da1558267305ee0d1d4a88bc09b9a1b46d8c801454d9762c66822",
+      "bytes": 43469
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-baseline-osv-empty-config.txt",
+      "sha256": "fb6f5d2a85ed9ffbc7ec86c0347d8ce83c6b2e6e687106a8359a4f02f8c07c8e",
+      "bytes": 44307
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-build-hash-install.txt",
+      "sha256": "531ca125a17fb3bc737cc1e63b8ed1b131ced2ee47821a976258a603cdba2ebc",
+      "bytes": 592
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-ci-config.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-ci-config.txt",
+      "sha256": "24f0d6ce6c9a34900663a79c21d3c2118799ed6fc1d8cfe27ab1a2be13976bee",
+      "bytes": 4380
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.json",
+      "sha256": "153338dd8099c7a9b96230308fc7b072d2783257bbe96821f2a5f7e09451ba24",
+      "bytes": 14534
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-current-config-rescan.txt",
+      "sha256": "72d39a51323df0a9888c433435cb5289b7a21b91df8b857caa56ce4df9c58332",
+      "bytes": 18790
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-empty-config.json",
+      "sha256": "afad529ade6763e00b9d46db35ff6f40cc52848858b97432057f98d48a15d25a",
+      "bytes": 19970
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-candidate-osv-empty-config.txt",
+      "sha256": "0586d512426ed14c0cba8f9ac033a1151986a67e853865628e152301600aaa4a",
+      "bytes": 20810
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-commands.json",
+      "sha256": "b577e9b013cd2e19daa197dd956baca9a1e063a3415ec4f98f7cbd01d48088b8",
+      "bytes": 112909
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-constraints.txt",
+      "sha256": "935e34547853b50ebe901a18bc054df02c3f0a6734b3dafbe6e3c654117cb21b",
+      "bytes": 37931
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-dependency-comparison.json",
+      "sha256": "f55330c05b4103f00e748ca2d54f1d20287ac39b98ed2e01b18eb3e7eb0483e4",
+      "bytes": 700
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-caller-source-review.txt",
+      "sha256": "61fba571a483831412c96daa07178e8261db77f58f2d60b8e2d9ff5a276f9db2",
+      "bytes": 20620
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-exact-lock-delta.txt",
+      "sha256": "69615406cf936ee0ecaa844953620b3a1aeb059fea4f927fc5e01794a9db1981",
+      "bytes": 2450
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan-after-upstream-example-redaction.txt",
+      "sha256": "71592f600700019925c85971e2e965f1130479db6eae2bf9c985f8bd758822c5",
+      "bytes": 9493
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-final-owned-file-publication-scan.txt",
+      "sha256": "e4c3e6648209bf90f77a50d9454000310e45906f33cebbaa50f39a02d4bf23c8",
+      "bytes": 9463
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-fresh-venv.txt",
+      "sha256": "98d76e14cb8b2c2787947a82ee3d7c8b57ebb40c6e0a4ab2ea607fad5810b0b2",
+      "bytes": 551
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-frozen-inputs.json",
+      "sha256": "a02a55b19d246116312664d05e68a8182ffacff856355e2930efc89675009659",
+      "bytes": 2317
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-git-help.txt",
+      "sha256": "f84b66a7247f23f5f864783f8a77e31e1b1a628475b46a9e63eff9e0660b9bc1",
+      "bytes": 3012
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-gitleaks-version.txt",
+      "sha256": "106a656382fa5139173c3bf2dfad0a09220be1dfbddd44ea090450127e22661a",
+      "bytes": 190
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-hosted-failure-36737133691.txt",
+      "sha256": "f1fdb8e6fc3989c3f61d8af4ee4fab61b5ba9fa8efd8951b01dfd0017afb1604",
+      "bytes": 37365
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-installed-version-inventory.txt",
+      "sha256": "d1e073a83ed95f20f8436c016e5a2c04efe6a64c55118f720e29011300f991f5",
+      "bytes": 1040
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-main-repair-pr546.txt",
+      "sha256": "8a4239286217070ba23adacd1cb840531d6cc065913ebaa36a03c1a9d2d8bc13",
+      "bytes": 25671
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-maintained-jwt-callers.txt",
+      "sha256": "f2cb234d51c610eadcc8114d28f0deff618899d2f6fd88d6fc7e28630f68931c",
+      "bytes": 3328
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-candidate-compile.txt",
+      "sha256": "b25fc55afe7cbb4791c6850406d6ef1fefe7aad87471ac3437214625ac5ac0a0",
+      "bytes": 249114
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-control-compile.txt",
+      "sha256": "4d2f9b42802e38983449113d8cc9d5655d80f17207b588eb846993f0fe077674",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-imports.txt",
+      "sha256": "670804dc7aef95981033adda1ac8acb9d023022759504ee57262e64a79e25fe7",
+      "bytes": 1786
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pip-check.txt",
+      "sha256": "a13391a6b9383b3bf1ae09fc3da3e567bbe6d87312f2c3def211a96a2cecd0f0",
+      "bytes": 359
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-native-pristine-reproduction.txt",
+      "sha256": "d054ccd94dde8ff2434db53d1e61fde2e5b006a828950ebda2bdf89f89c31435",
+      "bytes": 249121
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-oauthlib-alias-callers.txt",
+      "sha256": "019d8520664fec5d1c326901aabc988800688649ffae22ecc2624ae190813437",
+      "bytes": 37489
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-download.txt",
+      "sha256": "d82600844473eae879ad8d296b3850c313483b042d96fdbc6cd812894140a9a5",
+      "bytes": 356
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-release.txt",
+      "sha256": "e13f8810643270828e18aee0420f007ea308411d509d5ad45a69266aa5918c42",
+      "bytes": 6064
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-source-help.txt",
+      "sha256": "ab53298e1dd8fafd42c1480caaf75add6c307f3a87a2fa9f0c92c7eb48ef1f93",
+      "bytes": 5068
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-osv-version.txt",
+      "sha256": "245b92e6dce308af37eb7ff5ea3c76ba54b1f5e4ee5f57deafb9bbdb5a3f7d9e",
+      "bytes": 341
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-diff-check.txt",
+      "sha256": "748a787acf6ae7f176b36197ef18ea0d91be1f860f36f15f8ff46d05599dc503",
+      "bytes": 186
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan-after-declared-paths-redaction.txt",
+      "sha256": "7d7f93e7c5e1343a0549bc5e74ea624ca9e71fb16f5e922b422a6f413777dc09",
+      "bytes": 7653
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-owned-file-publication-scan.txt",
+      "sha256": "601a09a523f2fcf87e84dc66b66aee42fe6d98f2ab6b18f5c87daa4548ad5668",
+      "bytes": 7766
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pristine-source-verification.txt",
+      "sha256": "14f8cc5187612148f60de1541046a0844ab3bb6b9dc377090cb5de5138362c1c",
+      "bytes": 1110
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-215-pypi.txt",
+      "sha256": "96c2bb91c88b9e2869b62f1efaaeb7df24bd78e5db8c7e267b183557620b6c95",
+      "bytes": 5725
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-official.txt",
+      "sha256": "13345ffd64854f23a1f4db80e2c7d9e75bbdf7101c6de5042621974ea1ed0d4a",
+      "bytes": 13217
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-pyjwt-advisory-osv.txt",
+      "sha256": "ec68a691e5b919679732c8600d27c07a719718d0e80f8540e58319e94684ca14",
+      "bytes": 12178
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-rejected-normal-commit.txt",
+      "sha256": "dd9c5b92e06074e70581dd5451928e2f8dcc555a6377d970194c95f3dbc91716",
+      "bytes": 257
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-path-sanitization.txt",
+      "sha256": "004274ab419a392924dfe312dc3cab8704160e7d17c10c4915125df066c51a17",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-after-upstream-example-redaction.txt",
+      "sha256": "a0d1c9589020c5d48103ae8030bd7467763fba6317b3fea787b589c107820e76",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-before-integration.txt",
+      "sha256": "4c45bd586ff4760f2de93dbb2bbe950ee5e4d638870a80e5ea4ffd681d700e89",
+      "bytes": 502
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-repository-validation-final-owned-scope.txt",
+      "sha256": "7e7b5d9e03774c2fc89106a8560d34c500b8543be3830db32b5bf446a3f6694e",
+      "bytes": 363
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-requirements.in.txt",
+      "sha256": "058d660527965a2713aaad24bc56f15e79829a37029dfa2f64f8e8fcb1e16fba",
+      "bytes": 326
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-runtime-hash-install.txt",
+      "sha256": "0b8ce270ba574a751ff16d52190b4d5b329918e66e28b11c40cfdfd3bf5a3bee",
+      "bytes": 4763
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-source-cutoff-policy.txt",
+      "sha256": "8053b7326bc54ee1910f072f554534525758bd536859f24471ed79d60379acb2",
+      "bytes": 1428
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-after-public-example-redaction.txt",
+      "sha256": "d0c69d2dbdc6ad16b9322a36e4f1ac2e08536b8c854fd31429b59f9437293618",
+      "bytes": 494
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-redacted-report.json",
+      "sha256": "5f79177d4c8343f9483728f1059830370dad90f6adddbfd22fa677342b93e2df",
+      "bytes": 658
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-staged-gitleaks-rejection.txt",
+      "sha256": "8f1979d20d985a9eb7206f747f3c6656664738fbd3a7e5611af5e842f27b7496",
+      "bytes": 488
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-hashes.txt",
+      "sha256": "83d23b7f91491e023d0c2e69f529786ba749ac7e3dbb153d3151dd0a3c7541bd",
+      "bytes": 1111
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-sdk-release.txt",
+      "sha256": "f48602b12057ff9c5f0733c85957fa6f02701cc58fc0d4ded87a569517f8138d",
+      "bytes": 4030
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-download.txt",
+      "sha256": "57969232d3b956d421536eee3740e0ce4f1c0ab9b3bbb4e9d4d4824c527b2feb",
+      "bytes": 376
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-extract.txt",
+      "sha256": "bb3465f08e61b64b1bb31ac4b21c31bc21666c838c33af72242653d4647a4722",
+      "bytes": 246
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-upstream-source-repro-extract.txt",
+      "sha256": "8d8a8b51794ebc7495cb81c340d71081f560945f11403e5c02ab07c398958a49",
+      "bytes": 252
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-file-urllib3-2.8.0-py3-none-any.whl.txt",
+      "sha256": "2569c745287491f7d0768ac2b039afae7e8c756afc7de0e78fee3417c4eb46b9",
+      "bytes": 426
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-file-urllib3-2.8.0.tar.gz.txt",
+      "sha256": "b1f213c795eca75598839d0707e32b7c22e2766d93d9a4bdce10cad28709921e",
+      "bytes": 406
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-oauth-literal-sweep.txt",
+      "sha256": "fcc5ba26431b00ddd8522a75472de8242b3fea4dac4493e2837ce16e9fb749f3",
+      "bytes": 324
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-published-source-identity.txt",
+      "sha256": "243f20cb85641984d660ba1120a6f4b09b41b88cb7f89a37b3137206ac434012",
+      "bytes": 1050
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-pypi.txt",
+      "sha256": "5106dea6d766f9dea3a4c3598b0b5fb951170e7634ebc4077ae8229360a9de03",
+      "bytes": 9760
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-release.txt",
+      "sha256": "c3c73eb2724dafcbcffc7f3bb982ef72c9b887e32f180b0f5f9a64e0b56ca701",
+      "bytes": 12106
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-tag-object.txt",
+      "sha256": "ba19d552ebbe4bb59ce441c1d721eb9aa9ecdc03510e9ffb331771dd18134fea",
+      "bytes": 1682
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-urllib3-tag.txt",
+      "sha256": "a659c30ede244f097d299a8d553f31c9d74e48ace5883f8353db3a3e6fe6a6f4",
+      "bytes": 544
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-compile-help.txt",
+      "sha256": "cdd7acbd96b941d539827c6587697ab2f76a2e1b49227d5e7c42363ca3c0ec26",
+      "bytes": 12247
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-release.txt",
+      "sha256": "a2aa0212a86e5678bd2c32a27395bb9d1ad4cf445f50e54727fc34e2e9f904e1",
+      "bytes": 82074
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930-uv-version.txt",
+      "sha256": "8efd87c5c7a972462c1688d06383a5a81a58c78de5d827f68ac2e7ec541ec681",
+      "bytes": 217
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/urllib3-relock-20260930.json",
+      "sha256": "d55309e18f44ae0150fd477594df83b7bf7a552871e0d7122a684c64ea371db4",
+      "bytes": 52869
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/verification.md",
       "sha256": "51c90be86ab3fb3535f42aeb9227bff1479f101a3232860b47a98765c3e37269",
       "bytes": 2872
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-commands.json",
+      "sha256": "aa794a4a612821be38d62cf97faeb4b07814c772535ac83c6b9eb3bf17a34917",
+      "bytes": 27542
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-constraints.txt",
+      "sha256": "bfdcbb60d2ed181956765a665c0303faf389b727c8d755b84e5f2b1c24f1c433",
+      "bytes": 32789
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-jwt-callers.txt",
+      "sha256": "0b624ccf2ec63ed90a831bb02f7d05a338d490969482bee168179e5ac9a8b775",
+      "bytes": 3023
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers-first.txt",
+      "sha256": "56149cc6f319c70630e6949a3519f5483637bfdaeea2a3af1011c943b228d3ca",
+      "bytes": 6188
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.py.txt",
+      "sha256": "080aa7cece92c786b7977ade5bf851aa776c31dbebafab98decfc5b1ae0e5960",
+      "bytes": 7145
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-oauthlib-callers.txt",
+      "sha256": "44300134a28b763a02d17f36f34919084409c5e8288f3adc93987f67a6b4d82f",
+      "bytes": 37175
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-osv-after.json",
+      "sha256": "54345d5194d238b6017d0f3181f392109ce35023cc6b4bdfa8c134943dcb578e",
+      "bytes": 124
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-osv-before.json",
+      "sha256": "cb66e322c031410f198c51f6be43ca10092da79f91c293eaf1f6bc0be8834f0c",
+      "bytes": 266980
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-requirements.in.txt",
+      "sha256": "5c366b72ee59e8ddbda14c01fe794d8456beac33a5e4513544a44ef4c624c3cd",
+      "bytes": 403
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-sources.json",
+      "sha256": "7829c29474ff23ec7b50c957b03be75fca10935e974749ac054eb58ef8f2aad8",
+      "bytes": 30584
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930-tests.txt",
+      "sha256": "426019d491fb2f4c889226578487d6ff85a9c5a2648e949d38156cb89c3c73d9",
+      "bytes": 2329
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/wheel-relock-20260930.json",
+      "sha256": "f49dda8891c4367c47495f767fd1b6366c0659c7ad84d3a0a1b16c68f57c46cf",
+      "bytes": 21594
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/wheel-source-comparison.json",
@@ -9551,12 +11416,12 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/host.py",
-      "sha256": "c6a609b51403353da7fc16bc131cd2f76904b00f498d9478e30b742e6bc89e4c",
-      "bytes": 84290
+      "sha256": "00551430ef463323706866f65a91a3086af12299259cb6a619e651419e982e3f",
+      "bytes": 84582
     },
     {
       "path": "blueprints/runtime-workers/openhands/install-container.sh",
-      "sha256": "1b639d729d7a3e2384e39c2817269aaa786615b2806d7d8123b8e18b081f098a",
+      "sha256": "3824f5dbcfe4751884bcb1699faff3c994a6e17a77b81c5866d49b6565595051",
       "bytes": 1291
     },
     {
@@ -9566,17 +11431,17 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/install.sh",
-      "sha256": "8c79bfc0a512ad31653b428e19da458309ff3866cb6ec7d1410c0d2e7109cdd8",
+      "sha256": "4163d3e0d8eda0d61d2e832d6ffd1690348f71ddf03d1a3c99651635b3b53815",
       "bytes": 690
     },
     {
       "path": "blueprints/runtime-workers/openhands/mcp_guard.py",
-      "sha256": "b3d6012c8b2e65e3923d64bc39a2cf6ae9ea7042de9d4f6a0c342cfbc69eed03",
-      "bytes": 1326
+      "sha256": "a06d465736789ce9bace5197569ec76c7af20000d45eb8ca89e566f540634ba0",
+      "bytes": 1639
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "36f9ab6c1b901621d685b6721b789dcbcc3cc0ce4526f9c997772c371cf24464",
+      "sha256": "73d0465fe1f6b463e68848c447c1124457fe1b5c2132022be543b581d563e6df",
       "bytes": 4460
     },
     {
@@ -9586,43 +11451,43 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/receipt.py",
-      "sha256": "f8d04162b554157cf958d72ebc80f9adbc1f07a98a3b39bed4d72a16f0b00cc8",
-      "bytes": 17709
+      "sha256": "08224a7df50ff1593af6d67ba8f94eb236d9716e88907150a9f87750a9805d8d",
+      "bytes": 23331
     },
     {
       "path": "blueprints/runtime-workers/openhands/recipe.py",
-      "sha256": "8de3c2159a137c477716ba2871bbb9efa5275169f746a84ba5c98c16ecabce77",
-      "bytes": 6670
+      "sha256": "b648c9241c35ab9301c127423695d5018218ba8f901fed8db99e07f211750603",
+      "bytes": 8450
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
-      "bytes": 106257
+      "sha256": "38c20c899b8d7b08e03a04624daa17ba1fc353533fbff450bb0ac2bddd0832eb",
+      "bytes": 250484
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "ca047a295fe9f6ff5f23544cd10f2cac2687a93ab3eea4e4e351620058a85d9b",
-      "bytes": 75592
+      "sha256": "905f8f5d281da014fc60c1ca056c8bbb0f921c3f725a545f4e20a4a7a3141fa5",
+      "bytes": 81128
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
-      "sha256": "a14cf4b25484b77c5f5b6d3103877d9eae3dee660b087b1e264710dd93c207a4",
+      "sha256": "5a09ca401ae4719696a7e28e995f4e58f33451308d486e93aa840486ca8eff04",
       "bytes": 442
     },
     {
       "path": "blueprints/runtime-workers/openhands/server_transport.py",
-      "sha256": "39a26c5588f5865a129c982d0f60c591c4e745b35547816e68328e118cb97ac4",
-      "bytes": 629
+      "sha256": "3c56eff0bb52f899e96ccb0edb09d19b2ace55169484939b962b644325a84eac",
+      "bytes": 2552
     },
     {
       "path": "blueprints/runtime-workers/openhands/worker.py",
-      "sha256": "ea5d67a538f87feac8a4d0b8a66cfdcbaef44f86a8ee7cb11efc332272bb1f5c",
-      "bytes": 11141
+      "sha256": "210301d91808ed3bd6b81fdafcafa66bd2b9c2052c42fc2a382fef8e3a665808",
+      "bytes": 17490
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "b11d264ee2db92432e7e437672a1851306b2ba146464b879ca9637ca90e9e64f",
-      "bytes": 44742
+      "sha256": "c2f63856585e27159a7f6481d3b3df573bd86e67e87d1f3d3fb48432e85f2696",
+      "bytes": 46333
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -9630,14 +11495,54 @@
       "bytes": 82752
     },
     {
+      "path": "blueprints/runtime-workers/skills/freshness-20260930-before.json",
+      "sha256": "3860da4db54746d2d062fab5b30a4d6582230e28042842091e4871a04d50ec58",
+      "bytes": 83060
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/freshness-20260930.json",
+      "sha256": "296c2e949b38d01331a9cad9d8424c28d11aff0b8b3d68190c67e5235ba06406",
+      "bytes": 82403
+    },
+    {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "a67adbcde01e3d156a31ef67af1bad6278f7ec57f1274dfd955ca3aaab80b817",
-      "bytes": 185976
+      "sha256": "98dc14fcec4a6dc81b8cedea93ce366bda9ee3d3eac71aa5a729012bf8e77049",
+      "bytes": 187186
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/profiles.json",
+      "sha256": "856be295b8e460783134bef9f26824697c9044bed53e5dd64875b395e910937a",
+      "bytes": 20266
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/refresh-20260930-native-discovery-negative.txt",
+      "sha256": "00d0a64edf9292e03877cebb085bf0d666a148dc525b187107e8d6c4fbd4f164",
+      "bytes": 106
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/refresh-20260930-native-discovery.txt",
+      "sha256": "e07ee4a209821d322d5bbd84bbf61e5399b3810c92a4b2ef9c6d0277434b2530",
+      "bytes": 234
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/refresh-20260930-tests-first.txt",
+      "sha256": "3aa77a0041f8a58e7bb71881afbecb509103e80b47928c5e6c506d44df777808",
+      "bytes": 5262
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/refresh-20260930-tests.txt",
+      "sha256": "b2e30d3927f58bed90fcfd348f0e36fd25d6df8bce83bc78d060dfd9eb340346",
+      "bytes": 4209
+    },
+    {
+      "path": "blueprints/runtime-workers/skills/refresh-20260930.json",
+      "sha256": "a56b9f892500526f259f6e31b8159df486920efa8813ee9e4194622de6d1ac9f",
+      "bytes": 88843
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
-      "sha256": "804e30d507f9ee7d73a5a8a78e2c48274c2ab09e45f4bbff1c14c6ee69c3a2f3",
-      "bytes": 19776
+      "sha256": "89a0383e56d07fce3eea4951322f4dc38ae66dfad05d1abf2486084e32249bb4",
+      "bytes": 25709
     },
     {
       "path": "blueprints/runtime-workers/skills/validation.json",
@@ -14886,8 +16791,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "5f6d57d2d97618e0e02ac15bc917b9f917928dac82aad1346a99d7e224236825",
+      "bytes": 26816
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15688,6 +17593,21 @@
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
       "sha256": "b2d99153c8dffb6169923e9129cfb6e4343cd9f5fc443ad8839fa5f162e20c1e",
       "bytes": 37375
+    },
+    {
+      "path": "docs/decisions/2026-09-30-runtime-convergence-followup.md",
+      "sha256": "45e55239a8a0eca12996cf1e7deb3290c517189dfe47230929a1d79465258638",
+      "bytes": 35021
+    },
+    {
+      "path": "docs/decisions/2026-09-30-runtime-worker-coordination.md",
+      "sha256": "a00f0272bcba6883181da9d4f9cc9417ef45829563ffc996e4da7e2c02565216",
+      "bytes": 35469
+    },
+    {
+      "path": "docs/decisions/2026-09-30-runtime-worker-qualification.md",
+      "sha256": "d35dafb5d73df1e2bc84d2ccefb0d0152251de66b710c62aaec3f25bc65d3d1e",
+      "bytes": 13521
     },
     {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
@@ -38880,6 +40800,66 @@
       "bytes": 12542
     },
     {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/litellm-workflow-recheck.json",
+      "sha256": "68324150a53c112623cc203e4df6cd2b27d28ca2ea558f6f4481cf3218298b71",
+      "bytes": 6026
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/nas-fba-evidence-index-20260930.txt",
+      "sha256": "b9dd17b602fca37413e53cda5beeb4d15a3e814cd88f186f78206b4ec37168f3",
+      "bytes": 36
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/nas-fba-mutants-20260930.txt",
+      "sha256": "6aa1c51a2513c6c6fb8e1b51dbea64cd8cc29e0c3dea46f1fc4f933ecb4832bc",
+      "bytes": 5350
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/nas-fba-unittest-20260930.txt",
+      "sha256": "8df00f874a9b7bd6fe4c6ff33476a1c95f4f57f0fbac4c19a88769a6e4b54884",
+      "bytes": 258
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/nas-fba-validate-20260930.txt",
+      "sha256": "88e98c08151e4bff895ab73e76a46afbbafdb490af1d0bf3427d1d2afab2fe56",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/native-split-evidence-index.stdout.txt",
+      "sha256": "a26f8fb01df537ed9a634e45d29a4b0fb39084139d18b6147500e53e897add17",
+      "bytes": 36
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/native-split-review.json",
+      "sha256": "13848d96539a14fe27707c9f8f3deb06143e5a83ea66c561ebe0ffb60dd92bde",
+      "bytes": 4711
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/native-split-unittest.stderr.txt",
+      "sha256": "0c1031987a585f65dc0b5f3a98fd58b4d8e5c7cabfc5544f51dc1b88ba52d5cd",
+      "bytes": 346
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/native-split-validate.stdout.txt",
+      "sha256": "85c8c93994f1d022e4a681bcc1414f57571d380fc716f4091fa024e0977609ee",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/receipt.json",
+      "sha256": "2eb54c39f45a4543db4c6acf1a3f0c9038891948a2a9d7dac820e46ab28e76c4",
+      "bytes": 3125
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/source-reconciliation.json",
+      "sha256": "09b581401d0a172a6baeee59f7680e88d69136cfc972e501a107bde94f459aec",
+      "bytes": 3726
+    },
+    {
+      "path": "evidence/artifacts/osv-scope-followup-20260930/workflow-binding-addendum.json",
+      "sha256": "d97875056b8879220926294ea3a86121e6ca8a37e7065eb3845d5a5fdbc72cc7",
+      "bytes": 4525
+    },
+    {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
       "sha256": "d9d5d282a45d2b7e39b7cffeddaf73e50f07d24344cd77cff0484a33041cc756",
       "bytes": 80969
@@ -41590,6 +43570,36 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/runtime-roster-20260930/README-deerflow.md",
+      "sha256": "372dcfb7aaa1feba4f6f4ccaa6e32d4b672353542a8fac3d38a4103fc05cec9c",
+      "bytes": 5165
+    },
+    {
+      "path": "evidence/artifacts/runtime-roster-20260930/README.md",
+      "sha256": "f40f45374ff5fb2f85849c43b2935df56849527de23c709cb7521046e832faf3",
+      "bytes": 3345
+    },
+    {
+      "path": "evidence/artifacts/runtime-roster-20260930/crawl4ai-native.json",
+      "sha256": "d2505dcf00f84b10b0de59c00a08a8f14540a2b5ef2e80879c1d8b118c25b11d",
+      "bytes": 7774
+    },
+    {
+      "path": "evidence/artifacts/runtime-roster-20260930/deerflow-native.json",
+      "sha256": "f18cbad953e7cee73d059eaa4624ea8182c3fd522e1067d2c906b5503c2c7fe8",
+      "bytes": 46959
+    },
+    {
+      "path": "evidence/artifacts/runtime-roster-20260930/gpt-researcher-native.json",
+      "sha256": "618085cdf4664cb81658d3577986ff622f9fbb85cb2b817022238eec08f45a3f",
+      "bytes": 7804
+    },
+    {
+      "path": "evidence/artifacts/runtime-roster-20260930/lock-scan-and-nltk-scope.json",
+      "sha256": "e809b4d03c4300aa5e24c31ffc246233ec204273732a20eb205354d79ae01f21",
+      "bytes": 39015
+    },
+    {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
       "sha256": "70059a0b57eb1aae9bb62c04ffbbc60e4119381e777eba5290ad12c23f66f3bd",
       "bytes": 1585
@@ -41613,6 +43623,16 @@
       "path": "evidence/artifacts/runtime-sdk-20261001/receipt.json",
       "sha256": "4878a634b1b6dcd910150583fd701a2997b7233313f66256ac3673c7062a2cb4",
       "bytes": 7684
+    },
+    {
+      "path": "evidence/artifacts/runtime-sol-routing-20261002/dashboard-ci-repair.json",
+      "sha256": "7c7a7398d6ee6a369244ebd594b03b6774b8ac867e249622bd327d4f6794027a",
+      "bytes": 1777
+    },
+    {
+      "path": "evidence/artifacts/runtime-sol-routing-20261002/receipt.json",
+      "sha256": "3a4083952ce464f489c6e12a7867b1311e26c0e6bbd53a069edf6e8eb3fc4752",
+      "bytes": 5843
     },
     {
       "path": "evidence/artifacts/sdk-runtime-coverage-20260922/agent-sdks.json",
@@ -48306,8 +50326,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
-      "bytes": 19333
+      "sha256": "a3285c1673915648ae2f353664c2adb5294e656992ebb4d617f6031dac35aaef",
+      "bytes": 20543
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -49390,6 +51410,11 @@
       "bytes": 23194
     },
     {
+      "path": "tests/test_openhands_150.py",
+      "sha256": "52e1beefe24bfe03c298ae4d10a17d56388626503bc39c7f7b09a5ffbd840270",
+      "bytes": 17216
+    },
+    {
       "path": "tests/test_openhands_lock_binding.py",
       "sha256": "60ff8e66e308d623ea229578dc2ec66559ef91118bd237feccbca86fecf21b8f",
       "bytes": 3206
@@ -49406,8 +51431,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "31780dc60ea10f55597dbc984628fa22019a0a0c3cc63727f2a684fff2ea383e",
-      "bytes": 46337
+      "sha256": "e9b5bb89da004eed02a152c3fab8d0c73029d9da8263cb475f613020e4fdbec4",
+      "bytes": 47884
     },
     {
       "path": "tests/test_path_safety.py",
@@ -49490,9 +51515,24 @@
       "bytes": 58079
     },
     {
+      "path": "tests/test_runtime_worker_crawl4ai.py",
+      "sha256": "3f1c03410adee4ffa5e7417bf7e822944731d217df0683f92cf0b3940f12583e",
+      "bytes": 39755
+    },
+    {
+      "path": "tests/test_runtime_worker_deerflow.py",
+      "sha256": "aaa21a827e3dc7d3719051e76a8727b33a6438317509eea66adaf9ceab6326d2",
+      "bytes": 65244
+    },
+    {
+      "path": "tests/test_runtime_worker_gpt_researcher.py",
+      "sha256": "b7c9cc3ec10997a03c5b9e337044fc9305c357ada18fb6480869a07df4fa6413",
+      "bytes": 56663
+    },
+    {
       "path": "tests/test_runtime_worker_openhands.py",
-      "sha256": "1103b1cd52507997cd6a3c628970d7fe46007fc0ddcf3fb43027f53f05a4b981",
-      "bytes": 220324
+      "sha256": "1f79392caed23c3ac5e9c493c7b4e32d6db909138a7da2437b35f5fee14f0083",
+      "bytes": 223665
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -49876,8 +51916,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "5709f3609ccdf43f4fdf0ad7e55d1036f63b996aea77b0347b9d8db0b97098c7",
+      "bytes": 56156
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
@@ -50271,6 +52311,7 @@
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "blueprints/convergence-practice/runtime-image-browser-20260930/experiment.json"
   ]
 }

@@ -1,0 +1,77 @@
+$ ["rtk", "<PRIVATE_RESEARCH>/venv/bin/python", "-c", "import hashlib,json,sys,tarfile,zipfile\nfrom pathlib import Path\np,site=map(Path,sys.argv[1:3]); results=[]\nartifacts=json.loads((p/'fresh-caller-artifacts.json').read_text())\nartifacts += [{'filename':'openhands_sdk-1.50.0-py3-none-any.whl','name':'openhands-sdk'}, {'filename':'openhands_tools-1.50.0-py3-none-any.whl','name':'openhands-tools'}]\nfor artifact in artifacts:\n f=p/artifact['filename']; sources=[]\n if f.suffix=='.whl':\n  with zipfile.ZipFile(f) as z:\n   sources=[(n,z.read(n)) for n in z.namelist() if n.endswith('.py')]\n else:\n  with tarfile.open(f,'r:gz') as t:\n   for member in t.getmembers():\n    rel='/'.join(member.name.split('/')[1:])\n    if rel.startswith('func_timeout/') and rel.endswith('.py'):\n     sources.append((rel,t.extractfile(member).read()))\n mismatches=[]\n for rel,data in sources:\n  target=site/rel\n  if not target.is_file() or target.read_bytes()!=data: mismatches.append(rel)\n results.append({'name':artifact['name'],'artifact':f.name,'artifact_sha256':hashlib.sha256(f.read_bytes()).hexdigest(),'python_sources_compared':len(sources),'mismatches':mismatches})\nprint(json.dumps(results,indent=2))\nassert all(r['python_sources_compared']>0 and not r['mismatches'] for r in results)\n", "<PRIVATE_RESEARCH>", "<PRIVATE_RESEARCH>/venv/lib/python3.13/site-packages"]
+[
+  {
+    "name": "oauthlib",
+    "artifact": "oauthlib-3.3.1-py3-none-any.whl",
+    "artifact_sha256": "88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1",
+    "python_sources_compared": 75,
+    "mismatches": []
+  },
+  {
+    "name": "requests-oauthlib",
+    "artifact": "requests_oauthlib-2.0.0-py2.py3-none-any.whl",
+    "artifact_sha256": "7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36",
+    "python_sources_compared": 15,
+    "mismatches": []
+  },
+  {
+    "name": "google-auth-oauthlib",
+    "artifact": "google_auth_oauthlib-1.2.2-py3-none-any.whl",
+    "artifact_sha256": "fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2",
+    "python_sources_compared": 6,
+    "mismatches": []
+  },
+  {
+    "name": "func-timeout",
+    "artifact": "func_timeout-4.3.5.tar.gz",
+    "artifact_sha256": "74cd3c428ec94f4edfba81f9b2f14904846d5ffccc27c92433b8b5939b5575dd",
+    "python_sources_compared": 6,
+    "mismatches": []
+  },
+  {
+    "name": "PyJWT",
+    "artifact": "pyjwt-2.14.0-py3-none-any.whl",
+    "artifact_sha256": "ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc",
+    "python_sources_compared": 12,
+    "mismatches": []
+  },
+  {
+    "name": "click",
+    "artifact": "click-8.5.0-py3-none-any.whl",
+    "artifact_sha256": "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+    "python_sources_compared": 17,
+    "mismatches": []
+  },
+  {
+    "name": "pypdf",
+    "artifact": "pypdf-6.19.0-py3-none-any.whl",
+    "artifact_sha256": "7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14",
+    "python_sources_compared": 59,
+    "mismatches": []
+  },
+  {
+    "name": "soupsieve",
+    "artifact": "soupsieve-2.9.2-py3-none-any.whl",
+    "artifact_sha256": "8089a26fd974ca7a1f30276d3d8492ab266ab15af581642dfe8aa162e0c1c823",
+    "python_sources_compared": 7,
+    "mismatches": []
+  },
+  {
+    "name": "openhands-sdk",
+    "artifact": "openhands_sdk-1.50.0-py3-none-any.whl",
+    "artifact_sha256": "441ea190fb0af2253bf431650f209fedfbb9eb7c41cf35440a0548296d4b0faa",
+    "python_sources_compared": 296,
+    "mismatches": []
+  },
+  {
+    "name": "openhands-tools",
+    "artifact": "openhands_tools-1.50.0-py3-none-any.whl",
+    "artifact_sha256": "b237043c892111624fdc1fe98e0d29f772ae1f614b487866d926775167c9635e",
+    "python_sources_compared": 93,
+    "mismatches": []
+  }
+]
+
+[stderr]
+
+exit_code=0

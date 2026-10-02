@@ -1,0 +1,55 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/tox-driver/bin/python", "-m", "pip", "install", "--upgrade", "coverage[toml]", "virtualenv", "tox", "tox-gh-actions", "--index-url", "https://pypi.org/simple"]
+cwd: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+started_utc: 2026-09-30T17:07:04.096825+00:00
+ended_utc: 2026-09-30T17:07:07.529047+00:00
+exit_code: 0
+
+stdout:
+Collecting virtualenv
+  Downloading virtualenv-21.14.1-py3-none-any.whl.metadata (4.1 kB)
+Collecting tox
+  Downloading tox-4.64.5-py3-none-any.whl.metadata (3.8 kB)
+Collecting tox-gh-actions
+  Downloading tox_gh_actions-3.5.0-py3-none-any.whl.metadata (12 kB)
+Collecting coverage[toml]
+  Downloading coverage-7.16.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.2 kB)
+Collecting distlib<1,>=0.3.7 (from virtualenv)
+  Downloading distlib-0.4.3-py2.py3-none-any.whl.metadata (5.3 kB)
+Collecting filelock<5,>=3.24.2 (from virtualenv)
+  Downloading filelock-4.0.7-py3-none-any.whl.metadata (2.0 kB)
+Collecting packaging>=23.1 (from virtualenv)
+  Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting platformdirs<5,>=3.9.1 (from virtualenv)
+  Downloading platformdirs-4.12.2-py3-none-any.whl.metadata (5.5 kB)
+Collecting python-discovery>=1.6 (from virtualenv)
+  Downloading python_discovery-1.6.1-py3-none-any.whl.metadata (5.1 kB)
+Collecting cachetools>=7.0.3 (from tox)
+  Downloading cachetools-7.2.0-py3-none-any.whl.metadata (5.5 kB)
+Collecting colorama>=0.4.6 (from tox)
+  Downloading colorama-0.4.6-py2.py3-none-any.whl.metadata (17 kB)
+Collecting pluggy>=1.6 (from tox)
+  Downloading pluggy-1.6.0-py3-none-any.whl.metadata (4.8 kB)
+Collecting pyproject-api>=1.10 (from tox)
+  Downloading pyproject_api-1.11.2-py3-none-any.whl.metadata (2.2 kB)
+Collecting tomli-w>=1.2 (from tox)
+  Downloading tomli_w-1.2.0-py3-none-any.whl.metadata (5.7 kB)
+Downloading coverage-7.16.2-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (257 kB)
+Downloading virtualenv-21.14.1-py3-none-any.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 95.4 MB/s  0:00:00
+Downloading distlib-0.4.3-py2.py3-none-any.whl (470 kB)
+Downloading filelock-4.0.7-py3-none-any.whl (109 kB)
+Downloading platformdirs-4.12.2-py3-none-any.whl (32 kB)
+Downloading tox-4.64.5-py3-none-any.whl (232 kB)
+Downloading tox_gh_actions-3.5.0-py3-none-any.whl (9.9 kB)
+Downloading cachetools-7.2.0-py3-none-any.whl (16 kB)
+Downloading colorama-0.4.6-py2.py3-none-any.whl (25 kB)
+Using cached packaging-26.3-py3-none-any.whl (129 kB)
+Downloading pluggy-1.6.0-py3-none-any.whl (20 kB)
+Downloading pyproject_api-1.11.2-py3-none-any.whl (13 kB)
+Downloading python_discovery-1.6.1-py3-none-any.whl (38 kB)
+Downloading tomli_w-1.2.0-py3-none-any.whl (6.7 kB)
+Installing collected packages: distlib, tomli-w, pluggy, platformdirs, packaging, filelock, coverage, colorama, cachetools, python-discovery, pyproject-api, virtualenv, tox, tox-gh-actions
+
+Successfully installed cachetools-7.2.0 colorama-0.4.6 coverage-7.16.2 distlib-0.4.3 filelock-4.0.7 packaging-26.3 platformdirs-4.12.2 pluggy-1.6.0 pyproject-api-1.11.2 python-discovery-1.6.1 tomli-w-1.2.0 tox-4.64.5 tox-gh-actions-3.5.0 virtualenv-21.14.1
+
+stderr:

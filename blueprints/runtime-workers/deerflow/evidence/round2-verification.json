@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-27",
+  "scope": "DeerFlow Round-2 recipe and offline integration; lane:foundation",
+  "evidence_class": "local integration tests and source review; no new upstream benchmark/provider acceptance",
+  "results": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -v",
+      "exit_code": 0,
+      "result": "21 tests run: 20 passed, 1 explicitly skipped (real pinned upstream scorer unavailable)",
+      "returned_output": "round2-unit.txt"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/validate.py",
+      "exit_code": 1,
+      "result": "30 SHA-256/byte-count mismatches for 15 changed files in coordinator-owned manifests/evidence.json; no other reported errors",
+      "returned_output": "round2-repository.txt"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 Python AST/JSON parse; bash -n; inline shell Python AST parse; git diff --check; cache-directory check",
+      "exit_code": 0,
+      "result": "AST: 11 Python files; JSON: 14 files; shell: 8 files and inline Python; git diff --check: passed\nWorktree __pycache__ directories: 0",
+      "returned_output": "round2-syntax.txt"
+    }
+  ],
+  "fail_first": "round2-fail-first.json",
+  "raw_negative_controls": [
+    "round2-cleanup-red.txt",
+    "round2-malformed-red.txt"
+  ],
+  "grader": {
+    "primary": "Inspect Evals GAIA v0.22.0",
+    "commit": "41c72eaa2b807ce43f35fac6f3f399318adc7e9d",
+    "runtime": "Inspect AI 0.3.271",
+    "runtime_commit": "c2b63a0b0560f9c3b5b5230365e0a8fe08cd3df0",
+    "scorer": "unchanged gaia_scorer",
+    "executed": false
+  },
+  "ownership": {
+    "published_host_ports": [
+      "127.0.0.1:3771"
+    ],
+    "prefix": "rw-deerflow-",
+    "label": "com.native-agent-stack.owner=gpt6-omniroute-framework-integration",
+    "named_docker_volumes": 0
+  },
+  "pending": [
+    "coordinator skills PR (manifest/project-dir/universal interface)",
+    "coordinator shared evidence-manifest refresh after integration",
+    "pinned grader install and real known-pass/fail scorer controls",
+    "native HF access, frozen no-attachment GAIA validation ID and benchmark/A-B runs",
+    "native image/runtime/MCP/skills/gateway/persistence/cancellation qualification"
+  ],
+  "boundaries": {
+    "installed_on_host": false,
+    "services_started": false,
+    "images_pulled": false,
+    "runtime_model_invocations": 0,
+    "runtime_provider_usage": null,
+    "committed": false,
+    "pushed": false,
+    "shared_manifest_changed": false
+  },
+  "corrections": "../round2-research.json#/anti_pattern_log"
+}

@@ -35,9 +35,9 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def tool_filter(policy):
+def tool_filter(policy, additional=()):
     """FastMCP 3.2.0 multi-server names use one underscore, not two."""
-    parts = [r"terminal", r"file_editor"]
+    parts = [r"terminal", r"file_editor", *additional]
     for server, limits in policy.items():
         if not limits.get("enabled", True):
             continue
@@ -92,7 +92,10 @@ def arm_config(arm="control", model=None, base_url=None, compression=None):
         raise ValueError("unknown_arm")
     port = 20128 if arm == "control" else 20129
     selected = model or ("cx/gpt-6-astra-max" if arm == "control" else "sharedgw/gpt-6-astra-max")
-    valid = (isinstance(selected, str) and re.fullmatch(r"cx/gpt-6(?:-[a-z0-9]+)*", selected)
+    valid = (isinstance(selected, str) and selected in {
+                 "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max", "cx/gpt-6-sol-max", "cx/gpt-6-sol-medium",
+                 "cx/gpt-6-astra", "cx/gpt-6-astra-max",
+             }
              if arm == "control" else selected == "sharedgw/gpt-6-astra-max")
     if not valid:
         raise ValueError("gateway_requires_gpt6_route_for_selected_arm")
@@ -128,15 +131,47 @@ def llm_config(config, model=None, *, arm="control", base_url=None, compression=
     selected = arm_config(arm, model, base_url, compression)
     if result.get("reasoning_effort") != "max":
         raise ValueError("max_reasoning_effort_required")
-    if result.get("temperature") is not None and result["temperature"] <= 0.1:
-        raise ValueError("gateway_temperature_must_exceed_0_1_or_be_omitted")
+    if any(result.get(key) is not None for key in ("temperature", "top_p", "top_k")):
+        raise ValueError("gpt6_sampling_parameters_must_be_omitted")
     if result.get("response_format") is not None or result.get("native_tool_calling") is not True:
         raise ValueError("use_native_tool_calling_for_structured_output")
     # LiteLLM strips its openai provider prefix; the gateway receives selected.
     result["model"] = "openai/" + selected["requested_model"]
     result["base_url"] = selected["base_url"]
     result["extra_headers"] = selected["headers"]
+    # SDK@dcf401af v1.50.0 LLM.litellm_extra_body is the native extra_body field.
+    extra_body = dict(result.get("litellm_extra_body") or {})
+    extra_body["reasoning"] = {**(extra_body.get("reasoning") or {}), "effort": "max"}
+    result["litellm_extra_body"] = extra_body
     return result
+
+
+def task_profile(environment):
+    """Select an explicit native capability profile; extra services stay off."""
+    config = read_json(HERE / "config/profiles.json")
+    name = environment.get("OPENHANDS_PROFILE", config["default"])
+    if name not in config["profiles"]:
+        raise ValueError("unknown_worker_profile")
+    return name, {**config["profiles"][name], "delegation": config["delegation"], "goal": config["goal"]}
+
+
+def profile_skills(skills, manifest, profile):
+    """Native skills stay objects; expose only descriptions relevant to this role.
+
+    Bodies and resources remain available through native invoke_skill. Older
+    role-less input is accepted for the coding baseline only; other profiles
+    need the manifest role metadata recorded by the host before any model call.
+    """
+    roles = manifest.get("roles")
+    if roles is None:
+        if profile["role"] != "coding":
+            raise ValueError("profile_requires_skill_role_metadata")
+        return skills
+    relevant = {name: skill for name, skill in skills.items()
+                if profile["role"] in roles.get(name, [])
+                or name == "verification-before-completion"}
+    prefixes = profile.get("skill_prefixes")
+    return {name: skill for name, skill in relevant.items() if name.startswith(tuple(prefixes))} if prefixes else relevant
 
 
 def inventory(root):

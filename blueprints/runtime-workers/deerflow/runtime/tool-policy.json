@@ -1,0 +1,69 @@
+{
+  "source": "DeerFlow v2.1.0 authz/provider.py + authz/rbac.py; adoption/templates/codex{,.stack-worker}.config*.toml and project.codex.config.template.toml",
+  "builtin_tools": [
+    "ls",
+    "read_file",
+    "glob",
+    "grep",
+    "write_file",
+    "str_replace",
+    "bash",
+    "task",
+    "write_todos",
+    "present_files",
+    "tool_search",
+    "describe_skill"
+  ],
+  "servers": {
+    "context-mode": {
+      "allow": "*",
+      "deny": [
+        "ctx_upgrade",
+        "ctx_purge"
+      ]
+    },
+    "serena": {
+      "allow": "*",
+      "deny": []
+    },
+    "jcodemunch": {
+      "allow": [
+        "route",
+        "menu",
+        "order"
+      ]
+    },
+    "qmd": {
+      "allow": [
+        "query",
+        "get",
+        "multi_get",
+        "status"
+      ]
+    },
+    "ai-memory": {
+      "allow": [
+        "memory_query",
+        "memory_read_page",
+        "memory_recent",
+        "memory_status",
+        "memory_briefing"
+      ]
+    },
+    "socraticode": {
+      "allow": [
+        "codebase_search",
+        "codebase_status",
+        "codebase_list_projects",
+        "codebase_health"
+      ]
+    }
+  },
+  "qmd_collections": [
+    "foundation-docs",
+    "foundation-adoption",
+    "us-equities-foundation",
+    "us-equities-catalog"
+  ],
+  "headroom": "omitted: native tool_output already externalizes large results"
+}

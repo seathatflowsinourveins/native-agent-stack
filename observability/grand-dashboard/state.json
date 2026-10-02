@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-01T19:18:16Z",
-  "meaning": "Recorded checkpoint aligning Codex 0.159.3 and its SDK pair; native queue, capture and SDK qualification retain their linked scopes and limits. Existing foundation, paper and simulation records are preserved; the gateway request remains held.",
+  "recorded_at_utc": "2026-10-02T08:41:35Z",
+  "meaning": "Recorded checkpoint preserving main's Codex, foundation, paper and simulation evidence and adding scoped runtime source/effort repair gates. Linked records retain their original dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
@@ -26,6 +26,27 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "runtime-worker-quality-and-image",
+      "title": "Runtime candidate image and task-quality acceptance",
+      "state": "Historical 2026-09-30 image triage records 56 fixable High-Critical matches / full-image and task-quality gates remain open",
+      "evidence_ref": "blueprints/runtime-workers/openhands/evidence/image-triage-20260930.json"
+    },
+    {
+      "kind": "gate",
+      "id": "runtime-litellm-closure",
+      "title": "OpenHands package closure and owner review",
+      "state": "SDK1.50.0 Linux LiteLLM1.93.2 closure has linked native checks / source adoption and host integration and full-image task-quality acceptance remain pending",
+      "evidence_ref": "blueprints/runtime-workers/openhands/evidence/litellm-relock-20260930.json"
+    },
+    {
+      "kind": "gate",
+      "id": "runtime-sol-model-effort",
+      "title": "Sol route and native effort qualification",
+      "state": "Sol aliases and nested max repaired / local checks and source review pass / effective provider effort and inference and task-quality acceptance remain open",
+      "evidence_ref": "evidence/artifacts/runtime-sol-routing-20261002/receipt.json"
+    },
     {
       "kind": "gate",
       "id": "memory-scheduled-learning",

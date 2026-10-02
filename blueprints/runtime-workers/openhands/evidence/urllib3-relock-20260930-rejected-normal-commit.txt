@@ -1,0 +1,7 @@
+command: rtk git commit -m 'fix(openhands): relock candidate urllib3 to 2.8.0'
+exit_code: 1
+returned_output_class: exec_command combined output
+
+12:11PM INF 0 commits scanned.
+12:11PM INF scanned ~1501153 bytes (1.50 MB) in 435ms
+12:11PM WRN leaks found: 1

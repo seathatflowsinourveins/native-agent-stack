@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+"""Retain original native command streams under this owned private prefix.
+
+Evidence format follows the accepted pyjwt-relock-20260930 command ledger and
+docs/acceptance-evidence-policy.md; this helper is not worker runtime code.
+"""
+from datetime import datetime, timezone
+from pathlib import Path
+import hashlib
+import json
+import os
+import subprocess
+import sys
+
+private = Path(__file__).resolve().parent
+name, cwd, *argv = sys.argv[1:]
+assert name and '/' not in name and argv and argv[0] == 'rtk'
+started = datetime.now(timezone.utc).isoformat()
+result = subprocess.run(argv, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+ended = datetime.now(timezone.utc).isoformat()
+bindings = {}
+for stream, data in [('stdout', result.stdout), ('stderr', result.stderr)]:
+    path = private / (name + '.' + stream + '.txt')
+    path.write_bytes(data)
+    path.chmod(0o600)
+    bindings[stream] = {'file': path.name, 'bytes': len(data),
+                        'sha256': hashlib.sha256(data).hexdigest()}
+record = {'id': name, 'argv': argv, 'cwd': cwd, 'started_utc': started,
+          'ended_utc': ended, 'exit_code': result.returncode, 'original_streams': bindings}
+target = private / (name + '.json')
+target.write_text(json.dumps(record, indent=2) + '\n')
+target.chmod(0o600)
+print(json.dumps({'id': name, 'exit_code': result.returncode, 'original_streams': bindings}))
+raise SystemExit(result.returncode)

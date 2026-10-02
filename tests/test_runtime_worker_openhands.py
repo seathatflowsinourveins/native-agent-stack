@@ -234,7 +234,7 @@ class OpenHandsRecipeTests(unittest.TestCase):
 
     def test_immutable_artifacts(self):
         pins = self.read_json("pins.json")
-        self.assertEqual(pins["version"], "1.49.6")
+        self.assertEqual(pins["version"], "1.50.0")
         self.assertRegex(pins["commit"], r"^[0-9a-f]{40}$")
         for name in ("source_archive", "uv_lock"):
             self.assertRegex(pins[name]["sha256"], r"^[0-9a-f]{64}$")
@@ -380,9 +380,18 @@ class OpenHandsRecipeTests(unittest.TestCase):
 
     def test_runtime_model_override_and_native_tool_filter(self):
         helpers = load_recipe_module("recipe.py")
-        result = helpers.llm_config(self.read_json("config/worker.json"), "cx/gpt-6-sol-max")
-        self.assertEqual(result["model"], "openai/cx/gpt-6-sol-max")
-        self.assertEqual(result["base_url"], "http://gw:8081/v1")
+        for model in ("cx/gpt-6-sol-max", "cx/gpt-6.1-sol", "cx/gpt-6.1-sol-max"):
+            with self.subTest(model=model):
+                selection = helpers.environment_selection({"OPENHANDS_MODEL": model})
+                self.assertEqual(selection["requested_model"], model)
+                self.assertEqual(selection["gateway_model"], model.removeprefix("cx/"))
+                self.assertEqual(selection["gateway_port"], 20128)
+                self.assertEqual(selection["headers"], {})
+                result = helpers.llm_config(self.read_json("config/worker.json"), model)
+                self.assertEqual(result["model"], "openai/" + model)
+                self.assertEqual(result["base_url"], "http://gw:8081/v1")
+                self.assertEqual(result["reasoning_effort"], "max")
+                self.assertEqual(result["extra_headers"], {})
         pattern = re.compile(helpers.tool_filter(self.read_json("config/mcp-policy.json")))
         for name in ("terminal", "file_editor", "context-mode_ctx_execute", "serena_find_symbol", "qmd_query", "jcodemunch_order"):
             self.assertIsNotNone(pattern.fullmatch(name), name)
@@ -393,9 +402,40 @@ class OpenHandsRecipeTests(unittest.TestCase):
                      "headroom_headroom_compress", "memory_query", "qmd_query_evil"):
             self.assertIsNone(pattern.fullmatch(name), name)
 
+    def test_nested_max_survives_worker_configuration_and_oracle_controls(self):
+        helpers = load_recipe_module("recipe.py")
+        worker = load_recipe_module("worker.py")
+
+        def assert_nested_max(fields):
+            self.assertEqual(fields.get("litellm_extra_body", {}).get("reasoning"), {"effort": "max"})
+
+        for arm, model in (("control", "cx/gpt-6.1-sol"), ("control", "cx/gpt-6.1-sol-max"),
+                           ("control", "cx/gpt-6-astra-max"), ("engines-on", "sharedgw/gpt-6-astra-max")):
+            with self.subTest(arm=arm, model=model):
+                configured = helpers.llm_config(self.read_json("config/worker.json"), model, arm=arm)
+                assert_nested_max(configured)
+                fields = worker.worker_llm_config({"OPENHANDS_ARM": arm, "OPENHANDS_MODEL": model}, "dispatch-fixture")
+                assert_nested_max(fields)
+                self.assertEqual(fields["model"], "openai/" + model)
+                self.assertEqual(fields["reasoning_effort"], "max")
+                self.assertEqual(fields["base_url"], "http://gw:8081/v1")
+                self.assertEqual(fields["extra_headers"]["x-omniroute-session"], "dispatch-fixture")
+                self.assertEqual(fields["extra_headers"].get("x-omniroute-compression"),
+                                 "allow-lossy" if arm == "engines-on" else None)
+                for bad_body in (None, {}, {"reasoning": {}}, {"reasoning": {"effort": "high"}},
+                                 {"reasoning": {"effort": "xhigh"}}):
+                    invalid = dict(fields)
+                    if bad_body is None:
+                        invalid.pop("litellm_extra_body")
+                    else:
+                        invalid["litellm_extra_body"] = bad_body
+                    with self.subTest(bad_body=bad_body), self.assertRaises(AssertionError):
+                        assert_nested_max(invalid)
+
     def test_gateway_rejects_non_gpt6_models_and_unsafe_structured_modes(self):
         helpers = load_recipe_module("recipe.py")
-        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-5", "openai/cx/gpt-6-astra-max"):
+        for model in ("claude-opus-5-5", "cx/claude-opus-5-5", "cx/gpt-5", "openai/cx/gpt-6-astra-max",
+                      "cx/gpt-6-unknown-max", "cx/gpt-6.1-sol-unknown"):
             with self.subTest(model=model), self.assertRaises(ValueError):
                 helpers.llm_config(self.read_json("config/worker.json"), model)
         for change in ({"temperature": 0.1}, {"response_format": {"type": "json_object"}}, {"native_tool_calling": False}):
@@ -511,7 +551,9 @@ class OpenHandsRecipeTests(unittest.TestCase):
         # is built from upstream's unchanged uv.lock, so the digest is scanned.
         from scripts.validate import PRIVATE_CONTENT
         name = "evidence/agent-server-image-grype-20260928.json"
-        all_pins = self.read_json("pins.json")
+        # Historical scan is retained against its original immutable input;
+        # it is not acceptance of the new 1.50.0 image.
+        all_pins = self.read_json("evidence/pins-1.49.6.json")
         pins = all_pins["image"]
         receipt = self.read_json(name)
         keys = ("ref", "platform", "manifest_sha256", "config_sha256")
@@ -1620,9 +1662,10 @@ class OpenHandsProbeTests(unittest.TestCase):
         # RFC 1035 section 4.1.1-4.1.2: one recursive A/IN question for example.com.
         self.assertEqual(netprobe.DNS_QUERY[2:12], bytes.fromhex("01000001000000000000"))
         self.assertEqual(netprobe.DNS_QUERY[12:], b"\x07example\x03com\x00\x00\x01\x00\x01")
-        # P3 is a documented skeleton; it is never run in phase 2.
-        with self.assertRaises(NotImplementedError):
-            netprobe.p3_control_call()
+        # P3 is implemented but only runs in the explicitly owned container;
+        # fixture/import checks never make live model calls or certify P3.
+        with self.assertRaises(ValueError):
+            netprobe.p3_control_call({}, "rw-openhands-fixture")
 
     def test_netprobe_sends_raw_targets_verbatim_and_never_records_bodies(self):
         netprobe = load_recipe_module("e2e/netprobe.py")
@@ -2826,7 +2869,7 @@ class OpenHandsReceiptTests(unittest.TestCase):
                         **window, "base_url": "http://gw:8081/v1",
                         "started_at": "2026-09-28T18:00:00Z", "finished_at": "2026-09-28T18:00:01Z"}))
                     receipt = module.create_receipt(result, database=result / "absent.sqlite")
-                    self.assertEqual(receipt["schema_version"], 6)
+                    self.assertEqual(receipt["schema_version"], 7)
                     self.assertEqual(receipt["base_url"], "http://gw:8081/v1")
                     self.assertEqual(receipt["gateway_upstream"], f"http://10.0.2.2:{port}/v1")
                     self.assertEqual(receipt["compression_combo"], combo)
@@ -3102,14 +3145,22 @@ class OpenHandsDispatchTests(unittest.TestCase):
         from unittest.mock import MagicMock
         context = MagicMock()
         factory = MagicMock(return_value=context)
+        class NativeService:
+            async def start_goal_loop(self, *args, **kwargs):
+                return kwargs
+            async def resume_goal_loop(self, *args, **kwargs):
+                return kwargs
         modules = {"openhands.sdk": SimpleNamespace(LLM="native-llm"),
-                   "worker": SimpleNamespace(gateway_transport=factory, capture_correlation="callback")}
-        with patch.dict(sys.modules, modules), patch.dict(os.environ, {"OPENHANDS_OWNED_CONTAINER": "1"}), \
+                   "openhands.agent_server.event_service": SimpleNamespace(EventService=NativeService),
+                   "worker": SimpleNamespace(gateway_transport=factory, capture_correlation="callback",
+                                             register_worker_agents=MagicMock())}
+        with patch.dict(sys.modules, modules), patch.dict(os.environ, {
+                    "OPENHANDS_OWNED_CONTAINER": "1", "OPENHANDS_RUN_ID": "rw-openhands-fixture"}), \
                 patch("atexit.register") as register:
             load_recipe_module("server_transport.py")
         factory.assert_called_once_with("native-llm", correlation_callback="callback")
         context.__enter__.assert_called_once()
-        register.assert_called_once()
+        self.assertEqual(register.call_count, 2)
 
     def test_duplicate_start_keeps_running_status_and_serial_lock(self):
         dispatch = load_recipe_module("dispatch.py")

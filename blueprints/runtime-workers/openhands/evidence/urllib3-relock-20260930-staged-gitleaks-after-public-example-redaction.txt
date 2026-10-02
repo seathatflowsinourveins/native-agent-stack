@@ -1,0 +1,12 @@
+argv: ["rtk", "proxy", "gitleaks", "git", "--pre-commit", "--staged", "--redact", "--no-banner", "--config", "<WORKTREE>/.gitleaks.toml", "--report-format", "json", "--report-path", "<PRIVATE_RESEARCH>/gitleaks-clean-report.json", "<WORKTREE>"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T16:17:22.325408+00:00
+ended_utc: 2026-09-30T16:17:23.020742+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+12:17PM INF 0 commits scanned.
+12:17PM INF scanned ~1550343 bytes (1.55 MB) in 279ms
+12:17PM INF no leaks found

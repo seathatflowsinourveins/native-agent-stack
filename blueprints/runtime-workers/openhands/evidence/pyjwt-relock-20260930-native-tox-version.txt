@@ -1,0 +1,12 @@
+argv: ["rtk", "proxy", "<PRIVATE_RESEARCH>/tox-driver/bin/python", "-m", "tox", "--version"]
+cwd: <PRIVATE_RESEARCH>/pyjwt-source/pyjwt-1d41a6478e1562e68ff667fcd703356acf085f68
+started_utc: 2026-09-30T17:07:07.530393+00:00
+ended_utc: 2026-09-30T17:07:07.753900+00:00
+exit_code: 0
+
+stdout:
+4.64.5 from <PRIVATE_RESEARCH>/tox-driver/lib/python3.13/site-packages/tox/__init__.py
+registered plugins:
+    tox-gh-actions-3.5.0 at <PRIVATE_RESEARCH>/tox-driver/lib/python3.13/site-packages/tox_gh_actions/plugin.py
+
+stderr:

@@ -1,0 +1,16 @@
+E......s..
+======================================================================
+ERROR: test_native_task_hook_refuses_ambient_and_recursive_agents (test_openhands_150.OpenHands150Profiles.test_native_task_hook_refuses_ambient_and_recursive_agents)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<RECIPE>/tests/test_openhands_150.py", line 73, in test_native_task_hook_refuses_ambient_and_recursive_agents
+    self.assertTrue(hook.permitted({"tool_name": "task", "tool_input": {"subagent_type": "worker-research"}}))
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<RECIPE>/blueprints/runtime-workers/openhands/mcp_guard.py", line 15, in permitted
+    from recipe import task_profile
+ModuleNotFoundError: No module named 'recipe'
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.030s
+
+FAILED (errors=1, skipped=1)

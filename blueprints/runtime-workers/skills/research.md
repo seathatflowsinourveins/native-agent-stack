@@ -227,6 +227,93 @@ and C7-validation-evidence were CONFIRM verdicts without a defect, so nothing
 needed relaying; [validation](validation.json) now lists them under
 `repair_r3.confirmed`.
 
+The following September 30 sections preserve the separately recorded source
+refresh and main-adoption revisions. Their counts are dated snapshots; the current
+manifest and each entry's own ref govern the effective selection.
+
+## 2026-09-30 source refresh and task-scoped metadata
+
+The installed owned-prefix `skills --version` returned `1.7.0` (exit 0), and the
+official release endpoint still returned
+[`v1.7.0`](https://github.com/vercel-labs/skills/releases/tag/v1.7.0).
+The existing read-only freshness implementation was reused; `skills check` was
+not run. The [before report](freshness-20260930-before.json) checked all 137
+selected entries across 12 repositories: 27 current, 98 repository-only drift,
+11 changed skill trees and one removed at HEAD. Both fetched trees and pin
+integrity remain separate from installation and invocation.
+
+`gh api repos/OpenHands/extensions/commits/main` returned
+[`9495f4c59dd5fea2cee9e87ab37a6abda649627b`](https://github.com/OpenHands/extensions/commit/9495f4c59dd5fea2cee9e87ab37a6abda649627b)
+(2026-09-30T02:54:34Z). Native `git show` blob reads and `git rev-parse ref:path`
+checks matched every one of the 77 earlier `SKILL.md` SHA256 values and folder
+tree SHAs. At the current source, 75 bodies and 73 complete trees are identical.
+Only those 73 complete trees advance in the trial. The source row records both
+selected refs; the original 84-entry OpenHands inventory stays frozen at its
+earlier ref, without sweeping in newly catalogued optional artifacts.
+
+Four trees retain `bea7a20c59c44ec4dacddac3fc0efe58b9c73880`:
+
+- `canvas-extension-api`: changed body and Canvas validator/reference resources.
+- `github-pr-reviewer`: changed body and worker/state resources.
+- `github`: unchanged body, changed `scripts/agent_conversation.py`.
+- `github-stale-ci-pr-closer`: unchanged body, changed worker and test resources.
+
+The current GitHub conversation helper describes profile-backed automation and
+uses `AUTOMATION_API_URL` and `AUTOMATION_AGENT_PROFILE_ID`
+([source lines 1-119](https://github.com/OpenHands/extensions/blob/9495f4c59dd5fea2cee9e87ab37a6abda649627b/skills/github/scripts/agent_conversation.py#L1)).
+That does not qualify a local SDK/server dispatcher. No wrapper or Cloud
+activation is added. Other changed trees (`codebase-design`, `diagnosing-bugs`,
+`domain-modeling`, `improve-codebase-architecture`, `tdd`, `search-first`,
+`semgrep`) retain their pins. `resolving-merge-conflicts` is removed at current
+Matt Pocock HEAD and retains its trial pin: upstream deletion and unknown use
+do not satisfy the instrumented zero-activation pruning contract.
+
+The existing isolated SDK clone is pristine at
+[`dcf401af7a9a302ef92cb7d092e1df9bb659daa5`](https://github.com/OpenHands/software-agent-sdk/tree/dcf401af7a9a302ef92cb7d092e1df9bb659daa5),
+and native SDK/tools imports report 1.50.0. The official latest release endpoint
+returned [`v1.50.0`](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.0).
+The [worker recipe](../openhands/README.md) retains its unchanged upstream-suite
+results and its separate unqualified image/provider gates; that suite was not
+repeated for this source refresh.
+
+One local integration fixture addresses the new source-discovery gap. Official
+`git archive` snapshots expose the 73 current plus four retained source folders
+in an isolated `.agents/skills` project. The unchanged native
+[`load_project_skills`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/skills/skill.py#L1049)
+returns zero entries for an empty-project control, then all 77 expected names.
+Running the same 77-name qualification against the project with its source
+artifact absent exits 1, reporting 77 expected and zero discovered; the
+[negative output](refresh-20260930-native-discovery-negative.txt) is retained.
+Native [`to_prompt`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/skills/skill.py#L1453)
+returns names/descriptions without locations or full bodies. The returned result
+is in [refresh-20260930.json](refresh-20260930.json). This is source-discovery
+evidence, not a CLI-owned installation or a model-mediated skill invocation.
+`invoke_skill`, provider usage, worker lifecycle and E2E activation remain
+uncollected. No skill is pruned.
+
+[profiles.json](profiles.json) publishes the current scenario/role intersections
+and references the existing native OpenHands profile manifest. It is advisory
+selection metadata. The native
+[`InvokeSkillExecutor`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/tool/builtins/invoke_skill.py#L90)
+supplies the requested body; no replacement runtime or mandatory full-catalog
+installation is introduced. Canvas and Cloud/automation applicability remains
+task scoped.
+
+Correction recorded this turn: the initially supplied installed SDK path was
+absent, and an initially guessed invocation-test filename was absent. Bounded
+directory/source discovery located the existing isolated clone and the actual
+upstream test `tests/sdk/tool/test_invoke_skill.py`. Its HEAD, pristine state and
+native package versions were checked before the fixture. No absent-path lookup
+was used as a runtime capability claim.
+
+The first local contract run also caught four selected collision references
+still bound to the earlier OpenHands pin. They were updated to the same winning
+source triples as their selected entries. The retained
+[failed output](refresh-20260930-tests-first.txt) and
+[passing output](refresh-20260930-tests.txt) record one bounded repair: all 22
+existing runtime-worker tests pass. The final report records 100 current entries,
+25 repository-only drifts, 11 changed trees and one removed at HEAD, with no
+fetch or pin-integrity errors. These are local contract and source checks.
 ## 2026-09-30: main's LLM-native listing
 
 Main's [LLM-native listing decision](../../../docs/decisions/2026-09-30-skills-llm-native-listing.md)
@@ -289,7 +376,7 @@ Sources: [removal changeset](https://github.com/mattpocock/skills/blob/d81f3a183
 
 | Repository | Commit resolved with gh api | Selected skills |
 | --- | --- | --- |
-| OpenHands/extensions | `bea7a20c59c44ec4dacddac3fc0efe58b9c73880` | 77 |
+| OpenHands/extensions | `9495f4c59dd5fea2cee9e87ab37a6abda649627b` | 77 |
 | affaan-m/ECC | `2b6e839771e53096d8451a213d40dc64ec8acac0` | 2 |
 | anthropics/skills | `33375500bcea98d610eb30ce10ac4e59b89c390d` | 9 |
 | assafelovic/gpt-researcher | `0957c301ed06c2a5857b834358c7227c739041d4` | 1 |

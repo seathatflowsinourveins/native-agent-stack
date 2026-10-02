@@ -1,0 +1,46 @@
+{
+  "version": "0.9.4",
+  "grader": {
+    "repository": "https://github.com/promptfoo/promptfoo",
+    "version": "0.123.1",
+    "tag": "0.123.1",
+    "package": "promptfoo@0.123.1",
+    "node_minimum": "22.22.0",
+    "installation": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md",
+    "mode": "standalone assertions over native output",
+    "assertions": [
+      "is-json",
+      "equals"
+    ],
+    "lockfile": "grader/package-lock.json",
+    "lock_sha256": "a64877fe75a939652e3d98277ca35a331935f45ddea5860535e20e1d24bf7a7a",
+    "lock_source": "npm/cli@v11.19.0 metadata-only package-lock resolution of promptfoo/promptfoo@0.123.1 with version-scoped get-uri@8.0.1 > basic-ftp@6.2.1 override (package-json.md#overrides); npm-ci.md:15-24; registry.npmjs.org integrity for every package",
+    "install": "npm ci --ignore-scripts --no-audit --no-fund"
+  },
+  "repository": "https://github.com/unclecode/crawl4ai",
+  "tag": "v0.9.4",
+  "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",
+  "image": "unclecode/crawl4ai@sha256:048848e548fad60c670bd656cbb3eb204fd999709a30365d3697c411ce50796d",
+  "image_platform": "linux/amd64",
+  "image_index_digest": "sha256:9021b3cb5c6f12570bbcd5395638495e0a06969b3148e377b953d174af2ebc9b",
+  "image_config_digest": "sha256:e051a8fb924de84ddbb89abb8728062e68ba920ad2eff26b13783986b8d647b1",
+  "image_provenance_blob": "sha256:2b95a7c52886c9b195ac9a908781f08e2ac063a00da048482ff171eeaf59445a",
+  "image_provenance": "Docker Registry v2 manifest bytes and Docker-Content-Digest agree; BuildKit SLSA provenance vcs:revision agrees with the release commit",
+  "image_build_run": "https://github.com/unclecode/crawl4ai/actions/runs/35859470077/attempts/1",
+  "wheel": {
+    "url": "https://files.pythonhosted.org/packages/44/35/0bd5efdf383623983423a387a368aff85ddbe50079159957b1978e4db6ea/crawl4ai-0.9.4-py3-none-any.whl",
+    "sha256": "46779c8a93b35c7c5f9be9642ddef5e7b515e36b094639bb8e1e418bf0266179",
+    "provenance": "PyPI release JSON digests.sha256"
+  },
+  "upstream_lock_sha256": "c672410c737e3085cae56d948854596284b7ac55066a97d9241d91913e3bb8e9",
+  "upstream_lock_usable": false,
+  "requirements_lock_sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+  "python": "3.12",
+  "uv": "0.12.17",
+  "litellm_distribution": "unclecode-litellm==1.81.13",
+  "litellm_wheel_sha256": "5e1fbedbed92333b48e7371e0bacf86d1288020451bf34351703c3b159591399",
+  "playwright": "1.63.0",
+  "playwright_wheel_sha256": "ad21bc07516b187965a7521c5cf0df0bd657b17482eaad74335272d35a2b07de",
+  "upstream_supervisor_sha256": "f29b039f81b6cb3a19702cb65a52fe724061d984c0660a6134202d5fc3f18933",
+  "upstream_skill_zip_sha256": "a0014632d6f16ede6477a4d4eb4635c7bfc37f03a08c95f9a4ff52a09ae66091"
+}

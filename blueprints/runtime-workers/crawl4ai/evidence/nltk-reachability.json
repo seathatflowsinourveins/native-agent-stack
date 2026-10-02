@@ -1,0 +1,245 @@
+{
+  "schema": "crawl4ai-nltk-reachability/1",
+  "date": "2026-09-27",
+  "evidence_class": "local static scan of hash-verified locked artifacts (no install, no execution)",
+  "question": "Does any code in the crawl4ai runtime-worker lock closure, or the recipe's own Python, reach the nltk APIs named by GHSA-8mgp-746c-j5xp?",
+  "advisory": {
+    "id": "GHSA-8mgp-746c-j5xp",
+    "aliases": ["CVE-2026-81726", "PYSEC-2026-3740"],
+    "published": "2026-09-02T14:35:04Z",
+    "modified": "2026-09-02T14:45:06.878867805Z",
+    "summary": "NLTK: Model-artifact APIs bypass pathsec and touch files outside allowed roots",
+    "affected_functions": [
+      "TransitionParser.train",
+      "TransitionParser.parse",
+      "AveragedPerceptron.save",
+      "AveragedPerceptron.load",
+      "PerceptronTagger.save_to_json",
+      "save_maxent_params"
+    ],
+    "affected_functions_source": "The record's details text, 'Affected component' line; affected[0] carries no ecosystem_specific function field.",
+    "guarded_comparisons_named": ["pathsec.open()", "PerceptronTagger.load_from_json()", "load_maxent_params()"],
+    "precondition": "The application enables `pathsec` enforcement and lets untrusted workflows choose model import or export paths.",
+    "affected_range": {"package": "PyPI nltk", "events": [{"introduced": "0"}, {"last_affected": "3.10.3"}], "versions_list_includes_3_10_3": true},
+    "patched_versions": "Not yet patched",
+    "cwe_ids": ["CWE-22", "CWE-59", "CWE-73"],
+    "severity": "HIGH; CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:L/A:L",
+    "fix_references": [
+      "https://github.com/nltk/nltk/pull/3757",
+      "https://github.com/nltk/nltk/pull/3759",
+      "https://github.com/nltk/nltk/pull/3813"
+    ],
+    "source_url": "https://api.osv.dev/v1/vulns/GHSA-8mgp-746c-j5xp",
+    "fetch": {
+      "http_status": 200,
+      "bytes": 4877,
+      "sha256": "0049d801414601f4f3fa4129bb8315578cd3b6d9447de2705590485f7487a672",
+      "server_date": "Sun, 27 Sep 2026 21:59:51 GMT",
+      "osv_schema_version": "1.9.0"
+    }
+  },
+  "advisory_corroboration": {
+    "pypi": {
+      "source_url": "https://pypi.org/pypi/nltk/json",
+      "http_status": 200,
+      "sha256": "bcb887db94e1c4fe5eb120e7125ac9da760b3c07f4d8c8065079373fec07db3c",
+      "server_date": "Sun, 27 Sep 2026 22:00:07 GMT",
+      "latest_version": "3.10.3",
+      "latest_upload": "2026-08-12T23:44:13.478418Z",
+      "releases_newer_than_3_10_3": 0,
+      "files_3_10_3": {
+        "nltk-3.10.3-py3-none-any.whl": "ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c",
+        "nltk-3.10.3.tar.gz": "bb9327a461c3811c2fa4900e03840401f2126adfb30c0072827c433bd2444ea4"
+      }
+    },
+    "github_prs": {
+      "source": "gh api repos/nltk/nltk/pulls/<n>, exit 0 for each",
+      "results": [
+        {"number": 3757, "merged": true, "base": "develop", "merged_at": "2026-08-20T03:10:12Z"},
+        {"number": 3759, "merged": true, "base": "develop", "merged_at": "2026-08-18T14:12:44Z"},
+        {"number": 3813, "merged": true, "base": "develop", "merged_at": "2026-08-28T12:52:32Z"}
+      ]
+    },
+    "review_facts_check": "The 2026-09-27 read-only review's facts match these fetches and the downloaded bytes: the six functions, load_from_json as a guarded comparison, ENFORCE = True at nltk/pathsec.py:28 (comment lines 26-27), no patched PyPI release, and #3757, #3759 and #3813 merged into develop after the 3.10.3 upload."
+  },
+  "lock": {
+    "path": "blueprints/runtime-workers/crawl4ai/requirements.lock",
+    "sha256": "515633e3e9a1c94fc4bf9479f67983ccdc673b0a0f8fe04f27237fc10a53a701",
+    "matches_pins_json_requirements_lock_sha256": true,
+    "requirements": 95,
+    "nltk_pin": "nltk==3.10.3",
+    "nltk_pin_line": 1661,
+    "nltk_hashes": [
+      "sha256:bb9327a461c3811c2fa4900e03840401f2126adfb30c0072827c433bd2444ea4",
+      "sha256:ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c"
+    ],
+    "nltk_via": "crawl4ai (lock line 1664)"
+  },
+  "artifacts": {
+    "downloaded": 95,
+    "requirements": 95,
+    "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 PIP_CONFIG_FILE=/dev/null python3 -m pip download --disable-pip-version-check --no-input --index-url https://pypi.org/simple --cache-dir <scratch>/pip-cache --require-hashes --only-binary=:all: --no-deps --python-version 3.12 --platform manylinux2014_x86_64 --platform manylinux_2_17_x86_64 --platform manylinux_2_28_x86_64 --implementation cp -d <scratch>/wheels -r blueprints/runtime-workers/crawl4ai/requirements.lock",
+    "exit_code": 0,
+    "pip": "pip 26.2.1 run by the host's CPython 3.13.15, selecting cp312 wheels through --python-version",
+    "pip_output": "Final line 'Successfully downloaded' names 95 distributions; 0 log lines match warning, error or deprecat.",
+    "platform_tags": "The brief's three tags were sufficient; no platform tag was added.",
+    "deviation_from_brief": "--python-version 3.12 instead of the brief's 3.13. install.sh:24 asserts Python 3.12, pins.json:38 records python 3.12, and research.md:176-180 compiled the lock with --python-version 3.12 --python-platform x86_64-manylinux_2_35, so the cp312 selection is the recipe's exact wheel set. The other added flags only isolate pip from user configuration and keep its cache under <scratch>.",
+    "independent_hash_check": "A scratch script recomputed the sha256 of every downloaded file and matched it to that requirement's lock hashes: 95 matched, 0 mismatched or unlisted, 0 requirements without an artifact.",
+    "wheel_kinds": {"pure_python": 64, "binary": 31, "sdist": 0},
+    "key_artifacts": {
+      "nltk-3.10.3-py3-none-any.whl": "ff9598a8e20518ee0d557745890cc4435b9578489e2dcbc69c4f81fa060caf7c",
+      "crawl4ai-0.9.4-py3-none-any.whl": "46779c8a93b35c7c5f9be9642ddef5e7b515e36b094639bb8e1e418bf0266179"
+    },
+    "unpack": "Python zipfile extraction of each wheel to <scratch>/unpacked/<name>-<version>/; nothing was installed, imported or executed."
+  },
+  "scan": {
+    "tool": "ripgrep 14.1.0 over <scratch>/unpacked; caller passes exclude nltk-3.10.3/**",
+    "passes": [
+      {"search": "word nltk in *.py (-uu)", "result": "10 lines, all in crawl4ai 0.9.4", "exit_code": 0},
+      {"search": "import statements: 'import ... nltk' or 'from nltk' at line start", "result": "7 statements, listed in callers", "exit_code": 0},
+      {"search": "import_module(, __import__( or find_spec( naming nltk, all files", "result": "none", "exit_code": 1},
+      {"search": "quoted 'nltk' or 'nltk.' string literal in *.py", "result": "none", "exit_code": 1},
+      {"search": "TransitionParser|AveragedPerceptron|save_to_json|save_maxent_params|PerceptronTagger, all files including binary (-uuu)", "result": "none", "exit_code": 1},
+      {"search": "pos_tag, ne_chunk, MaxentClassifier, NEChunkParser or DependencyGraph in *.py", "result": "none", "exit_code": 1},
+      {"search": "pathsec or NLTK_ALLOW, all files", "result": "none", "exit_code": 1},
+      {"search": "Requires-Dist naming nltk in METADATA", "result": "crawl4ai only", "exit_code": 0},
+      {"search": "nltk in non-Python text and binary files", "result": "crawl4ai METADATA plus the four files in non_caller_matches", "exit_code": 0}
+    ]
+  },
+  "callers": [
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/model_loader.py",
+      "line": 178,
+      "symbol": "import nltk; nltk.data.find (181, 184) and nltk.download (183)",
+      "calls_affected_api": false,
+      "note": "Inside load_nltk_punkt() (177). Called by NlpSentenceChunking.__init__ (chunking_strategy.py:74) and by download_all_models (model_loader.py:277), which main() (281-292) runs for the crawl4ai-download-models console script. The worker selects neither, and no recipe file invokes crawl4ai-setup, crawl4ai-download-models, crwl or crawl4ai-doctor (rg exit 1)."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/chunking_strategy.py",
+      "line": 83,
+      "symbol": "from nltk.tokenize import sent_tokenize",
+      "calls_affected_api": false,
+      "note": "Inside NlpSentenceChunking.chunk (class at 65). CrawlerRunConfig defaults chunking_strategy to RegexChunking() (async_configs.py:1710; class at chunking_strategy.py:38 with no nltk use), and both deserialization allowlists name only RegexChunking among chunkers (async_configs.py:140, 195)."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/chunking_strategy.py",
+      "line": 108,
+      "symbol": "import nltk as nl; nl.tokenize.TextTilingTokenizer (110)",
+      "calls_affected_api": false,
+      "note": "Inside TopicSegmentationChunking.__init__ (class at 92); not selected by the worker and absent from async_configs.py (rg exit 1)."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/chunking_strategy.py",
+      "line": 120,
+      "symbol": "import nltk as nl; nl.toknize.word_tokenize (122), nl.corpus.stopwords.words (126)",
+      "calls_affected_api": false,
+      "note": "Inside TopicSegmentationChunking.extract_keywords (118). The upstream spelling 'toknize' names nothing in nltk 3.10.3 (rg exit 1); runtime behaviour was not observed."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/legacy/llmtxt.py",
+      "line": 11,
+      "symbol": "from nltk.tokenize import word_tokenize",
+      "calls_affected_api": false,
+      "note": "Module-level import in a module with no static importer in the closure: nothing imports crawl4ai.legacy, and the only llmtxt import (legacy/docs_manager.py:5) names crawl4ai.llmtxt, which the wheel does not contain."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/legacy/llmtxt.py",
+      "line": 12,
+      "symbol": "from nltk.corpus import stopwords",
+      "calls_affected_api": false,
+      "note": "Same legacy module as line 11."
+    },
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai/legacy/llmtxt.py",
+      "line": 13,
+      "symbol": "from nltk.stem import WordNetLemmatizer",
+      "calls_affected_api": false,
+      "note": "Same legacy module as line 11."
+    }
+  ],
+  "dependency_declarations": [
+    {
+      "package": "crawl4ai",
+      "version": "0.9.4",
+      "file": "crawl4ai-0.9.4.dist-info/METADATA",
+      "lines": [40, 57, 66, 73],
+      "text": "Requires-Dist: nltk>=3.9.1 unconditionally (40), and nltk for extras torch, cosine and all (57, 66, 73)"
+    }
+  ],
+  "non_caller_matches": [
+    {"package": "unclecode-litellm", "version": "1.81.13", "file": "litellm/litellm_core_utils/tokenizers/anthropic_tokenizer.json", "line": 1, "note": "Tokenizer vocabulary entry \"nltk\" (id 50055); data, not code."},
+    {"package": "certifi", "version": "2026.7.22", "file": "certifi/cacert.pem", "line": 2512, "note": "The letters nltk inside base64 certificate data."},
+    {"package": "playwright", "version": "1.63.0", "file": "playwright/driver/node", "note": "One binary match in the bundled Node.js executable; not Python."},
+    {"package": "patchright", "version": "1.63.0", "file": "patchright/driver/node", "note": "One binary match in the bundled Node.js executable; not Python."}
+  ],
+  "nltk_internal": {
+    "artifact": "nltk-3.10.3-py3-none-any.whl",
+    "affected_locations": [
+      {"function": "AveragedPerceptron.save", "file": "nltk/tag/perceptron.py", "line": 176, "builtin_open_lines": [178]},
+      {"function": "AveragedPerceptron.load", "file": "nltk/tag/perceptron.py", "line": 181, "builtin_open_lines": [183]},
+      {"function": "PerceptronTagger.save_to_json", "file": "nltk/tag/perceptron.py", "line": 332, "builtin_open_lines": [351, 372]},
+      {"function": "TransitionParser.train", "file": "nltk/parse/transitionparser.py", "line": 524, "builtin_open_lines": [564]},
+      {"function": "TransitionParser.parse", "file": "nltk/parse/transitionparser.py", "line": 568, "builtin_open_lines": [583]},
+      {"function": "save_maxent_params", "file": "nltk/classify/maxent.py", "line": 1583, "builtin_open_lines": [1596, 1598, 1600, 1602]}
+    ],
+    "guarded_comparisons": [
+      {"function": "PerceptronTagger.__init__ -> load_from_json", "file": "nltk/tag/perceptron.py", "lines": "238; load=True calls load_from_json at 252-253; load_from_json (377) resolves paths through find() at 381 and 389"},
+      {"function": "load_maxent_params", "file": "nltk/classify/maxent.py", "lines": "1560; reads through nltk.data.open_datafile at 1563-1577"}
+    ],
+    "entry_module_check": "The five API names do not occur in nltk/tokenize/, nltk/corpus/, nltk/stem/wordnet.py, nltk/data.py or nltk/downloader.py (rg exit 1), the modules behind the nltk APIs crawl4ai names. The legacy-pickle redirects to tagger and chunker loaders sit inside nltk.data.load (data.py:1037, redirects at 1121-1132); crawl4ai calls nltk.data.find and nltk.download, not nltk.data.load."
+  },
+  "pathsec_default": {
+    "file": "nltk/pathsec.py",
+    "line": 28,
+    "value": true,
+    "source_text": "ENFORCE = True",
+    "context": "Line 26 is '# Security Enforcement Toggle' and line 27 is '# ENFORCE = False'. Apart from line 28, searches for 'ENFORCE =' and for setattr naming \"ENFORCE\" match only the commented line 27 and test files; line 845 lists the name in __all__. pathsec.py reads only NLTK_DATA (88) and NLTK_ALLOW_PROXIED_URLOPEN (533) from the environment; neither sets ENFORCE. Nothing in the closure outside nltk references pathsec (rg exit 1)."
+  },
+  "recipe_code_hits": {
+    "scope": [
+      "blueprints/runtime-workers/crawl4ai/*.py: dispatch.py, host.py, install-browser.py, mcp-config.py, worker.py",
+      "blueprints/runtime-workers/crawl4ai/e2e/*.py: check.py, grade.py, mcp_probe.py, receipt.py, run.py"
+    ],
+    "nltk_imports": [],
+    "affected_api_hits": [],
+    "rg_exit_codes": {"top_level_py": 1, "e2e_py": 1},
+    "non_python_mentions": [
+      "common.sh:12 exports NLTK_DATA under the recipe state directory",
+      "config/compose.yaml:39 sets NLTK_DATA for the container"
+    ],
+    "worker_crawl4ai_imports": "AsyncWebCrawler, BrowserConfig, CacheMode, CrawlerRunConfig, LLMConfig, PruningContentFilterLXML, LLMExtractionStrategy, DefaultMarkdownGenerator (worker.py:99-102); CrawlerRunConfig keeps its default RegexChunking.",
+    "apply_chunking": {
+      "file": "blueprints/runtime-workers/crawl4ai/worker.py",
+      "line": 156,
+      "value": false,
+      "strategy": "LLMExtractionStrategy (worker.py:144-158), run via strategy.run at worker.py:159",
+      "upstream_effect": "crawl4ai 0.9.4 extraction_strategy.py:618-619 sets chunk_token_threshold to 1e9 when apply_chunking is false; run() (786-802) still merges through utils.merge_chunks (utils.py:170), whose default splitter is str.split (utils.py:193). Neither extraction_strategy.py nor utils.py mentions nltk (rg exit 1), so neither value of the setting leads to nltk."
+    }
+  },
+  "conclusion": "Not reached by static search. Among the 95 hash-verified cp312 wheels selected from the lock, crawl4ai 0.9.4 is the only distribution that imports nltk: 7 import statements in model_loader.py, chunking_strategy.py and legacy/llmtxt.py. Those sites use tokenization (sent_tokenize, word_tokenize, TextTilingTokenizer), corpora (stopwords, WordNetLemmatizer) and data management (nltk.data.find, nltk.download). None names an API listed by GHSA-8mgp-746c-j5xp, and the names TransitionParser, AveragedPerceptron, PerceptronTagger, save_to_json and save_maxent_params occur nowhere in the closure outside nltk, nor in the nltk modules behind the APIs crawl4ai uses. The recipe's own Python imports no nltk. The worker selects no nltk-using crawl4ai code: it passes apply_chunking=False to LLMExtractionStrategy (worker.py:156), whose run path has no nltk reference under either value, and it keeps CrawlerRunConfig's default RegexChunking. nltk 3.10.3 ships pathsec on (nltk/pathsec.py:28), so the advisory's enforcement precondition holds by default. No caller here lets input choose model import or export paths for the affected APIs. The lock still pins an OSV-affected nltk with no patched PyPI release, so this is a reachability finding, not a remediation.",
+  "limits": [
+    "Static text search with ripgrep over unpacked wheels and recipe files: not a runtime trace, import-time observation or call-graph analysis.",
+    "Dynamic dispatch, getattr, and string-built or computed imports (for example importlib.import_module with a variable) may be missed; only literal patterns were searched.",
+    "Compiled extension modules were covered only by byte searches for nltk and the five API names; names built at runtime inside native code would not be found.",
+    "Scope is the 95 cp312 manylinux x86_64 wheels the lock selects for the recipe's Python 3.12 venv. The unclecode/crawl4ai container image that the recipe also runs (pins.json image digest) has its own Python environment and was not scanned.",
+    "Reachability inside nltk was checked by name search in nltk/tokenize/, nltk/corpus/, nltk/stem/wordnet.py, nltk/data.py and nltk/downloader.py, not with a full nltk call graph.",
+    "Advisory and release facts are as fetched on 2026-09-27, with the OSV and PyPI response hashes recorded; OSV records and PyPI releases can change later.",
+    "Nothing was installed, imported or executed, and no nltk data was downloaded; runtime behaviour such as the 'toknize' attribute access or nltk.download side effects was not observed.",
+    "The brief's Python 3.13 wheel set was not downloaded; binary wheels for other interpreters were not scanned."
+  ],
+  "cleanup": "After the scan, rm -rf <scratch> removed the wheels, unpacked trees, pip cache, logs, fetched OSV and PyPI responses and the helper script (exit 0); a following ls of <scratch> reported 'No such file or directory' (exit 2)."
+}

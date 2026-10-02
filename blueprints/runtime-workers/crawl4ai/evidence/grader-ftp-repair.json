@@ -1,0 +1,121 @@
+{
+  "schema": "crawl4ai-grader-ftp-repair/1",
+  "date": "2026-10-02",
+  "base_commit": "1060f09fd7ab318a487a38015c072b2f4f5f46f1",
+  "scope": "FTP dependency repair in the pinned standalone Promptfoo grader",
+  "evidence_class": "native npm resolution/install, native standalone assertion controls and unchanged upstream FTP tests against the overridden dependency",
+  "selection": {
+    "promptfoo": "0.123.1",
+    "chain": ["promptfoo@0.123.1", "proxy-agent@8.0.2", "pac-proxy-agent@9.1.0", "get-uri@8.0.1", "basic-ftp@6.2.1"],
+    "root_override": {"get-uri@8.0.1": {"basic-ftp": "6.2.1"}},
+    "declared_get_uri_range": "^5.3.1",
+    "cross_major_override": true,
+    "basic_ftp_git_head": "a5b160ff7d127130107789029aec98632c51fd60",
+    "basic_ftp_integrity": "sha512-bK67isD+lKq46AU8vNtjvMaT2ZqAOAmNCbxUHlFBRD4k15NWxyEjmaKtZPlgce58So4BNTjITGQOVTjL9y0ECA==",
+    "lock_sha256": "a64877fe75a939652e3d98277ca35a331935f45ddea5860535e20e1d24bf7a7a",
+    "native_lock_cleanup": "npm pruned 16 pre-existing extraneous entries. basic-ftp is the only changed retained entry; node-forge@1.4.0 is byte-identical to the baseline lock entry."
+  },
+  "native_checks": {
+    "node": "v24.21.0",
+    "npm": "11.19.0",
+    "npm_version_and_install_ci_ls_config_help_exit_codes": [0, 0, 0, 0, 0],
+    "cwd": "blueprints/runtime-workers/crawl4ai/grader",
+    "configuration_scope": "Fresh private cache and empty user/global npm configuration files; no native credential/configuration stores read.",
+    "commands": [
+      {"command": "npm install --package-lock-only --ignore-scripts --no-audit --no-fund", "exit_code": 0},
+      {"command": "npm ci --ignore-scripts --no-audit --no-fund", "exit_code": 0, "installed_packages": 821},
+      {"command": "npm ls promptfoo get-uri basic-ftp jks-js node-forge", "exit_code": 0},
+      {"command": "python3 ../e2e/grade.py <private-controls> --executable <grader>/node_modules/.bin/promptfoo --controls", "exit_code": 0},
+      {"command": "python3 -m unittest discover -s tests -p test_runtime_worker_crawl4ai.py -k test_grader_install_uses_integrity_lock_without_lifecycle_scripts", "cwd": "repository root", "exit_code": 0, "tests": 1, "classification": "unchanged local integration check for guarded lock hash and registry integrity"},
+      {"command": "git diff --check", "cwd": "repository root", "exit_code": 0}
+    ],
+    "grader": {
+      "mode": "Standalone is-json and equals assertions over local fixture outputs; no provider/model run",
+      "telemetry_and_update_checks_disabled_by": "unchanged e2e/grade.py per-process supported Promptfoo environment switches",
+      "assertions_sha256": "d6e63c2260cdab75272957a08807294e1470cf91d460a3f20bd9540ab8feb509",
+      "controls": [
+        {"case": "known-pass", "native_exit_code": 0, "successes": 1, "failures": 0, "row_success": true, "report_sha256": "df84634fd7a76129783e5f119bbcdb548b8868eb3163a14451a28a0d83097de1"},
+        {"case": "known-fail", "native_exit_code": 100, "successes": 0, "failures": 1, "row_success": false, "report_sha256": "67b1bb2d00c63dc5b79088a190376176771d6f864e1579b5f08a52a2d6a0b56e"},
+        {"case": "malformed-output", "native_exit_code": 100, "successes": 0, "failures": 1, "row_success": false, "report_sha256": "09eef4cab6ad754539a47a61d5151e230ad3abc9bfa5da006a1f20353f646eb0"}
+      ]
+    }
+  },
+  "upstream_compatibility": {
+    "status": "PASS",
+    "repository": "https://github.com/TooTallNate/proxy-agents",
+    "tag": "get-uri@8.0.1",
+    "commit": "b7e5f7ccce1a3ac5b339cc4c587974e8989cbc16",
+    "test_source": "packages/get-uri/test/ftp.test.ts",
+    "native_test_command": "pnpm test --run --config ../../vitest.config.ts test/ftp.test.ts",
+    "native_test_exit_code": 0,
+    "test_result": {"files_passed": 1, "tests_passed": 4, "tests_failed": 0, "tests_skipped": 0},
+    "initial_test_failure": {"exit_code": 1, "tests_collected": 0, "condition": "Missing native build prerequisite: data-uri-to-buffer had no resolvable package entry; not a test assertion failure."},
+    "initial_retry": "Not run after the first sibling build failed because tsc was unavailable.",
+    "test_retry": "Passed after an approved frozen reinstall of the existing declared test graph with dev dependencies and replay of the native sibling build.",
+    "test_sha256": "731333c988ea64ab3790d0f98e5372c857fa7f06dd39c1702a9df0989f85a2e8",
+    "classification": "Unchanged upstream FTP tests against overridden dependency; bounded local compatibility acceptance",
+    "resolved_basic_ftp": {"version": "6.2.1", "same_grader_installed_package": true, "package_json_sha256": "7a87f0cf046a29ce8b78de25c9b22a31190b39d49dd306231cf10799f8928419"},
+    "source_test_config_diff_exit_code": 0,
+    "configured_workspace_lock_sha256": "3464912d6fdd92557b3b97c2c3f42eae74c026a8d44d24e066e934888dc55a95",
+    "configured_manifest_lock_settings_unchanged_by_frozen_reinstall": true,
+    "locked_native_prerequisites": {"typescript": "5.9.3", "tsc_version_exit_code": 0, "types_node": "22.19.15", "workspace_tsconfig_resolved": true, "vitest": "4.0.18"},
+    "generated_sibling_dist_files_retained": 12,
+    "pnpm": "10.30.3, matching the upstream packageManager; bootstrapped with npm exec",
+    "setup": [
+      {"command": "pnpm --filter get-uri... --filter . install --frozen-lockfile --ignore-scripts --store-dir <private-store>", "exit_code": 0},
+      {"command": "pnpm link <grader>/node_modules/basic-ftp", "exit_code": 1, "condition": "ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY; native diagnostic recommends CI=true"},
+      {"command": "CI=true pnpm --filter get-uri... --filter . link <grader>/node_modules/basic-ftp", "exit_code": 1, "condition": "Unknown option: recursive; install filters are unsupported by link"},
+      {"command": "CI=true pnpm link <grader>/node_modules/basic-ftp", "exit_code": 0, "condition": "Astra-approved replay of the original command/environment with CI=true only; native link configured dependency override and regenerated disposable workspace installation"},
+      {"command": "pnpm --filter data-uri-to-buffer run build", "cwd": "disposable upstream checkout root", "exit_code": 1, "condition": "Approved native script executes tsc; tsc not found, spawn ENOENT. At this attempt no artifacts were generated and the dependent FTP retry was not run."},
+      {"command": "CI=true pnpm --filter get-uri... --filter proxy-agent-monorepo install --frozen-lockfile --ignore-scripts --prod=false", "cwd": "disposable upstream checkout root", "exit_code": 0, "condition": "Reinstall existing declared test graph, including dev dependencies; configured lock hash unchanged, no dependency declarations changed."},
+      {"command": "pnpm --filter data-uri-to-buffer run build", "cwd": "disposable upstream checkout root", "exit_code": 0, "condition": "Exact replay after frozen reinstall; native tsc generated the declared dist exports."}
+    ],
+    "astra_review": {"trigger": "Compatibility setup unresolved after one bounded continuation, followed by missing native build prerequisites", "effort": "max", "note": "Approved plain-link retry, maintained sibling build, then a frozen reinstall of the existing declared test graph and the same build/test replay", "acceptance": "Native frozen reinstall preserved the configured lock; locked prerequisites, sibling build and four unchanged FTP tests passed. Each preceding failure remains retained separately."},
+    "note": "All four prior native failures, configured workspace manifest/lock/settings, exact dependency resolution, generated dist artifacts and passing test output retained privately. Source/tests/config unchanged. FTP compatibility is separate from grader controls and does not close Forge or the full OSV gate."
+  },
+  "security": {
+    "ftp_advisory": "GHSA-c475-qrg2-pj4r",
+    "ftp_fixed_release": "6.2.1",
+    "ftp_advisory_osv_sha256": "49563cbb0590505abecf7025c0d0de22325fcb59d9d58ea4d0ad6023db27085f",
+    "secure_transfer_host_default": "get-uri constructs Client without a separate-host option; installed basic-ftp defaults allowSeparateTransferHost to false. No relaxation was added; this is source review, not an FTP-bounce runtime test.",
+    "forge_gate": "OPEN",
+    "forge": {
+      "installed_chain": ["promptfoo@0.123.1", "jks-js@1.1.7", "node-forge@1.4.0"],
+      "advisory": "GHSA-86w9-cpqp-85rv",
+      "osv_events": [{"introduced": "0"}, {"last_affected": "1.4.0"}],
+      "registry_latest": "1.4.0",
+      "released_fix": null,
+      "upstream_pr": 1152,
+      "pr_state": "open",
+      "pr_merged": false,
+      "osv_response_sha256": "e8e283fac949c57f7fd1595178810f66d53f0078836c3a809a23172daf8ddcd7",
+      "registry_response_sha256": "bab897062dd42d67cc7212c18a524d729e84d0900512038a5ec14bba74357bf8",
+      "pr_response_sha256": "cba3b9264b6ae9345f48b735b5bfae69a3d2328531cde9fa1b0ae802f5055fcb"
+    },
+    "full_osv_gate": "OPEN",
+    "full_osv_scan_rerun": false,
+    "policy": "No advisory ignore, expiry/security-policy change, custom crypto patch, or dependency omission. This receipt addresses only the FTP candidate."
+  },
+  "sources": {
+    "npm_overrides": "https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#overrides",
+    "npm_exec": "https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/commands/npm-exec.md",
+    "promptfoo_installation": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/installation.md",
+    "ftp_advisory": "https://github.com/patrickjuchli/basic-ftp/security/advisories/GHSA-c475-qrg2-pj4r",
+    "ftp_osv": "https://api.osv.dev/v1/vulns/GHSA-c475-qrg2-pj4r",
+    "ftp_release_registry": "https://registry.npmjs.org/basic-ftp/6.2.1",
+    "ftp_fix": "https://github.com/patrickjuchli/basic-ftp/commit/a5b160ff7d127130107789029aec98632c51fd60",
+    "ftp_secure_default": "https://github.com/patrickjuchli/basic-ftp/releases/tag/v6.0.0",
+    "get_uri_ftp": "https://github.com/TooTallNate/proxy-agents/blob/b7e5f7ccce1a3ac5b339cc4c587974e8989cbc16/packages/get-uri/src/ftp.ts",
+    "get_uri_tests": "https://github.com/TooTallNate/proxy-agents/blob/b7e5f7ccce1a3ac5b339cc4c587974e8989cbc16/packages/get-uri/test/ftp.test.ts",
+    "sibling_build": "https://github.com/TooTallNate/proxy-agents/blob/b7e5f7ccce1a3ac5b339cc4c587974e8989cbc16/packages/data-uri-to-buffer/package.json",
+    "native_build_prerequisite": "https://github.com/TooTallNate/proxy-agents/blob/b7e5f7ccce1a3ac5b339cc4c587974e8989cbc16/turbo.json",
+    "pnpm_link": "https://github.com/pnpm/pnpm/blob/v10.30.3/pkg-manager/plugin-commands-installation/src/link.ts",
+    "pnpm_install": "https://github.com/pnpm/pnpm/blob/v10.30.3/pkg-manager/plugin-commands-installation/src/install.ts",
+    "pnpm_dev_dependencies": "https://pnpm.io/10.x/cli/install#--prod--p",
+    "forge_osv": "https://api.osv.dev/v1/vulns/GHSA-86w9-cpqp-85rv",
+    "forge_registry": "https://registry.npmjs.org/node-forge/latest",
+    "forge_pr": "https://github.com/digitalbazaar/forge/pull/1152"
+  },
+  "retention": "Full native returned output, exact private command arguments, exit records, controls and source-response bytes retained outside the checkout for coordinator review.",
+  "limits": ["The override crosses get-uri's declared major range; acceptance covers only its four unchanged local FTP tests, not all proxy-agent behavior, remote FTP servers or FTP-bounce security testing.", "Native standalone grader controls use fixtures and do not establish Crawl4AI runtime or provider acceptance.", "Forge and the full lock-wide OSV gate remain open; release/advisory/PR facts are dated snapshots."]
+}

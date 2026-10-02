@@ -1,0 +1,6 @@
+$ ["rtk", "uv", "--version"]
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+
+[stderr]
+
+exit_code=0

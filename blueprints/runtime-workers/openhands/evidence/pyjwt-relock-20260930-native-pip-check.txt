@@ -1,0 +1,12 @@
+argv: ["rtk", "proxy", "uv", "pip", "check", "--python", "<PRIVATE_RESEARCH>/venv/bin/python"]
+cwd: <WORKTREE>
+started_utc: 2026-09-30T17:04:36.814448+00:00
+ended_utc: 2026-09-30T17:04:36.855012+00:00
+exit_code: 0
+
+stdout:
+
+stderr:
+Using Python 3.13.15 environment at: <PRIVATE_RESEARCH>/venv
+Checked 178 packages in 3ms
+All installed packages are compatible

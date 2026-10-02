@@ -1,0 +1,207 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_qualification",
+  "component_id": "crawl4ai",
+  "date": "2026-09-30",
+  "lane": "foundation",
+  "status": "partial_native_qualification",
+  "source": {
+    "repository": "https://github.com/unclecode/crawl4ai",
+    "release": "v0.9.4",
+    "commit": "133e1d92e37885dfccc03ea2e3687d06c98b7ceb",
+    "image": "unclecode/crawl4ai@sha256:048848e548fad60c670bd656cbb3eb204fd999709a30365d3697c411ce50796d"
+  },
+  "runs": [
+    {
+      "id": "crawl-unchanged-extraction-tests",
+      "argv": [
+        "rtk",
+        "<CRAWL_PREFIX>/venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/regression/test_reg_extraction.py",
+        "-q",
+        "-m",
+        "not network",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "cwd": "<CRAWL_UPSTREAM>",
+      "started_at_utc": "2026-09-30T06:41:51.798605+00:00",
+      "finished_at_utc": "2026-09-30T06:42:07.413259+00:00",
+      "exit_code": 0,
+      "stdout": "................s                                                        [100%]\n16 passed, 1 skipped, 4 deselected in 14.08s\n",
+      "stderr": "",
+      "original_output_sha256": {
+        "stdout": "a5a4dd4b2d975c47072d8a9739f73ed9bb3f5ab2fd5c0cccdd223692775c0bb0",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "crawl-pip-check",
+      "argv": [
+        "rtk",
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "<CRAWL_PREFIX>/venv/bin/python"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:42:07.413645+00:00",
+      "finished_at_utc": "2026-09-30T06:42:07.450189+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using Python 3.12.3 environment at: <CRAWL_PREFIX>/venv\nChecked 99 packages in 2ms\nAll installed packages are compatible\n",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "84796fabc13989af173731d3d84e776e3fb7a63e562bee8fe05b1e3836a590ea"
+      }
+    },
+    {
+      "id": "crawl-source-clean",
+      "argv": [
+        "rtk",
+        "git",
+        "diff",
+        "--quiet"
+      ],
+      "cwd": "<CRAWL_UPSTREAM>",
+      "started_at_utc": "2026-09-30T06:42:07.450586+00:00",
+      "finished_at_utc": "2026-09-30T06:42:07.719053+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "crawl-owned-container-absent",
+      "argv": [
+        "rtk",
+        "docker",
+        "container",
+        "ls",
+        "--all",
+        "--filter",
+        "name=^/rw-crawl4ai-persistent$",
+        "--format",
+        "{{.Names}}"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:42:07.719472+00:00",
+      "finished_at_utc": "2026-09-30T06:42:07.763232+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "crawl-owned-network-absent",
+      "argv": [
+        "rtk",
+        "docker",
+        "network",
+        "ls",
+        "--filter",
+        "name=^rw-crawl4ai-persistent-net$",
+        "--format",
+        "{{.Name}}"
+      ],
+      "cwd": "<RECIPE>",
+      "started_at_utc": "2026-09-30T06:42:07.763584+00:00",
+      "finished_at_utc": "2026-09-30T06:42:07.808484+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "",
+      "original_output_sha256": {
+        "stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "native_model_free_job": {
+    "evidence_class": "local_integration",
+    "upstream_operation": "/crawl/job native REST API and /job status polling",
+    "input_url": "https://example.com/",
+    "dispatch_start_exit_code": 0,
+    "dispatch_wait_exit_code": 0,
+    "passed": true,
+    "native_status": "completed",
+    "poll_count": 2,
+    "llm_used": false,
+    "usage": {
+      "status": "not_applicable"
+    },
+    "content_quality_graded": false,
+    "original_artifact_sha256": {
+      "receipt.json": "d3464c30a545d71f8f20c5f55286c5d0568c63fad92323e4920826d08313ec4a",
+      "result.json": "bbc3b2b0959eb26f0b7faf219c72a191380806f70293062aafa9ba79e50cab4b",
+      "status.json": "a63d72eb9b9d06ab2fef1632d5f78eada3c0665daa71d12778b1eda4ceeca7d1",
+      "request.json": "3432977d1c00dcc4976059d0ffd07fe9cbf50d534028aeb164c95d68c321b940"
+    },
+    "independent_observation": {
+      "method": "Native result bytes independently inspected, separate from wrapper passed flag.",
+      "result_top_level_keys": [
+        "success",
+        "results",
+        "server_processing_time_s",
+        "server_memory_delta_mb",
+        "server_peak_memory_mb"
+      ],
+      "native_result_success_values": [
+        true
+      ]
+    }
+  },
+  "install_observation": {
+    "exit_code": 0,
+    "runtime_distributions": 95,
+    "test_overlay_distributions": 4,
+    "test_overlay_lock": "blueprints/runtime-workers/crawl4ai/test-requirements.lock",
+    "image_pull_exit_code": 0,
+    "container_start_exit_code": 0,
+    "owned_container_stop_and_remove_exit_code": 0,
+    "owned_network_remove_exit_code": 0,
+    "evidence_scope": "Actual installer/start/stop command output was observed in the session; persistent full install log retained privately. No other service was stopped."
+  },
+  "upstream_test_sha256": {
+    "tests/regression/test_reg_extraction.py": "c8f62c39ae0490da6fe3dda4860ec867480889de732a082504ec908eeb3721c5",
+    "tests/regression/conftest.py": "6f95ec32824d50cb30be343efbce5dd3c77181e156c39ef8900a7e0d89e24e10"
+  },
+  "corrections": [
+    {
+      "mistake": "Dispatch defaulted to legacy native Chat Completions LLM extraction despite the reviewed Responses route.",
+      "verification": "Pinned extraction_strategy.py and utils.py plus local default-dispatch regression fixture.",
+      "change": "Default dispatch is now model-free crawl; legacy extraction remains an explicitly selected, unqualified comparison."
+    },
+    {
+      "mistake": "The actual model-free job receipt carried unused model and gateway metadata.",
+      "verification": "Native result, llm_used false and dispatch implementation independently inspected.",
+      "change": "Current source emits route_applicability separate_responses_caller_only and does not validate or claim an unused model route. The retained original receipt is not rewritten."
+    }
+  ],
+  "qualification_boundaries": [
+    "No LLM was called for the native crawl or upstream extraction tests.",
+    "The native Chat Completions extraction lane is not qualified for cx/gpt-6-astra-max.",
+    "No complete Responses caller/citation-quality benchmark was run.",
+    "WebSocket MCP bridge, optional embedding services and cross-host recovery remain unqualified.",
+    "Native content completion is not a grading result or a saving comparison.",
+    "The original native tests use upstream localhost fixtures; marked network cases were deselected."
+  ],
+  "usage": {
+    "native_crawl": "not_applicable",
+    "enclosing_task_provider_usage": null,
+    "token_savings": null
+  },
+  "sanitization": [
+    "Native job IDs and private host configuration omitted.",
+    "Raw HTML stays private; original artifact hashes retained.",
+    "Owned prefix/checkouts and home path replaced with placeholders."
+  ]
+}

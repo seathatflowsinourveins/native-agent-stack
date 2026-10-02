@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Download official PyPI archives; independently verify the returned digest."""
+from pathlib import Path
+import hashlib
+import json
+import sys
+import urllib.request
+
+name, url, expected = sys.argv[1:]
+destination = Path(__file__).resolve().parent / name
+data = urllib.request.urlopen(url).read()
+actual = hashlib.sha256(data).hexdigest()
+assert actual == expected, (name, actual, expected)
+destination.write_bytes(data)
+destination.chmod(0o600)
+print(json.dumps({'filename': name, 'bytes': len(data), 'sha256': actual,
+                  'official_download_digest_match': True}))

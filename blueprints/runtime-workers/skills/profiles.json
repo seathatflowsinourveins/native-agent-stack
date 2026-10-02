@@ -1,0 +1,732 @@
+{
+  "schema_version": 1,
+  "kind": "runtime_worker_task_skill_profiles",
+  "checked_at": "2026-09-30",
+  "scope": "project",
+  "status": "trial_metadata",
+  "roster_manifest": "blueprints/runtime-workers/skills/manifest.json",
+  "default_effect": "None. This file is selection metadata, not a native runtime configuration or installation command.",
+  "selection": "Select the current task scenario and caller role. The names below are their intersection in the existing roster; eligibility is not observed activation.",
+  "installation": "Use tools/adoption/install_skills.py with an owned --project-dir and explicit native target/skill names. Do not install the complete catalog by default.",
+  "native_openhands": {
+    "version": "1.50.0",
+    "ref": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+    "runtime_profiles": "blueprints/runtime-workers/openhands/config/profiles.json",
+    "discovery": "openhands-sdk/openhands/sdk/skills/skill.py:1049-1142 load_project_skills",
+    "metadata_prompt": "openhands-sdk/openhands/sdk/skills/skill.py:1453-1533 to_prompt",
+    "body_loading": "openhands-sdk/openhands/sdk/tool/builtins/invoke_skill.py:90-124 InvokeSkillExecutor",
+    "description": "Native AgentSkills listings expose selected names/descriptions; invoke_skill renders the selected body. No replacement loader or dispatcher is supplied.",
+    "project_instruction_boundary": "load_project_skills also discovers project/Git-root third-party instructions. Use an owned worker project outside the stack checkout.",
+    "qualification": "Isolated source-discovery fixture passed for the 77 OpenHands entries; model invocation and provider usage remain uncollected."
+  },
+  "environment_boundaries": [
+    {
+      "names": [
+        "agent-canvas-environment",
+        "canvas-extension-api"
+      ],
+      "requires": "An explicitly selected Agent Canvas environment or Canvas extension task.",
+      "source": "OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/agent-canvas-environment/SKILL.md; skills/canvas-extension-api/SKILL.md"
+    },
+    {
+      "names": [
+        "openhands-api",
+        "openhands-automation"
+      ],
+      "requires": "The task explicitly selects the documented Cloud/automation API or the separately checked agent-server API path.",
+      "source": "OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/openhands-api/SKILL.md; skills/openhands-automation/SKILL.md"
+    },
+    {
+      "names": [
+        "github",
+        "github-pr-reviewer",
+        "github-stale-ci-pr-closer"
+      ],
+      "requires": "The added profile-backed automation resources are not local SDK/server dispatch qualification. These changed trees retain the earlier pin.",
+      "source": "OpenHands/extensions@9495f4c59dd5fea2cee9e87ab37a6abda649627b skills/github/scripts/agent_conversation.py:1-119"
+    }
+  ],
+  "task_profiles": [
+    {
+      "scenario": "planning-and-specs",
+      "roles": {
+        "coding": [
+          "add-javadoc",
+          "agent-canvas-environment",
+          "agent-creator",
+          "agent-readiness-report",
+          "agent-sdk-builder",
+          "azure-devops",
+          "bitbucket",
+          "bitbucket-cloud",
+          "bitbucket-data-center",
+          "brainstorming",
+          "build-setup",
+          "canvas-extension-api",
+          "cobol-modernization",
+          "codebase-design",
+          "dispatching-parallel-agents",
+          "domain-modeling",
+          "executing-plans",
+          "frontend-design",
+          "gitlab",
+          "gitlab-issue-to-mr",
+          "grill-me",
+          "improve-agent-readiness",
+          "improve-codebase-architecture",
+          "linear",
+          "linear-triage",
+          "mainframe-planning",
+          "mainframe-removal",
+          "mcp-builder",
+          "openhands-api",
+          "openhands-automation",
+          "openhands-sdk",
+          "prd",
+          "setup-agents-md",
+          "spark-version-upgrade",
+          "subagent-driven-development",
+          "to-java-migration",
+          "to-spec",
+          "to-tickets",
+          "using-git-worktrees",
+          "using-superpowers",
+          "vercel-composition-patterns",
+          "writing-for-agents",
+          "writing-plans"
+        ],
+        "orchestration": [
+          "add-javadoc",
+          "agent-canvas-environment",
+          "agent-creator",
+          "agent-readiness-report",
+          "agent-sdk-builder",
+          "azure-devops",
+          "bitbucket",
+          "bitbucket-cloud",
+          "bitbucket-data-center",
+          "brainstorming",
+          "build-setup",
+          "canvas-extension-api",
+          "cobol-modernization",
+          "codebase-design",
+          "dispatching-parallel-agents",
+          "domain-modeling",
+          "executing-plans",
+          "gitlab",
+          "gitlab-issue-to-mr",
+          "grill-me",
+          "improve-agent-readiness",
+          "improve-codebase-architecture",
+          "linear",
+          "linear-triage",
+          "mainframe-planning",
+          "mainframe-removal",
+          "mcp-builder",
+          "openhands-api",
+          "openhands-automation",
+          "openhands-sdk",
+          "prd",
+          "setup-agents-md",
+          "spark-version-upgrade",
+          "subagent-driven-development",
+          "to-java-migration",
+          "to-spec",
+          "to-tickets",
+          "using-git-worktrees",
+          "using-superpowers",
+          "writing-for-agents",
+          "writing-plans"
+        ],
+        "research": [
+          "brainstorming",
+          "domain-modeling",
+          "grill-me",
+          "prd",
+          "to-spec",
+          "writing-plans"
+        ],
+        "extraction-caller": [
+          "brainstorming",
+          "codebase-design",
+          "domain-modeling",
+          "grill-me",
+          "improve-codebase-architecture",
+          "prd",
+          "to-spec",
+          "writing-plans"
+        ]
+      }
+    },
+    {
+      "scenario": "tdd",
+      "roles": {
+        "coding": [
+          "build-setup",
+          "cobol-modernization",
+          "mainframe-planning",
+          "mainframe-removal",
+          "property-based-testing",
+          "spark-version-upgrade",
+          "tdd",
+          "test-driven-development",
+          "to-java-migration"
+        ],
+        "orchestration": [
+          "build-setup",
+          "cobol-modernization",
+          "mainframe-planning",
+          "mainframe-removal",
+          "property-based-testing",
+          "spark-version-upgrade",
+          "tdd",
+          "test-driven-development",
+          "to-java-migration"
+        ],
+        "research": [],
+        "extraction-caller": [
+          "property-based-testing",
+          "tdd",
+          "test-driven-development"
+        ]
+      }
+    },
+    {
+      "scenario": "e2e-testing",
+      "roles": {
+        "coding": [
+          "agent-browser",
+          "playwright",
+          "qa-changes",
+          "webapp-testing"
+        ],
+        "orchestration": [
+          "agent-browser",
+          "playwright",
+          "qa-changes",
+          "webapp-testing"
+        ],
+        "research": [],
+        "extraction-caller": [
+          "agent-browser",
+          "playwright",
+          "qa-changes",
+          "webapp-testing"
+        ]
+      }
+    },
+    {
+      "scenario": "ab-testing-and-evaluation",
+      "roles": {
+        "coding": [
+          "diagnosing-superpowers",
+          "jupyter",
+          "jupyter-notebook",
+          "migration-mapping",
+          "migration-report",
+          "migration-scoring",
+          "property-based-testing",
+          "score-quality",
+          "score-style",
+          "skill-creator",
+          "typesafe-ai",
+          "vercel-optimize",
+          "writing-skills"
+        ],
+        "orchestration": [
+          "diagnosing-superpowers",
+          "migration-mapping",
+          "migration-report",
+          "migration-scoring",
+          "property-based-testing",
+          "score-quality",
+          "score-style",
+          "skill-creator",
+          "typesafe-ai",
+          "vercel-optimize",
+          "writing-skills"
+        ],
+        "research": [
+          "jupyter",
+          "jupyter-notebook",
+          "skill-creator",
+          "writing-skills"
+        ],
+        "extraction-caller": [
+          "jupyter",
+          "jupyter-notebook",
+          "property-based-testing",
+          "skill-creator",
+          "typesafe-ai",
+          "writing-skills"
+        ]
+      }
+    },
+    {
+      "scenario": "debugging",
+      "roles": {
+        "coding": [
+          "datadog",
+          "diagnosing-bugs",
+          "diagnosing-superpowers",
+          "openhands-enterprise-troubleshooting",
+          "systematic-debugging"
+        ],
+        "orchestration": [
+          "datadog",
+          "diagnosing-bugs",
+          "diagnosing-superpowers",
+          "openhands-enterprise-troubleshooting",
+          "systematic-debugging"
+        ],
+        "research": [
+          "diagnosing-bugs",
+          "systematic-debugging"
+        ],
+        "extraction-caller": [
+          "diagnosing-bugs",
+          "systematic-debugging"
+        ]
+      }
+    },
+    {
+      "scenario": "code-review",
+      "roles": {
+        "coding": [
+          "code-review",
+          "code-simplifier",
+          "codebase-design",
+          "frontend-design",
+          "gh-address-comments",
+          "improve-codebase-architecture",
+          "migration-mapping",
+          "migration-report",
+          "migration-scoring",
+          "receiving-code-review",
+          "requesting-code-review",
+          "score-quality",
+          "score-style",
+          "vercel-composition-patterns",
+          "vercel-react-best-practices",
+          "web-design-guidelines"
+        ],
+        "orchestration": [
+          "code-review",
+          "code-simplifier",
+          "codebase-design",
+          "gh-address-comments",
+          "improve-codebase-architecture",
+          "migration-mapping",
+          "migration-report",
+          "migration-scoring",
+          "receiving-code-review",
+          "requesting-code-review",
+          "score-quality",
+          "score-style",
+          "vercel-react-best-practices",
+          "web-design-guidelines"
+        ],
+        "research": [],
+        "extraction-caller": [
+          "codebase-design",
+          "improve-codebase-architecture"
+        ]
+      }
+    },
+    {
+      "scenario": "security",
+      "roles": {
+        "coding": [
+          "agentic-actions-auditor",
+          "codeql",
+          "fp-check",
+          "sarif-parsing",
+          "security",
+          "security-best-practices",
+          "security-threat-model",
+          "semgrep",
+          "supply-chain-risk-auditor",
+          "variant-analysis"
+        ],
+        "orchestration": [
+          "agentic-actions-auditor",
+          "codeql",
+          "fp-check",
+          "sarif-parsing",
+          "security",
+          "security-best-practices",
+          "security-threat-model",
+          "semgrep",
+          "supply-chain-risk-auditor",
+          "variant-analysis"
+        ],
+        "research": [],
+        "extraction-caller": [
+          "security",
+          "security-best-practices",
+          "security-threat-model"
+        ]
+      }
+    },
+    {
+      "scenario": "github-issue-to-pr",
+      "roles": {
+        "coding": [
+          "finishing-a-development-branch",
+          "github",
+          "github-issue-to-pr",
+          "github-issue-triage",
+          "github-repo-monitor",
+          "jira-issue-to-pr",
+          "resolving-merge-conflicts",
+          "ticket-to-code-change",
+          "upstream-fork-sync"
+        ],
+        "orchestration": [
+          "finishing-a-development-branch",
+          "github",
+          "github-issue-to-pr",
+          "github-issue-triage",
+          "github-repo-monitor",
+          "jira-issue-to-pr",
+          "resolving-merge-conflicts",
+          "ticket-to-code-change",
+          "upstream-fork-sync"
+        ],
+        "research": [],
+        "extraction-caller": []
+      }
+    },
+    {
+      "scenario": "github-pr-review",
+      "roles": {
+        "coding": [
+          "code-review",
+          "code-simplifier",
+          "finishing-a-development-branch",
+          "gh-address-comments",
+          "github",
+          "github-delivery-watchdog",
+          "github-pr-review",
+          "github-pr-reviewer",
+          "receiving-code-review",
+          "requesting-code-review",
+          "resolving-merge-conflicts",
+          "setup-pr-review",
+          "upstream-fork-sync"
+        ],
+        "orchestration": [
+          "code-review",
+          "code-simplifier",
+          "finishing-a-development-branch",
+          "gh-address-comments",
+          "github",
+          "github-delivery-watchdog",
+          "github-pr-review",
+          "github-pr-reviewer",
+          "receiving-code-review",
+          "requesting-code-review",
+          "resolving-merge-conflicts",
+          "setup-pr-review",
+          "upstream-fork-sync"
+        ],
+        "research": [],
+        "extraction-caller": []
+      }
+    },
+    {
+      "scenario": "github-ci-fix",
+      "roles": {
+        "coding": [
+          "gh-fix-ci",
+          "github-stale-ci-pr-closer",
+          "iterate"
+        ],
+        "orchestration": [
+          "gh-fix-ci",
+          "github-stale-ci-pr-closer",
+          "iterate"
+        ],
+        "research": [],
+        "extraction-caller": []
+      }
+    },
+    {
+      "scenario": "github-actions",
+      "roles": {
+        "coding": [
+          "agentic-actions-auditor",
+          "github-actions",
+          "setup-openhands"
+        ],
+        "orchestration": [
+          "agentic-actions-auditor",
+          "github-actions",
+          "setup-openhands"
+        ],
+        "research": [],
+        "extraction-caller": []
+      }
+    },
+    {
+      "scenario": "release-notes",
+      "roles": {
+        "coding": [
+          "release-notes"
+        ],
+        "orchestration": [
+          "release-notes"
+        ],
+        "research": [],
+        "extraction-caller": []
+      }
+    },
+    {
+      "scenario": "docs-and-citations",
+      "roles": {
+        "coding": [
+          "add-javadoc",
+          "agent-memory",
+          "agent-readiness-report",
+          "doc-coauthoring",
+          "docx",
+          "evidence-based-citations",
+          "find-skills",
+          "github-agents-md-maintainer",
+          "handoff",
+          "improve-agent-readiness",
+          "iterative-retrieval",
+          "learn-from-code-review",
+          "mcp-builder",
+          "pdf",
+          "pdflatex",
+          "plain-english-content",
+          "pptx",
+          "release-notes",
+          "research",
+          "search-first",
+          "setup-agents-md",
+          "technical-writing",
+          "theme-factory",
+          "writing-for-agents",
+          "writing-skills",
+          "xlsx"
+        ],
+        "orchestration": [
+          "add-javadoc",
+          "agent-memory",
+          "agent-readiness-report",
+          "discord",
+          "doc-coauthoring",
+          "docx",
+          "evidence-based-citations",
+          "find-skills",
+          "github-agents-md-maintainer",
+          "gpt-researcher",
+          "handoff",
+          "improve-agent-readiness",
+          "incident-retrospective",
+          "iterative-retrieval",
+          "learn-from-code-review",
+          "mcp-builder",
+          "notion",
+          "pdf",
+          "pdflatex",
+          "plain-english-content",
+          "pptx",
+          "release-notes",
+          "research",
+          "research-brief",
+          "search-first",
+          "setup-agents-md",
+          "slack-channel-monitor",
+          "slack-standup-digest",
+          "technical-writing",
+          "theme-factory",
+          "writing-for-agents",
+          "writing-skills",
+          "xlsx"
+        ],
+        "research": [
+          "agent-memory",
+          "discord",
+          "doc-coauthoring",
+          "docx",
+          "evidence-based-citations",
+          "find-skills",
+          "github-agents-md-maintainer",
+          "gpt-researcher",
+          "handoff",
+          "incident-retrospective",
+          "iterative-retrieval",
+          "learn-from-code-review",
+          "notion",
+          "pdf",
+          "pdflatex",
+          "plain-english-content",
+          "pptx",
+          "research",
+          "research-brief",
+          "search-first",
+          "slack-channel-monitor",
+          "slack-standup-digest",
+          "technical-writing",
+          "theme-factory",
+          "writing-skills",
+          "xlsx"
+        ],
+        "extraction-caller": [
+          "agent-memory",
+          "doc-coauthoring",
+          "docx",
+          "evidence-based-citations",
+          "find-skills",
+          "github-agents-md-maintainer",
+          "gpt-researcher",
+          "handoff",
+          "iterative-retrieval",
+          "learn-from-code-review",
+          "pdf",
+          "pdflatex",
+          "plain-english-content",
+          "pptx",
+          "research",
+          "research-brief",
+          "search-first",
+          "technical-writing",
+          "theme-factory",
+          "writing-skills",
+          "xlsx"
+        ]
+      }
+    },
+    {
+      "scenario": "research",
+      "roles": {
+        "coding": [
+          "find-skills",
+          "iterative-retrieval",
+          "jupyter",
+          "jupyter-notebook",
+          "research",
+          "search-first"
+        ],
+        "orchestration": [
+          "find-skills",
+          "gpt-researcher",
+          "iterative-retrieval",
+          "news-digest",
+          "research",
+          "research-brief",
+          "search-first"
+        ],
+        "research": [
+          "find-skills",
+          "gpt-researcher",
+          "iterative-retrieval",
+          "jupyter",
+          "jupyter-notebook",
+          "news-digest",
+          "research",
+          "research-brief",
+          "search-first"
+        ],
+        "extraction-caller": [
+          "find-skills",
+          "gpt-researcher",
+          "iterative-retrieval",
+          "jupyter",
+          "jupyter-notebook",
+          "news-digest",
+          "research",
+          "research-brief",
+          "search-first"
+        ]
+      }
+    },
+    {
+      "scenario": "deployment-uv-docker",
+      "roles": {
+        "coding": [
+          "agent-canvas-environment",
+          "canvas-extension-api",
+          "deno",
+          "docker",
+          "kubernetes",
+          "modern-python",
+          "npm",
+          "ssh",
+          "swift-linux",
+          "uv",
+          "vercel",
+          "vercel-optimize"
+        ],
+        "orchestration": [
+          "agent-canvas-environment",
+          "canvas-extension-api",
+          "deno",
+          "docker",
+          "kubernetes",
+          "modern-python",
+          "npm",
+          "ssh",
+          "swift-linux",
+          "uv",
+          "vercel",
+          "vercel-optimize"
+        ],
+        "research": [],
+        "extraction-caller": [
+          "deno",
+          "docker",
+          "kubernetes",
+          "modern-python",
+          "npm",
+          "ssh",
+          "swift-linux",
+          "uv",
+          "vercel"
+        ]
+      }
+    },
+    {
+      "scenario": "memory",
+      "roles": {
+        "coding": [
+          "agent-memory",
+          "github-agents-md-maintainer",
+          "handoff",
+          "learn-from-code-review"
+        ],
+        "orchestration": [
+          "agent-memory",
+          "discord",
+          "github-agents-md-maintainer",
+          "handoff",
+          "incident-retrospective",
+          "learn-from-code-review",
+          "notion",
+          "slack-channel-monitor",
+          "slack-standup-digest"
+        ],
+        "research": [
+          "agent-memory",
+          "discord",
+          "github-agents-md-maintainer",
+          "handoff",
+          "incident-retrospective",
+          "learn-from-code-review",
+          "notion",
+          "slack-channel-monitor",
+          "slack-standup-digest"
+        ],
+        "extraction-caller": [
+          "agent-memory",
+          "github-agents-md-maintainer",
+          "handoff",
+          "learn-from-code-review"
+        ]
+      }
+    }
+  ]
+}

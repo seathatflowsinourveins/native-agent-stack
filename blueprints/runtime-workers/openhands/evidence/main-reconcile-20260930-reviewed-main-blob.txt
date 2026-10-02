@@ -1,0 +1,1138 @@
+$ ["rtk", "proxy", "git", "show", "f03f41c7:blueprints/runtime-workers/openhands/requirements.lock"]
+agent-client-protocol==0.12.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:9963ccb590ed96d7dc542c9c023e90676fc76b1c6562e21a9ee112f4fbcb0095 \
+    --hash=sha256:aaf3cc301ed87d9e2c4ccb91adfe1cd58784355f6ce7e513f50e7ca2391862ef
+aiofile==3.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:ce2f6c1571538cbdfa0143b04e16b208ecb0e9cb4148e528af8a640ed51cc8aa \
+    --hash=sha256:e5ad718bb148b265b6df1b3752c4d1d83024b93da9bd599df74b9d9ffcf7919b
+aiofiles==25.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:a8d728f0a29de45dc521f18f07297428d56992a742f0cd2701ba86e44d23d5b2 \
+    --hash=sha256:abe311e527c862958650f9438e859c1fa7568a141b22abcd015e120e86a85695
+aiohappyeyeballs==2.6.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:c3f9d0113123803ccadfdf3f0faa505bc78e6a72d1cc4806cbd719826e943558 \
+    --hash=sha256:f349ba8f4b75cb25c99c5c2d84e997e485204d2902a9597802b0371f09331fb8
+aiohttp==3.14.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:18cb43369747b2ae007bd2655fb8e63a099c2ff1d207962943636dac989b3147 \
+    --hash=sha256:1c5ec8fb1bcc31a8466f74aaf26c345d5c386fa4bd08a3f0eb9c7a4a3fe8b5bf \
+    --hash=sha256:2498f0fe69ead802f9675beca44a7c21c62fdaa4ec5145ea1c3ad6edbee29f85 \
+    --hash=sha256:3d4f72af88ac2474bb5bca640030320e3d38a0163a1d7533500e87be458eef71 \
+    --hash=sha256:498c6c623134f8e09a3c4e60bcd607a0b4590dd7dbf08dd40851b27cbb520ccb \
+    --hash=sha256:543906c127fb1d929b95076db19b83fa2d46751006ff1e23b093aa5ac4d8db42 \
+    --hash=sha256:7041d52c3a7fa20c9e8c182b534704abb19502c8bdcbde7ab23bfda6f642394f \
+    --hash=sha256:9491196535a88924a60afd5b5f434b5b203b6cc616250878dbdb223a8f7844bc \
+    --hash=sha256:d1558173930a5a8d3069cee5c92fc91c87c4dbcb099debbb3622053717145a19 \
+    --hash=sha256:d7d2deec16eeedf55f2c7cf75b521ea3856a5177e123844f8fd0f114ce252cb5 \
+    --hash=sha256:dfa68deb2a443bdaa3ea5297b0699c1464f08aef3812b486d1348eee61b07dc0
+aiosignal==1.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:053243f8b92b990551949e63930a839ff0cf0b0ebbe0597b0f3fb19e1a0fe82e \
+    --hash=sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7
+annotated-types==0.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1f02e8b43a8fbbc3f3e0d4f0f4bfc8131bcb4eebe8849b8e5c773f3a1c582a53 \
+    --hash=sha256:aff07c09a53a08bc8cfccb9c85b05f1aa9a2a6f23728d790723543408344ce89
+anthropic==0.75.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:e8607422f4ab616db2ea5baacc215dd5f028da99ce2f022e33c7c535b29f3dfb \
+    --hash=sha256:ea8317271b6c15d80225a9f3c670152746e88805a7a61e14d4a374577164965b
+anyio==4.14.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:9f505dda5ac9f0c8309b5e8bd445a8c2bf7246f3ce950121e45ea15bc41d1494 \
+    --hash=sha256:cfa139f3ed1a23ee8f88a145ddb5ac7605b8bbfd8592baacd7ce3d8bb4313c7f
+attrs==25.3.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:427318ce031701fea540783410126f03899a97ffc6f61596ad581ac2e40e3bc3 \
+    --hash=sha256:75d7cefc7fb576747b2c81b4442d4d4a1ce0900973527c011d1030fd3bf4af1b
+authlib==1.6.12 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0656d8482f28fc8221929d5f35b2bde5d13e10555ebc06b4561b0d622e83b1bd \
+    --hash=sha256:e9229ad7fde610b139dd12f5edbe97eab9ee78bfb85691247e767727850b99ab
+backoff==2.2.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba \
+    --hash=sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8
+beartype==0.22.9 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:8f82b54aa723a2848a56008d18875f91c1db02c32ef6a62319a002e3e25a975f \
+    --hash=sha256:d16c9bbc61ea14637596c5f6fbff2ee99cbe3573e46a716401734ef50c3060c2
+beautifulsoup4==4.14.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2a98ab9f944a11acee9cc848508ec28d9228abfd522ef0fad6a02a72e0ded69e \
+    --hash=sha256:5ef6fa3a8cbece8488d66985560f97ed091e22bbc4e9c2338508a9d5de6d4515
+binaryornot==0.4.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:359501dfc9d40632edc9fac890e19542db1a287bbcfa58175b66658392018061 \
+    --hash=sha256:b8b71173c917bddcd2c16070412e369c3ed7f0528926f70cac18a6c97fd563e4
+blake3==1.0.9 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:172d44245a19dfec08ab771c1b7a506b97783163cdc65f559fe020007e403c99 \
+    --hash=sha256:3cbe7f190164896dc3908e920716ee66bc31d40f1a0fb603ed59ac53290fb9cf \
+    --hash=sha256:5fa374fa5070ca084368776c19b420157eb0f2d3f091343d6bc59189929d62e2 \
+    --hash=sha256:66c84dbc2a31eda88b55bbf5c5b711037bf0698eba0fd1faf06bdaf313c39048 \
+    --hash=sha256:8a99f896e7718050ed033a888245098aab3d6a5338f91cc9450c563b53f90ad5 \
+    --hash=sha256:bcd56a7a972c4185070f7042ccc20166927eec3c0f98b8405f375d007b604a0b \
+    --hash=sha256:c7f648fa425138452d1e585ac625c7aefddb946d9765906c4c12d564a1523cd8 \
+    --hash=sha256:cfaa671b07eb73883162ca940442193868358b0b904cfa266e4b74131ce966da \
+    --hash=sha256:f65d77eb05331495485048f6804f53885b192b998acb7e6fe1487d941bf08435
+browser-use==0.11.9 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:a66accf4dded24d056eb2733e354e159fd7d82cab986d75dc0f14b395467c82c \
+    --hash=sha256:c3d8a420acf26d26c688c42916358ba546e7159e1a699c06064b899cb7927577
+browser-use-sdk==2.0.15 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0832ae0998736e6386457e6cf506e2820db0d626c4d9dbf0f567ea2b6c6888d3 \
+    --hash=sha256:5d8ba3836070c67a9774baac556b233e22f266823d3dee34295d98869bec7752
+bubus==1.5.6 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1a5456f0a576e86613a7bd66e819891b677778320b6e291094e339b0d9df2e0d \
+    --hash=sha256:254ae37cd9299941f5e9d6afb11f8e3ce069f83e5b9476f88c6b2e32912f237d
+cachetools==7.1.8 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1221d547a0b24b7f26fa891d40d488b5258beab9aebd8ed68c729be3af849c43 \
+    --hash=sha256:a81e3844acaa7355b6567f97bd67a94a14ec3a9bc2cbbdae45b9592cc036775b
+caio==0.9.25 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:06c0bb02d6b929119b1cfbe1ca403c768b2013a369e2db46bfa2a5761cf82e40 \
+    --hash=sha256:0998210a4d5cd5cb565b32ccfe4e53d67303f868a76f212e002a8554692870e6 \
+    --hash=sha256:0ba16aa605ccb174665357fc729cf500679c2d94d5f1458a6f0d5ca48f2060a7 \
+    --hash=sha256:16498e7f81d1d0f5a4c0ad3f2540e65fe25691376e0a5bd367f558067113ed10 \
+    --hash=sha256:44a6b58e52d488c75cfaa5ecaa404b2b41cc965e6c417e03251e868ecd5b6d77 \
+    --hash=sha256:6bebf6f079f1341d19f7386db9b8b1f07e8cc15ae13bfdaff573371ba0575d69 \
+    --hash=sha256:97084e4e30dfa598449d874c4d8e0c8d5ea17d2f752ef5e48e150ff9d240cd64 \
+    --hash=sha256:9ed3cfb28c0e99fec5e208c934e5c157d0866aa9c32aa4dc5e9b6034af6286b7
+cdp-use==1.4.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:330a848b517006eb9ad1dc468aa6434d913cf0c6918610760c36c3fdfdba0fab \
+    --hash=sha256:e37e80e067db2653d6fdf953d4ff9e5d80d75daa27b7c6d48c0261cccbef73e1
+certifi==2025.8.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:e564105f78ded564e3ae7c923924435e1daa7463faeab5bb932bc53ffae63407 \
+    --hash=sha256:f6c12493cfb1b06ba2ff328595af9350c65d6644968e5d3a2ffd78699af217a5
+cffi==2.0.0 ; platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and sys_platform == 'linux' \
+    --hash=sha256:28a3a209b96630bca57cce802da70c266eb08c6e97e5afd61a75611ee6c64592 \
+    --hash=sha256:2c8f814d84194c9ea681642fd164267891702542f028a15fc97d4674b6206187 \
+    --hash=sha256:38100abb9d1b1435bc4cc340bb4489635dc2f0da7456590877030c9b3d40b0c1 \
+    --hash=sha256:3e17ed538242334bf70832644a32a7aae3d83b57567f9fd60a26257e992b79ba \
+    --hash=sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529 \
+    --hash=sha256:6c6c373cfc5c83a975506110d17457138c8c63016b563cc9ed6e056a82f13ce4 \
+    --hash=sha256:6d50360be4546678fc1b79ffe7a66265e28667840010348dd69a314145807a1b \
+    --hash=sha256:afb8db5439b81cf9c9d0c80404b60c3cc9c3add93e114dcae767f1477cb53775 \
+    --hash=sha256:c8d3b5532fc71b7a77c09192b4a5a200ea992702734a2e9279a37f2478236f26
+chardet==5.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7 \
+    --hash=sha256:e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970
+charset-normalizer==3.4.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1606f4a55c0fd363d754049cdf400175ee96c992b1f8018b993941f221221c5f \
+    --hash=sha256:18343b2d246dc6761a249ba1fb13f9ee9a2bcd95decc767319506056ea4ad4dc \
+    --hash=sha256:18b97b8404387b96cdbd30ad660f6407799126d26a39ca65729162fd810a99aa \
+    --hash=sha256:320e8e66157cc4e247d9ddca8e21f427efc7a04bbd0ac8a9faf56583fa543f9f \
+    --hash=sha256:416175faf02e4b0810f1f38bcb54682878a4af94059a1cd63b8747244420801f \
+    --hash=sha256:6fce4b8500244f6fcb71465d4a4930d132ba9ab8e71a7859e6a5d59851068d14 \
+    --hash=sha256:ce571ab16d890d23b5c278547ba694193a45011ff86a9162a71307ed9f86759a \
+    --hash=sha256:d716a916938e03231e86e43782ca7878fb602a125a91e7acb8b5112e2e96ac16
+click==8.5.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360 \
+    --hash=sha256:ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34
+cloudpickle==3.1.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:7fda9eb655c9c230dab534f1983763de5835249750e85fbcef43aaa30a9a2414 \
+    --hash=sha256:9acb47f6afd73f60dc1df93bb801b472f05ff42fa6c84167d25cb206be1fbf4a
+cryptography==50.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:06a32a980526a6ab9a4b9bf8f7385800791e2bb960903cb6b530e4817509a3b7 \
+    --hash=sha256:105110f43a471dbd0060b9c9516cb8a6a79233631a04cc2ba16f28323ac6e025 \
+    --hash=sha256:11b74db56cdbe3cdee6e3f6982ecb70334fa10dce99ed58bf7894aaaa3b2a037 \
+    --hash=sha256:1b4a266766514614f8aa60416e71f2fc6e575d36e7bdc90f644fadb2f4b75b95 \
+    --hash=sha256:37fdb0d0111f1e2ff07139dfb79f1b49531f8e213c46f1163dd7642979b58c47 \
+    --hash=sha256:65c2c3add92b45fd0709db8594536aea39c2a67af0e27ffcf049c498501140b7 \
+    --hash=sha256:6ba6a53445bd3cfa809ef3ef5f1589aa6ba08784a1d962bf47d0940e871dab1c \
+    --hash=sha256:7cec5b856506da6defb290f30c9ee687d5f5e8cb0bd3f6459dde43b0b4fa40ef \
+    --hash=sha256:80b63928fa35083b33966ce1efb70e5b9607181e49dcd1c22c8c005e319f667f \
+    --hash=sha256:82148ec5bddac30b51a5b3c1945075f896fa022cb93f8e4a01e9f6ee95292c5f \
+    --hash=sha256:a91296cb61e8df6f86d0c19cc4068228da256bf59bf86049fbd821084565327f \
+    --hash=sha256:b42a28c1844fd9de8f3f7d540e36b66f3a9c83fceac7170ebc7a6a19edd9dcae \
+    --hash=sha256:eeac2acb5a20ed25e0ad6d1df9891a520b78b404266b6d11778f25d5d691a6c9
+cyclopts==4.6.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0a891cb55bfd79a3cdce024db8987b33316aba11071e5258c21ac12a640ba9f2 \
+    --hash=sha256:483c4704b953ea6da742e8de15972f405d2e748d19a848a4d61595e8e5360ee5
+deprecation==2.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff \
+    --hash=sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a
+distro==1.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2fa77c6fd8940f116ee1d6b94a2f90b13b5ea8d019b98bc8bafdcabcdd9bdbed \
+    --hash=sha256:7bffd925d65168f85027d8da9af6bddab658135b840670a223589bc0c8ef02b2
+dnspython==2.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:01d9bbc4a2d76bf0db7c1f729812ded6d912bd318d3b1cf81d30c0f845dbf3af \
+    --hash=sha256:181d3c6996452cb1189c4046c61599b84a5a86e099562ffde77d26984ff26d0f
+docstring-parser==0.17.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:583de4a309722b3315439bb31d64ba3eebada841f2e2cee23b99df001434c912 \
+    --hash=sha256:cf2569abd23dce8099b300f9b4fa8191e9582dda731fd533daf54c4551658708
+docutils==0.22.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:9fdb771707c8784c8f2728b67cb2c691305933d68137ef95a75db5f4dfbc213d \
+    --hash=sha256:b0e98d679283fc3bb0ead8a5da7f501baa632654e7056e9c5846842213d674d8
+email-validator==2.3.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4 \
+    --hash=sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426
+exceptiongroup==1.3.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4d111e6e0c13d0644cad6ddaa7ed0261a0b36971f6d23e7ec9b4b9097da78a10 \
+    --hash=sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88
+fakeredis==2.34.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0107ec99d48913e7eec2a5e3e2403d1bd5f8aa6489d1a634571b975289c48f12 \
+    --hash=sha256:4ff55606982972eecce3ab410e03d746c11fe5deda6381d913641fbd8865ea9b
+fastmcp==3.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:d4830b8ffc3592d3d9c76dc0f398904cf41f04910e41a0de38cc1004e0903bef \
+    --hash=sha256:e71aba3df16f86f546a4a9e513261d3233bcc92bef0dfa647bac3fa33623f681
+fastuuid==0.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1383fff584fa249b16329a059c68ad45d030d5a4b70fb7c73a08d98fd53bcdab \
+    --hash=sha256:178947fc2f995b38497a74172adee64fdeb8b7ec18f2a5934d037641ba265d26 \
+    --hash=sha256:33e678459cf4addaedd9936bbb038e35b3f6b2061330fd8f2f6a1d80414c0f87 \
+    --hash=sha256:3acdf655684cc09e60fb7e4cf524e8f42ea760031945aa8086c7eae2eeeabeb8 \
+    --hash=sha256:808527f2407f58a76c916d6aa15d58692a4a019fdf8d4c32ac7ff303b7d7af09 \
+    --hash=sha256:a8a0dfea3972200f72d4c7df02c8ac70bad1bb4c58d7e0ec1e6f341679073a7f \
+    --hash=sha256:ec27778c6ca3393ef662e2762dba8af13f4ec1aaa32d08d77f71f2a70ae9feb8
+filelock==3.20.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:18c57ee915c7ec61cff0ecf7f0f869936c7c30191bb0cf406f1341778d0834e1 \
+    --hash=sha256:4b0dda527ee31078689fc205ec4f1c1bf7d56cf88b6dc9426c4f230e46c2dce1
+frozenlist==1.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:073f8bf8becba60aa931eb3bc420b217bb7d5b8f4750e6f8b3be7f3da85d38b7 \
+    --hash=sha256:0c18a16eab41e82c295618a77502e17b195883241c563b00f0aa5106fc4eaa0d \
+    --hash=sha256:21900c48ae04d13d416f0e1e0c4d81f7931f73a9dfa0b7a8746fb2fe7dd970ed \
+    --hash=sha256:39ecbc32f1390387d2aa4f5a995e465e9e2f79ba3adcac92d68e3e0afae6657c \
+    --hash=sha256:3ede829ed8d842f6cd48fc7081d7a41001a56f1f38603f9d49bf3020d59a31ad \
+    --hash=sha256:494a5952b1c597ba44e0e78113a7266e656b9794eec897b19ead706bd7074383 \
+    --hash=sha256:6da155091429aeba16851ecb10a9104a108bcd32f6c1642867eadaee401c1c41 \
+    --hash=sha256:776f352e8329135506a1d6bf16ac3f87bc25b28e765949282dcc627af36123aa \
+    --hash=sha256:974b28cf63cc99dfb2188d8d222bc6843656188164848c4f679e63dae4b0708e \
+    --hash=sha256:b3210649ee28062ea6099cfda39e147fa1bc039583c8ee4481cb7811e2448c51 \
+    --hash=sha256:cba69cb73723c3f329622e34bdbf5ce1f80c21c290ff04256cff1cd3c2036ed2 \
+    --hash=sha256:fb30f9626572a76dfe4293c7194a09fb1fe93ba94c7d4f720dfae3b646b45027
+fsspec==2025.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:19fd429483d25d28b65ec68f9f4adc16c17ea2c7c7bf54ec61360d478fb19c19 \
+    --hash=sha256:530dc2a2af60a414a832059574df4a6e10cce927f6f4a78209390fe38955cfb7
+func-timeout==4.3.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:74cd3c428ec94f4edfba81f9b2f14904846d5ffccc27c92433b8b5939b5575dd
+google-api-core==2.26.0 ; python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2b204bd0da2c81f918e3582c48458e24c11771f987f6258e6e227212af78f3ed \
+    --hash=sha256:e6e6d78bd6cf757f4aee41dcc85b07f485fbb069d5daa3afb126defba1e91a62
+google-api-core==2.31.0 ; python_full_version >= '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2be84ee0f584c48e6bde1b36766e23348b361fb7e55e56135fc76ce1c397f9c2 \
+    --hash=sha256:ef79fb3784c71cbac89cbd03301ba0c8fb8ad2aa95d7f9204dd9628f7adf59ab
+google-api-python-client==2.184.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:15a18d02f42de99416921c77be235d12ead474e474a1abc348b01a2b92633fa4 \
+    --hash=sha256:ef2a3330ad058cdfc8a558d199c051c3356f6ed012436c3ad3d08b67891b039f
+google-auth==2.53.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:6e7449917c599b35126a99ec268ec6880301f2fea41dce198fe8fd83ff642b68 \
+    --hash=sha256:e7e6aa16f6bee7b2b264830fd04f08087a1d5a836df516251a5d15327b246c9c
+google-auth-httplib2==0.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:38aa7badf48f974f1eb9861794e9c0cb2a0511a4ec0679b1f886d108f5640e05 \
+    --hash=sha256:b65a0a2123300dd71281a7bf6e64d65a0759287df52729bdd1ae2e47dc311a3d
+google-auth-oauthlib==1.2.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:11046fb8d3348b296302dd939ace8af0a724042e8029c1b872d87fabc9f41684 \
+    --hash=sha256:fd619506f4b3908b5df17b65f39ca8d66ea56986e5472eb5978fd8f3786f00a2
+google-genai==1.75.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:56bac3991b311c93f980c0a2abcd287b672146905df1fbd71c92ed633d5a07cf \
+    --hash=sha256:8dc4c096e7d6288c3087f6893f582fe52468932464781edb8193bd92b9fefb2c
+googleapis-common-protos==1.70.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0e1b44e0ea153e6594f9f394fef15193a68aaaea2d843f83e2742717ca753257 \
+    --hash=sha256:b8bfcca8c25a2bb253e0e0b0adaf8c00773e5e6af6fd92397576680b807e0fd8
+groq==0.32.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0ed0be290042f8826f851f3a1defaac4f979dcfce86ec4a0681a23af00ec800b \
+    --hash=sha256:fb1ade61f47a06d1a1c1dc0fab690d269b799ebd57ad1dd867efaeaa7adeb2af
+grpcio==1.76.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1c9b93f79f48b03ada57ea24725d83a30284a012ec27eab2cf7e50a550cbbbcc \
+    --hash=sha256:2229ae655ec4e8999599469559e97630185fdd53ae1e8997d147b7c9b2b72cba \
+    --hash=sha256:615ba64c208aaceb5ec83bfdce7728b80bfeb8be97562944836a7a0a9647d882 \
+    --hash=sha256:61f69297cba3950a524f61c7c8ee12e55c486cb5f7db47ff9dcee33da6f0d3ae \
+    --hash=sha256:7be78388d6da1a25c0d5ec506523db58b18be22d9c37d8d3a32c08be4987bd73 \
+    --hash=sha256:931091142fd8cc14edccc0845a79248bc155425eee9a98b2db2ea4f00a235a42 \
+    --hash=sha256:980a846182ce88c4f2f7e2c22c56aefd515daeb36149d1c897f83cf57999e0b6
+h11==0.16.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1 \
+    --hash=sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86
+hf-xet==1.1.10 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:408aef343800a2102374a883f283ff29068055c111f003ff840733d3b715bb97 \
+    --hash=sha256:6b6bceb6361c80c1cc42b5a7b4e3efd90e64630bcf11224dcac50ef30a47e435 \
+    --hash=sha256:f900481cf6e362a6c549c61ff77468bd59d6dd082f3170a36acfef2eb6a6793f
+httpcore==1.0.9 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55 \
+    --hash=sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8
+httplib2==0.32.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:48a0ef30a42db65d8f3399045e1d09ab0ba66e3b9efc360d07f80ea55d286025 \
+    --hash=sha256:dc6705cacdf3fb0a2aba7629fa33c90fd93e30035db0c157325826be177e4816
+httpx==0.28.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc \
+    --hash=sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad
+httpx-sse==0.4.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0ac1c9fe3c0afad2e0ebb25a934a59f4c7823b60792691f779fad2c5568830fc \
+    --hash=sha256:9b1ed0127459a66014aec3c56bebd93da3c1bc8bb6618c8082039a44889a755d
+huggingface-hub==0.35.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0e3a01829c19d86d03793e4577816fe3bdfc1602ac62c7fb220d593d351224ba \
+    --hash=sha256:350932eaa5cc6a4747efae85126ee220e4ef1b54e29d31c3b45c5612ddf0b32a
+idna==3.15 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8 \
+    --hash=sha256:ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc
+importlib-metadata==8.5.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:45e54197d28b7a7f1559e60b95e7c567032b602131fbd588f1497f47880aa68b \
+    --hash=sha256:71522656f0abace1d072b9e5481a48f07c138e00f079c38c8f883823f9c26bd7
+inquirerpy==0.3.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:89d2ada0111f337483cb41ae31073108b2ec1e618a49d7110b0d7ade89fc197e \
+    --hash=sha256:c65fdfbac1fa00e3ee4fb10679f4d3ed7a012abf4833910e63c295827fe2a7d4
+jaraco-classes==3.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:47a024b51d0239c0dd8c8540c6c7f484be3b8fcf0b2d85c13825780d3b3f3acd \
+    --hash=sha256:f662826b6bed8cace05e7ff873ce0f9283b5c924470fe664fff1c2f00f581790
+jaraco-context==6.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:129a341b0a85a7db7879e22acd66902fda67882db771754574338898b2d5d86f \
+    --hash=sha256:a43b5ed85815223d0d3cfdb6d7ca0d2bc8946f28f30b6f3216bda070f68badda
+jaraco-functools==4.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:9eec1e36f45c818d9bf307c8948eb03b2b56cd44087b3cdc989abca1f20b9176 \
+    --hash=sha256:da21933b0417b89515562656547a77b4931f98176eb173644c0d35032a33d6bb
+jeepney==0.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:97e5714520c16fc0a45695e5365a2e11b81ea79bba796e26f9f1d178cb182683 \
+    --hash=sha256:cf0e9e845622b81e4a28df94c40345400256ec608d0e55bb8a3feaa9163f5732
+jinja2==3.1.6 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d \
+    --hash=sha256:85ece4451f492d0c13c5dd7c13a64681a86afae63a5f347908daf103ce6d2f67
+jiter==0.11.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:11840d2324c9ab5162fc1abba23bc922124fedcff0d7b7f85fffa291e2f69206 \
+    --hash=sha256:1d9637eaf8c1d6a63d6562f2a6e5ab3af946c66037eb1b894e8fad75422266e4 \
+    --hash=sha256:29ed1fe69a8c69bf0f2a962d8d706c7b89b50f1332cd6b9fbda014f60bd03a03 \
+    --hash=sha256:4ee5821e3d66606b29ae5b497230b304f1376f38137d69e35f8d2bd5f310ff73 \
+    --hash=sha256:6e2bbf24f16ba5ad4441a9845e40e4ea0cb9eed00e76ba94050664ef53ef4406 \
+    --hash=sha256:bb948402821bc76d1f6ef0f9e19b816f9b09f8577844ba7140f0b6afe994bc64 \
+    --hash=sha256:c9967c2ab338ee2b2c0102fd379ec2693c496abf71ffd47e4d791d1f593b68e2 \
+    --hash=sha256:cf408d2a0abd919b60de8c2e7bc5eeab72d4dafd18784152acc7c9adc3291591 \
+    --hash=sha256:dbb57da40631c267861dd0090461222060960012d70fd6e4c799b0f62d0ba166
+joserfc==1.7.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:add2c2c84e8373b084d526a8b53daba5d7a513a118cd2dcd9fc9f979d0922159 \
+    --hash=sha256:d5ff536e658e17664f8c1b1ab60dc4aa62aa973fcef1edd33cc44bda45d6f5ea
+json-repair==0.60.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:841661cdd2df507c9a4e189097f38ca6bc372e06d4b4e36d72e590f68176c290 \
+    --hash=sha256:ba6ff974f2a8bef2f7768144a7f03f870a816443f03da27a49cdd0ec31a78049
+jsonref==1.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:32fe8e1d85af0fdefbebce950af85590b22b60f9e95443176adbde4e1ecea552 \
+    --hash=sha256:590dc7773df6c21cbf948b5dac07a72a251db28b0238ceecce0a2abfa8ec30a9
+jsonschema==4.23.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:d71497fef26351a33265337fa77ffeb82423f3ea21283cd9467bb03999266bc4 \
+    --hash=sha256:fbadb6f8b144a8f8cf9f0b89ba94501d143e50411a1278633f56a7acf7fd5566
+jsonschema-path==0.3.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:8365356039f16cc65fddffafda5f58766e34bebab7d6d105616ab52bc4297001 \
+    --hash=sha256:f502191fdc2b22050f9a81c9237be9d27145b9001c55842bece5e94e382e52f8
+jsonschema-specifications==2025.9.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe \
+    --hash=sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d
+keyring==25.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:be4a0b195f149690c166e850609a477c532ddbfbaed96a404d4e43f8d5e2689f \
+    --hash=sha256:fe01bd85eb3f8fb3dd0405defdeac9a5b4f6f0439edbb3149577f244a2e8245b
+libtmux==0.53.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:024b7ae6a12aae55358e8feb914c8632b3ab9bd61c0987c53559643c6a58ee4f \
+    --hash=sha256:1d19af4cea0c19543954d7e7317c7025c0739b029cccbe3b843212fae238f1bd
+litellm==1.93.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0784172435de48f66ef7ad89d421604db1ad0db1321ef7f39dbcfe6b20111417 \
+    --hash=sha256:140bf215e264c71601bca9c06d2436c5451bb59e1e195ea23fc2d3d87b6929ec \
+    --hash=sha256:98c15e84d32e922a821c105308bf9ddae8700de9ed396530bee2cbb1cacf4cbb \
+    --hash=sha256:cd70ccd4ba3ef1a395535c287bce72d30c7d937ecca4290c0db37a00738f7ada
+lmnr==0.7.60 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:35076b302a8f4349824deb08f79d1c7e4c2486b5a14704c0e6efee9879942096 \
+    --hash=sha256:efec73de28eb8b66bcda6aaab7db0bda8247a26f982e63295a754412bee607f0
+lmnr-claude-code-proxy==0.1.23 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0fd8e1bfeef82802c8a74533a6d27e7c7912c7db68358ca67976f1635311503f \
+    --hash=sha256:44b270a4c40daf3b11a5d96694357c4ff99842e82c514281b2910eae4a5d653a \
+    --hash=sha256:5bb8df798ad59b5ba096a7ce1c9a1a08fab5fcb9a6701b3e304bac6a060f109c \
+    --hash=sha256:68fdb6a26d30977b5d4e7ce4a117b2a427a16b1cc0d075f4cecd1839da12975a \
+    --hash=sha256:6d8fa044c2f5774a6b70de9025a91c13c74361d4349ae528b4b4fcca48219a13 \
+    --hash=sha256:724ac0371eef99c034762521e580a986fc2b012ffc8c650dd8d66f1765d9a102 \
+    --hash=sha256:92233f1c19971678225ac884d26b77cbbe9e90ec0a154752f8feee9ffa3f21c2 \
+    --hash=sha256:9e7a58160b8c327e9fddbba828c86bb1084967519a160ae4f64d0ae01d65730b \
+    --hash=sha256:f8d636068b2b141f210dcadf433f86dc69f810245771f95f647c1a57d2a37dd9
+lupa==2.8 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2e64acbbd47e9b82a64405a39e0d2b36a5a7dad8ab41c0f3437f572f7d282ba3 \
+    --hash=sha256:4f81a02806e7c7ad26d8c6fa222c8bef1b0c1b124347c879be880b41339d41e4 \
+    --hash=sha256:8cf4f064a0e5531afce2d7d750120c10c10f9529139af6ca6150d13151034398 \
+    --hash=sha256:a591b9947ca347b41a63370e121d6e2b1458fe6dde9ae065029ec10a37f25ff4 \
+    --hash=sha256:d8022641b9ec8ecf2c5ecbe9f47e5a70e0b87c4b5ae921b92cb02a638e0acd08 \
+    --hash=sha256:f8a22088a552828958603323f0a5c4b3e11e03b75d0bf4c965ef879de9b60a8d \
+    --hash=sha256:fc47f536ac13a79cef47d29a2b205576a22841f042a2bcec1676b95806e7706a
+lxml==6.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:264c605ab9c0e4aa1a679636f4582c4d3313700009fac3ec9c3412ed0d8f3e1d \
+    --hash=sha256:37fabd1452852636cf38ecdcc9dd5ca4bba7a35d6c53fa09725deeb894a87491 \
+    --hash=sha256:3f00972f84450204cd5d93a5395965e348956aaceaadec693a22ec743f8ae3eb \
+    --hash=sha256:4b89b098105b8599dc57adac95d1813409ac476d3c948a498775d3d0c6124bfb \
+    --hash=sha256:7f4a77d6f7edf9230cee3e1f7f6764722a41604ee5681844f18db9a81ea0ec33 \
+    --hash=sha256:89e8d73d09ac696a5ba42ec69787913d53284f12092f651506779314f10ba585 \
+    --hash=sha256:9147d8e386ec3b82c3b15d88927f734f565b0aaadef7def562b853adca45784a \
+    --hash=sha256:9e7b0a4ca6dcc007a4cef00a761bba2dea959de4bd2df98f926b33c92ca5dfb9 \
+    --hash=sha256:bc783ee3147e60a25aa0445ea82b3e8aabb83b240f2b95d32cb75587ff781814 \
+    --hash=sha256:bfd57d8008c4965709a919c3e9a98f76c2c7cb319086b3d26858250620023b13 \
+    --hash=sha256:c6854e9cf99c84beb004eecd7d3a3868ef1109bf2b1df92d7bc11e96a36c2180 \
+    --hash=sha256:e69aa6805905807186eb00e66c6d97a935c928275182eb02ee40ba00da9623b2 \
+    --hash=sha256:fe022f20bc4569ec66b63b3fb275a3d628d9d32da6326b2982584104db6d3086
+markdown-it-py==4.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:87327c59b172c5011896038353a81343b6754500a08cd7a4973bb48c6d578147 \
+    --hash=sha256:cb0a2b4aa34f932c007117b194e945bd74e0ec24133ceb5bac59009cda1cb9f3
+markdownify==1.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:48e150a1c4993d4d50f282f725c0111bd9eb25645d41fa2f543708fd44161351 \
+    --hash=sha256:f6c367c54eb24ee953921804dfe6d6575c5e5b42c643955e7242034435de634c
+markupsafe==3.0.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:131a3c7689c85f5ad20f9f6fb1b866f402c445b220c19fe4308c0b147ccd2ad9 \
+    --hash=sha256:15ab75ef81add55874e7ab7055e9c397312385bd9ced94920f2802310c930396 \
+    --hash=sha256:444dcda765c8a838eaae23112db52f1efaf750daddb2d9ca300bcae1039adc5c \
+    --hash=sha256:ad10d3ded218f1039f11a75f8091880239651b52e9bb592ca27de44eed242a48 \
+    --hash=sha256:c0ef13eaeee5b615fb07c9a7dadb38eac06a0608b41570d8ade51c56539e509d \
+    --hash=sha256:e17c96c14e19278594aa4841ec148115f9c7615a47382ecb6b82bd8fea3ab0c8 \
+    --hash=sha256:ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0
+mcp==1.28.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2726bca5e7193f61c5dde8b12500a6de2d9acf6d1a1c0be9e8c2e706437991df \
+    --hash=sha256:d51e36a5f5644faea4f85ea649bfffa6bc6c26770d42798ad6a3de3d2ba69683
+mdurl==0.1.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8 \
+    --hash=sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba
+more-itertools==10.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:52d4362373dcf7c52546bc4af9a86ee7c4579df9a8dc268be0a2f949d376cc9b \
+    --hash=sha256:f638ddf8a1a0d134181275fb5d58b086ead7c6a72429ad725c67503f13ba30bd
+multidict==6.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:123e2a72e20537add2f33a79e605f6191fba2afda4cbb876e35c1a7074298a7d \
+    --hash=sha256:171b73bd4ee683d307599b66793ac80981b06f069b62eea1c9e29c9241aa66b0 \
+    --hash=sha256:18706cc31dbf402a7945916dd5cddf160251b6dab8a2c5f3d6d5a55949f676b3 \
+    --hash=sha256:394fc5c42a333c9ffc3e421a4c85e08580d990e08b99f6bf35b4132114c5dcb3 \
+    --hash=sha256:3e8bfdd0e487acf992407a140d2589fe598238eaeffa3da8448d63a63cd363f8 \
+    --hash=sha256:94218fcec4d72bc61df51c198d098ce2b378e0ccbac41ddbed5ef44092913288 \
+    --hash=sha256:9fe04da3f79387f450fd0061d4dd2e45a72749d31bf634aecc9e27f24fdc4b3f \
+    --hash=sha256:9ff96e8815eecacc6645da76c413eb3b3d34cfca256c70b16b286a687d013c32 \
+    --hash=sha256:c6e99d9a65ca282e578dfea819cfa9c0a62b2499d8677392e09feaf305e9e6f5 \
+    --hash=sha256:caf53b15b1b7df9fbd0709aa01409000a2b4dd03a5f6f5cc548183c7c8f8b63c \
+    --hash=sha256:d1bed1b467ef657f2a0ae62844a607909ef1c6889562de5e1d505f74457d0b96 \
+    --hash=sha256:f0feece2ef8ebc42ed9e2e8c78fc4aa3cf455733b507c09ef7406364c94376c6
+oauthlib==3.3.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0f0f8aa759826a193cf66c12ea1af1637f87b9b4622d46e866952bb022e538c9 \
+    --hash=sha256:88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1
+ollama==0.6.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:534511b3ccea2dff419ae06c3b58d7f217c55be7897c8ce5868dfb6b219cf7a0 \
+    --hash=sha256:da2b2d846b5944cfbcee1ca1e6ee0585f6c9d45a2fe9467cbcd096a37383da2f
+openai==2.33.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:03ac37d70e8c9e3a8124214e3afa785e2cbc12e627fbd98177a086ef2fd87ad5 \
+    --hash=sha256:f850c435e2a4685bba3295bd54912dd26315d9c1b7733068186134d6e0599f9a
+openapi-pydantic==0.5.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:a3a09ef4586f5bd760a8df7f43028b60cafb6d9f61de2acba9574766255ab146 \
+    --hash=sha256:ff6835af6bde7a459fb93eb93bb92b8749b754fc6e51b2f1590a19dc3005ee0d
+opentelemetry-api==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2edd8463432a7f8443edce90972169b195e7d6a05500cd29e6d13898187c9950 \
+    --hash=sha256:fbde8c80e1b937a2c61f20347e91c0c18a1940cecf012d62e65a7caf08967c9c
+opentelemetry-exporter-otlp-proto-common==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:08f8a5862d64cc3435105686d0216c1365dc5701f86844a8cd56597d0c764fde \
+    --hash=sha256:763370d4737a59741c89a67b50f9e39271639ee4afc999dadfe768541c027464
+opentelemetry-exporter-otlp-proto-grpc==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:772eb1c9287485d625e4dbe9c879898e5253fea111d9181140f51291b5fec3ad \
+    --hash=sha256:fa1c136a05c7e9b4c09f739469cbdb927ea20b34088ab1d959a849b5cc589c18
+opentelemetry-exporter-otlp-proto-http==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:31bdab9745c709ce90a49a0624c2bd445d31a28ba34275951a6a362d16a0b9cb \
+    --hash=sha256:d9f5207183dd752a412c4cd564ca8875ececba13be6e9c6c370ffb752fd59985
+opentelemetry-instrumentation==0.60b1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:04480db952b48fb1ed0073f822f0ee26012b7be7c3eac1a3793122737c78632d \
+    --hash=sha256:57ddc7974c6eb35865af0426d1a17132b88b2ed8586897fee187fd5b8944bd6a
+opentelemetry-instrumentation-threading==0.60b1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:20b18a68abe5801fa9474336b7c27487d4af3e00b66f6a8734e4fdd75c8b0b43 \
+    --hash=sha256:92a52a60fee5e32bc6aa8f5acd749b15691ad0bc4457a310f5736b76a6d9d1de
+opentelemetry-proto==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:22cdc78efd3b3765d09e68bfbd010d4fc254c9818afd0b6b423387d9dee46007 \
+    --hash=sha256:6c8e05144fc0d3ed4d22c2289c6b126e03bcd0e6a7da0f16cedd2e1c2772e2c8
+opentelemetry-sdk==1.39.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4d5482c478513ecb0a5d938dcc61394e647066e0cc2676bee9f3af3f3f45f01c \
+    --hash=sha256:cf4d4563caf7bff906c9f7967e2be22d0d6b349b908be0d90fb21c8e9c995cc6
+opentelemetry-semantic-conventions==0.60b1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:87c228b5a0669b748c76d76df6c364c369c28f1c465e50f661e39737e84bc953 \
+    --hash=sha256:9fa8c8b0c110da289809292b0591220d3a7b53c1526a23021e977d68597893fb
+opentelemetry-semantic-conventions-ai==0.4.13 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:883a30a6bb5deaec0d646912b5f9f6dcbb9f6f72557b73d0f2560bf25d13e2d5 \
+    --hash=sha256:94efa9fb4ffac18c45f54a3a338ffeb7eedb7e1bb4d147786e77202e159f0036
+orjson==3.11.7 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1eb80451a9c351a71dfaf5b7ccc13ad065405217726b59fdbeadbcc544f9d223 \
+    --hash=sha256:4682d1db3bcebd2b64757e0ddf9e87ae5f00d29d16c5cdf3a62f561d08cc3dd2 \
+    --hash=sha256:962d046ee1765f74a1da723f4b33e3b228fe3a48bd307acce5021dfefe0e29b2 \
+    --hash=sha256:9b1a67243945819ce55d24a30b59d6a168e86220452d2c96f4d1f093e71c0c49 \
+    --hash=sha256:a12b80df61aab7b98b490fe9e4879925ba666fccdfcd175252ce4d9035865ace \
+    --hash=sha256:a56df3239294ea5964adf074c54bcc4f0ccd21636049a2cf3ca9cf03b5d03cf1 \
+    --hash=sha256:e7745312efa9e11c17fbd3cb3097262d079da26930ae9ae7ba28fb738367cbad
+packaging==26.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79 \
+    --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+pathable==0.4.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:5ae9e94793b6ef5a4cbe0a7ce9dbbefc1eec38df253763fd0aeeacf2762dbbc2 \
+    --hash=sha256:6905a3cd17804edfac7875b5f6c9142a218c7caef78693c2dbbbfbac186d88b2
+pfzy==0.3.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:5f50d5b2b3207fa72e7ec0ef08372ef652685470974a107d0d4999fc5a903a96 \
+    --hash=sha256:717ea765dd10b63618e7298b2d98efd819e0b30cd5905c9707223dceeb94b3f1
+pillow==12.3.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0847a763afefb695bc912d7c131e7e0632d4edc1d8698f58ddabec8e46b8b6d3 \
+    --hash=sha256:0dd2064cbc55aaec028ef5fbb60fa47bb6c3e7918e07ff17935284b227a9d2df \
+    --hash=sha256:23aceaa007d6172b02c277f0cd359c79492bbb14f7072b4ede9fbcaf20648130 \
+    --hash=sha256:251bf95b67017e27b13d82f5b326234ca62d70f9cf4c2b9032de2358a3b12c7b \
+    --hash=sha256:30f2aa603c41533cc25c05acd0da21636e84a315768feb631c937177db558931 \
+    --hash=sha256:3b8182a766685eaa002637e28b4ec8d6b18819a0c71f579bf0dbaa5830297cce \
+    --hash=sha256:4998562bf62a445225f22e07c896bb04b35b1b1f2eb6d760584c9c51d7a5f78c \
+    --hash=sha256:6b02afb9b97f65fbca5f31db6a2a3ba21aa93030225f150fa3f249717e938fb4 \
+    --hash=sha256:756c768d0c9c2955feb7a56c37ea24aea2e369f8d36a88da270b6a9f19e62b5e \
+    --hash=sha256:78cb2c6865a35ab8ff8b75fd122f6033b92a62c82801110e48ddd6c936a45d91 \
+    --hash=sha256:a45650e8ce7fafffd731db8550230db6b0d306d181a90b67d3e6bca2f1990930 \
+    --hash=sha256:ae26d61dfa7a47befdc7572b521024e8745f3d809bd95ca9505a7bba9ef849ec \
+    --hash=sha256:bf16ba1b4d0b6b7c8e534936632270cf70eb00dbe09005bc345b2677b726855c \
+    --hash=sha256:cf1845d02ad822a369a49f2bb9345b1614744267682e7a03527dc3bf6eea1777 \
+    --hash=sha256:e795b7eb908249c4e43c7c99fac7c2c75dab0c43566e37db472a355f63693d71 \
+    --hash=sha256:f13c32a3abd6079a66d9526e18dad9b6d280384d49d7c54040cd57b6424041d9
+platformdirs==4.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:abd01743f24e5287cd7a5db3752faf1a2d65353f38ec26d98e25a6db65958c85 \
+    --hash=sha256:ca753cf4d81dc309bc67b0ea38fd15dc97bc30ce419a7f58d13eb3bf14c4febf
+portalocker==2.10.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:53a5984ebc86a025552264b459b46a2086e269b21823cb572f8f28ee759e45bf \
+    --hash=sha256:ef1bf844e878ab08aee7e40184156e1151f228f103aa5c6bd0724cc330960f8f
+posthog==6.7.7 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:bf8187ce8e6da33d5c122ee03a759efa8f181630380260526294454dab0c8bab \
+    --hash=sha256:ffb7bac388f66e5c9e2e3d6028572386ad3c98bba7a9a4669db05b10ac23357a
+prompt-toolkit==3.0.52 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:28cde192929c8e7321de85de1ddbe736f1375148b02f2e17edd840042b1be855 \
+    --hash=sha256:9aac639a3bbd33284347de5ad8d68ecc044b91a762dc39b7c21095fcd6a19955
+propcache==0.4.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:15932ab57837c3368b024473a525e25d316d8353016e7cc0e5ba9eb343fbb1cf \
+    --hash=sha256:35c3277624a080cc6ec6f847cbbbb5b49affa3598c4535a0a4682a697aaa5c75 \
+    --hash=sha256:4c3c70630930447f9ef1caac7728c8ad1c56bc5015338b20fed0d08ea2480b3a \
+    --hash=sha256:6f8b465489f927b0df505cbe26ffbeed4d6d8a2bbc61ce90eb074ff129ef0ab1 \
+    --hash=sha256:8326e144341460402713f91df60ade3c999d601e7eb5ff8f6f7862d54de0610d \
+    --hash=sha256:9a0bd56e5b100aef69bd8562b74b46254e7c8812918d3baa700c8a8009b0af66 \
+    --hash=sha256:a78372c932c90ee474559c5ddfffd718238e8673c340dc21fe45c5b8b54559a0 \
+    --hash=sha256:ab2943be7c652f09638800905ee1bab2c544e537edb57d527997a24c13dc1455 \
+    --hash=sha256:af2a6052aeb6cf17d3e46ee169099044fd8224cbaf75c76a2ef596e8163e2237 \
+    --hash=sha256:c9b822a577f560fbd9554812526831712c1436d2c046cedee4c3796d3543b144 \
+    --hash=sha256:d472aeb4fbf9865e0c6d622d7f4d54a4e101a89715d8904282bb5f9a2f476c3f \
+    --hash=sha256:f48107a8c637e80362555f37ecf49abe20370e557cc4ab374f04ec4423c97c3d
+proto-plus==1.26.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:13285478c2dcf2abb829db158e1047e2f1e8d63a077d94263c2b88b043c75a66 \
+    --hash=sha256:21a515a4c4c0088a773899e23c7bbade3d18f9c66c73edd4c7ee3816bc96a012
+protobuf==6.33.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:69915a973dd0f60f31a08b8318b73eab2bd6a392c79184b3612226b0a3f8ec02 \
+    --hash=sha256:6ddcac2a081f8b7b9642c09406bc6a4290128fce5f471cddd165960bb9119e5c \
+    --hash=sha256:cbf16ba3350fb7b889fca858fb215967792dc125b35c7976ca4818bee3521cf0
+psutil==7.2.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0746f5f8d406af344fd547f1c8daa5f5c33dbc293bb8d6a16d80b4bb88f59372 \
+    --hash=sha256:076a2d2f923fd4821644f5ba89f059523da90dc9014e85f8e45a5774ca5bc6f9 \
+    --hash=sha256:1a571f2330c966c62aeda00dd24620425d4b0cc86881c89861fbc04549e5dc63 \
+    --hash=sha256:1fa4ecf83bcdf6e6c8f4449aff98eefb5d0604bf88cb883d7da3d8d2d909546a \
+    --hash=sha256:b58fabe35e80b264a4e3bb23e6b96f9e45a3df7fb7eed419ac0e5947c61e47cc
+py-key-value-aio==0.4.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:18e17564ecae61b987f909fc2cd41ee2012c84b4b1dcb8c055cf8b4bc1bf3f5d \
+    --hash=sha256:e3012e6243ed7cc09bb05457bd4d03b1ba5c2b1ca8700096b3927db79ffbbe55
+pyasn1==0.6.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81 \
+    --hash=sha256:deda9277cfd454080ec40b207fb6df82206a3a2688735233cdcd8d3d565f088b
+pyasn1-modules==0.4.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a \
+    --hash=sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6
+pycparser==2.23 ; implementation_name != 'PyPy' and platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and sys_platform == 'linux' \
+    --hash=sha256:78816d4f24add8f10a06d6f05b4d424ad9e96cfebf68a4ddc99c65c0720d00c2 \
+    --hash=sha256:e5c6e8d3fbad53479cab09ac03729e0a9faf2bee3db8208a550daf5af81a5934
+pydantic==2.12.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4d351024c75c0f085a9febbb665ce8c0c6ec5d30e903bdb6394b7ede26aebb49 \
+    --hash=sha256:e561593fccf61e8a20fc46dfc2dfe075b8be7d0188df33f221ad1f0139180f9d
+pydantic-core==2.41.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:08daa51ea16ad373ffd5e7606252cc32f07bc72b28284b6bc9c6df804816476e \
+    --hash=sha256:22f0fb8c1c583a3b6f24df2470833b40207e907b90c928cc8d3594b76f874375 \
+    --hash=sha256:2a5e06546e19f24c6a96a129142a75cee553cc018ffee48a460059b1185f4470 \
+    --hash=sha256:2ff4321e56e879ee8d2a879501c8e469414d948f4aba74a2d4593184eb326660 \
+    --hash=sha256:406bf18d345822d6c21366031003612b9c77b3e29ffdb0f612367352aab7d586 \
+    --hash=sha256:76d0819de158cd855d1cbb8fcafdf6f5cf1eb8e470abe056d5d161106e38062b \
+    --hash=sha256:915c3d10f81bec3a74fbd4faebe8391013ba61e5a1a8d48c4455b923bdda7858 \
+    --hash=sha256:bfea2a5f0b4d8d43adf9d7b8bf019fb46fdd10a2e5cde477fbcb9d1fa08c68e1 \
+    --hash=sha256:e56ba91f47764cc14f1daacd723e3e82d1a89d783f0f5afe9c364b8bb491ccdb \
+    --hash=sha256:eceb81a8d74f9267ef4081e246ffd6d129da5d87e37a77c9bde550cb04870c1c
+pydantic-settings==2.11.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:d0e87a1c7d33593beb7194adb8470fc426e95ba02af83a0f23474a04c9a08180 \
+    --hash=sha256:fe2cea3413b9530d10f3a5875adffb17ada5c1e1bab0b2885546d7310415207c
+pygments==2.20.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f \
+    --hash=sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176
+pyjwt==2.14.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:77283c83fb56ecf566a886c757a714bc83668e38156de2cce8263302f42e0b86 \
+    --hash=sha256:ad0cef71c756a56e74863c2919cf0985f72decbcfcb550ee2f422e7c62b5eedc
+pyobjc==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:903f822cba40be53d408b8eaf834514937ec0b4e6af1c5ecc24fcb652812dd85 \
+    --hash=sha256:a71b14389657811d658526ba4d5faba4ef7eadbddcf9fe8bf4fb3a6261effba3
+pyobjc-core==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b63d4d90c5df7e762f34739b39cc55bc63dbcf9fb2fb3f2671e528488c7a87fe
+pyobjc-framework-accessibility==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c0fa5f1e00906ec002f582c7d3d80463a46d19f672bf5ec51144f819eeb40656
+pyobjc-framework-accounts==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:384fec156e13ff75253bb094339013f4013464f6dfd47e2f7de3e2ae7441c030 \
+    --hash=sha256:9c3fe342be7b8e73cba735e5a38affbe349cf8bc19091aa4fd788eabf2074b72
+pyobjc-framework-addressbook==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ce2db3be4a3128bf79d5c41319a6d16b73754785ce75ac694d0d658c690922fc
+pyobjc-framework-adservices==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:1744f59a75b2375e139c39f3e85658e62cd10cc0f12b158a80421f18734e9ffc \
+    --hash=sha256:44c72f8163705c9aa41baca938fdb17dde257639e5797e6a5c3a2b2d8afdade9
+pyobjc-framework-adsupport==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:78b9667c275785df96219d205bd4309731869c3298d0931e32aed83bede29096 \
+    --hash=sha256:c3e009612778948910d3a7135b9d77b9b7c06aab29d40957770834c083acf825
+pyobjc-framework-applescriptkit==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:477707352eaa6cc4a5f8c593759dc3227a19d5958481b1482f0d59394a4601c3 \
+    --hash=sha256:e22cbc9d1a25a4a713f21aa94dd017c311186b02062fc7ffbde3009495fb0067
+pyobjc-framework-applescriptobjc==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ac22526fd1f0a3b07ac1d77f90046b77f10ec9549182114f2428ee1e96d3de2b \
+    --hash=sha256:c8a0ec975b64411a4f16a1280c5ea8dbe949fd361e723edd343102f0f95aba6e
+pyobjc-framework-applicationservices==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:03fcd8c0c600db98fa8b85eb7b3bc31491701720c795e3f762b54e865138bbaf
+pyobjc-framework-apptrackingtransparency==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:796cc5f83346c10973806cfb535d4200b894a5d2626ff2eeb1972d594d14fed4 \
+    --hash=sha256:e25c3eae25d24ee8b523b7ecc4d2b07af37c7733444b80c4964071dea7b0cb19
+pyobjc-framework-audiovideobridging==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:12756b3aa35083b8ad5c9139b6a0e2f4792e217096b5bf6b702d499038203991
+pyobjc-framework-authenticationservices==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8fd801cdb53d426b4e678b0a8529c005d0c44f5a17ccd7052a7c3a1a87caed6a
+pyobjc-framework-automaticassessmentconfiguration==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:70eadbf8600101901a56fcd7014d8941604e14f3b3728bc4fb0178a9a9420032
+pyobjc-framework-automator==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9b46c55a4f9ae2b3c39ff560f42ced66bdd18c093188f0b5fc4060ad911838e4
+pyobjc-framework-avfoundation==11.1 ; platform_machine == 'x86_64' and platform_release >= '11.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6663056cc6ca49af8de6d36a7fff498f51e1a9a7f1bde7afba718a8ceaaa7377
+pyobjc-framework-avkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:d948204a7b94e0e878b19a909f9b33342e19d9ea519571d66a21fce8f72e3263
+pyobjc-framework-avrouting==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:7db1291d9f53cc58d34b2a826feb721a85f50ceb5e71952e8762baacd3db3fc0
+pyobjc-framework-backgroundassets==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:2e14b50539d96d5fca70c49f21b69fdbad81a22549e3630f5e4f20d5c0204fc2
+pyobjc-framework-browserenginekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '23.4' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:918440cefb10480024f645169de3733e30ede65e41267fa12c7b90c264a0a479
+pyobjc-framework-businesschat==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:69589d2f0cb4e7892e5ecc6aed79b1abd1ec55c099a7faacae6a326bc921259d \
+    --hash=sha256:7fdc1219b988ce3ae896bffd01f547c06cec3b4e4b2d0aa04d251444d7f1c2db
+pyobjc-framework-calendarstore==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:858ee00e6a380d9c086c2d7db82c116a6c406234038e0ec8fc2ad02e385dc437 \
+    --hash=sha256:bf066e17392c978becf17a61863eb81727bf593a2bfdab261177126072557e24
+pyobjc-framework-callkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b84d5ea38dff0cbe0754f5f9f6f33c742e216f12e7166179a8ec2cf4b0bfca94
+pyobjc-framework-carbon==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:047f098535479efa3ab89da1ebdf3cf9ec0b439a33a4f32806193886e9fcea71 \
+    --hash=sha256:1bf66853e939315ad7ee968170b16dd12cb838c42b80dfcd5354687760998825
+pyobjc-framework-cfnetwork==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ad600163eeadb7bf71abc51a9b6f2b5462a018d3f9bb1510c5ce3fdf2f22959d
+pyobjc-framework-cinematic==11.1 ; platform_machine == 'x86_64' and platform_release >= '23.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b62c024c1a9c7890481bc2fdfaf0cd3c251a4a08357d57dc1795d98920fcdbd1 \
+    --hash=sha256:efde39a6a2379e1738dbc5434b2470cd187cf3114ffb81390b3b1abda470b382
+pyobjc-framework-classkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ee1e26395eb00b3ed5442e3234cdbfe925d2413185af38eca0477d7166651df4
+pyobjc-framework-cloudkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:40d2dc4bf28c5be9b836b01e4d267a15d847d756c2a65530e1fcd79b2825e86d \
+    --hash=sha256:c583e40c710cf85ebe34173d1d2995e832a20127edc8899b2f35b13f98498af1
+pyobjc-framework-cocoa==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:87df76b9b73e7ca699a828ff112564b59251bb9bbe72e610e670a4dc9940d038
+pyobjc-framework-collaboration==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:3629ea5b56c513fb330d43952afabb2df2a2ac2f9048b8ec6e8ab4486191390a \
+    --hash=sha256:4564e3931bfc51773623d4f57f2431b58a39b75cb964ae5c48d27ee4dde2f4ea
+pyobjc-framework-colorsync==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:7a346f71f34b2ccd1b020a34c219b85bf8b6f6e05283d503185aeb7767a269dd \
+    --hash=sha256:d19d6da2c7175a3896a63c9b40a8ab98ade0779a5b40062789681501c33efd5c
+pyobjc-framework-contacts==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:752036e7d8952a4122296d7772f274170a5f35a53ee6454a27f3e1d9603222cc
+pyobjc-framework-contactsui==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5bc29ea2b10a342018e1b96be6b140c10ebe3cfb6417278770feef5e88026a1f
+pyobjc-framework-coreaudio==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b7b89540ae7efc6c1e3208ac838ef2acfc4d2c506dd629d91f6b3b3120e55c1b
+pyobjc-framework-coreaudiokit==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:0b461c3d6123fda4da6b6aaa022efc918c1de2e126a5cf07d2189d63fa54ba40
+pyobjc-framework-corebluetooth==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:1deba46e3fcaf5e1c314f4bbafb77d9fe49ec248c493ad00d8aff2df212d6190
+pyobjc-framework-coredata==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:fe9fd985f8e06c70c0fb1e6bbea5b731461f9e76f8f8d8e89c7c72667cdc6adf
+pyobjc-framework-corehaptics==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8f8c47ccca5052d07f95d2f35e6e399c5ac1f2072ba9d9eaae902edf4e3a7af4 \
+    --hash=sha256:e5da3a97ed6aca9b7268c8c5196c0a339773a50baa72d1502d3435dc1a2a80f1
+pyobjc-framework-corelocation==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:46a67b99925ee3d53914331759c6ee110b31bb790b74b05915acfca41074c206
+pyobjc-framework-coremedia==11.1 ; platform_machine == 'x86_64' and platform_release >= '11.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:82cdc087f61e21b761e677ea618a575d4c0dbe00e98230bf9cea540cff931db3
+pyobjc-framework-coremediaio==11.1 ; platform_machine == 'x86_64' and platform_release >= '11.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:bccd69712578b177144ded398f4695d71a765ef61204da51a21f0c90b4ad4c64
+pyobjc-framework-coremidi==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:095030c59d50c23aa53608777102bc88744ff8b10dfb57afe24b428dcd12e376
+pyobjc-framework-coreml==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:775923eefb9eac2e389c0821b10564372de8057cea89f1ea1cdaf04996c970a7
+pyobjc-framework-coremotion==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5884a568521c0836fac39d46683a4dea3d259a23837920897042ffb922d9ac3e
+pyobjc-framework-coreservices==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:cf8eb5e272c60a96d025313eca26ff2487dcd02c47034cc9db39f6852d077873
+pyobjc-framework-corespotlight==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:4dd363c8d3ff7619659b63dd31400f135b03e32435b5d151459ecdacea14e0f2
+pyobjc-framework-coretext==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a29bbd5d85c77f46a8ee81d381b847244c88a3a5a96ac22f509027ceceaffaf6
+pyobjc-framework-corewlan==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:4a8afea75393cc0a6fe696e136233aa0ed54266f35a47b55a3583f4cb078e6ce
+pyobjc-framework-cryptotokenkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5f82f44d9ab466c715a7c8ad4d5ec47c68aacd78bd67b5466a7b8215a2265328
+pyobjc-framework-datadetection==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5afd3dde7bba3324befb7a3133c9aeaa5088efd72dccc0804267a74799f4a12f \
+    --hash=sha256:cbe0080b51e09b2f91eaf2a9babec3dcf2883d7966bc0abd8393ef7abfcfc5db
+pyobjc-framework-devicecheck==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8b05973eb2673571144d81346336e749a21cec90bd7fcaade76ffd3b147a0741 \
+    --hash=sha256:8edb36329cdd5d55e2c2c57c379cb5ba1f500f74a08fe8d2612b1a69b7a26435
+pyobjc-framework-devicediscoveryextension==11.1 ; platform_machine == 'x86_64' and platform_release >= '24.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:96e5b13c718bd0e6c80fbd4e14b8073cffc88b3ab9bb1bbb4dab7893a62e4f11 \
+    --hash=sha256:ae160ea40f25d3ee5e7ce80ac9c1b315f94d0a4c7ccb86920396f71c6bf799a0
+pyobjc-framework-dictionaryservices==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:39c24452d0ddd037afeb73a1742614c94535f15b1c024a8a6cc7ff081e1d22e7 \
+    --hash=sha256:92f4871066653f18e2394ac93b0a2ab50588d60020f6b3bd93e97b67cd511326
+pyobjc-framework-discrecording==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:37585458e363b20bb28acdb5cc265dfca934d8a07b7baed2584953c11c927a87
+pyobjc-framework-discrecordingui==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:33233b87d7b85ce277a51d27acca0f5b38485cf1d1dc8e28a065910047766ee2 \
+    --hash=sha256:a9f10e2e7ee19582c77f0755ae11a64e3d61c652cbd8a5bf52756f599be24797
+pyobjc-framework-diskarbitration==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6a8e551e54df481a9081abba6fd680f6633babe5c7735f649731b22896bb6f08 \
+    --hash=sha256:a933efc6624779a393fafe0313e43378bcae2b85d6d15cff95ac30048c1ef490
+pyobjc-framework-dvdplayback==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6094e4651ea29540ac817294b27e1596b9d1883d30e78fb5f9619daf94ed30cb \
+    --hash=sha256:b44c36a62c8479e649133216e22941859407cca5796b5f778815ef9340a838f4
+pyobjc-framework-eventkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5643150f584243681099c5e9435efa833a913e93fe9ca81f62007e287349b561 \
+    --hash=sha256:c303207610d9c742f4090799f60103cede466002f3c89cf66011c8bf1987750b
+pyobjc-framework-exceptionhandling==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:31e6538160dfd7526ac0549bc0fce5d039932aea84c36abbe7b49c79ffc62437 \
+    --hash=sha256:e010f56bf60ab4e9e3225954ebb53e9d7135d37097043ac6dd2a3f35770d4efa
+pyobjc-framework-executionpolicy==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:3280ad2f4c5eaf45901f310cee0c52db940c0c63e959ad082efb8df41055d986 \
+    --hash=sha256:7d4141e572cb916e73bb34bb74f6f976a8aa0a396a0bffd1cf66e5505f7c76c8
+pyobjc-framework-extensionkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c114a96f13f586dbbab8b6219a92fa4829896a645c8cd15652a6215bc8ff5409
+pyobjc-framework-externalaccessory==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:50887e948b78a1d94646422c243ac2a9e40761675e38b9184487870a31e83371
+pyobjc-framework-fileprovider==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:748ca1c75f84afdf5419346a24bf8eec44dca071986f31f00071dc191b3e9ca8
+pyobjc-framework-fileproviderui==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:162a23e67f59e1bb247e84dda88d513d7944d815144901a46be6fe051b6c7970 \
+    --hash=sha256:f2765f114c2f4356aa41fb45c621fa8f0a4fae0b6d3c6b1a274366f5fe7fe829
+pyobjc-framework-findersync==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:692364937f418f0e4e4abd395a09a7d4a0cdd55fd4e0184de85ee59642defb6e \
+    --hash=sha256:c72b0fd8b746b99cfa498da36c5bb333121b2080ad73fa8cbea05cd47db1fa82
+pyobjc-framework-fsevents==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:d29157d04124503c4dfa9dcbbdc8c34d3bab134d3db3a48d96d93f26bd94c14d
+pyobjc-framework-fskit==11.1 ; platform_machine == 'x86_64' and platform_release >= '24.4' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9ded1eab19b4183cb04381e554bbbe679c1213fd58599d6fc6e135e93b51136f
+pyobjc-framework-gamecenter==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a1c4ed54e11a6e4efba6f2a21ace92bcf186e3fe5c74a385b31f6b1a515ec20c
+pyobjc-framework-gamecontroller==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:4d5346faf90e1ebe5602c0c480afbf528a35a7a1ad05f9b49991fdd2a97f105b
+pyobjc-framework-gamekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9b8db075da8866c4ef039a165af227bc29393dc11a617a40671bf6b3975ae269
+pyobjc-framework-gameplaykit==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9ae2bee69b0cc1afa0e210b4663c7cdbb3cc94be1374808df06f98f992e83639
+pyobjc-framework-healthkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:20f59bd9e1ffafe5893b4eff5867fdfd20bd46c3d03bc4009219d82fc6815f76
+pyobjc-framework-imagecapturecore==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a610ceb6726e385b132a1481a68ce85ccf56f94667b6d6e1c45a2cfab806a624
+pyobjc-framework-inputmethodkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:7037579524041dcee71a649293c2660f9359800455a15e6a2f74a17b46d78496
+pyobjc-framework-installerplugins==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:363e59c7e05553d881f0facd41884f17b489ff443d7856e33dd0312064c746d9 \
+    --hash=sha256:f92b06c9595f3c800b7aabf1c1a235bfb4b2de3f5406d5f604d8e2ddd0aecb4e
+pyobjc-framework-instantmessage==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a70b716e279135eec5666af031f536c0f32dec57cfeae55cc9ff8457f10d4f3d \
+    --hash=sha256:c222aa61eb009704b333f6e63df01a0e690136e7e495907e5396882779bf9525
+pyobjc-framework-intents==11.1 ; platform_machine == 'x86_64' and platform_release >= '16.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:13185f206493f45d6bd2d4903c2136b1c4f8b9aa37628309ace6ff4a906b4695
+pyobjc-framework-intentsui==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c8182155af4dce369c18d6e6ed9c25bbd8110c161ed5f1b4fb77cf5cdb99d135
+pyobjc-framework-iobluetooth==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:094fd4be60cd1371b17cb4b33a3894e0d88a11b36683912be0540a7d51de76f1
+pyobjc-framework-iobluetoothui==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:060c721f1cd8af4452493e8153b72b572edcd2a7e3b635d79d844f885afee860 \
+    --hash=sha256:3c5a382d81f319a1ab9ab11b7ead04e53b758fdfeb604755d39c3039485eaac6
+pyobjc-framework-iosurface==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:0c36ad56f8ec675dd07616418a2bc29126412b54627655abd21de31bcafe2a79 \
+    --hash=sha256:a468b3a31e8cd70a2675a3ddc7176ab13aa521c035f11188b7a3af8fff8b148b
+pyobjc-framework-ituneslibrary==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:4e87d41f82acb6d98cf70ac3c932a568ceb3c2035383cbf177f54e63de6b815f \
+    --hash=sha256:e2212a9340e4328056ade3c2f9d4305c71f3f6af050204a135f9fa9aa3ba9c5e
+pyobjc-framework-kernelmanagement==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:e934d1638cd89e38d6c6c5d4d9901b4295acee2d39cbfe0bd91aae9832961b44 \
+    --hash=sha256:ec74690bd3383a7945c4a038cc4e1553ec5c1d2408b60e2b0003a3564bff7c47
+pyobjc-framework-latentsemanticmapping==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:57f3b183021759a100d2847a4d8aa314f4033be3d2845038b62e5e823d96e871 \
+    --hash=sha256:c6c3142301e4d375c24a47dfaeebc2f3d0fc33128a1c0a755794865b9a371145
+pyobjc-framework-launchservices==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:80b55368b1e208d6c2c58395cc7bc12a630a2a402e00e4930493e9bace22b7bb \
+    --hash=sha256:8b58f1156651058b2905c87ce48468f4799db86a7edf760e1897fedd057a3908
+pyobjc-framework-libdispatch==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:11a704e50a0b7dbfb01552b7d686473ffa63b5254100fdb271a1fe368dd08e87
+pyobjc-framework-libxpc==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8fd7468aa520ff19915f6d793070b84be1498cb87224bee2bad1f01d8375273a
+pyobjc-framework-linkpresentation==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:018093469d780a45d98f4e159f1ea90771caec456b1599abcc6f3bf3c6873094 \
+    --hash=sha256:a785f393b01fdaada6d7d6d8de46b7173babba205b13b44f1dc884b3695c2fc9
+pyobjc-framework-localauthentication==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:3cd48907c794bd414ac68b8ac595d83c7e1453b63fc2cfc2d2035b690d31eaa1
+pyobjc-framework-localauthenticationembeddedui==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:22baf3aae606e5204e194f02bb205f244e27841ea7b4a4431303955475b4fa56 \
+    --hash=sha256:3539a947b102b41ea6e40e7c145f27280d2f36a2a9a1211de32fa675d91585eb
+pyobjc-framework-mailkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8e6026462567baba194468e710e83787f29d9e8c98ea0583f7b401ea9515966e \
+    --hash=sha256:bf97dc44cb09b9eb9d591660dc0a41f077699976144b954caa4b9f0479211fd7
+pyobjc-framework-mapkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:f3a5016f266091be313a118a42c0ea4f951c399b5259d93639eb643dacc626f1
+pyobjc-framework-mediaaccessibility==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:52479a998fec3d079d2d4590a945fc78c41fe7ac8c76f1964c9d8156880565a4 \
+    --hash=sha256:cd07e7fc375ff1e8d225e0aa2bd9c2c1497a4d3aa5a80bfb13b08800fcd7f034
+pyobjc-framework-mediaextension==11.1 ; platform_machine == 'x86_64' and platform_release >= '24.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:85a1c8a94e9175fb364c453066ef99b95752343fd113f08a3805cad56e2fa709
+pyobjc-framework-medialibrary==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:102f4326f789734b7b2dfe689abd3840ca75a76fb8058bd3e4f85398ae2ce29d \
+    --hash=sha256:779be84bd280f63837ce02028ca46b41b090902aa4205887ffd5777f49377669
+pyobjc-framework-mediaplayer==11.1 ; platform_machine == 'x86_64' and platform_release >= '16.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b655cf537ea52d73209eb12935a047301c30239b318a366600f0f44335d51c9a \
+    --hash=sha256:d07a634b98e1b9eedd82d76f35e616525da096bd341051ea74f0971e0f2f2ddd
+pyobjc-framework-mediatoolbox==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:97834addc5179b3165c0d8cd74cc97ad43ed4c89547724216426348aca3b822a
+pyobjc-framework-metal==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:f9fd3b7574a824632ee9b7602973da30f172d2b575dd0c0f5ef76b44cfe9f6f9
+pyobjc-framework-metalfx==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:555c1b895d4ba31be43930f45e219a5d7bb0e531d148a78b6b75b677cc588fd8
+pyobjc-framework-metalkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8811cd81ee9583b9330df4f2499a73dcc53f3359cb92767b409acaec9e4faa1e
+pyobjc-framework-metalperformanceshaders==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8a312d090a0f51651e63d9001e6cc7c1aa04ceccf23b494cbf84b7fd3d122071
+pyobjc-framework-metalperformanceshadersgraph==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9b8b014e8301c2ae608a25f73bbf23c8f3f73a6f5fdbafddad509a21b84df681 \
+    --hash=sha256:d25225aab4edc6f786b29fe3d9badc4f3e2d0caeab1054cd4f224258c1b6dbe2
+pyobjc-framework-metrickit==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a79d37575489916c35840e6a07edd958be578d3be7a3d621684d028d721f0b85
+pyobjc-framework-mlcompute==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:975150725e919f8d3d33f830898f3cd2fd19a440999faab320609487f4eae19d \
+    --hash=sha256:f6c4c3ea6a62e4e3927abf9783c40495aa8bb9a8c89def744b0822da58c2354b
+pyobjc-framework-modelio==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:fad0fa2c09d468ac7e49848e144f7bbce6826f2178b3120add8960a83e5bfcb7
+pyobjc-framework-multipeerconnectivity==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a3dacca5e6e2f1960dd2d1107d98399ff81ecf54a9852baa8ec8767dbfdbf54b
+pyobjc-framework-naturallanguage==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:65a780273d2cdd12a3fa304e9c9ad822cb71facd9281f1b35a71640c53826f7c \
+    --hash=sha256:ab1fc711713aa29c32719774fc623bf2d32168aed21883970d4896e901ff4b41
+pyobjc-framework-netfs==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9c49f050c8171dc37e54d05dd12a63979c8b6b565c10f05092923a2250446f50 \
+    --hash=sha256:f202e8e0c2e73516d3eac7a43b1c66f9911cdbb37ea32750ed197d82162c994a
+pyobjc-framework-network==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:f6df7a58a1279bbc976fd7e2efe813afbbb18427df40463e6e2ee28fba07d2df
+pyobjc-framework-networkextension==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:2b74b430ca651293e5aa90a1e7571b200d0acbf42803af87306ac8a1c70b0d4b
+pyobjc-framework-notificationcenter==11.1 ; platform_machine == 'x86_64' and platform_release >= '14.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:0b938053f2d6b1cea9db79313639d7eb9ddd5b2a5436a346be0887e75101e717
+pyobjc-framework-opendirectory==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:319ac3424ed0350be458b78148914468a8fc13a069d62e7869e3079108e4f118 \
+    --hash=sha256:bb4219b0d98dff4a952c50a79b1855ce74e1defd0d241f3013def5b09256fd7b
+pyobjc-framework-osakit==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:1b0c0cc537ffb8a8365ef9a8b46f717a7cc2906414b6a3983777a6c0e4d53d5a \
+    --hash=sha256:920987da78b67578367c315d208f87e8fab01dd35825d72242909f29fb43c820
+pyobjc-framework-oslog==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:b2af409617e6b68fa1f1467c5a5679ebf59afd0cdc4b4528e1616059959a7979
+pyobjc-framework-passkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:d2408b58960fca66607b483353c1ffbd751ef0bef394a1853ec414a34029566f
+pyobjc-framework-pencilkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9c173e0fe70179feadc3558de113a8baad61b584fe70789b263af202bfa4c6be \
+    --hash=sha256:b7824907bbcf28812f588dda730e78f662313baf40befd485c6f2fcb49018019
+pyobjc-framework-phase==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a940d81ac5c393ae3da94144cf40af33932e0a9731244e2cfd5c9c8eb851e3fc \
+    --hash=sha256:cfa61f9c6c004161913946501538258aed48c448b886adbf9ed035957d93fa15
+pyobjc-framework-photos==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c8c3b25b14a2305047f72c7c081ff3655b3d051f7ed531476c03246798f8156d
+pyobjc-framework-photosui==11.1 ; platform_machine == 'x86_64' and platform_release >= '15.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:1c7ffab4860ce3e2b50feeed4f1d84488a9e38546db0bec09484d8d141c650df
+pyobjc-framework-preferencepanes==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6e4a55195ec9fc921e0eaad6b3038d0ab91f0bb2f39206aa6fccd24b14a0f1d8 \
+    --hash=sha256:6ee5f5a7eb294e03ea3bac522ac4b69e6dc83ceceff627a0a2d289afe1e01ad9
+pyobjc-framework-pushkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:540769a4aadc3c9f08beca8496fe305372501eb28fdbca078db904a07b8e10f4
+pyobjc-framework-quartz==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a57f35ccfc22ad48c87c5932818e583777ff7276605fef6afad0ac0741169f75
+pyobjc-framework-quicklookthumbnailing==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:1614dc108c1d45bbf899ea84b8691288a5b1d25f2d6f0c57dfffa962b7a478c3 \
+    --hash=sha256:4d1863c6c83c2a199c1dbe704b4f8b71287168f4090ed218d37dc59277f0d9c9
+pyobjc-framework-replaykit==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6919baa123a6d8aad769769fcff87369e13ee7bae11b955a8185a406a651061b
+pyobjc-framework-safariservices==11.1 ; platform_machine == 'x86_64' and platform_release >= '16.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:39a17df1a8e1c339457f3acbff0dc0eae4681d158f9d783a11995cf484aa9cd0
+pyobjc-framework-safetykit==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c6b44e0cf69e27584ac3ef3d8b771d19a7c2ccd9c6de4138d091358e036322d4
+pyobjc-framework-scenekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '11.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:82941f1e5040114d6e2c9fd35507244e102ef561c637686091b71a7ad0f31306
+pyobjc-framework-screencapturekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.4' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:11443781a30ed446f2d892c9e6642ca4897eb45f1a1411136ca584997fa739e0
+pyobjc-framework-screensaver==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:d5fbc9dc076cc574ead183d521840b56be0c160415e43cb8e01cfddd6d6372c2
+pyobjc-framework-screentime==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:50a4e4ab33d6643a52616e990aa1c697d5e3e8f9f9bdab8d631e6d42d8287b4f \
+    --hash=sha256:9bb8269456bbb674e1421182efe49f9168ceefd4e7c497047c7bf63e2f510a34
+pyobjc-framework-scriptingbridge==11.1 ; platform_machine == 'x86_64' and platform_release >= '9.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:604445c759210a35d86d3e0dfcde0aac8e5e3e9d9e35759e0723952138843699
+pyobjc-framework-searchkit==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:13a194eefcf1359ce9972cd92f2aadddf103f3efb1b18fd578ba5367dff3c10c \
+    --hash=sha256:9c9d6ca71cef637ccc3627225fb924a460b3d0618ed79bb0b3c12fcbe9270323
+pyobjc-framework-security==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:dabcee6987c6bae575e2d1ef0fcbe437678c4f49f1c25a4b131a5e960f31a2da
+pyobjc-framework-securityfoundation==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:25f2cf10f80c122f462e9d4d43efe9fd697299c194e0c357e76650e234e6d286 \
+    --hash=sha256:b3c4cf70735a93e9df40f3a14478143959c415778f27be8c0dc9ae0c5b696b92
+pyobjc-framework-securityinterface==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:e7aa6373e525f3ae05d71276e821a6348c53fec9f812b90eec1dbadfcb507bc9
+pyobjc-framework-securityui==11.1 ; platform_machine == 'x86_64' and platform_release >= '24.4' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:3cdb101b03459fcf8e4064b90021d06761003f669181e02f43ff585e6ba2403d \
+    --hash=sha256:e80c93e8a56bf89e4c0333047b9f8219752dd6de290681e9e2e2b2e26d69e92d
+pyobjc-framework-sensitivecontentanalysis==11.1 ; platform_machine == 'x86_64' and platform_release >= '23.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:5b310515c7386f7afaf13e4632d7d9590688182bb7b563f8026c304bdf317308 \
+    --hash=sha256:dbb78f5917f986a63878bb91263bceba28bd86fc381bad9461cf391646db369f
+pyobjc-framework-servicemanagement==11.1 ; platform_machine == 'x86_64' and platform_release >= '10.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:104f56557342a05ad68cd0c9daf63b7f4678957fe1f919f03a872f1607a50710 \
+    --hash=sha256:90a07164da49338480e0e135b445acc6ae7c08549a2037d1e512d2605fedd80a
+pyobjc-framework-sharedwithyou==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ece3a28a3083d0bcad0ac95b01f0eb699b9d2d0c02c61305bfd402678753ff6e
+pyobjc-framework-sharedwithyoucore==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:790050d25f47bda662a9f008b17ca640ac2460f2559a56b17995e53f2f44ed73
+pyobjc-framework-shazamkit==11.1 ; platform_machine == 'x86_64' and platform_release >= '21.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:c6e3c9ab8744d9319a89b78ae6f185bb5704efb68509e66d77bcd1f84a9446d6
+pyobjc-framework-social==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:ab5878c47d7a0639704c191cee43eeb259e09688808f0905c42551b9f79e1d57 \
+    --hash=sha256:fbc09d7b00dad45b547f9b2329f4dcee3f5a50e2348de1870de0bd7be853a5b7
+pyobjc-framework-soundanalysis==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:42cd25b7e0f343d8b59367f72b5dae96cf65696bdb8eeead8d7424ed37aa1434 \
+    --hash=sha256:6cf983c24fb2ad2aa5e7499ab2d30ff134d887fe91fd2641acf7472e546ab4e5
+pyobjc-framework-speech==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:d382977208c3710eacea89e05eae4578f1638bb5a7b667c06971e3d34e96845c
+pyobjc-framework-spritekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '13.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:914da6e846573cac8db5e403dec9a3e6f6edf5211f9b7e429734924d00f65108
+pyobjc-framework-storekit==11.1 ; platform_machine == 'x86_64' and platform_release >= '11.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:85acc30c0bfa120b37c3c5ac693fe9ad2c2e351ee7a1f9ea6f976b0c311ff164
+pyobjc-framework-symbols==11.1 ; platform_machine == 'x86_64' and platform_release >= '23.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:0e09b7813ef2ebdca7567d3179807444dd60f3f393202b35b755d4e1baf99982 \
+    --hash=sha256:1de6fc3af15fc8d5fd4869663a3250311844ec33e99ec8a1991a352ab61d641d
+pyobjc-framework-syncservices==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:0f141d717256b98c17ec2eddbc983c4bd39dfa00dc0c31b4174742e73a8447fe
+pyobjc-framework-systemconfiguration==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:f30ed0e9a8233fecb06522e67795918ab230ddcc4a18e15494eff7532f4c3ae1
+pyobjc-framework-systemextensions==11.1 ; platform_machine == 'x86_64' and platform_release >= '19.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:8ff9f0aad14dcdd07dd47545c1dd20df7a286306967b0a0232c81fcc382babe6
+pyobjc-framework-threadnetwork==11.1 ; platform_machine == 'x86_64' and platform_release >= '22.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:55021455215a0d3ad4e40152f94154e29062e73655558c5f6e71ab097d90083e \
+    --hash=sha256:73a32782f44b61ca0f8a4a9811c36b1ca1cdcf96c8a3ba4de35d8e8e58a86ad5
+pyobjc-framework-uniformtypeidentifiers==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:6e2e8ea89eb8ca03bc2bc8e506fff901e71d916276475c8d81fbf0280059cb4c \
+    --hash=sha256:86c499bec8953aeb0c95af39b63f2592832384f09f12523405650b5d5f1ed5e9
+pyobjc-framework-usernotifications==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:38fc763afa7854b41ddfca8803f679a7305d278af8a7ad02044adc1265699996
+pyobjc-framework-usernotificationsui==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:18e0182bddd10381884530d6a28634ebb3280912592f8f2ad5bac2a9308c6a65 \
+    --hash=sha256:b84d73d90ab319acf8fad5c59b7a5e2b6023fbb2efd68c58b532e3b3b52f647a
+pyobjc-framework-videosubscriberaccount==11.1 ; platform_machine == 'x86_64' and platform_release >= '18.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:2dd78586260fcee51044e129197e8bf2e157176e02babeec2f873afa4235d8c6 \
+    --hash=sha256:d5a95ae9f2a6f0180a5bbb10e76c064f0fd327aae00a2fe90aa7b65ed4dad7ef
+pyobjc-framework-videotoolbox==11.1 ; platform_machine == 'x86_64' and platform_release >= '12.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:a27985656e1b639cdb102fcc727ebc39f71bb1a44cdb751c8c80cc9fe938f3a9
+pyobjc-framework-virtualization==11.1 ; platform_machine == 'x86_64' and platform_release >= '20.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:4221ee5eb669e43a2ff46e04178bec149af2d65205deb5d4db5fa62ea060e022
+pyobjc-framework-vision==11.1 ; platform_machine == 'x86_64' and platform_release >= '17.0' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:26590512ee7758da3056499062a344b8a351b178be66d4b719327884dde4216b
+pyobjc-framework-webkit==11.1 ; platform_machine == 'x86_64' and platform_system == 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:27e701c7aaf4f24fc7e601a128e2ef14f2773f4ab071b9db7438dc5afb5053ae
+pyotp==2.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:346b6642e0dbdde3b4ff5a930b664ca82abfa116356ed48cc42c7d6590d36f63 \
+    --hash=sha256:81c2e5865b8ac55e825b0358e496e1d9387c811e85bb40e71a3b29b288963612
+pyparsing==3.2.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2df8d5b7b2802ef88e8d016a2eb9c7aeaa923529cd251ed0fe4608275d4105b6 \
+    --hash=sha256:e38a4f02064cf41fe6593d328d0512495ad1f3d8a91c4f73fc401b3079a59a5e
+pypdf==6.19.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:7e5d6e730e7dae87d560a2cee218b852f6498c8be61966f3cd02ead971e48d14 \
+    --hash=sha256:bbc43aca292369ccc6cbc8a921991ecf2538a3587ab5a116eff06c321d647155
+pyperclip==1.11.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:244035963e4428530d9e3a6101a1ef97209c6825edab1567beac148ccc1db1b6 \
+    --hash=sha256:299403e9ff44581cb9ba2ffeed69c7aa96a008622ad0c46cb575ca75b5b84273
+python-dateutil==2.9.0.post0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3 \
+    --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+python-docx==1.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7 \
+    --hash=sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce
+python-dotenv==1.2.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a \
+    --hash=sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3
+python-frontmatter==1.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:335465556358d9d0e6c98bbeb69b1c969f2a4a21360587b9873bfc3b213407c1 \
+    --hash=sha256:7118d2bd56af9149625745c58c9b51fb67e8d1294a0c76796dafdc72c36e5f6d
+python-json-logger==4.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:af09c9daf6a813aa4cc7180395f50f2a9e5fa056034c9953aec92e381c5ba1e2 \
+    --hash=sha256:f58e68eb46e1faed27e0f574a55a0455eecd7b8a5b88b85a784519ba3cff047f
+python-multipart==0.0.31 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:8408153d68a9773291fc1da39a8b85a50044bddbabd2dd72e9229776b7b15e28 \
+    --hash=sha256:fc631183bb13e56db3158a4909908dfb2e23565286744e798241e63750e5d680
+pyyaml==6.0.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:68ccc6023a3400877818152ad9a1033e3db8625d899c72eacb5a668902e4d652 \
+    --hash=sha256:70b189594dbe54f75ab3a1acec5f1e3faa7e8cf2f1e08d9b561cb41b845f69d5 \
+    --hash=sha256:80bab7bfc629882493af4aa31a4cfa43a4c57c83813253626916b8c7ada83476 \
+    --hash=sha256:8b9c7197f7cb2738065c481a0461e50ad02f18c78cd75775628afb4d7137fb3b \
+    --hash=sha256:d584d9ec91ad65861cc08d42e834324ef890a082e591037abe114850ff7bbc3e
+redis==7.2.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:49e231fbc8df2001436ae5252b3f0f3dc930430239bfeb6da4c7ee92b16e5d33 \
+    --hash=sha256:6163c1a47ee2d9d01221d8456bc1c75ab953cbda18cfbc15e7140e9ba16ca3a5
+referencing==0.36.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:df2e89862cd09deabbdba16944cc3f10feb6b3e6f18e902f7cc25609a34775aa \
+    --hash=sha256:e8699adbbf8b5c7de96d8ffa0eb5c158b3beafce084968e2ea8bb08c6794dcd0
+regex==2025.9.18 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:039f11b618ce8d71a1c364fdee37da1012f5a3e79b1b2819a9f389cd82fd6282 \
+    --hash=sha256:06104cd203cdef3ade989a1c45b6215bf42f8b9dd705ecc220c173233f7cba41 \
+    --hash=sha256:4f130c3a7845ba42de42f380fff3c8aebe89a810747d91bcf56d40a069f15352 \
+    --hash=sha256:5514b8e4031fdfaa3d27e92c75719cbe7f379e28cacd939807289bce76d0e35a \
+    --hash=sha256:7cc9e5525cada99699ca9223cce2d52e88c52a3d2a0e842bd53de5497c604164 \
+    --hash=sha256:92a8e375ccdc1256401c90e9dc02b8642894443d549ff5e25e36d7cf8a80c783 \
+    --hash=sha256:9feb29817df349c976da9a0debf775c5c33fc1c8ad7b9f025825da99374770b7 \
+    --hash=sha256:c5ba23274c61c6fef447ba6a39333297d0c247f53059dba0bca415cac511edc4 \
+    --hash=sha256:d3bc882119764ba3a119fbf2bd4f1b47bc56c1da5d42df4ed54ae1e8e66fdf8f \
+    --hash=sha256:d488c236ac497c46a5ac2005a952c1a0e22a07be9f10c3e735bc7d1209a34773 \
+    --hash=sha256:dec57f96d4def58c422d212d414efe28218d58537b5445cf0c33afb1b4768571
+reportlab==4.4.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:299b3b0534e7202bb94ed2ddcd7179b818dcda7de9d8518a57c85a58a1ebaadb \
+    --hash=sha256:cb2f658b7f4a15be2cc68f7203aa67faef67213edd4f2d4bdd3eb20dab75a80d
+requests==2.33.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:3324635456fa185245e24865e810cecec7b4caf933d7eb133dcde67d48cee69b \
+    --hash=sha256:c7ebc5e8b0f21837386ad0e1c8fe8b829fa5f544d8df3b2253bff14ef29d7652
+requests-oauthlib==2.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36 \
+    --hash=sha256:b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9
+rich==14.3.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:793431c1f8619afa7d3b52b2cdec859562b950ea0d4b6b505397612db8d5362d \
+    --hash=sha256:b8daa0b9e4eef54dd8cf7c86c03713f53241884e814f4e2f5fb342fe520f639b
+rich-rst==1.3.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:a1196fdddf1e364b02ec68a05e8ff8f6914fee10fbca2e6b6735f166bb0da8d4 \
+    --hash=sha256:a99b4907cbe118cf9d18b0b44de272efa61f15117c61e39ebdc431baf5df722a
+rpds-py==0.27.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0dc5dceeaefcc96dc192e3a80bbe1d6c410c469e97bdd47494a7d930987f18b2 \
+    --hash=sha256:12ed005216a51b1d6e2b02a7bd31885fe317e45897de81d86dcce7d74618ffff \
+    --hash=sha256:1b207d881a9aef7ba753d69c123a35d96ca7cb808056998f6b9e8747321f03b8 \
+    --hash=sha256:26a1c73171d10b7acccbded82bf6a586ab8203601e565badc74bbbf8bc5a10f8 \
+    --hash=sha256:2efe4eb1d01b7f5f1939f4ef30ecea6c6b3521eec451fb93191bf84b2a522418 \
+    --hash=sha256:3ce0cac322b0d69b63c9cdb895ee1b65805ec9ffad37639f291dd79467bee675 \
+    --hash=sha256:466bfe65bd932da36ff279ddd92de56b042f2266d752719beb97b08526268ec5 \
+    --hash=sha256:9d992ac10eb86d9b6f369647b6a3f412fc0075cfd5d799530e84d335e440a002 \
+    --hash=sha256:a512c8263249a9d68cac08b05dd59d2b3f2061d99b322813cbcc14c3c7421998 \
+    --hash=sha256:dd2135527aa40f061350c3f8f89da2644de26cd73e4de458e79606384f4f68e7 \
+    --hash=sha256:f39f58a27cc6e59f432b568ed8429c7e1641324fbe38131de852cd77b2d534b0
+screeninfo==0.8.1 ; platform_machine == 'x86_64' and platform_system != 'darwin' and sys_platform == 'linux' \
+    --hash=sha256:9983076bcc7e34402a1a9e4d7dabf3729411fd2abb3f3b4be7eba73519cd2ed1 \
+    --hash=sha256:e97d6b173856edcfa3bd282f81deb528188aff14b11ec3e195584e7641be733c
+secretstorage==3.5.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0ce65888c0725fcb2c5bc0fdb8e5438eece02c523557ea40ce0703c266248137 \
+    --hash=sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be
+six==1.17.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
+    --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
+sniffio==1.3.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2f6da418d1f1e0fddd844478f41680e794e6051915791a034ff65e5f100525a2 \
+    --hash=sha256:f4324edc670a0f49750a81b895f35c3adb843cca46f0530f79fc1babb23789dc
+socksio==1.0.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:95dc1f15f9b34e8d7b16f06d74b8ccf48f609af32ab33c608d08761c5dcbb1f3 \
+    --hash=sha256:f88beb3da5b5c38b9890469de67d0cb0f9d494b78b106ca1845f96c10b91c4ac
+sortedcontainers==2.4.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88 \
+    --hash=sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0
+soupsieve==2.9.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4a55d8cf158a9c2e587fa4922f1bbb91d68ac829e2d6f25403a85747c71daf74 \
+    --hash=sha256:8089a26fd974ca7a1f30276d3d8492ab266ab15af581642dfe8aa162e0c1c823
+sse-starlette==3.0.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:16b7cbfddbcd4eaca11f7b586f3b8a080f1afe952c15813455b162edea619e5a \
+    --hash=sha256:ccd60b5765ebb3584d0de2d7a6e4f745672581de4f5005ab31c3a25d10b52b3a
+starlette==1.3.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:05d0213193f2fbaae60e2ecb593b4add4262ad4e46536b54abe36f11a71724e0 \
+    --hash=sha256:c7372aae11c3c3f26a42df7bd626cec2f47d03483d261d369516a615a53714c6
+tenacity==9.1.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1169d376c297e7de388d18b4481760d478b0e99a777cad3a9c86e556f4b697cb \
+    --hash=sha256:f77bf36710d8b73a50b2dd155c97b870017ad21afe6ab300326b0371b3b05138
+tiktoken==0.12.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:06a9f4f49884139013b138920a4c393aa6556b2f8f536345f11819389c703ebb \
+    --hash=sha256:0ee8f9ae00c41770b5f9b0bb1235474768884ae157de3beb5439ca0fd70f3e25 \
+    --hash=sha256:4a1a4fcd021f022bfc81904a911d3df0f6543b9e7627b51411da75ff2fe7a1be \
+    --hash=sha256:584c3ad3d0c74f5269906eb8a659c8bfc6144a52895d9261cdaf90a0ae5f4de0 \
+    --hash=sha256:5edb8743b88d5be814b1a8a8854494719080c28faaa1ccbef02e87354fe71ef0 \
+    --hash=sha256:83d16643edb7fa2c99eff2ab7733508aae1eebb03d5dfc46f5565862810f24e3 \
+    --hash=sha256:8f317e8530bb3a222547b85a58583238c8f74fd7a7408305f9f63246d1a0958b \
+    --hash=sha256:9baf52f84a3f42eef3ff4e754a0db79a13a27921b457ca9832cf944c6be4f8f3 \
+    --hash=sha256:b18ba7ee2b093863978fcb14f74b3707cdc8d4d4d3836853ce7ec60772139931 \
+    --hash=sha256:d186a5c60c6a0213f04a7a802264083dea1bbde92a2d4c7069e1a56630aef830 \
+    --hash=sha256:edde1ec917dfd21c1f2f8046b86348b0f54a2c0547f68149d8600859598769ad
+tokenizers==0.23.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1feeeadf865a7915adc25445dea30e9933e593c31bb96c277cee36de227c8bfa \
+    --hash=sha256:5075b405006415ea148a992d093699c66eb01952bf59f4d5727089a98bda45a4 \
+    --hash=sha256:e3d8f40ea6268047de7046906326abed5134f27d4e8447b23763afe5808c8a96
+tom-swe==1.0.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:57c97d0104e563f15bd39edaf2aa6ac4c3e9444afd437fb92458700d22c6c0f5 \
+    --hash=sha256:7b1172b29eb5c8fb7f1975016e7b6a238511b9ac2a7a980bd400dcb4e29773f2
+tqdm==4.67.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2 \
+    --hash=sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2
+tree-sitter==0.25.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:260586381b23be33b6191a07cea3d44ecbd6c01aa4c6b027a0439145fcbc3358 \
+    --hash=sha256:7d2ee1acbacebe50ba0f85fff1bc05e65d877958f00880f49f9b2af38dce1af0 \
+    --hash=sha256:b43a9e4c89d4d0839de27cd4d6902d33396de700e9ff4c5ab7631f277a85ead9 \
+    --hash=sha256:b878e296e63661c8e124177cc3084b041ba3f5936b43076d57c487822426f614 \
+    --hash=sha256:d77605e0d353ba3fe5627e5490f0fbfe44141bafa4478d88ef7954a61a848dae \
+    --hash=sha256:fbb1706407c0e451c4f8cc016fec27d72d4b211fdd3173320b1ada7a6c74c3ac \
+    --hash=sha256:fe43c158555da46723b28b52e058ad444195afd1db3ca7720c59a254544e9c20
+tree-sitter-bash==0.25.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:3f484c4bb8796cde7a87ca351e6116f09653edac0eb3c6d238566359dd28b117 \
+    --hash=sha256:a3332d71c7b7d5f78259b19d02d0ea111fcb82b72712ee4a93aaa5b226d3f0a8 \
+    --hash=sha256:bfc0bdaa77bc1e86e3c6652e5a6e140c40c0a16b84185c2b63ad7cd809b88f14
+typing-extensions==4.15.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466 \
+    --hash=sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548
+typing-inspection==0.4.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4ed1cacbdc298c220f1bd249ed5287caa16f34d44ef4e9c3d0cbad5b521545e7 \
+    --hash=sha256:ba561c48a67c5958007083d386c3295464928b01faa735ab8547c5692e87f464
+uncalled-for==0.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:2c0bd338faff5f930918f79e7eb9ff48290df2cb05fcc0b40a7f334e55d4d85f \
+    --hash=sha256:b4f8fdbcec328c5a113807d653e041c5094473dd4afa7c34599ace69ccb7e69f
+uritemplate==4.2.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:480c2ed180878955863323eea31b0ede668795de182617fef9c6ca09e6ec9d0e \
+    --hash=sha256:962201ba1c4edcab02e60f9a0d3821e82dfc5d2d6662a21abd533879bdb8a686
+urllib3==2.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c \
+    --hash=sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897
+uuid7==0.1.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:5e259bb63c8cb4aded5927ff41b444a80d0c7124e8a0ced7cf44efa1f5cccf61 \
+    --hash=sha256:8c57aa32ee7456d3cc68c95c4530bc571646defac01895cfc73545449894a63c
+uvicorn==0.52.4 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:73acfee47a0b133c5de13d219492d62d8a31e935f4fe6e41a232451a15379f86 \
+    --hash=sha256:f86e41a149d7d05a9969337e3946a9c171c06a5d42680896daaba624aeac8da1
+watchfiles==1.1.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1db5d7ae38ff20153d542460752ff397fcf5c96090c1230803713cf3147a6803 \
+    --hash=sha256:36193ed342f5b9842edd3532729a2ad55c4160ffcfa3700e0d54be496b70dd43 \
+    --hash=sha256:3a476189be23c3686bc2f4321dd501cb329c0a0469e77b7b534ee10129ae6374 \
+    --hash=sha256:3f7eb7da0eb23aa2ba036d4f616d46906013a68caf61b7fdbe42fc8b25132e77 \
+    --hash=sha256:5c85794a4cfa094714fb9c08d4a218375b2b95b8ed1666e8677c349906246c05 \
+    --hash=sha256:8c91ed27800188c2ae96d16e3149f199d62f86c7af5f5f4d2c61a3ed8cd3666c \
+    --hash=sha256:8fbe85cb3201c7d380d3d0b90e63d520f15d6afe217165d7f98c9c649654db81 \
+    --hash=sha256:a173cb5c16c4f40ab19cecf48a534c409f7ea983ab8fed0741304a1c0a31b3f2 \
+    --hash=sha256:a916a2932da8f8ab582f242c065f5c81bed3462849ca79ee357dd9551b0e9b01 \
+    --hash=sha256:c755367e51db90e75b19454b680903631d41f9e3607fbd941d296a020c2d752d \
+    --hash=sha256:f9a2ae5c91cecc9edd47e041a930490c31c3afb1f5e6d71de3dc671bfaca02bf
+wcwidth==0.2.14 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:4d478375d31bc5395a3c55c40ccdf3354688364cd61c4f6adacaa9215d0b3605 \
+    --hash=sha256:a7bb560c8aee30f9957e5f9895805edd20602f2d7f720186dfd906e82b4982e1
+websockets==15.0.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0f3c1e2ab208db911594ae5b4f79addeb3501604a165019dd221c0bdcabe4db8 \
+    --hash=sha256:3be571a8b5afed347da347bfcf27ba12b069d9d7f42cb8c7028b5e98bbb12597 \
+    --hash=sha256:558d023b3df0bffe50a04e710bc87742de35060580a293c2a984299ed83bc4e4 \
+    --hash=sha256:64dee438fed052b52e4f98f76c5790513235efaa1ef7f3f2192c392cd7c91b65 \
+    --hash=sha256:82544de02076bafba038ce055ee6412d68da13ab47f0c60cab827346de828dee \
+    --hash=sha256:f7a866fbc1e97b5c617ee4116daaa09b722101d4a3c170c787450ba409f9736f
+wrapt==1.17.3 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:042ec3bb8f319c147b1301f2393bc19dba6e176b7da446853406d041c36c7828 \
+    --hash=sha256:281262213373b6d5e4bb4353bc36d1ba4084e6d6b5d242863721ef2bf2c2930b \
+    --hash=sha256:5d4478d72eb61c36e5b446e375bbc49ed002430d17cdec3cecb36993398e1a9e \
+    --hash=sha256:6fd1ad24dc235e4ab88cda009e19bf347aabb975e44fd5c2fb22a3f6e4141277 \
+    --hash=sha256:7171ae35d2c33d326ac19dd8facb1e82e5fd04ef8c6c0e394d7af55a55051c22 \
+    --hash=sha256:74afa28374a3c3a11b3b5e5fca0ae03bef8450d6aa3ab3a1e2c30e3a75d023dc \
+    --hash=sha256:88547535b787a6c9ce4086917b6e1d291aa8ed914fdd3a838b3539dc95c12804 \
+    --hash=sha256:d40770d7c0fd5cbed9d84b2c3f2e156431a12c9a37dc6284060fb4bec0b7ffd4 \
+    --hash=sha256:e01375f275f010fcbf7f643b4279896d04e571889b8a5b3f848423d91bf07050 \
+    --hash=sha256:f66eb08feaa410fe4eebd17f2a2c8e2e46d3476e9f8c783daa8e09e0faa666d0
+yarl==1.22.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:1380560bdba02b6b6c90de54133c81c9f2a453dee9912fe58c1dcced1edb7cff \
+    --hash=sha256:22b029f2881599e2f1b06f8f1db2ee63bd309e2293ba2d566e008ba12778b8da \
+    --hash=sha256:50678a3b71c751d58d7908edc96d332af328839eea883bb554a43f539101277a \
+    --hash=sha256:9d7672ecf7557476642c88497c2f8d8542f8e36596e928e9bcba0e42e1e7d71f \
+    --hash=sha256:a49370e8f711daec68d09b821a34e1167792ee2d24d405cbc2387be4f158b520 \
+    --hash=sha256:bca03b91c323036913993ff5c738d0842fc9c60c4648e5c8d98331526df89784 \
+    --hash=sha256:bebf8557577d4401ba8bd9ff33906f1376c877aa78d1fe216ad01b4d6745af71 \
+    --hash=sha256:bec03d0d388060058f5d291a813f21c011041938a441c593374da6077fe21b1b \
+    --hash=sha256:c0232bce2170103ec23c454e54a57008a9a72b5d1c3105dc2496750da8cfa47c \
+    --hash=sha256:de6b9a04c606978fdfe72666fa216ffcf2d1a9f6a381058d4378f8d7b1e5de62 \
+    --hash=sha256:e1b51bebd221006d3d2f95fbe124b22b247136647ae5dcc8c7acafba66e5ee67 \
+    --hash=sha256:e51ac5435758ba97ad69617e13233da53908beccc6cfcd6c34bbed8dcbede486
+zipp==3.23.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:071652d6115ed432f5ce1d34c336c0adfd6a884660d1e9712a256d3d3bd4b14e \
+    --hash=sha256:a07157588a12518c9d4034df3fbbee09c814741a33ff63c05fa29d26a2404166
+openhands-sdk @ https://files.pythonhosted.org/packages/e9/ac/d27c5becc3b59b8cc46a1614ac478cc94eb73e626ab15831906fcdaafb29/openhands_sdk-1.49.6-py3-none-any.whl \
+    --hash=sha256:3b4701f125925e804929ab02b61fe2fe10b4fb1e7d723a2c4afdea35566328bb
+openhands-tools @ https://files.pythonhosted.org/packages/68/20/27d6d20cc8f3465ec861c450bc0113c8646285aa6c8f4291b62366dcb8a2/openhands_tools-1.49.6-py3-none-any.whl \
+    --hash=sha256:11e57a6635fd93c9f1fed14f804ab6f24a4873f75a2d35f0d1c3e57df2c51c87
+
+[stderr]
+
+exit_code=0

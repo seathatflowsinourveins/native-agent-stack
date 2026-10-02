@@ -19,9 +19,18 @@ on the builder's PATH; synthetic subprocess tests are labeled as such in
 [validation](validation.json). Worker discovery, invocation, task quality and
 prompt cost are the next native acceptance measurements.
 
+The [2026-09-30 refresh](refresh-20260930.json) advances 73 OpenHands entries to
+`9495f4c59dd5fea2cee9e87ab37a6abda649627b`: their complete native Git folder
+trees and actual `SKILL.md` bytes match the earlier pin. Four changed trees retain
+the earlier pin. An isolated SDK 1.50 source-discovery fixture found all 77
+OpenHands names; invocation, provider usage and runtime acceptance remain pending.
+[Task profiles](profiles.json) select the existing scenario/role intersections as
+advisory metadata. They do not install the roster or configure a runtime.
+
 ## Source selection and collisions
 
-`OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880` is release
+The original inventory is frozen at
+`OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880`, release
 `v0.25.0`, published 2026-09-27. Its recursive tree contains **66**
 `skills/<name>/SKILL.md` files and **18** plugin skill entrypoints. The manifest
 records all 84 in `openhands_inventory`: 77 selected, seven explicitly excluded.
@@ -328,16 +337,26 @@ python3 tools/adoption/runtime_skill_freshness.py \
 
 **OpenHands:** use the actual worker workspace as `--project-dir`. The inspected
 SDK loads `.agents/skills` natively and prefers it over the legacy location.
-Reference: [OpenHands/software-agent-sdk@da28c773 skill.py:1052](https://github.com/OpenHands/software-agent-sdk/blob/da28c7736ea667ceae51cf3a3b9b37ab5f528f22/openhands-sdk/openhands/sdk/skills/skill.py#L1052).
-This source pin is an inspected capability, not an implicit SDK upgrade. Match
-the worker's installed revision before claiming it follows this path, then start
+Reference: [OpenHands/software-agent-sdk@dcf401af skill.py:1049](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/skills/skill.py#L1049).
+The isolated SDK/tools environment reports 1.50.0 at that pristine source pin;
+the [current worker recipe](../openhands/README.md) keeps its runtime gates.
+Match the worker's installed revision before claiming it follows this path, then start
 a fresh conversation with the native project loader enabled: `load_project_skills`
-is `False` by default. Enabling it also loads the work directory's and its Git
+is [`False` by default](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/context/agent_context.py#L127). Enabling it also loads the work directory's and its Git
 root's `AGENTS.md`, `CLAUDE.md` and other third-party instruction files as
 permanent context
-([skill.py:1084-1121](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1121)),
+([skill.py:1084-1127](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/skills/skill.py#L1084-L1127)),
 so keep the worker project outside this repository; exclude any unwanted skill by
 name with `disabled_skills`.
+
+Expose only the names/descriptions selected for the current role and task.
+Native [`to_prompt`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/skills/skill.py#L1453)
+omits skill locations, and native
+[`invoke_skill`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/tool/builtins/invoke_skill.py#L90)
+renders the selected body. The task-profile file is a selection map for an owned
+caller; no new loader or wrapper is supplied. Its environment boundaries keep
+Canvas and Cloud/automation tasks explicit. Profile-backed GitHub automation
+resources do not establish compatibility with this local SDK/server recipe.
 
 **DeerFlow:** the repository's recorded native pin is
 `42334f26d7025d905678f9075b079fc65f9beaf9` (see its

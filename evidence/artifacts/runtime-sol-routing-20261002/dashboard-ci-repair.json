@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "record": "Three dashboard state fields corrected after native hosted validation failures",
+  "failing_head": "1060f09fd7ab318a487a38015c072b2f4f5f46f1",
+  "source_reference": "observability/grand-dashboard/progress.py:46-48 at the failing head",
+  "evidence_class": "local_integration_fixture",
+  "cause": "Three integration-authored states contained semicolons outside the existing public-token pattern; one also exceeded160 characters",
+  "repair": "Shorten only those three state fields with permitted characters; retain the metadata guard and detailed limitations in the linked evidence",
+  "native_hosted_failures": [
+    {"platform": "Linux", "job": "110785930665", "exit_code": 1, "tests_run": 9563, "failures": 1, "errors": 7, "skipped": 973},
+    {"platform": "macOS", "job": "110785930942", "exit_code": 1, "tests_run": 9563, "failures": 1, "errors": 7, "skipped": 1332, "full_output_sha256": "9a7ae18801023682e5af468dafca4586a2494a6a704b156b84b63a8db23649d7"}
+  ],
+  "focused_check": {
+    "command": "env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_grand_dashboard -v",
+    "exit_code": 0,
+    "tests_run": 17,
+    "returned_summary": "Ran 17 tests in 0.336s; OK",
+    "original_output_sha256": "5873276fa3480aa177afdb8c5a71200e3e6afcc43d8d91e18995c2e5c71206f3"
+  },
+  "limitations": ["Hosted Linux and macOS reruns require the published repair", "The focused checks are local fixtures, not unchanged upstream tests", "No host dashboard service installation or activation follows from these fixtures", "Provider and task-quality acceptance remain open", "Crawl4AI dependency advisories remain separate open gates"],
+  "usage": {"provider_usage": null, "reason": "No provider call was invoked by this local fixture check"}
+}

@@ -1,0 +1,13 @@
+{
+  "name": "runtime-worker-crawl4ai-grader",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "promptfoo": "0.123.1"
+  },
+  "overrides": {
+    "get-uri@8.0.1": {
+      "basic-ftp": "6.2.1"
+    }
+  }
+}

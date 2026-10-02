@@ -1,0 +1,7 @@
+{
+  "evidence_class": "local integration check",
+  "command": "python3 -m unittest discover -s tests -p test_runtime_worker_deerflow.py -v",
+  "exit_code": 1,
+  "recipe_files_absent": true,
+  "summary": "FAILED (failures=11, errors=4)"
+}
