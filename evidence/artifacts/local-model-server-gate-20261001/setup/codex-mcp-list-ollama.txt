@@ -1,0 +1,2 @@
+Name  Command                                                                                              Args                  Env  Cwd  Status   Auth       
+time  <STATE>/mcp-venv/bin/mcp-server-time  --local-timezone UTC  -    -    enabled  Unsupported

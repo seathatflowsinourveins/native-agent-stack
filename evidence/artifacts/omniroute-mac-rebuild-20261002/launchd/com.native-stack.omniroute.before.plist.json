@@ -1,0 +1,29 @@
+{
+  "Label": "com.native-stack.omniroute",
+  "ProgramArguments": [
+    "<HOME>/.local/share/codex-ecosystem/tools/omniroute-3.8.51-a58000c7-pr14904-pr13788/bin/omniroute",
+    "serve",
+    "--port",
+    "20128",
+    "--no-open",
+    "--no-tray"
+  ],
+  "RunAtLoad": true,
+  "KeepAlive": {
+    "SuccessfulExit": false
+  },
+  "Umask": 63,
+  "EnvironmentVariables": {
+    "PATH": "<HOME>/.local/share/codex-ecosystem/tools/omniroute-3.8.51-a58000c7-pr14904-pr13788/shim:<HOME>/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin",
+    "DATA_DIR": "<HOME>/.local/share/omniroute",
+    "OMNIROUTE_SERVER_HOST": "127.0.0.1",
+    "OMNIROUTE_MEMORY_MB": "16384",
+    "CODEX_CLIENT_VERSION": "0.158.0-alpha.2.1",
+    "STREAM_READINESS_TIMEOUT_MS": "600000",
+    "STREAM_READINESS_MAX_TIMEOUT_MS": "600000",
+    "STREAM_ACTIVE_TIMEOUT_MS": "3600000",
+    "CLI_ALLOW_CONFIG_WRITES": "false"
+  },
+  "StandardOutPath": "<HOME>/.local/share/omniroute/logs/omniroute.out.log",
+  "StandardErrorPath": "<HOME>/.local/share/omniroute/logs/omniroute.err.log"
+}

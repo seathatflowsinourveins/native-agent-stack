@@ -1,0 +1,5 @@
+Reading additional input from stdin...
+2026-10-01T23:23:21.210031Z ERROR codex_core::tools::router: error=resources/read failed: resources/read failed for `time` (/get_current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters("")
+2026-10-01T23:25:04.261344Z ERROR codex_core::tools::router: error=resources/read failed: resources/read failed for `time` (/get_current_time?tz=UTC): Mcp error: -32602: Invalid request parameters("")
+2026-10-01T23:25:09.786587Z ERROR codex_core::tools::router: error=resources/read failed: resources/read failed for `time` (/current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters("")
+2026-10-01T23:26:14.570334Z ERROR codex_core::tools::router: error=resources/read failed: resources/read failed for `time` (/current_time): Mcp error: -32602: Invalid request parameters("")

@@ -30,13 +30,44 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def converged_key(slot):
+    picks = []
+    for family in ("claude", "gpt"):
+        fam = slot.get("families", {}).get(family, {})
+        if fam.get("critic_verdict") != "converged":
+            return None
+        if "decider_defaults" in fam:
+            key = fam.get("default_key")
+            if not key or fam["decider_defaults"] != [key] * 2:
+                return None
+        else:
+            # The trading compact document retains the agreed names rather than finalist keys.
+            names = fam.get("defaults_named", fam.get("defaults", []))
+            if fam.get("deciders_agree") is not True or len(names) != 1:
+                return None
+            key = names[0]
+            if fam.get("default_after_review") and fam["default_after_review"]["name"] != key:
+                return None
+        picks.append(key)
+    return picks[0] if picks[0] == picks[1] else None
+
+
 class Manifest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = load(ART / "definitive-manifest.json")
         cls.foundation = load(ART / "foundation-definitive.compact.json")
         cls.trading = load(ART / "trading/trading-definitive.compact.json")
+        cls.settlements = load(ART / "settlements.json")
         cls.rows = cls.manifest["slots"]
+
+    def source_slots(self):
+        for catalog, doc in (("foundation", self.foundation), ("us-equities", self.trading)):
+            for layer in doc["layers"] + doc.get("cross_rows", []):
+                for slot in layer.get("slots", []):
+                    for part in slot.get("roles") or [slot]:
+                        sid = slot["slot_id"] if part is slot else f"{slot['slot_id']}/{part['slot_id']}"
+                        yield catalog, layer["layer_id"], sid, part
 
     def test_manifest_is_current(self):
         result = subprocess.run([sys.executable, str(ART / "assemble_manifest.py"), "--check"], capture_output=True, text=True)
@@ -71,6 +102,24 @@ class Manifest(unittest.TestCase):
                 # One default means one: the wording that this change retires must not come back.
                 self.assertIsNone(re.search(r"\bone of\b|\bcompare:", row["default"], re.I), row["default"])
 
+    def test_every_row_has_state_and_measurement(self):
+        for row in self.rows:
+            with self.subTest(slot=row["slot_id"]):
+                self.assertIn("state", row)
+                self.assertIn("measurement", row)
+                self.assertIn(row["state"], ("", "definitive", "split", "measurement"))
+                if row["state"] in ("split", "measurement"):
+                    self.assertIsInstance(row["measurement"], dict)
+                    self.assertEqual(set(row["measurement"]), {"returned", "receipts"})
+                    self.assertIsInstance(row["measurement"]["returned"], bool)
+                    self.assertIsInstance(row["measurement"]["receipts"], list)
+                else:
+                    self.assertIsNone(row["measurement"])
+                if row["definitive"]:
+                    self.assertEqual(row["state"], "definitive")
+                if row["row_kind"] == "pinned":
+                    self.assertEqual(row["state"], "")
+
     def test_no_tool_is_owned_by_two_layers(self):
         owners = {}
         for row in self.rows:
@@ -79,6 +128,13 @@ class Manifest(unittest.TestCase):
         self.assertEqual({k: v for k, v in owners.items() if len(v) > 1}, {})
 
     def test_definitive_only_when_both_families_converged(self):
+        for row in self.rows:
+            if row["definitive"]:
+                sources = [part for catalog, layer, sid, part in self.source_slots()
+                           if catalog == row["catalog"] and layer == row["layer_id"]
+                           and (row["slot_id"] == sid or row["slot_id"].startswith(sid + "/"))]
+                self.assertEqual(len(sources), 1, row["slot_id"])
+                self.assertTrue(converged_key(sources[0]), row["slot_id"])
         for layer in self.foundation["layers"] + self.foundation["cross_rows"]:
             for slot in layer["slots"]:
                 families = slot.get("families", {})
@@ -115,6 +171,67 @@ class Manifest(unittest.TestCase):
                         self.assertEqual(families["claude"]["status"], "converged", slot["slot_id"])
                         self.assertEqual(families["gpt"]["status"], "converged", slot["slot_id"])
         self.assertEqual(self.manifest["counts"]["definitive"], sum(1 for r in self.rows if r["definitive"]))
+
+    def test_converged_slots_are_definitive_except_the_known_trading_slot(self):
+        exceptions = set()
+        for catalog, layer, sid, slot in self.source_slots():
+            # The user took memory out of the blind round; its measurement decides the install.
+            if sid == "memory-owner" or not converged_key(slot):
+                continue
+            rows = [row for row in self.rows if row["catalog"] == catalog and row["layer_id"] == layer
+                    and (row["slot_id"] == sid or row["slot_id"].startswith(sid + "/"))]
+            self.assertTrue(rows, sid)
+            exceptions.update((catalog, row["slot_id"]) for row in rows if not row["definitive"])
+        self.assertEqual(exceptions, {("us-equities", "market-data-provider")})
+
+    def test_settled_rows_are_measurements_with_verified_receipts(self):
+        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, {"local-model-server"})
+        self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
+                         {"local-model-server"})
+        for settlement in self.settlements:
+            rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
+            self.assertEqual(len(rows), 1, settlement["slot_id"])
+            row = rows[0]
+            self.assertFalse(row["definitive"], row["slot_id"])
+            self.assertEqual(row["state"], "measurement")
+            self.assertEqual(row["default"], settlement["default"]["name"])
+            self.assertTrue(row["repository"], row["slot_id"])
+            self.assertEqual(row["repository"], settlement["default"]["repository"])
+            self.assertFalse(row["installs_nothing_extra"])
+            self.assertIs(row["measurement"]["returned"], True)
+            self.assertTrue(row["measurement"]["receipts"])
+            self.assertEqual(row["measurement"]["receipts"], settlement["receipts"])
+            self.assertEqual(row["label"], settlement["label"])
+            self.assertIn(settlement["settled_by"], row["label"])
+            self.assertIn("one workstation", row["label"])
+            self.assertIn("not a merit acceptance", row["label"])
+            for receipt in row["measurement"]["receipts"]:
+                path = ROOT / receipt["path"]
+                self.assertTrue(path.is_file(), receipt["path"])
+                self.assertEqual(sha(path), receipt["sha256"], receipt["path"])
+            self.assertEqual(settlement["limits"], load(ROOT / settlement["receipts"][-1]["path"])["limitations"])
+
+    def test_settled_split_tables_preserve_the_blind_picks(self):
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
+        for settlement in self.settlements:
+            slot = slots[settlement["slot_id"]]
+            if slot.get("split"):
+                line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[1], settlement["default"]["name"])
+                self.assertEqual(cells[2], settlement["label"])
+                for pick in slot["split_between"]:
+                    self.assertIn(pick["name"], cells[3 if pick["family"] == "claude" else 4])
+
+    def test_memory_and_code_search_measurements_have_not_returned(self):
+        rows = {row["slot_id"]: row for row in self.rows if row["catalog"] == "foundation"}
+        for sid, state in (("memory-owner", "measurement"), ("code-search", "split")):
+            row = rows[sid]
+            self.assertEqual(row["state"], state, sid)
+            self.assertEqual(row["measurement"], {"returned": False, "receipts": []}, sid)
+            self.assertTrue(row["installs_nothing_extra"], sid)
+            self.assertFalse(row["definitive"], sid)
 
     def test_the_decision_round_covers_its_six_slots(self):
         judged = {s["slot_id"]: s for l in self.foundation["layers"] for s in l["slots"] if s["row_kind"] == "judged"}
@@ -168,6 +285,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(sources["decision_round_preregistration_sha256"], sha(ART / "preregistration.json"))
         self.assertEqual(self.manifest["sources"]["foundation"]["sha256"], sha(ART / "foundation-definitive.compact.json"))
         self.assertEqual(self.manifest["sources"]["us-equities"]["sha256"], sha(ART / "trading/trading-definitive.compact.json"))
+        self.assertEqual(self.manifest["sources"]["settlements"]["sha256"], sha(ART / "settlements.json"))
 
     def test_preregistered_inputs_are_the_committed_ones(self):
         prereg = load(ART / "preregistration.json")
