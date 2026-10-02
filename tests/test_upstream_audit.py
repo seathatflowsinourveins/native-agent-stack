@@ -1,7 +1,8 @@
 """Offline tests for tools/sota-convergence/upstream_audit.py (synthetic fixtures; the last tests read the committed
 audit). Targets and roles come from the definitive manifest's foundation rows; every flag follows its frozen threshold,
 measured from the observation's own time; an erroring or incomplete collection stays unknown and never becomes a
-negative fact; each request, queried asset and digest is recorded; popularity fields never reach an observation; role
+negative fact, including a check-run collection on a head above GitHub's 1000-check-suite limit; each request, queried
+asset and digest is recorded; popularity fields never reach an observation; role
 drift fails --check; the build depends on the observations alone; the decision record's table is the audit's own; and
 a blind export withholds the audit's output, observations and decision record."""
 
@@ -59,8 +60,9 @@ def observation(**overrides):
            "head": {"sha": "abc", "date": "2026-09-30T00:00:00Z"},
            "release": {"tag": "v1", "published_at": "2026-09-01T00:00:00Z", "assets": 2, "assets_with_digest": 2,
                        "queried_assets": [{"name": "a.tar.gz", "digest": "sha256:aa", "attestations": 1}]},
-           "advisories": {"observed": 0, "total": 0, "complete": True, "pages": 1, "severities": []},
-           "check_runs": {"observed": 3, "total": 3, "complete": True, "pages": 1, "conclusions": {"success": 3}},
+           "advisories": {"observed": 0, "complete": True, "pages": 1, "severities": []},
+           "check_runs": {"observed": 3, "total": 3, "total_counts": [3], "check_suites": 2, "complete": True,
+                          "pages": 1, "conclusions": {"success": 3}},
            "deps_dev": {"status": "ok", "license": "MIT", "scorecard": {"date": "2026-09-28", "overall_score": 7.1}}}
     obs.update(overrides)
     return obs
@@ -213,6 +215,14 @@ class FlagTests(unittest.TestCase):
                          ([], "attested", 1))
         self.assertEqual(self.row(release=release(assets=3, with_digest=0))["release"]["provenance"], "no_digest")
 
+    def test_an_attestation_partial_error_alone_keeps_provenance_unknown(self):
+        # Every recorded asset answered 0, but an attestation request is listed as failed: the error key decides.
+        answered = release({"name": "a", "digest": "sha256:aa", "attestations": 0})
+        self.assertEqual(self.row(release=answered)["release"]["provenance"], "none")
+        row = self.row(release=answered, partial_errors={"attestations:b": "HTTP 502"})
+        self.assertEqual((row["flags"], row["release"]["provenance"]), ([], "unknown"))
+        self.assertIn("attestations", row["incomplete"])
+
     def test_an_incomplete_check_run_collection_never_reports_zero_failing(self):
         partial = {"observed": 100, "total": 755, "complete": False, "pages": 1, "conclusions": {"success": 100}}
         row = self.row(check_runs=partial)
@@ -225,14 +235,40 @@ class FlagTests(unittest.TestCase):
         # The pre-repair shape (a total and the first page's conclusions, no completeness) is incomplete.
         row = self.row(check_runs={"total": 755, "conclusions": {"success": 100}})
         self.assertIsNone(row["check_runs"]["failing"])
-        self.assertEqual(self.row()["check_runs"], {"observed": 3, "total": 3, "complete": True, "failing": 0})
+        self.assertEqual(self.row()["check_runs"], {"observed": 3, "total": 3, "total_counts": [3], "check_suites": 2,
+                                                    "complete": True, "failing": 0})
+
+    def test_a_head_above_the_check_suite_limit_is_incomplete(self):
+        # actions/attest as collected before the limit was read: 1000 of 1000 runs over 10 pages, recorded complete,
+        # while its head carried 1606 check suites, so the runs came from the 1000 most recent suites only.
+        capped = {"observed": 1000, "total": 1000, "total_counts": [1000], "check_suites": 1606, "complete": True,
+                  "pages": 10, "conclusions": {"queued": 1, "success": 999}}
+        row = self.row(check_runs=capped)
+        self.assertEqual(row["check_runs"], {"observed": 1000, "total": 1000, "total_counts": [1000],
+                                             "check_suites": 1606, "complete": False, "failing": None})
+        self.assertEqual((row["flags"], row["incomplete"]), ([], ["check_runs"]))
+        self.assertIn("1000 most recent of 1606 check suites", audit._check_runs_gap(row))
+        # The committed shape before this check (no suite count, no page totals) is incomplete too.
+        legacy = {k: v for k, v in capped.items() if k not in ("check_suites", "total_counts")}
+        self.assertIsNone(self.row(check_runs=legacy)["check_runs"]["failing"])
+        # The limit itself: 1000 suites are read in full, 1001 are not.
+        self.assertEqual(self.row(check_runs=dict(capped, check_suites=1000))["check_runs"]["failing"], 0)
+        self.assertIsNone(self.row(check_runs=dict(capped, check_suites=1001))["check_runs"]["failing"])
+        # A recorded complete flag cannot outvote the counts: a run short, or a total that moved between pages.
+        self.assertIsNone(self.row(check_runs=dict(capped, check_suites=1, observed=999))["check_runs"]["failing"])
+        moved = self.row(check_runs=dict(capped, check_suites=1, total_counts=[1000, 1001]))
+        self.assertIsNone(moved["check_runs"]["failing"])
+        self.assertIn("moved between pages: 1000, 1001", audit._check_runs_gap(moved))
+        # A failure seen in a capped collection is still a fact.
+        row = self.row(check_runs=dict(capped, conclusions={"failure": 2, "success": 998}))
+        self.assertEqual((row["flags"], row["check_runs"]["failing"], row["check_runs"]["complete"]),
+                         (["ci_failing"], 2, False))
 
     def test_an_errored_advisory_collection_reports_no_count(self):
-        row = self.row(advisories={"observed": None, "total": None, "complete": False},
-                       partial_errors={"advisories": "HTTP 502"})
+        row = self.row(advisories={"observed": None, "complete": False}, partial_errors={"advisories": "HTTP 502"})
         self.assertIsNone(row["advisories"]["count"])
         self.assertIn("advisories", row["incomplete"])
-        self.assertEqual(self.flags(advisories={"observed": 1, "total": 1, "complete": True, "severities": ["high"]}),
+        self.assertEqual(self.flags(advisories={"observed": 1, "complete": True, "severities": ["high"]}),
                          ["advisories"])
 
     def test_failing_checks_scorecard_and_archived(self):
@@ -279,7 +315,8 @@ class ObservationTests(unittest.TestCase):
         responses = {"/commits/main": ({"sha": "abc", "commit": {"committer": {"date": NOW}}}, None, 1),
                      "/releases/latest": (None, "gh: Not Found (HTTP 404)", 1),
                      "security-advisories": ([[{"ghsa_id": "GHSA-1", "severity": "low"}]], None, 1),
-                     "check-runs": ([{"total_count": 0, "check_runs": []}], None, 1)}
+                     "check-runs": ([{"total_count": 0, "check_runs": []}], None, 1),
+                     "check-suites": ({"total_count": 1, "check_suites": [{"id": 7}]}, None, 1)}
         responses.update(extra)
         return responses
 
@@ -293,11 +330,13 @@ class ObservationTests(unittest.TestCase):
             "repos/owner/kept", "repos/owner/kept/commits/main", "repos/owner/kept/releases/latest",
             "repos/owner/kept/security-advisories?state=published&per_page=100",
             "repos/owner/kept/commits/abc/check-runs?per_page=100",
+            "repos/owner/kept/commits/abc/check-suites?per_page=1",
             "https://api.deps.dev/v3/projects/github.com%2Fowner%2Fkept"])
         self.assertEqual(obs["requests"][2]["status"], "HTTP 404")
         self.assertEqual(calls[3][:2], ["--paginate", "--slurp"])
-        self.assertEqual(obs["advisories"], {"observed": 1, "total": 1, "complete": True, "pages": 1,
-                                             "severities": ["low"]})
+        self.assertEqual(calls[5], ["repos/owner/kept/commits/abc/check-suites?per_page=1"])  # one page, no paginate
+        # The advisories endpoint reports no total, so none is recorded.
+        self.assertEqual(obs["advisories"], {"observed": 1, "complete": True, "pages": 1, "severities": ["low"]})
 
     def test_each_queried_asset_keeps_its_name_digest_and_answer(self):
         assets = [{"name": f"a{i}", "digest": f"sha256:{i:02d}"} for i in range(7)] + [{"name": "nd", "digest": None}]
@@ -321,13 +360,38 @@ class ObservationTests(unittest.TestCase):
                                                     {"id": 2, "conclusion": "failure"}]},
                  {"total_count": 3, "check_runs": [{"id": 3, "conclusion": None, "status": "in_progress"}]}]
         obs, _ = self.observe(self.base(**{"check-runs": (pages, None, 1)}))
-        self.assertEqual(obs["check_runs"], {"observed": 3, "total": 3, "complete": True, "pages": 2,
+        self.assertEqual(obs["check_runs"], {"observed": 3, "total": 3, "total_counts": [3], "check_suites": 1,
+                                             "complete": True, "pages": 2,
                                              "conclusions": {"failure": 1, "in_progress": 1, "success": 1}})
         obs, _ = self.observe(self.base(**{"check-runs": (pages[:1], None, 1)}))
         self.assertEqual((obs["check_runs"]["observed"], obs["check_runs"]["complete"]), (2, False))
-        obs, _ = self.observe(self.base(**{"check-runs": (None, "gh: Server Error (HTTP 502)", 4)}))
+        # A run added while the pages were read moves the reported total: every distinct total is kept.
+        moved = [pages[0], dict(pages[1], total_count=4)]
+        obs, _ = self.observe(self.base(**{"check-runs": (moved, None, 1)}))
+        self.assertEqual((obs["check_runs"]["observed"], obs["check_runs"]["total_counts"],
+                          obs["check_runs"]["complete"]), (3, [3, 4], False))
+        obs, calls = self.observe(self.base(**{"check-runs": (None, "gh: Server Error (HTTP 502)", 4)}))
         self.assertEqual(obs["check_runs"], {"observed": None, "total": None, "complete": False})
         self.assertEqual(obs["partial_errors"], {"check_runs": "HTTP 502"})
+        self.assertFalse(any("check-suites" in call[-1] for call in calls))  # no suite count without the runs
+
+    def test_the_check_suite_count_read_after_the_runs_decides_completeness(self):
+        pages = [{"total_count": 2, "check_runs": [{"id": 1, "conclusion": "success"},
+                                                    {"id": 2, "conclusion": "success"}]}]
+        for suites, complete in ((1000, True), (1001, False), (1606, False)):
+            obs, calls = self.observe(self.base(**{"check-runs": (pages, None, 1),
+                                                   "check-suites": ({"total_count": suites}, None, 1)}))
+            self.assertEqual((obs["check_runs"]["check_suites"], obs["check_runs"]["complete"]), (suites, complete))
+            paths = [call[-1] for call in calls]
+            self.assertLess(paths.index("repos/owner/kept/commits/abc/check-runs?per_page=100"),
+                            paths.index("repos/owner/kept/commits/abc/check-suites?per_page=1"))
+        # A failed suite count leaves the runs' completeness unknown.
+        obs, _ = self.observe(self.base(**{"check-runs": (pages, None, 1),
+                                           "check-suites": (None, "gh: Server Error (HTTP 502)", 4)}))
+        self.assertEqual((obs["check_runs"]["check_suites"], obs["check_runs"]["complete"]), (None, False))
+        self.assertEqual(obs["partial_errors"], {"check_suites": "HTTP 502"})
+        row = audit.audit_row("owner/kept", [], obs)
+        self.assertEqual((row["check_runs"]["failing"], row["incomplete"]), (None, ["check_runs"]))
 
     def test_an_error_outcome_carries_no_message_text(self):
         self.assertEqual(audit.outcome("gh: API rate limit exceeded for user ID 12345. (HTTP 403)"), "HTTP 403")

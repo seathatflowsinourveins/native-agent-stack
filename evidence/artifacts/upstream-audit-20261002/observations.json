@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-10-02T20:54:42+00:00",
+  "collected_at": "2026-10-02T21:40:36+00:00",
   "kind": "upstream_audit_observations",
   "manifest": {
     "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
@@ -43,18 +43,21 @@
         "pages": 1,
         "severities": [
           "medium"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 9,
         "complete": true,
         "conclusions": {
           "success": 46
         },
         "observed": 46,
         "pages": 1,
-        "total": 46
+        "total": 46,
+        "total_counts": [
+          46
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -70,7 +73,7 @@
         "sha": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:49+00:00",
+      "observed_at": "2026-10-02T21:39:39+00:00",
       "pushed_at": "2026-10-01T02:01:57Z",
       "release": {
         "assets": 23,
@@ -162,6 +165,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/aannoo/hcom/commits/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Faannoo%2Fhcom"
@@ -174,19 +182,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
-        "complete": true,
+        "check_suites": 1607,
+        "complete": false,
         "conclusions": {
-          "queued": 1,
-          "success": 999
+          "success": 1000
         },
         "observed": 1000,
         "pages": 10,
-        "total": 1000
+        "total": 1000,
+        "total_counts": [
+          1000
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -202,7 +212,7 @@
         "sha": "a0eb68d51f3a5d373e107cfa9c8455ba800479cd"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:49+00:00",
+      "observed_at": "2026-10-02T21:39:39+00:00",
       "pushed_at": "2026-09-29T22:05:21Z",
       "release": {
         "assets": 0,
@@ -243,6 +253,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/actions/attest/commits/a0eb68d51f3a5d373e107cfa9c8455ba800479cd/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Factions%2Fattest"
@@ -255,18 +270,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 4,
         "complete": true,
         "conclusions": {
           "success": 13
         },
         "observed": 13,
         "pages": 1,
-        "total": 13
+        "total": 13,
+        "total_counts": [
+          13
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -285,7 +303,7 @@
         "sha": "6c1977a00b4e82ebb7e6fad1192467adaf24d430"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:53:49+00:00",
+      "observed_at": "2026-10-02T21:39:39+00:00",
       "pushed_at": "2026-10-02T16:53:41Z",
       "release": {
         "assets": 0,
@@ -326,6 +344,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/adbar/trafilatura/commits/6c1977a00b4e82ebb7e6fad1192467adaf24d430/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fadbar%2Ftrafilatura"
@@ -342,11 +365,11 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 3
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 5,
         "complete": true,
         "conclusions": {
           "failure": 1,
@@ -355,7 +378,10 @@
         },
         "observed": 14,
         "pages": 1,
-        "total": 14
+        "total": 14,
+        "total_counts": [
+          14
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -374,7 +400,7 @@
         "sha": "bc68299565d1d2bc7f54159db2f1eb5567144aff"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:53:49+00:00",
+      "observed_at": "2026-10-02T21:39:39+00:00",
       "pushed_at": "2026-10-02T20:50:41Z",
       "release": {
         "assets": 30,
@@ -466,6 +492,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/anchore/syft/commits/bc68299565d1d2bc7f54159db2f1eb5567144aff/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fanchore%2Fsyft"
@@ -480,11 +511,11 @@
         "pages": 1,
         "severities": [
           "critical"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
           "cancelled": 2,
@@ -494,7 +525,10 @@
         },
         "observed": 13,
         "pages": 1,
-        "total": 13
+        "total": 13,
+        "total_counts": [
+          13
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -510,7 +544,7 @@
         "sha": "68db221ebe29c1d82b0001ae80fa71e10d57d80a"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:51+00:00",
+      "observed_at": "2026-10-02T21:39:41+00:00",
       "pushed_at": "2026-10-02T20:22:41Z",
       "release": {
         "assets": 0,
@@ -548,6 +582,11 @@
           "pages": 1,
           "paginate": true,
           "path": "repos/anthropics/claude-agent-sdk-python/commits/68db221ebe29c1d82b0001ae80fa71e10d57d80a/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/anthropics/claude-agent-sdk-python/commits/68db221ebe29c1d82b0001ae80fa71e10d57d80a/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -596,21 +635,24 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 32
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 190,
         "complete": true,
         "conclusions": {
           "cancelled": 1,
-          "in_progress": 1,
-          "skipped": 13,
-          "success": 34
+          "failure": 2,
+          "skipped": 50,
+          "success": 127
         },
-        "observed": 49,
-        "pages": 1,
-        "total": 49
+        "observed": 180,
+        "pages": 2,
+        "total": 180,
+        "total_counts": [
+          180
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -626,7 +668,7 @@
         "sha": "1c229fcd1e1e4e452e29a8f116b45fe4cfe2c528"
       },
       "license": null,
-      "observed_at": "2026-10-02T20:53:52+00:00",
+      "observed_at": "2026-10-02T21:39:43+00:00",
       "pushed_at": "2026-10-02T20:19:56Z",
       "release": {
         "assets": 10,
@@ -712,9 +754,14 @@
         },
         {
           "api": "github",
-          "pages": 1,
+          "pages": 2,
           "paginate": true,
           "path": "repos/anthropics/claude-code/commits/1c229fcd1e1e4e452e29a8f116b45fe4cfe2c528/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/anthropics/claude-code/commits/1c229fcd1e1e4e452e29a8f116b45fe4cfe2c528/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -732,18 +779,21 @@
         "pages": 1,
         "severities": [
           "medium"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
           "success": 22
         },
         "observed": 22,
         "pages": 1,
-        "total": 22
+        "total": 22,
+        "total_counts": [
+          22
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -759,7 +809,7 @@
         "sha": "ed670b4cf9de2a5a570d130d2f6197b9e543cd64"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:53+00:00",
+      "observed_at": "2026-10-02T21:39:43+00:00",
       "pushed_at": "2026-10-02T20:30:33Z",
       "release": {
         "assets": 0,
@@ -800,6 +850,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/anthropics/claude-code-action/commits/ed670b4cf9de2a5a570d130d2f6197b9e543cd64/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fclaude-code-action"
@@ -812,19 +867,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
-          "skipped": 9,
-          "success": 2
+          "success": 4
         },
-        "observed": 11,
+        "observed": 4,
         "pages": 1,
-        "total": 11
+        "total": 4,
+        "total_counts": [
+          4
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -836,12 +893,12 @@
       "fork": false,
       "full_name": "anthropics/claude-plugins-official",
       "head": {
-        "date": "2026-09-30T20:11:48Z",
-        "sha": "ab024cdcfa7ca80be204acd4907656ba5a968589"
+        "date": "2026-10-02T21:26:10Z",
+        "sha": "d182ca456ca09d31d139f7d3818d1d333b103cce"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:53:53+00:00",
-      "pushed_at": "2026-10-02T20:17:53Z",
+      "observed_at": "2026-10-02T21:39:44+00:00",
+      "pushed_at": "2026-10-02T21:26:11Z",
       "release": null,
       "renamed_to": null,
       "requests": [
@@ -871,7 +928,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/anthropics/claude-plugins-official/commits/ab024cdcfa7ca80be204acd4907656ba5a968589/check-runs?per_page=100",
+          "path": "repos/anthropics/claude-plugins-official/commits/d182ca456ca09d31d139f7d3818d1d333b103cce/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/anthropics/claude-plugins-official/commits/d182ca456ca09d31d139f7d3818d1d333b103cce/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -889,18 +951,21 @@
         "pages": 1,
         "severities": [
           "low"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 8,
         "complete": true,
         "conclusions": {
           "success": 8
         },
         "observed": 8,
         "pages": 1,
-        "total": 8
+        "total": 8,
+        "total_counts": [
+          8
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -916,7 +981,7 @@
         "sha": "c7adb1e94c930bde56c3c011e4fe0df45b1e9d57"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:53:55+00:00",
+      "observed_at": "2026-10-02T21:39:46+00:00",
       "pushed_at": "2026-10-02T20:33:04Z",
       "release": {
         "assets": 0,
@@ -957,6 +1022,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/anthropics/sandbox-runtime/commits/c7adb1e94c930bde56c3c011e4fe0df45b1e9d57/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fanthropics%2Fsandbox-runtime"
@@ -969,19 +1039,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 22,
         "complete": true,
         "conclusions": {
-          "skipped": 27,
-          "success": 32
+          "skipped": 25,
+          "success": 25
         },
-        "observed": 59,
+        "observed": 50,
         "pages": 1,
-        "total": 59
+        "total": 50,
+        "total_counts": [
+          50
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -993,12 +1066,12 @@
       "fork": false,
       "full_name": "Arize-ai/phoenix",
       "head": {
-        "date": "2026-10-02T20:08:44Z",
-        "sha": "bcec2c5e0a16567557213a95a2af93c1a3f6bf3e"
+        "date": "2026-10-02T21:18:39Z",
+        "sha": "83c8271403d34607a144dbd5e5703437564f7129"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:53:55+00:00",
-      "pushed_at": "2026-10-02T20:53:07Z",
+      "observed_at": "2026-10-02T21:39:46+00:00",
+      "pushed_at": "2026-10-02T21:28:14Z",
       "release": {
         "assets": 0,
         "assets_with_digest": 0,
@@ -1034,7 +1107,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/arize-ai/phoenix/commits/bcec2c5e0a16567557213a95a2af93c1a3f6bf3e/check-runs?per_page=100",
+          "path": "repos/arize-ai/phoenix/commits/83c8271403d34607a144dbd5e5703437564f7129/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/arize-ai/phoenix/commits/83c8271403d34607a144dbd5e5703437564f7129/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -1050,18 +1128,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 7,
         "complete": true,
         "conclusions": {
           "success": 9
         },
         "observed": 9,
         "pages": 1,
-        "total": 9
+        "total": 9,
+        "total_counts": [
+          9
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1077,7 +1158,7 @@
         "sha": "0957c301ed06c2a5857b834358c7227c739041d4"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:53:57+00:00",
+      "observed_at": "2026-10-02T21:39:48+00:00",
       "pushed_at": "2026-10-01T19:33:35Z",
       "release": {
         "assets": 0,
@@ -1118,6 +1199,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/assafelovic/gpt-researcher/commits/0957c301ed06c2a5857b834358c7227c739041d4/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fassafelovic%2Fgpt-researcher"
@@ -1130,11 +1216,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 24,
         "complete": true,
         "conclusions": {
           "skipped": 12,
@@ -1142,7 +1228,10 @@
         },
         "observed": 127,
         "pages": 2,
-        "total": 127
+        "total": 127,
+        "total_counts": [
+          127
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1158,7 +1247,7 @@
         "sha": "25334496c105c9c728f0a6024f3d164aed40cacc"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:57+00:00",
+      "observed_at": "2026-10-02T21:39:49+00:00",
       "pushed_at": "2026-10-01T19:31:47Z",
       "release": {
         "assets": 7,
@@ -1250,6 +1339,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/ast-grep/ast-grep/commits/25334496c105c9c728f0a6024f3d164aed40cacc/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fast-grep%2Fast-grep"
@@ -1262,18 +1356,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 3,
         "complete": true,
         "conclusions": {
           "success": 2
         },
         "observed": 2,
         "pages": 1,
-        "total": 2
+        "total": 2,
+        "total_counts": [
+          2
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1289,7 +1386,7 @@
         "sha": "f88a2fd93fdca04c3d4d2db389e3031eb91682b1"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:57+00:00",
+      "observed_at": "2026-10-02T21:39:50+00:00",
       "pushed_at": "2026-10-02T18:58:47Z",
       "release": {
         "assets": 8,
@@ -1381,6 +1478,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/betterleaks/betterleaks/commits/f88a2fd93fdca04c3d4d2db389e3031eb91682b1/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fbetterleaks%2Fbetterleaks"
@@ -1393,18 +1495,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
-          "success": 23
+          "in_progress": 1,
+          "success": 24
         },
-        "observed": 23,
+        "observed": 25,
         "pages": 1,
-        "total": 23
+        "total": 25,
+        "total_counts": [
+          25
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1420,7 +1526,7 @@
         "sha": "8cd7aef5789cfda758a83985e02edf8a63d6233f"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:53:58+00:00",
+      "observed_at": "2026-10-02T21:39:52+00:00",
       "pushed_at": "2026-10-02T15:49:22Z",
       "release": {
         "assets": 0,
@@ -1461,6 +1567,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/bytedance/deer-flow/commits/8cd7aef5789cfda758a83985e02edf8a63d6233f/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fbytedance%2Fdeer-flow"
@@ -1473,20 +1584,23 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 16,
         "complete": true,
         "conclusions": {
-          "failure": 1,
-          "skipped": 6,
-          "success": 30
+          "in_progress": 1,
+          "skipped": 3,
+          "success": 4
         },
-        "observed": 37,
+        "observed": 8,
         "pages": 1,
-        "total": 37
+        "total": 8,
+        "total_counts": [
+          8
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1498,12 +1612,12 @@
       "fork": false,
       "full_name": "ccusage/ccusage",
       "head": {
-        "date": "2026-10-02T20:10:03Z",
-        "sha": "41407251305f2bcfe7d569e9134694ffb0cbe723"
+        "date": "2026-10-02T21:30:36Z",
+        "sha": "b42d9aa69d36fc39f4cf3d25c7f248419e0bd85d"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:00+00:00",
-      "pushed_at": "2026-10-02T20:10:31Z",
+      "observed_at": "2026-10-02T21:39:53+00:00",
+      "pushed_at": "2026-10-02T21:34:12Z",
       "release": {
         "assets": 0,
         "assets_with_digest": 0,
@@ -1539,7 +1653,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/ccusage/ccusage/commits/41407251305f2bcfe7d569e9134694ffb0cbe723/check-runs?per_page=100",
+          "path": "repos/ccusage/ccusage/commits/b42d9aa69d36fc39f4cf3d25c7f248419e0bd85d/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/ccusage/ccusage/commits/b42d9aa69d36fc39f4cf3d25c7f248419e0bd85d/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -1573,19 +1692,22 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 17
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 24,
         "complete": true,
         "conclusions": {
-          "skipped": 38,
-          "success": 62
+          "skipped": 40,
+          "success": 63
         },
-        "observed": 100,
-        "pages": 1,
-        "total": 100
+        "observed": 103,
+        "pages": 2,
+        "total": 103,
+        "total_counts": [
+          103
+        ]
       },
       "default_branch": "trunk",
       "deps_dev": {
@@ -1604,7 +1726,7 @@
         "sha": "6fc1c29d5477bfe71da7af290eb481c0df7811f1"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:01+00:00",
+      "observed_at": "2026-10-02T21:39:54+00:00",
       "pushed_at": "2026-10-02T18:35:35Z",
       "release": {
         "assets": 22,
@@ -1690,9 +1812,14 @@
         },
         {
           "api": "github",
-          "pages": 1,
+          "pages": 2,
           "paginate": true,
           "path": "repos/cli/cli/commits/6fc1c29d5477bfe71da7af290eb481c0df7811f1/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/cli/cli/commits/6fc1c29d5477bfe71da7af290eb481c0df7811f1/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -1715,11 +1842,11 @@
           "low",
           "low",
           "medium"
-        ],
-        "total": 6
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 17,
         "complete": true,
         "conclusions": {
           "skipped": 1,
@@ -1727,7 +1854,10 @@
         },
         "observed": 34,
         "pages": 1,
-        "total": 34
+        "total": 34,
+        "total_counts": [
+          34
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1743,7 +1873,7 @@
         "sha": "3cce8be87f2ad9b205105ecdef90a527fc70cb63"
       },
       "license": "GPL-3.0",
-      "observed_at": "2026-10-02T20:54:01+00:00",
+      "observed_at": "2026-10-02T21:39:54+00:00",
       "pushed_at": "2026-10-02T14:08:28Z",
       "release": {
         "assets": 15,
@@ -1835,6 +1965,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/dagucloud/dagu/commits/3cce8be87f2ad9b205105ecdef90a527fc70cb63/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fdagucloud%2Fdagu"
@@ -1849,18 +1984,21 @@
         "pages": 1,
         "severities": [
           "low"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 10,
         "complete": true,
         "conclusions": {
           "success": 41
         },
         "observed": 41,
         "pages": 1,
-        "total": 41
+        "total": 41,
+        "total_counts": [
+          41
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -1879,8 +2017,8 @@
         "sha": "6d7f8c810eacd642c59c6b351412b78514113291"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:02+00:00",
-      "pushed_at": "2026-10-02T20:41:36Z",
+      "observed_at": "2026-10-02T21:39:55+00:00",
+      "pushed_at": "2026-10-02T20:55:58Z",
       "release": {
         "assets": 0,
         "assets_with_digest": 0,
@@ -1920,6 +2058,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/dependabot/dependabot-core/commits/6d7f8c810eacd642c59c6b351412b78514113291/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fdependabot%2Fdependabot-core"
@@ -1934,11 +2077,11 @@
         "pages": 1,
         "severities": [
           "critical"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 24,
         "complete": true,
         "conclusions": {
           "failure": 11,
@@ -1949,7 +2092,10 @@
         },
         "observed": 120,
         "pages": 2,
-        "total": 120
+        "total": 120,
+        "total_counts": [
+          120
+        ]
       },
       "default_branch": "release/v3.8.52",
       "deps_dev": {
@@ -1965,7 +2111,7 @@
         "sha": "23a11484862b3bb589a55e85b00e4ac53ffeb234"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:04+00:00",
+      "observed_at": "2026-10-02T21:39:57+00:00",
       "pushed_at": "2026-10-02T18:26:57Z",
       "release": {
         "assets": 17,
@@ -2057,6 +2203,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/diegosouzapw/omniroute/commits/23a11484862b3bb589a55e85b00e4ac53ffeb234/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fdiegosouzapw%2Fomniroute"
@@ -2071,11 +2222,11 @@
         "pages": 1,
         "severities": [
           "high"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 18,
         "complete": true,
         "conclusions": {
           "failure": 7,
@@ -2084,7 +2235,10 @@
         },
         "observed": 141,
         "pages": 2,
-        "total": 141
+        "total": 141,
+        "total_counts": [
+          141
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2103,7 +2257,7 @@
         "sha": "42f48072bbf92ee9b0e43f9fdf2008d03546e7ca"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:05+00:00",
+      "observed_at": "2026-10-02T21:39:58+00:00",
       "pushed_at": "2026-10-02T15:37:02Z",
       "release": {
         "assets": 56,
@@ -2195,6 +2349,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/docker/compose/commits/42f48072bbf92ee9b0e43f9fdf2008d03546e7ca/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fdocker%2Fcompose"
@@ -2240,11 +2399,11 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 32
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 6,
         "complete": true,
         "conclusions": {
           "skipped": 4,
@@ -2252,7 +2411,10 @@
         },
         "observed": 49,
         "pages": 1,
-        "total": 49
+        "total": 49,
+        "total_counts": [
+          49
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -2271,8 +2433,8 @@
         "sha": "c46c1e37724f0478939de636ab8ea5a89086d532"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:06+00:00",
-      "pushed_at": "2026-10-01T22:01:02Z",
+      "observed_at": "2026-10-02T21:39:58+00:00",
+      "pushed_at": "2026-10-02T21:25:55Z",
       "release": null,
       "renamed_to": null,
       "requests": [
@@ -2306,6 +2468,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/git/git/commits/c46c1e37724f0478939de636ab8ea5a89086d532/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fgit%2Fgit"
@@ -2321,11 +2488,11 @@
         "severities": [
           "high",
           "medium"
-        ],
-        "total": 2
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 203,
         "complete": true,
         "conclusions": {
           "skipped": 65,
@@ -2333,7 +2500,10 @@
         },
         "observed": 506,
         "pages": 6,
-        "total": 506
+        "total": 506,
+        "total_counts": [
+          506
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2349,7 +2519,7 @@
         "sha": "b6d38e563b1e0a61fa4ebfaab8128732f5ed1bd4"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:08+00:00",
+      "observed_at": "2026-10-02T21:39:59+00:00",
       "pushed_at": "2026-10-02T18:02:44Z",
       "release": {
         "assets": 34,
@@ -2441,6 +2611,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/github/codeql-action/commits/b6d38e563b1e0a61fa4ebfaab8128732f5ed1bd4/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fgithub%2Fcodeql-action"
@@ -2453,11 +2628,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 8,
         "complete": true,
         "conclusions": {
           "failure": 2,
@@ -2466,7 +2641,10 @@
         },
         "observed": 10,
         "pages": 1,
-        "total": 10
+        "total": 10,
+        "total_counts": [
+          10
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2482,7 +2660,7 @@
         "sha": "c490becf42d18a3337a6ef351c24dfc77896e6d4"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:09+00:00",
+      "observed_at": "2026-10-02T21:40:01+00:00",
       "pushed_at": "2026-09-30T08:06:26Z",
       "release": {
         "assets": 0,
@@ -2520,6 +2698,11 @@
           "pages": 1,
           "paginate": true,
           "path": "repos/google-deepmind/gemma/commits/c490becf42d18a3337a6ef351c24dfc77896e6d4/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/google-deepmind/gemma/commits/c490becf42d18a3337a6ef351c24dfc77896e6d4/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -2564,20 +2747,23 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 28
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 64,
         "complete": true,
         "conclusions": {
-          "in_progress": 47,
-          "skipped": 12,
-          "success": 124
+          "in_progress": 1,
+          "skipped": 62,
+          "success": 266
         },
-        "observed": 183,
-        "pages": 2,
-        "total": 183
+        "observed": 329,
+        "pages": 4,
+        "total": 329,
+        "total_counts": [
+          329
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2596,8 +2782,8 @@
         "sha": "efcf53d80541454d5157b0b3c511920d0a07975f"
       },
       "license": "AGPL-3.0",
-      "observed_at": "2026-10-02T20:54:09+00:00",
-      "pushed_at": "2026-10-02T20:53:26Z",
+      "observed_at": "2026-10-02T21:40:02+00:00",
+      "pushed_at": "2026-10-02T21:37:49Z",
       "release": {
         "assets": 13,
         "assets_with_digest": 13,
@@ -2682,9 +2868,14 @@
         },
         {
           "api": "github",
-          "pages": 2,
+          "pages": 4,
           "paginate": true,
           "path": "repos/grafana/grafana/commits/efcf53d80541454d5157b0b3c511920d0a07975f/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/grafana/grafana/commits/efcf53d80541454d5157b0b3c511920d0a07975f/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -2700,20 +2891,23 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 66,
         "complete": true,
         "conclusions": {
           "failure": 2,
-          "skipped": 29,
+          "skipped": 58,
           "success": 147
         },
-        "observed": 178,
-        "pages": 2,
-        "total": 178
+        "observed": 207,
+        "pages": 3,
+        "total": 207,
+        "total_counts": [
+          207
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2732,8 +2926,8 @@
         "sha": "c99fe0bd5d07b1bfcb26f12cc7e6ebcbe3c34197"
       },
       "license": "AGPL-3.0",
-      "observed_at": "2026-10-02T20:54:11+00:00",
-      "pushed_at": "2026-10-02T20:42:51Z",
+      "observed_at": "2026-10-02T21:40:03+00:00",
+      "pushed_at": "2026-10-02T21:10:46Z",
       "release": {
         "assets": 47,
         "assets_with_digest": 47,
@@ -2818,9 +3012,14 @@
         },
         {
           "api": "github",
-          "pages": 2,
+          "pages": 3,
           "paginate": true,
           "path": "repos/grafana/loki/commits/c99fe0bd5d07b1bfcb26f12cc7e6ebcbe3c34197/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/grafana/loki/commits/c99fe0bd5d07b1bfcb26f12cc7e6ebcbe3c34197/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -2836,19 +3035,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 25,
         "complete": true,
         "conclusions": {
-          "skipped": 22,
+          "skipped": 26,
           "success": 3
         },
-        "observed": 25,
+        "observed": 29,
         "pages": 1,
-        "total": 25
+        "total": 29,
+        "total_counts": [
+          29
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2864,7 +3066,7 @@
         "sha": "dbd6dd045cbd7135c4a3994515df3907e3b9f0ea"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:12+00:00",
+      "observed_at": "2026-10-02T21:40:03+00:00",
       "pushed_at": "2026-10-02T16:34:35Z",
       "release": {
         "assets": 0,
@@ -2905,6 +3107,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/harbor-framework/harbor/commits/dbd6dd045cbd7135c4a3994515df3907e3b9f0ea/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fharbor-framework%2Fharbor"
@@ -2930,20 +3137,24 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 12
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 20,
         "complete": true,
         "conclusions": {
-          "cancelled": 14,
-          "skipped": 10,
-          "success": 41
+          "pending": 1,
+          "queued": 6,
+          "skipped": 6,
+          "success": 10
         },
-        "observed": 65,
+        "observed": 23,
         "pages": 1,
-        "total": 65
+        "total": 23,
+        "total_counts": [
+          23
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -2955,12 +3166,12 @@
       "fork": false,
       "full_name": "jdx/mise",
       "head": {
-        "date": "2026-10-02T18:13:02Z",
-        "sha": "750cbc5af7e06d6b159e0c3e7f2f461af28e07de"
+        "date": "2026-10-02T21:25:12Z",
+        "sha": "c6288e537022bd6fe1ce6db2c4c96b0628c4545e"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:14+00:00",
-      "pushed_at": "2026-10-02T20:16:29Z",
+      "observed_at": "2026-10-02T21:40:06+00:00",
+      "pushed_at": "2026-10-02T21:39:28Z",
       "release": {
         "assets": 52,
         "assets_with_digest": 52,
@@ -3047,7 +3258,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/jdx/mise/commits/750cbc5af7e06d6b159e0c3e7f2f461af28e07de/check-runs?per_page=100",
+          "path": "repos/jdx/mise/commits/c6288e537022bd6fe1ce6db2c4c96b0628c4545e/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/jdx/mise/commits/c6288e537022bd6fe1ce6db2c4c96b0628c4545e/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -3063,11 +3279,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 46,
         "complete": true,
         "conclusions": {
           "failure": 1,
@@ -3075,7 +3291,10 @@
         },
         "observed": 53,
         "pages": 1,
-        "total": 53
+        "total": 53,
+        "total_counts": [
+          53
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -3091,7 +3310,7 @@
         "sha": "f45fbd2f408424ef20fa300d6b8386ba92a3d3d7"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:15+00:00",
+      "observed_at": "2026-10-02T21:40:09+00:00",
       "pushed_at": "2026-10-02T14:08:59Z",
       "release": {
         "assets": 24,
@@ -3183,6 +3402,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/kjanat/actionlint/commits/f45fbd2f408424ef20fa300d6b8386ba92a3d3d7/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fkjanat%2Factionlint"
@@ -3195,18 +3419,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 3,
         "complete": true,
         "conclusions": {
           "success": 1
         },
         "observed": 1,
         "pages": 1,
-        "total": 1
+        "total": 1,
+        "total_counts": [
+          1
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3222,7 +3449,7 @@
         "sha": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:16+00:00",
+      "observed_at": "2026-10-02T21:40:09+00:00",
       "pushed_at": "2026-09-29T12:38:37Z",
       "release": {
         "assets": 0,
@@ -3263,6 +3490,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/mattpocock/skills/commits/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fmattpocock%2Fskills"
@@ -3275,19 +3507,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 19,
         "complete": true,
         "conclusions": {
           "skipped": 6,
-          "success": 19
+          "success": 22
         },
-        "observed": 25,
+        "observed": 28,
         "pages": 1,
-        "total": 25
+        "total": 28,
+        "total_counts": [
+          28
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3303,7 +3538,7 @@
         "sha": "9669d4a7bbdd99298be1f6e1e6dceadba5ceb449"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:17+00:00",
+      "observed_at": "2026-10-02T21:40:10+00:00",
       "pushed_at": "2026-10-02T19:05:42Z",
       "release": {
         "assets": 18,
@@ -3395,6 +3630,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/max-sixty/worktrunk/commits/9669d4a7bbdd99298be1f6e1e6dceadba5ceb449/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fmax-sixty%2Fworktrunk"
@@ -3407,19 +3647,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 7,
         "complete": true,
         "conclusions": {
-          "queued": 2,
-          "success": 6
+          "success": 8
         },
         "observed": 8,
         "pages": 1,
-        "total": 8
+        "total": 8,
+        "total_counts": [
+          8
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3438,7 +3680,7 @@
         "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:18+00:00",
+      "observed_at": "2026-10-02T21:40:10+00:00",
       "pushed_at": "2026-09-28T23:23:12Z",
       "release": {
         "assets": 0,
@@ -3476,6 +3718,11 @@
           "pages": 1,
           "paginate": true,
           "path": "repos/microsoft/playwright-cli/commits/b85c7a736bb473bf55b584e54a09ffa698d6d871/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/microsoft/playwright-cli/commits/b85c7a736bb473bf55b584e54a09ffa698d6d871/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -3518,11 +3765,11 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 26
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 22,
         "complete": true,
         "conclusions": {
           "cancelled": 1,
@@ -3532,7 +3779,10 @@
         },
         "observed": 296,
         "pages": 3,
-        "total": 296
+        "total": 296,
+        "total_counts": [
+          296
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -3551,7 +3801,7 @@
         "sha": "c8e265787b0a89d161f34c3920f73f136974744b"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:18+00:00",
+      "observed_at": "2026-10-02T21:40:11+00:00",
       "pushed_at": "2026-10-01T20:55:12Z",
       "release": {
         "assets": 0,
@@ -3592,6 +3842,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/moby/moby/commits/c8e265787b0a89d161f34c3920f73f136974744b/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fmoby%2Fmoby"
@@ -3607,11 +3862,11 @@
         "severities": [
           "critical",
           "high"
-        ],
-        "total": 2
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 12,
         "complete": true,
         "conclusions": {
           "skipped": 10,
@@ -3619,7 +3874,10 @@
         },
         "observed": 26,
         "pages": 1,
-        "total": 26
+        "total": 26,
+        "total_counts": [
+          26
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3635,7 +3893,7 @@
         "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:19+00:00",
+      "observed_at": "2026-10-02T21:40:12+00:00",
       "pushed_at": "2026-10-02T19:37:46Z",
       "release": {
         "assets": 0,
@@ -3676,6 +3934,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/modelcontextprotocol/inspector/commits/ae865a19178ddf6f375780a02e9c77c4cf4da184/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fmodelcontextprotocol%2Finspector"
@@ -3688,18 +3951,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 1,
         "complete": true,
         "conclusions": {
           "success": 1
         },
         "observed": 1,
         "pages": 1,
-        "total": 1
+        "total": 1,
+        "total_counts": [
+          1
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3715,7 +3981,7 @@
         "sha": "42e911bc3d05798cad729cb474bf62f378cb2e26"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:20+00:00",
+      "observed_at": "2026-10-02T21:40:13+00:00",
       "pushed_at": "2026-10-02T18:52:29Z",
       "release": {
         "assets": 17,
@@ -3807,6 +4073,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/ollama/ollama/commits/42e911bc3d05798cad729cb474bf62f378cb2e26/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Follama%2Follama"
@@ -3827,20 +4098,22 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 7
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 34,
         "complete": true,
         "conclusions": {
-          "in_progress": 4,
-          "skipped": 11,
-          "success": 250
+          "skipped": 13,
+          "success": 255
         },
-        "observed": 265,
+        "observed": 268,
         "pages": 3,
-        "total": 265
+        "total": 268,
+        "total_counts": [
+          268
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3859,7 +4132,7 @@
         "sha": "787258321e670c7250e8d8c7092d7d36902c4006"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:20+00:00",
+      "observed_at": "2026-10-02T21:40:13+00:00",
       "pushed_at": "2026-10-02T19:48:47Z",
       "release": {
         "assets": 0,
@@ -3900,6 +4173,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/open-telemetry/opentelemetry-collector-contrib/commits/787258321e670c7250e8d8c7092d7d36902c4006/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fopen-telemetry%2Fopentelemetry-collector-contrib"
@@ -3914,20 +4192,24 @@
         "pages": 1,
         "severities": [
           "high"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 12,
         "complete": true,
         "conclusions": {
-          "failure": 48,
-          "skipped": 73,
-          "success": 122
+          "failure": 42,
+          "in_progress": 8,
+          "skipped": 11,
+          "success": 44
         },
-        "observed": 243,
-        "pages": 3,
-        "total": 243
+        "observed": 105,
+        "pages": 2,
+        "total": 105,
+        "total_counts": [
+          105
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -3942,12 +4224,12 @@
       "fork": false,
       "full_name": "openai/codex",
       "head": {
-        "date": "2026-10-02T20:19:28Z",
-        "sha": "44dd77b71e88c78295736bffd3dc3b684c13be6d"
+        "date": "2026-10-02T21:28:40Z",
+        "sha": "b6903c0669df044e4a089dab949fd44d54aa9355"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:21+00:00",
-      "pushed_at": "2026-10-02T20:19:45Z",
+      "observed_at": "2026-10-02T21:40:15+00:00",
+      "pushed_at": "2026-10-02T21:39:47Z",
       "release": {
         "assets": 176,
         "assets_with_digest": 176,
@@ -4032,9 +4314,14 @@
         },
         {
           "api": "github",
-          "pages": 3,
+          "pages": 2,
           "paginate": true,
-          "path": "repos/openai/codex/commits/44dd77b71e88c78295736bffd3dc3b684c13be6d/check-runs?per_page=100",
+          "path": "repos/openai/codex/commits/b6903c0669df044e4a089dab949fd44d54aa9355/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/openai/codex/commits/b6903c0669df044e4a089dab949fd44d54aa9355/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -4050,18 +4337,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 6,
         "complete": true,
         "conclusions": {
           "success": 4
         },
         "observed": 4,
         "pages": 1,
-        "total": 4
+        "total": 4,
+        "total_counts": [
+          4
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4080,7 +4370,7 @@
         "sha": "7b583341fe16729127f6d5b94a7b09ccae97e1a1"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:22+00:00",
+      "observed_at": "2026-10-02T21:40:17+00:00",
       "pushed_at": "2026-07-24T18:56:01Z",
       "release": {
         "assets": 0,
@@ -4121,6 +4411,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/openai/gpt-oss/commits/7b583341fe16729127f6d5b94a7b09ccae97e1a1/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fopenai%2Fgpt-oss"
@@ -4133,18 +4428,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
           "success": 7
         },
         "observed": 7,
         "pages": 1,
-        "total": 7
+        "total": 7,
+        "total_counts": [
+          7
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4160,7 +4458,7 @@
         "sha": "9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:24+00:00",
+      "observed_at": "2026-10-02T21:40:17+00:00",
       "pushed_at": "2026-10-01T18:43:11Z",
       "release": {
         "assets": 5,
@@ -4252,6 +4550,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/openclaw/mcporter/commits/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fopenclaw%2Fmcporter"
@@ -4264,19 +4567,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 16,
         "complete": true,
         "conclusions": {
           "skipped": 1,
-          "success": 15
+          "success": 16
         },
-        "observed": 16,
+        "observed": 17,
         "pages": 1,
-        "total": 16
+        "total": 17,
+        "total_counts": [
+          17
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -4292,7 +4598,7 @@
         "sha": "ed50cc15bc2c9bfb00520dadfe61979866e62236"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:24+00:00",
+      "observed_at": "2026-10-02T21:40:18+00:00",
       "pushed_at": "2026-09-30T09:13:37Z",
       "release": {
         "assets": 1,
@@ -4344,6 +4650,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/opendatalab/mineru/commits/ed50cc15bc2c9bfb00520dadfe61979866e62236/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fopendatalab%2Fmineru"
@@ -4356,19 +4667,22 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 26,
         "complete": true,
         "conclusions": {
-          "in_progress": 22,
-          "success": 30
+          "skipped": 21,
+          "success": 66
         },
-        "observed": 52,
+        "observed": 87,
         "pages": 1,
-        "total": 52
+        "total": 87,
+        "total_counts": [
+          87
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4384,7 +4698,7 @@
         "sha": "35410b3af87e672b0264ba711755053c9d517bef"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:24+00:00",
+      "observed_at": "2026-10-02T21:40:19+00:00",
       "pushed_at": "2026-10-02T20:50:15Z",
       "release": {
         "assets": 7,
@@ -4476,6 +4790,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/openhands/software-agent-sdk/commits/35410b3af87e672b0264ba711755053c9d517bef/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fopenhands%2Fsoftware-agent-sdk"
@@ -4491,11 +4810,11 @@
         "severities": [
           "critical",
           "high"
-        ],
-        "total": 2
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 11,
         "complete": true,
         "conclusions": {
           "cancelled": 1,
@@ -4504,7 +4823,10 @@
         },
         "observed": 28,
         "pages": 1,
-        "total": 28
+        "total": 28,
+        "total_counts": [
+          28
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4520,7 +4842,7 @@
         "sha": "d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809"
       },
       "license": "NOASSERTION",
-      "observed_at": "2026-10-02T20:54:26+00:00",
+      "observed_at": "2026-10-02T21:40:19+00:00",
       "pushed_at": "2026-09-30T21:03:51Z",
       "release": {
         "assets": 0,
@@ -4561,6 +4883,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/oraios/serena/commits/d0f7f92631c23dc4c5ed0b5ccd35bc623b19a809/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Foraios%2Fserena"
@@ -4575,11 +4902,11 @@
         "pages": 1,
         "severities": [
           "high"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 40,
         "complete": true,
         "conclusions": {
           "failure": 2,
@@ -4588,7 +4915,10 @@
         },
         "observed": 54,
         "pages": 1,
-        "total": 54
+        "total": 54,
+        "total_counts": [
+          54
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4607,7 +4937,7 @@
         "sha": "61ba43d505ca5867ddfee77fc7a64ee80b114454"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:27+00:00",
+      "observed_at": "2026-10-02T21:40:20+00:00",
       "pushed_at": "2026-10-01T15:09:52Z",
       "release": {
         "assets": 40,
@@ -4699,6 +5029,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/prometheus/alertmanager/commits/61ba43d505ca5867ddfee77fc7a64ee80b114454/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fprometheus%2Falertmanager"
@@ -4718,11 +5053,11 @@
           "medium",
           "medium",
           "medium"
-        ],
-        "total": 6
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 14,
         "complete": true,
         "conclusions": {
           "skipped": 10,
@@ -4730,7 +5065,10 @@
         },
         "observed": 44,
         "pages": 1,
-        "total": 44
+        "total": 44,
+        "total_counts": [
+          44
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4749,7 +5087,7 @@
         "sha": "5ba0e8648a4314e7d12adc6dbeb34b9d76cafab2"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:28+00:00",
+      "observed_at": "2026-10-02T21:40:20+00:00",
       "pushed_at": "2026-10-02T14:46:17Z",
       "release": {
         "assets": 37,
@@ -4841,6 +5179,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/prometheus/prometheus/commits/5ba0e8648a4314e7d12adc6dbeb34b9d76cafab2/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fprometheus%2Fprometheus"
@@ -4853,19 +5196,23 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 18,
         "complete": true,
         "conclusions": {
+          "in_progress": 3,
           "skipped": 8,
-          "success": 84
+          "success": 78
         },
-        "observed": 92,
+        "observed": 89,
         "pages": 1,
-        "total": 92
+        "total": 89,
+        "total_counts": [
+          89
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4877,12 +5224,12 @@
       "fork": false,
       "full_name": "promptfoo/promptfoo",
       "head": {
-        "date": "2026-10-02T20:14:06Z",
-        "sha": "62657415e789c369ae388a01ac707c39f70be7b1"
+        "date": "2026-10-02T21:22:04Z",
+        "sha": "3f592883793b40cbc4680b9c1b2e3dce7dc11bf1"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:28+00:00",
-      "pushed_at": "2026-10-02T20:49:58Z",
+      "observed_at": "2026-10-02T21:40:22+00:00",
+      "pushed_at": "2026-10-02T21:22:07Z",
       "release": {
         "assets": 0,
         "assets_with_digest": 0,
@@ -4918,7 +5265,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/promptfoo/promptfoo/commits/62657415e789c369ae388a01ac707c39f70be7b1/check-runs?per_page=100",
+          "path": "repos/promptfoo/promptfoo/commits/3f592883793b40cbc4680b9c1b2e3dce7dc11bf1/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/promptfoo/promptfoo/commits/3f592883793b40cbc4680b9c1b2e3dce7dc11bf1/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -4934,16 +5286,19 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 0,
         "complete": true,
         "conclusions": {},
         "observed": 0,
         "pages": 1,
-        "total": 0
+        "total": 0,
+        "total_counts": [
+          0
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -4959,7 +5314,7 @@
         "sha": "44548aa5f0a0aed1c76d64e19afe47727a325b8f"
       },
       "license": null,
-      "observed_at": "2026-10-02T20:54:29+00:00",
+      "observed_at": "2026-10-02T21:40:23+00:00",
       "pushed_at": "2025-09-30T06:10:27Z",
       "release": null,
       "renamed_to": null,
@@ -4994,6 +5349,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/qwenlm/qwen3-embedding/commits/44548aa5f0a0aed1c76d64e19afe47727a325b8f/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fqwenlm%2Fqwen3-embedding"
@@ -5006,18 +5366,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 47,
         "complete": true,
         "conclusions": {
           "success": 94
         },
         "observed": 94,
         "pages": 1,
-        "total": 94
+        "total": 94,
+        "total_counts": [
+          94
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5033,7 +5396,7 @@
         "sha": "2ea10dc725823bf7c3e21ce8557cbe15245132ae"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:30+00:00",
+      "observed_at": "2026-10-02T21:40:25+00:00",
       "pushed_at": "2026-08-17T05:17:40Z",
       "release": null,
       "renamed_to": null,
@@ -5068,6 +5431,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/qwenlm/qwen3.8/commits/2ea10dc725823bf7c3e21ce8557cbe15245132ae/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fqwenlm%2Fqwen3.8"
@@ -5080,18 +5448,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 7,
         "complete": true,
         "conclusions": {
           "success": 20
         },
         "observed": 20,
         "pages": 1,
-        "total": 20
+        "total": 20,
+        "total_counts": [
+          20
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -5110,7 +5481,7 @@
         "sha": "5127c4abf921857fde4ae51f566c86028c8c2911"
       },
       "license": "BSD-2-Clause",
-      "observed_at": "2026-10-02T20:54:30+00:00",
+      "observed_at": "2026-10-02T21:40:25+00:00",
       "pushed_at": "2026-10-01T01:44:09Z",
       "release": {
         "assets": 29,
@@ -5202,6 +5573,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/restic/restic/commits/5127c4abf921857fde4ae51f566c86028c8c2911/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Frestic%2Frestic"
@@ -5214,19 +5590,24 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 8,
         "complete": true,
         "conclusions": {
+          "failure": 1,
+          "in_progress": 5,
           "skipped": 2,
-          "success": 21
+          "success": 15
         },
         "observed": 23,
         "pages": 1,
-        "total": 23
+        "total": 23,
+        "total_counts": [
+          23
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5237,12 +5618,12 @@
       "fork": false,
       "full_name": "seathatflowsinourveins/native-agent-stack",
       "head": {
-        "date": "2026-10-02T20:15:12Z",
-        "sha": "5803017249ad2a5e90ace4ab4e33e443ae00b66e"
+        "date": "2026-10-02T21:35:12Z",
+        "sha": "0eb47187925bf8134660b7a305aa32b0d44b9e17"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:31+00:00",
-      "pushed_at": "2026-10-02T20:48:08Z",
+      "observed_at": "2026-10-02T21:40:25+00:00",
+      "pushed_at": "2026-10-02T21:35:15Z",
       "release": {
         "assets": 2,
         "assets_with_digest": 2,
@@ -5299,7 +5680,12 @@
           "api": "github",
           "pages": 1,
           "paginate": true,
-          "path": "repos/seathatflowsinourveins/native-agent-stack/commits/5803017249ad2a5e90ace4ab4e33e443ae00b66e/check-runs?per_page=100",
+          "path": "repos/seathatflowsinourveins/native-agent-stack/commits/0eb47187925bf8134660b7a305aa32b0d44b9e17/check-runs?per_page=100",
+          "status": "ok"
+        },
+        {
+          "api": "github",
+          "path": "repos/seathatflowsinourveins/native-agent-stack/commits/0eb47187925bf8134660b7a305aa32b0d44b9e17/check-suites?per_page=1",
           "status": "ok"
         },
         {
@@ -5315,18 +5701,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 6,
         "complete": true,
         "conclusions": {
           "success": 12
         },
         "observed": 12,
         "pages": 1,
-        "total": 12
+        "total": 12,
+        "total_counts": [
+          12
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5342,7 +5731,7 @@
         "sha": "26b703c5daa8037df089a8104cbf7eeab4e51874"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:33+00:00",
+      "observed_at": "2026-10-02T21:40:25+00:00",
       "pushed_at": "2026-10-02T00:41:53Z",
       "release": {
         "assets": 0,
@@ -5383,6 +5772,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/tobi/qmd/commits/26b703c5daa8037df089a8104cbf7eeab4e51874/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Ftobi%2Fqmd"
@@ -5395,18 +5789,21 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 12,
         "complete": true,
         "conclusions": {
           "success": 11
         },
         "observed": 11,
         "pages": 1,
-        "total": 11
+        "total": 11,
+        "total_counts": [
+          11
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5422,7 +5819,7 @@
         "sha": "82fe8226252622fa807643bdca1710901198553a"
       },
       "license": "CC-BY-SA-4.0",
-      "observed_at": "2026-10-02T20:54:33+00:00",
+      "observed_at": "2026-10-02T21:40:27+00:00",
       "pushed_at": "2026-10-02T10:05:35Z",
       "release": null,
       "renamed_to": null,
@@ -5457,6 +5854,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/trailofbits/skills/commits/82fe8226252622fa807643bdca1710901198553a/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Ftrailofbits%2Fskills"
@@ -5471,11 +5873,11 @@
         "pages": 1,
         "severities": [
           "low"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 9,
         "complete": true,
         "conclusions": {
           "skipped": 1,
@@ -5483,7 +5885,10 @@
         },
         "observed": 5,
         "pages": 1,
-        "total": 5
+        "total": 5,
+        "total_counts": [
+          5
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5502,7 +5907,7 @@
         "sha": "59e3b04e820c4cad30462696ac497853a5f7679c"
       },
       "license": "AGPL-3.0",
-      "observed_at": "2026-10-02T20:54:34+00:00",
+      "observed_at": "2026-10-02T21:40:27+00:00",
       "pushed_at": "2026-10-02T19:23:42Z",
       "release": {
         "assets": 9,
@@ -5594,6 +5999,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/trufflesecurity/trufflehog/commits/59e3b04e820c4cad30462696ac497853a5f7679c/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Ftrufflesecurity%2Ftrufflehog"
@@ -5606,11 +6016,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 19,
         "complete": true,
         "conclusions": {
           "skipped": 12,
@@ -5618,7 +6028,10 @@
         },
         "observed": 123,
         "pages": 2,
-        "total": 123
+        "total": 123,
+        "total_counts": [
+          123
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -5637,7 +6050,7 @@
         "sha": "24b71e4cf9d98cce0801cfc68e7553355efeaff7"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:34+00:00",
+      "observed_at": "2026-10-02T21:40:27+00:00",
       "pushed_at": "2026-09-28T19:54:07Z",
       "release": {
         "assets": 111,
@@ -5729,6 +6142,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/twpayne/chezmoi/commits/24b71e4cf9d98cce0801cfc68e7553355efeaff7/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Ftwpayne%2Fchezmoi"
@@ -5741,11 +6159,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 7,
         "complete": true,
         "conclusions": {
           "skipped": 7,
@@ -5753,7 +6171,10 @@
         },
         "observed": 21,
         "pages": 1,
-        "total": 21
+        "total": 21,
+        "total_counts": [
+          21
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5769,7 +6190,7 @@
         "sha": "93f7182cf2ce9be22724b05e499cd1358d7ed41d"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:34+00:00",
+      "observed_at": "2026-10-02T21:40:28+00:00",
       "pushed_at": "2026-10-02T20:46:09Z",
       "release": null,
       "renamed_to": null,
@@ -5804,6 +6225,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/ukgovernmentbeis/inspect_ai/commits/93f7182cf2ce9be22724b05e499cd1358d7ed41d/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fukgovernmentbeis%2Finspect_ai"
@@ -5816,11 +6242,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 17,
         "complete": true,
         "conclusions": {
           "cancelled": 1,
@@ -5830,7 +6256,10 @@
         },
         "observed": 23,
         "pages": 1,
-        "total": 23
+        "total": 23,
+        "total_counts": [
+          23
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -5846,7 +6275,7 @@
         "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081"
       },
       "license": "Apache-2.0",
-      "observed_at": "2026-10-02T20:54:35+00:00",
+      "observed_at": "2026-10-02T21:40:29+00:00",
       "pushed_at": "2026-10-01T21:44:28Z",
       "release": {
         "assets": 7,
@@ -5938,6 +6367,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/vercel-labs/agent-browser/commits/39a74c70d7759d5a6de7a22c04570bb626bbd081/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fvercel-labs%2Fagent-browser"
@@ -5950,11 +6384,11 @@
         "complete": true,
         "observed": 0,
         "pages": 1,
-        "severities": [],
-        "total": 0
+        "severities": []
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 6,
         "complete": true,
         "conclusions": {
           "failure": 1,
@@ -5962,7 +6396,10 @@
         },
         "observed": 17,
         "pages": 1,
-        "total": 17
+        "total": 17,
+        "total_counts": [
+          17
+        ]
       },
       "default_branch": "master",
       "deps_dev": {
@@ -5981,7 +6418,7 @@
         "sha": "7854991031425719cfced56dda2f8920202d216d"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:36+00:00",
+      "observed_at": "2026-10-02T21:40:30+00:00",
       "pushed_at": "2026-10-02T08:47:16Z",
       "release": {
         "assets": 7,
@@ -6073,6 +6510,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/wilfred/difftastic/commits/7854991031425719cfced56dda2f8920202d216d/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fwilfred%2Fdifftastic"
@@ -6087,11 +6529,11 @@
         "pages": 1,
         "severities": [
           "medium"
-        ],
-        "total": 1
+        ]
       },
       "archived": false,
       "check_runs": {
+        "check_suites": 7,
         "complete": true,
         "conclusions": {
           "skipped": 1,
@@ -6099,7 +6541,10 @@
         },
         "observed": 24,
         "pages": 1,
-        "total": 24
+        "total": 24,
+        "total_counts": [
+          24
+        ]
       },
       "default_branch": "main",
       "deps_dev": {
@@ -6115,7 +6560,7 @@
         "sha": "56941012a98a93ccb3846dc625f64ee1d97f623e"
       },
       "license": "MIT",
-      "observed_at": "2026-10-02T20:54:38+00:00",
+      "observed_at": "2026-10-02T21:40:32+00:00",
       "pushed_at": "2026-10-02T03:07:54Z",
       "release": {
         "assets": 5,
@@ -6207,6 +6652,11 @@
           "status": "ok"
         },
         {
+          "api": "github",
+          "path": "repos/zizmorcore/zizmor/commits/56941012a98a93ccb3846dc625f64ee1d97f623e/check-suites?per_page=1",
+          "status": "ok"
+        },
+        {
           "api": "deps.dev",
           "status": "ok",
           "url": "https://api.deps.dev/v3/projects/github.com%2Fzizmorcore%2Fzizmor"
@@ -6223,6 +6673,7 @@
     },
     "exact_requests": "each repository's observation lists every request it made, in order, with its outcome",
     "github_rest": {
+      "check_suite_limit": "above 1000 check suites on a ref, the check-runs endpoint reads only the 1000 most recent (https://docs.github.com/en/rest/checks/runs#list-check-runs-for-a-git-reference), so a head above it is recorded incomplete; the suite count comes from https://docs.github.com/en/rest/checks/suites#list-check-suites-for-a-git-reference",
       "client": "gh api; a collection marked paginate is read with gh api --paginate --slurp",
       "docs": "https://docs.github.com/en/rest",
       "request_templates": [
@@ -6231,7 +6682,8 @@
         "repos/{owner}/{repo}/releases/latest",
         "repos/{owner}/{repo}/attestations/{digest} (the first 5 digest-carrying assets of the latest release)",
         "repos/{owner}/{repo}/security-advisories?state=published&per_page=100 (paginate)",
-        "repos/{owner}/{repo}/commits/{head_sha}/check-runs?per_page=100 (paginate)"
+        "repos/{owner}/{repo}/commits/{head_sha}/check-runs?per_page=100 (paginate)",
+        "repos/{owner}/{repo}/commits/{head_sha}/check-suites?per_page=1 (its total_count, read after the check runs)"
       ]
     }
   },

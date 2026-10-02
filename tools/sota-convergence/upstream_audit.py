@@ -38,7 +38,10 @@ Flags (thresholds frozen here; a flag is an observed fact, never a verdict):
 - ``low_scorecard``: a published Scorecard overall score below 5.0.
 A collection that errored or stopped short is listed in the row's ``incomplete`` and never reports a negative fact:
 an incomplete check-run collection without a failure reports ``failing: null``, not 0, and an incomplete advisory
-collection without an advisory reports ``count: null``. Every age is measured from the observation's own
+collection without an advisory reports ``count: null``. A check-run collection is complete only when every run it
+lists was read and the head carries at most ``CHECK_SUITE_LIMIT`` (1000) check suites: above that, GitHub's check-runs
+endpoint reads only the 1000 most recent suites and its ``total_count`` describes that truncated set. The suite count
+is read after the runs, so a suite added meanwhile is counted. Every age is measured from the observation's own
 ``observed_at``, so a rebuild is deterministic.
 
 Modes: ``--collect`` (network) writes the sanitized observations with the manifest's sha256 and the role table;
@@ -89,8 +92,11 @@ NAMED_AS = ("repository", "former_default", "arm", "text")
 PROVENANCE = ("attested", "none", "unknown", "no_digest", "no_assets")
 DEPS_DEV = "https://api.deps.dev/v3/projects/"
 GITHUB_REST_DOCS = "https://docs.github.com/en/rest"
+CHECK_RUNS_DOCS = "https://docs.github.com/en/rest/checks/runs#list-check-runs-for-a-git-reference"
+CHECK_SUITES_DOCS = "https://docs.github.com/en/rest/checks/suites#list-check-suites-for-a-git-reference"
 DEPS_DEV_DOCS = "https://docs.deps.dev/api/v3/#getproject"
 MAX_ATTESTED_ASSETS = 5
+CHECK_SUITE_LIMIT = 1000  # above it, commits/{ref}/check-runs reads only the 1000 most recent check suites
 PER_PAGE = 100
 RETRIES = 3
 BACKOFF_SECONDS = 30
@@ -107,7 +113,12 @@ SOURCES = {
             "assets of the latest release)",
             f"repos/{{owner}}/{{repo}}/security-advisories?state=published&per_page={PER_PAGE} (paginate)",
             f"repos/{{owner}}/{{repo}}/commits/{{head_sha}}/check-runs?per_page={PER_PAGE} (paginate)",
+            "repos/{owner}/{repo}/commits/{head_sha}/check-suites?per_page=1 (its total_count, read after the "
+            "check runs)",
         ],
+        "check_suite_limit": (f"above {CHECK_SUITE_LIMIT} check suites on a ref, the check-runs endpoint reads only "
+                              f"the {CHECK_SUITE_LIMIT} most recent ({CHECK_RUNS_DOCS}), so a head above it is "
+                              f"recorded incomplete; the suite count comes from {CHECK_SUITES_DOCS}"),
     },
     "deps_dev": {"url_template": DEPS_DEV + "github.com%2F{owner}%2F{repo}", "docs": DEPS_DEV_DOCS},
     "exact_requests": "each repository's observation lists every request it made, in order, with its outcome",
@@ -371,10 +382,11 @@ def observe(slug: str) -> dict:
     if error is None and isinstance(pages, list) and all(isinstance(page, list) for page in pages):
         items = [a for page in pages for a in page if isinstance(a, dict)]
         unique = {a.get("ghsa_id") or json.dumps(a, sort_keys=True): a for a in items}
-        obs["advisories"] = {"observed": len(unique), "total": len(unique), "complete": True, "pages": len(pages),
+        # The advisories endpoint reports no total, so the collection records only what it read.
+        obs["advisories"] = {"observed": len(unique), "complete": True, "pages": len(pages),
                              "severities": sorted((a.get("severity") or "unknown") for a in unique.values())}
     else:
-        obs["advisories"] = {"observed": None, "total": None, "complete": False}
+        obs["advisories"] = {"observed": None, "complete": False}
         errors["advisories"] = outcome(error)
 
     head = (obs.get("head") or {}).get("sha")
@@ -387,12 +399,24 @@ def observe(slug: str) -> dict:
                     runs[run.get("id")] = run
             totals = [page.get("total_count") for page in pages]
             total = totals[0] if isinstance(totals[0], int) else None
+            # Every distinct total_count the pages reported: more than one means runs moved while they were listed.
+            total_counts = sorted({t for t in totals if isinstance(t, int)})
             conclusions: dict[str, int] = {}
             for run in runs.values():
                 key = run.get("conclusion") or run.get("status") or "unknown"
                 conclusions[key] = conclusions.get(key, 0) + 1
-            obs["check_runs"] = {"observed": len(runs), "total": total,
-                                 "complete": total is not None and len(runs) == total and len(set(totals)) == 1,
+            # Above CHECK_SUITE_LIMIT suites the runs' total_count covers only the most recent suites, so the head's
+            # suite count decides completeness. It is read after the runs, so a suite added meanwhile is counted.
+            found, suites_error = requests.gh(f"repos/{slug}/commits/{head}/check-suites?per_page=1")
+            suites = found.get("total_count") if isinstance(found, dict) and suites_error is None else None
+            if not isinstance(suites, int) or isinstance(suites, bool):
+                suites = None
+                errors["check_suites"] = outcome(suites_error)
+            listed_all = (total is not None and len(runs) == total and len(set(totals)) == 1
+                          and total_counts == [total])
+            obs["check_runs"] = {"observed": len(runs), "total": total, "total_counts": total_counts,
+                                 "check_suites": suites,
+                                 "complete": listed_all and suites is not None and suites <= CHECK_SUITE_LIMIT,
                                  "pages": len(pages), "conclusions": dict(sorted(conclusions.items()))}
         else:
             obs["check_runs"] = {"observed": None, "total": None, "complete": False}
@@ -518,8 +542,16 @@ def audit_row(slug: str, roles: list, obs: dict) -> dict:
     if isinstance(runs, dict):
         conclusions = runs.get("conclusions") if isinstance(runs.get("conclusions"), dict) else {}
         failing = sum(n for k, n in conclusions.items() if k in FAILING)
-        complete = runs.get("complete") is True
-        row["check_runs"] = {"observed": runs.get("observed"), "total": runs.get("total"), "complete": complete,
+        suites = runs.get("check_suites")
+        suites = suites if isinstance(suites, int) and not isinstance(suites, bool) else None
+        counts = runs.get("total_counts") if isinstance(runs.get("total_counts"), list) else None
+        # Rechecked from the recorded counts: every listed run read under one unchanged total, and the head within
+        # the check-suite limit. An observation without these counts (the shape before they were read) is incomplete.
+        complete = (runs.get("complete") is True and isinstance(runs.get("total"), int)
+                    and runs.get("observed") == runs.get("total") and counts == [runs.get("total")]
+                    and suites is not None and suites <= CHECK_SUITE_LIMIT)
+        row["check_runs"] = {"observed": runs.get("observed"), "total": runs.get("total"), "total_counts": counts,
+                             "check_suites": suites, "complete": complete,
                              "failing": failing if (complete or failing) else None}
         if failing:
             flags.add("ci_failing")
@@ -630,6 +662,28 @@ def _listing(rows: list, detail=lambda row: "") -> str:
     return "; ".join(f"`{row['repository']}`{detail(row)} in {_roles_text(row)}" for row in rows)
 
 
+def _check_runs_gap(row: dict) -> str:
+    """Why a row's check-run collection is incomplete, from the row's own counts."""
+    runs = row.get("check_runs")
+    if not isinstance(runs, dict) or runs.get("observed") is None:
+        return " (not read)"
+    suites = runs.get("check_suites")
+    if suites is None:
+        return f" ({runs['observed']} runs read; check-suite count unknown)"
+    if suites > CHECK_SUITE_LIMIT:
+        return f" ({runs['observed']} runs read from the {CHECK_SUITE_LIMIT} most recent of {suites} check suites)"
+    counts = runs.get("total_counts") or []
+    if len(counts) > 1:
+        return (f" ({runs['observed']} runs read while the reported total moved between pages: "
+                + ", ".join(str(count) for count in counts) + ")")
+    return f" ({runs['observed']} of {runs['total']} runs read)"
+
+
+def _failing_detail(row: dict) -> str:
+    runs = row["check_runs"]
+    return f" ({runs['failing']} of {runs['observed']}{'' if runs['complete'] else ' read, collection incomplete'})"
+
+
 def results_markdown(audit: dict) -> str:
     """The decision record's results, generated from the audit so that none of its numbers can drift from it."""
     summary, rows = audit["summary"], audit["rows"]
@@ -672,8 +726,10 @@ def results_markdown(audit: dict) -> str:
         f"{LOW_SCORECARD}: " + _listing(
             flagged("low_scorecard"),
             lambda r: f" ({r['scorecard']['overall_score']}, scan of {str(r['scorecard']['date'])[:10]})") + ".",
-        "- **Failing check runs on the default-branch head:** " + _listing(
-            flagged("ci_failing"), lambda r: f" ({r['check_runs']['failing']} of {r['check_runs']['observed']})") + ".",
+        "- **Failing check runs on the default-branch head:** " + _listing(flagged("ci_failing"), _failing_detail)
+        + ".",
+        f"- **Check runs incomplete** (a head above {CHECK_SUITE_LIMIT} check suites, or a short or failed read): "
+        + _listing([row for row in rows if "check_runs" in (row.get("incomplete") or [])], _check_runs_gap) + ".",
         "- **Published advisories:** " + _listing(
             flagged("advisories"), lambda r: f" ({r['advisories']['count']})") + ".",
         f"- **Not audited** ({summary['not_audited']}): {not_audited}.",
