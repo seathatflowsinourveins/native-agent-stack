@@ -241,7 +241,11 @@ def _build_strategy(rows, instrument_id, venue, usd, alerts):
         def _on_ex_date_alert(self, event):
             # Native clock wakeup lets the existing venue module run at midnight;
             # the callback records its event without changing cash, orders or state.
-            self.alerts_fired.append({'name': str(event.name), 'ts_event_ns': int(event.ts_event)})
+            try:
+                self.alerts_fired.append({'name': str(event.name), 'ts_event_ns': int(event.ts_event)})
+            except BaseException as error:
+                self.errors.append('_on_ex_date_alert:' + type(error).__name__ + ':' + str(error))
+                raise
         def on_bar(self, bar):
             try:
                 row = rows[self.bars_seen]
