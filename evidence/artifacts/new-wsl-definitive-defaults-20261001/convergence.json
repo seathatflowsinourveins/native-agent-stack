@@ -1,0 +1,726 @@
+{
+ "schema_version": 1,
+ "rule": {
+  "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md",
+  "sha256": "3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6"
+ },
+ "combined": {
+  "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json",
+  "sha256": "8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25"
+ },
+ "samples": "G1 = pull request 595's blind GPT-6.1 Sol judge (not counted on the seven layers of amendment 1); G2 and G3 = the two seeded orders of the GPT lane's Sol-ultra round; the Claude record = the merged definitive manifest.",
+ "jobs": {
+  "claude-code": "coding agent on Claude models",
+  "codex": "coding agent on GPT models",
+  "claude-agent-sdk": "agent SDK on the Claude route",
+  "codex-sdk-and-codex-exec-app-server": "agent SDK on the native GPT route",
+  "trail-of-bits-security-skills-trailofbits-skills": "security review skills in both clients",
+  "mcporter": "calling MCP servers from scripts and the shell",
+  "mcp-inspector": "interactive test of an MCP server, run on demand",
+  "sandbox-runtime-srt": "process sandbox for agent commands",
+  "isolation-container-boundary": "second isolation boundary around agents",
+  "serena": "symbol navigation and references for both clients",
+  "claude-plugins-official-code-intelligence-lsp-pl": "symbol navigation through language servers, Claude Code only",
+  "code-search": "semantic code search",
+  "tobi-qmd": "search over Markdown documents",
+  "mineru": "document parsing to text",
+  "trafilatura": "web page text extraction",
+  "playwright-cli": "browser automation for agents",
+  "memory-owner": "long-term memory across sessions and clients",
+  "ccusage": "token and cost usage meter",
+  "context-supply": "context-supply layer between tools and the model",
+  "otel-collector-contrib": "telemetry collection and routing",
+  "prometheus": "metrics store",
+  "loki": "log store",
+  "grafana": "dashboards",
+  "phoenix": "agent and LLM trace store",
+  "local-model-server": "local model serving",
+  "inspect-ai": "model and task evaluation",
+  "harbor-containerized-agent-e2e-runner": "agent evaluation in containers",
+  "promptfoo": "prompt and provider regression tests",
+  "zizmor": "workflow security audit",
+  "attest": "build provenance attestation",
+  "syft": "software bill of materials",
+  "dependabot": "dependency update pull requests",
+  "codeql-sarif": "upload of scan results to code scanning",
+  "actionlint-kjanat": "workflow syntax and expression check",
+  "dagu": "scheduled workflows",
+  "docker-compose": "multi-container service definitions",
+  "container-engine": "container engine",
+  "betterleaks": "secret scanning before commit and in CI",
+  "trufflehog": "secret scanning with live verification",
+  "git": "version control",
+  "gh-github-cli": "GitHub from the command line",
+  "worktrunk": "worktrees for parallel agents",
+  "difftastic": "syntax-aware diff",
+  "claude-code-action": "coding agent in CI",
+  "agent-structural-diff": "entity-level diff for agents",
+  "mise": "tool version management",
+  "restic": "backup and restore",
+  "chezmoi": "dotfile management",
+  "base-distribution": "base operating system image",
+  "gpt-gateway": "GPT account pool gateway",
+  "agent-runtime-worker": "GPT task worker for coding tasks",
+  "research-harnesses": "GPT deep research with two independent gatherers",
+  "credential-guard": "command and secret-path guard",
+  "convergence-validators": "convergence records and their validators",
+  "market-data-provider": "market data",
+  "sec-filings": "SEC filings",
+  "exchange-calendars": "exchange calendars",
+  "research-data-versioning": "research data versioning",
+  "security-identity": "security identity over time",
+  "analytical-storage/engine": "analytical storage engine",
+  "analytical-storage/snapshot-table-layer": "snapshot table layer",
+  "market-data-validation": "market data validation",
+  "factor-research": "factor research",
+  "predictive-ml": "predictive machine learning",
+  "pinned/nautilustrader-2-0-0rc5": "backtesting and execution engine",
+  "backtest-oracle": "independent backtest oracle",
+  "pinned/ibkr-path--nautilustrader-in-tree-ibkr-a": "broker path, IBKR",
+  "pinned/alpaca-adapter-path--alpaca-py-0-44-0---": "broker path, Alpaca",
+  "ib-gateway-runtime": "IB Gateway runtime",
+  "portfolio-construction": "portfolio construction",
+  "performance-analytics": "performance analytics",
+  "experiment-tracking": "experiment tracking",
+  "strategy-qualification-statistics/arch": "strategy qualification statistics",
+  "strategy-qualification-statistics/purgedcv---purged-cross-validati": "purged cross-validation"
+ },
+ "decisions": [
+  {
+   "outcome": "final",
+   "slot_id": "claude-code",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "codex",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "claude-agent-sdk",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "codex-sdk-and-codex-exec-app-server",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "trail-of-bits-security-skills-trailofbits-skills",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "mcporter",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "mcp-inspector",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "sandbox-runtime-srt",
+   "by": "both families"
+  },
+  {
+   "outcome": "kept",
+   "reason": "decided by both families in the decision round: no second container boundary",
+   "slot_id": "isolation-container-boundary"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "serena",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "two blind Claude critics",
+   "covered_by": [
+    "serena"
+   ],
+   "reason": "the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it",
+   "slot_id": "claude-plugins-official-code-intelligence-lsp-pl",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
+    "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e"
+   }
+  },
+  {
+   "outcome": "kept",
+   "reason": "waits for or was settled by a measurement: outside the combination rule",
+   "slot_id": "code-search"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "tobi-qmd",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "mineru",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "two blind Claude critics",
+   "covered_by": [
+    "claude-code",
+    "codex"
+   ],
+   "reason": "text extraction is a sub-step of retrieval that the two agents' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it",
+   "slot_id": "trafilatura",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "split",
+   "by": "two blind Claude critics",
+   "measurement_id": "browser-tool",
+   "arms": [
+    {
+     "name": "Playwright CLI",
+     "repository": "https://github.com/microsoft/playwright-cli",
+     "support": "the Claude record; one of two blind Sol-ultra orders; critic 1"
+    },
+    {
+     "name": "agent-browser",
+     "repository": "https://github.com/vercel-labs/agent-browser",
+     "support": "both blind Sol-ultra orders; critic 2"
+    }
+   ],
+   "deciding_measurement": "Gate first: on the target WSL build, after the documented install, 20 consecutive default launches of agent-browser (close --all, open about:blank, snapshot) from a Claude Code shell and from a Codex shell with no connect-port workaround; if any fails, Playwright CLI. If all pass: a 20-task Harbor comparison (static page, redirect, JavaScript-rendered page, form fill, login fixture, long page; both agents; same budgets).",
+   "reason": "both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)",
+   "slot_id": "playwright-cli",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "kept",
+   "reason": "waits for or was settled by a measurement: outside the combination rule",
+   "slot_id": "memory-owner"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "one blind Claude critic",
+   "covered_by": [
+    "claude-code",
+    "codex",
+    "otel-collector-contrib"
+   ],
+   "reason": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
+   "slot_id": "ccusage",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "kept",
+   "reason": "decided by both families in the decision round on a measured comparison: no context-supply layer",
+   "slot_id": "context-supply"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "otel-collector-contrib",
+   "by": "both families"
+  },
+  {
+   "outcome": "installed_on_critic",
+   "by": "two blind Claude critics",
+   "reason": "metric storage is in the layer's requirement and has no other owner (one process, embedded store, native OTLP ingest); one blind GPT sample of three picked it",
+   "slot_id": "prometheus",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "split",
+   "by": "two blind Claude critics",
+   "measurement_id": "event-store-and-dashboards",
+   "arms": [
+    {
+     "name": "Collector connectors into Prometheus only",
+     "repository": "",
+     "support": "critic 2; no blind GPT sample picked Loki or Grafana"
+    },
+    {
+     "name": "the same plus Loki and Grafana",
+     "repository": "https://github.com/grafana/loki ; https://github.com/grafana/grafana",
+     "support": "the Claude record; critic 1"
+    }
+   ],
+   "deciding_measurement": "Ten fixed observation questions (tokens and cost per session and agent, API errors by type, tool failure rate by tool, which injected failure happened in which session, service-run outcomes) answered on the same real task set by both arms; metric: questions answered correctly, then operator minutes.",
+   "reason": "critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus",
+   "slot_id": "loki",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "split",
+   "by": "two blind Claude critics",
+   "measurement_id": "event-store-and-dashboards",
+   "arms": [
+    {
+     "name": "Collector connectors into Prometheus only",
+     "repository": "",
+     "support": "critic 2; no blind GPT sample picked Loki or Grafana"
+    },
+    {
+     "name": "the same plus Loki and Grafana",
+     "repository": "https://github.com/grafana/loki ; https://github.com/grafana/grafana",
+     "support": "the Claude record; critic 1"
+    }
+   ],
+   "deciding_measurement": "Ten fixed observation questions (tokens and cost per session and agent, API errors by type, tool failure rate by tool, which injected failure happened in which session, service-run outcomes) answered on the same real task set by both arms; metric: questions answered correctly, then operator minutes.",
+   "reason": "critic 1: tool results and API errors exist only as log events, so observing outcomes needs an event store and a display; critic 2: the requirement names usage and outcomes, not log search, and the Collector's connectors turn events into counters for Prometheus",
+   "slot_id": "grafana",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "not_installed",
+   "by": "two blind Claude critics",
+   "covered_by": [
+    "inspect-ai",
+    "harbor-containerized-agent-e2e-runner"
+   ],
+   "reason": "qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer's requirement has no trace-store job; no blind GPT sample picked it",
+   "slot_id": "phoenix",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "kept",
+   "reason": "waits for or was settled by a measurement: outside the combination rule",
+   "slot_id": "local-model-server"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "inspect-ai",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "harbor-containerized-agent-e2e-runner",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "one blind Claude critic",
+   "covered_by": [
+    "inspect-ai"
+   ],
+   "reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+   "slot_id": "promptfoo",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "final",
+   "slot_id": "zizmor",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "attest",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "syft",
+   "by": "both families"
+  },
+  {
+   "outcome": "installed_on_critic",
+   "by": "two blind Claude critics",
+   "reason": "the only owner of dependency update pull requests: none of zizmor, actionlint, Syft or attest moves a pin; one blind GPT sample of three picked it",
+   "slot_id": "dependabot",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
+    "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e"
+   }
+  },
+  {
+   "outcome": "not_installed",
+   "by": "two blind Claude critics",
+   "covered_by": [
+    "zizmor"
+   ],
+   "reason": "a transport, not a scanner: zizmor's own action carries the pinned upload step; no blind GPT sample picked it as a slot",
+   "slot_id": "codeql-sarif",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
+    "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e"
+   }
+  },
+  {
+   "outcome": "final",
+   "slot_id": "actionlint-kjanat",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "dagu",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "docker-compose",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "container-engine",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "betterleaks",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "the combination rule",
+   "covered_by": [
+    "betterleaks"
+   ],
+   "reason": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for",
+   "slot_id": "trufflehog"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "git",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "gh-github-cli",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "worktrunk",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "difftastic",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "one blind Claude critic",
+   "covered_by": "not needed",
+   "reason": "it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it",
+   "slot_id": "claude-code-action",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "not_installed",
+   "by": "one blind Claude critic",
+   "covered_by": [
+    "difftastic"
+   ],
+   "reason": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)",
+   "slot_id": "agent-structural-diff",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "final",
+   "slot_id": "mise",
+   "by": "both families"
+  },
+  {
+   "outcome": "final",
+   "slot_id": "restic",
+   "by": "both families"
+  },
+  {
+   "outcome": "not_installed",
+   "by": "one blind Claude critic",
+   "covered_by": [
+    "mise"
+   ],
+   "reason": "mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it",
+   "slot_id": "chezmoi",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  },
+  {
+   "outcome": "final",
+   "slot_id": "base-distribution",
+   "by": "both families"
+  },
+  {
+   "outcome": "kept",
+   "reason": "the owner's pin or project practice: outside the combination rule",
+   "slot_id": "gpt-gateway"
+  },
+  {
+   "outcome": "kept",
+   "reason": "the owner's pin or project practice: outside the combination rule",
+   "slot_id": "agent-runtime-worker"
+  },
+  {
+   "outcome": "kept",
+   "reason": "the owner's pin or project practice: outside the combination rule",
+   "slot_id": "research-harnesses"
+  },
+  {
+   "outcome": "kept",
+   "reason": "the owner's pin or project practice: outside the combination rule",
+   "slot_id": "credential-guard"
+  },
+  {
+   "outcome": "kept",
+   "reason": "the owner's pin or project practice: outside the combination rule",
+   "slot_id": "convergence-validators"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "market-data-provider"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "sec-filings"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "exchange-calendars"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "research-data-versioning"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "security-identity"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "analytical-storage/engine"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "analytical-storage/snapshot-table-layer"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "market-data-validation"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "factor-research"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "predictive-ml"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "pinned/nautilustrader-2-0-0rc5"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "backtest-oracle"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "pinned/ibkr-path--nautilustrader-in-tree-ibkr-a"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "pinned/alpaca-adapter-path--alpaca-py-0-44-0---"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "ib-gateway-runtime"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "portfolio-construction"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "performance-analytics"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "experiment-tracking"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "strategy-qualification-statistics/arch"
+  },
+  {
+   "outcome": "kept",
+   "reason": "trading row: the blind GPT round covered the foundation layers only",
+   "slot_id": "strategy-qualification-statistics/purgedcv---purged-cross-validati"
+  }
+ ],
+ "added_slots": [
+  {
+   "slot_id": "structural-search",
+   "layer_id": "code-navigation",
+   "job": "syntax-pattern code search and rewrite",
+   "default": {
+    "name": "ast-grep",
+    "repository": "https://github.com/ast-grep/ast-grep"
+   },
+   "outcome": "installed_on_critic",
+   "by": "two blind Claude critics",
+   "reason": "both blind GPT orders picked it and both critics found that syntax-pattern search has no other owner (Serena owns symbols and references)",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
+    "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e"
+   }
+  },
+  {
+   "slot_id": "engineering-process-skills",
+   "layer_id": "instructions-skills",
+   "job": "engineering-process skills in both clients, installed per skill",
+   "default": {
+    "name": "mattpocock/skills (selected skills, not the bundle)",
+    "repository": "https://github.com/mattpocock/skills"
+   },
+   "outcome": "installed_on_critic",
+   "by": "one blind Claude critic",
+   "reason": "all three blind GPT samples picked it; the critic found engineering-process skills a second job beside the security skills, with no skill name shared between the two collections at the checked commits",
+   "critic": {
+    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+   }
+  }
+ ],
+ "hygiene": [
+  {
+   "slot_id": "attest",
+   "field": "installs_nothing_extra",
+   "value": true,
+   "reason": "a GitHub-hosted feature configured in a workflow: nothing is installed on the host"
+  },
+  {
+   "slot_id": "dependabot",
+   "field": "installs_nothing_extra",
+   "value": true,
+   "reason": "a GitHub-hosted service configured by .github/dependabot.yml: nothing is installed on the host"
+  },
+  {
+   "slot_id": "base-distribution",
+   "field": "repository",
+   "value": "https://releases.ubuntu.com/26.04.1/",
+   "reason": "the image source rather than the server download page: microsoft/WSL's DistributionInfo.json registers https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl with sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+   "judged_as": "https://ubuntu.com/download/server"
+  }
+ ],
+ "recorded_only": [
+  {
+   "layer_id": "workers",
+   "repositories": [
+    "max-sixty/worktrunk",
+    "openai/codex"
+   ],
+   "note": "picked by all three blind GPT samples; both are already installed under git-github-automation and native-clients, so this layer adds nothing"
+  },
+  {
+   "layer_id": "isolation",
+   "repositories": [
+    "max-sixty/worktrunk"
+   ],
+   "note": "picked by all three blind GPT samples as worktree isolation; already installed under git-github-automation"
+  },
+  {
+   "layer_id": "scheduling-supervision",
+   "repositories": [
+    "systemd/systemd"
+   ],
+   "note": "picked by all three blind GPT samples; part of the base system: user units supervise services, Dagu runs scheduled workflows"
+  },
+  {
+   "layer_id": "semantic-rag",
+   "repositories": [
+    "giancarloerra/socraticode"
+   ],
+   "note": "picked by both blind Sol-ultra orders; code search is decided by its confirmatory measurement, in which SocratiCode is an arm"
+  },
+  {
+   "layer_id": "durable-memory",
+   "repositories": [
+    "rohitg00/agentmemory"
+   ],
+   "note": "picked by both blind Sol-ultra orders; memory is decided by the head-to-head, in which agentmemory is an arm"
+  },
+  {
+   "layer_id": "observation-inference",
+   "repositories": [
+    "openlit/openlit"
+   ],
+   "note": "picked by two of three blind GPT samples; both critics: not installed (its jobs are metric and log storage plus a view, on a ClickHouse pin outside ClickHouse's supported versions and its own older Collector; no measured gain)"
+  },
+  {
+   "layer_id": "quality-evaluation",
+   "repositories": [
+    "microsoft/playwright"
+   ],
+   "note": "picked by both blind Sol-ultra orders as a browser test framework; the critic: not installed, the requirement has no host-level browser-test job; a project that adopts Playwright Test chooses it for itself"
+  },
+  {
+   "layer_id": "hosting-services",
+   "repositories": [
+    "postgres/postgres"
+   ],
+   "note": "picked by two of three blind GPT samples; the critic: not installed, it arrives as a service in the Compose file of whichever application needs it"
+  },
+  {
+   "layer_id": "git-github-automation",
+   "repositories": [
+    "ataraxy-labs/sem"
+   ],
+   "note": "picked by all three blind GPT samples; the critic: not installed, the same job as difftastic"
+  }
+ ]
+}

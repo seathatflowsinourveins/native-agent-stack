@@ -21,6 +21,12 @@ CASES = [
     ("a row without state", "test_every_row_has_state_and_measurement", None),
     ("the memory row marked as returned", "test_memory_and_code_search_measurements_have_not_returned", None),
     ("an empty settlements file", "test_settled_rows_are_measurements_with_verified_receipts", None),
+    ("a final outcome for a Claude-only repository", "test_manifest_is_current", "final repository not in combined.json"),
+    ("two installed rows with one job", "test_manifest_is_current", "installed job also owned by"),
+    ("a slot without a decision", "test_manifest_is_current", "codex: missing decision"),
+    ("a critic install with a wrong evidence sha256", "test_manifest_is_current", "prometheus: evidence sha256 mismatch"),
+    ("a covering slot that installs nothing", "test_manifest_is_current", "covered_by memory-owner installs nothing"),
+    ("a split row that keeps a repository", "test_pending_measurements_install_nothing", None),
 ]
 
 
@@ -29,7 +35,22 @@ def run(root, *args):
 
 
 def mutate(root, case):
-    if case in (CASES[1][0], CASES[2][0], CASES[6][0]):
+    if case in {entry[0] for entry in CASES[7:12]}:
+        path = root / ART / "convergence.json"
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        decisions = {d["slot_id"]: d for d in doc["decisions"]}
+        if case == CASES[7][0]:
+            decisions["claude-plugins-official-code-intelligence-lsp-pl"]["outcome"] = "final"
+        elif case == CASES[8][0]:
+            doc["jobs"]["codex"] = doc["jobs"]["claude-code"]
+        elif case == CASES[9][0]:
+            doc["decisions"] = [d for d in doc["decisions"] if d["slot_id"] != "codex"]
+        elif case == CASES[10][0]:
+            decisions["prometheus"]["critic"]["sha256"] = "0" * 64
+        else:
+            decisions["claude-plugins-official-code-intelligence-lsp-pl"]["covered_by"] = ["memory-owner"]
+        path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    elif case in (CASES[1][0], CASES[2][0], CASES[6][0]):
         path = root / ART / "settlements.json"
         doc = json.loads(path.read_text(encoding="utf-8"))
         if case == CASES[1][0]:
@@ -42,7 +63,7 @@ def mutate(root, case):
     else:
         path = root / ART / "assemble_manifest.py"
         text = path.read_text(encoding="utf-8")
-        anchor = "    apply_settlements(rows)\n"
+        anchor = "    convergence = apply_convergence(rows, layers)\n"
         if text.count(anchor) != 1:
             raise ValueError("the assembler's mutation anchor is missing or ambiguous")
         defect = {
@@ -50,6 +71,7 @@ def mutate(root, case):
             CASES[3][0]: '    next(row for row in rows if row["slot_id"] == "container-engine")["definitive"] = False\n',
             CASES[4][0]: '    del rows[0]["state"]\n',
             CASES[5][0]: '    next(row for row in rows if row["slot_id"] == "memory-owner")["measurement"]["returned"] = True\n',
+            CASES[12][0]: '    next(row for row in rows if row["slot_id"] == "playwright-cli")["repository"] = "https://github.com/microsoft/playwright-cli"\n',
         }[case]
         path.write_text(text.replace(anchor, anchor + defect), encoding="utf-8")
 
@@ -59,7 +81,7 @@ def main():
         print("usage: controls.py <worktree root>")
         return 2
     root = Path(sys.argv[1]).resolve()
-    paths = [root / ART / name for name in ("assemble_manifest.py", "settlements.json", "definitive-manifest.json")]
+    paths = [root / ART / name for name in ("assemble_manifest.py", "settlements.json", "convergence.json", "definitive-manifest.json")]
     paths.append(root / RECORD)
     originals = {path: path.read_bytes() for path in paths}
 

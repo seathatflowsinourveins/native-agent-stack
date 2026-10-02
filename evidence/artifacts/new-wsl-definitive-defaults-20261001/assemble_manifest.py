@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build definitive-manifest.json: one row per slot of the new WSL architecture, across both catalogs.
 
-It reads the two committed compact documents and settlements in this folder and writes a flat table next to them. The output is
+It reads the two committed compact documents, settlements and convergence decisions in this folder and writes a flat table next to them. The output is
 deterministic: running it again over unchanged inputs writes the same bytes.
 
 Usage: assemble_manifest.py [--check]
@@ -16,6 +16,7 @@ ROOT = HERE.parents[2]
 FOUNDATION = HERE / "foundation-definitive.compact.json"
 TRADING = HERE / "trading" / "trading-definitive.compact.json"
 SETTLEMENTS = HERE / "settlements.json"
+CONVERGENCE = HERE / "convergence.json"
 OUT = HERE / "definitive-manifest.json"
 
 
@@ -94,6 +95,152 @@ def apply_settlements(rows):
                            "measurement": {"returned": True, "receipts": settlement["receipts"]}})
 
 
+def norm(url):
+    # Repository matching follows convergence/combine.py and RULE.md, including the distribution's image URL.
+    u = (url or "").strip().lower().rstrip("/")
+    if "github.com/" in u:
+        return "/".join(u.split("github.com/")[1].split("/")[:2])
+    return u
+
+
+def installs(row):
+    return bool(row["default"]) and not row["installs_nothing_extra"]
+
+
+def verify_evidence(ref, sid):
+    if not isinstance(ref, dict) or not ref.get("path") or not ref.get("sha256"):
+        raise ValueError(f"convergence {sid}: evidence path and sha256 required")
+    path = ROOT / ref["path"]
+    if not path.is_file():
+        raise ValueError(f"convergence {sid}: evidence missing: {ref['path']}")
+    if sha(path) != ref["sha256"]:
+        raise ValueError(f"convergence {sid}: evidence sha256 mismatch: {ref['path']}")
+
+
+def apply_convergence(rows, layers):
+    data = json.loads(CONVERGENCE.read_text(encoding="utf-8"))
+    for source in ("rule", "combined"):
+        verify_evidence(data[source], source)
+    combined = {layer["layer_id"]: layer for layer in json.loads((ROOT / data["combined"]["path"]).read_text(encoding="utf-8"))["rows"]}
+    by_slot = {row["slot_id"]: row for row in rows}
+    by_layer = {(layer["catalog"], layer["layer_id"]): [] for layer in layers}
+    for row in rows:
+        by_layer[row["catalog"], row["layer_id"]].append(row)
+    added_jobs = {}
+    for added in data["added_slots"]:
+        sid, lid = added["slot_id"], added["layer_id"]
+        if sid in by_slot:
+            raise ValueError(f"convergence {sid}: duplicate added slot")
+        matches = [layer for layer in layers if layer["layer_id"] == lid]
+        if len(matches) != 1:
+            raise ValueError(f"convergence {sid}: unknown or ambiguous layer: {lid}")
+        layer = matches[0]
+        row = rows_of(layer["catalog"], layer, {"slot_id": sid, "row_kind": "added", "default": added["default"]})[0]
+        by_slot[sid] = row
+        by_layer[layer["catalog"], lid].append(row)
+        added_jobs[sid] = added.get("job")
+    rows[:] = [row for layer in layers for row in by_layer[layer["catalog"], layer["layer_id"]]]
+    decisions = {}
+    for decision in data["decisions"] + data["added_slots"]:
+        sid = decision["slot_id"]
+        if sid not in by_slot:
+            raise ValueError(f"convergence {sid}: decision for unknown slot")
+        if sid in decisions:
+            raise ValueError(f"convergence {sid}: duplicate decision")
+        decisions[sid] = decision
+    for sid in data["jobs"]:
+        if sid not in by_slot:
+            raise ValueError(f"convergence {sid}: job for unknown slot")
+    measurements = {}
+    for row in rows:
+        sid = row["slot_id"]
+        if sid not in decisions:
+            raise ValueError(f"convergence {sid}: missing decision")
+        job = data["jobs"].get(sid, added_jobs.get(sid))
+        if not isinstance(job, str) or not job.strip():
+            raise ValueError(f"convergence {sid}: missing job")
+        row["job"] = job
+        decision = decisions[sid]
+        outcome = decision.get("outcome")
+        if outcome not in ("final", "installed_on_critic", "not_installed", "split", "kept"):
+            raise ValueError(f"convergence {sid}: unknown outcome: {outcome}")
+        resolution = {key: decision[key] for key in ("outcome", "by", "votes", "evidence", "reason", "covered_by") if key in decision}
+        row["resolution"] = resolution
+        if outcome in ("installed_on_critic", "split") and "critic" not in decision:
+            raise ValueError(f"convergence {sid}: critic evidence required")
+        for key in ("critic", "evidence"):
+            if key in decision:
+                verify_evidence(decision[key], sid)
+                resolution["evidence"] = decision[key]
+        if outcome == "final":
+            repos = [norm(repo) for repo in row["repository"].split(";") if norm(repo)]
+            final = {norm(repo) for repo in combined.get(row["layer_id"], {}).get("final", [])}
+            if not repos or any(repo not in final for repo in repos):
+                raise ValueError(f"convergence {sid}: final repository not in combined.json: {row['repository']}")
+            row.update({"state": "definitive", "definitive": True, "measurement": None})
+        elif outcome == "installed_on_critic":
+            row.update({"state": "resolved", "definitive": False, "measurement": None})
+        elif outcome in ("not_installed", "split"):
+            resolution["former_default"] = {"name": row["default"], "repository": row["repository"]}
+            row.update({"state": "resolved" if outcome == "not_installed" else "split", "definitive": False,
+                        "repository": "", "installs_nothing_extra": True})
+            if not decision.get("reason"):
+                raise ValueError(f"convergence {sid}: reason required")
+            if outcome == "not_installed":
+                row.update({"default": "Not installed: " + decision["reason"], "measurement": None})
+            else:
+                for key in ("arms", "deciding_measurement", "measurement_id"):
+                    if not decision.get(key):
+                        raise ValueError(f"convergence {sid}: split requires {key}")
+                    resolution[key] = decision[key]
+                mid = decision["measurement_id"]
+                if mid in measurements and measurements[mid] != decision["arms"]:
+                    raise ValueError(f"convergence {sid}: inconsistent arms for measurement {mid}")
+                measurements[mid] = decision["arms"]
+                row.update({"default": "Not installed until the deciding measurement returns",
+                            "measurement": {"returned": False, "receipts": []}})
+        elif not decision.get("reason"):
+            raise ValueError(f"convergence {sid}: kept decision requires a reason")
+    for correction in data["hygiene"]:
+        sid, field = correction["slot_id"], correction["field"]
+        if sid not in by_slot:
+            raise ValueError(f"convergence {sid}: hygiene for unknown slot")
+        row = by_slot[sid]
+        if field not in row:
+            raise ValueError(f"convergence {sid}: unknown hygiene field: {field}")
+        if field == "repository":
+            if correction.get("judged_as") != row["repository"]:
+                raise ValueError(f"convergence {sid}: hygiene judged_as differs from repository")
+            row["resolution"]["judged_repository"] = row["repository"]
+        row[field] = correction["value"]
+        reason = row["resolution"].get("reason", "")
+        row["resolution"]["reason"] = (reason + "; " if reason else "") + correction["reason"]
+    jobs = {}
+    for row in rows:
+        sid = row["slot_id"]
+        if installs(row):
+            if row["job"] in jobs:
+                raise ValueError(f"convergence {sid}: installed job also owned by {jobs[row['job']]}: {row['job']}")
+            jobs[row["job"]] = sid
+        if row["state"] == "split" or (row["measurement"] and not row["measurement"]["returned"]):
+            if installs(row) or row["repository"] or not row["installs_nothing_extra"]:
+                raise ValueError(f"convergence {sid}: pending measurement installs something")
+        if row["resolution"]["outcome"] == "not_installed":
+            if row["repository"] or not row["installs_nothing_extra"]:
+                raise ValueError(f"convergence {sid}: not_installed row installs something")
+            covered = row["resolution"].get("covered_by")
+            if covered == "not needed":
+                continue
+            if not isinstance(covered, list) or not covered:
+                raise ValueError(f"convergence {sid}: covered_by must name covering slots or not needed")
+            for owner in covered:
+                if owner not in by_slot:
+                    raise ValueError(f"convergence {sid}: covered_by names unknown slot: {owner}")
+                if not installs(by_slot[owner]):
+                    raise ValueError(f"convergence {sid}: covered_by {owner} installs nothing")
+    return data
+
+
 def build():
     foundation = json.loads(FOUNDATION.read_text(encoding="utf-8"))
     trading = json.loads(TRADING.read_text(encoding="utf-8"))
@@ -116,9 +263,12 @@ def build():
     layers = [{"catalog": "foundation", "layer_id": l["layer_id"], "owns": l["owns"], "uses": l["uses"]}
               for l in foundation["layers"] + foundation["cross_rows"]]
     layers += [{"catalog": "us-equities", "layer_id": l["layer_id"], "owns": l["owns"], "uses": l["uses"]} for l in trading["layers"]]
-    by_kind = {}
+    convergence = apply_convergence(rows, layers)
+    by_kind, by_state = {}, {}
     for r in rows:
         by_kind[r["row_kind"]] = by_kind.get(r["row_kind"], 0) + 1
+        state = r.get("state") or "open"
+        by_state[state] = by_state.get(state, 0) + 1
     doc = {
         "schema_version": 1, "kind": "new-wsl-definitive-manifest", "date_utc": "2026-10-01",
         "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, "
@@ -128,8 +278,11 @@ def build():
         "not_claimed": foundation["not_claimed"],
         "sources": {"foundation": {"file": FOUNDATION.name, "sha256": sha(FOUNDATION)},
                     "us-equities": {"file": "trading/" + TRADING.name, "sha256": sha(TRADING), "owner": trading["owner"]},
-                    "settlements": {"file": SETTLEMENTS.name, "sha256": sha(SETTLEMENTS)}},
-        "counts": {"layers": len(layers), "slots": len(rows), "definitive": sum(1 for r in rows if r["definitive"]), "by_row_kind": by_kind},
+                    "settlements": {"file": SETTLEMENTS.name, "sha256": sha(SETTLEMENTS)},
+                    "convergence": {"file": CONVERGENCE.name, "sha256": sha(CONVERGENCE)},
+                    "rule": convergence["rule"], "combined": convergence["combined"]},
+        "counts": {"layers": len(layers), "slots": len(rows), "definitive": sum(1 for r in rows if r["definitive"]), "by_row_kind": by_kind,
+                   "by_state": by_state, "installed": sum(1 for r in rows if installs(r))},
         "pinned_requirements": {"us-equities": trading.get("pinned_requirements", [])},
         "no_blind_default_today": {"us-equities": trading.get("no_blind_default_today", [])},
         "layers": layers, "slots": rows,

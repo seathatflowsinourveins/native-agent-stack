@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
 SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
-ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today"}
+ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added"}
 DECISION_SLOTS = {"container-engine", "isolation-container-boundary", "code-search", "memory-owner", "context-supply",
                   "local-model-server"}
 ROUTING = (r"(?i)gpt-6\.1|\bsol\b at|codex lane|anthropic judge|openai judge|claude family|gpt family|astra|arbitration was attempted|"
@@ -28,6 +28,13 @@ def load(path):
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def repository_key(value):
+    value = (value or "").strip().lower().rstrip("/")
+    if "github.com/" in value:
+        return "/".join(value.split("github.com/")[1].split("/")[:2])
+    return value
 
 
 def converged_key(slot):
@@ -59,6 +66,9 @@ class Manifest(unittest.TestCase):
         cls.foundation = load(ART / "foundation-definitive.compact.json")
         cls.trading = load(ART / "trading/trading-definitive.compact.json")
         cls.settlements = load(ART / "settlements.json")
+        cls.convergence = load(ART / "convergence.json")
+        cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
+        cls.combined = load(ROOT / cls.convergence["combined"]["path"])
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -107,7 +117,7 @@ class Manifest(unittest.TestCase):
             with self.subTest(slot=row["slot_id"]):
                 self.assertIn("state", row)
                 self.assertIn("measurement", row)
-                self.assertIn(row["state"], ("", "definitive", "split", "measurement"))
+                self.assertIn(row["state"], ("", "definitive", "resolved", "split", "measurement"))
                 if row["state"] in ("split", "measurement"):
                     self.assertIsInstance(row["measurement"], dict)
                     self.assertEqual(set(row["measurement"]), {"returned", "receipts"})
@@ -120,6 +130,188 @@ class Manifest(unittest.TestCase):
                 if row["row_kind"] == "pinned":
                     self.assertEqual(row["state"], "")
 
+    def test_every_row_has_job_and_resolution(self):
+        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions))
+        self.assertEqual(len(self.decisions), len(self.convergence["decisions"]) + len(self.convergence["added_slots"]))
+        added_jobs = {d["slot_id"]: d["job"] for d in self.convergence["added_slots"]}
+        owners = {}
+        for row in self.rows:
+            sid = row["slot_id"]
+            with self.subTest(slot=sid):
+                self.assertTrue(row.get("job"), sid)
+                self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
+                self.assertIn("resolution", row)
+                resolution = row["resolution"]
+                self.assertIsInstance(resolution, dict)
+                self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
+                for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
+                    if key in self.decisions[sid]:
+                        self.assertEqual(resolution[key], self.decisions[sid][key])
+                if row["default"] and not row["installs_nothing_extra"]:
+                    self.assertNotIn(row["job"], owners, f"{sid}: job already owned by {owners.get(row['job'])}")
+                    owners[row["job"]] = sid
+
+    def test_first_round_foundation_rows_have_an_outcome(self):
+        for row in self.rows:
+            if row["catalog"] != "foundation" or row["row_kind"] != "first_round":
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                resolution = row["resolution"]
+                self.assertIn(resolution["outcome"], ("final", "installed_on_critic", "not_installed", "split", "kept"))
+                if resolution["outcome"] == "kept":
+                    self.assertTrue(resolution["reason"])
+                else:
+                    self.assertIn(row["state"], ("definitive", "resolved", "split"))
+                if row["state"] == "split":
+                    self.assertTrue(resolution["measurement_id"])
+                    self.assertTrue(resolution["deciding_measurement"])
+
+    def test_pending_measurements_install_nothing(self):
+        for row in self.rows:
+            if row["state"] == "split" or (row["measurement"] and not row["measurement"]["returned"]):
+                with self.subTest(slot=row["slot_id"]):
+                    self.assertEqual(row["repository"], "")
+                    self.assertTrue(row["installs_nothing_extra"])
+                    self.assertFalse(row["definitive"])
+                    self.assertTrue(row["default"].startswith("Not installed"))
+                    if row["resolution"]["outcome"] == "split":
+                        self.assertEqual(row["measurement"], {"returned": False, "receipts": []})
+                        self.assertGreaterEqual(len(row["resolution"]["arms"]), 2)
+
+    def test_shared_measurement_ids_have_identical_arms(self):
+        measurements = {}
+        for row in self.rows:
+            resolution = row["resolution"]
+            if resolution["outcome"] == "split":
+                mid = resolution["measurement_id"]
+                if mid in measurements:
+                    self.assertEqual(resolution["arms"], measurements[mid], row["slot_id"])
+                measurements[mid] = resolution["arms"]
+        self.assertEqual(set(measurements), {"browser-tool", "event-store-and-dashboards"})
+
+    def test_data_final_rows_match_the_combined_final_list(self):
+        combined = {layer["layer_id"]: layer for layer in self.combined["rows"]}
+        for row in self.rows:
+            if row["resolution"]["outcome"] != "final":
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                self.assertEqual(row["state"], "definitive")
+                self.assertTrue(row["definitive"])
+                repository = row["resolution"].get("judged_repository", row["repository"])
+                repos = {repository_key(repo) for repo in repository.split(";") if repository_key(repo)}
+                self.assertTrue(repos)
+                final = {repository_key(repo) for repo in combined[row["layer_id"]]["final"]}
+                self.assertTrue(repos <= final, f"{row['slot_id']}: {repos - final}")
+
+    def test_critic_evidence_and_covering_slots_are_valid(self):
+        rows = {row["slot_id"]: row for row in self.rows}
+        for row in self.rows:
+            sid, resolution = row["slot_id"], row["resolution"]
+            decision = self.decisions[sid]
+            with self.subTest(slot=sid):
+                if resolution["outcome"] in ("installed_on_critic", "split"):
+                    self.assertIn("critic", decision)
+                if "critic" in decision:
+                    evidence = resolution["evidence"]
+                    self.assertEqual(evidence, decision["critic"])
+                    path = ROOT / evidence["path"]
+                    self.assertTrue(path.is_file(), sid)
+                    self.assertEqual(sha(path), evidence["sha256"], sid)
+                if resolution["outcome"] == "installed_on_critic":
+                    self.assertEqual(row["state"], "resolved")
+                    self.assertFalse(row["definitive"])
+                if resolution["outcome"] in ("not_installed", "split"):
+                    self.assertEqual(set(resolution["former_default"]), {"name", "repository"})
+                    self.assertTrue(resolution["former_default"]["name"])
+                if resolution["outcome"] == "not_installed":
+                    self.assertEqual(row["state"], "resolved")
+                    self.assertFalse(row["definitive"])
+                    self.assertEqual(row["repository"], "")
+                    self.assertTrue(row["installs_nothing_extra"])
+                    self.assertEqual(row["default"], "Not installed: " + decision["reason"])
+                    covered = resolution["covered_by"]
+                    if covered != "not needed":
+                        self.assertIsInstance(covered, list)
+                        self.assertTrue(covered)
+                        for owner in covered:
+                            self.assertIn(owner, rows, sid)
+                            self.assertTrue(rows[owner]["default"], owner)
+                            self.assertFalse(rows[owner]["installs_nothing_extra"], owner)
+
+    def test_added_slots_and_hygiene_preserve_the_decisions(self):
+        rows = {row["slot_id"]: row for row in self.rows}
+        added_by_layer = {}
+        for added in self.convergence["added_slots"]:
+            row = rows[added["slot_id"]]
+            self.assertEqual(row["row_kind"], "added")
+            self.assertEqual(row["default"], added["default"]["name"])
+            self.assertEqual(row["repository"], added["default"]["repository"])
+            self.assertEqual(row["layer_id"], added["layer_id"])
+            added_by_layer.setdefault(row["layer_id"], []).append(row["slot_id"])
+        for lid, added in added_by_layer.items():
+            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid]
+            self.assertEqual(order[-len(added):], added)
+        for correction in self.convergence["hygiene"]:
+            row = rows[correction["slot_id"]]
+            self.assertEqual(row[correction["field"]], correction["value"])
+            self.assertIn(correction["reason"], row["resolution"].get("reason", "") + row["label"])
+            if correction["field"] == "repository":
+                self.assertEqual(row["resolution"]["judged_repository"], correction["judged_as"])
+
+    def test_counts_include_states_and_installed_rows(self):
+        counts = self.manifest["counts"]
+        self.assertTrue({"layers", "slots", "definitive", "by_row_kind", "by_state", "installed"} <= set(counts))
+        states, kinds = {}, {}
+        for row in self.rows:
+            state = row["state"] or "open"
+            states[state] = states.get(state, 0) + 1
+            kinds[row["row_kind"]] = kinds.get(row["row_kind"], 0) + 1
+        self.assertEqual(counts["by_state"], states)
+        self.assertEqual(counts["by_row_kind"], kinds)
+        self.assertEqual(counts["slots"], len(self.rows))
+        self.assertEqual(counts["installed"], sum(1 for row in self.rows if row["default"] and not row["installs_nothing_extra"]))
+
+    def test_amendment_one_partitions_the_committed_samples(self):
+        affected = {"semantic-rag", "document-retrieval", "web-research", "durable-memory", "token-efficiency",
+                    "code-navigation", "quality-evaluation"}
+        combined = {layer["layer_id"]: layer for layer in self.combined["rows"]}
+        folder = (ROOT / self.convergence["combined"]["path"]).parent / "sol-ultra-round"
+        for lid in sorted(affected):
+            with self.subTest(layer=lid):
+                layer = combined[lid]
+                self.assertIs(layer["g1_counted"], False)
+                self.assertEqual(layer["gpt_samples_present"], 2)
+                self.assertEqual(layer["orders_present"], 2)
+                claude = set()
+                for catalog, source_layer, sid, slot in self.source_slots():
+                    if catalog != "foundation" or source_layer != lid:
+                        continue
+                    default = slot.get("default") or {}
+                    for pick in default if isinstance(default, list) else [default]:
+                        claude.update(repository_key(repo) for repo in pick.get("repository", "").split(";") if repository_key(repo))
+                samples = []
+                for n in (1, 2):
+                    doc = load(folder / f"order-{n}" / f"{lid}.json")
+                    self.assertTrue(doc["layers"], lid)
+                    samples.append({repository_key(pick.get("repository")) or pick.get("name", "").lower()
+                                    for source in doc["layers"] for pick in source.get("selection", [])})
+                union = claude | samples[0] | samples[1]
+                votes = {repo: sum(repo in sample for sample in samples) for repo in union}
+                expected = {"final": {repo for repo in claude if votes[repo] == 2},
+                            "claude_only": {repo for repo in claude if votes[repo] < 2},
+                            "gpt_only": {repo for repo in union - claude if votes[repo] == 2},
+                            "single_gpt_votes": {repo for repo in union - claude if votes[repo] < 2}}
+                actual = {"final": set(layer["final"])}
+                for key in ("claude_only", "gpt_only", "single_gpt_votes"):
+                    actual[key] = {repo for repo, count in layer[key]}
+                    for repo, count in layer[key]:
+                        self.assertEqual(count, votes[repo], repo)
+                self.assertEqual(actual, expected)
+                self.assertEqual(sum(map(len, actual.values())), len(union))
+                self.assertEqual(set().union(*actual.values()), union)
+                for repo in layer["final"]:
+                    self.assertEqual(votes[repo], 2, repo)
+
     def test_no_tool_is_owned_by_two_layers(self):
         owners = {}
         for row in self.rows:
@@ -130,6 +322,8 @@ class Manifest(unittest.TestCase):
     def test_definitive_only_when_both_families_converged(self):
         for row in self.rows:
             if row["definitive"]:
+                if row["resolution"]["outcome"] == "final":
+                    continue  # The separate combined-file check covers the blind GPT round's rule.
                 sources = [part for catalog, layer, sid, part in self.source_slots()
                            if catalog == row["catalog"] and layer == row["layer_id"]
                            and (row["slot_id"] == sid or row["slot_id"].startswith(sid + "/"))]
@@ -286,6 +480,11 @@ class Manifest(unittest.TestCase):
         self.assertEqual(self.manifest["sources"]["foundation"]["sha256"], sha(ART / "foundation-definitive.compact.json"))
         self.assertEqual(self.manifest["sources"]["us-equities"]["sha256"], sha(ART / "trading/trading-definitive.compact.json"))
         self.assertEqual(self.manifest["sources"]["settlements"]["sha256"], sha(ART / "settlements.json"))
+        self.assertEqual(self.manifest["sources"]["convergence"]["sha256"], sha(ART / "convergence.json"))
+        for source in ("rule", "combined"):
+            ref = self.convergence[source]
+            self.assertEqual(self.manifest["sources"][source], ref)
+            self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
 
     def test_preregistered_inputs_are_the_committed_ones(self):
         prereg = load(ART / "preregistration.json")
