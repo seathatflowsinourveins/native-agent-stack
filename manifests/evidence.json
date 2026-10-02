@@ -14871,8 +14871,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "395ed048db1394e89258ed3019a0ee57329c686ae54782675200d684bfdeeec8",
-      "bytes": 33464
+      "sha256": "ae37c318ba29ed51c3845db7a26db847f185f656310915be7846f7d986483a7f",
+      "bytes": 34731
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -15705,6 +15705,11 @@
       "bytes": 36549
     },
     {
+      "path": "docs/decisions/2026-10-02-github-automation-practice.md",
+      "sha256": "e90950fe72016e3d4732d6beb36ed0f898e9ccf550e2fa69866b6e3b5730efb2",
+      "bytes": 7563
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -15826,8 +15831,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "5c6245acf0c893f46282d110a0a4233a7195218af510ff39e1713023e2a5ac78",
-      "bytes": 90982
+      "sha256": "4695177fb498cfa277790b113971b152b4f5bb7bf23cf1cf836ebde4571646cd",
+      "bytes": 95856
     },
     {
       "path": "docs/grand-catalog-handbook.md",
