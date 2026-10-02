@@ -1528,14 +1528,39 @@ bindings and their consumers are indexed too. Runner inspection expands only
 the started command and reuses the base reading's outer segments. Permanent
 tests retain all three review generators, require their real hook responses
 within one second, and keep K4's named rows and helper measurements below
-0.5 seconds of processor time on the workstation. Other hosts, CI included,
-scale that bound by their time for a fixed guard-independent workload
-(the standard library's shlex lexer over short words and one long quoted
-word) relative to the workstation's, never below 1: on the hosted macOS
-runner a long quoted word lexes about 2.6 times slower than here. Each helper's
-growth from 25,000 to 100,000 characters must also fit an exponent under 1.5
-(1 is linear, 2 quadratic) over the minimum of up to three rounds, the
-criterion of the child-usage linearity checks. The mutation gate counts only
+0.5 seconds of processor time on the workstation. Each named row starts with
+one guarded measurement; each helper starts with one at each of 25,000, 50,000
+and 100,000 characters, measuring both helper and whole-check time. After the
+first failed absolute or growth criterion, calibration runs once beside that
+round: five processor-time measurements of a fixed guard-independent workload
+(standard-library shlex over short words and one long quoted word). The host
+factor is `min(4.0, max(1.0, min(reference samples) / 0.188))`, using the
+workstation's calibrated 0.188 seconds. The minimum prevents one increased
+reference sample from relaxing the bound; the 4.0 cap leaves margin above the
+recorded hosted macOS slowdown of about 2.8 times (2.6 times for the long-word
+row) and bounds the absolute limit at 2.0 seconds. The factor applies only to
+the absolute processor-time bounds.
+
+Each helper's growth exponent is computed from **raw** per-size timing minima:
+`ln((t100k + 0.005) / (t25k + 0.005)) / ln(4)` must be strictly below 1.5.
+The fixed 5 ms allowance is never scaled. This is the criterion of the
+child-usage linearity checks; the unadjusted exponent is 1 for linear and 2 for
+quadratic growth. After calibration the same first-round samples are rechecked;
+another guarded round runs only while a criterion still fails, with a maximum
+of three rounds and the per-size raw minimum over all rounds run so far.
+This follows [CPython's `timeit` repetition guidance](https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat)
+and uses its [maintained reference implementation](https://github.com/python/cpython/blob/3.14/Lib/timeit.py)
+for the five reference measurements. A clean later sample can resolve timing
+noise; three identical quadratic helper rounds of 10, 40 and 160 ms remain
+rejected at host factors 1.0, 2.6 and 4.0.
+
+An unscaled first-round pass costs one guarded measurement per named row,
+three per helper, and no references. Calibration alone can accept the first
+round without another guarded measurement. At most, each row uses three guarded
+measurements and five references, and each helper uses nine guarded measurements
+and five references. The separate nesting probe uses two guarded measurements
+per round, repeating only on failure up to three rounds, without calibration.
+The mutation gate counts only
 assertion failures from its named permanent tests, with passing unmutated
 controls. Shared-budget thresholds come from isolated stage measurements;
 each stage must fit alone and only their combined work exceeds the threshold.
