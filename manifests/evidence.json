@@ -3960,8 +3960,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "b716dee9b342629235517be37c9ba202920de736bf85c5689e53369709a8de7d",
-      "bytes": 22076
+      "sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f",
+      "bytes": 23346
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -15876,8 +15876,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "4695177fb498cfa277790b113971b152b4f5bb7bf23cf1cf836ebde4571646cd",
-      "bytes": 95856
+      "sha256": "595a97353798afdbaa5153db1393231a0ad0ac38d045e5f3bf1fa37be2bfbe14",
+      "bytes": 96941
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -49156,8 +49156,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "241697711e74fa15c1763c2650e0a9ee8316ab442fb69003312a9aa4a923da58",
-      "bytes": 55352
+      "sha256": "572d280922a42d62159c545094225d93d30cc3d6ca3f0253f794a044675a60d3",
+      "bytes": 59111
     },
     {
       "path": "tests/test_catalogs.py",
