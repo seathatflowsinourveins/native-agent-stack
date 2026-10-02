@@ -1,0 +1,8 @@
+model = "gate-qwen3-8b"
+model_provider = "ollama-launch"
+model_catalog_json = "<STATE>/scratch-home/.codex/model.json"
+
+[model_providers.ollama-launch]
+name = "Ollama"
+base_url = "http://127.0.0.1:20232/v1/"
+wire_api = "responses"

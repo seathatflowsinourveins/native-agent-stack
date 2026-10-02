@@ -15,6 +15,10 @@
    "file": "trading/trading-definitive.compact.json",
    "sha256": "dfd5bde721750474c8e55f5239a1e93987aa59c1517e4416c1bbb0ebc3f94081",
    "owner": "trading lane (native-agent-stack-ae)"
+  },
+  "settlements": {
+   "file": "settlements.json",
+   "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24"
   }
  },
  "counts": {
@@ -475,6 +479,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -490,6 +495,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -505,6 +511,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -520,6 +527,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -535,6 +543,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -550,6 +559,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -565,6 +575,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -580,6 +591,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -595,6 +607,7 @@
    "definitive": true,
    "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
    "state": "definitive",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -610,6 +623,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -625,6 +639,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -640,6 +655,10 @@
    "definitive": false,
    "label": "split between the model families; the measurement the critics named decides, before the clean install",
    "state": "split",
+   "measurement": {
+    "returned": false,
+    "receipts": []
+   },
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -655,6 +674,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -670,6 +690,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -685,6 +706,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -700,6 +722,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -715,6 +738,10 @@
    "definitive": false,
    "label": "decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent",
    "state": "measurement",
+   "measurement": {
+    "returned": false,
+    "receipts": []
+   },
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -730,6 +757,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -745,6 +773,7 @@
    "definitive": true,
    "label": "no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero",
    "state": "definitive",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -760,6 +789,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -775,6 +805,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -790,6 +821,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -805,6 +837,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -820,6 +853,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -829,12 +863,25 @@
    "layer_id": "observation-inference",
    "slot_id": "local-model-server",
    "row_kind": "judged",
-   "default": "Not installed until the deciding measurement returns (the families split between llama.cpp optional inference and ollama)",
-   "repository": "",
-   "installs_nothing_extra": true,
+   "default": "Ollama",
+   "repository": "https://github.com/ollama/ollama",
+   "installs_nothing_extra": false,
    "definitive": false,
-   "label": "split between the model families; the measurement the critics named decides, before the clean install",
-   "state": "split",
+   "label": "settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance",
+   "state": "measurement",
+   "measurement": {
+    "returned": true,
+    "receipts": [
+     {
+      "path": "evidence/artifacts/local-model-server-gate-20261001/receipt.json",
+      "sha256": "111802a9feca13139316187e206bf12dcee43fa1fba37be50dedee3994f3a0bf"
+     },
+     {
+      "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/receipt.json",
+      "sha256": "79010a4c336a99ec34caa80062f5724982f91f899106de0da7692abc98b95b44"
+     }
+    ]
+   },
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -850,6 +897,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -865,6 +913,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -880,6 +929,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -895,6 +945,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -910,6 +961,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -925,6 +977,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -940,6 +993,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -955,6 +1009,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -970,6 +1025,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -985,6 +1041,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1000,6 +1057,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1015,6 +1073,7 @@
    "definitive": true,
    "label": "default on documented fit; nothing measured separates the finalists",
    "state": "definitive",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "converged",
    "gpt": "converged"
@@ -1030,6 +1089,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1045,6 +1105,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1060,6 +1121,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1075,6 +1137,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1090,6 +1153,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1105,6 +1169,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1120,6 +1185,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1135,6 +1201,7 @@
    "definitive": false,
    "label": "no-install default: the first round kept sem only if a comparison shows a gain",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1150,6 +1217,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1165,6 +1233,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1180,6 +1249,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1195,6 +1265,7 @@
    "definitive": false,
    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress"
@@ -1210,6 +1281,7 @@
    "definitive": false,
    "label": "pinned by the user's directive: the GPT lane runs GPT-6.1 Sol through the gateway",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1225,6 +1297,7 @@
    "definitive": false,
    "label": "named by the user's directive of 2026-10-01; the source host's selection of record",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1240,6 +1313,7 @@
    "definitive": false,
    "label": "both named by the user's directive of 2026-10-01 for the evaluation work",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1255,6 +1329,7 @@
    "definitive": false,
    "label": "the project's own practice, not a third-party repository; settled by its closure record, not by a blind round",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1270,6 +1345,7 @@
    "definitive": false,
    "label": "the project's own practice, not a third-party repository; settled by its closure record",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1285,6 +1361,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "returned"
@@ -1300,6 +1377,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1315,6 +1393,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1330,6 +1409,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1345,6 +1425,7 @@
    "definitive": false,
    "label": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1360,6 +1441,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1375,6 +1457,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1390,6 +1473,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"
@@ -1405,6 +1489,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"
@@ -1420,6 +1505,7 @@
    "definitive": false,
    "label": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "not judged",
    "gpt": "not judged"
@@ -1434,6 +1520,8 @@
    "installs_nothing_extra": false,
    "definitive": false,
    "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "state": "",
+   "measurement": null,
    "claude": "not judged",
    "gpt": "not judged"
   },
@@ -1448,6 +1536,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1462,6 +1551,8 @@
    "installs_nothing_extra": false,
    "definitive": false,
    "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "state": "",
+   "measurement": null,
    "claude": "not judged",
    "gpt": "not judged"
   },
@@ -1475,6 +1566,8 @@
    "installs_nothing_extra": false,
    "definitive": false,
    "label": "a requirement the user selected; carried with its committed receipts, never judged",
+   "state": "",
+   "measurement": null,
    "claude": "not judged",
    "gpt": "not judged"
   },
@@ -1489,6 +1582,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"
@@ -1504,6 +1598,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1519,6 +1614,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"
@@ -1534,6 +1630,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": true,
    "claude": "converged",
    "gpt": "pending"
@@ -1549,6 +1646,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"
@@ -1564,6 +1662,7 @@
    "definitive": false,
    "label": "",
    "state": "",
+   "measurement": null,
    "coincides_with_lane_record": false,
    "claude": "converged",
    "gpt": "pending"

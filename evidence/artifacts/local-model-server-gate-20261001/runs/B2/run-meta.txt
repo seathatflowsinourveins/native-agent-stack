@@ -1,0 +1,10 @@
+label=B2
+arm=ollama
+profile=ollama-launch
+server_pid=3518112
+server_started_utc=2026-10-01T23:35:11Z
+server_ready_utc=2026-10-01T23:35:13Z
+codex_exit=0
+codex_finished_utc=2026-10-01T23:38:17Z
+server_stopped_utc=2026-10-01T23:38:20Z
+server_alive_after_stop=no
