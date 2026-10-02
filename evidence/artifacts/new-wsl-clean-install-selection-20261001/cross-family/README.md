@@ -17,6 +17,7 @@ record is `docs/decisions/2026-10-01-final-catalog.md`.
 | `build_record.py` | Builds the two files below from the private originals and audits every web search, opened page and command |
 | `selection-gpt.json` | Per layer: the GPT picks after the critic, the judge's picks where the critic revised them, reasons, exclusions, failed fact checks and the critic's issues |
 | `run-record.json` | Every process attempt with exit, duration and returned usage, the contamination audit, and the sha256 of each private original |
+| `instruction-probe.json` | The 2026-10-02 probe showing that `codex exec` loads `$CODEX_HOME/AGENTS.md`; the run's default home named eight packet candidates, so its judges were not instruction-blind |
 
 The private originals (prompts with local paths, event streams, raw returns and stderr) stay outside the repository with
-the coordinator's private records. This is source review by model judges: no candidate was installed or measured.
+the coordinator's private records. This is source review by model judges: no candidate was installed or measured. The judges' instructions included the user's global Codex `AGENTS.md`, which names eight of the candidates (`instruction-probe.json`).

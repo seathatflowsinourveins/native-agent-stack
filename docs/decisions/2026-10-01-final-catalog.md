@@ -116,10 +116,19 @@ picks standing whatever the statuses; no layer is in the first case. The tests e
   refuted a judge's claim: in cross:wsl-distro, judge J11 wrote that Canonical's listing lacked
   `ubuntu-26.04.1-wsl-amd64.wsl`, and critic C-G3 found that image (dated 2026-08-27) with signed checksum files. Every
   judge return names each packet candidate exactly once (the frozen prompt's rule).
-- **Blindness.** The processes received only the adapter, the frozen prompts, criteria, packets and facts. The audit
-  of every event stream counts 100 web searches, 160 opened pages and 39 commands; none of them names the project's
+- **Blindness, and its limit.** Besides the adapter, the frozen prompts, criteria, packets and facts, every process
+  also received the user's global Codex instructions. `codex exec` loads `$CODEX_HOME/AGENTS.md` into the model's
+  instructions: a probe on 2026-10-02 returned a canary placed there, and NONE without it
+  (`cross-family/instruction-probe.json`). The run used the default `CODEX_HOME`, whose `AGENTS.md` names eight packet
+  candidates: ai-memory, Hindsight, SocratiCode, QMD, Playwright CLI, Ollama, Context Mode and ast-grep. The Claude half
+  of #589 ran as workflow subagents, which receive the global `CLAUDE.md` (it names the same tools) and the project
+  `AGENTS.md` (it names promptfoo, Harbor, Inspect and QMD); #591 recorded the same limit for its round. Agreement on
+  the layers those tools belong to (semantic-rag, document-retrieval, web-research, durable-memory, token-efficiency,
+  code-navigation and quality-evaluation) is therefore not independent evidence. The definitive round re-judges every
+  open slot with both families in a clean room, with no instruction files, hooks or MCP servers. The audit of every
+  event stream counts 100 web searches, 160 opened pages and 39 commands, and none of them names the project's
   repositories or a local path outside the inputs (`run-record.json`). The audit sees queries, page actions and
-  commands, not the content of search results.
+  commands, not the instructions or the content of search results.
 - **Usage, as returned by Codex.** 20,644,160 input tokens (18,536,320 cached) and 360,405 output tokens (214,127
   reasoning) across the 14 processes; wall time per process up to 27 minutes. The Claude side of this unit (research
   workflow, verifiers and completeness critic) is reported with the pull request.
@@ -263,8 +272,8 @@ a fact a later check finds wrong where a pick rests on it. A move of the grand l
 ## Evidence class
 
 The statuses and standing picks are a deterministic join (`structural_validation`). The picks they join are
-`source_review` by model judges with adversarial critics in two model families, so a standing pick rests on blind
-two-family convergence alone: neither run installed or measured a candidate, and the source host's records were
+`source_review` by model judges with adversarial critics in two model families, whose instructions named some
+candidates (see "Blindness, and its limit"), so a standing pick rests on two-family agreement alone: neither run installed or measured a candidate, and the source host's records were
 excluded from both. Install and comparison evidence on the new host is still owed for every row.
 
 ## SOTA sources
