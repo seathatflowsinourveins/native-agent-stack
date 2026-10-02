@@ -1,0 +1,4344 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_quality_audit",
+  "meaning": "Upstream maintenance, release currency, provenance, advisories, default-branch checks, license and published Scorecard for the final catalog's GitHub repositories. Information only: no pick, status or selection changes through it.",
+  "observed_at": "2026-10-02T01:19:12+00:00",
+  "thresholds": {
+    "stale_after_days": 90,
+    "old_release_days": 365,
+    "low_scorecard": 5.0,
+    "failing_conclusions": [
+      "failure",
+      "timed_out",
+      "startup_failure"
+    ]
+  },
+  "inputs": {
+    "catalogs/foundation/final-catalog-20261001.json": "ca28926d34e920cb0ee6f0fc03d80154007416c0a40a1bae47957a9a4a0856da",
+    "evidence/artifacts/upstream-audit-20261002/observations.json": "5c16434972e319ba14a26cc254b9c57692c91417ab9927c542a4b03677f82d4b"
+  },
+  "summary": {
+    "repositories": 80,
+    "flag_counts": {
+      "fetch_error": 0,
+      "archived": 0,
+      "stale": 0,
+      "no_release": 5,
+      "old_release": 2,
+      "no_provenance": 27,
+      "advisories": 35,
+      "ci_failing": 21,
+      "low_scorecard": 2
+    },
+    "scorecard_published": 26
+  },
+  "rows": [
+    {
+      "repository": "actions/attest",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:28.928335+00:00",
+      "archived": false,
+      "last_commit": "2026-09-24T18:16:26Z",
+      "days_since_last_commit": 7,
+      "release": {
+        "tag": "v4.2.2",
+        "published_at": "2026-08-04T20:36:29Z",
+        "days_old": 58,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 1000,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "adbar/trafilatura",
+      "roles": [
+        {
+          "layer_id": "web-research",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:28.930278+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T19:47:15Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v2.2.0",
+        "published_at": "2026-07-31T16:07:10Z",
+        "days_old": 62,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 13,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.1
+      }
+    },
+    {
+      "repository": "akitaonrails/ai-memory",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "durable-memory",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:28.932720+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T19:18:44Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.5.2",
+        "published_at": "2026-10-01T07:40:18Z",
+        "days_old": 0,
+        "assets": 24,
+        "assets_with_digest": 24,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 2,
+        "severities": [
+          "low",
+          "low"
+        ]
+      },
+      "check_runs": {
+        "total": 23,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "roles": [
+        {
+          "layer_id": "backtesting-engine",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "execution-broker",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "identity-provenance",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "market-data-reference",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "portfolio-risk",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "storage-compute",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:28.934338+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T15:37:46Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "v0.44.0",
+        "published_at": "2026-08-11T10:11:55Z",
+        "days_old": 51,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 14,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "anchore/grype",
+      "roles": [
+        {
+          "layer_id": "security-supply-chain",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:28.937322+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T21:45:14Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.119.0",
+        "published_at": "2026-09-17T16:45:23Z",
+        "days_old": 14,
+        "assets": 18,
+        "assets_with_digest": 18,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 14,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.2
+      }
+    },
+    {
+      "repository": "anchore/syft",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "security-supply-chain",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:28.939095+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T21:21:09Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z",
+        "days_old": 0,
+        "assets": 30,
+        "assets_with_digest": 30,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 3,
+        "severities": [
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 13,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8
+      }
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "roles": [
+        {
+          "layer_id": "agent-sdks",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:31.028359+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:01:46Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.2.163",
+        "published_at": "2026-09-30T19:47:45Z",
+        "days_old": 1,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "critical"
+        ]
+      },
+      "check_runs": {
+        "total": 14,
+        "failing": 2
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "native-clients",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "workers",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:31.064037+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:43:08Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.1.287",
+        "published_at": "2026-10-01T18:00:22Z",
+        "days_old": 0,
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 32,
+        "severities": [
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 585,
+        "failing": 4
+      },
+      "license": null,
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "anthropics/claude-code-action",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "old_release",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:32.730263+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:01:56Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1",
+        "published_at": "2025-08-26T17:01:10Z",
+        "days_old": 401,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 23,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "anthropics/claude-plugins-official",
+      "roles": [
+        {
+          "layer_id": "code-navigation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-02T01:18:32.833311+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T20:11:48Z",
+      "days_since_last_commit": 1,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 7,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "anthropics/sandbox-runtime",
+      "roles": [
+        {
+          "layer_id": "isolation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:32.966320+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T11:58:43Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.0.78",
+        "published_at": "2026-09-30T01:09:22Z",
+        "days_old": 2,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "total": 8,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "arize-ai/phoenix",
+      "roles": [
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:33.124962+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:08:17Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "arize-phoenix-v20.19.0",
+        "published_at": "2026-10-01T22:59:10Z",
+        "days_old": 0,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 50,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "ast-grep/ast-grep",
+      "roles": [
+        {
+          "layer_id": "code-navigation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:33.310930+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T14:22:46Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "0.45.3",
+        "published_at": "2026-08-31T01:42:23Z",
+        "days_old": 31,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 94,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "ataraxy-labs/sem",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:34.877462+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:15:47Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.25.0",
+        "published_at": "2026-09-13T17:47:03Z",
+        "days_old": 18,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 3,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "basicmachines-co/basic-memory",
+      "roles": [
+        {
+          "layer_id": "durable-memory",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:35.086034+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T22:56:06Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.23.2",
+        "published_at": "2026-08-25T20:44:29Z",
+        "days_old": 37,
+        "assets": 2,
+        "assets_with_digest": 2,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 31,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "betterleaks/betterleaks",
+      "roles": [
+        {
+          "layer_id": "secrets-credentials",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:35.242837+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T19:05:13Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v1.9.0",
+        "published_at": "2026-09-29T20:08:06Z",
+        "days_old": 2,
+        "assets": 8,
+        "assets_with_digest": 8,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 2,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "ccusage/ccusage",
+      "roles": [
+        {
+          "layer_id": "token-efficiency",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:35.323517+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:51:47Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z",
+        "days_old": 4,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 3,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "cli/cli",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:36.226435+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T02:18:02Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v2.102.0",
+        "published_at": "2026-09-30T02:40:02Z",
+        "days_old": 1,
+        "assets": 22,
+        "assets_with_digest": 22,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 17,
+        "severities": [
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 755,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.8
+      }
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "scheduling-supervision",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:37.207669+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:26:02Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.18.1",
+        "published_at": "2026-09-29T15:24:51Z",
+        "days_old": 2,
+        "assets": 15,
+        "assets_with_digest": 15,
+        "attested_assets": 3
+      },
+      "advisories": {
+        "count": 6,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "low",
+          "low",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 26,
+        "failing": 0
+      },
+      "license": "GPL-3.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "dependabot/dependabot-core",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:37.660625+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T23:02:29Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.398.0",
+        "published_at": "2026-09-28T03:51:27Z",
+        "days_old": 3,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "total": 83,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.1
+      }
+    },
+    {
+      "repository": "dgunning/edgartools",
+      "roles": [
+        {
+          "layer_id": "identity-provenance",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "market-data-reference",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "research-factors-ml",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "storage-compute",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:38.438365+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T23:32:01Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v5.59.1",
+        "published_at": "2026-09-26T13:11:28Z",
+        "days_old": 5,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 11,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "diegosouzapw/omniroute",
+      "roles": [
+        {
+          "layer_id": "cross:gpt6-harnesses",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:38.783342+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:12:31Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "days_old": 1,
+        "assets": 17,
+        "assets_with_digest": 17,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "critical"
+        ]
+      },
+      "check_runs": {
+        "total": 67,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "docker/compose",
+      "roles": [
+        {
+          "layer_id": "hosting-services",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:38.971603+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T16:29:51Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v5.5.1",
+        "published_at": "2026-09-03T15:53:28Z",
+        "days_old": 28,
+        "assets": 56,
+        "assets_with_digest": 56,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 71,
+        "failing": 8
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8
+      }
+    },
+    {
+      "repository": "duckdb/duckdb",
+      "roles": [
+        {
+          "layer_id": "identity-provenance",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "market-data-reference",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "storage-compute",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:40.158674+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:52:46Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.5.6",
+        "published_at": "2026-09-28T13:35:11Z",
+        "days_old": 3,
+        "assets": 29,
+        "assets_with_digest": 29,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 3,
+        "severities": [
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 60,
+        "failing": 6
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "eyuansu62/agent-retrieval-bench",
+      "roles": [
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:40.167432+00:00",
+      "archived": false,
+      "last_commit": "2026-08-04T04:00:58Z",
+      "days_since_last_commit": 58,
+      "release": {
+        "tag": "v0.2.1",
+        "published_at": "2026-07-26T01:08:48Z",
+        "days_old": 68,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 0,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "fastapi/fastapi",
+      "roles": [
+        {
+          "layer_id": "hosting-services",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:41.106198+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:55:02Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "0.142.2",
+        "published_at": "2026-09-30T09:50:53Z",
+        "days_old": 1,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 26,
+        "failing": 3
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "gerrymanoim/exchange_calendars",
+      "roles": [
+        {
+          "layer_id": "identity-provenance",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "market-data-reference",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "storage-compute",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "ci_failing",
+        "low_scorecard"
+      ],
+      "observed_at": "2026-10-02T01:18:41.176261+00:00",
+      "archived": false,
+      "last_commit": "2026-09-15T09:27:58Z",
+      "days_since_last_commit": 16,
+      "release": {
+        "tag": "4.13.2",
+        "published_at": "2026-03-10T03:24:04Z",
+        "days_old": 205,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 22,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 4.1
+      }
+    },
+    {
+      "repository": "ggml-org/llama.cpp",
+      "roles": [
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:41.879663+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:12:25Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.5.0",
+        "published_at": "2026-09-23T20:50:06Z",
+        "days_old": 8,
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 13,
+        "severities": [
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 70,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "giancarloerra/socraticode",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "semantic-rag",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:42.777413+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T17:24:14Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v1.16.0",
+        "published_at": "2026-09-28T12:19:47Z",
+        "days_old": 3,
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 10,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "git/git",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_release",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:43.138948+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:28:16Z",
+      "days_since_last_commit": 0,
+      "release": null,
+      "advisories": {
+        "count": 32,
+        "severities": [
+          "critical",
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 49,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.2
+      }
+    },
+    {
+      "repository": "github/codeql-action",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:43.195649+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T17:31:06Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "codeql-bundle-v2.27.1",
+        "published_at": "2026-09-22T17:10:11Z",
+        "days_old": 9,
+        "assets": 34,
+        "assets_with_digest": 34,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 2,
+        "severities": [
+          "high",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 1352,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "gitleaks/gitleaks",
+      "roles": [
+        {
+          "layer_id": "security-supply-chain",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:43.317399+00:00",
+      "archived": false,
+      "last_commit": "2026-07-22T16:50:33Z",
+      "days_since_last_commit": 71,
+      "release": {
+        "tag": "v8.30.1",
+        "published_at": "2026-03-21T02:17:58Z",
+        "days_old": 194,
+        "assets": 11,
+        "assets_with_digest": 11,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 33,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "grafana/grafana",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:44.047825+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:41:45Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z",
+        "days_old": 2,
+        "assets": 13,
+        "assets_with_digest": 13,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 28,
+        "severities": [
+          "critical",
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 281,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.8
+      }
+    },
+    {
+      "repository": "grafana/loki",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:44.684083+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:15:02Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.7.8",
+        "published_at": "2026-09-17T15:51:10Z",
+        "days_old": 14,
+        "assets": 47,
+        "assets_with_digest": 47,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 77,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.1
+      }
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "roles": [
+        {
+          "layer_id": "quality-evaluation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:44.832471+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T06:31:25Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.23.0",
+        "published_at": "2026-09-12T04:55:17Z",
+        "days_old": 19,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 23,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "jdx/mise",
+      "roles": [
+        {
+          "layer_id": "recovery-portability",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:45.885279+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:38:43Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2026.9.18",
+        "published_at": "2026-09-30T12:51:01Z",
+        "days_old": 1,
+        "assets": 52,
+        "assets_with_digest": 52,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 11,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 13,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "kjanat/actionlint",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:46.883057+00:00",
+      "archived": false,
+      "last_commit": "2026-09-25T14:28:28Z",
+      "days_since_last_commit": 6,
+      "release": {
+        "tag": "v1.17.0",
+        "published_at": "2026-09-13T16:07:47Z",
+        "days_old": 18,
+        "assets": 24,
+        "assets_with_digest": 24,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 52,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "mattpocock/skills",
+      "roles": [
+        {
+          "layer_id": "instructions-skills",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:47.401025+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T12:37:40Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "v1.2.3",
+        "published_at": "2026-08-06T14:05:28Z",
+        "days_old": 56,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 1,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "max-sixty/worktrunk",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "isolation",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "workers",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:48.423976+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:01:12Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "days_old": 4,
+        "assets": 18,
+        "assets_with_digest": 18,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 44,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "mcpjam/inspector",
+      "roles": [
+        {
+          "layer_id": "mcp-surfaces",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:48.840900+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T23:57:08Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.12.8",
+        "published_at": "2026-10-01T09:53:48Z",
+        "days_old": 0,
+        "assets": 6,
+        "assets_with_digest": 6,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 2,
+        "severities": [
+          "critical",
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 76,
+        "failing": 3
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "microsoft/playwright",
+      "roles": [
+        {
+          "layer_id": "quality-evaluation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:49.186900+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T23:37:31Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.63.0",
+        "published_at": "2026-09-04T22:40:31Z",
+        "days_old": 27,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 86,
+        "failing": 6
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.6
+      }
+    },
+    {
+      "repository": "microsoft/playwright-cli",
+      "roles": [
+        {
+          "layer_id": "web-research",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:49.235858+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T23:22:31Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "days_old": 3,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 6,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.4
+      }
+    },
+    {
+      "repository": "minishlab/semble",
+      "roles": [
+        {
+          "layer_id": "semantic-rag",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:50.593992+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T06:56:09Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v0.6.1",
+        "published_at": "2026-09-25T07:16:03Z",
+        "days_old": 6,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 15,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "token-efficiency",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:50.789797+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:13:30Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.0.169",
+        "published_at": "2026-06-29T18:18:53Z",
+        "days_old": 94,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 1,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "mlflow/mlflow",
+      "roles": [
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:51.302284+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:14:13Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.16.1",
+        "published_at": "2026-09-17T02:40:08Z",
+        "days_old": 14,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 7,
+        "severities": [
+          "critical",
+          "critical",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 39,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.5
+      }
+    },
+    {
+      "repository": "moby/moby",
+      "roles": [
+        {
+          "layer_id": "hosting-services",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:51.731025+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:29:45Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "docker-v29.8.2",
+        "published_at": "2026-09-30T20:28:33Z",
+        "days_old": 1,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 26,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 247,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 9.1
+      }
+    },
+    {
+      "repository": "modelcontextprotocol/inspector",
+      "roles": [
+        {
+          "layer_id": "mcp-surfaces",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:52.199525+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T22:23:03Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "2.9.0",
+        "published_at": "2026-09-30T22:23:56Z",
+        "days_old": 1,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 2,
+        "severities": [
+          "critical",
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 22,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "roles": [
+        {
+          "layer_id": "backtesting-engine",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "execution-broker",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "portfolio-risk",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:52.443952+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:35:00Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.231.0",
+        "published_at": "2026-08-02T18:53:49Z",
+        "days_old": 60,
+        "assets": 55,
+        "assets_with_digest": 55,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 20,
+        "failing": 0
+      },
+      "license": "LGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.3
+      }
+    },
+    {
+      "repository": "ojuschugh1/sqz",
+      "roles": [
+        {
+          "layer_id": "token-efficiency",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:52.547112+00:00",
+      "archived": false,
+      "last_commit": "2026-09-24T06:35:39Z",
+      "days_since_last_commit": 7,
+      "release": {
+        "tag": "v1.9.0",
+        "published_at": "2026-09-23T18:25:35Z",
+        "days_old": 8,
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 8,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "ollama/ollama",
+      "roles": [
+        {
+          "layer_id": "semantic-rag",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:53.131638+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:05:01Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.35.0",
+        "published_at": "2026-09-28T21:23:22Z",
+        "days_old": 3,
+        "assets": 17,
+        "assets_with_digest": 17,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 22,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observation-inference",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:53.586138+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:45:08Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "days_old": 2,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 7,
+        "severities": [
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 292,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.7
+      }
+    },
+    {
+      "repository": "openai/codex",
+      "roles": [
+        {
+          "layer_id": "agent-sdks",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "cross:gpt6-harnesses",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "native-clients",
+          "role": "standing_pick"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "workers",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:54.248602+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:46:14Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "rust-v0.160.0",
+        "published_at": "2026-10-01T20:19:13Z",
+        "days_old": 0,
+        "assets": 176,
+        "assets_with_digest": 176,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 201,
+        "failing": 10
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.9
+      }
+    },
+    {
+      "repository": "openclaw/mcporter",
+      "roles": [
+        {
+          "layer_id": "mcp-surfaces",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:54.514524+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T18:43:09Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "days_old": 0,
+        "assets": 5,
+        "assets_with_digest": 5,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 7,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "opendatalab/mineru",
+      "roles": [
+        {
+          "layer_id": "document-retrieval",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:55.913132+00:00",
+      "archived": false,
+      "last_commit": "2026-09-29T07:16:39Z",
+      "days_since_last_commit": 2,
+      "release": {
+        "tag": "mineru-4.0.10-released",
+        "published_at": "2026-09-29T07:18:10Z",
+        "days_old": 2,
+        "assets": 1,
+        "assets_with_digest": 1,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 11,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "openhands/software-agent-sdk",
+      "roles": [
+        {
+          "layer_id": "cross:runtime-workers",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:18:56.263450+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T22:58:18Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.50.1",
+        "published_at": "2026-09-30T19:31:33Z",
+        "days_old": 1,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 65,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "openlit/openlit",
+      "roles": [
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:56.728859+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T06:35:33Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "openlit-2.1.0",
+        "published_at": "2026-09-10T10:55:59Z",
+        "days_old": 21,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "critical"
+        ]
+      },
+      "check_runs": {
+        "total": 34,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "oraios/serena",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "code-navigation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:57.329357+00:00",
+      "archived": false,
+      "last_commit": "2026-09-30T18:53:23Z",
+      "days_since_last_commit": 1,
+      "release": {
+        "tag": "v1.7.0",
+        "published_at": "2026-08-09T18:38:06Z",
+        "days_old": 53,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 2,
+        "severities": [
+          "critical",
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 28,
+        "failing": 1
+      },
+      "license": "NOASSERTION",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "podman-container-tools/podman",
+      "roles": [
+        {
+          "layer_id": "hosting-services",
+          "role": "challenger"
+        },
+        {
+          "layer_id": "isolation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:58.045260+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T14:09:59Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v6.1.3",
+        "published_at": "2026-09-29T15:34:46Z",
+        "days_old": 2,
+        "assets": 9,
+        "assets_with_digest": 9,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 10,
+        "severities": [
+          "critical",
+          "high",
+          "high",
+          "high",
+          "high",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 110,
+        "failing": 1
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "postgres/postgres",
+      "roles": [
+        {
+          "layer_id": "hosting-services",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-02T01:18:58.263075+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T22:29:22Z",
+      "days_since_last_commit": 0,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 11,
+        "failing": 0
+      },
+      "license": "NOASSERTION",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.1
+      }
+    },
+    {
+      "repository": "prometheus/prometheus",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observation-inference",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:18:58.975009+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T22:39:54Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z",
+        "days_old": 6,
+        "assets": 37,
+        "assets_with_digest": 37,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 6,
+        "severities": [
+          "high",
+          "high",
+          "high",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 40,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 8.5
+      }
+    },
+    {
+      "repository": "promptfoo/promptfoo",
+      "roles": [
+        {
+          "layer_id": "quality-evaluation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:18:59.393942+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T22:53:00Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "0.123.1",
+        "published_at": "2026-09-18T01:07:54Z",
+        "days_old": 14,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 87,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "qdrant/qdrant",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "semantic-rag",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:59.666430+00:00",
+      "archived": false,
+      "last_commit": "2026-09-03T12:36:18Z",
+      "days_since_last_commit": 28,
+      "release": {
+        "tag": "v1.19.1",
+        "published_at": "2026-09-04T07:59:14Z",
+        "days_old": 27,
+        "assets": 8,
+        "assets_with_digest": 8,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "high"
+        ]
+      },
+      "check_runs": {
+        "total": 214,
+        "failing": 3
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "quantconnect/lean",
+      "roles": [
+        {
+          "layer_id": "backtesting-engine",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "execution-broker",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "portfolio-risk",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "old_release",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:18:59.918290+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T14:23:47Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.4.0.1",
+        "published_at": "2017-08-08T20:57:57Z",
+        "days_old": 3341,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 17,
+        "failing": 3
+      },
+      "license": "Apache-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5
+      }
+    },
+    {
+      "repository": "restic/restic",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "observability-hosting",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "recovery-portability",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:19:00.495927+00:00",
+      "archived": false,
+      "last_commit": "2026-09-25T20:08:18Z",
+      "days_since_last_commit": 6,
+      "release": {
+        "tag": "v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z",
+        "days_old": 88,
+        "assets": 29,
+        "assets_with_digest": 29,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 20,
+        "failing": 0
+      },
+      "license": "BSD-2-Clause",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.3
+      }
+    },
+    {
+      "repository": "rohitg00/agentmemory",
+      "roles": [
+        {
+          "layer_id": "durable-memory",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:19:01.825603+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T11:28:24Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.9.29",
+        "published_at": "2026-08-16T13:56:45Z",
+        "days_old": 46,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 8,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "token-efficiency",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:19:02.183232+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T14:34:47Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.50.0",
+        "published_at": "2026-09-24T10:02:31Z",
+        "days_old": 7,
+        "assets": 10,
+        "assets_with_digest": 10,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 3,
+        "severities": [
+          "high",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 38,
+        "failing": 0
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "roles": [
+        {
+          "layer_id": "cross:convergence-practice",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "cross:credential-practice",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "execution-broker",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:19:02.601296+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:03:12Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2026.09.26.2",
+        "published_at": "2026-09-26T16:04:55Z",
+        "days_old": 5,
+        "assets": 2,
+        "assets_with_digest": 2,
+        "attested_assets": 2
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 23,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "roles": [
+        {
+          "layer_id": "portfolio-risk",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "research-factors-ml",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "no_provenance"
+      ],
+      "observed_at": "2026-10-02T01:19:03.206253+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T11:47:39Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.4.10",
+        "published_at": "2026-09-30T22:15:00Z",
+        "days_old": 1,
+        "assets": 4,
+        "assets_with_digest": 4,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 19,
+        "failing": 0
+      },
+      "license": "BSD-3-Clause",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "systemd/systemd",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "scheduling-supervision",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:19:03.452162+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T14:03:46Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v262",
+        "published_at": "2026-09-22T13:19:16Z",
+        "days_old": 9,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 15,
+        "severities": [
+          "low",
+          "low",
+          "low",
+          "low",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium",
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 54,
+        "failing": 1
+      },
+      "license": "GPL-2.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.8
+      }
+    },
+    {
+      "repository": "tobi/qmd",
+      "roles": [
+        {
+          "layer_id": "agents-models-workers",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "document-retrieval",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:19:04.193602+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:41:53Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "days_old": 46,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 12,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "trailofbits/skills",
+      "roles": [
+        {
+          "layer_id": "instructions-skills",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-02T01:19:04.645726+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T18:06:37Z",
+      "days_since_last_commit": 3,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 11,
+        "failing": 0
+      },
+      "license": "CC-BY-SA-4.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "treeverse/dvc",
+      "roles": [
+        {
+          "layer_id": "identity-provenance",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:19:05.592263+00:00",
+      "archived": false,
+      "last_commit": "2026-08-06T04:17:40Z",
+      "days_since_last_commit": 56,
+      "release": {
+        "tag": "3.67.1",
+        "published_at": "2026-03-31T05:06:44Z",
+        "days_old": 184,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 2429,
+        "failing": 6
+      },
+      "license": "Apache-2.0",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "trufflesecurity/trufflehog",
+      "roles": [
+        {
+          "layer_id": "secrets-credentials",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:19:05.850112+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:44:10Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v3.97.9",
+        "published_at": "2026-09-24T09:11:59Z",
+        "days_old": 7,
+        "assets": 9,
+        "assets_with_digest": 9,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "low"
+        ]
+      },
+      "check_runs": {
+        "total": 5,
+        "failing": 0
+      },
+      "license": "AGPL-3.0",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 7.4
+      }
+    },
+    {
+      "repository": "twpayne/chezmoi",
+      "roles": [
+        {
+          "layer_id": "recovery-portability",
+          "role": "challenger"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:19:05.950895+00:00",
+      "archived": false,
+      "last_commit": "2026-09-28T18:53:18Z",
+      "days_since_last_commit": 3,
+      "release": {
+        "tag": "v2.73.0",
+        "published_at": "2026-09-28T19:52:37Z",
+        "days_old": 3,
+        "assets": 111,
+        "assets_with_digest": 111,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 103,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 6.6
+      }
+    },
+    {
+      "repository": "ukgovernmentbeis/inspect_ai",
+      "roles": [
+        {
+          "layer_id": "evaluation-experiments",
+          "role": "unjudged_incumbent"
+        },
+        {
+          "layer_id": "quality-evaluation",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "no_release"
+      ],
+      "observed_at": "2026-10-02T01:19:06.059999+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T20:33:10Z",
+      "days_since_last_commit": 0,
+      "release": null,
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 20,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "unionai-oss/pandera",
+      "roles": [
+        {
+          "layer_id": "data-quality-orchestration",
+          "role": "unjudged_incumbent"
+        }
+      ],
+      "flags": [],
+      "observed_at": "2026-10-02T01:19:06.486910+00:00",
+      "archived": false,
+      "last_commit": "2026-09-26T16:29:55Z",
+      "days_since_last_commit": 5,
+      "release": {
+        "tag": "v0.33.1",
+        "published_at": "2026-09-01T15:20:20Z",
+        "days_old": 30,
+        "assets": 0,
+        "assets_with_digest": 0,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 339,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 5.6
+      }
+    },
+    {
+      "repository": "vectorize-io/hindsight",
+      "roles": [
+        {
+          "layer_id": "durable-memory",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:19:07.191269+00:00",
+      "archived": false,
+      "last_commit": "2026-10-01T19:01:22Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.10.2",
+        "published_at": "2026-09-29T10:06:40Z",
+        "days_old": 2,
+        "assets": 34,
+        "assets_with_digest": 34,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 5,
+        "failing": 3
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "vshulcz/deja-vu",
+      "roles": [
+        {
+          "layer_id": "durable-memory",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "advisories",
+        "ci_failing"
+      ],
+      "observed_at": "2026-10-02T01:19:08.187507+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T00:46:04Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v0.21.4",
+        "published_at": "2026-09-29T10:12:08Z",
+        "days_old": 2,
+        "assets": 25,
+        "assets_with_digest": 25,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 32,
+        "failing": 1
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    },
+    {
+      "repository": "wilfred/difftastic",
+      "roles": [
+        {
+          "layer_id": "git-github-automation",
+          "role": "challenger"
+        }
+      ],
+      "flags": [
+        "no_provenance",
+        "low_scorecard"
+      ],
+      "observed_at": "2026-10-02T01:19:08.301024+00:00",
+      "archived": false,
+      "last_commit": "2026-09-22T08:39:45Z",
+      "days_since_last_commit": 9,
+      "release": {
+        "tag": "0.71.0",
+        "published_at": "2026-09-18T22:57:29Z",
+        "days_old": 13,
+        "assets": 7,
+        "assets_with_digest": 7,
+        "attested_assets": 0
+      },
+      "advisories": {
+        "count": 0,
+        "severities": []
+      },
+      "check_runs": {
+        "total": 17,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": {
+        "date": "2026-08-24T00:00:00Z",
+        "overall_score": 3.9
+      }
+    },
+    {
+      "repository": "zizmorcore/zizmor",
+      "roles": [
+        {
+          "layer_id": "ci-supply-chain",
+          "role": "standing_pick"
+        }
+      ],
+      "flags": [
+        "advisories"
+      ],
+      "observed_at": "2026-10-02T01:19:08.512304+00:00",
+      "archived": false,
+      "last_commit": "2026-10-02T01:14:39Z",
+      "days_since_last_commit": 0,
+      "release": {
+        "tag": "v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z",
+        "days_old": 22,
+        "assets": 5,
+        "assets_with_digest": 5,
+        "attested_assets": 5
+      },
+      "advisories": {
+        "count": 1,
+        "severities": [
+          "medium"
+        ]
+      },
+      "check_runs": {
+        "total": 21,
+        "failing": 0
+      },
+      "license": "MIT",
+      "scorecard": "not_covered"
+    }
+  ],
+  "by_layer": {
+    "agent-sdks": {
+      "standing_pick": [
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "agents-models-workers": {
+      "unjudged_incumbent": [
+        {
+          "repository": "akitaonrails/ai-memory",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "giancarloerra/socraticode",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "flags": []
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "oraios/serena",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "qdrant/qdrant",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "tobi/qmd",
+          "flags": []
+        }
+      ]
+    },
+    "backtesting-engine": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "nautechsystems/nautilus_trader",
+          "flags": []
+        },
+        {
+          "repository": "quantconnect/lean",
+          "flags": [
+            "old_release",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "ci-supply-chain": {
+      "standing_pick": [
+        {
+          "repository": "actions/attest",
+          "flags": []
+        },
+        {
+          "repository": "anchore/syft",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "dependabot/dependabot-core",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "kjanat/actionlint",
+          "flags": [
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "zizmorcore/zizmor",
+          "flags": [
+            "advisories"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "github/codeql-action",
+          "flags": [
+            "advisories"
+          ]
+        }
+      ]
+    },
+    "code-navigation": {
+      "challenger": [
+        {
+          "repository": "anthropics/claude-plugins-official",
+          "flags": [
+            "no_release"
+          ]
+        },
+        {
+          "repository": "ast-grep/ast-grep",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "oraios/serena",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "cross:convergence-practice": {
+      "unjudged_incumbent": [
+        {
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "flags": []
+        }
+      ]
+    },
+    "cross:credential-practice": {
+      "unjudged_incumbent": [
+        {
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "flags": []
+        }
+      ]
+    },
+    "cross:gpt6-harnesses": {
+      "unjudged_incumbent": [
+        {
+          "repository": "diegosouzapw/omniroute",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "cross:runtime-workers": {
+      "unjudged_incumbent": [
+        {
+          "repository": "openhands/software-agent-sdk",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "data-quality-orchestration": {
+      "unjudged_incumbent": [
+        {
+          "repository": "anthropics/claude-code",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "dagucloud/dagu",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/grafana",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/loki",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "open-telemetry/opentelemetry-collector-contrib",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "prometheus/prometheus",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "restic/restic",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "systemd/systemd",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "unionai-oss/pandera",
+          "flags": []
+        }
+      ]
+    },
+    "document-retrieval": {
+      "standing_pick": [
+        {
+          "repository": "opendatalab/mineru",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "tobi/qmd",
+          "flags": []
+        }
+      ]
+    },
+    "durable-memory": {
+      "standing_pick": [
+        {
+          "repository": "akitaonrails/ai-memory",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "rohitg00/agentmemory",
+          "flags": []
+        },
+        {
+          "repository": "vectorize-io/hindsight",
+          "flags": [
+            "no_provenance",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "vshulcz/deja-vu",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "evaluation-experiments": {
+      "unjudged_incumbent": [
+        {
+          "repository": "anthropics/claude-code",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "dagucloud/dagu",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "eyuansu62/agent-retrieval-bench",
+          "flags": []
+        },
+        {
+          "repository": "grafana/grafana",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/loki",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "mlflow/mlflow",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "open-telemetry/opentelemetry-collector-contrib",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "prometheus/prometheus",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "restic/restic",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "systemd/systemd",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "ukgovernmentbeis/inspect_ai",
+          "flags": [
+            "no_release"
+          ]
+        }
+      ]
+    },
+    "execution-broker": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "nautechsystems/nautilus_trader",
+          "flags": []
+        },
+        {
+          "repository": "quantconnect/lean",
+          "flags": [
+            "old_release",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "seathatflowsinourveins/native-agent-stack",
+          "flags": []
+        }
+      ]
+    },
+    "git-github-automation": {
+      "challenger": [
+        {
+          "repository": "anthropics/claude-code-action",
+          "flags": [
+            "old_release",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "wilfred/difftastic",
+          "flags": [
+            "no_provenance",
+            "low_scorecard"
+          ]
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "ataraxy-labs/sem",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "cli/cli",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "git/git",
+          "flags": [
+            "no_release",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "max-sixty/worktrunk",
+          "flags": []
+        }
+      ]
+    },
+    "hosting-services": {
+      "standing_pick": [
+        {
+          "repository": "docker/compose",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "moby/moby",
+          "flags": [
+            "advisories"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "fastapi/fastapi",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "podman-container-tools/podman",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "postgres/postgres",
+          "flags": [
+            "no_release"
+          ]
+        }
+      ]
+    },
+    "identity-provenance": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "dgunning/edgartools",
+          "flags": []
+        },
+        {
+          "repository": "duckdb/duckdb",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "gerrymanoim/exchange_calendars",
+          "flags": [
+            "ci_failing",
+            "low_scorecard"
+          ]
+        },
+        {
+          "repository": "treeverse/dvc",
+          "flags": [
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "instructions-skills": {
+      "challenger": [
+        {
+          "repository": "mattpocock/skills",
+          "flags": []
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "trailofbits/skills",
+          "flags": [
+            "no_release"
+          ]
+        }
+      ]
+    },
+    "isolation": {
+      "standing_pick": [
+        {
+          "repository": "anthropics/sandbox-runtime",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "max-sixty/worktrunk",
+          "flags": []
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "podman-container-tools/podman",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "market-data-reference": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "dgunning/edgartools",
+          "flags": []
+        },
+        {
+          "repository": "duckdb/duckdb",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "gerrymanoim/exchange_calendars",
+          "flags": [
+            "ci_failing",
+            "low_scorecard"
+          ]
+        }
+      ]
+    },
+    "mcp-surfaces": {
+      "challenger": [
+        {
+          "repository": "mcpjam/inspector",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "modelcontextprotocol/inspector",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "openclaw/mcporter",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "native-clients": {
+      "standing_pick": [
+        {
+          "repository": "anthropics/claude-code",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "observability-hosting": {
+      "unjudged_incumbent": [
+        {
+          "repository": "anthropics/claude-code",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "dagucloud/dagu",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/grafana",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/loki",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "open-telemetry/opentelemetry-collector-contrib",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "prometheus/prometheus",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "restic/restic",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "observation-inference": {
+      "challenger": [
+        {
+          "repository": "arize-ai/phoenix",
+          "flags": []
+        },
+        {
+          "repository": "ggml-org/llama.cpp",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "grafana/grafana",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        },
+        {
+          "repository": "grafana/loki",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "openlit/openlit",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "prometheus/prometheus",
+          "flags": [
+            "advisories"
+          ]
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "open-telemetry/opentelemetry-collector-contrib",
+          "flags": [
+            "advisories"
+          ]
+        }
+      ]
+    },
+    "portfolio-risk": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "nautechsystems/nautilus_trader",
+          "flags": []
+        },
+        {
+          "repository": "quantconnect/lean",
+          "flags": [
+            "old_release",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "skfolio/skfolio",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "quality-evaluation": {
+      "standing_pick": [
+        {
+          "repository": "harbor-framework/harbor",
+          "flags": []
+        },
+        {
+          "repository": "ukgovernmentbeis/inspect_ai",
+          "flags": [
+            "no_release"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "microsoft/playwright",
+          "flags": [
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "promptfoo/promptfoo",
+          "flags": []
+        }
+      ]
+    },
+    "recovery-portability": {
+      "standing_pick": [
+        {
+          "repository": "jdx/mise",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "restic/restic",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "twpayne/chezmoi",
+          "flags": []
+        }
+      ]
+    },
+    "research-factors-ml": {
+      "unjudged_incumbent": [
+        {
+          "repository": "dgunning/edgartools",
+          "flags": []
+        },
+        {
+          "repository": "skfolio/skfolio",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "scheduling-supervision": {
+      "standing_pick": [
+        {
+          "repository": "dagucloud/dagu",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "systemd/systemd",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "secrets-credentials": {
+      "standing_pick": [
+        {
+          "repository": "betterleaks/betterleaks",
+          "flags": []
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "trufflesecurity/trufflehog",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        }
+      ]
+    },
+    "security-supply-chain": {
+      "unjudged_incumbent": [
+        {
+          "repository": "anchore/grype",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "anchore/syft",
+          "flags": [
+            "advisories"
+          ]
+        },
+        {
+          "repository": "gitleaks/gitleaks",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ]
+    },
+    "semantic-rag": {
+      "standing_pick": [
+        {
+          "repository": "giancarloerra/socraticode",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "ollama/ollama",
+          "flags": [
+            "no_provenance"
+          ]
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "minishlab/semble",
+          "flags": []
+        },
+        {
+          "repository": "qdrant/qdrant",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    },
+    "storage-compute": {
+      "unjudged_incumbent": [
+        {
+          "repository": "alpacahq/alpaca-py",
+          "flags": []
+        },
+        {
+          "repository": "dgunning/edgartools",
+          "flags": []
+        },
+        {
+          "repository": "duckdb/duckdb",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        },
+        {
+          "repository": "gerrymanoim/exchange_calendars",
+          "flags": [
+            "ci_failing",
+            "low_scorecard"
+          ]
+        }
+      ]
+    },
+    "token-efficiency": {
+      "standing_pick": [
+        {
+          "repository": "ccusage/ccusage",
+          "flags": []
+        }
+      ],
+      "challenger": [
+        {
+          "repository": "mksglu/context-mode",
+          "flags": []
+        },
+        {
+          "repository": "ojuschugh1/sqz",
+          "flags": [
+            "no_provenance"
+          ]
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "flags": [
+            "no_provenance",
+            "advisories"
+          ]
+        }
+      ]
+    },
+    "web-research": {
+      "challenger": [
+        {
+          "repository": "adbar/trafilatura",
+          "flags": []
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "microsoft/playwright-cli",
+          "flags": []
+        }
+      ]
+    },
+    "workers": {
+      "challenger": [
+        {
+          "repository": "anthropics/claude-code",
+          "flags": [
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ],
+      "standing_pick": [
+        {
+          "repository": "max-sixty/worktrunk",
+          "flags": []
+        },
+        {
+          "repository": "openai/codex",
+          "flags": [
+            "no_provenance",
+            "advisories",
+            "ci_failing"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -242,6 +242,10 @@ REMOVE_GLOBS = (
     "evidence/artifacts/new-wsl-definitive-defaults-*/trading/trading-ownership.json",
     "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
     "tests/test_new_wsl_definitive_defaults.py",
+    # The upstream quality audit maps each audited repository to its final-catalog roles (standing pick, challenger,
+    # unjudged incumbent), so its output and observations name the picks too.
+    "catalogs/foundation/upstream-audit-*",
+    "evidence/artifacts/upstream-audit-*",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/
