@@ -4824,6 +4824,26 @@
       "bytes": 787
     },
     {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/README.md",
+      "sha256": "f0d8fc33f531b430b2765e03142e40b53043c2e314fd1afbcac9788930c4e75f",
+      "bytes": 6291
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/attempts.json",
+      "sha256": "dc552909568c07298d0e550e0bd86af876e502c3f98f52fcd12049052e91f1de",
+      "bytes": 6229
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
+      "sha256": "4843b97193811f9b9abe321512ebeacc42e64be6454bf44a979ee3785502df05",
+      "bytes": 5605
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/oracle-experiment.json",
+      "sha256": "9c5fc4939a585a0a2999d0d8a4561743db4308a891cdff3fc5d0d57fc22e7fcb",
+      "bytes": 8142
+    },
+    {
       "path": "blueprints/convergence-practice/container-storage/README.md",
       "sha256": "5a44ca474d573c5faa36b762788277de5992d52b723eedfc2224d29361c04293",
       "bytes": 3355
@@ -11096,8 +11116,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-recovery.md",
-      "sha256": "aee5231130eb08d2f3008a1b62ef3d0f302e5527c7ea6843d1f9e8bd820199a2",
-      "bytes": 8721
+      "sha256": "71ef9cdfe871596d63fea41cbac7b2f5e237e6e661e5b4a1cd5710377e7f0a4b",
+      "bytes": 8609
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-research.md",
@@ -11400,6 +11420,11 @@
       "bytes": 79558
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json",
+      "sha256": "1f9dad30338fa35f2f30dd93a3604825dceca7685b2f6c89af67ebc87340cb93",
+      "bytes": 3052
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
       "sha256": "9bd58237bd11890010855a7508d36cb03ad3c7500774a403aadb8891757f569c",
       "bytes": 63197
@@ -11426,7 +11451,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/runner.py",
-      "sha256": "34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e",
+      "sha256": "d2c2944fe24a39c4304c976f49b09b553999d8f102ab08eeb0e28856c7e7ca7b",
       "bytes": 153832
     },
     {
@@ -13180,24 +13205,34 @@
       "bytes": 5117
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-stress-20261002.md",
+      "sha256": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+      "bytes": 3464
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/PREREGISTRATION-v2.md",
       "sha256": "4393a1b7d896b2f49c4091c18701bd08cfc72a8d313f0ad2a628e91db26d6f0c",
       "bytes": 8223
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/README.md",
-      "sha256": "da89a1f33349bbc6c88a051d04c52f5bb9558a75e8a46a6b15a79b9116e9e3e5",
-      "bytes": 13979
+      "sha256": "129e1f8bd5c467e0b4b1dec352fddd54ba693f2164a6c63a9f45347860261eb3",
+      "bytes": 15069
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/compare.py",
-      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
-      "bytes": 67588
+      "sha256": "7745662652c6e9ec590812f8e0849f0dc22d10356791c55fdc2478fc5f1332d8",
+      "bytes": 72917
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/convert.py",
       "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
       "bytes": 14090
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/cost_models.py",
+      "sha256": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+      "bytes": 2980
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-v2.json",
@@ -13216,8 +13251,58 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/fixture_strategy.py",
+      "sha256": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+      "bytes": 24076
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a.json",
+      "sha256": "19f568f037570322ea49575a0f2dd4ab93b4bf47e6cf16b1ec95a6c85617709e",
+      "bytes": 1065
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/compare.py",
+      "sha256": "c70386f869e45bcdc54602100991235a450d2a5854445d98ffe45b849454a5ec",
+      "bytes": 67588
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/convert.py",
+      "sha256": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "bytes": 14090
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/distribution_module.py",
+      "sha256": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "bytes": 10088
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/fixture_strategy.py",
       "sha256": "59649ac50f26c8b6090dc976e4ec0b3b7e2121cc214674f6c122fbbca9b143f1",
       "bytes": 23733
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/mapping-manifest-v2.json",
+      "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+      "bytes": 37153
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/mapping-manifest.json",
+      "sha256": "43f510494a970d235f27e5676120ee749b45eb6b060cf74f0b768374b8177909",
+      "bytes": 19081
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/run.py",
+      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
+      "bytes": 51307
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/historical-source-v2-a2ad39a/tolerances.json",
+      "sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+      "bytes": 2333
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-stress-20261002.json",
+      "sha256": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+      "bytes": 6098
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/mapping-manifest-v2.json",
@@ -13365,6 +13450,11 @@
       "bytes": 4266
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json",
+      "sha256": "045a20da29e8b008b35589b07edc89fd4f2945a3f94bb2b8f1024b6428ac82cd",
+      "bytes": 6220
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-v2.json",
       "sha256": "f881ee3208317c9f954639c5229a7c1e2c785b196d6ea7cfbac1e1d3088f041c",
       "bytes": 48161
@@ -13380,14 +13470,24 @@
       "bytes": 10844
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-linux-arm64-py313.lock",
+      "sha256": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+      "bytes": 489
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-macos-arm64-py313.lock",
+      "sha256": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+      "bytes": 489
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/review-record-v2-cc4503f.json",
       "sha256": "7fdf6d104f7e75b07718b33873fd2d32f06113e3cc42a14adfa934aeb0fb01f6",
       "bytes": 2475
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/run.py",
-      "sha256": "c3917c2f6446ffb1bcfe411cc2339ffc1f804a87904ed3a1f1a67e51817ad2f2",
-      "bytes": 51307
+      "sha256": "d1b0b0e1261e71bbaca5fb40ca76aef3209e4846fd8ea4de971308b37aa1b10b",
+      "bytes": 55406
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/tolerances.json",
@@ -14896,8 +14996,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "74b65f1acb6712c431c8b0e7d5c5261efdff75e51a3952f9558db326526c1c6f",
-      "bytes": 15681
+      "sha256": "ed9792b4b62865a322dffe0567a434edcbe9bb955e96d4e95b201c27581ee85e",
+      "bytes": 16851
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -14916,8 +15016,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
-      "bytes": 26007
+      "sha256": "883a9ee821dcbc45ded90dd385000a4d6b2e7183651f603595e2817863136c00",
+      "bytes": 29997
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -14951,8 +15051,8 @@
     },
     {
       "path": "catalogs/landscape/candidate-quality-review.json",
-      "sha256": "dbb5de39e9f5af58c20e3b75b560386776a29a994207ebf73b499e22f7d46ed8",
-      "bytes": 152069
+      "sha256": "f3c1658cee951076b22e12c5e267bd025ea294c419c944437ace0843ee0f372b",
+      "bytes": 152521
     },
     {
       "path": "catalogs/landscape/claude-independent-discovery.json",
@@ -15031,8 +15131,8 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618",
-      "bytes": 445299
+      "sha256": "a3960abdd4e5df64c999668798d8c13fc55a260b51e01c4219a33ca004aa9683",
+      "bytes": 448993
     },
     {
       "path": "catalogs/saturation/README.md",
@@ -15356,8 +15456,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
-      "bytes": 22531
+      "sha256": "a3c2ae5f2e1c601d89c013a798e7110c2d52956bda32e1bbd59f51741004c2f6",
+      "bytes": 23997
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -15745,9 +15845,29 @@
       "bytes": 49664
     },
     {
+      "path": "docs/decisions/2026-10-02-clean-resolution-goal.md",
+      "sha256": "4b45924e17a56ec4a6df4488c92d33d38a332d52c35c49e81a76fa33c6235366",
+      "bytes": 7039
+    },
+    {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
       "sha256": "e90950fe72016e3d4732d6beb36ed0f898e9ccf550e2fa69866b6e3b5730efb2",
       "bytes": 7563
+    },
+    {
+      "path": "docs/decisions/2026-10-02-north-star-host-paper-activation.md",
+      "sha256": "8642e1384b9748aa79ec902bd282df092d08bf419aaaa4f5a14ace999a70b0a4",
+      "bytes": 10966
+    },
+    {
+      "path": "docs/decisions/2026-10-02-north-star-readiness-execution.md",
+      "sha256": "b1f22f5022a407c01988b85ae5692f131220a92520c791ddfa7f391113693042",
+      "bytes": 14894
+    },
+    {
+      "path": "docs/decisions/2026-10-02-north-star-runtime-qualification.md",
+      "sha256": "88af1e80074c449066d8074bab5e9f71bf32991ee37b94ffeea00ccffb63eb18",
+      "bytes": 7352
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -48195,6 +48315,56 @@
       "bytes": 1589
     },
     {
+      "path": "examples/native-sdk-acceptance/README.md",
+      "sha256": "eab2c923e27b847c325f4487ea3bc806afa8b18b760fe6e562a438b5e85af476",
+      "bytes": 7012
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/README.md",
+      "sha256": "a7ba0fb484eca677b9192b38dd683c8deac36513fc145c10195ff6b55c6e10ea",
+      "bytes": 2305
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/controls/positive.py",
+      "sha256": "1437e6ee8ca79042b05b497f4907ad51b3375cab68928866902c92c46bd1cc4a",
+      "bytes": 344
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/controls/regression.py",
+      "sha256": "52a77b4291afb3e44be8283aba7df0f7f7d2d5f74a4ec08b81896720cd7e87f1",
+      "bytes": 171
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/local-observation.json",
+      "sha256": "93e3b64f75e6fe8d52c1cbb9dbdf568d63ccbc72fe1addadd607e7440b944e4b",
+      "bytes": 3554
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/results/baseline.stderr.txt",
+      "sha256": "2f60426f8d47a6a41363a82572b89ee6a294d7624bc7515ca2d454e6cbcfa680",
+      "bytes": 1905
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/results/positive.stderr.txt",
+      "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22",
+      "bytes": 524
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/results/regression.stderr.txt",
+      "sha256": "932849923872e1c73818e8f4991be9c14a1981bde444995db84056da7390f6d3",
+      "bytes": 1700
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/test_utils.py",
+      "sha256": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5",
+      "bytes": 1217
+    },
+    {
+      "path": "examples/native-sdk-acceptance/claude-quickstart/utils.py",
+      "sha256": "c29fde59b52cc1ee333382b6b216462a0271f37a455550052f0c1414b4d72fa5",
+      "bytes": 182
+    },
+    {
       "path": "examples/native-stack-embeddings.service.example",
       "sha256": "2cefa31441eb392333e706f4aa585ab009b45446031800484f7f5b04f2e75c93",
       "bytes": 632
@@ -48516,8 +48686,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "e7136a2188ca4e7dcfe57affad586ff45faf297f3d71aab66fa60f92cb61f6bc",
-      "bytes": 19333
+      "sha256": "4d6923d6ce8bebb0481ece96d97f00ebc94abdefb332dc65f7889dcc92f077a9",
+      "bytes": 20574
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -49011,8 +49181,13 @@
     },
     {
       "path": "tests/test_adaptive_paper_recovery.py",
-      "sha256": "6da67e1b83d887cbaaeaf289434a595dacc79517a6b74b61e2adf622f84462cb",
-      "bytes": 34451
+      "sha256": "c78f59b430d71da5679888784082e82dff2d6d4849b27e6707fe6c7badba22e3",
+      "bytes": 38168
+    },
+    {
+      "path": "tests/test_adaptive_paper_recovery_wiring.py",
+      "sha256": "e5dac5420289e6f454d945c3a10b9cf599eb8ca2931fa2046211da92fa27317a",
+      "bytes": 7649
     },
     {
       "path": "tests/test_adaptive_paper_runner.py",
@@ -49801,8 +49976,8 @@
     },
     {
       "path": "tests/test_spy_parity.py",
-      "sha256": "f210e6f4fc1ff37173fc42e84ace878245e3448f03a2d1bee93d4be04ae6ab5e",
-      "bytes": 121917
+      "sha256": "fa1d555630a0ab8d47f7336cef6e7cf2ac6aa0012064e12efbdfdcfed0fa606a",
+      "bytes": 132821
     },
     {
       "path": "tests/test_stack_lifecycle.py",

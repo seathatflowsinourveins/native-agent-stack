@@ -33,7 +33,7 @@
     "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
     "supported_python": ">=3.12,<3.15; vanilla CPython",
     "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
-    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. SPY/LEAN parity is established for the historical one_zero case only (gate spy-lean-parity, blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json; one case, and the open-fill proxy is not a general market-on-open equivalent). Realistic liquidity and rc5 native broker adapter acceptance remain open.",
+    "acceptance": "Retained upstream synthetic EURUSD quickstart and GitHub installation/replay acceptance; September21 native local AAPL diagnostic adds15 retained bars and two five-roundtrip baseline/fee-slippage scenarios with exact cash accounting. Historical SPY one_zero retains its original gate/verdict-v2.json scope. On2026-10-02, the independently reviewed one_stress mapping passed142/142 strict checks in each of two fresh isolated Linux ARM64 processes, with four matching UUID-normalized native exports (receipt-stress-20261002.json). Native cash90357.99 matches Decimal90357.995840 within the unchanged0.01USD tolerance. These are frozen-case agreements, not general market-on-open, margin/adaptive, strategy-merit or NativeStack WSL2 acceptance. Realistic liquidity and rc5 native broker adapter acceptance remain open.",
     "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
     "sources": [
       "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
@@ -191,6 +191,18 @@
     "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
   ],
   "next_acceptance": [
+    {
+      "id": "frozen-cost-rounding-stress-20261002",
+      "status": "one_stress_two_fresh_processes_strict_pass",
+      "scope": "Reviewed source648228d3252d1e82b7e0378bfd90210d1e1aacd3; pinned native rc5 Linux ARM64 simulation; each process123 execution and19 precondition checks passed, zero failures/skips; four matching normalized exports. Frozen maintenance-margin/adaptive cases remain blocked; over-limit refusal mapping requires separate prospective qualification.",
+      "executed_evidence_ref": "blueprints/us-equities/engine-nautilus/spy-parity/receipt-stress-20261002.json"
+    },
+    {
+      "id": "recovery-f1-source-20261002",
+      "status": "pinned_sdk_synthetic_contracts_passed_paper_not_run",
+      "scope": "Reviewed source2c669e18f705212f6f407b80f668d2a253591167 fixes explicit/forced recovery benchmark quote admission while retaining each residual exit's own fresh quote. Official locked SDK/native runtime passes523 unique tests without skips; deterministic fake broker ports provide no new account, native in-flight fault or IBKR paper acceptance.",
+      "executed_evidence_ref": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json"
+    },
     {
       "id": "retained-equity-replay",
       "status": "spy_lean_parity_passed_one_zero_case",

@@ -1,0 +1,119 @@
+{
+  "schema": "spy-parity-qualified-summary/1",
+  "case": "one_stress",
+  "evidence_class": "HIST: actual pinned native BacktestEngine; offline frozen-data simulation",
+  "harness_commit": "648228d3252d1e82b7e0378bfd90210d1e1aacd3",
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "python": "3.13.16",
+    "platform": "Linux ARM64 in a task-owned macOS VM; not NativeStack WSL2 acceptance",
+    "extension_sha256": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
+  },
+  "prospective_review": {
+    "completed_utc": "2026-10-02T19:44:00Z",
+    "verdict": "PASS",
+    "unresolved_findings": 0,
+    "original_record_sha256": "0576d92d86c55ada6f1d5d970ce22653dd389663a21e7844f27274e0f513471b",
+    "scope": "Ten source hashes independently reviewed before either engine process; original private record retained",
+    "reviewed_source_sha256": {
+      "PREREGISTRATION-stress-20261002.md": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+      "compare.py": "7745662652c6e9ec590812f8e0849f0dc22d10356791c55fdc2478fc5f1332d8",
+      "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "cost_models.py": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+      "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+      "mapping-manifest-stress-20261002.json": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+      "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+      "requirements-stress-macos-arm64-py313.lock": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+      "run.py": "d1b0b0e1261e71bbaca5fb40ca76aef3209e4846fd8ea4de971308b37aa1b10b"
+    }
+  },
+  "isolation": {
+    "zero_engine_fence_passed": 10,
+    "zero_engine_fence_failed": 0,
+    "fence_receipt_sha256": "52fa54805c89816493f621075dde8eb74b2badf2121222b2477e47c4ec2990aa",
+    "frozen_argv_sha256": "1f84b55dc02cc9fc5015c6126706035a8f81fc65d9651a028707c68d74e256bd",
+    "boundary": "Read-only source/runtime/data mounts, new PID/user namespaces, Python -I, cleared environment, loopback-only network; no host HOME or broker secrets",
+    "preserved_failed_attempts": "C1 mount-propagation denial; C2 proc-mount denial; C3 uses task-container systempaths=unconfined with the inner strict bubblewrap fence",
+    "foreign_sentinel_sha256": "c9e731585d0af9294f0361e08fb6510aa10a2f96b136f2a1b89f524167353dd3"
+  },
+  "frozen_inputs_sha256": {
+    "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+    "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+    "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+    "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+  },
+  "fresh_processes": [
+    {
+      "process": 1,
+      "started_utc": "2026-10-02T19:49:01.508518+00:00",
+      "native_exit": 0,
+      "comparison_exit": 0,
+      "strict_verdict": "PASS",
+      "execution_checks_passed": 123,
+      "preconditions_passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "complete": true,
+      "preregistration_qualifying": true,
+      "original_receipt_sha256": "b7e552b2c953decc6d903a44798804be0643ef270a0b6aa517e0a217dcd4ee9e",
+      "original_verdict_sha256": "9eb6cabdb34f8ecad2c64aae5aa6ff32cf2c144a354c2b249d060404f70d5487"
+    },
+    {
+      "process": 2,
+      "started_utc": "2026-10-02T19:50:34.112536+00:00",
+      "native_exit": 0,
+      "comparison_exit": 0,
+      "strict_verdict": "PASS",
+      "execution_checks_passed": 123,
+      "preconditions_passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "complete": true,
+      "preregistration_qualifying": true,
+      "original_receipt_sha256": "76843c6167ae7a2664f5b596299731ebc22ccfd5dea60497045c22c2016f0ba5",
+      "original_verdict_sha256": "f5b5050aacc6ca8a656be01593e4993e5f13ce30d9dcc7fb27ac2728ac59799f"
+    }
+  ],
+  "economics_equal_between_processes": {
+    "entry_intent_utc_seconds": 1577826000,
+    "entry_fill_utc_seconds": 1577977200,
+    "entry_quantity": 304,
+    "entry_price_usd": "324.227160",
+    "exit_intent_utc_seconds": 1588190400,
+    "exit_fill_utc_seconds": 1588255200,
+    "exit_quantity": 304,
+    "exit_price_usd": "291.106620",
+    "fees_usd": "2.00",
+    "dividend_cash_usd": "428.64",
+    "end_quantity": "0",
+    "native_end_cash_usd": "90357.99",
+    "decimal_reconciled_end_cash_usd": "90357.995840"
+  },
+  "currency_rounding": {
+    "native_entry_notional_usd": "98565.06",
+    "native_exit_notional_usd": "88496.41",
+    "unchanged_absolute_cash_tolerance_usd": "0.01",
+    "note": "Native per-order Money rounding differs from the prospectively predicted cent display90358.00. The measured90357.99 is published unchanged; the frozen oracle and tolerance are unchanged."
+  },
+  "determinism": {
+    "fresh_native_engine_exports": 4,
+    "normalization": "Declared native UUID-only normalization",
+    "all_four_normalized_sha256": "3b8b00986de055ad7b8d5a22be81598c68d313f16a4253403023eea957948f79",
+    "bars_per_engine": 725,
+    "error_log_lines_per_engine": 0,
+    "negative_cash_events": 0,
+    "final_open_orders": 0,
+    "final_open_positions": 0,
+    "final_pending_intents": 0,
+    "strategy_callback_errors": 0
+  },
+  "limits": [
+    "This summary publishes selected exact facts and original evidence digests; full receipts, logs, review and controller records remain in private task evidence.",
+    "This is one frozen cost-and-rounding stress case. It does not qualify margin/adaptive cases, research data fitness, NativeStack WSL2, paper brokers or shared inference lifecycle.",
+    "No account, model or provider operation occurred. Whole-task usage and net savings remain unknown."
+  ]
+}

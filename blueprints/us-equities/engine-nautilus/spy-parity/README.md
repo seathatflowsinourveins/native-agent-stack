@@ -259,3 +259,21 @@ are carried into the next harness round:
    Resolved 2026-09-23: all three modes were re-executed and retained (see the
    note under the mode table).
 6. The review inventory miscounted the test classes (17, not 13).
+
+## Cost and rounding stress qualification — 2026-10-02
+
+The historical blocked records above keep their original source and scope.
+The new `one_stress` mapping at `648228d3252d1e82b7e0378bfd90210d1e1aacd3`
+was independently reviewed before execution. Two separate fresh isolated
+processes each pass the strict frozen-input comparison:123 execution checks
+and19 preconditions,142/142 total, zero skips/failures. All four native engine
+exports match after the declared UUID-only normalization.
+
+See [the observed receipt](receipt-stress-20261002.json) and
+[the runtime qualification](../../../../docs/decisions/2026-10-02-north-star-runtime-qualification.md)
+for exact source/data/engine hashes, original evidence digests and boundaries.
+Native cash is90357.99 USD; exact Decimal reconciliation is90357.995840 USD.
+The existing0.01 USD cash tolerance passes without modifying the oracle,
+mapping or tolerance. This qualifies only the frozen stress case on the task's
+Linux ARM64 executor. Other margin/adaptive cases, NativeStack WSL2 and actual
+paper brokers retain their separate gates.

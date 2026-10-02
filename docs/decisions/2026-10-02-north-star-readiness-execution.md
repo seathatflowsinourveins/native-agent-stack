@@ -121,6 +121,12 @@ passed gate. Configuration/API verification stays at that evidence level.
 | G20 | Whole-task usage and token-efficiency comparison — open | Requirement for usage/savings claims. Include children, retries and cache semantics without adding overlapping counters. Whole-task usage, provider settlement, applied compression and net savings remain unknown. |
 | G21 | QMD Metal warning interpretation — verified configuration | Selected retrieval requirement. Observed offloading addresses the compiler warning only; top-three relevance misses, rerank latency and index freshness remain separate unqualified claims. |
 
+The [offline runtime qualification](2026-10-02-north-star-runtime-qualification.md)
+adds two fresh-process stress comparisons and pinned-SDK recovery acceptance at
+their exact source/host scopes. The [host and paper activation packet](2026-10-02-north-star-host-paper-activation.md)
+records supported next steps and missing destination/account prerequisites.
+These additions preserve the 21 carried gate dispositions above.
+
 Full production/full-stack readiness remains **false**. Optional exclusions do
 not reduce that claim to a passed subset. Separate research data, realistic
 simulation and broker-specific paper faults remain trading acceptance gates;
