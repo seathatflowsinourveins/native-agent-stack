@@ -37205,6 +37205,101 @@
       "bytes": 4419
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "sha256": "39cb417bf12b1c4a8f36d3d0befc66bef98f16348952fcaf3be1cf6085f3f78f",
+      "bytes": 12303
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "sha256": "5d9675de8af0ef3457cfbea4b306fdd17d109ecbe74f95b8d048634d499b450a",
+      "bytes": 48083
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
+      "sha256": "c21bee9177097b74fd2acfc8d91e127923c8b7a47c18d7d7e39afde67f37e19d",
+      "bytes": 20302
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "sha256": "d5eec991323a039375ac5f62546c744045233f2f1c077d42e2e10b5b84fd563e",
+      "bytes": 30355
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "sha256": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c",
+      "bytes": 16396
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager.yaml",
+      "sha256": "b4ff240a87515fa2c9b606c3570ed9c6c64dc36bd2cbad52c8ee62f22745f6a4",
+      "bytes": 528
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini",
+      "sha256": "139c743c02b428653de39bfac449a9a0f4f02f786732891715838022b25f936d",
+      "bytes": 324
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/loki.yaml",
+      "sha256": "151a56b093712f20ebd15329a8fa33678ca21fc36a7a8db46ed890a887032bb7",
+      "bytes": 1069
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env.example",
+      "sha256": "f5ee98e1470cc83e2c62b146ac72e851f2896038705149716ded1007a049893f",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute.env.example",
+      "sha256": "bbdb13b104e9337c30bf671a943e42439866dfe5dbbaa3390bd82347b80d7761",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml",
+      "sha256": "1bcdf496537bab925fd39b42fd5b2b8226e2d4fb4f95b3aaba1d52e23c3d731f",
+      "bytes": 1114
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml",
+      "sha256": "1565e9df52167eb06e5b33a4d57bc45fa1f9d1bd87a1bc3c268f9a3d5f0e58c4",
+      "bytes": 321
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
+      "sha256": "13ff53f8185c76732813ef1df3ed29c8dae1fe835cbf389c732005a017933159",
+      "bytes": 9927
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "14e80961d1e20420bb2891bbec1e8dd55d2db67433f12a242b0f3c311e965d34",
+      "bytes": 109336
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "sha256": "56cb6a8c2cb8168b191caa9d1eaeacac6bdc0a9a6b8d9b74f8ee585e25fd5a89",
+      "bytes": 40982
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
+      "sha256": "16bb7aacc4bc294ee3832200a4b9ad128894b30cbe254ea933518ec9395888b4",
+      "bytes": 946
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "sha256": "4ab26a9a7617cfa8741aa8ced5c178beeadf0606b26b5edaf663ea0cb1916b99",
+      "bytes": 24777
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
+      "sha256": "7de61ac3ae94b7f0c5b6cd7753b83d1b4368387dd18b04ef3eff60cf9ff19839",
+      "bytes": 11786
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
+      "sha256": "3e45b756af99d7683eb329af5672d48b14c2cac35e058f1900a87d6c19532552",
+      "bytes": 13984
+    },
+    {
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/README.md",
       "sha256": "4fa18bedcff8a0328a175dc79700c813148cdb3994b02c02b26eaea84eb285a9",
       "bytes": 6213
