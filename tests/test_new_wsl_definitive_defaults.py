@@ -189,7 +189,8 @@ class Manifest(unittest.TestCase):
                 if mid in measurements:
                     self.assertEqual(resolution["arms"], measurements[mid], row["slot_id"])
                 measurements[mid] = resolution["arms"]
-        self.assertEqual(set(measurements), {"browser-tool", "event-store-and-dashboards"})
+        self.assertEqual(set(measurements), {"browser-tool", "event-store-and-dashboards", "local-generation-model",
+                                             "embedding-model", "agent-messaging"})
 
     def test_data_final_rows_match_the_combined_final_list(self):
         combined = {layer["layer_id"]: layer for layer in self.combined["rows"]}
@@ -246,8 +247,14 @@ class Manifest(unittest.TestCase):
         for added in self.convergence["added_slots"]:
             row = rows[added["slot_id"]]
             self.assertEqual(row["row_kind"], "added")
-            self.assertEqual(row["default"], added["default"]["name"])
-            self.assertEqual(row["repository"], added["default"]["repository"])
+            if added["outcome"] in ("split", "not_installed"):
+                # an added row that installs nothing keeps the named candidate only in its resolution
+                self.assertEqual(row["repository"], "")
+                self.assertTrue(row["installs_nothing_extra"])
+                self.assertEqual(row["resolution"]["former_default"], added["default"])
+            else:
+                self.assertEqual(row["default"], added["default"]["name"])
+                self.assertEqual(row["repository"], added["default"]["repository"])
             self.assertEqual(row["layer_id"], added["layer_id"])
             added_by_layer.setdefault(row["layer_id"], []).append(row["slot_id"])
         for lid, added in added_by_layer.items():
