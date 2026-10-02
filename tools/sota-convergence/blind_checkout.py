@@ -209,6 +209,11 @@ REMOVE_GLOBS = (
     "tests/test_catalogs.py",
     "tests/test_new_host_grand_list.py",
     "tests/test_handbook_summary.py",
+    # The upstream quality audit maps each audited repository to its roles in the definitive manifest (slot, state and
+    # whether the row installs it), so its output, its observations and its decision record name the defaults too.
+    "catalogs/foundation/upstream-audit-*",
+    "evidence/artifacts/upstream-audit-*",
+    "docs/decisions/2026-10-02-upstream-audit.md",
 )
 
 # The closed-vocabulary enum labels found under selection/decision/disposition/
