@@ -1,10 +1,15 @@
 """Prospective over-limit refusal mapping; no BacktestEngine is constructed here."""
+import ast
 import copy
 from decimal import Decimal
 import importlib.util
+import inspect
 import json
 from pathlib import Path
+import sys
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'blueprints/us-equities/engine-nautilus/spy-parity'
@@ -54,6 +59,54 @@ class OverLimitTests(unittest.TestCase):
         self.assertEqual(config['instrument']['margin_maint'], '0.5')
         self.assertFalse(config['risk']['bypass'])
         self.assertEqual(config['risk']['max_notional_per_order'], {})
+
+    def test_on_start_schedules_both_frozen_ex_dates_as_native_noop_alerts(self):
+        module = self.module()
+        historical = json.loads((SOURCE / 'receipt.json').read_text())
+        events = [{'ex_instant_ns': event['utc_seconds'] * 10**9}
+                  for event in historical['derived_distributions']]
+        instants = [1576818000 * 10**9, 1584676800 * 10**9]
+        self.assertEqual([event['ex_instant_ns'] for event in events], instants)
+        scheduled = []
+
+        class FakeStrategy:
+            def __init__(self, config):
+                self.clock = SimpleNamespace(set_time_alert_ns=lambda name, instant, callback, **kwargs:
+                                             scheduled.append((name, instant, callback, kwargs)))
+                self.subscriptions = []
+
+            def subscribe_bars(self, bar_type):
+                self.subscriptions.append(bar_type)
+
+        native_interfaces = {
+            'nautilus_trader.config': SimpleNamespace(StrategyConfig=lambda: None),
+            'nautilus_trader.model': SimpleNamespace(BarType=SimpleNamespace(from_str=lambda value: value)),
+            'nautilus_trader.trading': SimpleNamespace(Strategy=FakeStrategy),
+        }
+        # Exercise the real construction call without constructing an engine:
+        # alerts must use the same frozen events as DistributionModule.
+        tree = ast.parse(inspect.getsource(module._run_once))
+        call = next(node for node in ast.walk(tree)
+                    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                    and node.func.id == '_build_strategy')
+        with patch.dict(sys.modules, native_interfaces):
+            strategy_class = eval(compile(ast.Expression(call), '<native-strategy-construction>', 'eval'),
+                                  {'_build_strategy': module._build_strategy, 'rows': self.rows(),
+                                   'instrument': SimpleNamespace(id='SPY.SIM'), 'venue': 'SIM',
+                                   'usd': 'USD', 'events': events})
+            strategy = strategy_class()
+        strategy.on_start()
+        self.assertEqual(strategy.subscriptions, [module.configuration()['instrument']['bar_type']])
+        self.assertEqual([(name, instant, kwargs) for name, instant, _, kwargs in scheduled],
+                         [('ex_date_' + str(instant), instant, {'allow_past': False}) for instant in instants])
+        before = (strategy.intents.copy(), strategy.native_marks.copy(), strategy.callback_events.copy(),
+                  strategy.errors.copy(), strategy.bars_seen)
+        for name, instant, callback, _ in scheduled:
+            callback(SimpleNamespace(name=name, ts_event=instant))
+        self.assertEqual((strategy.intents, strategy.native_marks, strategy.callback_events,
+                          strategy.errors, strategy.bars_seen), before)
+        self.assertEqual(strategy.alerts_fired,
+                         [{'name': name, 'ts_event_ns': instant} for name, instant, _, _ in scheduled])
 
     def test_one_intent_is_sized_from_decision_bar_not_expected_quantity(self):
         module = self.module()

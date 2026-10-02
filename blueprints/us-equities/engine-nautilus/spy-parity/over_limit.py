@@ -216,7 +216,7 @@ def refusal_checks(run, rows, expected):
     return checks
 
 
-def _build_strategy(rows, instrument_id, venue, usd):
+def _build_strategy(rows, instrument_id, venue, usd, alerts):
     from nautilus_trader.config import StrategyConfig
     from nautilus_trader.model import BarType
     from nautilus_trader.trading import Strategy
@@ -226,9 +226,22 @@ def _build_strategy(rows, instrument_id, venue, usd):
         def __init__(self):
             super().__init__(StrategyConfig())
             self.intents, self.native_marks, self.callback_events, self.errors = [], [], [], []
+            self.alerts_registered, self.alerts_fired = [], []
             self.bars_seen = 0
         def on_start(self):
-            self.subscribe_bars(bar_type)
+            try:
+                self.subscribe_bars(bar_type)
+                for instant in alerts:
+                    name = 'ex_date_' + str(instant)
+                    self.clock.set_time_alert_ns(name, instant, self._on_ex_date_alert, allow_past=False)
+                    self.alerts_registered.append({'name': name, 'alert_time_ns': instant})
+            except BaseException as error:
+                self.errors.append('on_start:' + type(error).__name__ + ':' + str(error))
+                raise
+        def _on_ex_date_alert(self, event):
+            # Native clock wakeup lets the existing venue module run at midnight;
+            # the callback records its event without changing cash, orders or state.
+            self.alerts_fired.append({'name': str(event.name), 'ts_event_ns': int(event.ts_event)})
         def on_bar(self, bar):
             try:
                 row = rows[self.bars_seen]
@@ -277,7 +290,8 @@ def _run_once(rows, events, out, preflight):
     instrument = native_instrument()
     fill, fee = RUN.COSTS.build_models(config['case'], config['instrument'])
     module = RUN.DISTRIBUTION.build_module(events, 'SPY.SIM', 'USD')
-    strategy_class = _build_strategy(rows, instrument.id, venue, usd)
+    strategy_class = _build_strategy(rows, instrument.id, venue, usd,
+                                     [event['ex_instant_ns'] for event in events])
     bars = RUN.CONVERT.to_bars(rows, config['instrument']['bar_type'], 6, 0)
     with RUN.CapturedOutput(out / 'engine.log'):
         engine = BacktestEngine(BacktestEngineConfig(
@@ -309,6 +323,7 @@ def _run_once(rows, events, out, preflight):
             run = {'intents': strategy.intents, 'bars_seen': strategy.bars_seen,
                    'engine_iterations': result.iterations,
                    'errors': strategy.errors, 'native_marks': strategy.native_marks,
+                   'alerts_registered': strategy.alerts_registered, 'alerts_fired': strategy.alerts_fired,
                    'native_callback_events': strategy.callback_events,
                    'native_orders': [order.to_dict() for order in orders],
                    'native_order_events': [event.to_dict() for order in orders for event in order.events()],
