@@ -14896,8 +14896,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "2d2956d1dd037480afaf4baebdfd7201141b9b6037017815ec3822864f69453e",
-      "bytes": 15250
+      "sha256": "74b65f1acb6712c431c8b0e7d5c5261efdff75e51a3952f9558db326526c1c6f",
+      "bytes": 15681
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -14916,8 +14916,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "1a71e2293de6578ba7099a7b7b8f8c6486ec1a923b38c8bf44ae205f77a95c5c",
+      "bytes": 26007
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15506,8 +15506,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "899e63f28a0463d344f771314edd2b73451c29f944a77a23ea2113cefdb9b400",
-      "bytes": 15350
+      "sha256": "1888656a0c4afcd630cb9fc861b05818de653e438bdb4780eaa91206380b401b",
+      "bytes": 15725
     },
     {
       "path": "docs/convergence-audit.md",
@@ -15753,6 +15753,11 @@
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
       "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
       "bytes": 6141
+    },
+    {
+      "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
+      "sha256": "e62e18241cfcf0ab8e83bb3aca0b90b3b2d5e3e5de7f815a85c4055d861a07ec",
+      "bytes": 16498
     },
     {
       "path": "docs/direct-results.md",
