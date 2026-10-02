@@ -6486,8 +6486,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "8a34f3ee5ea0c8d043c231b3dbe72b961c6e4e269d7e2b660d0f21ff348f166f",
-      "bytes": 19725
+      "sha256": "f63ef272a75a0d0e14d2486da289443a96e8fe82ad9f9083c2bc99833b8f075e",
+      "bytes": 20341
     },
     {
       "path": "blueprints/convergence-practice/wsl-restore/README.md",
@@ -36073,6 +36073,16 @@
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
       "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
       "bytes": 8224
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-rehearsal-20261002/coordinator-review.md",
+      "sha256": "33e010bf1a11c751126694f1bf472aa80681817a56f6a57b040d5c093f7d02d8",
+      "bytes": 3298
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-rehearsal-20261002/stage1-receipt.json",
+      "sha256": "1fba6490145c7b7de7d85b1968b52788c88eeb2b39a8db3758e94c541c0273b7",
+      "bytes": 51552
     },
     {
       "path": "evidence/artifacts/notification-types-20260929/README.md",
