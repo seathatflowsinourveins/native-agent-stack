@@ -117,6 +117,48 @@ class OverLimitTests(unittest.TestCase):
         changed[0]['c'] = '400.00'
         self.assertEqual(module.decision_intent(changed)['quantity'], 980)
 
+    def test_native_clock_startup_and_callback_failures_are_retained_for_guard(self):
+        module = self.module()
+
+        def fail_registration(*args, **kwargs):
+            raise RuntimeError('native_alert_registration_failure')
+
+        class FakeStrategy:
+            def __init__(self, config):
+                self.clock = SimpleNamespace(set_time_alert_ns=fail_registration)
+
+            def subscribe_bars(self, bar_type):
+                pass
+
+        class FailedNativeAlert:
+            name = 'ex_date_1576818000000000000'
+
+            @property
+            def ts_event(self):
+                raise RuntimeError('native_alert_callback_failure')
+
+        native_interfaces = {
+            'nautilus_trader.config': SimpleNamespace(StrategyConfig=lambda: None),
+            'nautilus_trader.model': SimpleNamespace(BarType=SimpleNamespace(from_str=lambda value: value)),
+            'nautilus_trader.trading': SimpleNamespace(Strategy=FakeStrategy),
+        }
+        with patch.dict(sys.modules, native_interfaces):
+            strategy = module._build_strategy(self.rows(), 'SPY.SIM', 'SIM', 'USD',
+                                             [1576818000000000000, 1584676800000000000])()
+        with self.assertRaisesRegex(RuntimeError, 'native_alert_registration_failure'):
+            strategy.on_start()
+        self.assertEqual(strategy.errors, ['on_start:RuntimeError:native_alert_registration_failure'])
+        with self.assertRaisesRegex(RuntimeError, 'native_alert_callback_failure'):
+            strategy._on_ex_date_alert(FailedNativeAlert())
+        self.assertEqual(strategy.errors,
+                         ['on_start:RuntimeError:native_alert_registration_failure',
+                          '_on_ex_date_alert:RuntimeError:native_alert_callback_failure'])
+        run = self.refusal_record(module)
+        run['errors'] = strategy.errors
+        oracle = module.CMP.oracle_case(json.loads((ROOT / 'blueprints/us-equities/historical-simulation/receipt.json').read_text()), 'over_limit')
+        self.assertFalse(next(check for check in module.refusal_checks(run, self.rows(), oracle)
+                              if check['field'] == 'no_callback_errors')['pass'])
+
     def test_decision_requires_session_final_bar(self):
         rows = self.rows()
         rows.insert(1, {**rows[0], 'local_start': '16:00'})
