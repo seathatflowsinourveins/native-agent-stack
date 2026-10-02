@@ -17,6 +17,54 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
+## Current practice (2026-10-02)
+
+This section is the current practice. The dated sections below are history; where they differ, this section and the
+live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 23739774 (updated
+2026-09-27T17:00:13-04:00) matches [`.github/main-ruleset.json`](../.github/main-ruleset.json).
+
+- **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
+  `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
+  `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
+- **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
+  and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
+  Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
+  catalog-freshness `propose` PR stay reviewable. Branches are deleted on merge. Land a PR with the merge guard in
+  [`docs/lanes.md`, "Labels and PRs"](lanes.md#labels-and-prs): read the head SHA, confirm that every required check
+  is in bucket `pass`, then squash-merge with that SHA pinned.
+- **Labels and the PR template.** Every PR carries exactly one of `lane:foundation`, `lane:trading` or `lane:shared`,
+  and a `lane:shared` PR needs the other lane's acknowledgement as a comment or review.
+  [`.github/pull_request_template.md`](../.github/pull_request_template.md) carries the Lane line and a
+  `### SOTA sources` section, which the required `sota-sources` check enforces.
+- **Generated reports.** CI checks each generated report against its inputs (`build_verdicts.py`,
+  `component_matrix.py`, `new_host_grand_list.py`, `gap_crosswalk.py`, `gap_wave_ledger.py`, `build_ecosystem.py`,
+  and the final catalog's generator once it lands). `manifests/evidence.json` follows the hot-file protocol in
+  [`docs/lanes.md`](lanes.md#hot-file-protocol).
+- **Secrets.** The required `secret-scan` job runs gitleaks 8.30.1 over the history and the working tree, plus the
+  allowlist regression tests. `secret-scan-betterleaks` runs betterleaks v1.8.1 as a non-required, report-only trial;
+  its fixture tests d2, d4 and d5 fail on every run, and its findings appear only as counts. GitHub secret scanning and
+  push protection are on; non-provider patterns and validity checks are off.
+- **Code and dependency scanning.** CodeQL default setup with the `default` suite. `github/codeql-action/upload-sarif`
+  carries the osv-scanner, zizmor and Scorecard SARIF. Dependabot version updates cover GitHub Actions only (weekly,
+  7-day cooldown), and Dependabot security updates are on.
+- **Actions.** Every `uses:` is pinned to a full commit SHA, which the repository also requires. The allow-list is
+  GitHub-owned actions plus `step-security/harden-runner` and `ossf/scorecard-action`. No agent action runs in CI:
+  only the catalog-freshness `propose` job holds `pull-requests: write`, and no workflow reviews or approves a pull
+  request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
+  `test_no_workflow_reviews_or_approves_a_pull_request`).
+- **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, added by the final-catalog PR):
+  standing picks are the picks both blind model families made, final only after new-host acceptance and the layer's
+  preregistered comparison.
+  - git-github-automation: git, gh, Worktrunk and sem stand; the Claude pick keeps sem only if the structural-diff
+    comparison shows a gain. difftastic and claude-code-action are challengers. difftastic remains the selection of
+    record, and claude-code-action stays unadopted (decision M45).
+  - ci-supply-chain: attest, Syft, Dependabot, actionlint (kjanat) and zizmor stand, and all of them are in use. The
+    challenger `github/codeql-action` is the `upload-sarif` step above.
+  - secrets-credentials: betterleaks stands with trufflehog as its challenger. gitleaks stays the required gate until
+    the comparison preregistered in
+    [`docs/decisions/2026-10-02-github-automation-practice.md`](decisions/2026-10-02-github-automation-practice.md)
+    decides.
+
 ## Event and execution policy
 
 The four ordinary workflows run on pull requests, relevant pushes to `main`,
@@ -170,6 +218,9 @@ Cloud engine authentication and billing are distinct from local Desktop sign-in;
 do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
+
+**Superseded 2026-10-02** by "Current practice (2026-10-02)" above: the live ruleset now requires 8
+checks and allows squash merges only. This section is kept as history.
 
 As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
 (id 23739774, updated 2026-09-22T11:08:22-04:00) requires the `validate`,
@@ -375,6 +426,9 @@ catalog is malformed, including a decision record that does not exist.
 
 ## Secret and supply-chain scanning, 2026-09-22
 
+For the current state, which adds the report-only betterleaks trial and GitHub push protection, see
+"Current practice (2026-10-02)" above.
+
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
 against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
 `components[name=gitleaks].archive.sha256`,
@@ -439,7 +493,8 @@ service), the private vulnerability reporting link (enabled;
 returned `{"enabled":true}` on 2026-09-23), supported refs (`main` and the
 latest `v*` tag) and the `gh attestation verify` and `gh release verify-asset`
 commands for the immutable tag releases. [`.github/pull_request_template.md`](../.github/pull_request_template.md)
-requires scope, base commit, a per-claim evidence-class table, exact local
+requires scope with a Lane line (exactly one `lane:*` label), base commit, a `### SOTA sources` section
+(enforced by the required `sota-sources` check), a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
 `contents: read`, no secrets, no paid hosting and preserved peer-owned
 untracked files.
@@ -457,7 +512,8 @@ live on 2026-09-25; `allowed_merge_methods:
 [`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
 section 10 ("Rulesets"). This section is kept as history and is not
 corrected in place; the `gh api` commands below still apply (a `PUT` is
-idempotent), just against the current target file.
+idempotent), just against the current target file. **Update 2026-10-02:** `sota-sources` is live, and the live
+ruleset matches the target file (see "Current practice (2026-10-02)").
 
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
