@@ -6218,7 +6218,7 @@
     },
     {
       "path": "catalogs/landscape/us-equities.json",
-      "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618"
+      "sha256": "a3960abdd4e5df64c999668798d8c13fc55a260b51e01c4219a33ca004aa9683"
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",

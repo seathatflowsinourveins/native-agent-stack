@@ -10,6 +10,14 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-linux-arm64-py313.lock",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/requirements-stress-macos-arm64-py313.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "adoption/sdk/accepted-constraints.txt",
       "parser": "requirements.txt"
     },

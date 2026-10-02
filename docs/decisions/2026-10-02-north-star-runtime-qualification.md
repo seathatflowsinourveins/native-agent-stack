@@ -115,7 +115,9 @@ reports one stale native-paper source binding among six bound files. Its retaine
 `34ab492f450431e79a3d5d5c6de32185b22590e1a109b3c5fd976db0aa0aa29e`;
 this correction has SHA256
 `d2c2944fe24a39c4304c976f49b09b553999d8f102ab08eeb0e28856c7e7ca7b`.
-The historical receipt and release hash manifest remain unchanged. The checker
+The historical native receipt and its recorded hashes remain unchanged. The
+current source-integrity index records the corrected tree bytes without
+rebinding that receipt. The checker
 reports bindings without changing gate status, so its arithmetic ladder cannot
 qualify the corrected runner's native paper faults. A newly admitted paper run
 must rebind actual measured source; synthetic tests do not replace that step.

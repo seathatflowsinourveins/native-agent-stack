@@ -3973,8 +3973,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2ee4a6de196999b33a1f37bb979076308d1a805efd96c0f28f9c23ee6c9e5c22",
-      "bytes": 10639
+      "sha256": "f47d554c18935ff97156d1fb59b423896cb5bb644b08222828759ab605babb71",
+      "bytes": 10955
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -11449,8 +11449,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt-recovery-f1-20261002.json",
-      "sha256": "2e1ec84a2541b111302badabba8fe1d1cbcf7f65ecb24f9fed82d7358dd61f2b",
-      "bytes": 4508
+      "sha256": "4d6d1b47f40c59e858013831b8cbe1a2fd88117ffb323fc524abb8e9e99ae83a",
+      "bytes": 4618
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipt.json",
@@ -11504,7 +11504,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "0c4c2df382c7d263b393f80ab5c0ff5116d149258b8d10140c37d5003a1ec6b9",
+      "sha256": "d9656d028641e1ab8d7153658244a060455ef6793e7c39f3b6b2dee29c2e16a2",
       "bytes": 7076
     },
     {
@@ -15914,8 +15914,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-north-star-runtime-qualification.md",
-      "sha256": "609a193b3c97a11bd514fa4a4e9177382dfed8a54e14ca726af0f012799140d3",
-      "bytes": 11028
+      "sha256": "8b0c2094473f1d657bfcc793d742e72a1438c2be784e61170c54a5fe1a6ecae5",
+      "bytes": 11133
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16189,12 +16189,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "159d381dd77a3066feee265220de9f6c1142c5236f448ba1d762c4b06769d7dc",
+      "sha256": "0b8e695cc6d24f26b5b025e9ea562657e8dfafc084e064f98ceb005034dfd829",
       "bytes": 510040
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "6833563e5718a5f8fc75b2b16b064722e0aa5aea180e88f44d2ff0059f522ee7",
+      "sha256": "415b85991dda3a8066b77c9df34035ed4471270e427b2686bc718521249eb4da",
       "bytes": 312114
     },
     {
@@ -37369,8 +37369,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ba8cfd7fa91b2d413a7f9dad7dfb05e46c250b19037112fad47d24088d9181e6",
-      "bytes": 4174
+      "sha256": "bb0e17c68f92aca2e5ed56dd2c78da6f40120510d77ad9fc9135c7d47db66ad0",
+      "bytes": 4935
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -50289,8 +50289,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "411ff7db992e19e4eb7d856aa1d1d0a7a7cf5c789a9aff3707847fe96017e25b",
+      "bytes": 55855
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
