@@ -1,0 +1,218 @@
+{
+ "slot_id": "container-engine",
+ "layer_id": "hosting-services",
+ "title": "Application and service hosting",
+ "requirement": "Run a local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+ "slot_question": "Which single container engine does the new host install? Docker Compose is already settled as the multi-service definition.",
+ "a_deciding_comparison_would_measure": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host.",
+ "context": "Tools that other layers' first-round selections or the user's named runtime workers run in containers: Inspect AI, Harbor, gVisor (an isolation finalist), OpenHands software-agent-sdk, DeerFlow. Check what each one's upstream documentation requires before relying on it. The base distribution is Ubuntu 26.04.1 LTS under WSL2 with systemd; 24.04.5 is the fallback.",
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "first_round": {
+  "reviewer_notes": [
+   {
+    "about": "Docker Compose",
+    "first_round_status": "selected",
+    "note": "Multi-service definition. One Compose-spec file declares the typed app and its supporting services, with explicit volumes and networks. It runs natively on Docker Engine and is the preferred provider behind `podman compose`, so it stays whichever engine wins.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/docker/compose",
+      "shows": "README: runs multi-container applications defined with the Compose file format (compose-spec.io) through `docker compose up`. Linux binaries come from the releases page and go into cli-plugins directories; macOS and Windows get it through Docker Desktop. Badges: CI, Codecov, OpenSSF Scorecard. GitHub GraphQL, 2026-10-01: v5.5.1 (2026-09-03); 361 default-branch commits since 2026-07-03."
+     },
+     {
+      "url": "https://docs.podman.io/en/latest/markdown/podman-compose.1.html",
+      "shows": "`podman compose` is a thin wrapper around an external compose provider. docker-compose takes precedence 'since it is the original implementation of the Compose specification'. The provider is set with compose_providers or PODMAN_COMPOSE_PROVIDER."
+     },
+     {
+      "url": "https://docs.docker.com/engine/install/ubuntu/",
+      "shows": "docker-compose-plugin installs in the same apt command as docker-ce from Docker's apt repository."
+     }
+    ]
+   },
+   {
+    "about": "Podman / Quadlet",
+    "first_round_status": "selected",
+    "note": "Container engine, arm A of the head-to-head: install both arms on the new host and keep one. It is rootless and daemonless. Quadlet .container/.pod/.kube units become systemd services, including per-user units, which keeps accounts and deployment scope explicit. GPU access goes through CDI, and `podman machine` covers macOS arm64.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/podman-container-tools/podman",
+      "shows": "README: rootless containers 'will never have more privileges than the user that launched them'. No manager daemon; Docker-compatible CLI and REST API; pods; Mac and Windows through `podman machine`; major or minor releases four times a year. GitHub GraphQL, 2026-10-01: v6.1.3 and v5.8.8 (both 2026-09-29); 745 default-branch commits since 2026-07-03."
+     },
+     {
+      "url": "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html",
+      "shows": "Quadlet generates systemd services from .container, .pod, .kube, .volume, .network, .build, .image and .artifact files, for both system and user units. The rootless search path includes ~/.config/containers/systemd/. Supports AutoUpdate=registry|local."
+     },
+     {
+      "url": "https://podman.io/docs/installation",
+      "shows": "Ubuntu: the podman package is in the official Ubuntu repositories (20.10 and newer), installed with `sudo apt-get -y install podman`. macOS: the pkg installer is recommended, then `podman machine init` and `podman machine start`."
+     },
+     {
+      "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+      "shows": "'For Podman, NVIDIA recommends using CDI for accessing NVIDIA devices in containers.'"
+     }
+    ]
+   },
+   {
+    "about": "Docker Engine / Moby",
+    "first_round_status": "selected",
+    "note": "Container engine, arm B of the head-to-head: install both arms on the new host and keep one. Docker's upstream apt repository ships current releases plus the native Compose plugin, and NVIDIA runtime configuration is documented for both rootful and rootless mode. The default daemon runs as root, so use rootless mode to keep accounts explicit. Moby itself has no macOS runtime.",
+    "cited_facts": [
+     {
+      "url": "https://docs.docker.com/engine/install/ubuntu/",
+      "shows": "Upstream apt repository plus the install command for docker-ce and docker-compose-plugin; `apt list --all-versions docker-ce` shows 5:29.8.2 for noble."
+     },
+     {
+      "url": "https://docs.docker.com/engine/install/linux-postinstall/",
+      "shows": "'The Docker daemon always runs as the root user'. Warning: 'The docker group grants root-level privileges to the user'. Rootless mode is the documented alternative."
+     },
+     {
+      "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+      "shows": "Docker setup is `nvidia-ctk runtime configure --runtime=docker`, and there is a separate documented setup for rootless Docker."
+     },
+     {
+      "url": "https://github.com/moby/moby",
+      "shows": "README: Moby is the upstream for the Docker product, with best-effort support; commercial support goes through Docker Desktop or Mirantis. GitHub GraphQL, 2026-10-01: docker-v29.8.2 (2026-09-30); 1223 default-branch commits since 2026-07-03."
+     }
+    ]
+   },
+   {
+    "about": "Podman (rootless)",
+    "first_round_status": "selected",
+    "note": "OCI arm for untrusted workloads that need a container boundary and resource limits: daemonless containers that are rootless by default, so there is no root daemon socket, with pasta/Netavark networking and a unified seccomp policy. gVisor runsc is the alternative runtime to test against it.",
+    "cited_facts": [
+     {
+      "url": "https://github.com/podman-container-tools/podman/blob/main/README.md",
+      "shows": "README (blob 5fcb469ccd): no manager daemon (L40); rootless containers never have more privileges than the user who launched them (L80-81); rootless networking via pasta (L109); unified seccomp policy (L112)."
+     },
+     {
+      "url": "https://github.com/podman-container-tools/podman/blob/main/docs/tutorials/podman-for-windows.md",
+      "shows": "On Windows each Podman machine is backed by a WSLv2 distribution or a Hyper-V VM (L13-14), so Podman's own Windows backend runs on the WSL2 kernel. That points to, but does not prove, a working Ubuntu WSL2 install."
+     },
+     {
+      "url": "https://podman.io/docs/installation",
+      "shows": "Ubuntu: the podman package is in the official repositories for Ubuntu 20.10 and newer (sudo apt-get update; sudo apt-get -y install podman). The page also documents building from source."
+     },
+     {
+      "url": "https://docs.docker.com/engine/security/",
+      "shows": "Contrast with the Docker arm: the Docker daemon requires root unless you opt in to Rootless mode, and only trusted users should be allowed to control it."
+     },
+     {
+      "url": "https://api.github.com/graphql",
+      "shows": "Observed 2026-10-01: Apache-2.0; latest release v6.1.3 (2026-09-29), with the v5.8.x line also maintained (v5.8.8); 745 default-branch commits since 2026-07-03; head ccc1e20775 statusCheckRollup FAILURE (snapshot); 874 open issues."
+     }
+    ]
+   },
+   {
+    "about": "Docker Engine / Moby",
+    "first_round_status": "not selected",
+    "note": "A mature engine (docker-v29.8.2, 2026-09-30). Docker's own docs state the daemon requires root unless Rootless mode is opted into, and that only trusted users should control it. At the same shared-kernel boundary, Podman's rootless, daemonless default fits agent isolation better."
+   }
+  ],
+  "critic": {
+   "findings": [
+    "Compose stands. The 'undetermined' verdict follows the judge's own framing ('install both arms on the new host and keep one') and applies only to the engine choice. Measured evidence does not separate Podman from Docker Engine, so the finalized set names both arms until the head-to-head runs.",
+    "Re-checked metadata held (GraphQL, observed 2026-10-01). Compose: v5.5.1 (2026-09-03); main head on 2026-10-01; 361 commits since 2026-07-03. Podman: v6.1.3 and v5.8.8, both 2026-09-29; main head on 2026-10-01; 745 commits since 2026-07-03. containers/podman resolves to podman-container-tools/podman, so the packet's repository is canonical. Moby: docker-v29.8.2 (2026-09-30); master head on 2026-10-01; 1230 commits since 2026-07-03 against the judge's 1223, which is same-day drift.",
+    "Docs claims held. podman-compose(1) says docker-compose 'takes precedence since it is the original implementation of the Compose specification'. The sentence continues 'and is widely used'; the judge quoted only the non-popularity half and does not rely on popularity. NVIDIA: 'For Podman, NVIDIA recommends using CDI', and a rootless-Docker configuration is documented. Podman README: rootless containers 'will never have more privileges than the user that launched them'; no manager daemon; a major or minor release '4 times a year'; podman machine. Quadlet man page (repo docs at HEAD, blob 89a1c4b8): the rootless search path includes ~/.config/containers/systemd/, and .artifact/.build/.pod/.kube units exist. Moby README: support is on a 'best efforts basis only', with Docker Desktop or Mirantis for commercial support. Compose README: the compose-spec.io format and cli-plugins install paths.",
+    "Precision issue: '`apt list --all-versions docker-ce` shows 5:29.8.2 for noble' quotes example output printed on the docs page, not an observed apt query. The example does match the current docker-v29.8.2 release.",
+    "New discriminating fact (install path, not measurement): Docker's Ubuntu install page lists Ubuntu Resolute 26.04 (LTS) as a supported OS. The Docker arm therefore installs current upstream packages, Compose plugin included, on the cross:wsl-distro primary pick. The Podman arm installs Ubuntu's archive package, whose version on 26.04 remains unverified (my Launchpad API fetch failed). If that package lags v6.1.3/v5.8.8, the Podman arm installs an older engine than current upstream. This fact does not tip the verdict: Podman still leads on account and scope fit (rootless, daemonless, Quadlet user units) and on macOS arm64 (podman machine), where Moby has no runtime.",
+    "Non-selections and exclusions re-checked. BentoML's latest release is v1.4.39 (2026-05-07); it has 6 default-branch commits since 2026-07-03, the last on 2026-09-07, so it is not stale but has no release in 90 days. postgres/postgres has tags only (REL_19_BETA4, REL_18_6). devcontainers/cli has tags only (v0.89.0), no GitHub Release objects. microsoft/WSL 3.0.1 was released 2026-09-29, next.js v16.3.8 on 2026-09-30. The reasons hold, and no candidate outside the two engines is stronger for this requirement.",
+    "No popularity or current-use reasoning found in the judgment. The old host's engine setup was not used as evidence.",
+    "Not verified: the podman version in the Ubuntu 26.04 archive; Podman auto-update rollback; Compose GPU device-reservation syntax; rootless Docker on WSL2; Modal pricing; whether the IB Gateway image needs an IBKR account.",
+    "Budget used: 2 GitHub API calls and 4 page fetches (the Launchpad fetch failed and counts against the budget)."
+   ],
+   "checked_facts": [
+    {
+     "claim": "Compose's latest release is v5.5.1, published 2026-09-03",
+     "url": "https://github.com/docker/compose/releases/tag/v5.5.1",
+     "holds": true
+    },
+    {
+     "claim": "Compose's last default-branch commit is on 2026-10-01, with 361 commits since 2026-07-03",
+     "url": "https://github.com/docker/compose/commits/main",
+     "holds": true
+    },
+    {
+     "claim": "podman compose prefers docker-compose 'since it is the original implementation of the Compose specification'; the provider is set with compose_providers or PODMAN_COMPOSE_PROVIDER",
+     "url": "https://docs.podman.io/en/latest/markdown/podman-compose.1.html",
+     "holds": true
+    },
+    {
+     "claim": "Podman v6.1.3 and v5.8.8 were both published 2026-09-29, and containers/podman resolves to podman-container-tools/podman",
+     "url": "https://github.com/podman-container-tools/podman/releases",
+     "holds": true
+    },
+    {
+     "claim": "Podman's last default-branch commit is on 2026-10-01, with 745 commits since 2026-07-03",
+     "url": "https://github.com/podman-container-tools/podman/commits/main",
+     "holds": true
+    },
+    {
+     "claim": "Quadlet's rootless unit search path includes ~/.config/containers/systemd/",
+     "url": "https://github.com/podman-container-tools/podman/blob/main/docs/source/markdown/podman-systemd.unit.5.md",
+     "holds": true
+    },
+    {
+     "claim": "For Podman, NVIDIA recommends CDI; NVIDIA also documents a rootless-Docker nvidia-ctk configuration",
+     "url": "https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html",
+     "holds": true
+    },
+    {
+     "claim": "Moby's latest release is docker-v29.8.2, published 2026-09-30",
+     "url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2",
+     "holds": true
+    },
+    {
+     "claim": "Moby's last default-branch commit is on 2026-10-01",
+     "url": "https://github.com/moby/moby/commits/master",
+     "holds": true
+    },
+    {
+     "claim": "Docker's apt repository supports Ubuntu Resolute 26.04 (LTS) and installs docker-compose-plugin in the same command as docker-ce",
+     "url": "https://docs.docker.com/engine/install/ubuntu/",
+     "holds": true
+    },
+    {
+     "claim": "The docs page's example output for `apt list --all-versions docker-ce` shows 5:29.8.2 for noble (illustrative output, not an observed apt query)",
+     "url": "https://docs.docker.com/engine/install/ubuntu/",
+     "holds": true
+    },
+    {
+     "claim": "BentoML has no release in the last 90 days (latest is v1.4.39, 2026-05-07)",
+     "url": "https://github.com/bentoml/BentoML/releases",
+     "holds": true
+    }
+   ],
+   "deciding_comparison": "Run the judge's head-to-head on the new WSL2 host, starting with installed-against-upstream version on the chosen distro: rootless Docker from Docker's apt repository (which supports 26.04) against Podman from the Ubuntu archive (version unverified). Record both versions. Then run one Compose file (typed app, Postgres, and a CUDA job on the RTX 4090) under rootless `docker compose` and under `podman compose` with the docker-compose provider, plus a Quadlet version. Measure GPU access (nvidia-ctk runtime against CDI), volume persistence and service restart across `wsl --shutdown`, port reachability from Windows, rollback after an image update, and idle RSS/CPU. Keep the engine that passes at lower cost, and re-check the Podman arm on macOS arm64 through podman machine."
+  },
+  "related_critic_findings": [
+   "srt facts hold: v0.0.78 (2026-09-30), HEAD 117eb92820 (2026-10-01) with rollup SUCCESS, 226 commits, 109 open issues, Apache-2.0. README lines that match: 7 (Beta Research Preview), 14 (npm install), 124 (network namespace removed), 547-560 (apt bubblewrap, socat, ripgrep), 562-568 (Ubuntu 24.04+ AppArmor userns sysctl), 886 (domain fronting) and 897 (proxying through environment variables). Lines 574-582 say gcc and libseccomp-dev are needed only on architectures without pre-generated seccomp filters, so the judge's install command is complete for x86_64. No CPU, memory or cgroup limit appears in the README. PR #99 'fix: support WSL2 sandboxing, reject WSL1' was merged 2026-01-21; issue #363 'Loses current directory under Windows WSL' has been open since 2026-06-30.",
+   "Claude Code sandboxing docs match: 'WSL2: uses bubblewrap, same as Linux. WSL1 is not supported', and the same primitives ship as @anthropic-ai/sandbox-runtime.",
+   "Podman facts hold. The repository resolves as podman-container-tools/podman; v6.1.3 and v5.8.8 were both released 2026-09-29; HEAD ccc1e20775 has rollup FAILURE (snapshot); 874 open issues. README lines 40, 80-81, 109 and 112 match. podman.io gives 'sudo apt-get -y install podman' for Ubuntu 20.10 and newer.",
+   "New and material for a clean install: the selected command installs Ubuntu's archive build, not an upstream release. Launchpad's published sources list podman 5.7.0 for 26.04 (resolute), 5.4.2 for 25.10, 5.4.1 for 25.04 and 5.8.6 for the development series. 24.04 (noble) was not returned by the query, so its version is unverified. Upstream's current lines are 6.1.3 and 5.8.8, so the currency evidence the judge cited (v6.1.3) does not describe what the install command delivers. Launchpad was read as JSON inside ctx_execute.",
+   "Podman README lines 85-87 say rootless use 'may require some additional configuration' and that 'a little configuration by an administrator is required' first. That is an extra setup step on a fresh WSL2 instance.",
+   "Only documented design separates Podman from Docker Engine: rootless, daemonless defaults favour Podman, while packaging currency on Ubuntu counts against it. No enforcement or cleanup measurement exists for any arm. Docker's own package repository was not checked in this review.",
+   "boxlite facts hold: README line 234 lists 'Windows (WSL2) x86_64' as Supported, lines 242-243 require KVM and kvm group membership, and line 167 lists CPU/memory limits and an egress allow-list. Issue #1239 ('stop leaks a detached box's VM wherever the box cgroup cannot be populated') has been open since 2026-08-14. gVisor release-20260928.0 (2026-09-30) holds; its operation under WSL2 remains unverified.",
+   "sandbox-runtime and Worktrunk stand; only the OCI/VM slot is undetermined. No popularity reasoning found."
+  ],
+  "evidence_gaps": [
+   "No head-to-head of Docker Engine against Podman on the WSL2 host (GPU, rootless networking, persistence across wsl --shutdown, rollback, idle cost).",
+   "The Ubuntu archive's Podman version for the target Ubuntu release is unverified (the packages.ubuntu.com fetch timed out).",
+   "Podman auto-update rollback was not fetched; the Quadlet page documents AutoUpdate only. Rootless Docker on WSL2 was not tested.",
+   "Compose GPU device-reservation syntax was not fetched.",
+   "Whether the IB Gateway image needs an Interactive Brokers account was not verified.",
+   "CI rollups over the last 20 default-branch commits count optional and flaky checks (Moby 8 SUCCESS, 5 FAILURE, 2 PENDING; Podman 6 SUCCESS, 11 FAILURE; Compose 9 FAILURE), so they were not used for ranking."
+  ]
+ },
+ "finalists": [
+  {
+   "key": "F2",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman"
+  },
+  {
+   "key": "F1",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby"
+  }
+ ]
+}
