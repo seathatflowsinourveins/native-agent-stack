@@ -73,6 +73,30 @@
    "default_branch": "main"
   },
   {
+   "layer": "instructions-skills",
+   "slot": "skill-discovery",
+   "owner": "find-skills (vercel-labs/skills)",
+   "repository": "https://github.com/vercel-labs/skills",
+   "installed": true,
+   "note": "added by the layer consensus of 2026-10-02; the pin is the record's commit, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "skill-authoring",
+   "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+   "repository": "https://github.com/anthropics/skills",
+   "installed": true,
+   "note": "added by the layer consensus of 2026-10-02; the pin is the record's commit, in install-plan.json; repository metadata was not read for this row"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "research-skill",
+   "owner": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed and this plan carries no install command for it until its activation gate returns. The gate, as the record gives it: An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal). The candidate is the GPT Researcher skill (assafelovic/gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4, skills/gpt-researcher/SKILL.md) with its dependency gptr-mcp (assafelovic/gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda); neither is installed, pinned into this plan or run."
+  },
+  {
    "layer": "mcp-surfaces",
    "slot": "mcporter",
    "owner": "mcporter",
@@ -518,6 +542,14 @@
    "note": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for"
   },
   {
+   "layer": "secrets-credentials",
+   "slot": "credential-custody",
+   "owner": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed until the deciding measurement returns, and the repository's practice stays in use. The measurement, as the record gives it: HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison. HASP 1.0.43 (gethasp/hasp at 624b3b38ac4f7a267e6925c545768c95945d781a) is the challenger arm; it is not installed, and this plan carries no install command for an arm."
+  },
+  {
    "layer": "git-github-automation",
    "slot": "git",
    "owner": "git",
@@ -578,6 +610,14 @@
    "repository": "",
    "installed": false,
    "note": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)"
+  },
+  {
+   "layer": "git-github-automation",
+   "slot": "cross-family-review",
+   "owner": "No additional component: the two clients' native review commands, each family on the other's work",
+   "repository": "",
+   "installed": false,
+   "note": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing additional is installed: the capability is the two clients' native review commands, which the claude-code and codex rows install. The record's open gate is the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane. PR-Agent 0.47.0 is a comparison only for an identified gap and is not installed."
   },
   {
    "layer": "recovery-portability",

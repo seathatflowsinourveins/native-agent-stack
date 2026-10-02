@@ -1,5 +1,7 @@
 # Install-plan validation
 
+The sections are kept in the order they were written. The first two describe the 64-row revision and its clean run, and their counts are that revision's. The plan now has 69 rows: the section "Rows added from the layer consensus" covers the five added afterwards, whose two install commands and two acceptance checks have not run anywhere.
+
 ## Revision to the merged manifest, after the real-distribution run
 
 ### Evidence class
@@ -78,6 +80,63 @@ The record binds each phase to the commit that ran and to the SHA-256 of each pl
 revision was unrun. No command, row or check changed and the corrected files were not run again, so the published
 files differ from the executed ones in those lines only. The raw outputs behind the record are private files; the
 record carries their hashes, and no reviewer has inspected them.
+
+## Rows added from the layer consensus (2026-10-02): static checks only
+
+### Evidence class
+
+Static checks of the plan's files and synthetic fixtures, on the workstation that holds the checkout. Nothing was
+installed, no installer command ran, no client loaded a skill and no distribution was used. Three read-only GitHub API
+reads supplied the tree hashes and the installer's source lines ([SOURCES.md](SOURCES.md), last section).
+
+The clean run above was made before these rows existed. Its record binds the files it executed by hash; `install.sh`,
+`accept.sh`, `install-plan.json` and `owners.json` have changed since, in more than their header lines, so the record
+describes the earlier files. No result of that run, of the previous revision's run or of round 1 applies to the rows
+below.
+
+### What changed
+
+Five rows, from the definitive manifest's five rows of kind `consensus`: 69 rows, 38 installed by default, three
+measurement-only and 28 not installed.
+
+- `skill-discovery` and `skill-authoring` install one skill folder each through the `skills` installer at 1.7.0, each
+  pinned to the commit in the consensus record. Both have one install command and one `post_install` check.
+- `research-skill`, `credential-custody` and `cross-family-review` are not installed: no command, no acceptance, no
+  function in either script, and the gate or measurement from the record in `notes`.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, "OK: 69 rows: 38 installed by default, 3 measurement-only, 28 not installed; 67
+  commands and 57 acceptance entries agree with the scripts".
+- `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- `bash install.sh --list`: exit 0, 69 lines.
+- Python `json.loads` of `install-plan.json` and `owners.json`: exit 0; both files equal their own re-serialisation.
+- `check_plan.py` against defects planted one at a time in scratch copies (our own mutations, not an upstream test):
+  deleting the `skill-discovery` install function, dropping `--copy` from the `skill-authoring` command in `install.sh`
+  only, dropping the `cross-family-review` line from `--list`, marking `research-skill` installed, adding an acceptance
+  function for `credential-custody`, dropping the shared-copy line from the `skill-authoring` acceptance in the JSON
+  only, dropping `credential-custody` from the skipped-slot loop and removing `skill-discovery` from `owners.json` each
+  exit 1 and name the problem. The unmodified copy exits 0.
+- The two new acceptance programs against stand-ins (a stub `npx` that prints a canned `list --json` output, a canned
+  lock file and a scratch `HOME`; our own fixtures, with jq 1.7): the matching case exits 0 for both. A missing agent,
+  another tree hash and an absent skill each exit 1 for `skill-discovery`. Another tree hash, a listing without Claude
+  Code and a `skill-creator` folder under `$HOME/.agents/skills` each exit 1 for `skill-authoring`; another skill in
+  that shared directory does not fail it.
+- `python3 -B scripts/validate.py`: exit 1; for this folder it reports only that the seven changed files differ from
+  the hashes and byte counts registered in `manifests/evidence.json`, to be re-registered by the coordinator.
+
+### Not established
+
+- That either install command works. The commit after `#` relies on the installer's fallback from a branch clone to a
+  fetch of the commit, which is read from its source and has never run under this plan.
+- That the installer records the folder's git tree hash in its lock file for an install pinned to a commit, and that
+  its listing shows the agents as the acceptance expects. The clean run showed both for `engineering-process-skills`,
+  which is pinned to a tag and installed for two agents.
+- That `--copy` with one agent leaves `$HOME/.agents/skills` without a `skill-creator` folder. It is read from the
+  installer's bundled code.
+- That the embedded Codex `skill-creator` is available on the destination, and that any client loads or usefully
+  invokes either skill. Those are open gates of the consensus record.
+- Anything on the destination distribution: installation and acceptance there remain UNRUN for every row.
 
 ## Round 1 install-plan repair (historical)
 

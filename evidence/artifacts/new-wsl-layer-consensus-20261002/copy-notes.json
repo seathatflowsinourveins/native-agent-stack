@@ -1,0 +1,39 @@
+{
+ "meaning": "the three notes of this folder are published copies of notes that the two lanes exchanged in a private coordination folder; this file records each copy's hash, the original's hash and every difference between them",
+ "copied_utc": "2026-10-02",
+ "copies": {
+  "claude-proposals.md": {
+   "sha256": "cd7b99553cc8d9c608262e47e709add19819aef84c06bbf35b84787f5969e832",
+   "original_sha256": "116932940653053f5f24c16b8649ed399a61bf7444801d99dff7635033f79b3d",
+   "original_bytes": 7805,
+   "paragraphs_left_out": 0,
+   "replacements": [
+    {"replaced_by": "the lane's private state folder (not published)", "what": "a path in the lane's private state folder", "times": 1}
+   ]
+  },
+  "claude-request.md": {
+   "sha256": "d939a5b4ee1433a0f68250c334fbe5bce1759279c19e2a9a21ca2c21d00af005",
+   "original_sha256": "2d7e04e8226b83c87cc81de20856cd99621f9341cdb0d37c73dbe74aef92e9a7",
+   "original_bytes": 2858,
+   "paragraphs_left_out": 1,
+   "left_out": "one operational request about a running session on the destination distribution; it carries no decision",
+   "replacements": [
+    {"replaced_by": "the lane's private state folder (not published)", "what": "a path in the lane's private state folder", "times": 1}
+   ]
+  },
+  "codex-decisions.md": {
+   "sha256": "464608b928709f5fd987b44ce2a019b29bb85f886b38c1bc095dc326c02cbac6",
+   "original_sha256": "14633855129b610ed43c04099936220d49f2c934efdc645ba5a2a2a87b40d4c4",
+   "original_bytes": 18621,
+   "paragraphs_left_out": 0,
+   "replacements": [
+    {"replaced_by": "the measurement distribution's", "what": "the name of the throwaway distribution, in the possessive", "times": 1}
+   ],
+   "note": "the Codex lane extended this note after its first version; the copy is the version of 2026-10-02T18:57:10Z, which holds the seven layer decisions, the three skills rows, the research skill's dependency review and the scoped dispositions of newly found repositories"
+  }
+ },
+ "claims_in_the_copies_that_this_record_does_not_carry": [
+  "The request note says 99 reports; the folder held 103 report folders when it was counted later the same day. The count is discovery metadata and no decision rests on it.",
+  "Corrections that the Codex lane made to the proposals are listed in consensus.json under corrections_of_the_proposals; the proposals copy keeps the original wording."
+ ]
+}

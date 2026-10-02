@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
   "base": "Ubuntu 26.04.1 WSL 2",
-  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json). On the destination distribution they are unrun",
+  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json). On the destination distribution they are unrun. Five rows were added afterwards from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, in that throwaway distribution or any other; research-skill, credential-custody and cross-family-review install nothing",
   "owners": [
     {
       "layer": "native-clients",
@@ -353,6 +353,172 @@
           "line": 113
         }
       ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-discovery",
+      "owner": "find-skills (vercel-labs/skills)",
+      "repository": "https://github.com/vercel-labs/skills",
+      "release": "v1.7.0",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add 'vercel-labs/skills#7407f3893ad4dceab546ac002c3ef806e4000c73' -g -a claude-code codex -s find-skills -y"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111",
+        "line": 111
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=76a98a285cb0434f3d39e1a873823556330e398b\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)\"\nfor agent in 'Claude Code' Codex; do\n  jq -e --arg agent \"$agent\" 'any(.[]; .name == \"find-skills\" and (.agents | index($agent) != null))' <<<\"$listing\" >/dev/null\ndone\njq -e --arg hash \"$want\" '.skills[\"find-skills\"].skillFolderHash == $hash' \"$lock\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills",
+        "${CODEX_HOME:-$HOME/.codex}/skills",
+        "$HOME/.agents/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. Only the find-skills folder is installed, for both agents, and no other skill of the repository: -s names the one skill (README.md:89), and -g, -a and -y are the installer's documented non-interactive form (README.md:111). The ref is the record's commit 7407f3893ad4dceab546ac002c3ef806e4000c73, which the record gives as release v1.7.0. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row: the installer's own listing must show find-skills for Claude Code and for Codex, and the skillFolderHash that the installer records in its lock file must equal 76a98a285cb0434f3d39e1a873823556330e398b, the git tree hash of skills/find-skills at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is a41bdd074bb587afd861332cf2f473f3154de4d7, as the record says). It does not hash the installed directories and says nothing about a client loading or invoking the skill: the record's open gates (listing, hash and read-back on the destination, and a useful invocation in each client) stay open.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md#L2",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-authoring",
+      "owner": "skill-creator (embedded in Codex; anthropics/skills for Claude Code)",
+      "repository": "https://github.com/anthropics/skills",
+      "release": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add 'anthropics/skills#8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4' -g -a claude-code -s skill-creator --copy -y"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111",
+        "line": 111
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6\nlock=\"${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}\"\nlock=\"${lock:-$HOME/.agents/.skill-lock.json}\"\nlisting=\"$(npx --yes skills@1.7.0 list -g -a claude-code --json)\"\njq -e 'any(.[]; .name == \"skill-creator\" and (.agents | index(\"Claude Code\") != null))' <<<\"$listing\" >/dev/null\njq -e --arg hash \"$want\" '.skills[\"skill-creator\"].skillFolderHash == $hash' \"$lock\" >/dev/null\n[[ ! -e \"$HOME/.agents/skills/skill-creator\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164",
+            "line": 164
+          }
+        }
+      },
+      "config_paths": [
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills"
+      ],
+      "notes": "Planned; the install and acceptance commands of this row have not run anywhere, on any distribution. Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md), after the clean run that VALIDATION.md records; that run does not cover this row. Classification gap: the permitted enum has no skills-CLI route. For Claude Code only: -a names claude-code alone, and --copy writes the folder into the Claude Code skills directory instead of a shared canonical copy with symlinks (README.md:91, :141-142). Nothing is installed for Codex and no same-name copy is placed for it. Codex carries its own skill-creator, embedded at the selected tag (the record cites codex-rs/skills/src/lib.rs at a956835d020762cb2b570053af06f643a11c0ecc). The installer's shared directory, $HOME/.agents/skills, is the one it uses for Codex's global skills (read in the bundled dist/cli.mjs of the skills 1.7.0 package: getAgentBaseDir and installSkillForAgent), so a copy there would be a same-name copy placed for Codex, which the record rules out. The acceptance therefore also requires that $HOME/.agents/skills/skill-creator does not exist. Only the skill-creator folder is installed, and no other skill of the repository (README.md:89). The record names no release of this repository, so the ref is the record's commit 8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4. A full commit after # is not a branch or tag: the installer first tries clone --depth 1 --branch <ref> and, when that fails with a missing-ref error and the ref is a 40-character commit, fetches that commit and checks out FETCH_HEAD (src/git.ts:295-322 at the installer's commit, with isCommitSha at :30 and cloneAtSha at :65). That path is read from source and has not been exercised by this plan. Telemetry is off through DISABLE_TELEMETRY=1 (README.md:540). The acceptance follows the engineering-process-skills row for one agent: the installer's listing must show skill-creator for Claude Code, and the skillFolderHash in its lock file must equal 3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6, the git tree hash of skills/skill-creator at that commit (GitHub tree API, read 2026-10-02; the SKILL.md blob there is 65b3a402dbd09b8e83f9d637c6b553875189085c, as the record says). It does not hash the installed directory, does not check that the embedded Codex skill is available on the destination and says nothing about a client loading or invoking the skill: those are the record's open gates.",
+      "supporting_sources": [
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89",
+          "line": 89
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91",
+          "line": 91
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L141",
+          "line": 141
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540",
+          "line": 540
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L302",
+          "line": 302
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315",
+          "line": 315
+        },
+        {
+          "url": "https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L65",
+          "line": 65
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/skills/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md#L2",
+          "line": 2
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "research-skill",
+      "owner": "Not installed until its activation gate returns (GPT Researcher's own skill with its MCP server)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed and this plan carries no install command for it until its activation gate returns. The gate, as the record gives it: An activation gate, not a comparison: a resolved and pinned environment for the MCP server, a native protocol handshake over STDIO, discovery of its five tools, a useful research result returned in each client, and a bounded lifecycle (start, stop, removal). The candidate is the GPT Researcher skill (assafelovic/gpt-researcher at 0957c301ed06c2a5857b834358c7227c739041d4, skills/gpt-researcher/SKILL.md) with its dependency gptr-mcp (assafelovic/gptr-mcp at 63884773685b1f12c7f0d9e283b3d71a5b9b5fda); neither is installed, pinned into this plan or run."
     },
     {
       "layer": "mcp-surfaces",
@@ -1918,6 +2084,30 @@
       "notes": "no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for"
     },
     {
+      "layer": "secrets-credentials",
+      "slot": "credential-custody",
+      "owner": "Not installed until the deciding measurement returns (the repository's runner and guard stay the practice)",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing is installed until the deciding measurement returns, and the repository's practice stays in use. The measurement, as the record gives it: HASP against the repository's runner and guard on the existing synthetic leak-path fixtures: output and trace checks, audit records, client boundaries, restart and removal. A claim that an agent can never read a value needs direct controls and a stated isolation scope. Native client sign-ins stay native: no import or copy of an authentication store, no real secret, no operating-system grant and no provider call is part of the comparison. HASP 1.0.43 (gethasp/hasp at 624b3b38ac4f7a267e6925c545768c95945d781a) is the challenger arm; it is not installed, and this plan carries no install command for an arm."
+    },
+    {
       "layer": "git-github-automation",
       "slot": "git",
       "owner": "git",
@@ -2119,6 +2309,30 @@
       "acceptance": {},
       "config_paths": [],
       "notes": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)"
+    },
+    {
+      "layer": "git-github-automation",
+      "slot": "cross-family-review",
+      "owner": "No additional component: the two clients' native review commands, each family on the other's work",
+      "repository": "",
+      "release": null,
+      "installed": false,
+      "route": "none",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": false,
+      "install_source": null,
+      "service": null,
+      "acceptance": {},
+      "config_paths": [],
+      "notes": "Added by the layer consensus of 2026-10-02 (docs/decisions/2026-10-02-new-wsl-layer-consensus.md). Nothing additional is installed: the capability is the two clients' native review commands, which the claude-code and codex rows install. The record's open gate is the qualification of the Codex 0.160 review command on the destination, owned by the Codex lane. PR-Agent 0.47.0 is a comparison only for an identified gap and is not installed."
     },
     {
       "layer": "recovery-portability",

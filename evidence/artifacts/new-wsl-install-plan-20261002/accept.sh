@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
+# Five rows were added after that run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing and have nothing to check.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi
@@ -24,7 +25,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -163,6 +164,44 @@ for skill in tdd diagnosing-bugs codebase-design domain-modeling writing-for-age
 done'
       ;;
     *) skipped engineering-process-skills ;;
+  esac
+}
+
+skill-discovery() {
+  # find-skills (vercel-labs/skills); https://github.com/vercel-labs/skills
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164
+      check skill-discovery smoke 'want=76a98a285cb0434f3d39e1a873823556330e398b
+lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+lock="${lock:-$HOME/.agents/.skill-lock.json}"
+listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
+for agent in '"'"'Claude Code'"'"' Codex; do
+  jq -e --arg agent "$agent" '"'"'any(.[]; .name == "find-skills" and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
+done
+jq -e --arg hash "$want" '"'"'.skills["find-skills"].skillFolderHash == $hash'"'"' "$lock" >/dev/null'
+      ;;
+    *) skipped skill-discovery ;;
+  esac
+}
+
+skill-authoring() {
+  # skill-creator (embedded in Codex; anthropics/skills for Claude Code); https://github.com/anthropics/skills
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164
+      # The last line: no same-name copy sits in the shared directory that the installer uses for Codex.
+      check skill-authoring smoke 'want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6
+lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+lock="${lock:-$HOME/.agents/.skill-lock.json}"
+listing="$(npx --yes skills@1.7.0 list -g -a claude-code --json)"
+jq -e '"'"'any(.[]; .name == "skill-creator" and (.agents | index("Claude Code") != null))'"'"' <<<"$listing" >/dev/null
+jq -e --arg hash "$want" '"'"'.skills["skill-creator"].skillFolderHash == $hash'"'"' "$lock" >/dev/null
+[[ ! -e "$HOME/.agents/skills/skill-creator" ]]'
+      ;;
+    *) skipped skill-authoring ;;
   esac
 }
 
@@ -630,6 +669,8 @@ if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
 if [[ -z "$only" || "$only" == codex-sdk-and-codex-exec-app-server ]]; then codex-sdk-and-codex-exec-app-server; fi
 if [[ -z "$only" || "$only" == trail-of-bits-security-skills-trailofbits-skills ]]; then trail-of-bits-security-skills-trailofbits-skills; fi
 if [[ -z "$only" || "$only" == engineering-process-skills ]]; then engineering-process-skills; fi
+if [[ -z "$only" || "$only" == skill-discovery ]]; then skill-discovery; fi
+if [[ -z "$only" || "$only" == skill-authoring ]]; then skill-authoring; fi
 if [[ -z "$only" || "$only" == mcporter ]]; then mcporter; fi
 if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt; fi
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
@@ -664,7 +705,7 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'claude-code-action' 'agent-structural-diff' 'chezmoi' 'base-distribution'; do
+for slot in 'research-skill' 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'cross-family-review' 'chezmoi' 'base-distribution'; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
 exit "$failed"

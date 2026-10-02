@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Mutate one input at a time, regenerate, and require the named unittest assertion to fail.
 
-Usage: controls.py <worktree root>
+Usage: controls.py [<worktree root>]   (default: the checkout that holds this file)
 Uses Python's unittest CLI (python/cpython v3.13.15, Lib/unittest/__main__.py), as the test module does.
 Each case restores the inputs, manifest and record byte for byte, including when a command fails.
 A case named "generated output: ..." plants its defect in the assembler's result instead of an input: it shows that the
 test sees the defect, not that the assembler refuses it. The older cases that add a line after apply_convergence work the same way.
+A case named "consensus: ..." mutates the layer-consensus record: the assembler's consensus step must refuse it with the
+named message, so the manifest stays as it was and the currency test fails.
 """
 import json
 import subprocess
@@ -13,6 +15,7 @@ import sys
 from pathlib import Path
 
 ART = Path("evidence/artifacts/new-wsl-definitive-defaults-20261001")
+CONSENSUS = Path("evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json")
 RECORD = Path("docs/decisions/2026-10-01-new-wsl-definitive-defaults.md")
 MODULE = "tests.test_new_wsl_definitive_defaults"
 CASES = [
@@ -35,12 +38,78 @@ CASES = [
 ]
 
 
+def added(doc, slot_id):
+    return next(row for row in doc["add_rows"] if row["slot_id"] == slot_id)
+
+
+def amendment(doc, slot_id):
+    return next(entry for entry in doc["amend_rows"] if entry["slot_id"] == slot_id)["amendment"]
+
+
+# One case per refusal of the assembler's consensus step: (case, the refusal it must print, the mutation of consensus.json).
+# The first ten are the refusals the step was specified with. The others hold the record to its own shape and the added
+# rows to the invariants that apply_convergence() enforces for the rows of the rounds.
+CONSENSUS_CASES = [
+    ("consensus: a slot to add that already exists", "consensus codex: slot already exists",
+     lambda doc: added(doc, "skill-discovery").update(slot_id="codex")),
+    ("consensus: an amendment for an unknown slot", "consensus no-such-slot: amendment for unknown slot",
+     lambda doc: doc["amend_rows"][0].update(slot_id="no-such-slot")),
+    ("consensus: an added row of another row kind", "consensus skill-discovery: an added row must have row_kind consensus, not added",
+     lambda doc: added(doc, "skill-discovery").update(row_kind="added")),
+    ("consensus: an added row marked definitive", "consensus skill-discovery: a consensus row is never definitive",
+     lambda doc: added(doc, "skill-discovery").update(definitive=True)),
+    ("consensus: an added row in a state the manifest does not know", "consensus skill-discovery: unknown state: accepted",
+     lambda doc: added(doc, "skill-discovery").update(state="accepted")),
+    ("consensus: an added row in a catalog the manifest does not know", "consensus skill-discovery: unknown catalog: tooling",
+     lambda doc: added(doc, "skill-discovery").update(catalog="tooling")),
+    ("consensus: an added row in a layer the manifest does not know", "consensus skill-discovery: unknown layer: skills",
+     lambda doc: added(doc, "skill-discovery").update(layer_id="skills")),
+    ("consensus: an amendment that carries every field the rounds decided",
+     "consensus claude-code: an amendment cannot replace default, definitive, installs_nothing_extra, repository, row_kind, state",
+     lambda doc: amendment(doc, "claude-code").update(default="pi", state="resolved", definitive=False, repository="",
+                                                      installs_nothing_extra=True, row_kind="consensus")),
+    ("consensus: a records file that is missing", "consensus records.claude_request: evidence missing",
+     lambda doc: doc["records"]["claude_request"].update(path=doc["records"]["claude_request"]["path"] + ".missing")),
+    ("consensus: a records file whose hash differs", "consensus records.codex_decisions: evidence sha256 mismatch",
+     lambda doc: doc["records"]["codex_decisions"].update(sha256="0" * 64)),
+    ("consensus: a record without one family's acknowledgement",
+     "consensus records: the exchanged notes and an acknowledgement of each family are required",
+     lambda doc: doc["records"].update(acknowledgements=[ack for ack in doc["records"]["acknowledgements"] if ack["family"] != "gpt"])),
+    ("consensus: an added row without one of the manifest's row fields",
+     "consensus skill-discovery: an added row carries the manifest's row fields: missing ['job']",
+     lambda doc: added(doc, "skill-discovery").pop("job")),
+    ("consensus: an added row with an outcome of the rounds", "consensus skill-discovery: an added row needs a job and an outcome that no round uses",
+     lambda doc: added(doc, "skill-discovery")["resolution"].update(outcome="final")),
+    ("consensus: an added row whose state and measurement disagree", "consensus research-skill: state and measurement disagree",
+     lambda doc: added(doc, "research-skill").update(measurement=None)),
+    ("consensus: an added row that waits for a measurement and names a repository",
+     "consensus credential-custody: pending measurement installs something",
+     lambda doc: added(doc, "credential-custody").update(repository="https://github.com/gethasp/hasp")),
+    ("consensus: an added row whose job an installed row owns",
+     "consensus skill-discovery: installed job also owned by engineering-process-skills",
+     lambda doc: added(doc, "skill-discovery").update(job="engineering-process skills in both clients, installed per skill")),
+    ("consensus: an amendment without its decision", "consensus claude-code: an amendment needs date_utc, by and decision",
+     lambda doc: amendment(doc, "claude-code").pop("decision")),
+    ("consensus: a record without its rule", "consensus: the record needs its rule, records, add_rows and amend_rows",
+     lambda doc: doc.pop("rule")),
+    ("consensus: a records file named without its hash", "consensus records.claude_proposals: evidence path and sha256 required",
+     lambda doc: doc["records"]["claude_proposals"].pop("sha256")),
+]
+CASES += [(case, "test_manifest_is_current", refusal) for case, refusal, _ in CONSENSUS_CASES]
+
+
 def run(root, *args):
     return subprocess.run([sys.executable, "-B", *map(str, args)], cwd=root, capture_output=True, text=True)
 
 
 def mutate(root, case):
-    if case in {entry[0] for entry in CASES[7:12]}:
+    consensus = {entry[0]: entry[2] for entry in CONSENSUS_CASES}
+    if case in consensus:
+        path = root / CONSENSUS
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        consensus[case](doc)
+        path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    elif case in {entry[0] for entry in CASES[7:12]}:
         path = root / ART / "convergence.json"
         doc = json.loads(path.read_text(encoding="utf-8"))
         decisions = {d["slot_id"]: d for d in doc["decisions"]}
@@ -88,12 +157,12 @@ def mutate(root, case):
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("usage: controls.py <worktree root>")
+    if len(sys.argv) > 2:
+        print("usage: controls.py [<worktree root>]")
         return 2
-    root = Path(sys.argv[1]).resolve()
+    root = Path(sys.argv[1]).resolve() if len(sys.argv) == 2 else Path(__file__).resolve().parents[3]
     paths = [root / ART / name for name in ("assemble_manifest.py", "settlements.json", "convergence.json", "definitive-manifest.json")]
-    paths.append(root / RECORD)
+    paths += [root / CONSENSUS, root / RECORD]
     originals = {path: path.read_bytes() for path in paths}
 
     def restore():

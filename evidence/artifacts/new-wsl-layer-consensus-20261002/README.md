@@ -1,0 +1,60 @@
+# The new WSL's layer consensus (2026-10-02)
+
+Rows added to the definitive manifest of the new WSL distribution, and amendments recorded on its rows, by a recorded
+direct consensus of the two model families. The decision, its rule and its limits are in
+`docs/decisions/2026-10-02-new-wsl-layer-consensus.md`.
+
+## Files
+
+| File | What it is |
+| --- | --- |
+| `consensus.json` | The record that the manifest's assembler reads: the owner's sentence that allows the method, the rule, five rows to add, six amendments, four topics held without a row change, a note to the trading lane, the two corrections the review made to the proposals, and what is not established. Its `records` name the three notes below by path and SHA-256 and the acknowledgements by link |
+| `claude-proposals.md` | Published copy of the Claude lane's proposals for seven layers |
+| `claude-request.md` | Published copy of the Claude lane's request to the Codex lane; it relays the owner's sentence |
+| `codex-decisions.md` | Published copy of the Codex lane's independent decisions |
+| `copy-notes.json` | Each copy's hash, its original's hash and every difference between the copy and the original |
+
+## Method
+
+Leads came from the research runtime on the live web (GPT Researcher 3.7.0 on a local model); those reports are
+leads, not facts. The Claude lane re-read every fact it used from GitHub by script and wrote proposals for seven
+layers and for the skills rows. The Codex lane decided each one independently from its own reading of the primary
+sources and corrected two statements of the proposals. Both acknowledgements are public comments on pull request 608.
+`consensus.json` is the coordinator's record of what the two lanes agreed; the three notes are the exchange itself.
+
+## What this folder is not
+
+- **Not a blind round.** The Codex lane decided with the Claude lane's proposals in front of it. A row from this
+  record has the row kind `consensus` and is never definitive.
+- **Not a measurement.** No arm was installed, no model was called and no host was changed for these decisions. Where
+  the record names a comparison or a gate, that comparison or gate has not run.
+- **No host acceptance.** No row here is a merit acceptance, a host acceptance or a useful-task result on the
+  destination distribution. The two rows that install are installed and accepted only through the install plan
+  (`evidence/artifacts/new-wsl-install-plan-20261002/`), whose commands for them have not run anywhere.
+
+## What the build verifies
+
+`assemble_manifest.py` reads `consensus.json` in its last step. It checks that each of the three notes exists with
+the SHA-256 that `consensus.json` records, and stops with a message when one is missing or differs. Those hashes are
+the ones `copy-notes.json` gives for the copies. The acknowledgements are links: the build checks that one of each
+family is listed and does not fetch them. The originals of the notes are private; their hashes in `copy-notes.json`
+cannot be checked from this repository.
+
+The same step refuses a record that would replace what the rounds decided: a slot that already exists, an added row
+that is not of kind `consensus` or is definitive, an unknown state, catalog or layer, and an amendment that names an
+unknown slot or carries one of the fields `default`, `state`, `definitive`, `repository`, `installs_nothing_extra` or
+`row_kind`. `controls.py` in the manifest's folder plants each of these and requires the refusal.
+
+## Rebuilding
+
+From the repository root:
+
+```
+python3 -B evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py
+python3 -B evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py --write docs/decisions/2026-10-01-new-wsl-definitive-defaults.md
+python3 -B scripts/build_new_wsl_handbook.py --write
+```
+
+The first command rebuilds the manifest from its inputs and this record; `--check` instead fails when the committed
+manifest is stale. The second regenerates the tables of the decision record, and the third the handbook, which reads
+the manifest.

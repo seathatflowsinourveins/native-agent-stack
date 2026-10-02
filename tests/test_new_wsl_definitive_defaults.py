@@ -1,13 +1,14 @@
 """The new WSL's definitive defaults: one default per slot, one owner per tool, and no stale generated text.
 
-Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001). They do not
-judge any pick; they hold the manifest to its own rule.
+Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
+layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
 """
 import hashlib
 import json
 import re
 import subprocess
 import sys
+import types
 import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -16,7 +17,13 @@ ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
 SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
-ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added"}
+CONSENSUS_ART = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002"
+CONSENSUS_RECORD = ROOT / "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
+ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added", "consensus"}
+# What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
+PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
+PRIVATE_SHAPES = (r"/home/[a-z][a-z0-9_-]*/|/mnt/[a-z]/Users/|/tmp/claude-\d+/|-home-[a-z]",
+                  r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}")
 DECISION_SLOTS = {"container-engine", "isolation-container-boundary", "code-search", "memory-owner", "context-supply",
                   "local-model-server"}
 RESOLVED = ("final", "installed_on_critic", "not_installed", "split")
@@ -66,6 +73,15 @@ def converged_key(slot):
     return picks[0] if picks[0] == picks[1] else None
 
 
+def load_assembler():
+    """The assembler's functions, compiled from source so that no bytecode is written into the artifact folder."""
+    path = ART / "assemble_manifest.py"
+    module = types.ModuleType("assemble_manifest")
+    module.__file__ = str(path)
+    exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), module.__dict__)
+    return module
+
+
 class Manifest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -76,6 +92,8 @@ class Manifest(unittest.TestCase):
         cls.convergence = load(ART / "convergence.json")
         cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
         cls.combined = load(ROOT / cls.convergence["combined"]["path"])
+        cls.consensus = load(CONSENSUS_ART / "consensus.json")
+        cls.consensus_rows = {row["slot_id"]: row for row in cls.consensus["add_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -138,7 +156,9 @@ class Manifest(unittest.TestCase):
                     self.assertEqual(row["state"], "")
 
     def test_every_row_has_job_and_resolution(self):
-        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions))
+        # A row is decided by the rounds (convergence.json) or added by the direct consensus (consensus.json), never both.
+        self.assertEqual(set(self.decisions) & set(self.consensus_rows), set())
+        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions) | set(self.consensus_rows))
         self.assertEqual(len(self.decisions), len(self.convergence["decisions"]) + len(self.convergence["added_slots"]))
         added_jobs = {d["slot_id"]: d["job"] for d in self.convergence["added_slots"]}
         owners = {}
@@ -146,14 +166,19 @@ class Manifest(unittest.TestCase):
             sid = row["slot_id"]
             with self.subTest(slot=sid):
                 self.assertTrue(row.get("job"), sid)
-                self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
                 self.assertIn("resolution", row)
                 resolution = row["resolution"]
                 self.assertIsInstance(resolution, dict)
-                self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
-                for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
-                    if key in self.decisions[sid]:
-                        self.assertEqual(resolution[key], self.decisions[sid][key])
+                if row["row_kind"] == "consensus":
+                    self.assertEqual(row["job"], self.consensus_rows[sid]["job"])
+                    self.assertEqual(resolution, self.consensus_rows[sid]["resolution"])
+                    self.assertNotIn(resolution["outcome"], RESOLVED + ("kept",))
+                else:
+                    self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
+                    self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
+                    for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
+                        if key in self.decisions[sid]:
+                            self.assertEqual(resolution[key], self.decisions[sid][key])
                 if row["default"] and not row["installs_nothing_extra"]:
                     self.assertNotIn(row["job"], owners, f"{sid}: job already owned by {owners.get(row['job'])}")
                     owners[row["job"]] = sid
@@ -214,6 +239,8 @@ class Manifest(unittest.TestCase):
     def test_critic_evidence_and_covering_slots_are_valid(self):
         rows = {row["slot_id"]: row for row in self.rows}
         for row in self.rows:
+            if row["row_kind"] == "consensus":
+                continue  # No round decided it: it has no critic and no covering slot; its own tests are further down.
             sid, resolution = row["slot_id"], row["resolution"]
             decision = self.decisions[sid]
             with self.subTest(slot=sid):
@@ -263,7 +290,8 @@ class Manifest(unittest.TestCase):
             self.assertEqual(row["layer_id"], added["layer_id"])
             added_by_layer.setdefault(row["layer_id"], []).append(row["slot_id"])
         for lid, added in added_by_layer.items():
-            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid]
+            # The consensus step places its rows after these, so the order is taken over the rows the rounds decided.
+            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid and row["row_kind"] != "consensus"]
             self.assertEqual(order[-len(added):], added)
         for correction in self.convergence["hygiene"]:
             row = rows[correction["slot_id"]]
@@ -350,6 +378,9 @@ class Manifest(unittest.TestCase):
         self.assertIn("decision-round", rule)
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
+        # The consensus record's rule is appended whole, after the rounds' rule.
+        self.assertTrue(rule.endswith(" " + self.consensus["rule"]))
+        self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
@@ -578,6 +609,9 @@ class Manifest(unittest.TestCase):
             ref = self.convergence[source]
             self.assertEqual(self.manifest["sources"][source], ref)
             self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        consensus = CONSENSUS_ART / "consensus.json"
+        self.assertEqual(self.manifest["sources"]["consensus"],
+                         {"path": consensus.relative_to(ROOT).as_posix(), "sha256": sha(consensus)})
 
     def test_preregistered_inputs_are_the_committed_ones(self):
         prereg = load(ART / "preregistration.json")
@@ -662,6 +696,136 @@ class Manifest(unittest.TestCase):
         self.assertEqual(len(self.trading["layers"]), 12)
         pinned = {p["name"] for p in self.trading["pinned_requirements"]}
         self.assertTrue(any("NautilusTrader 2.0.0rc5" in name for name in pinned))
+
+    # The layer consensus of 2026-10-02: rows added, and amendments recorded, by a direct consensus of the two families.
+
+    def test_counts_after_the_layer_consensus(self):
+        counts, by_catalog = self.manifest["counts"], {}
+        for row in self.rows:
+            by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
+        self.assertEqual(counts["slots"], 89)
+        self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
+        self.assertEqual(counts["layers"], 37)
+        self.assertEqual(counts["installed"], 56)
+        self.assertEqual(counts["by_row_kind"]["consensus"], 5)
+        self.assertEqual(counts["by_state"]["resolved"], 22)
+        self.assertEqual(counts["by_state"]["measurement"], 4)
+
+    def test_consensus_rows_are_the_records_rows_with_its_states(self):
+        rows = {row["slot_id"]: row for row in self.rows}
+        self.assertEqual(sorted(self.consensus_rows), ["credential-custody", "cross-family-review", "research-skill",
+                                                       "skill-authoring", "skill-discovery"])
+        self.assertEqual({row["slot_id"] for row in self.rows if row["row_kind"] == "consensus"}, set(self.consensus_rows))
+        # The fields a consensus row must carry are the ones the assembler writes for a row the rounds decided.
+        fields = load_assembler().ROW_FIELDS
+        self.assertEqual(tuple(key for key in self.rows[0] if key != "amendments"), fields)
+        for sid, recorded in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                self.assertEqual(rows[sid]["state"], recorded["state"])
+                self.assertEqual(rows[sid], recorded)  # copied as the record gives it
+                self.assertEqual(tuple(rows[sid]), fields)
+        # Each is placed after the last row the rounds decided in its layer, in the record's order.
+        for lid in sorted({row["layer_id"] for row in self.consensus_rows.values()}):
+            in_layer = [row for row in self.rows if row["layer_id"] == lid]
+            kinds = [row["row_kind"] == "consensus" for row in in_layer]
+            self.assertEqual(kinds, sorted(kinds), lid)
+            self.assertEqual([row["slot_id"] for row in in_layer if row["row_kind"] == "consensus"],
+                             [row["slot_id"] for row in self.consensus["add_rows"] if row["layer_id"] == lid])
+
+    def test_no_consensus_row_is_definitive(self):
+        for row in self.rows:
+            if row["row_kind"] != "consensus":
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                self.assertIs(row["definitive"], False)
+                self.assertNotEqual(row["state"], "definitive")
+                self.assertIn("direct consensus", row["label"])
+                self.assertEqual(row["resolution"]["by"], "direct consensus of both model families")
+                self.assertTrue(row["resolution"]["sources"])
+                if row["measurement"] is not None:
+                    # A consensus row that waits names what decides it and installs nothing meanwhile.
+                    self.assertEqual(row["measurement"], {"returned": False, "receipts": []})
+                    self.assertTrue(row["resolution"]["deciding_measurement"])
+                    self.assertTrue(row["resolution"]["measurement_id"])
+                    self.assertTrue(row["installs_nothing_extra"])
+
+    def test_amendments_leave_the_rows_as_the_rounds_decided_them(self):
+        _, _, decided, _, _ = load_assembler().assemble_rows()
+        before = {row["slot_id"]: row for row in decided}
+        self.assertEqual(set(before), {row["slot_id"] for row in self.rows} - set(self.consensus_rows))
+        recorded = {}
+        for entry in self.consensus["amend_rows"]:
+            self.assertEqual(set(entry), {"slot_id", "amendment"})
+            self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
+            recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
+        self.assertTrue(recorded)
+        self.assertTrue(set(recorded) <= set(before), "an amendment names a row that no round decided")
+        for row in self.rows:
+            sid = row["slot_id"]
+            with self.subTest(slot=sid):
+                if sid in recorded:
+                    self.assertEqual(row["amendments"], recorded[sid])
+                    for amendment in row["amendments"]:
+                        for key in ("date_utc", "by", "decision"):
+                            self.assertTrue(amendment[key], key)
+                else:
+                    self.assertNotIn("amendments", row)
+                if row["row_kind"] != "consensus":
+                    # Every other field is the one the assembler builds before the consensus step.
+                    self.assertEqual({key: value for key, value in row.items() if key != "amendments"}, before[sid])
+
+    def test_consensus_records_are_the_hashed_published_copies(self):
+        records = self.consensus["records"]
+        copies = load(CONSENSUS_ART / "copy-notes.json")["copies"]
+        named = {name: ref for name, ref in records.items() if name != "acknowledgements"}
+        self.assertEqual(sorted(Path(ref["path"]).name for ref in named.values()), sorted(copies))
+        for name, ref in named.items():
+            path = ROOT / ref["path"]
+            with self.subTest(record=name):
+                self.assertTrue(path.is_file())
+                self.assertEqual(sha(path), ref["sha256"])
+                self.assertEqual(copies[path.name]["sha256"], ref["sha256"])
+        # Both families' acknowledgements are on record; they are links to pull-request comments, not hashed files.
+        self.assertEqual({ack["family"] for ack in records["acknowledgements"]}, {"claude", "gpt"})
+        for ack in records["acknowledgements"]:
+            self.assertTrue(ack["url"].startswith("https://github.com/"), ack["url"])
+
+    def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        for sid, row in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                line = next(line for line in lines if line.startswith(f"| {row['layer_id']} | {sid} |"))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[4], row["state"])
+                self.assertEqual(cells[5], row["label"])
+                self.assertNotIn("**", cells[3])
+        start, end = lines.index("### Amendments by direct consensus"), lines.index("<!-- tables:end -->")
+        self.assertLess(start, end)
+        table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
+        self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
+        self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
+                                     for row in self.rows for amendment in row.get("amendments", [])])
+        self.assertEqual(len(table) - 2, len(self.consensus["amend_rows"]))
+
+    def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
+        text = CONSENSUS_RECORD.read_text(encoding="utf-8")
+        self.assertIn(self.consensus["rule"], text)
+        self.assertIn(self.consensus["authorization"]["verbatim"], text)
+        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.consensus["amend_rows"]]:
+            self.assertIn(f"`{sid}`", text, sid)
+        for sentence in self.consensus["not_established"]:
+            self.assertIn(sentence, text)
+        # The earlier record points to this one outside its generated tables.
+        earlier = RECORD.read_text(encoding="utf-8")
+        outside = earlier[:earlier.index("<!-- tables:begin")] + earlier[earlier.index("<!-- tables:end -->"):]
+        self.assertIn(CONSENSUS_RECORD.name, outside)
+
+    def test_no_host_path_or_user_name_in_the_consensus_folder(self):
+        for path in sorted(CONSENSUS_ART.rglob("*")):
+            if path.is_file():
+                text = path.read_text(encoding="utf-8")
+                self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
+                self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
 
 
 if __name__ == "__main__":
