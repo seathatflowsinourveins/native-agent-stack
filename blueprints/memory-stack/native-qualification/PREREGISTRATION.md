@@ -113,8 +113,12 @@ to be at least **+5 percentage points** against **both** ai-memory and native fi
 with each simultaneous decision interval's lower bound strictly greater than
 zero, plus every lifecycle, representative-workload and blind cross-family gate
 below. Ordinary paired 95% intervals are descriptive. No post hoc winner selection
-from the three arms is allowed. Native files would need its own prospectively
-registered replacement claim.
+from the three arms is allowed. A third predeclared contrast compares native
+files against ai-memory. If native files beat both memory-backed answer paths
+by the same point-gain and interval rule, recommend direct-file answers for the
+tested query scope, subject to matching native operational evidence. This does
+not retire memory capture or continuity: keep only the memory roles justified
+by their separate observed behavior. No decision file changes a default.
 
 There may be **one 60-case extension only**, with ten new cases per category,
 unchanged configurations and independently sealed sources. An initial result is
@@ -122,10 +126,10 @@ inconclusive when a comparator's interval admits both no gain and a gain, or the
 +5-point practical threshold remains uncertain; a conclusive regression does not
 trigger an extension. Any operational or lifecycle failure blocks extension.
 Stop at 120 total cases, pooling both batches for the final result. To keep
-simultaneous 95% decision coverage across two comparator claims and two planned
-looks, Bonferroni allocates alpha 0.0125 to each interval: use **98.75% paired
+simultaneous 95% decision coverage across three predeclared pairwise contrasts
+and two planned looks, Bonferroni allocates alpha 0.05/6 to each interval: use **99.1666667% paired
 intervals** at each decision look, alongside descriptive 95% intervals. For the
-same frozen 10,000 bootstrap draws, decision quantiles are 0.00625 and 0.99375;
+same frozen 10,000 bootstrap draws, decision quantiles are 0.0041666667 and 0.9958333333;
 descriptive quantiles are 0.025 and 0.975. Never select a favorable subset. The
 extension must be externally authored or technically withheld from the tuning
 executor and released against the same configuration freeze. It is not present

@@ -122,6 +122,7 @@ the exact approved checkout. `CANARY_CONFIG`, `CANDIDATE_URL`, `CANARY_DIR`,
 run-local paths/endpoints chosen and recorded by that owner, not global defaults.
 
 ```sh
+: "${CANARY_CONFIG:?}" "${CANDIDATE_URL:?}" "${AI_MEMORY_BIN:?}" "${PRIVATE_AI_DATA:?}" "${PRIVATE_AI_URL:?}"
 HINDSIGHT_CONFIG="$CANARY_CONFIG" \
   npx @vectorize-io/hindsight-coding-agents@0.8.0 \
   install codex claude-code --server self-hosted --api-url "$CANDIDATE_URL"
@@ -144,6 +145,7 @@ recovery, stop the canary, retain its logs, use the pinned upstream uninstall,
 then restore and verify the exact backed-up native configuration:
 
 ```sh
+: "${CANARY_CONFIG:?}"
 HINDSIGHT_CONFIG="$CANARY_CONFIG" \
   npx @vectorize-io/hindsight-coding-agents@0.8.0 uninstall codex claude-code
 ```

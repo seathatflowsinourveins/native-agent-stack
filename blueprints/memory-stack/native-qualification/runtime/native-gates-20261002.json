@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review_and_read_only_host_observation",
+  "checked_on": "2026-10-02",
+  "native_c_status": "NOT_RUN",
+  "canary_sessions": 0,
+  "blind_convergence_status": "NOT_RUN",
+  "production_mutated": false,
+  "observed_clients": {"codex": "0.160.0", "claude": "2.1.287"},
+  "observations": [
+    "Current user hook declarations in both clients still target production ai-memory on loopback port 49374.",
+    "Codex declares hooks enabled and ai-memory among its MCP servers; no Hindsight server declaration was found in the inspected user settings.",
+    "Claude user settings declare ai-memory lifecycle hooks and enabled plugins; no Hindsight hook marker was found.",
+    "These read-only checks do not attest effective managed, plugin, project, MCP or startup-context behavior.",
+    "The pinned default coding-agents installer edits both clients' user hook/config files, user MCP registration and shared skill directories.",
+    "HINDSIGHT_CONFIG scopes candidate configuration; it does not disable production ai-memory hooks.",
+    "The local gateway's GET /v1/models at loopback port 20128 returned HTTP 401. Other observed local listeners returned 426 and 404 respectively.",
+    "secret has OMNIROUTE_API_KEY exited 44; secret list succeeded but contained no names matching OmniRoute or gateway. No credential value was read or printed."
+  ],
+  "unresolved_prerequisites": [
+    "Native configuration owner attests all effective hook/MCP/startup-context sources and exact reversible config snapshots.",
+    "Prove supported suppression of control capture and unwanted control recall in the candidate lane while preserving the intended handoff behavior.",
+    "Provide the existing gateway Keychain variable name or store its credential privately; do not import native account stores.",
+    "Freeze model/configuration/source hashes, budgets and exposure attestation before any held-out query.",
+    "Run matching native lifecycle and representative quality/latency checks, blind cross-family review and genuine-session canary."
+  ],
+  "owner_action": "Deliver the exact canary inventory and rollback proposal to the existing native configuration/source owner. Do not run the default user-scope installer as an isolation shortcut.",
+  "source_pins": {
+    "coding_agents": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "repository_policy": "231eed43e17cc7953751b7caf90376b01cb5feec"
+  },
+  "limits": "This is an open-gate record, not a completed convergence record or a rejection of any candidate's repository quality. Earlier Codex version receipts do not qualify the newly observed client version."
+}
