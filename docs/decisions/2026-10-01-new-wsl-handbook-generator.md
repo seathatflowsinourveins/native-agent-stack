@@ -383,8 +383,9 @@ ownership declarations and inconsistent declared counts fail generation.
 
 Top-level `default_decisions` retains the source's meaning, rules, limitations,
 counts and upstream source-file hashes. Those hashes remain the producer's
-provenance statements; reading the manifest does not re-run its model rounds or
-independently rehash its companion sources. The handbook introduces no decision
+provenance statements. The input provenance table separately hashes the compact
+sources used to bind the slot inventory. Reading them does not re-run the model
+rounds or certify the producer's claims. The handbook introduces no decision
 rule and changes none of the existing tool picks, pins, provisioning statuses,
 acceptance examples, finality gates or `new_host_acceptance_claimed` flag.
 A source-fit default therefore cannot create host readiness or a live-provider
@@ -423,6 +424,103 @@ private integration evidence. Publication must regenerate against the accepted
 canonical source. These results are local adapter checks, not upstream model
 tests, new measurements, installations, provider calls or new-host acceptance.
 
+## Repairs after the two reviews
+
+The publication guard now reuses `validate.PRIVATE_CONTENT`, following
+[`scripts/new_host_grand_list.py` at `0d3893630c258696eed60f4431654f94471e8e3a`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d3893630c258696eed60f4431654f94471e8e3a/scripts/new_host_grand_list.py).
+Both rendered outputs are scanned before any write or successful `--check`.
+The recursive input check also applies the shared patterns. A refusal names
+only the pattern label and never the matched value. Synthetic install-command
+and rendered-output controls cover both publication modes and preserve existing
+files when publication is refused.
+
+Slot identifiers are bound to the compact catalog inventories named by the
+definitive manifest. The identifier expansion follows the already cited
+producer's `rows_of()` and `build()`: nested roles, multiple defaults and pinned
+requirements retain their exact identifiers. Unknown or omitted identifiers
+fail with the offending IDs even when counts remain consistent. The projected
+layer tables must cover the complete inventory. This reads and hashes the
+compact sources without changing their recommendations or evidence classes.
+
+The profile adapter and handbook refuse default installation of comparison arms
+whose owning slot remains `split` or `measurement`. This check uses the manifest
+state and comparison group even if an arm's profile status is changed to
+`picked`. Memory is included alongside retrieval and model-server arms. A
+returned measurement must resolve the source decision before it supplies an
+install default.
+
+Claude Code uses one version rule in its source entry, overview, bootstrap and
+generated handbook. The pin is the last qualified release and a floor; the
+install takes the release current at install time; the receipt records the
+installed version; a release newer than the pin counts as installed and not yet
+qualified until its acceptance command has passed on that host. The official
+[native installer documentation](https://code.claude.com/docs/en/setup#install-a-specific-version)
+supports the `latest` channel. The source entry retains the pinned artifact and
+checksum as the qualified-release reference. The older observed ai-memory and
+Worktrunk releases remain below their selected releases; their source-test
+commands retain their original scope and are still unexecuted. The profile
+rejects text that contradicts an entry's version floor rule.
+
+Docker Engine and the rootless boundary now share an unexecuted acceptance
+pair: `docker info` must report rootless in the daemon's security options, then
+`docker run --rm hello-world` must exit 0 through the user-level daemon. Docker's
+[rootless documentation](https://docs.docker.com/engine/security/rootless/) tells
+the user to confirm that daemon with `docker info`; its
+[troubleshooting example](https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors)
+runs `hello-world` without sudo. The
+[run reference](https://docs.docker.com/engine/containers/run/) supplies `--rm`.
+The paired exit requirement is this recipe's acceptance formulation. Both
+entries remain excluded from the minimal default install, and the pair remains
+`UNRUN`, owed on the first run on the new host. It checks daemon mode and startup;
+[resource-limit enforcement](https://docs.docker.com/engine/security/rootless/tips/#limiting-resources)
+still needs its own acceptance.
+
+The profile's host prerequisite requires WSL 3.0.1 or later with per-distribution
+cgroup isolation enabled before a second systemd distribution starts. On 2.7.x,
+distributions share the user cgroup tree and only one can start that user
+manager. [microsoft/WSL PR 40519](https://github.com/microsoft/WSL/pull/40519)
+documents that conflict and adds per-distribution cgroups;
+[PR 41512](https://github.com/microsoft/WSL/pull/41512) adds their cgroup namespaces
+and reports a manual rootless Docker success. The
+[3.0.1 release](https://github.com/microsoft/WSL/releases/tag/3.0.1), at
+[`91f161fa240dc355c1a88daabc8aac4273e35ba5`](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291),
+contains the namespace repair and its follow-up. These repairs appeared in
+earlier prereleases; 3.0.1 is the stable-release floor used by this recipe.
+[Issue 41492](https://github.com/microsoft/WSL/issues/41492) records the known
+rootless-container risk after the hierarchy change. Its historical report is
+not proof that built-in systemd remains broken on 3.0.1, and the upstream manual
+success is not acceptance on the new host. The gate is executed in the separately
+owned [distribution recipe](../../adoption/platforms/linux-wsl2-new-distro.md);
+this profile links that gate without copying its commands.
+
+The search-first source review used cached primary upstream documents and
+source snapshots. Live refreshes of the GitHub, Docker and Claude sources
+returned curl exit 6 because DNS was unavailable. No installation, host-service
+query or acceptance command was performed. The completeness critic retained
+the separate package-integrity, user-manager and resource-limit acceptance gaps.
+
+Seven focused regression tests first returned exit 1 with nine failures and two
+errors: secret-shaped install commands and rendered outputs were published,
+unknown and omitted slots passed, ai-memory could become a default before its
+measurement, and the version rule and rootless acceptance fields were missing.
+After repair the same seven tests returned exit 0. The Windows ordering check
+now inspects `first_boot_prerequisites`, requires F1 through F8 in order before
+stage 2, and places F10 and F11 afterward. Isolated negative controls reject F9
+in that prerequisite list, a swapped prerequisite order, an unmeasured memory
+default, an unknown slot, a secret-shaped value and a book left stale after one
+manifest default changes. These remain local synthetic integration checks.
+Earlier receipts retain their historical validation and evidence scope.
+
+The requested verification order returned exit 0 for handbook `--write`,
+handbook `--check`, the two test modules together (`Ran 72 tests`, `OK`, no
+skips), and `new_host_grand_list.py --check` (`status: passed`, 32 layers and
+66 winners). The handbook receipt's generator, profile and output hashes were
+refreshed; its earlier validation records remain historical. Profile review
+and freeze receipts retain their original snapshot hashes and counts.
+The publication validator returned exit 1 only for registered hash and byte
+count mismatches on changed files. It reported no other failure; the coordinator
+owns re-registration in the evidence manifest.
+
 ## Task correction log
 
 | Mistake | Correction and verification | Prevention |
@@ -438,6 +536,9 @@ tests, new measurements, installations, provider calls or new-host acceptance.
 | Repository/owner identity collapsed the TypeScript and Python Codex packages and rejected their different checksums. | Use supported npm/PyPI metadata URLs to retain separate package identities; preserve unresolved aggregates, alias deduplication and strict same-package conflicts. | The real 69-entry profile and five new public-CLI controls failed before the correction and pass afterward; all 44 handbook checks pass, and the original profile-absent bytes are unchanged. |
 | The sole-package repository fallback assigned a canonical package to an explicit entry with an unsupported metadata URL. | Permit that fallback only for selection aliases without their own profile entry; retain an explicit unresolved entry separately with a package-binding gap. | The independent single-sibling probe was reproduced through the public CLI, failed before repair and passes afterward; all six affected package checks and actual-profile write/check pass. |
 | Initial manifest inspection assumed every slot had a `state` field and returned `KeyError: 'state'`. | The reviewed producer's `build()` emits three pinned requirement rows without that field. Preserve their raw records and display the missing states as pending, alongside the 65 explicit empty states. | The actual 74-slot projection control checks all original records and the exact 3 definitive / 2 split / 1 measurement / 68 pending display counts. |
+| The payload path guard was treated as enough to protect publication. | Apply the shared private-content patterns to inputs and both rendered outputs before write or check success. | The synthetic install and per-output controls reject secret-shaped values, report only labels and preserve existing outputs. |
+| Unique nonempty slot IDs were treated as a complete inventory binding. | Compare IDs and owners with the manifest producer's compact catalog inventories and require complete projection coverage. | Unknown-ID and omitted-ID mutations reject with the offending IDs even when counts stay consistent. |
+| The first-boot boundary assertion searched the Windows steps, and the default-arm assertions omitted memory. | Check the F1 through F8 prerequisite collection and order; bind unresolved comparison defaults to the manifest states. | Separate F9, order and ai-memory mutations fail the corrected checks. |
 
 These corrections are recorded here because this bounded worker does not own
 the shared harness-defaults log. The coordinator can carry them into that log

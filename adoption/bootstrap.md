@@ -109,8 +109,11 @@ GitHub-hosted macOS runner; see
    `version_probe` its pin entry declares: the declared command, run with
    stdin from `/dev/null` in its own process group and killed after 30 s (or the
    longer `timeout_seconds` its pin declares), must
-   report the pinned version (Claude Code's pin is a floor, so any later
-   version passes); `context-mode` and `socraticode` have no version flag and
+   report the pinned version, or a later release for Claude Code: The pin is
+   the last qualified release and a floor; the install takes the release current
+   at install time; the receipt records the installed version; a release newer
+   than the pin counts as installed and not yet qualified until its acceptance
+   command has passed on that host. `context-mode` and `socraticode` have no version flag and
    start their MCP stdio server on any other argument, so npm reads their
    package version instead (those probes run only `bin/npm`). Every other
    executable in `$ECO_INSTALL_ROOT/bin` is listed with its link target and

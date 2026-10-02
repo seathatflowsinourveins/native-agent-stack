@@ -18,6 +18,22 @@ unprovisioned and outside the default install. The
 preserves the prior profile and receipt hashes; the earlier PR-open observation
 remains historical in the source review, with an appended correction.
 
+Claude Code uses this version rule. The pin is the last qualified release and a
+floor; the install takes the release current at install time; the receipt records
+the installed version; a release newer than the pin counts as installed and not
+yet qualified until its acceptance command has passed on that host. Its native installer uses
+the documented `latest` channel. The pinned artifact checksum describes the
+qualified release; the receipt records the release actually installed.
+
+A second systemd distribution requires WSL 3.0.1 or later with per-distribution
+cgroup isolation enabled. On 2.7.x, distributions share one cgroup tree and the
+new distribution's user manager fails when the existing distribution owns the
+shared user cgroup. The source is microsoft/WSL
+[PR 40519](https://github.com/microsoft/WSL/pull/40519),
+[PR 41512](https://github.com/microsoft/WSL/pull/41512) and the
+[3.0.1 release](https://github.com/microsoft/WSL/releases/tag/3.0.1).
+The gate is executed in the [new-distribution recipe](platforms/linux-wsl2-new-distro.md).
+
 Each JSON entry has one owning layer. `boundary.layer_uses` preserves other
 layers' uses. recovery-portability retains mise's reproduction ownership; uv
 supplies the requested Python distribution and package/lock operations. The
@@ -60,7 +76,7 @@ part of this artifact.
 
 Install and acceptance primary citations are retained per entry in the JSON.
 The core paths are [Codex's tagged README](https://github.com/openai/codex/blob/rust-v0.159.3/README.md),
-[Claude's specific-version installer](https://code.claude.com/docs/en/setup#install-a-specific-version),
+[Claude's version and channel installer](https://code.claude.com/docs/en/setup#install-a-specific-version),
 [uv 0.12.17](https://github.com/astral-sh/uv/releases/tag/0.12.17),
 [uv's tagged Python guide](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md),
 the [Node 24.21.0 distribution](https://nodejs.org/dist/v24.21.0/SHASUMS256.txt),
@@ -102,6 +118,17 @@ profile has **45 entries with 117 gaps**, **35 null install-command fields** and
 source-test commands; none is evidence of an installed functional run. All 69
 entries retain their prior provisioning status, and all 23 comparison arms
 retain their prior ownership and default-install exclusions.
+
+The Docker Engine and rootless boundary entries now carry the same source-backed
+acceptance pair: the daemon's security options report rootless mode, and
+`docker run --rm hello-world` exits 0 through the user-level daemon. Docker's
+[rootless documentation](https://docs.docker.com/engine/security/rootless/) and
+[startup troubleshooting](https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors)
+supply the examples. Both pairs remain **UNRUN** and are owed on the first run
+on the new host. The known cgroup risk is recorded in
+[microsoft/WSL issue 41492](https://github.com/microsoft/WSL/issues/41492).
+The current profile has **38 null acceptance-command fields**. These source
+examples establish no new-host result or resource-limit enforcement.
 
 Every added command is **UNRUN**. Serena's local install and source suite require
 the exact retained checkout and its Python 3.13 developer environment; PyPI

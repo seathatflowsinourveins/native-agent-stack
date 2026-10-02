@@ -557,18 +557,19 @@
       },
       "integrity_observation": "published_manifest_digest_not_rehashed",
       "install": {
-        "command": "curl -fsSL https://claude.ai/install.sh | bash -s 2.1.284",
+        "command": "curl -fsSL https://claude.ai/install.sh | bash -s latest",
         "source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
-        "execution_status": "UNRUN"
+        "execution_status": "UNRUN",
+        "scope": "The documented latest channel installs the release current at install time. The artifact and checksum above identify the pin; the receipt records the installed release."
       },
       "acceptance": {
         "command": "claude -p \"explain this function\"",
         "source": "https://code.claude.com/docs/en/quickstart#essential-commands",
         "evidence_class": "documented_upstream_example_not_executed",
-        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Installed host 2.1.287 help/version checks do not qualify selected 2.1.284; no model request occurred.",
+        "scope": "Official one-off query example. A prompt without actual function context is not a functional oracle. Host 2.1.287 is above the 2.1.284 floor and counts as installed; acceptance has not passed on that host. No model request occurred.",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Selected Claude Code 2.1.284 installed.",
+          "Claude Code at or above the 2.1.284 floor installed, with its installed version recorded in the receipt.",
           "Existing authorized native sign-in and actual function/project context sufficient to answer the example."
         ]
       },
@@ -588,7 +589,8 @@
         "source": "https://registry.npmjs.org/%40anthropic-ai%2Fclaude-code/2.1.284",
         "kind": "native_package_release"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "version_policy": "The pin is the last qualified release and a floor; the install takes the release current at install time; the receipt records the installed version; a release newer than the pin counts as installed and not yet qualified until its acceptance command has passed on that host."
     },
     {
       "name": "mcporter",
@@ -796,7 +798,7 @@
         "prerequisites": [
           "Selected upstream source checkout and Rust build/test dependencies."
         ],
-        "scope": "README default cargo test unit suite only; shell integration has a separate feature-enabled suite requiring bash, zsh, fish, nushell, pwsh and jq. No shell integration was qualified. Installed host 0.79.0 does not qualify selected 0.80.0."
+        "scope": "README default cargo test unit suite only; shell integration has a separate feature-enabled suite requiring bash, zsh, fish, nushell, pwsh and jq. No shell integration was qualified. The observed host release 0.79.0 is below the selected release 0.80.0; acceptance is owed on the new host."
       },
       "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -2133,8 +2135,8 @@
       "blocking_gaps": [
         "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
         "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The Moby docker-v29.8.2 tag is not a verified Docker CE apt package pin. Versioned Engine/rootless installation and checksum on each OS arm remain unresolved."
+        "The Moby docker-v29.8.2 tag is not a verified Docker CE apt package pin. Versioned Engine/rootless installation and checksum on each OS arm remain unresolved.",
+        "microsoft/WSL issue 41492 records the known rootless-container risk after the cgroup hierarchy change. The paired rootless check is owed on the first run on the new host."
       ],
       "artifact": {
         "name": "git source at 8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
@@ -2152,9 +2154,22 @@
         "source": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "docker info --format '{{json .SecurityOptions}}' | grep -Fq '\"name=rootless\"' && docker run --rm hello-world",
+        "source": "https://docs.docker.com/engine/security/rootless/",
+        "sources": [
+          "https://docs.docker.com/engine/security/rootless/",
+          "https://docs.docker.com/reference/cli/docker/info/",
+          "https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors",
+          "https://docs.docker.com/engine/containers/run/"
+        ],
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Docker Engine installed in rootless mode, with its user-level daemon running and the CLI connected to that daemon through the rootless context.",
+          "WSL built-in systemd support, a working user session and the host prerequisites checked in adoption/platforms/linux-wsl2-new-distro.md."
+        ],
+        "expected_result": "The daemon reports name=rootless in its SecurityOptions and docker run --rm hello-world exits 0 under the user-level daemon.",
+        "scope": "Docker documents docker info to confirm the Rootless daemon and hello-world to exercise container startup. This acceptance pair adds the documented --rm cleanup option and requires exit 0. It is owed on the first run on the new host and establishes daemon mode and basic startup; resource-limit enforcement needs its own acceptance."
       },
       "provisioning_status": "unprovisioned_comparison_arm",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -2163,7 +2178,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/hosting-services.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md"
+        "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md",
+        "https://docs.docker.com/engine/security/rootless/",
+        "https://docs.docker.com/reference/cli/docker/info/",
+        "https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors",
+        "https://docs.docker.com/engine/containers/run/",
+        "https://github.com/microsoft/WSL/issues/41492"
       ],
       "release": {
         "tag": "docker-v29.8.2",
@@ -2298,12 +2318,12 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No unique upstream implementation is selected for this comparison control; repository, release and install integrity remain undefined.",
+        "The boundary uses Docker Engine in rootless mode from hosting-services; its own release and install integrity are not separate from that engine.",
         "A pin matching the destination installation is not verified.",
         "No artifact checksum or native lock hash verified.",
         "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "Depends on the hosting-services engine comparison result; this row does not install a second engine."
+        "Uses the hosting-services Docker Engine in rootless mode and its user-level daemon; this row installs no second engine.",
+        "microsoft/WSL issue 41492 records the known rootless-container risk after the cgroup hierarchy change. The paired rootless check is owed on the first run on the new host."
       ],
       "artifact": null,
       "checksum": {
@@ -2317,9 +2337,22 @@
         "source": null
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "docker info --format '{{json .SecurityOptions}}' | grep -Fq '\"name=rootless\"' && docker run --rm hello-world",
+        "source": "https://docs.docker.com/engine/security/rootless/",
+        "sources": [
+          "https://docs.docker.com/engine/security/rootless/",
+          "https://docs.docker.com/reference/cli/docker/info/",
+          "https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors",
+          "https://docs.docker.com/engine/containers/run/"
+        ],
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Docker Engine installed in rootless mode, with its user-level daemon running and the CLI connected to that daemon through the rootless context.",
+          "WSL built-in systemd support, a working user session and the host prerequisites checked in adoption/platforms/linux-wsl2-new-distro.md."
+        ],
+        "expected_result": "The daemon reports name=rootless in its SecurityOptions and docker run --rm hello-world exits 0 under the user-level daemon.",
+        "scope": "Docker documents docker info to confirm the Rootless daemon and hello-world to exercise container startup. This acceptance pair adds the documented --rm cleanup option and requires exit 0. It is owed on the first run on the new host and establishes daemon mode and basic startup; resource-limit enforcement needs its own acceptance."
       },
       "provisioning_status": "unprovisioned_comparison_arm",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -2327,7 +2360,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
-        "evidence/artifacts/new-wsl-profile-20261001/source-review.json"
+        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
+        "https://docs.docker.com/engine/security/rootless/",
+        "https://docs.docker.com/reference/cli/docker/info/",
+        "https://docs.docker.com/engine/security/rootless/troubleshoot/#docker-run-errors",
+        "https://docs.docker.com/engine/containers/run/",
+        "https://github.com/microsoft/WSL/issues/41492"
       ],
       "release": null,
       "source_pin_kind": null
@@ -2378,7 +2416,7 @@
         "prerequisites": [
           "Selected upstream source checkout, pinned Rust 1.95 and cargo-nextest."
         ],
-        "scope": "Everyday source-test tier: cargo t aliases cargo nextest run for default workspace members. It excludes the full/slow tier and eval harness; it does not qualify a running daemon, model/backend, MCP connection or lifecycle hook. Installed host 2.4.2 does not qualify selected 2.5.2."
+        "scope": "Everyday source-test tier: cargo t aliases cargo nextest run for default workspace members. It excludes the full/slow tier and eval harness; it does not qualify a running daemon, model/backend, MCP connection or lifecycle hook. The observed host release 2.4.2 is below the selected release 2.5.2; acceptance is owed on the new host."
       },
       "provisioning_status": "unprovisioned_comparison_arm",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -4150,5 +4188,18 @@
     "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
     "review_update": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
     "command_gap_semantics": "An empty blocking_gaps list means the recorded source fields are populated; it does not establish prerequisites, installation, functional execution, sign-in, merit selection or new-host acceptance."
-  }
+  },
+  "host_prerequisites": [
+    {
+      "requirement": "A second systemd distribution requires WSL 3.0.1 or later with per-distribution cgroup isolation enabled. On WSL 2.7.x, distributions share one cgroup tree and the new distribution's user manager fails when the existing distribution owns the shared user cgroup. microsoft/WSL pull requests 40519 and 41512 supply the per-distribution cgroup and namespace isolation.",
+      "gate_source": "adoption/platforms/linux-wsl2-new-distro.md",
+      "sources": [
+        "https://github.com/microsoft/WSL/pull/40519",
+        "https://github.com/microsoft/WSL/pull/41512",
+        "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+        "https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L2291"
+      ],
+      "execution_status": "UNRUN"
+    }
+  ]
 }

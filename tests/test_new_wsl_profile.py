@@ -8,6 +8,7 @@ import copy
 from html.parser import HTMLParser
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -19,6 +20,7 @@ PROFILE = "new-wsl-clean-foundation"
 SOURCE = "adoption/new-wsl-profile.json"
 HEAD = "85543efe5abcddb7b7cddb14e8774e83b6758616"
 CLI = ROOT / "scripts/new_wsl_profile.py"
+DEFAULTS_SOURCE = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 
 
 def run_cli(*args):
@@ -67,7 +69,8 @@ class NewWslProfileCliTests(unittest.TestCase):
         by_name = {row["name"]: row for row in data["entries"]}
         for name in ("ColGREP", "BM25", "ripgrep", "gVisor", "boxlite", "sqz",
                      "Headroom", "no compression", "Docker Engine", "Ollama",
-                     "Ubuntu 26.04.1 LTS", "Ubuntu 24.04.5 LTS"):
+                     "Ubuntu 26.04.1 LTS", "Ubuntu 24.04.5 LTS", "ai-memory",
+                     "Hindsight", "agentmemory", "deja-vu"):
             with self.subTest(name=name):
                 arm = by_name[name]
                 self.assertEqual(arm["status"], "head-to-head-arm")
@@ -76,6 +79,88 @@ class NewWslProfileCliTests(unittest.TestCase):
         for row in data["entries"]:
             self.assertEqual(row["layer_id"], row["owner_layer_id"])
         self.assertEqual(len(by_name), len(data["entries"]))
+        self.assert_no_unmeasured_defaults(data)
+
+    def assert_no_unmeasured_defaults(self, data):
+        manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
+        for slot in manifest["slots"]:
+            if slot.get("state") in {"split", "measurement"}:
+                arms = [row for row in data["entries"] if row["layer_id"] == slot["layer_id"]
+                        and (row.get("comparison_group") or row["status"] == "head-to-head-arm")]
+                self.assertTrue(arms, slot["slot_id"])
+                for row in arms:
+                    self.assertFalse(row["default_install"], row["name"] + " in " + slot["slot_id"])
+
+    def test_negative_control_memory_cannot_become_a_default_before_measurement(self):
+        data = self.load()
+        row = next(row for row in data["entries"] if row["name"] == "ai-memory")
+        row.update(status="picked", default_install=True)
+        with self.assertRaisesRegex(AssertionError, "ai-memory.*memory-owner"):
+            self.assert_no_unmeasured_defaults(data)
+        result = self.fixture_cli(data)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("memory-owner", result.stderr)
+        self.assertIn("ai-memory", result.stderr)
+
+    def test_every_unresolved_slot_arm_is_rejected_as_a_default_even_when_picked(self):
+        original = self.load()
+        manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
+        unresolved = {slot["layer_id"] for slot in manifest["slots"]
+                      if slot.get("state") in {"split", "measurement"}}
+        for index, row in enumerate(original["entries"]):
+            if row["layer_id"] in unresolved and row.get("comparison_group"):
+                with self.subTest(name=row["name"]):
+                    data = copy.deepcopy(original)
+                    data["entries"][index].update(status="picked", default_install=True)
+                    result = self.fixture_cli(data)
+                    self.assertEqual(result.returncode, 2)
+                    self.assertIn(row["name"], result.stderr)
+
+    def test_entries_follow_one_version_drift_rule(self):
+        data = self.load()
+        claude = next(row for row in data["entries"] if row["name"] == "Claude Code")
+        rule = claude["version_policy"]
+        for phrase in ("last qualified release", "floor", "current at install time", "receipt",
+                       "installed version", "installed and not yet qualified", "acceptance command",
+                       "passed on that host"):
+            self.assertIn(phrase, rule)
+        self.assertTrue(claude["install"]["command"].endswith("bash -s latest"))
+        for row in data["entries"]:
+            text = json.dumps(row)
+            self.assertIsNone(re.search(r"Installed host .*?\b(?:does|do) not qualify\b.*?selected", text), row["name"])
+            if "floor" in text:
+                self.assertNotRegex(text, r"\b(?:does|do) not qualify\b")
+        bootstrap = (ROOT / "adoption/bootstrap.md").read_text()
+        self.assertIn(rule, " ".join(bootstrap.split()))
+        overview = (ROOT / "adoption/new-wsl-profile.md").read_text()
+        self.assertIn(rule, " ".join(overview.split()))
+
+    def test_negative_control_floor_rule_cannot_reject_a_newer_installed_release(self):
+        data = self.load()
+        row = next(row for row in data["entries"] if row["name"] == "Claude Code")
+        row["acceptance"]["scope"] += " Installed host 2.1.287 does not qualify selected 2.1.284."
+        result = self.fixture_cli(data)
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("version floor", result.stderr)
+
+    def test_rootless_engine_and_boundary_have_unrun_acceptance_and_host_gate(self):
+        data = self.load()
+        rows = {row["name"]: row for row in data["entries"]}
+        for name in ("Docker Engine", "rootless container boundary"):
+            row = rows[name]
+            acceptance = row["acceptance"]
+            self.assertFalse(row["default_install"])
+            self.assertEqual(acceptance["execution_status"], "UNRUN")
+            self.assertEqual(acceptance["evidence_class"], "documented_upstream_example_not_executed")
+            for fragment in ("docker info", "SecurityOptions", "rootless", "docker run --rm hello-world"):
+                self.assertIn(fragment, acceptance["command"])
+            self.assertEqual(acceptance["source"], "https://docs.docker.com/engine/security/rootless/")
+            self.assertIn("user-level daemon", " ".join(acceptance["prerequisites"]))
+            self.assertIn("41492", json.dumps(row))
+            self.assertIn("first run on the new host", " ".join(row["blocking_gaps"]))
+        prerequisites = json.dumps(data["host_prerequisites"])
+        for fragment in ("3.0.1", "2.7.x", "40519", "41512", "adoption/platforms/linux-wsl2-new-distro.md"):
+            self.assertIn(fragment, prerequisites)
 
     def test_accepted_cli_and_sdk_pins_do_not_assert_sdk_provisioning(self):
         data = self.load()
@@ -93,6 +178,9 @@ class NewWslProfileCliTests(unittest.TestCase):
             path = root / SOURCE
             path.parent.mkdir()
             path.write_text(json.dumps(data), encoding="utf-8")
+            manifest = root / DEFAULTS_SOURCE
+            manifest.parent.mkdir(parents=True)
+            manifest.write_bytes((ROOT / DEFAULTS_SOURCE).read_bytes())
             return run_cli("--root", str(root), "--json")
 
     def test_explicit_missing_evidence_survives_the_adapter(self):

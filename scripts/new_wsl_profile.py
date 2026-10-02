@@ -23,7 +23,11 @@ except ImportError:
 
 
 SOURCE_PATH = "adoption/new-wsl-profile.json"
+DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 EVIDENCE_CLASS = "source_review_recommendations"
+VERSION_FLOOR_RULE = ("The pin is the last qualified release and a floor; the install takes the release current at install time; "
+                      "the receipt records the installed version; a release newer than the pin counts as installed and not yet "
+                      "qualified until its acceptance command has passed on that host.")
 ACCEPTANCE_CLASSES = {"documented_upstream_example_not_executed", "upstream_test_command_not_executed"}
 ENTRY_FIELDS = {"name", "layer_id", "owner_layer_id", "status", "repository", "pin", "checksum",
                 "install", "acceptance", "stage", "position", "blocking_gaps", "evidence_refs",
@@ -69,6 +73,12 @@ def validate_profile(data, source_path=SOURCE_PATH, profile_id=None):
         require(isinstance(name, str) and bool(name.strip()) and name not in names,
                 "each named tool or control must have exactly one owner")
         names.add(name)
+        if row.get("version_policy") is not None:
+            require(row["version_policy"] == VERSION_FLOOR_RULE, "entry must use the shared version floor rule")
+        text = json.dumps(row)
+        if "floor" in text:
+            require(not re.search(r"\b(?:does|do) not qualify\b", text),
+                    "entry contradicts the version floor rule")
         require(isinstance(row["layer_id"], str) and bool(row["layer_id"])
                 and row["layer_id"] == row["owner_layer_id"], "entry has conflicting owners")
         require(row["status"] in {"picked", "head-to-head-arm"}, "entry status is invalid")
@@ -111,6 +121,17 @@ def validate_profile(data, source_path=SOURCE_PATH, profile_id=None):
     return data
 
 
+def validate_default_installs(data, slots):
+    """A split or measurement slot has no install decision until it is resolved."""
+    for slot in slots:
+        if slot.get("state") in {"split", "measurement"}:
+            for row in data.get("entries", []):
+                if (row["layer_id"] == slot["layer_id"]
+                        and (row.get("comparison_group") or row["status"] == "head-to-head-arm")):
+                    require(not row.get("default_install"),
+                            f"{row['name']}: default installation awaits the measurement for {slot['slot_id']}")
+
+
 def load_profile(root: Path, source_path=SOURCE_PATH, profile_id=None):
     """Generator adapter: read only the pointed-to, repository-confined contract."""
     root = root.resolve()
@@ -118,7 +139,15 @@ def load_profile(root: Path, source_path=SOURCE_PATH, profile_id=None):
     require(path.is_file(), "source profile is unavailable")
     require(path.stat().st_size <= 1_048_576, "source profile exceeds the one MiB limit")
     data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
-    return validate_profile(data, source_path, profile_id)
+    validate_profile(data, source_path, profile_id)
+    manifest = recipe_path(root, DEFAULTS_MANIFEST)
+    if manifest.is_file():
+        require(manifest.stat().st_size <= 1_048_576, "defaults manifest exceeds the one MiB limit")
+        defaults = json.loads(manifest.read_text(encoding="utf-8"), object_pairs_hook=unique_json)
+        require(isinstance(defaults, dict) and isinstance(defaults.get("slots"), list),
+                "defaults manifest needs a slot inventory")
+        validate_default_installs(data, defaults["slots"])
+    return data
 
 
 def summarize(data):

@@ -1,6 +1,8 @@
 """Public W-BOOK generator contract; these are integration checks, not host acceptance."""
 
 from copy import deepcopy
+from contextlib import redirect_stderr, redirect_stdout
+import io
 import json
 import os
 from pathlib import Path
@@ -9,6 +11,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from scripts import build_new_wsl_handbook as handbook
 
@@ -27,6 +30,12 @@ class NewWslHandbookTests(unittest.TestCase):
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, destination)
         shutil.copytree(ROOT / handbook.PACKETS, self.root / handbook.PACKETS)
+        manifest = json.loads((ROOT / DEFAULTS_SOURCE).read_text())
+        for source in manifest["sources"].values():
+            name = (Path(DEFAULTS_SOURCE).parent / source["file"]).as_posix()
+            destination = self.root / name
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, destination)
 
     def read(self, name):
         return json.loads((self.root / name).read_text())
@@ -86,9 +95,9 @@ class NewWslHandbookTests(unittest.TestCase):
             paths[f"{family}_verdicts"] = self.root / source
         return profile, paths
 
-    def public_cli(self, **verdicts):
+    def public_cli(self, mode="--write", **verdicts):
         command = [sys.executable, str(ROOT / "scripts/build_new_wsl_handbook.py"),
-                   "--root", str(self.root), "--write"]
+                   "--root", str(self.root), mode]
         for name, path in verdicts.items():
             command += ["--" + name.replace("_", "-"), str(path)]
         return subprocess.run(command, capture_output=True, text=True)
@@ -258,6 +267,13 @@ class NewWslHandbookTests(unittest.TestCase):
                           "definitive": state == "definitive", "state": state,
                           "label": "Synthetic source-fit decision; no execution.",
                           "claude": "converged", "gpt": "converged"})
+        for catalog in ("foundation", "us-equities"):
+            self.write((Path(DEFAULTS_SOURCE).parent / (catalog + ".json")).as_posix(), {
+                "layers": [{"layer_id": layer["layer_id"], "slots": [
+                    {"slot_id": slot["slot_id"], "default": {"name": "Fixture candidate"}}
+                    for slot in slots if slot["layer_id"] == layer["layer_id"]]}
+                    for layer in layers if layer["catalog"] == catalog],
+                "cross_rows": [], "pinned_requirements": []})
         return {"schema_version": 1, "kind": "new-wsl-definitive-manifest",
                 "date_utc": "2026-10-01", "meaning": "Fixture slot decisions only.",
                 "decision_rule": "Fixture source text; this adapter makes no decisions.",
@@ -373,6 +389,39 @@ class NewWslHandbookTests(unittest.TestCase):
         slots = [slot for row in data["layers"] for slot in row["default_slots"]]
         self.assertEqual([slot["state"] for slot in slots], ["definitive", "pending", "split", "measurement"])
 
+    def test_negative_control_unknown_slot_identifier_is_rejected(self):
+        manifest = self.defaults_fixture()
+        original = manifest["slots"][0]["slot_id"]
+        manifest["slots"][0]["slot_id"] = "unknown-fixture-slot"
+        self.write(DEFAULTS_SOURCE, manifest)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("slot inventory", result.stderr)
+        self.assertIn("unknown-fixture-slot", result.stderr)
+        self.assertIn(original, result.stderr)
+        self.assertFalse(any((self.root / path).exists() for path in handbook.OUTPUTS))
+
+    def test_missing_inventory_slot_is_rejected_even_with_consistent_counts(self):
+        manifest = self.defaults_fixture()
+        omitted = manifest["slots"].pop()
+        manifest["counts"]["slots"] -= 1
+        manifest["counts"]["by_row_kind"]["judged"] -= 1
+        self.write(DEFAULTS_SOURCE, manifest)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("slot inventory", result.stderr)
+        self.assertIn(omitted["slot_id"], result.stderr)
+
+    def test_inventory_covers_roles_multiple_defaults_and_pinned_requirements(self):
+        shutil.copyfile(ROOT / DEFAULTS_SOURCE, self.root / DEFAULTS_SOURCE)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        rendered = {slot["record"]["slot_id"] for row in self.read(handbook.OUTPUTS[1])["layers"]
+                    for slot in row["default_slots"]}
+        self.assertEqual(rendered, {slot["slot_id"] for slot in self.read(DEFAULTS_SOURCE)["slots"]})
+        self.assertTrue(any(slot.startswith("pinned/") for slot in rendered))
+        self.assertTrue(any("/" in slot and not slot.startswith("pinned/") for slot in rendered))
+
     def test_defaults_manifest_explicit_missing_input_fails(self):
         result = self.public_cli(defaults_manifest=self.root / "missing-defaults.json")
         self.assertEqual(result.returncode, 1, result.stdout)
@@ -481,6 +530,50 @@ class NewWslHandbookTests(unittest.TestCase):
                               "source": "https://example.org/install"})
         with self.assertRaisesRegex(ValueError, "host path"):
             handbook.build_data(self.root)
+
+    def test_negative_control_secret_install_is_rejected_before_write_and_check(self):
+        self.profile()
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        previous = {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS}
+        secret = "sk-" + "syntheticFixtureValue" * 3
+        profile = self.read(handbook.PROFILE)
+        profile["entries"][0]["install"]["command"] += " --token " + secret
+        self.write(handbook.PROFILE, profile)
+        for mode in ("--write", "--check"):
+            with self.subTest(mode=mode):
+                result = self.public_cli(mode=mode)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("API secret", result.stderr)
+                self.assertNotIn(secret, result.stdout + result.stderr)
+                self.assertEqual(previous, {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS})
+
+    def test_each_rendered_output_is_scanned_before_publication(self):
+        clean = handbook.render(self.root)
+        secret = "ghp_" + "SyntheticFixtureValue" * 3
+        for path in handbook.OUTPUTS:
+            for mode in ("--write", "--check"):
+                with self.subTest(path=path, mode=mode):
+                    outputs = dict(clean)
+                    if path.endswith(".json"):
+                        data = json.loads(outputs[path])
+                        data["fixture_metadata"] = secret
+                        outputs[path] = json.dumps(data).encode()
+                    else:
+                        outputs[path] += (secret + "\n").encode()
+                    # Matching on-disk bytes would otherwise let --check succeed.
+                    for destination, raw in outputs.items():
+                        target = self.root / destination
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        target.write_bytes(raw if mode == "--check" else b"unchanged\n")
+                    previous = {name: (self.root / name).read_bytes() for name in outputs}
+                    stdout, stderr = io.StringIO(), io.StringIO()
+                    with patch.object(handbook, "render", return_value=outputs), redirect_stdout(stdout), redirect_stderr(stderr):
+                        code = handbook.main(["--root", str(self.root), mode])
+                    self.assertEqual(code, 1)
+                    self.assertIn("GitHub token", stderr.getvalue())
+                    self.assertNotIn(secret, stdout.getvalue() + stderr.getvalue())
+                    self.assertEqual(previous, {name: (self.root / name).read_bytes() for name in outputs})
 
     def test_comparison_dependencies_and_reference_boundaries_survive(self):
         data = handbook.build_data(self.root)
@@ -716,11 +809,33 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertEqual(row["family_verdicts"]["codex"]["status"], "pending")
                 self.assertNotEqual(row["status"], "final")
 
-    def test_stage_one_stops_before_stage_two(self):
-        stages = handbook.build_data(self.root)["stage_order"]
+    def assert_stage_order(self, stages):
+        self.assertEqual([stage["stage"] for stage in stages], [1, 2])
         self.assertEqual(len(stages[0]["steps"]), 7)
         self.assertEqual(len(stages[0]["first_boot_prerequisites"]), 8)
-        self.assertFalse(any("F9." in step for step in stages[0]["steps"]))
+        self.assertFalse(any("F9." in step for step in stages[0]["first_boot_prerequisites"]),
+                         "F9 belongs to stage 2")
+        self.assertEqual([step.split(".", 1)[0] for step in stages[0]["steps"]],
+                         [f"W{i}" for i in range(1, 8)])
+        self.assertEqual([step.split(".", 1)[0] for step in stages[0]["first_boot_prerequisites"]],
+                         [f"F{i}" for i in range(1, 9)])
+        self.assertEqual([step.split(".", 1)[0] for step in stages[1]["after_bootstrap"]], ["F10", "F11"])
+
+    def test_stage_one_stops_before_stage_two(self):
+        self.assert_stage_order(handbook.build_data(self.root)["stage_order"])
+
+    def test_negative_control_stage_two_cannot_enter_first_boot_prerequisites(self):
+        stages = handbook.build_data(self.root)["stage_order"]
+        stages[0]["first_boot_prerequisites"][-1] = "F9. Stage 2 (outside this page)"
+        with self.assertRaisesRegex(AssertionError, "F9"):
+            self.assert_stage_order(stages)
+
+    def test_negative_control_first_boot_prerequisites_cannot_be_reordered(self):
+        stages = handbook.build_data(self.root)["stage_order"]
+        steps = stages[0]["first_boot_prerequisites"]
+        steps[1], steps[2] = steps[2], steps[1]
+        with self.assertRaises(AssertionError):
+            self.assert_stage_order(stages)
 
     def test_external_profile_never_exposes_its_host_path(self):
         self.profile()
@@ -753,6 +868,21 @@ class NewWslHandbookTests(unittest.TestCase):
         failed = subprocess.run(command + ["--check"], capture_output=True, text=True)
         self.assertEqual(failed.returncode, 1)
         self.assertIn("stale", failed.stderr)
+
+    def test_negative_control_check_rejects_book_after_manifest_default_changes(self):
+        shutil.copyfile(ROOT / DEFAULTS_SOURCE, self.root / DEFAULTS_SOURCE)
+        written = self.public_cli()
+        self.assertEqual(written.returncode, 0, written.stderr)
+        checked = self.public_cli(mode="--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        previous = {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS}
+        manifest = self.read(DEFAULTS_SOURCE)
+        manifest["slots"][0]["default"] += " Changed fixture recommendation."
+        self.write(DEFAULTS_SOURCE, manifest)
+        checked = self.public_cli(mode="--check")
+        self.assertEqual(checked.returncode, 1)
+        self.assertIn("stale generated output: docs/new-wsl-handbook.md", checked.stderr)
+        self.assertEqual(previous, {path: (self.root / path).read_bytes() for path in handbook.OUTPUTS})
 
 
 if __name__ == "__main__":
