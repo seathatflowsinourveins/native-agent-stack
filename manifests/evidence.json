@@ -4020,8 +4020,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "a6ecc9f9f8f5f56d46a3c6c16ae611968bf34db47fa235c6421a1eb576af2089",
-      "bytes": 37871
+      "sha256": "c68243396cdee1415f1dab9dbacc85a7f917bf76d0762bcae7406d6d24cf933a",
+      "bytes": 38032
     },
     {
       "path": ".gitignore",
@@ -14885,6 +14885,11 @@
       "bytes": 139753
     },
     {
+      "path": "catalogs/foundation/final-catalog-20261001.json",
+      "sha256": "ca28926d34e920cb0ee6f0fc03d80154007416c0a40a1bae47957a9a4a0856da",
+      "bytes": 244314
+    },
+    {
       "path": "catalogs/foundation/manifest.json",
       "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
       "bytes": 25723
@@ -15690,14 +15695,19 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-10-01-final-catalog.md",
+      "sha256": "867b8423f1e4e5d3c4a8a09ec6828163c1cedb6b6e72afad27af7655f022d6ba",
+      "bytes": 30594
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
-      "sha256": "d47647fd237f8a78920f1fc62e6780a9515a864acaa7be02cbc87385b4baffab",
-      "bytes": 20693
+      "sha256": "cc599939dc3280d16152fd6b06a555a8ebb6b2fe6d543ac422cee96e7366e003",
+      "bytes": 22160
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
@@ -15768,6 +15778,11 @@
       "path": "docs/examples/sec-contact.env.example",
       "sha256": "183e956761139218262df4046126d785f2aea20e946b13d667700353afedf2a7",
       "bytes": 316
+    },
+    {
+      "path": "docs/final-catalog-20261001.md",
+      "sha256": "565827aece816eb79fe00ed37701255ae06f32e3159c882cc4d0cedd77fdd39c",
+      "bytes": 24481
     },
     {
       "path": "docs/foundation-closure-20260921.md",
@@ -15881,8 +15896,8 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "c7bacc23aa75a860dc3a8a0957a4c74aac135d5a03bc1187e76a86cc630c0c84",
-      "bytes": 13335
+      "sha256": "4d08f01bb0ae651c5102e6fde0001a829526a29e489dfaf172f7d0f19f79054c",
+      "bytes": 13761
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
@@ -35490,6 +35505,171 @@
       "bytes": 1145
     },
     {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/README.md",
+      "sha256": "e030f1715cfddbb953c2d7402b125161591a0cdac9f497a4242a09b05c28659c",
+      "bytes": 2940
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/adapter.txt",
+      "sha256": "2dea556cf65cd856097313a2bac3358117dfaea97531cdd9185866d541bfa8bd",
+      "bytes": 1305
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/agreement-rule.txt",
+      "sha256": "cb21a4558f71a5d0b47370990ee4308093652bac99bd5f2481cb7751a8d774f1",
+      "bytes": 1416
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/assignment.json",
+      "sha256": "bac628fa2f5701ebdac986a3e8cd88ac3c24e4fe97e5bda3cd2718c69a9edc8c",
+      "bytes": 1638
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/build_record.py",
+      "sha256": "d9403b73a10803e509a513e7739d43ecdba6bef4cbbf75d63af57822de854e8b",
+      "bytes": 7652
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/critic-schema.json",
+      "sha256": "ce9195d350b331aeabfd5224b56e809936034d107e775c32c6be0f004f5118c3",
+      "bytes": 1201
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/agent-sdks.json",
+      "sha256": "501ceae7a2ccfdfd49677fa08c3e1b0698da890558e20d74fc3178ac14156fbf",
+      "bytes": 8366
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/ci-supply-chain.json",
+      "sha256": "a50fa213ff27476ce8567e1a447660a4887359d65af0961f3e76996336be71de",
+      "bytes": 13650
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/code-navigation.json",
+      "sha256": "3ab879c0d7a64dd8fd20d4cdc3e8009058cd908127395d10d9db17c6beeba993",
+      "bytes": 9692
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/cross_wsl-distro.json",
+      "sha256": "33a9fb8f89d45f590e62bd977a925afbb0d1f628dff828d7d12eb6256f79aea8",
+      "bytes": 3845
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/document-retrieval.json",
+      "sha256": "d3e7fd7469d020cb16655c4ca1d75d7f23147b816ce2f5754cf912b2d2e04785",
+      "bytes": 10398
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/durable-memory.json",
+      "sha256": "0ba336f2e2cd53d788cf0fe01a07bb441eb3c00e6f17a69f0d0f9f3683038be9",
+      "bytes": 19488
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/git-github-automation.json",
+      "sha256": "66c2560762c96bdf40e99ca1937dccdc5648fc239199af67fff456ca94de6843",
+      "bytes": 8162
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/hosting-services.json",
+      "sha256": "ccd442876b629fb73420175a8274ef1abd0e03d718e7606dfb03cf7e49986b67",
+      "bytes": 13502
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/instructions-skills.json",
+      "sha256": "4a6eefb913d3ef0672091260e94fb8de16547ebb0a99781c209cf3b9e3c142d6",
+      "bytes": 12976
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/isolation.json",
+      "sha256": "210d0ac8150b680ec26e13cf0a105b32d96ee983b1f01a19b6586fe1dade5368",
+      "bytes": 10445
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/mcp-surfaces.json",
+      "sha256": "7f17a4441c4378cc68bae5b3b14d2e8b74960087df17ecc937c3f636f88620e6",
+      "bytes": 4996
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/native-clients.json",
+      "sha256": "fd2d3819ca49de0479a303aec6fb690657cca94cb49603b72a74f47739096f00",
+      "bytes": 8398
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/observation-inference.json",
+      "sha256": "51e07670c5a268d8db238893b1c02cd25d760ff9349a508fdf32baf51fd3636b",
+      "bytes": 16207
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/quality-evaluation.json",
+      "sha256": "811656b1197dce1183447be0b2aad4447b2724b962b6224583adb93ea18fa167",
+      "bytes": 11485
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/recovery-portability.json",
+      "sha256": "c58058582b2acc54a135df243f295165b433952da8590f91b25103ebe2da3043",
+      "bytes": 8158
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/scheduling-supervision.json",
+      "sha256": "4d7aa05bbd804fc7f251585d90730022c3e66f4d8a86bda70d84c3a1213b41b8",
+      "bytes": 9295
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/secrets-credentials.json",
+      "sha256": "40f73ac5cb1bc0912e5d6281c3d926ab569e51064324eb4bc42c4544048ab4de",
+      "bytes": 6028
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/semantic-rag.json",
+      "sha256": "6a36ca5f4b618e23b82e27d1cbaa82cd696534a35bb62b0c254987d9da0ffc1b",
+      "bytes": 12704
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/token-efficiency.json",
+      "sha256": "f6e20ea1febf910fd1054445016e09977d15cf837f674bda3b05d3d93c1de114",
+      "bytes": 11604
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/web-research.json",
+      "sha256": "1e53d8692f2dfabeb67384cfde636b36009a05fb032f576e38ff3da44d9cebf5",
+      "bytes": 11608
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/workers.json",
+      "sha256": "6fe2242f63e9c14ab7787c8a22d68ab1d391a7142ba1fdf39ce7eed8990effbc",
+      "bytes": 13990
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/instruction-probe.json",
+      "sha256": "d32a2d441c53b2fa3bda0e373910671d49b01aaca9a39d0078e01f223fc8c138",
+      "bytes": 1216
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/judge-schema.json",
+      "sha256": "970eaa0f32acd77918cb6c99b1b1739bce643578cd251008c6c58be0014a22ab",
+      "bytes": 1683
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/preregistration-addendum.json",
+      "sha256": "1d1d4db8ff160072a0fa2ff70d62d3f490aee42b9a9dc0887b64034ff2fb3ffd",
+      "bytes": 8517
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/run-record.json",
+      "sha256": "4677c7afbd04e7bd9d06efb4727b842bba34a885a618f96558968d8df4dce6c2",
+      "bytes": 12160
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/run_xfam.py",
+      "sha256": "825965443725cb08eb5b2093ff177e69a028b8c38f9366ddc27e9870f93d6901",
+      "bytes": 7237
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json",
+      "sha256": "dbe2e4d7780ec079cdd1c0e3e3ddb952a15507e7d4125680a719dcd8d88581f9",
+      "bytes": 195884
+    },
+    {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/judge-prompt.txt",
       "sha256": "5b190230982c3e113d5299d412ef6e74251b52fa3b66649235dcbc33ec64168c",
       "bytes": 1918
@@ -48416,8 +48596,8 @@
     },
     {
       "path": "tools/sota-convergence/blind_checkout.py",
-      "sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
-      "bytes": 55711
+      "sha256": "03ddd57c1d21bd2dc07bb8a18eba38b6db85f3fc36850ff99153b47ad5a4c186",
+      "bytes": 58102
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
