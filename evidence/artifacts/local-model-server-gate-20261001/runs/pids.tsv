@@ -1,0 +1,20 @@
+label	role	pid	child_pids_at_stop
+setup	ollama-serve (wrapper subshell of the first wrapper version; the server was its child)	3168250	3168252
+setup	ollama-serve (wrapper subshell of the first wrapper version; the server was its child)	3194186	3194188
+diag	llama-server (wrapper subshell of the first wrapper version; the server was its child)	3225036	
+setup	ollama-serve (wrapper subshell of the first wrapper version; the server was its child)	3239635	3239637
+diag	llama-server(orphaned probe child)	3225038	
+setup	ollama-serve	3250146	
+setup	llama-server	3251283	
+warmup-A	llama-server	3306015	
+warmup-B	ollama-server	3355352	3355909
+A1	llama-server	3387559	
+B1	ollama-server	3447247	3448747
+A2	llama-server	3481685	
+B2	ollama-server	3518112	3518738
+A3	llama-server	3547072	
+B3	ollama-server	3578403	3578995
+setup-attempt1	llama-server wrapper subshell (server exited by itself: GPU allocation failure)	3173752	
+setup-attempt2	llama-server wrapper subshell (server exited by itself: GPU allocation failure)	3197353	
+diag	llama-server wrapper subshell, GPU probe at 4k context (server exited by itself: GPU allocation failure)	3203112	
+diag	llama-server wrapper subshell, GPU probe at 4k context (server exited by itself: GPU allocation failure)	3223908	
