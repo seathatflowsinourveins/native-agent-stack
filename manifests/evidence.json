@@ -48046,8 +48046,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "dfc6837cfe33d87d3a255e75710d77c1338a999c50635fa3c4893ce2a1853f18",
-      "bytes": 50895
+      "sha256": "524f2d60c73e8728318c8bc0fb463133f50414691d30294dd8ae4a441490c0ec",
+      "bytes": 50902
     },
     {
       "path": "tests/test_new_wsl_profile.py",
