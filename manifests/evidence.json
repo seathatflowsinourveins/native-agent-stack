@@ -4310,8 +4310,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1",
-      "bytes": 82092
+      "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80",
+      "bytes": 86950
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -4425,13 +4425,13 @@
     },
     {
       "path": "adoption/templates/wsl/first-boot-checklist.md",
-      "sha256": "2ecc17772416e39390a11d5cf30414bbc34540812114a6dfc44b9dc36eb7f23d",
-      "bytes": 13674
+      "sha256": "d3f1a57e53d85cfb6ee02c147564be714c24f85a2d9b6917fa773784be3033b4",
+      "bytes": 14288
     },
     {
       "path": "adoption/templates/wsl/stage1-receipt.example.json",
-      "sha256": "5dd17f19b447e92e1ecbbec82e5d38d219bd4cbc1f3402e03d9202c0afaa466d",
-      "bytes": 60178
+      "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a",
+      "bytes": 60963
     },
     {
       "path": "adoption/tools/README.md",
@@ -6496,7 +6496,7 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "4c23cd164947f8eee9a3eeb456a5a8b234f13224df0e968f42a537271ede94f1",
+      "sha256": "73ddb6640d03414d71a31e6d6d26812cac3bd9aab0ad82536db0097cc21e0413",
       "bytes": 23065
     },
     {
@@ -15736,8 +15736,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-      "sha256": "0fb3f1fd31e1cfea0b49923486eb705d29e51c4da00c9cc24bfed959235fed7a",
-      "bytes": 137555
+      "sha256": "ec03a494aa4d80ac004f74710250bf1ac7cf18e0506758d97a1cf98a0cee42a3",
+      "bytes": 147654
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
@@ -16026,13 +16026,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "f68e22f60bd0a1f1ef1ba7f7af8f0104451b64b14aaaf05121058c590fd25a65",
-      "bytes": 509886
+      "sha256": "159d381dd77a3066feee265220de9f6c1142c5236f448ba1d762c4b06769d7dc",
+      "bytes": 510040
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "ef5cb7b8abcfa01152f9f903884e67ae2f68269448cfd49977bb7e7f5255aa79",
-      "bytes": 311982
+      "sha256": "6833563e5718a5f8fc75b2b16b064722e0aa5aea180e88f44d2ff0059f522ee7",
+      "bytes": 312114
     },
     {
       "path": "docs/next-host-stages.md",
@@ -37206,7 +37206,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "f2e75e0877fbb12867c31c9931d9568cc4538c7f8df250bf9fe484c11f2bb419",
+      "sha256": "ba8cfd7fa91b2d413a7f9dad7dfb05e46c250b19037112fad47d24088d9181e6",
       "bytes": 4174
     },
     {
@@ -49911,8 +49911,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "ba9046d7730bb72f95b52408271c26c13151085a855db00132eb740571d061cb",
-      "bytes": 191668
+      "sha256": "b1c8b52f4358d03b00c6bb3ffdc5171febaa187ab5ff538fcf6bc2963096ac58",
+      "bytes": 218408
     },
     {
       "path": "tests/test_wsl_restore.py",
@@ -49951,8 +49951,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "b7f11aeec288fcbe1a333f111defc150d5fbdcd1f44de9f59aed972ef50ead9f",
-      "bytes": 14888
+      "sha256": "0c4b58276bbb962ee09c49cd19dc844e90f7f5155b8187e0bef2471b7aa60568",
+      "bytes": 16946
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -49961,8 +49961,8 @@
     },
     {
       "path": "tools/adoption/managed_block.py",
-      "sha256": "73c4d9ffaed0c7c17f1cc4d573c2cd0337a8907ed2361c60c26fbff36bd5106e",
-      "bytes": 21251
+      "sha256": "aa8147a6662a1083cd841f29c9eab7ad50bfb078c0f416b5980bffce6cfd575a",
+      "bytes": 23196
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
