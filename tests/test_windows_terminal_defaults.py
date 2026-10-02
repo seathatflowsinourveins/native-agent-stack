@@ -119,8 +119,9 @@ def resume_copy_problems(default: dict, resume: dict) -> list:
         problems.append(f"{resume.get('name')} is not named after {default.get('name')}")
     if resume.get("tabTitle") != f"{default.get('tabTitle')} (resume)":
         problems.append(f"{resume.get('name')} has the tab title {resume.get('tabTitle')!r}, not the default's plus ' (resume)'")
+    absent = object()  # a key present on one side only is a difference, even when its value is null
     for key in sorted((set(default) | set(resume)) - {"name", "commandline", "tabTitle"}):
-        if default.get(key) != resume.get(key):
+        if default.get(key, absent) != resume.get(key, absent):
             problems.append(f"{resume.get('name')} differs from {default.get('name')} in {key}")
     return problems
 
@@ -349,6 +350,7 @@ class ProfilePolicyMixin:
         profiles = {profile["name"]: profile for profile in fragment["profiles"]}
         for name, profile in profiles.items():
             self.assertNotIn("guid", profile, f"{name} declares a guid")
+            self.assertIs(profile.get("hidden"), False, f"{name} must stay visible: hidden is false")
             self.assertEqual(environment_problems(name, profile), [], f"{name}: COLORTERM only through the Claude profiles' environment key")
         self.check_shell(profiles["WSL - Shell"])
         for name, command in AI_COMMANDS.items():
@@ -471,7 +473,10 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
             ("an unlisted sixth profile", add_profile({"name": "WSL - Operations"}), "the example's profiles and their order"),
             ("a resume profile that declares a guid", edited(codex_resume, guid="not-a-guid"), "declares a guid"),
             ("the Codex resume profile with another tab colour", edited(codex_resume, tabColor="#000000"), "differs from WSL - Codex in tabColor"),
-            ("the Claude resume profile hidden", edited(claude_resume, hidden=True), "differs from WSL - Claude in hidden"),
+            ("the Claude resume profile hidden", edited(claude_resume, hidden=True), "must stay visible"),
+            ("both Codex profiles hidden (equal to each other, so the copy rule cannot see it)", lambda by_name, _profiles: [by_name[name].update(hidden=True) for name in (codex, codex_resume)], "must stay visible"),
+            ("the Shell profile without the hidden key", without(shell, "hidden"), "must stay visible"),
+            ("the Codex resume profile with a null key its default lacks", edited(codex_resume, icon=None), "differs from WSL - Codex in icon"),
             ("the Codex resume profile starting elsewhere", edited(codex_resume, startingDirectory="C:\\"), "differs from WSL - Codex in startingDirectory"),
             ("the Claude resume profile with its default's tab title", edited(claude_resume, tabTitle="WSL - Claude"), "has the tab title"),
             ("the Codex resume profile that discards the client's title", edited(codex_resume, suppressApplicationTitle=True), "discard the title"),
