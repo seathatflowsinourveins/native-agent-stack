@@ -263,7 +263,7 @@ def _build_strategy(rows, instrument_id, venue, usd, alerts):
                     if self.intents:
                         raise ValueError('duplicate_over_limit_submission')
                     self.intents.append(dict(intent))
-                    self.submit_order(native_market_order(self.trader_id, self.id, intent['quantity'],
+                    self.submit_order(native_market_order(self.trader_id, self.strategy_id, intent['quantity'],
                                                           self.clock.timestamp_ns()))
             except BaseException as error:
                 self.errors.append('on_bar:' + type(error).__name__ + ':' + str(error))
