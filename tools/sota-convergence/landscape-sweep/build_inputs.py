@@ -332,17 +332,32 @@ def eligible_field(catalog: str, layer: dict, baseline: dict, fresh: dict, ledge
     members = {}
     layer_id = layer["layer_id"]
 
-    def add(value, ref, legacy_refuted=False):
-        repository = repository_identity(value)
-        if not repository:
-            return
-        candidate_key = f"{catalog}/{layer_id}/{slug(repository)}"
-        member = members.setdefault(slug(repository), {
+    def add(value, ref, legacy_refuted=False, retained_v2=False, returns_ref=None):
+        retained_refs, retained_reason = [], None
+        if retained_v2 and isinstance(value, dict) and "candidate_key" in value:
+            # Revision 5 item 6 and PR #590: a previously validated opaque identity is still material.
+            led = ledger_module(REPO_ROOT)
+            repository, candidate_key = led.v2_frozen_identity(catalog, layer_id, value)
+            if value.get("candidate_key") != candidate_key or value.get("evidence_key") != candidate_key \
+                    or value.get("repository") != repository:
+                raise ValueError("retained V2 field has a mismatched identity")
+            retained_refs = [returns_ref + entry if entry.startswith("#") and returns_ref else entry
+                             for entry in value.get("evidence_refs", [])]
+            retained_reason = value.get("pending_reason")
+        else:
+            repository = repository_identity(value)
+            if not repository:
+                return
+            candidate_key = f"{catalog}/{layer_id}/{slug(repository)}"
+        member = members.setdefault(candidate_key, {
             "candidate_key": candidate_key, "repository": repository, "disposition": "admit_pending",
             "pending_reason": "awaiting_v2_screen", "exclusion_reason": None,
             "evidence_key": candidate_key, "evidence_refs": [], "material": True})
-        if ref not in member["evidence_refs"]:
-            member["evidence_refs"].append(ref)
+        for entry in [ref, *retained_refs]:
+            if entry not in member["evidence_refs"]:
+                member["evidence_refs"].append(entry)
+        if retained_reason:
+            member["pending_reason"] = retained_reason
         if legacy_refuted:
             member["pending_reason"] = "legacy_v1_refutation"
 
@@ -360,10 +375,14 @@ def eligible_field(catalog: str, layer: dict, baseline: dict, fresh: dict, ledge
         for layer_index, old in enumerate(sweep.get("layers") or []):
             if (old.get("catalog"), old.get("layer_id")) != (catalog, layer_id):
                 continue
-            for field in ("proposed", "survived", "refuted", "pending"):
+            retained_v2 = old.get("contract_version") == 2
+            fields = ("eligible_field", "proposed", "survived", "refuted", "pending") if retained_v2 else (
+                "proposed", "survived", "refuted", "pending")
+            for field in fields:
                 for index, value in enumerate(old.get(field) or []):
                     add(value, f"catalogs/saturation/ledger.json#/sweeps/{sweep_index}/layers/{layer_index}/{field}/{index}",
-                        legacy_refuted=field == "refuted" and sweep.get("contract_version", 1) == 1)
+                        legacy_refuted=field == "refuted" and sweep.get("contract_version", 1) == 1,
+                        retained_v2=retained_v2, returns_ref=sweep.get("returns_ref"))
     for index, seed in enumerate(seeds):
         add(seed, f"seeded_candidates#/{layer_id}/{index}")
     for source in sources:

@@ -190,23 +190,31 @@ def v2_identity(catalog: str, layer_id: str, repository: str) -> tuple[str, str]
 
 
 def v2_proposals(value, pointer):
-    """Retain each raw discoverer proposal, including identities the adapter cannot resolve."""
+    """Traverse return envelopes; proposal items themselves stay raw, including malformed items."""
     if isinstance(value, list):
         for index, item in enumerate(value):
-            yield from v2_proposals(item, f"{pointer}/{index}")
+            yield item, f"{pointer}/{index}"
     elif isinstance(value, dict):
         if "repository" in value:
             yield value, pointer
-        for child in ("output", "proposed"):
-            if child in value:
-                yield from v2_proposals(value[child], f"{pointer}/{child}")
+        elif "output" in value:
+            yield from v2_proposals(value["output"], f"{pointer}/output")
+        elif "proposed" in value:
+            if isinstance(value["proposed"], list):
+                yield from v2_proposals(value["proposed"], f"{pointer}/proposed")
+            else:
+                yield value["proposed"], f"{pointer}/proposed"
+        else:
+            yield value, pointer
+    elif value is not None:
+        yield value, pointer
 
 
 def v2_discovery_identity(catalog: str, layer_id: str, repository) -> tuple[str, str, bool]:
     """U11 B and PR #590 review: unsupported discovery must remain pending, never abort conversion.
 
     This opaque key identifies a raw proposal; it does not claim a supported upstream identity.
-    The strict original-field identity contract stays unchanged.
+    Frozen supported identities keep their strict contract; opaque keys may recur in later fields.
     """
     try:
         repo, key = v2_identity(catalog, layer_id, repository)
@@ -214,7 +222,45 @@ def v2_discovery_identity(catalog: str, layer_id: str, repository) -> tuple[str,
     except ValueError:
         raw = json.dumps(repository, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
         repo = repository.strip() if isinstance(repository, str) and repository.strip() else raw
-        return repo, f"{catalog}/{layer_id}/unsupported-identity-{sha256_bytes(norm_repo(repo).encode())}", False
+        repo, key = v2_opaque_identity(catalog, layer_id, repo)
+        return repo, key, False
+
+
+def v2_opaque_identity(catalog, layer_id, repository):
+    """Keep raw identity text opaque: the supported adapter searches for URLs inside larger strings."""
+    return repository, f"{catalog}/{layer_id}/unsupported-identity-{sha256_bytes(norm_repo(repository).encode())}"
+
+
+def v2_frozen_identity(catalog, layer_id, row):
+    """Verify an earlier opaque key without reparsing its raw JSON as a supported repository."""
+    repository, key = row.get("repository"), row.get("candidate_key")
+    if isinstance(key, str) and key.startswith(f"{catalog}/{layer_id}/unsupported-identity-"):
+        if not isinstance(repository, str) or not repository.strip():
+            raise ValueError("V2 frozen opaque identity must retain nonempty raw text")
+        canonical_repo, _, supported = v2_discovery_identity(catalog, layer_id, repository)
+        if supported and canonical_repo == repository:
+            raise ValueError("V2 opaque key cannot replace a supported canonical identity")
+        return v2_opaque_identity(catalog, layer_id, repository)
+    return v2_identity(catalog, layer_id, repository)
+
+
+def v2_proposal_details(catalog, layer_id, proposal, ref):
+    """U11 revision 5 item 6: malformed shape/evidence is pending, never a valid evidence list.
+
+    Source: decision at 49a4260029244e3e20d8b2dd3ada00af7983a3c9 and PR #590 comment 5942837180.
+    Raw returns stay untouched; an opaque malformed-proposal identity binds the complete raw item.
+    """
+    if not isinstance(proposal, dict) or "repository" not in proposal or ref.endswith("/proposed"):
+        raw = json.dumps(proposal, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        repo, key = v2_opaque_identity(catalog, layer_id, raw)
+        return repo, key, ["malformed_discovery_proposal"], []
+    repo, key, supported = v2_discovery_identity(catalog, layer_id, proposal["repository"])
+    issues = [] if supported else ["unsupported_discovery_identity"]
+    evidence = proposal.get("evidence", [])
+    if not isinstance(evidence, list) or not all(isinstance(value, str) for value in evidence):
+        issues.append("malformed_discovery_evidence")
+        evidence = []
+    return repo, key, issues, evidence
 
 
 def v2_expand_field(source: dict, rounds: list) -> list[dict]:
@@ -226,7 +272,7 @@ def v2_expand_field(source: dict, rounds: list) -> list[dict]:
     members = {}
     catalog, layer_id = source["catalog"], source["layer_id"]
     for row in source["eligible_field"]:
-        repo, key = v2_identity(catalog, layer_id, row["repository"])
+        repo, key = v2_frozen_identity(catalog, layer_id, row)
         if row.get("candidate_key") != key or row.get("evidence_key") != key or row["repository"] != repo \
                 or key in members:
             raise ValueError("V2 original frozen field has a duplicate or mismatched identity")
@@ -238,14 +284,17 @@ def v2_expand_field(source: dict, rounds: list) -> list[dict]:
             raise ValueError("V2 raw round does not belong to the frozen catalog/layer")
         for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
             for row, ref in v2_proposals(entry.get(slot), f"#/raw/{token}/{i}/{slot}"):
-                repo, key, supported = v2_discovery_identity(catalog, layer_id, row["repository"])
+                repo, key, issues, evidence = v2_proposal_details(catalog, layer_id, row, ref)
                 if key not in members:
+                    reason = row.get("pending_reason") if isinstance(row, dict) else None
                     members[key] = {"candidate_key": key, "repository": repo,
                                     "disposition": "admit_pending", "exclusion_reason": None,
-                                    "pending_reason": (row.get("pending_reason") or "discovery_awaiting_v2_screen")
-                                    if supported else "unsupported_discovery_identity",
+                                    "pending_reason": reason if isinstance(reason, str) and reason
+                                    else "discovery_awaiting_v2_screen",
                                     "evidence_key": key, "evidence_refs": [], "material": True}
-                refs = [ref, *(value for value in row.get("evidence", []) if isinstance(value, str))]
+                if issues:
+                    members[key]["pending_reason"] = issues[0]
+                refs = [ref, *evidence]
                 members[key]["evidence_refs"] = sorted(set(members[key]["evidence_refs"] + refs))
     return list(members.values())
 
@@ -284,10 +333,8 @@ def v2_round_failures(rounds: list) -> list[dict]:
         token = row.get("layer_id", "").replace("~", "~0").replace("/", "~1")
         for slot in ("claude_discover", "gpt6_discover", "merged", "dropped"):
             for proposal, ref in v2_proposals(row.get(slot), f"#/raw/{token}/{index}/{slot}"):
-                _, _, supported = v2_discovery_identity(row.get("catalog"), row.get("layer_id"),
-                                                        proposal["repository"])
-                if not supported:
-                    failures.append({"round": index, "cause": "unsupported_discovery_identity", "ref": ref})
+                _, _, issues, _ = v2_proposal_details(row.get("catalog"), row.get("layer_id"), proposal, ref)
+                failures.extend({"round": index, "cause": issue, "ref": ref} for issue in issues)
         if row.get("lost"):
             failures.append({"round": index, "cause": "round_lost"})
         for family, slot in (("claude", "claude_discover"), ("gpt6", "gpt6_discover")):
@@ -371,6 +418,14 @@ def v2_screen(role: str, documents: list, member: dict, source_field: dict, conf
     sampling seeds stay unknown; order_seed only binds declared packet order, not provider sampling.
     """
     out = {"status": "pending", "criterion": None, "complete": False, "pending_reasons": []}
+    # Carrying an opaque/malformed proposal into a later frozen field cannot let model labels resolve it.
+    # Revision 5 item 6 leaves adapter/shape failures pending with their retained raw provenance.
+    if member.get("candidate_key", "").startswith(
+            f"{source_field.get('catalog')}/{source_field.get('layer_id')}/unsupported-identity-") \
+            or member.get("pending_reason") in (
+            "malformed_discovery_proposal", "malformed_discovery_evidence"):
+        out["pending_reasons"].append(member.get("pending_reason") or "unsupported_discovery_identity")
+        return out
     if conflict:
         out["pending_reasons"].append("overlapping_judgment_ids")
         return out

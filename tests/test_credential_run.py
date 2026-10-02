@@ -1114,10 +1114,12 @@ class ProcessTests(RunnerCase):
         for sig, code in ((signal.SIGTERM, 5), (signal.SIGINT, 6), (signal.SIGHUP, 8), (signal.SIGQUIT, 9),
                           (signal.SIGUSR1, 11), (signal.SIGUSR2, 12), (signal.SIGALRM, 13)):
             with self.subTest(signal=sig.name):
+                # os.write on both sides: a handler that prints while the interrupted print still holds the buffered
+                # stdout raises RuntimeError (reentrant call) and the command exits 1 instead of its code.
                 runner = self.start_tool("tavily", *py(
                     "import os, signal, sys, time\n"
-                    f"signal.signal({int(sig)}, lambda *_: (print('got {sig.name}', flush=True), sys.exit({code})))\n"
-                    "print('ready', os.getpid(), flush=True)\ntime.sleep(30)\n"))
+                    f"signal.signal({int(sig)}, lambda *_: (os.write(1, b'got {sig.name}\\n'), sys.exit({code})))\n"
+                    "os.write(1, f'ready {os.getpid()}\\n'.encode())\ntime.sleep(30)\n"))
                 ready = self.read_until(runner.stdout, b"\n")
                 self.addCleanup(kill_quietly, int(ready.split()[1]))
                 runner.send_signal(sig)

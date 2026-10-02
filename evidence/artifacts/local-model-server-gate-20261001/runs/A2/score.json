@@ -1,0 +1,16 @@
+{
+  "codex_exit_code": 0,
+  "turn_status": "turn.completed",
+  "completed_item_types": {
+    "agent_message": 1
+  },
+  "non_json_lines": 0,
+  "mcp_tool_calls": [],
+  "tool_call_completed": false,
+  "tool_result_datetimes": [],
+  "final_answer": "The function `get_current_time` is not available in the provided MCP tools. The available functions are `list_mcp_resources` and `read_mcp_resource`, which require knowing specific resource URIs to retrieve data. Without additional context or resource details, the request cannot be fulfilled.",
+  "final_answer_contains_result": false,
+  "run_pass": false,
+  "reason": "tool_not_called",
+  "error_events": []
+}

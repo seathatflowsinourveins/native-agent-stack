@@ -1,0 +1,51 @@
+{
+ "schema_version": 1,
+ "kind": "decision-round-preregistration",
+ "catalog": "us-equities",
+ "round": 2,
+ "recorded_at": "2026-10-01T21:38:36Z",
+ "owner": "trading lane (native-agent-stack-ae)",
+ "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+ "purpose": "one default per contested trading slot for the new WSL clean install; every other finalist is recorded as an alternative with the comparison that would replace the default",
+ "round_one_returns_sha256": "533ea4e25be69ff3fb280cc8b2bf543fa45a650ee66b2515db705a3bd176b4c6",
+ "round_one_run": "wf_4d2dd504-4a2",
+ "criteria_sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+ "decide_prompt_sha256": "39b2bff604833badfd2c46647a1bd26651f3b2e2ddb8f06cef1b98bf3bd86086",
+ "critic_prompt_sha256": "5300306720bd7c5507e8baf828fa57adbadd9efe7c410a33940cf53d501f1507",
+ "workflow_sha256": "2c94d902ea8e161e951187595c52fc964d7a663f7b33bd4d2a17d082cff78f48",
+ "builder_sha256": "336738a0b5d25707ace4f45630b94978ccc9dc124839151ad4b65f4beadc0124",
+ "packets_sha256": {
+  "backtest-oracle.order-1.json": "8a517d9f25f2e94c2beed17d9fed423e83007031a131e7ab27101ec5ea9f2c62",
+  "backtest-oracle.order-2.json": "b2fa7636446da4161296bedc02f48a1d95543762cfbe0bafc36350c46b1fa80d",
+  "market-data-provider.order-1.json": "2c51e37702b39094660c221c2eccfd4843602edab9e8e473a1de665d03c3de44",
+  "market-data-provider.order-2.json": "0b56eebfa685541e29a1a6ddf7d8220e2b583b8341979aa91ce9902a75a4202f",
+  "market-data-validation.order-1.json": "df8e7323b0f311bdf349c40cd4c70553169dce354d7346ae0b9945a668a515f7",
+  "market-data-validation.order-2.json": "745ea22699a71193a46157b11116bfca6a7503eacc0bd45052f1c0c303875991",
+  "performance-analytics.order-1.json": "e265e40daa26dac6cda534b5653ab93fd62cd1d7a9fa68213a4315e606233ef0",
+  "performance-analytics.order-2.json": "b07c0c5d21c56ef1c370e03de56bfd555cdc390feb008dd58a898d9d9fb8d0cd",
+  "snapshot-table-layer.order-1.json": "d2a6db9e5244d45b90c728424b8afa699c4459ae4f73c22dd52eadf9d42fc0ba",
+  "snapshot-table-layer.order-2.json": "d81e24c6a599cc5a9ce4b417a6f63ab8456fb6efb3a2e3ca40c5dadc1caee87e"
+ },
+ "slots": [
+  "market-data-provider",
+  "market-data-validation",
+  "snapshot-table-layer",
+  "performance-analytics",
+  "backtest-oracle"
+ ],
+ "settled_in_round_one": {
+  "research-data-versioning": "DVC",
+  "sec-filings": "EdgarTools",
+  "exchange-calendars": "exchange_calendars",
+  "factor-research": "Qlib",
+  "portfolio-construction": "skfolio",
+  "ib-gateway-runtime": "Dockerized IB Gateway",
+  "experiment-tracking": "MLflow",
+  "strategy-qualification-statistics": "arch and purgedcv (two roles)",
+  "analytical-storage engine role": "DuckDB"
+ },
+ "dispatch": "per slot: two independent deciders (finalists in two seeded orders), then one adversarial critic (stack-researcher, opus, effort max); the GPT-6.1 Sol family runs the same packets and prompts through the Codex lane's handoff file",
+ "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
+ "same_method_as": "the foundation decision round wf_c0e29ea4-90f: byte copies of its workflow, criteria and prompts",
+ "not_claimed": "no candidate is installed or measured by this round; a default decided on documented fit says so"
+}

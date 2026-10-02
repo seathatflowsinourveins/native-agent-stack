@@ -116,6 +116,22 @@ coordinator's. One is the user's and carries a default until it is answered.
    by hand: a dated `limitations` entry on the row carries what changed since, as on the durable-memory row, and
    a sweep input dates those fields and joins the gap-wave ledgers onto them
    (`tools/sota-convergence/landscape-sweep/build_inputs.py`).
+6. **One default per slot (the user, 2026-10-01 about 20:35Z).** The user asked for a definitive architecture with no
+   "one of" and no missing layers (quoted in `2026-10-01-new-wsl-definitive-defaults.md`). This amends decision 5 for
+   layers that need a comparison: a blind decision round in both model families names one default per slot; the
+   clean install installs the defaults only; the comparison arms run beforehand, on the current workstation or on a
+   rehearsal distribution; and the comparison is the default's overturn check, no longer a gate on the install. The
+   default is the blind round's pick, with the project's adoption records withheld, not the source host's recorded
+   selection. A definitive default is an install decision, not merit acceptance: the full-field re-vote, the measured
+   comparison and new-host acceptance stay open. Gate A's re-aimed end-to-end run is, under this decision, the overturn
+   check of the context-supply default (the lean base): it runs on a rehearsal distribution that collects its own
+   evidence, not on the clean install. That placement is the coordinator's and the Gate A owner's reading of the
+   directive, not the user's words: the user's decision of 2026-10-01 03:33Z put that run on the new distribution,
+   and the user can restore it. The sentences of this record that place the run there (the Decision, phase 3b and the
+   Gate A re-aim section) are read with this amendment; the choice of its harness is still the user's. The decision
+   round covered the slots the blind selection had marked "compare"; the other layers decision 1 lists as needing a
+   comparison keep the first round's pick as default with that comparison as the overturn check. Overturn: the user
+   asks again for arms on the clean install.
 
 ## Phases
 
@@ -124,8 +140,8 @@ coordinator's. One is the user's and carries a default until it is answered.
 | 0 | Merge train (the freeze-list and lane PRs); the per-layer closure assessments start in parallel | eight required checks and the owner's script check per merge | the coordinator for the train; lane owners for their PRs |
 | 1 | Per-layer closure assessment (read-only, source-cited, refuted, synthesized) for the 20 foundation and 12 us-equities layers; bounded comparisons with frozen inputs where item 3 is unmet; closure records | the criterion above, with a second independent review | foundation lane (coordinator); trading lane keeps the trading decisions and records |
 | 2 | WSL import recipe (upstream image, `wsl --import` or `--install --from-file`, first boot, systemd, user services, terminal profile) researched from Microsoft and Canonical sources and recorded under `adoption/` | source-cited recipe; no host change before the last Gate A window closes | foundation lane; WSL package version stays with the keys lane |
-| 3 | Import the distro (the stage-1 recipe); capture the pre-install baseline; bootstrap from the revision of decision 4 (`adoption/bootstrap-linux.sh --profile <id> --configure-full-profile --host <host>`); install each layer's selection of record with upstream commands, as final where the selection is final (items 1, 2, 4 and 5 of the criterion, with the preregistered comparisons of item 3 done) and otherwise as a provisional install under decision 3, collecting the target-host lifecycle checks of item 3 as the install receipt; native sign-ins on the destination; a recoverable checkpoint before stage 2 and an owned rollback | the baseline capture, `scripts/adoption_status.py --login-shell --client-wiring --pinned-versions`, `scripts/skills_status.py`, the layer receipts, `scripts/validate.py` | the LLM-native session on the new distro, under the coordinator |
-| 3b | Gate A re-aimed on the new distro: the harness pilot, the re-aim amendment, the windows, the report | the Gate A owner's gates (the preregistration, the opening rules of the Claude and Codex families, the announcement of at least six hours) | Gate A owner |
+| 3 | Import the distro (the stage-1 recipe); capture the pre-install baseline; bootstrap from the revision of decision 4 (`adoption/bootstrap-linux.sh --profile <id> --configure-full-profile --host <host>`); install each slot's default from the definitive manifest with upstream commands (decision 6; a slot whose row says "not installed" installs nothing), as final where the selection is final (items 1, 2, 4 and 5 of the criterion, with the preregistered comparisons of item 3 done) and otherwise as a provisional install under decision 3, collecting the target-host lifecycle checks of item 3 as the install receipt; native sign-ins on the destination; a recoverable checkpoint before stage 2 and an owned rollback | the baseline capture, `scripts/adoption_status.py --login-shell --client-wiring --pinned-versions`, `scripts/skills_status.py`, the layer receipts, `scripts/validate.py` | the LLM-native session on the new distro, under the coordinator |
+| 3b | Gate A re-aimed on a rehearsal distribution (decision 6), not on the clean install: the harness pilot, the re-aim amendment, the windows, the report | the Gate A owner's gates (the preregistration, the opening rules of the Claude and Codex families, the announcement of at least six hours) | Gate A owner |
 | 4 | Complex projects and system building on the new runtime (general engineering) | the convergence loop of `docs/convergence-architecture.md` per project | the foundation lane and each project's owner |
 | 5 | The trading north star on the new runtime | the north star's own gates (`catalogs/us-equities/runtime-target.json`) | trading lane |
 

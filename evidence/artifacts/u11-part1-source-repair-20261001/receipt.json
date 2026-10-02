@@ -42,7 +42,7 @@
     },
     {
       "issue": "Acceptance text described summaries as extracts.",
-      "after": "README states summaries; exact plan section-byte hashes and a changed-section negative fixture bind the summaries."
+      "after": "README states summaries; exact unchanged-plan section-byte hash assertions bind the summaries. The prior claim of a changed-section negative fixture is withdrawn: no such fixture was run or retained."
     },
     {
       "issue": "CodeQL hostname comparison used a URL prefix.",
@@ -81,19 +81,45 @@
     "actual_backend": null,
     "verdict": "no source defect found in the bounded named claims",
     "commands": [
-      {"command": "python3 -m unittest tests.test_saturation_ledger.V2PendingCliTests", "exit_code": 0, "tests": 20, "returned_summary": "Ran 20 tests in 5.105s\n\nOK"},
-      {"command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests", "exit_code": 0, "tests": 14, "returned_summary": "Ran 14 tests in 4.861s\n\nOK"},
-      {"command": "python3 -B -", "exit_code": 0, "scope": "existing producer helpers in memory", "returned_summary": "PASS: 1135 memberships across 32 layers (688 foundation + 447 trading); promptfoo catalog alternative accounts for 1134 review count; V1 32 objects and 9 templates unchanged."}
+      {
+        "command": "python3 -m unittest tests.test_saturation_ledger.V2PendingCliTests",
+        "exit_code": 0,
+        "tests": 20,
+        "returned_summary": "Ran 20 tests in 5.105s\n\nOK"
+      },
+      {
+        "command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests",
+        "exit_code": 0,
+        "tests": 14,
+        "returned_summary": "Ran 14 tests in 4.861s\n\nOK"
+      },
+      {
+        "command": "python3 -B -",
+        "exit_code": 0,
+        "scope": "existing producer helpers in memory",
+        "returned_summary": "PASS: 1135 memberships across 32 layers (688 foundation + 447 trading); promptfoo catalog alternative accounts for 1134 review count; V1 32 objects and 9 templates unchanged."
+      }
     ],
     "v1_serialized_input_sha256": "c9ca8b33ca2363ee8759f60395d5d876bfb77de4913ccfa54db4a91a07415471",
-    "not_verified": ["historical review union itself", "ae summary acknowledgement", "full 390-test run independently", "central validator independently", "live full-field API pull", "provider/GPU/new-host acceptance"]
+    "not_verified": [
+      "historical review union itself",
+      "ae summary acknowledgement",
+      "full 390-test run independently",
+      "central validator independently",
+      "live full-field API pull",
+      "provider/GPU/new-host acceptance"
+    ]
   },
   "trading_owner_summary_acknowledgement": {
     "source": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/590#issuecomment-5942246194",
     "condition": "broker-state-failures and separate-paper-adapters replaced byte for byte with the owner's requested texts",
     "correction": "The earlier summaries omitted offline transport and frozen-limit scope, per-case results, adapter offline prerequisites, fees and duplicate-effect boundaries.",
     "source_plan_unchanged": true,
-    "targeted_regression": {"command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests", "native_exit_code": 0, "tests": 14},
+    "targeted_regression": {
+      "command": "python3 -m unittest tests.test_landscape_sweep_harness.NeutralFieldTests",
+      "native_exit_code": 0,
+      "tests": 14
+    },
     "runtime_acceptance": false
   },
   "unchanged": {
@@ -121,5 +147,361 @@
     "https://docs.github.com/en/rest/commits/commits#list-commits",
     "https://docs.github.com/en/rest/releases/releases#get-the-latest-release",
     "https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.model_info"
-  ]
+  ],
+  "historical_scope_notice": {
+    "fields": [
+      "observed_at",
+      "source_head",
+      "source_design_commit",
+      "producer_patch_sha256",
+      "validation",
+      "independent_verification",
+      "requested_architecture_worker"
+    ],
+    "scope": "Original 2026-10-01 record retained as history; it is not a fresh execution at the PR head or this repair.",
+    "actual_backend": "The historical null backend fields remain unknown; no backend/provider acceptance is inferred.",
+    "unresolved_receipt_provenance": "PR #590 note 4 remains queued for part 2 in the README."
+  },
+  "repair_20261002": {
+    "observed_at": "2026-10-02T08:33:21.286269Z",
+    "status": "local source checks passed; uncommitted for coordinator review",
+    "evidence_class": "local_source_and_synthetic_integration",
+    "source_baseline": "cc63b55e242556103ccb8c0d6d99affb0c159097",
+    "source_sha256": {
+      "scripts/saturation_ledger.py": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
+      "tests/test_saturation_ledger.py": "c8722d0593398542b0b5be6675f9df1a658f40b5ac338b702270fcccba7756c0",
+      "tools/sota-convergence/landscape-sweep/build_inputs.py": "9a26ac63c854ddcaa107f2a892707cc5fccf2cf35f99cf3d3249a0d8c8fe097f",
+      "tools/sota-convergence/landscape-sweep/convert.py": "37d4d396da385727ee6d571589e7aa162a030501660a37fac133caf8cbeebba3",
+      "tools/sota-convergence/landscape-sweep/README.md": "5952807786a23be219e69ee7ed417b5141a1384dec02ec33df818ec06a6b3316"
+    },
+    "source_design_commit": "49a4260029244e3e20d8b2dd3ada00af7983a3c9",
+    "source_design_sha256": "b23a1ce9be76aeb7499268f1ab62ced9cc9d536f0be3fe433dd7163db56ba1a4",
+    "sources": [
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/49a4260029244e3e20d8b2dd3ada00af7983a3c9/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cc63b55e242556103ccb8c0d6d99affb0c159097/tools/sota-convergence/landscape-sweep/build_inputs.py",
+      "https://github.com/seathatflowsinourveins/native-agent-stack/blob/cc63b55e242556103ccb8c0d6d99affb0c159097/scripts/saturation_ledger.py"
+    ],
+    "repairs": [
+      {
+        "blocker": 1,
+        "result": "Earlier V2 keys and source references survive two convert/append/check rounds, including opaque identities. Raw-return pointers are qualified to their original returns file; altered frozen keys are rejected."
+      },
+      {
+        "blocker": 2,
+        "result": "Malformed proposal shape and evidence retain raw returns, explicit material pending rows, pointer failures and reopen. Non-list evidence is never iterated as valid evidence; later healthy gamma returns credible and appends independently."
+      },
+      {
+        "blocker": 3,
+        "result": "Removed the unsupported changed-section negative-fixture claim. Existing unchanged-section hashes, acknowledged summaries and actual historical evidence remain historical."
+      }
+    ],
+    "failed_conditions_retained": [
+      {
+        "purpose": "Failing-first baseline run: 32 fixtures, 11 failures and one error before product edits.",
+        "evidence_class": "synthetic fixture",
+        "command": [
+          "rtk",
+          "proxy",
+          "env",
+          "NAS_CODEX_INTEGRATION=0",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "-v",
+          "tests.test_saturation_ledger.V2PendingCliTests"
+        ],
+        "working_directory": "<isolated-repair-worktree>",
+        "started_utc": "2026-10-02T08:01:33.301Z",
+        "finished_utc": "2026-10-02T08:01:38.928Z",
+        "exit_code": 1,
+        "signal": null,
+        "returned_summary": "Ran 32 tests in 5.522s\nFAILED (failures=11, errors=1)",
+        "retained_outputs": [
+          {
+            "artifact": "regressions-red.native.log",
+            "bytes": 23009,
+            "sha256": "794ad833ebddafc62673a20e49e688b6afb1877ea29f5c0c97fe1c0514f0a76c",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "regressions-red.run.json",
+            "bytes": 481,
+            "sha256": "03292e38edcdd0822fea7c6b5275b390fff84f96c08d570226a7a61d250e9ea7",
+            "retention": "private, outside the checkout"
+          }
+        ]
+      },
+      {
+        "purpose": "A stronger post-repair control exposed four malformed raw shapes using supported keys because canon searches embedded URLs.",
+        "evidence_class": "synthetic fixture",
+        "command": [
+          "rtk",
+          "proxy",
+          "env",
+          "NAS_CODEX_INTEGRATION=0",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "-v",
+          "tests.test_saturation_ledger.V2PendingCliTests.test_missing_repository_proposal_is_retained_pending",
+          "tests.test_saturation_ledger.V2PendingCliTests.test_nonobject_proposal_is_retained_pending",
+          "tests.test_saturation_ledger.V2PendingCliTests.test_nonlist_proposed_is_retained_pending",
+          "tests.test_saturation_ledger.V2PendingCliTests.test_nonlist_proposed_object_is_retained_pending"
+        ],
+        "working_directory": "<isolated-repair-worktree>",
+        "started_utc": "2026-10-02T08:19:33.028Z",
+        "finished_utc": "2026-10-02T08:19:33.548Z",
+        "exit_code": 1,
+        "signal": null,
+        "returned_summary": "Ran 4 tests in 0.396s\nFAILED (failures=4)",
+        "retained_outputs": [
+          {
+            "artifact": "opaque-malformed-red.native.log",
+            "bytes": 5557,
+            "sha256": "99283ad2dd76725beba07a3d124fb317ffa854daf4670e8a36e5d713da3f3bc4",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "opaque-malformed-red.run.json",
+            "bytes": 814,
+            "sha256": "0247a1686be0e6a286a6b6b8d3c52ce1dacb320e6c4023b953ee641331593b6d",
+            "retention": "private, outside the checkout"
+          }
+        ]
+      }
+    ],
+    "discriminating_baseline_control": {
+      "purpose": "Final 33 authored fixtures against unchanged baseline product source: 12 failures and one error. The retained stdin only changes test-module bindings in the isolated process.",
+      "evidence_class": "synthetic fixture",
+      "command": [
+        "rtk",
+        "proxy",
+        "env",
+        "NAS_CODEX_INTEGRATION=0",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "-B",
+        "-"
+      ],
+      "working_directory": "<isolated-repair-worktree>",
+      "started_utc": "2026-10-02T08:29:13.010Z",
+      "finished_utc": "2026-10-02T08:29:18.892Z",
+      "exit_code": 1,
+      "signal": null,
+      "returned_summary": "Ran 33 tests in 5.718s\nFAILED (failures=12, errors=1)",
+      "retained_outputs": [
+        {
+          "artifact": "baseline-current-tests.native.log",
+          "bytes": 24141,
+          "sha256": "fa3e7295aeaa58298bfc30a6d1d38ab55aab3e77d72f20e856f60da0cc89e7ac",
+          "retention": "private, outside the checkout"
+        },
+        {
+          "artifact": "baseline-current-tests.run.json",
+          "bytes": 634,
+          "sha256": "77cf1c3a4edd255338d3e4acd1b6d4aa3ca6cd296a44cfbe1acd994aa3bb96d9",
+          "retention": "private, outside the checkout"
+        },
+        {
+          "artifact": "baseline-current-tests.stdin.log",
+          "bytes": 1533,
+          "sha256": "4cf0e7bd920ee4a2c9d672b50cb08ee9ef558e53e75e27967afd91ca3ba3c8f2",
+          "retention": "private, outside the checkout"
+        }
+      ]
+    },
+    "validation": [
+      {
+        "purpose": "Final V2 converter/ledger contracts, two native rounds and a healthy later-layer oracle.",
+        "evidence_class": "synthetic fixture",
+        "command": [
+          "rtk",
+          "proxy",
+          "env",
+          "NAS_CODEX_INTEGRATION=0",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "-v",
+          "tests.test_saturation_ledger.V2PendingCliTests"
+        ],
+        "working_directory": "<isolated-repair-worktree>",
+        "started_utc": "2026-10-02T08:22:30.103Z",
+        "finished_utc": "2026-10-02T08:22:42.365Z",
+        "exit_code": 0,
+        "signal": null,
+        "returned_summary": "Ran 33 tests in 12.140s\nOK",
+        "retained_outputs": [
+          {
+            "artifact": "regressions-final-green.native.log",
+            "bytes": 5854,
+            "sha256": "a1023e9774bc97c176808c8d827bb585e27766604ced4d491547b54cd50e51c2",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "regressions-final-green.run.json",
+            "bytes": 1296,
+            "sha256": "f9e8233bf1baeda02afff9ef09d33c737014e37efa86be0d3d4556bdc6a31fd7",
+            "retention": "private, outside the checkout"
+          }
+        ]
+      },
+      {
+        "purpose": "Affected local saturation, repository sweep and skills suite; 403 tests with 45 skips.",
+        "evidence_class": "local integration check",
+        "command": [
+          "rtk",
+          "proxy",
+          "env",
+          "NAS_CODEX_INTEGRATION=0",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "python3",
+          "-B",
+          "-m",
+          "unittest",
+          "tests.test_saturation_ledger",
+          "tests.test_landscape_sweep_harness",
+          "tests.test_landscape_sweep_skills"
+        ],
+        "working_directory": "<isolated-repair-worktree>",
+        "started_utc": "2026-10-02T08:23:02.233Z",
+        "finished_utc": "2026-10-02T08:24:06.059Z",
+        "exit_code": 0,
+        "signal": null,
+        "returned_summary": "Ran 403 tests in 63.521s\nOK (skipped=45)",
+        "retained_outputs": [
+          {
+            "artifact": "affected-suite-final.native.log",
+            "bytes": 595,
+            "sha256": "ae9077768ee981cdcb48b4f8f5c9c00b079f4766c8341a90df5c9e0c2db781ea",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "affected-suite-final.run.json",
+            "bytes": 1351,
+            "sha256": "a97600dc2cd5b76b7de359a9f399ce169a7ae765f11718d41e0b38059b31e748",
+            "retention": "private, outside the checkout"
+          }
+        ]
+      },
+      {
+        "purpose": "Exact artifact comparisons against the baseline builder and pinned files; retained stdin supplies the complete comparison.",
+        "evidence_class": "local artifact comparison",
+        "command": [
+          "rtk",
+          "proxy",
+          "env",
+          "NAS_CODEX_INTEGRATION=0",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "python3",
+          "-B",
+          "-"
+        ],
+        "working_directory": "<isolated-repair-worktree>",
+        "started_utc": "2026-10-02T08:25:48.909Z",
+        "finished_utc": "2026-10-02T08:25:49.250Z",
+        "exit_code": 0,
+        "signal": null,
+        "returned_summary": "",
+        "retained_outputs": [
+          {
+            "artifact": "v1-and-immutable-final.native.log",
+            "bytes": 1820,
+            "sha256": "c4d47e54b8c11df2d5da14a5bdae6230b89e7714995701a64339a301e31484cf",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "v1-and-immutable-final.run.json",
+            "bytes": 1166,
+            "sha256": "66b6c558414433d6865da5fce2eff22d132dd23046eae96c9ab41acd06ebb8bf",
+            "retention": "private, outside the checkout"
+          },
+          {
+            "artifact": "v1-and-immutable-final.stdin.log",
+            "bytes": 4155,
+            "sha256": "1d3d17995f6bcfbf1709900a490710e2508aa93d3f41dd32eaf05be170c983ea",
+            "retention": "private, outside the checkout"
+          }
+        ]
+      }
+    ],
+    "original_probe_observation": {
+      "purpose": "Existing durable probe with explicit PROBE_WT: GitHub and GitLab second append/check return 0; malformed evidence conversion returns 0 with retained failures and later alpha/gamma output. Probe exit 0 is an observation, not product or provider acceptance.",
+      "evidence_class": "local observation",
+      "command": [
+        "rtk",
+        "proxy",
+        "env",
+        "NAS_CODEX_INTEGRATION=0",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "PROBE_WT=<isolated-repair-worktree>",
+        "python3",
+        "-B",
+        "<private-probe-script>"
+      ],
+      "working_directory": "<isolated-repair-worktree>",
+      "started_utc": "2026-10-02T08:25:34.362Z",
+      "finished_utc": "2026-10-02T08:25:48.782Z",
+      "exit_code": 0,
+      "signal": null,
+      "returned_summary": "Ran 35 tests in 14.294s\nOK",
+      "retained_outputs": [
+        {
+          "artifact": "original-probe-final.native.log",
+          "bytes": 1912,
+          "sha256": "3450e0c9fb6fd19f11d2ff5d47a14d699090c3f576a1cd8feb6340b4f05bb447",
+          "retention": "private, outside the checkout"
+        },
+        {
+          "artifact": "original-probe-final.run.json",
+          "bytes": 1302,
+          "sha256": "76ac1e9af88100d686dc9ced15423e2d5f7549c5a8ffdd0e9eeb963c0fab4158",
+          "retention": "private, outside the checkout"
+        }
+      ]
+    },
+    "unchanged": {
+      "v1_repository_inputs": 32,
+      "v1_repository_serialized_sha256": "c9ca8b33ca2363ee8759f60395d5d876bfb77de4913ccfa54db4a91a07415471",
+      "v1_skills_inputs": 13,
+      "v1_skills_serialized_sha256": "028620460e9fa311b0344480ae54915111fc80056211a4701c73b910becea6df",
+      "acceptance_requirements_source_sha256": "38f963ffcbc2e8895951f2f02b47caad7eedc35d9777c711a2a14a51d12c8508",
+      "acceptance_plan_sha256": "5e2132f41e30d97bacd269359496492c9853f940316c36c7b6d93295bf5a8a74",
+      "build_args_templates_schemas_sweep_js_make_prompt": "byte-identical to baseline",
+      "v2_launch": "still refused by unchanged V1 staging guard"
+    },
+    "corrections": [
+      {
+        "claim": "A changed-section negative fixture bound the acceptance summaries.",
+        "correction": "Only unchanged-section hash assertions were present; the negative-fixture claim is withdrawn.",
+        "verification_path": "tests/test_landscape_sweep_harness.py::NeutralFieldTests.test_acceptance_summaries_pin_the_exact_reviewed_plan_sections"
+      },
+      {
+        "claim": "Sending serialized malformed raw JSON through the supported identity adapter made it opaque.",
+        "correction": "The maintained canon helper searches embedded GitHub URLs. Dedicated opaque derivation now binds the raw text, and frozen verification preserves the opaque key without reinterpreting it.",
+        "verification_path": "opaque-malformed-red.native.log -> regressions-final-green.native.log; test_saturation_ledger.py::V2PendingCliTests"
+      }
+    ],
+    "astra_review_trigger": "Four stronger opaque-shape controls failed after one bounded Sol repair; coordinator notified to include Astra/max acceptance review. No reviewer backend or acceptance verdict is asserted here.",
+    "actual_backend": null,
+    "provider_usage": null,
+    "deferred_review_notes": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "scope_limit": "Locally authored fixtures and artifact checks only. No upstream test, native model workflow, provider/GPU/new-host or broker/account acceptance; shared evidence registration remains the coordinator integration step."
+  }
 }

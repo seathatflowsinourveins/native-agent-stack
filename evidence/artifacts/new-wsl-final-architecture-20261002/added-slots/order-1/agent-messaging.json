@@ -1,0 +1,190 @@
+{
+  "layers": [
+    {
+      "layer_id": "agent-messaging",
+      "selection": [
+        {
+          "name": "hcom",
+          "repository": "https://github.com/aannoo/hcom",
+          "role": "C04: Finalist for direct communication between terminal sessions. Launching Claude Code and Codex through hcom connects both to its local message store; agents can exchange messages, spawn sessions, and send follow-up work.",
+          "install_command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
+          "install_source": "https://github.com/aannoo/hcom/releases/tag/v0.7.27",
+          "basis": [
+            {
+              "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/README.md",
+              "shows": "Direct requirement fit: automatic delivery for both Claude Code and Codex, local SQLite storage, CLI messaging, session launch/resume, and examples of assigning work when another agent becomes idle. The documented entry points are hcom claude and hcom codex."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/send_delivery.rs",
+              "shows": "Relevant upstream regression tests cover ordered capped batches, preservation of unread messages, failed stdout writes, concurrent cursor updates, and messages arriving during delivery. These test transport behavior without requiring a model."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/actions/runs/36803903267/job/110183965493",
+              "shows": "GitHub reports SUCCESS for the real Codex CLI test job on Ubuntu 24.04 at the reviewed commit."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/actions/runs/36803903267/job/110183965480",
+              "shows": "GitHub reports SUCCESS for the real Claude Code CLI test job on Ubuntu. The workflow explicitly runs the otherwise ignored client tests; they exercise actual vendor CLIs against deterministic local model providers."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/scripts/mock-tools.pins",
+              "shows": "The tested client versions are explicit: Codex 0.159.2 and Claude Code 2.1.283. This makes the integration evidence reproducible, but does not establish compatibility with every newer client."
+            },
+            {
+              "url": "https://github.com/aannoo/hcom/releases/tag/v0.7.27",
+              "shows": "Released 2026-10-01; the reviewed default-branch commit is also dated 2026-10-01. Release assets include Linux x86_64 GNU/musl and macOS arm64 binaries. The release addresses unread-message loss and dead-session cleanup. Recent related issue closures provide maintenance activity. License: MIT."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Concord MCP",
+          "repository": "https://github.com/Get-Concord-AI/concord-mcp",
+          "role": "C09: Alternative finalist when handing off tracked work matters alongside messaging. Its MCP tools provide assignments, acceptance, versioned handoffs, durable prompt/reply threads, and delivery receipts.",
+          "install_command": "npm install -g @concord-ai/concord-mcp\nconcord setup",
+          "install_source": "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/README.md#quick-start",
+          "basis": [
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/README.md",
+              "shows": "Direct requirement fit through shared local work state, prompt/reply messaging, idempotency keys, and transfer_work operations. It distinguishes immediate delivery from queued pull delivery and reports an unreachable named recipient rather than silently redirecting a message."
+            },
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/claude-code.md",
+              "shows": "Claude Code integration uses a session-lifetime monitor for idle wake-up and lifecycle hooks for active turns. Existing sessions require a restart after installation."
+            },
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/codex.md",
+              "shows": "Codex integration uses a managed app-server bridge: turn/steer for a busy recipient and turn/start for an idle recipient. Live delivery is version-gated and requires trusted hooks; failed probes preserve an explicitly reported pull fallback."
+            },
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/relay/relay.test.ts",
+              "shows": "Upstream tests cover idle injection with receipts, expectedTurnId during busy steering, duplicate relay-host rejection, and retaining queued messages after failed immediate delivery. The adapters in these tests are fixtures, not a live Claude-to-Codex evaluation."
+            },
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/actions/runs/36152839951",
+              "shows": "Both reviewed Ubuntu verification jobs, Node 22.x and 24.x, succeeded. The workflow runs lint, formatting, type checks, Vitest tests, and a build. The package requires Node >=22.12. Linux installation is supported by this evidence; macOS arm64 delivery remains unverified in the reviewed CI."
+            },
+            {
+              "url": "https://github.com/Get-Concord-AI/concord-mcp/releases/tag/v0.10.5",
+              "shows": "Released 2026-09-23, with a default-branch commit on 2026-09-25, both inside 90 days. Recent issue activity includes a closed disclosure-channel report and an open response-delay report; the latter is a user report, not a confirmed measured defect. License: MIT."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C03",
+          "name": "A2A",
+          "reason": "The repository supplies a protocol and points to separate SDKs; its reviewed onboarding does not supply a ready Claude Code–Codex session bridge, so adoption requires more integration work. [Upstream README](https://github.com/a2aproject/A2A/blob/e16c0e9f66c9/README.md)"
+        },
+        {
+          "key": "C02",
+          "name": "AI Maestro",
+          "reason": "Fits both clients and has successful test/build CI, but its documented install adds a dashboard/service, Node, tmux, and broader orchestration facilities; that increases setup for this narrowly scoped messaging requirement. [Upstream quick start](https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/README.md#quick-start)"
+        },
+        {
+          "key": "C08",
+          "name": "agmsg",
+          "reason": "Strong cross-vendor fit and successful Ubuntu/macOS tests, but its Codex bridge guide documents first-interaction activation and orphaned bridges after TUI closure; these directly weaken the receiver-gone and clean-setup cases. [Codex guide](https://github.com/fujibee/agmsg/blob/07a67a3e3304/docs/codex-monitor-beta.md)"
+        },
+        {
+          "key": "C07",
+          "name": "Agent Message Queue",
+          "reason": "Provides an appropriate local queue and explicit WSL/macOS support, but its co-op guide documents optional wake delivery and pre-launch messages remaining unread without notification; reliable unattended exchange needs additional operational handling. [Co-op guide](https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/COOP.md)"
+        },
+        {
+          "key": "C10",
+          "name": "Sno Station",
+          "reason": "The current README distinguishes shipped shared-memory packages from Sno Reach messaging: Reach release archives and the complete onboarding install remain pending, reducing clean-install readiness for this layer. [Current status](https://github.com/sno-ai/sno-station/blob/4b4cafe43e3d/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "ai-memory",
+          "reason": "Includes directed, claim-once messaging and both-client integration, but adoption entails its broader memory-server deployment; the retained finalists address concurrent messaging with a more focused installation. [Upstream README](https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "Agent Relay",
+          "reason": "Has successful Linux/macOS integration CI, but the reviewed README centers a broader agent-infrastructure offering and describes self-hosting per primitive without a comparably complete single-host messaging walkthrough. [Upstream onboarding](https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/README.md)"
+        },
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "Native messaging exists, but the reviewed native sources do not establish ready bidirectional delivery between independent Claude Code and Codex sessions; coverage remains unproven, rather than disproved. [Codex native implementation](https://github.com/openai/codex/blob/d25c114d494d/codex-rs/core/src/tools/handlers/multi_agents/send_input.rs), [Claude Code changelog](https://github.com/anthropics/claude-code/blob/52c76441cae9/CHANGELOG.md)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Retain hcom and Concord MCP as alternative finalists, without asserting measured superiority. On separate clean WSL2 Ubuntu x86_64 instances, use identical Claude Code and Codex versions and the audited repository releases. Exchange numbered messages in both directions, including bursts exceeding 50 unread messages. Exercise idle, actively working, approval-paused, terminated, and resumed receivers. Measure losses, duplicates, per-sender ordering, delivery latency, accurate queued/unreachable receipts, recovery, and cleanup of departed sessions. Include a work handoff with a verifiable completion reply. Record installation time, manual configuration changes, restarts, and required background processes. Repeat essential cases on macOS arm64. The packet contains no comparison where these named arms both ran, and the reviewed upstream suites do not supply that comparison.",
+      "evidence_gaps": [
+        "Snapshot: 2026-10-02 UTC. GitHub repository metadata and default-branch commits were checked for all nine code repositories. All were unarchived and had a default-branch commit inside 90 days, so none qualifies for stale_or_archived exclusion. Release and recent issue activity were also retrieved for all nine. A2A's latest observed release, 2026-05-28, falls outside 90 days, although its current default branch prevents a stale classification.",
+        "No fresh-host WSL2 delivery evaluation was performed. WSL2 compatibility for the finalists is inferred from their Linux installation targets and integrations. hcom supplies explicit macOS arm64 artifacts; Concord's macOS arm64 live-delivery behavior was not established by the reviewed CI. This messaging requirement does not need the RTX 4090.",
+        "hcom's successful client tests use real pinned CLIs with deterministic local model providers. They demonstrate integration behavior, not live-model task success or a cross-repository performance advantage. Its tested Codex 0.159.2 baseline predates the latest stable release observed, 0.160.0.",
+        "Concord's reviewed relay tests use adapter fixtures. Its documented version gate, managed Codex daemon, trusted hooks, and reachability probes must succeed before immediate busy/idle delivery can be assumed on a fresh installation.",
+        "agmsg's README is internally inconsistent about Codex default delivery modes and monitor support. The dedicated Codex bridge guide establishes a monitor path and its limitations; no default-mode assertion was used to rank it.",
+        "Native cross-vendor sufficiency remains unresolved. Public native sources were reviewed, but installed-client inspection was outside the authorized judging evidence. No claim that native cross-vendor messaging is absent is made.",
+        "Research used 30 GitHub API calls, including five GraphQL calls, one failed web-search attempt, and two rejected page-fetch attempts. The requested ctx_fetch_and_index workflow was unavailable because that tool required approval while the session approval policy was never. Upstream README, documentation, and test sources were therefore retrieved through the GitHub API, indexed with ctx_index, and read with ctx_search."
+      ],
+      "sources_read": [
+        "Supplied agent-messaging packet; comparisons_on_record_where_every_named_arm_ran was empty.",
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/a2aproject/A2A",
+        "https://api.github.com/repos/23blocks-OS/ai-maestro",
+        "https://api.github.com/repos/Get-Concord-AI/concord-mcp",
+        "https://api.github.com/repos/aannoo/hcom",
+        "https://api.github.com/repos/fujibee/agmsg",
+        "https://api.github.com/repos/avivsinai/agent-message-queue",
+        "https://api.github.com/repos/sno-ai/sno-station",
+        "https://api.github.com/repos/akitaonrails/ai-memory",
+        "https://api.github.com/repos/AgentWorkforce/relay",
+        "https://api.github.com/repos/a2aproject/A2A/commits?per_page=1",
+        "https://api.github.com/repos/23blocks-OS/ai-maestro/commits?per_page=1",
+        "https://api.github.com/repos/Get-Concord-AI/concord-mcp/commits?per_page=1",
+        "https://api.github.com/repos/aannoo/hcom/commits?per_page=1",
+        "https://api.github.com/repos/fujibee/agmsg/commits?per_page=1",
+        "https://api.github.com/repos/avivsinai/agent-message-queue/commits?per_page=1",
+        "https://api.github.com/repos/sno-ai/sno-station/commits?per_page=1",
+        "https://api.github.com/repos/akitaonrails/ai-memory/commits?per_page=1",
+        "https://api.github.com/repos/AgentWorkforce/relay/commits?per_page=1",
+        "https://github.com/a2aproject/A2A/blob/e16c0e9f66c9/README.md",
+        "https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/README.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/README.md",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/README.md",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/README.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/README.md",
+        "https://github.com/sno-ai/sno-station/blob/4b4cafe43e3d/README.md",
+        "https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/README.md",
+        "https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/README.md",
+        "https://api.github.com/repos/aannoo/hcom/releases/latest",
+        "https://api.github.com/repos/fujibee/agmsg/releases/latest",
+        "https://api.github.com/repos/avivsinai/agent-message-queue/releases/latest",
+        "https://api.github.com/repos/23blocks-OS/ai-maestro/releases/latest",
+        "https://api.github.com/repos/Get-Concord-AI/concord-mcp/releases/latest",
+        "https://api.github.com/repos/aannoo/hcom/commits/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/check-runs?per_page=100",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/.github/workflows/ci.yml",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/send_delivery.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/real_tool_codex.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/tests/real_tool_claude.rs",
+        "https://github.com/aannoo/hcom/blob/2c5f343b2f9e/scripts/mock-tools.pins",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/claude-code.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/docs/codex.md",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/relay/relay.test.ts",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/test/install/adapters.test.ts",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/.github/workflows/ci.yml",
+        "https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/package.json",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/docs/codex-monitor-beta.md",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/tests/test_messaging.bats",
+        "https://github.com/fujibee/agmsg/blob/07a67a3e3304/tests/test_codex_bridge.bats",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/COOP.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/INSTALL.md",
+        "https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/.github/workflows/ci.yml",
+        "https://github.com/openai/codex/blob/d25c114d494d/codex-rs/core/src/tools/handlers/multi_agents/send_input.rs",
+        "https://github.com/openai/codex/blob/d25c114d494d/codex-rs/core/src/tools/handlers/multi_agents_v2/send_message.rs",
+        "https://github.com/openai/codex/blob/d25c114d494d/codex-rs/app-server/README.md",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://github.com/anthropics/claude-code/blob/52c76441cae9/CHANGELOG.md"
+      ]
+    }
+  ]
+}

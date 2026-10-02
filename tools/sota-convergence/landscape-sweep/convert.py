@@ -299,7 +299,9 @@ def convert_v2(res: dict, scope: dict, lane: str, work: Path | None, limits, wor
     """Explicit U11V4 neutral contract; V1's binary projections remain unchanged below.
 
     A lost/unavailable screen retains the complete frozen field, including V1 refutations.
-    Source: 89424e36e8f60c4413021bc449390f235c3f2cfd, decision sections A/B.
+    Unsupported and malformed raw proposals remain pending with pointer failures; other layers continue.
+    Sources: decision A/B and revision 5 item 6 at 49a4260029244e3e20d8b2dd3ada00af7983a3c9;
+    retained-field/malformed-proposal reproductions of PR #590 comment 5942837180.
     """
     if work is None:
         raise ValueError("V2 conversion needs --work-dir with frozen inputs/<layer>.json")

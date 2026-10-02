@@ -68,7 +68,20 @@ that the current adapter cannot resolve) is retained with an opaque `unsupported
 key and `pending_reason: unsupported_discovery_identity`. The raw proposal stays unchanged,
 its JSON pointer records a retained failure, and conversion continues through later proposals
 and layers. The failure reopens that layer. This does not establish that the candidate is ineligible.
-Original frozen GitHub/Hugging Face identities still use their strict canonical contract.
+The next input field retains earlier V2 keys and evidence references, including opaque keys, without
+requiring discovery to repeat them. Raw-return pointers are qualified against their original retained
+returns file. Frozen keys are checked against the same deterministic identity derivation; a replaced
+candidate or evidence key is rejected. Unsupported identities remain pending even when later model
+returns label them credible. GitHub/Hugging Face identities keep their strict canonical contract.
+
+A missing repository, non-object proposal or non-list `proposed` value also retains its complete raw
+return as an opaque pending member with a `malformed_discovery_proposal` pointer failure. An explicit
+null, integer or string `evidence`, or a list containing non-strings, records
+`malformed_discovery_evidence`; none is treated as a valid evidence list. Its raw value stays in the
+retained return, and the member remains material pending in later fields. Later proposals and layers
+continue through conversion. These are the bounded repairs to blockers 1–2 in the
+[PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180),
+under [revision 5 item 6 at 49a42600](https://github.com/seathatflowsinourveins/native-agent-stack/blob/49a4260029244e3e20d8b2dd3ada00af7983a3c9/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#revision-5-2026-10-01).
 
 The field hash is SHA256 of UTF-8 JSON with sorted keys, no inter-key whitespace and
 `ensure_ascii=False`: `{contract_version, catalog, layer_id, requirement_sha256,
@@ -116,6 +129,8 @@ sections 1–3 `a79c33c07f9de52bb7270fb9e6e0e85a19c1064da9ad47f9d7cc92ff362f0a0f
 `1f557403dc4169db578cd2a327f025ac3acee25c78b333dfc91906d83ff421c3`, and sections 5–6
 `e5921c5afa6d5db25408549873127b5a07cd8690e2ca674b6ed508f22bb32ec9`. A changed plan must prompt
 review of its summaries. This projection declares requirements and provides no new acceptance result.
+The receipt's earlier claim of a changed-section negative fixture was unsupported and is withdrawn;
+the retained test asserts the unchanged section hashes. The summaries and hashes remain unchanged.
 
 Discovery V2 returns `admit`, `admit_pending` or `not_admitted`, `requirement_fit` and `frozen_tasks`;
 it never requires a winner-relative gap. Even `not_admitted` enters the field pending because
@@ -151,6 +166,30 @@ unsupported exclusions or unresolved exposure stay material pending; clean satur
 Focused no-model integration tests cover neutral admission, full-field inclusion, blind input and
 pin/gate projection, provenance, the V1 staging guard, and unchanged V1 repository/skills contracts.
 They are synthetic/local integration checks, not unchanged upstream model acceptance or a merit result.
+
+### Part 2 review queue
+
+Notes 4–11 from the [PR #590 source review](https://github.com/seathatflowsinourveins/native-agent-stack/pull/590#issuecomment-5942837180)
+remain open for part 2. This repair does not qualify the future V2 runner.
+
+4. Reconcile the historical receipt's source revisions, unretained 1,135-count script and earlier
+   390-test run with retained command/source evidence. The historical verifier's actual backend is
+   unknown and remains null; a requested role/model does not establish the backend that ran.
+5. Resolve fit-only `target_host_incompatible` outcome behavior, cover credible versus pending facts
+   controls, and retain the excluding fact with the outcome.
+6. Bind each judgment's family to its native role slot and actual model route; self-declared family
+   labels and a nullable route do not prove independent families. Exercise `facts_gpt6` explicitly.
+7. Add discriminating fit-role controls for the evidence/credential/maintenance guards and differing
+   family majorities; facts-only `outside_requirement` controls do not exercise those exclusions.
+8. Reconcile credible field membership with novelty and saturation counting so a credible selection
+   of record does not permanently prevent a clean layer.
+9. Align the V2 maintenance template with the unconditional script-owned archived/stale criterion and
+   replace the fact-word pattern with deterministic API evidence before launch.
+10. Treat an expected missing GitHub latest release as an observation instead of a whole-source
+    failure, using the maintained `github_freshness.py` missing-response policy.
+11. Reconcile the inferred `alpacahq/alpaca-py` pin with the user's separate Alpaca adapter-path
+    requirement; the user has not pinned that repository. Preserve the acknowledged trading
+    acceptance summaries and exact section hashes while resolving this input policy.
 
 ## Files
 

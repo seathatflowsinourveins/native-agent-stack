@@ -1298,6 +1298,195 @@ class V2PendingCliTests(FixtureCase):
         self.assertEqual(appended.returncode, 0, appended.stderr)
         self.assertEqual(self.ledger_cli("--check").returncode, 0)
 
+    def healthy_later_round(self):
+        """An independently asserted later layer must produce a credible member, not just exist."""
+        scope = sl.scope_hashes(self.root)
+        repository, key = sl.v2_identity("foundation", "gamma", OTHER)
+        member = {"candidate_key": key, "repository": repository, "evidence_key": key,
+                  "disposition": "admit_pending", "pending_reason": "awaiting_v2_screen",
+                  "exclusion_reason": None, "material": True, "evidence_refs": []}
+        frozen = dict(self.field_input, layer_id="gamma", eligible_field=[member],
+                      requirement_sha256=scope["requirement_sha256"]["foundation/gamma"])
+        frozen["field_sha256"] = sl.v2_field_sha256(frozen)
+        write(self.work, "inputs/gamma.json", frozen)
+
+        def judgment(family, role, number):
+            doc = self.judgment(family, role, "credible", number)
+            doc["layer_id"] = "gamma"
+            doc["judgment"].update(judgment_id=f"gamma-{family}-{role}-{number}",
+                                   source_field_sha256=frozen["field_sha256"])
+            doc["votes"] = [dict(doc["votes"][0], candidate_key=key, repository=repository, evidence_key=key)]
+            return doc
+
+        return {"catalog": "foundation", "layer_id": "gamma", "round": "first", "merged": [],
+                "claude_discover": {"contract_version": 2, "layer_id": "gamma", "proposed": []},
+                "gpt6_discover": {"status": "ok", "output": {
+                    "contract_version": 2, "layer_id": "gamma", "proposed": []}},
+                "facts": [judgment("claude", "facts", n) for n in range(2)],
+                "facts_gpt6": [judgment("gpt6", "facts", n) for n in range(2)],
+                "fit_claude": [judgment("claude", "fit", n) for n in range(2)],
+                "fit_gpt6": [judgment("gpt6", "fit", n) for n in range(2)]}
+
+    def assert_healthy_later_layer(self, converted):
+        self.assertEqual([row["layer_id"] for row in converted["layers"]], ["alpha", "gamma"])
+        gamma_layer = converted["layers"][1]
+        self.assertEqual(gamma_layer["pending"], [])
+        self.assertEqual(gamma_layer["refuted"], [])
+        self.assertEqual([row["repo"] for row in gamma_layer["survived"]], [OTHER])
+        self.assertEqual(converted["returns"]["failures"]["gamma"], [])
+
+    def next_v2_field(self):
+        sys.path.insert(0, str(ROOT / "tools/sota-convergence/landscape-sweep"))
+        import build_inputs
+
+        layer = {"layer_id": "alpha", "candidates": [], "winners": [], "alternatives": []}
+        members = build_inputs.eligible_field("foundation", layer, {}, {}, self.ledger(), [], [])
+        self.field_input = dict(self.field_input, eligible_field=members)
+        self.field_input["field_sha256"] = sl.v2_field_sha256(self.field_input)
+        write(self.work, "inputs/alpha.json", self.field_input)
+        return {row["candidate_key"]: row for row in members}
+
+    def assert_second_native_round(self, prior, pending_keys):
+        rebuilt = self.next_v2_field()
+        self.assertEqual(set(rebuilt), set(prior), "the next source field dropped an earlier V2 identity")
+        for key, row in prior.items():
+            self.assertEqual(rebuilt[key]["evidence_key"], row["evidence_key"])
+            returns_ref = self.ledger()["sweeps"][0]["returns_ref"]
+            expected_refs = {returns_ref + ref if ref.startswith("#") else ref for ref in row["evidence_refs"]}
+            self.assertTrue(expected_refs.issubset(rebuilt[key]["evidence_refs"]))
+        run = self.screen_run(copies=2)
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual({row["candidate_key"] for row in converted["layers"][0]["pending"]}, pending_keys)
+        for row in converted["layers"][0]["pending"]:
+            self.assertEqual(row["pending_reason"], prior[row["candidate_key"]]["pending_reason"])
+            self.assertTrue(row["material"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(
+            converted, sweep_id="fx-2", day="2026-10-02")))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assertEqual(len(self.ledger()["sweeps"]), 2)
+        self.assertEqual({row["candidate_key"] for row in self.ledger()["sweeps"][1]["layers"][0]["eligible_field"]},
+                         set(prior))
+
+    def test_supported_discovery_survives_two_native_round_trips(self):
+        repository = "https://github.com/org/newrepo"
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = [{"repository": repository, "evidence": [repository]}]
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual(converted["returns"]["failures"]["alpha"], [])
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        self.assertIn(repository, prior["foundation/alpha/org/newrepo"]["evidence_refs"])
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, set())
+
+    def test_unsupported_discovery_survives_two_native_round_trips(self):
+        proposals = [{"repository": value} for value in (
+            "https://gitlab.com/org/project", "https://codeberg.org/org/project",
+            "https://docs.example.org/guide", None, {"unexpected": "object"})]
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        pending_keys = {row["candidate_key"] for row in converted["layers"][0]["pending"]}
+        self.assertEqual(len(pending_keys), len(proposals))
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, pending_keys)
+
+    def test_frozen_opaque_key_is_accepted_and_cannot_be_replaced(self):
+        repo, key, supported = sl.v2_discovery_identity("foundation", "alpha", "https://gitlab.com/org/project")
+        self.assertFalse(supported)
+        member = {"candidate_key": key, "repository": repo, "evidence_key": key,
+                  "disposition": "admit_pending", "pending_reason": "unsupported_discovery_identity",
+                  "exclusion_reason": None, "material": True,
+                  "evidence_refs": ["retained-returns.json#/raw/alpha/0/claude_discover/proposed/0"]}
+        frozen = dict(self.field_input, eligible_field=[member])
+        self.assertEqual(sl.v2_expand_field(frozen, []), [member])
+        for changed in (dict(member, candidate_key=key + "-changed"), dict(member, evidence_key=key + "-changed")):
+            with self.subTest(changed=changed):
+                with self.assertRaisesRegex(ValueError, "mismatched identity"):
+                    sl.v2_expand_field(dict(frozen, eligible_field=[changed]), [])
+        repository, opaque_key = sl.v2_opaque_identity("foundation", "alpha", SURV)
+        renamed = dict(member, repository=repository, candidate_key=opaque_key, evidence_key=opaque_key)
+        with self.assertRaisesRegex(ValueError, "cannot replace a supported canonical identity"):
+            sl.v2_expand_field(dict(frozen, eligible_field=[renamed]), [])
+
+    def assert_malformed_proposal_round_trips(self, proposals, cause):
+        run = self.screen_run(copies=2)
+        run["first"][0]["claude_discover"]["proposed"] = proposals
+        run["first"].append(self.healthy_later_round())
+        converted = self.convert_cli(run)
+        self.assert_healthy_later_layer(converted)
+        self.assertEqual(converted["returns"]["raw"]["alpha"][0]["claude_discover"]["proposed"], proposals)
+        pending = converted["layers"][0]["pending"]
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(pending[0]["pending_reason"], cause)
+        if cause == "malformed_discovery_proposal":
+            self.assertTrue(pending[0]["candidate_key"].startswith("foundation/alpha/unsupported-identity-"))
+        self.assertTrue(pending[0]["material"])
+        self.assertEqual(pending[0]["evidence_refs"], ["#/raw/alpha/0/claude_discover/proposed" +
+                                                    ("/0" if isinstance(proposals, list) else "")])
+        failures = converted["returns"]["failures"]["alpha"]
+        self.assertTrue(any(row["cause"] == cause and row["ref"] == pending[0]["evidence_refs"][0]
+                            for row in failures), failures)
+        self.assertTrue(converted["layers"][0]["reopen"])
+        prior = {row["candidate_key"]: row for row in converted["layers"][0]["eligible_field"]}
+        appended = self.ledger_cli("--append", str(self.retain_v2_result(converted)))
+        self.assertEqual(appended.returncode, 0, appended.stderr)
+        checked = self.ledger_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        self.assert_second_native_round(prior, {pending[0]["candidate_key"]})
+
+    def test_null_discovery_evidence_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": None}], "malformed_discovery_evidence")
+
+    def test_integer_discovery_evidence_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": 5}], "malformed_discovery_evidence")
+
+    def test_string_discovery_evidence_never_becomes_character_refs(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": "abc"}], "malformed_discovery_evidence")
+
+    def test_mixed_discovery_evidence_list_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"repository": "https://github.com/org/newrepo", "evidence": ["https://example.org", 5]}],
+            "malformed_discovery_evidence")
+
+    def test_missing_repository_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            [{"name": "x", "url": "https://github.com/org/newrepo"}], "malformed_discovery_proposal")
+
+    def test_nonobject_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            ["https://github.com/org/newrepo"], "malformed_discovery_proposal")
+
+    def test_null_proposal_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips([None], "malformed_discovery_proposal")
+
+    def test_nonlist_proposed_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips("https://github.com/org/newrepo", "malformed_discovery_proposal")
+
+    def test_null_proposed_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(None, "malformed_discovery_proposal")
+
+    def test_nonlist_proposed_object_is_retained_pending(self):
+        self.assert_malformed_proposal_round_trips(
+            {"repository": "https://github.com/org/newrepo", "evidence": []}, "malformed_discovery_proposal")
+
     def test_facts_role_outside_requirement_cannot_exclude(self):
         run = self.screen_run(copies=2)
         run["first"][0]["facts"] = [

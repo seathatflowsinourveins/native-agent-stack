@@ -1,0 +1,20 @@
+# Excerpt of the ollama server log of run B3: only the lines the receipt cites,
+# each prefixed with its line number in the full log. Paths, user and session ids are replaced.
+# Full log: 355 lines, kept in the state directory, not published.
+14: time=2026-10-01T23:42:06.881Z level=WARN source=runner.go:722 msg="user overrode visible devices" CUDA_VISIBLE_DEVICES=-1
+15: time=2026-10-01T23:42:06.881Z level=WARN source=runner.go:726 msg="if GPUs are not correctly discovered, unset and try again"
+29: time=2026-10-01T23:42:08.318Z level=INFO source=types.go:50 msg="inference compute" id=cpu library=cpu compute="" name=cpu description=cpu libdirs=ollama driver="" pci_id="" type="" total="102.2 GiB" available="59.1 GiB"
+32: time=2026-10-01T23:42:08.897Z level=DEBUG source=openai.go:1235 msg="parsed Responses tools" count=12 web_search=false
+38: time=2026-10-01T23:42:08.930Z level=INFO source=server.go:100 msg="using llama-server for model" model=<HOME>/.local/state/native-agent-stack/model-server-gate-20261001/ollama-models/blobs/sha256-d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785
+39: time=2026-10-01T23:42:08.931Z level=INFO source=llama_server.go:436 msg="starting llama-server" cmd="<HOME>/.local/state/native-agent-stack/model-server-gate-20261001/ollama/lib/ollama/llama-server --model <HOME>/.local/state/native-agent-stack/model-server-gate-20261001/ollama-models/blobs/sha256-d98cdcbd03e17ce47681435b5150e34c1417f50b5c0019dd560e4882c5745785 --port 25176 --host 127.0.0.1 --no-webui --offline -c 32768 -np 1 --log-verbosity 4 --no-log-prefix --no-log-timestamps --no-jinja --chat-template chatml --load-mode none --flash-attn auto -b 1024 -ub 1024 --context-shift --keep 4"
+192: llama_context: n_ctx                 = 32768
+222: srv    load_model: initializing, n_slots = 1, n_ctx_slot = 32768, kv_unified = 'false'
+246: time=2026-10-01T23:42:20.019Z level=INFO source=images.go:383 msg="template selection" model=registry.ollama.ai/library/gate-qwen3-8b:latest selected=go_template renderer="" parser="" go_template="[completion tools thinking]" chat_template="[tools thinking completion]" harmony=null renderer_parser=null
+251: time=2026-10-01T23:42:20.035Z level=DEBUG source=llama_server.go:1624 msg="llama-server completion request" media=0 prompt_len=18625
+319: slot print_timing: id  0 | task 0 | prompt eval time =   81639.95 ms /  4046 tokens (   20.18 ms per token,    49.56 tokens per second)
+320: slot print_timing: id  0 | task 0 |        eval time =  182557.81 ms /   604 tokens (  302.75 ms per token,     3.30 tokens per second)
+321: slot print_timing: id  0 | task 0 |       total time =  264197.76 ms /  4650 tokens
+325: [GIN] 2026/10/01 - 23:46:44 | 200 |         4m35s |       127.0.0.1 | POST     "/v1/responses"
+329: time=2026-10-01T23:46:44.317Z level=DEBUG source=openai.go:1235 msg="parsed Responses tools" count=12 web_search=false
+331: time=2026-10-01T23:46:44.381Z level=DEBUG source=llama_server.go:1624 msg="llama-server completion request" media=0 prompt_len=21640
+345: [GIN] 2026/10/01 - 23:47:08 | 200 | 24.116302818s |       127.0.0.1 | POST     "/v1/responses"

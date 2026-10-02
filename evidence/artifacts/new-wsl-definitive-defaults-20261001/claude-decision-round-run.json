@@ -1,0 +1,16 @@
+{
+ "schema_version": 1,
+ "kind": "source-review-run-summary",
+ "what": "The Claude family's decision round: counts and times read from the workflow's journal and agent transcripts, which stay private.",
+ "run": "wf_c0e29ea4-90f",
+ "dispatch": "stack-researcher, opus, effort max; 12 deciders and 6 critics",
+ "agents": 18,
+ "agent_errors": 0,
+ "subagent_tokens": 4158945,
+ "tool_uses": 670,
+ "preregistration_recorded_at_utc": "2026-10-01T20:51:08Z",
+ "first_agent_started_utc": "2026-10-01T20:51:44Z",
+ "last_agent_ended_utc": "2026-10-01T22:09:21Z",
+ "journal_sha256": "adc1cabf85cbd05217a5885ee9d62c9460a39e2d4db6da69ef280a6e2ccd2a90",
+ "limits": "the token and tool-use totals are the workflow runtime's own report; no provider bill was read"
+}

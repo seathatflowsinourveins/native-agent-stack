@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "record": "Current-main integration of the three scoped source repairs",
+  "feature_base": "cc63b55e242556103ccb8c0d6d99affb0c159097",
+  "main_revision": "49a4260029244e3e20d8b2dd3ada00af7983a3c9",
+  "evidence_class": "local_integration",
+  "source_reference": "docs/lanes.md shared hot-file integration protocol at the main revision",
+  "independent_source_review": "Astra/max accepted the bounded six-file repair; stronger malformed-identity controls had disproved the first bounded Sol repair and triggered this review",
+  "reviewed_repair_receipt_sha256": "f66f5ded077acdafc481cc3bdd5b701de20e800b90afda446867b82ba23c4664",
+  "reviewed_source_and_receipt_parity": "All six reviewed repair files remain byte-identical after the main merge",
+  "checks": [
+    {
+      "command": "env NAS_CODEX_INTEGRATION=0 PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills",
+      "exit_code": 0,
+      "tests_run": 403,
+      "skipped": 44,
+      "returned_summary": "Ran 403 tests in 62.042s; OK (skipped=44)",
+      "original_output_sha256": "c1e430b9ba07303c7b2c32ee091f747b02850ff67a925ba135fda25cbb2f4839",
+      "scope": "Fresh local fixtures on merged inputs; no native Codex/model acceptance"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_summary": "69 components, 9268 hashed files, 4 profiles, 186 receipts; passed",
+      "original_output_sha256": "6fee2574f40feee71f6326c7610afd0773c1ed2fd3c4604c5d754e4282a598d3",
+      "scope": "Before addition of this integration record; final commit validation is a separate coordinator check"
+    }
+  ],
+  "prior_snapshot": "The unchanged repair receipt retains its earlier 403-test/45-skip run. The fresh merged run above has44 skips; neither result is retroactively substituted or summed.",
+  "retained_failure": "Initial ancestry checks exited128 at the shallow boundary. Deepening the authorized public branch established merge-base85543efe; native merge then exited0. No allow-unrelated-histories override was used.",
+  "output_retention": "Exact native commands and returned output retained privately; this public record carries sanitized summaries and exact hashes.",
+  "limitations": ["V2 remains unlaunchable", "Part2 notes4–11 remain open", "Historical backend/family-route/count provenance is not newly qualified", "No provider, broker, trading or new-host acceptance follows from these fixtures"],
+  "usage": {"provider_usage": null, "reason": "No model call invoked by the declared fixture run and no native provider counter returned"}
+}
