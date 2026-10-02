@@ -164,10 +164,10 @@
       "id": "agent-sdks",
       "title": "Agent SDKs and runtime workers",
       "purpose": "Select the programmatic SDK or runtime that gives a worker structured events, custom tools or session control beyond the native CLI.",
-      "selection": "Retain the existing Codex CLI/SDK integration (component codex) for supported start/run/resume workflows; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unselected alternatives.",
+      "selection": "Retain native Codex CLI/SDK for session work. Use an explicitly configured OmniRoute SDK lane for application tools/events/handoffs; Pi remains an optional trial. The source-only 2026-10-02 two-host review is in docs/decisions/2026-10-02-two-host-north-star-architecture.md; it does not promote a new runtime.",
       "activation": "Use the native CLI for ordinary work; reach for an official SDK only when an application needs structured events, custom tools or programmatic session control.",
-      "lifecycle_scope": "Codex CLI/SDK use is accepted within its recorded tests; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph have no adoption lifecycle here, only source-reviewed version pins.",
-      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting a deferred alternative."
+      "lifecycle_scope": "Retain each runtime's recorded host, version and task scope. Native Codex receipts, separate SDK protocol checks and the unmerged Pi trial are distinct; the 2026-10-02 source review supplies no new model, runtime or workstation lifecycle acceptance.",
+      "next_gap": "The 2026-10-02 source review distinguishes native Ultra from API reasoning enums and Pi 0.99.1 trial evidence from upstream 1.0.0. Qualify the actual application's endpoint, locked SDK, extensions, cancellation and resume before broader promotion; workstation activation remains host-specific."
     },
     {
       "id": "mcp-surfaces",
