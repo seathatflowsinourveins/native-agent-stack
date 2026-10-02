@@ -41590,6 +41590,11 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
+      "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
+      "bytes": 29878
+    },
+    {
       "path": "evidence/artifacts/runtime-sdk-20260930/README.md",
       "sha256": "70059a0b57eb1aae9bb62c04ffbbc60e4119381e777eba5290ad12c23f66f3bd",
       "bytes": 1585
