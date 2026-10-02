@@ -151,14 +151,15 @@ engineering-process-skills() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L164
-      check engineering-process-skills smoke 'lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+      check engineering-process-skills smoke 'declare -A want=([tdd]=423f3cc2bccf3b0ed426fb35eeb4b38d9188a343 [diagnosing-bugs]=463c81def888fefa77b894837d301d9ed70e0994 [codebase-design]=20b7cd1dd1fe5b0bd37ba72649f3a29375574b5b [domain-modeling]=959e63161ff78b4b1cd553b2c0e09e0c68418e5f [writing-for-agents]=bd9c9c4762db0a9a094fd419316ebd4b0444d06e [setup-matt-pocock-skills]=abf20c04a4aa8a37ff20aa7286f28857150f8b8d)
+lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
 lock="${lock:-$HOME/.agents/.skill-lock.json}"
 listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
 for skill in tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills; do
   for agent in '"'"'Claude Code'"'"' Codex; do
     jq -e --arg skill "$skill" --arg agent "$agent" '"'"'any(.[]; .name == $skill and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
   done
-  jq -e --arg skill "$skill" '"'"'.skills[$skill].ref == "v1.2.3"'"'"' "$lock" >/dev/null
+  jq -e --arg skill "$skill" --arg hash "${want[$skill]}" '"'"'.skills[$skill].skillFolderHash == $hash'"'"' "$lock" >/dev/null
 done'
       ;;
     *) skipped engineering-process-skills ;;
