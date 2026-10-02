@@ -1531,8 +1531,9 @@ within one second, and keep K4's named rows and helper measurements below
 0.5 seconds of processor time on the workstation. Other hosts, CI included,
 scale that bound by their time for a fixed guard-independent workload
 (the standard library's shlex lexer over short words and one long quoted
-word) relative to the workstation's, never below 1: on the hosted macOS
-runner a long quoted word lexes about 2.6 times slower than here. Each helper's
+word) relative to the workstation's, never below 1, measured beside a
+measurement that exceeds the bound because load moves during a run: on the hosted
+macOS runner a long quoted word lexes about 2.6 times slower than here. Each helper's
 growth from 25,000 to 100,000 characters must also fit an exponent under 1.5
 (1 is linear, 2 quadratic) over the minimum of up to three rounds, the
 criterion of the child-usage linearity checks. The mutation gate counts only

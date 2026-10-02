@@ -4178,7 +4178,7 @@ K4_TIMING = {
     "T-STORES-PREFIX": (lambda: "echo " + ".local/share/omniroutX/ " * 7500 + "; cat ~/.local/share/omniroute/x", "credential_file_read"),
 }
 _K4_TIMING_CHILD = (
-    "import json, statistics, sys, time\n"
+    "import json, sys, time\n"
     "sys.dont_write_bytecode = True\n"
     "sys.path.insert(0, sys.argv[1])\n"
     "from tests import test_secret_path_guard as t\n"
@@ -4196,7 +4196,10 @@ _K4_TIMING_CHILD = (
     "    except t.guard.WorkBudgetExceeded as error:\n"
     "        verdict = error.args[0]\n"
     "    spans.append(time.process_time() - cpu)\n"
-    "print(json.dumps([verdict, statistics.median(spans), len(text)]))\n")
+    "best, factor = min(spans), 1.0\n"
+    "if best >= t.K4_LINEAR_SECONDS:  # only then is the host's speed asked, by two reference runs right after\n"
+    "    factor = max(t.k4_host_factor(1), t.k4_host_factor(1))\n"
+    "print(json.dumps([verdict, best, len(text), factor]))\n")
 
 
 # Per-helper scaling generators (section 9.6): a near-miss repetition that reaches the helper, at about 25k, 50k and 100k characters. The
@@ -4417,7 +4420,11 @@ K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, on the workstat
 # judged the runner, not the guard; a quadratic regression still grows 16 times per 4 times input and fails on any host. The text
 # holds short words and one long quoted word: shlex builds a token by repeated string concatenation, whose cost follows the
 # platform's allocator, and on that runner short words ran at 1.03 times the workstation while the row (one 120,000-character
-# quoted word, mostly shlex) ran at 2.6 times.
+# quoted word, mostly shlex) ran at 2.6 times. test_k4_timing asks for the factor only when a first measurement exceeds the bound,
+# and then right beside it (a row's child: two reference runs after its spans; a helper's repeated round: one before and one after,
+# the larger), because contention moves during a run: on
+# 2026-10-02 the workstation at a load average of 25 to 50 (other lanes' measurement workers) exceeded a factor taken once at the
+# start by up to 1.3 times on linear work.
 K4_REFERENCE_TEXT = (" ".join(f"word{i % 97} 'quoted {i % 13}' \"dq $X{i % 7}\"" for i in range(6000))
                      + " printf '" + "%s" * 60000 + "'")
 K4_REFERENCE_SECONDS = 0.188
@@ -4427,9 +4434,9 @@ def k4_host_scale(reference_seconds: float) -> float:
     return max(1.0, reference_seconds / K4_REFERENCE_SECONDS)
 
 
-def k4_host_factor() -> float:
+def k4_host_factor(runs: int = 5) -> float:
     best = math.inf
-    for _ in range(5):
+    for _ in range(runs):
         cpu = time.process_time()
         shlex.split(K4_REFERENCE_TEXT)
         best = min(best, time.process_time() - cpu)
@@ -4909,21 +4916,21 @@ class K4GuardTests(unittest.TestCase):
                 guard.check(K4_R + 'tavily -- true')
 
     def test_k4_timing(self):
-        # Section 9.6: each named row in a fresh Python child (-B), median of
-        # three process_time spans below 0.5 s on the workstation, scaled by the
-        # host factor elsewhere. Wall deadlines remain separate in the real
+        # Section 9.6: each named row in a fresh Python child (-B), the minimum
+        # of three process_time spans (the least-disturbed run, as for the
+        # helpers) below 0.5 s on the workstation, scaled by the host factor
+        # elsewhere. Wall deadlines remain separate in the real
         # hook-process test.
-        bound = K4_LINEAR_SECONDS * k4_host_factor()
         runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name, str(HOOK)],
                                      capture_output=True, text=True, timeout=180) for name in sorted(K4_TIMING)}
         for name, (build, expected) in sorted(K4_TIMING.items()):
             with self.subTest(row=name):
                 done = runs[name]
                 self.assertEqual(done.returncode, 0, done.stderr[-400:])
-                verdict, cpu, length = json.loads(done.stdout)
+                verdict, cpu, length, factor = json.loads(done.stdout)
                 self.assertLess(length, 199_000)
                 self.assertEqual(verdict, expected)
-                self.assertLess(cpu, bound)
+                self.assertLess(cpu, K4_LINEAR_SECONDS * factor)
         # T-CODE-NONOUTPUT's instrumentation: every environment occurrence is visited, and output context is read once a token (a list
         # built in one pass), so deepening the nesting four times with twice the occurrences stays linear, not depth x tokens.
         guard.start_work()
@@ -4959,8 +4966,11 @@ class K4GuardTests(unittest.TestCase):
         for name, generator in sorted(K4_SCALING.items()):
             with self.subTest(helper=name):
                 texts = {size: generator(size) for size in (25_000, 50_000, 100_000)}
+                # The first round is judged as measured; a repeated round divides its times by the host factor measured
+                # just before and after it (contention moves during a run), and each size keeps its least-disturbed round.
                 totals, helper_totals = {}, {}
                 for _round in range(3):
+                    factor, measured = (k4_host_factor(1) if _round else 1.0), []
                     for size, text in texts.items():
                         self.assertLess(len(text), 199_000)
                         original, inside = getattr(guard, name), []
@@ -4980,13 +4990,21 @@ class K4GuardTests(unittest.TestCase):
                                 pass
                             total = time.process_time() - cpu
                         self.assertTrue(inside, f"{name} not reached at {size}")
-                        helper_totals[size] = min(helper_totals.get(size, math.inf), sum(inside))
-                        totals[size] = min(totals.get(size, math.inf), total)
-                    if k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT:
+                        measured.append((size, sum(inside), total))
+                    if _round:
+                        factor = max(factor, k4_host_factor(1))
+                    for size, helper, total in measured:
+                        helper_totals[size] = min(helper_totals.get(size, math.inf), helper / factor)
+                        totals[size] = min(totals.get(size, math.inf), total / factor)
+                    # Another round only when a criterion fails: under a loaded host (SMT siblings busy) one round's processor
+                    # time can exceed the bound for linear work, while a real regression fails every round.
+                    if (k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT
+                            and all(helper_totals[size] < K4_LINEAR_SECONDS and totals[size] < K4_LINEAR_SECONDS
+                                    for size in texts)):
                         break
                 for size in texts:
-                    self.assertLess(helper_totals[size], bound)
-                    self.assertLess(totals[size], bound)
+                    self.assertLess(helper_totals[size], K4_LINEAR_SECONDS)
+                    self.assertLess(totals[size], K4_LINEAR_SECONDS)
                 # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
                 self.assertLess(k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]), K4_GROWTH_EXPONENT, helper_totals)
 
