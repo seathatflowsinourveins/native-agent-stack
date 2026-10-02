@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "a00b3290ef70debf39eaf5ef8a720d5bf30a9804ad4eec30a9b6042863992dd5"
+        "sha256": "aadb70bfc7f6f59cd012213c0210dc6e6a35c05f6cb6447e0ca75150d2844bcc"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -90,7 +90,7 @@
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "b24431aae4e18a16d9fd6ea5a608de22359fc981583a6014f7b0f50d045e19f4"
+        "sha256": "9c580b7178daa969d7d3342838418bda4e43ea2b772275cf13bf12ff1cf29cb7"
       }
     ],
     "inputs": [
@@ -102,28 +102,28 @@
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "6a556d21bb2d8599928089644eebe4c74941ddd7b2e642b2f12b55d7c11225a5"
+        "sha256": "37922f3cd632546f2e00f53d150b1b0bcf9696424b400ad69d70bce7f5a17cb9"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "0a12f732b05b0ec954578c5f5a668dd8a323d5e6382a38271e3bf6d42bbd1d75"
+        "sha256": "f8d7967e93f9d0515e20fc444323e63dbfe654a5c80c87660e01a0d02cb0850e"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "890d8e4cd92c55bade5a1f189454d4374737db41b5430c16193bf2307eb60f29"
+        "sha256": "1ed24656878313de663a0eec811e7dd37c511d247f341e5c8f8263fe46f8e8d9"
       }
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Both 26.04.1 trial and 24.04.5 fallback are symmetric provisional arms with no merit precedence. Preregister the same separate-throwaway R1 comparisons on one unchanged host/kernel/driver, checkout, user-data and bootstrap profile. Both signed sums pass P1; P2 workstation schema is not image qualification. W2 hashes the whole selected image against its exact signed/catalog release mapping; W4/W6 use that filename. Each arm must record first_boot (W5 default uid 1000, retained results, selected-image cloud-init version/schema and F1 running); systemd_user_from_second_instance (F2 linger/idle and F3 directory/socket ownership plus manager running from the workstation second instance); wsl_gpu (/dev/dxg and native nvidia-smi visibility on the same Windows driver); uv_cpython_3_13 (separate managed Python 3.13.x through uv); node_24 (bootstrap v24.21.0 startup). Preserve P3 age/baseline, W5 second count, W7 owner 1000:1000 and failed-rehearsal/W6 export-before-unregister guards. Missing, failed or skipped criteria do not qualify an arm or rank its peer. Record sanitized native per-arm output before selecting within the measured host scope. Full-stack, GPU-workload and model acceptance remain separate and unrun.",
+    "quality_rule": "Ubuntu 26.04.1 is the single default and 24.04.5 the named rollback; both stay provisional (amended on 2026-10-02 before any comparison ran: the merged definitive manifest names the default, and the first rehearsal showed the host condition below). Preregister the same separate-throwaway R1 comparisons on one unchanged host/kernel/driver, checkout, user-data and bootstrap profile. Both signed sums pass P1; P2 workstation schema is not image qualification. W2 hashes the whole selected image against its exact signed/catalog release mapping; W4/W6 use that filename. Each arm must record first_boot (W5 default uid 1000, retained results, selected-image cloud-init version/schema and F1's pass condition: running, or degraded with systemd-binfmt.service as the only failed unit, which fails by design on WSL 3.0.1); systemd_user_from_second_instance (F2 linger/idle and F3 directory/socket ownership plus manager running from the workstation second instance); wsl_gpu (/dev/dxg and native nvidia-smi visibility on the same Windows driver); uv_cpython_3_13 (separate managed Python 3.13.x through uv); node_24 (bootstrap v24.21.0 startup). Preserve P3 age/baseline, W5 second count, W7 owner 1000:1000 and failed-rehearsal/W6 export-before-unregister guards. Missing, failed or skipped criteria do not qualify an arm or rank its peer. Record sanitized native per-arm output before selecting within the measured host scope. Full-stack, GPU-workload and model acceptance remain separate and unrun.",
     "usage_rule": "No usage claim. The research unit's model usage (tokens, attempts and retries) was not recorded and stays unknown; this record neither estimates it nor counts it as zero. The second follow-up's two research passes, as the coordinator's brief reports them: the completeness critic made about 44 HTTP requests to 37 distinct URLs against a budget of about 25, its token usage not recorded here; the researcher used 284,098 tokens and 70 tool uses and made about 85 HTTP requests against a budget of about 35. The scope of that token counter is not stated here, and nothing is summed or compared. A host run executes deterministic commands; the session that runs them records its own provider usage separately. No whole-task savings claim. Prior native Claude W-IMG preparation attempt: actual weekly-limit failure, process exit 1, no changes. Its returned result has num_turns 87; input_tokens 162, cache_creation_input_tokens 390235, cache_read_input_tokens 19973920, output_tokens 110059 and output_tokens_details.thinking_tokens 86281. These are native result fields, not summed totals; thinking is included in output. Native retries, whole-task total and per-image usage remain unknown. No new provider run or usage comparison is claimed by this recipe parameterization."
   },
   "runtime_and_platform": {
-    "platform": "Planned target, not run: the existing Windows host with WSL 2.7.13 (the research unit's wsl.exe --version read) and a second WSL 2 distribution, <Name>, beside the workstation's.",
+    "platform": "Planned target, not run: the existing Windows host, updated from WSL 2.7.13 to 3.0.1.0 on 2026-10-02 (the adopted release for a second systemd distribution), and a second WSL 2 distribution, <Name>, beside the workstation's.",
     "tools": [
       {
         "name": "WSL",
-        "version": "2.7.13 as read on the host by the research unit; source read at microsoft/WSL tag 2.7.13 (80697fd42cca3de0c0d5dd1931c36112372a577e); not run for this record"
+        "version": "3.0.1.0 as read on the host on 2026-10-02 (kernel 6.18.40.1-1); 2.7.13 as read by the research unit before the update; source read at microsoft/WSL tag 2.7.13 (80697fd42cca3de0c0d5dd1931c36112372a577e); not run for this record"
       },
       {
         "name": "Ubuntu WSL image",

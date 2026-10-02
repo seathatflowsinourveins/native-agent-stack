@@ -54,7 +54,19 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
     attached, and the host-wide check passes a plain ``Select-String`` or ``grep`` read of ``.wslconfig`` and nothing
     else that names it;
   - G: R1, the page's first step, rehearses on a throwaway name with both storage readings and removes only that
-    name, exporting it first when the rehearsal failed.
+    name, exporting it first when the rehearsal failed;
+- the follow-up of 2026-10-02 to the first observations of the updated host (WSL 3.0.1.0), each rule bound to the recipe,
+  the record, the checklist and the receipt example, and each with in-memory controls that restore the pre-change text:
+  - Host-wide rules adopt stable WSL 3.0.1 or later for a second systemd distribution, as policy, and say the host was
+    updated and passed its check with the two-distribution proof still owed;
+  - W1 records the workstation's baseline of five values without sudo (``/proc/self`` where W1 read ``/proc/1``), and W5
+    reads the same five values from both running distributions, after its cgroup block and before F1, under the receipt's
+    ``paired_isolation`` (one object per distribution); W6 repeats that record;
+  - F1 accepts ``degraded`` only when ``systemctl --failed --no-legend --plain`` lists exactly ``systemd-binfmt.service``
+    and its log holds the read-only flush message (microsoft/WSL#40621 and #41226); any other failed unit stops the run;
+  - no recipe command controls ``systemd-binfmt``: the restart that served WSL 2.7.x exits 1 on the adopted release, so a
+    failed interop check after an unregister stops for review with two records after the check (a history sentence may
+    still name the restart).
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -113,7 +125,17 @@ INTEROP_VERIFY = ("wsl.exe -d '<Survivor>' --exec sh -c "
                   "'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'")
 INTEROP_GUARD = ("if ($LASTEXITCODE -ne 0) { throw "
                  "'interop failed: recover in the surviving distribution before continuing' }")
-NAMESPACE_READ = "readlink /proc/1/ns/cgroup"
+# The follow-up of 2026-10-02 (the updated host, WSL 3.0.1). W1 records the workstation's baseline of five values and W5
+# reads the same five from both running distributions. The namespace read is `/proc/self`, which needs no sudo, where the
+# earlier W1 read `/proc/1`.
+OLD_NAMESPACE_READ = "readlink /proc/1/ns/cgroup"
+NAMESPACE_READ = "readlink /proc/self/ns/cgroup"
+WORKSTATION_BASELINE = ("id -u; systemctl is-system-running; systemctl --failed --no-legend --plain | awk '{print $1}'; "
+                        'systemctl is-active "user@$(id -u).service"; ' + NAMESPACE_READ)
+PAIRED_NEW = ("/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'id -u; systemctl is-system-running; "
+              'systemctl --failed --no-legend --plain | awk "{print \\$1}"; systemctl is-active "user@$(id -u).service"; '
+              + NAMESPACE_READ + "'")
+ISOLATION_KEYS = {"uid", "system_state", "failed_units", "user_manager", "cgroup_namespace"}
 CGROUP_PROCS = "cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'"
 USER_MANAGER_ACTIVE = ('/mnt/c/Windows/System32/wsl.exe -d \'<Name>\' --exec sh -c '
                        '\'systemctl is-active "user@$(id -u).service"\'')
@@ -124,6 +146,40 @@ STORAGE_RULE = ("On both paths, record P3's baseline before the import and `seco
 OLD_STORAGE_RULE = ("On both paths, the second storage count equals P3's baseline; a larger count is recorded "
                     "with the new lines, a failed W5 counts as exposure to microsoft/WSL#41482, and nothing "
                     "continues to stage 2 until that is decided.")
+# The follow-up of 2026-10-02, change 1: the adopted target, as policy, and the two sentences it replaced.
+ADOPTED_TARGET = ("This recipe adopts stable WSL 3.0.1 or later for a second systemd distribution, and requires it "
+                  "before W4 or any W6 import.")
+HOST_UPDATE = ("The host was updated to WSL 3.0.1.0 on 2026-10-02 and passed its check (rootless container, interop, "
+               "user manager); the two-distribution proof is still owed.")
+OLD_ADOPTED_TARGET = "A second systemd distribution requires WSL 3.0.1 or later before W4 or any W6 import."
+OLD_HOST_UPDATE = "The host's 2.7.13 must be updated outside this page before this second-distribution run."
+# Change 3: on the adopted release WSL mounts the binfmt status file read-only (microsoft/WSL#40621), so
+# systemd-binfmt.service fails at every boot, which upstream calls benign (#41226). F1 accepts that one failed unit.
+BINFMT_UNIT = "systemd-binfmt.service"
+F1_FAILED = "systemctl --failed --no-legend --plain"
+F1_LOG = "journalctl -b 0 -t systemd-binfmt --no-pager | tail -n 4"
+F1_PASS = ("`degraded` when `systemctl --failed --no-legend --plain` lists exactly `systemd-binfmt.service` and that "
+           "unit's log, from the `journalctl` line, holds")
+FLUSH_MESSAGE = "Failed to flush binfmt_misc rules, ignoring: Read-only file system"
+# F1 reads that log as `<WSL_USER>` without sudo (the user is in `adm`); on `degraded` with only the journal's permission
+# notice, the line is repeated once with sudo, which the recipe's other journal commands also use.
+F1_SUDO_FALLBACK = ("On `degraded`, if the `journalctl` line prints only `Hint: You are currently not seeing messages from "
+                    "other users and the system.` or `-- No entries --`, the user cannot read the journal: repeat that line "
+                    "once with `sudo`, record both outputs and judge the second.")
+BINFMT_PR = "https://github.com/microsoft/WSL/pull/40621"
+BINFMT_ISSUE = "https://github.com/microsoft/WSL/issues/41226"
+BINFMT_BENIGN = "The systemd error is benign and won't affect registration of user defined binfmt settings."
+OLD_F1 = ("```sh\nsystemctl is-system-running --wait\nsystemctl --failed --no-legend\n"
+          "systemctl list-unit-files --type=service --no-pager\n```\n\n"
+          "Proof: `running`, no failed unit, and the service list prints. Ubuntu's own setup tests require `running` for "
+          "a new\ninstance. On `degraded`, record `systemctl --failed` and stop for review.\n\n")
+# The interop recovery: the restart was the WSL 2.7.x remedy; on the adopted release it exits 1, so a failed check stops
+# for review with two records. The native check stays in front of them.
+NATIVE_INTEROP = "test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver"
+INTEROP_RECORDS = ("ls /proc/sys/fs/binfmt_misc", "systemctl status systemd-binfmt.service --no-pager")
+RESTART_UNIT = "sudo systemctl restart systemd-binfmt || exit 1"
+OLD_INTEROP_RECOVERY = RESTART_UNIT + "\n" + NATIVE_INTEROP + "\n" + 'if [ "$?" -ne 0 ]; then exit 1; fi' + "\n"
+UNIT_CONTROL_RE = re.compile(r"\bsystemctl\b.*\b(?:restart|try-restart|reload-or-restart|start|stop)\b.*systemd-binfmt")
 USER_SESSION_WARNING = "wsl: Failed to start the systemd user session"
 # Loopback ports the workstation distribution already uses: the four in adoption/hosts/example.json, the gateway,
 # memory and the 2026-09-25 relocations named in adoption/platforms/linux-wsl2.md ("Listeners and ports"), and every
@@ -670,6 +726,16 @@ def chapter(text: str, title: str) -> str:
 def prose(text: str) -> str:
     """Markdown text with each run of whitespace as one space, so a phrase check does not depend on line wrapping."""
     return re.sub(r"\s+", " ", text)
+
+
+def reword(text: str, old: str, new: str) -> str:
+    """``text`` with the one phrase ``old`` replaced by ``new``, however the Markdown wraps it. It fails when the phrase is
+    not there exactly once, so a control that restores the pre-change wording cannot pass by changing nothing."""
+    pattern = r"\s+".join(re.escape(word) for word in old.split())
+    mutated, count = re.subn(pattern, lambda _match: new, text)
+    if count != 1:
+        raise AssertionError(f"{old!r} occurs {count} times, expected one")
+    return mutated
 
 
 def checklist_line(checklist: str, step: str) -> str:
@@ -1662,7 +1728,7 @@ def version_gate_errors(recipe: str, checklist: str) -> list[str]:
 
 def namespace_observation_errors(recipe: str, checklist: str) -> list[str]:
     errors = []
-    if ("sh", NAMESPACE_READ) not in step_commands(recipe, "W1"):
+    if ("sh", WORKSTATION_BASELINE) not in step_commands(recipe, "W1"):
         errors.append("W1 lacks the native observation on the running distribution")
     for needed in ("cgroup:[4026531835]", "PROC_CGROUP_INIT_INO", "initial cgroup namespace", "corroboration", "not the gate"):
         if needed not in prose(section(recipe, "W1")):
@@ -1718,10 +1784,10 @@ def unregister_interop_errors(recipe: str, checklist: str) -> list[str]:
     if sites != Counter({"R1": 2, "W5": 1, "W6": 1}):
         errors.append(f"unregister sites {dict(sites)} differ from the four reviewed removals")
     r1 = prose(section(recipe, "R1"))
-    if "sudo systemctl restart systemd-binfmt || exit 1" not in [c for _, c in step_commands(recipe, "R1")]:
-        errors.append("R1 lacks the supported surviving-distribution binfmt recovery")
-    if "If either check still fails, stop" not in r1:
-        errors.append("interop recovery lacks a stop when Windows execution does not return")
+    # The follow-up of 2026-10-02: on the adopted release the restart exits 1, so the recovery is a stop for review with two
+    # records (binfmt_recovery_errors); the stop when Windows execution does not return stays a requirement here.
+    if "stop for review" not in r1:
+        errors.append("interop recovery lacks a stop for review when Windows execution does not return")
     for step in ("R1", "W6"):
         if "WSLInterop" not in checklist_line(checklist, step) or "Windows executable" not in checklist_line(checklist, step):
             errors.append(f"the checklist's {step} removal lacks both interop observations")
@@ -1748,6 +1814,164 @@ def storage_window_errors(recipe: str, checklist: str) -> list[str]:
     return errors
 
 
+def adopted_target_errors(recipe: str) -> list[str]:
+    """Change 1 of the follow-up of 2026-10-02. "Host-wide rules" states, as policy, that the recipe adopts stable WSL
+    3.0.1 or later for a second systemd distribution. The 2.9.8 and 2.9.13 pre-release history stays beside it, and one
+    sentence says the host was updated to 3.0.1.0 on 2026-10-02 and passed its check, with the two-distribution proof still
+    owed. The two sentences the change replaced must not come back."""
+    rules = prose(chapter(recipe, "Host-wide rules"))
+    errors = [f"Host-wide rules lack: {needed}" for needed in
+              (ADOPTED_TARGET, HOST_UPDATE, "Neither pre-release is adopted", "2.9.8 pre-release notes",
+               "2.9.13 pre-release notes") if needed not in rules]
+    errors += [f"Host-wide rules still say: {old}" for old in (OLD_ADOPTED_TARGET, OLD_HOST_UPDATE) if old in rules]
+    return errors
+
+
+def paired_isolation_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """Change 2 of the follow-up of 2026-10-02. A reading of one distribution cannot show the same uid, distinct namespaces
+    and two healthy managers, so W5 runs, natively in the workstation's shell after its cgroup block and before F1, one
+    block of two command lines that read the same five values from both running distributions, and records them under the
+    receipt's ``paired_isolation`` (one object per distribution). W1 holds the workstation's baseline of the five, without
+    sudo, and W6 repeats the record as it repeats the cgroup proof."""
+    errors = []
+    w1 = step_commands(recipe, "W1")
+    if ("sh", WORKSTATION_BASELINE) not in w1:
+        errors.append("W1 lacks the workstation's baseline of the five observations")
+    if ("sh", OLD_NAMESPACE_READ) in w1:
+        errors.append("W1 still records the lone `/proc/1` namespace read, which needs privilege")
+    blocks = step_blocks(recipe, "W5")
+    paired = [block for block in blocks if WORKSTATION_BASELINE in block or PAIRED_NEW in block]
+    if paired != [[WORKSTATION_BASELINE, PAIRED_NEW]]:
+        errors.append("W5 does not hold one block of the two paired command lines, the workstation's first")
+    else:
+        cgroup = next((index for index, block in enumerate(blocks) if CGROUP_PROCS in block), len(blocks))
+        if blocks.index(paired[0]) <= cgroup:
+            errors.append("W5's paired block does not come after its cgroup block")
+    w5 = prose(section(recipe, "W5"))
+    errors += [f"W5's proof does not say: {needed}" for needed in (
+        "both distributions print the same uid", "both user managers print `active`",
+        "each system manager prints `running`, or `degraded` with `systemd-binfmt.service` as its only failed unit",
+        "differ from each other and neither is `cgroup:[4026531835]`",
+        "equal its own values recorded in W1 before the import",
+        "the WSL version and kernel from W1 and the image revision from W2", "`paired_isolation`",
+        *(f"`{key}`" for key in sorted(ISOLATION_KEYS))) if needed not in w5]
+    if "paired record" not in prose(section(recipe, "W6")):
+        errors.append("W6 does not repeat the paired record with the cgroup proof")
+    rows = command_table(record)
+    errors += [f"the record's command table lacks {step} {command}" for step, command in
+               (("W1", WORKSTATION_BASELINE), ("W5", WORKSTATION_BASELINE), ("W5", PAIRED_NEW))
+               if (step, "sh", command) not in rows]
+    w1_line, w5_line = checklist_line(checklist, "W1"), checklist_line(checklist, "W5")
+    if NAMESPACE_READ not in w1_line or "baseline" not in w1_line:
+        errors.append("the checklist's W1 line does not require the workstation's baseline")
+    if "paired_isolation" not in w5_line or "W1 baseline" not in w5_line:
+        errors.append("the checklist's W5 line does not require the paired record against the W1 baseline")
+    if "paired record" not in checklist_line(checklist, "W6"):
+        errors.append("the checklist's W6 line does not repeat the paired record")
+    record_block = field(receipt, "paired_isolation")
+    objects = [value for value in record_block.values() if isinstance(value, dict)] if isinstance(record_block, dict) else []
+    if len(objects) != 2 or not all(set(value) == ISOLATION_KEYS and all(is_placeholder(item, "<W5") for item in
+                                                                         value.values()) for value in objects):
+        errors.append("the receipt example has no paired_isolation with the five keys for two distributions")
+    host = field(receipt, "host")
+    baseline = host.get("workstation_baseline") if isinstance(host, dict) else None
+    if not isinstance(baseline, dict) or set(baseline) != ISOLATION_KEYS or not all(
+            is_placeholder(item, "<W1") for item in baseline.values()):
+        errors.append("the receipt example's host has no workstation_baseline with the five keys (W1)")
+    if isinstance(host, dict) and "cgroup_namespace" in host:
+        errors.append("the receipt example's host still holds the lone cgroup_namespace read")
+    return errors
+
+
+def binfmt_unit_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """Change 3 of the follow-up of 2026-10-02, the unit. On the adopted release WSL mounts the binfmt status file
+    read-only (microsoft/WSL#40621), so ``systemd-binfmt.service`` fails at every boot with ``Failed to flush binfmt_misc
+    rules, ignoring: Read-only file system``, which upstream calls benign (#41226). F1 passes on ``running``, or on
+    ``degraded`` only when ``systemctl --failed --no-legend --plain`` lists exactly that unit and its log holds the
+    message; any other failed unit stops the run. A text that accepts every ``degraded`` state, or stops at every one, fails."""
+    errors = []
+    f1 = [command for _, command in step_commands(recipe, "F1")]
+    wanted = ["systemctl is-system-running --wait", F1_FAILED, F1_LOG]
+    if any(command not in f1 for command in wanted) or [f1.index(command) for command in wanted] != sorted(
+            f1.index(command) for command in wanted):
+        errors.append(f"F1 does not run {wanted} in that order")
+    if "systemctl --failed --no-legend" in f1:
+        errors.append("F1 still lists the failed units without --plain")
+    text = prose(section(recipe, "F1"))
+    errors += [f"F1's text does not say: {needed}" for needed in
+               (F1_PASS, FLUSH_MESSAGE, "Any other failed unit stops the run", BINFMT_PR, BINFMT_ISSUE, BINFMT_BENIGN,
+                "`adm`", F1_SUDO_FALLBACK) if needed not in text]
+    if "On `degraded`, record" in text:
+        errors.append("F1 still stops at every `degraded`")
+    decision = prose(chapter(record, "Decision"))
+    errors += [f"the record's decision does not say: {needed}" for needed in
+               ("`degraded` when `systemctl --failed --no-legend --plain` lists exactly `systemd-binfmt.service`",
+                "microsoft/WSL#40621", "#41226") if needed not in decision]
+    if "F1 reports `degraded` on a clean run" in prose(chapter(record, "Overturn condition")):
+        errors.append("the record's overturn condition still revisits every `degraded` F1")
+    rows = command_table(record)
+    errors += [f"the record's command table lacks F1 {command}" for command in (F1_FAILED, F1_LOG)
+               if ("F1", "sh", command) not in rows]
+    errors += [f"the record's Sources lack {url}" for url in (BINFMT_PR, BINFMT_ISSUE) if url not in record]
+    line = checklist_line(checklist, "F1")
+    if not all(part in line for part in ("`running`", "`degraded`", "exactly `systemd-binfmt.service`",
+                                         "any other failed unit stops")):
+        errors.append("the checklist's F1 line does not accept `degraded` for the one unit only")
+    first = next((entry for entry in receipt.get("steps", []) if entry.get("step") == "F1"
+                  and entry.get("cmd") == "systemctl is-system-running --wait"), {})
+    if not all(isinstance(first.get(key), str) and "degraded" in first[key] for key in ("exit", "output_excerpt")):
+        errors.append("the receipt example's F1 entry for the wait command still holds a fixed `running`")
+    arms = receipt.get("comparison_arms", {})
+    if not arms or not all("degraded" in str(arm.get("first_boot")) for arm in arms.values()):
+        errors.append("the receipt example's first_boot criteria still read F1 `running` only")
+    return errors
+
+
+def binfmt_recovery_errors(recipe: str, record: str, checklist: str, receipt: dict) -> list[str]:
+    """Change 3 of the follow-up of 2026-10-02, the recovery. ``sudo systemctl restart systemd-binfmt`` was the WSL 2.7.x
+    remedy for the lost WSLInterop registration. On the adopted release the registration is protected and that restart
+    exits 1, so no recipe command may control the unit (a history sentence may still name the restart). Every unregister
+    keeps its check. After R1's removal blocks, a native ``sh`` block repeats the check and records ``ls
+    /proc/sys/fs/binfmt_misc`` and ``systemctl status systemd-binfmt.service --no-pager``, and the page stops for review,
+    importing and provisioning nothing."""
+    errors = [f"the recipe runs `{command}`, a control of systemd-binfmt" for _, command in fenced_commands(recipe)
+              if UNIT_CONTROL_RE.search(command)]
+    errors += [f"the record's command table has `{command}`, a control of systemd-binfmt"
+               for _, _, command in command_table(record) if UNIT_CONTROL_RE.search(command)]
+    r1 = step_commands(recipe, "R1")
+    blocks = [block for block in step_blocks(recipe, "R1") if INTEROP_RECORDS[0] in block]
+    if len(blocks) != 1 or blocks[0] != [NATIVE_INTEROP, *INTEROP_RECORDS]:
+        errors.append("R1 lacks one sh block of the native check, `ls /proc/sys/fs/binfmt_misc` and "
+                      "`systemctl status systemd-binfmt.service --no-pager`, in that order")
+    else:
+        guards = [index for index, (_, command) in enumerate(r1) if command == INTEROP_GUARD]
+        first = next(index for index, (shell, command) in enumerate(r1) if shell == "sh" and command == NATIVE_INTEROP)
+        if not guards or first < guards[-1]:
+            errors.append("R1's records do not come after its interop checks")
+    r1_text = prose(section(recipe, "R1"))
+    errors += [f"R1's text does not say: {needed}" for needed in
+               ("On WSL 2.7.13", "no remedy on the adopted release", BINFMT_PR, "exits 1", "stop for review",
+                "do not import or provision another distribution", "`interop_after_unregister`")
+               if needed not in r1_text]
+    errors += [f"R1 still says: {old}" for old in
+               ("If either check still fails, stop;", "Proof: the restart exits 0", "Recover from a native shell")
+               if old in r1_text]
+    w6 = prose(section(recipe, "W6"))
+    if "do not import" not in w6 or "repeat both observations before resuming" in w6:
+        errors.append("W6 does not stop for review without an import when the guard throws")
+    for step in ("R1", "W6"):
+        line = checklist_line(checklist, step)
+        if "stops for review" not in line or "systemctl restart" in line:
+            errors.append(f"the checklist's {step} line does not stop for review, or still runs the restart")
+    decision = prose(chapter(record, "Decision"))
+    if "stops for review" not in decision or "supported `sudo systemctl restart systemd-binfmt` recovery" in decision:
+        errors.append("the record's decision does not stop for review, or still names the supported restart recovery")
+    interop = receipt.get("interop_after_unregister") if isinstance(receipt, dict) else None
+    if not isinstance(interop, str) or "stop for review" not in interop or "systemd-binfmt recovery" in interop:
+        errors.append("the receipt example's interop_after_unregister does not record the stop for review")
+    return errors
+
+
 class RehearsalRepairTests(unittest.TestCase):
     """Source contracts from the real rehearsal; controls restore the unsafe old text in memory only."""
 
@@ -1756,7 +1980,7 @@ class RehearsalRepairTests(unittest.TestCase):
         receipt = json.loads(read(RECEIPT_EXAMPLE))
         components = {c["id"] for c in json.loads(read(STACK))["components"]}
         self.assertEqual(tuple(STEP_RE.findall(recipe)), REQUIRED_STAGE_IDS)
-        self.assertIn(("W1", "sh", NAMESPACE_READ), recipe_rows(recipe))
+        self.assertIn(("W1", "sh", WORKSTATION_BASELINE), recipe_rows(recipe))
         # The old checks derived their entire contract from the recipe and accepted this coordinated deletion.
         old_page = recipe.replace(section(recipe, "F4"), "")
         old_ticks = checklist.replace(checklist_line(checklist, "F4") + "\n", "")
@@ -1795,9 +2019,10 @@ class RehearsalRepairTests(unittest.TestCase):
     def test_namespace_is_observed_and_never_used_as_the_version_gate(self):
         recipe, checklist = read(RECIPE), read(CHECKLIST)
         self.assertEqual(namespace_observation_errors(recipe, checklist), [])
-        old = recipe.replace(NAMESPACE_READ + "\n", "")
+        old = recipe.replace(WORKSTATION_BASELINE + "\n", "")
         self.assertNotEqual(old, recipe)
         self.assertTrue(namespace_observation_errors(old, checklist))
+        self.assertTrue(namespace_observation_errors(recipe, checklist.replace(NAMESPACE_READ, "the namespace")))
         self.assertTrue(namespace_observation_errors(recipe.replace("not the gate", "the gate"), checklist))
 
     def test_cgroups_are_checked_from_the_running_distribution_before_f1(self):
@@ -1832,7 +2057,9 @@ class RehearsalRepairTests(unittest.TestCase):
                 old = removal.join(parts[:site + 1]) + removal.join(parts[site + 1:])
                 self.assertEqual(old.count(removal), 3)
                 self.assertTrue(unregister_interop_errors(old, checklist))
-        old = recipe.replace("sudo systemctl restart systemd-binfmt || exit 1\n", "")
+        # The interop recovery is a stop for review since 2026-10-02 (BinfmtRecoveryTests); dropping that stop is still rejected.
+        r1 = section(recipe, "R1")
+        old = recipe.replace(r1, reword(r1, "then stop for review", "then continue"))
         self.assertNotEqual(old, recipe)
         self.assertTrue(unregister_interop_errors(old, checklist))
 
@@ -1925,6 +2152,225 @@ def rootless_start_errors(recipe: str, checklist: str) -> list[str]:
     if run not in checklist_line(checklist, "F3") or "owed" not in checklist_line(checklist, "F3"):
         errors.append("the checklist still accepts the bus proof without the rootless-container result")
     return errors
+
+
+class AdoptedTargetTests(unittest.TestCase):
+    """Change 1 of the follow-up of 2026-10-02: Host-wide rules adopt stable WSL 3.0.1 or later as policy."""
+
+    def test_host_wide_rules_adopt_wsl_3_0_1_and_record_the_host_update(self):
+        self.assertEqual(adopted_target_errors(read(RECIPE)), [])
+
+    def test_the_check_rejects_the_pre_change_rule_a_stale_or_lost_update_sentence_and_a_misplaced_policy(self):
+        recipe = read(RECIPE)
+        rules = chapter(recipe, "Host-wide rules")
+        mutants = {
+            "pre-change rule": recipe.replace(rules, reword(rules, ADOPTED_TARGET, OLD_ADOPTED_TARGET)),
+            "pre-change update sentence": recipe.replace(rules, reword(rules, HOST_UPDATE, OLD_HOST_UPDATE)),
+            "update sentence lost": recipe.replace(rules, reword(rules, HOST_UPDATE, "")),
+            "pre-releases adopted": recipe.replace(rules, reword(rules, "Neither pre-release is adopted:",
+                                                                 "Both pre-releases are adopted:")),
+            "policy outside Host-wide rules": recipe.replace(rules, reword(rules, ADOPTED_TARGET, "")).replace(
+                "Start with R1", ADOPTED_TARGET + " Start with R1", 1),
+        }
+        for name, mutant in mutants.items():
+            with self.subTest(mutant=name):
+                self.assertNotEqual(mutant, recipe)
+                self.assertTrue(adopted_target_errors(mutant))
+
+
+class PairedIsolationTests(FollowUpCase):
+    """Change 2 of the follow-up of 2026-10-02: W5 reads the same five observations from both running distributions."""
+
+    def test_w5_pairs_the_five_observations_and_w1_holds_the_workstation_baseline(self):
+        self.assertEqual(paired_isolation_errors(*self.inputs()), [])
+
+    def test_the_check_rejects_the_pre_change_pages_a_half_pair_and_lost_records(self):
+        recipe, record, checklist, receipt = self.inputs()
+        w1, w5, w6 = section(recipe, "W1"), section(recipe, "W5"), section(recipe, "W6")
+        block = f"```sh\n{WORKSTATION_BASELINE}\n{PAIRED_NEW}\n```\n"
+        cgroup_block = "```sh\nsystemctl is-active '<COMMON_UNIT>'\n"
+        self.assertIn(WORKSTATION_BASELINE + "\n", w1)
+        self.assertIn(block, w5)
+        self.assertIn(cgroup_block, w5)
+        row = next(line for line in record.splitlines() if line.startswith("| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' "
+                                                                           "--exec sh -c 'id -u;"))
+        pair = receipt["paired_isolation"]
+        names = [name for name, value in pair.items() if isinstance(value, dict)]
+        host = {key: value for key, value in receipt["host"].items() if key != "workstation_baseline"}
+        page = lambda old_w5: recipe.replace(w5, old_w5)  # noqa: E731
+        self.assert_mutants_fail(paired_isolation_errors, {
+            "pre-change W1": (recipe.replace(w1, w1.replace(WORKSTATION_BASELINE, OLD_NAMESPACE_READ)), record, checklist,
+                              receipt),
+            "pre-change W5": (page(w5.replace(block, "")), record, checklist, receipt),
+            "the workstation's line only": (page(w5.replace(block, f"```sh\n{WORKSTATION_BASELINE}\n```\n")), record,
+                                            checklist, receipt),
+            "the new distribution's line only": (page(w5.replace(block, f"```sh\n{PAIRED_NEW}\n```\n")), record, checklist,
+                                                 receipt),
+            "lines in the wrong order": (page(w5.replace(block, f"```sh\n{PAIRED_NEW}\n{WORKSTATION_BASELINE}\n```\n")),
+                                         record, checklist, receipt),
+            "lines in two blocks": (page(w5.replace(block, f"```sh\n{WORKSTATION_BASELINE}\n```\n\n```sh\n{PAIRED_NEW}\n```\n")),
+                                    record, checklist, receipt),
+            "before the cgroup block": (page(w5.replace(block, "").replace(cgroup_block, block + "\n" + cgroup_block, 1)),
+                                        record, checklist, receipt),
+            "no five keys in the proof": (page(reword(w5, "each with `uid`, `system_state`, `failed_units`, "
+                                                          "`user_manager` and `cgroup_namespace`", "each with its values")),
+                                          record, checklist, receipt),
+            "no comparison with W1": (page(reword(w5, "equal its own values recorded in W1 before the import",
+                                                  "are healthy")), record, checklist, receipt),
+            "no namespace comparison": (page(reword(w5, "differ from each other and neither is `cgroup:[4026531835]`",
+                                                    "are printed")), record, checklist, receipt),
+            "no version, kernel or image record": (page(reword(w5, "with the WSL version and kernel from W1 and the image "
+                                                                   "revision from W2,", "")), record, checklist, receipt),
+            "W6 without the paired record": (recipe.replace(w6, reword(w6, "Repeat W5's cgroup-isolation proof and its "
+                                                                           "paired record", "Repeat W5's cgroup-isolation "
+                                                                           "proof")), record, checklist, receipt),
+            "record without the row": (recipe, record.replace(row + "\n", ""), checklist, receipt),
+            "checklist without the baseline": (recipe, record, checklist.replace(
+                checklist_line(checklist, "W1"), "- [ ] **W1** WSL 3.0.1 or later is recorded."), receipt),
+            "checklist without the pair": (recipe, record, checklist.replace("paired_isolation", "the receipt"), receipt),
+            "no receipt key": (recipe, record, checklist, without(receipt, "paired_isolation")),
+            "one distribution in the receipt": (recipe, record, checklist,
+                                                dict(receipt, paired_isolation={key: value for key, value in pair.items()
+                                                                                if key != names[1]})),
+            "a lost key in the receipt": (recipe, record, checklist, dict(receipt, paired_isolation=dict(
+                pair, **{names[1]: {key: value for key, value in pair[names[1]].items() if key != "uid"}}))),
+            "pre-change receipt host": (recipe, record, checklist, dict(receipt, host=dict(
+                host, cgroup_namespace="<W1: actual readlink /proc/1/ns/cgroup output in the already-running distribution>"))),
+        })
+
+
+class BinfmtUnitTests(FollowUpCase):
+    """Change 3 of the follow-up of 2026-10-02: F1 accepts `degraded` only for systemd-binfmt.service, the by-design failure."""
+
+    def test_f1_accepts_degraded_only_with_the_binfmt_unit_as_the_single_failed_unit(self):
+        self.assertEqual(binfmt_unit_errors(*self.inputs()), [])
+
+    def test_the_check_rejects_the_old_f1_any_degraded_state_and_lost_references(self):
+        recipe, record, checklist, receipt = self.inputs()
+        f1, overturn = section(recipe, "F1"), chapter(record, "Overturn condition")
+        for line in (F1_FAILED, F1_LOG):
+            self.assertIn(line + "\n", f1)
+        log_row = next(line for line in record.splitlines() if line.startswith("| F1 | sh | `journalctl -b 0 -t "))
+        pass_rule = f"Proof: `running`, or {F1_PASS} `{FLUSH_MESSAGE}`;"
+        first = next(entry for entry in receipt["steps"] if entry["step"] == "F1"
+                     and entry["cmd"] == "systemctl is-system-running --wait")
+        old_steps = [dict(entry, exit=0, output_excerpt="running") if entry is first else entry
+                     for entry in receipt["steps"]]
+        old_arms = {name: dict(arm, first_boot=arm["first_boot"].replace(", or degraded with only systemd-binfmt.service "
+                                                                         "failed", "")) for name, arm in
+                    receipt["comparison_arms"].items()}
+        page = lambda new_f1: (recipe.replace(f1, new_f1), record, checklist, receipt)  # noqa: E731
+        self.assert_mutants_fail(binfmt_unit_errors, {
+            "pre-change F1": page(f1[:f1.index("```sh")] + OLD_F1),
+            "any degraded state passes": page(reword(f1, pass_rule, "Proof: `running` or `degraded`;")),
+            "no single-unit condition": page(reword(f1, "lists exactly `systemd-binfmt.service`", "lists a failed unit")),
+            "no log condition": page(reword(f1, "that unit's log, from the `journalctl` line, holds", "it holds")),
+            "other failed units pass": page(reword(f1, "Any other failed unit stops the run",
+                                                   "Another failed unit is recorded")),
+            "no flush message": page(f1.replace(FLUSH_MESSAGE, "the message")),
+            "no pull request": page(f1.replace(BINFMT_PR, "https://example.invalid/pull")),
+            "no issue": page(f1.replace(BINFMT_ISSUE, "https://example.invalid/issue")),
+            "no upstream quote": page(reword(f1, BINFMT_BENIGN, "It is fine.")),
+            "no journal command": page(f1.replace(F1_LOG + "\n", "")),
+            "failed units without --plain": page(f1.replace(F1_FAILED + "\n", "systemctl --failed --no-legend\n")),
+            "journal read before the failed list": page(f1.replace(F1_FAILED + "\n" + F1_LOG + "\n",
+                                                                    F1_LOG + "\n" + F1_FAILED + "\n")),
+            "no adm statement": page(f1.replace("`adm`", "`wheel`")),
+            "no sudo fallback for an unreadable journal": page(reword(f1, F1_SUDO_FALLBACK, "")),
+            "a stop at the journal notice, even on running": page(reword(
+                f1, F1_SUDO_FALLBACK, "A `Hint: You are currently not seeing messages from other users and the system.` "
+                                      "notice or `-- No entries --` means it cannot: record it and stop for review.")),
+            "old overturn condition": (recipe, record.replace(overturn, reword(
+                overturn, "F1 reports `degraded` with a failed unit other than `systemd-binfmt.service`, or without that "
+                          "unit's read-only flush message, on a clean run;", "F1 reports `degraded` on a clean run;")),
+                                       checklist, receipt),
+            "record without the journal row": (recipe, record.replace(log_row + "\n", ""), checklist, receipt),
+            "record without the pull request": (recipe, record.replace(BINFMT_PR, "https://example.invalid/pull"), checklist,
+                                                receipt),
+            "checklist with the old F1": (recipe, record, checklist.replace(
+                checklist_line(checklist, "F1"), "- [ ] **F1** `systemctl is-system-running --wait` prints `running`; "
+                                                 "no failed unit."), receipt),
+            "receipt with a fixed running": (recipe, record, checklist, dict(receipt, steps=old_steps)),
+            "arms that still read running": (recipe, record, checklist, dict(receipt, comparison_arms=old_arms)),
+        })
+
+
+class BinfmtRecoveryTests(FollowUpCase):
+    """Change 3 of the follow-up of 2026-10-02: the interop recovery stops for review; nothing restarts systemd-binfmt."""
+
+    def test_no_recipe_command_controls_the_unit_and_r1_stops_for_review_with_two_records(self):
+        self.assertEqual(binfmt_recovery_errors(*self.inputs()), [])
+
+    def test_a_history_sentence_may_name_the_restart_but_a_command_block_may_not(self):
+        recipe = read(RECIPE)
+        self.assertIn("`sudo systemctl restart systemd-binfmt` there restored it", prose(section(recipe, "R1")))
+        self.assertEqual([command for _, command in fenced_commands(recipe) if UNIT_CONTROL_RE.search(command)], [])
+        for command in (RESTART_UNIT, "sudo systemctl start systemd-binfmt.service", "systemctl stop systemd-binfmt",
+                        "sudo systemctl try-restart systemd-binfmt.service"):
+            with self.subTest(command=command):
+                self.assertTrue(UNIT_CONTROL_RE.search(command))
+        for command in (*INTEROP_RECORDS, F1_FAILED, F1_LOG):
+            with self.subTest(command=command):
+                self.assertFalse(UNIT_CONTROL_RE.search(command))
+
+    def test_the_check_rejects_the_old_restart_recovery_and_a_lost_record_or_stop(self):
+        recipe, record, checklist, receipt = self.inputs()
+        r1, w6, decision = section(recipe, "R1"), section(recipe, "W6"), chapter(record, "Decision")
+        block = "\n".join([NATIVE_INTEROP, *INTEROP_RECORDS]) + "\n"
+        self.assertIn("```sh\n" + block + "```\n", r1)
+        native_row = next(line for line in record.splitlines() if line.startswith(f"| R1 | sh | `{NATIVE_INTEROP}` |"))
+        old_row = f"| R1 | sh | `{RESTART_UNIT.replace('|', chr(92) + '|')}` | only after removal, on the survivor: exit 0; " \
+                  "failure stops recovery |"
+        new_checklist = {"R1": (", and when either check fails R1's records (`ls /proc/sys/fs/binfmt_misc` and "
+                                "`systemctl status systemd-binfmt.service --no-pager`) are kept and the run stops for review, "
+                                "importing or provisioning nothing"),
+                         "W6": ", and when either check fails R1's records are kept and the run stops for review with no import"}
+        old_checklist = ", with R1's `sudo systemctl restart systemd-binfmt` recovery if needed and a stop if either check " \
+                        "still fails"
+        for step, fragment in new_checklist.items():
+            self.assertIn(fragment, checklist_line(checklist, step))
+        new_decision = ("If registration or Windows execution does not return, the run stops for review after the new "
+                        "distribution is removed, with `ls /proc/sys/fs/binfmt_misc` and `systemctl status "
+                        "systemd-binfmt.service --no-pager` recorded; nothing is imported or provisioned. The WSL 2.7.x "
+                        "remedy, restarting `systemd-binfmt`, is not used on the adopted release, where that restart exits 1.")
+        old_decision = ("R1's supported `sudo systemctl restart systemd-binfmt` recovery runs only after the new distribution "
+                        "is removed; if registration or Windows execution does not return, the run stops.")
+        new_w6 = ("If the guard throws, do not import: take R1's interop recovery there, which records the observations and "
+                  "stops for review.")
+        old_w6 = ("If the guard throws, run R1's interop recovery there and repeat both observations before resuming at "
+                  "`--import`; if interop does not return, stop.")
+        old_interop = ("<R1/W5/W6: after each actual unregister, surviving WSLInterop exists and /mnt/c/Windows/System32/"
+                       "cmd.exe /d /c ver launches; record any systemd-binfmt recovery and repeat observations; failure "
+                       "stops>")
+        moved = r1.replace("```sh\n" + block + "```\n", "").replace("\n\n", "\n\n```sh\n" + block + "```\n\n", 1)
+        page = lambda new_r1: (recipe.replace(r1, new_r1), record, checklist, receipt)  # noqa: E731
+        self.assert_mutants_fail(binfmt_recovery_errors, {
+            "the old restart recovery": page(r1.replace(block, OLD_INTEROP_RECOVERY)),
+            "the restart beside the records": page(r1.replace(block, RESTART_UNIT + "\n" + block)),
+            "a restart in another step": (recipe.replace("```sh\nid -u '<WSL_USER>' ||", "```sh\nsudo systemctl restart "
+                                                         "systemd-binfmt\nid -u '<WSL_USER>' ||", 1), record, checklist,
+                                          receipt),
+            "a start beside the records": page(r1.replace(block, block + "sudo systemctl start systemd-binfmt.service\n")),
+            "no listing of the formats": page(r1.replace(INTEROP_RECORDS[0] + "\n", "")),
+            "no status of the unit": page(r1.replace(INTEROP_RECORDS[1] + "\n", "")),
+            "records in the wrong order": page(r1.replace("\n".join(INTEROP_RECORDS) + "\n",
+                                                          "\n".join(reversed(INTEROP_RECORDS)) + "\n")),
+            "records before the interop checks": page(moved),
+            "no stop for review": page(reword(r1, "then stop for review", "then continue")),
+            "another distribution may be imported": page(reword(r1, "stop, do not import or provision another distribution, "
+                                                                    "and record", "stop and record")),
+            "no history of the 2.7.13 loss": page(reword(r1, "On WSL 2.7.13 the rehearsal's unregister removed this VM-wide "
+                                                             "registration on the surviving distribution, and `sudo "
+                                                             "systemctl restart systemd-binfmt` there restored it.", "")),
+            "W6 resumes after the recovery": (recipe.replace(w6, reword(w6, new_w6, old_w6)), record, checklist, receipt),
+            "R1 checklist with the restart": (recipe, record, checklist.replace(new_checklist["R1"], old_checklist), receipt),
+            "W6 checklist with the restart": (recipe, record, checklist.replace(new_checklist["W6"], old_checklist), receipt),
+            "record with the restart row": (recipe, record.replace(native_row, native_row + "\n" + old_row), checklist,
+                                            receipt),
+            "record decision with the restart": (recipe, record.replace(decision, reword(decision, new_decision,
+                                                                                           old_decision)), checklist, receipt),
+            "receipt with the old recovery note": (recipe, record, checklist, dict(receipt, interop_after_unregister=old_interop)),
+        })
 
 
 if __name__ == "__main__":

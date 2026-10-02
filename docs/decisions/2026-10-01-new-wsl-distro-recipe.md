@@ -6,7 +6,9 @@ A follow-up unit added F11 and the F5 range rule later that day, on the coordina
 then added the completeness critic's pre-stage-1 checks (R1, P1 to P3, W7, W5's schema check and F2's idle observation)
 and corrected three facts, on the coordinator's brief and a research packet of the same day. The coordinator then set
 P3's rule: the count is a baseline, an error line less than one hour old stops the run, and W5 counts again after the
-first launch.
+first launch. A third follow-up took the updated host's first observations into the recipe on 2026-10-02: it names WSL
+3.0.1 as the adopted target, adds W5's paired isolation record and F1's one accepted failed unit, and replaces the
+interop restart with a stop for review (Updated-host correction).
 This record changes nothing on a host. No `wsl.exe` command, import, `.wslconfig` edit or first launch ran for it. The
 second follow-up's artifact checks ran P1 to P3's commands in the workstation distribution and changed nothing on the
 host (Evidence classes).
@@ -18,7 +20,8 @@ pointer section in `adoption/platforms/linux-wsl2.md`; `adoption/templates/wsl/`
 **Status:** the merged definitive manifest selects Ubuntu 26.04.1 LTS (Canonical WSL image) as the single default.
 Ubuntu 24.04.5 is the named rollback, used only on a release-caused 26.04 failure with no in-release remedy.
 The 2026-10-02 rehearsal held through stage 1, then stopped at F1 on the host's shared cgroup tree. It does not
-trigger the image rollback. Full acceptance and the corrected checks on WSL 3.0.1 remain owed. The earlier scoped
+trigger the image rollback. The host was updated to WSL 3.0.1.0 on 2026-10-02; full acceptance and the corrected
+checks on it, with the two-distribution proof, remain owed. The earlier scoped
 [experiment](../../blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json) keeps `status: planned`,
 decision `trial`, no qualification runs and no usage comparison. Its next test preregisters both R1 rehearsals. The
 reported signature exits and image stream hash match retain their bounded artifact scope; local consistency checks and synthetic receipt examples
@@ -302,12 +305,14 @@ pre-releases; 3.0.1 is the first stable release with both. The 2.7 line has neit
 before any install or import. After launch, W5 must observe no `0` entry in a unit active in both distributions, from
 the already-running distribution, and an active new `user@<uid>.service`, before F1. A failed observation terminates
 only the new distribution, exports, unregisters and checks surviving interop; it never stops or restarts a system unit
-in either distribution. Nothing has been observed on 3.0.1 on this host. Rootless Docker/Podman issue 41492 remains
-open; F3's container start is owed on the first run after the update.
+in either distribution. When this correction was written, nothing had been observed on 3.0.1 on this host; the
+Updated-host correction below records what followed. Rootless Docker/Podman issue 41492 remains open; F3's container
+start is owed on the first run after the update.
 
 After removal, the surviving distribution lost the VM-wide `WSLInterop` registration. The coordinator restored it
 with `sudo systemctl restart systemd-binfmt`. Every unregister now checks both that registration and one Windows
-executable on the survivor, with that recovery after removal and a stop if either observation does not return.
+executable on the survivor and stops if either observation does not return. The Updated-host correction replaces
+the restart, which the adopted release does not support, with a stop for review.
 
 The rehearsal's storage baseline was 7 and second count 13, with six new lines in the disk-attachment window before
 cloud-init. Their placement about 15 seconds before `init-local` is derived in the receipt; the launch exited 0.
@@ -320,6 +325,51 @@ rerun the host rehearsal. A completeness check keeps path B, the export guards, 
 single-distribution install boundary; it also checks the new unregister in cgroup recovery. Public upstream refresh
 was unavailable because DNS resolution failed, so the retained review and the supplied upstream references are used
 without claiming a fresh fetch or an updated-host result.
+
+## Updated-host correction (2026-10-02)
+
+The coordinator's brief of 2026-10-02 reports the first observations of the updated host, WSL 3.0.1.0 with kernel
+6.18.40.1-1, made from 06:39Z to 06:57Z in the workstation's distribution, as its default user and without `sudo`.
+`id -u` printed `1000`. `systemctl is-system-running` printed `degraded` (exit 1), with `systemd-binfmt.service` as the
+only failed unit. `systemctl is-active "user@$(id -u).service"` printed `active`. `readlink /proc/self/ns/cgroup`
+printed `cgroup:[4026532183]`, equal to `/proc/1/ns/cgroup`; WSL 2.7.13 had printed the initial namespace,
+`cgroup:[4026531835]`. The host also passed its check of a rootless container, interop and the user manager.
+`systemd-binfmt.service` fails at every boot with `Failed to flush binfmt_misc rules, ignoring: Read-only file system`
+and exit 1, while `WSLInterop` and `python3.12` are registered and Windows executables launch. Nothing was observed with
+two distributions running.
+
+Three decisions follow; Sources lists what each rests on.
+
+1. **Adopted target.** The recipe adopts stable WSL 3.0.1 or later for a second systemd distribution. The 2.9.8 and
+   2.9.13 pre-release history and the 2.7.13 rehearsal stay as history, and the single-distribution note stays. The
+   host's update and its check are one sentence in Host-wide rules; the two-distribution proof is still owed.
+2. **Paired isolation (W5).** W5 records the same five observations from both running distributions, `uid`,
+   `system_state`, `failed_units`, `user_manager` and `cgroup_namespace`, under `paired_isolation` in the receipt, after
+   the cgroup block and before F1. The workstation's values must equal its own baseline from W1, the two namespaces must
+   differ from each other and from `cgroup:[4026531835]`, and both user managers must be `active`. W6's relaunch repeats
+   the record, as it repeats the cgroup proof, and the failure recovery is the cgroup-failure recovery, unchanged.
+3. **The by-design unit failure (F1) and the interop recovery (R1).** F1 accepts `degraded` only when
+   `systemctl --failed --no-legend --plain` lists exactly `systemd-binfmt.service` and that unit's log holds the
+   read-only flush message; any other failed unit stops the run as before. `sudo systemctl restart systemd-binfmt` was
+   the WSL 2.7.x interop remedy. On the adopted release the registration is protected and that restart itself exits 1,
+   so R1 keeps its check after every unregister and, when it fails on 3.0.1, stops for review with
+   `ls /proc/sys/fs/binfmt_misc` and `systemctl status systemd-binfmt.service --no-pager` recorded; nothing is imported
+   or provisioned.
+
+Alternatives, each rejected against that evidence:
+
+- **A one-sided W5 reading**, the new distribution's `user@<uid>.service` alone: it cannot show the same uid, distinct
+  namespaces and two healthy managers, so the record pairs the five observations.
+- **Namespace values alone**: a value does not prove isolation (W1 already says so), and two values compare only next to
+  the workstation's own baseline.
+- **Stopping at every `degraded`**, the earlier F1: the unit fails at every boot on the adopted release, so no run could
+  pass F1.
+- **Accepting any `degraded`**: it would hide a real failed unit. The pass condition names the one unit and its log
+  message.
+- **Keeping the restart as the interop recovery**: it exits 1 on the adopted release, where PR #40621 protects the
+  registration on purpose.
+
+The conditions that would overturn these decisions are in Overturn condition, items 3 and 4.
 
 ## Alternatives
 
@@ -418,17 +468,23 @@ without claiming a fresh fetch or an updated-host result.
      cause, stops the run. An unknown window stops for review; retain the actual cause with microsoft/WSL#41482.
    - **Preflight (W1).** Neither Ubuntu Pro file exists, or `agent.yaml`'s top-level keys are recorded and include
      neither `users` nor `write_files`. W1 also reads `instanceIdleTimeout` and `vmIdleTimeout` of the global WSL
-     configuration, without writing it. WSL must be 3.0.1 or later before W4 or any W6 import. Record
-     `readlink /proc/1/ns/cgroup` in the already-running distribution, with the initial namespace
-     `cgroup:[4026531835]`, Linux's `PROC_CGROUP_INIT_INO`, named as corroboration rather than the gate.
+     configuration, without writing it. WSL must be 3.0.1 or later before W4 or any W6 import. Record the
+     workstation's baseline of five values in the already-running distribution, as its default user and without `sudo`:
+     the uid, the system state, the failed unit names, the user manager's state and `readlink /proc/self/ns/cgroup`,
+     with the initial namespace `cgroup:[4026531835]`, Linux's `PROC_CGROUP_INIT_INO`, named as corroboration rather than
+     the gate. The baseline must already meet W5's rule for one distribution, or the run stops before W4.
    - **After the first launch (W5).** `cloud-init status --long` must print `status: disabled` with
      `boot_status_code: disabled-by-marker-file`. Completion and errors come from `/var/lib/cloud/data/result.json`
      (`DataSourceWSL`, `"errors": []`) and `/var/lib/cloud/data/status.json` (four stages finished without errors). On
      path A, `cloud-init schema --system` must print a line matching `^\s*Valid schema user-data$`; path B skips it.
      `wsl: Failed to start the systemd user session` stops even when the launch exits 0. While both distributions run,
      before F1, the already-running distribution must read no `0` entry in a system unit's `cgroup.procs`, for a unit
-     active in both, and the new distribution's `user@<uid>.service` must be active. Failure terminates only the new
-     distribution, never stops or restarts a unit in either, guards the export, unregisters and checks surviving interop.
+     active in both, and the new distribution's `user@<uid>.service` must be active. Then the paired record reads the
+     same five values from both distributions (`paired_isolation`): the same uid, active user managers, system managers
+     `running` or `degraded` with only `systemd-binfmt.service` failed, two namespaces that differ from each other and
+     from the initial one, and the workstation's values equal to its W1 baseline. Failure of either proof terminates
+     only the new distribution, never stops or restarts a unit in either, guards the export, unregisters and checks
+     surviving interop.
    - **Terminate once (W7).** After W5 (path A) or W6 (path B): `wsl --terminate <Name>`, a relaunch, and an empty file
      created from Windows under the user's home must read `1000:1000`. `0:0` stops every write from Windows.
    - **How to tell cloud-init did not provision.** The launch prints `Create a default Unix user account:` and
@@ -443,7 +499,10 @@ without claiming a fresh fetch or an updated-host result.
      `receipts[]` row; `kind` is `native_cli_e2e` and `component_ids` is `systemd` (stack row `255.4-1ubuntu8.17`, the
      image's version).
 3. **First boot**, as the user:
-   - `systemctl is-system-running --wait` must print `running`; Ubuntu's own setup test asserts that.
+   - `systemctl is-system-running --wait` must print `running`, as Ubuntu's own setup test asserts, or `degraded` when
+     `systemctl --failed --no-legend --plain` lists exactly `systemd-binfmt.service` and that unit's log holds the
+     read-only flush message: the adopted release mounts the binfmt status file read-only (microsoft/WSL#40621) and
+     upstream calls the unit's error benign (#41226). Any other failed unit stops the run for review.
    - `loginctl enable-linger`, then `Linger=yes`; then, with no client attached, `wsl.exe --list --running` every 10
      seconds for two minutes records whether `<Name>` stays up (F2).
    - The user bus is a socket owned by the user. Right after F3, a rootless container must start on Docker's
@@ -478,8 +537,10 @@ without claiming a fresh fetch or an updated-host result.
    - WSL package updates are the keys lane's decision.
    - The rehearsal (R1) names only its own distribution.
    - Every unregister checks `/proc/sys/fs/binfmt_misc/WSLInterop` and launches a Windows executable in the surviving
-     distribution. R1's supported `sudo systemctl restart systemd-binfmt` recovery runs only after the new
-     distribution is removed; if registration or Windows execution does not return, the run stops.
+     distribution. If registration or Windows execution does not return, the run stops for review after the new
+     distribution is removed, with `ls /proc/sys/fs/binfmt_misc` and `systemctl status systemd-binfmt.service
+     --no-pager` recorded; nothing is imported or provisioned. The WSL 2.7.x remedy, restarting `systemd-binfmt`, is
+     not used on the adopted release, where that restart exits 1.
    - W1's `Select-String` read is the only command that names `.wslconfig`; the test rejects any other command naming it.
    - The test rejects any recipe command that breaks these rules.
 5. **Open questions** stay open; see below.
@@ -499,7 +560,8 @@ without claiming a fresh fetch or an updated-host result.
 
    The coordinator may instead adopt the in-place repair as the first fallback, ahead of path B.
 3. **First boot.** Revisit in four cases:
-   - F1 reports `degraded` on a clean run;
+   - F1 reports `degraded` with a failed unit other than `systemd-binfmt.service`, or without that unit's read-only
+     flush message, on a clean run;
    - the bootstrap starts installing `uidmap` or `libatomic1` itself;
    - the Harbor lane retires rootless Docker, which removes `uidmap` and F5;
    - the user-scope MCP template registers jCodeMunch again (the addendum's overturn condition), or a script runs the
@@ -509,7 +571,11 @@ without claiming a fresh fetch or an updated-host result.
 4. **Host-wide.** Revisit when the keys lane updates WSL (re-verify install, import and first run at that tag; from
    2.9.8 or 3.0.1 on, the fix for microsoft/WSL#40941 is present and W7 becomes a check) or when a separate decision
    makes the new distribution the default. Revisit P3 when microsoft/WSL#41482 names a fixed release, or when a run
-   shows storage errors that the one-hour threshold, this recipe's choice, misjudges.
+   shows storage errors that the one-hour threshold, this recipe's choice, misjudges. Revisit the adopted target and
+   W5's paired record when a stable release after 3.0.1 changes how distributions share cgroups, or when a run shows two
+   equal namespaces or an unhealthy user manager. Revisit F1's one accepted failed unit when a WSL release stops mounting
+   the binfmt status file read-only or systemd stops failing on it, and R1's stop for review when a 3.0.1 run loses
+   `WSLInterop` after an unregister and upstream documents a remedy.
 
 ## Command table
 
@@ -532,7 +598,7 @@ workstation distribution (Evidence classes).
 | R1 | powershell | `wsl.exe --terminate '<Name>'` | the throwaway distribution stopped; no other distribution stops |
 | R1 | powershell | `wsl.exe --unregister '<Name>'` | the throwaway distribution removed, nothing else |
 | R1 | powershell | `wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'` | on the surviving distribution: WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches with exit 0 |
-| R1 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1 recovery must restore both observations before continuing |
+| R1 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | R1 | powershell | `wsl.exe --list --verbose` | the throwaway name absent; the starred line equals W1's |
 | R1 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
 | R1 | powershell | `wsl.exe --list --quiet` | read first: the throwaway name is listed, and it is not the real `<Name>` |
@@ -544,11 +610,11 @@ workstation distribution (Evidence classes).
 | R1 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Length` | the export's size in bytes, recorded in `rehearsal` |
 | R1 | powershell | `wsl.exe --unregister '<Name>'` | the throwaway distribution removed, nothing else |
 | R1 | powershell | `wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'` | on the surviving distribution: WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches with exit 0 |
-| R1 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1 recovery must restore both observations before continuing |
+| R1 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | R1 | powershell | `wsl.exe --list --verbose` | the throwaway name absent; the starred line equals W1's |
-| R1 | sh | `sudo systemctl restart systemd-binfmt \|\| exit 1` | only after removal, on the survivor: exit 0; failure stops recovery |
-| R1 | sh | `test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver` | registration exists and the Windows executable launches with exit 0; otherwise stop |
-| R1 | sh | `if [ "$?" -ne 0 ]; then exit 1; fi` | nonzero interop verification stops recovery |
+| R1 | sh | `test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver` | only after a failed removal check, natively on the survivor: the check again, its output recorded |
+| R1 | sh | `ls /proc/sys/fs/binfmt_misc` | the registered formats, recorded: whether `WSLInterop` is among them |
+| R1 | sh | `systemctl status systemd-binfmt.service --no-pager` | the unit's state and log lines, recorded; then stop for review and import or provision nothing |
 | P1 | sh | `for RELEASE in 26.04.1 24.04.5; do` | both signed-sums arms, each in an empty temporary directory |
 | P1 | sh | `SUMS_DIR="$(mktemp -d)"` | an empty temporary directory, also `gpgv`'s home |
 | P1 | sh | `curl -fsSL -o "$SUMS_DIR/SHA256SUMS" "https://releases.ubuntu.com/$RELEASE/SHA256SUMS" \|\| exit 1` | P1: record the returned exit and output required by the recipe |
@@ -577,7 +643,7 @@ workstation distribution (Evidence classes).
 | W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue` | no output, or the top-level keys recorded and neither `users:` nor `write_files:` among them |
 | W1 | powershell | `Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\s*\[', '^\s*instanceIdleTimeout\s*=', '^\s*vmIdleTimeout\s*=' -ErrorAction SilentlyContinue` | a read only: the section headers and the two idle keys, or nothing; recorded as `idle_keys` |
 | W1 | powershell | `Get-PSDrive -Name Z \| Select-Object -Property Name, Used, Free` | `Free` recorded |
-| W1 | sh | `readlink /proc/1/ns/cgroup` | record the actual namespace; cgroup:[4026531835] is PROC_CGROUP_INIT_INO, corroboration rather than the gate |
+| W1 | sh | `id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk '{print $1}'; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup` | the workstation's baseline of five values, recorded as `workstation_baseline`, already meeting W5's rule for one distribution; cgroup:[4026531835] is PROC_CGROUP_INIT_INO, corroboration rather than the gate |
 | W2 | powershell | `$ProgressPreference = 'SilentlyContinue'` | no progress rendering during the download |
 | W2 | powershell | `$Release = '<RELEASE>'` | W2: record the returned exit and output required by the recipe |
 | W2 | powershell | `switch ($Release) {` | W2: record the returned exit and output required by the recipe |
@@ -626,6 +692,8 @@ workstation distribution (Evidence classes).
 | W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec systemctl is-active '<COMMON_UNIT>'` | the same system unit is active in the new distribution, exit 0 |
 | W5 | sh | `cat '/sys/fs/cgroup/system.slice/<COMMON_UNIT>/cgroup.procs'` | read from the already-running distribution while both run: local process ids, no exact 0 entry; empty or unreadable stops |
 | W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'systemctl is-active "user@$(id -u).service"'` | the new default user has uid 1000 and user@1000.service is active, exit 0; otherwise cgroup recovery |
+| W5 | sh | `id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk '{print $1}'; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup` | natively in the workstation's shell, the paired record's first line: the five values, equal to W1's baseline |
+| W5 | sh | `/mnt/c/Windows/System32/wsl.exe -d '<Name>' --exec sh -c 'id -u; systemctl is-system-running; systemctl --failed --no-legend --plain \| awk "{print \$1}"; systemctl is-active "user@$(id -u).service"; readlink /proc/self/ns/cgroup'` | the same five values inside `<Name>`: the same uid, both user managers `active`, each system manager `running` or `degraded` with only `systemd-binfmt.service` failed, namespaces that differ from each other and from cgroup:[4026531835]; recorded as `paired_isolation` |
 | W5 | powershell | `$env:WSL_UTF8 = '1'` | W5: record the returned exit and output required by the recipe |
 | W5 | powershell | `wsl.exe --list --quiet` | W5: record the returned exit and output required by the recipe |
 | W5 | powershell | `wsl.exe --terminate '<Name>'` | cgroup failure only: terminate the new distribution, never stop or restart a system unit in either distribution |
@@ -636,7 +704,7 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-cgroup-failed.tar').Length` | record the export size in cgroup_failure_export |
 | W5 | powershell | `wsl.exe --unregister '<Name>'` | cgroup failure only: guarded export succeeded; remove only the new distribution and immediately check surviving interop |
 | W5 | powershell | `wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'` | on the surviving distribution: WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches with exit 0 |
-| W5 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1 recovery must restore both observations before continuing |
+| W5 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | W5 | powershell | `wsl.exe --list --verbose` | W5: record the returned exit and output required by the recipe |
 | W5 | sh | `sudo journalctl -k -b 0 --no-pager \| grep hv_storvsc \| grep -vc 'registering driver hv_storvsc'` | On both paths, record P3's baseline before the import and `second_count` after the first launch. An increase confined to the window in which the new disk is attached, before cloud-init starts, is recorded with the new lines and does not stop the run. Any storage error after that window, or any provisioning step that fails with a storage cause, stops the run. |
 | W6 | powershell | `$env:WSL_UTF8 = '1'` | as in W1 |
@@ -649,7 +717,7 @@ workstation distribution (Evidence classes).
 | W6 | powershell | `(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-failed.tar').Length` | the export's size in bytes, recorded in `failed_attempt_export` |
 | W6 | powershell | `wsl.exe --unregister '<Name>'` | `<Name>` removed, nothing else |
 | W6 | powershell | `wsl.exe -d '<Survivor>' --exec sh -c 'test -e /proc/sys/fs/binfmt_misc/WSLInterop && /mnt/c/Windows/System32/cmd.exe /d /c ver'` | on the surviving distribution: WSLInterop exists and /mnt/c/Windows/System32/cmd.exe /d /c ver launches with exit 0 |
-| W6 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1 recovery must restore both observations before continuing |
+| W6 | powershell | `if ($LASTEXITCODE -ne 0) { throw 'interop failed: recover in the surviving distribution before continuing' }` | a failure stops the block; R1's recovery records the observations and stops for review |
 | W6 | powershell | `wsl.exe --import '<Name>' 'Z:\WSL\<Name>' 'Z:\WSL\downloads\ubuntu-<RELEASE>-wsl-amd64.wsl' --version 2` | W6: record the returned exit and output required by the recipe |
 | W6 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init status --wait --long` | `done` or `error` when cloud-init ran, `disabled` by `disabled-by-generator` when it found no datasource; recorded (open question 1) |
 | W6 | sh | `id -u '<WSL_USER>' \|\| useradd --create-home --uid 1000 --groups adm,cdrom,sudo,dip,plugdev --shell /bin/bash '<WSL_USER>'` | uid 1000 exists |
@@ -668,8 +736,9 @@ workstation distribution (Evidence classes).
 | W7 | powershell | `New-Item -ItemType File -Path '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'` | an empty file created from Windows under the user's home |
 | W7 | powershell | `wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'` | `1000:1000`; `0:0` is recorded and stops every write from Windows |
 | W7 | powershell | `Remove-Item -LiteralPath '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'` | the probe file deleted |
-| F1 | sh | `systemctl is-system-running --wait` | `running` |
-| F1 | sh | `systemctl --failed --no-legend` | no output |
+| F1 | sh | `systemctl is-system-running --wait` | `running`; or `degraded` (exit 1) only when the next two rows show `systemd-binfmt.service` as the only failed unit, with its read-only flush message |
+| F1 | sh | `systemctl --failed --no-legend --plain` | no output when `running`; when `degraded`, a list of exactly `systemd-binfmt.service`; any other failed unit stops the run |
+| F1 | sh | `journalctl -b 0 -t systemd-binfmt --no-pager \| tail -n 4` | when `degraded`: the unit's log holds `Failed to flush binfmt_misc rules, ignoring: Read-only file system`; read without `sudo` through the `adm` group, or repeated once with `sudo` when only the journal's permission notice prints |
 | F1 | sh | `systemctl list-unit-files --type=service --no-pager` | the service list prints |
 | F2 | sh | `sudo loginctl enable-linger "$(id -un)"` | exit 0 |
 | F2 | sh | `loginctl show-user "$(id -un)" --property=Linger --value` | `yes` |
@@ -722,10 +791,11 @@ Each one stays open until a host run records the observation named here.
    with it; changing the global file is the user's decision, outside the recipe. W1 records both keys, and F2 lists the
    running distributions for two minutes with no client attached and records whether `<Name>` stays listed. Whether
    `wsl.exe --list --running` itself counts as a client is not verified.
-3. **Interop after unregister.** The surviving distribution lost the VM-wide `WSLInterop` registration after the
-   failed rehearsal was unregistered. Restarting its `systemd-binfmt` restored Windows execution. Every R1, W5 and
-   W6 unregister now checks the registration and a Windows executable; recovery failure stops the run. This is a
-   required observation and recovery, rather than an open binfmt question.
+3. **Interop after unregister.** On WSL 2.7.13 the surviving distribution lost the VM-wide `WSLInterop` registration
+   after the failed rehearsal was unregistered. Restarting its `systemd-binfmt` restored Windows execution there. Every
+   R1, W5 and W6 unregister now checks the registration and a Windows executable. On the adopted release the
+   registration is protected (microsoft/WSL#40621) and that restart exits 1, so a failed check stops for review with
+   R1's records. This is a required observation and a stop, rather than an open binfmt question.
 4. **Subordinate ids from `useradd`.** Whether `useradd` allocated subordinate ids on the selected release. cloud-init 26.1 creates
    users with `useradd` (`cloudinit/distros/__init__.py:683` at tag 26.1). useradd(8) says it allocates `SUB_UID_COUNT`
    ids when `/etc/subuid` exists, and the image ships both; F5 records which tool wrote the range.
@@ -742,6 +812,10 @@ Each one stays open until a host run records the observation named here.
    about 7.4 days old, did not stop that authoring check. The later rehearsal's baseline 7 and second count 13 retain
    their own boot scope; the six new lines preceded cloud-init in the attachment window. Future runs must establish
    their own window, retain its lines and stop on later errors or a provisioning failure with a storage cause.
+8. **Isolation with two distributions running on 3.0.1.** Whether the two distributions have distinct cgroup
+   namespaces, healthy managers and the same uid while both run. The updated host's reading covers one distribution
+   only (Updated-host correction). W5's paired record, `paired_isolation`, is the observation that settles it, and W1's
+   baseline shows whether the new distribution disturbed the workstation's values.
 
 ## Completeness critic (2026-10-01)
 
@@ -843,7 +917,17 @@ searches were samples of eight results per query, not sweeps.
   and owner results on WSL 2.7.13, then F1's failed user manager. Its coordinator review establishes the shared
   cgroup diagnosis. The later unregister/interop observations and the initial namespace observation are retained in
   the supplied repair brief; they are not invented as output in the earlier worker receipt.
-- **Not run.** The corrected recipe on WSL 3.0.1, including cgroup isolation and a rootless container, remains owed.
+- **Reported host observation, 2026-10-02.** The coordinator's brief gives the five reads of the Updated-host
+  correction, taken on WSL 3.0.1.0 with kernel 6.18.40.1-1 in the workstation's distribution from 06:39Z to 06:57Z. They
+  cover one distribution and are not a run of the recipe. The third follow-up's unit repeated the five commands in the
+  same distribution afterwards and read the same values: `1000`; `degraded` with exit 1; `systemd-binfmt.service` as
+  the only failed unit; `active`; `cgroup:[4026532183]`. It also ran
+  `journalctl -b 0 -t systemd-binfmt --no-pager | tail -n 4` as that distribution's default user, who is not in
+  `adm`, and read only the notice that other users' and the system's messages are hidden, which is why F1 states its
+  dependence on `adm` and repeats the line once with `sudo` when only that notice prints. Nothing was observed with two
+  distributions running.
+- **Not run.** The corrected recipe on WSL 3.0.1 with a second distribution, including W5's paired record, F1's accepted
+  `degraded` and a rootless container in the new distribution, remains owed.
   F11 rests on a source read and has not run on a new distribution. The addendum records a run of the same command
   form on 2026-09-25, under a temporary `CLAUDE_CONFIG_DIR` on one WSL2 host.
 - **Cross-family review.** GPT-6.1 Sol, read-only, 2026-10-01, of PR #569, returned `needs_changes` with three findings.
@@ -1042,3 +1126,18 @@ Sources for the rehearsal correction (2026-10-02), retained review and supplied 
 - This worktree's `evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`,
   `cross:wsl-distro` / `base-distribution`: the single Ubuntu 26.04.1 default. The repair brief supplies the later
   critics' confirmation and the release-caused-failure rollback condition.
+
+Sources for the updated-host correction (2026-10-02), read that day by the third follow-up's unit:
+
+- https://github.com/microsoft/WSL/pull/40621, "protect binfmt_misc from cross-distro wipe at shutdown" (merged): it
+  bind-mounts a read-only file over `/proc/sys/fs/binfmt_misc/status` in each per-distro mount namespace, so that the
+  write with which `systemd-shutdown` wiped the shared registry fails with `EROFS`. Read through the GitHub API.
+- https://github.com/microsoft/WSL/issues/41226, "`systemd-binfmt.service` fails with "Read-only file system" on boot"
+  (closed), and a contributor's answer of 2026-08-04: "The systemd error is benign and won't affect registration of user
+  defined binfmt settings. Please ignore it if it's not affecting any functions." Read through the GitHub API.
+- systemd `src/binfmt/binfmt.c`: `Failed to flush binfmt_misc rules, ignoring: %m` is line 253 of tag `v255` and line
+  249 of tag `v259`. `tmpfiles.d/systemd.conf.in`: the `adm` group's read access to the system journal, lines 47-53 of
+  `v255` and 44-50 of `v259`. The 26.04.1 image packages systemd 259.5-0ubuntu3.4 (the experiment record); tag `v259`
+  was read, not `v259.5`.
+- The coordinator's brief of 2026-10-02: the host observations of the Updated-host correction and the contract for the
+  three changes.
