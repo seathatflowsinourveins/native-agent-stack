@@ -2,7 +2,9 @@
 
 These are local consistency checks over the checked-in files, not a run of Windows Terminal, Claude Code or Codex. The
 policy is docs/decisions/2026-09-28-terminal-experience.md: each AI tab shows the title its client sends, the bell rings
-only for a real needed action and quietly, and a profile that starts a client through a login shell reaches its PATH.
+only for a real needed action and quietly, and a profile that starts a client through a login shell reaches its PATH. A resume profile
+(the update of 2026-10-02 in that record) opens its client's own session picker and nothing else, sits right after the client's default
+profile, and leaves that profile starting a new session.
 """
 
 import copy
@@ -45,6 +47,16 @@ BEL_HOOK = "jq -nc --arg s \"$(printf '\\a')\" '{terminalSequence:$s}'"
 # rust-v0.155.1, where naming it is inert.
 CODEX_KINDS = {"agent-turn-complete", "approval-requested", "plan-mode-prompt", "async-question"}
 PLACEHOLDERS = ("<DISTRO>", "<WSL_USER>", "<PROJECT>")
+# The example's profiles in order. A resume profile opens its client's own session picker (scoped to the directory the profile starts in) and nothing more, and
+# sits right after the client's default profile, which keeps starting a new session; nothing resumes by itself.
+FRAGMENT_ORDER = ["WSL - Shell", "WSL - Codex", "WSL - Codex - resume", "WSL - Claude", "WSL - Claude - resume"]
+AI_COMMANDS = {"WSL - Codex": "codex", "WSL - Codex - resume": "codex resume", "WSL - Claude": "claude", "WSL - Claude - resume": "claude --resume"}
+RESUME_OF = {"WSL - Codex - resume": "WSL - Codex", "WSL - Claude - resume": "WSL - Claude"}
+CLAUDE_PROFILES = ("WSL - Claude", "WSL - Claude - resume")
+# One profile opens many tabs and several tabs share one directory, so a profile must not decide one session, name or setting for all of them: `--continue` and `--last`
+# reopen the newest session of the directory in every tab, a fixed `--name` collides (the second live session is renamed), `--fork-session` starts a new session at every
+# launch, and `--effort`, `--settings` and `--permission-mode` would override what a picked session or the client's own settings say.
+SESSION_FLAGS = ("--name", "--effort", "--settings", "--permission-mode", "--continue", "--fork-session", "--last")
 
 
 MATCHER_QUOTE = re.compile(r"matcher(?: is the exact list)?\s+`([a-z_]+(?:\|[a-z_]+)*)`")   # the two operative phrasings; other prose says "matcher types" or "matcher values" before a quoted type
@@ -87,6 +99,47 @@ def recipe_profile() -> dict:
     start = text.index("For Windows Terminal, add a named profile")
     block = re.search(r"```json\n(.*?)\n```", text[start:], re.DOTALL)
     return json.loads(block.group(1))
+
+
+def placement_problems(names: list) -> list:
+    """Each resume profile must exist and sit right after the default profile of its client, so the two stay together in the list and in a reviewer's diff."""
+    problems = []
+    for resume, default in RESUME_OF.items():
+        if resume not in names or default not in names:
+            problems.append(f"{resume} or {default} is missing")
+        elif names.index(resume) != names.index(default) + 1:
+            problems.append(f"{resume} is not right after {default}")
+    return problems
+
+
+def resume_copy_problems(default: dict, resume: dict) -> list:
+    """A resume profile is its default profile with another name, command line and tab title (the default's title and ` (resume)`): every other key is equal, so the two tabs ring, colour and close alike."""
+    problems = []
+    if resume.get("name") != f"{default.get('name')} - resume":
+        problems.append(f"{resume.get('name')} is not named after {default.get('name')}")
+    if resume.get("tabTitle") != f"{default.get('tabTitle')} (resume)":
+        problems.append(f"{resume.get('name')} has the tab title {resume.get('tabTitle')!r}, not the default's plus ' (resume)'")
+    absent = object()  # a key present on one side only is a difference, even when its value is null
+    for key in sorted((set(default) | set(resume)) - {"name", "commandline", "tabTitle"}):
+        if default.get(key, absent) != resume.get(key, absent):
+            problems.append(f"{resume.get('name')} differs from {default.get('name')} in {key}")
+    return problems
+
+
+def session_flag_problems(profile: dict) -> list:
+    """The session, name and setting flags that a profile's command line passes, whether written `--flag value` or `--flag=value`; none may be there."""
+    return [flag for flag in SESSION_FLAGS if re.search(rf"(?<![\w-]){re.escape(flag)}(?![\w-])", profile["commandline"])]
+
+
+def environment_problems(name: str, profile: dict) -> list:
+    """COLORTERM reaches Claude Code through the `environment` key of both Claude profiles; no other profile sets an environment, and no command line carries the variable."""
+    problems = []
+    expected = {"COLORTERM": "truecolor"} if name in CLAUDE_PROFILES else None
+    if profile.get("environment") != expected:
+        problems.append(f"{name} has the environment {profile.get('environment')!r}, not {expected!r}")
+    if "COLORTERM" in profile["commandline"]:
+        problems.append(f"{name} sets COLORTERM in its command line")
+    return problems
 
 
 class OverlayTests(unittest.TestCase):
@@ -264,19 +317,24 @@ class ProfilePolicyMixin:
     """The tab, bell and launch rules of the decision record for one Windows Terminal profile."""
 
     def check_common(self, profile: dict):
+        self.assertIn("bellStyle", profile, "an explicit bellStyle")
         bell = profile["bellStyle"]
         self.assertIsInstance(bell, list, "an explicit array, never the default or a bare \"all\"")
         self.assertNotIn("all", bell, "\"all\" would also raise a toast on Terminal main")
         self.assertTrue(set(bell) <= {"audible", "taskbar"})
-        self.assertEqual(profile.get("closeOnExit"), "graceful")
+        self.assertEqual(profile.get("closeOnExit"), "graceful", "closeOnExit graceful, so a tab whose client ends abnormally stays open")
         self.assertIn("tabTitle", profile)
 
-    def check_ai(self, profile: dict, client: str):
+    def check_ai(self, profile: dict, command: str):
+        """`command` is what follows `exec` in the profile's login-shell command: the client alone for a default profile, the client's picker for a resume profile."""
         self.check_common(profile)
         self.assertNotIn("suppressApplicationTitle", profile, "it would discard the title each client sends")
-        self.assertEqual(profile["bellStyle"], ["audible", "taskbar"])
-        self.assertRegex(profile["bellSound"], r"\\Windows Ding\.wav$")
-        self.assertRegex(profile["commandline"], rf'^wsl\.exe -d \S+ -u \S+ --cd \S+ --exec /bin/bash -lc "exec {client}"$')
+        self.assertEqual(profile["bellStyle"], ["audible", "taskbar"], "the reviewed bellStyle")
+        self.assertIn("bellSound", profile, "the quiet sound")
+        self.assertRegex(profile["bellSound"], r"\\Windows Ding\.wav$", "the quiet sound")
+        self.assertEqual(session_flag_problems(profile), [], "a profile must not pin a session, name or setting flag: several tabs share one directory")
+        self.assertRegex(profile["commandline"], rf'^wsl\.exe -d \S+ -u \S+ --cd \S+ --exec /bin/bash -lc "exec {re.escape(command)}"$',
+                         "a login shell that runs exactly the command the policy names")
 
     def check_shell(self, profile: dict):
         self.check_common(profile)
@@ -284,23 +342,55 @@ class ProfilePolicyMixin:
         self.assertEqual(profile["bellStyle"], ["taskbar"], "a readline completion bell stays silent")
         self.assertNotIn("bellSound", profile)
 
+    def check_fragment(self, fragment: dict):
+        """Every rule of the example on any copy of it. The example itself must pass; the negative controls run this on copies that have one defect each."""
+        names = [profile["name"] for profile in fragment["profiles"]]
+        self.assertEqual(placement_problems(names), [], "each resume profile sits right after its client's default profile")
+        self.assertEqual(names, FRAGMENT_ORDER, "the example's profiles and their order")
+        profiles = {profile["name"]: profile for profile in fragment["profiles"]}
+        for name, profile in profiles.items():
+            self.assertNotIn("guid", profile, f"{name} declares a guid")
+            self.assertIs(profile.get("hidden"), False, f"{name} must stay visible: hidden is false")
+            self.assertEqual(environment_problems(name, profile), [], f"{name}: COLORTERM only through the Claude profiles' environment key")
+        self.check_shell(profiles["WSL - Shell"])
+        for name, command in AI_COMMANDS.items():
+            self.check_ai(profiles[name], command)
+        for resume, default in RESUME_OF.items():
+            self.assertEqual(resume_copy_problems(profiles[default], profiles[resume]), [], f"{resume} is its default profile with another name, command and tab title")
+
 
 class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
     def setUp(self):
         self.fragment = json.loads(FRAGMENT.read_text(encoding="utf-8"))
         self.profiles = {profile["name"]: profile for profile in self.fragment["profiles"]}
 
-    def test_a_fragment_of_three_profiles_that_declare_no_guid(self):
+    def test_a_fragment_of_five_profiles_that_declare_no_guid(self):
         # The GUID is optional in a fragment: Windows Terminal derives a stable one from the fragment folder's name and the profile
         # name (Profile::_GenerateGuidForProfile at v1.24.11911.0), and the derived value never travels in this repository.
         self.assertEqual(set(self.fragment), {"profiles"})
-        self.assertEqual(list(self.profiles), ["WSL - Shell", "WSL - Codex", "WSL - Claude"])
+        self.assertEqual([profile["name"] for profile in self.fragment["profiles"]], FRAGMENT_ORDER)
         for name, profile in self.profiles.items():
             self.assertNotIn("guid", profile, name)
 
     def test_the_ai_profiles_show_their_own_titles_and_ring_quietly(self):
-        self.check_ai(self.profiles["WSL - Codex"], "codex")
-        self.check_ai(self.profiles["WSL - Claude"], "claude")
+        # The default profile and the resume profile of each client: the title the client sends, the reviewed bell and quiet sound, a login shell and
+        # exactly one command each (the client alone for a default profile, so that it still starts a new session; its own picker for a resume profile).
+        for name, command in AI_COMMANDS.items():
+            self.check_ai(self.profiles[name], command)
+
+    def test_each_resume_profile_sits_right_after_its_default_profile_and_copies_it(self):
+        names = [profile["name"] for profile in self.fragment["profiles"]]
+        self.assertEqual(placement_problems(names), [])
+        for resume, default in RESUME_OF.items():
+            self.assertEqual(resume_copy_problems(self.profiles[default], self.profiles[resume]), [], resume)
+
+    def test_no_profile_pins_a_session_a_name_or_a_setting(self):
+        for name, profile in self.profiles.items():
+            self.assertEqual(session_flag_problems(profile), [], name)
+        self.assertEqual(session_flag_problems(recipe_profile()), [], "the recipe's profile")
+
+    def test_the_whole_example_passes_every_fragment_check(self):
+        self.check_fragment(self.fragment)
 
     def test_the_shell_profile_keeps_a_fixed_title_and_a_silent_bell(self):
         self.check_shell(self.profiles["WSL - Shell"])
@@ -308,9 +398,9 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
                          r'^wsl\.exe -d \S+ -u \S+ --cd \S+ --exec /bin/bash -lc "exec /bin/bash -l"$')
 
     def test_only_claude_sets_truecolor_and_only_through_the_environment_key(self):
+        # both Claude profiles (the default and the resume one) and no other profile
         for name, profile in self.profiles.items():
-            self.assertEqual(profile.get("environment"), {"COLORTERM": "truecolor"} if name == "WSL - Claude" else None, name)
-            self.assertNotIn("COLORTERM", profile["commandline"])
+            self.assertEqual(environment_problems(name, profile), [], name)
 
     def test_only_the_three_placeholders_stand_for_host_values(self):
         text = FRAGMENT.read_text(encoding="utf-8")
@@ -340,6 +430,91 @@ class FragmentExampleTests(ProfilePolicyMixin, unittest.TestCase):
         }.items():
             with self.subTest(label), self.assertRaises(AssertionError):
                 self.check_ai({**copy.deepcopy(good), **change}, "claude")
+
+    def test_a_defect_in_the_profile_set_is_detected(self):
+        # Negative controls for the five-profile example: every rule of check_fragment must fail, with that rule's own message, on an in-memory copy of the example
+        # that has the one defect (the example itself is not touched). The unchanged example passes first, so a failure below comes from the defect and from nothing else.
+        self.check_fragment(self.fragment)
+        shell, codex, codex_resume, claude, claude_resume = FRAGMENT_ORDER
+        launch = 'wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc'
+
+        def reordered(*names):
+            def change(by_name, profiles):
+                profiles[:] = [by_name[name] for name in names]
+            return change
+
+        def add_profile(change_to):
+            def change(by_name, profiles):
+                profiles.append({**copy.deepcopy(by_name[shell]), **change_to})
+            return change
+
+        def edited(name, **keys):
+            def change(by_name, _profiles):
+                by_name[name].update(copy.deepcopy(keys))
+            return change
+
+        def without(name, key):
+            def change(by_name, _profiles):
+                del by_name[name][key]
+            return change
+
+        def command_plus(name, text):
+            def change(by_name, _profiles):
+                by_name[name]["commandline"] = by_name[name]["commandline"][:-1] + text + '"'
+            return change
+
+        placement, flag = "right after", "pin a session, name or setting flag"
+        cases = [
+            ("the Codex resume profile at the end", reordered(shell, codex, claude, claude_resume, codex_resume), placement),
+            ("the Claude resume profile before its default profile", reordered(shell, codex, codex_resume, claude_resume, claude), placement),
+            ("the Claude resume profile right after the Codex profile", reordered(shell, codex, claude_resume, codex_resume, claude), placement),
+            ("both resume profiles first", reordered(codex_resume, claude_resume, shell, codex, claude), placement),
+            ("the Claude resume profile missing", reordered(shell, codex, codex_resume, claude), "is missing"),
+            ("an unlisted sixth profile", add_profile({"name": "WSL - Operations"}), "the example's profiles and their order"),
+            ("a resume profile that declares a guid", edited(codex_resume, guid="not-a-guid"), "declares a guid"),
+            ("the Codex resume profile with another tab colour", edited(codex_resume, tabColor="#000000"), "differs from WSL - Codex in tabColor"),
+            ("the Claude resume profile hidden", edited(claude_resume, hidden=True), "must stay visible"),
+            ("both Codex profiles hidden (equal to each other, so the copy rule cannot see it)", lambda by_name, _profiles: [by_name[name].update(hidden=True) for name in (codex, codex_resume)], "must stay visible"),
+            ("the Shell profile without the hidden key", without(shell, "hidden"), "must stay visible"),
+            ("the Codex resume profile with a null key its default lacks", edited(codex_resume, icon=None), "differs from WSL - Codex in icon"),
+            ("the Codex resume profile starting elsewhere", edited(codex_resume, startingDirectory="C:\\"), "differs from WSL - Codex in startingDirectory"),
+            ("the Claude resume profile with its default's tab title", edited(claude_resume, tabTitle="WSL - Claude"), "has the tab title"),
+            ("the Codex resume profile that discards the client's title", edited(codex_resume, suppressApplicationTitle=True), "discard the title"),
+            ("the Claude resume profile that rings for everything", edited(claude_resume, bellStyle=["all"]), "toast"),
+            ("the Codex resume profile without the taskbar flash", edited(codex_resume, bellStyle=["audible"]), "the reviewed bellStyle"),
+            ("the Claude resume profile with a loud sound", edited(claude_resume, bellSound="C:\\Windows\\Media\\Windows Notify System Generic.wav"), "the quiet sound"),
+            ("the Claude resume profile without a sound", without(claude_resume, "bellSound"), "the quiet sound"),
+            ("the Codex resume profile that stays open after a clean exit", edited(codex_resume, closeOnExit="never"), "closeOnExit graceful"),
+            ("the Codex resume profile that starts a new session", edited(codex_resume, commandline=f'{launch} "exec codex"'), "exactly the command"),
+            ("the Claude resume profile that starts a new session", edited(claude_resume, commandline=f'{launch} "exec claude"'), "exactly the command"),
+            ("the Codex resume profile that runs the other client's picker", edited(codex_resume, commandline=f'{launch} "exec claude --resume"'), "exactly the command"),
+            ("the Claude resume profile without a login shell", edited(claude_resume, commandline="wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec claude --resume"), "exactly the command"),
+            ("the Claude default profile that resumes", edited(claude, commandline=f'{launch} "exec claude --resume"'), "exactly the command"),
+            ("the Codex default profile that resumes", edited(codex, commandline=f'{launch} "exec codex resume"'), "exactly the command"),
+            ("the Claude resume profile without COLORTERM", without(claude_resume, "environment"), "has the environment"),
+            ("the Claude resume profile with another colour depth", edited(claude_resume, environment={"COLORTERM": "24bit"}), "has the environment"),
+            ("the Codex resume profile with COLORTERM", edited(codex_resume, environment={"COLORTERM": "truecolor"}), "has the environment"),
+            ("the Claude resume profile with COLORTERM in its command", edited(claude_resume, commandline=f'{launch} "COLORTERM=truecolor exec claude --resume"'), "COLORTERM in its command line"),
+        ]
+        # every flag on a resume profile and on a default profile (a resume profile with --last or --continue is the case the policy exists for)
+        for flag_name in SESSION_FLAGS:
+            for name in AI_COMMANDS:
+                cases.append((f"{flag_name} on {name}", command_plus(name, f" {flag_name}"), flag))
+        for label, change, expected in cases:
+            fragment = copy.deepcopy(self.fragment)
+            change({profile["name"]: profile for profile in fragment["profiles"]}, fragment["profiles"])
+            with self.subTest(label), self.assertRaisesRegex(AssertionError, re.escape(expected)):
+                self.check_fragment(fragment)
+
+    def test_the_flag_check_reads_each_flag_in_either_spelling_and_nothing_else(self):
+        launch = 'wsl.exe -d <DISTRO> -u <WSL_USER> --cd <PROJECT> --exec /bin/bash -lc'
+        for flag_name in SESSION_FLAGS:
+            for text in (f"exec claude {flag_name}", f"exec claude {flag_name}=value", f"exec claude --resume {flag_name} value"):
+                with self.subTest(text):
+                    self.assertEqual(session_flag_problems({"commandline": f'{launch} "{text}"'}), [flag_name])
+        for text in ("exec claude", "exec claude --resume", "exec codex", "exec codex resume", "exec /bin/bash -l", "exec claude --lastly", "exec claude --names"):
+            with self.subTest(text):
+                self.assertEqual(session_flag_problems({"commandline": f'{launch} "{text}"'}), [])
 
 
 class ScanReaderTests(unittest.TestCase):
@@ -513,6 +688,8 @@ class DocumentationTests(unittest.TestCase):
                      "adoption/templates/codex.config.template.toml", "scripts/adoption_status.py --login-shell",
                      "tools/adoption/apply_claude_settings.py"):
             self.assertIn(path, page)
+        for name in RESUME_OF:  # the page says what each shipped resume profile opens
+            self.assertIn(f"`{name}`", page)
         self.assertIn("(../adoption/platforms/linux-wsl2.md#windows-terminal-profiles-and-the-login-shell)",
                       RECIPE.read_text(encoding="utf-8"))
         # The hand-off line the page tells an operator to keep is the one the decision record verified.
