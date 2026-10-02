@@ -6591,7 +6591,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1"
+      "sha256": "bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -6767,8 +6767,10 @@
       "boundary": "Per-tool order is the W-PROF stage/position; missing entries block installation.",
       "commands": [
         "cd ~/code/native-agent-stack",
-        "adoption/bootstrap-linux.sh --profile '<id>'",
-        "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'"
+        "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+        "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "python3 -B tools/adoption/new_wsl_client_config.py --check",
+        "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'"
       ],
       "profile_order": [
         "os-provisional-comparison",

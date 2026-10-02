@@ -2,7 +2,7 @@ name: Catalog freshness (report-only)
 
 on:
   schedule:
-    - cron: '17 6 * * 1'
+    - cron: '17 6 * * *'
   workflow_dispatch:
     inputs:
       max_repos:
@@ -317,6 +317,21 @@ jobs:
           # branch head carries instead of embedding this run's report. A manual and a
           # scheduled propose can overlap (separate concurrency groups), and a
           # run-specific body could then describe an older commit than the branch holds.
+          find_open_pr() {
+            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
+          }
+          resolve_lane() {
+            lane=lane:shared
+            if [ -n "$existing" ]; then
+              current_lane="$(gh pr view "$existing" --json labels --jq '[.labels[].name | select(startswith("lane:"))] | join("\n")')"
+              case "$current_lane" in
+                "") ;;
+                lane:foundation|lane:trading|lane:shared) lane="$current_lane" ;;
+                *) echo "Expected at most one supported lane label; resolve the PR labels before retrying." >&2; return 1 ;;
+              esac
+            fi
+          }
+          write_pr_body() {
           body_file="$RUNNER_TEMP/freshness/pr-body.md"
           {
             echo "## Catalog freshness: report-only drift evidence"
@@ -324,21 +339,32 @@ jobs:
             echo "The evidence is the current head of \`automation/catalog-freshness\`: the drift report under \`evidence/artifacts/catalog-freshness-<date>/drift.md\` and the receipt under \`evidence/receipts/catalog-freshness-<date>.json\` in this PR's diff. The workflow run that produced the head commit is linked from that receipt."
             echo ""
             echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
+            echo ""
+            echo "Lane: \`$lane\`. This report covers foundation and trading source observations; an existing explicit lane label is preserved for owner review."
+            echo ""
+            echo "### SOTA sources"
+            echo ""
+            echo "The current PR's drift manifest and receipt retain the upstream repository identities, selected pins and fetched release/source observations. They are source-review evidence, not new runtime acceptance."
+            echo ""
+            echo "PR metadata source reviewed at cli/cli v2.102.0: [GitHub CLI create](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/create/create.go) and [edit](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/edit/edit.go). The hosted executable version is supplied by the runner image."
           } > "$body_file"
-          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
-          find_open_pr() {
-            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
           }
+          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
           existing="$(find_open_pr)"
+          resolve_lane
+          write_pr_body
           if [ -z "$existing" ] && ! gh pr create --base main --head automation/catalog-freshness \
-              --title "$title" --body-file "$body_file" >/dev/null; then
+              --title "$title" --body-file "$body_file" --label "$lane" >/dev/null; then
             # An overlapping run may have created the PR between the list and the create
             # (gh refuses a second PR for the same head); fall through to updating it.
             existing="$(find_open_pr)"
             [ -n "$existing" ] || { echo "gh pr create failed and no open PR exists" >&2; exit 1; }
           fi
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+            # Re-read after a create race and retain a human's existing lane choice.
+            resolve_lane
+            write_pr_body
+            gh pr edit "$existing" --title "$title" --body-file "$body_file" --add-label "$lane"
           fi
           pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
@@ -371,4 +397,9 @@ jobs:
             echo "use the approval banner in the PR's merge box and select \"Approve workflows to run\""
             echo "(GITHUB_TOKEN docs). A run left awaiting approval for"
             echo "more than 30 days is automatically deleted. See docs/github-automation.md."
+            echo ""
+            echo "For an existing PR whose old body lacked SOTA sources, the preceding push may"
+            echo "have captured that old body. If the approved source gate fails, make a genuine"
+            echo "human-authenticated body edit retaining the source section; rerunning the old"
+            echo "event keeps its old payload. GITHUB_TOKEN body edits do not trigger new runs."
           } >> "$GITHUB_STEP_SUMMARY"

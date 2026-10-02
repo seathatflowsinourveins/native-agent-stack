@@ -53,8 +53,10 @@ Commands, as the recipe page gives them:
 
 ```sh
 cd ~/code/native-agent-stack
-adoption/bootstrap-linux.sh --profile '<id>'
-adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'
+bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh
+bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
+python3 -B tools/adoption/new_wsl_client_config.py --check
+python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
 
 After stage 2:
@@ -2096,7 +2098,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `1e08ba8e879b0c52fd5c53341ea60bb27ca70ebc64cb9af655d9ba5ae0a21cb0` |
-| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1` |
+| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `bddd59c0cd2b7c6a5c2fb5357dd7a74c5a396a73cd3989b06914203343c97f80` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |

@@ -123,6 +123,7 @@
   "idle_observation": "<F2: the twelve poll times and whether <Name> was in every list, or the time of the first list without it>",
   "subordinate_ids": "<F5: the /etc/subuid and /etc/subgid lines, and whether useradd or usermod wrote them>",
   "jcodemunch_registration": "<F11: registered (the scope and command lines of claude mcp get jcodemunch), not installed (test -x exited 1), or skipped with the reason>",
+  "authorization_settings": "<F9: the plain --apply, or who asked for --with-authorization-settings, when, and the line --apply printed about the authorization settings, which says `left to the clients' own defaults`, `applied`, `partly applied`, `kept` or `not applied` (a dry run says `would be applied` or `would be partly applied`), with what it added, kept, found already the same and did not reach>",
   "failed_attempt_export": {
     "file": "<W6, path B only: Z:\\WSL\\downloads\\<Name>-failed.tar; null on path A>",
     "sha256": "<W6: the Get-FileHash line's lower-case hash of that file; null on path A>",
@@ -1283,7 +1284,7 @@
     },
     {
       "step": "F8",
-      "cmd": "ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'",
+      "cmd": "ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
@@ -1313,13 +1314,25 @@
     },
     {
       "step": "F9",
-      "cmd": "adoption/bootstrap-linux.sh --profile '<id>'",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
     {
       "step": "F9",
-      "cmd": "adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'",
+      "cmd": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --check",
+      "exit": "<exit code>",
+      "output_excerpt": "<sanitized output>"
+    },
+    {
+      "step": "F9",
+      "cmd": "python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'",
       "exit": "<exit code>",
       "output_excerpt": "<sanitized output>"
     },
