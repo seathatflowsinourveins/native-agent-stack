@@ -53,10 +53,12 @@ no provider call, no model run. The distribution was removed afterwards.
   owner, is installed by the script's first step, which prints no result line.
 - Post-install acceptance at `b48321ea`, first pass, counted in result lines, one per plan row (64): 34 exit 0, 29
   skipped and one exit 1 (`engineering-process-skills`). The 29 are the 25 rows that are not installed, the three
-  measurement-only owners and `credential-guard`, which has no host-executable check. The install was right and
-  the check was wrong: the installer's lock file records no `ref`. Each of the six skills' `skillFolderHash`
-  equals the git tree hash of its folder at tag `v1.2.3` and differs from main's, so the pin had been honoured.
-- Post-install acceptance at `1b290218`, final: the acceptance now compares those hashes. `accept.sh --only
+  measurement-only owners and `credential-guard`, which has no host-executable check. The check failed because
+  the lock that this run returned had no `ref` field; the installer at v1.7.0 supports that field as an optional
+  branch or tag, and why it was absent here is unresolved. Each of the six skills' recorded `skillFolderHash` equals
+  the git tree hash of its folder at tag `v1.2.3` and differs from main's.
+- Post-install acceptance at `1b290218`, final: the acceptance now compares those recorded hashes with the expected
+  ones; it does not hash the installed directories, and it says nothing about a client loading a skill. `accept.sh --only
   engineering-process-skills` returned exit 0, and one full `accept.sh` run returned 35 exit 0 and 29 skipped. Of
   that full run only the counts were kept, not its per-owner lines, so the record's `per_owner` table is the first
   pass and still shows this owner's failure; `per_owner_final` holds the one line that was kept.

@@ -4070,8 +4070,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d3102407adb302ab847c52afe31b538721eee69b4cf31be0ec68d2cac5d44361",
-      "bytes": 18532
+      "sha256": "ddb393a6d4a6ca317e14d75ba4fe5b2a357d93704adcea8f0cf8eb449e6c1da3",
+      "bytes": 18600
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -15006,8 +15006,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "7ca1f4e0d572746d4aabebfa288133162654d31926cee4a7072e6a2652a1ad2e",
-      "bytes": 4439
+      "sha256": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
+      "bytes": 4574
     },
     {
       "path": "catalogs/landscape/native-practice.json",
@@ -15886,8 +15886,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "bcfd68430f325a4395ad02e4a0bfbeeb3cd18722b12d6fcd87763b988f69075b",
-      "bytes": 129343
+      "sha256": "87229ac5a96c1c46165d8de5a09f38d3751dd6fc8264aaf78adec3dc35b2f425",
+      "bytes": 135407
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -37206,8 +37206,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "39cb417bf12b1c4a8f36d3d0befc66bef98f16348952fcaf3be1cf6085f3f78f",
-      "bytes": 12303
+      "sha256": "68d23be52f2b6a2bc26737d2bdba484b6cf2c1fae3a7d929b6eddb767e24cfe7",
+      "bytes": 12636
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -37216,8 +37216,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "c21bee9177097b74fd2acfc8d91e127923c8b7a47c18d7d7e39afde67f37e19d",
-      "bytes": 20302
+      "sha256": "2604bfbfee99f66d8d7b6c5ce2dcef634571c530a4c5bd73ec8834ecde41e039",
+      "bytes": 20515
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
@@ -37271,8 +37271,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "14e80961d1e20420bb2891bbec1e8dd55d2db67433f12a242b0f3c311e965d34",
-      "bytes": 109336
+      "sha256": "b8ac25dff11ae7ebb3fbbd71a18d0f6a14469a61f428c9d7dd90b8e756828a67",
+      "bytes": 109611
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -37291,8 +37291,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
-      "sha256": "7de61ac3ae94b7f0c5b6cd7753b83d1b4368387dd18b04ef3eff60cf9ff19839",
-      "bytes": 11786
+      "sha256": "726c7256b2ab42caf408a8fc7f53f3abd0cff7d6ccfa8ad76bf3e654eb5a74dc",
+      "bytes": 12122
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
