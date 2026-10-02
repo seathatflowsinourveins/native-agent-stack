@@ -121,6 +121,9 @@ EXTENSIONS = {
 }
 FIELDS = {
     "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping)",
+    "record_verdict": "the edition's verdict for the row, quoted as written (bookkeeping, not a decision of this "
+                      "record)",
+    "record_evidence_class": "the edition's evidence class for the row, quoted as written",
     "blind": "the blind Claude Opus 5.5 half (#589): status, critic verdict, picks with captured upstream facts, and "
              "the comparison arms it recorded",
     "cross_family": "the blind GPT-6.1 Sol half: status, critic verdict and picks with captured upstream facts",
@@ -139,6 +142,8 @@ FIELDS = {
     "pick_sets.versus_record": "picks both halves named that the source host's record lacks, and record entries that "
                                "are not among them",
     "disagreement_with_record": "the blind Claude half against the source host's record",
+    "grand_list": "the layer's decision and open-gap counts from the new-host grand list, carried as context; a move of "
+                  "the grand list alone is reported as drift by --check, not as a failure",
 }
 GITHUB = re.compile(r"^(?:https?://)?(?:www\.)?github\.com/([^/\s#?]+)/([^/\s#?]+)", re.IGNORECASE)
 
