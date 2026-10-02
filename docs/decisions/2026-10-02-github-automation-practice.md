@@ -20,23 +20,27 @@ drifted sections as superseded:
 - Secret scanning: gitleaks stays the required gate; betterleaks runs as a report-only trial; GitHub push protection is
   on.
 
-Against the final catalog of 2026-10-01 (`docs/final-catalog-20261001.md`, from the final-catalog pull request), the
-three layers this practice touches keep their selections of record. A standing pick becomes final only after
-new-host acceptance and the layer's preregistered comparison.
+Against the final catalog of 2026-10-01 (`docs/final-catalog-20261001.md`, #595), the three layers this practice
+touches keep their selections of record. The clean-room definitive round announced in #595 decides one pick per slot
+for each of them; until then the table records which picks each model family made.
 
-| Layer | Standing picks (both families) | Challengers (one family) | In use here |
+| Layer | Picks both families made | Picks one family made | In use here |
 | --- | --- | --- | --- |
 | git-github-automation | git, gh (cli/cli), Worktrunk, sem | difftastic, claude-code-action | git, gh, Worktrunk, difftastic; claude-code-action unadopted (M45); sem not adopted |
 | ci-supply-chain | actions/attest, Syft, Dependabot, actionlint (kjanat), zizmor | github/codeql-action | all five standing picks; the challenger is the `upload-sarif` step already in use |
 | secrets-credentials | betterleaks | trufflehog | gitleaks 8.30.1 as the required gate; betterleaks v1.8.1 as a report-only trial |
 
-## Preregistered comparisons
+## Preregistered checks
 
-Each comparison is frozen in its own preregistration before any arm runs, and each verdict lands in its own pull request.
+The definitive round decides each slot's pick. The checks below are the measurements that pick has to pass before
+the practice changes: the acceptance test for a gate swap, and the measurement that settles a slot if the round's two
+families stay split. Each is frozen in its own preregistration before any arm runs, and each verdict lands in its own
+pull request.
 
-- **P1, the secret-scan gate.**
-  - Arms: gitleaks 8.30.1 (the selection of record and required gate) against betterleaks 1.9.0 (the standing pick)
-    and trufflehog at its latest release when the comparison is frozen (the challenger), with verification on and off.
+- **P1, the secret-scan gate.** It runs once the definitive round has picked the secrets slot, as the acceptance
+  test before that pick replaces gitleaks in the required job.
+  - Arms: gitleaks 8.30.1 (the selection of record and required gate) against the round's pick, plus trufflehog
+    (with verification on and off) if the round's families split on it.
   - Corpus:
     - the pinned Samsung/CredData benchmark through its upstream harness;
     - this repository's history, for blocking false positives;
@@ -46,19 +50,14 @@ Each comparison is frozen in its own preregistration before any arm runs, and ea
     - The unprefixed 40-hex class is reported separately; it is the class behind the trial's failing fixture tests d2,
       d4 and d5 (`evidence/artifacts/betterleaks-parity-20260927/`).
   - Decision rule:
-    - betterleaks replaces gitleaks inside the `secret-scan` job, with the check name unchanged, only if it shows no
-      unaccepted class loss and no extra blocking false positives.
-    - trufflehog joins the new-WSL install only on a measured gain.
+    - The round's pick replaces gitleaks inside the `secret-scan` job, with the check name unchanged, only if it shows
+      no unaccepted class loss and no extra blocking false positives.
     - The gate swap is its own `lane:shared` pull request.
-- **P2, structural diffs.**
-  - Arms: sem 0.25.0 (standing pick) against difftastic 0.71.0 (challenger and selection of record) and plain
-    `git diff`.
+- **P2, structural diffs.** It runs only if the definitive round's families stay split on the structural-diff slot.
+  - Arms: sem 0.25.0 against difftastic 0.71.0 (the selection of record) and plain `git diff`.
   - Corpus: difftastic's sample files plus a frozen set of this repository's PR diffs.
   - Agent-answer quality is scored with promptfoo, the upstream harness AGENTS.md names for LLM A/B.
-  - Decision rule:
-    - difftastic stays the selection of record unless sem shows a measured gain.
-    - On a tie, the frozen agreement rule would keep sem standing while the Claude pick keeps it "only if the
-      structural-diff comparison shows a gain", so a tie goes to the user.
+  - Decision rule: the arm with the better preregistered score becomes the slot's pick; a tie goes to the user.
 - **P3, review automation.**
   - anthropics/claude-code-action stays unadopted under decision M45 (`docs/decisions/2026-09-28-community-sweep.md`,
     M45 and its auto-merge note).

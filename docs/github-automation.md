@@ -52,16 +52,15 @@ live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 237
   only the catalog-freshness `propose` job holds `pull-requests: write`, and no workflow reviews or approves a pull
   request (`test_pull_requests_write_is_granted_only_to_the_propose_job`,
   `test_no_workflow_reviews_or_approves_a_pull_request`).
-- **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, added by the final-catalog PR):
-  standing picks are the picks both blind model families made, final only after new-host acceptance and the layer's
-  preregistered comparison.
-  - git-github-automation: git, gh, Worktrunk and sem stand; the Claude pick keeps sem only if the structural-diff
-    comparison shows a gain. difftastic and claude-code-action are challengers. difftastic remains the selection of
-    record, and claude-code-action stays unadopted (decision M45).
-  - ci-supply-chain: attest, Syft, Dependabot, actionlint (kjanat) and zizmor stand, and all of them are in use. The
-    challenger `github/codeql-action` is the `upload-sarif` step above.
-  - secrets-credentials: betterleaks stands with trufflehog as its challenger. gitleaks stays the required gate until
-    the comparison preregistered in
+- **Against the final catalog of 2026-10-01** (`docs/final-catalog-20261001.md`, #595): the picks each blind model
+  family made for these layers. The clean-room definitive round announced there decides one pick per slot.
+  - git-github-automation: both families picked git, gh, Worktrunk and sem (the Claude pick keeps sem only if a
+    structural-diff comparison shows a gain); one picked difftastic and claude-code-action. difftastic remains the
+    selection of record, and claude-code-action stays unadopted (decision M45).
+  - ci-supply-chain: both families picked attest, Syft, Dependabot, actionlint (kjanat) and zizmor, all in use;
+    `github/codeql-action`, picked by one, is the `upload-sarif` step above.
+  - secrets-credentials: both families picked betterleaks, and one picked trufflehog. gitleaks stays the required
+    gate until the definitive pick passes the acceptance test preregistered in
     [`docs/decisions/2026-10-02-github-automation-practice.md`](decisions/2026-10-02-github-automation-practice.md)
     decides.
 
