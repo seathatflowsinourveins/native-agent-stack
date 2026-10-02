@@ -1,0 +1,11 @@
+The MCP server "time" does not support resource listing or time retrieval via the available tools. This suggests either:
+1. The server configuration is incorrect
+2. The required resource URI format is unknown
+3. The MCP connection is misconfigured
+
+No valid MCP resource path could be determined. Please verify:
+- The server name "time" is correct
+- The MCP server is properly configured
+- The required resource URI format for time retrieval
+
+No further progress can be made with the current toolset.

@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "quality-evaluation",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No retained same-oracle injected-regression comparison establishes Promptfoo/Inspect/MLflow catching the target changed behavior.",
+      "Representative held-out quality and complete provider/child accounting remain absent from retained task-specific evaluations."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "pin_of_record": "0.123.1",
+      "pin_source": "manifests/stack.json:701; no promptfoo ID in frozen Linux tools pins",
+      "source_pinned_url": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+      "upstream_currency": "Latest release 0.123.1: https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+      "native_install": {
+        "command": "npm install --global promptfoo@0.123.1",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "npm test",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/package.json",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "playwright-test",
+      "repository": "https://github.com/microsoft/playwright",
+      "pin_of_record": "1.63.0 @ 1b025d7e20a026371cd5f98ba0cdce48892737c8",
+      "pin_source": "manifests/stack.json:1857; no playwright-test ID in frozen Linux tools pins",
+      "source_pinned_url": "https://github.com/microsoft/playwright/blob/v1.63.0/README.md",
+      "upstream_currency": "Latest v1.63.0: https://github.com/microsoft/playwright/releases/tag/v1.63.0",
+      "native_install": {
+        "command": "npm install --save-dev @playwright/test@1.63.0 && npx playwright install chromium",
+        "source": "https://playwright.dev/docs/intro#installing-playwright; pinned package metadata: https://registry.npmjs.org/@playwright%2ftest/1.63.0",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "npx playwright test --project=chromium",
+        "source": "https://playwright.dev/docs/test-cli",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "ShellCheck",
+      "repository": "https://github.com/koalaman/shellcheck",
+      "verdict": "Retain scope-specific shell checks at current record/latest 0.11.0; one clean fixture does not show regression detection.",
+      "sources": [
+        "https://github.com/koalaman/shellcheck/blob/v0.11.0/README.md"
+      ]
+    },
+    {
+      "name": "Difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "verdict": "Retain structural review aid at current record/latest 0.71.0; --exit-code indicates a diff, not behavior correctness.",
+      "sources": [
+        "https://github.com/Wilfred/difftastic/blob/0.71.0/README.md"
+      ]
+    },
+    {
+      "name": "MCP Inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "verdict": "Record 2.8.0, latest 2.9.0. Conditional protocol/tool-call oracle; one retained arithmetic call does not qualify a plugin's hooks or lifecycle.",
+      "sources": [
+        "https://github.com/modelcontextprotocol/inspector/blob/2.9.0/README.md"
+      ]
+    },
+    {
+      "name": "TypeSafe semantic skill",
+      "repository": "https://github.com/typesafe-ai/skills",
+      "verdict": "Advisory task-specific judgments; retained 7/8 versus weak 3/8 baseline and corrected C4 disagreement do not establish general verification quality.",
+      "sources": [
+        "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/README.md"
+      ]
+    },
+    {
+      "name": "Official OpenAI CI/security skills",
+      "repository": "https://github.com/openai/skills",
+      "verdict": "Relevant on-demand procedures; installed discovery/clean-helper observations do not qualify actual failing-CI repair or security findings.",
+      "sources": [
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/SKILL.md"
+      ]
+    },
+    {
+      "name": "Inspect AI",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "verdict": "Current source and official Inspect docs support agent/model evals; PyPI latest 0.3.273. Conditional upstream harness, unexecuted against this frozen oracle.",
+      "sources": [
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/674e62823b226b5cf2449db8dd014276533841f7/README.md"
+      ]
+    },
+    {
+      "name": "MLflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "verdict": "Current agent/LLM evaluation is relevant, as well as tracking. No retained same-case negative-control comparison justifies replacing existing project checks/Promptfoo.",
+      "sources": [
+        "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "catalogs/landscape/foundation.json:3015 says MLflow tracks artifacts and does not verify changed behavior.",
+      "correction": "v3.16.1 explicitly supports agent/LLM evaluation. Keep it conditional and unqualified for this repository's oracle; narrow the tracking-only dismissal.",
+      "deciding_source": "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md#L87; https://mlflow.org/docs/latest/genai/eval-monitor/"
+    }
+  ],
+  "evidence_assessment": [
+    "Reuse docs/promptfoo-upstream-retrieval.md with its four upstream examples and locally authored rounded-output assertions; do not relabel them a held-out model-quality evaluation.",
+    "The retained Playwright one-test ledger flow is project/local synthetic integration, not an unchanged upstream Playwright suite. Test totals, source review and schema validation have separate classes.",
+    "TypeSafe's historical provider results remain eight selected cases, an unmatched weak baseline and native source review correcting C4 to insufficient; no new judgments/model requests occurred.",
+    "Pinned upstream scripts are native source-backed acceptance entry points, not returned passing results here. Installed promptfoo --help timed out; no absence claim follows.",
+    "A maintained harness supplies orchestration; the selected frozen oracle and independently inspected returned outputs determine acceptance. Every negative/failure and skip must be retained."
+  ],
+  "failed_access": [
+    {
+      "source": "promptfoo --help",
+      "result": "12-second timeout; source/package scripts reviewed instead, without provider calls."
+    },
+    {
+      "source": "UKGovernmentBEIS/inspect_ai releases/latest, guessed UKGovernmentAISI namespace and v0.3.273 tag",
+      "result": "HTTP 404/exit 1 for those endpoints/refs. Official docs, PyPI metadata and current immutable 674e6282 source remain available; not a product/capability absence."
+    }
+  ],
+  "omissions": [
+    "No model evaluation, CI repair, security audit, production browser task or new upstream suite execution performed.",
+    "Playwright tests require an actual project/config/browser; version identity alone does not establish its acceptance."
+  ],
+  "next_wave": [
+    "Use one frozen acceptance/negative-case corpus in the existing Promptfoo or Inspect native harness, disarm/inject the target regression once, and independently inspect failure and passing outputs before broader claims.",
+    "Trial MLflow evaluation only if its maintained scorer/run interface closes a concrete target-oracle gap; measure complete task/provider accounting rather than framework popularity."
+  ],
+  "reopen_on": [
+    "A missed real regression, unreliable scorer, protocol failure or matched oracle/usage improvement reopens the selected check/harness."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

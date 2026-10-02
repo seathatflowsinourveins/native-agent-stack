@@ -1,0 +1,60 @@
+{
+ "layer_id": "code-navigation",
+ "title": "Code navigation",
+ "requirement": "Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question.",
+ "a_deciding_comparison_would_measure": "Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "gitnexus",
+   "repository": "https://github.com/abhigyanpatwari/gitnexus"
+  },
+  {
+   "key": "C02",
+   "name": "Serena",
+   "repository": "https://github.com/oraios/serena"
+  },
+  {
+   "key": "C03",
+   "name": "codebase-memory-mcp",
+   "repository": "https://github.com/DeusData/codebase-memory-mcp"
+  },
+  {
+   "key": "C04",
+   "name": "Glean",
+   "repository": null
+  },
+  {
+   "key": "C05",
+   "name": "jCodeMunch",
+   "repository": "https://github.com/jgravelle/jcodemunch-mcp"
+  },
+  {
+   "key": "C06",
+   "name": "token-savior",
+   "repository": "https://github.com/mibayy/token-savior"
+  },
+  {
+   "key": "C07",
+   "name": "scip, zoekt and universal-ctags",
+   "repository": null
+  },
+  {
+   "key": "C08",
+   "name": "CodeGraph",
+   "repository": "https://github.com/colbymchenry/codegraph"
+  },
+  {
+   "key": "C09",
+   "name": "ast-grep",
+   "repository": "https://github.com/ast-grep/ast-grep"
+  },
+  {
+   "key": "C10",
+   "name": "claude-plugins-official",
+   "repository": "https://github.com/anthropics/claude-plugins-official"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

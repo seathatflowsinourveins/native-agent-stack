@@ -1,0 +1,49 @@
+{
+  "codex_exit_code": 0,
+  "turn_status": "turn.completed",
+  "completed_item_types": {
+    "mcp_tool_call": 3,
+    "agent_message": 1
+  },
+  "non_json_lines": 0,
+  "mcp_tool_calls": [
+    {
+      "server": "time",
+      "tool": "read_mcp_resource",
+      "status": "failed",
+      "arguments": {
+        "server": "time",
+        "uri": "/get_current_time?timezone=UTC"
+      },
+      "error": "resources/read failed: resources/read failed for `time` (/get_current_time?timezone=UTC): Mcp error: -32602: Invalid request parameters(\"\")",
+      "result_datetime": null
+    },
+    {
+      "server": "time",
+      "tool": "list_mcp_resources",
+      "status": "failed",
+      "arguments": {
+        "server": "time"
+      },
+      "error": "resources/list failed: resources/list failed for `time`: Mcp error: -32601: Method not found",
+      "result_datetime": null
+    },
+    {
+      "server": "time",
+      "tool": "list_mcp_resource_templates",
+      "status": "failed",
+      "arguments": {
+        "server": "time"
+      },
+      "error": "resources/templates/list failed: resources/templates/list failed for `time`: Mcp error: -32601: Method not found",
+      "result_datetime": null
+    }
+  ],
+  "tool_call_completed": false,
+  "tool_result_datetimes": [],
+  "final_answer": "The MCP server \"time\" does not appear to be available or properly configured, as attempts to list its resources or templates resulted in \"Method not found\" errors. Please verify the server name and ensure it is correctly configured in your environment.",
+  "final_answer_contains_result": false,
+  "run_pass": false,
+  "reason": "tool_call_failed",
+  "error_events": []
+}

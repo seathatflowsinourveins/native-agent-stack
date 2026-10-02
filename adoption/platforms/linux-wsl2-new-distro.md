@@ -3,27 +3,33 @@
 Added after `v2026.09.26.2`, with its templates under [`adoption/templates/wsl/`](../templates/wsl/) and the record
 [`docs/decisions/2026-10-01-new-wsl-distro-recipe.md`](../../docs/decisions/2026-10-01-new-wsl-distro-recipe.md), which
 holds the decisions, their alternatives, the command table and every source. Status: documented, not run. No host has
-executed these steps; the first one that does records the stage-1 receipt described at the end.
+executed these steps; the first one that does starts with the rehearsal of R1 and records the stage-1 receipt described
+at the end.
 
 This page creates a second WSL 2 distribution on the existing Windows host from Canonical's published
 `ubuntu-24.04.5-wsl-amd64.wsl`, gives it its default user without a prompt through cloud-init, and proves systemd, linger
 and the user bus before stage 2, the repository's bootstrap. The workstation's distribution keeps running, stays the
 default and is never shut down.
 
-Stage 1 (W1 to W6) runs on the Windows host in PowerShell. A session inside the workstation's WSL distribution runs each
+The page runs twice on a host: first as a rehearsal on a throwaway name, which R1 then removes, and then for the real
+`<Name>` ([Rehearsal first](#rehearsal-first)). Each run starts with P1 to P3, `sh` checks in the workstation's
+distribution that change nothing on the host; it shares the kernel and already has Ubuntu's keyring and cloud-init.
+Stage 1 (W1 to W7) runs on the
+Windows host in PowerShell. A session inside the workstation's WSL distribution runs each
 PowerShell block as a `.ps1` file with `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
 ([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Open each block's file with
 `Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append`, placed in W1 right after its first line
 (which creates that folder), and end the file with `Stop-Transcript`. That private transcript is the raw install log the
 receipt is cut from. The first boot (F1 to F11) runs inside the new
 distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a WSL session,
-`wsl.exe -d <Name> -- bash -s < steps.sh`. F11 needs a login shell instead, as its section says.
+`wsl.exe -d <Name> -- bash -s < steps.sh`. F2's idle observation and F10 run from the Windows side and F11 needs a login
+shell instead, as their sections say.
 
 ## Names and inputs
 
 | Placeholder | Meaning | Rule |
 | --- | --- | --- |
-| `<Name>` | the new distribution's name (`--name`) and the user-data file's name | letters, digits, `.`, `_`, `-`; not already registered (W1) |
+| `<Name>` | the new distribution's name (`--name`) and the user-data file's name | letters, digits, `.`, `_`, `-`; not already registered (W1); a throwaway name for the rehearsal (R1) |
 | `<WSL_USER>` | the Linux user cloud-init creates | `^[a-z_][a-z0-9_-]*$`, the rule of the image's `/usr/lib/wsl/wsl-setup` |
 | `Z:\WSL\<Name>` | the install location (`--location`); WSL puts `ext4.vhdx` there | must not exist yet (W1) |
 | `Z:\WSL\downloads` | the image, its checksum list and the private logs | outside the Windows profile, so its path names no user |
@@ -34,14 +40,18 @@ distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a
 ## Host-wide rules
 
 - No `.wslconfig` change, no `wsl --update` and never `wsl --shutdown`, which stops every distribution, the workstation's
-  included. The only stop is `wsl --terminate <Name>`, for the new distribution.
+  included. The only stop is `wsl --terminate <Name>`, for the new distribution. W1 reads two keys of `.wslconfig` with
+  `Select-String`; no command here writes, copies or edits it.
 - The default distribution stays the workstation's: nothing here sets a default, W1 records the starred line of
   `wsl.exe --list --verbose` and W4 and W5 prove it unchanged.
-- No WSL update is needed: `wsl --install --from-file` needs WSL 2.4.4 or later (Microsoft), 2.4.8 (Ubuntu's announcement)
-  or 2.4.10 (Ubuntu's install guide), and the host runs 2.7.13. WSL 2.7.14 and 3.0.1 change nothing about install, import
-  or first launch; updating WSL is the keys lane's decision.
+- No WSL update is needed to install: `wsl --install --from-file` needs WSL 2.4.4 or later (Microsoft), 2.4.8 (Ubuntu's
+  announcement) or 2.4.10 (Ubuntu's install guide), and the host runs 2.7.13. Later releases do change the first launch:
+  microsoft/WSL#40941 (after the first-run setup, files created from Windows are owned by 0:0) is fixed by PR #40977,
+  which ships first in 2.9.8, a pre-release, and in 3.0.1; tags 2.7.13 and 2.7.14 lack it. On 2.7.13, W7 terminates
+  `<Name>` once after the first launch and probes a file's owner before anything else is written from Windows. Updating
+  WSL is the keys lane's decision, not this page's.
 - `.wslconfig` is global, so the new distribution inherits the workstation's settings, among them
-  `networkingMode=mirrored` and the idle timeout.
+  `networkingMode=mirrored`, `swap` and the two idle keys that W1 reads and F2 observes.
 - WSL 2 distributions share one network namespace
   ([Listeners and ports](linux-wsl2.md#listeners-and-ports)): every listener of the new distribution competes with the
   workstation's for the same ports. F8 picks the host file's ports outside the workstation's set.
@@ -49,6 +59,135 @@ distribution as `<WSL_USER>`, from an interactive `wsl.exe -d <Name>` or, from a
   the distribution, and the image's `wsl-setup` copies the Ubuntu Sans Mono font into
   `%LOCALAPPDATA%\Microsoft\Windows\Fonts` and registers it under `HKCU` when that file is missing. The generated
   terminal profile may stay; hide it in Windows Terminal if it duplicates the fragment profile of F10.
+
+## Rehearsal first
+
+### R1. Rehearse on a throwaway name, then remove it
+
+Run the page once on a throwaway distribution before the real one. For that run `<Name>` is a throwaway name that no
+other distribution uses, never the real `<Name>` and never the workstation's, and `Z:\WSL\<Name>` is its own new folder.
+Run it through F3: P1 to P3, W1 to W7 (W6 only after the W5 marker) and F1 to F3, with the observations no host has
+made yet: P3's baseline and W5's second count of storage errors, W5's `cloud-init schema --system` (path A), W7's
+file-ownership probe and F2's idle observation. The first real reading of the storage rule thus comes from the throwaway
+distribution. Record the rehearsal's name, result, creation path and those observations in the receipt's `rehearsal`
+block. Every
+host-wide rule holds: the rehearsal names only its own distribution, and R1 terminates and unregisters only that literal
+name. A rehearsal that stopped before W4 installed nothing, and R1 has nothing to remove.
+
+After the rehearsal's F3, read the list first and remove the throwaway distribution. When every proof held, no export is
+needed:
+
+```powershell
+$env:WSL_UTF8 = '1'
+wsl.exe --list --quiet
+wsl.exe --terminate '<Name>'
+wsl.exe --unregister '<Name>'
+wsl.exe --list --verbose
+```
+
+When a proof failed after W4 installed it, keep the failed rehearsal first, by W6's export rule: the export comes before
+`--unregister` in the same block, and a nonzero exit throws while the name is still registered. A rehearsal that took
+path B already exported its first attempt in W6; this export keeps the state it failed in.
+
+```powershell
+$env:WSL_UTF8 = '1'
+wsl.exe --list --quiet
+wsl.exe --terminate '<Name>'
+wsl.exe --export '<Name>' 'Z:\WSL\downloads\<Name>-rehearsal.tar'
+$LASTEXITCODE
+if ($LASTEXITCODE -ne 0) { throw 'export failed: do not unregister' }
+(Get-FileHash -Algorithm SHA256 -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Hash.ToLowerInvariant()
+(Get-Item -LiteralPath 'Z:\WSL\downloads\<Name>-rehearsal.tar').Length
+wsl.exe --unregister '<Name>'
+wsl.exe --list --verbose
+```
+
+Proof: the first `--list --quiet` names the throwaway distribution; the last `--list --verbose` no longer lists it, and
+its starred line is still W1's. A failed rehearsal's export goes into the `rehearsal` block with its SHA-256 and size,
+and the real run waits until the failure is understood. The rehearsal's private transcript and its user-data file under
+`%USERPROFILE%\.cloud-init` stay; record whether WSL's Start-menu entry and terminal profile for the throwaway name
+outlive `--unregister`. Then run the page again from P1 for the real `<Name>`, without R1.
+
+## Pre-checks in the workstation distribution
+
+P1 to P3 run as `sh` in the workstation's distribution, before W1, so before anything is downloaded on Windows or
+installed. They write only into new temporary directories and change nothing on the host. They need an existing Ubuntu
+distribution with `ubuntu-keyring`, `gpgv`, `curl` and `cloud-init`; this page's host class has one, the workstation's.
+
+### P1. Signed checksums
+
+W2 checks the image against the hash this page pins and against Canonical's `SHA256SUMS`, and nothing there checks that
+list's signature. Canonical signs it in `SHA256SUMS.gpg`, beside it. Ubuntu's verification tutorial
+(https://ubuntu.com/tutorials/how-to-verify-ubuntu, read 2026-10-01) fetches the keys from a keyserver and runs
+`gpg --verify`, noting "Ubuntu and most variants come with the relevant keys pre-installed". This block uses the keyring
+the workstation's Ubuntu installs, from the `ubuntu-keyring` package, and `gpgv`, with no key import. Both files go into
+an empty temporary directory, which is also `gpgv`'s home, so no GnuPG home of the user is read or written.
+
+```sh
+SUMS_DIR="$(mktemp -d)"
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS" https://releases.ubuntu.com/24.04.5/SHA256SUMS
+curl -fsSL -o "$SUMS_DIR/SHA256SUMS.gpg" https://releases.ubuntu.com/24.04.5/SHA256SUMS.gpg
+gpgv --homedir "$SUMS_DIR" --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg "$SUMS_DIR/SHA256SUMS.gpg" "$SUMS_DIR/SHA256SUMS"
+grep ' \*ubuntu-24\.04\.5-wsl-amd64\.wsl$' "$SUMS_DIR/SHA256SUMS"
+```
+
+Proof: both downloads exit 0; `gpgv` exits 0 and prints `using RSA key 843938DF228D22F7B3742BC0D94AA3F0EFE21092` and
+`Good signature from "Ubuntu CD Image Automatic Signing Key (2012) <cdimage@ubuntu.com>"`; `grep` prints
+`bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e *ubuntu-24.04.5-wsl-amd64.wsl`, the hash W2 pins. A
+`BAD signature`, a missing key or any other nonzero exit stops the run with nothing installed.
+
+### P2. The user-data schema
+
+Added after `v2026.09.26.2`: this renders `adoption/templates/wsl/cloud-init.user-data.template` with `<WSL_USER>`
+before any boot and validates it with cloud-init's own schema check. The render is F8's `string.Template` program, which
+writes the same bytes as W3's literal replace (W3 says why). Run it from the root of the checkout that `<checkout>` names.
+The workstation's cloud-init checks against its own version's schema, which `cloud-init --version` records; the image
+runs 26.1.
+
+```sh
+RENDER_DIR="$(mktemp -d)"
+python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding="utf-8").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/cloud-init.user-data.template '<WSL_USER>' > "$RENDER_DIR/<Name>.user-data"
+cloud-init --version
+cloud-init schema -c "$RENDER_DIR/<Name>.user-data"
+sha256sum "$RENDER_DIR/<Name>.user-data"
+```
+
+Proof: `cloud-init schema -c` prints `Valid schema` with the file's path and exits 0; a warning that no datasource was
+detected may come first. An invalid file prints `Invalid user-data` and `Error: Invalid schema: user-data` and exits 1:
+stop. Record the `sha256sum` value. W3 prints the SHA-256 of the file it writes on Windows, and the two must be equal.
+
+### P3. Kernel storage errors
+
+WSL 2 distributions share one kernel, so the workstation's kernel journal shows the storage errors the new distribution
+would meet. microsoft/WSL#41482 (https://github.com/microsoft/WSL/issues/41482, read 2026-10-01) reports continuous
+`hv_storvsc` errors with WSL 2.7.12, kernel 6.18.33.2-2 and swap active, and systemd timeouts at boot
+(`/sbin/init failed to start within 10000ms`). Its workaround, `swap=0` in the global WSL configuration and a WSL
+shutdown, is outside this page. Without `sudo` the user cannot read the kernel journal, and `dmesg` holds only the
+recent ring buffer, so this reads the journal of the current boot. It searches for the driver's name, not a device id,
+and leaves out the driver's registration line, `hv_vmbus: registering driver hv_storvsc`, which every boot logs. A count
+over the whole boot cannot tell errors that are happening now from an old burst, so the count is
+a baseline, not a verdict: the newest error line's age decides here, and W5 counts again after the first launch.
+
+```sh
+sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
+sudo journalctl -k -b 0 --no-pager -o short-monotonic --no-hostname | grep hv_storvsc | grep -v 'registering driver hv_storvsc' | tail -n 1
+cat /proc/uptime
+swapon --show
+```
+
+Proof:
+
+- The first line prints the count: record it as the baseline (`storage_errors`). A count of `0` makes the last `grep`
+  exit 1, which is not a failure.
+- The second line prints the newest error line, with its kernel time in seconds since boot in brackets, or nothing.
+  `cat /proc/uptime` prints the seconds since boot now as its first number, and the difference is the line's age.
+  An age of less than one hour (3600 seconds) means errors are happening now, and this stops the run before anything is
+  installed: record the count, the line's time and its shape without device ids, name microsoft/WSL#41482 and leave the
+  next step to the user, because the workaround changes the global WSL configuration and shuts WSL down. An older line,
+  or none, lets the run continue. The one-hour threshold is this recipe's choice, not an upstream figure.
+- The kernel time decides, not the journal's wall-clock stamp: journald stamps a kernel line when it reads it, and a
+  restart of the workstation distribution reads the kernel's ring buffer again and stamps old lines anew.
+- Record `swapon --show`: active swap is the issue's condition, not a failure by itself.
 
 ## Stage 1 on the Windows host
 
@@ -67,6 +206,7 @@ Test-Path -LiteralPath 'Z:\WSL\<Name>'
 Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\<Name>.user-data')
 Test-Path -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml')
 Select-String -LiteralPath (Join-Path $env:USERPROFILE '.ubuntupro\.cloud-init\agent.yaml') -Pattern '^[A-Za-z_][A-Za-z0-9_-]*:' -ErrorAction SilentlyContinue
+Select-String -LiteralPath (Join-Path $env:USERPROFILE '.wslconfig') -Pattern '^\s*\[', '^\s*instanceIdleTimeout\s*=', '^\s*vmIdleTimeout\s*=' -ErrorAction SilentlyContinue
 Get-PSDrive -Name Z | Select-Object -Property Name, Used, Free
 ```
 
@@ -78,11 +218,18 @@ Proof, recorded in the receipt's `host` block:
   folder another registration already uses and creates the folder itself.
 - The second `Test-Path` prints `False`. A Landscape file at that path replaces the local user-data: cloud-init 26.1 loads
   it first and then never reads the file of W3 (`cloudinit/sources/DataSourceWSL.py:241-270` and `:465-476`).
-- The third `Test-Path` prints `False`, and the `Select-String` line then prints nothing. When `agent.yaml` exists (Ubuntu
+- The third `Test-Path` prints `False`, and the `agent.yaml` `Select-String` line then prints nothing. When `agent.yaml` exists (Ubuntu
   Pro for WSL writes it), that line lists its top-level keys: record them, and stop if `users:` or `write_files:` is among
   them. cloud-init 26.1 merges `agent.yaml` over the user-data one top-level key at a time, and an agent key replaces the
   user-data key entirely (`DataSourceWSL.py:317-336`, called at `:490`). Either key would replace the user or the
   `[user] default` of W3.
+- The `.wslconfig` line only reads: it prints the file's section headers and its `instanceIdleTimeout` and
+  `vmIdleTimeout` lines, or nothing when the file or the keys are absent. Record both values in the receipt's
+  `idle_keys`; a missing key has its default. `instanceIdleTimeout` (under `[general]`, default 15000 ms, `-1` turns it
+  off) is how long a distribution stays up after its last Windows-side client exits; `vmIdleTimeout` (under `[wsl2]`,
+  default 60000 ms) is the VM's. Without `instanceIdleTimeout=-1`, `<Name>` and its user services stop about
+  `instanceIdleTimeout` after the last client exits (15 seconds by default), and issue reports say linger does not
+  prevent it; F2 observes it. Changing either key is the user's decision, outside this page.
 - `Free` on `Z:` is recorded. The image unpacks to about 1.3 GB before stage 2 adds its tools.
 
 Stop on any other result.
@@ -90,7 +237,11 @@ Stop on any other result.
 ### W2. Download and verify the image
 
 The expected sha256 is published twice, by Canonical next to the image and by Microsoft's WSL distribution catalog.
-This block reads the catalog at the commit of 2026-09-14 (#41465), whose `Ubuntu-24.04` entry is this image.
+This block reads the catalog at the commit of 2026-09-14 (#41465), whose `Ubuntu-24.04` entry is this image. It is the
+only hash check before W4 installs the file: at WSL 2.7.13, `wsl --install --from-file` checks no hash
+(`WslClient.cpp:500-537`). The online `wsl --install Ubuntu-24.04` does compare its download with the catalog entry's
+`Sha256` (`WslInstall.cpp:36-50`, `:315`), but it reads the catalog from WSL's `master` branch at install time; this
+page installs a pinned file whose hash the operator sees, and P1 has tied that hash to Canonical's signature.
 
 ```powershell
 $ProgressPreference = 'SilentlyContinue'
@@ -114,7 +265,8 @@ Added after `v2026.09.26.2`: the template is `adoption/templates/wsl/cloud-init.
 placeholder is `${WSL_USER}`, so this literal replace writes the same bytes as Python's `string.Template`, and .NET's
 `WriteAllText` writes UTF-8 without a byte order mark, which keeps `#cloud-config` as the file's first bytes. The file name
 must be the instance name: the cloud-init WSL datasource reads
-`%USERPROFILE%\.cloud-init\<InstanceName>.user-data` before any less specific file.
+`%USERPROFILE%\.cloud-init\<InstanceName>.user-data` before any less specific file. The `Get-FileHash` line prints the
+written file's SHA-256 for comparison with P2's, which validated the same render.
 
 ```powershell
 New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.cloud-init')
@@ -122,11 +274,12 @@ $Text = [System.IO.File]::ReadAllText('<checkout>\adoption\templates\wsl\cloud-i
 [System.IO.File]::WriteAllText((Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data'), $Text)
 Get-Content -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data') -TotalCount 1
 Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data') -Pattern '^- name: ', '^    default='
+(Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data')).Hash.ToLowerInvariant()
 Select-String -LiteralPath (Join-Path $env:USERPROFILE '.cloud-init\<Name>.user-data') -SimpleMatch -Pattern '${'
 ```
 
-Proof: the first line is `#cloud-config`; the two matches end in `<WSL_USER>`; the last command prints nothing. The file
-holds no secret: the user's password stays locked and sudo needs none.
+Proof: the first line is `#cloud-config`; the two matches end in `<WSL_USER>`; the hash equals P2's `sha256sum` value;
+the last command prints nothing. The file holds no secret: the user's password stays locked and sudo needs none.
 
 ### W4. Install without launching
 
@@ -161,6 +314,7 @@ wsl.exe -d '<Name>' --exec id -u
 wsl.exe -d '<Name>' -u root --exec cloud-init status --long
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/result.json
 wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json
+wsl.exe -d '<Name>' -u root --exec cloud-init schema --system
 wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf
 wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled
 wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'
@@ -170,7 +324,8 @@ wsl.exe --list --verbose
 Proof (path A, cloud-init provisioned the instance):
 
 - The launch prints `Provisioning the new WSL instance <Name>` and `This might take a while...`, and `$LASTEXITCODE`
-  prints `0`.
+  prints `0`. The image's `wsl-setup` prints both lines, not WSL: lines 117-118 at its version 0.5.10~24.04.2, Launchpad
+  tag `import/0.5.10_24.04.2`, commit `74bfc89113bc7d46a4d9feb1e69cd6951fbc6908`.
 - `id -un` prints `<WSL_USER>` and `id -u` prints `1000`.
 - `cloud-init status --long` prints `status: disabled` and `boot_status_code: disabled-by-marker-file`. This line proves
   only that the marker is in place, because cloud-init 26.1 reports `disabled` once `/etc/cloud/cloud-init.disabled`
@@ -187,9 +342,29 @@ Proof (path A, cloud-init provisioned the instance):
   and empty `errors` (`main.py:915-929` and `:975-1015`). Record any `recoverable_errors` (warnings). Both files sit in
   cloud-init's persistent data directory, with only symbolic links under `/run` (`main.py:880-888`), so they outlive a
   restart.
+- `cloud-init schema --system` prints a line matching `^\s*Valid schema user-data$` and exits 0: cloud-init accepted
+  the instance's user-data, the check of Canonical's
+  [WSL cloud-init how-to](https://ubuntu.com/wsl/docs/stable/howto/cloud-init/) (read 2026-10-01). It needs root
+  (cloud-init 26.1, `cloudinit/config/schema.py:1388-1393`). With more than one data part a
+  `Found cloud-config data types:` header comes first and the line is indented (`:1443-1458`, `:1492`); an invalid
+  schema exits 1 (`:1493-1498`). The `schema` subcommand never reads the marker (`cloudinit/cmd/main.py:1240-1241`,
+  `:1286-1293`), but no new instance has run it after the marker yet. Record the output (`schema_system`).
 - `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
+
+On both paths, right after the launch and before W6 or W7, count the storage errors again in the workstation
+distribution, where P3 ran:
+
+```sh
+sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | grep -vc 'registering driver hv_storvsc'
+```
+
+Proof: the count equals P3's baseline; record it as `second_count`. A larger count means storage errors during W4 to
+W5. Record both counts and the new lines (P3's second line with `tail -n` set to the difference, without device ids),
+treat a failed W5 as exposure to microsoft/WSL#41482 rather than a cloud-init failure, and do not continue to stage 2
+(F9) until that is decided: its workaround changes the global WSL configuration and shuts WSL down, both outside this
+page.
 
 How to tell that cloud-init did not provision the instance: the launch output contains
 `Create a default Unix user account:` and `OOBE command "/usr/lib/wsl/wsl-setup" failed, exiting`, and the exit code is
@@ -251,16 +426,46 @@ wsl.exe -d '<Name>' --exec id -un
 ```
 
 Proof: `visudo` prints `parsed OK`; `<Name>` is absent from `--list --running`; `id -un` prints `<WSL_USER>`. Then repeat
-W5's checks from `id -u` on, with two differences:
+W5's checks from `id -u` on, with three differences:
 - `cloud-init status --long` reports `boot_status_code: disabled-by-marker-file` because the root block wrote the marker.
 - `result.json` and `status.json` exist only if cloud-init ran on the import (open question 1). Record their contents, or
   their absence, instead of treating absence as a failure.
+- skip `cloud-init schema --system`: when cloud-init never ran on the import, it exits 1 with
+  `Error: Config file ... does not exist` (cloud-init 26.1, `cloudinit/config/schema.py:1428-1433`; a source reading, not
+  a run). Record `skipped (path B)` as `schema_system`.
 
 Record `path B` in the receipt.
 
+### W7. Terminate once, then the file-ownership probe
+
+Both paths run this, after W5's proof (path A) or after W6 (path B). On WSL 2.7.13 a file that Windows creates in a new
+distribution after the first-run setup can be owned by 0:0. microsoft/WSL#40941
+(https://github.com/microsoft/WSL/issues/40941, read 2026-10-01) reports it, and a contributor's reproduction ends: "The
+file created will be 0:0 until the next wsl --shutdown", a command this page never runs. The fix, PR #40977
+(https://github.com/microsoft/WSL/pull/40977, read 2026-10-01), explains: "Because the uid was cached before the OOBE is
+complete. And this only recovers after a distro termination." It ships first in WSL 2.9.8, a pre-release, and in 3.0.1;
+tags 2.7.13 and 2.7.14 lack it. So this step terminates `<Name>` once, relaunches it for the F steps and reads the owner
+of an empty file created from Windows under the new user's home. Whether a terminate clears the state has not been
+observed anywhere; this probe is the first observation.
+
+```powershell
+$env:WSL_UTF8 = '1'
+wsl.exe --terminate '<Name>'
+wsl.exe --list --running --quiet
+wsl.exe -d '<Name>' --exec id -un
+New-Item -ItemType File -Path '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'
+wsl.exe -d '<Name>' --exec stat -c %u:%g '/home/<WSL_USER>/wsl-owner-probe'
+Remove-Item -LiteralPath '\\wsl.localhost\<Name>\home\<WSL_USER>\wsl-owner-probe'
+```
+
+Proof: `<Name>` is absent from `--list --running --quiet` right after the terminate; `id -un` prints `<WSL_USER>`;
+`stat` prints `1000:1000`; `Remove-Item` prints nothing. Record the owner as `ownership_probe`. `0:0` means the state
+persists after a terminate: record it, and write nothing into the distribution from Windows (no
+`\\wsl.localhost\<Name>` writes, no Explorer copies) until a WSL release with the fix or a decision changes that.
+
 ## First boot inside the new distribution
 
-Run F1 to F8 as `<WSL_USER>` in `<Name>`.
+Run F1 to F8 as `<WSL_USER>` in `<Name>`, except F2's idle observation, which runs from the workstation's session.
 
 ### F1. systemd
 
@@ -281,8 +486,24 @@ loginctl show-user "$(id -un)" --property=Linger --value
 ```
 
 Proof: `yes`. With linger, logind starts the user manager at boot and keeps it after logout, which the repository's
-`systemd --user` services and runners expect. Whether a lingering user manager keeps an idle distribution from WSL's idle
-timeout is an open question; record what the first days show.
+`systemd --user` services and runners expect. Linger does not keep the distribution itself running: WSL stops a
+distribution `instanceIdleTimeout` after its last Windows-side client exits (W1 reads the key; a negative value never
+stops it, WSL 2.7.13 `LxssUserSession.cpp:2658-2676`), and issue reports say linger alone does not prevent that
+(microsoft/WSL#13416 and #9968).
+
+Then observe it. First close every client of `<Name>`: its terminals, editors, Explorer windows on
+`\\wsl.localhost\<Name>` and `wsl.exe -d <Name>` processes (a `bash -s` run of F1 and F2 ends with its script). Then,
+from the workstation's session, list the running distributions every 10 seconds for two minutes:
+
+```powershell
+$env:WSL_UTF8 = '1'
+foreach ($Poll in 1..12) { Start-Sleep -Seconds 10; [DateTime]::UtcNow.ToString('HH:mm:ss'); wsl.exe --list --running --quiet }
+```
+
+Proof: twelve UTC times, each followed by the running distributions. Record in `idle_observation` whether `<Name>` is in
+every list, or the time of the first list without it, beside W1's two keys. With `instanceIdleTimeout=-1` it should stay
+listed; with the default it should leave after about 15 seconds. Whether `wsl.exe --list --running` itself counts as a
+client is not verified. F3 starts `<Name>` again if it stopped.
 
 ### F3. User bus
 
@@ -490,7 +711,9 @@ transcript and the F outputs:
   - the default distribution before and after;
   - `creation_path` (`A` or `B`), with the W5 markers when B was taken;
   - on path B, `failed_attempt_export`: the file name, SHA-256 and size of W6's export of the failed attempt;
-  - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`.
+  - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
+  - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
+    W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
 - **Contribute.** On a branch of current `main`, copy it to `evidence/receipts/wsl-new-distro-stage1-<host>-<YYYYMMDD>.json`
   and add a `receipts[]` row to `manifests/evidence.json` with the same `id`, `kind`, `component_ids`, `claim` and
   `limitations` and its `path`. Its claim quotes only that run's output. Follow
@@ -502,9 +725,14 @@ transcript and the F outputs:
 Kept open in the record, each with the observation that would settle it:
 
 - whether cloud-init provisions an imported distribution (path B records `cloud-init status`);
-- whether a lingering user manager keeps the distribution from WSL's idle shutdown;
+- what keeps `<Name>` running with no client attached: with `instanceIdleTimeout=-1` the setting does, by WSL's source,
+  and issue reports say linger alone does not (F2 records it; whether `wsl.exe --list --running` counts as a client is
+  not verified);
 - whether binfmt registrations survive `wsl --terminate` (WSL's `protectBinfmt`);
 - whether `useradd` allocated the subordinate ids on 24.04.5 (F5 records it);
+- whether a terminate clears the 0:0 file owner of microsoft/WSL#40941 (W7 records it);
+- whether `hv_storvsc` errors break a first launch on this kernel (microsoft/WSL#41482; P3 records a baseline and
+  stops on an error line less than one hour old, and W5 counts again after the first launch);
 - the bounded comparison against Ubuntu 26.04.1 LTS, WSL's current default `Ubuntu`.
 
 ## Boundaries

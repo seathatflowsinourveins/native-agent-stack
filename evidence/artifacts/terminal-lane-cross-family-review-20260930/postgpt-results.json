@@ -1,0 +1,1623 @@
+{
+ "jobs": [
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:52:39Z",
+   "finished": "2026-10-01T05:39:53Z",
+   "usage": {
+    "input_tokens": 6073590,
+    "cached_input_tokens": 5890944,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 64745,
+    "reasoning_output_tokens": 40850
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "sol",
+   "job": "P1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found one high and five medium defects in the post-merge repairs. Both probes pass their existing selftests, and four selected mutants fail exactly their expected cases. However, closed output can still make Ctrl-C resume a shell loop; a late second signal can replace the latched signal; Enter can be sent after cancellation; and three controls can report success without establishing their claimed behavior. Tests ran in private scratch copies. The checkout was not modified.",
+    "claims_checked": [
+     {
+      "claim": "The public post-merge record contains 11 findings, three medium and eight low, with 236,557 tokens, 27 tool uses, and 1,220 seconds.",
+      "result": "confirmed",
+      "source": "Counted post-merge-read.json rows and compared its read metadata with receipt data.post_merge_read; the values agree."
+     },
+     {
+      "claim": "Those metrics prove the original native Claude subagent execution and zero gateway pool usage.",
+      "result": "unverifiable",
+      "source": "The public receipt records these values, but the original native subagent event record and gateway counters were not inspected under the privacy restrictions. Those original records would settle execution and usage provenance."
+     },
+     {
+      "claim": "Bash continues after exit 130 and stops after a child dies by SIGINT.",
+      "result": "confirmed",
+      "source": "Reran shell_loop_control.py in scratch, adding only -B to its nested Python invocation: exit-130 loop continued three times; signal-death loop exited -2 with no continuation."
+     },
+     {
+      "claim": "CPython dispatches the tested simultaneously pending signals in ascending signal number.",
+      "result": "confirmed",
+      "source": "Fresh signal_order_probe.py run reproduced all three recorded orders. CPython v3.13.15 source contains 'for (int i = 1; i < Py_NSIG; i++) {' in its dispatch loop: https://raw.githubusercontent.com/python/cpython/v3.13.15/Modules/signalmodule.c, fetched 2026-10-01."
+     },
+     {
+      "claim": "The ordering control rejects an absent observation.",
+      "result": "contradicted",
+      "source": "Both no-send and event-discarding mutations exited 0 with three empty observed lists."
+     },
+     {
+      "claim": "Each pty probe passes eight integration cases and eight in-process lifecycle/typing/ignore cases.",
+      "result": "confirmed",
+      "source": "Fresh Python 3.13.15 --selftest runs: each exited 0 with 49 PASS, zero FAIL, zero SKIP, including eight end-to-end cases. The selftest arena scan found no owned stand-ins left."
+     },
+     {
+      "claim": "The recorded sweep counts are 110/160 and 123/186, with 45 and 50 lines up to the guard.",
+      "result": "confirmed",
+      "source": "Fresh Python 3.13.15 selftests reproduced those counts. Python 3.12.3 dry runs also returned 110/160 and 123/186. The watched and counted code objects are main, with_private_dir, and measure; nested helper bodies are excluded."
+     },
+     {
+      "claim": "The oldest declared Python runtime is fully verified for these probes.",
+      "result": "unverifiable",
+      "source": "Python 3.12.3 dry-run counting was verified. A full 3.12 sweep attempt did not complete within the imposed limit. Python 3.9 was not found by the installed-command check; no 3.9 execution was performed."
+     },
+     {
+      "claim": "Four selected new mutants fail exactly their expected sets.",
+      "result": "confirmed",
+      "source": "Used the repository's MUTANTS substitutions and DRIVER for all eight alert cases: spawn mutant failed only SWEEP; exit-status mutant failed the four signal cases; ignored-signal mutant failed only IGNORED; typing mutant failed only TYPING. No cases skipped."
+     },
+     {
+      "claim": "All 22 recorded mutant verdicts and both recorded baseline verdicts are present and successful.",
+      "result": "confirmed",
+      "source": "Counted recorded/pty_probe_mutants_alert.txt and recorded/pty_probe_mutants_push.txt: eleven mutant rows plus one baseline each, each ending '12 runs, 0 problems'."
+     },
+     {
+      "claim": "Every mutant failure set, including the changed raising-handler expectation, was independently rerun.",
+      "result": "unverifiable",
+      "source": "The full approximately 45-minute-per-probe runner was deliberately not run. Four alert mutants were independently reproduced; the remaining published failure sets were checked as records and source only."
+     },
+     {
+      "claim": "Each guard's removal is detected by the existing eight cases.",
+      "result": "contradicted",
+      "source": "Removing only both pre-Enter checks left all eight cases passing for both probes; the spawn mutant failed on missing source-marker discovery."
+     },
+     {
+      "claim": "The sweep establishes that no client was created for a pre-guard cancellation.",
+      "result": "contradicted",
+      "source": "Behavioral spawn control with delayed pidfile publication passed despite 25 recorded successful pre-guard Popen calls."
+     },
+     {
+      "claim": "The probes always terminate by the latched signal after cleanup.",
+      "result": "contradicted",
+      "source": "Real closed-output CLI runs exited 1 after SIGINT; full output blocked termination; actual __main__ tracing produced -15 after an earlier latched SIGINT."
+     },
+     {
+      "claim": "A blocked latched signal cannot fall through to normal sys.exit.",
+      "result": "contradicted",
+      "source": "Direct helper reproduction latched SIGINT, blocked it, called end_by_latched_signal, and fell through to sys.exit with return code 130 in both probes."
+     },
+     {
+      "claim": "Typing never submits Enter after a stop is latched.",
+      "result": "contradicted",
+      "source": "Real pty boundary injections produced STOP=15, submitted=True, and a completed input line at the slave in both probes."
+     },
+     {
+      "claim": "The tmux command-line identity clause is caught by the strengthened controls.",
+      "result": "confirmed",
+      "source": "Fresh tmux 3.4 runs of tmux_identity_mutant.py bell and sync exited 0: both baselines passed and both clause-removal mutants failed the shutdown control. Bell reported nine checks and one problem for the mutant."
+     },
+     {
+      "claim": "The recorded five-module unit suite completed successfully.",
+      "result": "confirmed",
+      "source": "recorded/unit_tests.txt reports 259 tests, OK with one skip. The same five modules at CHECKOUT ran 260 tests, OK with two skips. The exact historical c99a482e test tree was not reconstructed."
+     },
+     {
+      "claim": "Inherited SIG_IGN is preserved end to end.",
+      "result": "confirmed",
+      "source": "Fresh stand-in CLI runs for both probes: ignored SIGHUP, SIGINT, and SIGTERM carried on to exit 2; default SIGHUP ended by -1. Every run left zero payload directories and no live recorded client."
+     },
+     {
+      "claim": "The derived probe carries the reviewed common repairs.",
+      "result": "confirmed",
+      "source": "AST comparison found sixteen common functions identical, including termination, typing, ignore handling, signal cases, status cases, and both sweep functions. The three P1 files have no diff between c99a482e and CHECKOUT."
+     },
+     {
+      "claim": "Lane artifact registrations and provenance hashes match the files.",
+      "result": "confirmed",
+      "source": "Verified 102 registered artifact SHA-256 values with zero mismatches. The repository's receipt checker verified 71 provenance hashes with zero mismatches and no omitted artifact-directory scripts."
+     },
+     {
+      "claim": "The repaired 180-second and 900-second timeout branches were directly exercised.",
+      "result": "unverifiable",
+      "source": "The targeted timeout cleanup branches were read but not directly forced within the review budget."
+     },
+     {
+      "claim": "Live Windows Terminal bell/focus behavior and live user overlay behavior are verified.",
+      "result": "unverifiable",
+      "source": "Skipped live interactive clients, sign-in, Windows Terminal, and overlay_noop_check.py as instructed. An authorized live session and settings observation would settle these claims."
+     }
+    ],
+    "commands_run": [
+     "rtk sed -n <windows> skills/search-first/SKILL.md and skills/variant-analysis/SKILL.md with its relevant references",
+     "rtk sed -n '1,240p', '241,530p', and '530,760p' packets/post-P1.diff",
+     "rtk git -C CHECKOUT status --short",
+     "rtk rg --files and targeted rg searches in CHECKOUT",
+     "rtk sed -n <windows> and rtk nl -ba for the probes, mutant runner, records, receipt, READMEs, and decision",
+     "rtk git -C CHECKOUT diff c99a482e HEAD -- <three P1 files>",
+     "rtk git -C CHECKOUT diff dca821cc c99a482e -- docs/harness-defaults.md",
+     "web search followed by ctx_fetch_and_index for Python signal documentation, CPython v3.13.15 source, and Cracauer's original SIGINT article; GNU Bash documentation fetch failed twice",
+     "ctx_execute: mktemp <scratch>; cp -r CHECKOUT/. \"$D\"/; python3 -B <tests>; rm -rf \"$D\" for each scratch run",
+     "python3 -B alert_probe.py --selftest and python3 -B push_notification_probe.py --selftest with private fixture homes and stand-in clients",
+     "python3 -B - <scratch>: four original MUTANTS, each tested through the repository DRIVER against all eight cases",
+     "python3 -B - <scratch>: closed/full-output termination tests and real bash-loop controls",
+     "python3 -B - <scratch>: partial pre-Enter mutants, all eight cases for each probe",
+     "python3 -B - <scratch>: real-p tty Enter-boundary signal injections",
+     "python3 -B - <scratch>: unguarded-spawn sweeps with parent Popen observation and immediate/delayed pidfile publication",
+     "python3 -B review_shell_loop_control.py; python3 -B signal_order_probe.py; python3 -B <two signal-order mutants>",
+     "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "python3 -B check_receipt_hashes.py <scratch> cross-family-review-terminal-lane-20260930",
+     "python3 -B tmux_identity_mutant.py <scratch> bell; python3 -B tmux_identity_mutant.py <scratch> sync",
+     "python3 -B - <scratch>: inherited-ignore/default signal CLI controls",
+     "python3 -B - <scratch>: AST-targeted actual __main__ late-second-signal reproduction; corrected earlier snippet syntax and incorrect target selection before accepting its successful marked result",
+     "rtk python3.12 --version; rtk python3.9 --version",
+     "/usr/bin/python3.12 -B -c <dry-run/count driver> <each probe>; full 3.12 sweep attempt incomplete",
+     "python3 -B runner_late_skip.py <scratch> alert with the two new in-process mutants selected",
+     "python3 -B - <scratch>: manifest hash verification, recorded-count checks, and common-function AST comparison",
+     "rtk proxy git -C <scratch> show c99a482e:<selected files> for merged-byte comparisons",
+     "python3 -B - <scratch>: final read-only process scan found zero sleep 3137<digits> clients in deleted private review arenas"
+    ],
+    "finding_count": 6
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:52:54Z",
+   "finished": "2026-10-01T05:36:14Z",
+   "usage": {
+    "input_tokens": 4127456,
+    "cached_input_tokens": 3960192,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 58126,
+    "reasoning_output_tokens": 33998
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "sol",
+   "job": "P2",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found six defects in the P2 repair round: the tmux identity guard still permits signaling the wrong process; the new shutdown control leaks its additional server on an exception; the signal-order check accepts no observed handlers; and the shell control has unsafe temporary-file handling, a startup race, and an overgeneralized documentation claim. Both tmux selftests and their intended identity mutants behaved as recorded in an isolated environment. The cross-family receipt's 71 hashes and 77 relevant manifest hashes matched. Protected host state and historical native-client execution remain unverified.",
+    "claims_checked": [
+     {
+      "claim": "The published post-merge record contains 11 findings, comprising 3 medium and 8 low, and agrees with the receipt's usage and duration fields.",
+      "result": "confirmed",
+      "source": "Parsed post-merge-read.json and cross-family-review-terminal-lane-20260930.json: severity counts matched; subagent_tokens=236557, tool_uses=27, duration_seconds=1220 matched. The duration is 20.33 minutes, consistent with the rounded 20-minute description."
+     },
+     {
+      "claim": "Those usage figures, the resolved reviewer model, read-only execution, and zero gateway-pool usage are independently established by the client's original native record.",
+      "result": "unverifiable",
+      "source": "The public files contain matching summaries, but the original native subagent and pool records were unavailable within the permitted reads. Sanitized original client result and usage records, including resolved-model and tool-use evidence, would settle this."
+     },
+     {
+      "claim": "The tested Bash loop continues after the child exits 130 and stops after the child ends by SIGINT.",
+      "result": "confirmed",
+      "source": "python3 -B shell_loop_control.py returned 0: normal-exit arm had continued-1, continued-2, continued-3; signal-death arm had no continued lines and Bash return code -2. The author's primary explanation was fetched on 2026-10-01: https://www.cons.org/cracauer/sigint.html."
+     },
+     {
+      "claim": "The same loop behavior holds for an unqualified parent shell.",
+      "result": "contradicted",
+      "source": "The dash 0.5.12-6ubuntu5 comparison stopped after the normal-exit-130 child as well as after the signal-death child. A marker verified that the normal-exit path was reached."
+     },
+     {
+      "claim": "A 0.5-second startup delay is sufficient for the shell control to exercise its intended child handler.",
+      "result": "contradicted",
+      "source": "The delayed child-launcher fixture caused the original control to exit 1 before its exit-130 behavior was exercised."
+     },
+     {
+      "claim": "The shell control creates temporary scripts without overwriting another file.",
+      "result": "contradicted",
+      "source": "The pre-existing-symlink fixture overwrote a dummy document and then removed the symlink."
+     },
+     {
+      "claim": "CPython 3.13.15 dispatches already-tripped handlers in increasing signal-number order.",
+      "result": "confirmed",
+      "source": "The native probe reproduced HUP/TERM, HUP/TERM, and INT/TERM. CPython v3.13.15 Modules/signalmodule.c contains 'for (int i = 1; i < Py_NSIG; i++) {' and checks Handlers[i].tripped. Fetched 2026-10-01: https://raw.githubusercontent.com/python/cpython/v3.13.15/Modules/signalmodule.c."
+     },
+     {
+      "claim": "Linux guarantees that pending standard signals are delivered by the kernel in increasing signal-number order.",
+      "result": "contradicted",
+      "source": "signal(7) says 'the order in which the signals are delivered is unspecified.' This distinction supports the repository's CPython-dispatch explanation, not a kernel-order guarantee. Fetched 2026-10-01: https://man7.org/linux/man-pages/man7/signal.7.html."
+     },
+     {
+      "claim": "signal_order_probe.py rejects missing handler observations.",
+      "result": "contradicted",
+      "source": "The no-observation mutant returned 0 with three empty observed lists and an ascending-order verdict of True."
+     },
+     {
+      "claim": "Both tmux selftests pass their three shutdown controls and leave no private tmux processes or temporary socket directories.",
+      "result": "confirmed",
+      "source": "Reran both --selftest commands with tmux 3.4 in bubblewrap 0.9.0 private PID and temporary-directory namespaces. Both returned 0 with all three controls passing; post-run tmux inventories and tb*, tw*, ts*, and tmux-* directory inventories were empty. Isolation removed interference seen in the initial host-wide inventory."
+     },
+     {
+      "claim": "Deleting the command-line clause is caught by both tmux identity mutants.",
+      "result": "confirmed",
+      "source": "python3 -B tmux_identity_mutant.py <scratch> bell and sync each returned 0. Each baseline selftest returned 0; each clause-deleted selftest returned 1 with FAIL shutdown-failure control. Bell reported 9 checks and 1 problem for the mutant."
+     },
+     {
+      "claim": "The remaining command-line clause establishes that the pid belongs to the exact private tmux server.",
+      "result": "contradicted",
+      "source": "Both probes accepted a real server at <socket>-other and a non-tmux process named tmux-wrapper with an embedded socket substring. stop_server signaled those unrelated fixtures."
+     },
+     {
+      "claim": "The new third control stops its additional server when the measured command fails.",
+      "result": "contradicted",
+      "source": "A third-arm new-session CalledProcessError left the additional server alive while its socket was removed, in both probes."
+     },
+     {
+      "claim": "The /proc state parsing handles spaces and parentheses in comm, and stop_server completes for an unreaped zombie.",
+      "result": "confirmed",
+      "source": "A readiness-synchronized process named 'tmux ) odd name' was recognized as running with a non-null start time. After it became an unreaped Z-state process, both server_alive implementations returned False and both stop_server implementations completed and removed the fixture directory before waitpid reaped it."
+     },
+     {
+      "claim": "A failed attach-child exec exits 127 without executing parent cleanup, atexit handlers, or flushing inherited stdout.",
+      "result": "confirmed",
+      "source": "Forced os.execv to raise in both probe fixtures. Both observed the attach child exiting 127, cleanup only in the parent, no child atexit output, and zero bytes flushed from inherited buffered stdout."
+     },
+     {
+      "claim": "The five named test modules pass in the current checkout.",
+      "result": "confirmed",
+      "source": "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings returned 0: Ran 260 tests, OK (skipped=2), using scratch-local HOME and temporary directories."
+     },
+     {
+      "claim": "The historical execution ran exactly 259 tests with one skip.",
+      "result": "unverifiable",
+      "source": "recorded/unit_tests.txt reports 259 and one skip. The current run reports 260 and two skips; test_adoption_status.py changed between the recorded base 29458b43 and parent dca821cc. The exact historical executed worktree was not retained in the permitted evidence, so the original count was not independently replayed."
+     },
+     {
+      "claim": "The pty recorded outputs reconcile with the claimed selftest, sweep, signal-return, and mutant counts.",
+      "result": "confirmed",
+      "source": "Each recorded selftest has 49 PASS lines, including 8 end-to-end cases. The sweep details are alert 110/160 with 45 through the spawn guard, and push 123/186 with 50. Recorded signal returns are -15 and -2. Each mutant output lists 11 mutants plus one unmutated run and ends '12 runs, 0 problems'."
+     },
+     {
+      "claim": "The pty probes freshly pass every end-to-end case and all 22 mutant runs on this review host.",
+      "result": "unverifiable",
+      "source": "Fresh pty selftest and mutant runs were outside this P2 execution pass. Their records and hashes were checked, but that does not reproduce their runtime invariants. Fresh scratch runs of both --selftest commands and both pty_probe_mutants.py lanes with complete output would settle this."
+     },
+     {
+      "claim": "The unrecorded inherited-SIG_IGN end-to-end run exited 2, while the default-disposition run ended by SIGHUP.",
+      "result": "unverifiable",
+      "source": "No recorded output backs this ad hoc claim, and it was not rerun in this P2 pass. Retained stand-in executions showing both inherited dispositions, signal delivery, return codes, and cleanup would settle it."
+     },
+     {
+      "claim": "The cross-family receipt and relevant manifest SHA-256 values match the checkout.",
+      "result": "confirmed",
+      "source": "Computed all 71 hashes in the cross-family receipt's script, record, and recorded-output groups: zero mismatches. Computed 77 relevant manifest hash entries: zero mismatches. The older terminal-experience receipt's two differing script hashes are explicitly historical under its correction limitation, so they were not treated as defects."
+     },
+     {
+      "claim": "The four retained notification scans contain the same 17 types, and 2.1.283 is excluded from the current command log.",
+      "result": "confirmed",
+      "source": "Parsed the 2.1.283, 2.1.284, 2.1.285, and 2.1.286 scan JSON files; their types dictionaries are identical and contain 17 entries. exit_codes.txt has 35 lines, no duplicated lines, and no 2.1.283 scan command. README and receipt text scope 2.1.283 to a retained earlier scan."
+     },
+     {
+      "claim": "The scans were freshly produced by those installed binaries, and the 2.1.283 binary was pruned from the original host.",
+      "result": "unverifiable",
+      "source": "Only the retained scan records and their hashes were checked; installed release binaries and original execution records were not inspected. Version-identified binary inputs and retained scan-command outputs would establish the runs; an authorized host inventory would establish pruning."
+     },
+     {
+      "claim": "The revised colour arithmetic and scrub summaries agree with their recorded outputs.",
+      "result": "confirmed",
+      "source": "color_capture.txt gives 31+4=35 256-colour sequences without COLORTERM and 33+6=39 truecolor sequences with it, matching the receipt and decision record. scrub_placeholder_probe.txt reports 0, 27, and 26 empty files by arm, 19 home names checked, zero changed or unmeasured names, and one new other temporary entry, matching the receipt."
+     },
+     {
+      "claim": "The historical colour and scrub native runs, unchanged real-home state, live overlay settings, and Windows Terminal bell/focus behavior were independently reproduced.",
+      "result": "unverifiable",
+      "source": "Native client runs and protected host-state comparisons were not repeated; overlay_noop_check.py was skipped as instructed. No live Windows Terminal or interactive Claude Code session was used. Sanitized native-run evidence and controlled live-session observations would settle these claims."
+     },
+     {
+      "claim": "The scoped publication-path scan found no literal personal home paths.",
+      "result": "confirmed",
+      "source": "A bounded regex scan of the changed terminal review publication files found no matching /home/<name>, /Users/<name>, or Windows user-home paths. This was a path-pattern check, not a claim of exhaustive secret detection."
+     }
+    ],
+    "commands_run": [
+     "rtk sed reads of <skills>/security-audit/SKILL.md, search-first/SKILL.md, variant-analysis/SKILL.md, and its root-cause, searching, triage, and reporting references",
+     "rtk rg --files --hidden -g AGENTS.md -g '!**/.git/**' <checkout>; rtk sed -n '1,205p' <checkout>/AGENTS.md",
+     "rtk sed windows of <packets>/post-P2.diff: 1–240, 1–165, 165–275, 275–390, 391–570, and 570–960",
+     "rtk sed and rtk nl reads of tmux_bell_probe.py, tmux_sync_probe.py, shell_loop_control.py, signal_order_probe.py, tmux_identity_mutant.py, receipts, decision record, harness anti-pattern rows, and recorded outputs",
+     "rtk rg searches of the prior findings, recheck-findings, final-findings, CI, tests/test_windows_terminal_defaults.py, and manifests/evidence.json",
+     "rtk git -C <checkout> diff dca821cc c99a482e -- evidence/receipts/terminal-experience-20260928.json",
+     "rtk git -C <checkout> diff c99a482e HEAD -- the five named test modules and historical receipt/script paths",
+     "rtk python3 -B --version; rtk tmux -V; rtk bash --version; rtk dpkg-query -W -f='${Package} ${Version}\\n' dash",
+     "rtk which rtk python3 tmux; rtk readlink -f <installed-python>; rtk file <installed-python>; rtk bwrap --version",
+     "Web search for CPython signal dispatch and signal(7), followed by ctx_fetch_and_index of CPython v3.13.15 signalmodule.c, man7 signal(7), and the author's SIGINT explanation",
+     "For execution checks: ctx_execute created <scratch> with rtk mktemp -d <scratch> and rtk cp -r <checkout>/. <scratch>/; scratch copies were deleted",
+     "python3 -B tmux_bell_probe.py --selftest and python3 -B tmux_sync_probe.py --selftest, initially with scratch-local environment and then in a corrected bubblewrap private PID/device/temp environment",
+     "python3 -B shell_loop_control.py; python3 -B signal_order_probe.py",
+     "python3 -B tmux_identity_mutant.py <scratch> bell; python3 -B tmux_identity_mutant.py <scratch> sync",
+     "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute -> python3 -B - <scratch>: real tmux socket-prefix collision and wrong-pid shutdown fixtures",
+     "ctx_execute -> python3 -B - <scratch>: non-tmux wrapper with embedded socket argument; both identity and shutdown implementations exercised",
+     "ctx_execute -> python3 -B - <scratch>: third-arm RuntimeError and new-session CalledProcessError cleanup fixtures",
+     "ctx_execute -> python3 -B - <scratch>: readiness-synchronized unusual comm, unreaped zombie, and failed-exec cleanup/atexit/stdout fixtures",
+     "python3 -B <scratch>/signal_no_handlers.py; python3 -B <scratch>/shell_no_external_signal.py",
+     "ctx_execute -> python3 -B - <scratch>: Bash/dash comparison, verified normal-exit-130 marker, delayed child launcher, and predictable temporary-path symlink fixture",
+     "ctx_execute -> python3 -B - <scratch>: receipt and manifest SHA-256 comparisons, scan dictionary equality, output counts, colour arithmetic, scrub reconciliation, historical test-source fingerprints, and scoped publication-path scan"
+    ],
+    "finding_count": 6
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:53:09Z",
+   "finished": "2026-10-01T05:37:36Z",
+   "usage": {
+    "input_tokens": 5326795,
+    "cached_input_tokens": 5135744,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 58660,
+    "reasoning_output_tokens": 36857
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6.1-sol",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "sol",
+   "job": "P3",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found eight medium defects and one low documentation inconsistency. The repaired pty paths still admit Enter after cancellation, lose signal termination on a broken output pipe, and leak a stand-in after a timeout with an incomplete record. Three controls also accept incorrect behavior. Both pty selftests and both tmux identity-mutant checks passed, and repository validation passed; those checks do not cover the demonstrated failures. Executable checks used disposable scratch copies, which were removed.",
+    "claims_checked": [
+     {
+      "claim": "The reviewed artifact files are unchanged between c99a482e and CHECKOUT, so later artifact edits did not cause the reported defects.",
+      "result": "confirmed",
+      "source": "git diff c99a482e 50bba7bb over the reviewed decision, probe, review-artifact, and receipt paths returned no changes."
+     },
+     {
+      "claim": "All current cross-family receipt provenance hashes match CHECKOUT.",
+      "result": "confirmed",
+      "source": "check_receipt_hashes.py: 'provenance hashes checked: 71 | mismatches: []'; no unlisted scripts in its artifact directory."
+     },
+     {
+      "claim": "The historical terminal-experience receipt's script hashes describe earlier script versions.",
+      "result": "confirmed",
+      "source": "Computed all seven hashes: five match; alert_probe.py and color_capture.py differ. The receipt's correction limitation explicitly explains these historical hashes, so these are not findings."
+     },
+     {
+      "claim": "The repository's integrity and scope validator passes.",
+      "result": "confirmed",
+      "source": "Scratch-copy python3 -B scripts/validate.py --root: status passed, 69 components, 8,690 hashed files, four profiles, 177 receipts; it explicitly does not establish live execution."
+     },
+     {
+      "claim": "Both reviewed receipts' claim and limitations text is copied unchanged into manifests/evidence.json.",
+      "result": "confirmed",
+      "source": "Parsed comparison found one manifest entry per receipt and exact equality of both fields."
+     },
+     {
+      "claim": "Published post-merge metadata agrees on eleven findings, three medium, eight low, 236,557 tokens, 27 tool uses, and 1,220 seconds.",
+      "result": "confirmed",
+      "source": "Counted finding rows and compared post-merge-read.json with data.post_merge_read. Twenty minutes is the rounded duration."
+     },
+     {
+      "claim": "The native client's original record establishes the reviewer identity, token usage, tool usage, elapsed time, and zero gateway expenditure.",
+      "result": "unverifiable",
+      "source": "The published record is hand-written and the original client transcript and private work directory are not retained. A sanitized native usage/timing record and gateway accounting evidence would settle this without accessing prohibited state."
+     },
+     {
+      "claim": "The unmutated Bash control continues after exit 130 and stops after SIGINT termination when the process group receives SIGINT.",
+      "result": "confirmed",
+      "source": "Reran shell_loop_control.py: continuation arm exit 0 with three lines; signal arm exit -2 with none."
+     },
+     {
+      "claim": "The shell control rejects termination by a different signal.",
+      "result": "contradicted",
+      "source": "Wrong-termination mutant killed Bash with SIGTERM; the control exited 0 despite reporting bash exit -15."
+     },
+     {
+      "claim": "A child's SIGINT termination alone stops the measured Bash loop.",
+      "result": "contradicted",
+      "source": "Child-only SIGINT loop continued all three iterations. [Cracauer, fetched 2026-10-01](https://www.cons.org/cracauer/sigint.html), conditions interruption on SIGINT also reaching the shell."
+     },
+     {
+      "claim": "CPython dispatches signals pending together in ascending signal number.",
+      "result": "confirmed",
+      "source": "Reran all three signal_order_probe cases. [_PyErr_CheckSignalsTstate at CPython v3.13.15](https://raw.githubusercontent.com/python/cpython/v3.13.15/Modules/signalmodule.c) iterates 'for (int i = 1; i < Py_NSIG; i++)'."
+     },
+     {
+      "claim": "The signal-order control requires both intended handlers to run.",
+      "result": "contradicted",
+      "source": "Both the no-dispatch and no-send variants exited 0 with three empty handler lists."
+     },
+     {
+      "claim": "Each pty probe passes eight end-to-end cases and eight in-process tests, with 49 total PASS lines.",
+      "result": "confirmed",
+      "source": "Reran both --selftest commands with synthetic homes and stand-ins: each exit 0, PASS 49, FAIL 0, SKIP 0. Inspected the case definitions and recorded outputs."
+     },
+     {
+      "claim": "The repaired sweep counts are 110/160 with 45 lines through the spawn guard for alert, and 123/186 with 50 for push.",
+      "result": "confirmed",
+      "source": "Both scratch selftests reproduced those counts. Alert's client-running count was 17 in this rerun versus 15 in the receipt; the actual criterion is at least ten."
+     },
+     {
+      "claim": "The existing spawn mutant verifies the new pre-guard client-start assertion.",
+      "result": "contradicted",
+      "source": "The exact mutant still failed after that assertion was deleted, solely because its guard text was absent. With an independent boundary marker, assertion present yielded 25 startup violations; assertion deleted yielded a passing sweep."
+     },
+     {
+      "claim": "The recorded mutation totals distinguish eleven mutations per probe, 22 mutant runs, and two baseline runs.",
+      "result": "confirmed",
+      "source": "Each recorded file contains eleven mutant verdicts and ends '12 runs, 0 problems'; inspected MUTANTS and the eight-case mapping."
+     },
+     {
+      "claim": "All 22 mutation runs still reproduce end to end.",
+      "result": "unverifiable",
+      "source": "The full runner was not repeated within this review's budget; its documented runtime is about three quarters of an hour per probe. Recorded totals and selected controls were checked, including the defective spawn control."
+     },
+     {
+      "claim": "Typing sends no Enter after a stop has been latched.",
+      "result": "contradicted",
+      "source": "Deterministic SIGTERM injection at the final Enter write delivered b'abc\\n' to a real pty in both probes. The ordinary typing tests passed."
+     },
+     {
+      "claim": "The latched signal determines termination even if stdout is broken.",
+      "result": "contradicted",
+      "source": "Real closed-reader pipe fixture: both end_by_latched_signal calls exited 1 with BrokenPipeError instead of -15."
+     },
+     {
+      "claim": "An internal sweep timeout becomes a failed result and still kills its tracked stand-in.",
+      "result": "contradicted",
+      "source": "Timeout with a partial JSON record raised JSONDecodeError and left the tracked stand-in alive in both probes."
+     },
+     {
+      "claim": "Inherited SIGHUP SIG_IGN is preserved end to end.",
+      "result": "confirmed",
+      "source": "Four scratch runs using the probes' own arena: both probes exited -1 under default SIGHUP and 2 under inherited SIG_IGN, with a confirmed running stand-in and no client or payload directory left. The first fixture attempt accidentally replaced the stand-in PATH; it was corrected before obtaining these results."
+     },
+     {
+      "claim": "Both tmux probes have three shutdown-control arms and catch deletion of the command-line identity clause.",
+      "result": "confirmed",
+      "source": "Reran tmux_identity_mutant.py for bell and sync: baselines exit 0 and PASS shutdown control; mutants exit 1 and FAIL shutdown control. Bell reports nine checks; sync reports the aggregate control without a nine-check summary."
+     },
+     {
+      "claim": "The signal and /proc explanations are supported by primary sources.",
+      "result": "confirmed",
+      "source": "[Python signal documentation, fetched 2026-10-01](https://docs.python.org/3.13/library/signal.html), warns exceptions may be raised after any bytecode instruction. [signal(7), fetched 2026-10-01](https://man7.org/linux/man-pages/man7/signal.7.html), states 'the signal mask is preserved across execve(2)'. [proc_pid_stat(5), fetched 2026-10-01](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html), identifies 'Z Zombie' and field 22 as start time in clock ticks. Checked the corresponding probe code."
+     },
+     {
+      "claim": "The recorded five-module unit run reports 259 tests with one skip.",
+      "result": "confirmed",
+      "source": "recorded/unit_tests.txt: Ran 259 tests, OK (skipped=1). At CHECKOUT the synthetic-home rerun passed 260 tests with two skips; later module growth and the absent synthetic-home client account for the differing scope, rather than a defect in this round."
+     },
+     {
+      "claim": "Repeated review counts and token totals agree across structured records and the rebuilt receipt.",
+      "result": "confirmed",
+      "source": "Prior rounds contain 9/4/6 jobs and 46/33/37 findings. Input totals sum to 24,470,302 / 17,472,984 / 26,260,807; cached input to 23,242,624 / 16,766,336 / 25,129,344; output to 360,897 / 179,794 / 330,134. Severity and disposition counts also match."
+     },
+     {
+      "claim": "Original elapsed times and provider-pool changes are independently established.",
+      "result": "unverifiable",
+      "source": "The published 71/46/50-minute and pool figures are internally consistent metadata, but original timing and provider records are not retained or accessible under this review's restrictions."
+     },
+     {
+      "claim": "The retained scan and helper output counts support the updated evidence table.",
+      "result": "confirmed",
+      "source": "All four scan records contain 17 types and eight ring decisions. Retained summaries show 27 replacement controls, 15 mutants plus baseline, eleven reader mutants, 28 colour-counter cases, 512 Bash combinations, and 13 login PATH entries. The colour record contains 35 256-colour sequences versus 39 truecolour sequences, matching the corrected receipt."
+     },
+     {
+      "claim": "The release scans, native colour capture, live-home scrub comparison, overlay check, and native Codex acceptance were freshly repeated in this review.",
+      "result": "unverifiable",
+      "source": "Only their published output and cross-file consistency were checked. Live settings and sign-in-dependent checks were skipped; the pruned 2.1.283 binary cannot be rerun from the supplied evidence. Sanitized native rerun output tied to executable versions would settle the remaining execution claims."
+     },
+     {
+      "claim": "Original pre-repair F2 and F3 command outputs are retained in recorded/.",
+      "result": "contradicted",
+      "source": "Registered-output enumeration and scoped searches located their old measurement strings only in the hand-written post-merge-read.json, not the captured output files."
+     },
+     {
+      "claim": "All eleven post-merge findings have repaired disposition.",
+      "result": "contradicted",
+      "source": "Structured records contain ten repaired dispositions and one documented disposition; the decision's summary says all eleven repaired."
+     },
+     {
+      "claim": "The changed publication files contain no detected personal paths, credentials, session UUIDs, or known username.",
+      "result": "confirmed",
+      "source": "Scanned 35 scoped paths with repository PRIVATE_CONTENT patterns and value-free checks: zero findings and zero known-username occurrences. An initial whole-manifest host scan included 317 older occurrences; checking the actual delta found zero host-identifier occurrences on added manifest lines, so those older matches were excluded."
+     },
+     {
+      "claim": "Every private project label has been removed.",
+      "result": "unverifiable",
+      "source": "The original private-label list is outside the authorized checkout and was not accessed. A sanitized substitution audit or authorized independent comparison against that list would settle this."
+     },
+     {
+      "claim": "Windows Terminal bell, focus, and interactive Claude behavior is established by a fresh run.",
+      "result": "unverifiable",
+      "source": "No live Windows Terminal or interactive Claude session was run. These remain the round's documented observation gaps and are not reported as new findings."
+     }
+    ],
+    "commands_run": [
+     "Read-only commands used rtk; CHECKOUT abbreviates the supplied checkout path. Executable checks ran through ctx_execute in disposable <scratch>* copies using python3 -B, with trap-based deletion.",
+     "rtk ls -la in the empty lane directory",
+     "rtk sed -n '1,220p' search-first/SKILL.md and security-audit/SKILL.md; no delegated audit was launched",
+     "rtk rg --files -g AGENTS.md; rtk sed -n '1,220p' CHECKOUT/AGENTS.md",
+     "rtk sed -n '1,190p' post-all.diff",
+     "rtk sed -n '1,165p' post-P1.diff",
+     "rtk sed -n '1,200p' post-P2.diff; rtk sed -n '200,320p' post-P2.diff",
+     "rtk sed reads of the decision record, three changed READMEs, both receipts, five probes/runners, three new scripts, hash checker, validator, and recorded selftest outputs",
+     "rtk git diff dca821cc c99a482e -- docs/harness-defaults.md",
+     "rtk git diff c99a482e 50bba7bb -- reviewed artifact, decision, probe, and receipt paths",
+     "rtk rg -n for test dependencies, live-home access, guard detection, signal termination, typing, measurements, and disposition claims",
+     "rtk nl -ba signal_order_probe.py; rtk nl -ba shell_loop_control.py; numbered source checks for each finding",
+     "ctx_execute: mktemp, copy CHECKOUT, python3 -B check_receipt_hashes.py $D cross-family-review-terminal-lane-20260930, remove copy",
+     "ctx_execute: python3 -B scripts/validate.py --root $D",
+     "ctx_execute: rtk proxy python3 -B - $D; receipt/manifest equality, SHA-256 checks, numeric reconciliation, registered-output inventory, and value-free hygiene scans",
+     "ctx_execute: python3 -B signal_order_probe.py and shell_loop_control.py",
+     "ctx_execute: python3 -B missing_signals.py, pending_without_dispatch.py, and wrong_shell_signal.py in scratch copies",
+     "ctx_execute: python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings, with a synthetic home",
+     "ctx_execute: python3 -B tmux_identity_mutant.py $D bell; python3 -B tmux_identity_mutant.py $D sync",
+     "ctx_execute: python3 -B alert_probe.py --selftest; python3 -B push_notification_probe.py --selftest, with synthetic homes and stand-ins",
+     "ctx_execute: inline Python sweep_case checks against the exact spawn mutant with its new observation removed",
+     "ctx_execute: inline Python sweep_case checks with a condition-independent boundary, comparing observation-present and observation-deleted variants",
+     "ctx_execute: inline Python signal injection at type_prompt's Enter boundary, first with a recording writer and then with a real pty",
+     "ctx_execute: inline Python closed-output-pipe fixtures for both end_by_latched_signal implementations",
+     "ctx_execute: inline Python inherited-SIGHUP default/SIG_IGN subprocess fixtures using each probe's arena",
+     "ctx_execute: inline Python incomplete-record timeout fixtures using real tracked stand-ins and a shortened subprocess deadline",
+     "web search followed by ctx_fetch_and_index for Cracauer, Python signal documentation, CPython v3.13.15 signalmodule.c, signal(7), proc_pid_stat(5), and tmux 3.4 primary source files",
+     "rtk git status --short: clean"
+    ],
+    "finding_count": 9
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:53:24Z",
+   "finished": "2026-10-01T05:28:19Z",
+   "usage": {
+    "input_tokens": 3843664,
+    "cached_input_tokens": 3659776,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 61009,
+    "reasoning_output_tokens": 37095
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "P1",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found six medium-severity defects in the post-merge repairs. Both pty selftests passed, and ten sampled mutant runs matched their expected failing sets, but additional tests exposed failures in signal termination, prompt cancellation, timeout cleanup, and control sensitivity. The corresponding defects were reproduced in both pty probes. CHECKOUT remained clean; the private scratch copy was deleted, and no sleep 3137<digits> stand-ins remained.",
+    "claims_checked": [
+     {
+      "claim": "The post-merge record contains 11 findings: three medium and eight low.",
+      "result": "confirmed",
+      "source": "Parsed post-merge-read.json and counted its findings and severities."
+     },
+     {
+      "claim": "The historical Claude reader used 236,557 subagent tokens, 27 tool calls, approximately 20 minutes, and no gateway pool points.",
+      "result": "unverifiable",
+      "source": "The receipt and post-merge-read.json repeat these values, but the permitted files do not independently establish the original client counters or pool usage. A sanitized original client completion record and corresponding pool accounting would settle them."
+     },
+     {
+      "claim": "Bash distinguishes a normal exit 130 from death by SIGINT.",
+      "result": "confirmed",
+      "source": "Reran shell_loop_control.py, adding only -B to its scratch-copy child command: the exit-130 loop continued three times; the SIGINT-death loop exited -2 without continuing. Both actual pty probes also stopped a normal bash loop after its first iteration. Cracauer states, 'There is no other way of doing this than to kill yourself with a SIGINT signal.' [Primary source](https://www.cons.org/cracauer/sigint.html), fetched 2026-10-01."
+     },
+     {
+      "claim": "The tested pending signal pairs dispatch their CPython handlers in ascending signal-number order.",
+      "result": "confirmed",
+      "source": "Reran signal_order_probe.py: TERM/HUP dispatched HUP,TERM; HUP/TERM dispatched HUP,TERM; TERM/INT dispatched INT,TERM. This behavior reproduced, although the control's empty-observation weakness is reported separately."
+     },
+     {
+      "claim": "Both pty selftests pass their eight end-to-end cases and eight in-process lifecycle/typing cases.",
+      "result": "confirmed",
+      "source": "Completed --selftest for both probes on Python 3.13.15: 49 PASS lines each, no FAIL lines, including all eight end-to-end cases. The total also includes 28 BEL cases and five exit-status checks. An initial detached attempt inherited an ephemeral ctx TMPDIR; it was discarded and rerun with a persistent scratch TMPDIR."
+     },
+     {
+      "claim": "The repaired sweep reports 110/160 lines and 45 pre-spawn lines for alert, and 123/186 and 50 for push.",
+      "result": "confirmed",
+      "source": "Reproduced these counts on Python 3.13.15 and Python 3.12.3. Inspected SWEEP_DRIVER and co_lines counting: the named outer functions are counted and traced; nested callbacks and the __main__ block are outside this sweep."
+     },
+     {
+      "claim": "The four new mutants and the changed raising-handler mutant fail exactly their expected cases.",
+      "result": "confirmed",
+      "source": "Ran all eight repository CASES through DRIVER for each of these five mutants on both probes, ten runs total. Spawn failed only sweep; numeric signal exit failed the four signal cases; ignored-signal handling failed only ignored_case; typing failed only typing_case; raising-handler failed the four signal cases plus sweep. No cases were skipped. The spawn result is incidental as explained in the findings."
+     },
+     {
+      "claim": "All 22 recorded mutant outcomes were independently rerun.",
+      "result": "unverifiable",
+      "source": "The two retained logs each contain 11 mutant verdicts and '12 runs, 0 problems', including a baseline. Ten mutant runs were independently executed; the other twelve were not rerun because the requested bounded review excludes the full approximately 45-minute-per-probe runner."
+     },
+     {
+      "claim": "A latched signal always ends the executable by that signal after cleanup.",
+      "result": "contradicted",
+      "source": "Closed/full stdout, closed stdout pty, an OSError after latching, late second signals, and blocked-winner tests exposed normal exits, blocking, or termination by another signal. A blocked winner specifically fell through to sys.exit(status), yielding 130 or 143. Ordinary injected KeyboardInterrupt instead exited -2 and removed the private directory. Python documents that a closed pipe 'results in an exception like BrokenPipeError'. [Python 3.13 signal documentation](https://docs.python.org/3.13/library/signal.html#note-on-sigpipe), fetched 2026-10-01."
+     },
+     {
+      "claim": "Typing cannot send Enter after a stop is latched, and the typing control protects the final Enter checks.",
+      "result": "contradicted",
+      "source": "A real SIGTERM delivered immediately before the Enter write resulted in STOP=15, return True, and b'abc\\r' for both probes. Removing only the post-loop checks left all eight runner cases passing."
+     },
+     {
+      "claim": "The sweep establishes that no client was started before or at the spawn guard.",
+      "result": "contradicted",
+      "source": "The delayed-publication fixture proved a wrapper started while sweep_trial reported started=false; both unguarded variants passed their complete sweeps."
+     },
+     {
+      "claim": "A sweep-trial timeout becomes a failed result and still kills its stand-in.",
+      "result": "contradicted",
+      "source": "A timeout during record truncation caused JSONDecodeError before cleanup and left the verified stand-in alive in both probes."
+     },
+     {
+      "claim": "Inherited SIG_IGN remains ignored, including when the previous-handler map is empty.",
+      "result": "confirmed",
+      "source": "Fresh end-to-end runs with inherited ignored SIGHUP, SIGINT, or SIGTERM each exited 2 after the trust-dialog stand-in; default SIGHUP exited -1. No client or payload directory remained. An in-process run with all three ignored returned 7, latched nothing, and preserved all ignored dispositions. This verifies behavior, not whether the earlier unrecorded run occurred."
+     },
+     {
+      "claim": "The derived push probe carries the same repairs as alert_probe.py.",
+      "result": "confirmed",
+      "source": "AST comparison found identical bodies for the ten shared changed helpers: latch, end_by_latched_signal, with_private_dir, type_prompt, sweep_trial, sweep_case, typing_case, ignored_case, status_case, and signal_case. The P1 files have no differences between c99a482e and CHECKOUT."
+     },
+     {
+      "claim": "The tmux identity mutant is caught by the shutdown-failure control.",
+      "result": "confirmed",
+      "source": "Reran tmux_identity_mutant.py sequentially for bell and sync. Both unmutated selftests exited 0 and both mutants exited 1 with FAIL shutdown-failure control. Bell reported nine checks, zero problems versus nine checks, one problem."
+     },
+     {
+      "claim": "The five named unit-test modules pass, and the retained output records 259 tests with one skipped.",
+      "result": "confirmed",
+      "source": "The retained unit_tests.txt and receipt agree on 'Ran 259 tests' and 'OK (skipped=1)'. The fresh CHECKOUT run of those five modules completed 'Ran 260 tests ... OK (skipped=1)'; it therefore confirms current success, not an identical historical test count."
+     },
+     {
+      "claim": "The inspected artifact registrations match their files.",
+      "result": "confirmed",
+      "source": "Computed SHA-256 against original CHECKOUT for 104 registrations associated with the three relevant artifact directories: zero mismatches. A scratch-only shell_loop_control.py difference came from adding the required -B flag and was excluded from the original-file verification."
+     },
+     {
+      "claim": "The added lines contain no matches for the checked personal-home-path and explicit session-identifier patterns.",
+      "result": "confirmed",
+      "source": "Processed the dca821cc..c99a482e additions for the scoped paths; the bounded pattern scan returned no candidates. This was not a claim that every possible private label was recognized."
+     },
+     {
+      "claim": "Live Windows Terminal bell/focus behavior, interactive Claude Code behavior, and checks requiring live user settings were independently verified.",
+      "result": "unverifiable",
+      "source": "Skipped as instructed, including overlay_noop_check.py. Sanitized recordings from authorized live sessions and setting-specific checks would be required."
+     },
+     {
+      "claim": "Every requested signal/typing interleaving was exhaustively tested.",
+      "result": "unverifiable",
+      "source": "Testing covered the reported deterministic boundaries and native scenarios, not every interleaving. In particular, SIGHUP during a physically blocked flush and a client closing its pty during typing were not separately exercised."
+     },
+     {
+      "claim": "The review left CHECKOUT unchanged and removed its temporary execution state.",
+      "result": "confirmed",
+      "source": "Final original git status was clean. No live exact sleep 3137<digits> stand-ins or processes naming the review scratch copy remained. The private scratch copy was removed."
+     }
+    ],
+    "commands_run": [
+     "rtk cat <skills>/search-first/SKILL.md <skills>/diagnosing-bugs/SKILL.md; read variant-analysis skill and its references",
+     "rtk cat CHECKOUT/AGENTS.md",
+     "rtk sed -n '1,230p' PACKETS/post-P1.diff; rtk sed -n '230,520p' PACKETS/post-P1.diff",
+     "rtk sed / rtk nl -ba: inspected the scoped probe, runner, README, decision, receipt, and control-script windows at CHECKOUT",
+     "git diff dca821cc c99a482e -- <scoped paths>; git diff c99a482e 50bba7bb -- <P1 files>",
+     "ctx_execute: REVIEW_DIR=$(rtk mktemp -d <scratch>); rtk cp -r CHECKOUT/. \"$REVIEW_DIR\"/",
+     "python3 -B evidence/artifacts/terminal-experience-20260928/alert_probe.py --selftest",
+     "python3 -B evidence/artifacts/notification-types-20260929/push_notification_probe.py --selftest",
+     "python3 -B review-mutants.py: four new MUTANTS per probe, using the repository CASES and DRIVER",
+     "python3 -B review-raising-and-spawn.py: raising-handler mutants and spawn mutant without the started assertion",
+     "python3 -B review-extra-mutants.py: remove only the final Enter guards and run all eight CASES",
+     "python3 -B review-slow-spawn.py: unguarded Popen, delayed PID publication, independent start marker, complete sweeps",
+     "python3 -B review-python312.py: run both original sweep_case functions through /usr/bin/python3 -B",
+     "python3 -B <inline fixtures>: closed/full stdout pipes, closed stdout pty, native SIGINT, and exact-PID cleanup",
+     "python3 -B <inline trace fixtures>: late second signal, blocked/pending winner, KeyboardInterrupt, OSError after latching, and final Enter boundary",
+     "python3 -B <inline fixture>: sweep timeout while record.json is truncated, followed by exact-PID leak verification and cleanup",
+     "python3 -B <inline fixtures>: inherited ignored SIGHUP/SIGINT/SIGTERM and all-three-ignored handler map",
+     "python3 -B <inline fixtures>: actual probes in bash loops with group SIGINT, including alert with closed stdout",
+     "python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+     "python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+     "python3 -B review-signal-order-no-dispatch.py",
+     "python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_identity_mutant.py D bell",
+     "python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_identity_mutant.py D sync",
+     "python3 -B <inline analysis>: receipt counts, original-file SHA-256 registrations, helper AST comparison, variant searches, and added-line privacy-pattern scan",
+     "web search; ctx_fetch_and_index: https://docs.python.org/3.13/library/signal.html and https://www.cons.org/cracauer/sigint.html",
+     "ctx_execute: python3 -B <cleanup fixture>, verify no live stand-ins or scratch processes, then shutil.rmtree(D)",
+     "rtk git --no-optional-locks -C CHECKOUT status --porcelain"
+    ],
+    "finding_count": 6
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:53:39Z",
+   "finished": "2026-10-01T05:21:31Z",
+   "usage": {
+    "input_tokens": 2622870,
+    "cached_input_tokens": 2470144,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 47864,
+    "reasoning_output_tokens": 27363
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "P2",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Six reproduced findings in P2, including a tmux identity check that can terminate another server and a temporary-file write that can overwrite a symlink target. Both supplied identity-deletion mutants were detected. The five unit-test modules ran 260 tests with one skip; the recorded 259-test run predates one additional test. All 71 receipt provenance hashes and 33 selected manifest entries matched. Scratch copies were removed, the original checkout remained clean, and the final comparison found no added tmux processes or probe/socket directories.",
+    "claims_checked": [
+     {
+      "claim": "The strengthened tmux identity check prevents signaling another private server.",
+      "result": "contradicted",
+      "source": "Native overlapping-socket fixtures for both probes terminated the other server and removed the still-running original server's socket. Unrelated-argument and wrapper-process fixtures were also accepted."
+     },
+     {
+      "claim": "The third shutdown control cleans up its servers when the measurement fails.",
+      "result": "contradicted",
+      "source": "CalledProcessError injected into the actual third measurement's new-session call left the other server alive with its socket removed in both implementations."
+     },
+     {
+      "claim": "shell_loop_control.py confines its writes to temporary script files that it owns.",
+      "result": "contradicted",
+      "source": "A pre-existing symlink at its PID-derived pathname caused run() to overwrite a benign scratch victim."
+     },
+     {
+      "claim": "signal_order_probe.py rejects a run that does not observe the expected signal dispatch.",
+      "result": "contradicted",
+      "source": "The SIG_UNBLOCK-to-SIG_BLOCK mutation returned exit 0 with three empty observed sequences."
+     },
+     {
+      "claim": "The shell-loop control reliably measures the intended child behavior after its startup delay.",
+      "result": "contradicted",
+      "source": "An unchanged control with a 0.8-second child-launch delay returned exit 1 before the intended exit-130 child installed its handler."
+     },
+     {
+      "claim": "A parent shell generally continues after a child exits 130 following group SIGINT.",
+      "result": "contradicted",
+      "source": "Readiness-confirmed bash/dash comparison: bash continued, dash stopped; docs/harness-defaults.md:192 and docs/decisions/2026-09-28-terminal-experience.md:438 overgeneralize the measured case."
+     },
+     {
+      "claim": "The recorded bash experiment distinguishes normal exit 130 from death by SIGINT.",
+      "result": "confirmed",
+      "source": "shell_loop_control.py reproduced the recorded output. A separate readiness-confirmed run observed handler execution and cleanup in both arms. Removing the external group SIGINT caused the control to fail."
+     },
+     {
+      "claim": "CPython 3.13.15 dispatches simultaneously pending Python signal handlers in ascending signal-number order.",
+      "result": "confirmed",
+      "source": "signal_order_probe.py reproduced all three recorded orders. _PyErr_CheckSignalsTstate contains `for (int i = 1; i < Py_NSIG; i++) {`. [CPython v3.13.15 source](https://raw.githubusercontent.com/python/cpython/v3.13.15/Modules/signalmodule.c)."
+     },
+     {
+      "claim": "The Python dispatch result should not be presented as a guaranteed kernel delivery order for standard signals.",
+      "result": "confirmed",
+      "source": "signal(7) states: `If multiple standard signals are pending for a process, the order in which the signals are delivered is unspecified.` [Linux manual, fetched 2026-10-01](https://man7.org/linux/man-pages/man7/signal.7.html)."
+     },
+     {
+      "claim": "The repaired state parser handles spaces and parentheses in comm and excludes unreaped zombies.",
+      "result": "confirmed",
+      "source": "Both probes accepted a live child named `tmux a )b(` and rejected it after state became Z. Separate real-tmux tests retained the terminated server as an unreaped child: stop_server returned in under one second, server_alive was false, and the socket directory was removed."
+     },
+     {
+      "claim": "An exec failure in the pty child ends with os._exit(127), without executing parent cleanup, flushing inherited Python stdout, or running atexit handlers.",
+      "result": "confirmed",
+      "source": "Injected os.execv failure into both measurements. Each attach child exited 127; the buffered sentinel appeared once; event logs contained only `cleanup parent` and `atexit parent`."
+     },
+     {
+      "claim": "Both supplied tmux identity-deletion mutants are caught by the shutdown-failure control.",
+      "result": "confirmed",
+      "source": "tmux_identity_mutant.py <scratch> bell and sync both exited 0: each unmutated probe returned 0 and each mutant returned 1 with FAIL shutdown-failure control. Bell reported 9 checks and 1 problem for the mutant; sync prints no numeric summary. The initial direct sync selftest transiently returned 1 with three new tmux processes counted; its later unmutated run passed, and final process/socket differences were zero."
+     },
+     {
+      "claim": "The five affected unit-test modules pass, and the recorded 259-test count is internally consistent.",
+      "result": "confirmed",
+      "source": "Current checkout: `Ran 260 tests ... OK (skipped=1)`. recorded/unit_tests.txt: `Ran 259 tests ... OK (skipped=1)`. AST comparison found one additional test method in test_adoption_status.py since the recorded base 29458b43."
+     },
+     {
+      "claim": "The public post-merge record contains 11 findings, comprising 3 medium and 8 low, and its usage metadata agrees with the receipt.",
+      "result": "confirmed",
+      "source": "Parsed post-merge-read.json and data.post_merge_read in the receipt: 11 rows, matching severity counts, and matching 236557 tokens, 27 tool uses and 1220 seconds."
+     },
+     {
+      "claim": "The historical Claude agent actually used the stated tokens, tools, duration and zero gateway pool points.",
+      "result": "unverifiable",
+      "source": "Only sanitized summaries were available within the permitted files. A sanitized export of the native subagent usage record and contemporaneous pool measurements would settle the execution and accounting claims."
+     },
+     {
+      "claim": "The pty recorded outputs contain the stated case, sweep and mutant counts.",
+      "result": "confirmed",
+      "source": "Both selftest records contain 49 PASS lines, including 8 end-to-end lines. Their sweep records report 110/160 with 45 pre-guard lines and 123/186 with 50 pre-guard lines. Each mutant record contains 11 mutants plus one unmutated run and ends `12 runs, 0 problems`."
+     },
+     {
+      "claim": "The current pty implementations reproduce all end-to-end cases and all 22 mutant outcomes.",
+      "result": "unverifiable",
+      "source": "P1's full pty executions and long-running mutant sweeps were not rerun in this P2 review. The checked evidence establishes recorded counts, not a fresh execution of those outcomes."
+     },
+     {
+      "claim": "The unrecorded inherited-SIG_IGN SIGHUP experiment ended with status 2, while the default-disposition experiment ended by SIGHUP.",
+      "result": "unverifiable",
+      "source": "No returned output for this historical experiment is retained in the supplied record. A subprocess trace recording inherited disposition, child readiness, SIGHUP delivery and termination status would settle it."
+     },
+     {
+      "claim": "The receipt and manifest hashes match the registered files, and the exit ledger has 35 unique entries.",
+      "result": "confirmed",
+      "source": "check_receipt_hashes.py checked 71 provenance hashes with zero mismatches and no unlisted artifact scripts. Independent hashing checked 33 selected manifest entries, including byte counts, with no mismatch or missing registration. exit_codes.txt has 35 lines and no duplicate lines; both identity-mutant commands are present and the retained 2.1.283 scan is intentionally absent."
+     },
+     {
+      "claim": "The four retained notification scans describe the same 17 types, and 2.1.283 is scoped as retained evidence.",
+      "result": "confirmed",
+      "source": "Parsed scans for 2.1.283 through 2.1.286: each has 17 types, 17 matcher values and a 15-element base. The complete types mappings have identical hashes. The receipt, README and new decision section identify 2.1.283 as retained from the earlier pass."
+     },
+     {
+      "claim": "The historical native scans and all 35 recorded commands can be independently reproduced from this review's permitted inputs.",
+      "result": "unverifiable",
+      "source": "The retained 2.1.283 binary is unavailable, and the review did not access private installation state or execute commands requiring live settings or client sessions. Native reproduction would require the identified release binaries and permitted isolated inputs for each command."
+     },
+     {
+      "claim": "The colour and scrub numbers cited by the updated receipt match their recorded outputs.",
+      "result": "confirmed",
+      "source": "Colour: 31 foreground plus 4 background equals 35 256-colour sequences without COLORTERM; 33 plus 6 equals 39 truecolour sequences with it. Scrub: 0/27/26 empty files by arm, 19 home names checked, zero changed or unmeasured, and one other new top-level temporary entry agree with the receipt."
+     },
+     {
+      "claim": "Live colour, scrub, user-settings, Windows Terminal bell and focus behavior were freshly verified.",
+      "result": "unverifiable",
+      "source": "These native/client and live-state checks were not rerun. overlay_noop_check.py and the scrub probe's live-home comparison were excluded by the access constraints; Windows Terminal and interactive Claude behavior require the corresponding permitted live observation."
+     },
+     {
+      "claim": "The added P2 text passes the bounded publication-path and identifier scan performed here.",
+      "result": "confirmed",
+      "source": "Added-line scans found zero /home or /Users paths and zero session-id or hostname assignments under the tested patterns. This was a bounded pattern check, not a claim that arbitrary private labels or every possible secret were independently recognizable."
+     },
+     {
+      "claim": "The review left the original checkout unchanged and removed its test resources.",
+      "result": "confirmed",
+      "source": "Final checks: original checkout clean; zero newly present tmux processes; zero newly present probe/socket directories; zero review-specific temporary directories. Both scratch copies were deleted."
+     }
+    ],
+    "commands_run": [
+     "rtk cat <skills>/search-first/SKILL.md <skills>/security-audit/SKILL.md",
+     "rtk cat <checkout>/AGENTS.md; targeted rtk rg and rtk sed reads of the P2 source, tests, records and receipts",
+     "rtk sed -n '1,240p' <packets>/post-P2.diff; additional windows 1–125, 240–400, 400–560 and 560–760",
+     "rtk git diff dca821cc c99a482e -- docs/decisions/2026-09-28-terminal-experience.md docs/harness-defaults.md <lane READMEs>",
+     "ctx_execute: mktemp -d <scratch> and cp -r <checkout>/. <scratch>/",
+     "ctx_execute: rtk python3 -B - — interpreter/tool versions, scoped source inspection and before/after tmux/socket inventories",
+     "ctx_execute: python3 -B <scratch>/evidence/artifacts/notification-types-20260929/tmux_bell_probe.py --selftest",
+     "ctx_execute: python3 -B <scratch>/evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py --selftest",
+     "ctx_execute: python3 -B <review-artifacts>/shell_loop_control.py",
+     "ctx_execute: python3 -B <review-artifacts>/signal_order_probe.py",
+     "ctx_execute: python3 -B <review-artifacts>/tmux_identity_mutant.py <scratch> bell",
+     "ctx_execute: python3 -B <review-artifacts>/tmux_identity_mutant.py <scratch> sync",
+     "ctx_execute: python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute: python3 -B <review-artifacts>/check_receipt_hashes.py <scratch> cross-family-review-terminal-lane-20260930",
+     "ctx_execute: rtk python3 -B - — independent manifest hashing, scan-map comparison, receipt/record arithmetic, command-ledger counting and added-line hygiene checks",
+     "ctx_execute: rtk python3 -B - — real-tmux overlapping-socket, unrelated-argument and wrapper-process identity fixtures",
+     "ctx_execute: rtk python3 -B - — shutdown-control exception injection, including failure of the actual measured new-session command",
+     "ctx_execute: rtk python3 -B - — tricky comm parsing, unreaped child state and real tmux zombie cleanup fixtures",
+     "ctx_execute: python3 -B <scratch>/review-exec-failure.py bell; the corresponding sync invocation",
+     "ctx_execute: rtk python3 -B - — symlink-target overwrite fixture and delayed-python-launch fixture",
+     "ctx_execute: python3 -B <scratch>/review-mutant-signal_order_probe.py; python3 -B <scratch>/review-mutant-shell_loop_control.py",
+     "ctx_execute: rtk python3 -B - — bash/dash comparison, followed by a separate READY/HANDLED/CLEANUP_DONE-confirmed comparison",
+     "ctx_execute: dpkg-query -W -f=${Version} dash; git comparisons against recorded base 29458b43 and merged commit c99a482e",
+     "web search attempts for CPython signal dispatch, signal(7) and bash SIGINT behavior; ctx_fetch_and_index of CPython v3.13.15 signalmodule.c, man7 signal(7), and Cracauer's original SIGINT article",
+     "ctx_fetch_and_index: GNU Bash Signals manual page attempted twice; both fetches timed out",
+     "ctx_execute: git --no-optional-locks -C <checkout> status --porcelain; final process/socket inventory; deletion of both private scratch copies"
+    ],
+    "finding_count": 6
+   }
+  },
+  {
+   "status": "done",
+   "exit": 0,
+   "started": "2026-10-01T04:53:54Z",
+   "finished": "2026-10-01T05:33:53Z",
+   "usage": {
+    "input_tokens": 5698275,
+    "cached_input_tokens": 5502336,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 66908,
+    "reasoning_output_tokens": 43707
+   },
+   "usage_status": "reported",
+   "limit": false,
+   "model": "cx/gpt-6-astra-ultra",
+   "effort": "max",
+   "codex_version": "codex-cli 0.159.3",
+   "attempts": [],
+   "lane": "ultra",
+   "job": "P3",
+   "stderr_tail": "Reading additional input from stdin...\n",
+   "review": {
+    "verdict": "changes-needed",
+    "summary": "Found one high-severity file-overwrite defect and four medium-severity cancellation, control, and documentation defects. The repository validator passed, all 71 current receipt provenance hashes matched, and both PTY selftests passed all 49 checks, demonstrating that the existing checks miss these issues. The checkout remained unchanged, and the review scratch copy and temporary worktree were removed.",
+    "claims_checked": [
+     {
+      "claim": "The current cross-family receipt's script, record-file, and recorded-output hashes match CHECKOUT.",
+      "result": "confirmed",
+      "source": "check_receipt_hashes.py: 'provenance hashes checked: 71 | mismatches: []'; 'scripts in the directory but not in the receipt: []'. An independent hashlib comparison also checked all 71 entries."
+     },
+     {
+      "claim": "The repository's own validator passes at CHECKOUT.",
+      "result": "confirmed",
+      "source": "python3 -B scripts/validate.py in the private copy printed {\"components\":69,\"hashed_files\":8690,\"profiles\":4,\"receipts\":177,\"status\":\"passed\"}, followed by 'Integrity and scope checks only; no live provider or GPU execution.'"
+     },
+     {
+      "claim": "manifests/evidence.json preserves both changed receipts' claim and limitations text exactly.",
+      "result": "confirmed",
+      "source": "Parsed JSON equality checks returned True for claim and limitations for cross-family-review-terminal-lane-20260930 and terminal-experience-20260928."
+     },
+     {
+      "claim": "The older terminal-experience receipt retains historical script hashes, with later repairs disclosed.",
+      "result": "confirmed",
+      "source": "Seven provenance entries checked: alert_probe.py and color_capture.py differ at CHECKOUT; the other five match. The receipt's correction limitation and the decision record explicitly describe those hashes as historical, so these are not new findings."
+     },
+     {
+      "claim": "The post-merge record contains 11 findings: 3 medium and 8 low, with 10 repaired or partly repaired dispositions and one documented disposition.",
+      "result": "confirmed",
+      "source": "Counted post-merge-read.json findings and reconciled them with receipt data.post_merge_read. F3 and F8 combine a repair with a documented residual; F4 is documented."
+     },
+     {
+      "claim": "The original native reviewer used 236,557 tokens, 27 tool calls, 1,220 seconds, and zero gateway pool points.",
+      "result": "unverifiable",
+      "source": "The hand-written post-merge-read.json, receipt, and decision agree numerically, including approximately 20 minutes. No independent native usage export was found in the retained artifact files. A sanitized native subagent usage record and relevant pool observations would settle the execution claims; private client state was not read."
+     },
+     {
+      "claim": "The earlier review totals quoted by the changed documents agree with their retained records.",
+      "result": "confirmed",
+      "source": "Recomputed 46/33/37 findings and severity totals 3/34/9, 1/24/8, and 1/30/6. Verification counts are 23/19/21, with confirmed/partial/refuted totals 17/4/2, 16/3/0, and 17/4/0. Native job usage sums are 24,470,302/17,472,984/26,260,807 input tokens and 360,897/179,794/330,134 output tokens; cache shares approximately 95.0%/96.0%/95.7%; elapsed spans 71.12/46.73/50.17 minutes."
+     },
+     {
+      "claim": "Both PTY probes pass 49 selftest checks, including eight end-to-end cases and eight in-process tests, with the documented sweep coverage.",
+      "result": "confirmed",
+      "source": "Fresh --selftest runs under a synthetic HOME and stand-in clients both exited 0 with 49 PASS lines and no skips. Alert swept 110/160 code lines, including 45 through the spawn guard; push swept 123/186, including 50 through the guard. These counts match recorded outputs. The other checks are 28 BEL cases and five exit-status cases."
+     },
+     {
+      "claim": "The retained PTY mutant records describe 22 mutant runs plus two unmutated baselines.",
+      "result": "confirmed",
+      "source": "Each pty_probe_mutants_{alert,push}.txt has one passing baseline, eleven mutant verdicts, matching observed/expected failure counts, and '12 runs, 0 problems'. The runner compares exact failing-case sets. The eight runner cases include six end-to-end cases and two in-process cases."
+     },
+     {
+      "claim": "All 22 PTY mutant runs reproduce in the current review environment.",
+      "result": "unverifiable",
+      "source": "The complete runners were not repeated: their documented runtime is approximately 45 minutes per probe, exceeding this review's budget. Both full unmutated selftests and focused additional mutations were run; all retained mutant outputs were reconciled."
+     },
+     {
+      "claim": "The tmux selftests exercise three shutdown modes and catch deletion of the command-line identity clause.",
+      "result": "confirmed",
+      "source": "Fresh sync identity-mutant execution returned unmutated exit 0 and mutant exit 1. The final bell execution returned unmutated '9 checks, 0 problems' and mutant '9 checks, 1 problems'. The three modes cover honest identity, init's PID, and another private tmux server."
+     },
+     {
+      "claim": "The bell identity-mutant baseline passes reliably on every invocation.",
+      "result": "unverifiable",
+      "source": "The first invocation reported a failing unmutated shutdown control; a direct selftest and a later complete identity-mutant rerun passed. The initial cause was not isolated, so it is not reported as a defect attributable to this change."
+     },
+     {
+      "claim": "The new shell-loop control confines writes to temporary files it owns.",
+      "result": "contradicted",
+      "source": "The symlink/sentinel reproduction in finding 1 overwrote an unrelated scratch target while the unmodified control exited 0."
+     },
+     {
+      "claim": "The typing repair prevents submission after a stop has been latched, and its control observes the final Enter guards.",
+      "result": "contradicted",
+      "source": "Both probes wrote Enter after the traced SIGTERM had latched; deleting their final checks also left typing_case() passing. See finding 2."
+     },
+     {
+      "claim": "CPython dispatches handlers whose pending flags are set in ascending signal-number order.",
+      "result": "confirmed",
+      "source": "The original signal_order_probe.py reproduced all three recorded orders. [CPython v3.13.15 signalmodule.c](https://raw.githubusercontent.com/python/cpython/v3.13.15/Modules/signalmodule.c) iterates 'for (int i = 1; i < Py_NSIG; i++)' over the tripped handler flags. This is a CPython dispatch observation, not a general POSIX arrival-order guarantee."
+     },
+     {
+      "claim": "The signal-order control rejects an experiment missing expected deliveries.",
+      "result": "contradicted",
+      "source": "Both no-delivery and one-delivery variants exited 0 and claimed ascending order; see finding 3."
+     },
+     {
+      "claim": "Every post-merge repair is protected by a check that fails when the repair is removed.",
+      "result": "contradicted",
+      "source": "Removing either the tmux zombie exclusion or the failed-exec _exit independently left all nine bell selftest checks green; see finding 4."
+     },
+     {
+      "claim": "The Bash experiment distinguishes exit 130 from death by SIGINT, and its continuation result applies to shells generally.",
+      "result": "contradicted",
+      "source": "The Bash-specific portion reproduced: three continuation lines versus none. Dash stopped in both arms. The generic extension is false; see finding 5 and [Cracauer](https://www.cons.org/cracauer/sigint.html), fetched 2026-10-01."
+     },
+     {
+      "claim": "An inherited ignored SIGHUP remains ignored end to end, whereas the default-disposition run ends by SIGHUP.",
+      "result": "confirmed",
+      "source": "Fresh stand-in executions of both probes produced exit 2 with inherited SIG_IGN and exit -1 with the default disposition; every client started, no payload directory remained, and no stand-in survived. These are new review measurements, not authentication of the author's unretained ad hoc run."
+     },
+     {
+      "claim": "The signal-handler exception warning and inherited-mask/disposition explanations have primary-source support.",
+      "result": "confirmed",
+      "source": "[Python signal documentation](https://docs.python.org/3.13/library/signal.html), fetched 2026-10-01, says an exception 'may be raised after any bytecode instruction'. [signal(7)](https://man7.org/linux/man-pages/man7/signal.7.html), fetched the same day, states 'the signal mask is preserved across execve(2)' and that ignored dispositions remain unchanged."
+     },
+     {
+      "claim": "The /proc state and start-time fields used by the tmux repair have the stated meanings.",
+      "result": "confirmed",
+      "source": "[proc_pid_stat(5)](https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html), fetched 2026-10-01, identifies state Z as Zombie and field 22 as process start time in clock ticks. [proc_pid_cmdline(5)](https://man7.org/linux/man-pages/man5/proc_pid_cmdline.5.html) documents the command-line contents and their absence for zombies. The identity-clause behavior was also exercised with private tmux servers."
+     },
+     {
+      "claim": "The recorded five-module unit-test run contains 259 tests with one skip.",
+      "result": "confirmed",
+      "source": "recorded/unit_tests.txt says 'Ran 259 tests in 36.342s' and 'OK (skipped=1)'. Fresh runs at both c99a482e and CHECKOUT discovered 260 tests and passed with two skips under the synthetic HOME. Git/AST comparison located the extra test before dca821cc, after the recorded base 29458b43; it is not a defect introduced by this round."
+     },
+     {
+      "claim": "The updated scan, colour, scrub, PATH, and command counts agree with the retained outputs.",
+      "result": "confirmed",
+      "source": "All four retained release scans contain 17 matcher values, base size 15, zero unknown types and zero overlay disagreements; 2.1.283 is explicitly retained. Colour totals are 0 truecolor/35 indexed without COLORTERM and 39 truecolor/0 indexed with it. Scrub arms record 0/27/26 empty files and 19 unchanged real-home names; PATH records 13 entries; exit_codes.txt contains 35 commands. Other reconciled counts include 27 replacement controls, 15 replacement mutants plus a baseline, 11 reader mutants, 28 colour cases, 28 landscape checks, 11 shell homes, and 512 Bash combinations."
+     },
+     {
+      "claim": "The historical practice-profile control output supports the quoted 29-case count.",
+      "result": "contradicted",
+      "source": "practice_check_terminal_profiles_controls.txt contains 31 scenario lines, including one marked skipped, and a summary of 11 fragment, 10 settings, 3 derived-GUID, and 3 Media-folder cases plus four unmutated inputs. The same 29-case receipt claim and output already exist at dca821cc; this discrepancy was excluded from findings because it predates the reviewed round."
+     },
+     {
+      "claim": "Returned output independently corroborates the exact pre-repair F2/F3 measurements.",
+      "result": "unverifiable",
+      "source": "The exact pre-repair figures and F2 mutant-success quotation were found in the hand-written post-merge record and claims documents, without a corresponding retained returned-output artifact identified in the review directory. Sanitized stdout, invocation, and source/interpreter identification for those measurements would settle this."
+     },
+     {
+      "claim": "The changed publication files contain no detected home-path, UUID, credential-pattern, or newly introduced known-host-identifier leak.",
+      "result": "confirmed",
+      "source": "A bounded scan of 35 scoped changed files, including manifests/evidence.json, found zero non-example home-path matches, zero UUID matches, and zero tested credential-pattern matches. The known username scan also found no matches. The actual manifest delta adds and removes zero known host identifiers. This is a pattern-based check, not proof against every possible secret format."
+     },
+     {
+      "claim": "All private per-project labels are absent from the changed files.",
+      "result": "unverifiable",
+      "source": "The private label list was not accessed under the user-state restrictions. A value-free sanitizer report against the scoped files using the authorized private label list would settle this."
+     },
+     {
+      "claim": "Live settings, Windows Terminal bell/focus behavior, authenticated Claude sessions, and the historical host-dependent reruns are independently reproduced.",
+      "result": "unverifiable",
+      "source": "No live settings or credential stores were read; overlay_noop_check.py and live interactive acceptance were skipped as instructed. Saved outputs were reconciled, but the original colour/scrub/PATH/Codex/client-binary executions were not independently repeated. Sanitized native outputs from an authorized host would be required."
+     }
+    ],
+    "commands_run": [
+     "rtk pwd; rtk cat CHECKOUT/AGENTS.md; rtk sed -n '1,240p' search-first/SKILL.md; rtk sed -n '1,180p' find-skills/SKILL.md",
+     "rtk git -C CHECKOUT status --short; rtk git -C CHECKOUT rev-parse --short=8 HEAD",
+     "rtk sed -n '1,230p', '1,75p', and '940,1100p' packets/post-all.diff",
+     "rtk git -C CHECKOUT diff dca821cc c99a482e -- docs/harness-defaults.md and scoped recorded files",
+     "rtk rg, cat, and sed reads of the scoped decisions, READMEs, receipts, records, probes, mutant runner, and five test modules",
+     "ctx_execute: D=$(rtk mktemp -d <scratch>); rtk cp -r CHECKOUT/. \"$D\"/",
+     "ctx_execute: rtk python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/check_receipt_hashes.py . cross-family-review-terminal-lane-20260930",
+     "ctx_execute: rtk python3 -B scripts/validate.py",
+     "ctx_execute: python3 -B inline JSON/hash audits for both receipts, manifest equality, review totals, recorded counters, and publication hygiene",
+     "ctx_execute: rtk python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+     "ctx_execute: rtk python3 -B evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+     "ctx_execute: python3 -B no_delivery.py and python3 -B one_delivery.py, using private mutations of signal_order_probe.py",
+     "ctx_execute: python3 -B review_dash_loop.py, using the supplied shell control with Dash substituted for Bash",
+     "ctx_execute: python3 -B inline symlink/sentinel reproduction executing the original shell_loop_control.py through runpy",
+     "ctx_execute: python3 -B inline SIGTERM-at-Enter trace and pre-Enter-guard deletion checks for both PTY probes",
+     "ctx_execute: python3 -B inline inherited-SIGHUP end-to-end runs with both default and ignored dispositions and stand-in clients",
+     "ctx_execute: HOME=SCRATCH/review-home PYTHONDONTWRITEBYTECODE=1 python3 -B alert_probe.py --selftest and python3 -B push_notification_probe.py --selftest",
+     "ctx_execute: HOME=SCRATCH/review-home python3 -B tmux_identity_mutant.py . bell; repeated after an initial baseline failure",
+     "ctx_execute: HOME=SCRATCH/review-home python3 -B tmux_identity_mutant.py . sync",
+     "ctx_execute: python3 -B tmux_bell_probe.py --selftest with bounded before/after tmux-state observation",
+     "ctx_execute: python3 -B review-zombie-guard-removed.py --selftest; python3 -B review-exec-failure-exit-removed.py --selftest",
+     "ctx_execute: HOME=SCRATCH/review-home PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest tests.test_adoption_status tests.test_windows_terminal_defaults tests.test_adoption_docs_consistency tests.test_render_config tests.test_apply_claude_settings",
+     "ctx_execute: rtk git worktree add --detach SCRATCH/review-merged c99a482e; repeat the five-module unittest command there; rtk git worktree remove SCRATCH/review-merged",
+     "ctx_execute: python3 -B Git/AST comparisons of test methods at 29458b43, dca821cc, c99a482e, and CHECKOUT",
+     "Web search attempts followed by ctx_fetch_and_index and scoped ctx_search for Cracauer, Python signal/tempfile documentation, CPython v3.13.15 source, signal(7), /proc manuals, and tmux 3.4 sources",
+     "ctx_execute: rtk rm -rf SCRATCH; python3 -B existence check confirmed the review scratch directory was removed"
+    ],
+    "finding_count": 5
+   }
+  }
+ ],
+ "findings": [
+  {
+   "id": "F-sol-P1-1",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 546,
+   "claim": "Output errors or blocked output can prevent re-raising the latched signal, preserving the shell-loop defect this repair was intended to fix. The derived push probe has the same defect.",
+   "evidence": "ctx_execute, python3 -B: launched each real CLI with a running stand-in, closed its stdout reader, and sent SIGINT. Both reported 'real_cli_closed_stdout client_ran True exit 1 expected -2 private_dirs_left 0 stand_in_alive False', with BrokenPipeError at main's final cleanup report. In the native bash-loop reproduction, normal output gave 'bash_exit -2 continued []'; closed probe output gave 'bash_exit 0 continued [continued-1, continued-2, continued-3]' for both probes. Direct helper checks also produced exit 120 on a broken stdout pipe, exit 1 on closed stderr, and a hang on a full unread stdout pipe.",
+   "failure_scenario": "A probe runs inside a bash loop with its output redirected to a consumer that closes the pipe. Ctrl-C is latched and resources are cleaned up, but reporting raises before end_by_latched_signal is reached, or its flush raises or blocks. The child does not die by SIGINT, so bash starts subsequent sessions.",
+   "fix": "Ensure latched-signal termination runs from a finally path around main, including reporting failures. Make shutdown reporting and flushing unable to raise or block before re-raising the signal. Add real CLI controls for closed stdout, closed stderr, and full unread output pipes to both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P1-2",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 548,
+   "claim": "The first dispatched signal does not necessarily determine termination after cleanup: another handled signal has already regained its default disposition and can kill the process during the final handoff.",
+   "evidence": "ctx_execute, python3 -B, AST-targeted tracing through the actual __main__ path: injected SIGINT in measure, then SIGTERM immediately before end_by_latched_signal's os.kill. Alert output: 'first_target: 661, second_target: 549, exit: -15, expected: -2, marker: latched 2 after cleanup; sending SIGTERM, directory_left: 0, client_left: false'. Push output was identical in outcome, with targets 676 and 555. These signals were dispatched separately, rather than pending together.",
+   "failure_scenario": "SIGINT is latched while measuring. Cleanup completes and with_private_dir restores the previous SIGTERM disposition. SIGTERM arrives between resetting SIGINT to SIG_DFL and sending SIGINT to the process. The probe dies by SIGTERM, contradicting the stated first-signal guarantee even when signals arrive one dispatch apart.",
+   "fix": "Retain cancellation handling through the CLI's final shutdown handoff. After client cleanup, perform a protected handoff that prevents other handled signals from replacing the latched one and explicitly restores and unblocks the latched signal before re-raising it. Add an injection case after handler restoration and between reset and kill.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P1-3",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 565,
+   "claim": "Enter can still be submitted after a stop is already latched, and the new typing case does not exercise the pre-Enter cancellation boundaries. Both probes are affected.",
+   "evidence": "ctx_execute, python3 -B: with a real pty and the real latch handler, delivered SIGTERM at the line immediately before the Enter write. Both probes returned 'latched: 15, submitted: true, slave_received: b\\u0027abc\\\\n\\u0027'. Separately deleted only the two post-loop/pre-Enter stopped checks, retaining the per-character check. Running all eight cases through pty_probe_mutants.py's DRIVER gave 'failed [] skipped []' for both probes. With that partial mutant, a stop during the 0.4-second pause still produced [b'a', b'b', b'c', b'\\r'] and returned True.",
+   "failure_scenario": "SIGTERM is dispatched after the final stopped check but before the Enter write. The pending prompt is submitted despite STOP already containing SIGTERM. A regression removing both pre-Enter checks also remains green because typing_case stops after character five of twenty and never reaches those boundaries.",
+   "fix": "Protect the final latch check and Enter submission as one cancellation handoff, using a narrowly scoped signal critical section that does not span a client spawn. Add independent cases for cancellation on the final character, during the pre-Enter pause, and immediately before submission. Split the bundled typing mutant so each guard is independently verified.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P1-4",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 296,
+   "claim": "The sweep's new started fact measures pidfile publication, not client creation, so it can pass an implementation that starts clients after cancellation. The advertised spawn mutant also fails for losing its source marker rather than exercising this fact.",
+   "evidence": "The selected original spawn mutant failed solely with '0 of them up to the spawn guard ... 1 problems | the dry run did not reach the spawn guard'. For a behavioral control, retained the guard marker but made Popen unconditional, and instrumented successful Popen returns in the existing SWEEP_DRIVER. Immediate pidfile publication yielded 'BEFORE_GUARD_ACTUAL_SPAWNS 25 PIDFILE_STARTED 25' and 25 problems. Adding a three-second delay before pidfile publication yielded 'BEFORE_GUARD_ACTUAL_SPAWNS 25 PIDFILE_STARTED 0' and '[true, 111 lines swept ... the client was running at 13 of them, 0 problems]'. The corresponding sweep functions in the push probe are AST-identical.",
+   "failure_scenario": "A wrongly unguarded client starts after a pre-guard signal, but startup is slow enough that cleanup kills it before it publishes its pidfile. started becomes false although Popen successfully created the process. The sweep reports success, and the existing mutant does not expose this blind spot because changing its condition also defeats guard discovery.",
+   "fix": "Record successful client creation directly in the parent-side sweep driver, independently of readiness and pidfile publication. Preserve an independently identifiable guard marker in the mutant, and require the spawn control to reject unconditional Popen with both immediate and delayed pidfile publication.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P1-5",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order acceptance check succeeds when no signal handler ran.",
+   "evidence": "The source compares 'seen == sorted(seen)'. ctx_execute, python3 -B: one copy removed both os.kill calls; another changed the handler to discard events. Both exited 0, printed an empty handler list for all three sending orders, and concluded 'the handlers ran in ascending signal number in every case: True'.",
+   "failure_scenario": "Signal sending or event observation stops working. Every observed list is empty, which is sorted, so the script publishes a successful ordering measurement without observing either requested signal.",
+   "fix": "Require seen to equal sorted([first, second]), establishing exact identities, cardinality, and order. Add controls for no observations, one missing observation, and reversed observations.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P1-6",
+   "lane": "sol",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/pty_probe_mutants.py",
+   "line": 98,
+   "claim": "The two new in-process mutants can be accepted with all six integration cases skipped because mutant skip notes are discarded.",
+   "evidence": "ctx_execute, python3 -B: retained the runner's native baseline and verdict logic, restricted selection to the two new in-process mutants, and removed the private fixture working directory after the complete baseline. Baseline notes were empty. Each mutant then returned six skip notes, but the runner printed 'ok ... failing 1 of 8 (expected 1)', '3 runs, 0 problems', and exited 0. Line 98 assigns the returned notes to _notes, while line 99 checks only failed == expected.",
+   "failure_scenario": "The required working directory disappears after earlier checks have passed and before the last two mutants. Their in-process case fails as expected, while every integration case skips. The runner still accepts their exact failing sets, although it did not establish that the other cases passed. This differs from the documented selftest skip residual: it affects mutant-run acceptance.",
+   "fix": "Reject any skip in every mutant run, as the baseline already does. Include skip notes in the verdict and diagnostics, and add a control where prerequisites disappear after a successful baseline.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-1",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "high",
+   "file": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 42,
+   "claim": "The repaired identity control still permits the probe to kill another server or a non-tmux process. The socket check searches raw command-line bytes for a substring, and the process-name check accepts any name beginning with tmux. The same defect exists in tmux_sync_probe.py at line 35.",
+   "evidence": "Ran ctx_execute -> python3 -B - <scratch> with two real tmux 3.4 servers at <work>/tmux.sock and <work>/tmux.sock-other, and a wrapper that refused kill-server and answered the second server's pid. Both probes accepted that identity although the exact own socket was absent from argv. Calling stop_server produced: 'own process still alive True other process alive False own socket directory deleted True'. A second fixture used a Python process named tmux-wrapper whose argument was 'embedded:<socket>:suffix'; both probes accepted it and produced 'non-tmux fixture exit -15 cleanup returned success True'. The condition is literally 'socket not in ...cmdline.read_bytes()'.",
+   "failure_scenario": "A wrong-pid response identifies a server with a longer socket path containing the intended path, or a wrapper process whose argument merely contains that path. The probe signals the unrelated process, declares shutdown successful, and can remove the recovery socket directory while its actual server remains alive. The newly added control uses an unrelated o.sock path, so it passes with this defective comparison.",
+   "fix": "In both probes, parse the NUL-delimited argv and require the exact private socket as the value of the -S option. Verify the executable against the real tmux executable rather than trusting a mutable name prefix, and reject an unavailable start time. Add controls for a socket-path prefix collision and a non-tmux wrapper containing the path, requiring both unrelated processes to survive.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-2",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 27,
+   "claim": "The new control follows a pre-existing symlink at its predictable temporary filename and overwrites the symlink target.",
+   "evidence": "Ran ctx_execute -> python3 -B - <scratch> in an isolated filesystem. Before calling the original run(EXIT_130), the fixture placed /var/tmp/shell_loop_control_<child-pid>.py as a symlink to a dummy document. Output: 'victim was overwritten True symlink was removed True victim now begins import signal, sys, time'. Lines 26–28 construct the pid-based name and open it with mode 'w'; the finally block then unlinks the symlink.",
+   "failure_scenario": "The predictable pathname already exists as a symlink. Running the control truncates and replaces the linked document with its child script, then deletes the symlink, despite intending to create only temporary child scripts.",
+   "fix": "Use tempfile.TemporaryDirectory(dir='/var/tmp') with a script inside the fresh private directory, or tempfile.mkstemp and its returned descriptor. Do not open an existing predictable pathname for truncation.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-3",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 157,
+   "claim": "The new third shutdown control does not clean up its additional server when the measurement raises an exception other than ServerNotStopped. The duplicated control in tmux_sync_probe.py has the same defect at line 150.",
+   "evidence": "Ran ctx_execute -> python3 -B - <scratch> against both original shutdown_control implementations, injecting CalledProcessError into the measurement's new-session command only in arm three. Both produced: 'actual measurement exception CalledProcessError arm 3' and 'foreign control server alive True socket removed True TMUX restored True'. The finally block restores only TMUX; the other server's kill-server call is below it at bell line 170 and sync line 163, and is bypassed by the exception.",
+   "failure_scenario": "The additional private server starts successfully, but the measured server's new-session fails. The exception escapes, TemporaryDirectory removes the additional server's socket, and its sleep-120 server remains running without that recovery socket. This occurs during an ordinary command failure, without killing the test from outside.",
+   "fix": "Enclose creation, pid lookup, measurement, and assertions in an outer try/finally that always stops and verifies the additional server before removing its directory. Keep restoration of TMUX in that cleanup path. Exercise a third-arm new-session failure as a cleanup control.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-4",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order control accepts an empty or incomplete observation because it compares the observed list with a sorted copy of itself.",
+   "evidence": "Ran python3 -B signal_order_probe.py and a scratch mutant replacing 'lambda n, _frame: seen.append(n)' with 'lambda n, _frame: None'. The original returned 0 with the recorded orders. The mutant also returned 0, printed [] for all three cases, and ended with 'the handlers ran in ascending signal number in every case: True'. The predicate is 'ascending = ascending and seen == sorted(seen)'.",
+   "failure_scenario": "No handler observation is recorded, or only one of the two sent signals is observed. An empty list or singleton is sorted, so the control reports success without demonstrating the claimed two-handler dispatch order.",
+   "fix": "Require seen == sorted([first, second]) for each case, thereby checking the identities, count, and order together. Add controls with no observations and one missing observation; both must exit nonzero.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-5",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 31,
+   "claim": "The fixed 0.5-second delay can interrupt the launcher before the child installs its handler, causing the control to reject a host without testing the intended exit-130 behavior.",
+   "evidence": "Ran the unmodified control through python3 -B with PATH selecting a child Python launcher that slept 1.0 second and then executed the same Python interpreter. Output: 'slow child launcher exit 1'; both loops reported 'bash exit -2, lines []', and the exit-130 predicate was False. The ordinary launcher run returned 0 with all three continued lines. The docstring attributes exit 1 to Bash behaving differently.",
+   "failure_scenario": "Python startup or scheduling takes longer than 0.5 seconds. SIGINT reaches the first child's launcher before the catch handler exists, so Bash stops that loop instead of observing a child that catches SIGINT and exits normally with 130. The script misclassifies startup timing as a failed premise of the repair.",
+   "fix": "Have the first child acknowledge readiness after installing its handler, send SIGINT only after that acknowledgment, and record that the child received it. Report a readiness timeout separately from the shell-behavior verdict, and kill and reap the process group on timeout.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P2-6",
+   "lane": "sol",
+   "job": "P2",
+   "severity": "medium",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 438,
+   "claim": "The post-merge explanation generalizes Bash's measured behavior to a shell loop. The unqualified claim is false for the installed dash shell.",
+   "evidence": "The new text says: 'A shell loop goes on after a child that exits 130 and stops after one that ends BY SIGINT'. Reused shell_loop_control.py with only the parent executable changed from bash to dash. Bash continued after exit 130; dash stopped in both arms. A follow-up fixture wrote a marker immediately before the child's sys.exit(130) and produced: 'dash first loop: parent exit -2 continued lines [] child normal-exit path reached True'. Installed package: dash 0.5.12-6ubuntu5. The same generalization appears in docs/harness-defaults.md line 192.",
+   "failure_scenario": "A reader applies the published explanation to a dash parent receiving the process-group SIGINT. That parent stops even when its child reaches a normal exit 130, contradicting the stated general behavior.",
+   "fix": "Scope the measurement and explanation to the tested Bash 5.2.21 loop in the decision record and anti-pattern row. State that other shells may stop regardless of the child's normal exit status. Retain the repair that ends the probe by the latched signal.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-1",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 565,
+   "claim": "The typing repair can still deliver Enter after SIGTERM has already been latched. The same defect exists in push_notification_probe.py:571.",
+   "evidence": "A scratch-copy Python trace delivered SIGTERM immediately before the final write(master, b\"\\r\"), using a real pty and the installed latch handler. Output for both probes: 'signal latched 15 returned True client stdin bytes b\\'abc\\\\n\\''. Both ordinary typing_case tests nevertheless returned True. The docstring promises 'no model turn is submitted after the stop'.",
+   "failure_scenario": "SIGTERM is dispatched between the final stopped() check and the Enter write. STOP already contains SIGTERM, but the client receives the completed prompt line and type_prompt returns True.",
+   "fix": "Protect the final latch check and Enter write against handler dispatch as one short critical section, restoring the previous signal mask afterward and keeping that mask away from process creation. Add the demonstrated Enter-boundary injection case and state precisely how signals pending during that section are treated.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-2",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 291,
+   "claim": "The timeout repair still raises before killing the stand-in when the sweep driver's record is incomplete. The same defect exists in push_notification_probe.py:293.",
+   "evidence": "Ran sweep_trial with a driver that starts its tracked sleep stand-in, writes '{' to record.json, and exceeds the helper's subprocess deadline, shortened to 0.8 seconds for the fixture. Both probes printed: 'timeout observed True exception JSONDecodeError tracked stand-in alive after failure True'. The review fixture subsequently killed its own stand-ins.",
+   "failure_scenario": "The helper's own timeout kills a driver during record writing. TimeoutExpired is caught, but json.loads raises before the pidfile cleanup. The sweep aborts and its stand-in survives. This is an internal trial timeout, distinct from the documented external termination of the entire runner.",
+   "fix": "Put stand-in cleanup in a finally block independent of record decoding. Treat missing, incomplete, or unreadable records as failed trial evidence and return a failed result instead of raising before cleanup. Add this timeout-with-partial-record case to both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-3",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 546,
+   "claim": "An output flush failure prevents the promised termination by the latched signal. The same defect exists in push_notification_probe.py:552.",
+   "evidence": "In a child process, connected stdout to a real pipe whose reader was closed, buffered a status line, set STOP['signal'] to SIGTERM, and called end_by_latched_signal(). Both probes printed in the parent: 'REAL-BROKEN-PIPE ... exit 1 expected -15 BrokenPipeError observed True'. The flushes precede restoration of SIG_DFL and os.kill.",
+   "failure_scenario": "A downstream reader closes the probe's output pipe before cancellation finishes. stdout.flush raises BrokenPipeError, so the process exits normally with an error instead of dying by SIGTERM. The parent loses the signal information this repair was intended to preserve.",
+   "fix": "Make output flushing best effort and guarantee restoration and delivery of the latched signal even when either stream raises an output error. Add a closed-reader case that requires return code -SIGTERM.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-4",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 315,
+   "claim": "The spawn-guard mutant is caught by disappearance of its source marker rather than by the new client-start observation. Consequently, the mutant does not verify that observation. The same detector exists in push_notification_probe.py:317.",
+   "evidence": "Deleted the new 'if line in before_spawn and trial[\"started\"]' assertion, then applied the repository's exact 'if True:' spawn mutation. sweep_case still failed solely with 'the dry run did not reach the spawn guard', reporting zero lines up to it. With a condition-independent boundary marker, the same mutant produced 25 startup violations when the observation was present, but passed with '0 problems' when it was deleted.",
+   "failure_scenario": "The new startup observation is removed or broken. The existing mutation result remains the expected failing sweep because the detector requires the very 'if not stopped():' text that the mutant deletes. A green mutant receipt therefore does not establish the claimed semantic coverage.",
+   "fix": "Locate the spawn boundary independently of the condition being mutated, preserve that boundary marker in the mutant, and require the mutant to fail because a client started after a latched stop. Include an observation-deletion control to demonstrate that this assertion is necessary.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-5",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order control passes when neither handler runs.",
+   "evidence": "Replaced only SIG_UNBLOCK with a no-op, leaving both os.kill calls intact. The scratch script exited 0 and printed empty handler lists for all three cases followed by 'the handlers ran in ascending signal number in every case: True'. Removing both sends likewise exited 0. The predicate is 'seen == sorted(seen)'.",
+   "failure_scenario": "Dispatch or unblocking fails and seen is empty, or only one signal is observed. An empty or singleton list satisfies the comparison, so absence of the measured behavior is reported as successful evidence.",
+   "fix": "Compare seen with sorted((first, second)), requiring exactly both intended signals in the expected order. Add a blocked-dispatch negative control that must fail.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-6",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 44,
+   "claim": "The shell control accepts termination by the wrong signal as proof of the SIGINT behavior.",
+   "evidence": "Changed the DIE_BY_SIGINT child to finish its cleanup and send SIGTERM to its waiting parent instead of killing itself with SIGINT. The scratch script exited 0 and printed 'bash exit -15, lines []' followed by 'the loop stopped after a death by SIGINT: True'. The unmutated script reproduced bash exit -2.",
+   "failure_scenario": "The waiting shell dies for an unrelated reason before printing continued-1. Empty output alone satisfies stopped, even though the observed termination was SIGTERM and the child did not perform the required SIGINT termination.",
+   "fix": "Require died_code == -signal.SIGINT as well as no continuation lines, and require exited_code == 0 for the continuation arm. Add the demonstrated wrong-signal termination as a rejecting control.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-7",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 438,
+   "claim": "The shell-loop statement omits an essential condition of both its measurement and its primary source: the shell must also receive SIGINT.",
+   "evidence": "The document says 'A shell loop goes on after a child that exits 130 and stops after one that ends BY SIGINT'. Ran a noninteractive bash loop whose three children each restored SIG_DFL and killed themselves with SIGINT, without signaling bash: exit 0, lines ['continued-1', 'continued-2', 'continued-3']. Cracauer instructs the shell: 'If you did not, skip the rest of this list.' [Primary source, fetched 2026-10-01](https://www.cons.org/cracauer/sigint.html).",
+   "failure_scenario": "A reader signals just the probe, or the child otherwise dies by SIGINT while its parent shell receives no SIGINT. Bash continues the loop, contrary to the unqualified documented outcome. The recorded control instead signals the whole process group.",
+   "fix": "Scope the measured claim to noninteractive Bash receiving SIGINT with its foreground process group. Explicitly distinguish child-only SIGINT and avoid presenting the measured continuation policy as universal across shells.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-8",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 75,
+   "claim": "The README promises recorded outputs for verification measurements whose original outputs are not retained.",
+   "evidence": "The row lists five reproduced findings, including F2's pre-repair passing spawn mutant and F3's old swept-line counts, then says 'recorded/ holds their outputs.' Enumerated the 38 registered output files and searched the three relevant artifact directories. The quoted old measurements matched only post-merge-read.json, which describes them by hand. The retained selftest outputs instead contain the repaired 110/160 and 123/186 counts.",
+   "failure_scenario": "A reviewer follows the README to independently assess the pre-repair measurements and finds only the coordinator's assertions and later repair outputs. The publication overstates which measurements have captured command output.",
+   "fix": "Retain sanitized outputs with their commands and baseline source revision, and register their hashes, or explicitly identify the measurements whose original output was not retained. Narrow the README's retention statement accordingly.",
+   "tested": true
+  },
+  {
+   "id": "F-sol-P3-9",
+   "lane": "sol",
+   "job": "P3",
+   "severity": "low",
+   "file": "docs/decisions/2026-09-28-terminal-experience.md",
+   "line": 480,
+   "claim": "The decision record says all 11 findings were repaired, while the receipt and finding record classify ten as repaired and one as documented.",
+   "evidence": "The evidence row says 'returned 11 findings, all repaired'; line 468 repeats that disposition. Counting post-merge-read.json produced {'repaired': 10, 'documented': 1}, matching data.post_merge_read.findings.by_disposition in the receipt. F4 has disposition 'documented', and the subsection itself labels this behavior 'Documented, not repaired'.",
+   "failure_scenario": "A reader uses the summary row as a disposition tally and records eleven repairs, contradicting the published structured record and the section's explicit distinction.",
+   "fix": "Change both summaries to say all eleven were verified, ten received repairs, and one was documented, preserving the stated residuals.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-1",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 546,
+   "claim": "Cancellation can exit normally or hang when output fails, allowing a shell loop to continue after Ctrl-C.",
+   "evidence": "Ran both real CLI entry points with arena('sleep'), closed stdout pipes, and SIGINT. With buffered stdout, both exited 120 with BrokenPipeError at end_by_latched_signal's stdout.flush(); with unbuffered stdout, both exited 1 before reaching that helper. Closed stdout ptys also produced exit 120. Full pipes left both processes blocked after cleanup until the test killed them. A native bash loop running alert_probe.py with closed stdout and SIGINT sent to the whole group exited 0 and recorded ['started-1', 'continued-1', 'started-2', 'continued-2', 'started-3', 'continued-3']. The corresponding push flush is at line 552.",
+   "failure_scenario": "A pipeline consumer closes its read end or stops draining output while the probe runs. After SIGINT, cleanup succeeds, but reporting or flushing raises or blocks before the self-signal. The caller therefore receives a normal exit or no exit, and the repaired shell-loop cancellation behavior fails.",
+   "fix": "Make signal finalization run even when main raises, and keep fallible or blocking reporting and flushing off the cancellation path. Add CLI tests with closed and full output pipes, including a bash-loop control that must not start its second iteration.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-2",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 565,
+   "claim": "Enter can still be submitted after cancellation is latched, and the new typing control misses the final Enter guards.",
+   "evidence": "Using the repository's line-trace injection technique, delivered a real SIGTERM immediately before write(master, b\"\\r\"), after the final stopped() check. Both implementations returned True with STOP['signal'] == 15 and wrote b'abc\\r' (alert line 565; push line 571). Separately deleted only the two post-loop stopped() checks and ran all eight CASES through the repository DRIVER: both probes returned failed=[] and notes=[]. A stop injected during the 0.4-second delay made that mutant send Enter while the original correctly withheld it.",
+   "failure_scenario": "A signal is dispatched between the final latch check and the Enter write. The client receives Enter despite an already-latched stop. Additionally, removing the guards covering the final character and delay leaves every existing runner case green.",
+   "fix": "Make the final latch check and Enter submission atomic with respect to the handled signals, without extending a signal mask across client creation. Add cancellation cases at the final character, during the 0.4-second delay, and at the Enter boundary; add a mutant that removes only the post-loop guards.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-3",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 548,
+   "claim": "The final signal handoff does not reliably terminate by the first latched signal.",
+   "evidence": "Ran the actual __main__ block under a function-scoped trace. Sent the first signal at measure's spawn guard and the second immediately before end_by_latched_signal's os.kill. Both probes produced: first SIGINT, later SIGTERM -> exit -15; first SIGTERM, later SIGHUP -> exit -1. The first signal had already been dispatched and cleanup reported True. In the separately requested blocked-signal fault injection, blocking the latched winner at that same point produced normal exits 143 and 130, demonstrating fall-through to sys.exit(status).",
+   "failure_scenario": "with_private_dir restores the previous dispositions before the final self-signal. A later handled signal arriving in that interval can terminate the process instead of the recorded winner, even when the signals arrive one dispatch apart. If the winning signal is blocked at the handoff, os.kill only makes it pending and the program silently exits numerically.",
+   "fix": "Keep the cancellation dispositions active through the terminating handoff. After resource cleanup, prevent competing handled signals from overtaking the winner, restore the winner's default disposition, and ensure it is unblocked before delivery. Extend testing to the __main__ termination path; SWEEP_DRIVER currently calls main directly.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-4",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 291,
+   "claim": "The timeout repair still leaks its stand-in when the driver leaves a partially written record.",
+   "evidence": "In scratch, stalled SWEEP_DRIVER.dump between truncating record.json and writing its JSON, at a traced point where the trust stand-in was running. Shortened the outer subprocess timeout to nine seconds to exercise the existing TimeoutExpired branch. Both probes raised JSONDecodeError instead of returning a failed trial, and the exact recorded sleep stand-in was still alive. The reviewer then killed each recorded PID. The equivalent JSON read in push_notification_probe.py is at line 293.",
+   "failure_scenario": "The trial's timeout kills its driver while record.json is empty or incomplete. The new exception handler sets status='timeout', but json.loads raises before the PID-based cleanup. TemporaryDirectory then removes the arena, including the PID file, while the client survives.",
+   "fix": "Put stand-in cleanup in a finally block that runs independently of record parsing. Treat missing or malformed records as failed trial evidence, and add a timeout control that leaves a truncated record while a verified stand-in is alive.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-5",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 296,
+   "claim": "The repaired spawn control confuses delayed PID publication with no client creation, while its supplied mutant fails for an incidental source-text reason.",
+   "evidence": "Created an unguarded Popen variant that retained the original guard line as an empty branch, and delayed the stand-in's normal PID publication by three seconds. An immediate independent marker proved the wrapper started. At the guard, both trials reported actually_started=true but started=false. Both complete sweeps passed: alert '111 lines swept ... 45 ... up to the spawn guard ... 0 problems'; push '124 lines swept ... 50 ... up to the spawn guard ... 0 problems'. Also ran the supplied spawn mutant after deleting the new started assertion: it still failed solely with 'the dry run did not reach the spawn guard', because the mutant removes the text sought by the locator.",
+   "failure_scenario": "A client is created after a stop request but is terminated before its wrapper publishes the PID. The sweep reports that no client started. The advertised negative control does not establish sensitivity to that fact because removing its source anchor already causes the expected failure.",
+   "fix": "Record successful client creation from the parent-side Popen boundary in SWEEP_DRIVER instead of inferring it from a later child-written file. Locate the tested boundary independently of the exact predicate being mutated, and require the mutant to fail specifically because a forbidden spawn was observed.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P1-6",
+   "lane": "ultra",
+   "job": "P1",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order control passes when no signal handler runs.",
+   "evidence": "Ran a scratch copy with only signal.pthread_sigmask(signal.SIG_UNBLOCK, list(NUMBERS)) replaced by pass. It exited 0, printed an empty handler order for all three sending orders, and concluded 'the handlers ran in ascending signal number in every case: True'. The predicate is exactly 'ascending = ascending and seen == sorted(seen)'.",
+   "failure_scenario": "Signals remain blocked, or the observation mechanism otherwise records no dispatch. Since an empty list equals its sorted form, the script certifies the ordering claim without observing either requested signal.",
+   "fix": "Compare seen with sorted([first, second]), enforcing both membership and cardinality. Retain the no-unblock mutation as a negative control that must exit nonzero.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-1",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "high",
+   "file": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
+   "line": 42,
+   "claim": "The F7 repair still permits signaling another tmux server because identity verification uses substring membership rather than checking the server's exact socket argument. The same defect exists in tmux_sync_probe.py.",
+   "evidence": "Ran a ctx_execute `python3 -B -` fixture against both implementations, starting real tmux 3.4 servers at `<private>/own/tmux.sock` and `<private>/own/tmux.sock-other`. A wrapper refused kill-server and reported the second server's pid. Both produced: `different server accepted: True exact socket argv match: False` and `stop returned success; original server still alive: True other server still alive: False original recovery socket removed: True`. Additional native cases accepted a different server whose window-name argument contained the expected path, and a shell script named `tmux-wrapper` with an unused socket argument.",
+   "failure_scenario": "When the reported pid belongs to a server with a longer socket pathname, or with the expected pathname in an unrelated argument, server_identity accepts it. If kill-server fails, stop_server terminates that other process, declares cleanup successful, and removes the original server's recovery socket while the original server remains alive. The new control uses disjoint paths and misses these cases.",
+   "fix": "Parse the NUL-delimited argv and require the exact expected socket as the value of the actual -S option. Verify the native executable rather than accepting any comm beginning with `tmux`. Extend both shutdown controls with overlapping socket names, an unrelated argument containing the expected path, and a non-tmux wrapper process.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-2",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 27,
+   "claim": "The predictable temporary-script pathname follows existing symlinks and can overwrite an unrelated file.",
+   "evidence": "Ran a ctx_execute `python3 -B -` fixture that created a benign victim in the scratch checkout, made `/var/tmp/shell_loop_control_<current-pid>.py` a symlink to it, and called the source's run() function. Output: `preexisting symlink target overwritten: True target now begins: 'import signal,time,sys' symlink removed: True`. The source uses `open(script, \"w\", encoding=\"utf-8\")`, which truncates the target before entering the cleanup try block.",
+   "failure_scenario": "A pre-existing, followable symlink at the PID-derived pathname points to a file writable by the invoking user. Running the control replaces that file's contents with Python source and subsequently deletes the symlink. The reproduction establishes unintended file destruction; it does not assume that this host permits following another user's symlinks.",
+   "fix": "Create the child scripts inside a tempfile.TemporaryDirectory under /var/tmp, or use an exclusively created tempfile. Keep creation, execution and removal within that private directory's managed lifetime.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-3",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/tmux_sync_probe.py",
+   "line": 150,
+   "claim": "An unexpected measurement exception leaks the new control's other tmux server and deletes its recovery socket. The same cleanup gap exists in tmux_bell_probe.py.",
+   "evidence": "Ran both real measurement functions with subprocess.run fault injection on the fourth new-session invocation: the first two control measurements completed, the third control's other server started, and the measured server's startup raised CalledProcessError. Both implementations printed: `actual measurement raised CalledProcessError from new-session` followed by `other live: True socket exists: False`. The finally block restores TMUX only; cleanup of other_socket occurs later and is skipped.",
+   "failure_scenario": "The measured new-session command fails after the third control has created its `sleep 120` server. CalledProcessError escapes shutdown_control, TemporaryDirectory removes the other server's socket, and that server remains running until its pane exits or it is killed by pid. This occurs on an ordinary exception, independently of the documented external-signal limitation.",
+   "fix": "Place cleanup of the control-owned server in an outer finally covering startup, measurement and validation. Stop and verify the server before its temporary socket directory is removed, including when the measurement raises something other than ServerNotStopped.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-4",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order control passes when no signal handler runs.",
+   "evidence": "Ran a scratch mutation replacing `signal.pthread_sigmask(signal.SIG_UNBLOCK, list(NUMBERS))` with SIG_BLOCK. It exited 0 and printed an empty handler order for all three cases, followed by `the handlers ran in ascending signal number in every case: True`. The acceptance expression is `seen == sorted(seen)`, which accepts an empty list or a single delivered signal.",
+   "failure_scenario": "A regression leaves the signals blocked, omits delivery, or delivers only one member of a pair. The script still reports successful measurement of the two-signal dispatch order.",
+   "fix": "Require `seen == sorted((first, second))`, so both expected signals must be observed exactly once. Add a negative control that suppresses unblocking or delivery and must fail.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-5",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 31,
+   "claim": "The fixed 0.5-second delay can signal before the child installs its handler, producing a false conclusion about bash's behavior.",
+   "evidence": "Ran the unchanged script with a scratch PATH wrapper that delayed child python3 startup by 0.8 seconds before executing the same interpreter. It exited 1 and printed `child exits 130 after its cleanup: bash exit -2, lines []` and `the loop went on after an exit 130: False`. The nominal run passed on the same bash 5.2.21 installation.",
+   "failure_scenario": "On a loaded host or with a slow interpreter launcher, SIGINT reaches the child before its handler is installed. The intended exit-130 arm never executes, yet the script labels the outcome as that arm and describes failure as evidence that its behavioral premise does not hold on the host.",
+   "fix": "Have the child signal readiness through a dedicated pipe after installing its handler, and deliver SIGINT only after that marker arrives. Record that the handler ran; treat readiness failure as a failed prerequisite rather than a different shell behavior.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P2-6",
+   "lane": "ultra",
+   "job": "P2",
+   "severity": "low",
+   "file": "docs/harness-defaults.md",
+   "line": 192,
+   "claim": "The new documentation generalizes the measured bash behavior to parent shells, but the installed dash behaves differently.",
+   "evidence": "The row states: `A parent shell runs its next command after a normal exit`. Repeated both child behaviors under bash 5.2.21 and dash 0.5.12-6ubuntu5, with explicit READY, HANDLED and CLEANUP_DONE markers. Results included `bash EXIT_130 exit 0 ... continued ['continued-1', 'continued-2', 'continued-3']` and `dash EXIT_130 exit -2 ... continued []`; readiness, handler execution and cleanup were observed in both. The cited original article also says, `Of course, existing shells and applications follow different ways.` [Cracauer, fetched 2026-10-01](https://www.cons.org/cracauer/sigint.html).",
+   "failure_scenario": "A reader applies the stated rule to a /bin/sh script using dash and predicts that a child exiting 130 will allow the loop to continue after group SIGINT. In the demonstrated case, dash stops the loop.",
+   "fix": "Scope this row and the corresponding statements in the decision record and post-merge finding to the tested noninteractive bash behavior. Preserve the recommendation to terminate by the signal, while acknowledging that shell continuation policies differ.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P3-1",
+   "lane": "ultra",
+   "job": "P3",
+   "severity": "high",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/shell_loop_control.py",
+   "line": 27,
+   "claim": "The new shell control can overwrite an unrelated file through its predictable temporary pathname.",
+   "evidence": "Using ctx_execute and python3 -B, I placed a symlink at /var/tmp/shell_loop_control_<current-pid>.py pointing to a sentinel inside the private review copy, then executed the original script with runpy.run_path(..., run_name='__main__'). Output: 'control_exit 0', 'preexisting_target_overwritten True', 'target_now_contains_probe_code True'. The script uses open(script, 'w') without exclusive creation or protection against following a symlink.",
+   "failure_scenario": "A pre-existing symlink at the PID-based pathname points to a writable file. Starting the control truncates that target and replaces its contents with the generated Python child program. Both experimental arms still pass, so the control reports success after destroying the target's contents.",
+   "fix": "Create the child script with tempfile.mkstemp and write through its returned descriptor, or create it inside a newly allocated private TemporaryDirectory. Delete only the resource created by that invocation. Add a regression check that a pre-existing pathname or symlink cannot alter an unrelated sentinel. Python documents secure exclusive creation for [mkstemp](https://docs.python.org/3.13/library/tempfile.html#tempfile.mkstemp), fetched 2026-10-01.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P3-2",
+   "lane": "ultra",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/alert_probe.py",
+   "line": 565,
+   "claim": "The typing repair can still send Enter after SIGTERM has already been latched, contradicting its no-submission-after-stop guarantee.",
+   "evidence": "A python3 -B trace delivered an actual SIGTERM immediately before the Enter-write line, with the probe's latch installed. Both unchanged implementations reported 'signal_before_enter True latched 15 returned True enter_written True'—alert at line 565 and push_notification_probe.py at line 571. Separately deleting both pre-Enter stopped() checks left typing_case() returning True in both probes.",
+   "failure_scenario": "SIGTERM is dispatched after the final stopped() check returns false but before write(master, b'\\r'). The handler records the stop, execution resumes at the write, and the pending prompt is submitted anyway. The current typing case only interrupts after five ordinary characters, so it neither exercises this boundary nor detects removal of the final checks.",
+   "fix": "Make the final latch decision and Enter write atomic with respect to the latch handler, for example with a narrowly scoped signal-mask critical section containing no fork or exec. Add independent cases for cancellation after the final character, during the final delay, and at the Enter boundary, with separate mutants for the final guards. Apply the change to both probes.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P3-3",
+   "lane": "ultra",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/signal_order_probe.py",
+   "line": 20,
+   "claim": "The signal-order control reports success when it observes no ordering experiment at all.",
+   "evidence": "I ran private copies with both os.kill calls removed and with only the second call removed. 'python3 -B no_delivery.py' exited 0 while all three observed orders were []; 'python3 -B one_delivery.py' also exited 0 with singleton orders. Both printed 'the handlers ran in ascending signal number in every case: True'. The acceptance condition is seen == sorted(seen).",
+   "failure_scenario": "A regression omits one or both sends, sends the same standard signal twice so it coalesces, or otherwise fails to deliver both expected signals. Empty and singleton observations satisfy the sortedness predicate, falsely validating the claimed two-signal dispatch ordering.",
+   "fix": "Require seen to equal sorted([first, second]), including exactly those two deliveries. Add negative controls for missing and duplicate sends and require them to exit nonzero.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P3-4",
+   "lane": "ultra",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-lane-cross-family-review-20260930/README.md",
+   "line": 75,
+   "claim": "The README overstates regression coverage for the post-merge repairs.",
+   "evidence": "The README says the remaining findings 'were confirmed by reading and are covered by new cases and mutants'; the receipt also says 'Each repair has a check that fails without it'. I independently removed state != 'Z' from server_alive and replaced the new os._exit(127) with pass in private copies of tmux_bell_probe.py. Running each copy with python3 -B ... --selftest returned exit 0 and 'selftest: 9 checks, 0 problems', with all three shutdown controls passing.",
+   "failure_scenario": "Either the zombie repair or the failed-exec child-exit repair is reverted. The advertised shutdown regression suite remains green because it supplies neither a zombie identity nor an exec failure. A maintainer relying on the universal coverage claim would accept either regression.",
+   "fix": "Add a control using an unreaped zombie and a control forcing execv to fail in the PTY child, asserting the intended liveness result and child exit 127. Give each repair its own mutant. Until those controls exist, describe F8 and F10 as source-verified repairs and narrow the corresponding receipt claim.",
+   "tested": true
+  },
+  {
+   "id": "F-ultra-P3-5",
+   "lane": "ultra",
+   "job": "P3",
+   "severity": "medium",
+   "file": "evidence/artifacts/terminal-experience-20260928/README.md",
+   "line": 15,
+   "claim": "The shell-loop explanation incorrectly generalizes the measured Bash behavior to other shells.",
+   "evidence": "The README says a parent shell distinguishes signal death from exit 130 'and only the first stops a loop after Ctrl-C'. The supplied Bash control reproduced its recorded result. A private copy changing only the invoked shell to dash, plus labeling and -B for the child, produced 'child exits 130 after its cleanup: dash exit -2, lines []' and the same result for signal death. [Cracauer's primary source](https://www.cons.org/cracauer/sigint.html), fetched 2026-10-01, explicitly says: 'Both IUE or WUE shell would not have this problem, since they discontinue the script on their own.'",
+   "failure_scenario": "A reader applies the asserted continuation behavior to a Dash loop receiving the same process-group SIGINT. Dash stops even when the child exits normally with status 130. The recorded experiment measures Bash only; the wait-status distinction is general, but the loop policy is not.",
+   "fix": "Qualify the continuation claim with the measured Bash invocation and process-group signal conditions. Describe the general distinction between normal exit and signal death separately. Correct the matching wording in the decision row, probe docstrings, receipt, and manifest registration.",
+   "tested": true
+  }
+ ]
+}

@@ -1,0 +1,2332 @@
+{
+  "schema_version": 1,
+  "catalog": "us-equities",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "market-data-reference",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "Original historical availability, provider corrections, one corporate-action currency and a complete historical universe remain unqualified.",
+      "Databento pit/ts_record and Massive historical ticker filters have no identical-input native comparison.",
+      "SEFD table-fidelity parser needs a fixed provider-free path and comparison on already-held SEC bytes.",
+      "No new WSL distribution exists. Historical receipts and current client identity do not constitute new-host installation, recovery, provider, GPU or broker acceptance.",
+      "This is one bounded source wave within the authorized overall convergence research. Identity/release metadata and listed source review do not establish saturation or measured superiority of every candidate."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "repository_of_record": "https://github.com/alpacahq/alpaca-py",
+      "pin_of_record": "0.44.0",
+      "pin_source": "catalogs/us-equities/data-research.json:17",
+      "source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "source_pinned_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/alpacahq/alpaca-py",
+        "repository_endpoint": "https://api.github.com/repos/alpacahq/alpaca-py",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/alpacahq/alpaca-py/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.44.0",
+        "latest_release_published_at": "2026-08-11T10:11:55Z",
+        "latest_release_url": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/alpacahq/alpaca-py/releases/tags/v0.44.0",
+          "exit_code": 0,
+          "tag": "v0.44.0",
+          "prerelease": false,
+          "url": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0"
+        }
+      },
+      "verdict": "Retain official SDK price/action transport for the separate Alpaca path. Bounded historical acquisition exists, but pagination/provenance is local code, one action currency is unresolved and original historical availability is not established.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+          "sha256": "39d63bccc8dccc2871f62de52f31270c046b5613bb8d8dac7b50f2106ae2300f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/pyproject.toml",
+          "sha256": "e5cbb0cf53856a77f57e96688ac843e44a769f0a0c57f3dabf651bac3f7c3d51",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/Makefile",
+          "sha256": "f0be9ed0f2471e357eca10df3d816ebb1a22d3656b43137d302356a7e71f4a87",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/LICENSE",
+          "sha256": "bc84da682744c6dd008cf9ad3306caf18444d613a80c1bcc3de0dd46094787ef",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "alpaca/data/requests.py",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/data/requests.py",
+          "sha256": "7837528bfc298c2018aac993a9027b7322cafa336ec64967be8462f3c98a246c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/data/test_historical_stock_data.py",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/tests/data/test_historical_stock_data.py",
+          "sha256": "5f61ddc54aa92d2c96631b65ec5f6748c4517e89e6a8203a8005cb79086b6c00",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/data/test_corporate_actions.py",
+          "source_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/tests/data/test_corporate_actions.py",
+          "sha256": "b3208a42b8695f8fab004376b69b5ec74631ee8b2266437a56b2fde3211de50a",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install alpaca-py==0.44.0",
+        "source": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+          "upstream_document_line": 51,
+          "upstream_document_line_url": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md#L51",
+          "upstream_documented_command": "pip install alpaca-py",
+          "source_sha256": "39d63bccc8dccc2871f62de52f31270c046b5613bb8d8dac7b50f2106ae2300f",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:17",
+          "recorded_source_commit": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+          "command_in_record": "rtk python -m pip install alpaca-py==0.44.0",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/Makefile",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Native poetry run pytest; development environment needed"
+      },
+      "evidence_class": "historical_native_execution",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "component_id": "data-alpaca-py",
+      "selection_scope": "Retain official SDK price/action transport for the separate Alpaca path. Bounded historical acquisition exists, but pagination/provenance is local code, one action currency is unresolved and original historical availability is not established."
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "repository_of_record": "https://github.com/dgunning/edgartools",
+      "pin_of_record": "5.58.0",
+      "pin_source": "manifests/stack.json:1519",
+      "source_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "source_pinned_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/dgunning/edgartools",
+        "repository_endpoint": "https://api.github.com/repos/dgunning/edgartools",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/dgunning/edgartools/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v5.59.1",
+        "latest_release_published_at": "2026-09-26T13:11:28Z",
+        "latest_release_url": "https://github.com/dgunning/edgartools/releases/tag/v5.59.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/dgunning/edgartools/releases/tags/v5.58.0",
+          "exit_code": 0,
+          "tag": "v5.58.0",
+          "prerelease": false,
+          "url": "https://github.com/dgunning/edgartools/releases/tag/v5.58.0"
+        }
+      },
+      "verdict": "Retain native SEC acquisition and later offline snapshots. Parser/observed-at capture does not establish original historical availability or a complete historical universe.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+          "sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/pyproject.toml",
+          "sha256": "13b6b79634019b55b751c7151e6b182883649f64543760f39d0491a544d00a48",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/CONTRIBUTING.md",
+          "sha256": "08908e1f93e1dc5cc2ecbc369cf323e84d9fc1508e10c6ca88a837898efa9d56",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+          "sha256": "249fb5021f07689c5fb17925c4d8bcd04fd9e2cee4b4b789499fb80b1e9dfe0c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "edgar/_filings.py",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/_filings.py",
+          "sha256": "c9b55873d1baf00915d9150e7f2a6623b65e660eea962c0bbc80ce73acce67b3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "edgar/core.py",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/core.py",
+          "sha256": "a3ac193d1b295925b8ca4f44b50f8b1dcf45699f3f64b9ee2f3ab21fd8a5b228",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/regression-tests.yml",
+          "source_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/.github/workflows/regression-tests.yml",
+          "sha256": "adcb36c0dda54006a17749c336c173ffaa7979a68e126dd7d402c90176b684b0",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install edgartools==5.58.0",
+        "source": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+          "upstream_document_line": 74,
+          "upstream_document_line_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md#L74",
+          "upstream_documented_command": "pip install edgartools",
+          "source_sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1519",
+          "recorded_source_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "command_in_record": "rtk python -m pip install edgartools==5.58.0",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk hatch run test-offline-audit tests/issues/regression/",
+        "source": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Native socket-blocking offline audit, retries disabled; freeze files/dependencies"
+      },
+      "evidence_class": "historical_native_execution",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "b022ad29ac3965248c473b5790cf8e124887eac6",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/dgunning/edgartools/blob/b022ad29ac3965248c473b5790cf8e124887eac6/README.md",
+            "sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "pyproject.toml",
+            "source_url": "https://github.com/dgunning/edgartools/blob/b022ad29ac3965248c473b5790cf8e124887eac6/pyproject.toml",
+            "sha256": "13b6b79634019b55b751c7151e6b182883649f64543760f39d0491a544d00a48",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "source_url": "https://github.com/dgunning/edgartools/blob/b022ad29ac3965248c473b5790cf8e124887eac6/CONTRIBUTING.md",
+            "sha256": "08908e1f93e1dc5cc2ecbc369cf323e84d9fc1508e10c6ca88a837898efa9d56",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      },
+      "component_id": "data-edgartools",
+      "selection_scope": "Retain native SEC acquisition and later offline snapshots. Parser/observed-at capture does not establish original historical availability or a complete historical universe."
+    },
+    {
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "repository_of_record": "https://github.com/gerrymanoim/exchange_calendars",
+      "pin_of_record": "4.13.2",
+      "pin_source": "manifests/stack.json:1547",
+      "source_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "source_pinned_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/gerrymanoim/exchange_calendars",
+        "repository_endpoint": "https://api.github.com/repos/gerrymanoim/exchange_calendars",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/gerrymanoim/exchange_calendars/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "4.13.2",
+        "latest_release_published_at": "2026-03-10T03:24:04Z",
+        "latest_release_url": "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/gerrymanoim/exchange_calendars/releases/tags/4.13.2",
+          "exit_code": 0,
+          "tag": "4.13.2",
+          "prerelease": false,
+          "url": "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2"
+        }
+      },
+      "verdict": "Retain XNYS session support. Bounded session checks do not prove financial identity, source rights or provider revisions.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+          "sha256": "7c2311c4002592eb6d6c744a8225e183262e12d920921e71b401b9fff1f01186",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/pyproject.toml",
+          "sha256": "0624504db59140714e6d12dd5039009e6517e20e88017c2e8989cf961645a266",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/LICENSE",
+          "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/test_xnys_calendar.py",
+          "source_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/tests/test_xnys_calendar.py",
+          "sha256": "b1889c9f08462d8b8ed37ae8c5ca2352bfbaa335e7d44ad99774a3832b535c85",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "exchange_calendars/exchange_calendar_xnys.py",
+          "source_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar_xnys.py",
+          "sha256": "baa39f07163abafcf2800b69edc5d920c3db0a64f8bbb30dc7d522883d0b5bd7",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install exchange-calendars==4.13.2",
+        "source": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+          "upstream_document_line": 12,
+          "upstream_document_line_url": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md#L12",
+          "upstream_documented_command": "pip install exchange_calendars",
+          "source_sha256": "7c2311c4002592eb6d6c744a8225e183262e12d920921e71b401b9fff1f01186",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1547",
+          "recorded_source_commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+          "command_in_record": "rtk python -m pip install exchange-calendars==4.13.2",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests/test_xnys_calendar.py",
+        "source": "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/tests/test_xnys_calendar.py",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Unchanged XNYS test file under native pytest config"
+      },
+      "evidence_class": "historical_native_execution",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "component_id": "data-exchange-calendars",
+      "selection_scope": "Retain XNYS session support. Bounded session checks do not prove financial identity, source rights or provider revisions."
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "DuckDB",
+      "repository": "https://github.com/duckdb/duckdb",
+      "repository_of_record": "https://github.com/duckdb/duckdb",
+      "pin_of_record": "1.5.5",
+      "pin_source": "manifests/stack.json:1278",
+      "source_commit": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "source_pinned_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/duckdb/duckdb",
+        "repository_endpoint": "https://api.github.com/repos/duckdb/duckdb",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/duckdb/duckdb/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v1.5.6",
+        "latest_release_published_at": "2026-09-28T13:35:11Z",
+        "latest_release_url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.6",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/duckdb/duckdb/releases/tags/v1.5.5",
+          "exit_code": 0,
+          "tag": "v1.5.5",
+          "prerelease": false,
+          "url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5"
+        }
+      },
+      "verdict": "Retain embedded analytical storage with bounded decimal/Parquet receipts. Exact type/timezone/revision round-trip and scale alternatives still require identical frozen inputs.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+          "sha256": "a33bdaab742b92a37b07d2579d2c59825a7bb6cfcb426717a7aa50c0252852a2",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CMakeLists.txt",
+          "source_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/CMakeLists.txt",
+          "sha256": "1eb253d19cecfa9d79d2318c2c85c47504f39174abfb7b87d2a0bafd63bbf3d7",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/Makefile",
+          "sha256": "93f48b1e73311263d85bed21499146da26105ab5e0d110d4425e73431cb66c62",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/LICENSE",
+          "sha256": "7e17fd31249fa875cb3b1c5e05c6c3e99b75509f6a2804ca176c217834de1dcb",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "src/include/duckdb/common/types/timestamp.hpp",
+          "source_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/src/include/duckdb/common/types/timestamp.hpp",
+          "sha256": "bd567d28a59c164f5cb04cbef8c9181b116b4c22f80fba3f38ed726ade822436",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk make",
+        "source": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+          "upstream_document_line": 18,
+          "upstream_document_line_url": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md#L18",
+          "upstream_documented_command": "make",
+          "source_sha256": "a33bdaab742b92a37b07d2579d2c59825a7bb6cfcb426717a7aa50c0252852a2",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1278",
+          "recorded_source_commit": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+          "command_in_record": "rtk make",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make unittest_release",
+        "source": "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/Makefile",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Unchanged native C++ suite; source build required"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "069cc9f9b5be802405797faecc284961b07c70ef",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/README.md",
+            "sha256": "a33bdaab742b92a37b07d2579d2c59825a7bb6cfcb426717a7aa50c0252852a2",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "Makefile",
+            "source_url": "https://github.com/duckdb/duckdb/blob/069cc9f9b5be802405797faecc284961b07c70ef/Makefile",
+            "sha256": "01749459a6afb5e768aa8312e871e5eb80791f527ec5c46d4b49fa78a4b90d9a",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      }
+    },
+    {
+      "name": "Databento",
+      "repository": "https://github.com/databento/databento-python",
+      "repository_of_record": "https://github.com/databento/databento-python",
+      "pin_of_record": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+      "pin_source": "catalogs/us-equities/data-research.json:64",
+      "source_commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "source_pinned_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/databento/databento-python",
+        "repository_endpoint": "https://api.github.com/repos/databento/databento-python",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/databento/databento-python/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.87.0",
+        "latest_release_published_at": "2026-09-22T20:24:37Z",
+        "latest_release_url": "https://github.com/databento/databento-python/releases/tag/v0.87.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional revision-history challenger: exact corporate API/tests support pit=True and ts_record indexing. Default pit=False keeps latest records; entitlement, redistribution and cutoff reconciliation remain unobserved.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+          "sha256": "987d6ddaec6441f32f54e71fa9dd5a7dd566d60bb81b6128d4f494a0adaef144",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/pyproject.toml",
+          "sha256": "c7dd6081fa0a0cacd64016c704940dddee9ffc5e39651050565350dcc2a2f60c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/CONTRIBUTING.md",
+          "sha256": "412951b76b2216826043901396deaf820bb43dcf045ab68424c3efe4d3a90102",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/LICENSE",
+          "sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/.github/workflows/test.yml",
+          "sha256": "000c469299e4ce2e55c905644e64853adf279d203d6b6ba522c79813b6fc9a14",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "databento/reference/api/corporate.py",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/reference/api/corporate.py",
+          "sha256": "9ec588b95db94297e870faf4a8f31f1392dc0d322c8375de08e9900574d53eb3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/test_reference_corporate.py",
+          "source_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/tests/test_reference_corporate.py",
+          "sha256": "8559badc87750135aeecf29375e9eec7f3307da0663489447ea36184a0514d96",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install -U databento",
+        "source": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md#L46",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+          "upstream_document_line": 46,
+          "upstream_document_line_url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md#L46",
+          "upstream_documented_command": "pip install -U databento",
+          "source_sha256": "987d6ddaec6441f32f54e71fa9dd5a7dd566d60bb81b6128d4f494a0adaef144",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:64",
+          "recorded_source_commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+          "command_in_record": "rtk pip install -U databento",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "25eef4ee8e66559e2370166a57c20925ce244d49",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/README.md",
+            "sha256": "5b494741354dc3f6aef08daffa1af1d4d3ddffc755b4b43543abb1141867a229",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "pyproject.toml",
+            "source_url": "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/pyproject.toml",
+            "sha256": "0e4d9ae77ec5bcf785beb940987b077e149faacadfc3fdfe68d689d0b4f65855",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "databento/reference/api/corporate.py",
+            "source_url": "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/databento/reference/api/corporate.py",
+            "sha256": "9ec588b95db94297e870faf4a8f31f1392dc0d322c8375de08e9900574d53eb3",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "tests/test_reference_corporate.py",
+            "source_url": "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/tests/test_reference_corporate.py",
+            "sha256": "8559badc87750135aeecf29375e9eec7f3307da0663489447ea36184a0514d96",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      }
+    },
+    {
+      "name": "Massive Python client",
+      "repository": "https://github.com/massive-com/client-python",
+      "repository_of_record": "https://github.com/massive-com/client-python",
+      "pin_of_record": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+      "pin_source": "catalogs/us-equities/data-research.json:111",
+      "source_commit": "3c247d78c603fc13d274fda1aa26749e7c8c3710",
+      "source_pinned_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/massive-com/client-python",
+        "repository_endpoint": "https://api.github.com/repos/massive-com/client-python",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/massive-com/client-python/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v2.8.0",
+        "latest_release_published_at": "2026-05-26T08:18:05Z",
+        "latest_release_url": "https://github.com/massive-com/client-python/releases/tag/v2.8.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional provider arm. Official date/active ticker filters require a matched historical-universe and terminal-event comparison before adoption.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+          "sha256": "f023ebdcb3e989fa5ad9302e2a11ab2ba7f36b16d6964d1f8bca570064070a2a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/pyproject.toml",
+          "sha256": "9f61762be6ca8cdb5172044f51ba3fcded30f20ea627c59bdd022cbfeb571a2a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/Makefile",
+          "sha256": "cabf98e96c2ea4593439d612b649cb8a181396486c6b86edadc50289caee44b6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/LICENSE",
+          "sha256": "ec423cc5506eea1ffbfc9955c3ec8f86139996963d84ff306a5ee41eda8a4ff1",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install -U massive",
+        "source": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md#L17",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+          "upstream_document_line": 17,
+          "upstream_document_line_url": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md#L17",
+          "upstream_documented_command": "pip install -U massive",
+          "source_sha256": "f023ebdcb3e989fa5ad9302e2a11ab2ba7f36b16d6964d1f8bca570064070a2a",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:111",
+          "recorded_source_commit": "3c247d78c603fc13d274fda1aa26749e7c8c3710",
+          "command_in_record": "rtk pip install -U massive",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md#L217",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "OpenBB",
+      "repository": "https://github.com/openbq-org/OpenBB",
+      "repository_of_record": "https://github.com/openbb-finance/openbb",
+      "pin_of_record": "openbb 4.7.2; source 3e071fcc2cd9f891cac6040ae60296dba76dab46",
+      "pin_source": "catalogs/us-equities/data-research.json:243",
+      "source_commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+      "source_pinned_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/openbq-org/OpenBB",
+        "repository_endpoint": "https://api.github.com/repos/openbb-finance/openbb",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/openbb-finance/openbb/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "ODP",
+        "latest_release_published_at": "2026-09-30T01:47:43Z",
+        "latest_release_url": "https://github.com/openbq-org/OpenBB/releases/tag/ODP",
+        "upgrade_accepted": false,
+        "scope_note": "Canonical repository is now openbq-org/OpenBB. ODP GitHub label is distinct from Python openbb; PyPI reports 5.0.0."
+      },
+      "verdict": "Conditional provider aggregation; preserve historical immutable source and record canonical repository rename. Provider aggregation does not independently establish source rights or original availability.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md",
+          "sha256": "38ace73536447eded94a0608c7a9490b33a8ebbcdf980c3fc2998d698ba960b5",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/LICENSE",
+          "sha256": "442baa7865ddf53ba04808a29e4810ac1fd9c83383d4ac76297cec4569e19222",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/test-unit-platform.yml",
+          "source_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/.github/workflows/test-unit-platform.yml",
+          "sha256": "778193b6356b2649b183d7d8f69b1f20fb908d3d482aae74831882ef61e3b6a0",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install \"openbb[all]\"",
+        "source": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md#L68",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md",
+          "upstream_document_line": 68,
+          "upstream_document_line_url": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md#L68",
+          "upstream_documented_command": "pip install \"openbb[all]\"",
+          "source_sha256": "38ace73536447eded94a0608c7a9490b33a8ebbcdf980c3fc2998d698ba960b5",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:243",
+          "recorded_source_commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+          "command_in_record": "rtk pip install \"openbb[all]\"",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk nox -f .github/scripts/noxfile.py -s unit_test_platform --python \"${PYTHON_VERSION}\"",
+        "source": "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/.github/workflows/test-unit-platform.yml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Freeze a supported Python matrix member"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "sec-edgar-downloader",
+      "repository": "https://github.com/jadchaar/sec-edgar-downloader",
+      "repository_of_record": "https://github.com/jadchaar/sec-edgar-downloader",
+      "pin_of_record": "5.1.0; source 185a5548e49fd37afb9871df8aa9485075f21e21",
+      "pin_source": "catalogs/us-equities/data-research.json:203",
+      "source_commit": "185a5548e49fd37afb9871df8aa9485075f21e21",
+      "source_pinned_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/jadchaar/sec-edgar-downloader",
+        "repository_endpoint": "https://api.github.com/repos/jadchaar/sec-edgar-downloader",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/jadchaar/sec-edgar-downloader/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "5.1.0",
+        "latest_release_published_at": "2026-02-02T02:07:07Z",
+        "latest_release_url": "https://github.com/jadchaar/sec-edgar-downloader/releases/tag/5.1.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional SEC acquisition alternative. Exact source and native test entrypoints were reviewed; no matched provenance/availability comparison exists.",
+      "sources": [
+        {
+          "path": "README.rst",
+          "source_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+          "sha256": "80d82eae50c9b0ea37e80cb9d554734978993ad61e40408f9bbe67b167166324",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/pyproject.toml",
+          "sha256": "8d9b1288268d68944706b580505565b9342d4e032b592a08ea4c36d194266ef3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/Makefile",
+          "sha256": "0eaaf98d72eae09315c99b86d769dce4576ffb469972c19aa642ec32a679c4c6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/LICENSE",
+          "sha256": "4473e5d58a81d85f44fa119b4c96865b13f32024e8dc89e03b4ff015fb76bacc",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install -U sec-edgar-downloader",
+        "source": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+          "upstream_document_line": 42,
+          "upstream_document_line_url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst#L42",
+          "upstream_documented_command": "pip install -U sec-edgar-downloader",
+          "source_sha256": "80d82eae50c9b0ea37e80cb9d554734978993ad61e40408f9bbe67b167166324",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:203",
+          "recorded_source_commit": "185a5548e49fd37afb9871df8aa9485075f21e21",
+          "command_in_record": "rtk python -m pip install -U sec-edgar-downloader",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/Makefile#L19",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Polars",
+      "repository": "https://github.com/pola-rs/polars",
+      "repository_of_record": "https://github.com/pola-rs/polars",
+      "pin_of_record": "py-1.44.2; source 1bd8ec12f42d40fcec62badf32ef2177d2377d8d",
+      "pin_source": "catalogs/us-equities/data-research.json:415",
+      "source_commit": "1bd8ec12f42d40fcec62badf32ef2177d2377d8d",
+      "source_pinned_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/pola-rs/polars",
+        "repository_endpoint": "https://api.github.com/repos/pola-rs/polars",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/pola-rs/polars/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "py-1.44.2",
+        "latest_release_published_at": "2026-09-09T07:42:33Z",
+        "latest_release_url": "https://github.com/pola-rs/polars/releases/tag/py-1.44.2",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional dataframe compute arm; no identical-input exactness, memory or speed crossover over retained DuckDB/pandas is accepted.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md",
+          "sha256": "34ae7397cdce21d11b86261faa8c792b4ab502afaff817f1af26a6c22baa1f9f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Cargo.toml",
+          "source_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/Cargo.toml",
+          "sha256": "c620141686f6b4c78d69d9a9a187e555e67627604e3613f2fe5ac50d26287b55",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/Makefile",
+          "sha256": "d53b717296b2fd9daa341d7b226422f2cfbb6c3e98b5aff6a60053bc32ae26cb",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/LICENSE",
+          "sha256": "8296022372dc83cc8ef234b3d4889ef8f8b1779754a78bebf13d2c5178a6b4c4",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/test-python.yml",
+          "source_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/.github/workflows/test-python.yml",
+          "sha256": "5fc9a1ba6ff29ac99d8d0162e6ad6918891ad04cabbfeb1095f22bd983039801",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install polars",
+        "source": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md#L104",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md",
+          "upstream_document_line": 104,
+          "upstream_document_line_url": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md#L104",
+          "upstream_documented_command": "pip install polars",
+          "source_sha256": "34ae7397cdce21d11b86261faa8c792b4ab502afaff817f1af26a6c22baa1f9f",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:415",
+          "recorded_source_commit": "1bd8ec12f42d40fcec62badf32ef2177d2377d8d",
+          "command_in_record": "rtk pip install polars",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk pytest tests/docs/test_user_guide.py -m docs",
+        "source": "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/.github/workflows/test-python.yml#L138",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "QuestDB",
+      "repository": "https://github.com/questdb/questdb",
+      "repository_of_record": "https://github.com/questdb/questdb",
+      "pin_of_record": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+      "pin_source": "catalogs/us-equities/data-research.json:492",
+      "source_commit": "7a391566ac827e0d8c269b91f2415c16b0a32a84",
+      "source_pinned_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/questdb/questdb",
+        "repository_endpoint": "https://api.github.com/repos/questdb/questdb",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/questdb/questdb/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "10.0.1",
+        "latest_release_published_at": "2026-08-24T13:55:02Z",
+        "latest_release_url": "https://github.com/questdb/questdb/releases/tag/10.0.1",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional time-series service; source/test identity does not establish a financial correctness or recovery/scale advantage over embedded storage.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+          "sha256": "0d7159ccdbbfda028449ca7ac7bf09c874c63835192b34b30320fa41f4e75ec5",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pom.xml",
+          "source_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/pom.xml",
+          "sha256": "10b278fdaab9dbf92de48fbe56b960aeddfe1f47e91dd732d85919128793bdf0",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/CONTRIBUTING.md",
+          "sha256": "974428c2b652b8e1b65d1a348615b2f5084d7dae057fbf5d9d6354d530b7c3c8",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/LICENSE.txt",
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "ci/test-pipeline.yml",
+          "source_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/ci/test-pipeline.yml",
+          "sha256": "232516ccdcf103f1256570068d26a16ada456b6dd0933e29cdfb75161a298690",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk brew install questdb",
+        "source": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md#L133",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+          "upstream_document_line": 133,
+          "upstream_document_line_url": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md#L133",
+          "upstream_documented_command": "brew install questdb",
+          "source_sha256": "0d7159ccdbbfda028449ca7ac7bf09c874c63835192b34b30320fa41f4e75ec5",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:492",
+          "recorded_source_commit": "7a391566ac827e0d8c269b91f2415c16b0a32a84",
+          "command_in_record": "rtk brew install questdb",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk mvn test",
+        "source": "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/CONTRIBUTING.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Freeze native prerequisites/test subset"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "ClickHouse",
+      "repository": "https://github.com/ClickHouse/ClickHouse",
+      "repository_of_record": "https://github.com/clickhouse/clickhouse",
+      "pin_of_record": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+      "pin_source": "catalogs/us-equities/data-research.json:535",
+      "source_commit": "f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+      "source_pinned_url": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/ClickHouse/ClickHouse",
+        "repository_endpoint": "https://api.github.com/repos/clickhouse/clickhouse",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/clickhouse/clickhouse/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v26.9.7.9-stable",
+        "latest_release_published_at": "2026-09-30T15:30:54Z",
+        "latest_release_url": "https://github.com/ClickHouse/ClickHouse/releases/tag/v26.9.7.9-stable",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional analytical service; no measured financial exactness or scale crossover justifies an added service.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+          "sha256": "ba7b234fda3345e6208a584ae362683348b6f50557fe1f056a7112f653362e8b",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/pyproject.toml",
+          "sha256": "ea3391c9fb378f4c0da69d8f5026e47f6bc1c14b06925d775f5203fa8518aa46",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/CONTRIBUTING.md",
+          "sha256": "38a997d2d0e2f1764012e0ba962347703e3559b49579d54b82dc3596cf400d5f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/LICENSE",
+          "sha256": "af5d33e7f3dbbd25e889d8bdc61c83562c257d20c22386bb04106cd22937341a",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+            "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/CONTRIBUTING.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": [
+          "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+          "https://github.com/clickhouse/clickhouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/pyproject.toml"
+        ],
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact applicable native test command established in the listed files; no universal absence claim"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "DVC",
+      "repository": "https://github.com/treeverse/dvc",
+      "repository_of_record": "https://github.com/treeverse/dvc",
+      "pin_of_record": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+      "pin_source": "catalogs/us-equities/data-research.json:701",
+      "source_commit": "356dfa03278058b02df42124f243c2c345329dae",
+      "source_pinned_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/treeverse/dvc",
+        "repository_endpoint": "https://api.github.com/repos/treeverse/dvc",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/treeverse/dvc/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "3.67.1",
+        "latest_release_published_at": "2026-03-31T05:06:44Z",
+        "latest_release_url": "https://github.com/treeverse/dvc/releases/tag/3.67.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/treeverse/dvc/releases/tags/3.67.1",
+          "exit_code": 0,
+          "tag": "3.67.1",
+          "prerelease": false,
+          "url": "https://github.com/treeverse/dvc/releases/tag/3.67.1"
+        }
+      },
+      "verdict": "Provisional version/restore mechanics only, source reviewed. Content addressing does not establish provider publication clocks, permanent instrument identity or a historical universe.",
+      "sources": [
+        {
+          "path": "README.rst",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+          "sha256": "d10985fd1a1efb7ee4a28c0a4dac8a3f40cebe564dc86404aa5300e659ddeb39",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/pyproject.toml",
+          "sha256": "7c9a77d69f45b5d260c374c49132cb60439cb1e5d19c739987c693beba92b9ac",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/CONTRIBUTING.md",
+          "sha256": "35437aa20ec870481a597ac91aa8136de7b8f87989587648b0c0d48ae25e063d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/LICENSE",
+          "sha256": "e817a2cc039b0cf9902431510648773913ccc942dc01a07697cd6f88cf479e15",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/tests.yaml",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/.github/workflows/tests.yaml",
+          "sha256": "e5dbbc47ffad171d9e38a942c0694a09e3a2a03488a3b567581b14bcba252efc",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "tests/func/test_add.py",
+          "source_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/tests/func/test_add.py",
+          "sha256": "53734d2be0bd7a6fd5be17784e08a28b0e2491258a1095e2540da262861edf17",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install dvc==3.67.1",
+        "source": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+          "upstream_document_line": 161,
+          "upstream_document_line_url": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst#L161",
+          "upstream_documented_command": "pip install dvc",
+          "source_sha256": "d10985fd1a1efb7ee4a28c0a4dac8a3f40cebe564dc86404aa5300e659ddeb39",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:701",
+          "recorded_source_commit": "356dfa03278058b02df42124f243c2c345329dae",
+          "command_in_record": "rtk python -m pip install dvc==3.67.1",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests/func/test_add.py",
+        "source": "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/.github/workflows/tests.yaml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Unchanged file under upstream pytest CI/config"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Pandera",
+      "repository": "https://github.com/unionai-oss/pandera",
+      "repository_of_record": "https://github.com/unionai-oss/pandera",
+      "pin_of_record": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "pin_source": "catalogs/us-equities/data-research.json:997",
+      "source_commit": "62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "source_pinned_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/unionai-oss/pandera",
+        "repository_endpoint": "https://api.github.com/repos/unionai-oss/pandera",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/unionai-oss/pandera/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.33.1",
+        "latest_release_published_at": "2026-09-01T15:20:20Z",
+        "latest_release_url": "https://github.com/unionai-oss/pandera/releases/tag/v0.33.1",
+        "upgrade_accepted": false,
+        "recorded_release_check": {
+          "endpoint": "repos/unionai-oss/pandera/releases/tags/v0.33.1",
+          "exit_code": 0,
+          "tag": "v0.33.1",
+          "prerelease": false,
+          "url": "https://github.com/unionai-oss/pandera/releases/tag/v0.33.1"
+        }
+      },
+      "verdict": "Provisional pandas schema validation; native unit-test target is sourced but unexecuted. Schemas cannot independently establish provider truth, rights or historical availability.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+          "sha256": "cbe2f43b6dba825ebf0bfee73e12d48f490b103da9c346c005d90e1010c53847",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/pyproject.toml",
+          "sha256": "30cb9310adad8d0ea1465f151e484236c5cb241637e4c561a2e715bcf3890ccb",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/Makefile",
+          "sha256": "018dc350c320c6abee05e7f9dd0dd04fb54acf810a771d71ef37d12edfcf43b8",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/LICENSE.txt",
+          "sha256": "142d0a4e2b2ade63e1d3f85d8289865f729397aafeec9afced01877826c54640",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/ci-tests.yml",
+          "source_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/.github/workflows/ci-tests.yml",
+          "sha256": "38c3912450a2a79d2e6f5b4f1ae4fcdc603a585bcaf8d606ebfc0a0d4d0983b3",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk python -m pip install 'pandera[pandas]==0.33.1'",
+        "source": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Supported native entrypoint; freeze exact checkout/package and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+          "upstream_document_line": 47,
+          "upstream_document_line_url": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md#L47",
+          "upstream_documented_command": "pip install 'pandera[pandas]'",
+          "source_sha256": "cbe2f43b6dba825ebf0bfee73e12d48f490b103da9c346c005d90e1010c53847",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:997",
+          "recorded_source_commit": "62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+          "command_in_record": "rtk python -m pip install 'pandera[pandas]==0.33.1'",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make unit-tests",
+        "source": "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/Makefile",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Runs native tests/core and tests/pandas"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "lakeFS",
+      "repository": "https://github.com/treeverse/lakeFS",
+      "repository_of_record": "https://github.com/treeverse/lakefs",
+      "pin_of_record": "server v1.86.0; Python wrapper 0.16.0; source 36fad6476e23c118b91247523a0c7fb045cead4e",
+      "pin_source": "catalogs/us-equities/data-research.json:747",
+      "source_commit": "36fad6476e23c118b91247523a0c7fb045cead4e",
+      "source_pinned_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/treeverse/lakeFS",
+        "repository_endpoint": "https://api.github.com/repos/treeverse/lakefs",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/treeverse/lakefs/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v1.87.0",
+        "latest_release_published_at": "2026-09-22T14:26:14Z",
+        "latest_release_url": "https://github.com/treeverse/lakeFS/releases/tag/v1.87.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional snapshot service. Recorded v1.86.0 Apache-2.0 differs materially from current v1.87.0 BSL-1.1 and changed IAM/ACL scope; no restore trial or upgrade is accepted.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md",
+          "sha256": "8f6c248a58c56f774704b5ffe4f84c0f92ad2a267aa1557e94dd558bc6d8e83c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "go.mod",
+          "source_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/go.mod",
+          "sha256": "ef27309e435c4a92e93ebafe1a82b11457761dc6994152888e86a07b7887ac16",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/Makefile",
+          "sha256": "ce2c9a6c26d34c291108237624591473023a1cec939dc6770fc831406b39a0f1",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/LICENSE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install lakefs",
+        "source": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md#L34",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md",
+          "upstream_document_line": 34,
+          "upstream_document_line_url": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md#L34",
+          "upstream_documented_command": "pip install lakefs",
+          "source_sha256": "8f6c248a58c56f774704b5ffe4f84c0f92ad2a267aa1557e94dd558bc6d8e83c",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:747",
+          "recorded_source_commit": "36fad6476e23c118b91247523a0c7fb045cead4e",
+          "command_in_record": "rtk pip install lakefs",
+          "scope": "README pip install lakefs installs the Python client/quickstart helper, not acceptance of server v1.86.0 or v1.87.0. Server and client package identity must be qualified independently."
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/Makefile#L171",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files",
+      "focused_current_or_acceptance_pin_review": {
+        "source_commit": "358544dd7184fa972b0aa7862372366960511422",
+        "sources": [
+          {
+            "path": "README.md",
+            "source_url": "https://github.com/treeverse/lakefs/blob/358544dd7184fa972b0aa7862372366960511422/README.md",
+            "sha256": "9be184df7d48a99f7fadc15fd4abfa4aeaaa10e18882d34b952f56b1fa9e45b8",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "LICENSE",
+            "source_url": "https://github.com/treeverse/lakefs/blob/358544dd7184fa972b0aa7862372366960511422/LICENSE",
+            "sha256": "f2a08ee5c7cbe51f6cbdda08f470e05a5a355943073010dc9ade988ed6485bf5",
+            "native_gh_exit_code": 0
+          },
+          {
+            "path": "Makefile",
+            "source_url": "https://github.com/treeverse/lakefs/blob/358544dd7184fa972b0aa7862372366960511422/Makefile",
+            "sha256": "2525025203a9d8319f92f1723929fe2977dcfc5618602238f1a333ced193cb45",
+            "native_gh_exit_code": 0
+          }
+        ],
+        "acceptance": "not_run"
+      }
+    },
+    {
+      "name": "yfinance",
+      "repository": "https://github.com/ranaroussi/yfinance",
+      "repository_of_record": "https://github.com/ranaroussi/yfinance",
+      "pin_of_record": "1.7.0; source 3d9d2f0cacb662bff689874cd6113bae3a30a885",
+      "pin_source": "catalogs/us-equities/data-research.json:283",
+      "source_commit": "3d9d2f0cacb662bff689874cd6113bae3a30a885",
+      "source_pinned_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/ranaroussi/yfinance",
+        "repository_endpoint": "https://api.github.com/repos/ranaroussi/yfinance",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/ranaroussi/yfinance/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "1.7.0",
+        "latest_release_published_at": "2026-08-26T17:23:40Z",
+        "latest_release_url": "https://github.com/ranaroussi/yfinance/releases/tag/1.7.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional convenience/discovery source. Client source and disclaimers do not replace licensed provider acquisition and original-availability reconciliation.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md",
+          "sha256": "bccd83214103e1ecd3ebd397e5fe50e0f687d0876bcdbd4a59df39b2c7c7d1d0",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/pyproject.toml",
+          "sha256": "df08625c318a390a31de78d9eab0b726916673e08ff7f5b1683c44030250ff84",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/CONTRIBUTING.md",
+          "sha256": "16005289da5b0dc128d69f8013c28e6d0041624c37214ed8c43d2d6a4f6ed9f5",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install yfinance",
+        "source": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md#L53",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md",
+          "upstream_document_line": 53,
+          "upstream_document_line_url": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md#L53",
+          "upstream_documented_command": "pip install yfinance",
+          "source_sha256": "bccd83214103e1ecd3ebd397e5fe50e0f687d0876bcdbd4a59df39b2c7c7d1d0",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:283",
+          "recorded_source_commit": "3d9d2f0cacb662bff689874cd6113bae3a30a885",
+          "command_in_record": "rtk pip install yfinance",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m pytest tests",
+        "source": "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/pyproject.toml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_pytest_configuration; dependencies and selected tests must be frozen before execution; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "pandas exact timestamp support",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "repository_of_record": "https://github.com/pandas-dev/pandas",
+      "pin_of_record": "3.0.6",
+      "pin_source": "manifests/stack.json:1470",
+      "source_commit": "2905718b126579d2cf0fe5bae05bd75facb67d77",
+      "source_pinned_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/pandas-dev/pandas",
+        "repository_endpoint": "https://api.github.com/repos/pandas-dev/pandas",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/pandas-dev/pandas/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v3.0.6",
+        "latest_release_published_at": "2026-09-17T21:32:36Z",
+        "latest_release_url": "https://github.com/pandas-dev/pandas/releases/tag/v3.0.6",
+        "upgrade_accepted": false
+      },
+      "verdict": "Exact-type support context; freeze integer nanoseconds, decimal/null and timezone metadata through Arrow/Parquet/DuckDB. Displayed timestamps and package identity are insufficient.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md",
+          "sha256": "ca9cf77f319c4c6bab1cfa27e0bf0f7858258fff9e92dd8b7e43e54bea8eec7f",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/pyproject.toml",
+          "sha256": "1082aa877fa2e0902249287086041d95bd814fd678347625a3d04f9f411bce5e",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "setup.py",
+          "source_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/setup.py",
+          "sha256": "f587a75ce790617cb31a11937ebe7577052f64883778e16d9c64fff513f23446",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/LICENSE",
+          "sha256": "9850f6b5bdef7346503065807b878deb8058b976c5c329f4c4d23bf4796ce9ae",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install pandas",
+        "source": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md#L108",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md",
+          "upstream_document_line": 108,
+          "upstream_document_line_url": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md#L108",
+          "upstream_documented_command": "pip install pandas",
+          "source_sha256": "ca9cf77f319c4c6bab1cfa27e0bf0f7858258fff9e92dd8b7e43e54bea8eec7f",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "manifests/stack.json:1470",
+          "recorded_source_commit": "2905718b126579d2cf0fe5bae05bd75facb67d77",
+          "command_in_record": "rtk pip install pandas",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": null,
+        "source": "https://github.com/pandas-dev/pandas/blob/2905718b126579d2cf0fe5bae05bd75facb67d77/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No applicable executable native test target established in the listed files; no claim that the full upstream project lacks tests"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-feast",
+      "repository": "https://github.com/feast-dev/feast",
+      "repository_of_record": "https://github.com/feast-dev/feast",
+      "pin_of_record": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+      "pin_source": "catalogs/us-equities/data-research.json:953",
+      "source_commit": "1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+      "source_pinned_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/feast-dev/feast",
+        "repository_endpoint": "https://api.github.com/repos/feast-dev/feast",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/feast-dev/feast/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.66.0",
+        "latest_release_published_at": "2026-08-21T03:31:12Z",
+        "latest_release_url": "https://github.com/feast-dev/feast/releases/tag/v0.66.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional feature-history joins; point-in-time joins need established availability clocks and cannot manufacture original provider publication history.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+          "sha256": "c150196258165066e5ac8509f665998bec5aeb14a442b76866586ad16b079066",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/pyproject.toml",
+          "sha256": "7398783515594e395b965203be7debb6fbf58a26d860ed5500b4dff0cd0099d3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/Makefile",
+          "sha256": "3b2ba919ccaa1dd8a29f6aeda7024fe63aa22062ad48b9576f877f486b9dfff3",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install feast",
+        "source": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md#L49",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+          "upstream_document_line": 49,
+          "upstream_document_line_url": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md#L49",
+          "upstream_documented_command": "pip install feast",
+          "source_sha256": "c150196258165066e5ac8509f665998bec5aeb14a442b76866586ad16b079066",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:953",
+          "recorded_source_commit": "1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+          "command_in_record": "rtk pip install feast",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk make test",
+        "source": "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/Makefile#L51",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_make_target; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-dlt",
+      "repository": "https://github.com/dlt-hub/dlt",
+      "repository_of_record": "https://github.com/dlt-hub/dlt",
+      "pin_of_record": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+      "pin_source": "catalogs/us-equities/data-research.json:662",
+      "source_commit": "a2f4a21e22e5c266278271b6591c70dbc485aea8",
+      "source_pinned_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/dlt-hub/dlt",
+        "repository_endpoint": "https://api.github.com/repos/dlt-hub/dlt",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/dlt-hub/dlt/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "1.30.0",
+        "latest_release_published_at": "2026-08-11T13:23:00Z",
+        "latest_release_url": "https://github.com/dlt-hub/dlt/releases/tag/1.30.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional ingestion/schema evolution; no provider-specific pagination/revision/as-of comparison exists against the retained acquisition.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+          "sha256": "9b78d3252d37dd380602779b25c348bf50e02addfef6702863de0471176a143a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/pyproject.toml",
+          "sha256": "1ec1e9ad1f607203524aef4253eae5b5c62d8a7a303e2492e833c6ce795558c2",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "Makefile",
+          "source_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/Makefile",
+          "sha256": "6f4226d6534e6e8e95c4307c52f1370f3a3cabb534ef6827c604b802b454d77d",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE.txt",
+          "source_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/LICENSE.txt",
+          "sha256": "3bd68ce12f57c10e265b3d19b3251efa5aa40f780f590bc8bb7b1c83f85854ca",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install dlt",
+        "source": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md#L37",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+          "upstream_document_line": 37,
+          "upstream_document_line_url": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md#L37",
+          "upstream_documented_command": "pip install dlt",
+          "source_sha256": "9b78d3252d37dd380602779b25c348bf50e02addfef6702863de0471176a143a",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:662",
+          "recorded_source_commit": "a2f4a21e22e5c266278271b6591c70dbc485aea8",
+          "command_in_record": "rtk pip install dlt",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk uv run pytest \\",
+        "source": "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/Makefile#L112",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-gdeltdoc",
+      "repository": "https://github.com/alex9smith/gdelt-doc-api",
+      "repository_of_record": "https://github.com/alex9smith/gdelt-doc-api",
+      "pin_of_record": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+      "pin_source": "catalogs/us-equities/data-research.json:1392",
+      "source_commit": "f2e500144b0a6090d63723f94453b32717e5fd23",
+      "source_pinned_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/alex9smith/gdelt-doc-api",
+        "repository_endpoint": "https://api.github.com/repos/alex9smith/gdelt-doc-api",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/alex9smith/gdelt-doc-api/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "1.12.0",
+        "latest_release_published_at": "2025-04-03T09:01:15Z",
+        "latest_release_url": "https://github.com/alex9smith/gdelt-doc-api/releases/tag/1.12.0",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional event/news lead source; no matched licensed US-equity event or historical availability acceptance exists.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+          "sha256": "e0cd927d9ef695151149e66a24d47e329bd8dea6d220fac46189b06ad6dfab85",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "setup.py",
+          "source_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/setup.py",
+          "sha256": "4c5aa24ecdb58f71d847dcdbdbc8860fc277796cd739eb4f5ae7a5e869d8dac1",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/LICENSE",
+          "sha256": "cbb33aa236ed00bcd86fd8fe82dbcd66d10156306ac4d9cae74c6c659a7dc7a1",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/test.yml",
+          "source_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/.github/workflows/test.yml",
+          "sha256": "cfae3ea7dd30fa28b65c493807a5a8ab920815dae93a920cb0a9d8a2568be8ec",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install gdeltdoc",
+        "source": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md#L12",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+          "upstream_document_line": 12,
+          "upstream_document_line_url": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md#L12",
+          "upstream_documented_command": "pip install gdeltdoc",
+          "source_sha256": "e0cd927d9ef695151149e66a24d47e329bd8dea6d220fac46189b06ad6dfab85",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:1392",
+          "recorded_source_commit": "f2e500144b0a6090d63723f94453b32717e5fd23",
+          "command_in_record": "rtk pip install gdeltdoc",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python -m unittest",
+        "source": "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md#L118",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-fredapi",
+      "repository": "https://github.com/mortada/fredapi",
+      "repository_of_record": "https://github.com/mortada/fredapi",
+      "pin_of_record": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+      "pin_source": "catalogs/us-equities/data-research.json:1433",
+      "source_commit": "bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+      "source_pinned_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/mortada/fredapi",
+        "repository_endpoint": "https://api.github.com/repos/mortada/fredapi",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/mortada/fredapi/releases/latest",
+        "latest_release_exit_code": 0,
+        "latest_release_tag": "v0.5.2",
+        "latest_release_published_at": "2024-05-05T11:44:41Z",
+        "latest_release_url": "https://github.com/mortada/fredapi/releases/tag/v0.5.2",
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional macro-vintage source; native API/test entrypoints are sourced, but no acquisition or equity-factor experiment occurred here.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+          "sha256": "6adb21cad843829bf65803790a2abd73db970183908f3f0018b3341e75edeb2e",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "setup.py",
+          "source_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/setup.py",
+          "sha256": "7deebfb57d0ddf04282c8118a082961ead6d8cf5efeeb037db4227ec113894a4",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/LICENSE",
+          "sha256": "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": ".github/workflows/main.yml",
+          "source_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/.github/workflows/main.yml",
+          "sha256": "99cccf8112970e5a1e18fb94f2a836a2a18398e748a9dfad3ab265174850e018",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install fredapi",
+        "source": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md#L19",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+          "upstream_document_line": 19,
+          "upstream_document_line_url": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md#L19",
+          "upstream_documented_command": "pip install fredapi",
+          "source_sha256": "6adb21cad843829bf65803790a2abd73db970183908f3f0018b3341e75edeb2e",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/us-equities/data-research.json:1433",
+          "recorded_source_commit": "bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+          "command_in_record": "rtk pip install fredapi",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk coverage run --source fredapi.fred fredapi/tests/test_fred.py",
+        "source": "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/.github/workflows/main.yml",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Historical CI permits failure for this step"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "data-kafka",
+      "repository": "https://github.com/apache/kafka",
+      "repository_of_record": "https://github.com/apache/kafka",
+      "pin_of_record": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+      "pin_source": "catalogs/us-equities/data-research.json:574",
+      "source_commit": "26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+      "source_pinned_url": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/apache/kafka",
+        "repository_endpoint": "https://api.github.com/repos/apache/kafka",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/apache/kafka/releases/latest",
+        "latest_release_exit_code": 1,
+        "latest_release_tag": null,
+        "latest_release_published_at": null,
+        "latest_release_url": null,
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional durable event log; preserving observed order does not prove original availability, rights or permanent security identity.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+          "sha256": "494ca680332f964fb2fe4faa5f0588cb050ec7f1f89a3c2c7a66f47d0b298dd0",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/CONTRIBUTING.md",
+          "sha256": "a54694de100e819b2d35fb348d2582ef0960484cf705a9a9c32cc1c871d8a445",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": null,
+        "source": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption",
+        "upstream_document_binding": {
+          "status": "not_found_in_reviewed_files",
+          "documents_reviewed": [
+            "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+            "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/CONTRIBUTING.md"
+          ],
+          "scope": "No exact native installation command established in the listed pinned files; bounded install-documentation follow-up required before adoption"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk ./gradlew test",
+        "source": "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md#L51",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "atilaahmettaner/tradingview-mcp",
+      "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "repository_of_record": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "pin_of_record": "not recorded; source reviewed at a1e54b07e5c21b375363607920f297c5adfbeed4",
+      "pin_source": "catalogs/landscape/us-equities.json:367; no catalog version recorded; reviewed immutable source is not an adopted pin",
+      "source_commit": "a1e54b07e5c21b375363607920f297c5adfbeed4",
+      "source_pinned_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md",
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "method": "native gh api; source metadata only",
+        "canonical_repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+        "repository_endpoint": "https://api.github.com/repos/atilaahmettaner/tradingview-mcp",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_endpoint": "https://api.github.com/repos/atilaahmettaner/tradingview-mcp/releases/latest",
+        "latest_release_exit_code": 1,
+        "latest_release_tag": null,
+        "latest_release_published_at": null,
+        "latest_release_url": null,
+        "upgrade_accepted": false
+      },
+      "verdict": "Conditional MCP discovery surface; exact source resolves despite release-endpoint 404. No licensed/reconciled market-data acceptance is available.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md",
+          "sha256": "2a74d6b86b861082528549c88454add90a6b165c3dd77bac671216d58046f9ad",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/pyproject.toml",
+          "sha256": "c740094e86b798799ef9826803cc2a041164185cda4a281a632be6a4d18d5fb9",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "source_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/CONTRIBUTING.md",
+          "sha256": "29c53fe425d89f0c157588cecc1b184c95838479a9f7c90913e6ab46b5e62901",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/LICENSE",
+          "sha256": "d1496da72184ceb868048480b9e972fa34dab844b156c21e5f1aa9483d834351",
+          "native_gh_exit_code": 0
+        }
+      ],
+      "native_install": {
+        "command": "rtk pip install tradingview-mcp-server",
+        "source": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md#L146",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Documented native entrypoint; freeze exact package/checkout and prerequisites before future execution",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md",
+          "upstream_document_line": 146,
+          "upstream_document_line_url": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/README.md#L146",
+          "upstream_documented_command": "pip install tradingview-mcp-server",
+          "source_sha256": "2a74d6b86b861082528549c88454add90a6b165c3dd77bac671216d58046f9ad",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "catalogs/landscape/us-equities.json:367; no catalog version recorded; reviewed immutable source is not an adopted pin",
+          "recorded_source_commit": "a1e54b07e5c21b375363607920f297c5adfbeed4",
+          "command_in_record": "rtk pip install tradingview-mcp-server",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk uv run pytest",
+        "source": "https://github.com/atilaahmettaner/tradingview-mcp/blob/a1e54b07e5c21b375363607920f297c5adfbeed4/CONTRIBUTING.md#L52",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "upstream_documented_command; freeze safe subset/prerequisites; not financial/provider/GPU acceptance"
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown",
+      "review_depth": "Identity, immutable source, listed build/license/test surface and release metadata; capability review is limited to listed files"
+    },
+    {
+      "name": "Stanford EDGAR Filings Dataset parser (SEFD)",
+      "repository": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset",
+      "pin_of_record": "ff2828c13978067d306eed4b4c48d7ae3073706a",
+      "pin_source": "new source review; no catalog adoption",
+      "source_commit": "ff2828c13978067d306eed4b4c48d7ae3073706a",
+      "source_pinned_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/README.md",
+      "verdict": "Conditional parser challenger for layout-faithful MultiMarkdown and financial table integrity on already-held SEC bytes. June 2026 primary paper and pinned code establish a missing table-fidelity comparison capability, not measured superiority on this stack. Mistral/Playwright dependencies require a fixed provider-free path before comparison. No installation, corpus download, model or adoption occurred.",
+      "sources": [
+        {
+          "path": "README.md",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/README.md",
+          "sha256": "90a67a81c09022de6b661e00a90f1fa9dd30c474514e55214a0b60c85d29863c",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "pyproject.toml",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/pyproject.toml",
+          "sha256": "cca4d6bb5e4d8366fa9023ece3f44fd6ca46e8e6dfa4da9c146ca9266e496455",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/package.json",
+          "sha256": "74962c0e588107555c02721291c96d37d8a608f4b379ba98644a2034f8825b9b",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/LICENSE",
+          "sha256": "3d8ef536a67de06ab998373d532d36453f29a9e94ecac1cd5ef5b21650de0e3a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "stanford_edgar_parser/__main__.py",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/stanford_edgar_parser/__main__.py",
+          "sha256": "54cea7ab0511947247c2604b4ca9e6876e78996033df4506cee4f3baed67524a",
+          "native_gh_exit_code": 0
+        },
+        {
+          "path": "stanford_edgar_parser/mcp_server.py",
+          "source_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/stanford_edgar_parser/mcp_server.py",
+          "sha256": "87cf825b7a1942aa8906a34209e8228fc87cdceb744e422b7df810c239c5b3e6",
+          "native_gh_exit_code": 0
+        },
+        {
+          "source_url": "https://arxiv.org/abs/2606.18192",
+          "kind": "primary_paper",
+          "scope": "Paper claims are not our measured results"
+        }
+      ],
+      "upstream_currency": {
+        "checked_at": "2026-10-01",
+        "repository_exit_code": 0,
+        "archived": false,
+        "latest_release_exit_code": 1,
+        "head_source_commit": "ff2828c13978067d306eed4b4c48d7ae3073706a",
+        "package_version_in_source": "0.1.3",
+        "upgrade_accepted": false
+      },
+      "native_install": {
+        "command": "rtk python -m pip install stanford-edgar-parser",
+        "source": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/README.md",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Official package recipe; exact source/version and provider-free scope need freezing before installation",
+        "upstream_document_binding": {
+          "status": "verified_native_source",
+          "upstream_document_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/README.md",
+          "upstream_document_line": 26,
+          "upstream_document_line_url": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/README.md#L26",
+          "upstream_documented_command": "pip install stanford-edgar-parser",
+          "source_sha256": "90a67a81c09022de6b661e00a90f1fa9dd30c474514e55214a0b60c85d29863c",
+          "native_gh_exit_code": 0,
+          "match_kind": "documented_command"
+        },
+        "recipe_pin_binding": {
+          "pin_source": "new source review; no catalog adoption",
+          "recorded_source_commit": "ff2828c13978067d306eed4b4c48d7ae3073706a",
+          "command_in_record": "rtk python -m pip install stanford-edgar-parser",
+          "scope": "Version pins, rtk prefix and Python module invocation are review/recipe adaptations of the cited native upstream entrypoint; no install was run"
+        }
+      },
+      "native_acceptance": {
+        "command": "rtk python tools/check_showcase_tables.py <frozen_local_paths>",
+        "source": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset/blob/ff2828c13978067d306eed4b4c48d7ae3073706a/stanford_edgar_parser/mcp_server.py",
+        "evidence_class": "source_review",
+        "execution_in_this_wave": "not_run",
+        "scope": "Repository-only MCP handler invokes this native checker. Checker implementation/provider-free case matrix requires focused follow-up; not unchanged upstream tests or parsed financial acceptance."
+      },
+      "evidence_class": "source_review",
+      "new_host_acceptance": "unknown"
+    }
+  ],
+  "corrections": [
+    {
+      "prior_claim_or_scope": "Treating current lakeFS as the Apache-2.0 v1.86.0 alternative",
+      "correction": "Preserve recorded v1.86.0 Apache-2.0 source as historical. Native gh release v1.87.0 and its immutable LICENSE show BSL-1.1 and changed IAM/ACL scope; this is a distinct conditional adoption decision.",
+      "deciding_source": [
+        "https://github.com/treeverse/lakeFS/releases/tag/v1.87.0",
+        "https://github.com/treeverse/lakefs/blob/358544dd7184fa972b0aa7862372366960511422/LICENSE",
+        "https://github.com/treeverse/lakefs/blob/36fad6476e23c118b91247523a0c7fb045cead4e/LICENSE"
+      ],
+      "acceptance_scope": "Source correction only; no existing catalog choice or host adoption changed"
+    },
+    {
+      "prior_claim_or_scope": "Historical OpenBB repository name or ODP release label is current Python package identity",
+      "correction": "Native repository API resolves OpenBB-finance/OpenBB to openbq-org/OpenBB. Preserve historical source commit. PyPI openbb 5.0.0 is distinct from the ODP GitHub release label.",
+      "deciding_source": [
+        "https://api.github.com/repos/OpenBB-finance/OpenBB",
+        "https://pypi.org/pypi/openbb/json",
+        "https://github.com/openbb-finance/openbb/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md"
+      ],
+      "acceptance_scope": "Source correction only; no existing catalog choice or host adoption changed"
+    },
+    {
+      "prior_claim_or_scope": "Databento alternative has only a README-supported revision claim",
+      "correction": "Exact corporate API and unchanged tests at recorded 0.86.0 and current 0.87.0 expose pit=True and ts_record indexing. Default pit=False drops duplicates to latest ts_record. This is source-demonstrated revision retention, not provider data/rights/original-availability acceptance.",
+      "deciding_source": [
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/reference/api/corporate.py",
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/tests/test_reference_corporate.py",
+        "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/databento/reference/api/corporate.py",
+        "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/tests/test_reference_corporate.py"
+      ],
+      "acceptance_scope": "Source correction only; no existing catalog choice or host adoption changed"
+    }
+  ],
+  "evidence_assessment": [
+    {
+      "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+      "sha256": "ad49cf581b4add46de77bb717d3e2d9dcae0c5b44a08cc7b831a2922361ca657",
+      "evidence_class": "historical_native_execution_with_local_bridge",
+      "finding": "25 AAPL RAW bars/3 pages and two actions/2 pages; five HTTP 200, terminal pagination. Bars 25/25 equal, max difference 0.00; actions incomplete with one unknown currency. Original historical availability not established. Pagination/provenance/private transport seams are local integration.",
+      "rerun_in_this_wave": false,
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+      "sha256": "79dcaad87740e7f0f1e17cd0244164fd0a29764ba393b2eee39b1ed8dbf32615",
+      "evidence_class": "historical_native_acquisition_and_project_availability_gate",
+      "finding": "Native get_filings/to_context retained 371 memberships/360 accessions and five headers. Historical cutoff eligible=0, local-observation cutoff eligible=5. Contact, timing and retry differ from earlier failed run; no single-cause attribution.",
+      "rerun_in_this_wave": false,
+      "new_host_acceptance": "unknown"
+    },
+    {
+      "path": "blueprints/us-equities/data/receipt.json",
+      "sha256": "9a2338f3d064571c6f60a5b9a15c618252b281fd9df84349340d07abe8b7d75c",
+      "evidence_class": "historical_native_analytical_execution",
+      "finding": "XNYS 2013-10-07 open 13:30 UTC/close 20:00 UTC; bounded Decimal/Parquet summary does not validate every calendar, provider or corporate action.",
+      "rerun_in_this_wave": false,
+      "new_host_acceptance": "unknown"
+    }
+  ],
+  "failed_access": [
+    {
+      "repository": "https://github.com/apache/kafka",
+      "operation": "native gh api releases/latest",
+      "command": "rtk gh api repos/apache/kafka/releases/latest",
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n",
+      "impact": "Repository/exact source succeeded. Endpoint failure does not establish no releases, packages or capability."
+    },
+    {
+      "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "operation": "native gh api releases/latest",
+      "command": "rtk gh api repos/atilaahmettaner/tradingview-mcp/releases/latest",
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n",
+      "impact": "Repository/exact source succeeded. Endpoint failure does not establish no releases, packages or capability."
+    },
+    {
+      "repository": "https://github.com/Stanford-Advanced-FinTech-Lab-SAFTL/stanford-edgar-filings-dataset",
+      "operation": "native gh api releases/latest",
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n",
+      "impact": "Exact source/package metadata resolved; release endpoint success not claimed."
+    },
+    {
+      "operation": "official Massive docs fetch",
+      "source": "https://docs.massive.com/rest/stocks/tickers/all-tickers",
+      "returned_error": "DEPTH_ZERO_SELF_SIGNED_CERT",
+      "recovery_source": "https://massive.com/docs/rest/stocks/tickers/all-tickers",
+      "impact": "Official alternate hostname fetched; no TLS bypass."
+    },
+    {
+      "operation": "Databento technical docs fetch",
+      "source": "https://databento.com/docs/api-reference-reference/basics/symbology",
+      "returned_output_scope": "Initial HTML exposed a small JavaScript shell, not complete technical reference",
+      "recovery_source": [
+        "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/databento/reference/api/corporate.py",
+        "https://github.com/databento/databento-python/blob/25eef4ee8e66559e2370166a57c20925ce244d49/tests/test_reference_corporate.py"
+      ],
+      "impact": "Exact API/tests and primary web-indexed reference support narrow pit/ts_record claim; full rendered docs coverage not claimed."
+    }
+  ],
+  "omissions": [
+    {
+      "scope": "Candidate coverage",
+      "finding": "Every named candidate/alternative/winner has repository identity, exact source resolution and listed file review. Inherited group candidates remain comparison context.",
+      "named_repository_count": 22
+    },
+    {
+      "scope": "Installed capability",
+      "finding": "Only bounded Inspect 0.3.266/Dagu 2.16.6 identity and Inspect retry help were retained now. Component-isolated environments/new host were not audited; not found in one PATH/interpreter is not absent host-wide."
+    },
+    {
+      "scope": "Native acceptance",
+      "finding": "Install/test commands are unexecuted prospective upstream entrypoints. Historical returned native results remain dated/scoped; repository validation only establishes declared structural consistency."
+    },
+    {
+      "scope": "Financial/provider/GPU/broker",
+      "finding": "No market data/weights downloaded, provider evaluation, GPU run, broker session/orders, sign-in or credential reads performed. Missing availability, universe and provider/GPU usage remain unknown."
+    },
+    {
+      "scope": "Bounded upstream command documentation",
+      "candidates": [
+        {
+          "repository": "https://github.com/ClickHouse/ClickHouse",
+          "native_install_command_established": false,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/pandas-dev/pandas",
+          "native_install_command_established": true,
+          "native_test_command_established": false,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        },
+        {
+          "repository": "https://github.com/apache/kafka",
+          "native_install_command_established": false,
+          "native_test_command_established": true,
+          "scope": "Bounded listed source files only; no universal absence claim or promotion"
+        }
+      ]
+    }
+  ],
+  "next_wave": [
+    "Freeze already-held source bytes and predeclare independent outputs for bar/action revisions, ts_record/as-of cutoffs, numeric reconciliation and rename/reuse/delist cases. A Databento pit=True arm needs authorized native entitlement/data; unavailable data remain unknown, never an empty-data pass.",
+    "Compare EdgarTools and pinned SEFD on identical already-held SEC documents for numeric/table fidelity and source linkage through a fixed provider-free path. Retain failures/resources; no new corpus download is required to design this comparison."
+  ],
+  "reopen_on": [
+    "A retained native provider arm closes revision/original-availability and action-currency gaps on identical frozen cases.",
+    "A maintained parser measurably improves financial table/numeric/source-link fidelity on identical files.",
+    "Selected transport/source identity or rights change."
+  ],
+  "new_host_acceptance": "unknown",
+  "review_scope": {
+    "named_repository_count": 22,
+    "all_named_repository_identity_checks_exit_zero": true,
+    "all_named_recorded_source_resolutions_exit_zero": true,
+    "exact_source_files_reviewed_for_named_repositories": 102,
+    "source_review_depth": "Only listed immutable files and release metadata; breadth is not full implementation review or measured candidate superiority",
+    "research_wave": "One bounded primary-source wave; no saturation/full C4 closure",
+    "runtime_target": "catalogs/us-equities/runtime-target.json; NautilusTrader 2.0.0rc5/IBKR plus separate Alpaca adapter",
+    "catalog_choices_changed": false
+  },
+  "new_host_image_target": {
+    "image_of_record": "Ubuntu 24.04.5 LTS",
+    "source": "Coordinator instruction referencing PR #569",
+    "candidate_only": "Ubuntu 26.04.1 LTS",
+    "acceptance": "unknown; no new distribution exists"
+  }
+}

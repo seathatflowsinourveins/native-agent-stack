@@ -1,0 +1,169 @@
+{
+  "layers": [
+    {
+      "layer_id": "durable-memory",
+      "selection": [
+        {
+          "name": "C08 — agentmemory (rohitg00)",
+          "repository": "https://github.com/rohitg00/agentmemory",
+          "role": "Unranked, provisional finalist for the sole memory owner.",
+          "install_command": "npx -y @agentmemory/agentmemory@latest",
+          "install_source": "https://github.com/rohitg00/agentmemory",
+          "basis": [
+            {
+              "url": "https://github.com/rohitg00/agentmemory",
+              "shows": "Documents shared Claude/Codex hooks and MCP, handoffs, lessons, provenance inspection, deletion with an audit trail, export/import and snapshots. Explicitly documents Linux x86_64, WSL2 and macOS arm64. Default BM25 retrieval needs no GPU."
+            },
+            {
+              "url": "https://github.com/rohitg00/agentmemory",
+              "shows": "Reports LongMemEval-S retrieval R@5 of 95.2% over 500 questions and 86.2% with BM25 fallback, plus a passing-test badge. Raw results and CI runs were not inspected; these claims do not establish comparative superiority or complete recovery."
+            }
+          ],
+          "confidence": "low"
+        },
+        {
+          "name": "C04 — agent-memory (tigerless-labs)",
+          "repository": "https://github.com/tigerless-labs/agent-memory",
+          "role": "Unranked, provisional finalist for the sole memory owner.",
+          "install_command": "git clone https://github.com/tigerless-labs/agent-memory.git\ncd agent-memory\nuv sync --all-packages\nexport PATH=\"$PWD/.venv/bin:$PATH\"\nmem init\nmem setup --host claude-code\nmem setup --host codex",
+          "install_source": "https://github.com/tigerless-labs/agent-memory",
+          "basis": [
+            {
+              "url": "https://github.com/tigerless-labs/agent-memory",
+              "shows": "Documents one Claude/Codex store, project-scoped decisions, authoritative Markdown, disposable SQLite indexes and archived source traces. Deletion ends current validity while preserving historical records; index rebuilding is documented. This establishes auditability, not permanent erasure or tested disaster recovery."
+            },
+            {
+              "url": "https://github.com/tigerless-labs/agent-memory",
+              "shows": "Reports a bounded 120-episode evaluation with two replays: 127/240 versus MemCore's 86/240, and passing checks for nine ordered cross-client writer-reader pairs. Documents pytest, Ruff and mypy commands. Requires Python 3.12+ and uv; exact target-platform CI remains unverified. MIT license."
+            }
+          ],
+          "confidence": "low"
+        },
+        {
+          "name": "C15 — Basic Memory",
+          "repository": "https://github.com/basicmachines-co/basic-memory",
+          "role": "Unranked, provisional finalist for the sole memory owner.",
+          "install_command": "uv tool install basic-memory --prerelease=allow",
+          "install_source": "https://github.com/basicmachines-co/basic-memory",
+          "basis": [
+            {
+              "url": "https://github.com/basicmachines-co/basic-memory",
+              "shows": "Documents authoritative Markdown, scoped projects, shared Claude/Codex MCP access, inspectable writes and deletion tools. Its Claude plugin supplies session briefings and compaction checkpoints. Local backup is user-managed; reindexing and consistency checks are documented."
+            },
+            {
+              "url": "https://github.com/basicmachines-co/basic-memory",
+              "shows": "Documents SQLite/Postgres test suites and agent-package checks, without verified current CI results or comparable recall measurements. Python/uv installation is documented; WSL2 and macOS arm64 execution were not verified. The current install requires a transitive prerelease. AGPL-3.0 license."
+            }
+          ],
+          "confidence": "low"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C12",
+          "name": "memos",
+          "reason": "Insufficient retrieved primary evidence to judge native-client integration, lifecycle operations or target-host installation; no adverse capability conclusion is justified."
+        },
+        {
+          "key": "C09",
+          "name": "langmem",
+          "reason": "Upstream excerpts describe framework memory primitives; shared native-client capture and complete deletion/recovery remain unverified. [README](https://github.com/langchain-ai/langmem/blob/main/README.md)"
+        },
+        {
+          "key": "C11",
+          "name": "Letta Code",
+          "reason": "Documents a stateful harness and Git-tracked memory, but interoperability with existing native Claude/Codex sessions remains unverified. [README](https://github.com/letta-ai/letta-code)"
+        },
+        {
+          "key": "C01",
+          "name": "Mem0",
+          "reason": "Upstream explicitly attributes its prominent benchmark scores to managed-platform optimizations unavailable in the OSS SDK; complete self-hosted native-client lifecycle remains unverified. [README](https://github.com/mem0ai/mem0)"
+        },
+        {
+          "key": "C07",
+          "name": "Claude-mem",
+          "reason": "Documents both clients, capture and inspection, but deletion semantics and isolated restore were not verified. [README](https://github.com/thedotmack/claude-mem)"
+        },
+        {
+          "key": "C13",
+          "name": "letta",
+          "reason": "Its own upstream source was not retrieved sufficiently to establish this layer's native-client and lifecycle fit."
+        },
+        {
+          "key": "C14",
+          "name": "Supermemory",
+          "reason": "Indexed upstream documentation suggests shared plugins and local storage, but full lifecycle behavior and OSS service boundaries were not sufficiently inspected. [Local quickstart](https://github.com/supermemoryai/supermemory/blob/main/apps/docs/self-hosting/quickstart.mdx)"
+        },
+        {
+          "key": "C06",
+          "name": "Graphiti",
+          "reason": "Insufficient usable primary evidence was retrieved to judge complete native-client capture, deletion and recovery."
+        },
+        {
+          "key": "C03",
+          "name": "MemPalace",
+          "reason": "Documents scoped transcript retrieval and reported benchmarks; native Codex capture, deletion and recovery remain unverified. [README](https://github.com/mempalace/mempalace)"
+        },
+        {
+          "key": "C16",
+          "name": "OpenViking",
+          "reason": "Documents inspectable scoped memories, both native integrations and a reported coding-agent evaluation, but deletion and isolated restore remain unverified. [README](https://github.com/volcengine/OpenViking)"
+        },
+        {
+          "key": "C10",
+          "name": "deja-vu",
+          "reason": "Documents cross-client transcript recall and handoffs; complete memory deletion and disaster recovery remain unverified. [README](https://github.com/vshulcz/deja-vu)"
+        },
+        {
+          "key": "C02",
+          "name": "ai-memory",
+          "reason": "Competitive indexed documentation describes scoping and explicit backup/restore, but original lifecycle procedures and their tests were not inspected sufficiently. [Lifecycle documentation](https://github.com/akitaonrails/ai-memory/blob/main/docs/lifecycle-ops.md)"
+        },
+        {
+          "key": "C17",
+          "name": "Cognee",
+          "reason": "Indexed upstream excerpts advertise both native plugins and forgetting; scope isolation, recovery and measured complete-workflow behavior remain unverified. [README](https://github.com/topoteretes/cognee/blob/main/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "Hindsight",
+          "reason": "Documents scoped banks, both native integrations and evaluation resources; deletion, isolated restore and underlying benchmark results were not inspected. [README](https://github.com/vectorize-io/hindsight)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "No final winner is established. The selections are alternative sole owners, not a combined installation. Compare agentmemory, tigerless agent-memory and Basic Memory pairwise on the WSL2 host; ai-memory and Hindsight remain credible challengers pending lifecycle verification. Use the same source corpus, scoped projects and inference budget with complete upstream-supported configurations. Measure grounded recall, abstention, useful-write quality, cross-client handoffs, scope leakage, deletion across derived state, and restore into an isolated empty environment. Repeat portability checks on macOS arm64. The packet's 470-question comparison cannot decide this: capture, embedders and versions differed, and ai-memory's reranker was disabled.",
+      "evidence_gaps": [
+        "Required ctx_fetch_and_index and ctx_search tools were unavailable. Accessible primary sources were read through the web tool instead.",
+        "GitHub shell access failed, and public API endpoints were inaccessible through the web tool. Default-branch commits, exact pins, latest releases and archived status could not be verified.",
+        "The required currency window is 2026-07-03 through 2026-10-01. No complete activity audit was possible. Indexed ai-memory release and deja-vu changelog timestamps provide partial evidence only; crawl dates were not treated as repository activity.",
+        "Issue responsiveness, current passing CI, scope enforcement and isolated recovery were not verified consistently across candidates.",
+        "README evaluation numbers are upstream-reported evidence, not independently reproduced results; raw benchmark outputs and paper pages were not inspected.",
+        "Selected install commands follow retrieved default-branch documentation and are unpinned. No installation or host test was performed.",
+        "No candidate was excluded because none of the closed exclusion criteria was established.",
+        "Budget used: 6 web searches and 8 repository-page fetches; failed API attempts remained below the 30-call limit."
+      ],
+      "sources_read": [
+        "https://github.com/rohitg00/agentmemory",
+        "https://github.com/tigerless-labs/agent-memory",
+        "https://github.com/basicmachines-co/basic-memory",
+        "https://github.com/vectorize-io/hindsight",
+        "https://github.com/thedotmack/claude-mem",
+        "https://github.com/mem0ai/mem0",
+        "https://github.com/volcengine/OpenViking",
+        "https://github.com/letta-ai/letta-code",
+        "https://github.com/akitaonrails/ai-memory",
+        "https://github.com/akitaonrails/ai-memory/blob/main/docs/install.md",
+        "https://github.com/akitaonrails/ai-memory/blob/main/docs/deploy.md",
+        "https://github.com/akitaonrails/ai-memory/blob/main/docs/lifecycle-ops.md",
+        "https://github.com/akitaonrails/ai-memory/releases",
+        "https://github.com/mempalace/mempalace",
+        "https://github.com/vshulcz/deja-vu",
+        "https://github.com/vshulcz/deja-vu/blob/main/CHANGELOG.md",
+        "https://github.com/langchain-ai/langmem/blob/main/README.md",
+        "https://github.com/supermemoryai/supermemory/blob/main/apps/docs/self-hosting/quickstart.mdx",
+        "https://github.com/topoteretes/cognee/blob/main/README.md"
+      ]
+    }
+  ]
+}

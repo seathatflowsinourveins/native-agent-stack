@@ -1,0 +1,199 @@
+{
+  "layers": [
+    {
+      "layer_id": "structural-code-search",
+      "selection": [
+        {
+          "name": "C02 — ast-grep",
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "role": "Co-finalist for general syntax-pattern search and rewriting. Its CLI directly fits the requirement and can be called by Claude Code and Codex. Treat the two finalists as alternative clean installs pending the deciding comparison.",
+          "install_command": "npm install --global @ast-grep/cli",
+          "install_source": "https://github.com/ast-grep/ast-grep/blob/25334496c105/README.md#installation",
+          "basis": [
+            {
+              "url": "https://github.com/ast-grep/ast-grep/blob/25334496c105/README.md",
+              "shows": "Documents code-shaped patterns, metavariables, CLI rewriting, YAML rules, multicore execution, and the Linux install command. These directly satisfy the search-and-rewrite requirement."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/blob/25334496c105/crates/language/src/lib.rs",
+              "shows": "The inspected default-branch source enumerates 29 built-in language modes, including JavaScript, TypeScript, Python, Rust, Go, Ruby, and PHP."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/blob/25334496c105/crates/cli/tests/run_test.rs",
+              "shows": "Public CLI integration tests assert actual output, including rewriting JavaScript embedded in HTML and structured inspection output."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/blob/25334496c105/.github/workflows/coverage.yaml",
+              "shows": "Ubuntu CI runs workspace-wide tests through cargo llvm-cov --all-features --workspace, alongside formatting and lint checks."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/actions/runs/36435558702/job/108972446188",
+              "shows": "The GitHub API reported this coverage job SUCCESS for the inspected default-branch commit. This supports implementation quality; it does not establish comparative query precision or token efficiency."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+              "shows": "Release 0.45.3 was published 2026-08-31, within 90 days. Assets include Linux x86_64 and macOS arm64 binaries. Linux support provides a reasonable WSL2 fit, although WSL2 was not benchmarked here."
+            },
+            {
+              "url": "https://api.github.com/repos/ast-grep/ast-grep",
+              "shows": "The repository is unarchived and its default branch is main."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/commit/25334496c105",
+              "shows": "The latest default-branch commit was dated 2026-09-28, inside the 90-day currency window."
+            },
+            {
+              "url": "https://github.com/ast-grep/ast-grep/issues/2973",
+              "shows": "Recent issue activity includes this traversal-performance report, created 2026-09-30 and closed 2026-10-01."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C09 — Semgrep Community Edition",
+          "repository": "https://github.com/semgrep/semgrep",
+          "role": "Co-finalist for structural queries and rule-based autofix, with native MCP integration in addition to its CLI. The judgment relies on the open-source engine and local rules, without requiring paid platform features.",
+          "install_command": "python3 -m pip install semgrep",
+          "install_source": "https://github.com/semgrep/semgrep/blob/31729a1719c6/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/semgrep/semgrep/blob/31729a1719c6/README.md",
+              "shows": "Documents ad hoc structural CLI queries, the open-source Community Edition, installation on Ubuntu/WSL/Linux/macOS, optional login, and the built-in semgrep mcp server. It also documents Claude Code integration."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/blob/31729a1719c6/cli/tests/default/e2e/test_autofix.py",
+              "shows": "Public autofix tests exercise --autofix and --dryrun, snapshot JSON/text results, and verify resulting file contents. Cases include overlapping fixes, deletion, UTF-8, and several languages."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/blob/31729a1719c6/.github/workflows/tests.yml",
+              "shows": "The upstream workflow runs CLI tests, core builds/tests, and platform workflows. Its benchmarks-lite job invokes dummy benchmarks, so that job is not evidence of superiority over another candidate."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/actions/runs/36788590978/job/110135821043",
+              "shows": "The GitHub API reported the default-head x86 core build/test job SUCCESS; the inspected commit's overall check rollup was also SUCCESS."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/blob/31729a1719c6/.github/workflows/build-test-osx-arm64.yml",
+              "shows": "An upstream macOS arm64 workflow builds semgrep-core and runs make test, supporting the secondary host requirement."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/releases/tag/v1.179.0",
+              "shows": "Release v1.179.0 was published 2026-10-02, within 90 days, with detailed upstream release notes."
+            },
+            {
+              "url": "https://api.github.com/repos/semgrep/semgrep",
+              "shows": "The repository is unarchived and its default branch is develop."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/commit/31729a1719c6",
+              "shows": "The latest default-branch commit was dated 2026-09-30, inside the 90-day currency window."
+            },
+            {
+              "url": "https://github.com/semgrep/semgrep/issues/11906",
+              "shows": "Recent issue activity includes this Python parsing report, updated and closed 2026-09-30."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet contains no comparison establishing that symbol navigation and text search cover the structural-query and rewrite need. Retain this option as the baseline in the deciding experiment."
+        },
+        {
+          "key": "C03",
+          "name": "GritQL",
+          "reason": "The query language fits, but default-head standard-library tests failed and the latest release was 2026-03-30, giving weaker observed test/release health than the finalists. [CI result](https://github.com/biomejs/gritql/actions/runs/33301290316/job/99229846354), [release](https://github.com/biomejs/gritql/releases/tag/v0.0.3)."
+        },
+        {
+          "key": "C04",
+          "name": "astx",
+          "reason": "JS/TS scope is narrower; the README describes weak maintenance, the latest release is from 2023, and default-head CircleCI status was FAILURE. Its 2026-08-05 documentation commit still passes the frozen 90-day commit rule. [README](https://github.com/codemodsquad/astx/blob/9f0ee21ce3b1/README.md), [release](https://github.com/codemodsquad/astx/releases/tag/v2.2.3), [commit/checks](https://github.com/codemodsquad/astx/commit/9f0ee21ce3b1)."
+        },
+        {
+          "key": "C05",
+          "name": "NodeSeek",
+          "reason": "A capable eight-language CLI with passing Linux/macOS CI and transparent Apple M4 measurements, but narrower language coverage than the inspected ast-grep source; its corpus timings do not establish a target-host query-quality advantage. [README](https://github.com/connorg45/nodeseek/blob/56ad43154113/README.md), [benchmarks](https://github.com/connorg45/nodeseek/blob/56ad43154113/docs/BENCHMARKS.md)."
+        },
+        {
+          "key": "C06",
+          "name": "rwr",
+          "reason": "Strong Ruby/ERB specialization, but narrower fit for this language-neutral layer; its evaluation explicitly notes four author-scored ast-grep cases and an unverified hand-checked recall criterion. [README](https://github.com/dpep/rwr/blob/e6e270d27cb7/README.md), [evaluation](https://github.com/dpep/rwr/blob/e6e270d27cb7/docs/internal/phase0-conclusion.md)."
+        },
+        {
+          "key": "C07",
+          "name": "Greph",
+          "reason": "PHP-only structural matching/rewrite is narrower for this layer. Its reported 39/39 oracle checks and WordPress benchmarks are useful specialist evidence, with mixed cold-search results and strong warmed-index timings that should remain scoped to those workloads. [README and measured tables](https://github.com/inline0/greph/blob/a2fe0e83c343/README.md)."
+        },
+        {
+          "key": "C08",
+          "name": "Threadmoth",
+          "reason": "Its documented exact-source/node-kind targeting is a less direct demonstrated fit for general metavariable queries. Published evidence validates guarded mutations and inspection exposure, including an 86.5% JSON-byte reduction, without measuring tokens per answered structural query. [Syntax contract](https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/syntax-targeting.md), [mutation benchmarks](https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/benchmark-report.md), [inspection measurements](https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/context-economy-results-1.10.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The reviewed evidence supports two unranked finalists. On fresh WSL2 Ubuntu x86_64, pin ast-grep 0.45.3 and Semgrep CE v1.179.0 and run both against the same fixed multilingual corpus, alongside text search plus symbol navigation. Pre-register structural queries and hand-verified matches covering formatting changes, comments/strings, nesting, repeated metavariables, and argument sequences. Report precision and recall per query and language, verified rewrite correctness, and actual Claude Code/Codex tokens spent until each correct answer, including query construction, retries, and output reading. Hold the agent model and starting context constant within each client. Score shared-language behavior separately from total coverage. Repeat install/correctness smoke checks on macOS arm64. These are CPU workloads. Choose a single winner only if the measured results separate the finalists.",
+      "evidence_gaps": [
+        "No comparison in the packet ran every named arm. A target-host, gold-set precision/recall and agent-token comparison was not found in the packet or the inspected upstream README, test, benchmark, and CI sources.",
+        "Published specialist measurements are not interchangeable: NodeSeek measures an Apple M4 corpus workload; Greph measures PHP/WordPress with distinct cold and indexed modes; rwr acknowledges limited author-scored comparisons; Threadmoth distinguishes JSON payload measurement from token measurement.",
+        "Judgment date: 2026-10-02; the 90-day cutoff is 2026-07-04. All eight repositories were unarchived and had a default-branch commit within that window, so none met the frozen stale_or_archived exclusion. Recent documentation or dependency commits alone do not establish strong ongoing feature maintenance.",
+        "Capability sources were inspected at the cited default-branch commits and latest-release metadata was checked separately. Clean installs and the proposed host comparison were not executed here; passing upstream CI is not a measured comparative winner.",
+        "ctx_fetch_and_index was blocked with 'MCP tool call requires approval, but approval policy is never'. The eight upstream README pages were therefore fetched directly over HTTP, indexed with ctx_index, and read with ctx_search; additional source files and CI records came through the GitHub API. Web search timed out. Budget used: 2 search queries attempted, 8 successful page fetches, and 30 GitHub API calls, including GraphQL. Only the supplied packet was opened under the working directory."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/ast-grep/ast-grep",
+        "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+        "https://api.github.com/repos/ast-grep/ast-grep/commits?per_page=1",
+        "https://api.github.com/repos/semgrep/semgrep",
+        "https://api.github.com/repos/semgrep/semgrep/releases/latest",
+        "https://api.github.com/repos/semgrep/semgrep/commits?per_page=1",
+        "https://api.github.com/repos/connorg45/nodeseek",
+        "https://api.github.com/repos/connorg45/nodeseek/releases/latest",
+        "https://api.github.com/repos/connorg45/nodeseek/commits?per_page=1",
+        "https://api.github.com/repos/dpep/rwr",
+        "https://api.github.com/repos/dpep/rwr/releases/latest",
+        "https://api.github.com/repos/dpep/rwr/commits?per_page=1",
+        "https://api.github.com/repos/biomejs/gritql",
+        "https://api.github.com/repos/biomejs/gritql/releases/latest",
+        "https://api.github.com/repos/biomejs/gritql/commits?per_page=1",
+        "https://api.github.com/repos/inline0/greph",
+        "https://api.github.com/repos/inline0/greph/releases/latest",
+        "https://api.github.com/repos/inline0/greph/commits?per_page=1",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/releases/latest",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/commits?per_page=1",
+        "https://api.github.com/repos/codemodsquad/astx",
+        "https://api.github.com/repos/codemodsquad/astx/releases/latest",
+        "https://api.github.com/repos/codemodsquad/astx/commits?per_page=1",
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/ast-grep/ast-grep/contents/crates/language/src/lib.rs?ref=25334496c105c9c728f0a6024f3d164aed40cacc",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/git/trees/e36e2b46ac21023b4a6092ba28d82afc12127a7b?recursive=1",
+        "https://api.github.com/repos/matthewjameswatkins1978-cyber/Threadmoth/contents/docs/benchmark-report.md?ref=e36e2b46ac21023b4a6092ba28d82afc12127a7b",
+        "https://raw.githubusercontent.com/ast-grep/ast-grep/25334496c105c9c728f0a6024f3d164aed40cacc/README.md",
+        "https://raw.githubusercontent.com/semgrep/semgrep/31729a1719c6e76ac8d41ec8fb9ab191621ee10f/README.md",
+        "https://raw.githubusercontent.com/connorg45/nodeseek/56ad43154113b6cf5db7c4e8763c8ffb7386e334/README.md",
+        "https://raw.githubusercontent.com/dpep/rwr/e6e270d27cb755daebb4ccbfff03764b30c21e17/README.md",
+        "https://raw.githubusercontent.com/biomejs/gritql/4ca283484ab9bd11ca3cbc9e14b5ad2db5d61a37/README.md",
+        "https://raw.githubusercontent.com/inline0/greph/a2fe0e83c343877507a9c8fcd16fee365e57e9b9/README.md",
+        "https://raw.githubusercontent.com/matthewjameswatkins1978-cyber/Threadmoth/e36e2b46ac21023b4a6092ba28d82afc12127a7b/README.md",
+        "https://raw.githubusercontent.com/codemodsquad/astx/9f0ee21ce3b1e34a0122a50a5e604a109fa9a09a/README.md",
+        "https://github.com/ast-grep/ast-grep/blob/25334496c105/crates/cli/tests/run_test.rs",
+        "https://github.com/ast-grep/ast-grep/blob/25334496c105/.github/workflows/coverage.yaml",
+        "https://github.com/semgrep/semgrep/blob/31729a1719c6/cli/tests/default/e2e/test_autofix.py",
+        "https://github.com/semgrep/semgrep/blob/31729a1719c6/cli/src/semgrep/commands/scan.py",
+        "https://github.com/semgrep/semgrep/blob/31729a1719c6/.github/workflows/tests.yml",
+        "https://github.com/semgrep/semgrep/blob/31729a1719c6/.github/workflows/build-test-osx-arm64.yml",
+        "https://github.com/connorg45/nodeseek/blob/56ad43154113/docs/BENCHMARKS.md",
+        "https://github.com/dpep/rwr/blob/e6e270d27cb7/docs/internal/phase0-conclusion.md",
+        "https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/coverage.md",
+        "https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/benchmark-report.md",
+        "https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/cli.md",
+        "https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/syntax-targeting.md",
+        "https://github.com/matthewjameswatkins1978-cyber/Threadmoth/blob/e36e2b46ac21/docs/context-economy-results-1.10.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "candidates": [
+    {
+      "name": "Gemma 4 E4B IT",
+      "repository": "https://github.com/google-deepmind/gemma",
+      "why_candidate": "Open-weight generation family whose [README](https://github.com/google-deepmind/gemma/blob/main/README.md) includes the Gemma 4 E4B instruction checkpoint; latest library release [v4.0.1](https://github.com/google-deepmind/gemma/releases/tag/v4.0.1), 2026-05-20; [default-branch commit](https://github.com/google-deepmind/gemma/commit/c490becf42d1), 2026-09-30."
+    },
+    {
+      "name": "GLM-4-32B-0414",
+      "repository": "https://github.com/zai-org/GLM-4",
+      "why_candidate": "32B instruction model trained for function calling, [released 2025-04-14](https://github.com/zai-org/GLM-4/blob/main/README.md); no published GitHub release; latest [default-branch commit](https://github.com/zai-org/GLM-4/commit/024d8fd48e62), 2026-08-05."
+    },
+    {
+      "name": "gpt-oss-20b",
+      "repository": "https://github.com/openai/gpt-oss",
+      "why_candidate": "Open-weight 21B-total/3.6B-active model with native tool calling and structured output, documented to run within [16 GB using MXFP4](https://github.com/openai/gpt-oss/blob/main/README.md); latest repository release [v0.0.9](https://github.com/openai/gpt-oss/releases/tag/v0.0.9), 2026-01-13; [default-branch commit](https://github.com/openai/gpt-oss/commit/7b583341fe16), 2026-07-24."
+    },
+    {
+      "name": "Granite 4.2 — 3B, 8B and 30B",
+      "repository": "https://github.com/ibm-granite/granite-4.2-language-models",
+      "why_candidate": "Apache-2.0 instruction generation models at [3B, 8B and 30B with reasoning and tool calling](https://github.com/ibm-granite/granite-4.2-language-models/blob/main/README.md); no published GitHub release or exact model-release date in the README; latest [default-branch commit](https://github.com/ibm-granite/granite-4.2-language-models/commit/75355e6ef8c1), 2026-09-15."
+    },
+    {
+      "name": "Nemotron 3.5 Lightning 30B-A3B / Nemotron 3 Nano 30B-A3B",
+      "repository": "https://github.com/NVIDIA-NeMo/Nemotron",
+      "why_candidate": "Open-weight hybrid Mamba–Transformer MoE text models with [tool-calling training and deployment resources](https://github.com/NVIDIA-NeMo/Nemotron/blob/main/README.md); latest repository release [v0.1.0](https://github.com/NVIDIA-NeMo/Nemotron/releases/tag/v0.1.0), 2026-03-24; [default-branch commit](https://github.com/NVIDIA-NeMo/Nemotron/commit/8749344f8cce), 2026-09-11."
+    },
+    {
+      "name": "Qwen3.8-27B",
+      "repository": "https://github.com/QwenLM/Qwen3.8",
+      "why_candidate": "27B open-weight generation model with documented OpenAI-compatible serving and tool-call parsers, [released 2026-08-14](https://github.com/QwenLM/Qwen3.8/blob/main/README.md); no published GitHub release; latest [default-branch commit](https://github.com/QwenLM/Qwen3.8/commit/2ea10dc72582), 2026-08-17."
+    }
+  ],
+  "search_notes": "Unranked, with one entry per canonical upstream repository. Verified as of 2026-10-02 using gh api repos/OWNER/REPO, releases/latest and default-branch commit endpoints, plus upstream READMEs/model cards. Every included repository exists, reports archived=false and has a default-branch commit within the 90-day window beginning 2026-07-04. Repository release dates are labeled separately from model release dates. The DeepSeek-V3 and GLM-4.5 seeds failed the activity window; mistralai/mistral-inference reports archived=true. Hardware eligibility for 27–32B checkpoints assumes approximately 4-bit weights and bounded context/concurrency, with memory reserved for embeddings; this is a capacity estimate, and application-level tool-call reliability remains untested. The embedding model's memory requirement and laptop unified-memory capacities were unspecified. [llama-server documentation](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md) establishes a serving path with quantized GPU inference, OpenAI-compatible Chat Completions and Responses endpoints, schema-constrained JSON and function calling. Used 30 GitHub API calls and eight successful page fetches. All six web-search attempts timed out, so exhaustive discovery could not be established within the budget."
+}

@@ -1,0 +1,196 @@
+{
+  "layers": [
+    {
+      "layer_id": "document-retrieval",
+      "selection": [
+        {
+          "name": "C08: tobi/qmd",
+          "repository": "https://github.com/tobi/qmd",
+          "role": "Controlled Markdown collections, lexical/hybrid retrieval, and full-body reads through CLI or MCP. Refresh the index before relying on cached content.",
+          "install_command": "npm install -g @tobilu/qmd",
+          "install_source": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md#installation",
+          "basis": [
+            {
+              "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+              "shows": "Named collections, inclusion/exclusion controls, metadata filters, BM25/vector/hybrid search, and qmd get --full. CLI and MCP expose search followed by document-body retrieval. CUDA and Metal backend selection are documented."
+            },
+            {
+              "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/test/mcp.test.ts",
+              "shows": "Tests verify document-body retrieval and source line numbers. Model-backed vector and full hybrid groups are skipped in CI."
+            },
+            {
+              "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/test/eval-bm25.test.ts",
+              "shows": "Fixture-based relevance assertions include easy-query Hit@3 >=80% and overall Hit@3 >=40%; these are regression thresholds, not comparative benchmark results."
+            },
+            {
+              "url": "https://github.com/tobi/qmd/actions/runs/34403593747",
+              "shows": "GitHub API reported successful Node 22/23 test jobs on Ubuntu and macOS; Bun jobs also succeeded. This supports platform maintenance, not WSL2/RTX 4090 performance."
+            },
+            {
+              "url": "https://api.github.com/repos/tobi/qmd/commits?per_page=1",
+              "shows": "Unarchived repository; latest default-branch commit September 9, 2026, inside the 90-day window."
+            },
+            {
+              "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+              "shows": "Latest release August 16, 2026, inside the window."
+            },
+            {
+              "url": "https://github.com/tobi/qmd/issues/987",
+              "shows": "Issue activity continued October 1, including an unresolved report of query memory exhaustion; the report was not independently reproduced."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C03: MinerU",
+          "repository": "https://github.com/opendatalab/MinerU",
+          "role": "Controlled document discovery, parsing, search, and page/block source reads. Use normal-quality parsing before trusting discovery snippets; retain native originals. QMD covers native Markdown ingestion.",
+          "install_command": "uv tool install --force \"mineru[full]>=4.0,<5\"",
+          "install_source": "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/README.md",
+              "shows": "Document parsing and Markdown export; scan/watch controls; indexed search; stable document/tier/page/block locators and read continuation. Flash discovery is explicitly distinguished from final reading quality. Native Markdown is read directly rather than parsed into this library."
+            },
+            {
+              "url": "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/README.md#choose-local-tier",
+              "shows": "Documents Linux NVIDIA standard parsing with the full extra and Apple Silicon standard parsing. The target's 24 GB VRAM and 104 GB RAM exceed stated minimums by inference; installation and throughput remain untested."
+            },
+            {
+              "url": "https://github.com/opendatalab/OmniDocBench/blob/f133a71e9e91c3621c7ce8994200a7b394a06eb3/README.md",
+              "shows": "Published PDF parsing scores: MinerU2.5-Pro 95.75, MinerU-2.5 93.04, MinerU-Pipeline 86.47. These evaluate named variants, not the default MinerU 4.0 installation or its retrieval workflow."
+            },
+            {
+              "url": "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/.github/workflows/cli.yml",
+              "shows": "Observed CLI check succeeded, but its workflow explicitly checks out dev; it does not establish test success for the selected default-branch pin."
+            },
+            {
+              "url": "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/tests/README.md",
+              "shows": "Documents retained orchestration/CLI/library tests, parser regression migration to DocVortex, and three existing metadata/LaTeX assertion failures."
+            },
+            {
+              "url": "https://github.com/opendatalab/MinerU/releases/tag/mineru-4.0.10-released",
+              "shows": "Unarchived repository; release and latest default-branch commit September 29, 2026, inside the window."
+            },
+            {
+              "url": "https://github.com/opendatalab/MinerU/issues/5608",
+              "shows": "Recent issue activity includes an unresolved numerical table-recognition report; it was not independently reproduced."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "LlamaIndex",
+          "reason": "Current: commit October 1, release September 21. Its maintained connector/index/query SDK supports substantial customization, but the selected tools more directly expose the required agent search→source-body workflow. [README](https://github.com/run-llama/llama_index/blob/962940ddc079cc21701d28d1237c84c82a7c5164/README.md); [successful build](https://github.com/run-llama/llama_index/actions/runs/36908502317)."
+        },
+        {
+          "key": "C05",
+          "name": "MarkItDown",
+          "reason": "Current: commit October 1, release September 21. Useful multi-format Markdown conversion and MCP support, but a less complete managed ingestion/retrieval workflow; no matched difficult-layout superiority was verified. [README](https://github.com/microsoft/markitdown/blob/1f9530a6d35364886a038dc2dcb34256bb0c85b0/README.md); [test workflow](https://github.com/microsoft/markitdown/blob/1f9530a6d35364886a038dc2dcb34256bb0c85b0/.github/workflows/tests.yml)."
+        },
+        {
+          "key": "C06",
+          "name": "Poppler",
+          "reason": "Current mirror commit October 1; GitHub latest-release endpoint returned 404. Its PDF rendering/extraction utilities provide a narrower component than controlled corpus ingestion and retrieval. Observed macOS builds passed; AppVeyor failed. [README](https://github.com/tsdgeos/poppler_mirror/blob/03e8c2c9696c3f556f9ad7fbe9e5177907d625ef/README.md); [mirror CI](https://github.com/tsdgeos/poppler_mirror/actions/runs/36902590256)."
+        },
+        {
+          "key": "C02",
+          "name": "pageindex",
+          "reason": "Current: commit and release October 1. Strong measured text-PDF lookup results, but its OSS benchmark excludes charts/tables and documents the local indexer rejects; that evidence does not establish the broad ingestion fit required here. [README](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/README.md); [62-question OSS evaluation](https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md)."
+        },
+        {
+          "key": "C04",
+          "name": "Docling",
+          "reason": "Current: commit and release October 1. Closest ingestion alternative: broad formats, provenance, Linux/macOS arm64 support, and successful core/OCR/PDF/VLM CI. A native corpus discovery→search→body loop was not established in the inspected README/docs; current parsing superiority remains unresolved. [README](https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/README.md); [provenance](https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/docs/concepts/docling_document.md); [CI](https://github.com/docling-project/docling/actions/runs/36877114733)."
+        },
+        {
+          "key": "C07",
+          "name": "docs-mcp-server",
+          "reason": "Current: commit/release September 27. Strong controlled web/local ingestion and hybrid search; upstream reports MRR 0.747 on 59 queries. Exact stored full-body lookup was not found in the inspected README/usage: fetch-url retrieves a live representation, which can differ from indexed Markdown. Head checks were absent on the skip-ci release commit. [Benchmark](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/guides/benchmarking.md); [usage](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/guides/basic-usage.md); [representation tests](https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/test/markdown-identity-e2e.test.ts)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C09",
+          "name": "Context Hub",
+          "criterion": "stale_or_archived",
+          "fact": "Latest default-branch commit May 31, 2026, precedes the July 3 cutoff; latest release April 27. Recent repository updated_at and issue activity do not satisfy the frozen commit criterion. [Commit API](https://api.github.com/repos/andrewyng/context-hub/commits?per_page=1)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "The pair is selected on verified capability fit, without claiming measured superiority. On the WSL2/RTX 4090 host, seal one representative Markdown/PDF/Office corpus and relevance judgments. Randomize QMD versus Docs MCP lexical/hybrid retrieval and MinerU versus Docling difficult-layout ingestion at pinned versions. Measure coverage, Recall@5/nDCG@10, source-body fidelity, stale/deleted-source handling, table/formula accuracy, latency, RAM/VRAM, and clean-install success. Repeat platform checks on macOS arm64 before choosing permanent defaults.",
+      "evidence_gaps": [
+        "The packet contains no comparisons where every named arm ran; published evaluations use different corpora, models, and versions.",
+        "ctx_fetch_and_index was rejected with 'MCP tool call requires approval, but approval policy is never'. Primary README/docs/test/evaluation blobs were recovered through GitHub's API, indexed, and read with ctx_search. Budget used: 30 GitHub API calls, zero web searches, zero successful page fetches.",
+        "Neither target-host clean installation nor RTX 4090 performance was tested. QMD macOS CI passed, but arm64 runner architecture was not established from the inspected evidence.",
+        "QMD model-backed tests skip CI. MinerU CLI CI tests dev and documents existing local failures. Docling's reading-order benchmark skips CI, and its latest macOS lane was skipped.",
+        "QMD get returns indexed Markdown; MinerU read returns cached parsed pages/blocks. Refresh or reparse as appropriate, and retain native sources before relying on a result.",
+        "All repositories were unarchived. Currency was judged against October 1, 2026, using the July 3 cutoff. License information did not affect ranking."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/run-llama/llama_index",
+        "https://api.github.com/repos/run-llama/llama_index/releases/latest",
+        "https://api.github.com/repos/run-llama/llama_index/commits?per_page=1",
+        "https://api.github.com/repos/andrewyng/context-hub",
+        "https://api.github.com/repos/andrewyng/context-hub/releases/latest",
+        "https://api.github.com/repos/andrewyng/context-hub/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/markitdown",
+        "https://api.github.com/repos/microsoft/markitdown/releases/latest",
+        "https://api.github.com/repos/microsoft/markitdown/commits?per_page=1",
+        "https://api.github.com/repos/tsdgeos/poppler_mirror",
+        "https://api.github.com/repos/tsdgeos/poppler_mirror/releases/latest",
+        "https://api.github.com/repos/tsdgeos/poppler_mirror/commits?per_page=1",
+        "https://api.github.com/repos/tobi/qmd",
+        "https://api.github.com/repos/tobi/qmd/releases/latest",
+        "https://api.github.com/repos/tobi/qmd/commits?per_page=1",
+        "https://api.github.com/repos/VectifyAI/PageIndex",
+        "https://api.github.com/repos/VectifyAI/PageIndex/releases/latest",
+        "https://api.github.com/repos/VectifyAI/PageIndex/commits?per_page=1",
+        "https://api.github.com/repos/docling-project/docling",
+        "https://api.github.com/repos/docling-project/docling/releases/latest",
+        "https://api.github.com/repos/docling-project/docling/commits?per_page=1",
+        "https://api.github.com/repos/opendatalab/MinerU",
+        "https://api.github.com/repos/opendatalab/MinerU/releases/latest",
+        "https://api.github.com/repos/opendatalab/MinerU/commits?per_page=1",
+        "https://api.github.com/repos/arabold/docs-mcp-server",
+        "https://api.github.com/repos/arabold/docs-mcp-server/releases/latest",
+        "https://api.github.com/repos/arabold/docs-mcp-server/commits?per_page=1",
+        "https://api.github.com/graphql",
+        "https://github.com/run-llama/llama_index/blob/962940ddc079cc21701d28d1237c84c82a7c5164/README.md",
+        "https://github.com/microsoft/markitdown/blob/1f9530a6d35364886a038dc2dcb34256bb0c85b0/README.md",
+        "https://github.com/microsoft/markitdown/blob/1f9530a6d35364886a038dc2dcb34256bb0c85b0/.github/workflows/tests.yml",
+        "https://github.com/tsdgeos/poppler_mirror/blob/03e8c2c9696c3f556f9ad7fbe9e5177907d625ef/README.md",
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/package.json",
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/.github/workflows/ci.yml",
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/test/eval-bm25.test.ts",
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/test/mcp.test.ts",
+        "https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/README.md",
+        "https://github.com/VectifyAI/Mafin2.5-FinanceBench/blob/1c890d5e0fd9929953d38282614555847727011d/README.md",
+        "https://github.com/VectifyAI/PageIndex-OSS-Benchmark/blob/ad4c0b92970a6f4801f09ff2e647389e8f5874fa/README.md",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/README.md",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/docs/getting_started/installation.md",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/docs/concepts/docling_document.md",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/docs/usage/advanced_options.md",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/tests/test_e2e_conversion.py",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/tests/test_reading_order.py",
+        "https://github.com/docling-project/docling/blob/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e/.github/workflows/ci.yml",
+        "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/README.md",
+        "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/tests/README.md",
+        "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/.github/workflows/cli.yml",
+        "https://github.com/opendatalab/MinerU/blob/ed50cc15bc2c9bfb00520dadfe61979866e62236/.github/workflows/python-package.yml",
+        "https://github.com/opendatalab/OmniDocBench/blob/f133a71e9e91c3621c7ce8994200a7b394a06eb3/README.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/README.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/guides/basic-usage.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/guides/mcp-clients.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/guides/benchmarking.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/docs/setup/configuration.md",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/test/markdown-identity-e2e.test.ts",
+        "https://github.com/arabold/docs-mcp-server/blob/f2938c47bb8937c650f0d5ddb614f867773b29f4/.github/workflows/ci.yml"
+      ]
+    }
+  ]
+}

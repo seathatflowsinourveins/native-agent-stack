@@ -1,0 +1,135 @@
+{
+  "layers": [
+    {
+      "layer_id": "local-generation-model",
+      "selection": [
+        {
+          "name": "C04 — gpt-oss-20b",
+          "repository": "https://github.com/openai/gpt-oss",
+          "role": "Finalist for the single fallback-model slot; strongest documented serving and agent-client route among the reviewed sources. No measured winner is established.",
+          "install_command": "curl -fsSL https://ollama.com/install.sh | sh\nollama pull gpt-oss:20b\nollama run gpt-oss:20b",
+          "install_source": "Model commands: openai/gpt-oss@7b583341fe16729127f6d5b94a7b09ccae97e1a1, README.md#ollama. Linux runtime installer: ollama/ollama, README.md, Git blob e511fbe3fd3e73fc6d7cfb5393d827cf70f0a2f6, retrieved 2026-10-02.",
+          "basis": [
+            {
+              "url": "https://github.com/openai/gpt-oss/blob/7b583341fe16/README.md#highlights",
+              "shows": "Upstream documents native function calling and Structured Outputs, and reports operation within 16 GB of memory using native MXFP4. This is an upstream footprint claim, not a measured RTX 4090 result with an embedding model resident."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/blob/7b583341fe16/README.md#codex",
+              "shows": "Provides a Codex configuration using an OpenAI-compatible local endpoint and Ollama. Also documents vLLM serving and a partial reference Responses API server. Apple Silicon Metal inference exists but is described as not production-ready."
+            },
+            {
+              "url": "https://github.com/ollama/ollama/blob/main/README.md",
+              "shows": "Documents the Linux installer, macOS installation, and integrations with Claude Code and Codex. Retrieved README Git blob: e511fbe3fd3e73fc6d7cfb5393d827cf70f0a2f6. These recipes were not exercised on the target host."
+            },
+            {
+              "url": "https://api.github.com/repos/openai/gpt-oss",
+              "shows": "Repository is unarchived. Apache-2.0 license is information only."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/commit/7b583341fe16",
+              "shows": "Latest default-branch commit is 2026-07-24, inside the 90-day window."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/releases/tag/v0.0.9",
+              "shows": "Latest GitHub release is v0.0.9, published 2026-01-13, outside the 90-day window."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C02 — Granite 4.2 — 3B, 8B and 30B",
+          "repository": "https://github.com/ibm-granite/granite-4.2-language-models",
+          "role": "Alternative finalist using the 8B variant for the same single-model slot; target-server integration remains a qualification gate.",
+          "install_command": "pip install torch torchvision torchaudio\npip install accelerate transformers",
+          "install_source": "ibm-granite/granite-4.2-language-models@75355e6ef8c17d72a7b3736654ab525352f5e0b8, README.md, Quick Start Inference Examples with Transformers / Installation. These commands install the documented inference dependencies; they are not a complete OpenAI-server recipe.",
+          "basis": [
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/README.md",
+              "shows": "Documents OpenAI function-definition schemas, tool calling with integrated reasoning, and multi-turn tool responses. Nominal 8B BF16 weights imply approximately 16 GB by parameter-count arithmetic, before caches and runtime allocations. That estimate is an inference; actual GPU residency was not measured."
+            },
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/figures/8b-comparison.png",
+              "shows": "IBM's published chart reports Granite 4.2 8B scores of 52.4 on BFCL v4, 79.3 on IFBench, 73.2 on LiveCodeBench v6, and 86.7 on AIME25. It does not compare gpt-oss-20b or Gemma 4 E4B IT and does not establish the required RTX 4090 performance with an embedding model loaded."
+            },
+            {
+              "url": "https://api.github.com/repos/ibm-granite/granite-4.2-language-models",
+              "shows": "Repository is unarchived. Apache-2.0 license is information only."
+            },
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/commit/75355e6ef8c1",
+              "shows": "Latest default-branch commit is 2026-09-15, inside the 90-day window. The releases/latest API returned HTTP 404, so no latest GitHub Release was credited."
+            }
+          ],
+          "confidence": "low"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Gemma 4 E4B IT",
+          "reason": "JAX sampling and successful pytest jobs are verified, but exact E4B IT tool/schema evaluation and OpenAI-server operation remain unverified; the README's older 2B/7B memory guidance cannot establish E4B fit. [Pinned README](https://github.com/google-deepmind/gemma/blob/c490becf42d1/README.md), [pytest result](https://github.com/google-deepmind/gemma/actions/runs/36687621683/job/109797001920)."
+        },
+        {
+          "key": "C03",
+          "name": "Nemotron 3.5 Lightning 30B-A3B / Nemotron 3 Nano 30B-A3B",
+          "reason": "NVIDIA reports a 22 GB Lightning NVFP4 checkpoint, suggesting tight capacity for embedding, caches and runtime; Nano's small active-parameter count does not establish small resident weights. Neither reviewed path establishes the required shared-GPU fit. [Lightning guide](https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/docs/nemotron/lightning35/README.md), [Nano documentation](https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/README.md)."
+        },
+        {
+          "key": "C05",
+          "name": "Qwen3.8-27B",
+          "reason": "The documented vLLM example uses four GPUs, while GGUF and Apple Silicon guidance still refers to Qwen3.5; exact 3.8-27B quantized tool/schema quality and memory on one RTX 4090 remain unverified. [Pinned README](https://github.com/QwenLM/Qwen3.8/blob/2ea10dc72582/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "GLM-4-32B-0414",
+          "reason": "Upstream measured 68 GB GPU memory at BF16 with 1,000 input tokens on an H100, exceeding the target in that configuration; quantization could still qualify, but its target-host reliability was not established. [Inference benchmark](https://github.com/zai-org/GLM-4/blob/024d8fd48e62/inference/README.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "The selections are alternatives for one model slot, not a complementary installation set. Compare gpt-oss-20b in its deployed MXFP4 representation against Granite 4.2 8B through one pinned OpenAI-compatible server supporting both exact chat templates and tool parsers, on a clean WSL2 Ubuntu / RTX 4090 host. Keep the same embedding model GPU-resident and match context length, batching and output budget. Measure strict JSON-schema validity, correct tool selection and arguments, multi-turn tool completion, public BFCL v4 performance, answer quality on a fixed public reasoning-benchmark subset, prefill/decode tokens per second, latency and peak GPU memory; report CPU offload. Include Gemma 4 E4B IT as a compact challenger if its exact serving path can be verified. Choose one model after this comparison establishes the best reliable fallback within the shared GPU budget.",
+      "evidence_gaps": [
+        "Judgment date: 2026-10-02; 90-day cutoff: 2026-07-04. All six repositories are unarchived and have current default-branch commits: gpt-oss 2026-07-24, Granite 2026-09-15, Gemma 2026-09-30, Nemotron 2026-09-11, Qwen 2026-08-17 and GLM 2026-08-05. These are repository commit dates, not model-weight update dates. Nemotron's later pushed_at timestamp was not substituted for its default-branch commit date.",
+        "None of the returned latest GitHub Release dates falls inside the 90-day window: gpt-oss v0.0.9 on 2026-01-13, Gemma v4.0.1 on 2026-05-20 and Nemotron v0.1.0 on 2026-03-24. Granite, Qwen and GLM releases/latest returned HTTP 404. Separately, Qwen's README reports the 27B weight release on 2026-08-14, inside the window.",
+        "Latest issue updates from the GitHub health query were recent for every repository: gpt-oss 2026-10-02, Granite 2026-09-19, Gemma 2026-10-01, Nemotron 2026-10-02, Qwen 2026-09-30 and GLM 2026-09-21. Issue-update dates establish report activity, not maintainer response speed or defect resolution.",
+        "At Gemma's checked head, two pytest jobs succeeded but the publish job failed: [pytest](https://github.com/google-deepmind/gemma/actions/runs/36687639337/job/109797061459), [publish](https://github.com/google-deepmind/gemma/actions/runs/36687639337/job/109798637528). Nemotron's returned success rollup contained only a skipped request job. The other four checked heads returned no status rollup. This does not establish comparative model or inference test coverage.",
+        "No verified target-host measurement establishes structured-output reliability, tool-call success, throughput or peak memory with an embedding model loaded. The embedding model and laptop memory capacities are unspecified. Numerical gpt-oss, exact Gemma E4B and Qwen3.8 model-card quality results were not credited without reading their primary evaluations.",
+        "Granite's dependency installation and tool examples do not establish a complete target-server recipe; its model-download example also contains a https://https:// URL typo. macOS arm64 serving and tool/schema reliability remain unverified for the exact Granite, Gemma, Nemotron, Qwen3.8 and GLM variants. gpt-oss documents Apple Silicon reference Metal inference but labels it not production-ready.",
+        "Research used 30 GitHub API calls, one failed web-search attempt and eight requested page-fetch URLs. The attempted GitHub cookbook path articles/gpt-oss/run-vllm.md returned HTTP 404 and was not used as serving evidence.",
+        "ctx_fetch_and_index was rejected by the session approval policy with: MCP tool call requires approval, but approval policy is never. Public README files and guides were instead retrieved through the authorized GitHub API, indexed, and read with ctx_search. This deviates from the requested page-fetch method; separate model cards and papers remain unverified."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/openai/gpt-oss",
+        "https://api.github.com/repos/openai/gpt-oss/releases/latest",
+        "https://api.github.com/repos/openai/gpt-oss/commits?per_page=1",
+        "https://github.com/openai/gpt-oss/blob/7b583341fe16/README.md",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models/releases/latest",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models/commits?per_page=1",
+        "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/README.md",
+        "https://api.github.com/repos/google-deepmind/gemma",
+        "https://api.github.com/repos/google-deepmind/gemma/releases/latest",
+        "https://api.github.com/repos/google-deepmind/gemma/commits?per_page=1",
+        "https://github.com/google-deepmind/gemma/blob/c490becf42d1/README.md",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron/releases/latest",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron/commits?per_page=1",
+        "https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/README.md",
+        "https://api.github.com/repos/QwenLM/Qwen3.8",
+        "https://api.github.com/repos/QwenLM/Qwen3.8/releases/latest",
+        "https://api.github.com/repos/QwenLM/Qwen3.8/commits?per_page=1",
+        "https://github.com/QwenLM/Qwen3.8/blob/2ea10dc72582/README.md",
+        "https://api.github.com/repos/zai-org/GLM-4",
+        "https://api.github.com/repos/zai-org/GLM-4/releases/latest",
+        "https://api.github.com/repos/zai-org/GLM-4/commits?per_page=1",
+        "https://github.com/zai-org/GLM-4/blob/024d8fd48e62/README.md",
+        "https://api.github.com/graphql",
+        "https://github.com/ollama/ollama/blob/main/README.md",
+        "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/figures/8b-comparison.png",
+        "https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/docs/nemotron/lightning35/README.md",
+        "https://github.com/zai-org/GLM-4/blob/024d8fd48e62/inference/README.md"
+      ]
+    }
+  ]
+}

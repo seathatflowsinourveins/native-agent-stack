@@ -1,0 +1,1 @@
+The MCP server "time" is not accessible or improperly configured. The error "Method not found" indicates the server name or resource might be invalid. Please verify the MCP server configuration and ensure the "time" server is correctly set up to provide the `get_current_time` resource. This task cannot proceed without a valid MCP server connection.

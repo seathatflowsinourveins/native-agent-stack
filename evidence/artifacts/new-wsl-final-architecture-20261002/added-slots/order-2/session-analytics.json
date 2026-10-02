@@ -1,0 +1,191 @@
+{
+  "layers": [
+    {
+      "layer_id": "session-analytics",
+      "selection": [
+        {
+          "name": "agentsview",
+          "repository": "https://github.com/kenn-io/agentsview",
+          "role": "C07: unranked finalist for a searchable local session archive, transcript inspection, tool activity, and per-session usage and cost.",
+          "install_command": "curl -fsSL https://agentsview.io/install.sh | bash",
+          "install_source": "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md",
+              "shows": "Reads Claude Code and Codex session directories into local SQLite; provides full-text search, conversation browsing, tool analytics, and per-session cost estimates. Pricing has an offline fallback. Core inspection requires no hosted service."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/blob/v0.44.0/internal/parser/codex_parser_test.go",
+              "shows": "Upstream tests cover recorded tool calls and outputs, token usage, forked and subagent replay boundaries, malformed records, and incremental parsing. These establish tested format handling, without establishing comparative accuracy against the clients' counters."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/actions/runs/36938079410",
+              "shows": "At examined default-branch commit d37642206051dababc436635024676c17dddac45, Ubuntu, macOS, and Windows Go tests, frontend tests, end-to-end tests, integration tests, and the race detector reported SUCCESS."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/blob/d37642206051/internal/parser/codex_bench_test.go",
+              "shows": "Provides a reproducible incremental Codex parser benchmark. The README also documents backend benchmarks. Benchmark harness availability is not evidence that it outperforms another candidate."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+              "shows": "Release published 2026-09-21; inspected release-source commit is 413a87f7bfbd67b2815b1119ac51abc1efbeeaba. Published assets include Linux amd64 and macOS arm64 CLI archives. Release notes document MCP session/content search and usage-query improvements."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/commit/d37642206051",
+              "shows": "Default-branch commit dated 2026-10-01, within the 90-day window, merges an ongoing synchronization fix. Repository metadata reports archived=false; examined issue activity extended through 2026-10-02."
+            },
+            {
+              "url": "https://github.com/kenn-io/agentsview/blob/d37642206051/internal/mcp/tools.go",
+              "shows": "Includes agent-callable MCP tools, including usage summaries; the documented CLI also exposes session listing, searching, and usage inspection."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Sidekick Agent Hub",
+          "repository": "https://github.com/cesarandreslopez/sidekick-agent-hub",
+          "role": "C01: unranked finalist for local session inspection through CLI reports, a terminal dashboard, transcript dumps, and agent integration.",
+          "install_command": "npm i -g sidekick-agent-hub",
+          "install_source": "https://github.com/cesarandreslopez/sidekick-agent-hub/releases/tag/v0.27.6",
+          "basis": [
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/README.md",
+              "shows": "Claude Code and Codex usage reports read their session logs directly. Session dumps and conversation views expose prompts, replies, reasoning, and tool activity. Reports distinguish token categories and cost provenance; catalog pricing refreshes from LiteLLM. Local inspection does not require a hosted analytics service."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/sidekick-shared/src/sessionStats.parity.test.ts",
+              "shows": "Upstream tests check parity between session statistics, direct aggregation, and transcript projections, including tokens, cost provenance, tool usage, and tool failures."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/sidekick-shared/src/parsers/codexParser.test.ts",
+              "shows": "Tests repeated cumulative token_count events, missing last_token_usage, counter re-baselining, cached-input normalization, and tool-event conversion."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/sidekick-shared/src/usage/claudeUsageDedupe.test.ts",
+              "shows": "Tests deduplication of Claude split response lines and streamed usage corrections, directly addressing a source of inflated token totals."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/actions/runs/36291194204",
+              "shows": "Shared Library Tests and CLI Tests & Build reported SUCCESS at ddfe5055b12851cb9a50e3197b7b938f59a8401d. The reviewed workflow runs on Ubuntu with Node.js 22."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/releases/tag/v0.27.6",
+              "shows": "Release published 2026-09-27 and resolves to the examined default-branch commit, also dated 2026-09-27. Documents npm installation with Node.js 20+. Repository metadata reports archived=false and zero open issues/PRs at examination."
+            },
+            {
+              "url": "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/sidekick-cli/src/commands/mcp.ts",
+              "shows": "Implements a read-only MCP facts server for current metrics and project context. Historical inspection is available through the CLI reports and dumps."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "Confabulous",
+          "reason": "Both-agent transcript inspection and analytics fit, with a recent v0.7.3 release, but the documented Docker stack plus separate confab collector adds clean-install and operating complexity compared with the finalists. [README](https://github.com/ConfabulousDev/confab-web/blob/5376682656bf/README.md)"
+        },
+        {
+          "key": "C03",
+          "name": "tokview",
+          "reason": "Both local importers and tool-level token inspection fit, but the newest examined release, v0.0.7 dated 2026-06-01, falls outside the 90-day window; its 2026-07-09 default-branch commit keeps it active rather than stale. [README](https://github.com/headroomlabs-ai/tokview/blob/e28578d046e1/README.md), [release](https://github.com/headroomlabs-ai/tokview/releases/tag/v0.0.7)"
+        },
+        {
+          "key": "C04",
+          "name": "Claude Code Agent Monitor",
+          "reason": "Replay, tools, costs, and MCP support fit; however, upstream labels the Codex hook path beta, and the documented setup adds hook configuration and application build steps, making its clean-install route less settled than the finalists. [README](https://github.com/hoangsonww/Claude-Code-Agent-Monitor/blob/fc4d1cbf2e4a/README.md)"
+        },
+        {
+          "key": "C05",
+          "name": "Sessions Viewer",
+          "reason": "Both-agent replay and usage statistics fit, but the documented Linux route is a Tauri desktop application requiring GUI integration on WSL2, and macOS builds are ad-hoc signed; these add platform setup compared with the finalists' terminal/browser routes. [README](https://github.com/jerrywu001/cc-sessions-viewer/blob/c81f59223af2/README.md)"
+        },
+        {
+          "key": "C06",
+          "name": "Claude Code History Viewer",
+          "reason": "Supports both agents and a headless Linux server, but its latest examined main-branch Rust workflow failed Security Audit and Documentation; Ubuntu, macOS, and Windows test jobs passed, so this is weaker current CI evidence, not a platform exclusion. [README](https://github.com/jhlee0409/claude-code-history-viewer/blob/090737b593d8/README.md), [CI results](https://github.com/jhlee0409/claude-code-history-viewer/actions/runs/36797446665)"
+        },
+        {
+          "key": "C08",
+          "name": "Agent Console",
+          "reason": "Explicit accounting conformance and published synthetic-history benchmarks are strong evidence, but documented tool activity exposes categories and counts while withholding call arguments and outputs, giving a weaker fit for inspecting what actually ran. [Accounting](https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/docs/accounting.md), [benchmarks](https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/docs/PERFORMANCE.md), [README](https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/README.md)"
+        },
+        {
+          "key": "C09",
+          "name": "agtop",
+          "reason": "Strong fit for live process monitoring, including both agents' usage and recent tool activity, but its documented transcript reads are tail-only, limiting coverage of questions about complete past sessions. [README](https://github.com/MBrassey/agtop/blob/9a056270aee9/README.md)"
+        },
+        {
+          "key": "C10",
+          "name": "ccx",
+          "reason": "Local tracing, real-session fixture tests, passing CI, and Linux/macOS arm64 packages are strong; however, v0.17.0 explicitly documents an Opus 4.6 fast-mode pricing limitation, and GPT-6 pricing entries were not found in its pricing source or reviewed release notes, weakening cost coverage. [Pricing source](https://github.com/thevibeworks/ccx/blob/v0.17.0/internal/parser/pricing.go), [release](https://github.com/thevibeworks/ccx/releases/tag/v0.17.0), [CI](https://github.com/thevibeworks/ccx/actions/runs/34924245705)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "agentsview and Sidekick are an unranked shortlist of alternatives. On a clean WSL2 Ubuntu x86_64 host, compare their documented releases against identical local Claude Code and Codex session corpora, including streamed duplicate usage, resumed sessions, forks, subagents, compaction, and counter resets. Measure message/tool-call coverage, agreement of normalized token categories with the clients' counters, priced versus unpriced cost coverage, and cold-import plus warm-answer times for fixed questions about commands, results, failures, edits, and session spend. Repeat installation and the same questions on macOS arm64. The reviewed evidence does not establish a measured winner.",
+      "evidence_gaps": [
+        "The packet contains no completed comparisons. Upstream tests and CI provide useful evidence, but the reviewed sources do not establish a target-host head-to-head on client-counter agreement or question-answering time.",
+        "As of 2026-10-02, all ten repository APIs reported archived=false and all examined default-branch commits were within the 90-day window beginning 2026-07-04. The retrieved release lists showed recent releases for every candidate except tokview. No candidate met a closed exclusion criterion.",
+        "WSL2 fit is inferred from Linux support and the documented terminal/browser installation routes; no clean WSL2 installation was executed. agentsview publishes a macOS arm64 archive. Sidekick's macOS arm64 execution was not verified; macOS CI was not found in the reviewed CLI and extension workflows. The core analytics requirement does not need the RTX 4090.",
+        "agentsview's session usage CLI reports output-token and peak-context figures alongside cost, rather than every token category. The deciding comparison must also inspect its detailed archive/UI surfaces.",
+        "Cost figures are generally API-price estimates rather than subscription charges or reconciled invoices. Pricing completeness and missing-data handling remain part of the deciding comparison.",
+        "The shortlist was narrowed after inspecting ccx's pinned pricing source: its documented fast-mode limitation and the absence of GPT-6 entries in the reviewed source/release notes weakened its cost fit.",
+        "The requested ctx_fetch_and_index → ctx_search route was unavailable: the fetch tool required approval while this session's approval policy was never. Evidence was verified through public GitHub API JSON, including pinned source blobs and CI records. Budget used: 30 GitHub API calls, 2 failed web-search attempts, and 5 blocked page-fetch requests."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/kenn-io/agentsview",
+        "https://api.github.com/repos/hoangsonww/Claude-Code-Agent-Monitor",
+        "https://api.github.com/repos/jhlee0409/claude-code-history-viewer",
+        "https://api.github.com/repos/headroomlabs-ai/tokview",
+        "https://api.github.com/repos/LockedinLabs-AI/agent-console",
+        "https://api.github.com/repos/ConfabulousDev/confab-web",
+        "https://api.github.com/repos/thevibeworks/ccx",
+        "https://api.github.com/repos/MBrassey/agtop",
+        "https://api.github.com/repos/cesarandreslopez/sidekick-agent-hub",
+        "https://api.github.com/repos/jerrywu001/cc-sessions-viewer",
+        "https://api.github.com/repos/kenn-io/agentsview/commits?per_page=1",
+        "https://api.github.com/repos/hoangsonww/Claude-Code-Agent-Monitor/commits?per_page=1",
+        "https://api.github.com/repos/jhlee0409/claude-code-history-viewer/commits?per_page=1",
+        "https://api.github.com/repos/headroomlabs-ai/tokview/commits?per_page=1",
+        "https://api.github.com/repos/LockedinLabs-AI/agent-console/commits?per_page=1",
+        "https://api.github.com/repos/ConfabulousDev/confab-web/commits?per_page=1",
+        "https://api.github.com/repos/thevibeworks/ccx/commits?per_page=1",
+        "https://api.github.com/repos/MBrassey/agtop/commits?per_page=1",
+        "https://api.github.com/repos/cesarandreslopez/sidekick-agent-hub/commits?per_page=1",
+        "https://api.github.com/repos/jerrywu001/cc-sessions-viewer/commits?per_page=1",
+        "https://github.com/kenn-io/agentsview/blob/v0.44.0/README.md",
+        "https://github.com/hoangsonww/Claude-Code-Agent-Monitor/blob/fc4d1cbf2e4a/README.md",
+        "https://github.com/jhlee0409/claude-code-history-viewer/blob/090737b593d8/README.md",
+        "https://github.com/headroomlabs-ai/tokview/blob/e28578d046e1/README.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/README.md",
+        "https://github.com/ConfabulousDev/confab-web/blob/5376682656bf/README.md",
+        "https://github.com/thevibeworks/ccx/blob/v0.17.0/README.md",
+        "https://github.com/MBrassey/agtop/blob/9a056270aee9/README.md",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/README.md",
+        "https://github.com/jerrywu001/cc-sessions-viewer/blob/c81f59223af2/README.md",
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.44.0",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/releases/tag/v0.27.6",
+        "https://github.com/thevibeworks/ccx/releases/tag/v0.17.0",
+        "https://github.com/kenn-io/agentsview/blob/v0.44.0/internal/parser/codex_parser_test.go",
+        "https://github.com/kenn-io/agentsview/blob/d37642206051/internal/parser/codex_bench_test.go",
+        "https://github.com/kenn-io/agentsview/blob/d37642206051/internal/mcp/tools.go",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/sidekick-shared/src/sessionStats.parity.test.ts",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/v0.27.6/sidekick-shared/src/parsers/codexParser.test.ts",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/sidekick-shared/src/usage/claudeUsageDedupe.test.ts",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/sidekick-cli/src/commands/mcp.ts",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/.github/workflows/cli-ci.yml",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/blob/ddfe5055b128/.github/workflows/ci.yml",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/docs/accounting.md",
+        "https://github.com/LockedinLabs-AI/agent-console/blob/d14755421d4a/docs/PERFORMANCE.md",
+        "https://github.com/thevibeworks/ccx/blob/v0.17.0/internal/parser/pricing.go",
+        "https://github.com/thevibeworks/ccx/blob/c8c85c0c1b33/internal/provider/fixture_real_test.go",
+        "https://github.com/kenn-io/agentsview/actions/runs/36938079410",
+        "https://github.com/cesarandreslopez/sidekick-agent-hub/actions/runs/36291194204",
+        "https://github.com/thevibeworks/ccx/actions/runs/34924245705",
+        "https://github.com/jhlee0409/claude-code-history-viewer/actions/runs/36797446665"
+      ]
+    }
+  ]
+}

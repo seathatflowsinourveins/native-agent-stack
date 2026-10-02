@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 266,
+    "api_commands": 276,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 249,
+    "selected_component_api_commands": 259,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -634,8 +634,8 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.159.2",
-      "selected_source_pin": null,
+      "selected_version": "0.159.3",
+      "selected_source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
       "checks": [
         {
           "endpoint": "repos/openai/codex",
@@ -668,33 +668,80 @@
           "ended_at": "2026-09-30T05:30:30.637968+00:00",
           "stdout_sha256": "a2989731ee00f5dbbc04f0c089592aad70c0f90d226308111c93eb4ce3e8497e",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.925253+00:00",
+          "ended_at": "2026-10-01T14:06:21.462594+00:00",
+          "stdout_sha256": "e2f700c49c476105acf68be3ebbfd321057d5c147a8674bd2dec6ce709f2b791",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.925520+00:00",
+          "ended_at": "2026-10-01T14:06:21.486658+00:00",
+          "stdout_sha256": "2135b8ae7f801e728b487d62cd5a0d03a3107c4c775e348a53cb4a2f45c3682a",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/tags/rust-v0.159.3",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.926038+00:00",
+          "ended_at": "2026-10-01T14:06:21.399440+00:00",
+          "stdout_sha256": "2135b8ae7f801e728b487d62cd5a0d03a3107c4c775e348a53cb4a2f45c3682a",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/rust-v0.159.3",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:20.926594+00:00",
+          "ended_at": "2026-10-01T14:06:21.291844+00:00",
+          "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/01fc69f4026735edfdf6789820549727a4867b11",
+          "exit_code": 0,
+          "started_at": "2026-10-01T14:06:21.292613+00:00",
+          "ended_at": "2026-10-01T14:06:21.679064+00:00",
+          "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/openai/codex",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-30T04:49:08Z",
+      "pushed_at": "2026-10-01T13:58:06Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "rust-v0.159.2",
-        "published_at": "2026-09-29T23:57:16Z",
-        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "tag_name": "rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "rust-v0.159.2",
-        "sha": "ff6aec96948b70d94983af2641a6b67c94faeff5",
-        "html_url": "https://github.com/openai/codex/commit/ff6aec96948b70d94983af2641a6b67c94faeff5",
-        "committed_at": "2026-09-29T22:57:04Z"
+        "ref": "rust-v0.159.3",
+        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
+        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
+        "committed_at": "2026-09-30T21:46:21Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/openai/codex",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_source": {
+        "ref": "01fc69f4026735edfdf6789820549727a4867b11",
+        "sha": "01fc69f4026735edfdf6789820549727a4867b11",
+        "html_url": "https://github.com/openai/codex/commit/01fc69f4026735edfdf6789820549727a4867b11",
+        "committed_at": "2026-09-30T21:46:21Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "codex-for-claude",
@@ -1834,8 +1881,8 @@
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "selected_repository_url": "https://github.com/anthropics/sandbox-runtime",
-      "selected_version": "0.0.77",
-      "selected_source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "selected_version": "0.0.78",
+      "selected_source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
       "checks": [
         {
           "endpoint": "repos/anthropics/sandbox-runtime",
@@ -1868,33 +1915,73 @@
           "ended_at": "2026-09-21T22:32:17.828627+00:00",
           "stdout_sha256": "1ee99c5cf0fe9852a2ba2c0a85f07c63dc04caa154a37ff91ae900b365034722",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:05.389354+00:00",
+          "ended_at": "2026-10-02T11:43:05.771574+00:00",
+          "stdout_sha256": "93e18659e73af00d596472676ffa755c323526cba78c97a7e529aa771ec6709e",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:05.771862+00:00",
+          "ended_at": "2026-10-02T11:43:06.051811+00:00",
+          "stdout_sha256": "fff17805fa9f68c6dd4ff471e047782517cd41d730b110b2c021abcdb1a07550",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/releases/tags/v0.0.78",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.052058+00:00",
+          "ended_at": "2026-10-02T11:43:06.361548+00:00",
+          "stdout_sha256": "fff17805fa9f68c6dd4ff471e047782517cd41d730b110b2c021abcdb1a07550",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/commits/v0.0.78",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.361792+00:00",
+          "ended_at": "2026-10-02T11:43:06.713314+00:00",
+          "stdout_sha256": "ea1d0fc41ad8822910b11fdf6fab9f4adeff7cdf25c78c98918fefdec54cf58f",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/anthropics/sandbox-runtime/commits/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+          "exit_code": 0,
+          "started_at": "2026-10-02T11:43:06.713786+00:00",
+          "ended_at": "2026-10-02T11:43:07.044538+00:00",
+          "stdout_sha256": "ea1d0fc41ad8822910b11fdf6fab9f4adeff7cdf25c78c98918fefdec54cf58f",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/anthropics/sandbox-runtime",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T20:40:59Z",
+      "pushed_at": "2026-10-01T14:23:34Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.0.77",
-        "published_at": "2026-09-18T22:09:16Z",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "tag_name": "v0.0.78",
+        "published_at": "2026-09-30T01:09:22Z",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "latest_release_source": {
-        "ref": "v0.0.77",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "v0.0.78",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
@@ -3980,39 +4067,39 @@
       "component_id": "nextjs",
       "repository": "https://github.com/vercel/next.js",
       "selected_repository_url": "https://github.com/vercel/next.js",
-      "selected_version": "16.3.6",
-      "selected_source_pin": "a758ffcf501f6f1ddb03175bd1033508424c261e",
+      "selected_version": "16.3.8",
+      "selected_source_pin": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
       "checks": [
         {
           "endpoint": "repos/vercel/next.js",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:09.500324+00:00",
-          "ended_at": "2026-09-25T13:54:09.892223+00:00",
-          "stdout_sha256": "f42503630379a1bcd34701ead37d4fd33ae390a3a775a10ff6027308d4deb068",
+          "started_at": "2026-10-01T16:34:12.630283+00:00",
+          "ended_at": "2026-10-01T16:34:13.080468+00:00",
+          "stdout_sha256": "fed7ea517434fc4da16cdb7dea3a8abf0e0f84eb93f996f2747a45a4bc87dfc6",
           "status": "ok"
         },
         {
           "endpoint": "repos/vercel/next.js/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:09.892693+00:00",
-          "ended_at": "2026-09-25T13:54:10.167807+00:00",
-          "stdout_sha256": "6b8cb55525442a8a0d8e011bb77ee28b953645f86e713dce4d0f38afaff01c16",
+          "started_at": "2026-10-01T16:34:13.080597+00:00",
+          "ended_at": "2026-10-01T16:34:13.378015+00:00",
+          "stdout_sha256": "18ca493ad80926699236cc4fe2e2b447aff1b5d4cd0784c29dda07f8e59dd84f",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/a758ffcf501f6f1ddb03175bd1033508424c261e",
+          "endpoint": "repos/vercel/next.js/commits/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:10.168077+00:00",
-          "ended_at": "2026-09-25T13:54:10.521879+00:00",
-          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
+          "started_at": "2026-10-01T16:34:13.378106+00:00",
+          "ended_at": "2026-10-01T16:34:13.816368+00:00",
+          "stdout_sha256": "5b721c53973a045300ef69f1d57279a7e6f208c0c26ab21de84355de3ec43782",
           "status": "ok"
         },
         {
-          "endpoint": "repos/vercel/next.js/commits/v16.3.6",
+          "endpoint": "repos/vercel/next.js/commits/v16.3.8",
           "exit_code": 0,
-          "started_at": "2026-09-25T13:54:10.522060+00:00",
-          "ended_at": "2026-09-25T13:54:10.849822+00:00",
-          "stdout_sha256": "fb94afe98d35bb366eaf6ff72a0f15422fd9e14eb456f8dced29df26fa7540a1",
+          "started_at": "2026-10-01T16:34:13.816536+00:00",
+          "ended_at": "2026-10-01T16:34:14.198273+00:00",
+          "stdout_sha256": "5b721c53973a045300ef69f1d57279a7e6f208c0c26ab21de84355de3ec43782",
           "status": "ok"
         }
       ],
@@ -4020,27 +4107,27 @@
       "archived": false,
       "disabled": false,
       "default_branch": "canary",
-      "pushed_at": "2026-09-25T13:45:22Z",
+      "pushed_at": "2026-10-01T16:33:53Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v16.3.6",
-        "published_at": "2026-09-22T17:15:10Z",
-        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.6",
+        "tag_name": "v16.3.8",
+        "published_at": "2026-09-30T16:13:46Z",
+        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.8",
         "target_commitish": "canary",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "committed_at": "2026-09-22T15:41:35Z"
+        "ref": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "sha": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "html_url": "https://github.com/vercel/next.js/commit/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "committed_at": "2026-09-30T15:25:16Z"
       },
       "latest_release_source": {
-        "ref": "v16.3.6",
-        "sha": "a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "html_url": "https://github.com/vercel/next.js/commit/a758ffcf501f6f1ddb03175bd1033508424c261e",
-        "committed_at": "2026-09-22T15:41:35Z"
+        "ref": "v16.3.8",
+        "sha": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "html_url": "https://github.com/vercel/next.js/commit/b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+        "committed_at": "2026-09-30T15:25:16Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

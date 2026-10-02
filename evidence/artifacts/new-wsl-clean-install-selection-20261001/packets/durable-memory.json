@@ -1,0 +1,97 @@
+{
+ "layer_id": "durable-memory",
+ "title": "Durable memory",
+ "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+ "a_deciding_comparison_would_measure": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "Mem0",
+   "repository": "https://github.com/mem0ai/mem0"
+  },
+  {
+   "key": "C02",
+   "name": "ai-memory",
+   "repository": "https://github.com/akitaonrails/ai-memory"
+  },
+  {
+   "key": "C03",
+   "name": "MemPalace",
+   "repository": "https://github.com/MemPalace/mempalace"
+  },
+  {
+   "key": "C04",
+   "name": "agent-memory (tigerless-labs)",
+   "repository": "https://github.com/tigerless-labs/agent-memory"
+  },
+  {
+   "key": "C05",
+   "name": "Hindsight",
+   "repository": "https://github.com/vectorize-io/hindsight"
+  },
+  {
+   "key": "C06",
+   "name": "Graphiti",
+   "repository": "https://github.com/getzep/graphiti"
+  },
+  {
+   "key": "C07",
+   "name": "Claude-mem",
+   "repository": "https://github.com/thedotmack/claude-mem"
+  },
+  {
+   "key": "C08",
+   "name": "agentmemory (rohitg00)",
+   "repository": "https://github.com/rohitg00/agentmemory"
+  },
+  {
+   "key": "C09",
+   "name": "langmem",
+   "repository": "https://github.com/langchain-ai/langmem"
+  },
+  {
+   "key": "C10",
+   "name": "deja-vu",
+   "repository": "https://github.com/vshulcz/deja-vu"
+  },
+  {
+   "key": "C11",
+   "name": "Letta Code",
+   "repository": "https://github.com/letta-ai/letta-code"
+  },
+  {
+   "key": "C12",
+   "name": "memos",
+   "repository": "https://github.com/MemTensor/MemOS"
+  },
+  {
+   "key": "C13",
+   "name": "letta",
+   "repository": "https://github.com/letta-ai/letta"
+  },
+  {
+   "key": "C14",
+   "name": "Supermemory",
+   "repository": "https://github.com/supermemoryai/supermemory"
+  },
+  {
+   "key": "C15",
+   "name": "Basic Memory",
+   "repository": "https://github.com/basicmachines-co/basic-memory"
+  },
+  {
+   "key": "C16",
+   "name": "OpenViking",
+   "repository": "https://github.com/volcengine/OpenViking"
+  },
+  {
+   "key": "C17",
+   "name": "Cognee",
+   "repository": "https://github.com/topoteretes/cognee"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "LongMemEval-S, session-level retrieval, 470 questions, recall_all@5, on a Mac (descriptive): agentmemory 0.9.29 with the all-MiniLM-L6-v2 embedder over its REST path 0.821; ai-memory (a 2.5 pre-release build) with Qwen3-Embedding-4B and its LLM reranker turned off 0.570; plain BM25 0.747. Not run: ai-memory with its LLM reranker, agentmemory through its Claude Code hooks, Hindsight 0.10.1 and MemPalace 3.10.0. The two systems captured different amounts of each session and used different embedders."
+ ],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

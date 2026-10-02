@@ -76,6 +76,13 @@ orders (ibapi probe).
 
 ## Blockers for the gate
 
+**Update, 2026-10-01** (supersedes the #4983 bullet below; see
+`docs/decisions/2026-10-01-trading-layer-verdicts.md`): nautilus_trader#4983 is a stale v1.227.0 report for rc5.
+At tag `v2.0.0rc5` the execution engine denies an order only when `handles_order_venue` is false, and the IB
+execution client returns `true` (source reading, not an rc5 order observation). The open rc5 obstacles on the
+recovery and reconciliation paths that steps 3-4 exercise are #5007, #5057 and #5060 (`rc5_blockers` in
+`catalogs/us-equities/runtime-target.json`); #4946 is fixed on develop in no release.
+
 - Native stock orders (steps 2-4): [nautilus_trader#4983](https://github.com/nautechsystems/nautilus_trader/issues/4983),
   the execution client's `IB` venue never matches the `SMART` instrument venue,
   so every stock order is denied locally.

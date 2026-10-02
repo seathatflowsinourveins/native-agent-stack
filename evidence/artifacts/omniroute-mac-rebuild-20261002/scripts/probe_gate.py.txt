@@ -1,0 +1,84 @@
+#!/usr/bin/env python3
+"""Probe gate for the local OmniRoute gateway on 127.0.0.1:20128.
+
+The gateway runs keyless on loopback; callers pass the documented placeholder value (docs/secret-storage.md, the
+`omniroute` row). Checks: the model catalog lists GPT-6.1 Sol and GPT-6 Astra; a Responses call to each at effort max
+answers 200 and reports the effort the upstream applied; one codex exec through the gateway (an isolated CODEX_HOME
+with no AGENTS.md) answers and runs a web search. Prints one JSON object; exit 0 when every required check passes."""
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+BASE = "http://127.0.0.1:20128/v1"
+PLACEHOLDER = "local-loopback"
+HDR = {"Authorization": "Bearer " + PLACEHOLDER, "Content-Type": "application/json"}
+KEY_ENV = "OMNIROUTE" + "_API_KEY"
+
+
+def get(path):
+    req = urllib.request.Request(BASE + path, headers=HDR)
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return r.status, json.load(r)
+
+
+def responses(model, effort):
+    body = json.dumps({"model": model, "input": "Reply with the single word OK.", "reasoning": {"effort": effort},
+                       "stream": False}).encode()
+    req = urllib.request.Request(BASE + "/responses", data=body, headers=HDR, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=600) as r:
+            data = json.load(r)
+            text = "".join(c.get("text", "") for o in data.get("output", []) if o.get("type") == "message"
+                           for c in o.get("content", []))
+            return {"status": r.status, "model": data.get("model"), "reasoning": data.get("reasoning"),
+                    "text": text.strip()[:40], "usage": data.get("usage")}
+    except urllib.error.HTTPError as exc:
+        return {"status": exc.code, "error": exc.read().decode(errors="replace")[:300]}
+    except Exception as exc:  # noqa: BLE001
+        return {"status": None, "error": str(exc)[:300]}
+
+
+def codex_exec(model):
+    home = Path(tempfile.mkdtemp(prefix="probe-codex-home-"))
+    work = Path(tempfile.mkdtemp(prefix="probe-work-"))
+    (home / "config.toml").write_text("\n".join([
+        f'model = "{model}"', 'model_provider = "omniroute"', 'model_reasoning_effort = "max"', "",
+        "[features]", "shell_snapshot = false", "standalone_web_search = true", "",
+        "[model_providers.omniroute]", 'name = "OmniRoute"', f'base_url = "{BASE}"', f'env_key = "{KEY_ENV}"',
+        "requires_openai_auth = false", 'wire_api = "responses"', "supports_standalone_web_search = true", ""]))
+    env = dict(os.environ, CODEX_HOME=str(home))
+    env[KEY_ENV] = PLACEHOLDER
+    last = work / "last.txt"
+    proc = subprocess.run(["codex", "exec", "--skip-git-repo-check", "--ephemeral", "-s", "read-only", "-C", str(work),
+                           "-c", 'web_search="live"', "--json", "-o", str(last),
+                           "Use one web search to find the GitHub repository of the OmniRoute project, then reply "
+                           "with its owner/name only."],
+                          env=env, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=900)
+    return {"exit": proc.returncode, "answer": last.read_text().strip()[:80] if last.exists() else None,
+            "search_events": proc.stdout.count('"type":"search"'), "stderr_tail": proc.stderr.strip()[-200:]}
+
+
+def main():
+    out = {}
+    status, models = get("/models")
+    ids = {m.get("id") for m in models.get("data", [])}
+    out["catalog"] = {"status": status, "cx/gpt-6.1-sol": "cx/gpt-6.1-sol" in ids,
+                      "cx/gpt-6-astra": "cx/gpt-6-astra" in ids, "models": len(ids)}
+    out["sol_max"] = responses("cx/gpt-6.1-sol", "max")
+    out["astra_max"] = responses("cx/gpt-6-astra", "max")
+    out["codex_exec_sol"] = codex_exec("cx/gpt-6.1-sol")
+    required = [out["catalog"]["cx/gpt-6.1-sol"], out["catalog"]["cx/gpt-6-astra"],
+                out["sol_max"].get("status") == 200, out["astra_max"].get("status") == 200,
+                out["codex_exec_sol"]["exit"] == 0]
+    out["pass"] = all(required)
+    print(json.dumps(out, indent=2))
+    return 0 if out["pass"] else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,171 @@
+{
+  "layers": [
+    {
+      "layer_id": "agents-in-ci",
+      "selection": [
+        {
+          "name": "GitHub Agentic Workflows — C06",
+          "repository": "https://github.com/github/gh-aw",
+          "role": "Provisional clean-install choice for both agents: configure separate workflows with engine: claude and engine: codex. Its documented permission separation, constrained outputs, actor checks, and network controls best fit the least-privilege requirement. This is an architecture-based recommendation, not a measured review-quality or cost winner.",
+          "install_command": "gh extension install github/gh-aw --pin v0.89.21",
+          "install_source": "The upstream quickstart documents gh extension install github/gh-aw. The installed GitHub CLI's extension-install help confirms support for --pin. v0.89.21 was the latest published release returned by the GitHub API. GitHub CLI and authentication are prerequisites.",
+          "basis": [
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/engines.md",
+              "shows": "Provides native Claude Code and OpenAI Codex engines, so one repository covers both required clients without adding two overlapping action wrappers."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/permissions.md",
+              "shows": "Documents read-only agent permissions by default and routes GitHub writes through safe outputs."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/introduction/architecture.mdx",
+              "shows": "Documents separate jobs that validate and apply agent-requested writes with scoped permissions. Also identifies the runner, container runtime, firewall, and MCP infrastructure as trusted components; this is a documented security design, not proof that prompt injection is eliminated."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/pkg/cli/compile_permissions_integration_test.go",
+              "shows": "Contains integration tests asserting that compilation rejects agent write permissions in default strict mode. This is relevant public test evidence for enforcing the requirement; it is not a comparative review benchmark."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/triggers.md",
+              "shows": "Supports PR and issue events and documents default actor-role checks for admin, maintainer, and write access."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/sandbox.md",
+              "shows": "Documents the default Agent Workflow Firewall sandbox and domain-based egress controls. These are stronger documented runtime controls than a prompt instruction to avoid networking."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/releases/tag/v0.89.21",
+              "shows": "Published 2026-09-23, within the 90-day window. Release assets include linux-amd64 and darwin-arm64. Linux compatibility makes the workstation CLI suitable for WSL2 Ubuntu in principle; an actual WSL2 installation was not tested."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/reference/self-hosted-runners.md",
+              "shows": "Self-hosted execution requires Linux with Docker support; macOS and Windows runners are unsupported. macOS arm64 can host the compiler CLI while execution uses a Linux Actions runner. The documented workflows have no local GPU requirement."
+            },
+            {
+              "url": "https://api.github.com/repos/github/gh-aw",
+              "shows": "Repository is not archived. The observation reported 459 open issues/PRs; that count does not establish response times or backlog health. License is MIT and was not used to rank it."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/commit/35eb607ae44d",
+              "shows": "Observed default-branch commit dated 2026-10-02, within the 90-day window."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/actions/runs/36952605277",
+              "shows": "The observed current-main push CI run concluded failure. Two later scheduled CI runs at the same SHA concluded success, but their jobs and logs were not inspected, so those successes do not establish that the failure was repaired or that equivalent checks ran."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/engines/claude.md",
+              "shows": "Claude authentication requires an Anthropic API key or supported workload identity federation; Claude subscription OAuth tokens are explicitly unsupported. This is a material limitation if a clean install must reuse subscription authentication."
+            },
+            {
+              "url": "https://github.com/github/gh-aw/blob/v0.89.21/docs/src/content/docs/engines/codex.md",
+              "shows": "Documents Codex execution, CODEX_API_KEY or OPENAI_API_KEY authentication, and compiling the workflow with gh aw compile. Integration is through the compiler, agent CLI, and MCP infrastructure."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "No additional component",
+          "reason": "The packet provides no evidence establishing that both agents' PR/issue automation can be omitted. The value of adding agent automation is also unmeasured, so this remains a baseline for the deciding experiment rather than an established winner."
+        },
+        {
+          "key": "C02",
+          "name": "claude-codex-actions",
+          "reason": "A credible compact alternative covering both agents, with temporary credential-state isolation and nine parser/contract tests plus twelve synthetic composite-action scenarios; its README leaves triggers and permissions to the caller, whereas the selected compiler documents enforcement and separate write jobs. Active commit and v1.0.0 release on 2026-09-10. [README](https://github.com/andrii-artemenko-gen/claude-codex-actions/blob/v1.0.0/README.md), [validation record](https://github.com/andrii-artemenko-gen/claude-codex-actions/releases/tag/v1.0.0)."
+        },
+        {
+          "key": "C03",
+          "name": "claude-code-action (Anthropic)",
+          "reason": "Strong Claude-specific alternative with PR/issue integration, actor checks, tool controls, and a public Bun test suite; it needs a complementary Codex component and caller configuration to reproduce the selected common permission architecture. Active commit on 2026-10-01; releases/latest returned v1, published 2025-08-26, so release currency is weaker than commit currency. [security guidance](https://github.com/anthropics/claude-code-action/blob/97c53473391b/docs/security.md), [permission tests](https://github.com/anthropics/claude-code-action/blob/97c53473391b/test/permissions.test.ts)."
+        },
+        {
+          "key": "C05",
+          "name": "CodeForge",
+          "reason": "Covers both agents and supplies a CI action, but the Codex runner explicitly selects danger-full-access and its documented PR-review workflow grants pull-requests: write in the agent job, giving it a broader default privilege footprint for this requirement. Active commit and v1.1.3 release on 2026-09-17. [runner source](https://github.com/freema/codeforge/blob/v1.1.3/internal/tool/runner/codex.go), [CI workflow documentation](https://github.com/freema/codeforge/blob/v1.1.3/docs/ci-action.md), [upstream tests](https://github.com/freema/codeforge/blob/v1.1.3/.github/workflows/ci.yaml)."
+        },
+        {
+          "key": "C07",
+          "name": "codex-action (iCoreTech)",
+          "reason": "Maintained Codex-only Docker wrapper with Bats tests, but network_access: false is documented and implemented as a prompt-level instruction, and the sandbox input accepts full-auto or danger-full-access; these controls fit least privilege less closely than the selected documented runtime policies. Active commit and v0.9.48 release on 2026-10-01. [entrypoint](https://github.com/icoretech/codex-action/blob/v0.9.48/entrypoint.sh), [action inputs](https://github.com/icoretech/codex-action/blob/v0.9.48/action.yml), [tests](https://github.com/icoretech/codex-action/blob/v0.9.48/tests/entrypoint.bats)."
+        },
+        {
+          "key": "C08",
+          "name": "codex-action (OpenAI)",
+          "reason": "Strong Codex-specific alternative: tested actor checks, protected execution settings, API-key proxying, privilege reduction, and a README example separating review execution from comment posting. It still needs a Claude component, so it is an alternative architecture rather than a complementary addition to the selected Codex engine. Active commit on 2026-08-20; releases/latest returned HTTP 404. No review-quality or cost disadvantage is established. [README](https://github.com/openai/codex-action/blob/86365089eb2b/README.md), [hardening tests](https://github.com/openai/codex-action/blob/86365089eb2b/test/actionHardening.test.mjs)."
+        },
+        {
+          "key": "C09",
+          "name": "multi-llm-security-review",
+          "reason": "The documented workflow runs on-demand whole-repository security reviews, applies fixes, and opens PRs with contents: write and pull-requests: write, plus scanning permissions; that is a narrower task and broader documented privilege footprint than general PR/issue assistance. Active commit and 1.0.4 release on 2026-10-01. It could be adapted, so it is not excluded as incapable. [README](https://github.com/shaztechio/multi-llm-security-review/blob/main/README.md)."
+        },
+        {
+          "key": "C10",
+          "name": "claude-code-action (StepSecurity)",
+          "reason": "A maintained Claude-only drop-in alternative whose v1.0.183 release supplies SBOM and provenance assets; those are useful supply-chain evidence, but the sources read do not establish a measured runtime-permission or review-quality advantage over the other plausible architectures. Active commit on 2026-10-01; latest release published 2026-08-12. [README](https://github.com/step-security/claude-code-action/blob/main/README.md), [release evidence](https://github.com/step-security/claude-code-action/releases/tag/v1.0.183)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C04",
+          "name": "claude-code-base-action",
+          "criterion": "duplicate",
+          "fact": "Its GitHub repository description identifies it as a mirror of claude-code-action/base-action. The observed 2026-10-01 commit is titled Sync from claude-code-action base-action@97c5347, confirming the shared implementation rather than a complementary layer component. [repository metadata](https://api.github.com/repos/anthropics/claude-code-base-action), [sync commit](https://github.com/anthropics/claude-code-base-action/commit/4bd489c7d926)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "No measured winner is established. Compare the selected v0.89.21 release against the Anthropic action at 97c53473391bff1901034d4b454b5bac7ab7a029 plus the OpenAI action at 86365089eb2b84e0a8fb0717b304f8bdcb13b20e, and against claude-codex-actions v1.0.0. Use each repository's documented workflow patterns on fresh disposable WSL2 Ubuntu x86_64 Actions runners, with Docker where required, identical model/client pins, prompts, budgets, and a fixed PR/issue corpus. Measure blinded human-confirmed findings, false positives, requested and effective permissions, handling of untrusted contributors and repository instructions, provider cost, runner cost, and run failures. Repeat installation/compilation on macOS arm64 while executing Linux-only workflows on Linux runners. Include conventional CI plus human review as the no-additional-component baseline to test whether agent automation earns its cost. Until this comparison and the unresolved current-main CI failure are assessed, the selection remains provisional.",
+      "evidence_gaps": [
+        "Observations were collected on 2026-10-02 UTC; the 90-day window starts 2026-07-04. All nine repositories were unarchived and had an observed default-branch commit within that window. None qualified for stale_or_archived exclusion.",
+        "The packet contains no comparisons where every named arm ran. No human-confirmed review-quality or cost superiority was established from the upstream sources read.",
+        "The required ctx_fetch_and_index tool twice returned: MCP tool call requires approval, but approval policy is never. Pinned upstream archives were therefore downloaded through the shell, indexed with ctx_index, and read with ctx_search. This deviates from the requested fetch method.",
+        "Budget used: 30 GitHub API calls; six successful upstream archive fetches and two blocked fetch attempts; three submitted benchmark-search queries. The search batch failed with an upstream timeout, so benchmark discovery was incomplete.",
+        "Current-main GitHub Agentic Workflows push CI concluded failure. Later scheduled successes were observed, but failure logs, job-level results, and CI results for the selected release pin were not inspected. The installed-client, fresh-install, and target-host tests were not run.",
+        "The claude-codex-actions validation explicitly uses synthetic CLIs and makes no live provider requests. Public test-source presence in other repositories was not treated as a passing CI result or a comparative model evaluation.",
+        "Issue/PR snapshots were: CodeForge 3; OpenAI codex-action 84; iCoreTech codex-action 2; StepSecurity claude-code-action 17; claude-codex-actions 0; multi-llm-security-review 0; GitHub Agentic Workflows 459; Anthropic claude-code-action 815; claude-code-base-action 14. Issue response and closure activity were not measured, and these counts were not used as popularity or quality scores.",
+        "WSL2 execution compatibility is inferred from documented Linux support and release assets, not verified on the target host. The selected CLI has a darwin-arm64 asset, but its self-hosted Actions execution requires Linux with Docker. Claude subscription OAuth authentication is unsupported by the selected release."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/freema/codeforge",
+        "https://api.github.com/repos/freema/codeforge/releases/latest",
+        "https://api.github.com/repos/freema/codeforge/commits?per_page=1",
+        "https://api.github.com/repos/openai/codex-action",
+        "https://api.github.com/repos/openai/codex-action/releases/latest",
+        "https://api.github.com/repos/openai/codex-action/commits?per_page=1",
+        "https://api.github.com/repos/icoretech/codex-action",
+        "https://api.github.com/repos/icoretech/codex-action/releases/latest",
+        "https://api.github.com/repos/icoretech/codex-action/commits?per_page=1",
+        "https://api.github.com/repos/step-security/claude-code-action",
+        "https://api.github.com/repos/step-security/claude-code-action/releases/latest",
+        "https://api.github.com/repos/step-security/claude-code-action/commits?per_page=1",
+        "https://api.github.com/repos/step-security/claude-code-action/readme",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions/releases/latest",
+        "https://api.github.com/repos/andrii-artemenko-gen/claude-codex-actions/commits?per_page=1",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review/releases/latest",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review/commits?per_page=1",
+        "https://api.github.com/repos/shaztechio/multi-llm-security-review/readme",
+        "https://api.github.com/repos/github/gh-aw",
+        "https://api.github.com/repos/github/gh-aw/releases/latest",
+        "https://api.github.com/repos/github/gh-aw/commits?per_page=1",
+        "https://api.github.com/repos/github/gh-aw/actions/runs?branch=main&per_page=100",
+        "https://api.github.com/repos/anthropics/claude-code-action",
+        "https://api.github.com/repos/anthropics/claude-code-action/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code-action/commits?per_page=1",
+        "https://api.github.com/repos/anthropics/claude-code-base-action",
+        "https://api.github.com/repos/anthropics/claude-code-base-action/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code-base-action/commits?per_page=1",
+        "https://codeload.github.com/github/gh-aw/tar.gz/refs/tags/v0.89.21",
+        "https://codeload.github.com/openai/codex-action/tar.gz/86365089eb2b84e0a8fb0717b304f8bdcb13b20e",
+        "https://codeload.github.com/anthropics/claude-code-action/tar.gz/97c53473391bff1901034d4b454b5bac7ab7a029",
+        "https://codeload.github.com/freema/codeforge/tar.gz/refs/tags/v1.1.3",
+        "https://codeload.github.com/andrii-artemenko-gen/claude-codex-actions/tar.gz/refs/tags/v1.0.0",
+        "https://codeload.github.com/icoretech/codex-action/tar.gz/refs/tags/v0.9.48"
+      ]
+    }
+  ]
+}

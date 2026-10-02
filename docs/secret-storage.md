@@ -1528,14 +1528,39 @@ bindings and their consumers are indexed too. Runner inspection expands only
 the started command and reuses the base reading's outer segments. Permanent
 tests retain all three review generators, require their real hook responses
 within one second, and keep K4's named rows and helper measurements below
-0.5 seconds of processor time on the workstation. Other hosts, CI included,
-scale that bound by their time for a fixed guard-independent workload
-(the standard library's shlex lexer over short words and one long quoted
-word) relative to the workstation's, never below 1: on the hosted macOS
-runner a long quoted word lexes about 2.6 times slower than here. Each helper's
-growth from 25,000 to 100,000 characters must also fit an exponent under 1.5
-(1 is linear, 2 quadratic) over the minimum of up to three rounds, the
-criterion of the child-usage linearity checks. The mutation gate counts only
+0.5 seconds of processor time on the workstation. Each named row starts with
+one guarded measurement; each helper starts with one at each of 25,000, 50,000
+and 100,000 characters, measuring both helper and whole-check time. After the
+first failed absolute or growth criterion, calibration runs once beside that
+round: five processor-time measurements of a fixed guard-independent workload
+(standard-library shlex over short words and one long quoted word). The host
+factor is `min(4.0, max(1.0, min(reference samples) / 0.188))`, using the
+workstation's calibrated 0.188 seconds. The minimum prevents one increased
+reference sample from relaxing the bound; the 4.0 cap leaves margin above the
+recorded hosted macOS slowdown of about 2.8 times (2.6 times for the long-word
+row) and bounds the absolute limit at 2.0 seconds. The factor applies only to
+the absolute processor-time bounds.
+
+Each helper's growth exponent is computed from **raw** per-size timing minima:
+`ln((t100k + 0.005) / (t25k + 0.005)) / ln(4)` must be strictly below 1.5.
+The fixed 5 ms allowance is never scaled. This is the criterion of the
+child-usage linearity checks; the unadjusted exponent is 1 for linear and 2 for
+quadratic growth. After calibration the same first-round samples are rechecked;
+another guarded round runs only while a criterion still fails, with a maximum
+of three rounds and the per-size raw minimum over all rounds run so far.
+This follows [CPython's `timeit` repetition guidance](https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat)
+and uses its [maintained reference implementation](https://github.com/python/cpython/blob/3.14/Lib/timeit.py)
+for the five reference measurements. A clean later sample can resolve timing
+noise; three identical quadratic helper rounds of 10, 40 and 160 ms remain
+rejected at host factors 1.0, 2.6 and 4.0.
+
+An unscaled first-round pass costs one guarded measurement per named row,
+three per helper, and no references. Calibration alone can accept the first
+round without another guarded measurement. At most, each row uses three guarded
+measurements and five references, and each helper uses nine guarded measurements
+and five references. The separate nesting probe uses two guarded measurements
+per round, repeating only on failure up to three rounds, without calibration.
+The mutation gate counts only
 assertion failures from its named permanent tests, with passing unmutated
 controls. Shared-budget thresholds come from isolated stage measurements;
 each stage must fit alone and only their combined work exceeds the threshold.
@@ -2180,8 +2205,8 @@ host writes, announced to the peers first:
    line is the newest and reads `credential boot receipt: rows=<n> ok=<n> ...
    guard_matches_pin=true result=ok receipt=<name>.json`. `compare` prints
    `baseline: <name> (one receipt; nothing to compare yet)` and exits 0.
-3. If a canary harness from a later change of this design has landed, keep its
-   canary across the restart as that change documents.
+3. Finish and disarm any canary proof before restart; no canary survives a
+restart. Runtime proof records are bound to one boot and cannot qualify another.
 4. Checkpoint the peers (the grand-dashboard checkpoint). The restart is the
    user's: once the trading lane has confirmed a time, the user runs
    `wsl --shutdown` from Windows. No agent restarts its own host.
@@ -2202,10 +2227,273 @@ After the restart:
    ends with `result: regression: <ids>`, naming each required or optional file
    row that was `ok` and is not; exit 2 means no receipt could be read or one
    is malformed, and its one line names the receipt file.
-6. If a canary was kept, consume, verify and clean it up with that harness: it
-   shows a stored key injected by id after a restart with no person involved.
-7. Publish sanitized, value-free output with host paths stripped, in a
+6. Publish sanitized, value-free output with host paths stripped, in a
    follow-up evidence PR: `compare`'s lines, not the receipts.
+
+## Canary proof
+
+`tools/credentials/canary_proof.py` is a Linux-only, synthetic proof tool for
+six consumers: systemd-user-unit, fresh-claude-session, subagent,
+workflow-child, codex-exec and omniroute-lane. It launches no consumers.
+Its test-only inventory row is environment-only (`CANARY_E2E_KEY`, class
+`test_canary`, status `test_only`); the synthetic file exists only between
+arm and disarm. Patterns and controls stay in private runtime storage until
+cleanup. HMAC tag lines intentionally reach the consumer's recording sink.
+No canary is kept across restart; the boot-receipt comparison above qualifies
+restart persistence separately.
+
+The coordinator holds synthetic values and fixed records. A contained worker
+and its dumper are scanner-equivalent children: like ripgrep, they hold sink
+bytes. They alone walk names, sniff headers, read link targets, decode streams,
+read configuration to check the guard pin, and parse Git/SQLite/journal data.
+The coordinator never receives those bytes or raw diagnostics. Its output,
+log, run record and receipts contain fixed enums, keyed opaque ids and counts.
+This process boundary is the real-value guarantee; the scanner-side children's
+memory is a stated residual, not an assertion that no process sees values.
+"Upstream executable" means a child the worker starts (rg, gzip, bzip2, xz,
+journalctl, git, systemctl, systemd-cat and the SQLite dumper); each starts
+through `setpriv --pdeathsig TERM` with stdin from `/dev/null`, a held sink
+descriptor or an owned pipe, and never inherits the plan, protocol or
+acknowledgement descriptor.
+
+Three fixed frames cross the boundary, all big-endian (network order), all
+defined once in `canary_scan_worker.py` and imported by the coordinator:
+
+| Frame | Bytes | Layout (offset:width field) |
+| --- | --- | --- |
+| PLAN, coordinator to worker, once | 64 + body | 0:4 `CPPL`; 4:1 version 1; 5:1 kind 1; 6:2 zero; 8:16 request nonce; 24:4 body length (at most 4 MiB); 28:32 SHA-256 of the body; 60:4 zero; then the body, canonical JSON (sorted keys, ASCII, no spaces) |
+| CP03, worker to coordinator | 128 | 0:4 `CP03`; 4:1 version 1; 5:1 kind; 6:2 zero; 8:16 nonce; 24:8 sequence; 32:8 check id; 40:2 sink; 42:1 mode; 43:1 view; 44:1 class; 45:1 path class; 46:1 status; 47:1 reason; 48:1 consumer; 49:7 zero; 56:4 attempt; 60:4 subpass; 64:8 observed; 72:8 expected; 80:4 signed exit; 84:4 zero; 88:16 opaque object id; 104:16 seal; 120:8 auxiliary count |
+| ACK, coordinator to worker, per HIT | 32 | 0:4 `CPAK`; 4:1 version 1; 5:1 kind 1; 6:2 zero; 8:16 nonce; 24:8 the HIT's sequence number, sent only after the `hit` event is fsynced |
+
+CP03 is contract draft 3's record with amendment C7's extensions: kind 9
+COUNTER (check id 1-12: selected, unselected, special, excluded_key,
+excluded_user, declined, declared_link, dangling_link, covered_link,
+excluded_link, directories, git_stores; observed is the count), class 8
+anchor, path classes 14-16 for the coordinator's own session (main, subagent,
+workflow) beside 1-3 for other sessions, FACT 10 guard pin, 11 store
+outside a worktree, and 12 scope binding (observed worker PID, expected numeric
+scope suffix, all other optional fields zero). The coordinator binds the scope
+to its runner PID using kernel membership metadata. After END the worker waits
+for shutdown on its existing acknowledgement channel; the coordinator invokes
+the runner's native stop trap and requires the scope to be empty before reaping.
+M2 metadata checks carry the format enum and bind the per-format controls.
+Every field a kind does not use must be zero; a partial
+frame, a gap in the sequence, another nonce or an unknown value makes the
+request incomplete. Version FACTs use one formula for every executable the
+worker calls (rg, git, gzip, bzip2, xz, journalctl, systemctl, systemd-cat,
+setpriv, nice, ionice, python3) and for SQLite: major x 1,000,000 + minor x
+1,000 + patch, so rg 14.1.0 is 14001000.
+
+Reuse sources are [ripgrep 14.1.0](https://github.com/BurntSushi/ripgrep/tree/e50df40a1967708b9781486b1c017e48040bceb0),
+`crates/core/flags/defs.rs`, `hiargs.rs`, `main.rs` and the standard printer;
+GNU gzip/bzip2/xz's installed `-d -c` interfaces; Git v2.43.0 cat-file/fsck/
+verify-pack; SQLite URI/WAL/schema interfaces; and the unchanged repository
+`ecosystem-bounded-run`, credential runner, writer and boot-receipt publisher.
+ripgrep 15.2.0 (`e89fff89`) is a source-reviewed output grammar, not executed:
+the runtime accepts that version with its separate stats terminator, but its
+only test is a hand-written stats fixture. The executed version is 14.1.0.
+Resolve, hash and invoke absolute executables; a new version requires review
+and the corresponding fixtures. No ripgrep compression switch, quiet
+mode, recursive sink-path argv or raw fallback is used.
+
+The runtime root must be an absolute, owned 0700 `XDG_RUNTIME_DIR`; records
+and patterns are 0600. One nonblocking per-user flock spans each invocation,
+including cleanup. `--session` optionally binds the coordinator session id;
+without it, attribution reports reduced assurance. Register every planned
+Codex home before baseline. A later arm cannot add an unbaselined home.
+
+```sh
+rtk python3 tools/credentials/canary_proof.py prepare --transcripts confirmed --codex-home LANE_HOME --session SESSION_ID
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase baseline
+rtk python3 tools/credentials/canary_proof.py arm --run RUN CONSUMER
+rtk python3 tools/credentials/canary_proof.py arm --run RUN omniroute-lane --codex-home LANE_HOME
+rtk python3 tools/credentials/canary_proof.py disarm --run RUN
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase final
+rtk python3 tools/credentials/canary_proof.py status --run RUN
+rtk python3 tools/credentials/canary_proof.py verdict --run RUN
+rtk python3 tools/credentials/canary_proof.py cleanup --run RUN
+```
+
+Arm prints an id-only probe command followed by the disarm command; use that
+exact probe command in each approved consumer. Systemd adds `--leak-check`
+and records the masked form corpus in the user journal. Other consumer output
+goes to `/dev/null`; the client records the tag in its usual sink. S8 is the
+packaged `canary_lane_consumer.sh`, which selects the registered home, profile
+stack-worker, model cx/gpt-6-astra, effort max and a 900-second bound; it takes
+stdin and sends stdout/stderr to `/dev/null`, with no capture file. The
+placeholder assignment stays inside the wrapper. The workflow has two
+source-scout stages, each sonnet/max, under the native Workflow interface.
+
+Only the user in their terminal may run these optional commands:
+
+```sh
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase final --user-run
+rtk python3 tools/credentials/canary_proof.py scan --run RUN --phase comparison --user-run
+```
+
+The TTY/unset-CLAUDECODE checks are accident guards. K4 must deny agent Bash
+`--user-run`, `--phase comparison` and `--phase=comparison`. Argparse accepts
+no abbreviations. The build skips denial acceptance only when K4 item 14 is
+absent; installing K4 is mandatory before the operational window.
+
+Every scan request is appended and fsynced before its directory, union,
+controls or workers are prepared. The latest request supersedes earlier
+passes even if setup fails or SIGKILL occurs before the plan. Every valid
+hit is fsynced before acknowledgement and remains sticky across retries,
+rotation, user scans, comparison and cleanup. An optional request becomes
+required once made. A successful fragment never fills a missing obligation.
+Final/user/comparison freshness requires matching attempts, patterns, pins,
+boot, complete ledgers and at least 1,200 boottime seconds since last disarm.
+The one stability retry consumes the original sink deadline.
+
+| Exit | Meaning |
+| --- | --- |
+| 0 | Successful operation, complete zero-hit baseline/scan, or clean classifier result |
+| 1 | Safety/precondition refusal, including unsupported platform |
+| 2 | CLI usage |
+| 3 | Incomplete classifier or scan |
+| 4 | Invalid record |
+| 5 | Sticky canary leak; invalid-record precedence remains exit 4 |
+| 75 | Lock busy; no request admitted |
+
+`status`, `verdict` and `cleanup` return the classifier's 0/3/4/5, or 1 on a
+precondition refusal and 75 on contention. `record_invalid` maps to 4.
+Every other code below maps to 3; a validated sticky hit takes precedence
+over incompleteness and yields 5.
+
+| Code family (closed suffixes: CONSUMER, SINK, opaque ROOT id, CHECK number, the fixed `agentsview`, or a fixed REASON) | Exit |
+| --- | --- |
+| boot_changed, tool_changed, pattern_file_mismatch, clock_stepped, guard_not_pinned | 3 |
+| no_baseline, baseline_unfinished, baseline_incomplete, baseline_after_arm, baseline_scope_missing | 3 |
+| baseline_sink_not_scanned:SINK, baseline_check_not_scanned:ROOT:CHECK, baseline_sink_incomplete:SINK, baseline_control_missing | 3 |
+| not_armed:CONSUMER, not_disarmed:CONSUMER, disarm_unverified:CONSUMER, guard_not_pinned_at_arm:CONSUMER, recording_missing:CONSUMER | 3 |
+| no_final, final_unfinished, final_incomplete, final_stale, final_too_early | 3 |
+| sink_not_scanned:SINK, check_not_scanned:ROOT:CHECK, sink_incomplete:SINK:REASON, inventory_unreconciled | 3 |
+| control_missing:SINK, masking_markers_mismatch | 3 |
+| user_run_unfinished, user_run_incomplete, user_run_stale, user_run_too_early | 3 |
+| user_run_sink_not_scanned:SINK, user_run_check_not_scanned:ROOT:CHECK, user_run_sink_incomplete:SINK, user_run_control_missing, user_arrival_missing:agentsview | 3 |
+| comparison_unfinished, comparison_incomplete, comparison_stale, comparison_too_early | 3 |
+| comparison_sink_not_scanned:SINK, comparison_check_not_scanned:ROOT:CHECK, comparison_sink_incomplete:SINK, comparison_control_missing | 3 |
+| store_armed, arming_unresolved, store_absence_unverified | 3 |
+
+`protocol_error` and `negative_control_matched` are fixed REASON suffixes of
+`sink_incomplete:SINK:REASON`, rather than standalone verdict codes.
+`arm` prints an absolute `/usr/bin/python3 -I <checkout>/tools/credentials/...`
+probe command, which also resolves inside a user service's default directory.
+
+An agent scan covers A1 Claude state; A2 audit/bash history; A3 MCP cache;
+A4 all registered Codex homes; A9 collector file export; A10 task directories;
+A11 inclusive-cursor user-journal export; and A12 configured Git stores plus
+stores discovered inside an already covered root. A5–A8 are retired.
+
+User scans add U1 OmniRoute account state; U2 Docker environments/auth config;
+U3 Codex shell snapshots; U4 full user-manager environment; U5 environment/unit
+configuration; U6 Claude history/paste cache and each Codex history.jsonl;
+U7 client configuration and backups; U8 agentsview/ai-memory/context-mode/RTK/
+headroom aggregates and top-level Codex SQLite families. Codex rust-v0.157.1
+[`message-history/src/lib.rs`](https://github.com/openai/codex/blob/36650394c5b38c2990ccf2a3457165ca3e9d9726/codex-rs/message-history/src/lib.rs#L52)
+places history.jsonl in CODEX_HOME; this mapping does not inspect a real history.
+Requested U finals require the fresh-session tag's agentsview arrival.
+
+K is never scanned: the key store, exact inventory credential/native-store
+paths, registered auth files, declared pointer targets, SSH/GnuPG, the Claude
+daemon key and keys directly in its sessions directory. Exclusions match
+canonical locations, not an arbitrary basename. Metadata at a parent's
+boundary is counted; key-home contents are never opened. The narrow synthetic
+store lifecycle exception permits only create-only publication, no-follow stat
+of the fixed leaf, and identity-checked unlink. A missing/unsafe store is
+neither created nor chmodded. A foreign file is preserved.
+
+`--transcripts exclude` is the default and excludes exactly every Claude
+projects subtree and every registered Codex sessions subtree, all or nothing.
+It cannot be broadened within a run. Required tags in declined roots remain
+missing, so such a run cannot establish the six-consumer proof. At window time
+the user may confirm those roots are safe and inactive through the last scan;
+no transcript purge is requested or performed.
+
+Selection uses full-file ctime at the prepare reference minus one hour,
+selecting all on unknown filesystems and in comparison. Held regular fds,
+pre/post full identity tuples, complete directory entry lists, family membership
+and route rechecks establish metadata quiescence. This is not an atomic snapshot.
+Every claim retains backward clock excursions beyond the hour margin that are
+undone between checks, deferred shared-mapping timestamps, privileged/direct-
+disk or same-uid tampering, and writes after the final check as residuals.
+
+M1 raw always runs; BOM, compression, Git and SQLite logical views are additive.
+Every compressed UTF-16 stream fans one decoder into raw and BOM-first readers.
+Git reconciles physical loose/packs against verified enumeration and scans
+metadata such as .keep. The .keep control exists only in the synthetic control
+repository. A gitfile whose target is uncovered or not a logical store, and a
+directory reached directly with Git object-store shape (a loose object
+`objects/<2 hex>/<rest of an object name>`, or a pack or index file in
+`objects/pack`) but no HEAD, refs or `*.git` name, refuse as incomplete with
+`git_indirection_unplanned`. SQLite covers schema SQL/names and
+ordinary/shadow-table values, checks escaped read-only URIs and the actual main
+fd, and never creates missing WAL/SHM to rescue a read. Virtual tables require
+real shadow tables. Special entries are name-checked but never opened for
+content. Each request/control kind gets a fresh control value. Unrelated
+sentinels exist only in test fixtures.
+
+Recognized unsupported zstd/lz4/compress/lzip/lzop/Snappy/brotli and containers
+make selected content incomplete. Container signatures at offset zero include
+zip local/empty/spanned, 7z, RAR, PDF, cpio newc/crc/odc, ar, cabinet, xar and
+PACK outside a reconciled Git store; tar's ustar signature is at offset 257.
+Zlib without recognized magic (outside a Git store and outside object-store
+shape), nameless lzma, UTF-16 without BOM, application-compressed cells,
+arbitrary transformations and paths split across Git objects are explicit
+residuals. Freed SQLite pages/superseded WAL frames have raw coverage only.
+Indexes, API-fed stores, unrelated scratch/state, privileged journals,
+process/unit memory, terminal scrollback, remote/provider and Windows copies
+remain outside scope. Receipts always say `not_covered:proxy_unverified` for Loki;
+collector/Loki equality belongs only to the external window record.
+
+The operational window requires P1 explicit Gate A closure, P2 K4 installed,
+P3 accepted build plus independent Astra/Opus review, P4 pinned tools/core/scopes,
+P5 no-arm rehearsal, P6 quota and a 25-point lane reserve, P7 normal client
+sandbox/scrub settings, P8 packaged S8 and P9 transcript confirmation or decline.
+Other Claude/Codex sessions must be idle; baseline and final come from a user
+terminal, and scan output appears only after every sink finishes. P5 exercises
+real session writes/Git rotations, journal cursor/anchor and collector/Loki
+marker counts after W. The build suite writes nothing to the real journal.
+
+| Window step | Action |
+| --- | --- |
+| W1 | Prepare with all homes, session and transcript policy registered |
+| W2 | Require complete zero-hit baseline |
+| W3 | Arm systemd consumer, run emitted probe with leak-check to journal, disarm |
+| W4 | Arm fresh Claude, run emitted command in sonnet/max session, discard output, disarm |
+| W5 | Arm subagent, one sonnet/max child runs command, discard client output, disarm |
+| W6 | Arm workflow, run two-stage native workflow with run/attempt, disarm |
+| W7 | Arm ordinary Codex, read-only exec with null stdin/output, disarm |
+| W8 | Arm registered lane, packaged null-output wrapper, disarm |
+| W9 | Wait 1,200 boottime seconds, request agent final from user terminal |
+| W10 | Optional U final/comparison in the user's terminal; requests become required |
+| W11 | Verdict publishes current high-water receipt and scoped claim |
+| W12 | Cleanup safely disarms if pending/armed, checks absence, publishes same classifier result |
+
+On failure disarm, preserve sticky hits and resolve the cause before a new
+request. A zstd installation requires an announced host change after W, an
+updated decoder contract and fixtures. Cleanup records its absence check as
+`cleaned`, which does not stale final evidence, then removes owned runtime files.
+Receipt publication is create-only and rejects synthetic forms/tags/controls.
+An old receipt is historical at its high-water mark; it never authorizes a
+new invocation. No operational acceptance is claimed by synthetic tests.
+
+The build's synthetic acceptance runs from the checkout, never against the
+operator's homes: `tests/test_canary_proof.py` (every class builds its own
+host under `/tmp`; `python3 -I tests/test_canary_proof.py --skip-list` prints
+the machine-readable skip list, and on the workstation the boundary, request,
+stability, mode, FIFO, store and real-scope containment classes skip nothing)
+and the mutation table:
+
+```sh
+rtk python3 -I tests/canary_mutants.py --json
+```
+
+It prints one JSON object per mutant (`id`, `target_file`, `patch_sha256`,
+`killing_test`, `failing_assertion`, `killed`) and exits 0 only when every
+mutant is killed: its named test passes unmutated and fails with that exact
+assertion on the mutant, in a scratch copy under `/tmp`.
 
 ## Follow-ups not in this change
 
