@@ -52,7 +52,7 @@ from the harness's submission strings.
 from __future__ import annotations
 
 import argparse
-from decimal import Decimal, ROUND_HALF_EVEN
+from decimal import Decimal
 import hashlib
 import importlib.util
 import json
@@ -98,13 +98,6 @@ ACCEPTED_DEVIATION = "first_v2_run_preceded_review"
 SHA256_HEX = frozenset("0123456789abcdef")
 V2_SOURCES =("convert.py", "fixture_strategy.py", "distribution_module.py", "run.py",
               "compare.py", "mapping-manifest.json", "mapping-manifest-v2.json", "tolerances.json")
-STRESS_MANIFEST = "mapping-manifest-stress-20261002.json"
-STRESS_PREREGISTRATION = "PREREGISTRATION-stress-20261002.md"
-STRESS_REVIEWED_FILES = (*REVIEWED_HARNESS_FILES, "cost_models.py", STRESS_MANIFEST,
-                         STRESS_PREREGISTRATION, "requirements-stress-macos-arm64-py313.lock",
-                         "requirements-stress-linux-arm64-py313.lock")
-SEALED_STRESS_MANIFEST_SHA256 = "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039"
-SEALED_STRESS_PREREGISTRATION_SHA256 = "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799"
 
 
 def digest(path: Path) -> str:
@@ -261,23 +254,6 @@ def load_effective_v2(v2: dict, manifest_dir: Path) -> dict:
     return effective_manifest(v2, json.loads(v1_path.read_text()))
 
 
-def is_stress(manifest):
-    return bool(manifest) and manifest.get("id") == "spy-parity-one-stress-mappings-20261002"
-
-
-def load_effective_stress(stress, manifest_dir):
-    base = Path(manifest_dir) / "mapping-manifest-v2.json"
-    if (stress["extends_v2"]["sha256"] != SEALED_V2_MANIFEST_SHA256
-            or digest(base) != SEALED_V2_MANIFEST_SHA256):
-        raise ValueError("stress_base_manifest_sha256_mismatch")
-    if digest(Path(manifest_dir) / "PREREGISTRATION-v2.md") != SEALED_V2_PREREGISTRATION_SHA256:
-        raise ValueError("stress_base_preregistration_sha256_mismatch")
-    effective = load_effective_v2(json.loads(base.read_text()), manifest_dir)
-    rows = {r["id"]: r for r in effective["mappings"]}
-    rows.update({r["id"]: r for r in stress["mappings"]})
-    return {**effective, **stress, "mappings": list(rows.values())}
-
-
 def manifest_evidence_class(manifest: dict) -> str:
     """v2 annotates the class ('HIST (for the future replay); ...'); use its token."""
     value = manifest["evidence_class"]
@@ -317,10 +293,6 @@ def check_case_configuration(receipt: dict, manifest: dict, plan: dict) -> None:
         if (not isinstance(modules, list) or len(modules) != 1 or len(declared["venue_modules"]) != 1
                 or not declared["venue_modules"][0].startswith(str(modules[0]) + " ")):
             raise ValueError("case_configuration_disagrees_with_manifest:venue_modules")
-        if is_stress(manifest):
-            for field in ("instrument", "oco_trigger_increment"):
-                if configuration.get(field) != declared[field]:
-                    raise ValueError("case_configuration_disagrees_with_manifest:" + field)
 
 
 def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=None,
@@ -333,23 +305,19 @@ def bind(receipt: dict, tolerances_path: Path, manifest_path: Path, oracle_path=
     if digest(manifest_path) != receipt["mapping_manifest"]["sha256"]:
         raise ValueError("mapping_manifest_sha256_mismatch")
     if is_v2(manifest):
-        stress = is_stress(manifest)
-        sealed = SEALED_STRESS_MANIFEST_SHA256 if stress else SEALED_V2_MANIFEST_SHA256
-        if digest(manifest_path) != sealed or receipt["mapping_manifest"]["sha256"] != sealed:
+        if digest(manifest_path) != SEALED_V2_MANIFEST_SHA256 or \
+                receipt["mapping_manifest"]["sha256"] != SEALED_V2_MANIFEST_SHA256:
             raise ValueError("v2_receipt_not_bound_to_the_sealed_manifest")
-        prereg = Path(manifest_path).parent / (STRESS_PREREGISTRATION if stress else "PREREGISTRATION-v2.md")
-        prereg_hash = SEALED_STRESS_PREREGISTRATION_SHA256 if stress else SEALED_V2_PREREGISTRATION_SHA256
-        if receipt.get("preregistration", {}).get("sha256") != prereg_hash or \
-                not prereg.is_file() or digest(prereg) != prereg_hash:
+        prereg = Path(manifest_path).parent / "PREREGISTRATION-v2.md"
+        if receipt.get("preregistration", {}).get("sha256") != SEALED_V2_PREREGISTRATION_SHA256 or \
+                not prereg.is_file() or digest(prereg) != SEALED_V2_PREREGISTRATION_SHA256:
             raise ValueError("v2_receipt_not_bound_to_the_sealed_preregistration")
-        manifest = (load_effective_stress(manifest, Path(manifest_path).parent) if stress
-                    else load_effective_v2(manifest, Path(manifest_path).parent))
         if digest(tolerances_path) != manifest["tolerances"]["sha256"]:
             raise ValueError("tolerances_sha256_disagrees_with_manifest")
         if receipt.get("schema_version") != 2:
             raise ValueError("receipt_is_not_a_v2_receipt")
-        sources = (*V2_SOURCES, *STRESS_REVIEWED_FILES) if stress else V2_SOURCES
-        missing = [name for name in sources if name not in receipt.get("local_source_sha256", {})]
+        manifest = load_effective_v2(manifest, Path(manifest_path).parent)
+        missing = [name for name in V2_SOURCES if name not in receipt.get("local_source_sha256", {})]
         if missing:
             raise ValueError("local_source_not_recorded:" + ",".join(missing))
         module = receipt.get("distribution_module", {})
@@ -623,13 +591,7 @@ def v2_oco_checks(checks, receipt: dict, expected: dict, bars) -> None:
             _exact(checks, name, "fill_in_tested_bar", tested["ts_event_ns"], fill["ts_event_ns"])
             gap = abs(Decimal(tested["o"]) - close)
             _exact(checks, name, "moo_proxy_no_gap", ">= " + str(TICK), gap, ok=gap >= TICK)
-            price = Decimal(tested["o"])
-            if receipt.get("case") == "one_stress":
-                # Independent Decimal implementation; never imports cost_models.
-                slip = Decimal(receipt["case_configuration"]["slippage"])
-                price = (price * (1 + slip if quantity > 0 else 1 - slip)).quantize(
-                    Decimal("0.000001"), rounding=ROUND_HALF_EVEN)
-            _exact(checks, name, "moo_proxy_not_open", price, _decimal(fill["last_px"]))
+            _exact(checks, name, "moo_proxy_not_open", Decimal(tested["o"]), _decimal(fill["last_px"]))
             # Which leg fills is preregistered too: judged from the engine's own
             # record of the filled order, not from the harness's leg label.
             want_leg = expected_filled_leg(quantity, close, Decimal(tested["o"]))
@@ -657,37 +619,6 @@ def v2_run_checks(checks, receipt: dict) -> None:
                ok=scan["lines"] > 0)
         _exact(checks, "engine_log", label + ".error_lines", 0, scan["error_lines"])
         _exact(checks, "engine_log", label + ".negative_cash_lines", 0, scan["negative_cash_lines"])
-
-
-def stress_cost_checks(checks, receipt, bars):
-    """Check the native hook's inputs/outputs independently against raw sample bars."""
-    config = receipt["case_configuration"]
-    instrument = config["instrument"]
-    _exact(checks, "stress_costs", "price_precision", 6, instrument.get("price_precision"))
-    _exact(checks, "stress_costs", "price_increment", "0.000001", instrument.get("price_increment"))
-    _exact(checks, "stress_costs", "oco_trigger_increment", "0.0001", config.get("oco_trigger_increment"))
-    _exact(checks, "stress_costs", "fill_model", "TwentyBasisPointFillModel", config.get("fill_model"))
-    _exact(checks, "stress_costs", "fee_model", "FixedFeeModel(1.00 USD,charge_commission_once=true)",
-           config.get("fee_model"))
-    calls, fills = receipt.get("stress_fill_model_calls", []), receipt["fills"]
-    _exact(checks, "stress_costs", "native_hook_calls", len(fills), len(calls))
-    ids = [f["client_order_id"] for f in fills]
-    _exact(checks, "stress_costs", "native_hook_order_ids", ids,
-           [c.get("client_order_id") for c in calls])
-    first = first_bars_by_instant(bars) if bars else {}
-    for i, (call, fill) in enumerate(zip(calls, fills)):
-        name = "stress_cost_" + str(i + 1)
-        quantity = int(fill["quantity"])
-        _exact(checks, name, "side", "BUY" if quantity > 0 else "SELL", call.get("side"))
-        _exact(checks, name, "quantity", Decimal(abs(quantity)), _decimal(call["quantity"]))
-        bar = first.get(fill["utc_seconds"])
-        if bar is None:
-            _skip(checks, name, "reference_price", "Raw first-bar evidence is required")
-        else:
-            _exact(checks, name, "reference_price", Decimal(bar["o"]), _decimal(call["reference_price"]))
-            _exact(checks, name, "open_tick_quantity_domain", True,
-                   abs(quantity) <= int(bar["v"]) // 4)
-        _exact(checks, name, "native_fill_price", _decimal(fill["price"]), _decimal(call["fill_price"]))
 
 
 def v2_distribution_checks(checks, receipt: dict, manifest: dict, limits: dict) -> None:
@@ -787,16 +718,10 @@ def v2_precondition_checks(checks, receipt: dict, manifest: dict, context: dict)
             _exact(checks, name, "unresolved_findings", 0, content.get("unresolved_findings"))
     # [0, continued] "... before the first v2 run": earlier v2 replays ran before
     # any review, so the qualifying reading needs the gate owner's acceptance.
-    if is_stress(manifest):
-        # New dated stress scope does not retroactively review v2 history.
-        # Its exact new source review is required before every stress operation.
-        _exact(checks, name, "stress_scope", "one_stress", receipt.get("case"))
-    else:
-        _replay_history_checks(checks, name, receipt, context)
+    _replay_history_checks(checks, name, receipt, context)
     # [1] Sealed files and frozen inputs, at run time and at comparison time.
     name = PRECONDITION_PREFIX + "hashes"
-    _exact(checks, name, "sealed_manifest_sha256",
-           SEALED_STRESS_MANIFEST_SHA256 if is_stress(manifest) else SEALED_V2_MANIFEST_SHA256,
+    _exact(checks, name, "sealed_manifest_sha256", SEALED_V2_MANIFEST_SHA256,
            receipt["mapping_manifest"]["sha256"])
     _exact(checks, name, "tolerances_sha256", manifest["tolerances"]["sha256"],
            receipt["tolerances"]["sha256"])
@@ -812,14 +737,8 @@ def v2_precondition_checks(checks, receipt: dict, manifest: dict, context: dict)
     # [2] Engine pin and isolation.
     name = PRECONDITION_PREFIX + "engine"
     _exact(checks, name, "version", manifest["engine"]["version"], receipt["engine"]["version"])
-    binaries = manifest["engine"]["extension_sha256"]
-    observed_binary = receipt["engine"].get("extension_sha256")
-    if is_stress(manifest):
-        _exact(checks, name, "extension_sha256", "one preregistered official platform extension",
-               observed_binary, ok=isinstance(observed_binary, dict) and len(observed_binary) == 1
-               and all(binaries.get(k) == v for k, v in observed_binary.items()))
-    else:
-        _exact(checks, name, "extension_sha256", binaries, observed_binary)
+    _exact(checks, name, "extension_sha256", manifest["engine"]["extension_sha256"],
+           receipt["engine"].get("extension_sha256"))
     isolation = receipt.get("isolation", {})
     interfaces = [list(i) for i in isolation.get("network_interfaces", [])]
     _exact(checks, name, "network_interfaces", [[1, "lo"]], interfaces)
@@ -848,8 +767,7 @@ def _harness_files_differing(reviewed, receipt: dict) -> list:
     """Reviewed harness files whose recorded hash is absent or not the file that ran."""
     reviewed = reviewed if isinstance(reviewed, dict) else {}
     recorded = receipt.get("local_source_sha256", {})
-    files = STRESS_REVIEWED_FILES if receipt.get("case") == "one_stress" else REVIEWED_HARNESS_FILES
-    return sorted(f for f in files
+    return sorted(f for f in REVIEWED_HARNESS_FILES
                   if not reviewed.get(f) or reviewed.get(f) != recorded.get(f))
 
 
@@ -1102,8 +1020,6 @@ def compare(receipt: dict, oracle: dict, limits: dict, manifest=None, bars=None,
         v2_oco_checks(checks, receipt, expected, bars if evidence_available else None)
         v2_run_checks(checks, receipt)
         v2_distribution_checks(checks, receipt, manifest, limits)
-        if is_stress(manifest):
-            stress_cost_checks(checks, receipt, bars if evidence_available else None)
 
     if is_v2(manifest):
         deterministic, detail = v2_determinism(receipt)

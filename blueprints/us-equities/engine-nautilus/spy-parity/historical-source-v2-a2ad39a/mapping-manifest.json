@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "id": "spy-parity-one-zero-mappings",
+  "gate": "G-a",
+  "drafted_utc_date": "2026-09-22",
+  "case": "one_zero",
+  "frozen_before_execution": true,
+  "status_vocabulary": {
+    "resolved": "A concrete pinned-engine mapping exists, is implemented here and is checked by a test or by the replay itself.",
+    "unsupported": "The pinned engine cannot express the LEAN behaviour. Recorded as a deviation; never defaulted, approximated silently or absorbed by tolerance.",
+    "blocked": "Not decided here. The dependent comparison cannot pass until it is decided."
+  },
+  "evidence_class": "HIST",
+  "case_configuration": {
+    "case": "one_zero",
+    "seed": 20260922,
+    "account_type": "CASH",
+    "use_random_ids": false,
+    "fill_model": null,
+    "fee_model": null,
+    "window": {"symbol": "SPY", "start": "2019-12-02", "end": "2020-04-30"},
+    "plan_owned_fields": ["initial_cash_usd", "sizing_buffer", "target", "fee_usd", "slippage"],
+    "note": "Preregistered here for the choices the frozen plan does not express. compare.py binds the plan-owned fields to historical-simulation/plan.json and these fields to this block, and refuses a receipt that disagrees with either."
+  },
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "environment": "~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5",
+    "interpreter": "~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5/bin/python",
+    "upstream_source_at_pin_available_offline": false,
+    "evidence_basis": "Installed wheel interface stubs plus offline behavioural probes run under bwrap --unshare-all. Upstream source at the pin was not present on this host, so no source-level citation is claimed."
+  },
+  "probes": {
+    "directory": "blueprints/us-equities/engine-nautilus/spy-parity/probes",
+    "isolation": "Each probe ran under the pinned interpreter inside bwrap --unshare-all with a cleared environment and no network namespace.",
+    "artifacts": {
+      "fill_semantics_probe.py": "0ee16512ac041257c53e8388cce13a650e77820cf6fc774df41ee4fbe3c72500",
+      "fill-semantics-plain.json": "a7a19dec5c901d7c7104910c3dc5ffd30271bac4316aa8cc156704900a0d3461",
+      "fill-semantics-atopen.json": "78e1eaa71d07bf17d33f5dba557825584d2a9de3487647be7557ab1e0a09489d",
+      "fill-semantics-on_start.json": "057e968b0c9a5168509c46d15aa4d64e025642f80a1e0474a3ec4a7a7cf600ec",
+      "dividend_symbol_scan.py": "993e59b328438ba8a1872c5ce034c842155926d556c386c7defb48fe6252389a",
+      "dividend-symbol-scan.json": "07e2ce8fba554746f9c0af8fd09daddf6ddd028c298fb366b9afc6986e6a4009"
+    },
+    "note": "Freshly generated UUID4 identities are rendered as <uuid4> in the fill-semantics transcripts so they are stable; nothing else is filtered."
+  },
+  "oracle": {
+    "receipt": "blueprints/us-equities/historical-simulation/receipt.json",
+    "receipt_id": "native-historical-leverage-stress-20260919",
+    "receipt_sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+    "receipt_sha256_source": "acceptance-plan.md section 1 frozen table, row 'Published baseline receipt'",
+    "plan": "blueprints/us-equities/historical-simulation/plan.json",
+    "plan_sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "lean_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  },
+  "inputs": {
+    "data_root": "<LEAN_DATA>/Data (retained bundled sample; located on this host at ~/.local/share/codex-ecosystem/tools/lean-985ef30/Data)",
+    "frozen_sha256": {
+      "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    },
+    "all_five_verified_present_and_matching": true
+  },
+  "mappings": [
+    {
+      "id": "instrument_identity",
+      "lean_concept": "SPY US equity, USD, raw normalization, integer shares, resolved through the bundled map file",
+      "nautilus_concept": "model.Equity with InstrumentId SPY.SIM on an explicit simulated Venue(\"SIM\"); price_precision 4, price_increment 0.0001, size_precision 0, lot_size 1",
+      "status": "resolved",
+      "decision": "Declare price precision 4 because retained hourly rows carry sub-cent values (for example 2019-12-31 11:00 low 320.3020 and 2020-04-30 09:00 close 291.2350). Precision 2 would silently round retained input.",
+      "validation": "convert.check_map_file refuses a missing or renamed ticker over the window; the frozen map file resolves spy/P for 1998-01-02 through 2050-12-31 with no rename in the window.",
+      "limitations": [
+        "SPY.SIM is a simulation identifier only. It is not an IBKR contract ID, an Alpaca asset ID or any broker identity."
+      ]
+    },
+    {
+      "id": "raw_data_decoding",
+      "lean_concept": "ZIP member spy.csv, one row per hourly bar, prices as integer deci-cents scaled by 10,000, volume in whole shares, raw (unadjusted) normalization",
+      "nautilus_concept": "model.Bar built from Decimal(raw)/10000 quantized to 4 decimals and Quantity(volume, 0)",
+      "status": "resolved",
+      "decision": "Divide by 10,000 exactly in Decimal; never float. Reject malformed field counts, non-digit price or volume fields, nonpositive or nonfinite prices, inconsistent OHLC, duplicate timestamps and non-monotonic rows. No forward fill and no adjusted-price substitution.",
+      "validation": "convert.parse_hour_rows and tests/test_spy_parity.py (bad hash, duplicate timestamp, malformed row, nonpositive price, non-integer volume, invalid OHLC). Window decode returns 725 hourly rows and 104 daily rows, matching the dated receipt's data.hourly_rows_in_window and data.daily_rows_in_window.",
+      "limitations": [
+        "These are bundled upstream sample bytes. Byte identity is not vendor authenticity, point-in-time availability or market-wide coverage."
+      ]
+    },
+    {
+      "id": "sessions_and_time",
+      "lean_concept": "Hourly rows labelled by local New York bar start; a bar is complete at start + 1 hour; XNYS session membership over 2019-12-02 to 2020-04-30",
+      "nautilus_concept": "ts_event = ts_init = integer UTC nanoseconds of the bar end instant, computed with zoneinfo America/New_York",
+      "status": "resolved",
+      "decision": "Bar end, not bar start, is the observation instant, so the 15:00 row is the completed 16:00 decision bar and the 09:00 row completes at 10:00. Session membership comes from the retained daily spy.zip rows in the window. A full XNYS regular session (09:30-16:00) yields exactly 7 hourly rows: 09:00 covering the 09:30 open through 10:00, then 10:00 through 15:00. Any other row count is refused unless the session is declared below.",
+      "full_session_rows": 7,
+      "known_short_sessions": {"2019-12-24": 4},
+      "known_short_sessions_reason": "2019-12-24 is the XNYS Christmas Eve half day, closing at 13:00 New York, so it yields the 09:00, 10:00, 11:00 and 12:00 rows only. 104 sessions x 7 rows - 3 missing rows = 725.",
+      "validation": "convert.check_sessions found 104 sessions, 725 hourly rows, zero missing and zero extra session dates, and exactly one short session (2019-12-24, 4 rows) which it refuses unless declared here. Strict monotonic ordering is enforced. The DST change on 2020-03-08 falls on a non-session day and both EST and EDT sessions convert through zoneinfo. The counts equal the dated LEAN receipt's independent exchange-calendars XNYS check (104 expected sessions, 104 daily rows, 725 hourly rows, no missing or extra dates).",
+      "limitations": [
+        "exchange_calendars is not installed in the pinned Nautilus environment and no network is used, so the XNYS schedule is not recomputed here. Session membership is cross-checked daily-against-hourly inside the same retained bundle and corroborated by the dated receipt's counts.",
+        "Bundled history carries no original availability attestation, so event time is preserved but observation time is not independently attested."
+      ]
+    },
+    {
+      "id": "decision_visibility",
+      "lean_concept": "A completed 16:00 bar may form an intent; the fill must land on a later session",
+      "nautilus_concept": "Intent recorded in Strategy.on_bar for the 15:00 row; the market order is submitted only on the first bar of the next session, so no order exists while the decision bar is being matched",
+      "status": "resolved",
+      "decision": "Submission is deferred by session, not by bar count, so an early close cannot pull the order into the decision session.",
+      "validation": "fixture_strategy.check_causality raises look_ahead_fill when any fill instant is at or before its own decision instant; run.py applies it to the native fills of both runs and tests/test_spy_parity.py exercises the guard directly.",
+      "limitations": [
+        "The guard proves the decision bar was not used to execute. It does not make the submission bar's own close an open price; that residual is recorded under market_on_open_proxy."
+      ]
+    },
+    {
+      "id": "market_on_open_proxy",
+      "lean_concept": "MarketOnOpenOrder filled by EquityFillModel.MarketOnOpenFill at the next session's first hourly bar OPEN, stamped at that bar's end (10:00 New York)",
+      "nautilus_concept": "none",
+      "status": "unsupported",
+      "decision": "No pinned-engine construct produces a bar-open fill. The fixture fills at the CLOSE of the next session's first hourly bar. That reproduces LEAN's fill instant exactly and its fill price not at all. The difference is reported as a deviation and must never be absorbed by tolerance.",
+      "evidence_probes": ["probes/fill-semantics-atopen.json", "probes/fill-semantics-on_start.json",
+                          "probes/fill-semantics-plain.json"],
+      "evidence": [
+        "TimeInForce.AT_THE_OPEN exists in model/__init__.pyi but the simulated exchange returns OrderRejected with reason 'time in force AT_THE_OPEN is not currently supported' and zero fills (probes/fill-semantics-atopen.json).",
+        "A market order submitted in on_start, i.e. pending before the first bar was processed, still filled at that bar's close: avg_px 100.50 on a 100.00/101.00/99.00/100.50 probe bar, not its open (probes/fill-semantics-on_start.json).",
+        "A market order submitted in on_bar fills at the same bar's close at that bar's ts_event: avg_px 100.50, ts_init 1600000000000 (probes/fill-semantics-plain.json).",
+        "add_venue exposes bar_execution, bar_adaptive_high_low_ordering, trade_execution, liquidity_consumption, queue_position, fill_model and fee_model. None selects the bar open as the fill price; the shipped fill models (DefaultFillModel, BestPriceFillModel, MarketHoursFillModel, OneTickSlippageFillModel, VolumeSensitiveFillModel and the tier models) vary liquidity, probability and slippage, not the OHLC point matched."
+      ],
+      "expected_effect_on_one_zero": "Entry fills at 323.87 instead of 323.58 and exit at 291.2350 instead of 291.69, a 304 x 0.745 = 226.48 USD cash deviation. This blocks one_zero fill-price and cash parity.",
+      "limitations": [
+        "A current-bar market order is not a market-on-open order. Nothing here claims otherwise.",
+        "Injecting a synthetic open-priced data point or a look-ahead limit price would fabricate the mapping and is not done."
+      ]
+    },
+    {
+      "id": "distributions_and_cash",
+      "lean_concept": "Raw-normalized cash dividends posted to the account at the ex-date, derived from the bundled factor file; unexpected splits block the fixture",
+      "nautilus_concept": "none",
+      "status": "unsupported",
+      "decision": "The pinned wheel exposes no dividend, corporate-action or cash-distribution mechanism that a backtest account can be credited from. No balancing cash entry is injected into the engine. Distribution cash is derived independently in Decimal from the frozen factor file and reported beside the native account, flagged engine_posted=false.",
+      "evidence_probes": ["probes/dividend-symbol-scan.json"],
+      "symbol_scan": {
+        "scanned": "95 shipped .py/.pyi files plus the compiled _libnautilus extension",
+        "source_matches": 3,
+        "binary_matches": 9,
+        "found": [
+          "adapters/interactive_brokers/__init__.pyi:658 IB_DIVIDENDS - an IBKR market-data tick type, echoed in the extension as IbTickType.IB_DIVIDENDS and IbDividends.",
+          "common/__init__.pyi:1164 and :1208 flat_dividend_yield - an input to the option greeks helpers instrument_greeks and portfolio_greeks.",
+          "Extension only: pv_dividend, an IBKR option-computation field carried beside implied_vol and opt_price.",
+          "Extension only: a bare 'Dividend' member inside two adapter enum blocks, one beside ISOLATED and one beside AdlTrade, Delivery and BustTrad - venue trade-condition and liquidation-reason vocabularies."
+        ],
+        "conclusion": "Every match is a broker tick type, an option-pricing input, or an adapter enum member. None is a data type the backtest engine ingests and none credits a simulated account, so there is nothing to map a LEAN cash distribution onto."
+      },
+      "derivation": "For consecutive factor rows, the ex-date is the day after the earlier row's date and per_share = reference_price * (1 - price_factor / next_price_factor), rounded to cents half-to-even to match the pinned .NET Math.Round default in Dividend.ComputeDistribution. Eligible holdings are the position held at the ex-date instant (local midnight New York).",
+      "validation": "Derivation reproduces 1.57 per share on 2019-12-20 (held 0) and 1.41 per share on 2020-03-20 from the frozen factor file, independently of the oracle. convert.check_no_splits refuses any split-factor change whose ex-date falls in the window; both in-window factor rows carry split_factor 1.",
+      "limitations": [
+        "SimulationModule exists in the backtest stubs, but writing a custom module to post dividend cash would be exactly the invented balancing cash entry the acceptance plan forbids, so it is not used.",
+        "Because the ledger is external, the native exported account balance will differ from the LEAN balance by the distribution total."
+      ]
+    },
+    {
+      "id": "costs_and_rounding",
+      "lean_concept": "one_zero: zero fees, zero slippage. one_stress and later: 1 USD per order plus 20 bp adverse slippage with an explicit rounding stage",
+      "nautilus_concept": "one_zero: no fee_model and no fill_model configured on the venue, so commission is 0.00 USD and no slippage is applied",
+      "status": "resolved",
+      "decision": "Resolved for one_zero only. Zero costs are configured, not assumed: fixture_strategy.assert_commission reads the commission and its currency back from every native OrderFilled event and raises unexpected_commission or unexpected_commission_currency on anything but 0 USD. Measured: the pinned engine catches and logs an exception raised inside a strategy callback, so each callback records its failure on the strategy and fixture_strategy.check_run_integrity refuses the run afterwards. An injected commission failure surfaces as strategy_callback_failed; with that guard removed the same injection ran to completion and was caught only by the final-state check.",
+      "blocked_extension": {
+        "id": "costs_and_rounding_stress",
+        "status": "blocked",
+        "reason": "The 1 USD per order and 20 bp adverse slippage mapping, and the rounding stage for LEAN's more-than-two-decimal stress exports, are frozen separately after one_zero passes. They are not decided here."
+      },
+      "limitations": [
+        "Zero-cost parity says nothing about the stressed cases' quantities or fill schedule."
+      ]
+    },
+    {
+      "id": "margin_and_adaptive_state",
+      "lean_concept": "SecurityMarginModel(2m) with DefaultMarginCallModel, post-processing marks, hourly peak and a one-way 5% drawdown latch",
+      "nautilus_concept": "not established",
+      "status": "blocked",
+      "decision": "one_zero requests 1x with no leverage, records zero margin calls, zero reductions and no buying-power rejection, so no leverage or latch behaviour is exercised or claimed. The fixture uses AccountType.CASH with a 100,000 USD starting balance and no configured leverage. The replay still records buying-power and latch event lists so an empty result is observable rather than assumed.",
+      "limitations": [
+        "Nautilus defaults, default_leverage, margin_model and the exposed liquidation options do not prove equivalence to SecurityMarginModel(2m) or to DefaultMarginCallModel timing and quantity. That equivalence, and the hourly peak and one-way 5% latch, remain undecided and block two_zero, two_stress, adaptive_stress and over_limit.",
+        "A CASH account is not a margin account; no margin-remaining series is compared."
+      ]
+    }
+  ],
+  "dependent_comparison_status": {
+    "one_zero_event_times": "unblocked",
+    "one_zero_quantities": "unblocked",
+    "one_zero_fill_prices": "blocked_by:market_on_open_proxy",
+    "one_zero_cash_and_end_cash": "blocked_by:market_on_open_proxy,distributions_and_cash",
+    "one_zero_distributions": "unblocked (derived externally; not engine-posted)",
+    "one_stress": "blocked_by:costs_and_rounding_stress",
+    "two_zero": "blocked_by:margin_and_adaptive_state",
+    "two_stress": "blocked_by:margin_and_adaptive_state,costs_and_rounding_stress",
+    "adaptive_stress": "blocked_by:margin_and_adaptive_state",
+    "over_limit": "blocked_by:margin_and_adaptive_state"
+  },
+  "generated_id_normalization": {
+    "declared_before_execution": true,
+    "authorized_maximum_fields": ["client_order_id", "venue_order_id", "init_id", "event_id", "last_trade_id", "trade_id", "position_id", "account_id", "trader_id", "strategy_id", "order_list_id", "exec_spawn_id"],
+    "applied_fields": ["init_id", "event_id"],
+    "rule": "A field in the applied set is replaced by its ordinal within the run for the normalized hash only, and only after its value validates as a UUID4. Every other authorized identity is retained raw and must repeat exactly across the two runs. Raw and normalized hashes are both retained.",
+    "proof_requirement": "run.py diffs the two runs' raw reports field by field. Any differing field path outside the applied set fails the determinism claim; it is never absorbed by the normalization.",
+    "never_normalized": ["timing", "prices", "quantities", "fees", "distributions", "position transitions", "decision order"],
+    "caveat": "The FX verifier's UUID locations do not authorize dropping any equity field."
+  }
+}

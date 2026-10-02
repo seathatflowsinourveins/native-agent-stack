@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "spy-parity-one-zero-default-tolerances",
+  "status": "default",
+  "provenance": "Written with the harness from acceptance-plan.md section 3. A preregistered sheet replaces this file without any code change. Division of labour: run.py copies these limits and this file's sha256 into the receipt and applies none of them, because its own checks are exact; compare.py is the only component that applies them, and it refuses a sheet whose key set is not exactly the eight limits below or whose sha256 is not the one the receipt recorded.",
+  "frozen_before_execution": true,
+  "limits": {
+    "event_seconds_abs": "0",
+    "fill_quantity_abs": "0",
+    "fill_price_usd_abs": "0",
+    "fees_usd_abs": "0",
+    "dividend_usd_abs": "0",
+    "cash_usd_abs": "0.01",
+    "end_cash_usd_abs": "0.01",
+    "final_quantity_abs": "0"
+  },
+  "rationale": {
+    "event_seconds_abs": "Decision and fill instants are exact: both engines read the same retained bar timestamps.",
+    "fill_quantity_abs": "Integer shares from the same sizing rule on the same decision bar; exact.",
+    "fill_price_usd_abs": "Exact on shared bar data. A price difference here is a mapping deviation, not measurement noise, and must not be absorbed by widening this limit.",
+    "fees_usd_abs": "one_zero configures zero costs in both engines.",
+    "dividend_usd_abs": "Distributions are derived from the same frozen factor file and are exact.",
+    "cash_usd_abs": "Applies to each intermediate entry of the receipt's cash ledger, which compare.py rebuilds independently from the receipt's own fills and distributions. It is a one-cent allowance on the receipt's published cash path, not a comparison against LEAN: the dated oracle receipt publishes no per-event cash for a case, so no intermediate LEAN cash is compared here.",
+    "end_cash_usd_abs": "Applies to the two balances that are compared against the oracle's end cash: the reconciled figure and the native exported figure. One cent matches the baseline analyzer's allowance on exported native currency balances.",
+    "final_quantity_abs": "Quantity starts and ends at zero; exact."
+  },
+  "prohibitions": [
+    "No post-result widening: a failing comparison is retained, not retuned.",
+    "Tolerance never substitutes for an unresolved or unsupported mapping row."
+  ]
+}

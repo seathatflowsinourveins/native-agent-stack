@@ -1,0 +1,129 @@
+{
+  "schema_version": 2,
+  "id": "spy-parity-one-stress-mappings-20261002",
+  "case": "one_stress",
+  "frozen_before_execution": true,
+  "run_status": "preregistered_not_run",
+  "extends_v2": {
+    "path": "mapping-manifest-v2.json",
+    "sha256": "1b821d7ba42ea6121002a26a5082df08ed7a79f9a50b2edc9959503e1088ac67",
+    "scope": "Reuse v2 native OCO, distributions, conversion, exact causality, review and Linux isolation checks. Historical v1/v2 files and their failures stay unchanged. This separate stress mapping requires an independent review of its own exact bytes before any engine operation; prior v2 history remains informational for this newly dated stress scope."
+  },
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "extension_sha256": {
+      "_libnautilus.cpython-313-darwin.so": "c649d5e27e91c40271ebc67725208e89397f1d5d7d71ccd099157ca3461378e3",
+      "_libnautilus.cpython-313-aarch64-linux-gnu.so": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
+    },
+    "official_wheel": {
+      "filename": "nautilus_trader-2.0.0rc5-cp313-cp313-macosx_11_0_arm64.whl",
+      "sha256": "af9d9dffc729ab7f2e042a59772c3234ac6bcbb413a46b5b94c203e07b1fe6be",
+      "metadata": "https://pypi.org/pypi/nautilus_trader/2.0.0rc5/json",
+      "note": "A compatible official Mac wheel enables native API checks; it does not satisfy inherited Linux namespace isolation. No engine or host acceptance is claimed by installation."
+    },
+    "official_linux_wheel": {
+      "filename": "nautilus_trader-2.0.0rc5-cp313-cp313-manylinux_2_34_aarch64.whl",
+      "sha256": "9905300762f2cdb094d2bc13a51f3860ffaafb499237088daf9f294290a86c10",
+      "url": "https://files.pythonhosted.org/packages/0d/26/bcf4847a93ae28eb4b732afdfd1d83811f70b0e1168494833d2d9af2eee0/nautilus_trader-2.0.0rc5-cp313-cp313-manylinux_2_34_aarch64.whl"
+    },
+    "license": "LGPL-3.0-only",
+    "trusted_publisher": {
+      "repository": "nautechsystems/nautilus_trader",
+      "workflow": "build.yml",
+      "environment": "release"
+    }
+  },
+  "case_configuration": {
+    "case": "one_stress",
+    "seed": 20260922,
+    "account_type": "CASH",
+    "oms_type": "NETTING",
+    "use_random_ids": false,
+    "fill_model": "TwentyBasisPointFillModel",
+    "fee_model": "FixedFeeModel(1.00 USD,charge_commission_once=true)",
+    "latency_model": null,
+    "bar_execution": true,
+    "bar_adaptive_high_low_ordering": false,
+    "reject_stop_orders": true,
+    "support_contingent_orders": true,
+    "frozen_account": false,
+    "venue_modules": [
+      "DistributionModule (the only module; inherited unchanged from v2)"
+    ],
+    "window": {
+      "symbol": "SPY",
+      "start": "2019-12-02",
+      "end": "2020-04-30"
+    },
+    "instrument": {
+      "instrument_id": "SPY.SIM",
+      "symbol": "SPY",
+      "venue": "SIM",
+      "currency": "USD",
+      "price_precision": 6,
+      "price_increment": "0.000001",
+      "size_precision": 0,
+      "lot_size": 1,
+      "bar_type": "SPY.SIM-1-HOUR-LAST-EXTERNAL"
+    },
+    "oco_trigger_increment": "0.0001"
+  },
+  "mappings": [
+    {
+      "id": "instrument_identity",
+      "status": "preregistered",
+      "decision": "The historical one_zero instrument remains precision 4. The stress fixture explicitly uses precision 6/increment 0.000001 because multiplying the raw four-decimal sample open by 1.002 or 0.998 yields six-decimal native execution prices. Raw bars are only represented at higher precision; their values are unchanged. This is fixture precision, not an exchange tick-size claim. OCO triggers keep the preregistered 0.0001 spacing from the decision close.",
+      "limitations": [
+        "No claim that SPY venue order prices use a six-decimal real-market tick."
+      ]
+    },
+    {
+      "id": "costs_and_rounding",
+      "status": "preregistered",
+      "decision": "Use official native FixedFeeModel with 1 USD commission and charge_commission_once=true. Only the one filled OCO leg incurs a fee, once per economic order; the canceled sibling has no fill and no fee. A supported low-level FillModel returns a one-level book at the native best ask times 1.002 for BUY or best bid times 0.998 for SELL. This is deterministic fixture slippage applied by the matching engine before native OrderFilled/account events, never export repricing.",
+      "rounding": "Decimal ROUND_HALF_EVEN once at six decimals after the adverse percentage multiplication. Native USD Money display uses cents. Independent reconstruction preserves all six-decimal share-price products; the existing 0.01 cash allowance remains unchanged. No second cash rounding stage or balancing adjustment.",
+      "native_sources": [
+        "docs/concepts/backtesting/fill-models.md:108-120 custom low-level Python FillModel protocol",
+        "crates/execution/src/python/fill.rs:110-139 custom model invocation and OrderBook return",
+        "crates/execution/src/matching_engine/mod.rs:4455-4478 matching engine simulates fills from the custom book",
+        "python/nautilus_trader/execution/__init__.pyi:157-170 FixedFeeModel API"
+      ],
+      "limitations": [
+        "The custom book represents deterministic fixture slippage only. It is not an observed liquidity model and supports only native STOP_MARKET/MARKET_IF_TOUCHED legs. Full-quantity, one-fill, gap-domain and ERROR-log checks remain mandatory."
+      ]
+    }
+  ],
+  "case_predictions": {
+    "intents": [
+      {
+        "utc_seconds": 1577826000,
+        "quantity": 304
+      },
+      {
+        "utc_seconds": 1588190400,
+        "quantity": -304
+      }
+    ],
+    "fills": [
+      {
+        "utc_seconds": 1577977200,
+        "quantity": 304,
+        "price": "324.227160",
+        "fee": "1"
+      },
+      {
+        "utc_seconds": 1588255200,
+        "quantity": -304,
+        "price": "291.106620",
+        "fee": "1"
+      }
+    ],
+    "fees_usd": "2",
+    "dividends_usd": "428.64",
+    "final_quantity": "0",
+    "reconciled_end_cash_usd": "90357.995840",
+    "native_end_cash_usd": "90358.00"
+  }
+}

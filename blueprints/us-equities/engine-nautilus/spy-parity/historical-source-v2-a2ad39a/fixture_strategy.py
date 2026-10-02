@@ -73,12 +73,6 @@ def oco_triggers(quantity: int, close: Decimal, tick: Decimal = TICK) -> dict:
     return {STOP_MARKET: close - tick, MARKET_IF_TOUCHED: close + tick}
 
 
-def oco_trigger_strings(quantity, close, price_precision=4):
-    """Keep the original trigger spacing while encoding the native precision."""
-    return {kind: format(price, "." + str(price_precision) + "f")
-            for kind, price in oco_triggers(quantity, close).items()}
-
-
 ENGINE_ORDER_FIELDS = ("client_order_id", "type", "side", "quantity", "status", "trigger_price",
                        "trigger_type", "time_in_force", "is_reduce_only", "contingency_type",
                        "order_list_id", "linked_order_ids", "filled_qty")
@@ -248,7 +242,7 @@ def cash_ledger(initial_cash: Decimal, fills, distributions) -> list[dict]:
     return ledger
 
 
-def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=(), price_precision=4):
+def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=()):
     """Return the native Strategy class bound to this frozen case.
 
     ``ex_instants_ns`` are the DistributionModule's ex-date instants; the
@@ -267,7 +261,7 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=(), price
     buffer = Decimal(case["sizing_buffer"])
     initial_cash = Decimal(case["initial_cash_usd"])
     alerts = [int(ns) for ns in ex_instants_ns]
-    price_format = "." + str(price_precision) + "f"
+    price_format = "." + str(-TICK.as_tuple().exponent) + "f"
 
     class OneZeroFixture(Strategy):
         def __init__(self):
@@ -362,7 +356,6 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=(), price
         def _submit_oco(self, order_ref, quantity, close, row):
             """Submit the preregistered native OCO pair from the decision bar."""
             triggers = oco_triggers(quantity, close)
-            trigger_strings = oco_trigger_strings(quantity, close, price_precision)
             side = OrderSide.BUY if quantity > 0 else OrderSide.SELL
             list_id = OrderListId("OL-" + str(order_ref))
             ids = {STOP_MARKET: ClientOrderId("O-" + str(order_ref) + "-STOP"),
@@ -376,11 +369,11 @@ def build_strategy(equity_id, bar_type_str, rows, case, ex_instants_ns=(), price
                           contingency_type=ContingencyType.OCO, order_list_id=list_id)
             stop = StopMarketOrder(
                 client_order_id=ids[STOP_MARKET],
-                trigger_price=Price.from_str(trigger_strings[STOP_MARKET]),
+                trigger_price=Price.from_str(format(triggers[STOP_MARKET], price_format)),
                 init_id=UUID4(), linked_order_ids=[ids[MARKET_IF_TOUCHED]], **common)
             touched = MarketIfTouchedOrder(
                 client_order_id=ids[MARKET_IF_TOUCHED],
-                trigger_price=Price.from_str(trigger_strings[MARKET_IF_TOUCHED]),
+                trigger_price=Price.from_str(format(triggers[MARKET_IF_TOUCHED], price_format)),
                 init_id=UUID4(), linked_order_ids=[ids[STOP_MARKET]], **common)
             legs = []
             for leg_type, order in ((STOP_MARKET, stop), (MARKET_IF_TOUCHED, touched)):

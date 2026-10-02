@@ -39,6 +39,16 @@ VERDICT_V2 = SOURCE / "verdict-v2.json"
 LEAN_RECEIPT = ROOT / "blueprints/us-equities/historical-simulation/receipt.json"
 
 
+def historical_v2_sources():
+    """Original reviewed source bytes, independently bound to the frozen receipt."""
+    snapshot = json.loads((SOURCE / "historical-source-v2-a2ad39a.json").read_text())
+    directory = SOURCE / snapshot["directory"]
+    hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in directory.iterdir() if p.is_file()}
+    if hashes != snapshot["files"]:
+        raise ValueError("historical_v2_source_files_sha256_mismatch")
+    return hashes
+
+
 class _TrackingLimits(dict):
     """Records which tolerance keys the comparator actually reads."""
 
@@ -995,6 +1005,159 @@ class FixtureGuardTests(unittest.TestCase):
             FIXTURE.assert_commission("0.00", "0", "EUR", "USD")
 
 
+class StressMappingTests(unittest.TestCase):
+    def test_stress_oco_trigger_encoding_preserves_spacing_at_native_precision(self):
+        self.assertTrue(callable(getattr(FIXTURE, "oco_trigger_strings", None)),
+                        "instrument precision must govern native trigger encoding")
+        self.assertEqual(FIXTURE.oco_trigger_strings(304, Decimal("321.8600"), 6),
+                         {"STOP_MARKET": "321.860100", "MARKET_IF_TOUCHED": "321.859900"})
+        self.assertEqual(FIXTURE.oco_trigger_strings(-304, Decimal("293.2100"), 4),
+                         {"STOP_MARKET": "293.2099", "MARKET_IF_TOUCHED": "293.2101"})
+
+    def test_stress_case_declares_six_decimal_prices_without_changing_zero_case(self):
+        self.assertTrue(callable(getattr(RUN, "case_settings", None)), "stress case selection missing")
+        case, instrument, venue = RUN.case_settings("one_stress")
+        self.assertEqual((case["id"], case["fee_usd"], case["slippage"]),
+                         ("one_stress", "1", "0.002"))
+        self.assertEqual((instrument["price_precision"], instrument["price_increment"]),
+                         (6, "0.000001"))
+        self.assertEqual(case["oco_trigger_increment"], "0.0001")
+        self.assertEqual(RUN.case_settings("one_zero"), (RUN.CASE, RUN.INSTRUMENT, RUN.VENUE))
+        with self.assertRaisesRegex(ValueError, "unsupported_case"):
+            RUN.case_settings("two_stress")
+
+    def test_adverse_prices_match_frozen_oracle_exactly(self):
+        self.assertTrue(hasattr(RUN, "COSTS"), "native stress cost mapping missing")
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        for side, raw, wanted in (("BUY", "323.5800", "324.227160"),
+                                  ("SELL", "291.6900", "291.106620")):
+            self.assertEqual(RUN.COSTS.adverse_price(raw, side, "0.002", 6), Decimal(wanted))
+        self.assertEqual([f["price"] for f in oracle["fills"]],
+                         [Decimal("324.22716"), Decimal("291.10662")])
+        self.assertEqual(RUN.COSTS.adverse_price("1.2345675", "BUY", "0", 6),
+                         Decimal("1.234568"))
+        self.assertEqual(RUN.COSTS.adverse_price("1.2345665", "SELL", "0", 6),
+                         Decimal("1.234566"))
+        with self.assertRaisesRegex(ValueError, "invalid_order_side"):
+            RUN.COSTS.adverse_price("100", "UNKNOWN", "0.002", 6)
+
+    def test_stress_cash_reconstructs_without_a_second_rounding_stage(self):
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        fills = [{"utc_seconds": f["utc_seconds"], "quantity": f["quantity"],
+                  "price": str(f["price"]), "fee": str(f["fee"])} for f in oracle["fills"]]
+        ledger = FIXTURE.cash_ledger(Decimal("100000"), fills,
+                                    [{"utc_seconds": DIVIDEND_TS, "amount": "428.64"}])
+        self.assertEqual(Decimal(ledger[-1]["cash"]), Decimal("90357.995840"))
+        self.assertEqual(oracle["fees_usd"], Decimal("2"))
+        self.assertEqual(TOLERANCES["cash_usd_abs"], "0.01")
+        self.assertEqual(TOLERANCES["fill_price_usd_abs"], "0")
+
+    def test_stress_manifest_is_separate_and_inherits_frozen_v2(self):
+        path = SOURCE / "mapping-manifest-stress-20261002.json"
+        self.assertTrue(path.is_file(), "new frozen stress manifest missing")
+        raw, effective = RUN.load_bound_manifests("one_stress")
+        self.assertEqual(raw["extends_v2"]["sha256"], COMPARE.SEALED_V2_MANIFEST_SHA256)
+        self.assertEqual(effective["case_configuration"]["case"], "one_stress")
+        self.assertEqual(effective["inputs"], EFFECTIVE_V2["inputs"])
+        self.assertEqual(effective["tolerances"], EFFECTIVE_V2["tolerances"])
+        self.assertEqual(COMPARE.load_effective_stress(json.loads(path.read_text()), SOURCE), effective)
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(),
+                         COMPARE.SEALED_STRESS_MANIFEST_SHA256)
+        row = next(r for r in effective["mappings"] if r["id"] == "costs_and_rounding")
+        self.assertEqual(row["status"], "preregistered")
+
+    def test_stress_review_gate_refuses_missing_or_changed_review_before_engine(self):
+        self.assertTrue(callable(getattr(RUN, "require_stress_review", None)), "stress review gate missing")
+        hashes = {n: hashlib.sha256((SOURCE / n).read_bytes()).hexdigest()
+                  for n in RUN.stress_reviewed_files()}
+        with self.assertRaisesRegex(ValueError, "stress_review_required_before_engine"):
+            RUN.require_stress_review(None, hashes, "2026-10-02T20:00:00+00:00")
+        review = {"completed_utc": "2026-10-02T19:00:00+00:00", "unresolved_findings": 0,
+                  "reviewed_local_source_sha256": dict(hashes)}
+        self.assertIsNone(RUN.require_stress_review(review, hashes, "2026-10-02T20:00:00+00:00"))
+        review["reviewed_local_source_sha256"]["cost_models.py"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "stress_review_source_mismatch"):
+            RUN.require_stress_review(review, hashes, "2026-10-02T20:00:00+00:00")
+
+    def test_stress_oco_checker_uses_native_slipped_price_without_widening(self):
+        receipt = _v2_receipt()
+        receipt["case"] = "one_stress"
+        receipt["case_configuration"]["slippage"] = "0.002"
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        for event in receipt["order_events"]:
+            if event["event"] == "OrderFilled":
+                event["last_px"] = str(oracle["fills"][0 if event["last_qty"] == "304" and
+                                       event["ts_event_ns"] == ENTRY_FILL_TS * 10 ** 9 else 1]["price"])
+        checks = []
+        COMPARE.v2_oco_checks(checks, receipt, oracle, V2_BARS)
+        price_checks = [c for c in checks if c["field"] == "moo_proxy_not_open"]
+        self.assertEqual([c["status"] for c in price_checks], ["PASS", "PASS"])
+        receipt["order_events"][-2]["last_px"] = "291.1066"
+        checks = []
+        COMPARE.v2_oco_checks(checks, receipt, oracle, V2_BARS)
+        self.assertEqual([c["status"] for c in checks if c["field"] == "moo_proxy_not_open"],
+                         ["PASS", "FAIL"])
+
+    def test_stress_review_comparison_covers_cost_model_and_manifest_bytes(self):
+        receipt = _v2_receipt(case="one_stress")
+        receipt["local_source_sha256"] = {n: "a" * 64 for n in RUN.stress_reviewed_files()}
+        reviewed = dict(receipt["local_source_sha256"])
+        reviewed["cost_models.py"] = "b" * 64
+        self.assertEqual(COMPARE._harness_files_differing(reviewed, receipt), ["cost_models.py"])
+
+    def test_native_cost_api_returns_adverse_books_and_one_dollar_commission(self):
+        if importlib.util.find_spec("nautilus_trader") is None:
+            self.skipTest("official pinned native runtime not installed in this interpreter")
+        from nautilus_trader.core import UUID4
+        from nautilus_trader.model import (BookOrder, Currency, Equity, InstrumentId, OrderSide, Price,
+            Quantity, StopMarketOrder, Symbol, TraderId, StrategyId, ClientOrderId,
+            TriggerType, TimeInForce)
+        case, instrument, _ = RUN.case_settings("one_stress")
+        usd = Currency.from_str("USD")
+        equity = Equity(InstrumentId.from_str("SPY.SIM"), Symbol("SPY"), usd, 6,
+                        Price.from_str("0.000001"), 0, 0, lot_size=Quantity.from_int(1))
+        fill_model, fee_model = RUN.COSTS.build_models(case, instrument)
+        for side, raw, expected in ((OrderSide.BUY, "323.580000", "324.227160"),
+                                    (OrderSide.SELL, "291.690000", "291.106620")):
+            order = StopMarketOrder(trader_id=TraderId("TEST-001"), strategy_id=StrategyId("TEST-001"),
+                instrument_id=equity.id, client_order_id=ClientOrderId("ORDER-" + side.name),
+                order_side=side, quantity=Quantity.from_int(304), trigger_price=Price.from_str(raw),
+                trigger_type=TriggerType.DEFAULT, time_in_force=TimeInForce.GTC,
+                reduce_only=False, quote_quantity=False, init_id=UUID4(), ts_init=0)
+            book = fill_model.get_orderbook_for_fill_simulation(equity, order,
+                                                                Price.from_str(raw), Price.from_str(raw))
+            probe = Price.from_str("999.000000" if side == OrderSide.BUY else "0.000001")
+            fills = book.simulate_fills(BookOrder(side, probe, Quantity.from_int(304), 0))
+            self.assertEqual([(str(p), str(q)) for p, q in fills], [(expected, "304")])
+            self.assertEqual(str(fee_model.get_commission(order, Quantity.from_int(304),
+                                                        Price.from_str(expected), equity)), "1.00 USD")
+
+    def test_stress_native_cost_provenance_refuses_wrong_reference_and_quantity(self):
+        self.assertTrue(callable(getattr(COMPARE, "stress_cost_checks", None)),
+                        "independent native stress cost checks missing")
+        oracle = COMPARE.oracle_case(json.loads(LEAN_RECEIPT.read_text()), "one_stress")
+        case, instrument, venue = RUN.case_settings("one_stress")
+        fills = [{"client_order_id": str(i), "utc_seconds": f["utc_seconds"],
+                  "quantity": f["quantity"], "price": str(f["price"])}
+                 for i, f in enumerate(oracle["fills"])]
+        calls = [{"client_order_id": str(i), "side": "BUY" if i == 0 else "SELL",
+                  "reference_price": "323.580000" if i == 0 else "291.690000",
+                  "fill_price": str(f["price"]), "quantity": "304"}
+                 for i, f in enumerate(oracle["fills"])]
+        receipt = {"case_configuration": {**case, **venue, "instrument": instrument},
+                   "fills": fills, "stress_fill_model_calls": calls}
+        checks = []
+        COMPARE.stress_cost_checks(checks, receipt, V2_BARS)
+        self.assertTrue(checks)
+        self.assertTrue(all(c["status"] == "PASS" for c in checks))
+        calls[0]["reference_price"] = "323.870000"
+        calls[1]["quantity"] = "303"
+        checks = []
+        COMPARE.stress_cost_checks(checks, receipt, V2_BARS)
+        failures = [c for c in checks if c["status"] == "FAIL"]
+        self.assertEqual({c["field"] for c in failures}, {"reference_price", "quantity"})
+
+
 class UnsupportedMappingSourceTests(unittest.TestCase):
     def test_runner_derives_the_list_from_the_manifest(self):
         self.assertEqual(RUN.unsupported_mappings(MANIFEST),
@@ -1632,13 +1795,12 @@ class V2PublishedResultTests(unittest.TestCase):
         self.assertEqual(self.receipt["tolerances"]["sha256"], MANIFEST_V2["tolerances"]["sha256"])
         self.assertEqual(self.receipt["unsupported_mappings"], [])
 
-    # The published receipt ran the f079f6c harness; the 2026-09-23 pre-run
-    # review round changed exactly these files, so the receipt is superseded.
-
-    def test_published_receipt_is_the_qualifying_run_of_the_harness_on_disk(self):
+    def test_published_receipt_is_the_qualifying_run_of_the_preserved_historical_source(self):
+        self.assertEqual(historical_v2_sources(), self.receipt["local_source_sha256"])
+        # The new stress-capable harness is not qualified by the historical review.
         changed = {name for name, recorded in self.receipt["local_source_sha256"].items()
                    if hashlib.sha256((SOURCE / name).read_bytes()).hexdigest() != recorded}
-        self.assertEqual(changed, set())
+        self.assertEqual(changed, {"run.py", "compare.py", "fixture_strategy.py"})
         entry = next(r for r in RUN.load_replay_history()["replays"] if r["id"] == "bwrap-cc4503f-qualifying")
         self.assertTrue(entry["reviewed_before_run"])
         self.assertTrue(entry["status"].startswith("qualifying"))
@@ -1787,7 +1949,7 @@ class V2DeviationAcceptanceTests(unittest.TestCase):
         self.assertIsNotNone(acceptance)
         self.assertEqual(acceptance["deviation_id"], COMPARE.ACCEPTED_DEVIATION)
         self.assertEqual(acceptance["reviewed_harness_local_source_sha256"],
-                         {f: hashlib.sha256((SOURCE / f).read_bytes()).hexdigest() for f in RUN.REVIEWED_HARNESS_FILES})
+                         {f: historical_v2_sources()[f] for f in RUN.REVIEWED_HARNESS_FILES})
         self.assertEqual(COMPARE.DEVIATION_ACCEPTANCE_FIELDS, RUN.DEVIATION_ACCEPTANCE_FIELDS)
         self.assertEqual(COMPARE.REPLAY_HISTORY, RUN.REPLAY_HISTORY)
         self.assertIn(COMPARE.ACCEPTED_DEVIATION, [d["id"] for d in RUN.PREREGISTRATION_DEVIATIONS])

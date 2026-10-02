@@ -1,0 +1,5 @@
+nautilus_trader==2.0.0rc5 --hash=sha256:af9d9dffc729ab7f2e042a59772c3234ac6bcbb413a46b5b94c203e07b1fe6be
+numpy==2.5.3 --hash=sha256:92f30e89b8ee0ecf363033576c422b2f58fed6a80bed0aa48dff6d14c654663e
+pandas==3.0.6 --hash=sha256:60d81f9e1799b36f3739e7fff44d1fbb2e8fd5a271b3863e03de9715fccda0fa
+python-dateutil==2.9.0.post0 --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
