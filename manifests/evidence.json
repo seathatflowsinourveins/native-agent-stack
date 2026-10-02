@@ -3880,6 +3880,26 @@
         "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
       ],
       "path": "evidence/receipts/codex-01593-hindsight-native-memory-20261001.json"
+    },
+    {
+      "id": "native-sdk-acceptance-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Actual Claude SDK task failed its independent oracle despite successful protocol completion; a separate informed Codex SDK repair passed all four unchanged cases. Unchanged Claude and OpenHands default source suites passed within recorded skip, warning and environment limits.",
+      "limitations": [
+        "Two different model tasks and source-test suites have different evidence scopes; this is not a model-quality or token-efficiency comparison, global SOTA winner claim or full foundation closure.",
+        "Claude original useful-task acceptance remains FAILED. Codex passes only the four-case informed repair; its requested model/effort are bound, but resolved model/provider identity and billing cost were not returned.",
+        "Coordinator observed invocation, native exits and process samples. Independent reviewers checked retained source/artifact/outcome bindings without rerunning; hash equality alone is not execution provenance.",
+        "Public attachments are declared projections, exact resulting candidates and selected native output. Complete permitted streams remain private; raw conversations, auth/session metadata and personal paths are not published.",
+        "Claude default source suite has six skips, with five collection identities inferred from source/dependencies. OpenHands retains seven optional ToolShield skips, 12 xfails, 83 warnings, default stress/ACP-live exclusions and a preserved failed environment attempt; exact fetched model-map bytes were not retained.",
+        "OpenHands is supplemental source-test evidence, not a new adopted stack component. Its FACTS provider task remains unrun in this lane; Codex default source-suite execution remains with its separate owner.",
+        "Researcher/reviewer roles, resume/recovery, selected MCP, generation permission-negative tests, complete target lifecycle and target token routing remain open. Exact before/after process-name samples do not prove complete descendant cleanup.",
+        "Historical Claude task binding is CLI2.1.287. Current release2.1.288 reconciliation remains with the configuration owner and cannot retroactively change these captures."
+      ],
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json"
     }
   ],
   "files": [
@@ -4822,6 +4842,16 @@
       "path": "blueprints/convergence-practice/ci-security/receipt.json",
       "sha256": "218dca2e923462c85c08cd7ff07edeb20f1e784cd409988f2e201ad2351c8b31",
       "bytes": 787
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/README.md",
+      "sha256": "b965c5034ff964b6082526301957ecb2349ec675ba02689e061f679b018af1e1",
+      "bytes": 6634
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
+      "sha256": "0b987db92cca4dc40b9ef2f35e2d015db16c4dba136ac2c32324374da30e0c77",
+      "bytes": 8487
     },
     {
       "path": "blueprints/convergence-practice/container-storage/README.md",
@@ -35485,6 +35515,51 @@
       "bytes": 4419
     },
     {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/README.md",
+      "sha256": "a2cf68ee5ef60fe6d485cf99abd21f22bf41d81e49eb674c3d440fb48814d6e6",
+      "bytes": 6106
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-candidate.py",
+      "sha256": "8bf05cd5709b44f860eae6f6f6acbb2042baaaa87e4e8fc6120092a44c8e2d61",
+      "bytes": 258
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-oracle.stderr.txt",
+      "sha256": "f3866ae926de929f605535cbf32c8633c17a339a14d0640e33438b21c0291d87",
+      "bytes": 1157
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-trial.json",
+      "sha256": "faf4d0eb9e12648b19e35855b7ae7217b982cce80664eba9ce21663e2bc4e649",
+      "bytes": 6147
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-candidate.py",
+      "sha256": "f2f46a4d90ef352c69b3f5b3c6d21bbfd7bf730758881fb53c33ac9f69642c1f",
+      "bytes": 297
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-oracle.stderr.txt",
+      "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22",
+      "bytes": 524
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-trial.json",
+      "sha256": "1dcfd1d5cbc209c366bcaf21b2cd5ae1e3a8759e0ffa43746e57e283b22a0f08",
+      "bytes": 6622
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/native-suite-excerpts.json",
+      "sha256": "c20feff5127854af84a3fda57cfb4252129630676efc3f5ebb5e302a1a953092",
+      "bytes": 1716
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "sha256": "bf629e08d9b19a9919a212efb07d6d90b307f6ae7b687896485a588e1fcca439",
+      "bytes": 16601
+    },
+    {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
       "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
       "bytes": 111
@@ -47705,6 +47780,11 @@
       "bytes": 2504
     },
     {
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
+      "sha256": "d50dc8b83d1bd7be2a96eb0d98c13a561fa4d173ae20d796021f59d27f31e5ce",
+      "bytes": 7562
+    },
+    {
       "path": "evidence/receipts/native-service-reboot-20260920.json",
       "sha256": "7f13f5bfe6072465d09aa725d766fb880eb865f6c0452902a41cf7f5b446a0d0",
       "bytes": 5495
@@ -48198,6 +48278,11 @@
       "path": "examples/mcporter.json.example",
       "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
       "bytes": 1589
+    },
+    {
+      "path": "examples/native-sdk-acceptance/README.md",
+      "sha256": "f95f4ee5f1f8322ec2bdbab623b0dbbd62549180d31656e97d9fad67308bf2f2",
+      "bytes": 11266
     },
     {
       "path": "examples/native-stack-embeddings.service.example",
