@@ -83,6 +83,15 @@ class QualificationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "source metadata differs"):
             self.q._corpus_snapshot(changed)
 
+    def test_extension_parent_is_verified_on_every_cached_corpus_row(self):
+        metadata = self.inputs()[0]
+        cache = {}
+        self.q._corpus_snapshot(metadata, cache)
+        changed = copy.deepcopy(metadata)
+        changed["freeze"]["parent_manifest_sha256"] = "d" * 64
+        with self.assertRaisesRegex(ValueError, "extension parent differs"):
+            self.q._corpus_snapshot(changed, cache)
+
     def test_actual_log_record_requires_native_identity_and_transcript_kind(self):
         record = copy.deepcopy(self.record)
         for key in ("model", "model_family", "version"):

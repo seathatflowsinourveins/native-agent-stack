@@ -662,8 +662,10 @@ def _corpus_snapshot(metadata: dict[str, Any], cache: dict[Any, Any] | None = No
             raise ValueError("native log frozen corpus totals mismatch")
         for source in sources.values():
             _verified_path(sources_path.parent, source.path, source.sha256)
-        cache[key] = (cases, sources)
-    cases, sources = cache[key]
+        cache[key] = (cases, sources, manifest.get("parent_manifest_sha256"))
+    cases, sources, verified_parent = cache[key]
+    if not _same(freeze.get("parent_manifest_sha256"), verified_parent):
+        raise ValueError("logged extension parent differs from frozen corpus manifest bytes")
     case = Case.model_validate(metadata["case"])
     if case.case_id not in cases or not _same(case.model_dump(), cases[case.case_id].model_dump()):
         raise ValueError("logged case/oracle differs from frozen corpus bytes")
