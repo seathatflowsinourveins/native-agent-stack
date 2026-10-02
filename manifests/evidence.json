@@ -3925,8 +3925,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "97c35ece0b41e0ad3b06bc48857aa5c1eb0119862f35603920c33a7ea0244637",
-      "bytes": 10394
+      "sha256": "2ee4a6de196999b33a1f37bb979076308d1a805efd96c0f28f9c23ee6c9e5c22",
+      "bytes": 10639
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -15750,14 +15750,19 @@
       "bytes": 7563
     },
     {
+      "path": "docs/decisions/2026-10-02-mac-claude-resolution.md",
+      "sha256": "d57056c63153f7ac7a7f0dcf7b6de8892a7bfdb95417a06f6163c178c433df9a",
+      "bytes": 4885
+    },
+    {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
       "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
       "bytes": 6141
     },
     {
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
-      "sha256": "37696eb3f370be7e16809f87a1f1f20e940d6225ee292e72318008b1e95d8be8",
-      "bytes": 16577
+      "sha256": "f3234c014072e6a567a42fcc989c7e8bf716823f52c96a633bbe76e1c8d10e26",
+      "bytes": 16881
     },
     {
       "path": "docs/direct-results.md",

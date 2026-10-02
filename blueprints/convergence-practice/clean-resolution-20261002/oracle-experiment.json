@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Prepare a narrow independent oracle for the official Claude SDK Quickstart fixture. The original fixture crashes on both documented edge inputs. Target SDK execution remains pending.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/tree/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "revision": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/fc303db44d52c0d08f9d568866bec76c411fd3aa/evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "revision": "fc303db44d52c0d08f9d568866bec76c411fd3aa"
+    }
+  ],
+  "discovery_provenance": [
+    "The live Codex owner assigned selected SDK useful-work source/oracle preparation to this isolated branch.",
+    "The selected acceptance dispatcher suppresses application stdout; the Claude arithmetic query is a connectivity smoke.",
+    "The fixture was transcribed from https://code.claude.com/docs/en/agent-sdk/quickstart, Create a buggy file, read 2026-10-02. That documentation is dated rather than represented as an immutable repository file."
+  ],
+  "license_and_compatibility": "Claude SDK source is MIT; this local stdlib-unittest oracle transcribes a short attributed official documentation example. Python 3.13.15 executed these checks. No SDK installation or runtime license acceptance is inferred.",
+  "baseline_and_candidate": {
+    "baseline": "Published Quickstart utils.py with its two documented crashes",
+    "candidate": "A manual positive control and a deliberately regressed manual control, used only to test oracle discrimination"
+  },
+  "frozen_inputs": {
+    "base_revision": "18eea2c1de992b46c266d79ef0cc40f93c9fb943",
+    "tasks": ["quickstart-oracle"],
+    "roles": ["local-verifier"],
+    "sources": [
+      {
+        "path": "examples/native-sdk-acceptance/claude-quickstart/utils.py",
+        "sha256": "c29fde59b52cc1ee333382b6b216462a0271f37a455550052f0c1414b4d72fa5"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "examples/native-sdk-acceptance/claude-quickstart/controls/positive.py",
+        "sha256": "1437e6ee8ca79042b05b497f4907ad51b3375cab68928866902c92c46bd1cc4a"
+      },
+      {
+        "path": "examples/native-sdk-acceptance/claude-quickstart/controls/regression.py",
+        "sha256": "52a77b4291afb3e44be8283aba7df0f7f7d2d5f74a4ec08b81896720cd7e87f1"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "examples/native-sdk-acceptance/claude-quickstart/test_utils.py",
+        "sha256": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "The baseline must report both documented errors; a manually guarded control must pass all four checks; a crash-free all-None control must fail both normal-result checks. This rule qualifies only local discrimination.",
+    "usage_rule": "These native unittest processes call no model; their model counters are zero. Coordinator, review and source-discovery usage is outside this slice and remains incomplete. No savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Existing Linux x86_64 host; isolated source worktree",
+    "tools": [{"name": "python", "version": "3.13.15"}],
+    "isolation": "Source-only worktree and local manual controls; no new-target entry or provider execution"
+  },
+  "commands": [
+    "rtk proxy python3 -m unittest discover -s examples/native-sdk-acceptance/claude-quickstart -p test_utils.py -v",
+    "rtk proxy python3 -m unittest discover -s examples/native-sdk-acceptance/claude-quickstart -p test_utils.py -v",
+    "rtk proxy python3 -m unittest discover -s examples/native-sdk-acceptance/claude-quickstart -p test_utils.py -v"
+  ],
+  "observations": [
+    {
+      "id": "baseline-errors",
+      "task": "quickstart-oracle",
+      "role": "local-verifier",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "offline_artifact_check",
+      "scope": "local oracle discrimination only",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {"semantic": false, "contract": true},
+      "artifacts": [{"path": "examples/native-sdk-acceptance/claude-quickstart/results/baseline.stderr.txt", "sha256": "2f60426f8d47a6a41363a82572b89ee6a294d7624bc7515ca2d454e6cbcfa680"}],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "manual-positive",
+      "task": "quickstart-oracle",
+      "role": "local-verifier",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "offline_artifact_check",
+      "scope": "local oracle discrimination only",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {"semantic": true, "contract": true},
+      "artifacts": [{"path": "examples/native-sdk-acceptance/claude-quickstart/results/positive.stderr.txt", "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22"}],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    },
+    {
+      "id": "manual-regression",
+      "task": "quickstart-oracle",
+      "role": "local-verifier",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "offline_artifact_check",
+      "scope": "local oracle discrimination only",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {"semantic": false, "contract": true},
+      "artifacts": [{"path": "examples/native-sdk-acceptance/claude-quickstart/results/regression.stderr.txt", "sha256": "932849923872e1c73818e8f4991be9c14a1981bde444995db84056da7390f6d3"}],
+      "usage": {"uncached_input": 0, "cache_creation": 0, "cache_read": 0, "output": 0, "reasoning_in_output": 0, "total": 0, "native_retries": 0}
+    }
+  ],
+  "failures_and_skips": [
+    {"run_id": "baseline-errors", "reason": "Expected two documented input crashes; retained as failed tests rather than relabeled a successful SDK task."},
+    {"run_id": "manual-regression", "reason": "Expected rejection of a crash-free control that destroys normal results; retained as failed tests."}
+  ],
+  "limitations": [
+    "This record describes completed local checks and is not a preregistered model comparison.",
+    "The SDK, model/provider, native upstream test suite, new-host lifecycle and full foundation goal remain unqualified by this slice.",
+    "Manual controls are distinct synthetic inputs, not agent attempts or evidence of comparative quality. Each command received NATIVE_SDK_CANDIDATE in its process environment, selecting respectively the original fixture, manual positive control and manual regression control. Their hashes bind the retained bytes; private absolute paths are omitted.",
+    "The first required Astra review returned no verdict after an account usage-limit failure. Subsequent scoped Claude and Astra reviews accepted the oracle and cross-runtime architecture at 6537a17a1; final evidence/head binding and target execution remain separate gates (PR609 comments 5958056799 and 5958338134).",
+    "Original-output hashes are recorded separately; the public files contain checkout-path redaction."
+  ],
+  "decision_and_scope": {"decision": "trial", "scope": "local oracle discrimination only", "qualification_run_ids": []},
+  "rollback": "Leave the selected native acceptance commands unchanged; remove this unaccepted preparation if independent review rejects it.",
+  "next_decision_changing_test": "Final evidence/head binding review, then selected SDK native useful-task execution after the current builder's readiness handoff, retaining actual result and native usage.",
+  "usage_assessment": {"claim": "none", "coverage": "partial", "expected_run_ids": ["baseline-errors", "manual-positive", "manual-regression"], "coverage_artifact": null}
+}
