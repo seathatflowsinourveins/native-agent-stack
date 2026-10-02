@@ -324,6 +324,14 @@ jobs:
             echo "The evidence is the current head of \`automation/catalog-freshness\`: the drift report under \`evidence/artifacts/catalog-freshness-<date>/drift.md\` and the receipt under \`evidence/receipts/catalog-freshness-<date>.json\` in this PR's diff. The workflow run that produced the head commit is linked from that receipt."
             echo ""
             echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
+            echo ""
+            echo "Lane: \`lane:foundation\` (report-only catalog automation and evidence registration)."
+            echo ""
+            echo "### SOTA sources"
+            echo ""
+            echo "The current PR's drift manifest and receipt retain the upstream repository identities, selected pins and fetched release/source observations. They are source-review evidence, not new runtime acceptance."
+            echo ""
+            echo "PR metadata uses the supported [GitHub CLI create](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/create/create.go) and [edit](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/edit/edit.go) interfaces (cli/cli v2.102.0)."
           } > "$body_file"
           title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
           find_open_pr() {
@@ -331,14 +339,14 @@ jobs:
           }
           existing="$(find_open_pr)"
           if [ -z "$existing" ] && ! gh pr create --base main --head automation/catalog-freshness \
-              --title "$title" --body-file "$body_file" >/dev/null; then
+              --title "$title" --body-file "$body_file" --label lane:foundation >/dev/null; then
             # An overlapping run may have created the PR between the list and the create
             # (gh refuses a second PR for the same head); fall through to updating it.
             existing="$(find_open_pr)"
             [ -n "$existing" ] || { echo "gh pr create failed and no open PR exists" >&2; exit 1; }
           fi
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+            gh pr edit "$existing" --title "$title" --body-file "$body_file" --add-label lane:foundation
           fi
           pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
