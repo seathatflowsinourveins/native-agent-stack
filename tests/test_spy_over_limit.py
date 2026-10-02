@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import sys
 from types import SimpleNamespace
+import textwrap
 import unittest
 from unittest.mock import patch
 
@@ -238,6 +239,91 @@ class OverLimitTests(unittest.TestCase):
     def test_no_synthetic_native_record_builder_in_production(self):
         module = self.module()
         self.assertNotIn('test_refusal_record', Path(module.__file__).read_text())
+
+    def test_order_ownership_and_adjacent_calls_match_compiled_strategy_api(self):
+        module = self.module()
+        try:
+            from nautilus_trader.common import Clock
+            from nautilus_trader.model import BarType, Currency, StrategyId, TraderId, Venue
+            from nautilus_trader.trading import Strategy
+        except ImportError:
+            self.skipTest('official task-private native wheel required for strategy API check')
+        strategy_class = module._build_strategy(self.rows(), module.native_instrument().id,
+                                               Venue('SIM'), Currency.from_str('USD'), [])
+        strategy = strategy_class()
+        self.assertIsInstance(strategy.strategy_id, StrategyId)
+        self.assertFalse(hasattr(Strategy, 'id'))
+        tree = ast.parse(textwrap.dedent(inspect.getsource(strategy_class.on_bar)))
+        call = next(node for node in ast.walk(tree)
+                    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                    and node.func.id == 'native_market_order')
+        # Evaluate the actual ownership argument against the compiled Strategy.
+        # No fake id alias can hide an unsupported production property.
+        ownership = eval(compile(ast.Expression(call.args[1]), '<native-order-ownership>', 'eval'),
+                         {'self': strategy})
+        self.assertEqual(ownership, strategy.strategy_id)
+        trader_id = TraderId('TESTER-001')
+        order = module.native_market_order(trader_id, ownership, 1217, 1577826000 * 10**9)
+        self.assertEqual(order.strategy_id, strategy.strategy_id)
+        self.assertEqual(order.trader_id, trader_id)
+        for name in ('strategy_id', 'trader_id', 'clock', 'cache', 'subscribe_bars', 'submit_order'):
+            self.assertTrue(hasattr(Strategy, name), name)
+        inspect.signature(Strategy.subscribe_bars).bind(
+            strategy, BarType.from_str(module.configuration()['instrument']['bar_type']))
+        inspect.signature(Strategy.submit_order).bind(strategy, order)
+        inspect.signature(Clock.timestamp_ns).bind(None)
+        inspect.signature(Clock.set_time_alert_ns).bind(
+            None, 'ex_date_1576818000000000000', 1576818000000000000,
+            strategy._on_ex_date_alert, allow_past=False)
+        # Clock/cache/trader ownership are initialized by the engine's existing
+        # trader registration, which this component test deliberately does not run.
+        self.assertIsNone(strategy.trader_id)
+        for name in ('clock', 'cache'):
+            with self.assertRaisesRegex(RuntimeError, 'registered with a trader'):
+                getattr(strategy, name)
+
+    def test_native_order_event_callback_and_export_apis_without_engine(self):
+        module = self.module()
+        try:
+            from nautilus_trader.backtest import BacktestEngine
+            from nautilus_trader.common import Cache
+            from nautilus_trader.core import UUID4
+            from nautilus_trader.model import Currency, MarginAccount, OrderDenied, TraderId, Venue
+        except ImportError:
+            self.skipTest('official task-private native wheel required for export API check')
+        venue, usd = Venue('SIM'), Currency.from_str('USD')
+        strategy = module._build_strategy(self.rows(), module.native_instrument().id, venue, usd, [])()
+        order = module.native_market_order(TraderId('TESTER-001'), strategy.strategy_id,
+                                          1217, 1577826000 * 10**9)
+        # These are standalone native API components, never a simulated risk
+        # rejection or an engine export. The actual denial remains a replay gate.
+        reason = 'INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free=100000.00 USD, margin=195937.00 USD'
+        denied = OrderDenied(order.trader_id, order.strategy_id, order.instrument_id,
+                             order.client_order_id, reason, UUID4(),
+                             1577826000 * 10**9, 1577826000 * 10**9)
+        events = [order.events()[0], denied]
+        for event in events:
+            strategy.on_order_event(event)
+        self.assertEqual(strategy.callback_events, [event.to_dict() for event in events])
+        self.assertEqual([event['type'] for event in strategy.callback_events],
+                         ['OrderInitialized', 'OrderDenied'])
+        self.assertEqual(strategy.callback_events[-1]['reason'], reason)
+        self.assertEqual(strategy.errors, [])
+        self.assertEqual(order.commissions(), {})
+        self.assertEqual(order.to_dict()['strategy_id'], str(strategy.strategy_id))
+        cache = Cache()
+        self.assertIsNone(cache.account_for_venue(venue))
+        for name in ('positions_open', 'orders', 'orders_open'):
+            self.assertEqual(getattr(cache, name)(), [])
+        for name in ('account_type', 'default_leverage', 'events'):
+            self.assertTrue(hasattr(MarginAccount, name), name)
+        for name in ('balance_total', 'balance_free', 'total_initial_margin', 'total_maintenance_margin'):
+            inspect.signature(getattr(MarginAccount, name)).bind(None, usd)
+        self.assertTrue(hasattr(BacktestEngine, 'cache'))
+        inspect.signature(BacktestEngine.generate_account_report).bind(None, venue=venue)
+        for name in ('generate_positions_report', 'generate_order_fills_report', 'get_result'):
+            inspect.signature(getattr(BacktestEngine, name)).bind(None)
+        inspect.signature(BacktestEngine.add_strategy).bind(None, strategy)
 
     def test_native_configuration_and_market_order_api_without_engine(self):
         module = self.module()
