@@ -456,7 +456,7 @@ def build_receipt(receipt_id: str, component_ids: list[str], drifted_component_c
         "kind": RECEIPT_KIND,
         "component_ids": component_ids,
         "claim": (
-            f"Scheduled catalog-freshness run ({run_url}) rebuilt the SOTA-convergence manifest and "
+            f"Catalog-freshness run ({run_url}) rebuilt the SOTA-convergence manifest and "
             f"found {drifted_component_count} component(s) with pin/upstream drift against the "
             "currently published manifest. This receipt, and the branch/PR it is registered from, are "
             "report-only: no catalogs/sota-convergence/*, catalogs/landscape/*.json, "
