@@ -15701,13 +15701,18 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "6460fda263a493f7c5ac76bcaa44cbed4d18b3aa8722b10db2a82045e468cc6e",
-      "bytes": 36549
+      "sha256": "39c0309b3fe38c7e62c2cc5d6e4f5e8a166415c660bd07f642f6d65a98831c2e",
+      "bytes": 37463
     },
     {
       "path": "docs/decisions/2026-10-02-github-automation-practice.md",
       "sha256": "e90950fe72016e3d4732d6beb36ed0f898e9ccf550e2fa69866b6e3b5730efb2",
       "bytes": 7563
+    },
+    {
+      "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
+      "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
+      "bytes": 6141
     },
     {
       "path": "docs/direct-results.md",
@@ -16001,8 +16006,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6f48997efed9e2e1271f2e21754e5b304f423e89faf45328951143c9a01a1fe4",
-      "bytes": 180968
+      "sha256": "6a1d218b78f68dcfca91993be36e0ab22292315114b8accbb4d99bee2907f03f",
+      "bytes": 182719
     },
     {
       "path": "docs/stack.md",
@@ -33161,8 +33166,8 @@
     },
     {
       "path": "evidence/artifacts/local-model-server-gate-20261001/REBUILD.md",
-      "sha256": "6bc6243585a2c1f5acc9427cb7a28ea12bde5fa58a3b9899d4fc32ee9e04e665",
-      "bytes": 2635
+      "sha256": "d8facfea789a1b9b3ed62d718c2be989bc7d9b1bf168ef83fa935240e8c11e10",
+      "bytes": 2705
     },
     {
       "path": "evidence/artifacts/local-model-server-gate-20261001/codex-config/config.toml.tmpl",
@@ -33526,8 +33531,8 @@
     },
     {
       "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/REBUILD.md",
-      "sha256": "a052a5b4963599d9723a34257219e7715738f99d11d97246029c5d0ed788e040",
-      "bytes": 2749
+      "sha256": "ceb63b5ba2a5ce2369347c584200ac307147eb4ab3ab492762af76cb107f6fa4",
+      "bytes": 2906
     },
     {
       "path": "evidence/artifacts/local-model-server-gate-confirmatory-20261001/codex-config/config.toml.tmpl",
@@ -36366,8 +36371,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/README.md",
-      "sha256": "7f8ff105e4a573021afc32ea068993a491ebafcaf6920b0c357ceb7f77a8ec34",
-      "bytes": 4337
+      "sha256": "22aae185ed10f42ee08894bfdcc3d388297fba20d373f928ebb95df414c2abf5",
+      "bytes": 4922
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_foundation_definitive.py",
@@ -36391,8 +36396,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/controls.py",
-      "sha256": "6c120397f7696cc6b3e2760d459d91c5b27ce60e415d8fe5e6384fcf99d722c2",
-      "bytes": 5348
+      "sha256": "b1da066beda6120b93054680fd3955af45daa8320dbf034a9a207c083a02c7de",
+      "bytes": 5153
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/criteria.txt",
@@ -36416,8 +36421,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "722158a6da44304b4718a64ff2d2970a373850aef68e3e76bf4ef5d5d2a0c19a",
-      "bytes": 55655
+      "sha256": "0deff3ce45d6d1fa73cd0329d7b5e554c660884050c9750ce4deaaf97ee94d77",
+      "bytes": 55709
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -36496,8 +36501,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "554aaabf0770165bb32fcbf6a999b191c74c65d969913d0a30cd1d36bd851e31",
-      "bytes": 4358
+      "sha256": "4aefd46b42b371842876758fc6d06fc88c2d928dc59a7eb0f0a33258778bb3b1",
+      "bytes": 4683
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -36506,8 +36511,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "8ebe354114a995cfc93e2d2efab0a1f4175307ea630a5bbae9e0232daf66c168",
-      "bytes": 3479
+      "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24",
+      "bytes": 3650
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
@@ -37093,6 +37098,86 @@
       "path": "evidence/artifacts/omniroute-gateway-20260927/upstream-tests-route-keepalive.txt",
       "sha256": "becee3cfc8f9a8aad31e779d437f01f0dda9417fb09c35d0dfdba6da42247f7a",
       "bytes": 141
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/README.md",
+      "sha256": "2d04b079ab92f00e42738f2ddda3041f0efcc3426584f6a90535b7df8abf4d34",
+      "bytes": 1341
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/build-manifest.json",
+      "sha256": "c11011d262d773ab7249bc9ed3b40f8fbefdf98912c541dd91a02b600bfc60e2",
+      "bytes": 1321
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/probe-after.json",
+      "sha256": "b3882d9346a29935df2ae4329ed674ed73ea446b69056930339e15ab5d49e49c",
+      "bytes": 719
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/probe-before.json",
+      "sha256": "5d74c6e09c8f7c0972b92577ec9211385b9e41a5aeb9ec89f1eb91d974557cac",
+      "bytes": 619
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/switch-1.log",
+      "sha256": "9c3f12954c43cbdf4a5419918840b095992ada6572c9b22ee3aec794b268a2df",
+      "bytes": 1059
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/checks/switch-2.log",
+      "sha256": "92f5a9dc8704e7d526edc0e37d923abb97e08f09258bab204103e7dd930ab738",
+      "bytes": 557
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute-update-check.plist.json",
+      "sha256": "42927400b60db5e9a70a0957577c2dc0d68b947e3fb7b6ac58e18e5ef73197e8",
+      "bytes": 564
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute.before.plist.json",
+      "sha256": "a2d9d3b153b36ebe10c01c98bba201d0f0897244d2e3b8d1d423c8e7329e0291",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/launchd/com.native-stack.omniroute.plist.json",
+      "sha256": "51bb7b82f9b390b49dd9cb33671a42d864e0a59895323b104d701e631752cb74",
+      "bytes": 1028
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/receipt.json",
+      "sha256": "e20b0a4e05f91c357d7c72f01c91d6908472fea9ee97c11902e07f96b198c185",
+      "bytes": 5469
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/build-release.sh.txt",
+      "sha256": "8a82ef0336f40f420e04dd9c68d9b0aaac4e034252bb3e08bac281e86e851104",
+      "bytes": 671
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/build.sh.txt",
+      "sha256": "d8f71f96df4eec0c6e42e44f81988dacb69922e7602ccf2de6317ab4bcbb8f01",
+      "bytes": 772
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-serve.sh.txt",
+      "sha256": "8e451183da50c6d5be3fd2130a5e57b7b75a8c5e49ceb92686f226acee4a44f8",
+      "bytes": 1091
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-update-check.py.txt",
+      "sha256": "42120a0f77da93698cc7e5a009ac6c3e345b7f7bd4afcd12ee37b4032fea5241",
+      "bytes": 4772
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/probe_gate.py.txt",
+      "sha256": "9c58750ee29c959998ceea0ebb249f232570b1c193473caa87a164dbc64ee322",
+      "bytes": 4257
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/switch_gateway.py.txt",
+      "sha256": "9d484f36c8c4605fa374335ca93ef708299ed9e866f0721325cc35f02bfcb2b1",
+      "bytes": 7455
     },
     {
       "path": "evidence/artifacts/omniroute-npm-3851-qualification-20260930/README.md",
@@ -48646,8 +48731,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "de08823100f989af4e064723a1fb037e916c7d6a860821a7364300fb597fb49e",
-      "bytes": 22417
+      "sha256": "fb5a9be15154a5028586968928301b2a9f4a0091181456eedfdbc0f49b938627",
+      "bytes": 23484
     },
     {
       "path": "tests/test_observability.py",
@@ -48816,8 +48901,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "27f37eab1c20b0be93153831a0d533d5d93b0c3daa638b5e4fb9f368d61f4d6e",
-      "bytes": 359232
+      "sha256": "5cb82aa2cd0a37da70c19bda336bb8bfe320c1c40a9f1904bed9daccdc4753fb",
+      "bytes": 366112
     },
     {
       "path": "tests/test_security_identity.py",

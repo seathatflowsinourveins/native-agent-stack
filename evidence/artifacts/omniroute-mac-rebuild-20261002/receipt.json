@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "kind": "gateway_rebuild_receipt",
+  "host": "Mac coordinator (macOS, arm64); launchd agent com.native-stack.omniroute on loopback port 20128",
+  "recorded_at_utc": "2026-10-02T03:55:00Z",
+  "decision": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
+  "before": {
+    "build": "omniroute-3.8.51-a58000c7-pr14904-pr13788 (a source build of a58000c7 with upstream PRs 14904 and 13788)",
+    "announced_codex_client_version": "0.158.0-alpha.2.1 (fixed in the plist)",
+    "probe": "checks/probe-before.json: the catalog has no cx/gpt-6.1-sol; a Responses call to cx/gpt-6.1-sol returns 400 'not available in the active live catalog for provider codex'; GPT-6 Astra at max answers 200",
+    "evidence_class": "local_integration"
+  },
+  "build": {
+    "manifest": "build-manifest.json",
+    "base": "upstream release/v3.8.52 at 52823517533cfceec7abef2ff3e6285a19fe4121",
+    "carried": "upstream PR 13788 (two commits: /v1/alpha/search for Codex web.run) and upstream PR 15167 (one commit: GPT-6.1 Sol in the Codex registry and alias sets, so max reaches the wire); both open upstream on 2026-10-02",
+    "steps": "npm ci; npm run build:release (writes dist/BUILD_SHA 6f246e84a); OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact (upstream's own artifact policy; passed, recorded as a canary build because the carried PRs are not on the release line); npm pack",
+    "tarball_sha256": "d602dc42c7357e032b1e2323ba6660e0e1400bb5e997cb1c3857882654f9dbe4",
+    "first_check_without_build_sha": "the first pack (npm run build:cli without build:release) failed upstream's artifact check for a missing dist/BUILD_SHA and was discarded",
+    "evidence_class": "upstream_unchanged (upstream's build and artifact-policy scripts) and local_integration"
+  },
+  "switch": {
+    "tool": "scripts/switch_gateway.py.txt",
+    "attempt_1": {
+      "log": "checks/switch-1.log",
+      "result": "rolled back automatically after four failed probes",
+      "cause": "every call answered 401: the gateway requires an API key, callers pass the documented loopback placeholder, and the new build's database migration left the placeholder unaccepted as a stored key; after the rollback the previous build, on the migrated database, answered 401 as well, and its port preflight also counted a browser's open dashboard connections as a listener ('Port 20128 is already in use by PID <browser>') and restarted several times before it bound",
+      "safety": "OmniRoute wrote its own pre-migration database backup into its data directory (db_backups/, 03:34Z) before migrating; it was not needed"
+    },
+    "attempt_2": {
+      "log": "checks/switch-2.log",
+      "change": "the launch agent passes the documented placeholder as the gateway's configured env key (OMNIROUTE_API_KEY=local-loopback, docs/secret-storage.md), independent of the database's key table; the rollback target carries the same change",
+      "result": "switched; smoke start on a scratch port healthy; health 200; probe gate passed on its first attempt",
+      "probe": "checks/probe-after.json: catalog 200 with cx/gpt-6.1-sol and cx/gpt-6-astra (618 models); cx/gpt-6.1-sol at body effort max 200; cx/gpt-6-astra at max 200; codex exec through the gateway with cx/gpt-6.1-sol exit 0"
+    },
+    "evidence_class": "local_integration"
+  },
+  "codex_follow": {
+    "wrapper": "scripts/omniroute-serve.sh.txt: the launch agent runs it; at every start it reads the installed Codex CLI's version and exports it as CODEX_CLIENT_VERSION (the plist value stays as the fallback), and records the announced version in the state directory",
+    "observed": "the installed Codex moved to 0.160.0 during the switch; the gateway announced 0.160.0 at its start (03:44:47Z) without any edit",
+    "evidence_class": "local_integration"
+  },
+  "update_check": {
+    "agent": "launchd com.native-stack.omniroute-update-check, daily at 09:17 local (launchd/com.native-stack.omniroute-update-check.plist.json)",
+    "script": "scripts/omniroute-update-check.py.txt: restarts the gateway when the installed Codex version differs from the announced one and no non-browser client holds a connection; posts a macOS notification and writes omniroute-update.json when an official OmniRoute release carries every carried PR; installs nothing",
+    "first_run": "2026-10-02T03:52Z: codex_follow unchanged (0.160.0 = 0.160.0); latest release v3.8.51; PRs 13788 and 15167 unmerged; no notice",
+    "evidence_class": "local_integration"
+  },
+  "limits": [
+    "Upstream effort on the wire was not read back on this host (the gateway's call log is in its credential-bearing database, which was not opened); max for gpt-6.1-sol rests on PR 15167's source and its measured read-back on the workstation gateway (docs/decisions/2026-09-30-omniroute-rebuild.md, update of 06:32Z).",
+    "Web search through the gateway does not work on this build: with no credentialed search provider resolved, the /v1/alpha/search route falls back to DuckDuckGo lite, which timed out from this host (a direct request also timed out after 20 s); page opening was already unsupported ('Unsupported operation for /v1/alpha/search: open').",
+    "The build carries two open upstream PRs (a canary build in upstream's own terms); the update check flags when an official release carries both.",
+    "The omniroute row of manifests/stack.json (npm 3.8.50) is unchanged; it is a shared hot file and changes in its own lane:shared change."
+  ]
+}
