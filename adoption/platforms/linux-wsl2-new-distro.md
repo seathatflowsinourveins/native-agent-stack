@@ -47,7 +47,6 @@ These sources do not establish full-stack compatibility for either arm.
 | `Z:\WSL\downloads` | the image, its checksum list and the private logs | outside the Windows profile, so its path names no user |
 | `<checkout>` | the Windows path of a checkout of `origin/main` holding these templates | from a WSL session: `wslpath -w .` in the checkout |
 | `<host>` | the host value file `adoption/hosts/<host>.json` | `^[A-Za-z0-9][A-Za-z0-9_.-]*$`, the bootstrap's `--host` rule |
-| `<id>` | the adoption profile stage 2 installs | a `profiles[].id` of `adoption/manifest.json` |
 
 The controlled release pins below come from Canonical's signed sums and Microsoft's catalog at
 `8bc98bc33b246fe66710eec9eaa1b24c323da987`. The merged
@@ -943,8 +942,8 @@ Proof: `cat` prints exactly the hand-off line. Anything else means a file existe
 
 ### F7. Clone origin/main
 
-`adoption/bootstrap-linux.sh --configure-full-profile` refuses a checkout whose `HEAD` is not `origin/main`, so this host
-starts from a clone of `main`, not from the release checkout described in
+The install plan and the client-configuration tool that F9 runs are on `main` and were added after `v2026.09.26.2`, so
+this host starts from a clone of `main`, not from the release checkout described in
 [Get the catalog](linux-wsl2.md#get-the-catalog).
 
 ```sh
@@ -961,13 +960,17 @@ Proof: the two commands print the same commit. Record it as the receipt's `catal
 Added after `v2026.09.26.2`: `adoption/templates/wsl/host.new-distro.json.template` has the keys of
 `adoption/hosts/example.json` with ports outside the workstation's. Exclusion set: `3710`, `3800`, `8231`, `13000`,
 `13100`, `14318`, `14333`, `16333`, `18080`, `18231`, `18525`, `18888`, `18889`, `19090`, `19093`, `20128`, `20129`,
-`31415`, `49374` and `49474`. These are the example's four ports, the gateway and memory services, the 2026-09-25
-relocations and the observability backend's fixed ports. When the observability layer is installed here later, move its
-ports with `--port-overrides` ([Listeners and ports](linux-wsl2.md#listeners-and-ports)).
+`24318`, `26333`, `31415`, `49374` and `49474`. These are the example's four ports, the gateway and memory services, the
+2026-09-25 relocations, the observability backend's fixed ports, and `24318` and `26333`, which the workstation's own
+collector and its Qdrant hold after their 2026-09-25 relocation (observed listening 2026-10-02, when a first run of this
+step failed its proof on them). The template's collector port, `21318`, is the OTLP/HTTP port of the install plan's
+collector (`evidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml`), and its Qdrant port, `21633`, is one
+the plan does not use. When the observability layer is installed here later, move its ports with `--port-overrides`
+([Listeners and ports](linux-wsl2.md#listeners-and-ports)).
 
 ```sh
 cd ~/code/native-agent-stack
-ss -ltnH '( sport = :24318 or sport = :29374 or sport = :26333 or sport = :28231 )'
+ss -ltnH '( sport = :21318 or sport = :29374 or sport = :21633 or sport = :28231 )'
 python3 -c 'import string, sys; sys.stdout.write(string.Template(open(sys.argv[1], encoding="utf-8").read()).substitute(WSL_USER=sys.argv[2]))' adoption/templates/wsl/host.new-distro.json.template "$(id -un)" > 'adoption/hosts/<host>.json'
 python3 -m json.tool 'adoption/hosts/<host>.json'
 git check-ignore 'adoption/hosts/<host>.json'
@@ -975,22 +978,66 @@ git check-ignore 'adoption/hosts/<host>.json'
 
 Proof: `ss` prints nothing, because no distribution listens on those ports in the shared namespace; `json.tool` prints the
 nine keys; `git check-ignore` prints the path, so the host file never enters a commit. If `ss` shows a listener, choose
-another free port outside the exclusion set and edit the rendered file.
+another free port outside the exclusion set and edit the rendered file. The collector's `21318` is the exception: it is
+the port the install plan's collector binds and the one F9's tool renders into both clients, so a listener on it is a
+conflict to resolve before F9, not a value to edit here.
 
-### F9. Stage 2 (outside this page)
+### F9. Stage 2
 
-Changed after `v2026.09.26.2`: `adoption/bootstrap-linux.sh` installs the pinned tools for `<id>` (step 2 of
-[`adoption/bootstrap.md`](../bootstrap.md)). Native sign-in comes next and is never copied from another machine
-(step 3: `codex login`, then `claude`). The second run is the whole-profile configuration; it needs `--profile` (an
-empty profile exits 1) and the host file from F8.
+Changed after `v2026.09.26.2`: this host runs neither `adoption/bootstrap-linux.sh --profile` nor its
+`--configure-full-profile`, because every profile of `adoption/manifest.json` installs tools that the
+[definitive manifest](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) does not
+install and wires the clients to them. Stage 2 is the
+[install plan](../../evidence/artifacts/new-wsl-install-plan-20261002/README.md), which installs the 36 owners that the
+manifest installs by default (Claude Code and Codex through their native installers), then
+`tools/adoption/new_wsl_client_config.py`, which configures both clients and wires each only to what the manifest
+installs ([record](../../docs/decisions/2026-10-02-new-wsl-client-configuration.md)), then the native sign-ins. The plan
+and the tool were added after `v2026.09.26.2`. The tool comes before the sign-ins on purpose: the guard hooks then run in the first
+session a person starts. It merges into what the plan and the clients leave behind. The plan's
+`codex plugin marketplace add` writes `~/.codex/config.toml`, so that file usually exists: every key and table in it stays
+as it is, what the render has and it lacks is added, and a value that differs stays, printed beside the render's, with
+the step ending `merged with conflicts kept`. Claude Code's `settings.json` is merged too: the template's values win,
+except the theme, which stays as the file has it, and the authorization settings, which are not written by default
+(below). No step of `--apply` needs a signed-in client. The tool needs the host
+file from F8, installs no tool, backs up what it changes and runs again to the same files; `--dry-run` shows its steps
+without writing.
 
 ```sh
 cd ~/code/native-agent-stack
-adoption/bootstrap-linux.sh --profile '<id>'
-adoption/bootstrap-linux.sh --profile '<id>' --configure-full-profile --host '<host>'
+bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh
+bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh
+python3 -B tools/adoption/new_wsl_client_config.py --check
+python3 -B tools/adoption/new_wsl_client_config.py --apply --host '<host>'
 ```
 
-Proof: as in [`adoption/bootstrap.md`](../bootstrap.md); stage 2 records its own receipts.
+The `--apply` line is the plain one: it writes none of the authorization settings, which grant a permission or suppress
+a confirmation (Claude Code's `permissions.defaultMode` and `skipDangerousModePermissionPrompt`, Codex's
+`approval_policy` and `sandbox_mode`, and the tool approval mode of a Codex MCP server, which no server wired here
+sets), so each client keeps its own defaults and a value a person set is never touched. Add
+`--with-authorization-settings` to that line only on a host whose owner asked for the repository's permission practice
+(it adds a setting the file lacks and keeps a differing value, printed beside the render's), and the receipt's
+`authorization_settings` records who asked.
+
+After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
+after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
+--stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `local-model-server`,
+`agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust grant or hook
+approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until Codex
+trusts its directory; Codex has no hook wired here.
+
+Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
+`summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key
+it kept, with both values, for the person to decide), and its `verify` step lists what a login shell finds: `claude` is
+the launcher in the `bin` directory of the host file's `ECO_ROOT`, which starts an interactive session at `max` effort,
+and `codex` and the mise tools resolve as well; `--apply` prints a line before the summary that starts `authorization
+settings:` and says `left to the clients' own defaults` when the option was not given and, when it was, `applied`,
+`partly applied`, `kept` or `not applied` (`would be applied` or `would be partly applied` in a dry run), followed by
+what it added, kept, found already the same and did not reach, a skipped step and a failed step told apart. The two
+instruction blocks ([Claude](../new-wsl/claude-user-instructions.md), [Codex](../new-wsl/codex-user-instructions.md))
+are installed as the filter leaves them, and nothing is written in place of a unit it leaves out: a unit is left out
+when it names a tool that is not wired, which is a name the map lists for an unwired piece or the former default of a
+manifest row that installs nothing; a unit is not left out merely for naming a skill or timer that neither lists, and
+whether those skills exist on the host is not established by this step.
 
 ### F10. Windows Terminal profiles and the PATH proof
 
@@ -1018,16 +1065,14 @@ second line therefore tests each printed path as a regular file (`test -f`) that
 
 ### F11. jCodeMunch for this clone
 
-Added after `v2026.09.26.2`. Stage 2's Claude profile step copies the SubagentStart carrier blocks of
-`adoption/hooks/claude/` (changed after `v2026.09.26.2`) into `~/.claude/hooks/`. Four of the six name jCodeMunch tools
-as a retrieval lane: the full block and the researcher block name `route`, `menu` and `order`, and the builder and
-reviewer blocks name `route` and `order`. The user-scope MCP template leaves jCodeMunch out on purpose, because it
-registers per project
+Added after `v2026.09.26.2`. F9 no longer copies the SubagentStart carrier blocks of `adoption/hooks/claude/`
+(changed after `v2026.09.26.2`) into `~/.claude/hooks/`: the client-configuration tool leaves them out, and four of the
+six name jCodeMunch tools, so no session on this distribution is told to use jCodeMunch. The user-scope MCP template leaves
+jCodeMunch out on purpose, because it registers per project
 ([2026-09-25 addendum](../../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)),
-and no script runs that registration, so without this step those lanes name a server the clone has not registered.
-F9's stage 2 does not install the server either: no adoption profile pins `jcodemunch-mcp`, and only the
-`uv tool install` line of [`adoption/bootstrap.md`](../bootstrap.md) step 4a installs it. After F9 alone,
-`not installed` is the expected outcome.
+and no script runs that registration. F9 does not install the server either: no adoption profile pins `jcodemunch-mcp`,
+and only the `uv tool install` line of [`adoption/bootstrap.md`](../bootstrap.md) step 4a installs it. After F9 alone,
+`not installed` is the expected outcome, and a host that installs the binary itself registers it here.
 
 Run F11 as `<WSL_USER>` inside `<Name>` in a login shell, such as the `<Name> - Shell` profile: F10's proof found
 `claude` from a login shell, and a non-login `bash -s` may not. First test for the binary:
@@ -1086,7 +1131,9 @@ transcript and the F outputs:
   - W1's `workstation_baseline`, W5's common-unit process ids and active user manager and its `paired_isolation`, any
     `w5_failure_export` with its `cause`, each removal's interop check and the records of any stop for review,
     F1's outcome (`running`, or `degraded` with its two proving outputs) and F3's rootless-container result or `owed`;
-  - the clone's commit, the subordinate-id outcome and F11's `jcodemunch_registration`;
+  - the clone's commit, the subordinate-id outcome, F9's `authorization_settings` (the plain `--apply`, or who asked for
+    `--with-authorization-settings`, when, and the line `--apply` printed about them) and F11's
+    `jcodemunch_registration`;
   - the `rehearsal` block of R1, the `pre_checks` of P1 and P2, the `storage_errors` of P3 and W5, W1's `idle_keys`,
     W5's `schema_system`, W7's `ownership_probe` and F2's `idle_observation`.
   - all five workstation values equal to `host.workstation_baseline`; its optional `getty_tty1_result` is present only
