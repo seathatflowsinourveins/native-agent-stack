@@ -1,0 +1,186 @@
+{
+  "schema": "spy-parity-qualified-summary/1",
+  "case": "over_limit",
+  "evidence_class": "HIST: actual pinned native BacktestEngine; offline frozen-data simulation",
+  "harness_commit": "deff844fb7803c11ad5f16ab7d7db8d87f14ca4a",
+  "engine": {
+    "package": "nautilus_trader",
+    "version": "2.0.0rc5",
+    "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "python": "3.13.16",
+    "official_container_image": "docker.io/library/python@sha256:110e8d1de526341568b8fcdb1773b0d47ad63309df21980c6028803226a2dab0",
+    "platform": "Linux ARM64 in a task-owned macOS VM; not NativeStack WSL2 acceptance",
+    "extension_sha256": "d03e4ac01a3675f91a3c7edde999735fefcc89bfb910f1fdaab946ab5e0beed3"
+  },
+  "prospective_review": {
+    "completed_utc": "2026-10-02T21:26:46+00:00",
+    "verdict": "PASS",
+    "unresolved_findings": 0,
+    "original_record_sha256": "2101926e4dcf8a2a713ab4e4ab1d5852a9779d0cd88838ba8f65e0d7f73697ca",
+    "scope": "Same independent reviewer verified the narrow compiled Strategy API repair, all thirteen runtime hashes and exact full execution/comparison wrappers before both fresh repaired processes.",
+    "reviewed_source_sha256": {
+      "PREREGISTRATION-over-limit-20261002.md": "d1843ab5c264ed3c60b209f4f2cae0271da19fa8a8b63c5efdab54211a7ac316",
+      "PREREGISTRATION-stress-20261002.md": "c7c80352d49296fd7fcb30040605e175077dbe76bb25d48a37a661931cbc7799",
+      "compare.py": "7745662652c6e9ec590812f8e0849f0dc22d10356791c55fdc2478fc5f1332d8",
+      "convert.py": "08cba0a2aac938e9306935f91c2889b181dfc880b532b5943e0ccda395592c65",
+      "cost_models.py": "5b46bbe7042d60851eb22bde4a00430c9e7e793356e1460fd32672424a163b92",
+      "distribution_module.py": "eefee070b0dbe6ad3a1e68755ca959b5fff081fad61af8b84902a438996b126b",
+      "fixture_strategy.py": "90ed38609de9082c5a8ba3f3fd13967b1520a371b970a04c523b8ebdfe70df4e",
+      "mapping-manifest-over-limit-20261002.json": "a2aaa9fe469d2ee1a9b1783a91935f0afbc5e260ba1377ffc8bedff166a0f74a",
+      "mapping-manifest-stress-20261002.json": "586bf5024f7979641b6bb5eb8cea7fda5e2fe7eff36cae559bcd85a1dcec1039",
+      "over_limit.py": "15884e32c3838871c02947adcbefc46acf03519b0468f2c46a8ef334d14da57e",
+      "requirements-stress-linux-arm64-py313.lock": "8d6564b26f093a9da4383f74d06a47e0b212fbae2fd3058fbc7b9ca4a1e5a878",
+      "requirements-stress-macos-arm64-py313.lock": "2f8e40e1b75a4fe28b13da8f054d838c3fdee746d16603bb350e63fed7226539",
+      "run.py": "d1b0b0e1261e71bbaca5fb40ca76aef3209e4846fd8ea4de971308b37aa1b10b"
+    },
+    "reviewed_test_sha256": "6c14d0fb6bd6745730cc8d1b6f44ec66d0c79c5b8cb0778544eec68edd55b576"
+  },
+  "isolation": {
+    "zero_engine_fence_passed": 10,
+    "zero_engine_fence_failed": 0,
+    "fence_receipt_sha256": "52fa54805c89816493f621075dde8eb74b2badf2121222b2477e47c4ec2990aa",
+    "layout_receipt_sha256": "ee927ab066a605332ad4c8f88be79f777664b6e6a2df576339eed59e0c1a1ff9",
+    "actual_argument_freeze_sha256": "ed66e31b9f2953d3d8959b545175854716597230e3d04614cbe4d50e92414ee2",
+    "boundary": "Task-only Linux ARM64 VM/container with strict inner bubblewrap: read-only source/runtime/data; cleared environment, Python isolation and separate PID/user/network namespaces; loopback-only network; task output only writable. No host accounts, broker credentials or shared inference."
+  },
+  "frozen_inputs_sha256": {
+    "alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899",
+    "equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+    "equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+    "equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+    "equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf"
+  },
+  "frozen_oracle": {
+    "path": "blueprints/us-equities/historical-simulation/receipt.json",
+    "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9"
+  },
+  "frozen_plan": {
+    "path": "blueprints/us-equities/historical-simulation/plan.json",
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+  },
+  "tolerances_sha256": "c8bc72317fb4de83f2b0b7e71888828c7dd15a5a7eb2f60b68f87d54e751c15a",
+  "fresh_processes": [
+    {
+      "process": 1,
+      "started_utc": "2026-10-02T21:28:19.517698+00:00",
+      "receipt_sha256": "2d25fe59c3b1a635c83e1c50a7623b65d87e3bd87642ac8dad90e1aac797d775",
+      "verdict_sha256": "e0a3af9bbce9dcffb1d11df625adfe6137dff459fe23df5e5fae7c24896e7ab1",
+      "pass": 86,
+      "fail": 0,
+      "skipped": 0,
+      "raw_export_sha256": [
+        "83e087b9f7d00e34f294d643794909f2f1a5f44337e85e38f2a75348e1dac296",
+        "6bffe25ecfb1f1b705238487b99dca14355c7fe6798435c2c5886e24270260ef"
+      ],
+      "frozen_arguments_sha256": "c9fb8375efb3ff924bfcac817cb1dfa1af13ebd3575adbcef29c32de393006af"
+    },
+    {
+      "process": 2,
+      "started_utc": "2026-10-02T21:28:44.612420+00:00",
+      "receipt_sha256": "0acfe123be7847410a93920344f7f4a8d3585bfcd9c57b2f49401e716f663f02",
+      "verdict_sha256": "e0a3af9bbce9dcffb1d11df625adfe6137dff459fe23df5e5fae7c24896e7ab1",
+      "pass": 86,
+      "fail": 0,
+      "skipped": 0,
+      "raw_export_sha256": [
+        "3501ed149f47f3d674dc0490097f2deac90137eb943dfc5c28e9ee90c45f1923",
+        "dccd0e9f51362a1eb4fd73723e093e5452e7de34466ccfdc3faaeb0bbbdcf7ce"
+      ],
+      "frozen_arguments_sha256": "37820678007fb36f360c60f896a53072e3851aaf78a5a15ad9b9a9021b586ae8"
+    }
+  ],
+  "controller_evidence_sha256": [
+    {
+      "process": 1,
+      "stage": "run",
+      "record_sha256": "c496c966b06793aaaa4c4db68246bdfa1f3a3c0574dd6374c93360b1121cf7e0",
+      "log_sha256": "1f48d35f4e70f8b7ebe7160eec776894abc15564ed9d3fa46bd60d5f49e65d7f"
+    },
+    {
+      "process": 1,
+      "stage": "compare",
+      "record_sha256": "6df881b6fedbfd60e93a1c40de3ccf0e947ea819dcbae8e30c88333fcfd29968",
+      "log_sha256": "4d0953ddf79d9532b0c60d1288947fa07ecdc68e5f5a7ff97afd5c0592dcaf9c"
+    },
+    {
+      "process": 2,
+      "stage": "run",
+      "record_sha256": "37ab247d5536db5961637a366d304ba369b9f981a9fe1a3150a789649807e609",
+      "log_sha256": "f24246fd6be8b4175626d726811799150c7b5ea625c5725e2f2292efa545ced2"
+    },
+    {
+      "process": 2,
+      "stage": "compare",
+      "record_sha256": "c09571549eca8d39f1c8f88997449d4a46db986b1cdc0de6ee1f751fde01a4c3",
+      "log_sha256": "4d0953ddf79d9532b0c60d1288947fa07ecdc68e5f5a7ff97afd5c0592dcaf9c"
+    }
+  ],
+  "economics_equal_between_processes": {
+    "side": "BUY",
+    "quantity": "1217",
+    "status": "DENIED",
+    "filled_qty": "0",
+    "ts_event_ns": 1577826000000000000,
+    "reason": "INITIAL_MARGIN_EXCEEDS_FREE_BALANCE: free=100000.00 USD, margin=195851.81 USD",
+    "balance_total": "100000.00 USD",
+    "balance_free": "100000.00 USD",
+    "native_order_type": "MARKET"
+  },
+  "mapping_boundary": {
+    "scope": "Frozen economic no-fill refusal only. Native MARKET, DENIED and OrderDenied remain verbatim; no general equivalence with the LEAN MOO/Invalid execution labels.",
+    "risk_bypass": false,
+    "max_notional_per_order": {},
+    "default_leverage": "2",
+    "margin_init": "0.5",
+    "margin_maint": "0.5",
+    "native_margin_model": "StandardMarginModel",
+    "fees_usd": "0.00",
+    "dividend_cash_usd": "0.00",
+    "fills": 0,
+    "end_quantity": 0,
+    "initial_margin_at_all_marks_usd": "0.00",
+    "maintenance_margin_at_all_marks_usd": "0.00"
+  },
+  "determinism": {
+    "fresh_native_engine_exports": 4,
+    "normalization": "Only generated UUID4 init_id and event_id are replaced by ordinal; all other native fields, timestamps, economics and identities remain unchanged.",
+    "all_four_normalized_sha256": "b8db67fb920e4762b3cc1fc9cd3f2b07fa51a1583338d51067bebf8a67b42b51",
+    "bars_per_engine": 725,
+    "error_log_lines_per_engine": 0,
+    "strategy_callback_errors": 0,
+    "fill_model_calls": 0,
+    "final_open_orders": 0,
+    "final_open_positions": 0,
+    "ex_date_alerts_registered_per_engine": 2,
+    "ex_date_alerts_fired_per_engine": 2,
+    "on_time_zero_eligible_dividend_events_per_engine": 2
+  },
+  "repair_acceptance": {
+    "tests_passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "engine_construction": false,
+    "log_sha256": "adf653e28a47fdaf2c7715a2bf7d137c25d582d20f7b7ae29e1f18bd2d74e3a8",
+    "production_delta": "self.id -> self.strategy_id, supported by the actual pinned compiled Strategy API; native OrderDenied callback and adjacent cache/account/report checks are retained."
+  },
+  "preserved_history": {
+    "earlier_prospective_review_sha256": "ec09c89dfea0733d598192fd2f753f381082e926ca7ab731b5279e94b2ced1e6",
+    "failed_native_attempt": {
+      "harness_commit": "473b7282ebd688dad516d34355102eaa97cf007a",
+      "started_utc": "2026-10-02T21:10:48.716678+00:00",
+      "exit_code": 1,
+      "controller_log_sha256": "92a9b14730724e3ede3720c724c81da5a25b83091b91eef63892896b33add9c3",
+      "diagnostic": "strategy_callback_failed:on_bar:AttributeError:'OverLimitRefusal' object has no attribute 'id'",
+      "native_initial_margin_refusal_observed": false,
+      "included_in_successful_processes": false
+    },
+    "earlier_clock_source_findings": "Missing exact ex-date wakeups and callback-failure retention were repaired prospectively; original fail-first and intermediate test diagnostics remain in private versioned evidence.",
+    "native_api_repair_packet_sha256": "609aa4e8821f2aaa08d1633fbf0d8961b2c52913a390cbbd9698c810addb7b6a",
+    "protected_failure_files_verified_unchanged": 21
+  },
+  "limits": [
+    "This qualifies only the frozen over_limit economic refusal on this task-owned Linux ARM64 executor. Maintenance-margin valuation, liquidation, adaptive cases, production data fitness and other mappings remain separate gates.",
+    "Mac VM acceptance does not enroll or qualify the surviving NativeStack WSL2 workstation. No broker account, paper order, model or provider call was made by these offline replay procedures.",
+    "The original failed native attempt, earlier prospective review, raw exports and controller logs remain private and unchanged. Full-stack readiness is false; whole-task usage, settlement and net savings remain unknown."
+  ]
+}

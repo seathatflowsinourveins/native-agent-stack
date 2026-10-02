@@ -122,8 +122,9 @@ passed gate. Configuration/API verification stays at that evidence level.
 | G21 | QMD Metal warning interpretation — verified configuration | Selected retrieval requirement. Observed offloading addresses the compiler warning only; top-three relevance misses, rerank latency and index freshness remain separate unqualified claims. |
 
 The [offline runtime qualification](2026-10-02-north-star-runtime-qualification.md)
-adds two fresh-process stress comparisons and pinned-SDK recovery acceptance at
-their exact source/host scopes. The [host and paper activation packet](2026-10-02-north-star-host-paper-activation.md)
+adds two fresh-process stress comparisons, two native initial-margin-refusal
+comparisons and pinned-SDK recovery acceptance at their exact source/host scopes.
+The [host and paper activation packet](2026-10-02-north-star-host-paper-activation.md)
 records supported next steps and missing destination/account prerequisites.
 These additions preserve the 21 carried gate dispositions above.
 

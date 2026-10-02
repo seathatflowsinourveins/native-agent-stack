@@ -277,3 +277,23 @@ The existing 0.01 USD cash tolerance passes without modifying the oracle,
 mapping or tolerance. This qualifies only the frozen stress case on the task's
 Linux ARM64 executor. Other margin/adaptive cases, NativeStack WSL2 and actual
 paper brokers retain their separate gates.
+
+## Native initial-margin refusal qualification — 2026-10-02
+
+The new refusal-only `over_limit` mapping at
+`deff844fb7803c11ad5f16ab7d7db8d87f14ca4a` was reviewed prospectively at all
+thirteen runtime hashes and exact commands. Two fresh fenced processes each
+pass 86/86 strict checks, zero failures/skips; all four native exports match after
+the declared UUID-only normalization. A native 1217-share `MARKET` BUY is
+`DENIED` by initial-margin risk before execution, with its original OrderDenied
+reason retained. Free/total cash remains 100000.00 USD, every initial/maintenance
+margin mark is 0.00 USD, and no fill, fee or position is created.
+
+See [the observed refusal receipt](receipt-over-limit-20261002.json),
+[prospective scope](PREREGISTRATION-over-limit-20261002.md) and
+[runtime qualification](../../../../docs/decisions/2026-10-02-north-star-runtime-qualification.md).
+The original native `.id` callback failure and its reviewed compiled-API repair
+remain preserved. This qualifies only the frozen economic refusal; native
+`MARKET`/`DENIED` labels do not provide general LEAN MOO execution equivalence.
+Maintenance/liquidation/adaptive cases, surviving workstation activation, data
+fitness and actual paper brokers keep their separate gates.
