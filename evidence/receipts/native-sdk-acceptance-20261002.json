@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "native-sdk-acceptance-20261002",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "recorded_at_utc": "2026-10-02T22:45:00Z",
+  "claim": "Actual Claude SDK task failed its independent oracle despite successful protocol completion; a separate informed Codex SDK repair passed all four unchanged cases. Unchanged Claude and OpenHands default source suites passed within recorded skip, warning and environment limits.",
+  "limitations": [
+    "Two different model tasks and source-test suites have different evidence scopes; this is not a model-quality or token-efficiency comparison, global SOTA winner claim or full foundation closure.",
+    "Claude original useful-task acceptance remains FAILED. Codex passes only the four-case informed repair; its requested model/effort are bound, but resolved model/provider identity and billing cost were not returned.",
+    "Coordinator observed invocation, native exits and process samples. Independent reviewers checked retained source/artifact/outcome bindings without rerunning; hash equality alone is not execution provenance.",
+    "Public attachments are declared projections, exact resulting candidates and selected native output. Complete permitted streams remain private; raw conversations, auth/session metadata and personal paths are not published.",
+    "Claude default source suite has six skips, with five collection identities inferred from source/dependencies. OpenHands retains seven optional ToolShield skips, 12 xfails, 83 warnings, default stress/ACP-live exclusions and a preserved failed environment attempt; exact fetched model-map bytes were not retained.",
+    "OpenHands is supplemental source-test evidence, not a new adopted stack component. Its FACTS provider task remains unrun in this lane; Codex default source-suite execution remains with its separate owner.",
+    "Researcher/reviewer roles, resume/recovery, selected MCP, generation permission-negative tests, complete target lifecycle and target token routing remain open. Exact before/after process-name samples do not prove complete descendant cleanup.",
+    "Historical Claude task binding is CLI2.1.287. Current release2.1.288 reconciliation remains with the configuration owner and cannot retroactively change these captures."
+  ],
+  "artifact_directory": "evidence/artifacts/native-sdk-acceptance-20261002",
+  "data": {
+    "claude_task": {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-trial.json",
+      "status": "failed_useful_task",
+      "native_query_exit": 0,
+      "oracle_exit": 1,
+      "oracle_passed": 3,
+      "oracle_errors": 1
+    },
+    "codex_informed_repair": {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-trial.json",
+      "status": "passed_narrow_local_integration",
+      "native_query_exit": 0,
+      "oracle_exit": 0,
+      "oracle_passed": 4
+    },
+    "source_suites": {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "claude": "1587 passed, 6 skipped; native exit0",
+      "openhands": "6621 passed, 7 skipped, 12 xfailed, 83 warnings; native exit0",
+      "evidence_class": "unchanged_upstream_tests_separate_from_provider_acceptance"
+    },
+    "verifier": {
+      "oracle_path": "examples/native-sdk-acceptance/claude-quickstart/test_utils.py",
+      "oracle_sha256": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5",
+      "sandbox": "Installed Codex0.160 read-only sandbox with Python -B",
+      "enforcement_observation": "File-create EROFS30; AF_INET socket-create EPERM1; probe exit0, coordinator observed invocation/family",
+      "private_probe": {
+        "name": "sandbox-enforcement.stdout.txt",
+        "bytes": 378,
+        "sha256": "639547e908d90950f2351e43b9b7bd5daf7150fe46ac9dad32532edce7bc2d8b"
+      }
+    }
+  },
+  "retained_failures": [
+    "Claude actual task: get_user_name(None) still crashes; successful native SDK termination does not override failed oracle.",
+    "Codex capture retains four unsuccessful discovery/baseline commands among13 command items; one completed file change.",
+    "OpenHands preparation PATH resolution failure before any child test; first full suite exited1 with16 failures,6605passes,7skips,12xfails,82warnings. One bounded environment repair produced the retained passing run.",
+    "OpenHands repair note originally cited the wrong LiteLLM source filename; corrected record and preserved original hashes are in the independent source-suite review."
+  ],
+  "references": [
+    "https://github.com/anthropics/claude-agent-sdk-python/tree/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+    "https://code.claude.com/docs/en/agent-sdk/quickstart",
+    "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/.github/workflows/test.yml#L18",
+    "https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript",
+    "https://github.com/OpenHands/software-agent-sdk/blob/1e1390acc8788346ba4804c34323284009bf3f5e/.github/workflows/tests.yml#L110",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5962100363",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5962302097",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5962257991",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/pull/609#issuecomment-5960776319",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.288",
+    "docs/acceptance-evidence-policy.md",
+    "evidence/receipts/native-returned-results-20260921.json"
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/README.md",
+      "bytes": 6106,
+      "sha256": "a2cf68ee5ef60fe6d485cf99abd21f22bf41d81e49eb674c3d440fb48814d6e6"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-candidate.py",
+      "bytes": 258,
+      "sha256": "8bf05cd5709b44f860eae6f6f6acbb2042baaaa87e4e8fc6120092a44c8e2d61"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-oracle.stderr.txt",
+      "bytes": 1157,
+      "sha256": "f3866ae926de929f605535cbf32c8633c17a339a14d0640e33438b21c0291d87"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-trial.json",
+      "bytes": 6147,
+      "sha256": "faf4d0eb9e12648b19e35855b7ae7217b982cce80664eba9ce21663e2bc4e649"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-candidate.py",
+      "bytes": 297,
+      "sha256": "f2f46a4d90ef352c69b3f5b3c6d21bbfd7bf730758881fb53c33ac9f69642c1f"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-oracle.stderr.txt",
+      "bytes": 524,
+      "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-trial.json",
+      "bytes": 6622,
+      "sha256": "1dcfd1d5cbc209c366bcaf21b2cd5ae1e3a8759e0ffa43746e57e283b22a0f08"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/native-suite-excerpts.json",
+      "bytes": 1716,
+      "sha256": "c20feff5127854af84a3fda57cfb4252129630676efc3f5ebb5e302a1a953092"
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "bytes": 16601,
+      "sha256": "bf629e08d9b19a9919a212efb07d6d90b307f6ae7b687896485a588e1fcca439"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration_with_actual_provider_task",
+  "projection": "Selected fields from the frozen private result; subsequent independent review included separately. Raw conversation and init/auth/session metadata are not published.",
+  "outcome": "narrow_informed_repair_passed",
+  "sdk_version": "0.160.0",
+  "native_cli_version": "0.160.0",
+  "source_commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+  "data": {
+    "process": {
+      "query_exit": 0,
+      "bridge_exit": 0,
+      "start_epoch": 1790978282.524517,
+      "end_epoch": 1790978410.9277794
+    },
+    "requested_route": {
+      "sdk": "0.160.0",
+      "native_cli": "0.160.0",
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "resolved_model_identity_in_capture": null,
+      "provider_identity_in_capture": null
+    },
+    "returned_items": {
+      "command_execution": 13,
+      "file_change": 1,
+      "agent_message": 3,
+      "turn": 1,
+      "note": "Original item statuses and unsuccessful discovery/baseline-test commands remain in capture; this is not a claim that every tool command passed."
+    },
+    "native_usage": {
+      "input_tokens": 104731,
+      "cached_input_tokens": 93696,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 3362,
+      "reasoning_output_tokens": 2022,
+      "cost": null,
+      "scope": "Returned SDK turn.usage; cached input and reasoning output are subsets, not additional totals. SDK0.160 normalizes absent cache-write counts to zero. Actual resolved model/provider identity and billing cost were not returned in this capture."
+    },
+    "change": "get_user_name now returns an empty string for None before calling .get; existing calculate_average and ordinary-name behavior retained.",
+    "candidate": {
+      "path": "candidate-result.py",
+      "bytes": 297,
+      "sha256": "f2f46a4d90ef352c69b3f5b3c6d21bbfd7bf730758881fb53c33ac9f69642c1f",
+      "only_file_observed_in_owned_candidate_directory": "utils.py"
+    },
+    "oracle": {
+      "exit_code": 0,
+      "cases": 4,
+      "passed": 4,
+      "boundary": "Previously qualified installed Codex read-only sandbox, Python -B, NATIVE_SDK_CANDIDATE bound to actual resulting repair",
+      "sha256_after": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5"
+    },
+    "lifecycle": {
+      "before_ps_exit": 0,
+      "after_query_ps_exit": 0,
+      "after_verifier_ps_exit": 0,
+      "exact_comm_matches": [],
+      "scope": "Limited claude/codex exact comm-name observation; not comprehensive descendant or host lifecycle acceptance"
+    },
+    "limits": [
+      "Original Claude task remains failed; this is a separate explicitly adapted repair task with the concrete failure disclosed",
+      "Four-case integration oracle establishes only the frozen narrow contract, not comprehensive robustness",
+      "No fair model-efficiency comparison between different prompts and tasks",
+      "Returned command text has no explicit RTK prefix; this capture alone does not establish target RTK hook routing or token-efficiency foundation acceptance",
+      "Roles, MCP integration, resume/recovery, negative permission tests and full destination lifecycle remain separate gates",
+      "Capture omits reasoning items and init/session/auth metadata; failed run() would lose partial items, but this run returned usage and items"
+    ]
+  },
+  "private_originals": [
+    {
+      "name": "trial-result.json",
+      "bytes": 3941,
+      "sha256": "12b97f788e01eca2d7c71307da5c860526ddd6a449589448d4622e5c616283c2"
+    },
+    {
+      "name": "independent-review.json",
+      "bytes": 1273,
+      "sha256": "0498462ebb086b7253d955ac25a02bfd372ecef785791763732f103d2d24659c"
+    },
+    {
+      "name": "trial-plan.json",
+      "bytes": 2055,
+      "sha256": "260a720e52a5f77d6b58955d39b6d6a6067e04061277c2964391562435551d2b"
+    },
+    {
+      "name": "query.stdout.jsonl",
+      "bytes": 16801,
+      "sha256": "8ecfff4a53b3f8ee7bd25502f34cd1a77e56a9e113b5ad7f7dda100d4af1a8d6"
+    },
+    {
+      "name": "query.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "oracle.stderr.txt",
+      "bytes": 524,
+      "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22"
+    },
+    {
+      "name": "oracle.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "repair_trial.mjs",
+      "bytes": 2077,
+      "sha256": "603860817c72d6a74444e51a1cfef70aca2ba3e72ea1adae803635271f2edda9"
+    }
+  ],
+  "target_capture_bindings": [
+    {
+      "path": "target-query-capture.stdout.jsonl",
+      "bytes": 1056,
+      "sha256": "66b3183c3767490d252c9e06ff17dd080ed2b372a5b88259d85884ab992cbb1e"
+    },
+    {
+      "path": "target-oracle-capture.stdout.txt",
+      "bytes": 1315,
+      "sha256": "cc3fb489228b19899424de6ca9834c51131b2ce9a583fee01f0f36df140daa9b"
+    }
+  ],
+  "independent_review": {
+    "role": "Sol/max independent source and artifact review",
+    "verdict": "ACCEPT the narrow Codex repair; original Claude attempt remains FAILED",
+    "receipt": {
+      "path": "trial-result.json",
+      "bytes": 3941,
+      "sha256": "12b97f788e01eca2d7c71307da5c860526ddd6a449589448d4622e5c616283c2"
+    },
+    "verified": "All9 declared local bindings and6 target-capture bindings match. One completed utils.py change adds only the None guard; before/after reads match frozen artifacts. Independent unchanged oracle has4passes/exit0. Native13command items retain9successes/4failures. Returned usage matches receipt without overlapping sums.",
+    "capture_scope": "Installed skill and ancestor instruction discovery extend beyond candidate-only reads. No oracle/auth/config-content access or extra edit is shown; whitelist does not establish all filesystem activity. Raw turn.completed is not retained, but non-null SDK usage is; turn wrapper is authored. Requested model/effort are known, resolved model/provider identities unknown.",
+    "limits": "Coordinator-observed execution/termination; exact process-name observation only. No rerun/edit/target entry by reviewer. Four-case narrow contract only; not comprehensive robustness, role/lifecycle, permission-negative or efficiency acceptance."
+  },
+  "provenance_limit": "The coordinator observed invocation, native exits and process samples. Independent review checked retained bytes/source/outcomes without a new execution. An oracle hash alone does not establish execution; passing output also occurs in the historical positive control."
+}
