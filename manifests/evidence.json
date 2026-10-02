@@ -4070,8 +4070,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d3102407adb302ab847c52afe31b538721eee69b4cf31be0ec68d2cac5d44361",
-      "bytes": 18532
+      "sha256": "ddb393a6d4a6ca317e14d75ba4fe5b2a357d93704adcea8f0cf8eb449e6c1da3",
+      "bytes": 18600
     },
     {
       "path": "adoption/agents/claude/blind-adjudicator.md",
@@ -15006,8 +15006,8 @@
     },
     {
       "path": "catalogs/landscape/manifest.json",
-      "sha256": "7ca1f4e0d572746d4aabebfa288133162654d31926cee4a7072e6a2652a1ad2e",
-      "bytes": 4439
+      "sha256": "8f2795612616853c92db1571de32d5ffb2019c32b3376ef0ed3b28fe9a8cc077",
+      "bytes": 4574
     },
     {
       "path": "catalogs/landscape/native-practice.json",
