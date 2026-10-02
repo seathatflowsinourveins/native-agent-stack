@@ -4,7 +4,7 @@
 
 ### Evidence class
 
-The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added, which have not run on a distribution. The round 1 container run below is a separate, earlier class of evidence.
+The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1, on 2026-10-02, executing this plan as it stood before this revision (branch `foundation/new-wsl-install-plan-20261002`, commit `bf5a08e2`). The coordinator recorded it in a findings note kept outside the repository. It is a historical host execution of the previous revision. It says nothing about the commands this revision changed or added. When this section was written they had not run on a distribution; their one run since then is the section "Clean run of this revision" below. The round 1 container run below is a separate, earlier class of evidence.
 
 ### Result of that run
 
@@ -24,9 +24,9 @@ The result below is one run on one host: a throwaway Ubuntu 26.04.1 distribution
 
 The inventory is the merged manifest's 64 foundation rows (the previous revision had 53 owner rows, 46 of them selected): 36 installed by default, three measurement-only (Loki, Grafana, Playwright CLI) and 25 not installed. Trafilatura, ccusage, Phoenix, Promptfoo, chezmoi, Claude Code Action, CodeQL SARIF, trufflehog, the LSP plugins, the structural-diff row, attest and Dependabot left the installed set; ast-grep, Alertmanager and mattpocock/skills joined it, and GPT Researcher and DeerFlow became one row. The round 1 table below keeps its rows for owners that left the plan: it records what that run did.
 
-### Checks run for this revision
+### Static checks run for this revision, before its clean run
 
-All static; none installs anything, and `install.sh` and `accept.sh` were not run except `install.sh --list`.
+All static; none installs anything, and in these checks `install.sh` and `accept.sh` were not run except `install.sh --list`. Their run on a distribution is the next section.
 
 - `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
 - `bash install.sh --list`: exit 0, 64 lines.
@@ -47,12 +47,19 @@ merged new-distribution recipe (main `3a8dc31a`), with the plan run from a clone
 no provider call, no model run. The distribution was removed afterwards.
 
 - Stage 1 and first boot of the recipe passed (P1 to P3, W1 to W5, W7, F1 to F5), with the two-distribution proof.
-- Install at `b48321ea`: 35 owners exit 0, the three measurement-only owners skipped, none failed.
-- Post-install acceptance at `b48321ea`: 34 exit 0, 29 skipped, one exit 1 (`engineering-process-skills`). The install
-  was right and the check was wrong: the installer's lock file records no `ref`. Each of the six skills'
-  `skillFolderHash` equals the git tree hash of its folder at tag `v1.2.3` and differs from main's, so the pin had been
-  honoured. The acceptance now compares those hashes (`1b290218`), and the full acceptance at that commit returns 35
-  exit 0 and 29 skipped.
+- Install at `b48321ea`, counted in result lines, one per owner that `install.sh` handles as a slot: 38 lines, 35
+  exit 0 and the three measurement-only owners reported as skipped; none failed. Two of the 35 run no install
+  command and print the repository recipe (`credential-guard`, `convergence-validators`). `mise`, the 36th default
+  owner, is installed by the script's first step, which prints no result line.
+- Post-install acceptance at `b48321ea`, first pass, counted in result lines, one per plan row (64): 34 exit 0, 29
+  skipped and one exit 1 (`engineering-process-skills`). The 29 are the 25 rows that are not installed, the three
+  measurement-only owners and `credential-guard`, which has no host-executable check. The install was right and
+  the check was wrong: the installer's lock file records no `ref`. Each of the six skills' `skillFolderHash`
+  equals the git tree hash of its folder at tag `v1.2.3` and differs from main's, so the pin had been honoured.
+- Post-install acceptance at `1b290218`, final: the acceptance now compares those hashes. `accept.sh --only
+  engineering-process-skills` returned exit 0, and one full `accept.sh` run returned 35 exit 0 and 29 skipped. Of
+  that full run only the counts were kept, not its per-owner lines, so the record's `per_owner` table is the first
+  pass and still shows this owner's failure; `per_owner_final` holds the one line that was kept.
 - Service health: Docker and Dagu pass as installed; the OTel collector, Prometheus, Alertmanager and Ollama pass after
   being started with the commands in [SOURCES.md](SOURCES.md) on ports 21317, 21318, 21333, 21888, 21090, 21093 and
   21434. The gateway and the research harnesses were not started.
@@ -60,7 +67,15 @@ no provider call, no model run. The distribution was removed afterwards.
   listener was left after the distribution was removed.
 
 Not established by this run: a signed-in client, a pulled or running model, the GPU, the gateway and the research
-harnesses as services, the three measurement-only owners, and a distribution that stays.
+harnesses as services, the three measurement-only owners, and a distribution that stays. On the destination
+distribution nothing has run: installation and acceptance there are UNRUN.
+
+The record binds each phase to the commit that ran and to the SHA-256 of each plan file at that commit
+(`executed_files`). After both commits had run, the header comments of `install.sh` (lines 2 and 3) and of
+`accept.sh` (line 2) and the `status` text of `install-plan.json` were corrected, because they still said that this
+revision was unrun. No command, row or check changed and the corrected files were not run again, so the published
+files differ from the executed ones in those lines only. The raw outputs behind the record are private files; the
+record carries their hashes, and no reviewer has inspected them.
 
 ## Round 1 install-plan repair (historical)
 
@@ -117,4 +132,4 @@ The container cannot establish these conditions; check them on the real distribu
 
 Unresolved evidence limits: the suppressed original mise/chezmoi/Codex diagnostic rows cannot be recovered from these logs. Five workflow/adoption rows have no source-backed host executable check, so their explicit unavailable entries are skipped. Neither a skip, source review, configuration validation nor a version proves provider/GPU/service acceptance. All revised target-distribution commands remain unrun; no upstream failure was waived.
 
-Executed checks for this revision: the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.
+Historical: executed checks for the round 1 revision (the first plan, 53 rows; the current plan has 64 rows and its checks are in the two sections above): the requested Python JSON load, `bash -n` on both scripts and `bash install.sh --list` all returned 0. The list retained all 53 rows. TOML parsing, stage/schema/source agreement, all 156 slot/stage combinations, default/all-owner stages, unavailable/excluded skips, nonzero failure propagation and invalid arguments passed local fixtures. Additional Bash fixtures caught the original caller-directory and doctor-only false-pass patterns and verified the repairs. All 16 passing acceptance objects, original model/research examples, original HTTP endpoints and all seven exclusions were compared with the original plan and retained. The entire plan folder passed a personal-path/user-name scan; `git diff --check` passed. The fixtures ran no native owner programs, stack services or models. Independent Astra/Max source review confirmed the two review fixes and reported no remaining follow-up findings.

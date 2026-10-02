@@ -1,5 +1,5 @@
 {
- "schema_version": 1,
+ "schema_version": 2,
  "kind": "install_plan_real_distribution_run",
  "evidence_class": "native execution on one host, in a throwaway WSL distribution created by the merged recipe; no sign-in, no provider call, no model run",
  "host": {
@@ -14,6 +14,44 @@
  },
  "started": "2026-10-02T12:55:30Z",
  "ended": "2026-10-02T13:18:18Z",
+ "counting_units": {
+  "install": "Result lines of install.sh, one per owner that the script handles as a slot. A default run prints 38: the 35 default owners that have a slot function and the three measurement-only owners, which it reports as skipped. Two of the 35 (credential-guard, convergence-validators) run no install command and print the repository recipe. mise, the 36th default owner, is installed by the script's first step, which prints no result line; its post-install check passed.",
+  "post_install_acceptance": "Result lines of accept.sh, one per plan row: 64 lines. Skipped rows are the 25 rows that are not installed, the three measurement-only owners and credential-guard, which has no host-executable check.",
+  "service_health": "Result lines of `accept.sh --stage service_health` for the owners that declare a service.",
+  "per_owner": "The 38 owners that have an install result line; mise and the rows that are not installed are outside it, so its totals differ from the post-install totals."
+ },
+ "phases": [
+  {
+   "phase": "install",
+   "plan_commit": "b48321eab5eed2cbc3ed5cffddf9cbef160d159f",
+   "raw_output": "I1-install",
+   "retained": "every result line"
+  },
+  {
+   "phase": "post_install acceptance, first pass",
+   "plan_commit": "b48321eab5eed2cbc3ed5cffddf9cbef160d159f",
+   "raw_output": "I2-accept",
+   "retained": "every result line"
+  },
+  {
+   "phase": "service_health as installed",
+   "plan_commit": "b48321eab5eed2cbc3ed5cffddf9cbef160d159f",
+   "raw_output": "I2-accept",
+   "retained": "every result line"
+  },
+  {
+   "phase": "post_install acceptance, final",
+   "plan_commit": "1b290218e8b969e1324b26fc24ebcab222743b86",
+   "raw_output": "I4-recheck",
+   "retained": "the result line of `accept.sh --only engineering-process-skills` and the counts of one full `accept.sh` run; that full run's per-owner lines were not kept"
+  },
+  {
+   "phase": "service_health after the documented starts",
+   "plan_commit": "1b290218e8b969e1324b26fc24ebcab222743b86",
+   "raw_output": "I5-services",
+   "retained": "the result lines of the four owners that were started"
+  }
+ ],
  "stage_1_and_first_boot": "P1 to P3, W1 to W5, W7 and F1 to F5 passed: getty masked and inactive, the paired proof (same uid, both user managers active, distinct cgroup namespaces, the workstation equal to its baseline), file owner 1000:1000, one failed unit (systemd-binfmt.service) with its read-only flush message, linger, user bus, packages, subordinate ids",
  "install": {
   "rows_reported": 38,
@@ -54,6 +92,7 @@
   ]
  },
  "correction_made_from_this_run": "engineering-process-skills: the first acceptance looked for a `ref` field that the installer's lock file does not record. The six installed skills' skillFolderHash values equal the git tree hashes of their folders at tag v1.2.3 and differ from main's, so the pin was honoured; the acceptance now compares those hashes.",
+ "per_owner_phase": "First pass, kept as it was returned: install from I1-install and post_install from I2-accept, both at plan commit b48321ea. Its post_install column holds 33 exit 0, 4 skipped and 1 nonzero, and it still shows the failure of engineering-process-skills that the correction above addresses.",
  "per_owner": {
   "actionlint-kjanat": {
    "install": 0,
@@ -208,6 +247,33 @@
    "post_install": 0
   }
  },
+ "per_owner_final": {
+  "engineering-process-skills": {
+   "post_install": 0,
+   "plan_commit": "1b290218",
+   "raw_output": "I4-recheck"
+  },
+  "every_other_owner": "not retained per owner: the final full pass is recorded as counts only"
+ },
+ "executed_files": {
+  "note": "SHA-256 of each plan file at the commit that the distribution's clone had checked out for the phase. install.sh ran only at the first commit; accept.sh ran at both.",
+  "install and first pass": {
+   "commit": "b48321eab5eed2cbc3ed5cffddf9cbef160d159f",
+   "install.sh": "313ddee0af7fecb7ab7be4f540ebc8f561a1e312ed6e4faadb07131e137b4d35",
+   "accept.sh": "a6aa5f00a74d8eedd8d03755f03f7ae9f08a63d3bdbf680fcf61475dac48b2c5",
+   "install-plan.json": "481e931e8d5940e99773b541b7e6258859a41c4d59ec73070b69b33bb32a1d6e",
+   "check_plan.py": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c"
+  },
+  "final acceptance and service starts": {
+   "commit": "1b290218e8b969e1324b26fc24ebcab222743b86",
+   "install.sh": "313ddee0af7fecb7ab7be4f540ebc8f561a1e312ed6e4faadb07131e137b4d35",
+   "accept.sh": "dd7b1c236f8f008f6dc91742e0ffaf9ed1b3f3ef8679bfb87a14d2e869ac2d52",
+   "install-plan.json": "855302d45885dc81520acfece65119f05d23346733e495b37d9f3a5c03bcd24e",
+   "check_plan.py": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c"
+  }
+ },
+ "changes_after_the_runs": "After both commits had run, the header comments of install.sh (lines 2 and 3) and of accept.sh (line 2) and the `status` text of install-plan.json were corrected on 2026-10-02: they had said that this revision was unrun. No command, row or check changed, and the corrected files were not run again, so the published files differ from the executed ones in those lines only.",
+ "raw_outputs_scope": "The raw outputs are private files kept outside the repository. Their SHA-256 values bind them for a later inspection; no reviewer has inspected them. This record takes from them only counts, exit codes, slot names and time stamps.",
  "raw_outputs": {
   "P1": "bc3df15df8b254a2e0c22ad73f5215cc19abbb2d6de41cc9817ef83eb33cde72",
   "P2": "d227dcb954c395552cb471c2614364c4b0d7e5a8d30e0a5ca3954b32aa5f78a4",
@@ -239,7 +305,8 @@
   "The gateway and the two research harnesses were installed and passed their post-install checks; their services were not started (they need provider configuration or a container build).",
   "No client was signed in; no model was pulled or run; the GPU was not exercised.",
   "The three measurement-only owners (Loki, Grafana, the browser tool) were not installed in this run.",
-  "One host. The throwaway distribution was removed after the run; a distribution meant to stay is a separate step."
+  "One host. The throwaway distribution was removed after the run; a distribution meant to stay is a separate step.",
+  "Nothing has run on the destination distribution, the one meant to stay: installation and acceptance there are UNRUN."
  ],
  "sanitization": "built by a script from private raw outputs; it writes counts, exit codes and hashes only and refuses to write if the user name or the Windows computer name appears in the result"
 }

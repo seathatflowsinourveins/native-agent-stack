@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Revised staged acceptance for the merged definitive manifest (64 foundation rows). Target-distribution execution of this revision remains unrun.
+# Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi

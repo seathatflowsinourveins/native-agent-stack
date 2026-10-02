@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision;
-# this revision's installation remains unrun on a distribution.
+# Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision.
+# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
 # Baseline results and limitations: VALIDATION.md.
 # Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail

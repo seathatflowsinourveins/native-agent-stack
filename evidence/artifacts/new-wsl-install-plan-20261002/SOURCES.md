@@ -1,5 +1,5 @@
 # Source research and review
-Status: revised to the merged definitive manifest (64 foundation rows) after the real-distribution run of the previous revision. The earlier research below was source-only; its historical static checks remain in validation.json. Round 1 outcomes and log evidence, and the real-distribution result, are in VALIDATION.md. This revision's target-distribution installation, service and provider/GPU commands remain unrun. Local syntax/inventory/dispatch/consistency checks do not certify native runtime acceptance. Rows that left the plan lost their source entries here; their round 1 results stay in VALIDATION.md, and the sources of this revision's repairs and additions are in the last section.
+Status: revised to the merged definitive manifest (64 foundation rows) after the real-distribution run of the previous revision. The earlier research below was source-only; its historical static checks remain in validation.json. Round 1 outcomes and log evidence, and the real-distribution result, are in VALIDATION.md. When this file was written, this revision's installation, service and provider/GPU commands were unrun. On 2026-10-02 (12:54Z to 13:17Z) the installation and acceptance commands and four service starts ran once in a throwaway distribution (VALIDATION.md, "Clean run of this revision"). An UNRUN label in a heading below gives the status at the source review and is dated where that run changed it. Provider, model and GPU commands remain unrun, and nothing has run on the destination distribution. Local syntax/inventory/dispatch/consistency checks do not certify native runtime acceptance. Rows that left the plan lost their source entries here; their round 1 results stay in VALIDATION.md, and the sources of this revision's repairs and additions are in the last section.
 North-star action served: a reproducible foundation installation plan for subsequent US-equities research and historical simulation. No trading readiness or live/paper operation is claimed.
 Discovery was bounded to the supplied owners/pins, selected upstream READMEs/docs, mise registry entries, release assets/checksums, and the existing repository adoption recipes. search-first and context-mode were used; researchers were read-only.
 The specialized stack-researcher role retained its defined Astra/Max model. Consequential source judgment trigger: native-versus-Compose host listener boundaries and SDK route/package classification. Acceptance result: coordinator accepted the pinned primary-source conclusions only; runtime acceptance remains unrun.
@@ -43,7 +43,7 @@ Each owner's install and acceptance source is in install-plan.json. The followin
 Transport/checksum/user-prefix placement is thin script glue around the selected upstream binary routes, adapted from the quoted OTel HTTPS transport recipe and published release checksums. No constructed download wrapper is represented as a verbatim owner installer. Versions, filenames, destinations, noninteractive extraction flags, and loopback endpoints are explicit parameters.
 Prometheus has a prose download link plus a quoted tar command; that transport quotation gap is retained. Alertmanager's README describes the precompiled binaries in prose only (README.md:14-19) and quotes no tar command: its `tar xvfz` and `install` steps are the Prometheus row's form applied to Alertmanager's archive, script glue, with the sha256 taken from the release's own `sha256sums.txt`. Loki's release-note template supplies curl/unzip/chmod commands. Grafana's versioned official page supplies wget/tar commands and checksum. Loki and Grafana are measurement-only.
 
-### OTel Collector Contrib — source quotation, UNRUN
+### OTel Collector Contrib — source quotation (UNRUN at the source review; installed and started in the clean run of 2026-10-02)
 [source](https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87)
 ```sh
 curl --proto '=https' --tlsv1.2 -fOL https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v{{% param vers %}}/otelcol_{{% param vers %}}_linux_amd64.tar.gz
@@ -51,14 +51,14 @@ tar -xvf otelcol_{{% param vers %}}_linux_amd64.tar.gz
 ```
 Published artifact: https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz; SHA256 `fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3`.
 
-### Prometheus — source quotation, UNRUN
+### Prometheus — source quotation (UNRUN at the source review; installed and started in the clean run of 2026-10-02)
 [source](https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/getting_started.md#L18)
 ```sh
 tar xvfz prometheus-*.tar.gz
 ```
 Published artifact: https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz; SHA256 `2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0`.
 
-### Alertmanager — source description, UNRUN
+### Alertmanager — source description (UNRUN at the source review; installed and started in the clean run of 2026-10-02)
 [source](https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L14)
 ```text
 Precompiled binaries for released versions are available in the download section on prometheus.io. Using the latest production release binary is the recommended way of installing Alertmanager.
@@ -82,7 +82,8 @@ tar -zxvf grafana_13.2.3_36482603486_linux_amd64.tar.gz
 ```
 Published artifact: https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz; SHA256 `6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235`.
 
-## Service starts — separate from installation, all UNRUN
+## Service starts — separate from installation
+Status: all UNRUN at the source review. In the clean run of 2026-10-02 the OTel collector, Prometheus, Alertmanager and Ollama were started once with the commands below in a throwaway distribution and passed their health checks, and Docker and Dagu were started by their installers. The gateway and the research harnesses were not started; Loki and Grafana are measurement-only and were not installed.
 These invoke documented upstream foreground/daemon forms. No systemd user unit was created except those installed upstream by Docker and Dagu.
 The shell variables below are the portable prefixes defined in install.sh/accept.sh; run foreground services in their own terminals. Configuration is installed from config/ without overwriting existing files.
 - OTel: `otelcol-contrib --config "$config_root/otel.yaml"`. Only OTLP grpc21317/http21318, health21333, and metrics21888 bind loopback; optional pprof/zpages/Jaeger/Zipkin are omitted from the upstream distribution template.
@@ -106,7 +107,7 @@ Rootless Docker exposes a Unix socket, no host TCP port. All assigned host ports
 - Supplemental Grafana citation correction: the guessed start-restart-grafana/index.md path returned404; the tagged tree and raw read establish start-restart-grafana.md. The install source itself returned200 on its first required fetch.
 ## Completeness critic
 Reviewed omitted modalities/classes: native self-updating clients, SDK libraries, CLI tools, marketplaces, workflow-only owners, rootless containers, services/auxiliary listeners, repository practices, and excluded overlaps.
-Original review limits, updated after round 1: route enum has no precise library/marketplace labels; individual security plugins are unselected; Dependabot has no uses reference; host acceptance is unavailable for workflow-only/guard rows; most services ship no documented user unit; Prometheus has no quoted transport command. Revised commands, model/account setup, WSL GPU execution and real-distribution rootless/systemd/browser acceptance remain unrun. Git's former route gap is resolved below.
+Original review limits, updated after round 1: route enum has no precise library/marketplace labels; individual security plugins are unselected; Dependabot has no uses reference; host acceptance is unavailable for workflow-only/guard rows; most services ship no documented user unit; Prometheus has no quoted transport command. At the source review, revised commands, model/account setup, WSL GPU execution and real-distribution rootless/systemd/browser acceptance were unrun. The clean run of 2026-10-02 then exercised the revised commands, and both throwaway-distribution runs of that day exercised the rootless Docker and systemd user-session acceptance (VALIDATION.md). Model/account setup, GPU execution and the browser check (its owner is measurement-only and was not installed) remain unrun, as does everything on the destination distribution. Git's former route gap is resolved below.
 DeerFlow's make doctor is documented but requires host pnpm/nginx/backend environment, inapplicable to the selected Compose install. Its shipped /health/ready probe is used instead; no alternative runtime manager or passed container check is claimed.
 No benchmark, convergence/SOTA superiority, billing saving, new model run, or E2E acceptance is claimed. This record feeds the next foundation lifecycle/source sweep.
 
