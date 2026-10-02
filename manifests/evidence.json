@@ -3960,7 +3960,7 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f",
+      "sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
       "bytes": 23346
     },
     {
@@ -15896,8 +15896,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "87229ac5a96c1c46165d8de5a09f38d3751dd6fc8264aaf78adec3dc35b2f425",
-      "bytes": 135407
+      "sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+      "bytes": 136634
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
