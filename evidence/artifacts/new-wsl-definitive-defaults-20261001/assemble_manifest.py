@@ -109,6 +109,40 @@ def installs(row):
     return bool(row["default"]) and not row["installs_nothing_extra"]
 
 
+# A row the convergence data resolves states its current basis; the first round's text moves to resolution.first_round_record.
+BASIS = {"final": "both families: the Claude record and the blind GPT samples",
+         "installed_on_critic": "kept or added on a blind critic's verdict",
+         "not_installed": "not installed: resolved by the rule or a blind critic",
+         "split": "split: decided by the named measurement, nothing installed until it returns"}
+STALE_GPT = "pending: the blind GPT-6.1 Sol run"
+
+
+def gpt_status(sid, row, outcome, repos, layer):
+    """The GPT family's current status on a resolved row, from its layer's entry in combined.json (RULE.md and amendment 1)."""
+    samples = layer["gpt_samples_present"]
+    if not samples:
+        raise ValueError(f"convergence {sid}: combined.json holds no blind GPT sample for layer {row['layer_id']}")
+    if outcome == "final":
+        # Where amendment 1 leaves the first sample uncounted, the two Sol-ultra orders are the whole GPT side.
+        if layer["g1_counted"] and samples == 3:
+            return "returned: at least two of three blind GPT samples"
+        if not layer["g1_counted"] and samples == 2 and layer["orders_present"] == 2:
+            return "returned: both blind Sol-ultra orders"
+        raise ValueError(f"convergence {sid}: combined.json holds {samples} GPT samples for layer {row['layer_id']}, not the set a final row needs")
+    named = {norm(repo): count for key in ("claude_only", "gpt_only", "single_gpt_votes") for repo, count in layer[key]}
+    counts = [named[repo] for repo in repos if repo in named]
+    if len(counts) > 1:
+        raise ValueError(f"convergence {sid}: more than one repository in combined.json: {'; '.join(repos)}")
+    if counts:
+        return f"returned: {counts[0]} of {samples} blind GPT samples"
+    if row["row_kind"] == "added":
+        return "returned: named by the critic or the added-slot round, not by the layer's blind samples"
+    if repos:
+        raise ValueError(f"convergence {sid}: repository not in combined.json: {'; '.join(repos)}")
+    # A first-round default that installs nothing has no repository for a sample to name.
+    return f"returned: 0 of {samples} blind GPT samples"
+
+
 def verify_evidence(ref, sid):
     if not isinstance(ref, dict) or not ref.get("path") or not ref.get("sha256"):
         raise ValueError(f"convergence {sid}: evidence path and sha256 required")
@@ -168,6 +202,9 @@ def apply_convergence(rows, layers):
             raise ValueError(f"convergence {sid}: unknown outcome: {outcome}")
         resolution = {key: decision[key] for key in ("outcome", "by", "votes", "evidence", "reason", "covered_by") if key in decision}
         row["resolution"] = resolution
+        # Both are read before a branch below changes the row: the inherited status, and the repository that was judged.
+        inherited = {"claude": row["claude"], "gpt": row["gpt"], "label": row["label"]}
+        repos = [norm(repo) for repo in row["repository"].split(";") if norm(repo)]
         if outcome in ("installed_on_critic", "split") and "critic" not in decision:
             raise ValueError(f"convergence {sid}: critic evidence required")
         for key in ("critic", "evidence"):
@@ -175,7 +212,6 @@ def apply_convergence(rows, layers):
                 verify_evidence(decision[key], sid)
                 resolution["evidence"] = decision[key]
         if outcome == "final":
-            repos = [norm(repo) for repo in row["repository"].split(";") if norm(repo)]
             final = {norm(repo) for repo in combined.get(row["layer_id"], {}).get("final", [])}
             if not repos or any(repo not in final for repo in repos):
                 raise ValueError(f"convergence {sid}: final repository not in combined.json: {row['repository']}")
@@ -203,6 +239,21 @@ def apply_convergence(rows, layers):
                             "measurement": {"returned": False, "receipts": []}})
         elif not decision.get("reason"):
             raise ValueError(f"convergence {sid}: kept decision requires a reason")
+        if outcome != "kept":
+            layer = combined.get(row["layer_id"])
+            if layer is None:
+                raise ValueError(f"convergence {sid}: layer not in combined.json: {row['layer_id']}")
+            added = row["row_kind"] == "added"
+            # A decision may state the GPT side itself where the row has no repository for a sample to name.
+            row.update({"claude": "not judged in the first round" if added else row["claude"],
+                        "gpt": decision.get("gpt_status") or gpt_status(sid, row, outcome, repos, layer),
+                        "label": BASIS[outcome]})
+            if not added:
+                resolution["first_round_record"] = inherited
+        elif row["catalog"] == "us-equities" and row["gpt"].startswith(STALE_GPT):
+            # The blind GPT round judged the 21 foundation packets only; a trading row never waits on it.
+            resolution["first_round_record"] = inherited
+            row["gpt"] = "not judged: the blind GPT round covered the 21 foundation packets only"
     for correction in data["hygiene"]:
         sid, field = correction["slot_id"], correction["field"]
         if sid not in by_slot:
@@ -275,7 +326,11 @@ def build():
         "schema_version": 1, "kind": "new-wsl-definitive-manifest", "date_utc": "2026-10-01",
         "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, "
                    "agreed by both model families, and is not a merit acceptance",
-        "decision_rule": foundation["decision_rule"],
+        "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples "
+                         f"under the combination rule ({convergence['rule']['path']} and its amendment 1); a contested one is resolved by a blind "
+                         "Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families "
+                         "name it and both critics return converged, and a split is settled by the measurement the critics name.",
+        "decision_rule_before_amendment_2": foundation["decision_rule"],
         "no_install_rule": foundation["no_install_rule"],
         "not_claimed": foundation["not_claimed"],
         "sources": {"foundation": {"file": FOUNDATION.name, "sha256": sha(FOUNDATION)},

@@ -3,7 +3,8 @@
  "kind": "new-wsl-definitive-manifest",
  "date_utc": "2026-10-01",
  "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
- "decision_rule": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
+ "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name.",
+ "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
  "no_install_rule": "an option that installs nothing extra is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero",
  "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
  "sources": {
@@ -22,7 +23,7 @@
   },
   "convergence": {
    "file": "convergence.json",
-   "sha256": "7399b6b17b14b18f16b2ebab9c19fa61461b8affc1a2ba0e319a10cfd3188cd9"
+   "sha256": "2c1df503112cb02816e80231728a3d54d57165190dc863e15e0d15c2118f9c45"
   },
   "rule": {
    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md",
@@ -498,16 +499,21 @@
    "repository": "https://github.com/anthropics/claude-code",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "coding agent on Claude models",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld"
+    }
    }
   },
   {
@@ -519,16 +525,21 @@
    "repository": "https://github.com/openai/codex",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "coding agent on GPT models",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld"
+    }
    }
   },
   {
@@ -540,16 +551,21 @@
    "repository": "https://github.com/anthropics/claude-agent-sdk-python",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "agent SDK on the Claude route",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld"
+    }
    }
   },
   {
@@ -561,16 +577,21 @@
    "repository": "https://github.com/openai/codex",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "agent SDK on the native GPT route",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld"
+    }
    }
   },
   {
@@ -582,16 +603,21 @@
    "repository": "https://github.com/trailofbits/skills",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "security review skills in both clients",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call"
+    }
    }
   },
   {
@@ -603,12 +629,12 @@
    "repository": "https://github.com/mattpocock/skills",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "",
+   "label": "kept or added on a blind critic's verdict",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: 3 of 3 blind GPT samples",
    "job": "engineering-process skills in both clients, installed per skill",
    "resolution": {
     "outcome": "installed_on_critic",
@@ -629,16 +655,21 @@
    "repository": "https://github.com/openclaw/mcporter",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "calling MCP servers from scripts and the shell",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -650,16 +681,21 @@
    "repository": "https://github.com/modelcontextprotocol/inspector",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "interactive test of an MCP server, run on demand",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -671,15 +707,15 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
     "receipts": []
    },
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "messages between running agent sessions of both clients",
    "resolution": {
     "outcome": "split",
@@ -718,16 +754,21 @@
    "repository": "https://github.com/anthropics/sandbox-runtime",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "process sandbox for agent commands",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call"
+    }
    }
   },
   {
@@ -760,16 +801,21 @@
    "repository": "https://github.com/oraios/serena",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: both blind Sol-ultra orders",
    "job": "symbol navigation and references for both clients",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call"
+    }
    }
   },
   {
@@ -781,12 +827,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 2 blind GPT samples",
    "job": "symbol navigation through language servers, Claude Code only",
    "resolution": {
     "outcome": "not_installed",
@@ -802,6 +848,11 @@
     "former_default": {
      "name": "claude-plugins-official (code-intelligence LSP plugins)",
      "repository": "https://github.com/anthropics/claude-plugins-official"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict revised; the judge flagged a close call"
     }
    }
   },
@@ -814,12 +865,12 @@
    "repository": "https://github.com/ast-grep/ast-grep",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "",
+   "label": "kept or added on a blind critic's verdict",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: 2 of 2 blind GPT samples",
    "job": "syntax-pattern code search and rewrite",
    "resolution": {
     "outcome": "installed_on_critic",
@@ -864,15 +915,15 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
     "receipts": []
    },
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "local embedding model",
    "resolution": {
     "outcome": "split",
@@ -916,12 +967,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "reranker model for retrieval",
    "resolution": {
     "outcome": "not_installed",
@@ -949,16 +1000,21 @@
    "repository": "https://github.com/tobi/qmd",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: both blind Sol-ultra orders",
    "job": "search over Markdown documents",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -970,16 +1026,21 @@
    "repository": "https://github.com/opendatalab/mineru",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: both blind Sol-ultra orders",
    "job": "document parsing to text",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -991,12 +1052,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 2 blind GPT samples",
    "job": "web page text extraction",
    "resolution": {
     "outcome": "not_installed",
@@ -1013,6 +1074,11 @@
     "former_default": {
      "name": "trafilatura",
      "repository": "https://github.com/adbar/trafilatura"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1025,7 +1091,7 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
@@ -1033,7 +1099,7 @@
    },
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 1 of 2 blind GPT samples",
    "job": "browser automation for agents",
    "resolution": {
     "outcome": "split",
@@ -1060,7 +1126,12 @@
      }
     ],
     "deciding_measurement": "Gate first: on the target WSL build, after the documented install, 20 consecutive default launches of agent-browser (close --all, open about:blank, snapshot) from a Claude Code shell and from a Codex shell with no connect-port workaround; if any fails, Playwright CLI. If all pass: a 20-task Harbor comparison (static page, redirect, JavaScript-rendered page, form fill, login fixture, long page; both agents; same budgets).",
-    "measurement_id": "browser-tool"
+    "measurement_id": "browser-tool",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1072,12 +1143,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "web search for the research harnesses",
    "resolution": {
     "outcome": "not_installed",
@@ -1129,12 +1200,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 2 blind GPT samples",
    "job": "token and cost usage meter",
    "resolution": {
     "outcome": "not_installed",
@@ -1152,6 +1223,11 @@
     "former_default": {
      "name": "ccusage",
      "repository": "https://github.com/ccusage/ccusage"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call"
     }
    }
   },
@@ -1185,16 +1261,21 @@
    "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "telemetry collection and routing",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1206,12 +1287,12 @@
    "repository": "https://github.com/prometheus/prometheus",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "kept or added on a blind critic's verdict",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 1 of 3 blind GPT samples",
    "job": "metrics store",
    "resolution": {
     "outcome": "installed_on_critic",
@@ -1220,6 +1301,11 @@
     "evidence": {
      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
      "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1232,7 +1318,7 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
@@ -1240,7 +1326,7 @@
    },
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "log store",
    "resolution": {
     "outcome": "split",
@@ -1267,7 +1353,12 @@
      }
     ],
     "deciding_measurement": "Ten fixed observation questions (tokens and cost per session and agent, API errors by type, tool failure rate by tool, which injected failure happened in which session, service-run outcomes) answered on the same real task set by both arms; metric: questions answered correctly, then operator minutes.",
-    "measurement_id": "event-store-and-dashboards"
+    "measurement_id": "event-store-and-dashboards",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1279,7 +1370,7 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
@@ -1287,7 +1378,7 @@
    },
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "dashboards",
    "resolution": {
     "outcome": "split",
@@ -1314,7 +1405,12 @@
      }
     ],
     "deciding_measurement": "Ten fixed observation questions (tokens and cost per session and agent, API errors by type, tool failure rate by tool, which injected failure happened in which session, service-run outcomes) answered on the same real task set by both arms; metric: questions answered correctly, then operator minutes.",
-    "measurement_id": "event-store-and-dashboards"
+    "measurement_id": "event-store-and-dashboards",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1326,12 +1422,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "agent and LLM trace store",
    "resolution": {
     "outcome": "not_installed",
@@ -1348,6 +1444,11 @@
     "former_default": {
      "name": "Phoenix",
      "repository": "https://github.com/Arize-ai/phoenix"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1393,12 +1494,12 @@
    "repository": "https://github.com/prometheus/alertmanager",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "",
+   "label": "kept or added on a blind critic's verdict",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "alert routing and delivery",
    "resolution": {
     "outcome": "installed_on_critic",
@@ -1419,15 +1520,15 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "split: decided by the named measurement, nothing installed until it returns",
    "state": "split",
    "measurement": {
     "returned": false,
     "receipts": []
    },
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "local generation model",
    "resolution": {
     "outcome": "split",
@@ -1466,12 +1567,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "analytics over past agent sessions",
    "resolution": {
     "outcome": "not_installed",
@@ -1500,16 +1601,21 @@
    "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: both blind Sol-ultra orders",
    "job": "model and task evaluation",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1521,16 +1627,21 @@
    "repository": "https://github.com/harbor-framework/harbor",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: both blind Sol-ultra orders",
    "job": "agent evaluation in containers",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1542,12 +1653,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 2 blind GPT samples",
    "job": "prompt and provider regression tests",
    "resolution": {
     "outcome": "not_installed",
@@ -1563,6 +1674,11 @@
     "former_default": {
      "name": "Promptfoo",
      "repository": "https://github.com/promptfoo/promptfoo"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1575,16 +1691,21 @@
    "repository": "https://github.com/zizmorcore/zizmor",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "workflow security audit",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1596,16 +1717,21 @@
    "repository": "https://github.com/actions/attest",
    "installs_nothing_extra": true,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "build provenance attestation",
    "resolution": {
     "outcome": "final",
     "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    },
     "reason": "a GitHub-hosted feature configured in a workflow: nothing is installed on the host"
    }
   },
@@ -1618,16 +1744,21 @@
    "repository": "https://github.com/anchore/syft",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "software bill of materials",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1639,12 +1770,12 @@
    "repository": "https://github.com/dependabot/dependabot-core",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "kept or added on a blind critic's verdict",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 1 of 3 blind GPT samples",
    "job": "dependency update pull requests",
    "resolution": {
     "outcome": "installed_on_critic",
@@ -1653,6 +1784,11 @@
     "evidence": {
      "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round1-critics-result.json",
      "sha256": "bf4bc787f19c7b92ae1d3a3e7ca748a5315e13c4d8e6d4abe8b89b8d0751cd2e"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1665,12 +1801,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "upload of scan results to code scanning",
    "resolution": {
     "outcome": "not_installed",
@@ -1686,6 +1822,11 @@
     "former_default": {
      "name": "codeql-sarif",
      "repository": "https://github.com/github/codeql-action"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1698,16 +1839,21 @@
    "repository": "https://github.com/kjanat/actionlint",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "workflow syntax and expression check",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1719,16 +1865,21 @@
    "repository": "https://github.com/dagucloud/dagu",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "scheduled workflows",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1740,16 +1891,21 @@
    "repository": "https://github.com/docker/compose",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "multi-container service definitions",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict undetermined; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1769,8 +1925,8 @@
    "gpt": "converged",
    "job": "container engine",
    "resolution": {
-    "outcome": "final",
-    "by": "both families"
+    "outcome": "kept",
+    "reason": "decided by both families in the decision round (Docker Engine in rootless mode); the three blind GPT samples of the first round name it too"
    }
   },
   {
@@ -1782,12 +1938,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "not judged",
-   "gpt": "not judged",
+   "claude": "not judged in the first round",
+   "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
    "job": "GPU access for containers",
    "resolution": {
     "outcome": "not_installed",
@@ -1813,16 +1969,21 @@
    "repository": "https://github.com/betterleaks/betterleaks",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "secret scanning before commit and in CI",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1834,12 +1995,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "secret scanning with live verification",
    "resolution": {
     "outcome": "not_installed",
@@ -1851,6 +2012,11 @@
     "former_default": {
      "name": "trufflehog",
      "repository": "https://github.com/trufflesecurity/trufflehog"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1863,16 +2029,21 @@
    "repository": "https://github.com/git/git",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "version control",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1884,16 +2055,21 @@
    "repository": "https://github.com/cli/cli",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "GitHub from the command line",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1905,16 +2081,21 @@
    "repository": "https://github.com/max-sixty/worktrunk",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "worktrees for parallel agents",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1926,16 +2107,21 @@
    "repository": "https://github.com/Wilfred/difftastic",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "syntax-aware diff",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -1947,12 +2133,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "coding agent in CI",
    "resolution": {
     "outcome": "not_installed",
@@ -1966,6 +2152,11 @@
     "former_default": {
      "name": "claude-code-action",
      "repository": "https://github.com/anthropics/claude-code-action"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -1978,12 +2169,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "no-install default: the first round kept sem only if a comparison shows a gain",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: all three blind GPT samples picked a challenger for this job (ataraxy-labs/sem)",
    "job": "entity-level diff for agents",
    "resolution": {
     "outcome": "not_installed",
@@ -1999,6 +2190,11 @@
     "former_default": {
      "name": "Not installed: git diff and difftastic cover diffs",
      "repository": ""
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "no-install default: the first round kept sem only if a comparison shows a gain"
     }
    }
   },
@@ -2011,16 +2207,21 @@
    "repository": "https://github.com/jdx/mise",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "tool version management",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -2032,16 +2233,21 @@
    "repository": "https://github.com/restic/restic",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "backup and restore",
    "resolution": {
     "outcome": "final",
-    "by": "both families"
+    "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    }
    }
   },
   {
@@ -2053,12 +2259,12 @@
    "repository": "",
    "installs_nothing_extra": true,
    "definitive": false,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "not installed: resolved by the rule or a blind critic",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: 0 of 3 blind GPT samples",
    "job": "dotfile management",
    "resolution": {
     "outcome": "not_installed",
@@ -2074,6 +2280,11 @@
     "former_default": {
      "name": "chezmoi",
      "repository": "https://github.com/twpayne/chezmoi"
+    },
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
     }
    }
   },
@@ -2086,16 +2297,21 @@
    "repository": "https://releases.ubuntu.com/26.04.1/",
    "installs_nothing_extra": false,
    "definitive": true,
-   "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call",
+   "label": "both families: the Claude record and the blind GPT samples",
    "state": "definitive",
    "measurement": null,
    "coincides_with_lane_record": null,
    "claude": "returned",
-   "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+   "gpt": "returned: at least two of three blind GPT samples",
    "job": "base operating system image",
    "resolution": {
     "outcome": "final",
     "by": "both families",
+    "first_round_record": {
+     "claude": "returned",
+     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+    },
     "judged_repository": "https://ubuntu.com/download/server",
     "reason": "the image source rather than the server download page: microsoft/WSL's DistributionInfo.json registers https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl with sha256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104"
    }

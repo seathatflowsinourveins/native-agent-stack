@@ -92,7 +92,7 @@ across both catalogs. The tables below are generated from it.
 | ci-supply-chain | actionlint-kjanat | workflow syntax and expression check | **actionlint (kjanat)** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
 | scheduling-supervision | dagu | scheduled workflows | **Dagu** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
 | hosting-services | docker-compose | multi-container service definitions | **Docker Compose** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
-| hosting-services | container-engine | container engine | **Docker Engine / Moby** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
+| hosting-services | container-engine | container engine | **Docker Engine / Moby** | definitive | decided by both families in the decision round (Docker Engine in rootless mode); the three blind GPT samples of the first round name it too |
 | hosting-services | gpu-container-runtime | GPU access for containers | Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | resolved | one refuting Claude critic; not needed |
 | secrets-credentials | betterleaks | secret scanning before commit and in CI | **betterleaks** | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
 | secrets-credentials | trufflehog | secret scanning with live verification | Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog's verification against live services is a separate audit job that the layer's requirement does not ask for | resolved | the combination rule; covered by betterleaks |
@@ -150,7 +150,7 @@ across both catalogs. The tables below are generated from it.
 | memory-owner | Not installed until the memory head-to-head returns (the blind round's documented-fit pick is ai-memory) | decided by measurement at the user's request: the best-scoring eligible system of the memory head-to-head is installed, with no protected incumbent | converged | converged | no | long-term memory across sessions and clients | measurement | waiting for the memory head-to-head, at the user's request |
 | context-supply | No context-supply layer: the usage meter only | no-install default: no challenger showed a gain on the requirement's metric with an interval excluding zero | converged | converged | yes | context-supply layer between tools and the model | definitive | decided by both families in the decision round on a measured comparison: no context-supply layer |
 | local-model-server | Ollama | settled by the preregistered gate: neither arm passed the first gate's frozen pass rule; at the 300-second wall limit llama-server passed 0 of 3 scored runs and Ollama 2 of 3 (MCP tool calls completed in 0 of 3 and 3 of 3); at the confirmatory 1,200-second wall limit llama-server passed 0 of 3 and Ollama 3 of 3; measured on one workstation; not a merit acceptance | converged on llama.cpp optional inference in the blind round | converged on ollama in the blind round | no | local model serving | measurement | settled by the preregistered gate |
-| container-engine | Docker Engine / Moby | default on documented fit; nothing measured separates the finalists | converged | converged | yes | container engine | definitive | both families: the Claude record and at least 2 of 3 blind GPT samples |
+| container-engine | Docker Engine / Moby | default on documented fit; nothing measured separates the finalists | converged | converged | yes | container engine | definitive | decided by both families in the decision round (Docker Engine in rootless mode); the three blind GPT samples of the first round name it too |
 
 <!-- tables:end -->
 
@@ -450,6 +450,11 @@ resolution. The structural-diff row, which already installed nothing, is resolve
 sem, and a blind Claude critic found it the same job as difftastic. This amendment replaces the earlier definition of
 definitive for foundation first-round rows and the earlier account of the unfinished GPT round; those paragraphs
 record the previous version.
+
+The generated manifest now states the current rule in `decision_rule` and the current family status and basis on
+every resolved row. It keeps the earlier rule under `decision_rule_before_amendment_2`, and each resolved row's
+first-round status and label under `resolution.first_round_record`; the ten added rows were not in the first round
+and have none.
 
 The following defaults were dropped, with the reasons recorded in
 [`convergence.json`](../../evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json):

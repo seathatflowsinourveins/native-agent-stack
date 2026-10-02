@@ -386,9 +386,9 @@
    "by": "both families"
   },
   {
-   "outcome": "final",
-   "slot_id": "container-engine",
-   "by": "both families"
+   "outcome": "kept",
+   "reason": "decided by both families in the decision round (Docker Engine in rootless mode); the three blind GPT samples of the first round name it too",
+   "slot_id": "container-engine"
   },
   {
    "outcome": "final",
@@ -442,6 +442,7 @@
     "difftastic"
    ],
    "reason": "git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic's JSON output is still behind DFT_UNSTABLE=yes)",
+   "gpt_status": "returned: all three blind GPT samples picked a challenger for this job (ataraxy-labs/sem)",
    "slot_id": "agent-structural-diff",
    "critic": {
     "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",

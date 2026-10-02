@@ -84,13 +84,14 @@ def render():
     for layer in fnd["layers"]:
         for slot in layer["slots"]:
             if slot["row_kind"] == "judged":
-                fam = slot["families"]
                 row = rows[slot["slot_id"]]
-                statuses = {family: fam[family]["status"] for family in ("claude", "gpt")}
+                # The family columns are the manifest's current status; the blind round's own basis stays in the third column.
+                statuses = {family: row[family] for family in ("claude", "gpt")}
                 if slot.get("split") and row["measurement"] and row["measurement"]["returned"]:
                     for pick in slot["split_between"]:
                         statuses[pick["family"]] += f" on {pick['name']} in the blind round"
-                lines.append(f"| {slot['slot_id']} | {row['default']} | {row['label']} | {statuses['claude']} | {statuses['gpt']} | "
+                blind_basis = row["resolution"].get("first_round_record", row)["label"]
+                lines.append(f"| {slot['slot_id']} | {row['default']} | {blind_basis} | {statuses['claude']} | {statuses['gpt']} | "
                              f"{'yes' if row['definitive'] else 'no'} | {row['job']} | {row.get('state') or 'open'} | {basis(row, combined)} |")
                 if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
                     lines.append(f"| | | {slot['split_note']} | | | | | | |")

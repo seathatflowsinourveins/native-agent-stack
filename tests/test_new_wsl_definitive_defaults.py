@@ -19,6 +19,11 @@ SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
 ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added"}
 DECISION_SLOTS = {"container-engine", "isolation-container-boundary", "code-search", "memory-owner", "context-supply",
                   "local-model-server"}
+RESOLVED = ("final", "installed_on_critic", "not_installed", "split")
+BASIS = {"final": "both families: the Claude record and the blind GPT samples",
+         "installed_on_critic": "kept or added on a blind critic's verdict",
+         "not_installed": "not installed: resolved by the rule or a blind critic",
+         "split": "split: decided by the named measurement, nothing installed until it returns"}
 ROUTING = (r"(?i)gpt-6\.1|\bsol\b at|codex lane|anthropic judge|openai judge|claude family|gpt family|astra|arbitration was attempted|"
            r"approval policy|approval review")
 
@@ -266,6 +271,85 @@ class Manifest(unittest.TestCase):
             self.assertIn(correction["reason"], row["resolution"].get("reason", "") + row["label"])
             if correction["field"] == "repository":
                 self.assertEqual(row["resolution"]["judged_repository"], correction["judged_as"])
+
+    def compact_values(self, row):
+        """The claude status, gpt status and label that the compact input gave the slot (or role) a row came from."""
+        sources = [part for catalog, layer, sid, part in self.source_slots()
+                   if catalog == row["catalog"] and layer == row["layer_id"]
+                   and (row["slot_id"] == sid or row["slot_id"].startswith(sid + "/"))]
+        self.assertEqual(len(sources), 1, row["slot_id"])
+        part = sources[0]
+        status = {}
+        for family in ("claude", "gpt"):
+            block = (part.get("families") or {}).get(family) or part.get(family)
+            status[family] = block.get("status", "returned") if isinstance(block, dict) else "not judged"
+        return {"claude": status["claude"], "gpt": status["gpt"], "label": part.get("label") or part.get("reason", "")}
+
+    def expected_gpt(self, row):
+        """The GPT family's current status on a resolved row, worked out from combined.json alone."""
+        layer = next(layer for layer in self.combined["rows"] if layer["layer_id"] == row["layer_id"])
+        resolution = row["resolution"]
+        if resolution["outcome"] == "final":
+            return ("returned: at least two of three blind GPT samples" if layer["g1_counted"]
+                    else "returned: both blind Sol-ultra orders")
+        repository = resolution.get("former_default", {}).get("repository", row["repository"])
+        named = {repository_key(repo): count for key in ("claude_only", "gpt_only", "single_gpt_votes") for repo, count in layer[key]}
+        if repository_key(repository) in named:
+            return f"returned: {named[repository_key(repository)]} of {layer['gpt_samples_present']} blind GPT samples"
+        if row["row_kind"] == "added":
+            return "returned: named by the critic or the added-slot round, not by the layer's blind samples"
+        # A first-round default that installs nothing has no repository for a sample to name.
+        return f"returned: 0 of {layer['gpt_samples_present']} blind GPT samples"
+
+    def test_no_family_status_is_stale(self):
+        for row in self.rows:
+            with self.subTest(slot=row["slot_id"]):
+                for family in ("claude", "gpt"):
+                    self.assertNotIn("in progress", row[family])
+                    if row["resolution"]["outcome"] in RESOLVED:
+                        self.assertFalse(row[family].startswith("pending"), f"{row['slot_id']}: {family}: {row[family]}")
+
+    def test_resolved_rows_keep_their_first_round_record(self):
+        for row in self.rows:
+            resolution = row["resolution"]
+            if resolution["outcome"] not in RESOLVED:
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                if row["row_kind"] == "added":
+                    self.assertNotIn("first_round_record", resolution)
+                else:
+                    self.assertIn("first_round_record", resolution)
+                    self.assertEqual(resolution["first_round_record"], self.compact_values(row))
+
+    def test_resolved_rows_state_their_current_family_status(self):
+        # A decision may state the GPT side itself (a row with no repository for a sample to name); otherwise it is computed.
+        stated = {d["slot_id"]: d["gpt_status"] for d in self.convergence["decisions"] + self.convergence["added_slots"]
+                  if d.get("gpt_status")}
+        self.assertEqual(sorted(stated), ["agent-structural-diff"])
+        for row in self.rows:
+            resolution = row["resolution"]
+            if resolution["outcome"] not in RESOLVED:
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                self.assertEqual(row["gpt"], stated.get(row["slot_id"]) or self.expected_gpt(row))
+                self.assertEqual(row["label"], BASIS[resolution["outcome"]])
+                if row["row_kind"] == "added":
+                    self.assertEqual(row["claude"], "not judged in the first round")
+                else:
+                    self.assertEqual(row["claude"], self.compact_values(row)["claude"])
+        forms = [row["gpt"] for row in self.rows if row["resolution"]["outcome"] == "final"]
+        self.assertEqual(forms.count("returned: both blind Sol-ultra orders"), 5)
+        self.assertEqual(forms.count("returned: at least two of three blind GPT samples"), 23)
+
+    def test_decision_rule_states_the_current_rule(self):
+        rule = self.manifest["decision_rule"]
+        self.assertIn("combination rule", rule)
+        self.assertIn("RULE.md", rule)
+        self.assertIn(self.convergence["rule"]["path"], rule)
+        self.assertIn("amendment 1", rule)
+        self.assertIn("decision-round", rule)
+        self.assertNotEqual(rule, self.foundation["decision_rule"])
+        self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
