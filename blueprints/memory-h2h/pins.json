@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-10-01",
+  "longmemeval": {
+    "repository": "https://github.com/xiaowu0162/LongMemEval",
+    "commit": "9e0b455f4ef0e2ab8f2e582289761153549043fc",
+    "dataset": {
+      "repository": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned",
+      "revision": "98d7416c24c778c2fee6e6f3006e7a073259d48f",
+      "file_name": "longmemeval_s_cleaned.json",
+      "official_download_url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/main/longmemeval_s_cleaned.json",
+      "download_url": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/resolve/98d7416c24c778c2fee6e6f3006e7a073259d48f/longmemeval_s_cleaned.json",
+      "expected_sha256": "d6f21ea9d60a0d56f34a05b609c79c88a451d2ae03597821ea3d5a9678c3a442",
+      "size_bytes": 277383467,
+      "checksum_source": "https://huggingface.co/datasets/xiaowu0162/longmemeval-cleaned/raw/98d7416c24c778c2fee6e6f3006e7a073259d48f/longmemeval_s_cleaned.json",
+      "metadata_source": "https://huggingface.co/api/datasets/xiaowu0162/longmemeval-cleaned/revision/98d7416c24c778c2fee6e6f3006e7a073259d48f?blobs=true",
+      "download_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/README.md#L36-L42",
+      "schema_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/README.md#L79-L88",
+      "timestamp_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/data/custom_history/sample_haystack_and_timestamp.py#L76-L89",
+      "note": "The README format section still uses original S/M filenames; the download commands and pinned HF card specify cleaned S. Metadata and LFS pointer were read; the dataset was not downloaded during this build."
+    },
+    "answer": {
+      "file": "src/generation/run_generation.py",
+      "prompt_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/generation/run_generation.py#L53-L57",
+      "request_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/generation/run_generation.py#L339-L375",
+      "request": {"n": 1, "temperature": 0, "max_tokens": 500},
+      "choices": "Common direct-reading prompt for every arm, including empty history. Native retrieved text stays in retrieval order; no extra extraction, expansion or per-arm prompt. UTF-8 byte count plus 32 frames a conservative byte-BPE input budget because no arbitrary endpoint tokenizer is exposed. Provider prompt_tokens are retained and exceeding the cap stops scoring.",
+      "upstream_benchmark_setting_not_applied": "README L180 recommends con reading; per-chunk extraction/CoN at run_generation.py L193-L222 is not applied. Upstream tokenizer-specific truncation L265-L277 is not copied with a tokenizer guessed for arbitrary model IDs."
+    },
+    "judge": {
+      "file": "src/evaluation/evaluate_qa.py",
+      "prompts_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/evaluation/evaluate_qa.py#L24-L43",
+      "request_and_parser_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/evaluation/evaluate_qa.py#L101-L117",
+      "hypothesis_format_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/README.md#L90-L99",
+      "request": {"n": 1, "temperature": 0, "max_tokens": 10},
+      "parsing": "'yes' in response.strip().lower(), exactly as upstream; abstention if '_abs' occurs in question_id.",
+      "adaptation": "Caller-selected judge model/base URL; one recorded request with no hidden backoff retries."
+    },
+    "recall_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/README.md#L88",
+    "abstention_recall_exclusion_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/README.md#L206"
+  },
+  "vectorize_reference": {
+    "repository": "https://github.com/vectorize-io/agent-memory-benchmark",
+    "commit": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+    "dataset_citation": "https://github.com/vectorize-io/agent-memory-benchmark/blob/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150/src/memory_bench/dataset/longmemeval.py#L15-L17",
+    "bm25_citation": "https://github.com/vectorize-io/agent-memory-benchmark/blob/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150/src/memory_bench/memory/bm25.py#L17-L40",
+    "taken": "Question-level isolation; lowercase whitespace BM25 tokens and deterministic score ranking.",
+    "not_taken": "Automatic dataset download, chunk splitting, rewritten reader/JSON judge prompts, or gold IDs derived from has_answer; use official answer_session_ids and official judge instead."
+  },
+  "controls": {
+    "bm25": {
+      "repository": "https://github.com/dorianbrown/rank_bm25",
+      "release": "0.2.2",
+      "commit": "2550648efdbdcc5ebadbc8e5c8b26f5eb94b2b36",
+      "scoring_citation": "https://github.com/dorianbrown/rank_bm25/blob/2550648efdbdcc5ebadbc8e5c8b26f5eb94b2b36/rank_bm25.py#L78-L120",
+      "official_baseline_citation": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/src/retrieval/run_retrieval.py#L105-L111",
+      "settings": {"k1": 1.5, "b": 0.75, "epsilon": 0.25},
+      "adaptation": "Standard-library scoring port, no library install. One whole session per document; both roles, lowercase whitespace tokens, input-order tie breaks. Official LME indexes user-only literal-space tokens at run_retrieval.py L202-L229; that corpus setting is not applied. Empty corpora are supported. No models, service, port, or disk store. Reset discards the previous namespace entirely."
+    },
+    "none": {
+      "release": "harness-control-v1",
+      "adaptation": "Required no-context ablation: ingest accepts and discards sessions; recall returns []; uses the same common reader prompt with empty history. No models, service, port, disk store, or persistent namespace."
+    }
+  },
+  "statistics": {
+    "resamples": 10000,
+    "seed": 20261002,
+    "method": "95% percentile bootstrap of mean accuracy; paired question differences resampled together. Holm adjustment accepts caller-supplied p-values, with no p-values guessed from bootstrap intervals.",
+    "bootstrap_reference": {
+      "repository": "https://github.com/scipy/scipy",
+      "release": "v1.18.1",
+      "commit": "e4e854eaa8f18d807cd3496028e257e36caa93cc",
+      "paired_citation": "https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L363-L367",
+      "percentile_citation": "https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_resampling.py#L650-L663",
+      "adaptation": "Standard-library implementation of the cited percentile algorithm; SciPy default BCa and default resample count are not applied."
+    },
+    "holm_reference": {
+      "repository": "https://github.com/statsmodels/statsmodels",
+      "release": "v0.15.0",
+      "commit": "278ff9950636cdd4939b4055e339a8e681d79cab",
+      "citation": "https://github.com/statsmodels/statsmodels/blob/278ff9950636cdd4939b4055e339a8e681d79cab/statsmodels/stats/multitest.py#L233-L244"
+    }
+  },
+  "chat_completions_reference": {
+    "url": "https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create",
+    "read_on": "2026-10-01",
+    "endpoint": "POST <base_url>/chat/completions",
+    "note": "Bearer authentication from the named environment variable; non-streaming JSON choices[0].message.content and usage. Legacy max_tokens and temperature=0 are retained to match LongMemEval; use a compatible model. Failed requests retain returned usage or unknown usage; no automatic retry."
+  },
+  "corrections": [
+    {
+      "finding": "Removing has_answer alone does not blind ingestion: original dataset session IDs mark evidence with answer prefixes.",
+      "verification": "https://github.com/xiaowu0162/LongMemEval/blob/9e0b455f4ef0e2ab8f2e582289761153549043fc/data/custom_history/sample_haystack_and_timestamp.py#L391-L400",
+      "fix": "protocol.py assigns opaque chronological session IDs before ingestion, then maps returned IDs back only inside the scorer. test_core.py verifies original answer-marked IDs are absent from adapter input and answer prompts."
+    },
+    {
+      "finding": "An ID-bearing hit on one question does not establish provenance for another question's nonempty, unreported retrieval.",
+      "fix": "recall_at_k skips nonempty results without IDs; summary never infers provenance across questions. Partial provenance is explicitly a reported-ID coverage lower bound, checked by test_mixed_provenance_is_labeled_and_counted_as_a_lower_bound. Empty results count zero only for explicitly ID-capable controls."
+    },
+    {
+      "finding": "Summarizing only completed answers understated paid pending ingestion/answer costs, and checkpointing only answers allowed a successful judge call to repeat after a torn append.",
+      "fix": "Partial summaries count all observed attempts while accuracy/recall use completed questions; scored pending entries replay without a model call. Failed model attempts retain returned or unknown usage across resume.",
+      "verification": "tests/test_core.py: test_failed_judge_keeps_answer_usage_and_resumes_without_ingest, test_scored_pending_and_torn_append_resume_without_any_model_or_system_call, test_failed_answer_attempt_is_preserved_when_resume_reingests, test_body_read_failures_retain_an_unknown_model_attempt."
+    }
+  ]
+}
