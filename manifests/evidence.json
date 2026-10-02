@@ -37181,8 +37181,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "b533cf492b994db1a2ed7ebb4aa1f52c14baa91519a9d9016cbf1648777e6f24",
-      "bytes": 16469
+      "sha256": "ab89411f1a04c4a7b314eda5ca7854a1f5f1d4dcc5bcc85763b606e698df07a6",
+      "bytes": 18441
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
@@ -37253,6 +37253,11 @@
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
       "sha256": "4ab26a9a7617cfa8741aa8ced5c178beeadf0606b26b5edaf663ea0cb1916b99",
       "bytes": 24777
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
+      "sha256": "c8a1049832938ecee9677561b606b82d6fb042d18f7ec9f10303751bdaf032b1",
+      "bytes": 7241
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/validation.json",
