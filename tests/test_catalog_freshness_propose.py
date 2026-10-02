@@ -940,6 +940,74 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn('existing="$(find_open_pr)"', body)
         self.assertIn('gh pr edit "$existing" --title "$title" --body-file "$body_file"', body)
 
+    def _run_pr_metadata(self, lanes="", existing=True, race=False):
+        """Execute the actual metadata shell with a synthetic gh; no network calls."""
+        job = self._job_body("propose")
+        step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Note that this PR")]
+        script = step.split("        run: |\n", 1)[1]
+        script = "\n".join(line[10:] for line in script.splitlines())
+        stub = r'''
+gh() {
+  printf '%s\n' "$*" >> "$TEST_CALLS"
+  case "$1 $2" in
+    "pr list")
+      if [ "$TEST_EXISTING" = 1 ] || [ -f "$TEST_CREATED" ]; then printf '527\n'; fi ;;
+    "pr view")
+      case "$*" in
+        *"--json labels"*) printf '%s\n' "$TEST_LANES" ;;
+        *) printf 'https://example.invalid/pull/527\n' ;;
+      esac ;;
+    "pr create")
+      if [ "$TEST_RACE" = 1 ]; then : > "$TEST_CREATED"; return 1; fi ;;
+    "pr edit") ;;
+    *) return 99 ;;
+  esac
+}
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "freshness").mkdir()
+            env = {**os.environ, "RUNNER_TEMP": directory, "GITHUB_OUTPUT": str(root / "output"),
+                   "TEST_CALLS": str(root / "calls"), "TEST_CREATED": str(root / "created"),
+                   "TEST_LANES": lanes, "TEST_EXISTING": str(int(existing)), "TEST_RACE": str(int(race))}
+            result = subprocess.run(["bash", "-c", stub + script], env=env, capture_output=True,
+                                    text=True, timeout=30, check=False)
+            body_path = root / "freshness/pr-body.md"
+            return result, (root / "calls").read_text(), body_path.read_text() if body_path.exists() else ""
+
+    def test_pr_metadata_creates_a_shared_report_with_a_valid_source_section(self):
+        from tests.test_sota_sources_gate import NODE, GATE, body, inline_script, run_check, sota_job
+        if not NODE:
+            self.skipTest("node unavailable; CI supplies it for the native source gate")
+        result, calls, rendered = self._run_pr_metadata(existing=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertIn("Lane: `lane:shared`", rendered)
+        outcome = run_check(inline_script(sota_job(GATE)), [body(rendered)])[0]
+        self.assertIsNone(outcome["failed"], outcome)
+
+    def test_pr_metadata_preserves_one_lane_and_rejects_ambiguous_lanes(self):
+        for supplied, expected in (("", "lane:shared"), ("lane:foundation", "lane:foundation"),
+                                   ("lane:trading", "lane:trading"), ("lane:shared", "lane:shared")):
+            with self.subTest(lanes=supplied):
+                result, calls, rendered = self._run_pr_metadata(supplied)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertRegex(calls, rf"pr edit 527 .*--add-label {expected}")
+                self.assertIn(f"Lane: `{expected}`", rendered)
+        for lanes in ("lane:foundation\nlane:shared", "lane:unknown"):
+            with self.subTest(lanes=lanes):
+                result, calls, _ = self._run_pr_metadata(lanes)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertNotIn("pr edit", calls)
+                self.assertNotIn("pr create", calls)
+
+    def test_pr_metadata_rechecks_the_lane_after_a_create_race(self):
+        result, calls, rendered = self._run_pr_metadata("lane:trading", existing=False, race=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertRegex(calls, r"pr edit 527 .*--add-label lane:trading")
+        self.assertIn("Lane: `lane:trading`", rendered)
+
     def test_unfetched_wording_says_pin_changes_are_still_drift(self):
         report = fp.render_drift_markdown(
             "published.json", "rebuilt.json", {"counts": {}}, {"counts": {}},
