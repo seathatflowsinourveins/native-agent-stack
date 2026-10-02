@@ -6,7 +6,7 @@
   "scope": "Existing Mac deployment and this qualification unit; not other owners or hosts",
   "canonical_revision": "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4",
   "shared_memory": {"component": "ai-memory", "version": "2.5.2", "disposition": "retain"},
-  "local_inference": {"component": "Ollama", "version": "0.34.4", "disposition": "retain_existing_pin_without_new_acceptance"},
+  "local_inference": {"component": "Ollama", "version": "0.34.4", "disposition": "retain", "new_acceptance_established": false},
   "challenger_disposition": "not_selected_for_this_deployment",
   "comparative_winner": null,
   "full_stack_readiness_established": false,

@@ -38,6 +38,14 @@ Linux total includes seven pre-push checks cascading from the same inventory
 failure. The repair registers both files and refreshes only the existing
 inventory evidence hash/byte count; original CI logs remain retained.
 
+The closed-verdict commit `9ac024a` then exposed one unclassified disposition
+string in the new closure record. macOS completed 9,556 tests with one failure
+and 1,326 skips; Linux completed 9,556 tests with eight failures and 967 skips,
+including seven pre-push cascades. The closure now uses the existing classified
+`retain` disposition and a separate `new_acceptance_established: false` flag.
+Both repository-classification tests passed after that semantic-preserving
+repair. The original full-suite failures remain evidence.
+
 Full command logs and original native identifiers are retained in the private
 task directory; public runtime evidence uses stable synthetic labels.
 
