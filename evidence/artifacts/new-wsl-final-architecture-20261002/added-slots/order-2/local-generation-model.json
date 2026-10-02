@@ -1,0 +1,158 @@
+{
+  "layers": [
+    {
+      "layer_id": "local-generation-model",
+      "selection": [
+        {
+          "name": "gpt-oss-20b",
+          "repository": "https://github.com/openai/gpt-oss",
+          "role": "C04 — Co-finalist for the single deployed fallback model. Strongest documented consumer-hardware path among the reviewed candidates; an overall winner is not established.",
+          "install_command": "ollama pull gpt-oss:20b",
+          "install_source": "https://cookbook.openai.com/articles/gpt-oss/run-locally-ollama — upstream-documented model installation, with Ollama installed first through the installer linked by the guide.",
+          "basis": [
+            {
+              "url": "https://github.com/openai/gpt-oss/blob/7b583341fe16/README.md",
+              "shows": "Documents native function calling, Structured Outputs, Harmony formatting, and MXFP4 weights that allow the model to run within 16 GB of memory. This supports capability and resource fit; it does not establish peak memory with an embedding model and KV cache loaded."
+            },
+            {
+              "url": "https://cookbook.openai.com/articles/gpt-oss/run-locally-ollama",
+              "shows": "Documents consumer GPU and Apple Silicon use, a recommended minimum of 16 GB VRAM or unified memory, an OpenAI-compatible Chat Completions endpoint, and a function-calling example."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/blob/7b583341fe16/gpt_oss/evals/README.md",
+              "shows": "Provides an upstream GPQA and HealthBench evaluation harness for a local Responses-compatible runtime. This is reproducible evaluation infrastructure, not evidence of measured superiority over the other finalists."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/commit/7b583341fe16",
+              "shows": "Default-branch commit dated 2026-07-24, inside the 90-day window ending 2026-10-02. The repository API reports archived=false."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/releases/tag/v0.0.9",
+              "shows": "Latest stable GitHub release is v0.0.9, published 2026-01-13, outside the 90-day window. Recent default-branch activity keeps the repository current under the frozen maintenance rule."
+            },
+            {
+              "url": "https://github.com/openai/gpt-oss/issues/314",
+              "shows": "Issue activity continued through 2026-09-24. This is an open report about the repository's example Responses adapter; its title and activity were checked, but the reported behavior was not independently reproduced."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "Granite 4.2 — 8B",
+          "repository": "https://github.com/ibm-granite/granite-4.2-language-models",
+          "role": "C02 — Co-finalist, selecting the 8B variant from the candidate family. Strong published tool-use and coding evidence plus documented OpenAI-compatible serving; deploy one finalist after the deciding comparison.",
+          "install_command": "pip install torch torchvision torchaudio\npip install accelerate transformers",
+          "install_source": "https://huggingface.co/ibm-granite/granite-4.2-8b — exact upstream dependency-install commands. The same model card documents OpenAI-compatible vLLM and SGLang serving; the serving runtime is an additional prerequisite.",
+          "basis": [
+            {
+              "url": "https://huggingface.co/ibm-granite/granite-4.2-8b",
+              "shows": "Documents an 8B dense model with reasoning and tool calling. Approximately 16 GB for BF16 parameter storage is a calculation from the stated parameter count, not a measured deployment footprint; runtime, KV cache, and embedding memory remain additional."
+            },
+            {
+              "url": "https://huggingface.co/ibm-granite/granite-4.2-8b",
+              "shows": "Publishes 8B evaluation results: BFCL v4 52.39, τ³-bench 58.06, LiveCodeBench v6 73.24, IFBench 79.33, and SWE-bench Verified 47.67. These are upstream-reported results, not RTX 4090 measurements or a matched comparison with gpt-oss-20b."
+            },
+            {
+              "url": "https://huggingface.co/ibm-granite/granite-4.2-8b",
+              "shows": "Documents OpenAI-compatible serving and function-call examples. Its vLLM route requires v0.20+ for the supplied reasoning parser and uses qwen3_coder for tool parsing; a built-in reasoning-parser alternative and SGLang serving are also documented."
+            },
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/figures/8b-comparison.png",
+              "shows": "Publishes a comparison including Granite 4.2 8B and Nemotron 3 Nano 30B-A3B. Results are mixed: Granite leads on instruction following and coding, while Nano leads on BFCL v4. The Gemma arm is 26B-A4B, which differs from the packet's E4B candidate."
+            },
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/commit/75355e6ef8c1",
+              "shows": "Default-branch commit dated 2026-09-15, inside the 90-day window; archived=false. The releases/latest endpoint returned HTTP 404, so no latest stable GitHub release was found through that endpoint."
+            },
+            {
+              "url": "https://github.com/ibm-granite/granite-4.2-language-models/pull/2",
+              "shows": "Benchmark-chart contribution merged 2026-08-25. Issue activity was also present in September. No completed functional model-test result was retrieved for the current head."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Gemma 4 E4B IT",
+          "reason": "Current, with a 2026-09-30 head and May stable release; native function calling and published evaluations are credible, but the checked E4B guide lacks a complete OpenAI-server recipe, and E4B contains 8B total parameters. [Model card](https://huggingface.co/google/gemma-4-E4B-it), [head](https://github.com/google-deepmind/gemma/commit/c490becf42d1)."
+        },
+        {
+          "key": "C03",
+          "name": "Nemotron 3.5 Lightning 30B-A3B / Nemotron 3 Nano 30B-A3B",
+          "reason": "Current, with a September head and March stable release; tool-use evidence is strong, but Nano's BF16/FP8 weight estimates exceed 24 GB and its documented NVFP4 path requires Blackwell, leaving an Ada-compatible deployment unverified. [Cookbook](https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/usage-cookbook/Nemotron-3-Nano/vllm_cookbook.ipynb), [repository](https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/README.md)."
+        },
+        {
+          "key": "C05",
+          "name": "Qwen3.8-27B",
+          "reason": "Current, with an August head and releases/latest returning 404; OpenAI-compatible tool serving is documented, but the example uses four GPUs and no single-4090 quantized structured-output result was verified. [Deployment documentation](https://github.com/QwenLM/Qwen3.8/blob/2ea10dc72582/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "GLM-4-32B-0414",
+          "reason": "Current, with an August head and releases/latest returning 404; published agent evaluations are useful, but the dense 32B model needs quantization for this GPU and a validated co-resident structured/tool deployment was not established. [Evaluations and implementation](https://github.com/zai-org/GLM-4/blob/024d8fd48e62/README.md)."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "No overall winner is justified between gpt-oss-20b and Granite 4.2 8B. On the specified WSL2 RTX 4090 host, first establish a pinned version of one OpenAI-compatible server that supports both models on Ada hardware. Compare gpt-oss's supplied MXFP4 checkpoint against Granite 8B BF16, recording any quantization or CPU offload. Keep the embedding checkpoint, GPU residency, context lengths, concurrency, reasoning budget, and output budget fixed. Measure JSON-schema validity, correct tool selection and arguments, successful multi-turn tool completion, answer quality on a fixed public benchmark subset, prefill/decode throughput, latency, and aggregate peak GPU memory. Include the actual agent-service request shapes. This comparison must establish reliable operation within 24 GB with the embedding model loaded before selecting the one deployed model.",
+      "evidence_gaps": [
+        "The packet contains no recorded comparison in which both finalists ran. The reviewed public sources do not supply the required matched RTX 4090 comparison, so the selection is an unordered shortlist rather than a claim of measured superiority.",
+        "The embedding model and its memory footprint are unspecified. Parameter-storage estimates and gpt-oss's advertised 16 GB footprint do not establish aggregate peak memory, usable context length, or concurrency with that embedding model loaded.",
+        "Structured-output capability statements and function-call examples do not establish semantic tool-call success or schema reliability on the target host. Those remain deployment gates for both finalists.",
+        "The gpt-oss model card links a separate evaluation paper, but that paper was not fetched within this investigation. No numerical quality ranking for gpt-oss is inferred from the unread paper.",
+        "The checked gpt-oss vLLM guide documents an older 0.10.1+gptoss installation and targets dedicated server GPUs. Its consumer guide supports Ollama instead. A current common-server version with verified Ada support remains to be established.",
+        "The Granite serving example uses a 131072-token context. That example is not evidence that such a context fits this 24 GB deployment; an appropriate context and memory allocation must be measured.",
+        "OpenAI-compatible service integration is documented for both finalists. Direct Claude Code or Codex routing, Responses-API behavior, and automatic outage fallback were not verified and are not credited as completed integrations.",
+        "macOS arm64 support is explicitly documented for gpt-oss through its consumer guide and Metal reference implementation. Exact Granite 4.2 8B, Gemma E4B, Qwen3.8-27B, and Nemotron deployment parity on the secondary laptops was not established.",
+        "The 90-day window begins 2026-07-04. All six repositories are unarchived and have default-branch commits inside that window; therefore none qualifies for stale_or_archived. Stable GitHub releases found for Gemma, Nemotron, and gpt-oss are outside the window. The other three releases/latest endpoints returned 404.",
+        "CI findings were interpreted narrowly: Gemma's current-head pytest jobs passed, while one publication job failed; gpt-oss checks retrieved were review jobs; Nemotron had a successful documentation build; Qwen checks were issue-administration jobs; GLM had a dependency-graph job. These do not establish model-serving correctness. Granite had no completed functional-test result in the retrieved head checks.",
+        "Budget used: 30 GitHub API requests, six attempted web searches, and eight page-fetch attempts counting four policy-blocked requests. Both web-search batches timed out. No stars, downloads, installed-model choices, or local project records were used.",
+        "The execution policy rejected ctx_fetch_and_index calls because approval policy is never. Four upstream raw documents were instead fetched through read-only curl, indexed with ctx_index, and read with ctx_search. The requested page-fetch route could not be followed exactly."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/google-deepmind/gemma",
+        "https://api.github.com/repos/google-deepmind/gemma/releases/latest",
+        "https://api.github.com/repos/google-deepmind/gemma/commits?per_page=1",
+        "https://github.com/google-deepmind/gemma/blob/c490becf42d1/README.md",
+        "https://huggingface.co/google/gemma-4-E4B-it/raw/main/README.md",
+        "https://github.com/google-deepmind/gemma/actions/runs/36687621683",
+        "https://github.com/google-deepmind/gemma/actions/runs/36687639337",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models/releases/latest",
+        "https://api.github.com/repos/ibm-granite/granite-4.2-language-models/commits?per_page=1",
+        "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/README.md",
+        "https://github.com/ibm-granite/granite-4.2-language-models/blob/75355e6ef8c1/figures/8b-comparison.png",
+        "https://huggingface.co/ibm-granite/granite-4.2-8b/raw/main/README.md",
+        "https://github.com/ibm-granite/granite-4.2-language-models/pull/2",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron/releases/latest",
+        "https://api.github.com/repos/NVIDIA-NeMo/Nemotron/commits?per_page=1",
+        "https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/README.md",
+        "https://github.com/NVIDIA-NeMo/Nemotron/blob/8749344f8cce/usage-cookbook/Nemotron-3-Nano/vllm_cookbook.ipynb",
+        "https://github.com/NVIDIA-NeMo/Nemotron/actions/runs/34687860258",
+        "https://api.github.com/repos/openai/gpt-oss",
+        "https://api.github.com/repos/openai/gpt-oss/releases/latest",
+        "https://api.github.com/repos/openai/gpt-oss/commits?per_page=1",
+        "https://github.com/openai/gpt-oss/blob/7b583341fe16/README.md",
+        "https://github.com/openai/gpt-oss/blob/7b583341fe16/gpt_oss/evals/README.md",
+        "https://huggingface.co/openai/gpt-oss-20b/raw/main/README.md",
+        "https://github.com/openai/openai-cookbook/blob/main/articles/gpt-oss/run-vllm.md",
+        "https://raw.githubusercontent.com/openai/openai-cookbook/main/articles/gpt-oss/run-locally-ollama.md",
+        "https://github.com/openai/gpt-oss/issues/314",
+        "https://github.com/openai/gpt-oss/actions/runs/32757171688",
+        "https://api.github.com/repos/QwenLM/Qwen3.8",
+        "https://api.github.com/repos/QwenLM/Qwen3.8/releases/latest",
+        "https://api.github.com/repos/QwenLM/Qwen3.8/commits?per_page=1",
+        "https://github.com/QwenLM/Qwen3.8/blob/2ea10dc72582/README.md",
+        "https://github.com/QwenLM/Qwen3.8/actions/runs/32010423588",
+        "https://api.github.com/repos/zai-org/GLM-4",
+        "https://api.github.com/repos/zai-org/GLM-4/releases/latest",
+        "https://api.github.com/repos/zai-org/GLM-4/commits?per_page=1",
+        "https://github.com/zai-org/GLM-4/blob/024d8fd48e62/README.md",
+        "https://github.com/zai-org/GLM-4/actions/runs/30983750741"
+      ]
+    }
+  ]
+}

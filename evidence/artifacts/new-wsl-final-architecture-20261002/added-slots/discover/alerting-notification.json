@@ -1,0 +1,60 @@
+{
+  "candidates": [
+    {
+      "name": "Alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "why_candidate": "Alert router with deduplication, grouping, silencing, inhibition, and receiver integrations ([README](https://github.com/prometheus/alertmanager/blob/main/README.md)); latest release [v0.34.1](https://github.com/prometheus/alertmanager/releases/tag/v0.34.1), 2026-09-17."
+    },
+    {
+      "name": "Apprise",
+      "repository": "https://github.com/caronc/apprise",
+      "why_candidate": "Python notification library and CLI supporting desktop notifications, email, Gotify, and ntfy ([README](https://github.com/caronc/apprise/blob/master/README.md)); latest release [v2.0.0](https://github.com/caronc/apprise/releases/tag/v2.0.0), 2026-09-26."
+    },
+    {
+      "name": "ElastAlert 2",
+      "repository": "https://github.com/jertel/elastalert2",
+      "why_candidate": "Rule-based alerting tool for Elasticsearch and OpenSearch data, available as container images ([README](https://github.com/jertel/elastalert2/blob/master/README.md)); latest release [elastalert2-2.31.0](https://github.com/jertel/elastalert2/releases/tag/elastalert2-2.31.0), 2026-07-22."
+    },
+    {
+      "name": "Gotify",
+      "repository": "https://github.com/gotify/server",
+      "why_candidate": "Notification server with REST publishing, WebSocket reception, and a web UI ([README](https://github.com/gotify/server/blob/master/README.md)); latest release [v3.1.1](https://github.com/gotify/server/releases/tag/v3.1.1), 2026-09-15."
+    },
+    {
+      "name": "Grafana Alerting",
+      "repository": "https://github.com/grafana/grafana",
+      "why_candidate": "Observability platform with alert rules and notification integrations for its connected data sources ([README](https://github.com/grafana/grafana/blob/main/README.md)); latest release [v13.2.3](https://github.com/grafana/grafana/releases/tag/v13.2.3), 2026-09-29."
+    },
+    {
+      "name": "Keep",
+      "repository": "https://github.com/keephq/keep",
+      "why_candidate": "Alert management platform with deduplication, correlation, filtering, and notification workflows ([README](https://github.com/keephq/keep/blob/main/README.md)); latest release [v0.54.3](https://github.com/keephq/keep/releases/tag/v0.54.3), 2026-09-09."
+    },
+    {
+      "name": "Nightingale",
+      "repository": "https://github.com/ccfos/nightingale",
+      "why_candidate": "Metrics and logs alerting engine with mute rules, notification rules, and notification channels ([README](https://github.com/ccfos/nightingale/blob/main/README.md)); latest release [v9.1.1](https://github.com/ccfos/nightingale/releases/tag/v9.1.1), 2026-08-18."
+    },
+    {
+      "name": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "why_candidate": "HTTP publish/subscribe notification service supporting desktop delivery and running your own server ([README](https://github.com/binwiederhier/ntfy/blob/main/README.md)); latest release [v2.28.0](https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0), 2026-08-27."
+    },
+    {
+      "name": "OneUptime",
+      "repository": "https://github.com/OneUptime/oneuptime",
+      "why_candidate": "Community observability and incident management platform with metrics, logs, alerting, and on-call notifications ([README](https://github.com/OneUptime/oneuptime/blob/master/README.md)); latest release [14.0.11](https://github.com/OneUptime/oneuptime/releases/tag/14.0.11), 2026-10-01."
+    },
+    {
+      "name": "OpenObserve",
+      "repository": "https://github.com/openobserve/openobserve",
+      "why_candidate": "Observability platform with alerts on logs, metrics, and traces, plus configurable notification channels ([README](https://github.com/openobserve/openobserve/blob/main/README.md)); latest release [v1.1.0-rc1](https://github.com/openobserve/openobserve/releases/tag/v1.1.0-rc1), 2026-09-30."
+    },
+    {
+      "name": "SigNoz",
+      "repository": "https://github.com/SigNoz/signoz",
+      "why_candidate": "OpenTelemetry observability platform with metrics, logs, alerts, and a free Community deployment ([README](https://github.com/SigNoz/signoz/blob/main/README.md)); latest release [v0.144.0](https://github.com/SigNoz/signoz/releases/tag/v0.144.0), 2026-09-29."
+    }
+  ],
+  "search_notes": "Alphabetical, unranked candidate list checked on 2026-10-01 America/New_York. For every included repository, gh api repos/OWNER/REPO confirmed public visibility and archived:false, and gh api repos/OWNER/REPO/releases/latest returned a release within the 90-day window beginning 2026-07-03; each README was also checked. Apprise, Gotify, and ntfy are delivery-component candidates: grouping and silencing require an upstream alert router such as the listed Alertmanager. ElastAlert 2 requires relevant data in Elasticsearch or OpenSearch. Community/open-source editions are the scope for projects offering commercial editions; Keep's core is MIT-licensed outside ee/ ([LICENSE](https://github.com/keephq/keep/blob/main/LICENSE)). Host suitability is inferred from upstream Linux, Python, container deployment instructions, and available release artifacts; execution on WSL2 or macOS arm64 was not tested. Alerta was excluded: its latest release was [v9.1.0, 2026-03-28](https://github.com/alerta/alerta/releases/tag/v9.1.0), and its [default-branch commit](https://github.com/alerta/alerta/commit/4ac0106300cd) was dated 2026-03-30. Used 30 GitHub API calls and 8 README page fetches. Four web-search queries returned no usable results; discovery therefore relied on GitHub search and verified project sources. Exhaustiveness beyond this bounded discovery was not established. No workspace files were opened."
+}

@@ -1,0 +1,265 @@
+{
+  "layers": [
+    {
+      "layer_id": "quality-evaluation",
+      "selection": [
+        {
+          "name": "C08 — Inspect AI",
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "role": "Provisional semantic evaluation runner. Its documented sample records, partial failed logs and score history best match the failure-preserving evidence requirement. Agents can invoke its CLI; independent labels and uncertainty handling must come from the evaluation protocol.",
+          "install_command": "git clone https://github.com/UKGovernmentBEIS/inspect_ai.git\ncd inspect_ai\ngit checkout c05398d897affcb85bd4cb9d10a7c03e1779a18e\nuv sync --extra dev",
+          "install_source": "Pinned upstream README documents cloning and uv sync --extra dev; checkout adds the verified source pin. Requires Git, uv and Python >=3.10.",
+          "basis": [
+            {
+              "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/c05398d897affcb85bd4cb9d10a7c03e1779a18e/README.md",
+              "shows": "Supported source installation and evaluation CLI."
+            },
+            {
+              "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/c05398d897affcb85bd4cb9d10a7c03e1779a18e/docs/scorers.qmd",
+              "shows": "Dataset targets, heuristic and model grading, custom scorers, multiple scorers and rescoring."
+            },
+            {
+              "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/c05398d897affcb85bd4cb9d10a7c03e1779a18e/docs/eval-logs.qmd",
+              "shows": "Per-sample inputs, outputs, targets and scores; errors and tracebacks; readable partial failed logs; score edits retaining author, reason and history."
+            },
+            {
+              "url": "https://github.com/UKGovernmentBEIS/inspect_ai/commit/c05398d897affcb85bd4cb9d10a7c03e1779a18e",
+              "shows": "Default-branch commit on 2026-10-02 UTC, within 90 days."
+            },
+            {
+              "url": "https://github.com/UKGovernmentBEIS/inspect_ai/actions/runs/36957760169",
+              "shows": "Current-head Python 3.10 and 3.11 tests succeeded; slow tests were skipped. These are upstream CI observations, not target-host or semantic-accuracy measurements."
+            },
+            {
+              "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai",
+              "shows": "Unarchived; 368 open issues/PRs. Backlog size does not establish responsiveness."
+            },
+            {
+              "url": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/releases/latest",
+              "shows": "Returned 404; a GitHub latest release was not found. PyPI release currency remains unverified, so the recommendation pins source."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C04 — Harbor (containerized agent E2E runner)",
+          "repository": "https://github.com/harbor-framework/harbor",
+          "role": "Run Claude Code and Codex tasks in isolated environments with project verifiers, retaining trial results, verifier logs and agent trajectories.",
+          "install_command": "uv tool install harbor==0.23.0",
+          "install_source": "The v0.23.0 README documents uv tool install harbor; the version constraint pins the verified release. Python >=3.12 and a working Docker daemon are required for local container tasks.",
+          "basis": [
+            {
+              "url": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md",
+              "shows": "Supported installation, Claude Code/Codex CLI adapters and local Docker evaluation; paid cloud environments are optional."
+            },
+            {
+              "url": "https://github.com/harbor-framework/docs/blob/main/quickstart.mdx",
+              "shows": "Per-trial agent.log, verifier.log, result.json and trajectory.json evidence."
+            },
+            {
+              "url": "https://github.com/harbor-framework/harbor/blob/bf991e490394ef9c3250a6db2bc5cbda903cb4c3/tests/integration/README.md",
+              "shows": "Documented Docker, deterministic fake-model and golden-trajectory integration checks; supported pytest command."
+            },
+            {
+              "url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+              "shows": "Release published 2026-09-12, within 90 days."
+            },
+            {
+              "url": "https://github.com/harbor-framework/harbor/commit/bf991e490394ef9c3250a6db2bc5cbda903cb4c3",
+              "shows": "Default-branch commit on 2026-10-01, within 90 days."
+            },
+            {
+              "url": "https://github.com/harbor-framework/harbor/actions/runs/36825231241",
+              "shows": "Current-head Ubuntu and Windows test jobs succeeded."
+            },
+            {
+              "url": "https://github.com/harbor-framework/harbor/actions/runs/36825231175/job/110249313621",
+              "shows": "Type checking was cancelled; the head's aggregate check state was FAILURE, not a clean pass."
+            },
+            {
+              "url": "https://api.github.com/repos/harbor-framework/harbor",
+              "shows": "Unarchived; 969 open issues/PRs. Direct WSL2 and macOS arm64 execution was not observed."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C05 — Playwright",
+          "repository": "https://github.com/microsoft/playwright",
+          "role": "Independent browser behavior assertions, with traces, screenshots and other failure artifacts. Claude Code and Codex can invoke Playwright Test through its CLI.",
+          "install_command": "npm i -D @playwright/test@1.63.0\nnpx playwright install --with-deps",
+          "install_source": "Upstream README documents manual installation; upstream Linux CI uses --with-deps. The package constraint pins verified release v1.63.0. Requires Node >=20.",
+          "basis": [
+            {
+              "url": "https://github.com/microsoft/playwright/blob/v1.63.0/README.md",
+              "shows": "Browser isolation, assertions, CLI testing, failure tracing and Linux/macOS browser support."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright/blob/b630e71fcda7885885c459bcbb88e5bfa7c0a1ac/.github/workflows/infra.yml",
+              "shows": "Upstream use of playwright install --with-deps for browser system dependencies."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0",
+              "shows": "Release published 2026-09-04, within 90 days."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright/commit/b630e71fcda7885885c459bcbb88e5bfa7c0a1ac",
+              "shows": "Default-branch commit on 2026-10-01, within 90 days."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright/actions/runs/36941789987",
+              "shows": "Successful Ubuntu browser, installation and test-runner checks at the inspected head."
+            },
+            {
+              "url": "https://github.com/microsoft/playwright/actions/runs/36941789986",
+              "shows": "The inspected head also had macOS Firefox and Chrome failures. Aggregate CI was FAILURE."
+            },
+            {
+              "url": "https://api.github.com/repos/microsoft/playwright",
+              "shows": "Unarchived; 195 open issues/PRs. Exact WSL2 and macOS arm64 runtime behavior remains untested here."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C03 — ShellCheck",
+          "repository": "https://github.com/koalaman/shellcheck",
+          "role": "Deterministic shell checks with failing exit codes and structured diagnostics, complementing behavioral and semantic evaluations.",
+          "install_command": "sudo apt install shellcheck",
+          "install_source": "Upstream-documented Debian/Ubuntu command. Record the distribution package version; latest upstream stable release is v0.11.0. Upstream also documents brew install shellcheck for macOS.",
+          "basis": [
+            {
+              "url": "https://github.com/koalaman/shellcheck/blob/v0.11.0/README.md",
+              "shows": "Linux/macOS installation, CI exit-code use, JSON/CheckStyle/GCC diagnostics and cabal test."
+            },
+            {
+              "url": "https://github.com/koalaman/shellcheck/commit/35814d5e7620f0c61e2639f1a4deea3d0d160164",
+              "shows": "Default-branch commit on 2026-10-02 UTC, within 90 days; the repository is not stale under the frozen rule."
+            },
+            {
+              "url": "https://api.github.com/repos/koalaman/shellcheck/releases/latest",
+              "shows": "v0.11.0 was published 2025-08-04, outside 90 days; its official assets include Linux x86_64 and Darwin aarch64 archives."
+            },
+            {
+              "url": "https://github.com/koalaman/shellcheck/actions/runs/36946516622",
+              "shows": "GHC test jobs and Linux x86_64/Darwin aarch64 builds succeeded. Cross-build success does not establish execution on macOS."
+            },
+            {
+              "url": "https://api.github.com/repos/koalaman/shellcheck",
+              "shows": "Unarchived; 1,117 open issues/PRs. Recent commits establish currency despite the older stable release."
+            }
+          ],
+          "confidence": "high"
+        },
+        {
+          "name": "C09 — MCP Inspector",
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "role": "Independent protocol inspection and scriptable checks when changed behavior involves MCP tools used by either agent client.",
+          "install_command": "npx @modelcontextprotocol/inspector@2.9.0 --cli",
+          "install_source": "The release README documents npx and --cli; the version constraint pins verified release 2.9.0. Requires Node >=22.19.0.",
+          "basis": [
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/blob/2.9.0/README.md",
+              "shows": "Scriptable CLI, web/TUI inspection, automation/CI use and documented smoke-testing workflows."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/.github/workflows/main.yml",
+              "shows": "Ubuntu validation, smoke checks and an enforced per-file coverage gate."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/actions/runs/36785256558",
+              "shows": "Build and coverage jobs succeeded at the inspected head; packaging was skipped."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0",
+              "shows": "Release published 2026-09-30, within 90 days."
+            },
+            {
+              "url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+              "shows": "Default-branch commit on 2026-09-30, within 90 days."
+            },
+            {
+              "url": "https://api.github.com/repos/modelcontextprotocol/inspector",
+              "shows": "Unarchived; 62 open issues/PRs. Direct WSL2/macOS arm64 runtime validation remains unverified."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C06",
+          "name": "Promptfoo",
+          "reason": "Close challenger: strong declarative CLI evaluations and successful Linux/macOS CI, with an October 1 head and September 18 release; Inspect provisionally wins on directly documented partial-failure retrieval and score history, while comparative semantic accuracy remains unresolved. [README](https://github.com/promptfoo/promptfoo/blob/94119b67648756bf475a950885b2799c1694f1c2/README.md), [release](https://github.com/promptfoo/promptfoo/releases/tag/0.123.1), [CI](https://github.com/promptfoo/promptfoo/actions/runs/36937687839)."
+        },
+        {
+          "key": "C10",
+          "name": "MLflow",
+          "reason": "Healthy local evaluation/tracking option, with an October 2 head, September 17 release and successful evaluation CI; its broad tracking role adds less to this set than the selected sample and trial evidence facilities, and comparable failure/label provenance was not established in the reviewed README. [README](https://github.com/mlflow/mlflow/blob/5fb75a55ed41daea5ce90fec1717acb47a1f6687/README.md), [release](https://github.com/mlflow/mlflow/releases/tag/v3.16.1), [CI](https://github.com/mlflow/mlflow/actions/runs/36952198069)."
+        },
+        {
+          "key": "C02",
+          "name": "Difftastic",
+          "reason": "Fresh and well tested on Linux x86_64 and macOS arm64, but syntax-change inspection has weaker requirement fit than checks of expected behavior; head September 22 and release September 18 are within 90 days. [README](https://github.com/Wilfred/difftastic/blob/e2e1e3b7f5be18290135cc16ec521c16284eb21b/README.md), [release](https://github.com/Wilfred/difftastic/releases/tag/0.71.0), [CI](https://github.com/Wilfred/difftastic/actions/runs/35706032451)."
+        },
+        {
+          "key": "C07",
+          "name": "TypeSafe semantic skill",
+          "reason": "Fresh September 12 API-judgment skill with agent installation instructions, but a comparable evaluation runner and audited failure trail were not established in its README/SKILL.md; mandatory payment was also not established, so no paid-service exclusion is justified. [README](https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/README.md), [skill](https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C01",
+          "name": "Official OpenAI CI and security skills",
+          "criterion": "stale_or_archived",
+          "fact": "Last default-branch commit was 2026-06-24, before the approximately July 4 UTC cutoff; later repository pushed_at activity does not satisfy the frozen default-branch rule. The repository is unarchived, and its README explicitly deprecates it. [Commit API](https://api.github.com/repos/openai/skills/commits?per_page=1), [pinned README](https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/README.md)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "Inspect AI versus Promptfoo on the new WSL2 host, followed by macOS arm64. Freeze fresh task cases, rubrics and independently collected human labels before running either arm. Replay identical Claude Code/Codex outputs, preserving both reviewers' labels and unresolved disagreements. Keep the existing eight cases diagnostic-only. Include a safe, deliberately incorrect advice fixture as the negative control. Compare false approvals, correct rejection, uncertain outcomes, label agreement, and recovery of original failed/partial attempts after retries or interruption. Require case IDs, raw outputs, verifier results, judge reasons and immutable failure artifacts. Record clean-install success, latency and resource use. The present selection favors documented capability fit; it does not claim measured semantic superiority.",
+      "evidence_gaps": [
+        "Evidence was collected October 1 EDT / October 2 UTC. No clean installation, target-host trial or fresh independently labeled comparison was performed.",
+        "CI observations concern the inspected default-branch commits, not proof that the selected release tags pass the same checks. Job conclusions were verified; full test logs and benchmark measurements were not independently reproduced.",
+        "WSL2 fit is inferred from Ubuntu/Linux support. Harbor requires functioning Docker integration; macOS arm64 task-image compatibility and Inspect/Inspector runtime behavior still need direct checks.",
+        "The selected frameworks do not require a GPU. No RTX 4090 speedup or local-model compatibility was measured; local runner/storage support does not imply offline model access.",
+        "Independent labeling and retention of uncertain disagreements are evaluation-protocol requirements. Playwright's README example traces the first retry, which alone does not prove retention of the initial failed attempt.",
+        "Issue response times and closure rates were not measured. Open-issue/PR counts were recorded as maintenance context, without treating them as quality rankings.",
+        "Astra/Max review was triggered by conflicting ShellCheck Apple Silicon documentation. Acceptance: the release API's official Darwin aarch64 asset overrides the outdated negative README sentence; native macOS execution remains unverified.",
+        "Budget used: 30 GitHub API requests, two web searches and zero successful page fetches. The mandated ctx_fetch_and_index route was blocked with 'MCP tool call requires approval, but approval policy is never'; upstream files were read through GitHub API snapshots instead, so the requested page-fetch workflow could not be completed."
+      ],
+      "sources_read": [
+        "https://api.github.com/graphql",
+        "https://api.github.com/repos/microsoft/playwright",
+        "https://api.github.com/repos/microsoft/playwright/releases/latest",
+        "https://api.github.com/repos/microsoft/playwright/commits?per_page=1",
+        "https://api.github.com/repos/promptfoo/promptfoo",
+        "https://api.github.com/repos/promptfoo/promptfoo/releases/latest",
+        "https://api.github.com/repos/promptfoo/promptfoo/commits?per_page=1",
+        "https://api.github.com/repos/openai/skills",
+        "https://api.github.com/repos/openai/skills/releases/latest",
+        "https://api.github.com/repos/openai/skills/commits?per_page=1",
+        "https://api.github.com/repos/harbor-framework/harbor",
+        "https://api.github.com/repos/harbor-framework/harbor/releases/latest",
+        "https://api.github.com/repos/harbor-framework/harbor/commits?per_page=1",
+        "https://api.github.com/repos/koalaman/shellcheck",
+        "https://api.github.com/repos/koalaman/shellcheck/releases/latest",
+        "https://api.github.com/repos/koalaman/shellcheck/commits?per_page=1",
+        "https://api.github.com/repos/mlflow/mlflow",
+        "https://api.github.com/repos/mlflow/mlflow/releases/latest",
+        "https://api.github.com/repos/mlflow/mlflow/commits?per_page=1",
+        "https://api.github.com/repos/modelcontextprotocol/inspector",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/releases/latest",
+        "https://api.github.com/repos/modelcontextprotocol/inspector/commits?per_page=1",
+        "https://api.github.com/repos/typesafe-ai/skills",
+        "https://api.github.com/repos/typesafe-ai/skills/commits?per_page=1",
+        "https://api.github.com/repos/Wilfred/difftastic",
+        "https://api.github.com/repos/Wilfred/difftastic/releases/latest",
+        "https://api.github.com/repos/Wilfred/difftastic/commits?per_page=1",
+        "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai",
+        "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/releases/latest",
+        "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits?per_page=1"
+      ]
+    }
+  ]
+}

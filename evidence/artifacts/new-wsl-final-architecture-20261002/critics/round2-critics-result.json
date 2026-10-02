@@ -1,0 +1,873 @@
+[
+ {
+  "label": "critic:observation-inference:single-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "observation-inference",
+     "item": "OpenLIT",
+     "job": "Store and query OTLP metrics, log events and traces in ClickHouse and show them in its own UI; it also offers hook capture of agent sessions and LLM evaluations.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Prometheus (metrics), Loki (log events), Grafana (view)",
+     "reasons": "Rule 1: the jobs it could own here are metric and log-event storage and the view. Its hook capture duplicates both agents' native OTLP exporters, its evaluations duplicate Harbor and Inspect AI, and release 2.1.0 runs its own, older Collector Contrib (v0.142.0). Rule 2: no public measurement shows a gain over native export into single-purpose stores. Rule 3, per job: all gates pass; no performance evidence; steps tie at about four for metrics; moving parts decide for Prometheus, then Loki and Grafana: OpenLIT is two containers with ClickHouse (pinned 24.4.1, outside ClickHouse's security-supported versions), UI, OpAMP server, supervisor and collector, against one embedded-store binary per job.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docs/latest/openlit/installation.mdx",
+       "quote": "Self-host OpenLIT with Docker or Kubernetes. Deploy OpenLIT, ClickHouse, and an OpenTelemetry Collector on your own infrastructure."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/src/Dockerfile",
+       "quote": "ARG OTEL_VERSION=v0.142.0"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docker-compose.yml",
+       "quote": "image: clickhouse/clickhouse-server:24.4.1"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/ClickHouse/ClickHouse/master/SECURITY.md",
+       "quote": "| 24.* | \u274c |"
+      }
+     ],
+     "measurement": "Fan the settled Collector's output (native Claude Code and Codex OTLP only, same real task set, privacy sentinels injected) out to OpenLIT 2.1.0 and to Prometheus+Loki+Grafana at once. Compare: share of the agents' own counters reproduced (tokens, cost, tool and API outcomes per session), events lost or duplicated across a restart, steady-state RSS, process and container count. OpenLIT replaces the three only with equal coverage and lower RSS on a ClickHouse release that ClickHouse still supports.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Prometheus",
+     "job": "Store and query metrics: Claude Code usage counters (tokens, cost, sessions), Codex API and tool counters and durations, service metrics.",
+     "verdict": "install",
+     "winner_if_competing": "Prometheus",
+     "reasons": "Rule 1: metric storage is in the requirement: Claude Code exports usage as time series and Codex exports API and tool counters with success fields; no settled tool stores or queries them. Overlap: OpenLIT's ClickHouse metric tables. Rule 2: the job would otherwise have no owner, so documented capability decides. Rule 3 against OpenLIT: both pass the gates; no measured comparison exists; steps tie at four (run, OTLP flag, cumulative temporality, one exporter, against clone, compose, OTLP port remap, one exporter); moving parts decide: one process with an embedded store and no container against two containers and a ClickHouse server. With metrics owned here, OpenLIT is an extra install for the remaining jobs.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Claude Code exports metrics as time series data via the standard metrics protocol, events via the logs/events protocol, and optionally distributed traces via the [traces protocol](#traces-beta)."
+      },
+      {
+       "url": "https://developers.openai.com/codex/config-advanced",
+       "quote": "When the OTel metrics pipeline is enabled, Codex emits counters and duration histograms for API, stream, and tool activity."
+      },
+      {
+       "url": "https://prometheus.io/docs/guides/opentelemetry/",
+       "quote": "This will cause Prometheus to serve OTLP metrics receiving on HTTP"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/README.md",
+       "quote": "No dependency on distributed storage; **single server nodes are autonomous**"
+      }
+     ],
+     "measurement": "The paired run named under OpenLIT: answer fixed usage questions (Claude Code tokens and cost per session, Codex API error rate and tool success rate, service-run counts) from Prometheus and from OpenLIT's ClickHouse metric tables, checked against the agents' own session totals. Metrics: answer accuracy, steady-state RSS, process and container count. Prometheus is dropped if OpenLIT matches accuracy with lower RSS and fewer parts.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Loki",
+     "job": "Store and query OTLP log events: Claude Code tool-result and API-error events, Codex run events, service logs.",
+     "verdict": "install",
+     "winner_if_competing": "Loki",
+     "reasons": "Rule 1: log-event storage is in the requirement: Claude Code reports tool results and API errors only as events on the logs protocol, Codex exports its run events as logs, and these are the content-bearing records the privacy filter acts on. No settled tool stores OTLP log records. Overlap: OpenLIT's otel_logs table. Rule 2: the nothing-extra option, the Collector's alpha count and signaltometrics connectors, yields counts, not stored or queryable events, so the job has no owner and documented capability decides. Rule 3 against OpenLIT, with Prometheus already owning metrics: gates pass for both; no measured comparison; steps tie; Loki is one process with a filesystem store taking OTLP natively, against two containers and a ClickHouse server.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Claude Code exports the following events via OpenTelemetry logs/events (when `OTEL_LOGS_EXPORTER` is configured):"
+      },
+      {
+       "url": "https://developers.openai.com/codex/config-advanced",
+       "quote": "Enable OpenTelemetry (OTel) log export to track Codex runs (API requests, SSE/events, prompts, tool approvals/results)."
+      },
+      {
+       "url": "https://grafana.com/docs/loki/latest/send-data/otel/",
+       "quote": "Loki natively supports ingesting OpenTelemetry logs over HTTP."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/connector/countconnector/README.md",
+       "quote": "The `count` connector can be used to count spans, span events, metrics, data points, and log records."
+      }
+     ],
+     "measurement": "Two runs on the same real task set. (a) No-install arm: derive outcome counters from the log events with the Collector's count and signaltometrics connectors (both alpha at v0.162.0) into Prometheus, then answer ten fixed outcome questions (which tool failed, which API error, in which session); Loki is dropped if all ten are answered without stored events. (b) The paired run against OpenLIT's otel_logs: event coverage against session transcripts, loss across a restart, RSS.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Grafana",
+     "job": "One query and display surface over Prometheus and Loki (Explore and dashboards).",
+     "verdict": "install",
+     "winner_if_competing": "Grafana",
+     "reasons": "Rule 1: the requirement's verb is observe. Loki ships no display: its README assigns querying and displaying logs to Grafana and LogCLI is command-line only; Prometheus describes its expression browser as an aid for ad-hoc queries and debugging. Overlaps: that browser for ad-hoc metric queries; OpenLIT's UI. Rule 2: displaying stored events would otherwise have no owner, so documented capability decides; alerting is not in the requirement and is not counted. Rule 3 against OpenLIT's UI: gates pass for both; no measured comparison; that UI arrives only with its ClickHouse stack, while Grafana is one apt package with an embedded SQLite store that reads both stores.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/README.md",
+       "quote": "- [Grafana](https://github.com/grafana/grafana) for querying and displaying the logs."
+      },
+      {
+       "url": "https://prometheus.io/docs/visualization/browser/",
+       "quote": "This is primarily useful for ad-hoc queries and debugging."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/README.md",
+       "quote": "Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored."
+      },
+      {
+       "url": "https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/",
+       "quote": "sudo apt-get install grafana"
+      }
+     ],
+     "measurement": "Answer ten fixed observation questions (tokens per session per agent, tool failure rate, API errors by type, service-run outcomes) twice on the same stored data: with Prometheus's expression browser plus LogCLI only, and with Grafana. Metrics: questions answered and operator minutes per question. Grafana is dropped if all ten are answered without it in comparable time.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Phoenix",
+     "job": "Store and inspect LLM and agent traces, with evaluations, datasets and experiments on them.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Harbor and Inspect AI (route qualification)",
+     "reasons": "Rule 1: its README lists tracing, evaluation, datasets and experiments, and no metric or log store. Qualifying a model route on real work already belongs to Harbor and Inspect AI in another layer, which leaves Phoenix only trace storage. Traces are not in the requirement: Claude Code's tracing is beta and off by default, and usage and outcomes arrive as metrics and events. Its documented session tracing for Claude Code and Codex uses a separate hook plugin, a second capture path beside the native exporters. Rule 2: with no job of its own in the requirement and no public measurement of a gain, nothing is installed. If traces become required, Phoenix and OpenLIT compete for that job.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/README.md",
+       "quote": "Arize Phoenix is Arize's open-source AI observability platform designed for experimentation, evaluation, and troubleshooting."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/README.md",
+       "quote": "- [**_Experiments_**](https://arize.com/docs/phoenix/datasets-and-experiments/overview-datasets#experiments) - Track and evaluate changes to prompts, LLMs, and retrieval."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Tracing is off by default. To enable it, set both `CLAUDE_CODE_ENABLE_TELEMETRY=1` and `CLAUDE_CODE_ENHANCED_TELEMETRY_BETA=1`, then set `OTEL_TRACES_EXPORTER` to choose where spans are sent."
+      },
+      {
+       "url": "https://arize.com/docs/phoenix/integrations/coding-agents/claude-code",
+       "quote": "No application code changes required: the plugin hooks into Claude Code\u2019s lifecycle events and streams OpenInference spans to Phoenix."
+      }
+     ],
+     "measurement": "Qualify one optional model route on the same real task set twice: (a) Harbor and Inspect AI scores plus the route's latency, error and token series in Prometheus and Loki; (b) the same with Phoenix receiving both agents' native OTLP traces through the Collector. Metric: route failures or regressions found only through Phoenix's trace view or experiments. Phoenix is installed only if (b) finds a failure class that (a) misses.",
+     "confidence": "medium"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "observation-inference",
+     "owners": "OTel Collector Contrib (collects and privacy-filters both agents' native OTLP export) -> Prometheus (metrics), Loki (log events), Grafana (query and display). No trace store; route qualification runs in Harbor and Inspect AI; the model-server row is unchanged and waits for its measurement."
+    }
+   ],
+   "extra_differences": [
+    "Capture path: Record B's OpenLIT command installs hooks into both agents (`openlit coding install --vendor=claude-code` and `--vendor=codex`, content capture default `full`) beside the OTLP exporters both agents already have; under the no-install default the native exporters own capture and the hooks are not installed. Phoenix's session tracing uses a separate hook plugin (coding-harness-tracing) and gets the same verdict.",
+    "Record B pass 1 keeps two stores with two query surfaces (agent sessions in OpenLIT, service metrics in Prometheus), although OpenLIT's docs say its Metrics explorer lists every OTel metric it receives; the record does not say which store owns Claude Code's native token and cost metrics.",
+    "OpenLIT's release and its current docs describe different ingest designs: tag 2.1.0 bundles otelcol-contrib v0.142.0 under an OpAMP supervisor, while main documents a first-party OTLP receiver and says the image does not ship otelcol. `ghcr.io/openlit/openlit:latest` and `:2.1.0` had the same digest on 2026-10-02, so the compose installs the bundled-collector build today.",
+    "Port contention: OpenLIT's compose publishes OTLP on host ports 4317 and 4318, the ports Record B also gives the Collector (`openlit configure --endpoint http://127.0.0.1:4318`); neither pass says which process owns them.",
+    "Off-host usage reporting is on by default in Grafana and Loki (`reporting_enabled`, stats.grafana.org), OpenLIT (PostHog, `TELEMETRY_ENABLED`) and Phoenix (`PHOENIX_TELEMETRY_ENABLED`); neither record lists the opt-outs that a local pipeline needs.",
+    "Temporality: Claude Code exports delta metrics by default and Prometheus handles OTLP deltas only behind the experimental `otlp-deltatocumulative` flag; set `OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE=cumulative`. Neither record states it.",
+    "Collector install path: Record B builds it from source (`make otelcontribcol`, the CONTRIBUTING local-testing target); upstream's Linux install page says every Collector release includes DEB and RPM packaging. Record A gives no command."
+   ],
+   "notes": "Gates were read as written, so all five candidates pass; OpenLIT's ClickHouse pin counts under moving parts, not as a gate failure. Rule 3 was applied per job, as written. The layer flips only if the paired run shows OpenLIT with equal coverage, lower RSS and fewer parts. Re-judge when OpenLIT releases its first-party receiver. One web search found no public measured comparison of these candidates. Default-branch CI was green for all five on 2026-10-02; gh calls: 3 of 14."
+  }
+ },
+ {
+  "label": "critic:observation-inference:pair-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "observation-inference",
+     "item": "OpenLIT",
+     "job": "Claims several jobs at once: capturing Claude Code and Codex sessions through its own hooks, storing traces, metrics and logs in ClickHouse, its own UI and dashboards, and evaluations.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Prometheus (metric store); OTel Collector Contrib (ingest and filter)",
+     "reasons": "Rule 1: every job it claims already has an owner. Capture is the agents' native OTLP export, which OpenLIT's own documentation calls authoritative for Claude Code cost and tokens; its hooks are a second capture path. Ingest and filtering belong to Collector Contrib, yet release 2.1.0 ships its own otelcol-contrib v0.142.0 and ClickHouse. Evaluation belongs to Inspect AI and Harbor. Rule 2: no public measured gain was found. Rule 3, against Prometheus for the store: both pass the gates (2.1.0 released 2026-09-10, head CI green, documented compose install, both agents covered); no performance evidence separates them; OpenLIT needs two containers and two datastores against one process, and its hook capture defaults to full content.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docs/latest/openlit/installation.mdx",
+       "quote": "Both methods deploy the same 3 components: OpenLIT, ClickHouse, and an OpenTelemetry Collector."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/src/Dockerfile",
+       "quote": "COPY --from=otel-downloader /tmp/otelcol-contrib /app/opamp/otelcontribcol"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docs/latest/openlit/coding-agents/overview.mdx",
+       "quote": "The `openlit` CLI ingests events from each vendor's hook system, normalizes them onto OpenTelemetry's `gen_ai.*` and OpenLIT's `coding_agent.*` semantic conventions, and ships them to your existing OpenLIT collector."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openlit/openlit/openlit-2.1.0/docs/latest/openlit/coding-agents/setup-and-configure.mdx",
+       "quote": "Both paths can run side by side - OpenLIT dedupes per `session.id` (Claude Code's authoritative cost/tokens from the native path win, while the hook path provides the repository/working-folder context that Claude Code itself can't see)."
+      }
+     ],
+     "measurement": "Run one fixed Claude Code and Codex task set on the WSL2 host behind Collector Contrib v0.162.0 with two sinks, Prometheus v3.15.0 and OpenLIT 2.1.0 (native OTLP only, then with OpenLIT hooks). Metrics: token and cost totals reconciled against each agent's native counters, planted prompt and tool-result sentinels found in stored data, duplicate events, container count and resident memory. Overturn if OpenLIT reconciles more accurately or observes outcomes Prometheus misses, with no added leakage.",
+     "confidence": "high"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Prometheus",
+     "job": "Store and query the metrics the pipeline delivers (native usage and outcome counters, service metrics), with its expression browser and HTTP API as the read path.",
+     "verdict": "install",
+     "winner_if_competing": "Prometheus",
+     "reasons": "Rule 1: the job is in the requirement and has no other owner. Claude Code exports usage and cost as metrics, Codex emits OTel counters, histograms and OTLP log events, and the Collector can filter and convert these but cannot store or query them. Rule 3, against OpenLIT's ClickHouse store: both pass the gates (v3.15.0 released 2026-09-25, head CI green, documented docker run, OTLP ingest); no comparative performance evidence exists; Prometheus is one autonomous process with one datastore and a native Claude Code exporter target, against two containers. Caveats: its OTLP receiver is off by default, and Claude Code's default delta temporality must be set to cumulative or converted.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Claude Code exports metrics as time series data via the standard metrics protocol, events via the logs/events protocol, and optionally distributed traces via the [traces protocol](#traces-beta)."
+      },
+      {
+       "url": "https://developers.openai.com/codex/config-advanced.md",
+       "quote": "When the OTel metrics pipeline is enabled, Codex emits counters and duration histograms for API, stream, and tool activity."
+      },
+      {
+       "url": "https://prometheus.io/docs/guides/opentelemetry/",
+       "quote": "This will cause Prometheus to serve OTLP metrics receiving on HTTP `/api/v1/otlp/v1/metrics` path."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/README.md",
+       "quote": "* No dependency on distributed storage; **single server nodes are autonomous**"
+      }
+     ],
+     "measurement": "Send the same Claude Code and Codex task set through Collector Contrib v0.162.0 into Prometheus v3.15.0 (OTLP receiver) and into OpenLIT 2.1.0 (ClickHouse). Metrics: error of stored token and cost totals against each agent's native counters, latency of a fixed list of usage and outcome queries, resident memory and process count. Overturn if OpenLIT's reconciliation error is lower at an equal or smaller process count.",
+     "confidence": "high"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Loki",
+     "job": "Store OTLP log records (the agents' native events, service logs) and query them at event level with LogQL.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "OTel Collector Contrib (log-to-metric connectors) with Prometheus",
+     "reasons": "Rule 1: the requirement names usage and outcomes, not log search. Those reach Prometheus without a log store: the settled Collector turns log records into counters and sums (count and signal-to-metrics connectors, both alpha for logs), and systemd's journal already serves unit logs. Rule 2: that path installs nothing, and no public measurement shows Loki's gain. Loki would add a process, a datastore and, by its own README, a Grafana front end. Limits: Claude Code's documentation lists log aggregation among event backends, and event-level drill-down is given up, hence medium confidence. Gates pass (v3.7.8 released 2026-09-17, native OTLP log ingest), so the reason is ownership, not quality.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/connector/signaltometricsconnector/README.md",
+       "quote": "Signal to metrics connector produces metrics from all signal types (traces, logs, or metrics)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/README.md",
+       "quote": "- [Grafana](https://github.com/grafana/grafana) for querying and displaying the logs."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "* **Log aggregation systems**: Full-text search, log analysis"
+      },
+      {
+       "url": "https://www.freedesktop.org/software/systemd/man/latest/journalctl.html",
+       "quote": "journalctl \u2014 Print log entries from the systemd journal"
+      }
+     ],
+     "measurement": "On the WSL2 host run a fixed Claude Code and Codex task set with injected failures (API error, denied tool call, failing tool, MCP disconnect) through Collector Contrib v0.162.0. Arm A: count and signal-to-metrics connectors into Prometheus v3.15.0. Arm B: otlphttp into Loki v3.7.8. Questions: token totals by agent and model, API error count by status and model, tool failure rate by tool, each injected failure found with its cause. Metric: share answered correctly, plus added processes and memory. Install Loki if arm A fails a question that arm B answers.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Grafana",
+     "job": "Saved dashboards and alert rules over the stored telemetry.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Prometheus (expression browser, console templates, HTTP API)",
+     "reasons": "Rule 1: the requirement says observe; it names neither dashboards nor alerting. The read path already has an owner: Prometheus graphs any expression in its own browser, offers console templates, and serves the same queries over its HTTP API, which both agents can call. Rule 2: Grafana adds a process and a datastore, and no public measurement shows a gain on the requirement's metric; without Loki its second data source is gone. Counter-evidence weighed: Prometheus's documentation calls the browser an ad-hoc tool, and Anthropic's monitoring guide ships Grafana. Both are documented capability, which decides only for an ownerless job. Gates pass (v13.2.3 released 2026-09-29, documented apt install).",
+     "evidence": [
+      {
+       "url": "https://prometheus.io/docs/visualization/browser/",
+       "quote": "The expression browser is available at `/graph` on the Prometheus server, allowing you to enter any expression and see its result either in a table or graphed over time."
+      },
+      {
+       "url": "https://prometheus.io/docs/visualization/browser/",
+       "quote": "This is primarily useful for ad-hoc queries and debugging. For graphs, use [Grafana](/docs/visualization/grafana/) or [Console templates](/docs/visualization/consoles/)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/README.md",
+       "quote": "Grafana allows you to query, visualize, alert on and understand your metrics no matter where they are stored."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/anthropics/claude-code-monitoring-guide/main/docker-compose.yml",
+       "quote": "image: grafana/grafana:latest"
+      }
+     ],
+     "measurement": "Give the operator and each agent the same ten observation questions on the WSL2 host (tokens and cost by model and agent, API error rate, tool failure rate by tool, service up or down). Arm A: Prometheus v3.15.0 expression browser and HTTP API. Arm B: Grafana v13.2.3 with a provisioned dashboard on the same Prometheus. Metric: correct answers and median time per question. Install Grafana if arm B answers a question arm A cannot, or halves the operator's median time.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "observation-inference",
+     "item": "Phoenix",
+     "job": "Store and inspect LLM and agent traces, and run datasets, experiments and evaluations on them.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Inspect AI and Harbor (evaluation)",
+     "reasons": "Rule 1: usage and outcomes travel as metrics and log events; tracing is off by default in Claude Code (beta) and an opt-in exporter in Codex, so a trace store has no job in the requirement. Phoenix's documented path to coding-agent sessions is a separate hook plugin, a second capture path beside native export. Its evaluation and experiment functions, the part that could serve route qualification, overlap Inspect AI and Harbor in another layer. Rule 2: no public measured gain for this requirement was found. Gates pass (v20.19.0 released 2026-10-01, head CI green, pip install, MCP endpoint and CLI for both agents), so the reason is ownership, not quality.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "Tracing is off by default. To enable it, set both `CLAUDE_CODE_ENABLE_TELEMETRY=1` and `CLAUDE_CODE_ENHANCED_TELEMETRY_BETA=1`, then set `OTEL_TRACES_EXPORTER` to choose where spans are sent."
+      },
+      {
+       "url": "https://arize.com/docs/phoenix/integrations/coding-agents/claude-code",
+       "quote": "No application code changes required: the plugin hooks into Claude Code\u2019s lifecycle events and streams"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/README.md",
+       "quote": "Arize Phoenix is Arize's open-source AI observability platform designed for experimentation, evaluation, and troubleshooting."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/main/README.md",
+       "quote": "Welcome to Inspect, a framework for large language model evaluations created by the [UK AI Security Institute](https://aisi.gov.uk/)."
+      }
+     ],
+     "measurement": "Qualify one optional local model route on its actual workload twice on the RTX 4090 host. Arm A: Harbor and Inspect AI logs plus Prometheus route metrics. Arm B: the same plus Phoenix v20.19.0 fed by native traces (Claude Code beta tracing, Codex trace_exporter) through the Collector. Metric: defects found that change the qualification decision, plus added processes and overhead. Install Phoenix if arm B finds decision-changing defects that arm A misses.",
+     "confidence": "medium"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "observation-inference",
+     "owners": "OTel Collector Contrib: collect, privacy-filter, convert native log events to counters. Prometheus: store and query metrics, read path through its expression browser and HTTP API. Capture: the agents' native OTLP export (nothing installed). Route qualification: Harbor and Inspect AI (other layer). Local model server: waits for its measurement. Not installed: OpenLIT, Loki, Grafana, Phoenix."
+    }
+   ],
+   "extra_differences": [
+    "Capture owner: Record A (pass 1) captures sessions through OpenLIT hooks; Record B implies the agents' native OTLP export. Phoenix's coding-agent tracing is also a hook plugin (Arize-ai/coding-harness-tracing).",
+    "Record A's second pass selects nothing, including the Collector and Prometheus, for lack of verified evidence; Record A's selections rest on one pass.",
+    "OpenLIT release versus main: tag openlit-2.1.0 ships otelcol-contrib v0.142.0 and an OpAMP server; main replaced them with a first-party OTLP receiver that is in no release, and the documented install clones main with the unpinned image tag latest.",
+    "Log signal: Record A says a log store is not required and Record B installs one; neither states that both agents emit their events as OTLP log records, so without a log store the Collector must convert them with alpha connectors.",
+    "Codex routing: otel.metrics_exporter defaults to statsig and the log and trace exporters default to none, so the local pipeline needs explicit Codex configuration; the fetched reference documents endpoint keys for the log and trace exporters only.",
+    "Metric transport: Record A scrapes the Collector's Prometheus exporter, Record B names none; Prometheus's OTLP receiver is off by default, and Claude Code exports delta temporality by default while Prometheus's delta conversion is experimental.",
+    "Pins and install path: Record A pins Collector v0.162.0 and Prometheus v3.15.0 and builds the Collector from source (make otelcontribcol); Record B carries no pins or commands; opentelemetry.io documents v0.162.0 release packages.",
+    "Model-route arms differ: Record A names llama.cpp, vLLM and SGLang; Record B names llama.cpp and ollama (row not judged here)."
+   ],
+   "notes": "Checked 2026-10-02: all five repositories are unarchived with default-branch commits on 2026-10-01 or 10-02 and green head CI, so gates do not separate them; ownership and the no-install rule do. Two web searches found no public measured comparison on agent telemetry. What any host runs today was not counted. Unverified: Codex metrics to a local OTLP endpoint; all behaviour on this host. gh calls: 3 of 14. Token tools: ctx_fetch_and_index, ctx_search, ctx_execute (page fetch, quote extraction)."
+  }
+ },
+ {
+  "label": "critic:web-research:single-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "web-research",
+     "item": "agent-browser",
+     "job": "Browser-automation CLI the coding agents drive: open, snapshot, click/fill and read selected pages (the same job as Playwright CLI).",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Playwright CLI",
+     "reasons": "Rule 1: same job as Playwright CLI (both are browser-automation CLIs for agents), so one owner. Rule 2: its extra `read <url>` covers retrieval, which the agents' native web tools already own; capability alone cannot decide. Rule 3 gates: maintained (v0.38.2, 2026-10-01), documented install, both agents named: pass. WSL2 gate not cleared by upstream evidence: README, install docs and repository never mention WSL; WSL2 launch issues #1791 and #316 are open, fix PRs #1793/#1796 unmerged, and v0.38.2 keeps the implicated `--remote-debugging-port=0` launch. The reporter's latest note: raw loopback probe passes on a newer WSL build, agent-browser not retested. Playwright documents WSL and launches through a pipe. Secondary: head CI red (1 of 141 E2E tests).",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/README.md",
+       "quote": "| Linux x64   | Native Rust |"
+      },
+      {
+       "url": "https://github.com/vercel-labs/agent-browser/issues/1791",
+       "quote": "Auto-launch fails on WSL2: daemon-spawned Chrome with --remote-debugging-port=0 LISTENs but refuses all CDP connects (fixed port works)"
+      },
+      {
+       "url": "https://api.github.com/repos/vercel-labs/agent-browser/issues/1791/comments",
+       "quote": "The earlier failure is no longer reproducible, so I cannot currently attribute it to Cisco VPN or WSL networking. The WSL update may have fixed it. I have not rerun the full agent-browser suite yet."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/cli/src/native/cdp/chrome.rs",
+       "quote": "\"--remote-debugging-port=0\".to_string(),"
+      }
+     ],
+     "measurement": "On the target host (Ubuntu 26.04.1, WSL2, x86_64, its installed WSL build): `npm install -g agent-browser@0.38.2 && agent-browser install --with-deps && agent-browser doctor`, then 20 consecutive `agent-browser close --all; agent-browser open about:blank && agent-browser snapshot -i` from a Claude Code shell and from a Codex shell, default auto-launch, no `connect <port>` workaround. Metric: launch successes (pass = 20/20 in both shells). If it passes, the head-to-head named under Playwright CLI decides; agent-browser takes the slot only with equal or higher task success and fewer agent-visible tokens per task.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "web-research",
+     "item": "Playwright CLI",
+     "job": "Browser-automation CLI the coding agents drive: open, snapshot, click/fill and read selected pages, each result carrying page URL and title.",
+     "verdict": "install",
+     "winner_if_competing": "Playwright CLI",
+     "reasons": "Rule 1: owns page interaction and rendered-page reading; no other tool of the final set does. Rule 2: no native owner on this host: Codex CLI has no Browser and Claude Code's Chrome integration is unsupported in WSL, so one browser CLI is installed on documented capability. Rule 3 gates, all cleared from primary sources: v0.1.22 released 2026-09-28; Playwright lists WSL and Ubuntu 26.04 x86-64; `npm install -g @playwright/cli@latest`; skills install into ~/.claude/skills and ~/.agents/skills, the Codex user location. No upstream head-to-head performance evidence exists. agent-browser's documented seamlessness edge is not reached because its WSL2 gate is uncleared. Head CI green.",
+     "evidence": [
+      {
+       "url": "https://developers.openai.com/codex/browser.md",
+       "quote": "Browser isn't available in Codex CLI or the Codex IDE extension."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/chrome.md",
+       "quote": "Chrome integration isn't supported in Windows Subsystem for Linux (WSL)."
+      },
+      {
+       "url": "https://playwright.dev/docs/intro",
+       "quote": "Windows 11+, Windows Server 2019+ or Windows Subsystem for Linux (WSL)."
+      },
+      {
+       "url": "https://playwright.dev/docs/getting-started-cli",
+       "quote": "To share the skills across all your projects, add the `-g` flag to install them into your home directory (`~/.claude/skills` or, with `--skills=agents`, `~/.agents/skills`):"
+      }
+     ],
+     "measurement": "On the target host, Playwright CLI v0.1.22 against agent-browser v0.38.2, each driven by Claude Code and by Codex through Harbor on one frozen set of 20 tasks (static docs page, redirect, JavaScript-rendered page, form fill, login fixture, long page), same model and output budget per agent. Metrics in order: default-launch success after the documented install (`playwright-cli install-browser --with-deps`; `agent-browser install --with-deps`), task success with correct final URL, title and quoted passage, agent-visible tokens per task, wall time. Overturned if Playwright CLI fails to launch, or if agent-browser passes its launch gate with equal or higher task success and fewer tokens.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "web-research",
+     "item": "trafilatura",
+     "job": "HTTP download plus main-text and metadata extraction from static HTML: a sub-step of retrieval, with no JavaScript rendering and no interaction.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "",
+     "reasons": "Rule 1: HTML-to-text is a sub-step of retrieval, not a job the requirement names; it already has owners: Claude Code WebFetch/curl and Codex web_search (native), Playwright CLI snapshots for rendered pages, and MinerU, whose README lists HTML input. Rule 2: the no-install path is the default; trafilatura's public evidence (F-score 0.924, 990 documents, v2.2.0, 2026-08-04) compares main-text extraction against other Python extractors only, not attributable retrieval through agent commands, and no source measures a gap against the native path. Gates pass (v2.2.0 2026-07-31, commits to 2026-09-30, `pip install trafilatura`) but are not reached. It also cannot do the interaction half.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/tools-reference.md",
+       "quote": "Ask Claude to fetch again with a more specific prompt, or use `curl` via Bash for the unprocessed page."
+      },
+      {
+       "url": "https://developers.openai.com/codex/web-search.md",
+       "quote": "For local Codex chats, Codex enables cached search by default."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/adbar/trafilatura/96e19b949c3ac4a9e193b41fe2fb352e7150db86/docs/evaluation.rst",
+       "quote": "is the library documented here, several options are tested regarding main text extraction only, without metadata or comments"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/opendatalab/MinerU/master/README.md",
+       "quote": "**Multiple input formats**: PDF, images, DOC/DOCX, PPT/PPTX, XLS/XLSX, RTF, ODT/ODS/ODP, EPUB, OFD, HTML/MHTML, and CSV/TSV."
+      }
+     ],
+     "measurement": "On the target host, a frozen set of 50 primary-source URLs (docs pages, release notes, READMEs, HTML papers) with one gold passage each, both agents through Harbor, same model and output budget. Arm A (no install): Claude Code WebFetch and `curl`, Codex `web_search = \"live\"` and `curl`, Playwright CLI `goto` plus `find` for rendered pages. Arm B: `trafilatura -u URL --markdown --with-metadata`. Metric: exact-match recall of the gold passage with the correct final URL, then agent-visible tokens per source. trafilatura is installed only if arm B has higher passage recall at equal or lower tokens.",
+     "confidence": "high"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "web-research",
+     "owners": "Retrieval (search and fetch): the agents' native web tools, no install (Claude Code WebSearch/WebFetch and curl; Codex web_search and curl). Page interaction and rendered-page reading: Playwright CLI v0.1.22, serving both agents. Not installed: agent-browser, trafilatura."
+    }
+   ],
+   "extra_differences": [
+    "Neither record lists the no-install owner of retrieval as a slot: record A has only installed defaults, record B treats the agents' native web tools as an unstated baseline.",
+    "agent-browser `read <url>` (HTTP fetch without Chrome, Markdown and llms.txt negotiation, --max-output) has no Playwright CLI equivalent; Playwright CLI reads pages only through a launched browser (snapshot, find, eval, pdf).",
+    "Platform evidence weighed by neither record: Playwright's requirements name WSL and Ubuntu 26.04; agent-browser's README, install docs and repository never mention WSL, and its tracker has open WSL2 launch issues #1791 and #316.",
+    "Launch transport differs: agent-browser v0.38.2 starts Chrome with --remote-debugging-port=0 (TCP loopback); Playwright starts Chromium with --remote-debugging-pipe.",
+    "Record B's Playwright CLI install pin omits the browser step (pass 1 flagged it as unestablished): `playwright-cli install-browser --with-deps` exists in Playwright's source but not in the CLI README or docs page.",
+    "Both-agents path differs: agent-browser documents one `npx skills add` for Claude Code and Codex; Playwright CLI needs `install --skills` plus `install --skills=agents` (~/.agents/skills, which Codex reads), and its docs never name Codex.",
+    "CI at head differs: agent-browser rollup FAILURE (1 of 141 E2E tests, an assertion on live example.com; 16 of 20 listed CI runs on main failed 2026-09-08 to 09-22, causes not read), Playwright CLI SUCCESS; record B pass 2 did not verify run conclusions.",
+    "trafilatura's cited F-score 0.924 exists only on master 96e19b9; the v2.2.0 tag's docs still show the 2022 table (0.909, 750 documents). Cross-layer overlaps named by neither record: MinerU parses HTML; OpenHands SDK ships its own browser tools."
+   ],
+   "notes": "Browser automation and web text extraction are two functions but one installable job: extraction is a sub-step of retrieval that native tools already own; page interaction has no native owner under WSL2. agent-browser and Playwright CLI compete for it; the WSL2 gate separates them. Playwright source was read at main, not at the v0.1.22 pin. Third-party blog comparisons were read and not used. gh calls: 12 of 14. Token tools: ctx_fetch_and_index, ctx_search, ctx_execute."
+  }
+ },
+ {
+  "label": "critic:web-research:pair-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "web-research",
+     "item": "agent-browser",
+     "job": "One CLI for both agents that reads a chosen URL as bounded text (`read`) and drives a real browser on selected pages (snapshot, click, fill).",
+     "verdict": "install",
+     "winner_if_competing": "agent-browser",
+     "reasons": "Rule 1: page interaction has no owner (Claude Code's Chrome integration is unsupported in WSL; Codex's CLI documents web search, not interaction), so one browser CLI installs. Rule 2: native retrieval is lossy (WebFetch returns a model's answer), a cached index (Codex) or raw HTML through curl without text bounds, so bounded verbatim reads lack an owner. Rule 3: both competitors pass the gates, judging WSL2 as Linux x64. Performance evidence does not separate them: no head-to-head; agent-browser's E2E suite passed 140 of 141 at v0.38.2 while every main CI run since 2026-09-15 failed or was cancelled. Seamlessness and parts decide: one binary owns `read` and interaction with documented bounds, one skill command names both agents, no Node runtime.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/chrome.md",
+       "quote": "Chrome integration isn't supported in Windows Subsystem for Linux (WSL)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/README.md",
+       "quote": "`read` fetches a URL without launching Chrome. Omit the URL to read the rendered DOM of the active tab in the current browser session, including browser auth state and client-side updates."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/README.md",
+       "quote": "This works with Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, Goose, OpenCode, and Windsurf."
+      },
+      {
+       "url": "https://api.github.com/repos/vercel-labs/agent-browser/actions/jobs/110565821942/logs",
+       "quote": "test result: FAILED. 140 passed; 1 failed; 0 ignored; 0 measured; 1404 filtered out; finished in 163.49s"
+      }
+     ],
+     "measurement": "On the clean WSL2 Ubuntu 26.04.1 x86_64 host, as Harbor tasks: arm A agent-browser 0.38.2; arm B @playwright/cli 0.1.22 with trafilatura 2.2.0 for retrieval. Each arm is driven by Claude Code and by Codex at identical models and command, time and output budgets. Inputs: a frozen list of primary-source URLs with expected passages (static, redirect, JavaScript-rendered, long document, markdown alternate) and frozen click, fill and login-fixture tasks. Metrics: interaction tasks completed, final URL and title correct, expected-passage recall, agent-visible tokens, wall time, processes left after exit. Overturn if arm A fails to install or launch on this host, or if arm B completes more tasks or attributes more sources correctly at equal budgets.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "web-research",
+     "item": "Playwright CLI",
+     "job": "A CLI that drives a real browser for a coding agent (snapshot refs, click, fill, eval); the same job as agent-browser's interaction half.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "agent-browser",
+     "reasons": "Same job as agent-browser: a ref-based browser CLI for coding agents, so one owner. Gates pass: v0.1.22 released 2026-09-28; Playwright lists WSL and Ubuntu 26.04; npm install documented; Claude Code named, Codex served through OpenAI's curated skill. No public measurement shows a gain over agent-browser: its own green CI is four tests, and the CLI's real tests sit in the engine repository, whose results for the pinned alpha build were not read. It loses on seamlessness and parts: no read-to-text command (page text only through a live browser snapshot or eval), so retrieval would need a second tool and runtime; its README names neither Codex nor the browser and system-dependency step; Node is required at run time.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md",
+       "quote": "After each command, playwright-cli provides a snapshot of the current browser state."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/tests/integration.spec.ts",
+       "quote": "test('open data URL', async ({}) => {"
+      },
+      {
+       "url": "https://playwright.dev/docs/intro",
+       "quote": "Debian 12 / 13, Ubuntu 22.04 / 24.04 / 26.04 (x86-64 or arm64)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openai/skills/main/skills/.curated/playwright/SKILL.md",
+       "quote": "Drive a real browser from the terminal using `playwright-cli`. Prefer the bundled wrapper script so the CLI works even when it is not globally installed."
+      }
+     ],
+     "measurement": "The same run as for agent-browser: arm A agent-browser 0.38.2, arm B @playwright/cli 0.1.22 with trafilatura 2.2.0, on the WSL2 Ubuntu 26.04.1 host, both agents, the same frozen URLs, tasks and metrics. Playwright CLI installs instead if arm B completes more interaction tasks or attributes more sources correctly at equal token and time budgets, or if agent-browser 0.38.2 fails to install or launch there.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "web-research",
+     "item": "trafilatura",
+     "job": "Python CLI and library that downloads static HTML and extracts main text and metadata; the retrieval half only.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "agent-browser",
+     "reasons": "Job: main-text extraction from static HTML; it cannot interact and needs a browser tool for JavaScript pages. Rule 1: retrieval is already owned by agent-browser `read`, installed for interaction, with output, domain and timeout bounds and the final URL in its JSON; trafilatura would be a second owner and a Python runtime. Rule 2: its benchmark (990 documents) shows a gain over raw HTML (F 0.924 against 0.667), but `read` is untested: it asks for markdown first, and only its HTML fallback sits in the whole-page class (precision about 0.53, recall up to 0.991 against trafilatura's 0.943). The gain over `read` is unmeasured, so the default stands. Gates pass. It would install only if Playwright CLI owned interaction.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/adbar/trafilatura/master/docs/troubleshooting.rst",
+       "quote": "Trafilatura works on raw HTML. If a page uses JavaScript to render its content, render it first with a browser automation library and pass the resulting HTML to ``extract()``:"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/adbar/trafilatura/master/docs/evaluation.rst",
+       "quote": "trafilatura 2.2.0 (standard)    0.906      0.943      **0.923** **0.924** 3.2x"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/adbar/trafilatura/master/docs/evaluation.rst",
+       "quote": "*raw HTML*                      0.528      0.906      0.549     0.667     0.03x"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/cli/src/read.rs",
+       "quote": "for tag in [\"script\", \"style\", \"noscript\", \"svg\", \"head\"] {"
+      }
+     ],
+     "measurement": "On the same host, run `trafilatura -u URL --markdown --with-metadata` (2.2.0) and `agent-browser read URL --json` (0.38.2) on the frozen primary-source URL list with expected passages and on trafilatura's own 990-document evaluation set served over local HTTP. Metrics: expected-passage recall, share of output tokens that is boilerplate, final URL, title and date present, tokens per page. Overturn if `read` returns fewer expected passages, or cannot stay inside the output budget with `--filter` or `--max-output` without losing them.",
+     "confidence": "medium"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "web-research",
+     "owners": "agent-browser 0.38.2, called as a CLI by Claude Code and Codex: `read` owns bounded attributable page retrieval and its browser commands own page interaction; source discovery stays on each agent's native web search (nothing installed). Playwright CLI and trafilatura are not installed."
+    }
+   ],
+   "extra_differences": [
+    "Pass 1 of the two-pass record returns two unranked finalists for one browser-CLI slot instead of one owner; pass 2 and this verdict name agent-browser.",
+    "The single record splits retrieval and interaction across two tools and two runtimes (Python, Node); the split is needed only because Playwright CLI v0.1.22 documents no read-to-text command.",
+    "agent-browser main: all 18 push CI runs from 2026-09-15 to 2026-10-01 ended failure (14) or cancelled (4), failing tests vary (1 of 141 at v0.38.2 on a live example.com assertion, 3 of 130 on 09-15), and the separate Release workflow published v0.38.2 anyway; pass 1 saw only the head failure, pass 2 verified no run.",
+    "Playwright CLI's green CI (10 of 10 main push runs since 2026-08-27) is the wrapper repository's four tests (three skill-update checks, one data-URL open); the CLI code and its cli-*.spec.ts tests live in microsoft/playwright, whose head rollup was FAILURE on 2026-10-01 (head, not the pinned alpha build).",
+    "agent-browser `read` falls back, for HTML without a markdown alternate, to a whole-page tag stripper (drops only script, style, noscript, svg and head blocks), not main-content extraction, and `read --json` carries url, finalUrl and status but no title or date; neither record examined it.",
+    "Install commands differ between the passes: pass 2 adds `npx skills add vercel-labs/agent-browser`, which fetches the skill from the repository unpinned at run time; pass 1 omits the skill step, so Codex and Claude Code would rely on `--help` only.",
+    "Platform wording differs: Playwright's requirements name WSL and Ubuntu 26.04, agent-browser's README names Linux x64 and never WSL; @playwright/cli 0.1.22 depends on an alpha engine build (playwright 1.64.0-alpha) while the engine's latest release is v1.63.0.",
+    "agent-browser ships optional surfaces outside the requirement (`chat` with an AI model, a dashboard server on port 4848, an `mcp` server, plugins); use plain CLI mode so mcporter and sandbox-runtime keep their jobs and no research-agent stack is added."
+   ],
+   "notes": "Decision first: two jobs, bounded retrieval of a chosen page and page interaction. agent-browser owns both; Playwright CLI competes with it for interaction only, trafilatura for retrieval only. GPT Researcher and DeerFlow are the research-agent workers the requirement excludes: a different job, no overlap. Native-retrieval baseline read at code.claude.com/docs/en/tools-reference.md and learn.chatgpt.com/docs/web-search. Not verified: any install or run on Ubuntu 26.04.1 under WSL2. CI facts observed 2026-10-02 through gh. Token tools: ctx_fetch_and_index, ctx_search, ctx_execute."
+  }
+ },
+ {
+  "label": "critic:quality-evaluation:pair-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "quality-evaluation",
+     "item": "Playwright (browser test framework, @playwright/test)",
+     "job": "Run a project's scripted end-to-end browser tests (assertions, traces, reports) on Chromium, Firefox and WebKit.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "",
+     "reasons": "Rule 1: the requirement names no browser job. Playwright Test is a per-project dev dependency: upstream installs it with npm init playwright into the project's package.json, and each version needs its own browser binaries, so a project with browser tests carries it as one of its own checks. Independent browser observation with snapshots, screenshots and traces overlaps the browser-tool layer's candidates: Playwright CLI (whose skill also covers running and generating Playwright tests) and agent-browser. Rule 2: no public measured evidence of a gain from a host-level install. Rule 3: gates pass (v1.63.0; WSL and Ubuntu 26.04 x86-64 documented; init-agents loops for claude and codex) but create no unowned job.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/microsoft/playwright/v1.63.0/README.md",
+       "quote": "| **[Playwright Test](#playwright-test)** | End-to-end testing | `npm init playwright@latest` |"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/microsoft/playwright/v1.63.0/docs/src/intro-js.md",
+       "quote": "In existing projects dependencies are added to your current `package.json`."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md",
+       "quote": "* **Running and Debugging Playwright tests** \u2014 run, debug and manage Playwright test suites"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/vercel-labs/agent-browser/v0.38.2/README.md",
+       "quote": "agent-browser trace start             # Start recording trace"
+      }
+     ],
+     "measurement": "Seed UI regressions into a sample web project with no Playwright dependency on the WSL2 host. Arm A: the browser-tool layer's owner driven by Claude Code and Codex, plus the project's own checks. Arm B: arm A plus host-provisioned @playwright/test 1.63.0 run with --trace on. Metrics: seeded regressions missed (false passes) and first-failure artifacts retained. Overturns if B catches regressions that A misses.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "quality-evaluation",
+     "item": "Promptfoo",
+     "job": "Declarative prompt, model and provider evaluation (test matrices with assertions), plus LLM red teaming.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Inspect AI",
+     "reasons": "Rule 1: Promptfoo's job (test prompts and models, compare providers) is one Inspect AI already owns: LLM evaluation with prompt-engineering components, model-graded scoring, built-in and OpenAI-compatible providers and multi-model eval sets; Claude Code and Codex runs are covered by Inspect and Harbor. Red teaming and model scanning are outside the requirement. Rule 2: no public measured evidence shows a Promptfoo gain. Rule 3: both pass the gates (documented npm install; Claude Agent SDK and Codex SDK providers). On failure retention, a sample Inspect retries keeps its original errors; promptfoo retry removes old ERROR results in place once it succeeds, and keeping them means using --filter-errors-only instead, which creates a second eval: a seamlessness point, not a capability gap.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/README.md",
+       "quote": "- **Test your prompts and models** with [automated evaluations](https://www.promptfoo.dev/docs/getting-started/)"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/c05398d897affcb85bd4cb9d10a7c03e1779a18e/README.md",
+       "quote": "Inspect provides many built-in components, including facilities for prompt engineering, tool usage, multi-turn dialog, and model graded evaluations."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/usage/command-line.md",
+       "quote": "If the retry operation fails (network error, API timeout, etc.), your original ERROR results are preserved. You can simply run the retry command again to continue. Old ERROR results are only removed after the retry succeeds."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/c05398d897affcb85bd4cb9d10a7c03e1779a18e/docs/handling-errors.qmd",
+       "quote": "If a sample is retried, the original error(s) that induced the retries will be recorded in its `error_retries` field."
+      }
+     ],
+     "measurement": "Run Inspect AI 0.3.275 and Promptfoo 0.123.1 on the WSL2 host over one frozen case set (fresh, independently labeled cases plus a deliberately wrong negative control), replaying identical Claude Code and Codex outputs with the same grader model through the gateway, with injected transient provider errors and retries. Metrics: false approvals, label agreement, scored/errored/unscored coverage, and original failed attempts still retrievable after retry. Overturns if Promptfoo shows fewer false approvals at equal or better failure retention.",
+     "confidence": "high"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "quality-evaluation",
+     "owners": "Inspect AI \u2014 model, prompt and provider evaluation with per-sample logs that keep retry errors; Harbor \u2014 containerized end-to-end trials of Claude Code and Codex agents. No host-level browser test framework, no Promptfoo."
+    }
+   ],
+   "extra_differences": [
+    "ShellCheck (pass 1 only): a static shell-script linter (upstream: 'A shell script static analysis tool'), not verification of changed behavior; actionlint in another layer runs shellcheck on workflow run: scripts and needs it installed separately, so any install belongs to that layer; latest release v0.11.0 is from 2025-08-04, head commit 2026-10-02.",
+    "MCP Inspector (pass 1 only): MCP server inspection with a scriptable CLI that runs through npx without an install; mcporter in another layer already lists and calls MCP tools from the CLI (mcporter list, mcporter call); the requirement names no MCP job.",
+    "Inspect AI install path: pass 1 clones the source at c05398d and runs uv sync --extra dev (the README's development setup); pass 2 uses pip install inspect-ai, the documented user install (PyPI 0.3.275, uploaded 2026-10-02); the single record gives no command.",
+    "Harbor version: pass 1 pins uv tool install harbor==0.23.0, pass 2 installs unpinned; the single record gives no command or pin.",
+    "Playwright pin: pass 1 pins @playwright/test@1.63.0, pass 2 uses @latest; moot under the verdict.",
+    "Both passes mark the layer a close call and name an Inspect-versus-Promptfoo comparison as deciding; the single record carries no close-call flag, install commands or sources. Both passes report their page-fetch route was blocked and read GitHub API snapshots.",
+    "Head CI observed 2026-10-02 via gh GraphQL: Playwright b630e71 rollup FAILURE (macOS Firefox and Chrome jobs in 'tests 2', BiDi, report publishing; 'tests 1' 27 of 27 and 'MCP' 13 of 13 pass); Harbor bf991e4 FAILURE from a cancelled type check (Python Tests pass); Inspect AI and Promptfoo SUCCESS. Pass 2 recorded a 13-job all-green Playwright run and no failure.",
+    "Promptfoo's README states 'Promptfoo is now part of OpenAI' (still open source, MIT); neither record notes it (information only). Only pass 2 records Promptfoo's in-place retry, which the 0.123.1 command-line doc confirms."
+   ],
+   "notes": "Sources: 32 upstream pages fetched with ctx_fetch_and_index; ctx_search was rate-limited, so quotes were checked verbatim against the same raw URLs via ctx_execute. Release, commit and CI facts observed via gh GraphQL on 2026-10-02 (2 of 14 calls). Two web searches found no public measured head-to-head for either item. If a project adopts Playwright Test: run with --trace on (default on-first-retry skips the first run) and review healer-produced skips."
+  }
+ },
+ {
+  "label": "critic:git-github-automation:single-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "git-github-automation",
+     "item": "ataraxy-labs/sem",
+     "job": "Entity-level structural diff of changed code (functions, classes and methods added, modified, deleted, moved or renamed) with JSON, Markdown and MCP output; also entity blame/log and dependency-graph queries.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "difftastic",
+     "reasons": "Rule 1: difftastic's job is the requirement's own phrase, structural diffs for changed code; sem diff does that job at entity granularity, and its optional `sem setup` takes the global diff.external key difftastic uses. Its other commands duplicate git (log -L, blame -L by function name) and, across layers, Serena and ast-grep (impact, context, find, callers, refs). Rule 2: upstream's diff measurement (three commits of sem's own repository) compares sem JSON with raw git diff, never difftastic, scores against ground truth extracted from sem's own output, and is scoped as comprehension, not task success. Rule 3: both pass the gates; sem adds a SQLite cache and an index and documents Claude Code, not Codex.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/Ataraxy-Labs/sem/v0.25.0/README.md",
+       "quote": "It parses your code with tree-sitter, extracts every function, class, and method as an entity, and diffs at the entity level instead of lines."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/Wilfred/difftastic/0.71.0/README.md",
+       "quote": "Difftastic is a structural diff tool that compares files based on their syntax."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/Ataraxy-Labs/sem/v0.25.0/bench/agent-accuracy.py",
+       "quote": "Sends identical questions to Claude about code changes, using sem diff output vs git diff output as context. Scores responses against ground truth extracted from sem diff JSON."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/Ataraxy-Labs/sem/v0.25.0/docs/benchmarks.html",
+       "quote": "Scope note: this measures comprehension of a diff, not end-to-end task success."
+      }
+     ],
+     "measurement": "Give Claude Code and Codex, as their only change context, (a) git diff, (b) difft --display inline and DFT_UNSTABLE=yes difft --display json, (c) sem diff --format json, on one corpus of at least 30 commits from repositories other than sem's (moves, renames, formatting-only edits, nested edits, parse errors, large diffs), with changed-entity labels and seeded defects produced independently of all three tools. Metrics: changed-entity F1, seeded-defect review recall, total tokens, latency, peak memory. Overturn: sem beats difftastic on both accuracy metrics for both agents.",
+     "confidence": "medium"
+    },
+    {
+     "layer": "git-github-automation",
+     "item": "claude-code-action",
+     "job": "Run Claude Code on GitHub-hosted runners in response to PR and issue events (@claude mentions, automatic review, scheduled prompts), configured per repository.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "gh (GitHub CLI)",
+     "reasons": "Rule 1: the requirement's GitHub review/PR automation is owned by gh, which both agents call; the action cannot submit formal reviews, approve or merge, and its own review example calls gh. Running a coding agent in CI is not a job of this host layer: it executes on GitHub-hosted runners and is configured per repository (GitHub App, repository secret, workflow file), so the machine has nothing to own; its setup path, /install-github-app, is native Claude Code plus gh. It serves Claude only (Codex needs openai/codex-action), so no single owner would pass the both-agents gate. Rule 2: upstream publishes no measured review gain. It packages Claude Code and the Agent SDK, owned in another layer.",
+     "evidence": [
+      {
+       "url": "https://code.claude.com/docs/en/github-actions",
+       "quote": "the Claude Code GitHub Action runs on GitHub-hosted runners, which consume your GitHub Actions minutes."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/v1.0.239/docs/capabilities-and-limitations.md",
+       "quote": "**Submit PR Reviews**: Claude cannot submit formal GitHub PR reviews"
+      },
+      {
+       "url": "https://cli.github.com/manual/gh_pr_review",
+       "quote": "Add a review to a pull request."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/openai/codex-action/main/README.md",
+       "quote": "Run [Codex](https://github.com/openai/codex#codex-exec) from a GitHub Actions workflow while keeping tight control over the privileges available to Codex."
+      }
+     ],
+     "measurement": "On one repository with at least 20 pull requests carrying seeded defects: arm A, the settled path (Claude Code and Codex reviewing through gh, started manually or by a Dagu poll on the host); arm B, claude-code-action plus openai/codex-action on pull_request events. Metrics: seeded-defect recall, false positives per PR, time from push to first review, cost (tokens plus Actions minutes). Overturn: arm B gains on recall or latency for both agents and the requirement is amended to name event-triggered CI review as a job.",
+     "confidence": "high"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "git-github-automation",
+     "owners": "git (repository, native worktrees and line diffs); gh (GitHub PR, review, checks, merge and API automation, called by both agents); worktrunk (worktree lifecycle and agent launch); difftastic (structural diffs for changed code). sem is not installed; claude-code-action is not a layer owner."
+    }
+   ],
+   "extra_differences": [
+    "Pass 2 does not select difftastic outright: its definite set is 'Git, worktrunk and gh, plus one unresolved structural-diff finalist' and it calls sem and difftastic 'tied alternatives, not a recommendation to install both'; pass 1 retains both; the single record selects difftastic alone.",
+    "git/git: pass 1 lists it under not_selected (the foundation under worktrunk); pass 2 and the single record select it.",
+    "sem install command: pass 1 `cargo install --git https://github.com/Ataraxy-Labs/sem sem-cli` builds unreleased main; pass 2 `cargo install sem-cli`; the v0.25.0 README's first documented path is the install.sh one-liner (moot under do_not_install).",
+    "difftastic install command: pass 1 `nix-env --install difftastic` (needs Nix, which has no owner on this host), pass 2 `cargo install --locked difftastic` (needs Rust and a C++ compiler); the 0.71.0 manual documents pre-built Linux release binaries and lists no apt command; the single record gives none.",
+    "worktrunk install command: pass 1 uses the v0.80.0 release installer script, pass 2 `cargo install worktrunk` (needs Cargo); the single record gives none; not checked upstream in this session.",
+    "Record B pins versions (worktrunk v0.80.0, gh v2.102.0, difftastic 0.71.0, sem v0.25.0); the single record carries no versions or install commands.",
+    "claude-code-action currency: releases/latest is the rolling tag v1 (published 2025-08-26), which both passes left unresolved; the newest release is v1.0.239, published 2026-10-01, and the main head commit's checks pass (gh GraphQL, this session).",
+    "Evidence basis: pass 2 reports zero successful page fetches and cites locally installed gh 2.101.0 help (installed state is not evidence under rule 4); pass 1 used HTTP/API retrieval; neither qualified sem's upstream benchmark."
+   ],
+   "notes": "Quotes from hard-wrapped sources join line breaks with one space. difftastic's JSON display is unstable-gated (options.rs 0.71.0, DFT_UNSTABLE=yes), the one fact favoring sem for agents. At v0.25.0 sem's only CI workflow that runs cargo test targets windows-latest. claude-code-action stays a per-repository choice outside the machine's architecture; managed Code Review is a Team/Enterprise research preview. gh calls: 4 of 14. Token tools: context-mode fetch-and-index and execute (fetch, grep, quote checks)."
+  }
+ },
+ {
+  "label": "critic:hosting-services+instructions-skills:single-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "hosting-services",
+     "item": "PostgreSQL",
+     "job": "Relational database server: a supporting service that the layer runs, not a job the layer owns.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "",
+     "reasons": "Rule 1: the requirement's job is running the selected application and supporting services reproducibly with explicit accounts, state and scope; Docker Compose with Docker Engine owns it. PostgreSQL is one of the services that gets run, not a runner, and no named owner needs a host cluster (Dagu: no external DBMS; others not verified per service). Rule 2: installing nothing is the default; no public measurement shows a host-level server improving reproducibility. The official image documents delivery as a Compose service, with state in a volume declared beside the service that uses it. A host install instead adds an OS account, a data directory and a daemon outside every Compose project.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/docker/docs/main/content/manuals/compose/intro/compose-application-model.md",
+       "quote": "- Two services, backed by Docker images: `webapp` and `database`\n- One secret (HTTPS certificate), injected into the frontend\n- One configuration (HTTP), injected into the frontend\n- One persistent volume, attached to the backend"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/docker-library/docs/master/postgres/README.md",
+       "quote": "## ... via [`docker compose`](https://github.com/docker/compose)\n\nExample `compose.yaml` for `postgres`:"
+      },
+      {
+       "url": "https://www.postgresql.org/docs/current/install-make.html",
+       "quote": "adduser postgres\nmkdir -p /usr/local/pgsql/data\nchown postgres /usr/local/pgsql/data\nsu - postgres\n/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/dagu-org/dagu/main/README.md",
+       "quote": "- Self-contained: no external DBMS or message broker required."
+      }
+     ],
+     "measurement": "Overturn if (a) a settled service's upstream install documentation requires a pre-existing host PostgreSQL that its own image or Compose file does not provide; or (b) on this WSL2 host, pgbench with the same PostgreSQL major version and settings (initialise at scale 100, then 16 clients for 300 s, data on the same ext4 virtual disk) shows the apt-installed host server beating the official image under rootless Docker Compose with a named volume on transactions per second and p95 latency by a margin a named consumer needs, while both arms rebuild identical state from versioned files.",
+     "confidence": "high"
+    },
+    {
+     "layer": "instructions-skills",
+     "item": "mattpocock/skills",
+     "job": "Upstream engineering-process procedures (test-first loop, bug diagnosis, module and domain design, agent-document writing), installed skill by skill for both agents.",
+     "verdict": "install",
+     "winner_if_competing": "mattpocock/skills",
+     "reasons": "Rule 1: different subjects. Trail of Bits covers security analysis, testing and development tooling; mattpocock covers engineering process: test-first loop, bug diagnosis, module and domain design, writing agent documents. Observed: 0 shared names across 37 and 85 skills. Overlapping skills stay out: code-review (replaces Claude Code's bundled /code-review), research (GPT Researcher, DeerFlow), triage (Trail of Bits github-triage). Rule 2: no public measurement of this collection's gain exists, but the job is in the requirement and otherwise unowned, so documented capability decides. Rule 3: gates pass (release 2026-08-06, commit 2026-09-29, both agents); it beats ECC on per-skill selection and fewer parts. Five skills add about 900 name-and-description characters per agent; Codex also lists each file path.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/mattpocock/skills/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/README.md",
+       "quote": "Pick the skills you want, and which coding agents to install them on."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md",
+       "quote": "A Claude Code plugin marketplace from Trail of Bits providing skills to enhance AI-assisted security analysis, testing, and development workflows. Codex can load this marketplace through its Claude marketplace compatibility."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/skills.md",
+       "quote": "Your skill replaces the bundled command, but not its aliases. A project `code-review` skill replaces `/code-review`, and the bundled alias `/review` never runs your skill"
+      },
+      {
+       "url": "https://developers.openai.com/codex/skills.md",
+       "quote": "In Codex, the initial list also includes each skill's file path. To avoid\ncrowding out the rest of the prompt, this list uses at most 2% of the model's\ncontext window, or 8,000 characters when the context window is unknown."
+      }
+     ],
+     "measurement": "Paired run under Harbor on this host, same pinned model and client for each agent (Claude Code, Codex): at least 30 frozen tasks with deterministic verifiers (feature built test-first, bug diagnosis, AGENTS.md edit). Arm A: native skills plus Trail of Bits. Arm B: A plus tdd, diagnosing-bugs, writing-for-agents, codebase-design, domain-modeling. Metrics: verifier pass rate, mutation-kill rate of the produced tests, total tokens per task, listing characters at session start. Overturn to do_not_install if B's paired pass-rate gain has a 95% interval that includes zero, or tokens rise without a gain.",
+     "confidence": "medium"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "hosting-services",
+     "owners": "Docker Engine / Moby in rootless mode (container runtime) and Docker Compose (declarative lifecycle of the application and every supporting service; a database arrives as a service in the Compose file of whichever application needs it). No host-level PostgreSQL, no second engine, no Dev Containers CLI."
+    },
+    {
+     "layer": "instructions-skills",
+     "owners": "Canonical rules: the agents' native AGENTS.md and CLAUDE.md files, nothing installed. Security, audit and verification procedures: Trail of Bits skills, one plugin per task. Engineering-process procedures: mattpocock/skills, per skill through the skills CLI for both agents (tdd, diagnosing-bugs, writing-for-agents, codebase-design, domain-modeling; spec and ticket flows on request), never its whole-set plugin. ECC not installed."
+    }
+   ],
+   "extra_differences": [
+    "hosting-services: Podman / Quadlet (pass 1 only) would be a second owner of the container-runtime and service-lifecycle jobs that Docker Engine and Compose hold in both records; pass 1 itself lists it as an alternative bundle with no measured winner. Not installed.",
+    "hosting-services: Dev Containers CLI (pass 2 only) builds development-environment containers from devcontainer.json on top of an engine, which is not the layer's run-services job; its README still lists `devcontainer stop` and `devcontainer down` as unimplemented. Not installed.",
+    "instructions-skills: affaan-m/ECC (pass 1 only) competes with mattpocock/skills for the same job; its README counts 68 agents, 293 skills and 94 command shims plus hooks and rules, its minimal profile still installs rules, agents, commands and platform configs, and per-skill selection is documented only for the Claude target. Not installed.",
+    "instructions-skills: mattpocock's `code-review` shares its name with Claude Code's bundled /code-review, and a personal or project skill of that name replaces the bundled command; leave it out, together with `research` and `triage`, whose jobs already have owners.",
+    "instructions-skills: install route. mattpocock's Claude Code plugin 'installs the whole set', so only the skills CLI with `--skill <name>` and `-a claude-code codex` is selective; pass 2's bare `npx skills@latest add mattpocock/skills` is interactive and unpinned, and the CLI itself is an installer no layer owns (pin its version, set DISABLE_TELEMETRY).",
+    "instructions-skills: mattpocock's default branch (d81f3a18, 2026-09-29) carries 13 unreleased changesets beyond v1.2.3 (2026-08-06); implement-spec, pr and retro exist only on the branch and resolving-merge-conflicts only in the release, so pin a tag or commit explicitly. The five selected skills exist in both.",
+    "instructions-skills: neither record names an owner for 'concise canonical rules'. The native instruction files own it with nothing installed; Claude Code's bundled /doctor already trims and audits CLAUDE.md, so writing-for-agents overlaps there in part and is the only procedure that also serves Codex.",
+    "instructions-skills: Trail of Bits scope. The single record names the whole repository as the default while both passes install one plugin per task; the whole marketplace is 85 skills in 42 plugins with about 35,900 listing characters, above Codex's 8,000-character fallback budget, so per-plugin installation is required."
+   ],
+   "notes": "All sources fetched 2026-10-02. Skill counts, listing characters and the empty name intersection were computed from depth-1 clones at mattpocock d81f3a18 and trailofbits 82fe8226 in the scratchpad: observations, not upstream statements. Issue #514 is an n=1 comparison of two tdd versions; SkillsBench (arXiv 2602.12670 v4) reports +16.6 points for curated skills and focused sets beating exhaustive bundles, class-level only. Six gh calls. Token tools: ctx_fetch_and_index, ctx_search, ctx_execute."
+  }
+ },
+ {
+  "label": "critic:recovery-portability+token-efficiency:pair-as-A",
+  "result": {
+   "items": [
+    {
+     "layer": "recovery-portability",
+     "item": "chezmoi",
+     "job": "Manage personal configuration files (dotfiles) across multiple machines from one git source of truth, with templates and password-manager secrets.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "mise, together with the repository-carried bootstrap (mise's documented `mise bootstrap` applies dotfiles from a repository; nothing extra is installed)",
+     "reasons": "Rule 1: the requirement names tool reproduction and application-state recovery on one adopted host; cross-machine dotfile synchronization is not in it. The configuration part of tool reproduction already has owners: the repository-carried bootstrap, and mise v2026.10.0, whose `mise bootstrap --from <repo>` applies `[dotfiles]` (template mode, rendered on each machine; macOS sections exist) and takes `[bootstrap.secrets]` from the environment; Restic restores state files. chezmoi would be a second source of truth for the same files. Rule 2: no public measurement shows a chezmoi gain in reproduction fidelity; its comparison table lists features only. Rule 3: chezmoi passes the gates (v2.73.0, 2026-09-28; CI success via gh; documented Linux and macOS installs), but mise adds no binary. Pages fetched 2026-10-02.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/twpayne/chezmoi/v2.73.0/README.md",
+       "quote": "Manage your dotfiles across multiple diverse machines, securely."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/bootstrap.md",
+       "quote": "Use `--from` to clone a project and apply its `mise.toml`:"
+      },
+      {
+       "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/bootstrap.md",
+       "quote": "9. `mise dot apply` applies [`[dotfiles]`](/dotfiles.html)."
+      },
+      {
+       "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/bootstrap/secrets.md",
+       "quote": "[bootstrap.secrets] declares the sensitive inputs a bootstrap configuration needs without storing their values in mise configuration."
+      }
+     ],
+     "measurement": "On a reset WSL2 Ubuntu x86_64 instance, apply this host's repository-carried configuration set (agent settings, shell and git config, templated and secret-bearing files) twice: (a) the repository bootstrap plus `mise bootstrap --from <repo>`; (b) `chezmoi init --apply <repo>`. Metric: byte equality of every target file with the reference, count of files that mise template mode or `[bootstrap.secrets]` cannot render, and manual steps. Install chezmoi only if (a) fails a file this host needs that (b) renders.",
+     "confidence": "high"
+    },
+    {
+     "layer": "token-efficiency",
+     "item": "ccusage",
+     "job": "Read the agents' local usage logs after the fact and report token totals and estimated cost per day, week, month and session.",
+     "verdict": "do_not_install",
+     "winner_if_competing": "Claude Code and Codex native usage reporting (usage commands, JSON usage output) with their OpenTelemetry export into OTel Collector Contrib",
+     "reasons": "Rule 1: provider usage is the reference side of the requirement's measurement clause, so the job is in scope, but it already has owners. Claude Code: `/usage`, headless JSON usage, OTel `claude_code.token.usage`. Codex: `/status`, `/usage daily|weekly|cumulative`, `codex exec --json` usage, OTel `codex.sse_event` token counts and the `turn.token_usage` metric. OTel Collector Contrib can receive both over OTLP. ccusage re-reads the same local files. Rule 2: the fetched ccusage pages report no evaluation against provider records; its guide says costs are estimates. Rule 3: gates pass (v20.0.26, 2026-09-27; CI success via gh; `npx ccusage@latest`), but its Codex source is labelled experimental. A clean host has no pre-telemetry backlog. Docs fetched 2026-10-02.",
+     "evidence": [
+      {
+       "url": "https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/apps/ccusage/README.md",
+       "quote": "ccusage reads local usage data from coding agent CLIs and turns it into daily, weekly, monthly, and session reports."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/commands.md",
+       "quote": "| `/usage` | Show session cost, plan usage limits, and activity stats."
+      },
+      {
+       "url": "https://developers.openai.com/codex/cli/slash-commands.md",
+       "quote": "3. To open token activity directly, type `/usage daily`, `/usage weekly`, or `/usage cumulative`."
+      },
+      {
+       "url": "https://code.claude.com/docs/en/monitoring-usage.md",
+       "quote": "| `claude_code.token.usage` | Number of tokens used | tokens |"
+      }
+     ],
+     "measurement": "Run matched Claude Code and Codex sessions on this host (interactive, headless, with subagents) with OpenTelemetry export on. Compare per-session and per-day totals per token class from (a) native sources: `claude -p --output-format json` usage, `codex exec --json` `turn.completed` usage and the collector's series; (b) `ccusage daily --json` and `ccusage session`; reference: provider-side usage records for the same requests. Metric: absolute token error per class and sessions missing. Install ccusage only if (a) cannot give complete per-session totals for both agents and (b) matches the provider within tolerance.",
+     "confidence": "high"
+    }
+   ],
+   "resulting_layer": [
+    {
+     "layer": "recovery-portability",
+     "owners": "mise: reproduces the selected tools and their configuration from the repository-carried bootstrap (lockfile, `mise bootstrap`). Restic: backs up and restores application state, with explicit paths and excludes keeping authentication stores out. chezmoi and Devbox are not installed."
+    },
+    {
+     "layer": "token-efficiency",
+     "owners": "No installed tool. Context supply: none (settled by measurement). Provider usage: Claude Code and Codex native usage commands and JSON usage output, plus their OpenTelemetry token data through OTel Collector Contrib (telemetry layer, configuration only). ccusage, agent-console and sqz are not installed."
+    }
+   ],
+   "extra_differences": [
+    "recovery-portability: Devbox (pair pass 2 only) competes for tool reproduction, the job the task settles on mise; its README says it is \"internally powered by `nix`\", an extra substrate, and neither pass shows a measured gain: not installed.",
+    "recovery-portability: the passes differ on Restic's install command (`mise use -g restic@0.19.1` vs `sudo apt-get install restic`); Restic's 0.19.1 documentation lists `mise use -g restic@latest`, so the mise route is upstream-documented and the 0.19.1 pin is pass 1's substitution.",
+    "recovery-portability: both pair passes record that neither tool enforces authentication-store exclusion by itself (it rests on Restic paths and excludes); the single record carries no such acceptance condition.",
+    "token-efficiency: sqz (pair pass 2 only) is a context compressor, the context-supply job already settled as none by measurement; its README calls its replay savings an estimate: outside the final set.",
+    "token-efficiency: agent-console (pair pass 2 only) does the same after-the-fact usage job as ccusage and adds a local console process on 127.0.0.1:6787; same overlap with the native counters, more moving parts: not installed.",
+    "token-efficiency: pair pass 1 selected nothing and deferred every candidate because its page fetches were blocked, so the pair record's selection rests on pass 2 alone.",
+    "token-efficiency: for the ccusage versus agent-console comparison, pass 1 names complete provider records as the reference and pass 2 names identical raw usage records; only provider-side records can test accuracy, since both tools read the same client logs.",
+    "token-efficiency: the single record's row title \"the usage meter only\" presumes a meter; with ccusage not installed the layer holds no installed tool."
+   ],
+   "notes": "Pages fetched 2026-10-02 through Context Mode; quotes re-read from the same URLs. One gh call (GraphQL): chezmoi, ccusage, mise and Restic heads show CI SUCCESS, none archived. Claude Code and Codex docs state no version. Codex `/usage` requires Codex account sign-in; its other owners carry no such condition. The model gateway may be a third usage ledger: possible, unverified. mise's dotfiles pages carry no experimental marker but link an introductory post dated 2026-09-07, so that route is young."
+  }
+ }
+]
