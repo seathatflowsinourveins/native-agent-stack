@@ -82,7 +82,7 @@
     "sources": [
       {
         "path": "adoption/platforms/linux-wsl2-new-distro.md",
-        "sha256": "91e8052e075bff33aa92e2253a8309e21381f8c5ca2aab680996b39e79ae6cb1"
+        "sha256": "2a3c40ae04f62070c78e2ac18ec797658377d334d046fa1e9ec477e6f9074074"
       },
       {
         "path": "adoption/templates/wsl/cloud-init.user-data.template",
@@ -90,27 +90,27 @@
       },
       {
         "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
-        "sha256": "0fb3f1fd31e1cfea0b49923486eb705d29e51c4da00c9cc24bfed959235fed7a"
+        "sha256": "01a48adc8490a002d44ce232b20c34bb6dcd64e179d1e965c1286c89350b89ac"
       }
     ],
     "inputs": [
       {
         "path": "adoption/templates/wsl/host.new-distro.json.template",
-        "sha256": "a71758e5bea33e98da1dc6e391469715a76d44a225fcd3b3696ba871a0961756"
+        "sha256": "4395aec846f1d418a55a862cb4db03906d2513d00fa596c190b56641f760f6b0"
       }
     ],
     "evaluation": [
       {
         "path": "adoption/templates/wsl/first-boot-checklist.md",
-        "sha256": "2ecc17772416e39390a11d5cf30414bbc34540812114a6dfc44b9dc36eb7f23d"
+        "sha256": "c74f1660fc355da29638b257ff2cc3a9529f1f49ad58aecbe04d63a96a5ac3e7"
       },
       {
         "path": "adoption/templates/wsl/stage1-receipt.example.json",
-        "sha256": "5dd17f19b447e92e1ecbbec82e5d38d219bd4cbc1f3402e03d9202c0afaa466d"
+        "sha256": "179972ae1c8a26af3f3b0b4b9f2a087b8ac2c3d4abba83ea7ceceb5ccf9409d3"
       },
       {
         "path": "tests/test_wsl_new_distro_recipe.py",
-        "sha256": "ba9046d7730bb72f95b52408271c26c13151085a855db00132eb740571d061cb"
+        "sha256": "6c1a3eced0898034f1b8b2c6594a94801a2a2cfe3f4cd943df33a26a3126f912"
       }
     ]
   },

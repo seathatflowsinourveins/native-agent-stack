@@ -91,7 +91,7 @@
    "research-harnesses"
   ]
  },
- "correction_made_from_this_run": "engineering-process-skills: the first acceptance looked for a `ref` field that the installer's lock file does not record. The six installed skills' skillFolderHash values equal the git tree hashes of their folders at tag v1.2.3 and differ from main's, so the pin was honoured; the acceptance now compares those hashes.",
+ "correction_made_from_this_run": "engineering-process-skills: the first acceptance looked for a `ref` field, and the lock that this run returned had none. The installer at v1.7.0 supports that field as an optional branch or tag; why it was absent in this run is unresolved. The six skills' recorded skillFolderHash values equal the git tree hashes of their folders at tag v1.2.3 and differ from main's. The acceptance now compares those recorded values with the expected hashes; it does not hash the installed directories.",
  "per_owner_phase": "First pass, kept as it was returned: install from I1-install and post_install from I2-accept, both at plan commit b48321ea. Its post_install column holds 33 exit 0, 4 skipped and 1 nonzero, and it still shows the failure of engineering-process-skills that the correction above addresses.",
  "per_owner": {
   "actionlint-kjanat": {
@@ -272,7 +272,7 @@
    "check_plan.py": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c"
   }
  },
- "changes_after_the_runs": "After both commits had run, the header comments of install.sh (lines 2 and 3) and of accept.sh (line 2) and the `status` text of install-plan.json were corrected on 2026-10-02: they had said that this revision was unrun. No command, row or check changed, and the corrected files were not run again, so the published files differ from the executed ones in those lines only.",
+ "changes_after_the_runs": "After both commits had run, the header comments of install.sh (lines 2 and 3) and of accept.sh (line 2) and the `status` text of install-plan.json were corrected on 2026-10-02: they had said that this revision was unrun. Two sentences of the notes of the engineering-process-skills row in install-plan.json were scoped or marked as superseded later the same day. No command, row or check changed, and the corrected files were not run again, so the published files differ from the executed ones in those lines and those two sentences only.",
  "raw_outputs_scope": "The raw outputs are private files kept outside the repository. Their SHA-256 values bind them for a later inspection; no reviewer has inspected them. This record takes from them only counts, exit codes, slot names and time stamps.",
  "raw_outputs": {
   "P1": "bc3df15df8b254a2e0c22ad73f5215cc19abbb2d6de41cc9817ef83eb33cde72",
