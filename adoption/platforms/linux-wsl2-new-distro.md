@@ -818,8 +818,13 @@ The log line is selected by identifier (`-t systemd-binfmt`), not by unit: on th
 early-boot message is not attributed to it, while the identifier query returned the message.
 
 The exception has a reason. On the adopted release WSL mounts `/proc/sys/fs/binfmt_misc/status` read-only, so that one
-distribution cannot flush the VM-wide registrations ([PR #40621](https://github.com/microsoft/WSL/pull/40621)), and
-`systemd-binfmt.service` fails at every boot with that message and exit 1. Upstream calls the error benign
+distribution cannot flush the VM-wide registrations ([PR #40621](https://github.com/microsoft/WSL/pull/40621)). It does
+so when the distribution's `[boot] protectBinfmt` setting is on, which is the default, and as a best-effort step whose
+failures are only logged (microsoft/WSL `3.0.1`: `src/linux/init/init.cpp` L2433 and L2916-L2923,
+`WslDistributionConfig.h` L27 and L62). Under that condition `systemd-binfmt.service` fails with that message and exit
+1; that is what every boot of the workstation and of the rehearsal distributions showed on 2026-10-02, not a guarantee
+for every configuration. A distribution that turns the setting off, or where the lock did not take, may print
+`running`, which F1 accepts as well. Upstream calls the error benign
 ([issue #41226](https://github.com/microsoft/WSL/issues/41226), a contributor's answer of 2026-08-04: "The systemd error
 is benign and won't affect registration of user defined binfmt settings.").
 

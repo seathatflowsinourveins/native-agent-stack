@@ -335,8 +335,12 @@ The coordinator's brief of 2026-10-02 reports the first observations of the upda
 only failed unit. `systemctl is-active "user@$(id -u).service"` printed `active`. `readlink /proc/self/ns/cgroup`
 printed `cgroup:[4026532183]`, equal to `/proc/1/ns/cgroup`; WSL 2.7.13 had printed the initial namespace,
 `cgroup:[4026531835]`. The host also passed its check of a rootless container, interop and the user manager.
-`systemd-binfmt.service` fails at every boot with `Failed to flush binfmt_misc rules, ignoring: Read-only file system`
-and exit 1, while `WSLInterop` and `python3.12` are registered and Windows executables launch. Nothing was observed with
+`systemd-binfmt.service` failed at each observed boot with `Failed to flush binfmt_misc rules, ignoring: Read-only file system`
+and exit 1, while `WSLInterop` and `python3.12` are registered and Windows executables launch. (Qualified on 2026-10-02
+after the Codex lane's bounded review of `46acc1e5`: WSL installs that read-only lock only while `[boot]
+protectBinfmt` is on, its default, and as a best-effort step, `init.cpp` L2433 and L2916-L2923 and
+`WslDistributionConfig.h` L62 at tag `3.0.1`; "every boot" is this host's observation under the default, not an
+upstream guarantee.) Nothing was observed with
 two distributions running.
 
 Three decisions follow; Sources lists what each rests on.
@@ -363,8 +367,8 @@ Alternatives, each rejected against that evidence:
   namespaces and two healthy managers, so the record pairs the five observations.
 - **Namespace values alone**: a value does not prove isolation (W1 already says so), and two values compare only next to
   the workstation's own baseline.
-- **Stopping at every `degraded`**, the earlier F1: the unit fails at every boot on the adopted release, so no run could
-  pass F1.
+- **Stopping at every `degraded`**, the earlier F1: the unit fails at each boot on the adopted release under its default
+  `protectBinfmt` setting, so no run on this host could pass F1.
 - **Accepting any `degraded`**: it would hide a real failed unit. The pass condition names the one unit and its log
   message.
 - **Keeping the restart as the interop recovery**: it exits 1 on the adopted release, where PR #40621 protects the
