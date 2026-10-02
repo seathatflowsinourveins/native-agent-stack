@@ -37,6 +37,31 @@ All static; none installs anything, and `install.sh` and `accept.sh` were not ru
 
 Observations from upstream release archives run in a scratch directory (Alertmanager's `amtool check-config` on `config/alertmanager.yaml`, its readiness endpoint, the ast-grep probe) and fixtures for the skills and Trail of Bits acceptance programs are described in [SOURCES.md](SOURCES.md), last section; they are not acceptance.
 
+## Clean run of this revision on a real distribution (2026-10-02T12:54Z to 13:17Z)
+
+Record: [real-distribution-validation.json](real-distribution-validation.json), built by a script from the
+coordinator's private raw outputs (counts, exit codes and the raw files' hashes only).
+
+Evidence class: native execution on one host, in a throwaway Ubuntu 26.04.1 distribution on WSL 3.0.1.0 created by the
+merged new-distribution recipe (main `3a8dc31a`), with the plan run from a clone of this branch inside it. No sign-in,
+no provider call, no model run. The distribution was removed afterwards.
+
+- Stage 1 and first boot of the recipe passed (P1 to P3, W1 to W5, W7, F1 to F5), with the two-distribution proof.
+- Install at `b48321ea`: 35 owners exit 0, the three measurement-only owners skipped, none failed.
+- Post-install acceptance at `b48321ea`: 34 exit 0, 29 skipped, one exit 1 (`engineering-process-skills`). The install
+  was right and the check was wrong: the installer's lock file records no `ref`. Each of the six skills'
+  `skillFolderHash` equals the git tree hash of its folder at tag `v1.2.3` and differs from main's, so the pin had been
+  honoured. The acceptance now compares those hashes (`1b290218`), and the full acceptance at that commit returns 35
+  exit 0 and 29 skipped.
+- Service health: Docker and Dagu pass as installed; the OTel collector, Prometheus, Alertmanager and Ollama pass after
+  being started with the commands in [SOURCES.md](SOURCES.md) on ports 21317, 21318, 21333, 21888, 21090, 21093 and
+  21434. The gateway and the research harnesses were not started.
+- The plan's port band did not collide with the workstation's listeners in the shared network namespace, and no 21xxx
+  listener was left after the distribution was removed.
+
+Not established by this run: a signed-in client, a pulled or running model, the GPU, the gateway and the research
+harnesses as services, the three measurement-only owners, and a distribution that stays.
+
 ## Round 1 install-plan repair (historical)
 
 The coordinator ran 34 slots as uid 1000 in a disposable `ubuntu:26.04` container (Ubuntu 26.04.1 LTS), with passwordless sudo, no systemd/user bus, no bubblewrap user namespaces, no service started by the validation procedure and no sign-in. The repository was read-only at `/repo`; the mounted worktree's Git metadata was outside the container. This file quotes only nonprivate evidence. Log locations below are relative to the supplied read-only `round1/` results directory.
