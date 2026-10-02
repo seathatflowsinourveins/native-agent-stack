@@ -6486,8 +6486,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
-      "sha256": "f2d741e55b282dd697278468f84b374c16babd9475fc87416cb26f48d9aeeded",
-      "bytes": 20728
+      "sha256": "96c1b8b1792a05e7c04ec1cce715b4e333ee505d9f689752d3ddce8131a38f87",
+      "bytes": 21137
     },
     {
       "path": "blueprints/convergence-practice/wsl-restore/README.md",
