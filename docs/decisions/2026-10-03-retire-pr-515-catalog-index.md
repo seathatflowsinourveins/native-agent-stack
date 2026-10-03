@@ -43,7 +43,8 @@ four files; their exact Git blob identities at the retained head are:
 The generated index joins committed catalogs and evidence. The explorer gains a **Ranked by evidence**
 tab; CI checks regeneration; the freshness bot regenerates the index after registering a receipt;
 the matrix-refresh procedures gain another write step. These are preserved proposal facts, not changes
-made by this retirement ([old record:16-23][old-scope], [old record:193-204][old-procedures]).
+made by this retirement ([old record:16-23][old-scope], [old record:193-206][old-procedures]; the
+receipt-then-index call order is at [scripts/freshness_propose.py:681-687][old-freshness-order]).
 
 ## Why retire it
 
@@ -102,8 +103,9 @@ The [osv-scanner job](https://github.com/seathatflowsinourveins/native-agent-sta
 also failed at the retained head. The PR body's checklist named only that failure, describing it as
 repository-wide; it omitted the macOS failure. The original advisory cause has not been re-derived
 here. [Merged #622](https://github.com/seathatflowsinourveins/native-agent-stack/pull/622) subsequently
-retired the historical WSL retrieval fixture and separated its archive scan; it did **not** retire
-osv-scanner ([.github/workflows/security-scan.yml:5-9,76-81 at `dcae68bd`][osv-scope]). That later
+retired the historical WSL retrieval fixture's replay/install entry points and scanned its unchanged lock
+in a separate archive partition; it did **not** retire osv-scanner
+([.github/workflows/security-scan.yml:3-9][osv-scope] and [:62-81 at `dcae68bd`][osv-scan]). That later
 change neither repairs #515's macOS test nor establishes the cause of its older scanner failure.
 
 The merge base is `ed293987f3eab7e065581f74824c588d16fb8fbe`. Staleness was recomputed from Git history,
@@ -186,7 +188,7 @@ The pointers are zero-based JSON locations in the retained index, not ranking po
 pairs its first pointer (tier A, K3 level 1) with `/layers/11/placements/9` (tier B, K3 level 0).
 Class-first order puts the first pointer ahead; verification-first order reverses it. All five are
 within `foundation/observation-inference`; none involves a recorded winner. The original placement
-fields are at [JSON:23376-23749][pair-placements]; the common entry's tier is at line 23701.
+fields are at [JSON:23376-23756][pair-placements]; the common entry's tier is at line 23701.
 
 | First placement | Second placement | Status item and pinned file:line |
 | --- | --- | --- |
@@ -257,9 +259,11 @@ status explicit. The repository precedent retains historical receipts while reco
    a registered receipt bound to its inputs and outcome ([U11:111-117][u11-receipt]). A merit-only
    index may then return with K1-K3 removed, K4 bound to that receipt, the macOS fixture fix and
    main's current freshness wording.
-2. The user restores precedence for the selection of record, program decision 5's explicit overturn
-   ([program decision 5:105-106][program-5]).
-3. The user asks again for a ranked single index.
+2. The user restores the provisional install of the recorded selection as the default, program decision 5's
+   overturn ([program decision 5:105-106][program-5-overturn]).
+3. The user restores precedence for the selection of record by an explicit decision. This is a separate
+   user decision, not decision 5's overturn.
+4. The user asks again for a ranked single index.
 
 This record changes no catalog, verdict, receipt, pin, explorer, CI or blind-checkout file. It does
 not touch #595 or #616. Foundation owns this new `docs/decisions/` file
@@ -269,13 +273,15 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 
 [blind-docs]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/tools/sota-convergence/blind_checkout.py#L814-L826
 [old-scope]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L16-L23
-[old-procedures]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L193-L204
+[old-procedures]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L193-L206
+[old-freshness-order]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/freshness_propose.py#L681-L687
 [old-evidence-order]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L162-L167
 [k1]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L205-L209
 [k2]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L210-L216
 [k3]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L220-L234
 [k4]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L244-L250
 [program-5]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L96-L106
+[program-5-overturn]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L105-L106
 [u11-status]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L1-L9
 [u11-context]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L14-L17
 [u11-precedence]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-u11-merit-neutral-selection.md#L126-L127
@@ -289,7 +295,8 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 [mac-root]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/tests/test_catalog_index.py#L274-L288
 [resolved-root]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/scripts/catalog_index.py#L1060-L1065
 [mac-assertion]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/tests/test_catalog_index.py#L1020-L1024
-[osv-scope]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e/.github/workflows/security-scan.yml#L5-L9
+[osv-scope]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e/.github/workflows/security-scan.yml#L3-L9
+[osv-scan]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e/.github/workflows/security-scan.yml#L62-L81
 [old-snapshot]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L70-L86
 [unmodeled]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L478-L499
 [status-array]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42268
@@ -299,7 +306,7 @@ PR needs no trading-lane ACK ([docs/lanes.md:145-150][lane-labels]).
 [pair-62]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42777-L42785
 [pair-63]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42787-L42795
 [pair-64]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L42797-L42805
-[pair-placements]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L23376-L23749
+[pair-placements]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/catalog-index.json#L23376-L23756
 [old-alternatives]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/docs/decisions/2026-09-29-catalog-index-ranking.md#L134-L150
 [scorecard]: https://github.com/ossf/scorecard/blob/ac4b584439389e57f8d56d925f7fef245d8dda1f/README.md#L109-L112
 [pin-rule]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/3d4a9510136c8f38b636b70b04e0ac53060b2fa9/catalogs/landscape/manifest.json#L32
