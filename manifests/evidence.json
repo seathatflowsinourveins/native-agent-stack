@@ -15896,8 +15896,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
-      "bytes": 136634
+      "sha256": "fd5afe19e297caa79eb14e4b89cb83ec1947589668fbd340a1bb3312ac3eca5c",
+      "bytes": 142312
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -49461,8 +49461,8 @@
     },
     {
       "path": "tests/test_managed_block.py",
-      "sha256": "65191a29f502605e296fdd924c38f889ea6bda4c239674fd1b5f14352a2c9bdc",
-      "bytes": 28016
+      "sha256": "103c30facbb744404abcef68734b9d46b78b7fe04593484a899293b4407dd25e",
+      "bytes": 33095
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -49961,8 +49961,8 @@
     },
     {
       "path": "tools/adoption/managed_block.py",
-      "sha256": "aa8147a6662a1083cd841f29c9eab7ad50bfb078c0f416b5980bffce6cfd575a",
-      "bytes": 23196
+      "sha256": "4a5d7c2001be450209aa903af691e653b39989af654bf0e61d70b2199012bba8",
+      "bytes": 23567
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
