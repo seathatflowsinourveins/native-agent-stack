@@ -1,0 +1,211 @@
+{
+ "schema_version": 1,
+ "record": "frozen-variant-guard-mutations-20261003",
+ "purpose": "Index of the retained runs of the mutation driver for tests/test_frozen_macos_variant_no_use.py (PR #635): round 8's final run and round 7's three older-module runs, whose rows evidence/receipts/dependabot-alert-16-dismissal-20261003.json reports in guard_mutation_checks.",
+ "evidence_class": "Local fault injection with synthetic scenario fixtures, run in scratch clones on one host: not an upstream harness, and not run in CI. Each mutant writes scenario files into a scratch clone, runs python3 -m unittest tests.test_frozen_macos_variant_no_use there and restores the clone; nothing was installed, built or served.",
+ "driver": {
+  "path": "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+  "sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+  "origin": "The round-6 driver (sha256 5fff1fa7c6323b059b778fc6ed1478f42b54e19d4d63d7f5e85640a81f336f2e, not retained) with three edits: M9's artifact directory name is assembled from fragments as PARENT's is, PARENT's comment is reworded and the docstring gains a round-7 sentence. Loading both drivers and recording every mutant's file operations gave the same calls for all 45 (the two that read the clone or run git were compared by source)."
+ },
+ "host": {
+  "system": "Linux (WSL2)",
+  "python": "3.13.16",
+  "git": "2.53.0"
+ },
+ "placeholders": {
+  "<repo>": "the owned checkout of PR #635's branch at the final run's clone_head, from which the driver ran at its repository path",
+  "<clone>": "the run's scratch clone (its root directory)",
+  "<out>": "the run's scratch output directory, whose files the run's subdirectory here holds",
+  "<python>": "the Python installation's prefix, which tracebacks name"
+ },
+ "sanitization": "Each copied file had every occurrence of its run's clone root replaced with <clone>, of the run's output directory with <out> and of the Python installation's prefix with <python> (counts in each run's replacements); nothing else was changed. An empty stderr was not copied (stderr_bytes). After the copy, a recursive grep of this directory for the host's home and temporary directory prefixes and its user name printed nothing.",
+ "runs": [
+  {
+   "name": "final",
+   "purpose": "all 45 rows against this round's module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T12:04:09Z",
+   "end_utc": "2026-10-03T12:04:34Z",
+   "exit_code": 0,
+   "exit_code_expected": 0,
+   "exit_code_note": "every row came out as expected",
+   "clone": "a fresh clone of PR #635's branch, made for this run",
+   "clone_head": "a447a5114337b471ef1aae11013063a40db0a201",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "Round 8's content commit: the branch rebuilt as one content commit on main 4ced2923 (#636), whose tree equals round 7's first content commit 8f547913 apart from main's changes since 9b0b8d6d (AGENTS.md and manifests/evidence.json, which the module does not scan). It was not on the remote when the run was made; it reaches the remote with round 8's push. The commit that adds this directory's run files and the receipt's retained field follows it and changes no file the module scans. Round 7 ran the same 45 rows against 8f547913 (2026-10-03T10:46:37Z to 10:47:04Z, all as expected); 8f547913 was never pushed, and this run replaces that one.",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "bfd2c5cdaff2b82e7f8862391a3c325fb162dd417caab4692aadb4d4b6250da6",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "final/results.json",
+   "results_sha256": "cabf4c842e4c67098cae5814cc8c3936f57f85283b9d4f0cab57b4e0a1ff7e97",
+   "logs": "final/results-<id>.log, one per row",
+   "stdout_file": "final/stdout.txt",
+   "stdout_sha256": "77a55cd4e79357fbcdcd2f5931eacaee1566fd96d1db9f7c6f28056f8324da20",
+   "stderr_bytes": 0,
+   "row_count": 45,
+   "rows_as_expected": 45,
+   "rows_not_as_expected": [],
+   "replacements": {
+    "<clone>": 154,
+    "<out>": 0,
+    "<python>": 9
+   }
+  },
+  {
+   "name": "round5-module",
+   "purpose": "N9 against the round-5 module, which compared the client configuration directory names as written",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N9"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T10:47:04Z",
+   "end_utc": "2026-10-03T10:47:07Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N9 is expected to fail and passes against this module, the gap round 6 closed",
+   "clone": "the scratch clone of round 6's round-5 check",
+   "clone_head": "4028806255b532c7cbd00080a2e9ab1624139baa",
+   "clone_head_on_remote_when_run": false,
+   "clone_head_note": "A scratch commit made in that clone: 4af88b1d with the round-5 module (the module of the round-5 content commit, a17c7476 before round 7's rebase) committed on it. It is on no remote.",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "6006cede80c9df94028fc377dfc4efbbb8c3e283ec99bbf1ad25cd4040ddd054",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round5-module/results.json",
+   "results_sha256": "f2b38df0875d22a138b17b8d1efbc57c79a85c20c477166f062320b55f6c9767",
+   "logs": "round5-module/results-<id>.log, one per row",
+   "stdout_file": "round5-module/stdout.txt",
+   "stdout_sha256": "d531952a5f4a5395235cede3dd68b3996bb2399427672964a5d0f36759302ebd",
+   "stderr_bytes": 0,
+   "row_count": 2,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N9"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  },
+  {
+   "name": "round4-module",
+   "purpose": "N4-N8 and X13 against the round-4 module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N4",
+    "N5",
+    "N6",
+    "N7",
+    "N8",
+    "X13"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T10:47:07Z",
+   "end_utc": "2026-10-03T10:47:13Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N4-N8 and X13 are expected to fail and pass against this module, the gaps round 5 closed",
+   "clone": "the scratch clone of round 5's round-4 check",
+   "clone_head": "4af88b1d5b153b7d2f09f83385bcca05ff4fb87e",
+   "clone_head_on_remote_when_run": true,
+   "clone_head_note": "PR #635's round-4 content commit, whose module this is. When the run was made, git branch -r --contains listed origin's PR branch (PR #635's history before round 7's rebase). Rounds 7 and 8 rebuilt that branch, so after round 8's push no remote branch contains it.",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "415d90caf23b81f0d0b4c2a3e3f23316db51f4058cbebed81ef0bf71a0d02242",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round4-module/results.json",
+   "results_sha256": "26d2e1dd3e24787f7aa2231056aa4edcab1d632084be3fa99590cdb6a36ce30f",
+   "logs": "round4-module/results-<id>.log, one per row",
+   "stdout_file": "round4-module/stdout.txt",
+   "stdout_sha256": "90cd8296195eae421bfc2bb29d283cfb8e8ba9537870e07f6c940417fdd0627c",
+   "stderr_bytes": 0,
+   "row_count": 7,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N4",
+    "N5",
+    "N6",
+    "N7",
+    "N8",
+    "X13"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  },
+  {
+   "name": "round3-module",
+   "purpose": "N1-N3 against the round-3 module",
+   "argv": [
+    "python3",
+    "evidence/artifacts/frozen-variant-guard-mutations-20261003/mutants.py",
+    "<clone>",
+    "<out>/results",
+    "M0",
+    "N1",
+    "N2",
+    "N3"
+   ],
+   "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+   },
+   "cwd": "<repo>",
+   "start_utc": "2026-10-03T10:47:14Z",
+   "end_utc": "2026-10-03T10:47:17Z",
+   "exit_code": 1,
+   "exit_code_expected": 1,
+   "exit_code_note": "by design: N1-N3 are expected to fail and pass against this module, the gaps round 4 closed",
+   "clone": "the scratch clone of round 4's round-3 check",
+   "clone_head": "faaa86f9216c9cf03ccbaafeb203e958a7f8331d",
+   "clone_head_on_remote_when_run": true,
+   "clone_head_note": "PR #635's round-3 content commit, whose module this is. When the run was made, git branch -r --contains listed origin's PR branch (PR #635's history before round 7's rebase). Rounds 7 and 8 rebuilt that branch, so after round 8's push no remote branch contains it.",
+   "clone_status": "git status --short --ignored printed nothing before and after the run",
+   "module_sha256": "3058872c039726e7057addb1e54ea32cd5f24b1f8cbdd449a23befc10ee77bd2",
+   "driver_sha256": "7be2ee12614da9145629158a6e517baebd0155e2c9180acd0767d559729fb001",
+   "results_file": "round3-module/results.json",
+   "results_sha256": "d3d7e7e519488133c44a0c4baa2809bc2a1f8670a38d85de98ab4e059115d301",
+   "logs": "round3-module/results-<id>.log, one per row",
+   "stdout_file": "round3-module/stdout.txt",
+   "stdout_sha256": "9856c4f19cc2ee81393d23503383bbe4440c1f40f4b028fe75a564036cb9dba2",
+   "stderr_bytes": 0,
+   "row_count": 4,
+   "rows_as_expected": 1,
+   "rows_not_as_expected": [
+    "N1",
+    "N2",
+    "N3"
+   ],
+   "replacements": {
+    "<clone>": 0,
+    "<out>": 0,
+    "<python>": 0
+   }
+  }
+ ]
+}

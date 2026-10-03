@@ -1,0 +1,7 @@
+M0   expected=pass observed=pass exit=0 ok=True reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 1.791s', 'OK']
+N4   expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.529s', 'OK']
+N5   expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.520s', 'OK']
+N6   expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.555s', 'OK']
+N7   expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.642s', 'OK']
+N8   expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.585s', 'OK']
+X13  expected=fail observed=pass exit=0 ok=False reopen=False stale=False git=False recheck=False skipped=False failing=[] ['Ran 9 tests in 0.520s', 'OK']
