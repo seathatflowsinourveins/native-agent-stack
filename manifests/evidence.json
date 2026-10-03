@@ -16109,8 +16109,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d287f7a805406b916eea9408ecb50851cbf8b7deb92a8a3c7c0a584d2bd4b2a3",
-      "bytes": 143284
+      "sha256": "5e87cc6552a77bc0a32df9c9abd03d354463b9308468ce1246e03c4355148723",
+      "bytes": 143786
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16359,8 +16359,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "caf81fa3aa0fa3e662e1807869331dc024ca787233a4844a0eca3e92e4ea46d6",
-      "bytes": 90785
+      "sha256": "173fe5e0cf2121eb7d3ad76bf397843e24f52a2fd388a17a133e2691d61fc3d5",
+      "bytes": 90784
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
