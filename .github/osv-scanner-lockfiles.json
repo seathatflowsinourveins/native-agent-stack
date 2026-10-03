@@ -6,6 +6,14 @@
       "parser": "requirements.txt"
     },
     {
+      "path": ".github/requirements-ci-suite-macos.txt",
+      "parser": "requirements.txt"
+    },
+    {
+      "path": ".github/requirements-ci-suite-linux.txt",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "parser": "requirements.txt"
     },

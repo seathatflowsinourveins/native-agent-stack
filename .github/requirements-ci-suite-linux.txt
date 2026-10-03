@@ -1,0 +1,15 @@
+# Suite-parallelism trial lock (.github/workflows/macos-suite-parallel-trial.yml), Linux x86_64 runners with the
+# ubuntu-24.04 image's own python3, which the validate job uses: CPython 3.12.3 in image 20260927.320.1
+# (actions/runner-images@db776964592d0362a6bed85f90bc4e2980250e49, images/ubuntu/Ubuntu2404-Readme.md).
+# Installed in every arm, serial included, the way validate.yml installs requirements-ci.txt. Official PyPI
+# wheels; each sha256 was checked on 2026-10-03 against https://pypi.org/pypi/<name>/<version>/json. The closure
+# is complete: unittest-parallel 1.8.6 requires only coverage>=5.1 (pyproject.toml at its release commit
+# craigahobbs/unittest-parallel@bda5d77dc1a2fa2df90f5f5a7de297ea375e345c, and its PyPI requires_dist), and
+# coverage 7.16.2 requires nothing outside its "toml" extra. The coverage wheel also installs a1_coverage.pth,
+# which starts measurement only when COVERAGE_PROCESS_START or COVERAGE_PROCESS_CONFIG is set.
+# coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
+coverage==7.16.2 \
+    --hash=sha256:5375ebd99038021b35e99dc88255022912c06565d316212f4a576e4b08d30f5d
+# unittest_parallel-1.8.6-py3-none-any.whl (MIT)
+unittest-parallel==1.8.6 \
+    --hash=sha256:7f04b0ada502f6b3d655ef49ea2a785f0e37869f9d0ce7a075c1a18ec204ac93
