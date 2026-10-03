@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-token-stack-release-review.md",
-      "sha256": "1c7abbced652c29a84c00b36d8ad150e905e48c41be12cf1ab4c8e3e4c753af3",
-      "bytes": 20552
+      "sha256": "0be1428ff335868f64f2e46b823135d7a9ec3cdb7d9ade1e5c6ef9e7a123e596",
+      "bytes": 23109
     },
     {
       "path": "docs/direct-results.md",
