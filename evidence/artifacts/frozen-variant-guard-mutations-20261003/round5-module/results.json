@@ -1,5 +1,5 @@
 {
- "clone_head": "4028806255b532c7cbd00080a2e9ab1624139baa",
+ "clone_head": "b6ffec8645f1c2a0ead45dc36b02dda9511cee00",
  "results": [
   {
    "id": "M0",
@@ -17,7 +17,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 10 tests in 1.565s",
+    "Ran 10 tests in 0.401s",
     "OK"
    ]
   },
@@ -37,7 +37,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 10 tests in 0.576s",
+    "Ran 10 tests in 0.391s",
     "OK"
    ]
   }

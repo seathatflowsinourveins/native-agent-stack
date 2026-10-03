@@ -1,5 +1,5 @@
 {
- "clone_head": "faaa86f9216c9cf03ccbaafeb203e958a7f8331d",
+ "clone_head": "e55a098df8beed2464946463d4b75d12a538397e",
  "results": [
   {
    "id": "M0",
@@ -17,7 +17,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 7 tests in 1.346s",
+    "Ran 7 tests in 0.311s",
     "OK"
    ]
   },
@@ -37,7 +37,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 7 tests in 0.348s",
+    "Ran 7 tests in 0.311s",
     "OK"
    ]
   },
@@ -57,7 +57,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 7 tests in 0.335s",
+    "Ran 7 tests in 0.307s",
     "OK"
    ]
   },
@@ -77,7 +77,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 7 tests in 0.341s",
+    "Ran 7 tests in 0.312s",
     "OK"
    ]
   }

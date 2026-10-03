@@ -1,5 +1,5 @@
 {
- "clone_head": "4af88b1d5b153b7d2f09f83385bcca05ff4fb87e",
+ "clone_head": "223cc34da51ed1aba191940dd5d6c35e96342bc1",
  "results": [
   {
    "id": "M0",
@@ -17,7 +17,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 1.791s",
+    "Ran 9 tests in 0.379s",
     "OK"
    ]
   },
@@ -37,7 +37,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.529s",
+    "Ran 9 tests in 0.375s",
     "OK"
    ]
   },
@@ -57,7 +57,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.520s",
+    "Ran 9 tests in 0.381s",
     "OK"
    ]
   },
@@ -77,7 +77,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.555s",
+    "Ran 9 tests in 0.373s",
     "OK"
    ]
   },
@@ -97,7 +97,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.642s",
+    "Ran 9 tests in 0.371s",
     "OK"
    ]
   },
@@ -117,7 +117,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.585s",
+    "Ran 9 tests in 0.370s",
     "OK"
    ]
   },
@@ -137,7 +137,7 @@
    "recheck_message": false,
    "skipped": false,
    "summary": [
-    "Ran 9 tests in 0.520s",
+    "Ran 9 tests in 0.368s",
     "OK"
    ]
   }
