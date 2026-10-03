@@ -198,3 +198,14 @@ patch has its own rollback: restore build `dd6e9607e`.
   effective-effort preservation across both hops is unproven (harm:4). OAuth refresh concurrency needs review before
   pinned traffic concentrates (missing:1). HTTP 200 is not completion without the terminal SSE event (missing:2). The
   all-200 counts in part1-final-recheck and limiter-lift-20129 are HTTP status only.
+
+## Addendum (2026-10-03)
+
+The R02 scored run never started. The 2026-09-30 rebuild restarted 20128 with `045aa81f3`, ending **in fact** both
+the freeze under "Decisions" and the "after R02" order under "Next test and rollback". The rebuild record names
+neither R02 nor #445. No explicit release by the user is on record; this addendum neither claims nor supplies one
+and releases nothing. #445 is retired by the
+[dated R02 retirement record](../../../docs/decisions/2026-10-03-retire-gateway-ab-r02.md), which preserves the
+design, history and evidence limits. Sources: the original `decisions.json:29-41,65-74` and
+`docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,43-55`; class `source_review`. The historical instructions
+above and every pinned artifact remain unchanged.
