@@ -8,7 +8,7 @@ direct consensus of the two model families. The decision, its rule and its limit
 
 | File | What it is |
 | --- | --- |
-| `consensus.json` | The record that the manifest's assembler reads: the owner's sentence that allows the method, the rule, five rows to add, six amendments, four topics held without a row change, a note to the trading lane, the two corrections the review made to the proposals, and what is not established. Its `records` name the three notes and the review below by path and SHA-256, and the acknowledgements by link |
+| `consensus.json` | The record that the manifest's assembler reads: the owner's sentence that allows the method, the rule, five rows to add, six amendments, four topics held without a row change, a note to the trading lane, the two corrections the review made to the proposals, and what is not established. Its `records` name the three notes and the review below by path and SHA-256, and the acknowledgements by link, each with what its comment covers |
 | `claude-proposals.md` | Published copy of the Claude lane's proposals for seven layers |
 | `claude-request.md` | Published copy of the Claude lane's request to the Codex lane; it relays the owner's sentence |
 | `codex-decisions.md` | Published copy of the Codex lane's independent decisions |
@@ -20,22 +20,34 @@ direct consensus of the two model families. The decision, its rule and its limit
 Leads came from the research runtime on the live web (GPT Researcher 3.7.0 on a local model); those reports are
 leads, not facts. The Claude lane re-read every fact it used from GitHub by script and wrote proposals for seven
 layers and for the skills rows. The Codex lane decided each one independently from its own reading of the primary
-sources and corrected two statements of the proposals. Both acknowledgements are public comments on pull request 608.
-`consensus.json` is the coordinator's record of what the two lanes agreed; the three notes are the exchange itself.
+sources and corrected two statements of the proposals. The acknowledgements are public comments on pull request 608;
+`consensus.json` says what each one covers. `consensus.json` is the coordinator's record of what the two lanes agreed;
+the three notes are the exchange itself.
+
+| Comment | Lane and time (UTC, 2026-10-02) | What it covers |
+| --- | --- | --- |
+| 5958766754 | Claude, 18:29:20 | The Claude lane's acknowledgement of the Codex lane's decisions, which comment 5959059286 received as agreeing all seven layer decisions and the three skills capabilities |
+| 5959059286 | Codex, 18:45:13 | The Codex lane's acknowledgement of the seven layer decisions and the three skills rows |
+| 5959205007 | Codex, 18:51:56 | The Codex lane's statements on catalog freshness (its root takes the standing freshness and notice unit; Updatecli 0.122.0 offers no extra closure, so no new dependency) and its verdict on the research skill's dependency. It says that the review of HOL Guard, AgentCompass and the Compose delta continues, so it acknowledges none of those dispositions |
+| 5959684384 | Claude, 19:16:53 | The Claude lane's agreement to the scoped dispositions as the Codex lane's note states them in its version of 18:57:10, given from the note before the review in this folder |
+| 5959996494 | Codex, 19:35:35 | The Codex lane's receipt of 5959684384, and no immediate substantive objection from its Astra/max review to the additive consensus rule as supplied to it. It asks that a resolved selection be kept distinct from native qualification |
 
 ## The `credential-guard` amendment and the held topics
 
-These four came from the Codex lane's note, section "Scoped novelty source dispositions". The Claude lane first
-acknowledged them from the note; its own reading of their sources came afterwards and is the review in this folder. Of
-the 36 claims it checks, 27 are confirmed, 9 are qualified and none is refuted; where `consensus.json` states a
+These four came from the Codex lane's note, section "Scoped novelty source dispositions", in its version of
+2026-10-02T18:57:10Z, which is the published copy. The Claude lane agreed to them from the note in comment 5959684384
+(2026-10-02T19:16:53Z); its own reading of their sources came afterwards and is the review in this folder. The Codex
+lane recorded receipt of that agreement in comment 5959996494 (2026-10-02T19:35:35Z). Its earlier comments,
+5959059286 (18:45:13Z) and 5959205007 (18:51:56Z), came before that version and acknowledge none of these four. Of
+the 36 claims the review checks, 27 are confirmed, 9 are qualified and none is refuted; where `consensus.json` states a
 qualified claim, its text carries the qualification, and no decision changed.
 
 | Item | Proposal | Independent review | Acknowledgements |
 | --- | --- | --- | --- |
-| Amendment to `credential-guard`: keep the guard; hold HOL Guard 3.17.1 for a scoped enforcement comparison | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 1 | Both families: the Codex lane's comments that `consensus.json` lists, and the Claude lane's comment 5959684384 of 2026-10-02T19:16:53Z, given from the note before the review |
-| Held: evaluation harness (keep Inspect AI and Harbor; AgentCompass only for an identified unmet requirement) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 2 | Both families, as for the amendment |
-| Held: Docker Compose 5.6.0 (qualify the update; 5.5.1 stays meanwhile) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 4 | Both families, as for the amendment |
-| Held: catalog freshness (keep the existing automation; no Updatecli) | The Codex lane, `codex-decisions.md` | The Claude lane, `claude-review-held-topics.md`, topic 3 | Both families, as for the amendment |
+| Amendment to `credential-guard`: keep the guard; hold HOL Guard 3.17.1 for a scoped enforcement comparison | The Codex lane, `codex-decisions.md`, version of 2026-10-02T18:57:10Z | The Claude lane, `claude-review-held-topics.md`, topic 1 | The Claude lane's agreement in comment 5959684384 (2026-10-02T19:16:53Z), given from the note before the review; the Codex lane's receipt of it in comment 5959996494 (2026-10-02T19:35:35Z) |
+| Held: evaluation harness (keep Inspect AI and Harbor; AgentCompass only for an identified unmet requirement) | The Codex lane, `codex-decisions.md`, version of 2026-10-02T18:57:10Z | The Claude lane, `claude-review-held-topics.md`, topic 2 | Comments 5959684384 (Claude lane, 19:16:53Z) and 5959996494 (Codex lane, 19:35:35Z), as for the amendment |
+| Held: Docker Compose 5.6.0 (qualify the update; 5.5.1 stays meanwhile) | The Codex lane, `codex-decisions.md`, version of 2026-10-02T18:57:10Z | The Claude lane, `claude-review-held-topics.md`, topic 4 | Comments 5959684384 (Claude lane, 19:16:53Z) and 5959996494 (Codex lane, 19:35:35Z), as for the amendment |
+| Held: catalog freshness (keep the existing automation; no Updatecli) | The Codex lane, `codex-decisions.md`, version of 2026-10-02T18:57:10Z | The Claude lane, `claude-review-held-topics.md`, topic 3 | Comments 5959684384 (Claude lane, 19:16:53Z) and 5959996494 (Codex lane, 19:35:35Z), as for the amendment |
 
 ## What this folder is not
 
@@ -45,15 +57,18 @@ qualified claim, its text carries the qualification, and no decision changed.
   the record names a comparison or a gate, that comparison or gate has not run.
 - **No host acceptance.** No row here is a merit acceptance, a host acceptance or a useful-task result on the
   destination distribution. The two rows that install are installed and accepted only through the install plan
-  (`evidence/artifacts/new-wsl-install-plan-20261002/`), whose commands for them have not run anywhere.
+  (`evidence/artifacts/new-wsl-install-plan-20261002/`), whose commands for them have not run anywhere. A row in state
+  `resolved` is a resolved source selection, not a native qualification, as the Codex lane's comment 5959996494 asks
+  the record to keep them: its open acceptance gates are the qualification still owed on the destination.
 
 ## What the build verifies
 
 `assemble_manifest.py` reads `consensus.json` in its last step. It checks that each file named under `records` (the
 three notes and the review) exists with the SHA-256 that `consensus.json` records, that at least one is named, and
 stops with a message when one is missing or differs. For the three notes those hashes are the ones `copy-notes.json`
-gives for the copies; the review is no copy and has no entry there. The acknowledgements are links: the build checks
-that one of each family is listed and does not fetch them. The originals of the notes are private; their hashes in
+gives for the copies; the review is no copy and has no entry there. The acknowledgements are links, each with what its
+comment covers: the build checks that one of each family is listed and does not fetch them, so it checks neither the
+comments nor what the record says they cover. The originals of the notes are private; their hashes in
 `copy-notes.json` cannot be checked from this repository. The review as it was returned is private too, and no hash of
 it is recorded.
 

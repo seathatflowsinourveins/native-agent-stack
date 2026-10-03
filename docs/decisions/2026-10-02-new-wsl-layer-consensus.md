@@ -40,6 +40,11 @@ The rule, verbatim from the record. The assembler appends it to the manifest's `
 The labels say it in their own words: "not a blind round, not a measurement" for a row that is resolved, and "decides ...,
 nothing installed until it returns" for the two rows whose install waits; three rows carry `open_acceptance_gates`.
 
+A resolved selection is not a native qualification, and the Codex lane's comment 5959996494 asks that the record keep
+the two apart. The state `resolved` says that the source selection is settled. The native qualification on the
+destination is what a resolved row's open acceptance gates still ask for, and the record counts none of those gates as
+passed.
+
 What the assembler holds the record to: each file that the record names under `records` (the three exchanged notes and
 the Claude lane's review of the scoped dispositions) exists with the recorded SHA-256, at least one such file is named,
 and an acknowledgement of each family is on record; a slot to add does not exist yet; an added row has the kind
@@ -54,8 +59,31 @@ pull-request comments; the build checks that they are present, not what they say
 The method is the record's own account. Leads came from the research runtime on the live web (GPT Researcher 3.7.0 on
 a local model); those reports are leads, not facts. The Claude lane re-read every fact it used from GitHub by script
 and wrote proposals for seven layers and for the skills rows. The Codex lane decided each one independently from its
-own reading of the primary sources and corrected two statements of the proposals. Both acknowledgements are public
-comments on pull request 608.
+own reading of the primary sources and corrected two statements of the proposals. The acknowledgements are public
+comments on pull request 608, and the record says what each one covers.
+
+Who acknowledged what, from the comments as read again on 2026-10-03; none covers more than its words:
+
+- Comment 5958766754, the Claude lane, 2026-10-02T18:29:20Z: its acknowledgement of the Codex lane's decisions, which
+  the Codex lane's comment 5959059286 received as agreeing all seven layer decisions and the three skills capabilities.
+- Comment 5959059286, the Codex lane, 2026-10-02T18:45:13Z: its acknowledgement of the seven layer decisions and the
+  three skills rows, in its words "Actual Claude acknowledgement received at PR608 comment 5958766754: all seven layer
+  decisions and the three skills capabilities are agreed."
+- Comment 5959205007, the Codex lane, 2026-10-02T18:51:56Z: its root takes the standing freshness and notice unit;
+  Updatecli 0.122.0 offers no extra closure, so no new dependency is taken; and its verdict on the research skill's
+  dependency (gptr-mcp at 63884773, MIT; activation in both clients held until a pinned environment, a handshake,
+  discovery and a useful result). It says that the Astra/max review of HOL Guard, AgentCompass and the Compose delta
+  continues, so it is not an acknowledgement of those dispositions.
+- The Codex lane's note, version of 2026-10-02T18:57:10Z (the published copy `codex-decisions.md`), writes the scoped
+  dispositions: the `credential-guard` amendment and the three topics held without a row change.
+- Comment 5959684384, the Claude lane, 2026-10-02T19:16:53Z: its agreement to those scoped dispositions, given from the
+  note before its own review of their sources.
+- Comment 5959996494, the Codex lane, 2026-10-02T19:35:35Z: "Actual acknowledgement 5959684384 received." It states that
+  its Astra/max review has no immediate substantive objection to the additive consensus rule as supplied to it ("never
+  definitive or measured, explicit labels, no replacement of default/state/definitive or measured results"), asks that
+  a resolved selection be kept distinct from native qualification, and says that the throwaway installs remain unrun
+  until their actual receipts return and that cross-family review stays a source selection with its destination task
+  gate open.
 
 The exchanged notes are published as copies in the evidence folder (`claude-proposals.md`, `claude-request.md`,
 `codex-decisions.md`). `copy-notes.json` gives each copy's hash, the original's hash and every difference between
@@ -174,18 +202,20 @@ alternatives it admits and the comparison that would overturn the row.
   a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not
   qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged
   into one winner. That scoped enforcement comparison would overturn the row. Proposal: the Codex lane's, in its note
-  (`codex-decisions.md`, "Scoped novelty source dispositions"). Independent review: the Claude lane's, in
-  `claude-review-held-topics.md`, topic 1: eight claims confirmed and two qualified, the managed launches (for Codex
-  only, now in the text above) and, for the review's brief, whether 3.17.1 is the current release (3.17.2 followed on
-  the same day). Acknowledgements of both families: the Codex lane's comments that the record lists, and the Claude
-  lane's comment 5959684384 (2026-10-02T19:16:53Z), which acknowledged this amendment and the held topics below from
-  the note, before that review.
+  (`codex-decisions.md`, version of 2026-10-02T18:57:10Z, "Scoped novelty source dispositions"). Independent review:
+  the Claude lane's, in `claude-review-held-topics.md`, topic 1: eight claims confirmed and two qualified, the managed
+  launches (for Codex only, now in the text above) and, for the review's brief, whether 3.17.1 is the current release
+  (3.17.2 followed on the same day). Acknowledgements: the Claude lane's comment 5959684384 (2026-10-02T19:16:53Z)
+  agreed to this amendment and the held topics below, from the note and before that review, and the Codex lane's
+  comment 5959996494 (2026-10-02T19:35:35Z) recorded receipt of that agreement.
 
 ## Held without a row change
 
 Each of the first three topics, like the `credential-guard` amendment above, is the Codex lane's proposal in its note
-(`codex-decisions.md`, "Scoped novelty source dispositions"), has the Claude lane's independent review in
-`claude-review-held-topics.md`, and has the acknowledgements of both families named for that amendment.
+(`codex-decisions.md`, version of 2026-10-02T18:57:10Z, "Scoped novelty source dispositions") and has the Claude lane's
+independent review in `claude-review-held-topics.md`. The Claude lane agreed to it in comment 5959684384
+(2026-10-02T19:16:53Z), from the note and before that review, and the Codex lane recorded receipt of that agreement in
+comment 5959996494 (2026-10-02T19:35:35Z).
 
 - **Evaluation harness.** Keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet
   evaluation requirement. AgentCompass supplies composable harness, environment, trajectory and resume machinery; a
@@ -194,7 +224,8 @@ Each of the first three topics, like the `credential-guard` amendment above, is 
   neither runs on a native sign-in as shipped), so equivalence with the native account route is not established. No
   adapter or permission change is adopted. Proposal: the Codex lane's note. Independent review: the Claude lane's,
   topic 2: ten claims confirmed and one qualified, that only the Claude adapter supplies provider configuration (the
-  Codex adapter does too, as the text above now says). Acknowledgements: as for `credential-guard`.
+  Codex adapter does too, as the text above now says). Acknowledgements: comments 5959684384 (the Claude lane,
+  19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the note's version of 18:57:10Z.
 - **Docker Compose 5.6.0.** Qualify the update; the selected 5.5.1 stays until the owner of that review accepts it. It
   is the same incumbent at a newer release: dry-run, config-hash, watch, monitor and log fixes, and more than those,
   among them manually triggered jobs, provider-service relay networks, warnings for unsupported Compose-file
@@ -204,7 +235,8 @@ Each of the first three topics, like the `credential-guard` amendment above, is 
   review: the Claude lane's, topic 4: four claims confirmed and two qualified, the list of changes (incomplete in the
   note; the text above names the main further ones, and the review lists more) and, for the review's brief, that
   nothing in the release changes what the install plan or the rootless engine relies on (no rootless change and
-  preserved configuration hashes upstream, not checked on a host). Acknowledgements: as for `credential-guard`.
+  preserved configuration hashes upstream, not checked on a host). Acknowledgements: comments 5959684384 (the Claude
+  lane, 19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the note's version of 18:57:10Z.
 - **Catalog freshness and the session-start notice.** Keep the existing automation; the Codex lane owns a daily
   report-only cadence and the notice documentation. The existing freshness workflow, weekly at the revision the note
   cites and daily since pull request 613 (merged 2026-10-02), already supplies metadata and drift reports with guarded
@@ -215,7 +247,8 @@ Each of the first three topics, like the `credential-guard` amendment above, is 
   lane's note. Independent review: the Claude lane's, topic 3: five claims confirmed and four qualified, the cadence
   and the overlap (both now in the text above), that the cadence change sits on a separate branch (it has merged as
   pull request 613), and that a historical 48-hour statement needs a dated correction (the correction has landed).
-  Acknowledgements: as for `credential-guard`.
+  Acknowledgements: comments 5959684384 (the Claude lane, 19:16:53Z) and 5959996494 (the Codex lane, 19:35:35Z), on the
+  note's version of 18:57:10Z.
 - **Local generation and embedding models.** Not part of this record. The first trial's result and the arms chosen
   again from the newest releases follow in their own record.
 
@@ -259,7 +292,11 @@ Beyond that list:
   `skill-authoring` have not run anywhere. The plan says so in its status, in the notes of both rows and in its
   validation file, and no earlier run of the plan covers them.
 - The acknowledgements are comments on a pull request. The manifest's build checks that the record lists them; it does
-  not fetch or hash them.
+  not fetch or hash them, and it does not check what the record says each one covers.
+- For the scoped dispositions, the Codex lane's side is its note of 2026-10-02T18:57:10Z, which writes them, and its
+  receipt of the Claude lane's agreement (comment 5959996494); none of the Codex lane's comments listed here
+  acknowledges them by name. Its comment 5959205007 (18:51:56Z), which came before that version of the note, says that
+  the review of HOL Guard, AgentCompass and the Compose delta continues.
 - The Claude lane acknowledged the Codex lane's scoped dispositions and the `credential-guard` amendment (comment
   5959684384) from the note, before it read their sources. Its review, `claude-review-held-topics.md`, came afterwards:
   of 36 claims it confirms 27, qualifies 9 and refutes none. Where this record states a qualified claim, its text now
@@ -304,11 +341,13 @@ five rows of this change have not run there or anywhere else. A source selection
 
 - The record: `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`, with `claude-proposals.md`,
   `claude-request.md`, `codex-decisions.md`, `claude-review-held-topics.md` and `copy-notes.json` in the same folder.
-- The acknowledgements: [Claude, 18:29:20Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5958766754),
+- The acknowledgements, each described under Method: [Claude, 18:29:20Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5958766754),
   [GPT, 18:45:13Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959059286),
-  [GPT, 18:51:56Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007) and
-  [Claude, 19:16:53Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959684384),
-  the last for the scoped dispositions and the `credential-guard` amendment.
+  [GPT, 18:51:56Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959205007),
+  [Claude, 19:16:53Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959684384) and
+  [GPT, 19:35:35Z](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5959996494);
+  the last two for the scoped dispositions and the `credential-guard` amendment, as the Codex lane's note of
+  18:57:10Z writes them.
 - The Claude lane's review of the scoped dispositions: `claude-review-held-topics.md`, which gives each claim's sources,
   each at a pinned commit where one is cited.
 - `skill-discovery`: [find-skills at the pinned commit](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/skills/find-skills/SKILL.md).

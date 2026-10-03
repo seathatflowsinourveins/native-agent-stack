@@ -804,11 +804,20 @@ class Manifest(unittest.TestCase):
         self.assertEqual({ack["family"] for ack in records["acknowledgements"]}, {"claude", "gpt"})
         for ack in records["acknowledgements"]:
             self.assertTrue(ack["url"].startswith("https://github.com/"), ack["url"])
-        # The Claude lane's acknowledgement of the scoped dispositions came from the note, before its review; the record
-        # says what it covers and names the review.
-        covering = [ack for ack in records["acknowledgements"] if "covers" in ack]
-        self.assertEqual([(ack["family"], ack["url"].rsplit("-", 1)[1]) for ack in covering], [("claude", "5959684384")])
-        self.assertIn("claude_review_held_topics", covering[0]["covers"])
+        # Each acknowledgement says what its comment covers, in time order. The scoped dispositions are in the Codex
+        # lane's note of 18:57:10Z: the Claude lane agreed to them from the note, before its review (5959684384), and the
+        # Codex lane recorded receipt of that agreement (5959996494).
+        acknowledgements = records["acknowledgements"]
+        self.assertEqual([(ack["family"], ack["url"].rsplit("-", 1)[1]) for ack in acknowledgements],
+                         [("claude", "5958766754"), ("gpt", "5959059286"), ("gpt", "5959205007"),
+                          ("claude", "5959684384"), ("gpt", "5959996494")])
+        self.assertEqual([ack["at"] for ack in acknowledgements], sorted(ack["at"] for ack in acknowledgements))
+        for ack in acknowledgements:
+            self.assertTrue(ack["covers"].strip(), ack["url"])
+        by_id = {ack["url"].rsplit("-", 1)[1]: ack["covers"] for ack in acknowledgements}
+        self.assertIn("claude_review_held_topics", by_id["5959684384"])
+        self.assertIn("2026-10-02T18:57:10Z", by_id["5959684384"])
+        self.assertIn("5959684384", by_id["5959996494"])
 
     def test_consensus_labels_follow_the_rule(self):
         """The rule's label clause, in the labels' own words: every consensus row names the direct consensus of both

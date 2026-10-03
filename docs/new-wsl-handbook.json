@@ -152,7 +152,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "70f6d3f619fb6fe2fa4231cca1427aaaaab0b65ae32d4b92454e998e646768c5"
+          "sha256": "19cd8898150d685af371d564b0ca3e118000c495b0b07aefde7731b69d6e7e72"
         },
         "convergence": {
           "file": "convergence.json",
@@ -6707,7 +6707,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "13c1c2301f131c29084686b961c07136c714c8c57d8e1dcbe4a320de6be98a88"
+      "sha256": "47f454589e9d89ddb3202e2e3bfeb678e46680fd9f265a18608ba88f0137a47a"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -6731,7 +6731,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "70f6d3f619fb6fe2fa4231cca1427aaaaab0b65ae32d4b92454e998e646768c5"
+      "sha256": "19cd8898150d685af371d564b0ca3e118000c495b0b07aefde7731b69d6e7e72"
     }
   ],
   "stage_order": [
