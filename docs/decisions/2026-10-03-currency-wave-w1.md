@@ -149,6 +149,22 @@ The W1 `holds_not_in_scope` entries stay out of this integration:
 | dagu | The supplied hold records no verified 2.18.1 archive, installed version or behavior review. Requalification is running separately. |
 | rtk | The supplied hold records no candidate artifact, observed version or qualified release metadata. Requalification is running separately. |
 
+**Judgment custody.** The complete reviewer outputs behind this record, and the
+repair replies that answered them, are retained under
+`evidence/artifacts/currency-wave-w1-20261003/judgments/`, sanitized only of
+host paths:
+[move-hold-judges.json](../../evidence/artifacts/currency-wave-w1-20261003/judgments/move-hold-judges.json)
+(the nine Opus move judges of `W1-moves.json`, workflow `wf_a95468d8-3af`; its
+seven `holds_not_in_scope` strings are kept as the packet recorded them,
+already cut at 600 characters),
+[review-round-findings.json](../../evidence/artifacts/currency-wave-w1-20261003/judgments/review-round-findings.json)
+(the start events and results of the Opus `approve` and Sol `repair` #642
+reviewers, workflow `wf_267d65f8-7f6`),
+[repair-round-replies.md](../../evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-replies.md)
+(R642) and
+[repair-round-2-replies.md](../../evidence/artifacts/currency-wave-w1-20261003/judgments/repair-round-2-replies.md)
+(R642b).
+
 ## Completeness critic and next sweep
 
 Search-first used the existing native recipes and upstream snapshot method; no
