@@ -219,3 +219,63 @@ Rollback of this source change is its documentation commit. The private Mac
 receipt records the exact targeted configuration change and prior values;
 rollback must preserve any subsequent unrelated edit. The previous Astra/low
 values are historical rollback data, not the selected operating policy.
+
+## Amendment 2026-10-03: WSL scope
+
+This amendment changes no text above. The Codex lane asked for it in an
+Astra/max read-only verdict on pull request 608
+([comment 5962894990](https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5962894990),
+2026-10-02T23:09:38Z). Line numbers refer to this file as merged at main
+`56473e4b840f`. "The new WSL distribution" below is the destination that the
+[definitive-defaults record](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/docs/decisions/2026-10-01-new-wsl-definitive-defaults.md)
+selects for.
+
+1. **Model and effort on the WSL hosts.** Lines 12-17, 55 and 71-80 select
+   Sol at Ultra for workers and extend that override to both hosts and to the
+   portable launch. On the WSL workstation and on the new WSL distribution the
+   defaults remain those of
+   [AGENTS.md line 38](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/AGENTS.md#L38)
+   and the
+   [September 30 routing record, lines 13-30](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/docs/decisions/2026-09-30-sol-primary-quality-defaults.md#L13-L30):
+   GPT-6.1 Sol at ultra coordinates and at max runs primary workers, GPT-6
+   Astra at max takes a single consequential judgment (and at ultra
+   coordinates a complex workflow that needs it), and explicit model choices
+   and role definitions are preserved. The Ultra-worker override is scoped to
+   the Mac host; its authority there is unverified, not revoked. This
+   amendment sets no new global model default.
+2. **Workstation and distribution.** Lines 27-32 keep their finding that this
+   Mac review did not attest workstation activation. Their broader statement,
+   that no surviving replacement environment and no current workstation
+   distribution or transport were identified, is dated: it describes what the
+   sources of this review showed on 2026-10-02, at source baseline
+   `18eea2c1`, and does not say that none exists. Separately, the new WSL
+   distribution is established as the destination. By the Codex lane's
+   verdict it was built from the merged
+   [recipe](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/adoption/platforms/linux-wsl2-new-distro.md),
+   its clients are signed in, and the client configuration of pull request
+   608 is applied there. Those steps have no public receipt yet. The host
+   gates on that distribution are open: a real task in each client,
+   persistent services, restart, backup and restore, and the host receipt. A
+   row that installs something is installed and accepted only through the
+   install plan, and the
+   [client configuration](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/docs/decisions/2026-10-02-new-wsl-client-configuration.md)
+   wires it only after that.
+3. **Claude Code in the source table.** Line 110 names Claude Code 2.1.287,
+   which is the historical source this review read (tag `v2.1.287`, commit
+   `816ec211`). Upstream has since tagged
+   [2.1.288](https://github.com/anthropics/claude-code/releases/tag/v2.1.288)
+   (commit `1c229fcd`, read with `git ls-remote` on 2026-10-03). Its
+   rehearsal and its activation on the destination are pending.
+4. **What stays open.** Lines 5-8 call the two-host design resolved. That word
+   covers the design only, and these gates stay open: the
+   [layer consensus of 2026-10-02](2026-10-02-new-wsl-layer-consensus.md);
+   the pin updates of lines 109-111, where the stack manifest's Codex, Claude
+   Code and shared-memory pins trail the reviewed releases; the local-model
+   results, where by the Codex lane's verdict generation and embedding are
+   measured and its own read of them is pending; the native lifecycle
+   qualification
+   ([open-work.json, lines 24-28](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/blueprints/convergence-practice/clean-resolution-20261002/open-work.json#L24-L28));
+   the remaining measurements, that is the rows of the definitive-defaults
+   record that install nothing until their measurement returns; and the SDK
+   owner's gates
+   ([open-work.json, lines 31-35](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/blueprints/convergence-practice/clean-resolution-20261002/open-work.json#L31-L35)).
