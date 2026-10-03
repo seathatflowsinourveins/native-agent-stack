@@ -1,9 +1,12 @@
 {
-  "name": "wsl-retrieval-qualification",
+  "name": "retired-wsl-retrieval",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "@tobilu/qmd": "2.8.3",
-    "sqlite-vec-linux-x64": "0.1.9"
+  "description": "Retired historical WSL retrieval fixture; retained lock is audit evidence.",
+  "devEngines": {
+    "runtime": {
+      "name": "retired-wsl-retrieval",
+      "onFail": "error"
+    }
   }
 }
