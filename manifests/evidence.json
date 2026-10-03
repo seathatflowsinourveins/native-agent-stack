@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
-      "sha256": "7227ae704e43ed5978125db2e27318eb850cd4314468814f5bc0cfaa0aa673a7",
-      "bytes": 21068
+      "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
+      "bytes": 21398
     },
     {
       "path": "docs/direct-results.md",
