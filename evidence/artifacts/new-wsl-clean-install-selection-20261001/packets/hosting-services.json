@@ -1,0 +1,70 @@
+{
+ "layer_id": "hosting-services",
+ "title": "Application and service hosting",
+ "requirement": "Run a local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+ "a_deciding_comparison_would_measure": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "microsoft/wsl",
+   "repository": "https://github.com/microsoft/WSL"
+  },
+  {
+   "key": "C02",
+   "name": "Docker Engine / Moby",
+   "repository": "https://github.com/moby/moby"
+  },
+  {
+   "key": "C03",
+   "name": "Dockerized IB Gateway",
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker"
+  },
+  {
+   "key": "C04",
+   "name": "BentoML",
+   "repository": "https://github.com/bentoml/BentoML"
+  },
+  {
+   "key": "C05",
+   "name": "FastAPI",
+   "repository": "https://github.com/fastapi/fastapi"
+  },
+  {
+   "key": "C06",
+   "name": "React",
+   "repository": "https://github.com/react/react"
+  },
+  {
+   "key": "C07",
+   "name": "PostgreSQL",
+   "repository": "https://github.com/postgres/postgres"
+  },
+  {
+   "key": "C08",
+   "name": "Docker Compose",
+   "repository": "https://github.com/docker/compose"
+  },
+  {
+   "key": "C09",
+   "name": "Podman / Quadlet",
+   "repository": "https://github.com/podman-container-tools/podman"
+  },
+  {
+   "key": "C10",
+   "name": "nextjs",
+   "repository": "https://github.com/vercel/next.js"
+  },
+  {
+   "key": "C11",
+   "name": "Modal",
+   "repository": "https://github.com/modal-labs/modal-client"
+  },
+  {
+   "key": "C12",
+   "name": "Dev Containers CLI",
+   "repository": "https://github.com/devcontainers/cli"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

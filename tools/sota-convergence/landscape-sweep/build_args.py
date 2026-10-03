@@ -67,6 +67,7 @@ MODALITY_TEMPLATES = {REPOSITORY_MODALITY: {}, SKILLS_MODALITY: {"discover": "di
                                                                   "critic": "critic_skills"}}
 # templates.json: the role keys plus the skills modality's templates (modality_skills fills <<MODALITY>>).
 TEMPLATE_KEYS = (*make_prompt.RUNTIME_PLACEHOLDERS, "discover_skills", "critic_skills", "modality_skills")
+V2_TEMPLATE_KEYS = ("common_v2", "discover_v2", "facts_v2", "fit_v2")
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
 # Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". Every
 # template reaches a worker (the skills modality's discover_skills, critic_skills and modality_skills too), so
@@ -402,16 +403,24 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
 
 
 def fill_build(templates: dict, run_date: str, layer_count: int, skills_checked_at: str,
-               modality: str = REPOSITORY_MODALITY) -> dict:
+               modality: str = REPOSITORY_MODALITY, contract_version: int = 1) -> dict:
     """The run's frozen templates: the role keys sweep.js and make_prompt.py read (make_prompt.RUNTIME_PLACEHOLDERS),
     with only their per-call placeholders left. The modality is resolved here: a skills run's discover and critic are
     discover_skills and critic_skills, and its facts and fit end in modality_skills (<<MODALITY>>), which a repository
     run fills with "", so a repository run's frozen templates are the templates it had before the skills modality."""
-    if set(templates) != set(TEMPLATE_KEYS):
-        raise ValueError(f"templates must hold exactly {sorted(TEMPLATE_KEYS)}")
+    if set(templates) not in (set(TEMPLATE_KEYS), set(TEMPLATE_KEYS) | set(V2_TEMPLATE_KEYS)):
+        raise ValueError(f"templates must hold exactly {sorted(TEMPLATE_KEYS)}, with all or no {sorted(V2_TEMPLATE_KEYS)}")
     if modality not in MODALITY_TEMPLATES:
         raise ValueError(f"modality {modality!r} is not one of {sorted(MODALITY_TEMPLATES)}")
+    if contract_version not in (1, 2):
+        raise ValueError("contract_version must be 1 or 2")
+    if contract_version == 2 and modality == SKILLS_MODALITY:
+        raise ValueError("the skills modality keeps version 1")
+    if contract_version == 2 and not set(V2_TEMPLATE_KEYS) <= set(templates):
+        raise ValueError("version 2 requires all V2 templates")
     roles = {**{key: key for key in make_prompt.RUNTIME_PLACEHOLDERS}, **MODALITY_TEMPLATES[modality]}
+    if contract_version == 2:
+        roles.update({key.removesuffix("_v2"): key for key in V2_TEMPLATE_KEYS})
     values = {"DATE": run_date, "LAYER_COUNT": str(layer_count), "SKILLS_CHECKED_AT": skills_checked_at,
               "MODALITY": templates["modality_skills"] if modality == SKILLS_MODALITY else ""}
     filled = {key: make_prompt.fill(templates[source], values) for key, source in roles.items()}
@@ -519,6 +528,9 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     first_prompts = {}
     for layer in selected:  # everything is checked before anything is written
         layer_input = load_json(work / "inputs" / f"{layer['layer_id']}.json")
+        if layer.get("contract_version", 1) != 1 or layer_input.get("contract_version", 1) != 1:
+            raise ValueError("V2 inputs require the future V2 runner; sweep.js and make_prompt.py still use the "
+                             "V1 shared input and proposal projection, so no launchable run is staged")
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             if not layer_input.get(field):
                 raise ValueError(f"inputs/{layer['layer_id']}.json has no {field}; rebuild it with build_inputs.py")
@@ -595,6 +607,8 @@ def main(argv=None) -> int:
     parser.add_argument("--work-dir", default=os.environ.get("SWEEP_WORK_DIR"))
     parser.add_argument("--sweep-id", required=True, help="lane name, e.g. landscape-sweep-20260926")
     parser.add_argument("--date", required=True, help="the run's date (YYYY-MM-DD), filled into the templates")
+    parser.add_argument("--contract-version", type=int, choices=(1, 2), default=1,
+                        help="V1 runner only; V2 producer contracts await the future V2 runner")
     choose = parser.add_mutually_exclusive_group()
     choose.add_argument("--layers", help="comma-separated layer ids, swept in the order given")
     choose.add_argument("--due-report", type=Path, help="saturation_ledger.py --report --json output: its due layers")
@@ -634,6 +648,9 @@ def main(argv=None) -> int:
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
+    if args.contract_version == 2:
+        parser.error("V2 staging requires the future V2 runner; prepare fields with build_inputs.py "
+                     "--contract-version 2 without activating the V1 workflow")
     try:
         work = work_dir(args.work_dir)
         date.fromisoformat(args.date)

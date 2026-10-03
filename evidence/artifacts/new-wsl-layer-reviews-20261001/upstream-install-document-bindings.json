@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "upstream_install_document_bindings",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "checked_at": "2026-10-01",
+  "purpose": "Bind the upstream-documented command shape separately from this repository's version-pinned recipe. A generic example or installed-client help does not establish unchanged pinned-client execution.",
+  "coverage": "Six harness-layer and coordinator memory bindings here; context-install-bindings-followup.json covers15 context components and operations-install-bindings-followup.json covers31 operation fields across30 components. Trading reviews carry their own upstream_document_binding and recipe_pin_binding. These are source bindings, not executed installation.",
+  "bindings": [
+    {
+      "component": "claude-code",
+      "layers": ["native-clients", "workers"],
+      "recorded_command": "claude install 2.1.284",
+      "immutable_source": "https://github.com/anthropics/claude-code/blob/v2.1.284/README.md#L21-L24",
+      "source_contract": "Generic native bootstrap; exact specific-version install command at the selected tag was not found in the inspected public README.",
+      "additional_primary_source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
+      "installed_observation": {
+        "client": "2.1.286",
+        "command": "rtk claude install --help",
+        "exit_code": 0,
+        "returned_output": "Usage: claude install [options] [target]\n\nInstall Claude Code native build. Use [target] to specify version (stable,\nlatest, or specific version)\n\nOptions:\n  --force     Force installation even if already installed\n  -h, --help  Display help for command\n"
+      },
+      "pin_specialization": "2.1.284 is the retained local target; installed 2.1.286 help supports specific-version targets, but no installation was invoked."
+    },
+    {
+      "component": "codex",
+      "layers": ["native-clients"],
+      "recorded_command": "npm install -g @openai/codex@0.159.2",
+      "immutable_source": "https://github.com/openai/codex/blob/rust-v0.159.2/README.md#L40-L43",
+      "source_contract": "Upstream npm example is unversioned.",
+      "pin_specialization": "@0.159.2 is this repository's retained package pin; production 0.159.3 qualification is a separate pending artifact and not a silent edit to this frozen edition."
+    },
+    {
+      "component": "worktrunk",
+      "layers": ["workers", "isolation"],
+      "recorded_command": "cargo install worktrunk --version 0.79.0",
+      "immutable_source": "https://github.com/max-sixty/worktrunk/blob/5ba6f148e8505c20794f2d8bc706aa4f26335c95/README.md#L118-L122",
+      "source_contract": "Generic Cargo installation and subsequent wt config shell install.",
+      "pin_specialization": "--version 0.79.0 is the local package pin; source inspection does not establish shell activation or target-host execution."
+    },
+    {
+      "component": "mcporter",
+      "layers": ["mcp-surfaces"],
+      "recorded_command": "npm install -g mcporter@0.14.1",
+      "immutable_source": "https://github.com/openclaw/mcporter/blob/v0.14.1/README.md#L24-L29",
+      "source_contract": "Generic unversioned npm installation.",
+      "pin_specialization": "@0.14.1 is the retained local package pin."
+    },
+    {
+      "component": "mcp-inspector",
+      "layers": ["mcp-surfaces"],
+      "recorded_command": "npx --yes @modelcontextprotocol/inspector@2.8.0 --cli <server-command> --method tools/list",
+      "immutable_sources": [
+        "https://github.com/modelcontextprotocol/inspector/blob/2.8.0/docs/cli-smoke-testing.md#L24-L28",
+        "https://github.com/modelcontextprotocol/inspector/blob/2.8.0/docs/cli-smoke-testing.md#L91-L94"
+      ],
+      "source_contract": "Pinned runner guidance uses version2.5.0 as its example; CLI tools/list is an upstream probe template.",
+      "pin_specialization": "2.8.0 is the local runner pin. The server-command placeholder must be resolved by the selected component recipe before execution."
+    },
+    {
+      "component": "codex-sdk",
+      "layers": ["agent-sdks"],
+      "recorded_command": "npm install @openai/codex-sdk",
+      "immutable_source": "https://github.com/openai/codex/blob/rust-v0.159.2/sdk/typescript/README.md#L7-L13",
+      "source_contract": "Literal upstream command is unversioned.",
+      "published_package_observation": {
+        "primary_source": "https://registry.npmjs.org/@openai%2Fcodex-sdk/0.159.2",
+        "http_status": 200,
+        "name": "@openai/codex-sdk",
+        "version": "0.159.2",
+        "integrity": "sha512-rK84U6QFadh529yK9iMtwERN0rVviJ91hwvenA2RWoUi4wGnjYGZahEmoO8P/NPam+yHq8Nnkx5p3PccuF1H6w==",
+        "git_head": null
+      },
+      "tagged_source_observation": {
+        "primary_source": "https://github.com/openai/codex/blob/rust-v0.159.2/sdk/typescript/package.json",
+        "name": "@openai/codex-sdk",
+        "version": "0.0.0-dev"
+      },
+      "pin_specialization": "The matching-number npm package exists; the unversioned install command does not select it. The tag's development package.json and registry metadata alone do not prove published-artifact source equivalence or qualified SDK execution.",
+      "remaining_gap": "Bind the selected package and its verified artifact to the repository recipe, then run native SDK acceptance."
+    },
+    {
+      "component": "skills-cli-command-template",
+      "layers": ["instructions-skills"],
+      "recorded_command": "skills add <pinned-skill-url> -g -a codex claude-code",
+      "source_components": ["affaan-m/ECC", "skill:typesafe-ai", "skill:openai-curated"],
+      "immutable_sources": [
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L36-L44",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L85-L88",
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/package.json#L6-L9"
+      ],
+      "source_contract": "Supported URL and agent/global options at Skills1.7.0.",
+      "pin_specialization": "The generic review fields remain templates. Concrete selected URLs are recoverable from the maintained skills manifest below; the manifest's per-skill refs, controls and status take precedence over a catalog repository-head pin.",
+      "maintained_recipe": {
+        "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+        "manifest": "adoption/skills/manifest.json",
+        "documentation": "adoption/skills/lifecycle.md:80-94",
+        "installer": "tools/adoption/install_skills.py",
+        "dry_run_command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --dry-run --json",
+        "install_command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
+        "status": "Source recipe recovered; not invoked. skills was not found on PATH (rtk which skills exit1), which does not establish absence from an owned prefix or an upstream capability gap. Resolve the pinned1.7.0 executable through the selected profile before running."
+      },
+      "selected_manifest_urls": [
+        {"name": "typesafe-ai", "status": "kept", "url": "https://github.com/typesafe-ai/skills/tree/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai"},
+        {"name": "gh-fix-ci", "status": "kept", "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci"},
+        {"name": "security-best-practices", "status": "kept", "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices"},
+        {"name": "iterative-retrieval", "status": "kept", "url": "https://github.com/affaan-m/ECC/tree/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval"},
+        {"name": "search-first", "status": "kept", "url": "https://github.com/affaan-m/ECC/tree/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first"}
+      ],
+      "remaining_gap": "Reconcile catalog repository-head pins with intentionally retained per-skill refs, resolve the selected profile's executable, and qualify native listing/disable/remove/restore. Catalog discovery does not authorize installing every alternative or promoting trial skills."
+    },
+    {
+      "component": "sandbox-runtime",
+      "layers": ["isolation"],
+      "recorded_command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.77",
+      "immutable_source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md#L12-L15",
+      "source_contract": "Generic unversioned npm installation.",
+      "pin_specialization": "@0.0.77 is the retained local package pin; candidate0.0.78 requires its separate lifecycle and negative-control qualification."
+    },
+    {
+      "component": "ai-memory",
+      "layers": ["durable-memory"],
+      "recorded_command": "cargo build --release --workspace",
+      "immutable_source": "https://github.com/akitaonrails/ai-memory/blob/433a19f3d54dea287571b1423591db2a89965fa9/docs/install.md#L1558",
+      "source_contract": "Literal retained-source build; the preceding lines state that the crates.io crate name is taken.",
+      "pin_specialization": "Run only inside the retained2.4.1 source checkout433a19f3d54dea287571b1423591db2a89965fa9. Candidate recipes and installed-client help are separate in durable-memory.json."
+    }
+  ],
+  "new_host_acceptance": "unknown",
+  "limitations": "Source bindings and current installed help only. No commands that install software were invoked by this audit. Remaining placeholders and artifact bindings are explicit gaps, not completed installations."
+}

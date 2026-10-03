@@ -1,3 +1,10 @@
-child exits 130 after its cleanup: bash exit 0, lines ['continued-1', 'continued-2', 'continued-3']
-child ends BY SIGINT after its cleanup: bash exit -2, lines []
-the loop went on after an exit 130: True; the loop stopped after a death by SIGINT: True
+bash, SIGINT to the group, child exit 130: 3 of 3 runs continued, shell ended with 0 | expected (3, 0): True
+bash, SIGINT to the group, child dies by SIGINT: 0 of 3 runs continued, shell ended with -2 | expected (0, -2): True
+bash, SIGINT to the child only, child exit 130: 3 of 3 runs continued, shell ended with 0 | expected (3, 0): True
+bash, SIGINT to the child only, child dies by SIGINT: 3 of 3 runs continued, shell ended with 0 | expected (3, 0): True
+dash, SIGINT to the group, child exit 130: 0 of 3 runs continued, shell ended with -2 | expected (0, -2): True
+dash, SIGINT to the group, child dies by SIGINT: 0 of 3 runs continued, shell ended with -2 | expected (0, -2): True
+dash, SIGINT to the child only, child exit 130: 3 of 3 runs continued, shell ended with 0 | expected (3, 0): True
+dash, SIGINT to the child only, child dies by SIGINT: 3 of 3 runs continued, shell ended with 0 | expected (3, 0): True
+control, bash, the child kills its parent shell with SIGTERM: 0 of 3 runs continued, shell ended with -15; accepted as a death by SIGINT: False (expected False)
+the measured behaviour equals the documented one, and the wrong-signal control is rejected: True

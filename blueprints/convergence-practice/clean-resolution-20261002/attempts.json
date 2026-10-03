@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_resolution_attempt_inventory",
+  "base_revision": "18eea2c1de992b46c266d79ef0cc40f93c9fb943",
+  "scope": "Coordination and source/oracle preparation on the existing host; selected target SDK execution pending builder readiness.",
+  "attempts": [
+    {
+      "id": "claude-coordination-1",
+      "role": "native-peer-sender",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 1,
+      "status": "failed",
+      "returned_error": "Invalid MCP configuration: ENAMETOOLONG while reading the positional prompt as a configuration filename",
+      "model_execution_observed": false,
+      "usage": null,
+      "correction": "Installed CLI declares --mcp-config <configs...>; add the standard -- option terminator before the positional prompt."
+    },
+    {
+      "id": "claude-coordination-2",
+      "role": "native-peer-sender",
+      "evidence_class": "model_task_execution",
+      "exit_code": 0,
+      "status": "sender_completed_recipient_readback_pending",
+      "native_version": "2.1.287",
+      "native_result_subtype": "success",
+      "native_num_turns": 3,
+      "native_duration_ms": 105602,
+      "sender_reported_message_id": "retained only in the private native tool result",
+      "sender_reported_delivery_state": "queued",
+      "recipient_readback_verified": false,
+      "result_retention": "The terminal tool retained beginning and final-result excerpts and reported 14611 original tokens; the middle containing the tool exchange was truncated. The sender's final delivery statement is a lead, not independent recipient observation.",
+      "native_returned_model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 6303,
+          "cacheReadInputTokens": 81297,
+          "cacheCreationInputTokens": 37731,
+          "thinkingTokens": 5413,
+          "costUSD": 0.4330664
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 28666,
+          "outputTokens": 2789,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "thinkingTokens": 0,
+          "costUSD": 0.42611
+        }
+      },
+      "native_returned_total_cost_usd": 0.8591764,
+      "accounting_limit": "Per-model returned counters only. Do not add top-level usage to modelUsage, sum cumulative snapshots, count thinking again, or claim complete goal usage/token savings. Coordinator and audit-agent usage is not in this native invocation."
+    },
+    {
+      "id": "claude-sender-log-readback-1",
+      "role": "observer",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 1,
+      "status": "failed",
+      "command": "rtk proxy claude logs <sender-session-id>",
+      "limitation": "Installed help describes logs as background-session terminal output; the completed foreground sender produced no matching success/queued/error fields. No receipt recovery or recipient readback was established.",
+      "usage": null
+    }
+  ],
+  "correction_sources": [
+    "Installed Claude Code 2.1.287 --help: --mcp-config <configs...>",
+    "https://code.claude.com/docs/en/cli-reference",
+    "https://code.claude.com/docs/en/cross-session-messaging"
+  ],
+  "subagent_attempts": [
+    {
+      "id": "sdk_acceptance_architecture",
+      "role": "stack-researcher",
+      "selected_model_effort": "Astra/Max (role-defined)",
+      "trigger": "Consequential acceptance contract spanning Claude, Codex and OpenHands SDK runtimes",
+      "status": "failed_before_verdict",
+      "returned_error": "You have hit your usage limit",
+      "acceptance_result": null,
+      "usage": null
+    },
+    {
+      "id": "sdk_fixture_worker",
+      "role": "worker",
+      "selected_model_effort": "Sol/Max",
+      "status": "failed_before_writes",
+      "returned_error": "You have hit your usage limit",
+      "acceptance_result": null,
+      "usage": null
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "The first publication candidate included native session/message identifiers in the public envelope and attempt record.",
+      "correction": "scripts/validate.py exited 1 and named both files before publication. Public records now use descriptive owners and keep identifiers only in the private coordination ledger and native tool result.",
+      "verification": "Run scripts/validate.py again after removing the identifiers; retain the original rejection and subsequent actual result."
+    },
+    {
+      "claim": "The current main Codex pin was initially treated as 0.159.2 from the dirty older checkout.",
+      "correction": "At fixed main 18eea2c1, manifests/stack.json selects Codex 0.159.3. The selected new-target SDK is separately 0.160.0.",
+      "verification": "Read manifests/stack.json in the isolated 18eea2c1 worktree and the fc303db4 acceptance script; resolve rust-v0.160.0 to a956835d020762cb2b570053af06f643a11c0ecc via the native GitHub API."
+    },
+    {
+      "claim": "A source-filtering JavaScript regex accidentally included an unescaped parenthesis.",
+      "correction": "The processor failed before further source derivation. A bounded native Python read used literal substring matching and successfully returned the tagged OpenHands metrics/persistence source lines, exit 0.",
+      "verification": "OpenHands/software-agent-sdk v1.50.1 examples/01_standalone_sdk/13_get_llm_metrics.py and 10_persistence.py fetched with gh api."
+    },
+    {
+      "claim": "The Claude Quickstart .md endpoint was assumed readable through urllib.",
+      "correction": "That request returned HTTP 403; the official HTML page was successfully opened through the web tool. No source content was inferred from the failed request.",
+      "verification": "https://code.claude.com/docs/en/agent-sdk/quickstart, Create a buggy file, read 2026-10-02."
+    }
+  ],
+  "limitations": [
+    "Original full native result retention was incomplete; preserve this failed condition and capture subsequent SDK runs through a private output destination before filtering.",
+    "The independent live Codex ownership handoff is separate evidence from the Claude sender delivery lead.",
+    "No SDK provider task, new-target entry, client configuration change or installation occurred in these attempts."
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "layer-ownership",
+  "catalog": "us-equities",
+  "date_utc": "2026-10-01",
+  "owner": "trading lane (native-agent-stack-ae)",
+  "rule": "Every tool has exactly one owning layer, the layer whose requirement names its primary job; any other layer lists it under 'uses'. Two different tools that do the same job become one comparison owned by one layer. Two tools whose roles differ both stay, each with its role stated.",
+  "trading_rule": "The 12 us-equities layers own only trading-specific capabilities; shared infrastructure (agents, memory, scheduling, observability, storage tooling, CI, evaluation, secrets) is used from the owning foundation layer, not selected again (evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json, accepted by the trading lane owner 2026-10-01). Requirements the user pinned are not judged: the NautilusTrader destination with its IBKR path, and the separate Alpaca adapter path.",
+  "supersedes": "This map supersedes only the per-row winner lists of the architecture edition's 12 trading rows (catalogs/foundation/new-wsl-architecture-20261001.json), where alpaca-py, EdgarTools, DuckDB, exchange_calendars and NautilusTrader each appeared in several rows. It does not change closure state: the research state's statuses (8 comparison_required, 4 on_requirement_change) and the owner's verdict of 2026-10-01 ('selection of record, open', docs/decisions/2026-10-01-trading-layer-verdicts.md) describe the same open state, mapped in docs/decisions/2026-10-01-new-wsl-architecture-edition.md.",
+  "row_kinds": {
+    "pinned": "a requirement the user selected; carried with its committed receipts, never judged",
+    "judged": "a trading-specific slot decided blind: round one (merit method of #589) then round two (definitive-defaults method), both model families",
+    "uses": "a foundation-owned capability the trading layers use, not selected again",
+    "no_blind_default_today": "a slot that cannot be decided blind today, with the reason"
+  },
+  "layers": [
+    {
+      "layer_id": "market-data-reference",
+      "owns": ["slot market-data-provider (judged): licensed historical and current US-equity bars, trades, quotes and corporate actions for research", "slot sec-filings (judged): SEC EDGAR filing acquisition and parsing", "slot exchange-calendars (judged): exchange session calendars and half days"],
+      "uses": ["alpaca-py (execution-broker) where the Alpaca market-data API is used", "DuckDB with Parquet (storage-compute) for snapshots", "pandera (data-quality-orchestration) for validation"]
+    },
+    {
+      "layer_id": "identity-provenance",
+      "owns": ["slot research-data-versioning (judged): versioned research datasets and pipeline reproduction with exact restore (DVC today)", "slot security-identity (no blind default today): permanent security identity across ticker changes"],
+      "uses": ["EdgarTools (market-data-reference) for CIK-keyed filings", "DuckDB with Parquet (storage-compute)", "Restic (foundation recovery-portability) for host backup, a different job from dataset versioning"]
+    },
+    {
+      "layer_id": "storage-compute",
+      "owns": ["slot analytical-storage (judged): exact reproducible analytical snapshots and research queries (DuckDB with Parquet today)"],
+      "uses": ["Restic (foundation recovery-portability)"]
+    },
+    {
+      "layer_id": "data-quality-orchestration",
+      "owns": ["slot market-data-validation (judged): schema and value checks that reject bad market data before promotion (pandera today)"],
+      "uses": ["Dagu (foundation scheduling-supervision)", "systemd user units (foundation cross:wsl-distro) for the paper units"]
+    },
+    {
+      "layer_id": "research-factors-ml",
+      "owns": ["slot factor-research (judged): factor returns, information coefficients and turnover diagnostics with explicit purging", "slot predictive-ml (no blind default today)"],
+      "uses": ["EdgarTools (market-data-reference)", "skfolio (portfolio-risk) for chronological evaluation", "NautilusTrader (backtesting-engine) for replays", "MLflow (evaluation-experiments) for run tracking"]
+    },
+    {
+      "layer_id": "backtesting-engine",
+      "owns": ["pinned: NautilusTrader 2.0.0rc5 (tag v2.0.0rc5 = 1b0a49d2), the destination engine", "slot backtest-oracle (judged): an independent engine that cross-checks the destination's orders, fills and cash on frozen cases (LEAN today)"],
+      "uses": []
+    },
+    {
+      "layer_id": "execution-broker",
+      "owns": ["pinned: the IBKR execution path through NautilusTrader's in-tree IBKR adapter (a use of the nautilus-trader package owned by backtesting-engine)", "pinned: the separate Alpaca adapter path: alpaca-py 0.44.0 and the in-repository adaptive-paper engine at main dca821cc", "slot ib-gateway-runtime (judged): how the IB Gateway runs headless on the host for the IBKR path"],
+      "uses": ["NautilusTrader (backtesting-engine)"]
+    },
+    {
+      "layer_id": "portfolio-risk",
+      "owns": ["slot portfolio-construction (judged): portfolio optimization and walk-forward allocation (skfolio today)", "slot performance-analytics (judged): risk and performance statistics and tear sheets of backtest and paper results"],
+      "uses": ["NautilusTrader's RiskEngine (backtesting-engine) for deterministic pre-trade risk"]
+    },
+    {
+      "layer_id": "evaluation-experiments",
+      "owns": ["slot experiment-tracking (judged): research experiment runs, parameters, artifacts and metrics (MLflow today)", "slot strategy-qualification-statistics (judged): multiple-testing-aware strategy statistics (reality checks, deflated performance, overfitting probability)"],
+      "uses": ["Inspect AI, Harbor, promptfoo (foundation quality-evaluation) for model-route and agent evaluations", "agent-retrieval-bench (foundation quality-evaluation candidate task set)"]
+    },
+    {
+      "layer_id": "agents-models-workers",
+      "owns": [],
+      "uses": ["Claude Code and Codex (foundation native-clients)", "Claude Agent SDK and Codex SDK (foundation agent-sdks)", "the durable-memory owner (foundation durable-memory)", "QMD and MinerU (foundation document-retrieval) for dated financial sources", "the semantic-rag owner (foundation semantic-rag)", "native subagents (foundation workers)"]
+    },
+    {
+      "layer_id": "observability-hosting",
+      "owns": ["configuration only: the paper-trading dashboards and alert rules (observability/paper-trading-live/), on the foundation stack"],
+      "uses": ["OTel Collector Contrib, Prometheus, Loki, Grafana (foundation observation-inference)", "Dagu (foundation scheduling-supervision)", "Restic (foundation recovery-portability)", "the container engine (foundation hosting-services)"]
+    },
+    {
+      "layer_id": "security-supply-chain",
+      "owns": ["engine-enforced controls only: paper-only endpoint guard, per-account credential pointers through the engine's guarded loader, no broker authority for research workers (these are engine behaviour, not tools)"],
+      "uses": ["betterleaks and trufflehog (foundation secrets-credentials)", "zizmor, attest, Syft, Dependabot, CodeQL upload-sarif, actionlint (foundation ci-supply-chain)"]
+    }
+  ],
+  "pinned_requirements": [
+    {"name": "NautilusTrader 2.0.0rc5", "owner": "backtesting-engine", "source": "catalogs/us-equities/runtime-target.json engine (decision selected_destination)", "evidence": ["blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json (one_zero PASS, rc5)", "evidence/receipts/native-nautilus-v2-20260920.json (unchanged rc5 EURUSD quickstart)"], "release_pin_rule": "the release pin changes only through a dated version-selection record after qualification"},
+    {"name": "IBKR path (NautilusTrader in-tree IBKR adapter)", "owner": "execution-broker", "source": "catalogs/us-equities/runtime-target.json broker_boundaries", "evidence": ["evidence/receipts/ibkr-readonly-acceptance-20260923.json (step 1 passed; steps 2-4 need the user's IB Gateway paper sign-in)"]},
+    {"name": "Alpaca adapter path (alpaca-py 0.44.0 + adaptive-paper at dca821cc)", "owner": "execution-broker", "source": "catalogs/us-equities/runtime-target.json broker_boundaries", "evidence": ["blueprints/us-equities/adaptive-paper/trials/{pre,rth,ext}-20260929/receipt.json (11 of 13 trials passed, engine b528bb55)", "blueprints/us-equities/adaptive-paper/native-faults/receipt.json (native_faults_passed on dca821cc, PR #584)"]}
+  ],
+  "no_blind_default_today": [
+    {"slot": "security-identity", "owner": "identity-provenance", "reason": "the requirement needs an entitled identity source that the user owns (catalogs/us-equities/gates-20260922.json, security-identity gate); the recorded candidates (OpenFIGI, PermID, CRSP-class sources) are services, not installable repositories, so a blind repository judgment does not apply; this is a user decision (entitlement), recorded as a gate"},
+    {"slot": "predictive-ml", "owner": "research-factors-ml", "reason": "no prediction contract and no executable economic oracle exist yet (docs/decisions/2026-10-01-trading-layer-verdicts.md, decision 7); LightGBM, XGBoost, CatBoost, Qlib, tsfresh and Kronos stay recorded candidates until both exist"}
+  ],
+  "overlaps_resolved": [
+    {"overlap": "alpaca-py appeared in six trading rows.", "resolution": "execution-broker owns it as part of the pinned Alpaca adapter path; market-data-reference uses it where the Alpaca data API serves research, and its provider slot judges the data source, not the SDK."},
+    {"overlap": "NautilusTrader appeared in four rows.", "resolution": "backtesting-engine owns the pinned engine; execution-broker uses its IBKR adapter, portfolio-risk its RiskEngine and research-factors-ml its replays."},
+    {"overlap": "EdgarTools appeared in four rows.", "resolution": "market-data-reference owns SEC filing acquisition and parsing; the others use it."},
+    {"overlap": "DuckDB appeared in three rows.", "resolution": "storage-compute owns analytical storage; the data layers use it."},
+    {"overlap": "skfolio appeared in research-factors-ml and portfolio-risk.", "resolution": "portfolio-risk owns portfolio construction; research uses it for chronological evaluation."},
+    {"overlap": "DVC versioning and Restic backup both restore data.", "resolution": "different roles: DVC versions research datasets and reproduces their pipelines (identity-provenance); Restic backs up host and application state (foundation)."}
+  ]
+}

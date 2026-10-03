@@ -1,0 +1,1225 @@
+{
+  "schema_version": 1,
+  "kind": "core_native_recipe_source_integration_wave_1",
+  "date_utc": "2026-10-01",
+  "base_commit": "18d9308cff5761c65cd36967db58020f5e40b6c8",
+  "evidence_class": "documented_upstream_example_unrun",
+  "scope": "Eight existing profile entries only: supported install/source-test command documentation. No upstream test, installation, browser, MCP, provider, authenticated turn or new-host operation was executed.",
+  "source_packet": {
+    "sha256": "70bcee36299f17a8cc72cc10438ae2877cc872f5a9daeb666b8347f59398859c",
+    "kind": "source-only-native-recipe-gap-wave",
+    "source_profile_sha256": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+    "requested_researcher": "Astra/max",
+    "actual_backend": null,
+    "retained_dispatch_failure": "Selected model is at capacity; same task retried successfully without a model switch",
+    "execution_status": "all installation and test commands documented and unrun",
+    "private_path_omitted": true
+  },
+  "source_profile_sha256_before": "d316e29413ee927122fa8cdb55d74427bb9a646421ae401f1c5e26e314b474fa",
+  "source_profile_sha256_after": "b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92",
+  "counts_before": {
+    "entries": 69,
+    "comparison_arms": 23,
+    "null_install_commands": 38,
+    "null_acceptance_commands": 48,
+    "entries_with_blocking_gaps": 51,
+    "blocking_gap_items": 128,
+    "documented_source_test_commands": 11
+  },
+  "counts_after": {
+    "entries": 69,
+    "comparison_arms": 23,
+    "null_install_commands": 35,
+    "null_acceptance_commands": 40,
+    "entries_with_blocking_gaps": 45,
+    "blocking_gap_items": 117,
+    "documented_source_test_commands": 19
+  },
+  "count_semantics": "Null install/acceptance fields count missing documented commands. Source-test commands remain UNRUN and do not qualify installed functional behavior. All 69 entries remain without new live acceptance in this wave; the requested 48/33 figures are not the raw profile counts at the supplied d316 baseline.",
+  "preserved": {
+    "unrelated_rows": 61,
+    "top_level_metadata_unchanged": true,
+    "protected_entry_fields": [
+      "pin",
+      "checksum",
+      "integrity_observation",
+      "status",
+      "default_install",
+      "owner_layer_id",
+      "layer_id",
+      "default_precedence",
+      "provisioning_status",
+      "provisioning_reason"
+    ],
+    "historical_file_sha256": {
+      "evidence/artifacts/new-wsl-profile-20261001/final-freeze.json": "c5cf2f1e7dd39cb74e552400ad9a6cd0a543264776f39a5da5ab80070aa44485",
+      "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json": "cb3a796d1032739fccf1dedb96f92465bb7dd87f126feb2f5873bd02f8551d0f"
+    },
+    "generated_book_files_changed": false
+  },
+  "source_file_verification": [
+    {
+      "url": "https://raw.githubusercontent.com/oraios/serena/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md",
+      "http_status": 200,
+      "sha256": "370f5ac4ab25823573833d434743b20d6e90efa2811875bf14ff9530a06dd1ab",
+      "command_fragments": [
+        {
+          "line": 63,
+          "text": "3. Install the required packages with all extras: `uv sync --extra dev`"
+        },
+        {
+          "line": 70,
+          "text": "uv tool install --reinstall -p 3.13 ."
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/oraios/serena/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+      "http_status": 200,
+      "sha256": "d3c645a7077daec5b054145fe8d50af1ab7361dee2e84015924f3d31eb0db966",
+      "command_fragments": [
+        {
+          "line": 169,
+          "text": "test = \"pytest test -vv\""
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/installation.rst",
+      "http_status": 200,
+      "sha256": "573b0fc82fe8803ccf83bd8612c648c78c10f98e5452f9877bb18c401bf93d65",
+      "command_fragments": [
+        {
+          "line": 51,
+          "text": "2. Type the following command: ``pip install trafilatura`` (``pip3`` where applicable)"
+        },
+        {
+          "line": 59,
+          "text": "    $ pip install --upgrade trafilatura"
+        },
+        {
+          "line": 61,
+          "text": "    $ pip install --force-reinstall -U git+https://github.com/adbar/trafilatura"
+        },
+        {
+          "line": 73,
+          "text": "``pip install trafilatura==number``"
+        },
+        {
+          "line": 105,
+          "text": "    $ pip install faust-cchardet  # single package only"
+        },
+        {
+          "line": 106,
+          "text": "    $ pip install trafilatura[all]  # all additional functionality"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/.github/workflows/tests.yml",
+      "http_status": 200,
+      "sha256": "6fc376d8299c4f67722c8d77f9fda0a784c0441e918ff43ab5c9f2d4755056c8",
+      "command_fragments": [
+        {
+          "line": 1,
+          "text": "# This workflow will install Python dependencies, run tests and lint with a variety of Python versions"
+        },
+        {
+          "line": 53,
+          "text": "      run: uv pip install --system -e \".[dev]\""
+        },
+        {
+          "line": 74,
+          "text": "      run: uv pip install --system -e \".[all]\""
+        },
+        {
+          "line": 83,
+          "text": "        python -m pytest --cov=./ --cov-report=xml"
+        },
+        {
+          "line": 89,
+          "text": "        uv pip install --system -e \".[docs]\""
+        },
+        {
+          "line": 90,
+          "text": "        python -m pytest docs/docs_tests.py"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.21/README.md",
+      "http_status": 200,
+      "sha256": "c0cbb367cd90ca750581017715c14931706f03e32dcc77761f6885eedc25735d",
+      "command_fragments": [
+        {
+          "line": 26,
+          "text": "npm install -g @playwright/cli@latest"
+        },
+        {
+          "line": 406,
+          "text": "npm install -g @playwright/cli@latest"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.21/.github/workflows/ci.yml",
+      "http_status": 200,
+      "sha256": "ee432faa58c5b4293f57a87b09e9b56e2b27a738697025a0e8b1fcbba6b0d279",
+      "command_fragments": [
+        {
+          "line": 24,
+          "text": "      run: npm ci"
+        },
+        {
+          "line": 26,
+          "text": "      run: npm run test"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.21/tests/integration.spec.ts",
+      "http_status": 200,
+      "sha256": "16e8a83a94ce268a916e17fca63b79c61375abf2fc870e15edcb251c824d6ed8",
+      "command_fragments": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md",
+      "http_status": 200,
+      "sha256": "c38a933bf8fef26316ea38635989b254e69a26d21d80b96bf5731cba4e88bcc6",
+      "command_fragments": [
+        {
+          "line": 8,
+          "text": "pip install claude-agent-sdk"
+        },
+        {
+          "line": 324,
+          "text": "pip install build twine"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/.github/workflows/test.yml",
+      "http_status": 200,
+      "sha256": "c8b998911705f3fd82de1d8844499f12455ed0b60d3bbaf60c87ddec76ef8a83",
+      "command_fragments": [
+        {
+          "line": 26,
+          "text": "          python -m pip install --upgrade pip"
+        },
+        {
+          "line": 27,
+          "text": "          pip install -e \".[dev]\""
+        },
+        {
+          "line": 36,
+          "text": "          python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml"
+        },
+        {
+          "line": 59,
+          "text": "          python -m pip install --upgrade pip"
+        },
+        {
+          "line": 60,
+          "text": "          pip install -e \".[dev]\""
+        },
+        {
+          "line": 61,
+          "text": "          pip install \"mcp==1.23.0\""
+        },
+        {
+          "line": 70,
+          "text": "          python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml"
+        },
+        {
+          "line": 128,
+          "text": "          python -m pip install --upgrade pip"
+        },
+        {
+          "line": 129,
+          "text": "          pip install -e \".[dev]\""
+        },
+        {
+          "line": 150,
+          "text": "          python -m pytest e2e-tests/ -v -m e2e"
+        },
+        {
+          "line": 187,
+          "text": "            claude-sdk-test python -m pytest e2e-tests/ -v -m e2e"
+        },
+        {
+          "line": 234,
+          "text": "          python -m pip install --upgrade pip"
+        },
+        {
+          "line": 235,
+          "text": "          pip install -e ."
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/typescript/README.md",
+      "http_status": 200,
+      "sha256": "bc454b26a6920efb1826912be6b6ba96348ab39d9f4e70078465deb586dbbfe7",
+      "command_fragments": [
+        {
+          "line": 10,
+          "text": "npm install @openai/codex-sdk"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/.github/workflows/sdk.yml",
+      "http_status": 200,
+      "sha256": "dd7d2b266dc56cb8a7b7cbb69e2c80f8ff512f03aa5767e18049ed26b45ee9d0",
+      "command_fragments": [
+        {
+          "line": 31,
+          "text": "              /tmp/build/bin/python -m pip install uv==0.11.3"
+        },
+        {
+          "line": 34,
+          "text": "              /tmp/build/bin/uv pip install --python /tmp/installed/bin/python /tmp/dist/*.whl"
+        },
+        {
+          "line": 35,
+          "text": "              env -u PYTHONPATH -u CODEX_EXEC_PATH /tmp/installed/bin/python tests/installed_sdk_smoke.py"
+        },
+        {
+          "line": 77,
+          "text": "      - name: Build codex and the code-mode host with Bazel"
+        },
+        {
+          "line": 96,
+          "text": "            //codex-rs/code-mode-host:codex-code-mode-host"
+        },
+        {
+          "line": 104,
+          "text": "              'set(//codex-rs/cli:codex //codex-rs/code-mode-host:codex-code-mode-host)' \\"
+        },
+        {
+          "line": 114,
+          "text": "          # code-mode host while the SDK tests spawn the CLI directly."
+        },
+        {
+          "line": 118,
+          "text": "          echo \"CODEX_EXEC_PATH=${install_dir}/codex\" >> \"$GITHUB_ENV\""
+        },
+        {
+          "line": 124,
+          "text": "          \"${CODEX_EXEC_PATH}\" --version"
+        },
+        {
+          "line": 127,
+          "text": "        run: pnpm install --frozen-lockfile"
+        },
+        {
+          "line": 130,
+          "text": "        run: pnpm -r --filter ./sdk/typescript run build"
+        },
+        {
+          "line": 136,
+          "text": "        run: pnpm -r --filter ./sdk/typescript run test"
+        },
+        {
+          "line": 146,
+          "text": "          uv sync --only-group dev --frozen"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/README.md",
+      "http_status": 200,
+      "sha256": "687e4f416b43e1ab28afb3cd48f556d7a9f4d664ac78ac1a2a07a7ab9b95b1b7",
+      "command_fragments": [
+        {
+          "line": 22,
+          "text": "uv tool install harbor"
+        },
+        {
+          "line": 26,
+          "text": "pip install harbor"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/.github/workflows/pytest.yml",
+      "http_status": 200,
+      "sha256": "d9f2b526bf5feab942645996b986fea60c596c1de37f389287661828385e87da",
+      "command_fragments": [
+        {
+          "line": 54,
+          "text": "        run: uv sync --all-packages --all-extras --locked"
+        },
+        {
+          "line": 59,
+          "text": "          uv run pytest tests/ \\"
+        },
+        {
+          "line": 77,
+          "text": "          uv run pytest tests/ \\"
+        },
+        {
+          "line": 89,
+          "text": "          uv run pytest tests/ --cov=src/harbor --cov-report=xml --cov-report=term-missing --ignore=tests/unit/agents/installed/test_agent_install_execution.py -m \"not runtime and not windows_containers\" -k \"not test_full_task_mapping\""
+        },
+        {
+          "line": 94,
+          "text": "          uv run pytest tests/ -m \"windows_containers\" -v"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/README.md",
+      "http_status": 200,
+      "sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb",
+      "command_fragments": [
+        {
+          "line": 31,
+          "text": "npm install -g promptfoo"
+        },
+        {
+          "line": 35,
+          "text": "Also available via `brew install promptfoo` and `pip install promptfoo`. You can also use `npx promptfoo@latest` to run any command without installing."
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/contributing.md",
+      "http_status": 200,
+      "sha256": "b932f855098e27b41713636dbed0e5989b3bc35aec6991f0509a96c42ab81fd3",
+      "command_fragments": [
+        {
+          "line": 49,
+          "text": "   npm install -g npm@11"
+        },
+        {
+          "line": 52,
+          "text": "   npm install"
+        },
+        {
+          "line": 62,
+          "text": "   npm install -g npm@11"
+        },
+        {
+          "line": 63,
+          "text": "   npm install"
+        },
+        {
+          "line": 75,
+          "text": "   npm run build"
+        },
+        {
+          "line": 145,
+          "text": "To run tests in watch mode:"
+        },
+        {
+          "line": 148,
+          "text": "npm run test:watch"
+        },
+        {
+          "line": 189,
+          "text": "npm run build"
+        },
+        {
+          "line": 195,
+          "text": "npm run build:watch"
+        },
+        {
+          "line": 366,
+          "text": "npm run build"
+        },
+        {
+          "line": 373,
+          "text": "This will not update the web UI if you make further changes to the code. You have to run `npm run build` again."
+        },
+        {
+          "line": 416,
+          "text": "npm run build"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/package.json",
+      "http_status": 200,
+      "sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3",
+      "command_fragments": [
+        {
+          "line": 60,
+          "text": "    \"build:app\": \"npm run build --prefix src/app\","
+        },
+        {
+          "line": 63,
+          "text": "    \"build\": \"concurrently -g --kill-others-on-fail \\\"npm run tsc\\\" \\\"NODE_OPTIONS='--max-old-space-size=8192' tsdown\\\" \\\"npm run build:app\\\"\","
+        },
+        {
+          "line": 93,
+          "text": "    \"prepublishOnly\": \"node -e \\\"if (!process.env.PROMPTFOO_POSTHOG_KEY) { console.error('Error: PROMPTFOO_POSTHOG_KEY must be set'); process.exit(1); }\\\" && npm run build:clean && npm run build\","
+        },
+        {
+          "line": 94,
+          "text": "    \"test:app\": \"npm --prefix src/app run test --\","
+        },
+        {
+          "line": 95,
+          "text": "    \"test:app:browser\": \"npm --prefix src/app run test:browser --\","
+        },
+        {
+          "line": 97,
+          "text": "    \"test:site\": \"npm run test --prefix site\","
+        },
+        {
+          "line": 98,
+          "text": "    \"test:integration\": \"vitest run --config vitest.integration.config.ts\","
+        },
+        {
+          "line": 99,
+          "text": "    \"test:vitest\": \"vitest run\","
+        },
+        {
+          "line": 102,
+          "text": "    \"test:redteam:integration\": \"npm run build && ./test/redteam/integration/test.sh\","
+        },
+        {
+          "line": 103,
+          "text": "    \"test:smoke\": \"vitest run --config vitest.smoke.config.ts\","
+        },
+        {
+          "line": 104,
+          "text": "    \"test\": \"vitest run\","
+        },
+        {
+          "line": 105,
+          "text": "    \"test:coverage\": \"vitest run --coverage && npm run test:coverage --prefix src/app\","
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/docs/installing-mise.md",
+      "http_status": 200,
+      "sha256": "fa251ac6386f3b022ce41b928e5ac1bf6afe5ab17b49f7d695609a03e7d5f00e",
+      "command_fragments": [
+        {
+          "line": 17,
+          "text": "| macOS            | mise.run       | Homebrew        |"
+        },
+        {
+          "line": 18,
+          "text": "| Linux            | mise.run       | System packages |"
+        },
+        {
+          "line": 21,
+          "text": "| CI/Docker        | mise.run       | GitHub Releases |"
+        },
+        {
+          "line": 23,
+          "text": "The official single-binary release installed by `mise.run` is the preferred method on macOS and"
+        },
+        {
+          "line": 76,
+          "text": "### <https://mise.run> {#mise-run}"
+        },
+        {
+          "line": 82,
+          "text": "curl -fsSL https://mise.run | sh"
+        },
+        {
+          "line": 88,
+          "text": "curl -fsSL https://mise.run | MISE_INSTALL_PATH=\"$HOME/bin/mise\" sh"
+        },
+        {
+          "line": 98,
+          "text": "curl -fsSL https://mise.run/zsh | sh"
+        },
+        {
+          "line": 103,
+          "text": "curl -fsSL https://mise.run/bash | sh"
+        },
+        {
+          "line": 108,
+          "text": "curl -fsSL https://mise.run/fish | sh"
+        },
+        {
+          "line": 128,
+          "text": "- `MISE_VERSION=v2025.12.0` \u2013 install a specific version, bypassing the release-age delay"
+        },
+        {
+          "line": 151,
+          "text": "release ages when run, even if you saved the script earlier. Set `MISE_VERSION` to pin a version"
+        },
+        {
+          "line": 156,
+          "text": "curl -fsSL https://mise.run | MISE_SELF_UPDATE_MINIMUM_RELEASE_AGE=7d sh"
+        },
+        {
+          "line": 181,
+          "text": "The installer at `mise.run` selects musl builds automatically on musl systems."
+        },
+        {
+          "line": 186,
+          "text": "curl -fsSL https://mise.run | MISE_INSTALL_MUSL=1 sh"
+        },
+        {
+          "line": 354,
+          "text": "fastest access to new releases, use the [`mise.run`](#mise-run) installer instead."
+        },
+        {
+          "line": 369,
+          "text": "npm install -g mise"
+        },
+        {
+          "line": 411,
+          "text": "repository. The `mise.run` installer handles platform selection and checksum"
+        },
+        {
+          "line": 514,
+          "text": "For the default `mise.run` installation before activation, use"
+        },
+        {
+          "line": 522,
+          "text": "The examples assume `mise` is on PATH. For a default `mise.run` installation,"
+        },
+        {
+          "line": 604,
+          "text": "For a default `mise.run` installation before mise is on PATH, use"
+        },
+        {
+          "line": 642,
+          "text": "so the activation added above puts `mise` on `PATH`. For a default `mise.run`"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/docs/contributing.md",
+      "http_status": 200,
+      "sha256": "c98dd882dad15ddf9085c81b92bb156205918beafe4d7ad364652d8727fa85fe",
+      "command_fragments": [
+        {
+          "line": 63,
+          "text": "mise run build"
+        },
+        {
+          "line": 118,
+          "text": "- `mise run build` - Build the project"
+        },
+        {
+          "line": 119,
+          "text": "- `mise run test:unit` followed by `mise run test:e2e --all` - Explicitly run unit and E2E suites"
+        },
+        {
+          "line": 120,
+          "text": "- `mise run test:unit` - Run unit tests only"
+        },
+        {
+          "line": 121,
+          "text": "- `mise run test:e2e <test-pattern>` - Run selected E2E tests"
+        },
+        {
+          "line": 143,
+          "text": "After installing prerequisites, `mise run build` and `target/debug/mise --version` establish"
+        },
+        {
+          "line": 215,
+          "text": "mise run test:unit"
+        },
+        {
+          "line": 226,
+          "text": "For the Lua runtime crate, use `mise --cd crates/vfox run test`. Tests and fixtures there"
+        },
+        {
+          "line": 235,
+          "text": "mise run test:e2e e2e/cli/test_version"
+        },
+        {
+          "line": 236,
+          "text": "mise run test:e2e '^test_use$'"
+        },
+        {
+          "line": 237,
+          "text": "mise run test:e2e '^test_task_'"
+        },
+        {
+          "line": 240,
+          "text": "mise run test:e2e --list"
+        },
+        {
+          "line": 241,
+          "text": "mise run test:e2e --all"
+        },
+        {
+          "line": 242,
+          "text": "TEST_ALL=1 mise run test:e2e --all"
+        },
+        {
+          "line": 260,
+          "text": "`mise run test:coverage` is the CI-oriented setup/E2E runner in `xtasks/test/coverage`."
+        },
+        {
+          "line": 317,
+          "text": "Run `mise run test:unit` and a focused E2E selection while developing. For an explicit full"
+        },
+        {
+          "line": 318,
+          "text": "local run, use `mise run test:unit` followed by `mise run test:e2e --all`. The aggregate"
+        },
+        {
+          "line": 322,
+          "text": "`mise run test:shuffle` requires nightly Rust and tests order sensitivity. Use a command-local"
+        },
+        {
+          "line": 333,
+          "text": "`mise run test:perf` prepares a workspace and runs the performance scripts. Read the script's"
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/packaging/standalone/install.envsubst",
+      "http_status": 200,
+      "sha256": "ad44ae1836630d82f22f76df7b351232da8098ff27f469839580a1f4c8d30915",
+      "command_fragments": [
+        {
+          "line": 87,
+          "text": "  elif [ -n \"${MISE_VERSION:-}\" ] && echo \"$MISE_VERSION\" | grep -q '^v2024'; then"
+        },
+        {
+          "line": 299,
+          "text": "  if [ -n \"${MISE_VERSION:-}\" ]; then"
+        },
+        {
+          "line": 300,
+          "text": "    printf '%s\\n' \"${MISE_VERSION#v}\""
+        },
+        {
+          "line": 312,
+          "text": "  selected=$(printf '%s\\n' \"$index\" | select_release \"$cutoff\") || error \"no eligible mise release or invalid release index; lower MISE_SELF_UPDATE_MINIMUM_RELEASE_AGE or set MISE_VERSION\""
+        },
+        {
+          "line": 330,
+          "text": "  if [ -z \"${MISE_VERSION:-}\" ] && [ -x \"$install_path\" ]; then"
+        },
+        {
+          "line": 332,
+          "text": "    [ -n \"$existing_version\" ] || error \"cannot compare installed mise version; set MISE_VERSION explicitly\""
+        },
+        {
+          "line": 335,
+          "text": "      newest=$(printf 'v%s 0\\nv%s 0\\n' \"$compare_version\" \"$version\" | select_release 0) || error \"cannot compare installed mise version; set MISE_VERSION explicitly\""
+        }
+      ]
+    }
+  ],
+  "source_packet_hash_bindings": [
+    {
+      "name": "Serena",
+      "bound_path": "CONTRIBUTING.md",
+      "url": "https://raw.githubusercontent.com/oraios/serena/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md",
+      "expected_sha256": "370f5ac4ab25823573833d434743b20d6e90efa2811875bf14ff9530a06dd1ab",
+      "observed_sha256": "370f5ac4ab25823573833d434743b20d6e90efa2811875bf14ff9530a06dd1ab",
+      "matches": true
+    },
+    {
+      "name": "trafilatura",
+      "bound_path": "docs/installation.rst",
+      "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/installation.rst",
+      "expected_sha256": "573b0fc82fe8803ccf83bd8612c648c78c10f98e5452f9877bb18c401bf93d65",
+      "observed_sha256": "573b0fc82fe8803ccf83bd8612c648c78c10f98e5452f9877bb18c401bf93d65",
+      "matches": true
+    },
+    {
+      "name": "Playwright CLI",
+      "bound_path": "tests/integration.spec.ts",
+      "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.21/tests/integration.spec.ts",
+      "expected_sha256": "16e8a83a94ce268a916e17fca63b79c61375abf2fc870e15edcb251c824d6ed8",
+      "observed_sha256": "16e8a83a94ce268a916e17fca63b79c61375abf2fc870e15edcb251c824d6ed8",
+      "matches": true
+    },
+    {
+      "name": "Claude Agent SDK",
+      "bound_path": ".github/workflows/test.yml",
+      "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/.github/workflows/test.yml",
+      "expected_sha256": "c8b998911705f3fd82de1d8844499f12455ed0b60d3bbaf60c87ddec76ef8a83",
+      "observed_sha256": "c8b998911705f3fd82de1d8844499f12455ed0b60d3bbaf60c87ddec76ef8a83",
+      "matches": true
+    },
+    {
+      "name": "Codex TypeScript SDK",
+      "bound_path": ".github/workflows/sdk.yml",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/.github/workflows/sdk.yml",
+      "expected_sha256": "dd7d2b266dc56cb8a7b7cbb69e2c80f8ff512f03aa5767e18049ed26b45ee9d0",
+      "observed_sha256": "dd7d2b266dc56cb8a7b7cbb69e2c80f8ff512f03aa5767e18049ed26b45ee9d0",
+      "matches": true
+    },
+    {
+      "name": "Harbor",
+      "bound_path": ".github/workflows/pytest.yml",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/.github/workflows/pytest.yml",
+      "expected_sha256": "d9f2b526bf5feab942645996b986fea60c596c1de37f389287661828385e87da",
+      "observed_sha256": "d9f2b526bf5feab942645996b986fea60c596c1de37f389287661828385e87da",
+      "matches": true
+    },
+    {
+      "name": "promptfoo",
+      "bound_path": "package.json",
+      "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/package.json",
+      "expected_sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3",
+      "observed_sha256": "208ce88e9e2a9e7518f0c29d384a30250a7708c19267b2db0971afafdadc86e3",
+      "matches": true
+    },
+    {
+      "name": "mise",
+      "bound_path": "packaging/standalone/install.envsubst",
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/packaging/standalone/install.envsubst",
+      "expected_sha256": "ad44ae1836630d82f22f76df7b351232da8098ff27f469839580a1f4c8d30915",
+      "observed_sha256": "ad44ae1836630d82f22f76df7b351232da8098ff27f469839580a1f4c8d30915",
+      "matches": true
+    }
+  ],
+  "entry_changes": [
+    {
+      "name": "Serena",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; a pin-matching upstream install remains required.",
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The reviewed quick start targets PyPI, while this row retains a Git commit. The exact supported commit-pinned install requires verification."
+      ],
+      "remaining_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
+        "The reviewed PyPI quick start is not proven to resolve the retained c6fbd1c5932df2494ffa0020af5a9fbe80b82143 source pin; the documented source-checkout installation does not establish PyPI equivalence."
+      ],
+      "before_install": {
+        "command": null,
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md"
+      },
+      "after_install": {
+        "command": "uv tool install --reinstall -p 3.13 .",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from an owned checkout at c6fbd1c5932df2494ffa0020af5a9fbe80b82143; the dot operand refers to that checkout.",
+          "uv and Python 3.13 must be available; this local source install does not prove equivalence to the PyPI package."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "pytest test -vv",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/pyproject.toml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Same exact source checkout with the upstream developer environment: uv venv -p 3.13, activate the owned virtual environment, then uv sync --extra dev.",
+          "The upstream Poe test task supplies pytest test -vv; language-server dependencies remain those of the upstream test configuration."
+        ],
+        "scope": "Unchanged upstream source test task, not installed language-server, MCP, provider or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "trafilatura",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The selected official installation URL could not be fetched in this session, and the tagged README did not establish the full install command. Do not infer one from the PyPI artifact."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": null,
+        "source": null
+      },
+      "after_install": {
+        "command": "pip install trafilatura==2.2.0",
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Use an owned Python environment with pip; the selected package is trafilatura 2.2.0."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "uv pip install --system -e \".[dev]\" && python -m pytest --cov=./ --cov-report=xml",
+        "source": "https://github.com/adbar/trafilatura/blob/v2.2.0/.github/workflows/tests.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2.2.0 source checkout in an owned disposable workflow environment with its selected Python and uv.",
+          "The --system argument is copied from CI and targets that disposable environment, not the host OS Python. The non-minimal workflow arm also installs .[all] plus libcurl4-gnutls-dev and libgnutls28-dev; those prerequisites are not implied by this two-step excerpt."
+        ],
+        "scope": "Upstream editable dev install and pytest steps only; the omitted lint, type-check, docs and non-minimal setup are not qualified. No installed extraction or new-host execution.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "Playwright CLI",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": "npm install -g @playwright/cli@0.1.21",
+        "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "after_install": {
+        "command": "npm install -g @playwright/cli@0.1.21",
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node/npm and the selected package installation target must be available."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "npm ci && npm run test",
+        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
+          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
+        ],
+        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "Claude Agent SDK",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": "pip install claude-agent-sdk==0.2.163",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md"
+      },
+      "after_install": {
+        "command": "pip install claude-agent-sdk==0.2.163",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/README.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Python environment and pip for claude-agent-sdk 0.2.163."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "pip install -e \".[dev]\" && python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/.github/workflows/test.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.2.163 source checkout in the upstream Python test environment with its development extras.",
+          "This selects tests/, not the separate authenticated e2e-tests/ workflow."
+        ],
+        "scope": "Unchanged upstream source tests; no native sign-in, authenticated SDK turn, provider or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "Codex TypeScript SDK",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": "npm install @openai/codex-sdk@0.159.3",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "after_install": {
+        "command": "npm install @openai/codex-sdk@0.159.3",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Owned Node/npm project environment for @openai/codex-sdk 0.159.3."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "pnpm install --frozen-lockfile && pnpm -r --filter ./sdk/typescript run build && pnpm -r --filter ./sdk/typescript run test",
+        "source": "https://github.com/openai/codex/blob/rust-v0.159.3/.github/workflows/sdk.yml#L126",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the rust-v0.159.3 repository root with the workflow's pnpm setup and Node.js 22.",
+          "Complete the selected workflow's Bazel preparation and build //codex-rs/cli:codex plus //codex-rs/code-mode-host:codex-code-mode-host. Stage both matching binaries together and set CODEX_EXEC_PATH to that CLI as the workflow specifies; no environment or credential values were read here.",
+          "The recorded install/build/test steps omit the separate lint step and do not reproduce the whole CI job."
+        ],
+        "scope": "Upstream SDK source test workflow with its matching CLI/code-mode-host prerequisites; no live provider/sign-in or new-host result. Python SDK qualification does not qualify this TypeScript SDK.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "Harbor",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "remaining_gaps": [
+        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked."
+      ],
+      "before_install": {
+        "command": "uv tool install harbor==0.23.0",
+        "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md"
+      },
+      "after_install": {
+        "command": "uv tool install harbor==0.23.0",
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/README.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "uv and an owned tool installation scope for harbor 0.23.0."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "uv sync --all-packages --all-extras --locked && uv run pytest tests/ -m \"not runtime\" --cov=src/harbor --cov-report=term-missing",
+        "source": "https://github.com/harbor-framework/harbor/blob/v0.23.0/.github/workflows/pytest.yml",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v0.23.0 Linux source checkout with the locked all-packages/all-extras environment and Python 3.13.",
+          "The upstream Linux workflow sets up Docker, Docker Compose and Deno v2.x before this non-runtime suite. Those developer prerequisites remain unprovisioned."
+        ],
+        "scope": "Exact Linux non-runtime pytest steps; the separate runtime/Podman and Windows suites, agent/provider benchmarks and destination acceptance are excluded. Published wheel metadata is not a downloaded or rehashed artifact.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "promptfoo",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": "npm install -g promptfoo@0.123.1",
+        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+      },
+      "after_install": {
+        "command": "npm install -g promptfoo@0.123.1",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Node/npm and an owned global install scope for promptfoo 0.123.1."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "npm install && npm test",
+        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/contributing.md",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the 0.123.1 source checkout after the contributing guide's developer setup.",
+          "The tagged package.json maps npm test to vitest run; integration, smoke, browser and provider benchmark scripts are separate."
+        ],
+        "scope": "Documented source install and test commands only; no installed CLI/provider evaluation or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    },
+    {
+      "name": "mise",
+      "changed_fields": [
+        "blocking_gaps",
+        "install",
+        "acceptance",
+        "evidence_refs"
+      ],
+      "closed_gap_statements": [
+        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "The tagged guide documents MISE_VERSION, but its exact v-prefixed version invocation was not independently verified. Node's minimal native adapter does not depend on mise."
+      ],
+      "remaining_gaps": [],
+      "before_install": {
+        "command": null,
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md"
+      },
+      "after_install": {
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "curl, sh and a chosen owned installation target; no installer was executed.",
+          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
+        ],
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      },
+      "before_acceptance": {
+        "command": null,
+        "source": null,
+        "evidence_class": null
+      },
+      "after_acceptance": {
+        "command": "mise run test:unit && mise run test:e2e '^test_use$'",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
+        ],
+        "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
+        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+      }
+    }
+  ],
+  "harbor_wheel": {
+    "source": "https://pypi.org/pypi/harbor/0.23.0/json",
+    "filename": "harbor-0.23.0-py3-none-any.whl",
+    "url": "https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl",
+    "published_sha256": "8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37",
+    "published_size": 2142100,
+    "observation": "published_metadata_only",
+    "downloaded": false,
+    "rehash_performed": false,
+    "profile_integrity_gap_preserved": true
+  },
+  "retained_source_failures": [
+    {
+      "name": "mise",
+      "observation": "guessed /install URL HTTP404; tagged render script located packaging/standalone/install.envsubst, whose line299 strips leading v",
+      "origin": "source researcher packet; failure not rerun during integration",
+      "correction": "Verified packaging/standalone/install.envsubst: line 299 tests MISE_VERSION and line 300 strips the leading v. The source packet's shorthand line-299 attribution is corrected here."
+    }
+  ],
+  "integration_decisions": [
+    "The supported profile acceptance class remains upstream_test_command_not_executed; the receipt's documented_upstream_example_unrun class describes source review, not execution.",
+    "Serena's source-checkout installer resolves the install-command condition. Its PyPI equivalence uncertainty is retained as a narrowed gap, and its source-only integrity gap remains unchanged.",
+    "Conjoined commands join published sequential steps and do not reproduce omitted CI setup, lint stages, optional dependency arms or excluded tests.",
+    "The Codex TypeScript sequence requires the exact workflow's Bazel preparation and matching CLI/code-mode-host binaries plus CODEX_EXEC_PATH; Python SDK acceptance does not qualify it.",
+    "The mise installer route is documented and its version operand is supported by tagged source; live installer bytes were not pinned or executed.",
+    "No unrelated entry, pin, checksum, destination, owner, default selection, provisioning state or comparison precedence was changed."
+  ],
+  "local_validation_status": "passed",
+  "native_install_commands_executed": false,
+  "native_upstream_source_tests_executed": false,
+  "provider_calls_performed": false,
+  "new_host_acceptance_verified": false,
+  "provider_usage": null,
+  "ownership": "Coordinator owns scripts, shared registries, other receipts, generated-book integration and publication. This worktree stages only adoption/new-wsl-profile.json, adoption/new-wsl-profile.md and this new receipt.",
+  "local_validations": [
+    {
+      "command": "rtk python3 scripts/new_wsl_profile.py --json",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-02T00:01:06.109229+00:00",
+      "finished_at_utc": "2026-10-02T00:01:06.509142+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output_sha256": "b55e826e7828752b17d69ba16a42a66bd935e1686d2b1246f7627abbbea68c92",
+      "source_bytes_match": true,
+      "stderr": ""
+    },
+    {
+      "command": "rtk python3 scripts/adoption_status.py --profile new-wsl-clean-foundation --json",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-02T00:01:06.110715+00:00",
+      "finished_at_utc": "2026-10-02T00:01:06.452098+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "{\n  \"schema_version\": 1,\n  \"status\": \"prerequisites_present\",\n  \"platform\": {\n    \"os\": \"linux\",\n    \"architecture\": \"x86_64\",\n    \"python\": \"3.13.15\",\n    \"supported\": true\n  },\n  \"manifest\": {\n    \"status\": \"valid\",\n    \"schema_version\": 1\n  },\n  \"profiles\": [\n    {\n      \"id\": \"new-wsl-clean-foundation\",\n      \"commands\": [\n        {\n          \"name\": \"git\",\n          \"present\": true\n        },\n        {\n          \"name\": \"python3\",\n          \"present\": true\n        },\n        {\n          \"name\": \"node\",\n          \"present\": true\n        },\n        {\n          \"name\": \"npm\",\n          \"present\": true\n        },\n        {\n          \"name\": \"uv\",\n          \"present\": true\n        },\n        {\n          \"name\": \"gh\",\n          \"present\": true\n        },\n        {\n          \"name\": \"codex\",\n          \"present\": true\n        },\n        {\n          \"name\": \"claude\",\n          \"present\": true\n        }\n      ],\n      \"recipes\": [\n        {\n          \"path\": \"adoption/new-wsl-profile.json\",\n          \"present\": true\n        },\n        {\n          \"path\": \"adoption/new-wsl-profile.md\",\n          \"present\": true\n        },\n        {\n          \"path\": \"adoption/bootstrap.md\",\n          \"present\": true\n        },\n        {\n          \"path\": \"recipes/README.md\",\n          \"present\": true\n        }\n      ],\n      \"status\": \"prerequisites_present\",\n      \"source_profile\": {\n        \"path\": \"adoption/new-wsl-profile.json\",\n        \"profile_id\": \"new-wsl-clean-foundation\",\n        \"source_head\": \"85543efe5abcddb7b7cddb14e8774e83b6758616\",\n        \"evidence_class\": \"source_review_recommendations\",\n        \"entries\": 69,\n        \"entries_with_blocking_gaps\": 45,\n        \"status\": \"source_review_incomplete\",\n        \"default_install\": [\n          \"Node 24\",\n          \"uv\",\n          \"gh\",\n          \"CPython 3.13\",\n          \"Codex\",\n          \"Claude Code\"\n        ],\n        \"new_host_acceptance_verified\": false\n      }\n    }\n  ],\n  \"errors\": [],\n  \"runtime_acceptance_verified\": false,\n  \"limitations\": [\n    \"Executable presence does not verify its version, installation integrity, activation, or E2E behavior.\",\n    \"Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.\",\n    \"Git comparison reports source identity only; it does not compare worktree file contents with that commit.\",\n    \"No credentials, client configuration, environment values, network endpoints, or running processes are inspected.\"\n  ],\n  \"git\": {\n    \"baseline_commit\": \"8f1da51757e925d319e2a50f080b02742e7e7168\",\n    \"current_commit\": \"18d9308cff5761c65cd36967db58020f5e40b6c8\",\n    \"comparison\": \"baseline_differs\"\n  }\n}\n",
+      "sanitization": "Worktree path replaced by <wave-1 worktree> if present."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile.NewWslProfileCliTests",
+      "exit_code": 0,
+      "started_at_utc": "2026-10-02T00:01:06.111313+00:00",
+      "finished_at_utc": "2026-10-02T00:01:15.326296+00:00",
+      "evidence_class": "local_integration_check",
+      "returned_output": "........\n----------------------------------------------------------------------\nRan 8 tests in 8.911s\n\nOK\n",
+      "sanitization": "Worktree path replaced by <wave-1 worktree> if present."
+    }
+  ],
+  "document_correction": {
+    "claim": "The adapter is still untracked until coordinator staging.",
+    "correction": "That condition belonged to the historical first review. At base 18d9308 the adapter is already tracked; the guide now labels the old gate historically.",
+    "command": "rtk git ls-files -- scripts/new_wsl_profile.py",
+    "exit_code": 0,
+    "returned_output": "scripts/new_wsl_profile.py\n"
+  },
+  "gap_statement_accounting": {
+    "original_statements_removed_or_replaced": 12,
+    "retained_narrowed_uncertainty_statements": 1,
+    "net_gap_item_reduction": 11,
+    "source_test_command_gaps_closed": 8,
+    "new_install_commands": 3,
+    "source_only_serena_py_pi_uncertainty_preserved": true
+  }
+}

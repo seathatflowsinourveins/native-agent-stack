@@ -1,0 +1,148 @@
+{
+  "layers": [
+    {
+      "layer_id": "cross:wsl-distro",
+      "selection": [
+        {
+          "name": "C01 — Ubuntu 26.04.1 LTS (Canonical WSL image)",
+          "repository": "https://ubuntu.com/download/server",
+          "role": "Provisional co-finalist for the base distribution. Verified vendor image, checksum, documented WSL installation, and five-year standard LTS support.",
+          "install_command": "wsl --install --from-file ubuntu-26.04.1-wsl-amd64.wsl",
+          "install_source": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/howto/install-ubuntu-wsl2.md",
+          "basis": [
+            {
+              "url": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+              "shows": "API-verified catalog blob 47315eb9a5ff3dbf954e609a46d2aa61f429e87d lists the exact Canonical amd64 image at releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl, SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104, and a separate arm64 image."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/explanation/security-overview.md",
+              "shows": "Documents automatic SHA-256 verification for online installation and manual Get-FileHash verification for downloaded images. Verify the downloaded image before running the installation command."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/reference/distributions.md",
+              "shows": "Documents five years of standard support for numbered Ubuntu LTS releases and identifies 26.04 LTS as the current Ubuntu WSL family."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/commit/3b7a6b2a43af18aa541eeee1669ac27656630097",
+              "shows": "Ubuntu's WSL repository is unarchived; its latest default-branch commit was 2026-08-28, within 90 days. This establishes launcher-source currency, rather than an image-specific test result."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/e2e/README.md",
+              "shows": "An upstream E2E suite covers instance registration, setup, and restart. Its existence does not establish that this exact image passed on the target host."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/actions/runs/33166365199/job/98832632224",
+              "shows": "A successful August 28 metadata/assets check was observed. It is release infrastructure evidence, not a systemd-user, GPU, or toolchain evaluation."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/issues/520",
+              "shows": "An upstream Store-version issue was closed and updated on 2026-08-29, providing recent issue activity."
+            },
+            {
+              "url": "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/systemd.md",
+              "shows": "Documents systemd support for sufficiently recent WSL versions. Successful systemd user services on this exact image and host remain unmeasured."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C02 — Ubuntu 24.04.5 LTS (Canonical WSL image)",
+          "repository": "https://ubuntu.com/download/server",
+          "role": "Provisional co-finalist. It has the same verified vendor-image, checksum, installation, and standard LTS support evidence; retrieved measurements do not separate it from the newer LTS image.",
+          "install_command": "wsl --install --from-file ubuntu-24.04.5-wsl-amd64.wsl",
+          "install_source": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/howto/install-ubuntu-wsl2.md",
+          "basis": [
+            {
+              "url": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+              "shows": "The verified catalog lists the exact Canonical amd64 image at releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl, SHA-256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e, and a separate arm64 image."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/reference/distributions.md",
+              "shows": "The documented five-year standard-support policy applies to numbered LTS releases, including this release family."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/howto/install-ubuntu-wsl2.md",
+              "shows": "Lists Ubuntu-24.04 and documents installation of downloaded .wsl images through --from-file."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/explanation/security-overview.md",
+              "shows": "Documents checksum verification; compare the downloaded file's SHA-256 with the catalog digest before installation."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/commit/3b7a6b2a43af18aa541eeee1669ac27656630097",
+              "shows": "Shares Ubuntu's maintained WSL implementation, whose latest default-branch commit was within 90 days."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/.github/workflows/e2e.yaml",
+              "shows": "The upstream launcher E2E workflow uses windows-2025. No retrieved passing result demonstrates this exact point-release image's target-host behavior."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C03",
+          "name": "Debian 13 (WSL distribution)",
+          "reason": "Provisional: the verified vendor catalog provides Debian amd64/arm64 images and checksums, but labels the installer generically; this research did not verify its Debian 13 base, security lifecycle, or complete required toolchain path sufficiently to prefer it over the documented Ubuntu LTS options."
+        },
+        {
+          "key": "C04",
+          "name": "Arch Linux (WSL distribution)",
+          "reason": "Its official README documents rolling releases, systemd, and monthly images, and pipeline 179549 passed on October 1; a fixed multi-year security-support commitment was not verified, giving it weaker documented fit for this requirement. Sources: https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/blob/27c3224bd240dc056855165d56c263b89bb81725/README.md and https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/pipelines/179549."
+        },
+        {
+          "key": "C05",
+          "name": "Fedora (WSL distribution)",
+          "reason": "Provisional: Fedora 44 vendor images and checksums are verified in the WSL catalog, but its security lifecycle and vendor-source maintenance were not successfully verified; the available evidence does not establish preference over the documented LTS options."
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Install the exact checksum-pinned Ubuntu 26.04.1 and 24.04.5 images on the same Windows host with WSL 2.7.13 and kernel 6.18, using the same bootstrap. Compare installation and first-boot success/time, updates and restart, a lingering systemd user service, supported provisioning and smoke tests for Python 3.13, Node 24 and current Rust, Claude Code/Codex CLI operation, and nvidia-smi plus the same CUDA workload on the RTX 4090. No unique winner or measured performance superiority is established.",
+      "evidence_gaps": [
+        "The required ctx_fetch_and_index action was rejected with 'MCP tool call requires approval, but approval policy is never'; the requested fetch-and-search workflow could not be completed. Findings therefore rely on accessible upstream API records and source files, and the selection is provisional.",
+        "The packet contains no comparison in which every named arm ran. No retrieved benchmark compares these exact images on the target host.",
+        "Exact Python 3.13, Node 24 and current Rust provisioning was not verified for either selected image. Canonical's documented apt installation of Node does not establish Node 24.",
+        "Node v24.10.0 BUILDING.md says GNU/Linux binaries should work under WSL but treats WSL as unsupported. This caveat applies across the candidates.",
+        "Systemd documentation establishes support, rather than successful user-service operation on the specified host. NVIDIA WSL capability does not establish an RTX 4090 result for either exact image.",
+        "The documented base-image installation commands run on the Windows host. An upstream-documented native Linux installation command for creating this Windows WSL instance was not verified.",
+        "Arm64 WSL catalog entries do not establish native macOS arm64 support. That secondary-host behavior was not verified.",
+        "No distro-specific Claude Code/Codex integration or client smoke-test result was verified.",
+        "Debian and Fedora vendor-source archive status, latest default-branch commit, release activity and issue activity remain unverified. Recent microsoft/WSL activity establishes catalog/runtime maintenance, not each vendor's maintenance.",
+        "Arch's latest main commit was 2026-09-25 and its October 1 pipeline succeeded, but archive status and a latest-release record were not established.",
+        "Ubuntu/WSL releases/latest returned a launcher release from 2022; that is not evidence that current Ubuntu vendor images are stale. Exact LTS support end dates were not verified.",
+        "Budget used: 6 web-search queries, 6 unsuccessful page-fetch attempts, 20 GitHub API calls, and 10 additional upstream GitLab API attempts."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/microsoft/WSL",
+        "https://api.github.com/repos/microsoft/WSL/releases/latest",
+        "https://api.github.com/repos/microsoft/WSL/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/WSL/contents/distributions/DistributionInfo.json",
+        "https://api.github.com/repos/microsoft/WSL/actions/runs?per_page=5",
+        "https://api.github.com/repos/microsoft/WSL/issues?state=all&per_page=5",
+        "https://api.github.com/repos/ubuntu/WSL",
+        "https://api.github.com/repos/ubuntu/WSL/releases/latest",
+        "https://api.github.com/repos/ubuntu/WSL/commits?per_page=1",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/README.md",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/e2e/README.md",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/.github/workflows/e2e.yaml",
+        "https://github.com/ubuntu/WSL/issues/520",
+        "https://github.com/ubuntu/WSL/issues/494",
+        "https://github.com/ubuntu/WSL/actions/runs/33166365201/job/98832632258",
+        "https://github.com/ubuntu/WSL/actions/runs/33166365199/job/98832632224",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/howto/install-ubuntu-wsl2.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/explanation/security-overview.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/reference/distributions.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/b4a54de2d258a458885309148607673e7fb9e8ad/docs/tutorials/develop-with-ubuntu-wsl.md",
+        "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/systemd.md",
+        "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/tutorials/gpu-compute.md",
+        "https://github.com/nodejs/node/blob/v24.10.0/BUILDING.md",
+        "https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/blob/27c3224bd240dc056855165d56c263b89bb81725/README.md",
+        "https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/blob/27c3224bd240dc056855165d56c263b89bb81725/.gitlab-ci.yml",
+        "https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/pipelines/179549",
+        "https://gitlab.archlinux.org/archlinux/archlinux-wsl/-/commit/27c3224bd240dc056855165d56c263b89bb81725"
+      ]
+    }
+  ]
+}

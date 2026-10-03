@@ -1,0 +1,116 @@
+{
+  "layers": [
+    {
+      "layer_id": "cross:wsl-distro",
+      "selection": [
+        {
+          "name": "C01 — Ubuntu 26.04.1 LTS (Canonical WSL image)",
+          "repository": "https://github.com/ubuntu/WSL",
+          "role": "Provisional preferred base distribution; complete target-host acceptance remains unresolved.",
+          "install_command": "wsl --install --from-file ubuntu-26.04.1-wsl-amd64.wsl",
+          "install_source": "Canonical vendor image: https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl . Run the installation command in Windows PowerShell after verifying SHA-256.",
+          "basis": [
+            {
+              "url": "https://github.com/microsoft/WSL/blob/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67/distributions/DistributionInfo.json",
+              "shows": "Registers the exact Canonical AMD64 image and SHA-256 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104. All five candidates have modern AMD64 image URLs and checksum fields; checksum availability alone does not separate them."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/howto/install-ubuntu-wsl2.md",
+              "shows": "Documents Ubuntu 26.04, direct vendor-image installation and the --from-file command. The new image format requires WSL 2.4.10 or newer, below the packet's stated 2.7.13."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/explanation/security-overview.md",
+              "shows": "Documents automatic SHA-256 verification through wsl --install and manual verification of downloaded images with Get-FileHash."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/reference/distributions.md",
+              "shows": "Supports Ubuntu 26.04 on WSL and states five years of standard support for numbered LTS releases. Its later support horizon than 24.04 is an inference from their release years; selection does not depend on paid extensions."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/commit/3b7a6b2a43af18aa541eeee1669ac27656630097",
+              "shows": "Default-branch commit dated 2026-08-28, inside the 90-day window beginning 2026-07-03. Repository metadata reports not archived."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/issues/520",
+              "shows": "Recent issue activity: the request to update the Ubuntu Store application to 26.04 closed on 2026-08-29."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/actions/runs/33087242181",
+              "shows": "Successful upstream Windows build CI on 2026-08-27. This verifies build activity, not functional acceptance of either exact candidate image."
+            },
+            {
+              "url": "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/e2e/launchertester/test_cases.go",
+              "shows": "Upstream tests cover default users, systemd state, failed units and interoperability. They do not establish successful systemd user-service operation on the target host."
+            },
+            {
+              "url": "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/howto/gpu-cuda.md",
+              "shows": "Documents CUDA for Ubuntu 24.04 or newer on WSL2, explicitly demonstrates installation on Ubuntu 26.04 AMD64, and publishes a deviceQuery PASS example. The example uses another GPU, so it establishes neither RTX 4090 performance nor comparative superiority."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C02",
+          "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+          "reason": "Closest alternative: exact image/checksum and the same maintained Ubuntu WSL source are verified, but 26.04 offers a later standard-support horizon; no target-host result separates their practical reliability. [Support policy](https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/reference/distributions.md)"
+        },
+        {
+          "key": "C03",
+          "name": "Debian 13 (WSL distribution)",
+          "reason": "Five-year support, Python 3.13 and systemd 257 are documented, but the required WSL toolchain, user-service and RTX 4090 acceptance evidence remains unresolved. [Debian release announcement](https://www.debian.org/News/2025/20250809)"
+        },
+        {
+          "key": "C04",
+          "name": "Arch Linux (WSL distribution)",
+          "reason": "Vendor AMD64 image/checksum are verified; long-term-support fit and distribution-specific maintenance/test evidence were insufficiently verified to prefer it. [Registry](https://github.com/microsoft/WSL/blob/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67/distributions/DistributionInfo.json)"
+        },
+        {
+          "key": "C05",
+          "name": "Fedora (WSL distribution)",
+          "reason": "Vendor Fedora 44 AMD64 image/checksum are verified; long-term-support fit and distribution-specific maintenance/test evidence were insufficiently verified to prefer it. [Registry](https://github.com/microsoft/WSL/blob/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67/distributions/DistributionInfo.json)"
+        }
+      ],
+      "excluded": [],
+      "close_call": true,
+      "deciding_comparison": "Compare Ubuntu 26.04.1, Ubuntu 24.04.5 and Debian 13 on the stated WSL 2.7.13/kernel 6.18/RTX 4090 host. Verify vendor-image hashes, run the same bootstrap, and measure first-boot success/time, repeated startup, systemd --user service activation, Python 3.13/Node 24/current Rust builds, CUDA deviceQuery and an identical GPU workload, plus Claude Code/Codex shell smoke tests. No recorded all-arm comparison or verified public benchmark establishes a measured winner.",
+      "evidence_gaps": [
+        "The required ctx_fetch_and_index calls were blocked because approval was required and session policy is never. Five requested page fetches produced no content for ctx_search; findings instead use GitHub API source files and official search results. The mandated page-retrieval workflow remains incomplete.",
+        "Budget used: six web-search queries and 30 GitHub API calls, including one 404.",
+        "Exact Python 3.13, Node 24, current Rust, systemd user services and RTX 4090 behavior were not verified on any candidate image. No agent-client compatibility advantage is established.",
+        "The Ubuntu e2e workflow API returned zero main-branch runs. Successful build/example CI cannot substitute for exact-image functional test results.",
+        "Ubuntu's latest GitHub launcher release is dated 2022-08-11; it is distinct from current vendor WSL image releases. Official search results show recent image publication, but release-directory pages could not be fetched.",
+        "Microsoft/WSL is a shared runtime and registry. Its recent commits do not establish Debian, Arch or Fedora maintenance health; their build repositories' default-branch dates, issue activity and CI remain unverified.",
+        "ARM64 registry images target Windows ARM64 WSL. Documented WSL installation requires Windows; native macOS arm64 support was not established.",
+        "Published checksums were inspected; image bytes and signed manifests were not downloaded or validated. No closed exclusion criterion was established for an unselected candidate."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/microsoft/WSL",
+        "https://api.github.com/repos/microsoft/WSL/releases/latest",
+        "https://api.github.com/repos/microsoft/WSL/commits?per_page=1",
+        "https://api.github.com/repos/microsoft/WSL/contents/distributions/DistributionInfo.json",
+        "https://api.github.com/repos/ubuntu/WSL",
+        "https://api.github.com/repos/ubuntu/WSL/releases/latest",
+        "https://api.github.com/repos/ubuntu/WSL/commits?per_page=1",
+        "https://github.com/ubuntu/WSL/blob/main/README.md",
+        "https://github.com/ubuntu/WSL/issues/520",
+        "https://github.com/ubuntu/WSL/actions/runs/33087242181",
+        "https://github.com/ubuntu/WSL/actions/runs/33166365201",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/e2e/README.md",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/.github/workflows/e2e.yaml",
+        "https://github.com/ubuntu/WSL/blob/3b7a6b2a43af18aa541eeee1669ac27656630097/e2e/launchertester/test_cases.go",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/howto/install-ubuntu-wsl2.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/explanation/security-overview.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/reference/distributions.md",
+        "https://github.com/canonical/ubuntu-pro-for-wsl/blob/main/docs/howto/gpu-cuda.md",
+        "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/systemd.md",
+        "https://github.com/MicrosoftDocs/WSL/blob/main/WSL/install.md",
+        "https://www.debian.org/News/2025/20250809",
+        "https://ubuntu.com/download/wsl",
+        "https://releases.ubuntu.com/releases/26.04.1/?C=N%3BO%3DD",
+        "https://na.releases.ubuntu.com/releases/24.04/"
+      ]
+    }
+  ]
+}

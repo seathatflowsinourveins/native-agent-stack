@@ -1,0 +1,334 @@
+{
+  "status": "source-only, unrun",
+  "scope": "Static parsing, source reachability, and repository publication integrity only; no target install, acceptance, service, model, or GPU execution.",
+  "checks": {
+    "required_json_parse": {
+      "exit_code": 0
+    },
+    "bash_n_install": {
+      "exit_code": 0
+    },
+    "bash_n_accept": {
+      "exit_code": 0
+    },
+    "toml_parse": {
+      "status": "passed",
+      "tools": 13
+    },
+    "owner_inventory": {
+      "status": "passed",
+      "input_rows": 53,
+      "selected_rows": 46,
+      "excluded_rows": 7,
+      "duplicate_slot": "research-harnesses",
+      "duplicate_rows_retained": 2
+    },
+    "readme_lines": {
+      "status": "passed",
+      "lines": 32,
+      "limit_exclusive": 60
+    },
+    "personal_path_and_user_name_scan": {
+      "status": "passed",
+      "scope": "All plan-folder text; no literal personal home directory or host user name."
+    },
+    "service_ports": {
+      "status": "passed",
+      "host_ports": [
+        2026,
+        21080,
+        21090,
+        21128,
+        21129,
+        21300,
+        21301,
+        21302,
+        21317,
+        21318,
+        21333,
+        21396,
+        21434,
+        21606,
+        21617,
+        21888,
+        50055
+      ],
+      "reserved_overlap": [],
+      "loopback_configuration": "All proposed TCP host listeners constrained; Phoenix wildcard is confined to container networking."
+    },
+    "install_source_http": {
+      "status": "passed",
+      "urls_fetched_once": 46,
+      "results": [
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/claude-code/v2.1.287/README.md#L23",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/README.md#L19",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/v0.2.163/README.md#L5",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.160.0/sdk/typescript/README.md#L7",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/trailofbits/skills/82fe8226252622fa807643bdca1710901198553a/README.md#L9",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/README.md#L28",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/oraios/serena/v1.7.0/README.md#L229",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L32",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/opendatalab/mineru/mineru-4.0.10-released/README.md#L307",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/adbar/trafilatura/v2.2.0/docs/installation.rst#L73",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L26",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ccusage/ccusage/v20.0.26/docs/guide/installation.md#L58",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/getting_started.md#L18",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/grafana/loki/v3.7.8/tools/release-note.md#L24",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/Arize-ai/phoenix/arize-phoenix-v20.19.0/docs/phoenix/self-hosting/deployment-options/docker.mdx#L156",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ollama.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0.3.273/docs/index.qmd#L38",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/README.md#L22",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/README.md#L31",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/zizmor.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/actions/attest/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md#L80",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/syft.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/dependabot/dependabot-core/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md#L42",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/github/codeql-action/416ff0dea110f80f0f56f0046500dbf7420e4bb0/upload-sarif/action.yml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/kjanat/actionlint/v1.17.0/docs/install.md#L223",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/docker/docs/f0e4e4790191aaee83f9375dce56ada3971c6773/content/manuals/compose/install/linux.md#L38",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/docker/docs/dd2797b84208848765705a1518aeee7e47907bd7/content/manuals/engine/install/ubuntu.md#L122",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/betterleaks.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/git/git/v2.56.0/INSTALL#L4",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/github-cli.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/worktrunk.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/difftastic.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/anthropics/claude-code-action/97c53473391bff1901034d4b454b5bac7ab7a029/docs/usage.md#L17",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/restic.toml#L1",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/twpayne/chezmoi/v2.73.0/assets/chezmoi.io/docs/install.md.tmpl#L137",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/v3.8.51/README.md#L1005",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/OpenHands/docs/832ad1635431c7711cbfdc9d1f52c2dab9ee7e61/sdk/getting-started.mdx#L80",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/README.md#L99",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
+          "http_status": "200",
+          "exit_code": 0
+        },
+        {
+          "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L58",
+          "http_status": "200",
+          "exit_code": 0
+        }
+      ]
+    },
+    "supplemental_sources": {
+      "status": "passed after correction",
+      "initial_404": "Grafana start-restart-grafana/index.md",
+      "corrected_source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/setup-grafana/start-restart-grafana.md",
+      "corrected_http_status": 200
+    },
+    "repository_integrity": {
+      "initial_exit_code": 1,
+      "initial_output": "Publication validation failed:\nevidence/artifacts/new-wsl-install-plan-20261002/README.md: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/accept.sh: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/config/grafana.ini: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/config/loki.yaml: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/config/otel.yaml: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/config/phoenix-compose.yaml: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/config/prometheus.yaml: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/install-plan.json: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/install.sh: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/mise.toml: evidence file is not hash-listed\nevidence/artifacts/new-wsl-install-plan-20261002/owners.json: evidence file is not hash-listed\n",
+      "repair": "Register only the new plan-folder files in manifests/evidence.json using scripts/host_receipts.py:710-727 record format; preserve all pre-existing records.",
+      "final_status": "pending",
+      "second_exit_code": 1,
+      "second_output": "Publication validation failed:\nevidence/artifacts/new-wsl-install-plan-20261002/config/ollama.env: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it\nevidence/artifacts/new-wsl-install-plan-20261002/config/omniroute.env: hash-listed but ignored by Git and not tracked, so a commit would leave it out; rename it, add a narrow .gitignore exception, or force-add it\n",
+      "second_repair": "Rename public, secret-free service binding templates to *.env.example; update references and hashes without changing ignore policy."
+    },
+    "review": {
+      "status": "static review completed",
+      "fixes": [
+        "make prerequisite",
+        "native client prerequisites for selective marketplace/SDK install",
+        "checked mise env before eval",
+        "independent install attempts for both research owners",
+        "worktrunk explicit checkout working directory",
+        "DeerFlow Compose-specific readiness"
+      ],
+      "limits": "No generated scripts were executed."
+    }
+  },
+  "commit": {
+    "status": "blocked, not created",
+    "stage_exit_code": 128,
+    "stage_output_sanitized": "FAILED: git add\nfatal: Unable to create '<shared-git>/worktrees/installplan/index.lock': Read-only file system\n",
+    "reason": "Worktree files are writable but shared Git metadata is read-only in the session filesystem permissions. No permission override or bypass was attempted.",
+    "commit_hash": null,
+    "commands_unrun": [
+      "git add evidence/artifacts/new-wsl-install-plan-20261002 manifests/evidence.json",
+      "git commit -m \"New WSL install plan: one upstream install and acceptance command per owner (source-only, unrun)\""
+    ]
+  }
+}

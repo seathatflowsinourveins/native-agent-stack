@@ -1,0 +1,52 @@
+{
+ "layer_id": "scheduling-supervision",
+ "title": "Scheduling and supervision",
+ "requirement": "Run local workflows with visible history, bounded process trees, cancellation and recoverable effects appropriate to the actual workload.",
+ "a_deciding_comparison_would_measure": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+ "candidates": [
+  {
+   "key": "C01",
+   "name": "conductor",
+   "repository": "https://github.com/conductor-oss/conductor"
+  },
+  {
+   "key": "C02",
+   "name": "Prefect",
+   "repository": "https://github.com/PrefectHQ/prefect"
+  },
+  {
+   "key": "C03",
+   "name": "Dagu",
+   "repository": "https://github.com/dagucloud/dagu"
+  },
+  {
+   "key": "C04",
+   "name": "Dagster",
+   "repository": "https://github.com/dagster-io/dagster"
+  },
+  {
+   "key": "C05",
+   "name": "systemd",
+   "repository": "https://github.com/systemd/systemd"
+  },
+  {
+   "key": "C06",
+   "name": "pg_durable",
+   "repository": "https://github.com/microsoft/pg_durable"
+  },
+  {
+   "key": "C07",
+   "name": "Temporal",
+   "repository": "https://github.com/temporalio/temporal"
+  },
+  {
+   "key": "C08",
+   "name": "Restate",
+   "repository": "https://github.com/restatedev/restate"
+  }
+ ],
+ "comparisons_on_record_where_every_named_arm_ran": [
+  "A recovery comparison of Dagu, Prefect and Temporal on one maintenance workload, with material deviations and unequal recovery configuration between the arms; it named no winner."
+ ],
+ "target_hosts": "Primary: a new WSL2 Ubuntu-family instance on a Windows workstation, x86_64, 48 cores, 104 GB RAM, NVIDIA RTX 4090 24 GB. Secondary: macOS arm64 laptops. Users: Claude Code and Codex agent sessions on that host."
+}

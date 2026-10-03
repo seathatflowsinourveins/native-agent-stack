@@ -83,6 +83,10 @@
     {
       "path": "blueprints/catalog-clean-install/README.md",
       "label": "Clean install checks"
+    },
+    {
+      "path": "docs/new-wsl-handbook.md",
+      "label": "New WSL handbook: source recommendations and acceptance stages"
     }
   ]
 }

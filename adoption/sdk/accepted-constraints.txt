@@ -18,8 +18,8 @@ korean-lunar-calendar==0.4.0
 msgpack==1.2.2
 numpy==2.5.3
 openai==3.16.2
-openai-codex==0.159.2
-openai-codex-cli-bin==0.159.2
+openai-codex==0.159.3
+openai-codex-cli-bin==0.159.3
 packaging==26.3
 pandas==3.0.6
 pydantic==2.13.5

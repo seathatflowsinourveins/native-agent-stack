@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "codex-01593-hindsight-native-memory-20261001",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-01T03:36:05Z",
+  "component_ids": ["codex"],
+  "claim": "Fresh native Codex automatic capture and independent recollection from the selected Hindsight bank passed in both headless exec and daemon-backed interactive resume/queue paths.",
+  "limitations": [
+    "Two invented canaries and their record budgets are explicitly synthetic, not project policy, market data or trading acceptance.",
+    "This is supported native command/API execution with synthetic inputs and independent observation, not an executed upstream Docker or Cargo test suite.",
+    "Headless exec and daemon-backed TUI are distinct paths; each has its own fresh provider-backed observations below.",
+    "Knowledge-page search completed but did not contain either canary. Native Hindsight reflect supplied the correct values; page population or cron refresh is not qualified here.",
+    "Backend seed/survey completion was not established. Native status reported synced=false with active operations; the coordinator separately owns seed-job recovery.",
+    "Native model token usage excludes Hindsight backend extraction/reflection usage. Backend usage and monetary cost are unknown.",
+    "No production-quality or token-efficiency comparison is claimed, and no unrelated session or authentication store was read."
+  ],
+  "host_scope": "Authorized current-host native sign-in and owner-controlled qualification worktree; owned synthetic threads only; scoped root-owned Hindsight activation already installed before these probes.",
+  "data": {
+    "native_client": {"repository": "openai/codex", "tag": "rust-v0.159.3", "commit": "01fc69f4026735edfdf6789820549727a4867b11", "model": "gpt-6.1-sol", "effort": "max"},
+    "memory_runtime": {"package": "@vectorize-io/hindsight-coding-agents", "version": "0.8.0", "repository": "vectorize-io/hindsight", "commit": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c", "backend_native_openapi_version": "0.10.2", "bank": "coding-agent::foundation-native-agent-stack"},
+    "execution_classes": ["upstream-native-operation", "synthetic-input", "independent-observation"],
+    "native_commands": [
+      {"argv": ["codex", "exec", "--model", "gpt-6.1-sol", "-c", "model_reasoning_effort=\"max\"", "--sandbox", "read-only", "--color", "never", "--json", "--output-last-message", "<private-final-output>", "<synthetic-prompt>"], "invocations": 2, "exit_codes": [0, 0]},
+      {"argv": ["codex", "resume", "<owned-thread-uuid>", "--no-alt-screen"], "invocations": 2, "exit_codes": [0, 0], "transport": "Native shared daemon; independently observed Unix socket peer for the capture TUI"},
+      {"argv": ["codex", "queue", "--thread", "<owned-thread-uuid>", "--message", "<synthetic-prompt>"], "invocations": 2, "exit_codes": [0, 0], "accepted_submission_ids_returned": true},
+      {"argv": ["node", "<official-installed-status.js>", "--repo", "<owned-worktree>", "--harness", "codex"], "invocations": 2, "exit_codes": [0, 0], "explicit_bank_override_used": false, "resolved_bank_matches": true},
+      {"argv": ["curl", "<native-API>/v1/default/banks/<bank>/documents/conversation:<owned-session>"], "purpose": "Read independently stored owned documents only", "headless_capture_http_status": 200, "headless_recollection_http_status": 200, "daemon_capture_http_status": 200},
+      {"argv": ["lsof", "+E", "-n", "-a", "-p", "<owned-tui-pid>", "-U"], "exit_code": 0, "shared_daemon_peer_independently_confirmed": true, "owned_tui_embedded_children": 0}
+    ],
+    "capture": [
+      {"lane": "headless-exec", "canary": "synthetic-canary-A", "expected_record_budget": 47, "native_response_matches_requested_ack": true, "manual_retention_tool_used": false, "model_tool_calls": 0, "native_stop_hook": {"event": "retain_ok", "at_utc": "2026-10-01T03:19:10.438Z", "duration_ms": 64, "transcript_turns": 2}, "independent_document": {"http_status": 200, "bank_matches": true, "owned_session_matches": true, "canary_and_budget_present": true, "memory_unit_count": 1, "source": "chat", "harness": "codex", "tags": ["source:chat", "harness:codex"], "strategy": "conversation", "observation_scopes": "shared"}},
+      {"lane": "daemon-resume-and-queue", "canary": "synthetic-canary-B", "expected_record_budget": 59, "native_response_matches_requested_ack": true, "manual_retention_tool_used": false, "model_tool_calls": 0, "native_tui_bank_banner_matches": true, "native_stop_hook": {"event": "retain_ok", "at_utc": "2026-10-01T03:29:32.559Z", "duration_ms": 62, "transcript_turns": 12}, "independent_document": {"http_status": 200, "bank_matches": true, "owned_session_matches": true, "canary_and_budget_present": true, "memory_unit_count": 1, "source": "chat", "harness": "codex"}}
+    ],
+    "recollection": [
+      {"lane": "fresh-headless-session", "canary": "synthetic-canary-A", "expected_record_budget": 47, "same_thread_as_capture": false, "value_in_user_prompt": false, "value_in_mcp_query": false, "native_mcp_tools": [{"server": "hindsight", "tool": "hindsight_search_knowledge_pages", "status": "completed", "canary_found": false}, {"server": "hindsight", "tool": "hindsight_reflect", "status": "completed", "actual_result_contains_correct_canary_and_budget": true}], "native_mcp_errors": 0, "final_reply_budget_matches": true, "final_reply_marks_synthetic": true, "returned_source_user_timestamp_utc": "2026-10-01T03:19:06.185Z", "file_or_shell_tool_used": false, "manual_retention_tool_used": false, "native_stop_hook": {"event": "retain_ok", "at_utc": "2026-10-01T03:24:05.885Z", "duration_ms": 60, "transcript_turns": 7}},
+      {"lane": "fresh-daemon-resume-and-queue", "canary": "synthetic-canary-B", "expected_record_budget": 59, "same_thread_as_capture": false, "value_in_prior_thread_history": false, "value_in_queued_prompt": false, "value_in_mcp_query": false, "native_code_mode_tools": ["mcp__hindsight__hindsight_search_knowledge_pages", "mcp__hindsight__hindsight_reflect"], "native_wait_completion_contains_actual_correct_canary_and_budget": true, "native_mcp_errors": 0, "final_reply_budget_matches": true, "final_reply_marks_synthetic": true, "returned_source_user_timestamp_utc": "2026-10-01T03:29:29.059Z", "native_task_completed_at_utc": "2026-10-01T03:33:48.356Z", "native_turn_duration_ms": 87484, "file_or_shell_tool_used": false, "manual_retention_tool_used": false, "native_stop_hook": {"event": "retain_ok", "at_utc": "2026-10-01T03:33:48.346Z", "duration_ms": 49, "transcript_turns": 15}}
+    ],
+    "native_model_usage": {
+      "scope": "Only the four provider-backed user turns in this memory qualification. Earlier queue qualification is excluded. Native turn.completed aggregates are used once for headless turns; daemon turns sum distinct last_token_usage records within that turn only.",
+      "turns": [
+        {"lane": "headless-capture", "input_tokens": 22779, "cached_input_tokens": 0, "cache_write_input_tokens": 0, "output_tokens": 57, "reasoning_output_tokens": 43, "total_tokens": 22836},
+        {"lane": "headless-recollection", "input_tokens": 151564, "cached_input_tokens": 131584, "cache_write_input_tokens": 0, "output_tokens": 914, "reasoning_output_tokens": 514, "total_tokens": 152478},
+        {"lane": "daemon-capture", "input_tokens": 27554, "cached_input_tokens": 24448, "cache_write_input_tokens": 0, "output_tokens": 30, "reasoning_output_tokens": 15, "total_tokens": 27584},
+        {"lane": "daemon-recollection", "input_tokens": 152861, "cached_input_tokens": 127872, "cache_write_input_tokens": 0, "output_tokens": 460, "reasoning_output_tokens": 58, "total_tokens": 153321, "distinct_provider_updates": 5}
+      ],
+      "four_turn_total": {"input_tokens": 354758, "cached_input_tokens": 283904, "cache_write_input_tokens": 0, "output_tokens": 1461, "reasoning_output_tokens": 630, "total_tokens": 356219},
+      "counter_relationship": "Cached input is a subset of input; reasoning is a subset of output. Do not add overlapping native cumulative snapshots or Hindsight backend usage to these totals.",
+      "hindsight_backend_usage": "unknown",
+      "monetary_cost": "unknown"
+    },
+    "bank_status_boundary": {
+      "initial_native_status": {"bank": "coding-agent::foundation-native-agent-stack", "gitlogPresent": false, "chatDocs": 0, "pagesCount": 5, "surveyDocs": 0, "activeOps": 4, "synced": false},
+      "after_headless_recollection_native_status": {"bank": "coding-agent::foundation-native-agent-stack", "gitlogPresent": false, "chatDocs": 4, "pagesCount": 5, "surveyDocs": 0, "activeOps": 12, "synced": false},
+      "interpretation": "Correct routing, canary document extraction and native reflect retrieval passed; metadata page count is not page-content/cron acceptance or full seed/survey readiness."
+    },
+    "post_backend_owner_recovery_observation": {"operation": "Targeted native API GET of each owned capture document after the separate owner reported native backend restart/recovery complete", "headless_capture_http_status": 200, "daemon_capture_http_status": 200, "each_memory_unit_count": 1, "both_canaries_and_budgets_preserved": true, "bank_and_chat_codex_metadata_preserved": true, "new_provider_turn_executed": false},
+    "corrections": [
+      {"initial_check": "String(payload.output) did not find a daemon MCP canary in the native wait output.", "cause": "Native tool output can be an array of typed content rather than a string.", "verification": "Full serialized payload and typed native output inspection found the correct canary and 59 records in the completed native wait response, independently of the final model reply."}
+    ],
+    "cleanup_and_ownership": {"owned_headless_processes_exited": true, "owned_tui_processes_exited": true, "all_native_exit_codes": [0, 0, 0, 0], "daemon_restart_performed": false, "shared_config_trust_or_service_mutations": false, "native_auth_read_or_copied": false, "raw_outputs_outside_worktree": true, "memory_calls_quiesced_for_coordinator_owned_seed_recovery": true}
+  },
+  "provenance": {
+    "primary_sources": [
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/cli/tests/queue.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/cli/tests/daemon_startup.rs",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/codex-stop-hook.ts",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/core/retain-hook.ts",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/harness/hook-lifecycle.ts",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/mcp-server.ts",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/status.ts",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/harness.e2e.test.ts"
+    ],
+    "native_api_source": "Actual backend OpenAPI response declared version 0.10.2 and supported the targeted GET document endpoint; body and HTTP statuses are preserved privately.",
+    "private_returned_artifacts": "Owner-only codex-qualification-private state directory outside all worktrees: native capture/recollection JSONL, stderr/final output, both daemon TUI typescripts/timing, targeted owned-document responses/statuses, owned-session native diagnostic lines, native status outputs, socket peer observation, and owned-rollout snapshots.",
+    "public_sanitization": "Personal paths, process/thread/submission identifiers, literal canary keys and conversation text are omitted. Budgets remain labelled synthetic oracle inputs. Bank routing metadata, timestamps, native counters and booleans are retained.",
+    "locally_authored_e2e_runner": false,
+    "upstream_test_suite_executed": false
+  }
+}

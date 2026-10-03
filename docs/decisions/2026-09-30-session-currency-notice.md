@@ -14,6 +14,11 @@ startup rule, item 4 of [`docs/token-practice.md`](../token-practice.md).
 both are frozen Gate A units. This record gives F2 the file contract and the acceptance gate below. No unit was
 installed and no host file was written: the timer and the service are drafted templates.
 
+**Correction (2026-10-02):** the implemented notice uses `MAX_AGE = timedelta(days=8)`, not the 48-hour
+proposal recorded below, and emits the summary through SessionStart `additionalContext`. The catalog-freshness
+workflow is now configured for a daily report; this supersedes this record's weekly references for that workflow
+only. See the [current behavior and bounded schedule decision](2026-10-02-daily-catalog-currency.md).
+
 ## Context
 
 - The currency checks already exist and are read-only. `scripts/adoption_status.py --pinned-versions` compares the
@@ -64,7 +69,8 @@ installed and no host file was written: the timer and the service are drafted te
   stopped does need one, and `Persistent=` applies only to `OnCalendar=` timers.
 - **Removing the earlier due-file when a run fails.** Rejected, because it would hide due items exactly when the
   checks break. A failed run leaves the state directory as it was, the unit shows in
-  `systemctl --user --failed`, and the hook's 48-hour age limit below keeps an old line from lingering.
+  `systemctl --user --failed`, and the proposed age limit below was intended to keep an old line from lingering.
+  The implemented limit is eight days, as corrected above.
 - **Counting an incomplete skill check as nothing due.** Rejected. The first draft did, and a `--network` run whose
   `gh api` calls failed, or whose skill pin did not verify, could delete the notice an earlier run had written (found by
   the cross-family review of that draft and reproduced by the failing-first tests below). The check's own report says
@@ -145,7 +151,9 @@ installed and no host file was written: the timer and the service are drafted te
 3. **The startup rule.** Item 4 of `docs/token-practice.md` now allows exactly one read-only SessionStart line from
    that file, printed fail-open; the checks never run at startup. `AGENTS.md:28` still reads "Do not rerun the full
    audit or model trials at startup", which this design keeps. Any change to that wording is unit F1's.
-4. **The contract for the hook in unit F2, which this change does not contain:**
+4. **The historical proposed contract for the hook in unit F2, which this change does not contain:**
+   The correction above identifies the implemented age limit and output format; this list preserves the original
+   proposal and its unmeasured acceptance gate.
    - Read only that file and print its `summary_line` as plain stdout. Exit 0 in every case.
    - Print nothing when the file is missing, unreadable or not a JSON object, when `summary_line` is not one line
      of at most 160 characters, or when `generated_at` is more than 48 hours old, because a failing timer leaves

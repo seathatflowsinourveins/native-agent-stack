@@ -4178,7 +4178,7 @@ K4_TIMING = {
     "T-STORES-PREFIX": (lambda: "echo " + ".local/share/omniroutX/ " * 7500 + "; cat ~/.local/share/omniroute/x", "credential_file_read"),
 }
 _K4_TIMING_CHILD = (
-    "import json, statistics, sys, time\n"
+    "import json, sys, time\n"
     "sys.dont_write_bytecode = True\n"
     "sys.path.insert(0, sys.argv[1])\n"
     "from tests import test_secret_path_guard as t\n"
@@ -4188,15 +4188,18 @@ _K4_TIMING_CHILD = (
     "    t.guard = importlib.util.module_from_spec(spec)\n"
     "    spec.loader.exec_module(t.guard)\n"
     "text = t.K4_TIMING[sys.argv[2]][0]()\n"
-    "spans, verdict = [], None\n"
-    "for _ in range(3):\n"
+    "verdict = None\n"
+    "def measure_round():\n"
+    "    global verdict\n"
     "    cpu = time.process_time()\n"
     "    try:\n"
     "        verdict = t.guard.check(text)\n"
     "    except t.guard.WorkBudgetExceeded as error:\n"
     "        verdict = error.args[0]\n"
-    "    spans.append(time.process_time() - cpu)\n"
-    "print(json.dumps([verdict, statistics.median(spans), len(text)]))\n")
+    "    return {}, {0: time.process_time() - cpu}\n"
+    "rounds, factor = t.k4_run_timing_rounds(measure_round)\n"
+    "best = t.k4_min_timings([checks for _, checks in rounds])[0]\n"
+    "print(json.dumps([verdict, best, len(text), factor]))\n")
 
 
 # Per-helper scaling generators (section 9.6): a near-miss repetition that reaches the helper, at about 25k, 50k and 100k characters. The
@@ -4409,46 +4412,82 @@ K4_CHARGE_FIXTURES = dict(K4_HELPER_FIXTURES, **{
     'k4_gateway_reason': K4_HELPER_FIXTURES['k4_gateway_code'],
     'read_command': k4_code_f('pass'),
 })
-K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time, on the workstation; other hosts scale it by k4_host_factor().
-# Host speed (2026-10-01): the processor-time bounds scale by this host's time for a guard-independent reference, the standard
-# library's pure-Python shlex lexer over a fixed text (minimum of five runs), relative to the workstation's 0.188 s, and never below 1
-# (a reference-machine ratio, the way SPEC CPU reports speed against its reference machine). The hosted macOS runner measured row
-# T-STORE-PRINTF at 0.550 s and k4_runner_commands' whole check at 0.562 s where the workstation measures 0.197 s, so a fixed 0.5 s
-# judged the runner, not the guard; a quadratic regression still grows 16 times per 4 times input and fails on any host. The text
-# holds short words and one long quoted word: shlex builds a token by repeated string concatenation, whose cost follows the
-# platform's allocator, and on that runner short words ran at 1.03 times the workstation while the row (one 120,000-character
-# quoted word, mostly shlex) ran at 2.6 times.
+K4_LINEAR_SECONDS = 0.5  # Contract section 9.6: processor time; only this absolute bound scales with host speed.
+# The guard-independent reference is stdlib shlex over short words and one long quoted word, calibrated at 0.188 s.
+# After the first failed timing criterion (absolute or growth), take five reference measurements once, use their minimum,
+# and recheck the same raw timings before deciding whether another guarded round is needed. One noisy reference cannot
+# raise the bound. The recorded macOS whole-check slowdown was 0.562 / 0.197 ~= 2.8 times (the long-word row: 2.6 times).
+# A 4.0 cap leaves margin above that observed slowdown while keeping the absolute limit bounded at 2.0 s.
 K4_REFERENCE_TEXT = (" ".join(f"word{i % 97} 'quoted {i % 13}' \"dq $X{i % 7}\"" for i in range(6000))
                      + " printf '" + "%s" * 60000 + "'")
 K4_REFERENCE_SECONDS = 0.188
+K4_REFERENCE_RUNS = 5
+K4_HOST_SCALE_CAP = 4.0
+K4_TIMING_MAX_ROUNDS = 3
 
 
-def k4_host_scale(reference_seconds: float) -> float:
-    return max(1.0, reference_seconds / K4_REFERENCE_SECONDS)
+def k4_host_scale(reference_samples) -> float:
+    if len(reference_samples) < K4_REFERENCE_RUNS:
+        raise ValueError("K4 calibration requires at least five reference samples")
+    return min(K4_HOST_SCALE_CAP, max(1.0, min(reference_samples) / K4_REFERENCE_SECONDS))
 
 
-def k4_host_factor() -> float:
-    best = math.inf
-    for _ in range(5):
-        cpu = time.process_time()
-        shlex.split(K4_REFERENCE_TEXT)
-        best = min(best, time.process_time() - cpu)
-    return k4_host_scale(best)
+def k4_reference_samples():
+    # Adopt CPython's maintained repeat implementation, with one reference lex per CPU-time measurement:
+    # https://github.com/python/cpython/blob/3.14/Lib/timeit.py (Timer.repeat).
+    import timeit
+    return timeit.repeat(lambda: shlex.split(K4_REFERENCE_TEXT), number=1, repeat=K4_REFERENCE_RUNS,
+                         timer=time.process_time)
 
 
 # Helper scaling criterion (2026-10-01), the pattern of examples/claude-native/workflows/test-child-usage.mjs (#556): the growth
 # exponent from 25k to 100k characters (a 4 times range), ln((t100k + 5 ms) / (t25k + 5 ms)) / ln 4, stays under 1.5 (1 is linear,
 # 2 is quadratic). It replaces one sample per size with "100k under 8 times 25k", which failed linear helpers on a CI runner at
 # margins of 1 to 6 % (k4_shell_literals 0.1058 against 0.0998, k4_store_text 0.1408 against 0.1397). Up to three rounds take the
-# elementwise minimum per size (the least-disturbed run, as Python's timeit documentation advises for repeats), so one pause cannot
-# fail a linear helper while a quadratic one fails every round. Below about 4.4 ms at 25k a quadratic helper passes the exponent;
-# the host-scaled K4_LINEAR_SECONDS bounds it there.
+# elementwise minimum of RAW timings per size, as https://docs.python.org/3/library/timeit.html#timeit.Timer.repeat advises.
+# Repetition can remove an increased timing sample; host scaling never changes this exponent or its fixed 5 ms allowance.
+# A systematic 16-times growth with a 25k timing above 4.375 ms fails the exponent even after three identical rounds.
 K4_GROWTH_NOISE_SECONDS = 0.005
 K4_GROWTH_EXPONENT = 1.5
 
 
 def k4_growth_exponent(small: float, large: float, ratio: float = 4.0) -> float:
     return math.log((large + K4_GROWTH_NOISE_SECONDS) / (small + K4_GROWTH_NOISE_SECONDS)) / math.log(ratio)
+
+
+def k4_min_timings(rounds):
+    return {size: min(round_[size] for round_ in rounds) for size in rounds[0]}
+
+
+def k4_timing_passes(rounds, host_factor: float = 1.0) -> bool:
+    """Each round is (raw helper times, raw whole-check times); rows have no helper times."""
+    helper_totals = k4_min_timings([helpers for helpers, _checks in rounds])
+    totals = k4_min_timings([checks for _helpers, checks in rounds])
+    return (all(seconds < K4_LINEAR_SECONDS * host_factor for seconds in (*helper_totals.values(), *totals.values()))
+            and (not helper_totals
+                 or k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT))
+
+
+def k4_run_timing_rounds(measure_round, measure_reference=None):
+    """Calibrate once on failure; repeat only while the shared raw-minimum decision fails."""
+    rounds, factor = [], 1.0
+    for _ in range(K4_TIMING_MAX_ROUNDS):
+        rounds.append(measure_round())
+        if k4_timing_passes(rounds, factor):
+            break
+        if len(rounds) == 1:
+            samples = (measure_reference or k4_reference_samples)()
+            factor = k4_host_scale(samples)
+            if k4_timing_passes(rounds, factor):
+                break
+    return rounds, factor
+
+
+def k4_nesting_passes(rounds) -> bool:
+    spans = k4_min_timings(rounds)
+    return spans[4096] < 8 * max(spans[1024], 0.005)
+
+
 # The acceptance/mutation driver injects the actual scratch adapter module.
 # Its behavioral assertions live here; no scratch callback counts as a kill.
 K4_ACCEPTANCE_ADAPTER = None
@@ -4909,21 +4948,24 @@ class K4GuardTests(unittest.TestCase):
                 guard.check(K4_R + 'tavily -- true')
 
     def test_k4_timing(self):
-        # Section 9.6: each named row in a fresh Python child (-B), median of
-        # three process_time spans below 0.5 s on the workstation, scaled by the
-        # host factor elsewhere. Wall deadlines remain separate in the real
-        # hook-process test.
-        bound = K4_LINEAR_SECONDS * k4_host_factor()
+        # Section 9.6: each named row runs in a fresh Python child (-B). Per row: one guarded CPU measurement and zero
+        # references if its unscaled first round passes; at most three guarded measurements and five references.
+        # Per helper: three guarded measurements (one per size) and zero references if its unscaled first round passes;
+        # at most nine guarded measurements and five references. Calibration alone can pass the first round, without a
+        # second guarded round. The separate nesting probe takes two guarded measurements, at most six, without references.
+        # With R rows and H helpers, all first-round criteria passing costs R + 3H + 2 guarded measurements, zero references;
+        # the maximum is 3R + 9H + 6 guarded measurements and 5(R + H) references (here R=51, H=67: 254/0, at most 762/590).
+        # Unmeasured instrumentation below is separate, as are wall deadlines in the real hook-process test.
         runs = {name: subprocess.run([sys.executable, "-B", "-c", _K4_TIMING_CHILD, str(ROOT), name, str(HOOK)],
                                      capture_output=True, text=True, timeout=180) for name in sorted(K4_TIMING)}
         for name, (build, expected) in sorted(K4_TIMING.items()):
             with self.subTest(row=name):
                 done = runs[name]
                 self.assertEqual(done.returncode, 0, done.stderr[-400:])
-                verdict, cpu, length = json.loads(done.stdout)
+                verdict, cpu, length, factor = json.loads(done.stdout)
                 self.assertLess(length, 199_000)
                 self.assertEqual(verdict, expected)
-                self.assertLess(cpu, bound)
+                self.assertTrue(k4_timing_passes([({}, {0: cpu})], factor), (cpu, factor))
         # T-CODE-NONOUTPUT's instrumentation: every environment occurrence is visited, and output context is read once a token (a list
         # built in one pass), so deepening the nesting four times with twice the occurrences stays linear, not depth x tokens.
         guard.start_work()
@@ -4934,22 +4976,26 @@ class K4GuardTests(unittest.TestCase):
             self.assertEqual(guard._k4_cache[("environment-visits", "py", body)], 1024)
         finally:
             guard.stop_work()
-        spans = {}
-        for depth, count in ((1024, 512), (4096, 2048)):
-            text = k4_code_f("import os\nx = " + "f(" * depth + ", ".join(["os.environ.get('HOME')"] * count) + ")" * depth)
-            best = []
-            for _ in range(3):
+        nesting_texts = {depth: k4_code_f("import os\nx = " + "f(" * depth
+                                       + ", ".join(["os.environ.get('HOME')"] * count) + ")" * depth)
+                         for depth, count in ((1024, 512), (4096, 2048))}
+        nesting_rounds = []
+        for _ in range(K4_TIMING_MAX_ROUNDS):
+            spans = {}
+            for depth, text in nesting_texts.items():
                 cpu = time.process_time()
                 self.assertIsNone(guard.check(text))
-                best.append(time.process_time() - cpu)
-            spans[depth] = min(best)
-        self.assertLess(spans[4096], 8 * max(spans[1024], 0.005))
+                spans[depth] = time.process_time() - cpu
+            nesting_rounds.append(spans)
+            if k4_nesting_passes(nesting_rounds):
+                break
+        self.assertTrue(k4_nesting_passes(nesting_rounds), nesting_rounds)
         # T-TAIL-BUDGET: several tail reads that each fit, together over a test-only budget, refuse without any reset.
         self.assert_shared_stages([
             lambda n=n: guard.k4_tail_reason(f"cat <<'E{n}'\ntext\nE{n}\ntrue {n}") for n in range(6)], 'texts')
         # Per-helper generators at about 25k, 50k and 100k characters: the helper is reached with the generated text (instrumented), each
         # size finishes under the host-scaled bound through check() and inside the helper, and the helper's growth exponent from 25k to 100k
-        # stays under K4_GROWTH_EXPONENT (a quadratic scan's is 2), over the elementwise minimum of up to three rounds.
+        # stays under K4_GROWTH_EXPONENT, over the elementwise RAW minimum of up to three rounds.
         # k4_charge is an O(1) counter update with no scan. k4_word_charge's
         # linear sum is exercised by its own supplementary generator.
         scanners = ({name for name in dir(guard) if name.startswith("k4_") and callable(getattr(guard, name))}
@@ -4959,8 +5005,8 @@ class K4GuardTests(unittest.TestCase):
         for name, generator in sorted(K4_SCALING.items()):
             with self.subTest(helper=name):
                 texts = {size: generator(size) for size in (25_000, 50_000, 100_000)}
-                totals, helper_totals = {}, {}
-                for _round in range(3):
+                def measure_round():
+                    helper_totals, totals = {}, {}
                     for size, text in texts.items():
                         self.assertLess(len(text), 199_000)
                         original, inside = getattr(guard, name), []
@@ -4980,29 +5026,106 @@ class K4GuardTests(unittest.TestCase):
                                 pass
                             total = time.process_time() - cpu
                         self.assertTrue(inside, f"{name} not reached at {size}")
-                        helper_totals[size] = min(helper_totals.get(size, math.inf), sum(inside))
-                        totals[size] = min(totals.get(size, math.inf), total)
-                    if k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]) < K4_GROWTH_EXPONENT:
-                        break
-                for size in texts:
-                    self.assertLess(helper_totals[size], bound)
-                    self.assertLess(totals[size], bound)
-                # the helper's own time scales linearly (the whole check also holds B's shlex, which is quadratic in one long quoted word)
-                self.assertLess(k4_growth_exponent(helper_totals[25_000], helper_totals[100_000]), K4_GROWTH_EXPONENT, helper_totals)
+                        helper_totals[size], totals[size] = sum(inside), total
+                    return helper_totals, totals
+
+                rounds, factor = k4_run_timing_rounds(measure_round)
+                # Growth constrains the helper; whole-check times also include B's shlex long-word cost.
+                self.assertTrue(k4_timing_passes(rounds, factor), (rounds, factor))
 
     def test_k4_growth_criterion_controls(self):
         # The two CI samples that failed the single-ratio check (linear helpers) fit an exponent under the bound; a helper that is
         # quadratic by construction (16 times the time for 4 times the input) does not, from 4.5 ms at 25k upward.
         for small, large in ((0.0998 / 8, 0.1058), (0.1397 / 8, 0.1408)):
-            self.assertLess(k4_growth_exponent(small, large), K4_GROWTH_EXPONENT)
+            self.assertTrue(k4_timing_passes([({25_000: small, 50_000: large / 2, 100_000: large}, {})]))
         for small in (0.0045, 0.01, 0.05, 0.2):
-            self.assertGreater(k4_growth_exponent(small, 16 * small), K4_GROWTH_EXPONENT)
-        # The host factor: never below 1, so a faster host keeps the workstation's bound, and proportional on a slower one (the
-        # macOS runner's 2.8 times); this host's own factor is finite and at least 1.
-        self.assertEqual(k4_host_scale(K4_REFERENCE_SECONDS / 3), 1.0)
-        self.assertAlmostEqual(k4_host_scale(K4_REFERENCE_SECONDS * 2.8), 2.8)
-        factor = k4_host_factor()
-        self.assertTrue(1.0 <= factor < math.inf, factor)
+            self.assertFalse(k4_timing_passes([({25_000: small, 50_000: 4 * small, 100_000: 16 * small}, {})]))
+        quadratic = {25_000: 0.010, 50_000: 0.040, 100_000: 0.160}
+        for factor in (1.0, 2.6, 4.0):
+            for count in (1, 3):
+                with self.subTest(factor=factor, rounds=count):
+                    self.assertFalse(k4_timing_passes([(quadratic, quadratic)] * count, factor))
+
+    def test_k4_timing_retry_controls(self):
+        noisy = {25_000: 0.009996, 50_000: 0.019747, 100_000: 0.117139}
+        clean = {25_000: 0.0101, 50_000: 0.0199, 100_000: 0.0402}
+        self.assertFalse(k4_timing_passes([(noisy, noisy)]))
+        for samples, expected, count in (([(noisy, noisy), (clean, clean)], True, 2),
+                                         ([(noisy, noisy)] * 3, False, 3)):
+            with self.subTest(accepted=expected):
+                measure = mock.Mock(side_effect=samples)
+                reference = mock.Mock(return_value=[0.188] * 5)
+                rounds, factor = k4_run_timing_rounds(measure, reference)
+                self.assertEqual(k4_timing_passes(rounds, factor), expected)
+                self.assertEqual(measure.call_count, count)
+                # A growth-only failure calibrates once too, but calibration cannot fix the raw exponent.
+                reference.assert_called_once_with()
+
+    def test_k4_timing_minimum_controls(self):
+        # Clean helper time arrives later; clean whole-check times arrived earlier. Both must survive a later noisy sample.
+        noisy_helper = {25_000: 0.009996, 50_000: 0.019747, 100_000: 0.117139}
+        clean_helper = {25_000: 0.0101, 50_000: 0.0199, 100_000: 0.0402}
+        clean_check = {25_000: 0.1, 50_000: 0.2, 100_000: 0.3}
+        noisy_check = {25_000: 0.6, 50_000: 0.8, 100_000: 1.0}
+        measure = mock.Mock(side_effect=[(noisy_helper, clean_check), (clean_helper, noisy_check),
+                                         (clean_helper, noisy_check)])
+        rounds, factor = k4_run_timing_rounds(measure, lambda: [0.188] * 5)
+        self.assertTrue(k4_timing_passes(rounds, factor))
+        self.assertEqual(measure.call_count, 2)
+
+    def test_k4_host_calibration_controls(self):
+        self.assertEqual(k4_host_scale([K4_REFERENCE_SECONDS / 3] * 5), 1.0)
+        self.assertAlmostEqual(k4_host_scale([K4_REFERENCE_SECONDS * 2.8] * 5), 2.8)
+        self.assertEqual(k4_host_scale([0.188, 0.188, 0.188, 0.188, 1.88]), 1.0)
+        factor = k4_host_scale([1.88] * 5)
+        self.assertEqual(factor, K4_HOST_SCALE_CAP)
+        with self.assertRaises(ValueError):
+            k4_host_scale([0.188] * 4)
+        # Even the capped 2.0 s absolute bound rejects a consistently 4 s row, before and after all three rounds.
+        for count in (1, 3):
+            self.assertFalse(k4_timing_passes([({}, {0: 4.0})] * count, factor))
+        self.assertFalse(k4_timing_passes([({}, {0: 2.0})], factor))  # strict bound
+        # Whole checks have an absolute criterion, not a helper-growth criterion: all three fit 0.5 * 2.6 = 1.3 s.
+        whole = {25_000: 0.6, 50_000: 0.8, 100_000: 1.0}
+        self.assertFalse(k4_timing_passes([({}, whole)], 1.0))
+        self.assertTrue(k4_timing_passes([({}, whole)], 2.6))
+
+    def test_k4_reference_measurement_controls(self):
+        ticks = [tick for index in range(5) for tick in (index, index + 0.188)]
+        with mock.patch.object(shlex, 'split') as lex, mock.patch.object(time, 'process_time', side_effect=ticks):
+            samples = k4_reference_samples()
+        self.assertEqual(lex.call_count, 5)
+        self.assertEqual(len(samples), 5)
+        self.assertAlmostEqual(k4_host_scale(samples), 1.0)
+
+    def test_k4_timing_round_budget_controls(self):
+        helper = {25_000: 0.01, 50_000: 0.02, 100_000: 0.04}
+        whole = {25_000: 0.1, 50_000: 0.2, 100_000: 0.3}
+        measure, reference = mock.Mock(return_value=(helper, whole)), mock.Mock()
+        rounds, factor = k4_run_timing_rounds(measure, reference)
+        self.assertTrue(k4_timing_passes(rounds, factor))
+        measure.assert_called_once_with()
+        reference.assert_not_called()
+        # On a stable 2.6-times slower host, calibration alone accepts the first round; it costs no second guarded round.
+        slow_whole = {25_000: 0.6, 50_000: 0.8, 100_000: 1.0}
+        measure = mock.Mock(return_value=(helper, slow_whole))
+        reference = mock.Mock(return_value=[K4_REFERENCE_SECONDS * 2.6] * 5)
+        rounds, factor = k4_run_timing_rounds(measure, reference)
+        self.assertTrue(k4_timing_passes(rounds, factor))
+        measure.assert_called_once_with()
+        reference.assert_called_once_with()
+        measure = mock.Mock(return_value=({}, {0: 4.0}))
+        reference = mock.Mock(return_value=[1.88] * 5)
+        rounds, factor = k4_run_timing_rounds(measure, reference)
+        self.assertFalse(k4_timing_passes(rounds, factor))
+        self.assertEqual(measure.call_count, 3)
+        reference.assert_called_once_with()
+
+    def test_k4_nesting_criterion_controls(self):
+        noisy, clean = {1024: 0.01, 4096: 0.09}, {1024: 0.011, 4096: 0.05}
+        self.assertFalse(k4_nesting_passes([noisy]))
+        self.assertTrue(k4_nesting_passes([noisy, clean]))
+        self.assertFalse(k4_nesting_passes([noisy] * 3))
 
     def test_k4_hook_process_and_hints(self):
         # Section 9.7: the real hook, launched as `python3 -B scripts/hooks/secret_path_guard.py` with a JSON payload on stdin (the payload

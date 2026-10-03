@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "kind": "new-wsl-dual-image-recipe-integration",
+  "accepted_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+  "source_recipe_base": "798ac445307e2cd8eba6e74d7722ac0e16da02c7",
+  "evidence_class": "local_integration",
+  "source_patch_sha256": "019af42cc09aed576b26702c75537a1eed1ee0421ab0516f7aadd2211c480019",
+  "release_status": {"26.04.1": "provisional", "24.04.5": "provisional", "acceptance_precedence": null},
+  "image_sha256": {
+    "26.04.1": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+    "24.04.5": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e"
+  },
+  "validation": [
+    {"command": "python3 -m unittest tests.test_wsl_new_distro_recipe", "tests": 50, "native_exit_code": 0, "independent": true, "duration_seconds": 0.428},
+    {"command": "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json --root . --json", "native_exit_code": 0, "independent": true, "observations": 0, "returned_output": {"records": [{"errors": [], "observations": 0, "path": "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json", "valid": true}], "valid": true}},
+    {"scope": "swapped selected release recipe and receipt digest rejection", "native_exit_code": 0, "independent": true},
+    {"scope": "frozen seven-file patch application check on accepted main", "native_exit_code": 0},
+    {"scope": "frozen seven-file patch application on accepted main", "native_exit_code": 0}
+  ],
+  "source_verification": {
+    "evidence_class": "reported signature verification exit codes and signer fingerprint; reported 26.04.1 stream hash match; no retained verification output",
+    "signed_checksum_verification_exit_codes": {"26.04.1": 0, "24.04.5": 0},
+    "signer_fingerprint": "843938DF228D22F7B3742BC0D94AA3F0EFE21092",
+    "catalog_commit": "8bc98bc33b246fe66710eec9eaa1b24c323da987",
+    "wsl_setup_commit": "73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8",
+    "image_26_stream_hash_match": true,
+    "image_26_download_bytes": null
+  },
+  "retained_failed_conditions": [
+    {"scope": "original native Claude Opus actor", "native_exit_code": 1, "cause": "returned weekly limit", "changes_made": false},
+    {"scope": "dual-image recipe regression before repair", "native_exit_code": 1, "tests": 2},
+    {"scope": "integration commit secret scanner", "native_exit_code": 1, "cause": "public GPG signer fingerprint labeled as a key matched generic-api-key", "correction": "rename the receipt field to signer_fingerprint; preserve the public fingerprint and scanner"},
+    {"scope": "dependent publication sequencing", "correction": "the first push after the rejected commit published only accepted main; wait for successful commit before publishing the repaired branch"}
+  ],
+  "not_run": ["new distro import or installation", "first boot", "systemd user lifecycle", "second isolated instance", "GPU runtime acceptance", "provider acceptance"],
+  "boundaries_preserved": ["export before unregister", "historical 24.04 receipts", "no global WSL shutdown or kernel change", "native operating-system consent", "Ubuntu insights consent guard"],
+  "sources": [
+    "https://github.com/microsoft/WSL/blob/8bc98bc33b246fe66710eec9eaa1b24c323da987/distributions/DistributionInfo.json",
+    "https://releases.ubuntu.com/26.04.1/",
+    "https://releases.ubuntu.com/24.04.5/",
+    "https://github.com/ubuntu/wsl-setup/tree/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8",
+    "adoption/platforms/linux-wsl2-new-distro.md"
+  ]
+}

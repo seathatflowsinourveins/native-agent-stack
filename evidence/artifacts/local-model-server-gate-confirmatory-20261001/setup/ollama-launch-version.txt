@@ -1,0 +1,2 @@
+codex-cli 0.159.3
+ollama launch codex -- --version exit=0

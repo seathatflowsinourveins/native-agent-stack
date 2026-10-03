@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "layer_id": "workers",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["No matched worker/challenger comparison or Worktrunk-backed model-child equivalence.","Automatic selected-Codex PTY submission held; explicit Claude handoff is separate.","Host failure, provider cancellation, external exactly-once effects and recovery accounting unqualified."]},
+  "selected_repositories": [
+    {"component_id":"claude-code","repository":"https://github.com/anthropics/claude-code","pin_of_record":"2.1.284","pin_source":"manifests/stack.json:190; adoption/pins-linux-x86_64.json:68 (floor)","source_pinned_url":"https://github.com/anthropics/claude-code/tree/v2.1.284","upstream_currency":"Latest/installed 2.1.286; official subagent docs/changelog read.","native_install":{"command":"claude install 2.1.284","source":"installed install --help; official setup docs","evidence_class":"source-only; not run"},"native_acceptance":{"command":null,"source":"tagged README/changelog; installed help","evidence_class":"public CLI suite not found in checked sources; help only executed"}},
+    {"component_id":"worktrunk","repository":"https://github.com/max-sixty/worktrunk","pin_of_record":"0.79.0","pin_source":"manifests/stack.json:1057","source_pinned_url":"https://github.com/max-sixty/worktrunk/tree/5ba6f148e8505c20794f2d8bc706aa4f26335c95","upstream_currency":"Latest 0.80.0; installed 0.79.0. New release notes do not qualify ownership.","native_install":{"command":"cargo install worktrunk --version 0.79.0","source":"pinned README.md Cargo installation","evidence_class":"source-only; not run"},"native_acceptance":{"command":"cargo test","source":"pinned README.md development instructions","evidence_class":"source-only; not run"}}
+  ],
+  "alternatives": [
+    {"name":"Codex native workers","repository":"openai/codex","verdict":"Main CLI 0.159.2 (stack:295/Linux pins:53); installed/latest 0.159.3. Recorded queue acceptance only.","sources":["https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/app-server/README.md"]},
+    {"name":"Codex for Claude companion","repository":"openai/codex-plugin-cc","verdict":"v1.0.6 plugin; review/interruption/client parity conditional.","sources":["https://github.com/openai/codex-plugin-cc/blob/v1.0.6/README.md"]},
+    {"name":"Beads","repository":"gastownhall/beads","verdict":"Optional queue: main 1.3.0/f45b249c; latest 1.3.1. make test source-only.","sources":["https://github.com/gastownhall/beads/blob/f45b249ce6b40ba62aecc03949e6371e8f7c79d8/Makefile#L175"]},
+    {"name":"DeerFlow","repository":"bytedance/deer-flow","verdict":"v2.1.0 harness; matched task acceptance open.","sources":["https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md"]},
+    {"name":"Deep Agents","repository":"langchain-ai/deepagents","verdict":"Filesystem/subagents; concrete-task comparison open.","sources":["https://github.com/langchain-ai/deepagents/blob/dd0e2f5366da3704585a372aa905734cafcec900/README.md"]},
+    {"name":"OpenHands SDK","repository":"OpenHands/software-agent-sdk","verdict":"v1.50.1 SDK; conditional container/remote need.","sources":["https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/README.md"]},
+    {"name":"OpenHands Agent Canvas","repository":"OpenHands/OpenHands","verdict":"v1.24.0 third-party-agent control center; parity unmeasured.","sources":["https://github.com/OpenHands/OpenHands/blob/v1.24.0/README.md"]},
+    {"name":"Microsoft Agent Framework","repository":"microsoft/agent-framework","verdict":"Python/.NET workflow alternative; unqualified.","sources":["https://github.com/microsoft/agent-framework/blob/python-1.19.0/README.md"]},
+    {"name":"LangGraph","repository":"langchain-ai/langgraph","verdict":"Stateful orchestration; latest CLI tag is not core version.","sources":["https://github.com/langchain-ai/langgraph/blob/4be610c6bc7c042038f671d6def9f523ca385a69/README.md"]},
+    {"name":"Temporal","repository":"temporalio/temporal","verdict":"v1.32.0 workflow server; external-effects need.","sources":["https://github.com/temporalio/temporal/blob/v1.32.0/README.md"]},
+    {"name":"Agent Relay / Relaycast","repository":"AgentWorkforce/relay","verdict":"13.0.0/8.14.0 transport/restart retained; Codex PTY push held.","sources":["https://github.com/AgentWorkforce/relay/blob/v13.0.0/README.md"]}
+  ],
+  "corrections": [
+    {"claim":"Landscape Claude worker pin is 2.1.278.","correction":"Main floor 2.1.284; installed 2.1.286. Preserve explicit role/model/effort.","deciding_source":"manifests/stack.json:190; installed help; v2.1.286 CHANGELOG.md"}
+  ],
+  "evidence_assessment": [
+    "Read retained queue commands/daemon observations; no rerun. Main/installed client pins kept separate.",
+    "Relay restart exits 0; messages persist. Default npm test exits 1: 3531 passed/1 failed/35 skipped. Longer-timeout focused pass does not erase failure.",
+    "Official Claude subagent docs preserve explicit routing and conditional SendMessage. Root live-owner handoff awaits sanitized original proof."
+  ],
+  "failed_access": [
+  ],
+  "omissions": [
+    "No challenger/model runs or private sessions; Beads source refresh is not lifecycle acceptance."
+  ],
+  "next_wave": [
+    "Bound native queue-bridge source/test parity and one matched worker challenger."
+  ],
+  "reopen_on": [
+    "Supported bridge passes delivery/recovery controls, ownership failure, or matched challenger win."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

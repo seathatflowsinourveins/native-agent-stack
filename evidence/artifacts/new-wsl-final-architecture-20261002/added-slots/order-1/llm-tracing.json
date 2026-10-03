@@ -1,0 +1,170 @@
+{
+  "layers": [
+    {
+      "layer_id": "llm-tracing",
+      "selection": [
+        {
+          "name": "C07 — OpenLIT",
+          "repository": "https://github.com/openlit/openlit",
+          "role": "Provisional sole choice for persistent local OTLP storage and inspection of agent and LLM calls. Its documented Claude Code and Codex instrumentation most directly covers the named users. This is a capability-and-install-fit judgment, not a claim of measured performance superiority.",
+          "install_command": "git clone https://github.com/openlit/openlit.git\ncd openlit\ndocker compose up -d\ncurl -fsSL https://raw.githubusercontent.com/openlit/openlit/main/cli/scripts/install.sh | sh\nopenlit configure --endpoint http://127.0.0.1:4318\nopenlit coding install --vendor=claude-code\nopenlit coding install --vendor=codex\nopenlit doctor",
+          "install_source": "https://github.com/openlit/openlit/blob/897838a26e44/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e44/README.md",
+              "shows": "Documents OpenTelemetry-native tracing, a coding-agent session dashboard, and explicit installation commands for Claude Code and Codex instrumentation. The documented captured data includes prompts, LLM calls, tool calls, sub-agent activity, token usage and costs. Apache-2.0 licensing is information only."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e44/docker-compose.yml",
+              "shows": "The local deployment has two services, OpenLIT and ClickHouse, persistent named volumes, an inspection UI on port 3000, and OTLP receivers on ports 4317 and 4318. This establishes a concrete local storage path; it does not establish RAM use or ingestion speed."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-cli.yml",
+              "shows": "The CLI suite runs go test -race -count=1 ./..., checks embedded plugin synchronization, and cross-compiles the CLI for macOS arm64."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/actions/runs/36825597705/job/110250469651",
+              "shows": "The inspected October 1 default-branch commit has a completed SUCCESS result for the CLI Go test job; plugin synchronization also succeeded in this run."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/actions/runs/36825597705/job/110250822172",
+              "shows": "The same inspected commit has a completed SUCCESS result for the darwin-arm64 CLI build. This is cross-compilation evidence, not a complete macOS installation test."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/release-openlit.yml",
+              "shows": "The server release workflow publishes Linux amd64 and arm64 images. Linux amd64 fits the WSL2 host; the arm64 image provides a documented route through Docker on Apple Silicon. GPU execution is unnecessary for the required trace-store job."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-openlit.yml",
+              "shows": "The dashboard has an upstream Jest coverage suite, type checking, linting and a container build. Its existence is supporting test evidence; a successful Jest run was not present in the sampled documentation commit's checks."
+            },
+            {
+              "url": "https://github.com/openlit/openlit/releases/tag/openlit-2.1.0",
+              "shows": "The latest GitHub release was published September 10, 2026, inside the 90-day window. Release notes report expanded dashboard tests and branch coverage above 96%; that upstream report is not a cross-repository benchmark."
+            },
+            {
+              "url": "https://api.github.com/repos/openlit/openlit",
+              "shows": "The repository is not archived. Its default-branch commit 897838a26e447f7f82dccfb59f7cbe0bfba3b694 is dated October 1, 2026, and sampled issues were updated October 1–2."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C01",
+          "name": "Opik",
+          "reason": "Strong local OpenTelemetry, LLM-tracing and evaluation alternative with self-hosted agent-accessible MCP and passing SDK/E2E checks; the consulted README gives a less explicit path for capturing both coding agents' own sessions than OpenLIT's vendor instrumentation commands. [README](https://github.com/comet-ml/opik/blob/3de1c5e630ff/README.md), [E2E CI](https://github.com/comet-ml/opik/actions/runs/36891099668/job/110466634676), [October 1 release](https://github.com/comet-ml/opik/releases/tag/2.2.87)."
+        },
+        {
+          "key": "C02",
+          "name": "HyperDX / ClickStack",
+          "reason": "Good OTLP storage and inspection fit, with an all-in-one deployment, agent-friendly SQL/NDJSON CLI and passing OTLP smoke tests; its documented strengths center on general observability rather than the required coding-agent session capture, and no shared measurement establishes an advantage here. [README](https://github.com/hyperdxio/hyperdx/blob/b52adf718944/README.md), [OTLP smoke CI](https://github.com/hyperdxio/hyperdx/actions/runs/36920517517/job/110565115653), [October 1 CLI release](https://github.com/hyperdxio/hyperdx/releases/tag/cli-v0.6.4)."
+        },
+        {
+          "key": "C03",
+          "name": "Jaeger",
+          "reason": "Strong tracing alternative with passing unit and persistent-storage integration tests, Linux amd64/macOS arm64 release artifacts, and recent MCP/LLM-related changes; its documented quickstart uses in-memory storage, so persistent local retention requires additional configuration, while OpenLIT more directly documents both coding-agent integrations. [README](https://github.com/jaegertracing/jaeger/blob/e95545457675/README.md), [Badger integration CI](https://github.com/jaegertracing/jaeger/actions/runs/36954903126/job/110675620846), [September 14 release](https://github.com/jaegertracing/jaeger/releases/tag/v2.21.0)."
+        },
+        {
+          "key": "C04",
+          "name": "Langfuse",
+          "reason": "Strong finalist for LLM/agent inspection and evaluations, with passing ingestion/UI-related suites; its supported local deployment contains six services, versus OpenLIT's two, and the inspected sources do not establish better ingestion or inspection of both named clients. The service-count comparison concerns installation complexity, not measured resource use. [Compose](https://github.com/langfuse/langfuse/blob/9a29212e855c/docker-compose.yml), [CI](https://github.com/langfuse/langfuse/actions/runs/36876004364/job/110415490324), [October 1 release](https://github.com/langfuse/langfuse/releases/tag/v4.49.0)."
+        },
+        {
+          "key": "C05",
+          "name": "LangWatch",
+          "reason": "Closest coding-agent challenger: documents Claude Code/Codex wrappers and npx @langwatch/server, but that command provisions a multi-component stack, and sampled recent Linux package-smoke checks contain both successes and failures; this leaves clean-install reliability unresolved and does not prove platform inability. [README](https://github.com/langwatch/langwatch/blob/83d152e18926/README.md), [packaged-server test](https://github.com/langwatch/langwatch/blob/83d152e18926/.github/workflows/npx-server-smoke.yml), [failed Ubuntu check](https://github.com/langwatch/langwatch/actions/runs/36943823560/job/110641200464), [successful Ubuntu check](https://github.com/langwatch/langwatch/actions/runs/36943906666/job/110641460638)."
+        },
+        {
+          "key": "C06",
+          "name": "MLflow",
+          "reason": "Strong finalist with a simple uvx mlflow server path, OpenTelemetry tracing, experiment tracking and upstream tracing benchmarks; the README's agent-assisted setup instruments application code, while complete capture of the named Codex sessions was not verified in this review. Its tracking overlap could reverse the choice in the deciding comparison. [README](https://github.com/mlflow/mlflow/blob/5fb75a55ed41/README.md), [tracing benchmark workflow](https://github.com/mlflow/mlflow/blob/5fb75a55ed41/.github/workflows/tracing-benchmark.yml), [September 17 release](https://github.com/mlflow/mlflow/releases/tag/v3.16.1)."
+        },
+        {
+          "key": "C08",
+          "name": "OpenObserve",
+          "reason": "Credible local single-binary/Docker OpenTelemetry store with LLM observability and passing database/UI checks; the inspected sources provide less direct evidence for capturing both coding-agent sessions, and its advertised Elasticsearch storage comparison does not measure this layer's workload. [README](https://github.com/openobserve/openobserve/blob/3e15abc94719/README.md), [database CI](https://github.com/openobserve/openobserve/actions/runs/36936983395/job/110619642062), [September 30 release](https://github.com/openobserve/openobserve/releases/tag/v1.1.0-rc1)."
+        },
+        {
+          "key": "C09",
+          "name": "SigNoz",
+          "reason": "Capable self-hosted OpenTelemetry/LLM inspection platform with MCP access, passing Go tests and Linux amd64/macOS arm64 release artifacts; no inspected measurement establishes a better fit for the two coding-agent sessions or a distinct job requiring it alongside the provisional choice. Optional cloud-only Noz is not needed for the required trace-store capability. [README](https://github.com/SigNoz/signoz/blob/1643df620bbe/README.md), [Go CI](https://github.com/SigNoz/signoz/actions/runs/36921838943/job/110569529369), [September 29 release](https://github.com/SigNoz/signoz/releases/tag/v0.144.0)."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C10",
+          "name": "Uptrace",
+          "criterion": "stale_or_archived",
+          "fact": "As of October 2, 2026 UTC, the latest default-branch commit returned by the GitHub commits API is f617f6c76a035a1b2a83cc19cb2bc2802a68f0a6, dated June 14, 2026, outside the frozen 90-day window. The repository is not archived, but its August 13 pushed_at timestamp does not establish a newer default-branch commit. [Default-branch commits API](https://api.github.com/repos/uptrace/uptrace/commits?per_page=1), [commit](https://github.com/uptrace/uptrace/commit/f617f6c76a03)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "No unique measured winner is established. OpenLIT is the provisional fit choice because its documented installation covers persistent local OTLP storage and both named coding-agent integrations with two deployment services. Currency does not separate the nine non-stale candidates: all are unarchived, have October 1–2 default-branch commits, releases inside 90 days, and sampled October 1–2 issue activity. The primary head-to-head is OpenLIT versus LangWatch on a fresh WSL2 Ubuntu x86_64 host; include MLflow to resolve experiment-tracking overlap, with Langfuse and Jaeger as additional strong finalists if practical. Feed identical fixed OTLP fixtures and actual Claude Code/Codex sessions through each supported integration. First require complete ingestion, correct session/parent relationships, preservation of LLM/tool attributes and persistence across restart. Then compare a fixed inspection/query task set, installation effort, dropped spans, ingestion delay, p50/p95 query latency, idle/peak RAM and CPU, and disk growth. Assess whether experiment tracking adds a needed job or duplicates work. Repeat installation and the correctness checks on macOS arm64. The RTX 4090 is not required for this comparison.",
+      "evidence_gaps": [
+        "The packet contains no comparison where every named arm ran. Upstream tests and CI establish exercised code paths; they do not establish comparative ingestion completeness, inspection quality or resource use on the target hosts.",
+        "ctx_fetch_and_index was blocked with: \"MCP tool call requires approval, but approval policy is never\". Public README, Compose, workflow, issue and CI evidence was instead obtained through the GitHub API, indexed with ctx_index and read with ctx_search. Linked external documentation and benchmark pages were not fetched through the requested route.",
+        "OpenLIT's current README and CI were inspected at commit 897838a26e447f7f82dccfb59f7cbe0bfba3b694. Its documented quickstart uses a floating server image and a main-branch CLI installer; a matching immutable server/CLI release bundle and complete cold installation were not verified.",
+        "OpenLIT's Python provider test job is commented out because it requires live service credentials; the successful CLI, TypeScript and build checks must not be generalized to all provider integrations. Source: https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-python.yml.",
+        "Linux amd64 build/test evidence and macOS arm64 cross-compilation support the platform assessment, but complete WSL2 and Apple Silicon deployments were not exercised.",
+        "CI snapshots cover the three latest commits per non-stale repository, with at most 100 check contexts per commit. They are samples, not historical pass-rate measurements. LangWatch has mixed Linux smoke results; Jaeger's sampled tracing tests passed despite separate Scorecard and Metrics Comparison failures.",
+        "Agent integration commands in upstream READMEs do not themselves prove that every native telemetry signal becomes a complete trace. The deciding comparison must distinguish OTLP traces from logs/metrics and check any supported adapters or hooks.",
+        "Budget used: 30 GitHub API requests, including one GraphQL request for source/test/CI/issue data; one denied fetch batch requesting four pages; two web-search queries that supplied no usable evidence."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/comet-ml/opik",
+        "https://api.github.com/repos/comet-ml/opik/commits?per_page=1",
+        "https://api.github.com/repos/comet-ml/opik/releases/latest",
+        "https://api.github.com/repos/hyperdxio/hyperdx",
+        "https://api.github.com/repos/hyperdxio/hyperdx/commits?per_page=1",
+        "https://api.github.com/repos/hyperdxio/hyperdx/releases/latest",
+        "https://api.github.com/repos/jaegertracing/jaeger",
+        "https://api.github.com/repos/jaegertracing/jaeger/commits?per_page=1",
+        "https://api.github.com/repos/jaegertracing/jaeger/releases/latest",
+        "https://api.github.com/repos/langfuse/langfuse",
+        "https://api.github.com/repos/langfuse/langfuse/commits?per_page=1",
+        "https://api.github.com/repos/langfuse/langfuse/releases/latest",
+        "https://api.github.com/repos/langwatch/langwatch",
+        "https://api.github.com/repos/langwatch/langwatch/commits?per_page=1",
+        "https://api.github.com/repos/langwatch/langwatch/releases/latest",
+        "https://api.github.com/repos/mlflow/mlflow",
+        "https://api.github.com/repos/mlflow/mlflow/commits?per_page=1",
+        "https://api.github.com/repos/mlflow/mlflow/releases/latest",
+        "https://api.github.com/repos/openlit/openlit",
+        "https://api.github.com/repos/openlit/openlit/commits?per_page=1",
+        "https://api.github.com/repos/openlit/openlit/releases/latest",
+        "https://api.github.com/repos/openobserve/openobserve",
+        "https://api.github.com/repos/openobserve/openobserve/commits?per_page=1",
+        "https://api.github.com/repos/openobserve/openobserve/releases/latest",
+        "https://api.github.com/repos/SigNoz/signoz",
+        "https://api.github.com/repos/SigNoz/signoz/commits?per_page=1",
+        "https://api.github.com/repos/SigNoz/signoz/releases/latest",
+        "https://api.github.com/repos/uptrace/uptrace",
+        "https://api.github.com/repos/uptrace/uptrace/commits?per_page=1",
+        "https://api.github.com/graphql",
+        "https://github.com/comet-ml/opik/blob/3de1c5e630ff/README.md",
+        "https://github.com/hyperdxio/hyperdx/blob/b52adf718944/README.md",
+        "https://github.com/jaegertracing/jaeger/blob/e95545457675/README.md",
+        "https://github.com/langfuse/langfuse/blob/9a29212e855c/README.md",
+        "https://github.com/langwatch/langwatch/blob/83d152e18926/README.md",
+        "https://github.com/mlflow/mlflow/blob/5fb75a55ed41/README.md",
+        "https://github.com/openlit/openlit/blob/897838a26e44/README.md",
+        "https://github.com/openobserve/openobserve/blob/3e15abc94719/README.md",
+        "https://github.com/SigNoz/signoz/blob/1643df620bbe/README.md",
+        "https://github.com/openlit/openlit/blob/897838a26e44/docker-compose.yml",
+        "https://github.com/langfuse/langfuse/blob/9a29212e855c/docker-compose.yml",
+        "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-cli.yml",
+        "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-openlit.yml",
+        "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/ci-python.yml",
+        "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/release-cli.yml",
+        "https://github.com/openlit/openlit/blob/897838a26e44/.github/workflows/release-openlit.yml",
+        "https://github.com/langwatch/langwatch/blob/83d152e18926/.github/workflows/npx-server-smoke.yml",
+        "https://github.com/mlflow/mlflow/blob/5fb75a55ed41/.github/workflows/tracing-benchmark.yml",
+        "https://github.com/mlflow/mlflow/blob/5fb75a55ed41/.github/workflows/tracing.yml",
+        "https://github.com/jaegertracing/jaeger/blob/e95545457675/.github/workflows/ci-e2e-badger.yaml",
+        "https://github.com/jaegertracing/jaeger/blob/e95545457675/.github/workflows/ci-build-binaries.yml"
+      ]
+    }
+  ]
+}

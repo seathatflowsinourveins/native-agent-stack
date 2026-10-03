@@ -1,0 +1,235 @@
+{
+ "schema_version": 1,
+ "id": "nextjs-1638-qualification-20261001",
+ "kind": "native_cli_e2e",
+ "recorded_at_utc": "2026-10-01T16:07:49Z",
+ "component_ids": [
+  "nextjs"
+ ],
+ "claim": "On host nativestack-5975wx-20260925 on 2026-10-01, the application-delivery recipe was qualified at Next.js 16.3.8 (tag v16.3.8, commit b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6, released 2026-09-30T16:13:46Z), whose release notes list seven security advisories, the most severe GHSA-cjq9-62q9-8jv4 (high: server-side request forgery in Image Optimization). The two-file patch (package.json and pnpm-lock.yaml, sha256 570ac44d237b6641a5087fe57b079aaf61dcb781b6496a721b0224dd17ea60d0) changes next, @next/env and the eight @next/swc-* lock entries, every other lock entry byte-identical. With Node v24.21.0 and pnpm 12.4.2 the frozen install, the peer check, the typecheck and the production build each exited 0 (recorded at 16:07:49Z), after a first frozen install at 12:13Z exited 1 with ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION for the ten packages published on 2026-09-30; no exclusion or policy change was made.",
+ "limitations": [
+  "Bounded recipe checks only: make verify with its PostgreSQL, API and browser stages was not run, so the 2026-09-20 receipts still qualify 16.3.5, not 16.3.6 or 16.3.8.",
+  "The pnpm store, node_modules and build cache were warm from the earlier attempt; no cold-store install is claimed.",
+  "This recipe's exposure to the seven advisories was not established; the move removes the vulnerable versions from its lock.",
+  "Labels 15 to 17 are the version prints of Node and pnpm and a git diff check; they are metadata, not acceptance.",
+  "No new-host install ran: that is unit U10 on the new distribution. Provider usage of the builder is unknown."
+ ],
+ "host_scope": "nativestack-5975wx-20260925 (linux-wsl2-x86_64): the builder's owned worktree and a task-private pnpm prefix",
+ "data": {
+  "evidence_class": "local_integration_check",
+  "component": {
+   "id": "nextjs",
+   "repository": "https://github.com/vercel/next.js",
+   "from": "16.3.6",
+   "to": "16.3.8"
+  },
+  "recipe": "blueprints/convergence-practice/application-delivery",
+  "source": {
+   "release": "https://github.com/vercel/next.js/releases/tag/v16.3.8",
+   "published_at": "2026-09-30T16:13:46Z",
+   "prerelease": false,
+   "tag_commit": "b0fad0d45eb4c4430fda5eeeb442e8a5af08a5f6",
+   "registry": "https://registry.npmjs.org/next/16.3.8",
+   "registry_integrity": "sha512-U7QEZaTini6wKrb8A8hqLLqYQyCetegKjCpJOyxk642vWoMoU1x5PyZCJFvgYgiptA8xc5j/9xYlZFO7w9Sjmw==",
+   "advisories": [
+    {
+     "id": "GHSA-cjq9-62q9-8jv4",
+     "cve": "CVE-2026-94483",
+     "severity": "high",
+     "title": "Server-Side Request Forgery in Image Optimization",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-cjq9-62q9-8jv4"
+    },
+    {
+     "id": "GHSA-f87g-xv8r-7p7x",
+     "cve": "CVE-2026-94485",
+     "severity": "medium",
+     "title": "Information disclosure in App Router metadata image routes via dynamicParams bypass",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-f87g-xv8r-7p7x"
+    },
+    {
+     "id": "GHSA-4jqv-mc3x-m676",
+     "cve": "CVE-2026-94543",
+     "severity": "medium",
+     "title": "Cache poisoning of SSG and ISR pages in self-hosted applications",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-4jqv-mc3x-m676"
+    },
+    {
+     "id": "GHSA-mcj8-r9mp-w47p",
+     "cve": "CVE-2026-94484",
+     "severity": "medium",
+     "title": "Cache poisoning in SSG/ISR rendering: cross-user content substitution and persistent denial of service",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-mcj8-r9mp-w47p"
+    },
+    {
+     "id": "GHSA-3w37-wq28-93x7",
+     "cve": "CVE-2026-94544",
+     "severity": "medium",
+     "title": "Pending use cache fill can leak Draft Mode content into regular responses and persisted pages",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-3w37-wq28-93x7"
+    },
+    {
+     "id": "GHSA-h694-7cp9-m8p3",
+     "cve": "CVE-2026-103004",
+     "severity": "medium",
+     "title": "Cache leak across root param values in nested use cache functions",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-h694-7cp9-m8p3"
+    },
+    {
+     "id": "GHSA-39w2-rjm5-chcv",
+     "cve": "CVE-2026-94486",
+     "severity": "low",
+     "title": "Information disclosure in the development server's Model Context Protocol endpoint",
+     "url": "https://github.com/vercel/next.js/security/advisories/GHSA-39w2-rjm5-chcv"
+    }
+   ],
+   "association": "The v16.3.8 release notes list all seven advisories as fixed in that release. In the repository advisories' own metadata six give the patched version as \"16.3.?\" and GHSA-h694-7cp9-m8p3 gives 16.3.8; all seven were published at 16:14 to 16:15Z on 2026-09-30, two minutes after the release. Read 2026-10-01 with gh api.",
+   "read_at": "2026-10-01"
+  },
+  "change": {
+   "files": [
+    "package.json",
+    "pnpm-lock.yaml"
+   ],
+   "patch_sha256": "570ac44d237b6641a5087fe57b079aaf61dcb781b6496a721b0224dd17ea60d0",
+   "lock_packages_changed": [
+    "next",
+    "@next/env",
+    "@next/swc-darwin-arm64",
+    "@next/swc-darwin-x64",
+    "@next/swc-linux-arm64-gnu",
+    "@next/swc-linux-arm64-musl",
+    "@next/swc-linux-x64-gnu",
+    "@next/swc-linux-x64-musl",
+    "@next/swc-win32-arm64-msvc",
+    "@next/swc-win32-x64-msvc"
+   ],
+   "other_lock_entries_unchanged": true,
+   "package_json_sha256": {
+    "before": "adc11906a06213750da8eb351ee5a6289720b2cdb2ffc6723025e1624270c31d",
+    "after": "8cacbaa315ccf2f87edf2579ee303842bef88a672bae95bd544eee6237435335"
+   },
+   "pnpm_lock_sha256": {
+    "before": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
+    "after": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4"
+   }
+  },
+  "host": {
+   "platform": "linux-wsl2-x86_64",
+   "node": "v24.21.0",
+   "pnpm": "12.4.2",
+   "next": "16.3.8",
+   "pnpm_provisioning": "pnpm 12.4.2 from the npm registry into a task-private prefix: the Linux pin manifest carries no pnpm, and none was on PATH; no global install"
+  },
+  "failed_attempts": [
+   {
+    "label": "10-frozen-install-without-workspace",
+    "command": "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+    "started_at_utc": "2026-10-01T12:13:21.593Z",
+    "exit_code": 1,
+    "error": "ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION",
+    "rejected_entries": 10,
+    "latest_rejected_publication": {
+     "package": "@next/swc-win32-arm64-msvc@16.3.8",
+     "published_at": "2026-09-30T15:59:57.117Z"
+    },
+    "disposition": "pnpm's minimum release age rule refused the ten Next.js packages published on 2026-09-30. No exclusion or policy change was made; the unchanged candidate was retried after the window. An earlier run whose lock generation wrote a temporary exclusion file is not counted here."
+   }
+  ],
+  "commands": [
+   {
+    "label": "11-mature-policy-frozen-install",
+    "command": "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "fa3c444da7ad742d7a81f480dceb635ae166281d8c48ead1df8a28b40708a837",
+     "bytes": 213
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   {
+    "label": "12-mature-policy-peer-check",
+    "command": "pnpm peers check",
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb",
+     "bytes": 32
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   {
+    "label": "13-mature-policy-typecheck",
+    "command": "pnpm typecheck",
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "adba4af9194e10e47dda75ff0fd0f8c2b756474896d0eba5612799c527ff372a",
+     "bytes": 59
+    },
+    "stderr": {
+     "sha256": "cfa69a51e55057ccedc8f49f26354f7691f65298677767c6424aefe649f6ee22",
+     "bytes": 31
+    }
+   },
+   {
+    "label": "14-mature-policy-build",
+    "command": "NEXT_TELEMETRY_DISABLED=1 pnpm build",
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "4312f708083ca7e036a901671b0ac73ae3b04976a93b715678ad98d33c85f956",
+     "bytes": 659
+    },
+    "stderr": {
+     "sha256": "8c87e6c88f8aa719cdec20bba96b21a6a64d5678f80517663f3457e265cbe519",
+     "bytes": 13
+    }
+   },
+   {
+    "label": "15-mature-policy-node-version",
+    "command": null,
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "f2ec568164f99546161909b0189b57bb5be3e80f8e2ccd8a51a4aed8c4055a04",
+     "bytes": 9
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   {
+    "label": "16-mature-policy-pnpm-version",
+    "command": null,
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "9e742a2b4fa5c337297c7cd77a6fd328d17b4afe12cb9121f6392cf7c35c00da",
+     "bytes": 7
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   },
+   {
+    "label": "17-mature-policy-diff-check",
+    "command": null,
+    "exit_code": 0,
+    "stdout": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    },
+    "stderr": {
+     "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+     "bytes": 0
+    }
+   }
+  ],
+  "result": "passed: frozen install, peer check, typecheck and production build at Next.js 16.3.8",
+  "observed_by": "the Codex catalog lane's builder (gpt-6.1-sol) in an owned worktree at base 000aae77, delegated by the foundation coordinator; the coordinator read the retained record and did not re-run the commands",
+  "checked_at": "2026-10-01T16:07:49Z"
+ }
+}

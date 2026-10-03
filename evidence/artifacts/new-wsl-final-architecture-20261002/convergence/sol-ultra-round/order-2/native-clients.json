@@ -1,0 +1,145 @@
+{
+  "layers": [
+    {
+      "layer_id": "native-clients",
+      "selection": [
+        {
+          "name": "C08 — Codex",
+          "repository": "https://github.com/openai/codex",
+          "role": "Provisional choice for native ChatGPT-account coding sessions and recovery.",
+          "install_command": "curl -fsSL https://chatgpt.com/codex/install.sh | sh",
+          "install_source": "https://github.com/openai/codex/blob/d25c114d494ddb693290b76bf5e5f64ecbdb38fc/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/openai/codex/blob/d25c114d494ddb693290b76bf5e5f64ecbdb38fc/README.md",
+              "shows": "Terminal coding client, ChatGPT-account login, documented installation, Linux x86_64 and macOS arm64 binaries."
+            },
+            {
+              "url": "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+              "shows": "October 1 release documents provider model controls, restored permissions on resume, corrected resume/fork history, and reconnect recovery avoiding duplicate submissions."
+            },
+            {
+              "url": "https://github.com/openai/codex/commit/d25c114d494ddb693290b76bf5e5f64ecbdb38fc",
+              "shows": "October 2 UTC default-branch commit satisfies 90-day currency and describes additional file-open admission and cleanup tests."
+            },
+            {
+              "url": "https://github.com/openai/codex/actions/runs/36960596898",
+              "shows": "Completed postmerge-ci at that commit failed. The failing job was not investigated; this is not evidence of comparative task superiority."
+            }
+          ],
+          "confidence": "medium"
+        },
+        {
+          "name": "C02 — Claude Code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "role": "Provisional choice for native Claude-account coding, research tools and resumable sessions; complete-client open-source status remains unverified.",
+          "install_command": "curl -fsSL https://claude.ai/install.sh | bash",
+          "install_source": "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+          "basis": [
+            {
+              "url": "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+              "shows": "Terminal coding and git workflows, plugins, and the documented native installation command; npm installation is deprecated."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.287",
+              "shows": "October 1 release documents claude.ai OAuth, model selection, session resumption, MCP, hooks, web search/fetch activity, and Linux x64/macOS arm64 assets. These are capability claims, not comparative measurements."
+            },
+            {
+              "url": "https://github.com/anthropics/claude-code/commit/52c76441cae91f6891e4712306bffb057ff6fec5",
+              "shows": "October 1 default-branch commit satisfies 90-day currency."
+            },
+            {
+              "url": "https://api.github.com/repos/anthropics/claude-code",
+              "shows": "Repository is unarchived; license metadata is null. The README links Commercial Terms. Licensing remains informational under the frozen criteria."
+            }
+          ],
+          "confidence": "medium"
+        }
+      ],
+      "not_selected": [
+        {
+          "key": "C04",
+          "name": "Letta Code",
+          "reason": "Credible current alternative with persistent agents, model controls, hooks and explicit WSL support; main CI passed, but no completed comparison establishes native-client tool and recovery parity. [README](https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md), [CI](https://github.com/letta-ai/letta-code/actions/runs/36956099691)."
+        },
+        {
+          "key": "C05",
+          "name": "Claude Agent SDK",
+          "reason": "Current programmatic companion with bundled Claude Code, MCP tools and hooks; no concrete missing event, tool or recovery requirement establishes a reason to replace the native client. [README](https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md)."
+        },
+        {
+          "key": "C07",
+          "name": "OpenAI Agents SDK",
+          "reason": "Current application framework with tools, handoffs and sessions; its documented API-key workflow is less direct for the required native-account client role. [README](https://github.com/openai/openai-agents-python/blob/730deb419c0a2e9e5ebd739499744e4a6bf89ed1/README.md)."
+        },
+        {
+          "key": "C01",
+          "name": "MCPorter native bridge",
+          "reason": "Current complementary MCP runtime and CLI bridge, with documented fixture tests and client-config discovery; those capabilities do not establish it as the coding/session client. [README](https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md)."
+        },
+        {
+          "key": "C06",
+          "name": "opencode and gemini-cli",
+          "reason": "The packet supplies no repository identities or pins for this combined entry, preventing repository-specific verification and a defensible selection."
+        },
+        {
+          "key": "C09",
+          "name": "goose, pi, jcode, maka, codex-acp, prime-agent, hermes-agent, claude-agent-acp",
+          "reason": "The packet supplies no repository identities or pins for this combined entry, preventing consistent verification of its distinct projects."
+        }
+      ],
+      "excluded": [
+        {
+          "key": "C03",
+          "name": "Letta V1 legacy server",
+          "criterion": "outside_requirement",
+          "fact": "Upstream explicitly calls the archive branch's V1 API server retired and directs active projects to Letta Code. The repository is unarchived and has a recent documentation commit, so it is not excluded as stale. [Pinned README](https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md#historical-source)."
+        }
+      ],
+      "close_call": true,
+      "deciding_comparison": "No measured winner is established. On WSL2 x86_64, with a macOS arm64 repeat, compare Letta Code against the direct clients using identical native-account entitlements, models, tasks, tool permissions and effect checks. Measure coding correctness, bounded-research citation accuracy, tool compatibility, and interruption/resume without duplicated effects. Compare a native client with its supported SDK only after identifying a concrete missing event, tool or recovery requirement, and align underlying engine versions; none was established here.",
+      "evidence_gaps": [
+        "The required ctx_fetch_and_index calls were rejected: 'MCP tool call requires approval, but approval policy is never.' GitHub API responses and README source were instead indexed and read through ctx_search; external documentation and papers remain unverified.",
+        "Budget used: 30 GitHub API calls, one web search, and eight attempted page fetches, none successful. Only the packet was read under the working directory.",
+        "There is no completed comparison in the packet and no verified comparative benchmark separating the leading clients. Selections reflect documented capability fit, not measured superiority.",
+        "All seven identifiable repositories are unarchived and have default-branch commits within 90 days. All latest releases are within 90 days except the retired Letta server's May 14 release. Issue response and resolution activity were not assessed.",
+        "Only Codex and Letta Code CI outcomes were retrieved. Letta Code's main CI passed, while its scheduled Claude Agent Watch failed; neither result establishes comparative task quality. Test counts, job logs and platform matrices were not verified.",
+        "No clean-install, account-entitlement, bounded-research or recovery tests ran on the target hosts. Codex's bounded web-research configuration and the Claude Agent SDK's native-account authentication were not established by the inspected sources.",
+        "Linux x86_64 and macOS arm64 distributions were verified for the selected clients. Letta Code explicitly mentions WSL, but its architecture-specific support was not verified. GPU performance was not scored because the packet specifies no local GPU requirement.",
+        "License was not scored. Claude Code's complete-client open-source status remains unverified. Claude Agent SDK metadata identifies MIT while its README separately describes Commercial Terms and component exceptions; their legal relationship was not verified."
+      ],
+      "sources_read": [
+        "https://api.github.com/repos/anthropics/claude-code",
+        "https://api.github.com/repos/anthropics/claude-code/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-code/commits?per_page=1",
+        "https://github.com/anthropics/claude-code/blob/52c76441cae91f6891e4712306bffb057ff6fec5/README.md",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/releases/latest",
+        "https://api.github.com/repos/anthropics/claude-agent-sdk-python/commits?per_page=1",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/bfb895c6ef46e095191938b4eda798a025957c09/README.md",
+        "https://api.github.com/repos/openai/openai-agents-python",
+        "https://api.github.com/repos/openai/openai-agents-python/releases/latest",
+        "https://api.github.com/repos/openai/openai-agents-python/commits?per_page=1",
+        "https://github.com/openai/openai-agents-python/blob/730deb419c0a2e9e5ebd739499744e4a6bf89ed1/README.md",
+        "https://api.github.com/repos/openclaw/mcporter",
+        "https://api.github.com/repos/openclaw/mcporter/releases/latest",
+        "https://api.github.com/repos/openclaw/mcporter/commits?per_page=1",
+        "https://github.com/openclaw/mcporter/blob/9d3cf4f4a3b07eb625e1ad4d7196182dc24e0392/README.md",
+        "https://api.github.com/repos/openai/codex",
+        "https://api.github.com/repos/openai/codex/releases/latest",
+        "https://api.github.com/repos/openai/codex/commits?per_page=1",
+        "https://github.com/openai/codex/blob/d25c114d494ddb693290b76bf5e5f64ecbdb38fc/README.md",
+        "https://api.github.com/repos/openai/codex/actions/runs?branch=main&status=completed&per_page=100",
+        "https://api.github.com/repos/letta-ai/letta",
+        "https://api.github.com/repos/letta-ai/letta/releases/latest",
+        "https://api.github.com/repos/letta-ai/letta/commits?per_page=1",
+        "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "https://api.github.com/repos/letta-ai/letta-code",
+        "https://api.github.com/repos/letta-ai/letta-code/releases/latest",
+        "https://api.github.com/repos/letta-ai/letta-code/commits?per_page=1",
+        "https://github.com/letta-ai/letta-code/blob/37c2ab0fc80b58bff0fc2ccdbe838a2d72d45bf7/README.md",
+        "https://api.github.com/repos/letta-ai/letta-code/actions/runs?branch=main&status=completed&per_page=100"
+      ]
+    }
+  ]
+}
