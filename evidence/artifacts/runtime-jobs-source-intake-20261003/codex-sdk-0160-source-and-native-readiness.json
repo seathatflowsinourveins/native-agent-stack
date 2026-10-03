@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-03T08:54:01Z",
+  "evidence_class": "private official-package installation and independent byte observation",
+  "status": "package-install-passed; upstream-mocked-tests-not-run; role-and-provider-acceptance-unqualified",
+  "repository_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "scope": {
+    "package": "@openai/codex-sdk@0.160.0",
+    "installation": "new owned private prefix, cache, temporary directory and cwd",
+    "repository_ownership": "this receipt only; registration and integration belong to the coordinator",
+    "provider_requests": 0,
+    "sdk_imports_or_constructors": 0,
+    "native_model_executions": 0,
+    "upstream_tests_executed": 0,
+    "adoption_or_default_change": false
+  },
+  "public_sanitization": {
+    "personal_and_host_paths": "normalized to <owned-sdk-prefix>, <public-node>, <public-npm-cli> and <owned-cwd>; no host paths are published",
+    "install_output": "the safe merged output returned by the native tool is retained verbatim",
+    "failure_output": "concise observed cause excerpts retained; excerpts are not represented as complete raw stdout/stderr",
+    "timestamps": "original process start/end UTC timestamps were not retained; unknown values remain null",
+    "excluded_content": "credentials, active client configuration, native authentication stores, raw conversations and provider prompts"
+  },
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "tag": "rust-v0.160.0",
+      "path": "sdk/typescript/package.json",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/package.json",
+      "bytes": 1934,
+      "sha256": "bc908b2ca2823217d19e56fc472b895b18a451a57411046b131992b34977b02c",
+      "supports": "Node >=18, ESM entry/types, Jest test script and upstream development dependency surface; source version is 0.0.0-dev"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/README.md",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/README.md",
+      "bytes": 5147,
+      "sha256": "bc454b26a6920efb1826912be6b6ba96348ab39d9f4e70078465deb586dbbfe7",
+      "lines": "7-13, 34-50, 119-138",
+      "supports": "native npm package installation, stock runStreamed event loop and supported environment/configuration overrides"
+    },
+    {
+      "repository": "npm/cli",
+      "pin": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "tag": "v11.19.0",
+      "path": "workspaces/config/lib/index.js",
+      "url": "https://github.com/npm/cli/blob/bfacd33ccbcd908480610703b60455d2da5b57a9/workspaces/config/lib/index.js",
+      "bytes": 32085,
+      "sha256": "938b85a17fde9f2355497fd4befc9bac45d406fb4afacd8af63322796697ff06",
+      "lines": "570-573, 765-770",
+      "supports": "duplicate configuration source path rejection and explicit user/global configuration loading",
+      "installed_source_byte_match": true
+    },
+    {
+      "repository": "npm/cli",
+      "pin": "bfacd33ccbcd908480610703b60455d2da5b57a9",
+      "url": "https://github.com/npm/cli/releases/tag/v11.19.0",
+      "evidence": "official version changelog read; no update to the later version advertised by npm was performed"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/jest.config.cjs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/jest.config.cjs",
+      "bytes": 838,
+      "sha256": "c5babef9cbbbf1e3ada6fec43c56415fee9f3e6562fc8db9103f3afba52e4b0c",
+      "supports": "unchanged upstream Jest configuration loads tests/setupCodexHome.ts"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "sdk/typescript/tests/setupCodexHome.ts",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/tests/setupCodexHome.ts",
+      "bytes": 746,
+      "sha256": "7212a09dd1169661746eb9c5f7d90271beb336134648c268804a256e241e1e44",
+      "supports": "fixture-internal mkdtemp CODEX_HOME, restoration/deletion and cleanup; permitted unchanged inside an auth-excluding filesystem namespace"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/model-provider-info/src/lib.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/model-provider-info/src/lib.rs",
+      "bytes": 31061,
+      "sha256": "941a8ec0e8be4b45080cac3df3d052999a4cb104811575634b1a9ed510690958",
+      "lines": "184-190, 474-488",
+      "supports": "custom provider, Responses routing, http_headers, requires_openai_auth=false and no env_key for a keyless provider; this is source support, not a no-auth execution proof"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/exec/src/event_processor_with_jsonl_output.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/event_processor_with_jsonl_output.rs",
+      "bytes": 27168,
+      "sha256": "bc296541b385f9b4ca2c28cc638e25a8d6b1332b2cd67f5a03eaa97a3d612b19",
+      "lines": "118-128, 509, 533",
+      "supports": "JSONL completion uses the latest token_usage.total; absent native usage can produce default zero values"
+    },
+    {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/exec/src/exec_events.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/exec/src/exec_events.rs",
+      "bytes": 10713,
+      "sha256": "dafa872d7e86a099e56e28a329dcb9c03db90ed768c3b88cca8c91d46dc1d0e5",
+      "supports": "native cache-write usage deserialization defaults; zero does not establish an observed complete cache counter"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "version": "3.8.51",
+      "path": "src/lib/semanticCache.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/semanticCache.ts",
+      "bytes": 19900,
+      "sha256": "c71b2c555584370bad3d90de8c5b43a550e68a31d2050d7d78361f5c98a1390a",
+      "lines": "483, 501",
+      "supports": "X-OmniRoute-No-Cache=true guards semantic response-cache reads/writes; this does not purge upstream provider prompt caches",
+      "prior_original_read_receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-cache-controls.json"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "path": "open-sse/handlers/chatCore.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts",
+      "bytes": 280134,
+      "sha256": "15e4eae668dc790a5dad1995f6f9e3c9e87bd7ace7cc76cfe5acc89b0c4343ac",
+      "lines": "1692",
+      "supports": "x-omniroute-compression=off suppresses the configured compression gate after trimming/lowercasing; request-header intake is in open-sse/handlers/chatCore/headers.ts:44",
+      "boundary": "reused pinned original-source observations; no current gateway request or composed-build qualification"
+    }
+  ],
+  "runtime_prerequisites": {
+    "node": {
+      "version": "v24.21.0",
+      "native_version_exit": 0,
+      "returned_output": "v24.21.0\n"
+    },
+    "npm": {
+      "version": "11.19.0",
+      "native_version_exit_after_repair": 0,
+      "native_install_help_exit_after_repair": 0,
+      "installed_package_json": {
+        "bytes": 6597,
+        "sha256": "09dfcf187178ce1ab3ea6194c80d3ae082ad2a86dc1269ac963f94429e718122"
+      },
+      "installed_config_package": {
+        "version": "10.12.0",
+        "package_json_bytes": 1439,
+        "package_json_sha256": "17e999d89f983a3cc9f8149cffbf4c5e3dec7f4f505b81d072398286c39deaad"
+      }
+    },
+    "pnpm": "not resolved in the named current PATH; no host-wide absence claim"
+  },
+  "installation": {
+    "official_recipe": "npm install @openai/codex-sdk; pinned package version 0.160.0 selected",
+    "cwd": "<owned-sdk-prefix>",
+    "environment": {
+      "inheritance": "env -i",
+      "PATH": "<public-node-directory>:/usr/bin:/bin",
+      "TMPDIR": "<owned-sdk-prefix>/tmp",
+      "HOME_assignment": false,
+      "CODEX_HOME_assignment": false,
+      "credential_variables_injected": false
+    },
+    "native_argv_after_rtk_proxy": [
+      "env", "-i",
+      "PATH=<public-node-directory>:/usr/bin:/bin",
+      "TMPDIR=<owned-sdk-prefix>/tmp",
+      "<public-node>", "<public-npm-cli>",
+      "--userconfig=<owned-sdk-prefix>/npm-user-empty.conf",
+      "--globalconfig=<owned-sdk-prefix>/npm-global-empty.conf",
+      "--cache=<owned-sdk-prefix>/npm-cache",
+      "--prefix=<owned-sdk-prefix>",
+      "--registry=https://registry.npmjs.org",
+      "install", "--save-exact", "@openai/codex-sdk@0.160.0"
+    ],
+    "owned_nonsecret_configs": {
+      "files": ["npm-user-empty.conf", "npm-global-empty.conf"],
+      "each_bytes": 1,
+      "each_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "content": "one newline; created by apply_patch, with distinct source paths"
+    },
+    "script_policy": "registry scripts inspected before installation; SDK has no release install/prepare hook, CLI/platform packages have no scripts; native npm policy retained without ignore-scripts, allow-all or approval bypass",
+    "native_exit": 0,
+    "start_utc": null,
+    "end_utc": null,
+    "tool_observed_wall_seconds": 5.520371013,
+    "returned_output": "\nadded 3 packages in 6s\nnpm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.0\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0\nnpm notice To update run: npm install -g npm@12.2.0\nnpm notice\n",
+    "returned_output_utf8_bytes": 233,
+    "returned_output_sha256": "b373c82451eaef9dbf3c4dc9524e8c6569071d92d3ce4af3018dde7c6bd4fac1",
+    "npm_ls_all_json_native_exit": 0,
+    "actual_installed_packages": [
+      "@openai/codex-sdk@0.160.0",
+      "@openai/codex@0.160.0",
+      "@openai/codex-linux-x64@0.160.0-linux-x64"
+    ],
+    "optional_platform_scope": "the lock retains other platforms' metadata; npm ls reports those optional packages as empty nodes, not additional installed packages",
+    "installer_generated_files": [
+      {"path": "package.json", "bytes": 63, "sha256": "fc8c798659eb86267961be316426babc2293319ec3c455926d35d4116e479806"},
+      {"path": "package-lock.json", "bytes": 4652, "sha256": "1203b06e04ac31a5f574a2220605526596dfdbeb03c88e578033b155b646901c"}
+    ]
+  },
+  "registry_identity": {
+    "metadata_url": "https://registry.npmjs.org/@openai/codex-sdk/0.160.0",
+    "name": "@openai/codex-sdk",
+    "version": "0.160.0",
+    "gitHead": null,
+    "tarball_url": "https://registry.npmjs.org/@openai/codex-sdk/-/codex-sdk-0.160.0.tgz",
+    "dist_integrity": "sha512-PWmoVvX/YqofBnauvao7IEUSYWzbbbIBmwQfRu3ARb2ZbcwIUeuMaicchEpdBzpE8Bw3KOMyhlPlcSQWeg+EoA==",
+    "dist_sha1": "2bea67015277e4f33bea85c46ededb6f47d9c1e7",
+    "dist_file_count": 6,
+    "dist_unpacked_size": 79412,
+    "independent_tarball_observation": {
+      "bytes": 21187,
+      "sha256": "db2a2315d32285f5701d8f31984356e77f757399014f64f20cf246cb9cadd1e3",
+      "calculated_sha512_sri_matches_dist_integrity": true,
+      "installed_release_files_match_archive": "6 of 6; total 79412 bytes"
+    },
+    "attestation_metadata": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@openai%2fcodex-sdk@0.160.0",
+      "read_status": "two decoded statements observed, publish predicate and SLSA v1",
+      "subject": "pkg:npm/%40openai/codex-sdk@0.160.0",
+      "declared_source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "declared_source_ref": "refs/tags/rust-v0.160.0",
+      "declared_build_workflow": ".github/workflows/rust-release.yml",
+      "declared_invocation": "https://github.com/openai/codex/actions/runs/36897822835/attempts/5",
+      "cryptographic_attestation_verification_run": false,
+      "limit": "parsed upstream provenance declaration, corroborated by embedded source byte matches; not a verified attestation signature"
+    }
+  },
+  "installed_release_files": [
+    {"path": "LICENSE", "bytes": 10926, "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc"},
+    {"path": "dist/index.js", "bytes": 17089, "sha256": "d62ed107033bdba802b283c77d875e4bec3deb2704a910bb7e3f95059473b16f"},
+    {"path": "package.json", "bytes": 1955, "sha256": "e8c2fd59b5499439b33c8fa6f1b6e5d3a51d9a38ca6cca8d8d95f5aa69576338"},
+    {"path": "dist/index.js.map", "bytes": 33926, "sha256": "830f7fb2b7f1e3ff4aed4bfc48344159136a4050918676ddef77f5cf6c5af4b5"},
+    {"path": "README.md", "bytes": 5147, "sha256": "bc454b26a6920efb1826912be6b6ba96348ab39d9f4e70078465deb586dbbfe7"},
+    {"path": "dist/index.d.ts", "bytes": 10369, "sha256": "954d28bec3db17316c2f6acbbd157210ded9f75143c50827215739110327c7ac"}
+  ],
+  "embedded_sources": {
+    "method": "installed source-map sourcesContent bytes compared independently with pinned raw upstream originals",
+    "all_four_match_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "files": [
+      {"path": "sdk/typescript/src/outputSchemaFile.ts", "bytes": 1084, "sha256": "fa415b396f87ba69b196abb637ac639d077f46f8f04ea4d99c39aced4f2e41ac"},
+      {"path": "sdk/typescript/src/thread.ts", "bytes": 4971, "sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c"},
+      {"path": "sdk/typescript/src/exec.ts", "bytes": 14203, "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79"},
+      {"path": "sdk/typescript/src/codex.ts", "bytes": 1230, "sha256": "25a5b9ccb6a485f3aaa474d6e39f3d48ad72903d9e3a2f02e7b6218228d6a470"}
+    ]
+  },
+  "installed_api_observation": {
+    "esm_export": "./dist/index.js",
+    "types_export": "./dist/index.d.ts",
+    "binary_override": "CodexOptions.codexPathOverride",
+    "structured_provider_override": "CodexOptions.config; SDK flattens the object and serializes TOML CLI config overrides",
+    "child_environment_control": "CodexOptions.env replaces inherited process.env when supplied",
+    "literal_effort": "ModelReasoningEffort includes ultra and max; ThreadOptions.modelReasoningEffort accepts the literal",
+    "job_classification": "ThreadOptions.threadSource is a source classification; it does not establish role correctness, isolation or correlation propagation",
+    "terminal_events": ["turn.completed", "turn.failed", "error", "item.completed"],
+    "usage_fields": ["input_tokens", "cached_input_tokens", "cache_write_input_tokens", "output_tokens", "reasoning_output_tokens"],
+    "observation_boundary": "read-only declarations and source bytes, not SDK import, constructor, child-process execution or request-wire qualification"
+  },
+  "installed_platform_binary": {
+    "package": "@openai/codex-linux-x64@0.160.0-linux-x64",
+    "relative_path": "vendor/x86_64-unknown-linux-musl/bin/codex",
+    "bytes": 289101384,
+    "sha256": "12eb3e81114588aca3b7998f4f19e8997b056aca08e57a7ca7c8a3ec8c652aad",
+    "identity_relation": "byte identity with the lane's separately named native 0.160 binary, not a shared file or new execution",
+    "prior_native_receipt": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-0160-native-readiness.json",
+    "executed_in_this_task": false
+  },
+  "preserved_failures_and_corrections": [
+    {
+      "attempt": "initial clean-environment npm --version",
+      "native_exit": 1,
+      "config_arguments": ["--userconfig=/dev/null", "--globalconfig=/dev/null"],
+      "observed_cause_excerpt": "Exit prior to config file resolving; double-loading config \"/dev/null\" as \"global\", previously loaded as \"user\"",
+      "installation_occurred": false
+    },
+    {
+      "attempt": "initial clean-environment npm install --help",
+      "native_exit": 1,
+      "observed_cause_excerpt": "the same duplicate /dev/null configuration source rejection",
+      "installation_occurred": false
+    },
+    {
+      "repair": "one authorized bounded Sol repair: distinct owned empty nonsecret user/global configuration files",
+      "source": "npm/cli@bfacd33ccbcd908480610703b60455d2da5b57a9 workspaces/config/lib/index.js",
+      "after_repair_native_version_exit": 0,
+      "after_repair_native_install_help_exit": 0,
+      "native_auth_or_global_config_change": false
+    },
+    {
+      "attempt": "independent archive/source-map observation followed by platform binary hashing",
+      "native_exit": 1,
+      "observed_cause_excerpt": "ENOENT for guessed legacy vendor/x86_64-unknown-linux-musl/codex/codex",
+      "partial_results_preserved": "all six archive comparisons and all four source-map comparisons completed successfully before the path error; the whole command still exited 1",
+      "correction": "pinned SDK exec.ts lines 432-437 resolve the release package's vendor/<target>/bin/codex path; legacy fallback is separate",
+      "corrected_native_metadata_exit": 0,
+      "subsequent_independent_installed_metadata_and_hash_observation_exit": 0
+    },
+    {
+      "attempt": "scoped rg --files <owned-sdk-prefix>/native-output",
+      "native_exit": 1,
+      "observation": "no files matched in the new owned output directory; native returned install output is retained in this receipt, not fabricated as an existing log file"
+    },
+    {
+      "attempt": "scoped source-locator rg using adoption/recipes and the named public evidence directory",
+      "native_exit": 2,
+      "observed_cause_excerpt": "rg: adoption/recipes: No such file or directory (os error 2)",
+      "correction": "bounded rg in the explicitly named public evidence directory returned 0 and resolved the existing pinned gateway source locators; no capability absence was inferred"
+    },
+    {
+      "source_read_correction": "earlier role-source intake guessed event_processor_with_json_output.rs and received HTTP 404",
+      "verification_path": "exact a956835d tag tree resolved event_processor_with_jsonl_output.rs; original corrected file read and hash retained above",
+      "not_a_provider_or_test_failure": true
+    },
+    {
+      "qualification_correction": "fixture-internal CODEX_HOME mkdtemp/restore is supported unchanged inside an auth-excluding namespace; external HOME/CODEX_HOME repurposing remains prohibited",
+      "verification_path": "original setupCodexHome.ts hash matched the coordinator's independent read",
+      "remaining_gap": "tests remain unrun because full pinned development source/dependencies and this SDK namespace setup were not prepared, not because the unchanged fixture is prohibited"
+    }
+  ],
+  "upstream_mocked_test_gate": {
+    "status": "NOT RUN",
+    "declared_native_package_script": "test: jest",
+    "installed_release_tests_directory": false,
+    "jest_binary_in_owned_prefix": false,
+    "full_pinned_development_checkout_installed": false,
+    "sdk_namespace_probe_or_suite_attempted": false,
+    "fixture_support": "unchanged tests/setupCodexHome.ts performs temporary internal state isolation and cleanup; permitted within the qualified filesystem envelope",
+    "remaining_work": "prepare pinned upstream development source/dependencies through its native supported commands; bind exact mock-only test names; expose only owned source/package and public Node/libraries in a fresh auth-excluding namespace before running unchanged controls",
+    "limitations": "release installation is not an upstream test pass; no substitute custom acceptance test was authored"
+  },
+  "prospective_native_gpt_role_canary": {
+    "status": "source-supported proposal only; no provider request or window allocated by this receipt",
+    "integration": "stock SDK README runStreamed with a fresh thread and an explicitly frozen useful task/oracle in an owned copy",
+    "constructor_config": {
+      "codexPathOverride": "<qualified-native-codex-0.160-binary>",
+      "config": {
+        "model_provider": "lane_omniroute",
+        "model_providers": {
+          "lane_omniroute": {
+            "name": "OmniRoute SDK canary",
+            "base_url": "http://127.0.0.1:21128/v1",
+            "wire_api": "responses",
+            "requires_openai_auth": false,
+            "http_headers": {
+              "X-Correlation-Id": "lane:runtime-jobs-20261003:codex-sdk:<job-id>",
+              "X-OmniRoute-No-Cache": "true",
+              "x-omniroute-compression": "off"
+            }
+          }
+        }
+      }
+    },
+    "thread_options": {
+      "model": "cx/gpt-6.1-sol",
+      "modelReasoningEffort": "ultra",
+      "threadSource": "<frozen-role-job-classification>",
+      "workingDirectory": "<owned-useful-task-cwd>",
+      "sandboxMode": "workspace-write",
+      "approvalPolicy": "never",
+      "webSearchMode": "disabled"
+    },
+    "credential_contract": "omit apiKey, env_key and bearer/header secrets; configure the keyless provider explicitly rather than assuming baseUrl alone avoids native OpenAI authentication",
+    "isolation_contract": "fresh auth-excluding filesystem and nonsecret child environment must be bound before execution; configuration support alone does not prove the native loader avoided a host auth store",
+    "observable_contract": "retain job/thread identity, final terminal event, tool-effect evidence, the unchanged frozen task's native oracle and complete authoritative native usage; distinguish task success from model/effort/header wire acceptance",
+    "stop_conditions": "unbound useful task/oracle, unavailable scoped provider window, effective model/effort unknown, failed terminal/tool effect, unexpected credentials/state access or missing complete native cache counters",
+    "retry_contract": "no zero-retry claim; record all actual attempts and usage, including native retry behavior",
+    "cache_control_scope": "the no-cache header is a gateway semantic response-cache bypass, not upstream prompt-cache isolation; actual headers, compression application and complete native cache counts still require request-matched observations",
+    "gateway_scope": "source-supported request fields only; current-process build, effective provider/model/Ultra and control application remain unqualified"
+  },
+  "sdk_617_boundary": {
+    "pr": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/617",
+    "head": "f7c813a7e5569de95cc14a8fb05722b38ef465b6",
+    "state_at_coordinator_observation": "OPEN; not merged",
+    "historical_evidence": "older source/example and role-trial receipts are historical; their terminal/oracle observations do not qualify this new SDK 0.160 package or current gateway",
+    "remaining_role_acceptance": "each requested role requires frozen role instructions/task, terminal and tool-effect observations, independent task-matched oracle, job/thread/correlation binding and complete native usage on the selected route",
+    "pr_files_modified": false
+  },
+  "usage_and_quality": {
+    "authoritative_native_usage": null,
+    "input_tokens": null,
+    "cached_input_tokens": null,
+    "cache_write_input_tokens": null,
+    "output_tokens": null,
+    "reasoning_output_tokens": null,
+    "uncached_input_plus_output": null,
+    "quality_score": null,
+    "provider_cost": null,
+    "token_savings": null,
+    "missingness": "SDK thread.ts lines 107-109 normalizes absent cache-write input to zero, and native exec may emit default usage without a notification; neither default establishes observed completeness",
+    "count_once_contract": "for a fresh job retain one authoritative final native aggregate; do not add cumulative snapshots or overlapping cached/reasoning subsets; compute uncached input plus output only after complete compatible native cache counts are established",
+    "claimed_acceptance": "package identity and private native installation only; no role, lifecycle, correlation, provider, wire, quality, savings or default acceptance"
+  },
+  "repository_validation": {
+    "baseline_command": "rtk proxy /usr/bin/python3 scripts/validate.py",
+    "baseline_revision": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "baseline_native_exit": 0,
+    "baseline_returned_output": "{\"components\": 69, \"hashed_files\": 9477, \"profiles\": 4, \"receipts\": 187, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+    "after_receipt_command": "rtk proxy /usr/bin/python3 scripts/validate.py",
+    "after_receipt_native_exit": 1,
+    "after_receipt_returned_output": "Publication validation failed:\nevidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-source-and-native-readiness.json: evidence file is not hash-listed\n",
+    "after_receipt_scope": "sole failure is this intentionally unregistered owned receipt; coordinator registration remains the final integration step",
+    "receipt_registration": "pending coordinator integration; only this file is owned here"
+  }
+}
