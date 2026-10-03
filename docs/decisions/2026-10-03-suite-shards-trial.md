@@ -25,8 +25,9 @@ The trial belongs to a draft pull request that is never merged. It adds two work
 `.github/workflows/suite-shards-trial-linux.yml` and `.github/workflows/suite-shards-trial-macos.yml`, and the
 oracle, generator and records in
 [`blueprints/convergence-practice/suite-shards-trial-20261003/`](../../blueprints/convergence-practice/suite-shards-trial-20261003/README.md),
-preregistered in its `experiment.json` (status `planned`). The only other change is the expected-workflow set of
-`tests/test_workflow_security_coverage.py`. None of the trial's job names is a required context.
+preregistered in its `experiment.json` (status `planned`). Besides these, it changes only the expected-workflow set of
+`tests/test_workflow_security_coverage.py` and registers its files in `manifests/evidence.json`. None of the trial's
+job names is a required context.
 
 Why this candidate: the first trial (unittest-parallel 1.8.6, draft pull request #646, run 37109532421) failed its
 rule on Linux because that runner pickles live `TestCase` instances: `IsolatedAsyncioTestCase` holds a
