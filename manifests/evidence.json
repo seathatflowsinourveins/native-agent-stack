@@ -9191,8 +9191,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/README.md",
-      "sha256": "3bef3150f4d6c7e3b3877c69292a4d87b7a00b96fb8fe3ed947714873ee02461",
-      "bytes": 72164
+      "sha256": "cc2cb788eea6508ba9248ce87c320557bfb4850edd77ace52f758bed165e64d7",
+      "bytes": 72361
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -15803,6 +15803,11 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
       "bytes": 21453
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md",
+      "sha256": "2e60f1ccc8be4f3772b9119e58b1020ae17d86ba62202997517ef4555baf299b",
+      "bytes": 35949
     },
     {
       "path": "docs/direct-results.md",
