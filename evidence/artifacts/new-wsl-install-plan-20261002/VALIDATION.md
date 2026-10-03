@@ -1,6 +1,6 @@
 # Install-plan validation
 
-The sections are kept in the order they were written. The first two describe the 64-row revision and its clean run, and their counts are that revision's. The plan now has 69 rows: the section "Rows added from the layer consensus" covers the five added afterwards, whose two install commands and two acceptance checks have not run anywhere.
+The sections are kept in the order they were written. The first two describe the 64-row revision and its clean run, and their counts are that revision's. The plan now has 69 rows: the section "Rows added from the layer consensus" covers the five added afterwards, whose two install commands and two acceptance checks have not run anywhere, and the section "The two local-model rows" covers the two rows that became installable on 2026-10-03, whose commands and checks have not run as plan rows anywhere either.
 
 ## Revision to the merged manifest, after the real-distribution run
 
@@ -160,6 +160,80 @@ measurement-only and 28 not installed.
 - Anything on the destination distribution for these rows. The plan's one run there was the 64-row revision (main
   `6652b78e`), whose record is private and whose public receipt comes with that distribution's acceptance; it did not
   include these rows, and none of the five has run there or anywhere else.
+
+## The two local-model rows (2026-10-03): static checks only
+
+### Evidence class
+
+Static checks of the plan's files, our own mutations and synthetic fixtures, on the workstation that holds the checkout.
+No command of either row ran, no model was created, no model server was started and no distribution was used. Reads:
+the registry's manifest for `qwen3-embedding:0.6b`, the Hugging Face Hub's model information and model-card files, and
+Ollama's sources at v0.35.0 ([SOURCES.md](SOURCES.md), section "The two local-model rows").
+
+The measurement that settled the two rows (`evidence/artifacts/new-wsl-local-models-20261002/`) created and ran the
+same models in a throwaway distribution, from the same file and library digest, by its own scripts. That is evidence for
+the systems measured; it is not a run of these plan rows' commands.
+
+### What changed
+
+69 rows: 40 installed (38 by the default run and two only when named), three measurement-only and 26 not installed.
+
+- `local-generation-model` has four commands (the GGUF at the pinned Hugging Face revision through `fetch_verified`
+  with its sha256, the placement of the two Modelfiles from `models/`, two `ollama create`) and two checks (`post_install`
+  on files, `service_health` through the server).
+- `embedding-model` has three commands (`ollama pull`, the pinned manifest digest as `/api/tags` reports it, one
+  `ollama create`) and the same two stages.
+- Both install only with `--only`, after the model server answers, and `accept.sh` gates both the same way.
+- `check_plan.py` checks the dispatch of such rows in both directions: a row that `install.sh` installs only when named
+  fails when `accept.sh` checks it in the default run, and a row that `install.sh` installs in the default run fails
+  when `accept.sh` skips it there.
+
+### Checks run
+
+- `python3 -B check_plan.py`: exit 0, "OK: 69 rows: 40 installed (38 by the default run, 2 only when named),
+  3 measurement-only, 26 not installed; 74 commands and 61 acceptance entries agree with the scripts".
+- `bash -n` on `install.sh` and on `accept.sh`: exit 0 each.
+- `bash install.sh --list`: exit 0, 69 lines; both rows print as `model-server | planned`.
+- Python `json.loads` of `install-plan.json` and `owners.json`: exit 0; both files equal their own re-serialisation
+  (`owners.json` at indent 1 without a final newline, as before this change).
+- `check_plan.py` against defects planted one at a time in scratch copies (our own mutations, not an upstream test):
+  `accept.sh` checking `embedding-model` in the default run; `install.sh` installing `local-generation-model` in the
+  default run; another GGUF sha256 in `install.sh` only; the server-wide context (`num_ctx` 64000) in the JSON's
+  embedding check only; no `Source:` comment above the 64k `ollama create`; the `--list` line of `embedding-model`
+  dropped; `owners.json` marking `local-generation-model` not installed; `local-generation-model` back in the
+  skipped-slot loop; no acceptance function for `embedding-model`; no post-install check for `local-generation-model`
+  in the JSON; and another owner for `embedding-model` than the manifest's default. Each exits 1 and names the problem.
+  The unmodified copy exits 0. With the second dispatch check taken out of a scratch copy of the checker, the defect
+  "`install.sh` installs `local-generation-model` in the default run" exited 0, which is why that check was added.
+- The four acceptance programs against stand-ins: the committed class `LocalModelAcceptance` in
+  `tests/test_new_wsl_definitive_defaults.py` checks that its programs are the ones `accept.sh` runs and runs them as
+  `accept.sh` does (`bash -euo pipefail -c`), with stub `ollama` and `curl` programs that print canned answers, a
+  scratch `HOME` and model store (our own fixtures, with jq on the workstation). The expected states exit 0. Each
+  planted condition exits 1: another 64k Modelfile, another model layer and no created model (generation files);
+  another library manifest and another derived layer (embedding files); another context, another quantization and an
+  empty answer (generation service); the server-wide context and 512 dimensions (embedding service). Taking any one of
+  the nine conditions out of its program, in a scratch run of the test, made its planted case pass.
+- The `ollama show` table that the service checks read is rendered by a table writer with an empty first column and
+  space padding (`cmd/cmd.go:1362-1368`, parameter rows at `:1474-1480`, at v0.35.0); the measurement's record of that
+  output squeezes the spaces (`raw/M15-a2-setup.txt` in the private measurement folder, listed by sha256 in that
+  evidence folder's `files.json`), so the stand-ins imitate the layout read from the source.
+- The Swift Modelfile: `reconstruct_s2o_modelfile.py --check` exit 0, and with the measurement's own `FROM` line the
+  rebuilt file hashes to the recorded `8911245e…` (SOURCES.md, section "The two local-model rows").
+
+### Not established
+
+- That any command of the two rows works as a plan row: the 11.8 GB download through `fetch_verified`, the placement,
+  the two creates, the pull and the digest check have not run under this plan.
+- That the models the rows create carry the manifest digests the measurement recorded. Those digests are in `notes`
+  for comparison; no check reads them.
+- That the checks read the real `ollama show` table and the real answers as the stand-ins do. The stubs do not
+  exercise the server.
+- That the server reads the same model store as the user who runs the checks: the post-install checks read
+  `${OLLAMA_MODELS:-$HOME/.ollama/models}` and assume the server runs as that user with the same `OLLAMA_MODELS`.
+- GPU residency on the destination, and which distribution's model server holds the card. The measured co-residency
+  held under the preregistration's condition N (no other WSL process holding GPU memory, the workstation's two model
+  services stopped first); the README leaves GPU ownership to the lifecycle design.
+- Anything on the destination distribution for these rows.
 
 ## Round 1 install-plan repair (historical)
 

@@ -1054,5 +1054,116 @@ class SkillAuthoringAcceptance(unittest.TestCase):
                 self.assertEqual(status, 1, stderr)
 
 
+class LocalModelAcceptance(unittest.TestCase):
+    """The install plan's checks of the two local-model rows, run against stand-ins.
+
+    The programs that accept.sh runs for local-generation-model and embedding-model are run as accept.sh runs them
+    (bash -euo pipefail -c), with a scratch HOME and model store and with stub ollama and curl programs that print canned
+    answers. The expected state passes, and each planted condition fails it. The fixtures are our own: no model server
+    answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
+    path), so its case writes a stand-in manifest and puts that file's digest in place of the pinned one, after checking
+    that the program names the pinned digest once.
+    """
+
+    PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
+    SWIFT_FILE = "1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786"
+    EMBEDDER_LAYER = "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+
+    @classmethod
+    def setUpClass(cls):
+        if not (shutil.which("bash") and shutil.which("jq") and shutil.which("sha256sum")):
+            raise unittest.SkipTest("bash, jq and sha256sum are needed to run the acceptance programs")
+        rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
+        cls.generation = rows["local-generation-model"]["acceptance"]
+        cls.embedding = rows["embedding-model"]["acceptance"]
+
+    @staticmethod
+    def table(num_ctx, quantization):
+        """The two rows of `ollama show` that the checks read, padded as its table pads them."""
+        return (f"  Model\n    quantization        {quantization}     \n\n"
+                f"  Parameters\n    temperature          1        \n    num_ctx              {num_ctx}    \n\n")
+
+    @staticmethod
+    def store(scratch, model, tag, text):
+        path = scratch / "home/.ollama/models/manifests/registry.ollama.ai/library" / model / tag
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def run_program(self, program, scratch, show="", reply=""):
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "show.txt").write_text(show, encoding="utf-8")
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        for name, canned in (("ollama", "show.txt"), ("curl", "reply.json")):
+            (stub / name).write_text(f'#!/bin/sh\ncat "$STUB_DIR/{canned}"\n', encoding="utf-8")
+            (stub / name).chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("OLLAMA_MODELS", "BASH_ENV", "ENV")}
+        env.update(HOME=str(scratch / "home"), tool_root=str(scratch / "tools"), STUB_DIR=str(stub),
+                   PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60).returncode
+
+    def test_the_programs_are_the_ones_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        for slot, acceptance in (("local-generation-model", self.generation), ("embedding-model", self.embedding)):
+            self.assertEqual(checker.checks_of(functions[slot]),
+                             [(stage, slot, "smoke", acceptance[stage]["command"]) for stage in ("post_install", "service_health")])
+
+    def test_the_generation_files_check(self):
+        cases = {"the expected state": (None, 0), "another 64k Modelfile": ("modelfile", 1),
+                 "another model layer": ("layer", 1), "no created model": ("missing", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                models = scratch / "tools/ollama-models"
+                models.mkdir(parents=True)
+                for modelfile in ("swift-iq3s-s2o.Modelfile", "swift-iq3s-s2o-64k.Modelfile"):
+                    shutil.copy(PLAN / "models" / modelfile, models / modelfile)
+                if change == "modelfile":
+                    (models / "swift-iq3s-s2o-64k.Modelfile").write_text("FROM swift-iq3s-s2o\nPARAMETER num_ctx 65536\n")
+                if change != "missing":
+                    layer = "0" * 64 if change == "layer" else self.SWIFT_FILE
+                    self.store(scratch, "swift-iq3s-s2o-64k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                status = self.run_program(self.generation["post_install"]["command"], scratch)
+                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+
+    def test_the_embedding_files_check(self):
+        program = self.embedding["post_install"]["command"]
+        self.assertEqual(program.count(self.PINNED_LIBRARY), 1)
+        library = '{"schemaVersion":2,"stand-in":true}'
+        program = program.replace(self.PINNED_LIBRARY, hashlib.sha256(library.encode()).hexdigest())
+        cases = {"the expected state": (None, 0), "another library manifest": ("library", 1),
+                 "another derived layer": ("layer", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                self.store(scratch, "qwen3-embedding", "0.6b", library + ("\n" if change == "library" else ""))
+                layer = "1" * 64 if change == "layer" else self.EMBEDDER_LAYER
+                self.store(scratch, "qwen3-embedding-8k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                status = self.run_program(program, scratch)
+                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+
+    def test_the_service_checks(self):
+        answer = json.dumps({"model": "swift-iq3s-s2o-64k", "response": "ready", "done": True})
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        generation, embedding = self.generation["service_health"]["command"], self.embedding["service_health"]["command"]
+        cases = {
+            "generation: the expected state": (generation, self.table(64000, "IQ3_S"), answer, 0),
+            "generation: another context": (generation, self.table(65536, "IQ3_S"), answer, 1),
+            "generation: another quantization": (generation, self.table(64000, "Q4_K_M"), answer, 1),
+            "generation: an empty answer": (generation, self.table(64000, "IQ3_S"), json.dumps({"response": "", "done": True}), 1),
+            "embedding: the expected state": (embedding, self.table(8192, "Q8_0"), vector, 0),
+            "embedding: the server-wide context": (embedding, self.table(64000, "Q8_0"), vector, 1),
+            "embedding: 512 dimensions": (embedding, self.table(8192, "Q8_0"), json.dumps({"embeddings": [[0.01] * 512]}), 1),
+        }
+        for name, (program, show, reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                status = self.run_program(program, scratch, show, reply)
+                self.assertEqual(status == 0, want == 0, f"{name}: exit {status}")
+
+
 if __name__ == "__main__":
     unittest.main()
