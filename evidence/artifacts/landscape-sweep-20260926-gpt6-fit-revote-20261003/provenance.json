@@ -251,8 +251,8 @@
  "workflow_run": "wf_555874dd-5a7",
  "superseded_launch": {
   "workflow_run": "wf_8066ceb5-b9a",
-  "status": "killed 2026-10-03T07:03:12Z",
-  "agents": "planner only (305,181 tokens and 71 tool calls by the runtime's count); it returned nothing and nothing of it was used"
+  "status": "incomplete child-usage measurement; see child-usage-wf_8066ceb5-b9a.json",
+  "agents": "one Opus planner; child-usage-wf_8066ceb5-b9a.json records 64 requests, 71 tool_calls, input_tokens 130, output_tokens 62672, cache_read_input_tokens 11564262 and cache_creation_input_tokens 305171; issue: no result entry in journal. The measurement status and exit_code do not authenticate the parent workflow's or any model driver's exit."
  },
  "label_note": "run_id is a label. Nothing in this flow reads it: codex_job.py never reads sweep_id, make_result.py refuses a GPT-6-only supplement, and record_verdicts.py RUN_ID_PATTERN [0-9A-Za-z]+ rejects it. A later verdict wave cites this record under its own alphanumeric run id.",
  "props_retention": "evidence copies of jobs/<layer>/props.json stay byte-identical (full 40-hex ids). gitleaks 8.30.1 with .gitleaks.toml at e88d59e4b found 0 leaks in the nine props.json files; its 3 findings in jobs/ are code-navigation/prompt.txt lines 23, 176 and 254 (sourcegraph-access-token on pin ids)",

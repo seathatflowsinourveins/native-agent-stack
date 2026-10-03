@@ -1,9 +1,10 @@
 # GPT-6 fit re-vote of the 2026-09-26 landscape sweep (run 2026-10-03)
 
 - **Label:** `landscape-sweep-20260926-gpt6-fit-revote-20261003`, the `sweep_id` staged in both lanes.
-- **Workflow run:** `wf_555874dd-5a7`. An earlier launch of the same script, `wf_8066ceb5-b9a`, was killed at
-  2026-10-03T07:03:12Z with only its planner run (305,181 tokens and 71 tool calls by the runtime's count). It
-  returned nothing and nothing of it was used. It is kept as a failed attempt.
+- **Workflow run:** `wf_555874dd-5a7`. The earlier launch, `wf_8066ceb5-b9a`, is kept as a failed attempt.
+  [Its retained usage record](child-usage-wf_8066ceb5-b9a.json) reports `child_usage.status: incomplete`, one Opus
+  planner, 64 requests, 71 tool calls and the issue "no result entry in journal". Its counters are `input_tokens`
+  130, `output_tokens` 62,672, `cache_read_input_tokens` 11,564,262 and `cache_creation_input_tokens` 305,171.
 - **Evidence class:** returned GPT-6 votes. Per the workflow script, Claude Sonnet command wrappers (`run:<layer>`,
   effort max) started and relayed the jobs: they ran `codex_call.sh` start, wait and result and made no judgment.
   Opus agents planned, criticized and recorded the run. No Claude vote enters the tabulation; the facts and Claude
@@ -138,10 +139,8 @@ Native lane:
 - The prompts carry Date 2026-09-26 but ran on 2026-10-03.
 - The frozen V1 fit template still carries the license gate ("its license is non-commercial, custom-restrictive or
   unclear for this use") that the 2026-09-26 anti-pattern row retired.
-- The native login is the pooled 20128 account 71d44348, so the native votes spent a pooled account's weekly quota. The
-  planning stage's read-only fingerprint at 08:07Z, not re-measured here: `codex_quota.py` plan pro, weekly reset
-  2026-10-10T06:35Z, 1 reset credit; the provider-limits pool entry plan pro, resetAt 2026-10-10T06:35:54Z, 1 banked
-  credit; no other pool entry matched.
+- The votes ran through Codex's native sign-in. The retained native job records in [jobs.json](jobs.json) show
+  `limit` and `limit_marker` false; they record no usage limit.
 
 ## What reads the label
 
@@ -192,20 +191,35 @@ it. Counters are never added to each other.
 | 9 fit jobs, native | 15,909,199 | 14,354,176 | 142,287 | 83,620 |
 | pre-launch probe, native | 129,366 | 84,224 | 759 | 475 |
 
-Claude usage is not in this record yet. The Record stage is a child of `wf_555874dd-5a7` and cannot measure it; after
-the workflow ends the coordinator writes `child-usage-wf_555874dd-5a7.json` and `child-usage-wf_8066ceb5-b9a.json`
-here with `usage_record.py`. Those records sit beside the GPT-6 counters and are never summed with them.
+Claude usage was measured at 2026-10-03T10:14:35Z in the two retained files below. [jobs.json](jobs.json) remains
+the Record stage's earlier 2026-10-03T09:59:23Z snapshot, including its historical `claude_usage.status: pending`
+and superseded-launch description; the later usage records supply the current measured state and failed-attempt
+counters. The Claude table copies each file's `child_usage.by_resolved_model` counters and stays separate from
+the GPT-6 table. The two tables are never summed, and token categories are never added to one another.
+
+| Usage record | child_usage.status | Total children | Resolved model | Model children | input_tokens | output_tokens | cache_read_input_tokens | cache_creation_input_tokens |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| [wf_555874dd-5a7](child-usage-wf_555874dd-5a7.json) | complete | 13 | claude-opus-5-5 | 4 | 768 | 527,983 | 87,987,107 | 2,843,752 |
+| [wf_555874dd-5a7](child-usage-wf_555874dd-5a7.json) | complete | 13 | claude-sonnet-5-5 | 9 | 230 | 119,756 | 6,513,081 | 898,490 |
+| [wf_8066ceb5-b9a](child-usage-wf_8066ceb5-b9a.json) | incomplete | 1 | claude-opus-5-5 | 1 | 130 | 62,672 | 11,564,262 | 305,171 |
+
+The incomplete record contains only the planner and its issue "no result entry in journal". The files'
+`child_usage.status` and `measurement.exit_code` (0 for `wf_555874dd-5a7`, 1 for `wf_8066ceb5-b9a`) are
+counter-measurement results. They do not authenticate the parent workflow's exit or any model driver's exit.
 
 ## Usage limits and reset credits
 
-No usage limit or 429 occurred, so neither the OmniRoute fallback nor a reset was exercised; this run is not
-evidence that the fallback works. No Codex reset credit is consumed automatically. The installed codex-cli 0.159.3
-generates the app-server method `account/rateLimitResetCredit/consume` in its stable protocol schema (`codex app-server
-generate-json-schema`; params `idempotencyKey`, required, and `creditId`, optional), declared in openai/codex
-rust-v0.159.3 `codex-rs/app-server-protocol/src/protocol/common.rs` line 1315. `codex --help` lists no subcommand for
-it, and no harness client calls it: `scripts/codex_quota.py` only sends `account/rateLimits/read` with
-`excludeResetCreditDetails`. The OmniRoute fallback is the only automatic route, and it stays outside 06:30-09:00Z
-and 13:00-16:00Z.
+The retained [job records](jobs.json) show no usage limit, and all nine native fit jobs counted, so the OmniRoute
+fallback was not exercised. This run supplies no fallback or reset acceptance evidence.
+[codex-client-check-20261003.txt](codex-client-check-20261003.txt) retains the R650 check's `date -u`,
+`codex --version` (`codex-cli 0.159.3`) and full `codex --help` output, with each exit code. A reset-credit command
+was not found in that help output or the version's
+[release notes](https://github.com/openai/codex/releases/tag/rust-v0.159.3), retained in
+[codex-upstream-check-20261003.json](codex-upstream-check-20261003.json). The pinned upstream source declares
+`ConsumeAccountRateLimitResetCredit => "account/rateLimitResetCredit/consume"` in
+[openai/codex rust-v0.159.3 common.rs, line 1315](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-protocol/src/protocol/common.rs#L1315);
+the same receipt retains the verified source excerpt. This is upstream source evidence; no installed-schema
+generation result is retained.
 
 ## Files
 
@@ -218,3 +232,11 @@ and 13:00-16:00Z.
   schema_sha256), workflow run, superseded launch and the verified regeneration recipe.
 - `tabulation.json`: the 71 rows with sealed pointers, lane class and job id, and the 27 decisive rows' before and
   after, with native and OmniRoute in separate fields.
+- [child-usage-wf_555874dd-5a7.json](child-usage-wf_555874dd-5a7.json): later Claude counter measurement, complete,
+  13 children, with `by_resolved_model` counters.
+- [child-usage-wf_8066ceb5-b9a.json](child-usage-wf_8066ceb5-b9a.json): later Claude counter measurement of the failed
+  attempt, incomplete, one planner with "no result entry in journal".
+- [codex-client-check-20261003.txt](codex-client-check-20261003.txt): dated installed-client version and full help
+  output, including command exit codes.
+- [codex-upstream-check-20261003.json](codex-upstream-check-20261003.json): dated release-note fields and the exact
+  numbered reset-credit method excerpt from the pinned upstream source.
