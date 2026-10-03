@@ -1,4 +1,5 @@
 {
+  "clock": "clock_gettime(CLOCK_MONOTONIC)",
   "env_present": {
     "CHILD_USAGE_SHELL_PARSER": false,
     "CI": false,
@@ -8,6 +9,7 @@
     "REQUIRE_PROMOTION_GATE_VENV": false,
     "SUITE_SHARDS_ENV_PROBE": true
   },
+  "monotonic_ns": 108468763606546,
   "python_executable": "<python>/bin/python3",
   "python_full_version": "3.13.16 (main, Oct  1 2026, 20:59:14) [Clang 22.1.3 ]",
   "python_version": "3.13.16",
@@ -22,5 +24,6 @@
       "handler": "<Handlers.SIG_DFL: 0>",
       "ignored": false
     }
-  }
+  },
+  "wall_ns": 1791031353166682833
 }

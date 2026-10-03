@@ -1,4 +1,5 @@
 {
+  "control_limit_seconds": 300,
   "controls": [
     {
       "command": "python3 -m unittest -v test_ctl_pass",
@@ -29,7 +30,11 @@
   "files": [
     {
       "file": "controls/foreground.probe.json",
-      "sha256": "245df8257e47081f2b1a092045cc4975bf19f7095996e429de19e22862b34bef"
+      "sha256": "6343be46de51999ccfcd649eff647c5c5d0df9e877002614379e6875cee7a344"
+    },
+    {
+      "file": "controls/heartbeat.json",
+      "sha256": "7b93614dcacfb0dcb38d6c4ebf763b99c6d01d201efaba9d4f36eed0a617d306"
     },
     {
       "file": "controls/shard-0.log",
@@ -37,15 +42,15 @@
     },
     {
       "file": "controls/shard-0.probe.json",
-      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
+      "sha256": "1c13cc730d86d93aeb1474983fce2c7418a5a92867ae7a10bc9a8077e785f383"
     },
     {
       "file": "controls/shard-1.log",
-      "sha256": "d96586d0e0f4d56942e48bd83c6bfffe48f397da972d4d2f7d53868517220d7b"
+      "sha256": "c1d01fb03d2892dd64a88190ea9af2735cb074724af823b19fe0b8672f2f2fc9"
     },
     {
       "file": "controls/shard-1.probe.json",
-      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
+      "sha256": "5fe8d13e3c15457b01717a854446e6123da78771c273e8690130e5b50a1c8322"
     },
     {
       "file": "controls/shard-2.log",
@@ -53,7 +58,7 @@
     },
     {
       "file": "controls/shard-2.probe.json",
-      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
+      "sha256": "7cfb01958b9b8b0e8daef53f114fa17d71d0dc1e743c9d1356830bbf92696989"
     },
     {
       "file": "controls/shard-3.log",
@@ -61,7 +66,7 @@
     },
     {
       "file": "controls/shard-3.probe.json",
-      "sha256": "72624e409c9b564c6fb0bf3f8b6243e2239ae8eed146f0e5b2d3d9ebc674816d"
+      "sha256": "17795fb2f3cd25dcc543a9121a668a3dc7e394d52d82081d28856111d0427d80"
     },
     {
       "file": "inventory/inventory.txt",
@@ -129,7 +134,7 @@
     },
     {
       "file": "runs/G4-shard-3.log",
-      "sha256": "e3d8b84fd96c6a57f3c3d22a9580c13cef281d60199e5241d346454ba6ec1b16"
+      "sha256": "ba5445b9be9496f5e66b105ad6ccc35f0419b1d30d2d6ca6a14b7520f192fb9a"
     },
     {
       "file": "runs/G4T-shard-0.log",
@@ -170,7 +175,7 @@
   ],
   "fixture_os": "ubuntu-24.04",
   "generator": "make_fixtures.py --work <scratch>",
-  "hang_limit_seconds": 3,
+  "hang_limit_seconds": 60,
   "host": {
     "machine": "x86_64",
     "python_version": "3.13.16",

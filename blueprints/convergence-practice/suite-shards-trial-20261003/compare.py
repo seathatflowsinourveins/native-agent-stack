@@ -5,9 +5,14 @@ It reads the run directories of actual GitHub-hosted runs, decides whether each 
 tests the serial production command (arm S) ran on the same OS, with exactly the same outcomes, and applies
 the preregistered speed rule. README.md states every rule and the input layout.
 
-  python3 compare.py verdict --results DIR --inventory DIR --expected-sha SHA [--os OS] [--needs FILE]
-                     --out result.json [--summary-md FILE] [--checkout-status FILE]
-  python3 compare.py controls --dir DIR --os OS --job-result RESULT [--expected-sha SHA] [--out FILE]
+  python3 compare.py verdict --results DIR --inventory DIR --expected-sha SHA --run-attempt N [--os OS]
+                     [--needs FILE] --out result.json [--summary-md FILE] [--checkout-status FILE]
+  python3 compare.py controls --artifact DIR --os OS --job-result RESULT [--expected-sha SHA] [--out FILE]
+
+--results is the directory the compare job downloads the artifacts into without merging them: one directory
+arm-<run name> per arm artifact, holding exactly the run directory <run name>, and the directory `controls`
+(the control artifact), holding exactly <os>-controls. --run-attempt is the compare job's own
+GITHUB_RUN_ATTEMPT; any value but 1 makes every OS incomplete.
 
 verdict exits 0 when result.json was written (the outcome is inside it) and 2 for unusable arguments.
 controls exits 0 when the control run met every expectation and 1 otherwise.
@@ -48,24 +53,46 @@ CLOCK_TOLERANCE_NS = 5 * 10 ** 9
 CLOCK_TOLERANCE_PART = Fraction(1, 100)
 RUN_DIR_RE = re.compile(r"^(?P<os>macos-15|ubuntu-24\.04)-(?:(?P<arm>[A-Za-z0-9]+)-r(?P<rep>[1-9][0-9]*)"
                         r"|(?P<controls>controls))$")
+# Artifact layout (README.md, "Run directory contract"): arm artifact `arm-<run name>` holds exactly the run
+# directory <run name>; the control artifact `controls` holds exactly <os>-controls. A run directory that reaches
+# the oracle by any other path (a bare directory, another artifact) is not attributed and does not count.
+ARM_ARTIFACT_PREFIX = "arm-"
+CONTROL_ARTIFACT = "controls"
 JOB_STATUSES = ("success", "failure", "cancelled")
 # The jobs of each trial workflow, as the compare job's needs context names them, and the results under which
 # the rule applies. A cancelled or skipped job makes the run incomplete, never a rule outcome.
 NEEDS_RESULTS = {"inventory": ("success", "failure"), "serial": ("success", "failure"),
                  "shards": ("success", "failure"), "controls": ("success", "failure"),
                  "controls-check": ("success", "failure")}
+# The step ids the finish steps record from the steps context (meta.json "steps"): the clock-start step of every
+# timed job, after which the test phase begins, and the control job's foreground probe step, after which its
+# parallel group begins. Any outcome but success means the test phase or the group never started.
+START_STEP = "start"
+FOREGROUND_STEP = "foreground"
 # The control run (README.md, "Controls"): four shards of one parallel group, each one control module run with
-# the arms' shard command in an empty directory. The job is expected to fail.
+# the arms' shard command in an empty directory, each step with its own id and expected outcome. The job is
+# expected to fail.
 CONTROL_JOB_RESULT = "failure"
 CONTROL_SHARDS = (
-    {"module": "test_ctl_pass", "expect": "pass",
+    {"module": "test_ctl_pass", "expect": "pass", "step": "control-0", "outcome": "success",
      "records": (("test", "test_ctl_pass.Pass.test_one", "ok"), ("test", "test_ctl_pass.Pass.test_two", "ok"))},
-    {"module": "test_ctl_fail", "expect": "fail",
+    {"module": "test_ctl_fail", "expect": "fail", "step": "control-1", "outcome": "failure",
      "records": (("test", "test_ctl_fail.Fail.test_fails", "FAIL"), ("test", "test_ctl_fail.Fail.test_passes", "ok"))},
-    {"module": "test_ctl_crash", "expect": "crash", "started": "test_ctl_crash.Crash.test_exits", "exit": 3},
-    {"module": "test_ctl_hang", "expect": "killed", "started": "test_ctl_hang.Hang.test_sleeps"},
+    {"module": "test_ctl_crash", "expect": "crash", "step": "control-2", "outcome": "failure",
+     "started": "test_ctl_crash.Crash.test_exits", "exit": 3},
+    {"module": "test_ctl_hang", "expect": "killed", "step": "control-3", "outcome": "failure",
+     "started": "test_ctl_hang.Hang.test_sleeps"},
 )
 CONTROL_ENV_NAME = "SUITE_SHARDS_ENV_PROBE"
+# The four control steps must start together: every probe within this span of the others, so that control shards
+# 1 and 2 (failing after 90 s and crashing after 120 s) are running when control shard 3 reaches its 1-minute limit.
+CONTROL_START_SPREAD_MAX_NS = 30 * 10 ** 9
+# The hang control (control shard 3): its test process must still be alive at least HANG_ALIVE_MIN_NS after its
+# step's probe (the 60 s step limit less 10 s for the heartbeat interval and the step's start-up), so the step was
+# not stopped before its limit; and the control job's finish step, which runs only after the whole group ended,
+# must begin less than HANG_GROUP_MAX_NS after that probe, so the group did not wait for the test's 300 s sleep.
+HANG_ALIVE_MIN_NS = 50 * 10 ** 9
+HANG_GROUP_MAX_NS = 240 * 10 ** 9
 SIGNALS = ("SIGINT", "SIGQUIT")
 LIST_CAP = 200
 
@@ -214,11 +241,16 @@ class Run:
     checkout_status: str | None = None
     logs: list = dataclasses.field(default_factory=list)
     problems: list = dataclasses.field(default_factory=list)
+    unstarted: list = dataclasses.field(default_factory=list)
     mismatches: list = dataclasses.field(default_factory=list)
     mismatch_total: int = 0
     missing_ids: list = dataclasses.field(default_factory=list)
     extra_ids: list = dataclasses.field(default_factory=list)
     repeated_ids: list = dataclasses.field(default_factory=list)
+
+    @property
+    def attempt(self):
+        return attempt_of(self.runtime)
 
     @property
     def step_ns(self) -> int | None:
@@ -291,6 +323,32 @@ def timing_problems(timing) -> list:
     return problems
 
 
+def attempt_of(runtime):
+    """The run attempt runtime.json records (GITHUB_RUN_ATTEMPT), or None when it is unrecorded."""
+    return runtime.get("run_attempt") if isinstance(runtime, dict) else None
+
+
+def step_outcome(meta, step_id: str):
+    """The outcome meta.json records for the step with this id (from the steps context), or None."""
+    steps = meta.get("steps") if isinstance(meta, dict) else None
+    entry = steps.get(step_id) if isinstance(steps, dict) else None
+    return entry.get("outcome") if isinstance(entry, dict) else None
+
+
+def unstarted_reasons(meta, step_id: str) -> list:
+    """Why the runner's own record does not show that the step before the test phase (or the control group)
+    succeeded; [] when it does. A run that never reached its test phase failed in setup: it is partial, never
+    ineligible (README.md, "Decision rule", rule 5)."""
+    if not isinstance(meta, dict):
+        return ["meta.json is missing or not JSON: whether the test phase started is unrecorded"]
+    if not isinstance(meta.get("steps"), dict):
+        return ["meta.json records no step outcomes: whether the test phase started is unrecorded"]
+    outcome = step_outcome(meta, step_id)
+    if outcome != "success":
+        return [f"the {step_id!r} step's outcome is {outcome!r}, not 'success': the test phase never started"]
+    return []
+
+
 def read_log(path: Path, label: str, prefix: str | None, modules: list) -> Log:
     """One command's files and the per-log rules. prefix None is the S layout (log.txt, exit-code.txt,
     command.txt, no probe); otherwise <prefix>.log, <prefix>.exit, <prefix>.command and <prefix>.probe.json."""
@@ -348,6 +406,11 @@ def read_run(path: Path, os_name: str, arm: str, repeat: int, inventory: Invento
     run = Run(path.name, os_name, arm, repeat)
     run.meta, run.runtime, run.timing, run.checkout_status, run.problems = common_problems(
         path, os_name, arm, repeat, expected_sha, timed=True)
+    # Never started: the clock-start step did not succeed (the runner's record), or the finish step found no clock
+    # start (timing.json step_ns None). Then a setup step failed or the job stopped before the test phase.
+    run.unstarted = unstarted_reasons(run.meta, START_STEP)
+    if run.timing is None or run.timing.get("step_ns") is None:
+        run.unstarted.append("timing.json records no clock start: the test phase never started")
     if arm not in arms_of(os_name):
         run.problems.append(f"arm {arm} is not preregistered for {os_name}")
         return run
@@ -416,14 +479,64 @@ def groups(logs: list) -> dict:
 # --------------------------------------------------------------------------- controls
 
 
-def check_controls(path: Path, os_name: str, job_result: str | None, expected_sha: str | None = None) -> dict:
-    """The control run against CONTROL_SHARDS (README.md, "Controls"); passed only when every expectation holds."""
+def is_count(value) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def hang_report(path: Path, probe_ns) -> tuple:
+    """(report, problems) for the hang control (control shard 3) from heartbeat.json, which the control job's
+    finish step writes after the whole group ended: its test process's heartbeats, each `[monotonic ns, parent pid]`,
+    the finish step's own monotonic start and the heartbeat count after a short recheck. Judged: the process was alive
+    HANG_ALIVE_MIN_NS after the step's probe (not stopped before the 60 s limit) and the finish step began less than
+    HANG_GROUP_MAX_NS after it (the group did not wait for the 300 s sleep). Reported only: whether the process
+    outlived its step (its parent pid changed, or it still beat during the recheck)."""
+    data = read_json(path / "heartbeat.json")
+    data = data if isinstance(data, dict) else {}
+    beats = [item for item in data.get("beats") or []
+             if isinstance(item, list) and len(item) == 2 and all(is_count(value) for value in item)]
+    end_ns, after = data.get("end_monotonic_ns"), data.get("beats_after_recheck")
+    report = {"beats": len(beats), "beats_after_recheck": after if is_count(after) else None,
+              "alive_after_probe_seconds": None, "group_end_after_probe_seconds": None,
+              "parent_lost_after_probe_seconds": None, "outlived_step": None}
+    problems = []
+    if not is_count(probe_ns):
+        problems.append("shard-3.probe.json holds no monotonic timestamp of the step's start")
+    if not beats:
+        problems.append("heartbeat.json is missing or holds no heartbeat: the hang control's process was never observed")
+    if not is_count(end_ns):
+        problems.append("heartbeat.json holds no monotonic timestamp of the finish step")
+    if problems:
+        return report, problems
+    lost = next((ns for ns, parent in beats if parent != beats[0][1]), None)
+    alive, group = beats[-1][0] - probe_ns, end_ns - probe_ns
+    report.update(alive_after_probe_seconds=round(alive / 1e9, 3), group_end_after_probe_seconds=round(group / 1e9, 3),
+                  parent_lost_after_probe_seconds=None if lost is None else round((lost - probe_ns) / 1e9, 3),
+                  outlived_step=lost is not None or (report["beats_after_recheck"] or 0) > len(beats))
+    if alive < HANG_ALIVE_MIN_NS:
+        problems.append(f"shard-3: the hang control's last heartbeat came {alive / 1e9:.1f} s after its step started, "
+                        f"under {HANG_ALIVE_MIN_NS // 10 ** 9} s: the step was stopped before its 1-minute limit")
+    if group >= HANG_GROUP_MAX_NS:
+        problems.append(f"shard-3: the finish step began {group / 1e9:.1f} s after the hang control's step started, "
+                        f"not under {HANG_GROUP_MAX_NS // 10 ** 9} s: the group waited for the hang")
+    return report, problems
+
+
+def check_controls(artifact: Path, os_name: str, job_result: str | None, expected_sha: str | None = None) -> dict:
+    """The control artifact against CONTROL_SHARDS (README.md, "Controls"): it must hold exactly <os>-controls,
+    which passes only when every expectation holds. "started" is False when the group never started (the
+    foreground probe step did not succeed or left no probe), which makes the OS incomplete, never a rule outcome."""
+    path = artifact / f"{os_name}-controls"
+    strays = sorted(entry.name for entry in artifact.iterdir() if entry.name != path.name) if artifact.is_dir() else []
     if not path.is_dir():
-        return {"passed": False, "present": False, "problems": ["no control run directory"], "shards": [],
-                "job_result": job_result}
-    _meta, runtime, _timing, _status, problems = common_problems(path, os_name, "controls", 1, expected_sha, timed=False)
+        return {"passed": False, "present": False, "started": False, "unstarted": [], "run_attempt": None,
+                "problems": ["no control run directory"], "shards": [], "job_result": job_result}
+    meta, runtime, _timing, _status, problems = common_problems(path, os_name, "controls", 1, expected_sha, timed=False)
+    if strays:
+        problems.append(f"the control artifact holds entries besides {path.name}: {_cap(strays)}")
+    unstarted = unstarted_reasons(meta, FOREGROUND_STEP)
     foreground = read_json(path / "foreground.probe.json")
     if not isinstance(foreground, dict):
+        unstarted.append("foreground.probe.json is missing or not JSON: the group never started")
         problems.append("foreground.probe.json is missing or not JSON")
         foreground = {}
     if job_result != CONTROL_JOB_RESULT:
@@ -439,6 +552,8 @@ def check_controls(path: Path, os_name: str, job_result: str | None, expected_sh
         entry = {"shard": index, "module": spec["module"], "expect": spec["expect"], "exit_code": log.exit_code,
                  "ran": log.parsed.ran if log.parsed else None,
                  "status_word": log.parsed.status_word if log.parsed else None,
+                 "step": spec["step"], "step_outcome": step_outcome(meta, spec["step"]),
+                 "probe_monotonic_ns": probe.get("monotonic_ns"),
                  "signals": {name: (signals.get(name) or {}).get("handler") for name in SIGNALS},
                  "ignored": {name: (signals.get(name) or {}).get("ignored") for name in SIGNALS},
                  "env_propagated": (probe.get("env_present") or {}).get(CONTROL_ENV_NAME),
@@ -450,6 +565,10 @@ def check_controls(path: Path, os_name: str, job_result: str | None, expected_sh
         mine = list(command_and_probe)
         if listed is None or listed.split() != [spec["module"]]:
             mine.append(f"{label}.txt does not list exactly {spec['module']}")
+        if entry["step_outcome"] != spec["outcome"]:
+            # The runner's own outcome of this step (steps.<id>.outcome after the group's implicit wait): each control
+            # must fail or pass on its own, so a masked failure cannot hide behind another shard's.
+            mine.append(f"{label}: the step's own outcome is {entry['step_outcome']!r}, expected {spec['outcome']!r}")
         if log.probe is not None:
             if entry["env_propagated"] is not True:
                 mine.append(f"{label}: {CONTROL_ENV_NAME}, exported through GITHUB_ENV by an earlier step, is not set "
@@ -483,8 +602,18 @@ def check_controls(path: Path, os_name: str, job_result: str | None, expected_sh
         entry["problems"], entry["passed"] = mine, not mine
         problems.extend(mine)
         shards.append(entry)
-    return {"passed": not problems, "present": True, "problems": problems[:LIST_CAP], "job_result": job_result,
-            "run_attempt": (runtime or {}).get("run_attempt"),
+    starts = [entry["probe_monotonic_ns"] for entry in shards]
+    spread = max(starts) - min(starts) if all(is_count(value) for value in starts) else None
+    if spread is None:
+        problems.append("a control step's probe holds no monotonic timestamp: their concurrency is unrecorded")
+    elif spread > CONTROL_START_SPREAD_MAX_NS:
+        problems.append(f"the control steps started {spread / 1e9:.1f} s apart, more than "
+                        f"{CONTROL_START_SPREAD_MAX_NS // 10 ** 9} s: they did not run together")
+    hang, hang_problems = hang_report(path, shards[3]["probe_monotonic_ns"])
+    problems.extend(hang_problems)
+    return {"passed": not problems, "present": True, "started": not unstarted, "unstarted": unstarted,
+            "problems": problems[:LIST_CAP], "job_result": job_result, "run_attempt": attempt_of(runtime),
+            "start_spread_seconds": None if spread is None else round(spread / 1e9, 3), "hang": hang,
             "foreground_signals": {name: ((foreground.get("signals") or {}).get(name) or {}).get("handler")
                                    for name in SIGNALS},
             "background_ignores_sigint": any(entry["ignored"].get("SIGINT") is True for entry in shards),
@@ -514,6 +643,22 @@ def job_result(needs, job: str):
     return entry.get("result") if isinstance(entry, dict) else None
 
 
+def rerun_reasons(runs: list, controls: dict, compare_attempt) -> list:
+    """Every sign of a re-run (README.md, "Trigger, repetition and re-runs"): the compare job's own run attempt, or
+    the run_attempt of any run or control directory, other than "1" or unrecorded. Checked before anything else,
+    the controls-check result included: a re-run is never a rule outcome."""
+    reasons = []
+    if compare_attempt != "1":
+        reasons.append(f"the compare job's own run attempt is {compare_attempt!r}, not '1'")
+    for run in runs:
+        if run.attempt != "1":
+            reasons.append(f"{run.name}: run_attempt {run.attempt!r}"
+                           f"{' (runtime.json is missing)' if run.runtime is None else ''}")
+    if controls.get("present") and controls.get("run_attempt") != "1":
+        reasons.append(f"the control run: run_attempt {controls.get('run_attempt')!r}")
+    return reasons
+
+
 def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats: int) -> list:
     """Why this OS's workflow run is cancelled or partial (then no rule outcome applies), else []."""
     reasons = []
@@ -530,9 +675,19 @@ def partial_reasons(os_name: str, runs: list, needs, controls: dict, min_repeats
     cancelled = sorted(run.name for run in runs if run.job_status == "cancelled")
     if cancelled:
         reasons.append(f"cancelled jobs: {', '.join(cancelled)}")
+    for run in runs:
+        if run.unstarted:
+            reasons.append(f"{run.name}: {'; '.join(run.unstarted)}")
     if not controls.get("present"):
         reasons.append("no control run directory")
+    elif not controls.get("started"):
+        reasons.append("the control run's parallel group never started: " + "; ".join(controls.get("unstarted") or []))
     return reasons
+
+
+def incomplete_reasons(reruns: list, partial: list) -> list:
+    return ((["a re-run, never a rule outcome: " + "; ".join(reruns)] if reruns else [])
+            + (["a cancelled or partial run, not a rule outcome: " + "; ".join(partial)] if partial else []))
 
 
 def compare_with_baseline(os_name: str, by_arm: dict, baseline: dict) -> None:
@@ -566,18 +721,28 @@ def compare_with_baseline(os_name: str, by_arm: dict, baseline: dict) -> None:
                 run.problems.append(f"{len(diffs)} ids differ from the S baseline: {_cap([d['id'] for d in diffs])}")
 
 
-def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dict, needs, min_repeats: int) -> dict:
+def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dict, needs, min_repeats: int,
+                   compare_attempt) -> dict:
     report = {"outcome": None, "selected_arm": None, "reasons": [], "arms": {},
               "baseline": {"flaky_ids": [], "flaky_total": 0}}
+    reruns = rerun_reasons(runs, controls, compare_attempt)
     if job_result(needs, "inventory") == "failure":
-        report.update(outcome="no verdict", reasons=["the inventory gate failed (job inventory: result 'failure'), "
-                                                     "so no arm ran"])
+        if reruns:
+            report.update(outcome="incomplete", reasons=incomplete_reasons(reruns, []))
+        elif isinstance(inventory.report, dict) and inventory.report.get("ok") is False:
+            report.update(outcome="no verdict", reasons=["the inventory gate failed (job inventory: result 'failure', "
+                                                         "report.json ok false), so no arm ran"])
+        else:
+            # The job failed before its gate reported a failure (a setup step, or the upload): a partial run.
+            report.update(outcome="incomplete", reasons=incomplete_reasons([], [
+                "job inventory: result 'failure' without a report.json that records a failed gate, so the gate "
+                "never reported and no arm ran"]))
         return report
     if inventory.problems:
         partial = partial_reasons(os_name, runs, needs, controls, min_repeats)
-        report.update(outcome="incomplete" if partial else "no verdict",
+        report.update(outcome="incomplete" if reruns or partial else "no verdict",
                       reasons=["the inventory artifact is unusable: " + "; ".join(inventory.problems[:10])]
-                      + (["a cancelled or partial run: " + "; ".join(partial)] if partial else []))
+                      + incomplete_reasons(reruns, partial))
         return report
     by_arm = {arm: sorted((run for run in runs if run.arm == arm), key=lambda run: run.repeat)
               for arm in arms_of(os_name)}
@@ -610,8 +775,8 @@ def verdict_for_os(os_name: str, runs: list, inventory: Inventory, controls: dic
                              meets_speed_rule=median_ratio <= MEDIAN_RATIO_MAX and max_ratio <= MAX_RATIO_MAX)
         report["arms"][arm] = entry
     partial = partial_reasons(os_name, runs, needs, controls, min_repeats)
-    if partial:
-        report.update(outcome="incomplete", reasons=["a cancelled or partial run, not a rule outcome: " + "; ".join(partial)])
+    if reruns or partial:
+        report.update(outcome="incomplete", reasons=incomplete_reasons(reruns, partial))
         return report
     if not report["arms"][SERIAL_ARM]["eligible"]:
         report.update(outcome="no verdict",
@@ -639,7 +804,8 @@ def run_summary(run: Run) -> dict:
     item = {"name": run.name, "os": run.os, "arm": run.arm, "repeat": run.repeat, "eligible": not run.problems,
             "reasons": run.problems[:LIST_CAP], "reasons_total": len(run.problems), "step_ns": run.step_ns,
             "step_seconds": seconds(Fraction(run.step_ns, 10 ** 9)) if run.step_ns else None,
-            "run_attempt": (run.runtime or {}).get("run_attempt"), "job_status": run.job_status,
+            "run_attempt": run.attempt, "job_status": run.job_status, "test_phase_started": not run.unstarted,
+            "unstarted_reasons": run.unstarted, "steps": (run.meta or {}).get("steps"),
             "checkout_clean": None if run.checkout_status is None else run.checkout_status == "",
             "mismatch_total": run.mismatch_total, "mismatches": run.mismatches, "missing_total": len(run.missing_ids),
             "missing_ids": run.missing_ids[:LIST_CAP], "extra_total": len(run.extra_ids),
@@ -661,26 +827,52 @@ def run_summary(run: Run) -> dict:
     return item
 
 
-def load_runs(results: Path, inventory: Inventory, expected_sha: str | None) -> tuple:
-    runs, control_dirs, ignored = [], {}, []
+def arm_artifacts(results: Path) -> tuple:
+    """([(artifact name, run directory, its other entries)], [ignored entries]) of the downloaded arm artifacts.
+
+    The compare job downloads `arm-*` without merge-multiple, so each artifact lands in its own directory named
+    after it (actions/download-artifact src/download-artifact.ts at 3e5f45b2, lines 186-195) and must hold exactly
+    the run directory its name gives. When only one artifact matches, that action extracts it without the
+    directory; such a bare run directory is not attributed and is ignored, and the missing runs make the OS
+    incomplete. The control artifact's directory is read by check_controls."""
+    found, ignored = [], []
     for entry in sorted(results.iterdir()) if results.is_dir() else []:
-        match = RUN_DIR_RE.match(entry.name) if entry.is_dir() else None
-        if not match:
+        if entry.name == CONTROL_ARTIFACT and entry.is_dir():
+            continue
+        name = entry.name[len(ARM_ARTIFACT_PREFIX):] if entry.name.startswith(ARM_ARTIFACT_PREFIX) else ""
+        match = RUN_DIR_RE.match(name) if entry.is_dir() else None
+        if not match or match.group("controls"):
             ignored.append(entry.name)
-        elif match.group("controls"):
-            control_dirs[match.group("os")] = entry
+        elif not (entry / name).is_dir():
+            ignored.append(f"{entry.name} (holds no {name} directory)")
         else:
-            runs.append(read_run(entry, match.group("os"), match.group("arm"), int(match.group("rep")), inventory,
-                                 expected_sha))
-    return runs, control_dirs, ignored
+            found.append((entry.name, entry / name, sorted(child.name for child in entry.iterdir() if child.name != name)))
+    return found, ignored
+
+
+def load_runs(results: Path, os_name: str, inventory: Inventory, expected_sha: str | None) -> tuple:
+    """(runs of os_name, ignored entries) from the arm artifacts; a run whose artifact holds anything besides its
+    run directory is ineligible, because another job's files would otherwise pass as this run's."""
+    runs = []
+    found, ignored = arm_artifacts(results)
+    for artifact, path, others in found:
+        match = RUN_DIR_RE.match(path.name)
+        if match.group("os") != os_name:
+            continue
+        run = read_run(path, os_name, match.group("arm"), int(match.group("rep")), inventory, expected_sha)
+        if others:
+            run.problems.append(f"its artifact {artifact} holds entries besides its run directory: {_cap(others)}")
+        runs.append(run)
+    return runs, ignored
 
 
 def checkout_report(results: Path) -> dict:
-    """The clean-checkout rule on its own: every run directory's git-status.txt exists and is empty."""
+    """The clean-checkout rule on its own: every attributed run directory's git-status.txt exists and is empty."""
     items = []
-    for entry in sorted(results.iterdir()) if results.is_dir() else []:
-        if not entry.is_dir():
-            continue
+    directories = [path for _artifact, path, _others in arm_artifacts(results)[0]]
+    control = results / CONTROL_ARTIFACT
+    directories += [entry for entry in sorted(control.iterdir()) if entry.is_dir()] if control.is_dir() else []
+    for entry in directories:
         status = read_text(entry / "git-status.txt")
         clean = status == ""
         items.append({"name": entry.name, "clean": clean, "status": None if status is None else status[:4000],
@@ -692,12 +884,17 @@ def checkout_report(results: Path) -> dict:
 
 
 def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, os_name: str | None, needs,
-                 min_repeats: int = REPEATS, weights: Path | None = HERE / "weights.json") -> dict:
+                 min_repeats: int = REPEATS, weights: Path | None = HERE / "weights.json",
+                 compare_attempt: str | None = None) -> dict:
+    """result.json for the artifacts under results. compare_attempt is the compare job's own GITHUB_RUN_ATTEMPT;
+    anything but "1" (None included) makes every measured OS incomplete."""
     probe = load_inventory(inventory_dir, None, None)
-    runs_seen = sorted({RUN_DIR_RE.match(entry.name).group("os") for entry in
-                        (results.iterdir() if results.is_dir() else []) if entry.is_dir() and RUN_DIR_RE.match(entry.name)})
+    control = results / CONTROL_ARTIFACT
+    runs_seen = sorted({RUN_DIR_RE.match(path.name).group("os") for _artifact, path, _others in arm_artifacts(results)[0]}
+                       | {RUN_DIR_RE.match(entry.name).group("os") for entry in
+                          (control.iterdir() if control.is_dir() else []) if RUN_DIR_RE.match(entry.name)})
     measured = [os_name] if os_name else runs_seen
-    controls, verdicts, all_runs, ignored = {}, {}, [], []
+    controls, verdicts, all_runs, ignored = {}, {}, [], arm_artifacts(results)[1]
     for os_key in OSES:
         if os_key not in measured:
             verdicts[os_key] = {"outcome": "no verdict", "selected_arm": None, "arms": {},
@@ -706,17 +903,16 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                                             f"{os_key} is measured by its own trial workflow"]}
             continue
         inventory = load_inventory(inventory_dir, os_key, weights)
-        runs, control_dirs, ignored = load_runs(results, inventory, expected_sha)
-        mine = [run for run in runs if run.os == os_key]
+        mine, ignored = load_runs(results, os_key, inventory, expected_sha)
         all_runs.extend(mine)
-        controls[os_key] = (check_controls(control_dirs[os_key], os_key, job_result(needs, "controls"), expected_sha)
-                            if os_key in control_dirs else
-                            {"passed": False, "present": False, "problems": ["no control run directory"], "shards": []})
+        # The control run's attempt and start are read here and judged by verdict_for_os before the controls-check
+        # result below can matter: a re-run or a group that never started makes the OS incomplete, never a reject.
+        controls[os_key] = check_controls(control, os_key, job_result(needs, "controls"), expected_sha)
         if isinstance(needs, dict) and job_result(needs, "controls-check") != "success":
             controls[os_key]["passed"] = False
             controls[os_key]["problems"] = controls[os_key].get("problems", []) + [
                 f"the controls-check job's result is {job_result(needs, 'controls-check')!r}, not 'success'"]
-        verdicts[os_key] = verdict_for_os(os_key, mine, inventory, controls[os_key], needs, min_repeats)
+        verdicts[os_key] = verdict_for_os(os_key, mine, inventory, controls[os_key], needs, min_repeats, compare_attempt)
         probe = inventory
     return {
         "schema": SCHEMA,
@@ -736,10 +932,15 @@ def build_result(results: Path, inventory_dir: Path, expected_sha: str | None, o
                      "a tail); adopt it only if its median <= 3/5 of the S median and its slowest run <= 3/4 of the "
                      "fastest S run, compared as exact fractions; otherwise reject, with no fall-through; no eligible "
                      "sharded arm rejects; an ineligible S gives no verdict",
-            "incomplete": "a cancelled or skipped job, a missing run directory or a cancelled job status makes the OS "
-                          "incomplete, which is recorded as such and is not a rule outcome",
+            "incomplete": "a re-run (the compare job's own run attempt, or the run_attempt of any run or control "
+                          "directory, other than 1 or unrecorded), a cancelled or skipped job, a missing run "
+                          "directory, a cancelled job status, a run whose test phase never started (its clock-start "
+                          "step did not succeed or timing.json records no start), a control run whose parallel group "
+                          "never started, or an inventory job that failed before its gate reported makes the OS "
+                          "incomplete, which is recorded as such and is never a rule outcome",
         },
         "inputs": {"expected_sha": expected_sha, "os": os_name, "min_repeats": min_repeats,
+                   "compare_run_attempt": compare_attempt,
                    "inventory": {"ids": probe.count, "test_files": len(probe.module_ids), "sha256": probe.sha256,
                                  "problems": probe.problems[:LIST_CAP],
                                  "python_version": (probe.report or {}).get("python_version"),
@@ -773,15 +974,22 @@ def summary_markdown(result: dict) -> str:
                      f"{' (' + reasons + ')' if reasons else ''}; flaky ids in S: {verdict['baseline']['flaky_total']}")
     for os_name, control in result["controls"].items():
         exits = ", ".join(f"{item['module']} {'killed (no exit status)' if item['exit_code'] is None else item['exit_code']}"
-                          for item in control.get("shards", []))
+                          f" (step {item.get('step_outcome')})" for item in control.get("shards", []))
+        hang = control.get("hang") or {}
         lines.append(f"- controls {os_name}: {'passed' if control.get('passed') else 'FAILED'} (job result "
                      f"{control.get('job_result')}; {exits or 'no shard'}); background steps ignore SIGINT: "
-                     f"{control.get('background_ignores_sigint')}, SIGQUIT: {control.get('background_ignores_sigquit')}")
+                     f"{control.get('background_ignores_sigint')}, SIGQUIT: {control.get('background_ignores_sigquit')}; "
+                     f"steps started within {control.get('start_spread_seconds')} s; hang control alive "
+                     f"{hang.get('alive_after_probe_seconds')} s after its start, group ended by "
+                     f"{hang.get('group_end_after_probe_seconds')} s, its process outlived its step: "
+                     f"{hang.get('outlived_step')}")
     bad = [run["name"] for run in result["runs"] if not run["eligible"]]
     lines.append(f"- ineligible arm-runs: {', '.join(bad) if bad else 'none'}")
     inventory = result["inputs"]["inventory"]
     lines.append(f"- inventory: {inventory['ids']} ids in {inventory['test_files']} test files; "
                  f"problems: {len(inventory['problems'])}")
+    lines.append(f"- compare job run attempt: {result['inputs'].get('compare_run_attempt')}")
+    lines.append("- This summary is a rendering; result.json, the exit files and the job results are the record.")
     return "\n".join(lines) + "\n"
 
 
@@ -792,6 +1000,8 @@ def main(argv=None) -> int:
     verdict.add_argument("--results", required=True, type=Path)
     verdict.add_argument("--inventory", required=True, type=Path)
     verdict.add_argument("--expected-sha", required=True)
+    verdict.add_argument("--run-attempt", required=True,
+                         help="the compare job's own GITHUB_RUN_ATTEMPT; anything but 1 makes every OS incomplete")
     verdict.add_argument("--os", choices=OSES, help="the OS this workflow measures (default: every OS with runs)")
     verdict.add_argument("--needs", type=Path, help="the compare job's needs context as JSON")
     verdict.add_argument("--out", required=True, type=Path)
@@ -802,14 +1012,15 @@ def main(argv=None) -> int:
                          help="do not re-derive the inventory's lists with make_shards.py (for local checks of "
                               "lists made elsewhere; result.json records it)")
     controls = commands.add_parser("controls")
-    controls.add_argument("--dir", required=True, type=Path)
+    controls.add_argument("--artifact", required=True, type=Path,
+                          help="the downloaded control artifact, holding exactly <os>-controls")
     controls.add_argument("--os", required=True, choices=OSES)
     controls.add_argument("--job-result", required=True)
     controls.add_argument("--expected-sha")
     controls.add_argument("--out", type=Path)
     args = parser.parse_args(argv)
     if args.command == "controls":
-        report = check_controls(args.dir, args.os, args.job_result, args.expected_sha)
+        report = check_controls(args.artifact, args.os, args.job_result, args.expected_sha)
         if args.out:
             args.out.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         print(f"controls {args.os}: {'passed' if report['passed'] else 'FAILED'}")
@@ -823,7 +1034,7 @@ def main(argv=None) -> int:
             print("compare.py: --needs is not a JSON object", file=sys.stderr)
             return 2
     result = build_result(args.results, args.inventory, args.expected_sha, args.os, needs, args.min_repeats,
-                          None if args.skip_list_recompute else HERE / "weights.json")
+                          None if args.skip_list_recompute else HERE / "weights.json", args.run_attempt)
     args.out.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     if args.summary_md:
         args.summary_md.write_text(summary_markdown(result), encoding="utf-8")

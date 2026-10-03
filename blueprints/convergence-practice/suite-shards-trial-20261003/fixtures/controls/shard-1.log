@@ -5,12 +5,12 @@ test_passes (test_ctl_fail.Fail.test_passes) ... ok
 FAIL: test_fails (test_ctl_fail.Fail.test_fails)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "<work>/control-1/test_ctl_fail.py", line 14, in test_fails
+  File "<work>/control-suite/test_ctl_fail.py", line 18, in test_fails
     self.fail("planted control failure")
     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
 AssertionError: planted control failure
 
 ----------------------------------------------------------------------
-Ran 2 tests in 0.000s
+Ran 2 tests in 90.001s
 
 FAILED (failures=1)

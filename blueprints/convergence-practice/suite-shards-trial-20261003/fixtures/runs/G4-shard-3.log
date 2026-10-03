@@ -15,7 +15,7 @@ RuntimeError: planted setUpClass error
 ======================================================================
 UNEXPECTED SUCCESS: test_unexpected_success (tests.test_gamma.GammaTests.test_unexpected_success)
 ----------------------------------------------------------------------
-Ran 4 tests in 0.001s
+Ran 4 tests in 0.000s
 
 FAILED (errors=1, unexpected successes=1)
 output between records

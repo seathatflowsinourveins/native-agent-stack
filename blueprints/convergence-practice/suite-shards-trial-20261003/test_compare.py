@@ -3,9 +3,10 @@
   python3 -m unittest discover -s blueprints/convergence-practice/suite-shards-trial-20261003 -p "test_*.py" -v
 
 The run directories are built in temporary directories from fixtures/ (real local runs of a fixture suite and of
-the controls, made by make_fixtures.py) with synthetic meta, runtime, timing and checkout files. blueprints/ is
-not a package, so the repository's own suite never collects this file; the trial's compare jobs run it before
-compare.py, fail-closed.
+the controls, made by make_fixtures.py) with synthetic meta, runtime, timing and checkout files, in the layout the
+compare job downloads: one directory arm-<run name> per arm artifact and the directory controls for the control
+artifact. blueprints/ is not a package, so the repository's own suite never collects this file; the trial's compare
+jobs run it before compare.py, fail-closed.
 """
 
 from __future__ import annotations
@@ -48,6 +49,11 @@ NEEDS = {"inventory": {"result": "success", "outputs": {}}, "serial": {"result":
          "controls-check": {"result": "success", "outputs": {}}}
 RUN_EXITS = {(item["arm"], item.get("list"), item.get("repeat")): item["exit_code"] for item in INDEX["runs"]}
 CONTROL_EXITS = {item["module"]: item["exit_code"] for item in INDEX["controls"]}
+STARTED = {"start": {"outcome": "success", "conclusion": "success"}}
+CONTROL_STEPS = {compare.FOREGROUND_STEP: {"outcome": "success", "conclusion": "success"},
+                 **{spec["step"]: {"outcome": spec["outcome"], "conclusion": spec["outcome"]}
+                    for spec in compare.CONTROL_SHARDS}}
+SECOND = 10 ** 9
 
 
 def fixture(relative: str) -> str:
@@ -61,7 +67,7 @@ def nanoseconds(seconds) -> int:
 
 
 class Tree:
-    """A results tree and an inventory directory in a temporary directory, built from the fixtures."""
+    """A results tree (the compare job's artifact layout) and an inventory directory, built from the fixtures."""
 
     def __init__(self, root: Path):
         self.results = root / "results"
@@ -69,11 +75,24 @@ class Tree:
         self.inventory = root / "inventory"
         shutil.copytree(FIXTURES / "inventory", self.inventory)
 
-    def common(self, directory: Path, arm: str, repeat: int, seconds, job_status="failure"):
+    def run_dir(self, name: str) -> Path:
+        """The run directory <name> inside its arm artifact's directory arm-<name>."""
+        return self.results / f"{compare.ARM_ARTIFACT_PREFIX}{name}" / name
+
+    @property
+    def control_artifact(self) -> Path:
+        return self.results / compare.CONTROL_ARTIFACT
+
+    @property
+    def control_dir(self) -> Path:
+        return self.control_artifact / f"{OS}-controls"
+
+    def common(self, directory: Path, arm: str, repeat: int, seconds, job_status="failure", steps=None):
         directory.mkdir(parents=True)
         (directory / "meta.json").write_text(json.dumps({
             "os": OS, "arm": arm, "repeat": repeat, "checkout_sha": SHA, "python_version": PYTHON,
-            "platform": "fixture", "runner_image": "fixture", "job_status": job_status}))
+            "platform": "fixture", "runner_image": "fixture", "job_status": job_status,
+            "steps": STARTED if steps is None else steps}))
         (directory / "runtime.json").write_text(json.dumps({"run_attempt": "1"}))
         if seconds is not None:
             ns = nanoseconds(seconds)
@@ -82,7 +101,7 @@ class Tree:
         (directory / "git-status.txt").write_text("")
 
     def serial(self, repeat: int, seconds=100, log: str | None = None):
-        directory = self.results / f"{OS}-S-r{repeat}"
+        directory = self.run_dir(f"{OS}-S-r{repeat}")
         self.common(directory, "S", repeat, seconds)
         (directory / "log.txt").write_text(log if log is not None else fixture(f"runs/S-r{repeat}.log"))
         (directory / "exit-code.txt").write_text(f"{RUN_EXITS[('S', None, repeat)]}\n")
@@ -90,7 +109,7 @@ class Tree:
         return directory
 
     def sharded(self, arm: str, repeat: int, seconds=40):
-        directory = self.results / f"{OS}-{arm}-r{repeat}"
+        directory = self.run_dir(f"{OS}-{arm}-r{repeat}")
         self.common(directory, arm, repeat, seconds)
         probe = fixture("controls/foreground.probe.json")
         source = self.inventory / "shards" / arm
@@ -109,9 +128,10 @@ class Tree:
         return directory
 
     def controls(self):
-        directory = self.results / f"{OS}-controls"
-        self.common(directory, "controls", 1, None)
+        directory = self.control_dir
+        self.common(directory, "controls", 1, None, steps=CONTROL_STEPS)
         shutil.copy(FIXTURES / "controls/foreground.probe.json", directory / "foreground.probe.json")
+        shutil.copy(FIXTURES / "controls/heartbeat.json", directory / "heartbeat.json")
         for index, spec in enumerate(compare.CONTROL_SHARDS):
             label = f"shard-{index}"
             (directory / f"{label}.txt").write_text(spec["module"] + "\n")
@@ -135,7 +155,27 @@ class Tree:
         return self
 
     def result(self, needs=NEEDS, **kwargs):
+        kwargs.setdefault("compare_attempt", "1")
         return compare.build_result(self.results, self.inventory, SHA, OS, needs, weights=FIXTURE_WEIGHTS, **kwargs)
+
+
+def rewrite_json(path: Path, **fields):
+    data = json.loads(path.read_text())
+    data.update(fields)
+    path.write_text(json.dumps(data))
+
+
+def setup_failure(directory: Path, steps=None):
+    """What the finish step leaves when a step before the clock failed: meta.json (the clock step skipped), an
+    untimed timing.json and git-status.txt, and nothing else (record.py finish, `if: always()`)."""
+    for path in list(directory.iterdir()):
+        if path.name not in ("meta.json", "git-status.txt"):
+            path.unlink()
+    rewrite_json(directory / "meta.json",
+                 steps={"start": {"outcome": "skipped", "conclusion": "skipped"}} if steps is None else steps)
+    (directory / "timing.json").write_text(json.dumps({
+        "clock": "fixture", "step_ns": None, "wall_ns": None,
+        "problems": ["timing-start.json is missing or unreadable: the test phase was never timed"]}))
 
 
 class TreeCase(unittest.TestCase):
@@ -156,6 +196,11 @@ class TreeCase(unittest.TestCase):
         text = path.read_text()
         self.assertIn(old, text)
         path.write_text(text.replace(old, new, count))
+
+    def assertIncomplete(self, verdict, fragment: str):
+        self.assertEqual(verdict["outcome"], "incomplete", verdict["reasons"])
+        self.assertIsNone(verdict["selected_arm"])
+        self.assertTrue(any(fragment in reason for reason in verdict["reasons"]), verdict["reasons"])
 
 
 # --------------------------------------------------------------------------- fixtures and provenance
@@ -189,6 +234,10 @@ class FixtureTests(unittest.TestCase):
             logs = [compare.Log(item["list"], [], parsed=logparse.parse_log(fixture(item["file"])))
                     for item in INDEX["runs"] if item["arm"] == arm]
             self.assertEqual(compare.groups(logs), serial, arm)
+
+    def test_the_control_fixtures_ran_with_the_hosted_limits(self):
+        self.assertEqual((INDEX["hang_limit_seconds"], INDEX["control_limit_seconds"]), (60, 300))
+        self.assertEqual([item["exit_code"] for item in INDEX["controls"]], [0, 1, 3, None])
 
     def test_logparse_is_the_recorded_copy(self):
         text = (HERE / "logparse.py").read_text(encoding="utf-8")
@@ -344,13 +393,15 @@ class RecordTests(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
-        self.repo = Path(tmp.name) / "repo"
+        self.tmp = Path(tmp.name)
+        self.repo = self.tmp / "repo"
         self.repo.mkdir()
-        environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+        environment = {key: value for key, value in os.environ.items()
+                       if not key.startswith("GIT_") and key != "STEPS_JSON"}
         for args in (["init", "-q"], ["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty",
                                       "-m", "t"]):
             subprocess.run(["git", *args], cwd=self.repo, env=environment, check=True)
-        self.out = Path(tmp.name) / "out"
+        self.out = self.tmp / "out"
         self.env = dict(environment, GITHUB_RUN_ATTEMPT="1", JOB_STATUS="failure")
 
     def record(self, *args, **popen):
@@ -358,6 +409,8 @@ class RecordTests(unittest.TestCase):
                               capture_output=True, text=True, check=True, **popen)
 
     def test_a_timed_run_directory(self):
+        self.env["STEPS_JSON"] = json.dumps({"start": {"outputs": {"note": "dropped"}, "outcome": "success",
+                                                       "conclusion": "success"}})
         self.record("runtime", str(self.out))
         self.record("start", str(self.out))
         self.record("probe", str(self.out), "shard-0")
@@ -367,6 +420,8 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(compare.timing_problems(timing), [])
         self.assertEqual(json.loads((self.out / "runtime.json").read_text())["run_attempt"], "1")
         self.assertEqual((meta["os"], meta["arm"], meta["repeat"], meta["job_status"]), (OS, "G4", 2, "failure"))
+        self.assertEqual(meta["steps"], STARTED, "outcome and conclusion of each step with an id, outputs dropped")
+        self.assertEqual(compare.unstarted_reasons(meta, compare.START_STEP), [])
         self.assertEqual(len(meta["checkout_sha"]), 40)
         self.assertEqual((self.out / "git-status.txt").read_text(), "")
         probe = json.loads((self.out / "shard-0.probe.json").read_text())
@@ -374,14 +429,33 @@ class RecordTests(unittest.TestCase):
             compare.CONTROL_ENV_NAME, "CHILD_USAGE_SHELL_PARSER", "LANDSCAPE_SWEEP_SKILLS_YAML", "PROMOTION_GATE_PYTHON",
             "REQUIRE_PROMOTION_GATE_VENV", "GITHUB_ACTIONS", "CI"})
         self.assertTrue(all(isinstance(value, bool) for value in probe["env_present"].values()), "names only, no values")
+        self.assertTrue(timing["start_monotonic_ns"] < probe["monotonic_ns"] < timing["end_monotonic_ns"])
+        self.assertIsInstance(probe["wall_ns"], int)
 
     def test_finish_without_start_is_untimed_and_a_dirty_checkout_is_recorded(self):
         (self.repo / "untracked.txt").write_text("x")
         self.record("finish", str(self.out), "--os", OS, "--arm", "S", "--repeat", "1")
         timing = json.loads((self.out / "timing.json").read_text())
+        meta = json.loads((self.out / "meta.json").read_text())
         self.assertIsNone(timing["step_ns"])
         self.assertTrue(compare.timing_problems(timing))
+        self.assertIsNone(meta["steps"], "no STEPS_JSON: the step outcomes are unrecorded")
+        self.assertTrue(compare.unstarted_reasons(meta, compare.START_STEP))
         self.assertEqual((self.out / "git-status.txt").read_text(), "?? untracked.txt\n")
+
+    def test_invalid_step_outcomes_are_unrecorded(self):
+        self.env["STEPS_JSON"] = "not json"
+        self.record("finish", str(self.out), "--os", OS, "--arm", "S", "--repeat", "1")
+        self.assertIsNone(json.loads((self.out / "meta.json").read_text())["steps"])
+
+    def test_finish_records_the_hang_controls_heartbeat(self):
+        beats = self.tmp / "test_ctl_hang.heartbeat"
+        beats.write_text("100 7\n200 7\n300 1\n40")  # the last line is still being written
+        self.record("finish", str(self.out), "--os", OS, "--arm", "controls", "--repeat", "1", "--heartbeat", str(beats))
+        record = json.loads((self.out / "heartbeat.json").read_text())
+        self.assertEqual(record["beats"], [[100, 7], [200, 7], [300, 1]])
+        self.assertEqual((record["file"], record["beats_after_recheck"]), ("test_ctl_hang.heartbeat", 3))
+        self.assertEqual(record["end_monotonic_ns"], json.loads((self.out / "timing.json").read_text())["end_monotonic_ns"])
 
     @unittest.skipUnless(hasattr(signal, "SIGQUIT"), "POSIX signals")
     def test_a_probe_sees_ignored_signals(self):
@@ -409,6 +483,8 @@ class VerdictTests(TreeCase):
         self.assertTrue(all(run["eligible"] for run in result["runs"]), [r["reasons"] for r in result["runs"]])
         self.assertTrue(result["controls"][OS]["passed"], result["controls"][OS]["problems"])
         self.assertEqual(verdict["arms"]["G4"]["median_vs_s_median_exact"], "9/20")
+        self.assertEqual(result["inputs"]["compare_run_attempt"], "1")
+        self.assertEqual(result["inputs"]["ignored_entries"], [])
 
     def test_the_tail_arm_wins_when_its_median_is_smaller(self):
         verdict = self.verdict(self.tree.full(g=(50, 50, 50), gt=(45, 45, 45)).result())
@@ -435,7 +511,7 @@ class VerdictTests(TreeCase):
 
     def test_a_changed_outcome_makes_the_run_and_its_arm_ineligible(self):
         self.tree.full()
-        shard = self.tree.results / f"{OS}-G4-r2" / "shard-0.log"
+        shard = self.tree.run_dir(f"{OS}-G4-r2") / "shard-0.log"
         self.edit(shard, "test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok",
                   "test_passes (tests.test_alpha.AlphaTests.test_passes) ... skipped 'mutated'")
         self.edit(shard, "OK (skipped=1, expected failures=1)", "OK (skipped=2, expected failures=1)")
@@ -450,7 +526,7 @@ class VerdictTests(TreeCase):
 
     def test_ids_that_differ_among_the_serial_runs_are_flaky_and_excluded(self):
         self.tree.full()
-        serial = self.tree.results / f"{OS}-S-r3" / "log.txt"
+        serial = self.tree.run_dir(f"{OS}-S-r3") / "log.txt"
         self.edit(serial, "test_passes (tests.test_alpha.AlphaTests.test_passes) ... ok",
                   "test_passes (tests.test_alpha.AlphaTests.test_passes) ... skipped 'flaky'")
         self.edit(serial, "skipped=1, expected", "skipped=2, expected")
@@ -460,7 +536,7 @@ class VerdictTests(TreeCase):
 
     def test_a_module_run_twice_or_never_is_ineligible(self):
         self.tree.full()
-        run = self.tree.results / f"{OS}-G4-r1"
+        run = self.tree.run_dir(f"{OS}-G4-r1")
         shutil.copy(run / "shard-0.log", run / "shard-2.log")  # alpha twice, epsilon and the tail module never
         entry = self.run_entry(self.tree.result(), f"{OS}-G4-r1")
         self.assertFalse(entry["eligible"])
@@ -469,63 +545,67 @@ class VerdictTests(TreeCase):
 
     def test_the_command_must_be_the_shards_list(self):
         self.tree.full()
-        command = self.tree.results / f"{OS}-G4T-r1" / "shard-3.command"
+        command = self.tree.run_dir(f"{OS}-G4T-r1") / "shard-3.command"
         command.write_text("python3 -m unittest -v tests.test_epsilon tests.test_delta\n")
         entry = self.run_entry(self.tree.result(), f"{OS}-G4T-r1")
         self.assertTrue(any("command" in reason for reason in entry["reasons"]), entry["reasons"])
 
     def test_the_serial_command_must_be_exact(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-S-r1" / "command.txt").write_text("python3 -X dev -m unittest -v\n")
+        (self.tree.run_dir(f"{OS}-S-r1") / "command.txt").write_text("python3 -X dev -m unittest -v\n")
         verdict = self.verdict()
         self.assertEqual(verdict["outcome"], "no verdict")
 
     def test_the_run_lists_must_be_the_inventory_lists(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-G4-r3" / "shard-0.txt").write_text("tests.test_beta\n")
+        (self.tree.run_dir(f"{OS}-G4-r3") / "shard-0.txt").write_text("tests.test_beta\n")
         entry = self.run_entry(self.tree.result(), f"{OS}-G4-r3")
         self.assertIn("the run's shard lists are not the inventory artifact's lists for this arm", entry["reasons"])
 
     def test_an_exit_status_that_disagrees_with_the_status_line(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-G4-r1" / "shard-0.exit").write_text("1\n")
+        (self.tree.run_dir(f"{OS}-G4-r1") / "shard-0.exit").write_text("1\n")
         entry = self.run_entry(self.tree.result(), f"{OS}-G4-r1")
         self.assertTrue(any("disagrees with the status line" in reason for reason in entry["reasons"]))
 
     def test_a_missing_shard_exit_status_is_ineligible(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-G4-r1" / "shard-1.exit").unlink()
+        (self.tree.run_dir(f"{OS}-G4-r1") / "shard-1.exit").unlink()
         self.assertFalse(self.run_entry(self.tree.result(), f"{OS}-G4-r1")["eligible"])
+
+    def test_a_started_shard_that_never_reached_its_command_is_ineligible_not_incomplete(self):
+        # The test phase started (the clock step succeeded): a shard step that then fails before its command is a
+        # property of the sharded arm, so its run is ineligible and the other arm may still be selected.
+        self.tree.full()
+        run = self.tree.run_dir(f"{OS}-G4-r1")
+        for name in ("shard-2.command", "shard-2.log", "shard-2.exit", "shard-2.probe.json"):
+            (run / name).unlink()
+        result = self.tree.result()
+        self.assertFalse(self.run_entry(result, f"{OS}-G4-r1")["eligible"])
+        self.assertTrue(self.run_entry(result, f"{OS}-G4-r1")["test_phase_started"])
+        self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["selected_arm"]), ("adopt", "G4T"))
 
     def test_checkout_attempt_and_head_rules(self):
         mutations = {
             "dirty": lambda d: (d / "git-status.txt").write_text("?? stray.txt\n"),
             "no status": lambda d: (d / "git-status.txt").unlink(),
             "status failed": lambda d: (d / "git-status.txt").write_text("git status failed\n"),
-            "attempt 2": lambda d: (d / "runtime.json").write_text(json.dumps({"run_attempt": "2"})),
-            "no runtime": lambda d: (d / "runtime.json").unlink(),
-            "other head": lambda d: self.rewrite_meta(d, checkout_sha="f" * 40),
-            "other python": lambda d: self.rewrite_meta(d, python_version="3.12.3"),
-            "no timing": lambda d: (d / "timing.json").unlink(),
+            "other head": lambda d: rewrite_json(d / "meta.json", checkout_sha="f" * 40),
+            "other python": lambda d: rewrite_json(d / "meta.json", python_version="3.12.3"),
             "clocks disagree": lambda d: (d / "timing.json").write_text(json.dumps(
                 {"step_ns": nanoseconds(40), "wall_ns": nanoseconds(60), "problems": []})),
         }
         for label, mutate in mutations.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
                 tree = Tree(Path(tmp)).full()
-                mutate(tree.results / f"{OS}-G4T-r2")
+                mutate(tree.run_dir(f"{OS}-G4T-r2"))
                 result = tree.result()
                 self.assertFalse(self.run_entry(result, f"{OS}-G4T-r2")["eligible"], label)
                 self.assertFalse(result["verdicts"][OS]["arms"]["G4T"]["eligible"], label)
 
-    def rewrite_meta(self, directory: Path, **fields):
-        meta = json.loads((directory / "meta.json").read_text())
-        meta.update(fields)
-        (directory / "meta.json").write_text(json.dumps(meta))
-
     def test_a_background_step_on_another_interpreter_is_ineligible(self):
         self.tree.full()
-        probe = self.tree.results / f"{OS}-G4-r1" / "shard-2.probe.json"
+        probe = self.tree.run_dir(f"{OS}-G4-r1") / "shard-2.probe.json"
         data = json.loads(probe.read_text())
         data["python_version"] = "3.9.6"
         probe.write_text(json.dumps(data))
@@ -534,25 +614,25 @@ class VerdictTests(TreeCase):
 
     def test_a_unittest_parallel_header_is_ineligible(self):
         self.tree.full()
-        log = self.tree.results / f"{OS}-G4-r1" / "shard-0.log"
+        log = self.tree.run_dir(f"{OS}-G4-r1") / "shard-0.log"
         log.write_text("Running 1 test suites (4 total tests) across 1 workers\n" + log.read_text())
         self.assertFalse(self.run_entry(self.tree.result(), f"{OS}-G4-r1")["eligible"])
 
     def test_a_serial_run_must_execute_the_inventory(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-S-r2" / "log.txt").write_text(fixture("runs/G4-shard-0.log"))
+        (self.tree.run_dir(f"{OS}-S-r2") / "log.txt").write_text(fixture("runs/G4-shard-0.log"))
         result = self.tree.result()
         self.assertFalse(self.run_entry(result, f"{OS}-S-r2")["eligible"])
         self.assertEqual(self.verdict(result)["outcome"], "no verdict")
 
     def test_serial_runs_on_two_python_versions_give_no_verdict(self):
         self.tree.full()
-        self.rewrite_meta(self.tree.results / f"{OS}-S-r3", python_version="3.12.3")
+        rewrite_json(self.tree.run_dir(f"{OS}-S-r3") / "meta.json", python_version="3.12.3")
         self.assertEqual(self.verdict()["outcome"], "no verdict")
 
     def test_failed_controls_reject(self):
         self.tree.full()
-        (self.tree.results / f"{OS}-controls" / "shard-2.exit").write_text("0\n")
+        (self.tree.control_dir / "shard-2.exit").write_text("0\n")
         result = self.tree.result()
         self.assertFalse(result["controls"][OS]["passed"])
         self.assertEqual((self.verdict(result)["outcome"], self.verdict(result)["reasons"]),
@@ -567,12 +647,12 @@ class VerdictTests(TreeCase):
 
     def test_partial_and_cancelled_runs_are_incomplete_not_a_rule_outcome(self):
         cases = {
-            "missing run directory": (lambda tree: shutil.rmtree(tree.results / f"{OS}-G4T-r3"), NEEDS),
-            "cancelled job status": (lambda tree: self.rewrite_meta(tree.results / f"{OS}-S-r1", job_status="cancelled"),
-                                     NEEDS),
+            "missing run directory": (lambda tree: shutil.rmtree(tree.run_dir(f"{OS}-G4T-r3").parent), NEEDS),
+            "cancelled job status": (lambda tree: rewrite_json(tree.run_dir(f"{OS}-S-r1") / "meta.json",
+                                                               job_status="cancelled"), NEEDS),
             "cancelled job": (lambda tree: None, {**NEEDS, "shards": {"result": "cancelled"}}),
             "skipped job": (lambda tree: None, {**NEEDS, "serial": {"result": "skipped"}}),
-            "no control run": (lambda tree: shutil.rmtree(tree.results / f"{OS}-controls"), NEEDS),
+            "no control run": (lambda tree: shutil.rmtree(tree.control_artifact), NEEDS),
         }
         for label, (mutate, needs) in cases.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
@@ -585,12 +665,21 @@ class VerdictTests(TreeCase):
     def test_no_run_directory_at_all_is_incomplete(self):
         verdict = self.verdict()
         self.assertEqual(verdict["outcome"], "incomplete")
-        self.assertIn("no run directory", verdict["reasons"][0])
+        self.assertTrue(any("no run directory" in reason for reason in verdict["reasons"]), verdict["reasons"])
 
     def test_a_failed_inventory_gate_gives_no_verdict(self):
+        rewrite_json(self.tree.inventory / "report.json", ok=False)
         needs = {**NEEDS, "inventory": {"result": "failure"}, "serial": {"result": "skipped"},
                  "shards": {"result": "skipped"}}
         self.assertEqual(self.verdict(self.tree.result(needs=needs))["outcome"], "no verdict")
+
+    def test_an_inventory_job_that_failed_before_its_gate_reported_is_incomplete(self):
+        # E2: a setup failure of the inventory job (checkout, setup-python, the upload) is a partial run; on the
+        # previous head it gave no verdict, which the deciding-run rule would have made final.
+        (self.tree.inventory / "report.json").unlink()
+        needs = {**NEEDS, "inventory": {"result": "failure"}, "serial": {"result": "skipped"},
+                 "shards": {"result": "skipped"}}
+        self.assertIncomplete(self.verdict(self.tree.result(needs=needs)), "the gate never reported")
 
     def test_an_unusable_inventory_gives_no_verdict(self):
         mutations = {
@@ -622,17 +711,166 @@ class VerdictTests(TreeCase):
         out = self.tree.results.parent
         with contextlib.redirect_stdout(io.StringIO()):
             code = compare.main(["verdict", "--results", str(self.tree.results), "--inventory", str(self.tree.inventory),
-                                 "--expected-sha", SHA, "--os", OS, "--needs", str(needs),
+                                 "--expected-sha", SHA, "--run-attempt", "1", "--os", OS, "--needs", str(needs),
                                  "--out", str(out / "result.json"), "--summary-md", str(out / "summary.md"),
                                  "--checkout-status", str(out / "checkout-status.json"), "--skip-list-recompute"])
         self.assertEqual(code, 0)
         result = json.loads((out / "result.json").read_text())
         self.assertEqual(result["verdicts"][OS]["outcome"], "adopt")
+        self.assertEqual(result["inputs"]["compare_run_attempt"], "1")
         self.assertFalse(result["inputs"]["inventory"]["lists_recomputed"])
-        self.assertIn("**ubuntu-24.04**: adopt G4", (out / "summary.md").read_text())
+        summary = (out / "summary.md").read_text()
+        self.assertIn("**ubuntu-24.04**: adopt G4", summary)
+        self.assertIn("result.json, the exit files and the job results are the record", summary)
         status = json.loads((out / "checkout-status.json").read_text())
         self.assertTrue(status["ok"])
         self.assertEqual(len(status["runs"]), 10)
+
+
+class RerunTests(TreeCase):
+    """E1: any re-run (a run attempt other than 1 anywhere) makes the OS incomplete, never a rule outcome."""
+
+    def test_a_rerun_arm_run_is_incomplete_not_a_handover_to_the_other_arm(self):
+        # On the previous head the re-run voided only G4 r1, so the rule picked G4T: adopt G4T.
+        self.tree.full()
+        rewrite_json(self.tree.run_dir(f"{OS}-G4-r1") / "runtime.json", run_attempt="2")
+        self.assertIncomplete(self.verdict(), "ubuntu-24.04-G4-r1: run_attempt '2'")
+
+    def test_a_rerun_serial_run_is_incomplete_not_no_verdict(self):
+        # Previous head: no verdict (S ineligible).
+        self.tree.full()
+        rewrite_json(self.tree.run_dir(f"{OS}-S-r2") / "runtime.json", run_attempt="2")
+        self.assertIncomplete(self.verdict(), "ubuntu-24.04-S-r2: run_attempt '2'")
+
+    def test_a_rerun_control_run_is_incomplete_not_reject(self):
+        # Previous head: the attempt failed the controls, every sharded arm became ineligible, and the OS got reject.
+        # A re-run of the control job also re-runs controls-check, whose result is applied after the attempt check.
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"
+        self.tree.full()
+        rewrite_json(self.tree.control_dir / "runtime.json", run_attempt="2")
+        for case in (NEEDS, needs):
+            with self.subTest(controls_check=case["controls-check"]["result"]):
+                self.assertIncomplete(self.verdict(self.tree.result(needs=case)), "the control run: run_attempt '2'")
+
+    def test_an_unrecorded_attempt_is_incomplete(self):
+        self.tree.full()
+        (self.tree.run_dir(f"{OS}-G4T-r2") / "runtime.json").unlink()
+        self.assertIncomplete(self.verdict(), "ubuntu-24.04-G4T-r2: run_attempt None (runtime.json is missing)")
+
+    def test_the_compare_jobs_own_attempt_decides_before_anything_else(self):
+        # Previous head: build_result took no attempt (TypeError) and the CLI had no --run-attempt (exit 2).
+        self.tree.full()
+        for attempt in ("2", "", None):
+            with self.subTest(attempt=attempt):
+                result = self.tree.result(compare_attempt=attempt)
+                self.assertIncomplete(result["verdicts"][OS], "the compare job's own run attempt")
+                self.assertEqual(result["inputs"]["compare_run_attempt"], attempt)
+        needs = {**NEEDS, "inventory": {"result": "failure"}, "serial": {"result": "skipped"},
+                 "shards": {"result": "skipped"}}
+        rewrite_json(self.tree.inventory / "report.json", ok=False)
+        self.assertIncomplete(self.verdict(self.tree.result(needs=needs, compare_attempt="2")),
+                              "the compare job's own run attempt")
+
+    def test_the_cli_requires_the_run_attempt(self):
+        self.tree.full()
+        out = self.tree.results.parent / "result.json"
+        base = ["verdict", "--results", str(self.tree.results), "--inventory", str(self.tree.inventory),
+                "--expected-sha", SHA, "--os", OS, "--out", str(out)]
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as raised:
+            compare.main(base)
+        self.assertEqual(raised.exception.code, 2)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(compare.main(base + ["--run-attempt", "2"]), 0)
+        self.assertEqual(json.loads(out.read_text())["verdicts"][OS]["outcome"], "incomplete")
+
+
+class SetupFailureTests(TreeCase):
+    """E2: a run whose test phase never started, or a control group that never started, is partial (incomplete)."""
+
+    def test_a_g4_setup_failure_with_g4t_fine_is_incomplete_not_adopt_g4t(self):
+        # Previous head: G4 r1 was merely ineligible, so G4T decided: adopt G4T.
+        cases = {
+            "clock step skipped, nothing but the finish step's files": lambda d: setup_failure(d),
+            "clock step failed": lambda d: rewrite_json(d / "meta.json", steps={
+                "start": {"outcome": "failure", "conclusion": "failure"}}),
+            "no step outcomes recorded": lambda d: rewrite_json(d / "meta.json", steps=None),
+            "no clock start in timing.json": lambda d: (d / "timing.json").write_text(json.dumps(
+                {"clock": "fixture", "step_ns": None, "wall_ns": None, "problems": ["never timed"]})),
+            "no timing.json": lambda d: (d / "timing.json").unlink(),
+            "no meta.json": lambda d: (d / "meta.json").unlink(),
+        }
+        for label, mutate in cases.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                mutate(tree.run_dir(f"{OS}-G4-r1"))
+                result = tree.result()
+                self.assertIncomplete(result["verdicts"][OS], "ubuntu-24.04-G4-r1: ")
+                self.assertFalse(self.run_entry(result, f"{OS}-G4-r1")["test_phase_started"])
+
+    def test_a_serial_setup_failure_is_incomplete_not_no_verdict(self):
+        self.tree.full()
+        setup_failure(self.tree.run_dir(f"{OS}-S-r2"))
+        self.assertIncomplete(self.verdict(), "the test phase never started")
+
+    def test_a_control_group_that_never_started_is_incomplete_not_reject(self):
+        # Previous head: a control directory without probes or logs failed the controls: reject.
+        def finish_only(directory: Path):
+            for path in list(directory.iterdir()):
+                if path.name not in ("meta.json", "git-status.txt", "runtime.json"):
+                    path.unlink()
+            rewrite_json(directory / "meta.json", steps={"foreground": {"outcome": "skipped", "conclusion": "skipped"}})
+
+        cases = {
+            "setup failure before the foreground probe": finish_only,
+            "foreground probe missing": lambda d: (d / "foreground.probe.json").unlink(),
+            "foreground step failed": lambda d: rewrite_json(d / "meta.json", steps={
+                **CONTROL_STEPS, "foreground": {"outcome": "failure", "conclusion": "failure"}}),
+        }
+        needs = json.loads(json.dumps(NEEDS))
+        needs["controls-check"]["result"] = "failure"
+        for label, mutate in cases.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
+                tree = Tree(Path(tmp)).full()
+                mutate(tree.control_dir)
+                result = tree.result(needs=needs)
+                self.assertFalse(result["controls"][OS]["started"])
+                self.assertIncomplete(result["verdicts"][OS], "the control run's parallel group never started")
+
+
+class ArtifactTests(TreeCase):
+    """S2: a run directory counts only from the artifact whose name gives it."""
+
+    def test_an_artifact_holding_another_runs_directory_makes_its_run_ineligible(self):
+        self.tree.full()
+        victim = self.tree.run_dir(f"{OS}-G4T-r1")
+        stray = self.tree.run_dir(f"{OS}-G4-r1").parent / victim.name
+        shutil.copytree(victim, stray)
+        (stray / "shard-0.log").write_text("planted\n")
+        result = self.tree.result()
+        entry = self.run_entry(result, f"{OS}-G4-r1")
+        self.assertTrue(any("holds entries besides its run directory" in reason for reason in entry["reasons"]))
+        self.assertTrue(self.run_entry(result, victim.name)["eligible"], "the victim is read from its own artifact")
+        self.assertEqual(self.verdict(result)["selected_arm"], "G4T")
+
+    def test_a_bare_or_misdelivered_run_directory_is_not_attributed(self):
+        self.tree.full()
+        moved = self.tree.run_dir(f"{OS}-S-r1")
+        shutil.move(str(moved), str(self.tree.results / moved.name))
+        (self.tree.results / f"{compare.ARM_ARTIFACT_PREFIX}{moved.name}").rmdir()
+        other = self.tree.run_dir(f"{OS}-G4-r2")
+        shutil.move(str(other), str(other.parent / "elsewhere"))
+        result = self.tree.result()
+        self.assertEqual(result["inputs"]["ignored_entries"],
+                         ["arm-ubuntu-24.04-G4-r2 (holds no ubuntu-24.04-G4-r2 directory)", "ubuntu-24.04-S-r1"])
+        self.assertIncomplete(result["verdicts"][OS], "arm S: no run directory for repeat 1")
+
+    def test_a_stray_entry_in_the_control_artifact_fails_the_controls(self):
+        self.tree.full()
+        (self.tree.control_artifact / "stray").mkdir()
+        report = compare.check_controls(self.tree.control_artifact, OS, "failure", SHA)
+        self.assertFalse(report["passed"])
+        self.assertIn("the control artifact holds entries besides ubuntu-24.04-controls: [stray] (1)", report["problems"])
 
 
 # --------------------------------------------------------------------------- compare.py: the controls
@@ -643,20 +881,33 @@ class ControlTests(TreeCase):
         super().setUp()
         self.directory = self.tree.controls()
 
-    def check(self, job_result="failure"):
-        return compare.check_controls(self.directory, OS, job_result, SHA)
+    def check(self, job_result="failure", artifact=None):
+        return compare.check_controls(artifact or self.tree.control_artifact, OS, job_result, SHA)
 
     def test_the_real_control_runs_pass(self):
         report = self.check()
         self.assertTrue(report["passed"], report["problems"])
+        self.assertTrue(report["started"])
         self.assertEqual([item["exit_code"] for item in report["shards"]], [0, 1, 3, None])
+        self.assertEqual([item["step_outcome"] for item in report["shards"]],
+                         ["success", "failure", "failure", "failure"])
         self.assertFalse(report["background_ignores_sigquit"])
+        hang = report["hang"]
+        self.assertGreaterEqual(hang["alive_after_probe_seconds"], compare.HANG_ALIVE_MIN_NS / 1e9)
+        self.assertLess(hang["group_end_after_probe_seconds"], compare.HANG_GROUP_MAX_NS / 1e9)
+        self.assertGreaterEqual(hang["group_end_after_probe_seconds"], 120, "the crash control ends the group")
+        self.assertFalse(hang["outlived_step"], "make_fixtures.py stops the hang control's own process")
+        self.assertLess(report["start_spread_seconds"], 5)
 
     def test_the_control_job_must_fail(self):
         self.assertFalse(self.check("success")["passed"])
         self.assertFalse(self.check(None)["passed"])
 
     def test_each_expectation_is_checked(self):
+        def steps(**changed):
+            return lambda d: rewrite_json(d / "meta.json", steps={
+                **CONTROL_STEPS, **{step: {"outcome": value, "conclusion": value} for step, value in changed.items()}})
+
         mutations = {
             "the hang wrote an exit status": lambda d: (d / "shard-3.exit").write_text("0\n"),
             "the crash exited 1": lambda d: (d / "shard-2.exit").write_text("1\n"),
@@ -669,20 +920,80 @@ class ControlTests(TreeCase):
             "a background step ran another interpreter": lambda d: self.probe(d, "shard-2", python="3.9.6"),
             "a list names another module": lambda d: (d / "shard-0.txt").write_text("test_ctl_fail\n"),
             "dirty checkout": lambda d: (d / "git-status.txt").write_text("?? x\n"),
+            # E3: each step's own outcome, the concurrency of the steps and the hang control's span.
+            "the failing step's own outcome was masked": steps(**{"control-1": "success"}),
+            "the crashing step's own outcome was masked": steps(**{"control-2": "success"}),
+            "the hang step was cancelled, not failed": steps(**{"control-3": "cancelled"}),
+            "the passing step failed on its own": steps(**{"control-0": "failure"}),
+            "the step outcomes are unrecorded": lambda d: rewrite_json(d / "meta.json", steps={
+                "foreground": {"outcome": "success", "conclusion": "success"}}),
+            "the steps did not run together": lambda d: self.probe(d, "shard-1", shift=31 * SECOND),
+            "a probe holds no start time": lambda d: self.probe(d, "shard-2", drop="monotonic_ns"),
+            "the hang was stopped before its limit": lambda d: self.beats(d, keep_until=40 * SECOND),
+            "the group waited for the hang": lambda d: self.beats(d, end_after=300 * SECOND),
+            "no heartbeat": lambda d: (d / "heartbeat.json").unlink(),
         }
         for label, mutate in mutations.items():
             with self.subTest(label), tempfile.TemporaryDirectory() as tmp:
-                directory = Tree(Path(tmp)).controls()
+                tree = Tree(Path(tmp))
+                directory = tree.controls()
                 mutate(directory)
-                self.assertFalse(compare.check_controls(directory, OS, "failure", SHA)["passed"], label)
+                report = compare.check_controls(tree.control_artifact, OS, "failure", SHA)
+                self.assertFalse(report["passed"], label)
+                self.assertTrue(report["started"], label)
 
-    def probe(self, directory: Path, label: str, env=True, python=None):
+    def probe(self, directory: Path, label: str, env=True, python=None, shift=0, drop=None):
         path = directory / f"{label}.probe.json"
         data = json.loads(path.read_text())
         data["env_present"][compare.CONTROL_ENV_NAME] = env
         if python:
             data["python_version"] = python
+        data["monotonic_ns"] += shift
+        if drop:
+            del data[drop]
         path.write_text(json.dumps(data))
+
+    def beats(self, directory: Path, keep_until=None, end_after=None, parent=None, after_recheck=None):
+        """Rewrite heartbeat.json relative to the hang control's probe."""
+        start = json.loads((directory / "shard-3.probe.json").read_text())["monotonic_ns"]
+        data = json.loads((directory / "heartbeat.json").read_text())
+        if keep_until is not None:
+            data["beats"] = [beat for beat in data["beats"] if beat[0] - start <= keep_until]
+            data["beats_after_recheck"] = len(data["beats"])
+        if end_after is not None:
+            data["end_monotonic_ns"] = start + end_after
+        if parent is not None:
+            changed_from, pid = parent
+            data["beats"] = [[ns, pid if ns - start >= changed_from else first]
+                             for (ns, first) in data["beats"]]
+        if after_recheck is not None:
+            data["beats_after_recheck"] = after_recheck
+        (directory / "heartbeat.json").write_text(json.dumps(data))
+
+    def test_a_process_that_outlived_its_step_is_reported_not_judged(self):
+        # S4: the runner signals only a stopped step's shell (actions/runner v2.337.0, ProcessInvoker.cs), so its
+        # python child may live on, re-parented, until the job ends: recorded and reported, not judged.
+        data = json.loads((self.directory / "heartbeat.json").read_text())
+        self.beats(self.directory, parent=(50 * SECOND, 1), after_recheck=len(data["beats"]) + 3)
+        report = self.check()
+        self.assertTrue(report["passed"], report["problems"])
+        self.assertTrue(report["hang"]["outlived_step"])
+        self.assertGreaterEqual(report["hang"]["parent_lost_after_probe_seconds"], 50)
+
+    def test_the_controls_outlive_the_hang_limit(self):
+        # E3: control shards 1 and 2 fail only after control shard 3's 1-minute limit, 1 before 2, and the hang
+        # control would run far beyond its limit; checked on the frozen modules' text.
+        def constant(module: str, name: str) -> int:
+            text = (HERE / "controls" / f"{module}.py").read_text(encoding="utf-8")
+            return int(re.search(rf"(?m)^{name} = ([0-9]+)$", text).group(1))
+
+        fail, crash = constant("test_ctl_fail", "SLEEP_SECONDS"), constant("test_ctl_crash", "SLEEP_SECONDS")
+        hang = constant("test_ctl_hang", "SLEEP_SECONDS")
+        self.assertGreaterEqual(fail, 90)
+        self.assertGreater(crash, fail)
+        self.assertGreater(hang, compare.HANG_GROUP_MAX_NS // SECOND)
+        self.assertGreater(fail * SECOND, compare.HANG_ALIVE_MIN_NS + 30 * SECOND)
+        self.assertEqual(constant("test_ctl_hang", "HEARTBEAT_SECONDS"), 1)
 
     def test_ignored_signals_are_reported_not_judged(self):
         path = self.directory / "shard-0.probe.json"
@@ -695,9 +1006,9 @@ class ControlTests(TreeCase):
 
     def test_the_controls_cli(self):
         with contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(compare.main(["controls", "--dir", str(self.directory), "--os", OS,
+            self.assertEqual(compare.main(["controls", "--artifact", str(self.tree.control_artifact), "--os", OS,
                                            "--job-result", "failure", "--expected-sha", SHA]), 0)
-            self.assertEqual(compare.main(["controls", "--dir", str(self.directory), "--os", OS,
+            self.assertEqual(compare.main(["controls", "--artifact", str(self.tree.control_artifact), "--os", OS,
                                            "--job-result", "success"]), 1)
 
 
@@ -721,6 +1032,15 @@ class WorkflowTests(unittest.TestCase):
                 self.assertIn("  pull_request:\n    types: [opened, reopened]\n    paths:\n"
                               f"      - .github/workflows/{WORKFLOWS[os_name].name}\n", head)
                 self.assertNotIn("synchronize", head.split("\non:\n", 1)[1])
+
+    def test_a_reopen_cancels_a_run_in_progress(self):
+        # E4: one attended run per OS, never an unattended second run queued behind the first.
+        for os_name, text in self.texts.items():
+            with self.subTest(os_name):
+                block = text.split("\nconcurrency:\n", 1)[1].split("\n\n", 1)[0]
+                self.assertIn(f"group: suite-shards-trial-{os_name.split('-')[0].replace('ubuntu', 'linux')}-"
+                              "${{ github.event.pull_request.number }}", block)
+                self.assertRegex(block, r"(?m)^  cancel-in-progress: true$")
 
     def test_the_jobs_and_their_runners(self):
         runner = {"ubuntu-24.04": "ubuntu-24.04", "macos-15": "macos-15"}
@@ -750,9 +1070,11 @@ class WorkflowTests(unittest.TestCase):
                 self.assertEqual(serial.count("python3 -m unittest"), 2)  # the command and its record
                 self.assertIn("matrix:\n        repeat: [1, 2, 3]\n", serial)
 
+    def group(self, job: str) -> str:
+        return job.split("      - parallel:\n", 1)[1].split("\n      - ", 1)[0]
+
     def shard_steps(self, job: str) -> list:
-        group = job.split("      - parallel:\n", 1)[1].split("\n      - ", 1)[0]
-        return re.split(r"(?m)^          - ", group)[1:]
+        return re.split(r"(?m)^          - ", self.group(job))[1:]
 
     def test_the_shard_steps_follow_the_arm_table(self):
         limit = {"ubuntu-24.04": "25", "macos-15": "40"}
@@ -767,7 +1089,6 @@ class WorkflowTests(unittest.TestCase):
                     self.assertTrue(step.startswith(f"name: Shard {index}\n"), step[:40])
                     self.assertIn(f"timeout-minutes: {limit[os_name]}\n", step)
                     self.assertIn(f"SHARD: shard-{index}\n", step)
-                    self.assertNotIn("${{", step)
                     self.assertNotIn("if:", step)
                     bodies.add(step.split("run: |\n", 1)[1].rstrip("\n"))
                 self.assertEqual(len(bodies), 1, "every shard step runs the same body")
@@ -780,6 +1101,33 @@ class WorkflowTests(unittest.TestCase):
                 self.assertIn(f"if: ${{{{ !cancelled() && matrix.arm == '{tail_arm}' && steps.start.outcome == 'success' }}}}",
                               job)
                 self.assertIn(body.replace("\n              ", "\n          ").strip(), job.split("SHARD: tail\n", 1)[1])
+
+    def test_no_step_inside_a_parallel_group_takes_an_expression_an_action_or_an_environment_write(self):
+        # S1: zizmor's coverage inside parallel groups is experimental (README.md, "Limits"), so these stay out of them.
+        for os_name, text in self.texts.items():
+            for name in ("shards", "controls"):
+                with self.subTest(os_name=os_name, job=name):
+                    group = self.group(jobs(text)[name])
+                    for forbidden in ("${{", "uses:", "GITHUB_ENV", "GITHUB_PATH", "if:"):
+                        self.assertNotIn(forbidden, group)
+
+    def test_the_finish_steps_record_the_step_outcomes(self):
+        # E2 and E3: the clock-start, foreground and control steps carry ids, and every finish step records the steps
+        # context, from which compare.py reads whether the test phase or the control group started.
+        for os_name, text in self.texts.items():
+            found = jobs(text)
+            for name in ("serial", "shards", "controls"):
+                with self.subTest(os_name=os_name, job=name):
+                    self.assertEqual(found[name].count("STEPS_JSON: ${{ toJSON(steps) }}"), 1)
+            for name in ("serial", "shards"):
+                with self.subTest(os_name=os_name, job=name):
+                    self.assertIn("      - name: Start the clock\n        id: start\n", found[name])
+            with self.subTest(os_name=os_name, job="controls"):
+                self.assertIn(f"        id: {compare.FOREGROUND_STEP}\n        run: python3 \"$TRIAL_DIR/record.py\" "
+                              "probe \"$RUNNER_TEMP/results/$RUN_NAME\" foreground\n", found["controls"])
+                self.assertEqual(re.findall(r"(?m)^            id: (\S+)$", self.group(found["controls"])),
+                                 [spec["step"] for spec in compare.CONTROL_SHARDS])
+                self.assertIn('--heartbeat "$RUNNER_TEMP/control-suite/test_ctl_hang.heartbeat"', found["controls"])
 
     def test_the_concurrency_limits(self):
         expected = {"ubuntu-24.04": "2", "macos-15": "1"}
@@ -803,6 +1151,8 @@ class WorkflowTests(unittest.TestCase):
                 check = jobs(text)["controls-check"]
                 self.assertIn("needs: controls\n    if: always()\n", check)
                 self.assertIn("CONTROLS_RESULT: ${{ needs.controls.result }}", check)
+                self.assertIn("pattern: controls\n          path: ${{ runner.temp }}/results/controls\n", check)
+                self.assertIn('compare.py" controls --artifact "$RUNNER_TEMP/results/controls"', check)
 
     def test_artifacts_and_run_directories_match_the_oracle(self):
         for os_name, text in self.texts.items():
@@ -811,9 +1161,11 @@ class WorkflowTests(unittest.TestCase):
                 self.assertIn(f"RUN_NAME: {os_name}-S-r${{{{ matrix.repeat }}}}", found["serial"])
                 self.assertIn(f"RUN_NAME: {os_name}-${{{{ matrix.arm }}}}-r${{{{ matrix.repeat }}}}", found["shards"])
                 self.assertIn(f"RUN_NAME: {os_name}-controls", found["controls"])
-                for name in ("serial", "shards"):
-                    self.assertTrue(compare.RUN_DIR_RE.match(f"{os_name}-S-r1"))
-                    self.assertIn(f"name: arm-{os_name}-", found[name])
+                self.assertIn(f"name: {compare.ARM_ARTIFACT_PREFIX}{os_name}-S-r${{{{ matrix.repeat }}}}\n", found["serial"])
+                self.assertIn(f"name: {compare.ARM_ARTIFACT_PREFIX}{os_name}-${{{{ matrix.arm }}}}-r${{{{ matrix.repeat }}}}\n",
+                              found["shards"])
+                self.assertIn(f"name: {compare.CONTROL_ARTIFACT}\n", found["controls"])
+                self.assertTrue(compare.RUN_DIR_RE.match(f"{os_name}-S-r1"))
                 uploads = text.count("uses: actions/upload-artifact@")
                 self.assertEqual(uploads, 5)
                 self.assertEqual(len(re.findall(r"(?m)^ +overwrite: false$", text)), uploads)
@@ -822,7 +1174,13 @@ class WorkflowTests(unittest.TestCase):
                 self.assertIn("needs: [inventory, serial, shards, controls, controls-check]\n    if: always()\n", compare_job)
                 self.assertIn('python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v', compare_job)
                 self.assertIn("NEEDS_JSON: ${{ toJSON(needs) }}", compare_job)
+                self.assertIn('--run-attempt "$GITHUB_RUN_ATTEMPT"', compare_job)
                 self.assertIn("name: compare\n", compare_job)
+                # S2: the arm-runs are not merged; only the single inventory artifact is downloaded with merging.
+                self.assertIn("pattern: arm-*\n          path: ${{ runner.temp }}/results\n", compare_job)
+                self.assertIn("pattern: controls\n          path: ${{ runner.temp }}/results/controls\n", compare_job)
+                self.assertEqual(text.count("merge-multiple"), 1)
+                self.assertIn("pattern: inventory\n          merge-multiple: true\n", compare_job)
 
 
 if __name__ == "__main__":

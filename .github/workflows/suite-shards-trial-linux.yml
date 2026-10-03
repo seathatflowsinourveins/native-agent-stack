@@ -13,23 +13,29 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # c67a9362ec63f3993d095bf70bd11724359cc50e, lines 1193-1224 (`parallel`: every step of the group is a background
 # step, with an implicit wait at the end of the group) and 1078-1086 (at most 10 concurrent background steps; a
 # failed background step fails the job at the wait that includes it). Every shard step exits with its unittest
-# status, so a failing shard fails its step, the group and the job, as production would. No step inside a group
-# has an `if:`.
+# status, so a failing shard is expected to fail its step, the group and the job, as production would; the control
+# job measures that each failing step fails on its own. No step inside a group has an `if:`, an expression in its
+# script, a `uses:` or a GITHUB_ENV or GITHUB_PATH write.
 #
 # Trigger: only `opened` and `reopened` (events-that-trigger-workflows.md at 63859c48, lines 465 and 484-489), with
 # a paths filter on this file, so pushing to the branch (synchronize) never re-runs the trial and the observed
-# record can never land on this branch by accident. To repeat the trial, close and reopen the pull request. A job
-# re-run voids its arm-run (compare.py requires run_attempt 1), and every upload sets overwrite: false. Never use
-# "Re-run failed jobs" or "Re-run all jobs": the control job fails by design, so it would run again with attempt 2
-# and fail the controls. Only the compare job may be re-run on its own (for example after its self-test failed); it
-# touches no arm-run. The concurrency group keeps at most one run going: a reopen during a run queues one run, which
-# starts unattended when the first ends; a further reopen replaces the queued run, which then shows as cancelled.
+# record can never land on this branch by accident.
+#
+# Repetition (preregistered, experiment.json quality_rule): the first workflow run whose compare result
+# (compare_run_attempt 1) is adopt, reject or no verdict decides this OS; later runs are reported and cannot
+# overturn it. A repeat is allowed only after a run that ended incomplete, by closing and reopening the pull request
+# when no run of either trial workflow is in progress. Never re-run any job, the compare job included: compare.py
+# makes the OS incomplete when its own GITHUB_RUN_ATTEMPT, or the run_attempt of any run or control directory, is
+# not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact name, and
+# whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
+# cancel-in-progress is true: a reopen during a run cancels that run (incomplete, never a rule outcome) and starts
+# one attended run, instead of queueing an unattended second run behind it.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
-# serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a failing, a
-# crashing and a hanging shard in one parallel group; expected to fail) and controls-check (asserts that failure);
-# compare (the oracle's own tests, then compare.py; needs every job, runs always). Every job checks out the pull
-# request head (a pull_request checkout is otherwise the merge commit) and asserts it.
+# serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a passing, a
+# failing, a crashing and a hanging shard in one parallel group; expected to fail) and controls-check (asserts each
+# step's own outcome); compare (the oracle's own tests, then compare.py; needs every job, runs always). Every job
+# checks out the pull request head (a pull_request checkout is otherwise the merge commit) and asserts it.
 
 on:
   pull_request:
@@ -42,7 +48,9 @@ permissions:
 
 concurrency:
   group: suite-shards-trial-linux-${{ github.event.pull_request.number }}
-  cancel-in-progress: false
+  # github/docs data/reusables/actions/actions-group-concurrency.md at 336b7f54, line 11: true also cancels a run in
+  # progress in this group. See "Repetition" above.
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -235,6 +243,9 @@ jobs:
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          # The outcome of every step with an id (here the clock start): compare.py counts a run whose clock step did
+          # not succeed as partial (a setup failure), never as ineligible.
+          STEPS_JSON: ${{ toJSON(steps) }}
         run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm "$ARM" --repeat "$REPEAT"
       - name: Upload the arm-run
         if: always()
@@ -490,6 +501,9 @@ jobs:
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
+          # The outcome of every step with an id (here the clock start): compare.py counts a run whose clock step did
+          # not succeed as partial (a setup failure), never as ineligible.
+          STEPS_JSON: ${{ toJSON(steps) }}
         run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm "$ARM" --repeat "$REPEAT"
       - name: Upload the arm-run
         if: always()
@@ -549,12 +563,16 @@ jobs:
           # compare.py requires every background shard to see this export from an earlier step.
           echo "SUITE_SHARDS_ENV_PROBE=1" >> "$GITHUB_ENV"
       - name: Record what a foreground step inherits (signal dispositions, interpreter, exported names)
+        id: foreground
         run: python3 "$TRIAL_DIR/record.py" probe "$RUNNER_TEMP/results/$RUN_NAME" foreground
       # The production parallel structure on the controls: the arms' shard step body, run from the control
-      # directory. Expected: shard-0 exits 0, shard-1 exits 1, shard-2 exits 3 (os._exit), shard-3 is stopped by its
-      # 1-minute limit before it writes an exit status; the group, and so the job, fails.
+      # directory, each step with an id so the finish step records its own outcome. Expected: shard-0 exits 0 at
+      # once; shard-3 is stopped by its 1-minute limit before it writes an exit status; shard-1 fails after 90 s and
+      # shard-2 ends itself with os._exit(3) after 120 s, so both must outlive that stop and each other's failure;
+      # steps success, failure, failure, failure; the group, and so the job, fails.
       - parallel:
           - name: Control shard 0 (passes)
+            id: control-0
             timeout-minutes: 5
             env:
               SHARD: shard-0
@@ -576,7 +594,8 @@ jobs:
               printf '%s\n' "$status" > "$out/$SHARD.exit"
               echo "$SHARD: exit $status"
               exit "$status"
-          - name: Control shard 1 (one failing test)
+          - name: Control shard 1 (one failing test, after 90 s)
+            id: control-1
             timeout-minutes: 5
             env:
               SHARD: shard-1
@@ -598,7 +617,8 @@ jobs:
               printf '%s\n' "$status" > "$out/$SHARD.exit"
               echo "$SHARD: exit $status"
               exit "$status"
-          - name: Control shard 2 (the process ends itself with os._exit(3))
+          - name: Control shard 2 (the process ends itself with os._exit(3), after 120 s)
+            id: control-2
             timeout-minutes: 5
             env:
               SHARD: shard-2
@@ -621,6 +641,7 @@ jobs:
               echo "$SHARD: exit $status"
               exit "$status"
           - name: Control shard 3 (hangs; stopped by its 1-minute limit)
+            id: control-3
             timeout-minutes: 1
             env:
               SHARD: shard-3
@@ -642,11 +663,16 @@ jobs:
               printf '%s\n' "$status" > "$out/$SHARD.exit"
               echo "$SHARD: exit $status"
               exit "$status"
-      - name: Record the metadata and the checkout's status (the job is expected to fail)
+      - name: Record the metadata, each step's outcome, the hang control's heartbeat and the checkout's status
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
-        run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm controls --repeat 1
+          # The outcome of every step with an id (the foreground probe and the four control steps), read after the
+          # group's implicit wait.
+          STEPS_JSON: ${{ toJSON(steps) }}
+        run: >-
+          python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm controls
+          --repeat 1 --heartbeat "$RUNNER_TEMP/control-suite/test_ctl_hang.heartbeat"
       - name: Upload the control run
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -683,18 +709,19 @@ jobs:
             exit 1
           fi
           echo "testing the pull request head $actual"
+      # One artifact matches, so it is extracted into this path directly (download-artifact.ts at 3e5f45b2, lines
+      # 186-195), which must then hold exactly the control run directory.
       - name: Download the control run
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: controls
-          merge-multiple: true
-          path: ${{ runner.temp }}/results
-      - name: Assert the control job failed and every control shard behaved as preregistered
+          path: ${{ runner.temp }}/results/controls
+      - name: Assert the control job failed and every control step behaved as preregistered
         env:
           CONTROLS_RESULT: ${{ needs.controls.result }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: >-
-          python3 "$TRIAL_DIR/compare.py" controls --dir "$RUNNER_TEMP/results/$OS_LABEL-controls"
+          python3 "$TRIAL_DIR/compare.py" controls --artifact "$RUNNER_TEMP/results/controls"
           --os "$OS_LABEL" --job-result "$CONTROLS_RESULT" --expected-sha "$PR_HEAD_SHA"
 
   compare:
@@ -725,32 +752,35 @@ jobs:
           echo "testing the pull request head $actual"
       # Pattern downloads: a missing artifact downloads nothing instead of failing the step
       # (actions/download-artifact src/download-artifact.ts at 3e5f45b2, lines 149-163 and 176-246), so compare.py
-      # always runs and records a missing run directory as an incomplete run.
+      # always runs and records a missing run directory as an incomplete run. The arm-runs are not merged: each
+      # artifact lands in its own arm-<run name> directory (lines 186-195), and compare.py counts only the run
+      # directory that artifact's name gives, so no job's files can pass as another run's.
       - name: Download the inventory
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: inventory
           merge-multiple: true
           path: ${{ runner.temp }}/inventory
-      - name: Download the arm-runs
+      - name: Download the arm-runs (one directory per artifact)
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: arm-*
-          merge-multiple: true
           path: ${{ runner.temp }}/results
       - name: Download the control run
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: controls
-          merge-multiple: true
-          path: ${{ runner.temp }}/results
-      # An oracle that fails its own tests here gives no verdict: this step fails and compare.py does not run.
+          path: ${{ runner.temp }}/results/controls
+      # An oracle that fails its own tests here writes no result.json: this step fails, compare.py does not run, and
+      # the run decides nothing (README.md, "Which run decides").
       - name: Run the oracle's own tests on this interpreter (fail-closed)
         run: python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v
       - name: Keep the needs context (each job's result) for compare.py
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: printf '%s\n' "$NEEDS_JSON" > "$RUNNER_TEMP/needs.json"
+      # result.json (with this job's own run attempt), the exit files and the job results are the record; the step
+      # summary below is a rendering of text the pull request controls, never the record.
       - name: Compare every run with the serial arm (compare.py)
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -758,8 +788,8 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/compare" "$RUNNER_TEMP/results" "$RUNNER_TEMP/inventory"
           python3 "$TRIAL_DIR/compare.py" verdict --results "$RUNNER_TEMP/results" \
-            --inventory "$RUNNER_TEMP/inventory" --expected-sha "$PR_HEAD_SHA" --os "$OS_LABEL" \
-            --needs "$RUNNER_TEMP/needs.json" --out "$RUNNER_TEMP/compare/result.json" \
+            --inventory "$RUNNER_TEMP/inventory" --expected-sha "$PR_HEAD_SHA" --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --os "$OS_LABEL" --needs "$RUNNER_TEMP/needs.json" --out "$RUNNER_TEMP/compare/result.json" \
             --summary-md "$RUNNER_TEMP/compare/summary.md" --checkout-status "$RUNNER_TEMP/compare/checkout-status.json"
           cat "$RUNNER_TEMP/compare/summary.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload the comparison

@@ -11,14 +11,17 @@ SCRATCH_DIR/suite, then runs, with one interpreter and stdout and stderr in one 
     G4T lists);
   - the serial command `python3 -m unittest -v` three times (S r1 to r3);
   - every G4 and G4T list as `python3 -m unittest -v <modules>`, one process per list, and the G4T tail;
-  - every control module of controls/ alone in an empty directory with the same command, the hang control
-    stopped after HANG_LIMIT seconds (it then writes no exit status, as a killed step does), each with a
-    record.py probe, plus one foreground probe.
+  - the four control modules of controls/, copied alone into one empty directory and run there together with the
+    same command, each after its own record.py probe, as the control job's parallel group runs them: the hang
+    control is stopped HANG_LIMIT seconds after it started (it then writes no exit status, as a stopped step does),
+    the others run to their end (about 90 and 120 s for the failing and crashing controls); then one foreground
+    probe before them and the finish step's heartbeat record (record.py finish --heartbeat) after them.
 
 SCRATCH_DIR must lie outside the checkout and be empty or absent; the tool creates every directory in it and
 deletes none. Logs and probes are sanitized (scratch, interpreter and home prefixes become <work>, <python>
 and <home>) and written to fixtures/, with fixtures/index.json listing each file's sha256, command and exit
-status. test_compare.py reads only fixtures/ and requires index.json to match the files.
+status. test_compare.py reads only fixtures/ and requires index.json to match the files. A run takes about two
+minutes, most of it the controls' sleeps.
 """
 
 from __future__ import annotations
@@ -32,12 +35,15 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]  # the checkout root: <root>/blueprints/convergence-practice/<this directory>
 FIXTURES = HERE / "fixtures"
-HANG_LIMIT = 3
+HANG_LIMIT = 60  # control shard 3's step limit in the workflows (timeout-minutes: 1)
+CONTROL_LIMIT = 300  # the other control steps' limit (timeout-minutes: 5)
+CONTROL_MODULES = ("test_ctl_pass", "test_ctl_fail", "test_ctl_crash", "test_ctl_hang")
 FIXTURE_OS = "ubuntu-24.04"
 FIXTURE_WEIGHTS = {"tests.test_alpha": "4.000", "tests.test_beta": "3.000", "tests.test_gamma": "2.000",
                    "tests.test_delta": "1.500", "tests.test_epsilon": "1.000", "tests.test_secret_path_guard": "2.500"}
@@ -195,6 +201,37 @@ def run(python: str, args: list, cwd: Path, log: Path, timeout: int | None = Non
             return None
 
 
+def run_controls(python: str, suite: Path, controls: Path) -> list:
+    """The four control modules together in suite, each after its own probe into controls, each stopped at its limit
+    (HANG_LIMIT for the hang control, CONTROL_LIMIT for the others); [exit status or None (stopped)] in order."""
+    env_probe = dict(os.environ, SUITE_SHARDS_ENV_PROBE="1")
+    running = []
+    for index, module in enumerate(CONTROL_MODULES):
+        subprocess.run([python, str(HERE / "record.py"), "probe", str(controls), f"shard-{index}"], check=True,
+                       env=env_probe)
+        handle = (controls / f"shard-{index}.log").open("wb")
+        process = subprocess.Popen([python, "-m", "unittest", "-v", module], cwd=suite, stdout=handle,
+                                   stderr=subprocess.STDOUT, env=env_probe)
+        limit = HANG_LIMIT if module == "test_ctl_hang" else CONTROL_LIMIT
+        running.append((process, handle, time.monotonic() + limit))
+    codes = [None] * len(running)
+    pending = set(range(len(running)))
+    while pending:
+        for index in sorted(pending):
+            process, handle, deadline = running[index]
+            if process.poll() is not None:
+                codes[index] = process.returncode
+            elif time.monotonic() >= deadline:
+                process.kill()
+                process.wait()
+            else:
+                continue
+            handle.close()
+            pending.discard(index)
+        time.sleep(0.2)
+    return codes
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n", 1)[0])
     parser.add_argument("--work", required=True, type=Path)
@@ -238,22 +275,20 @@ def main(argv=None) -> int:
             runs.append({"file": f"runs/{arm}-{label}.log", "arm": arm, "list": label,
                          "command": "python3 -m unittest -v " + " ".join(modules),
                          "exit_code": run(python, ["-m", "unittest", "-v", *modules], suite, log)})
-    control_runs = []
-    probe_names = ["foreground"]
+    control_suite = work / "control-suite"
+    control_suite.mkdir()
+    for module in CONTROL_MODULES:
+        shutil.copy(HERE / "controls" / f"{module}.py", control_suite / f"{module}.py")
     subprocess.run([python, str(HERE / "record.py"), "probe", str(controls), "foreground"], check=True)
-    for index, module in enumerate(("test_ctl_pass", "test_ctl_fail", "test_ctl_crash", "test_ctl_hang")):
-        directory = work / f"control-{index}"
-        directory.mkdir()
-        shutil.copy(HERE / "controls" / f"{module}.py", directory / f"{module}.py")
-        env_probe = dict(os.environ, SUITE_SHARDS_ENV_PROBE="1")
-        subprocess.run([python, str(HERE / "record.py"), "probe", str(controls), f"shard-{index}"], check=True,
-                       env=env_probe)
-        probe_names.append(f"shard-{index}")
-        log = controls / f"shard-{index}.log"
-        code = run(python, ["-m", "unittest", "-v", module], directory, log,
-                   timeout=HANG_LIMIT if module == "test_ctl_hang" else 60)
-        control_runs.append({"file": f"controls/shard-{index}.log", "module": module,
-                             "command": f"python3 -m unittest -v {module}", "exit_code": code})
+    probe_names = ["foreground"] + [f"shard-{index}" for index in range(len(CONTROL_MODULES))]
+    codes = run_controls(python, control_suite, controls)
+    control_runs = [{"file": f"controls/shard-{index}.log", "module": module,
+                     "command": f"python3 -m unittest -v {module}", "exit_code": code}
+                    for index, (module, code) in enumerate(zip(CONTROL_MODULES, codes))]
+    finish = work / "control-finish"
+    subprocess.run([python, str(HERE / "record.py"), "finish", str(finish), "--os", FIXTURE_OS, "--arm", "controls",
+                    "--repeat", "1", "--heartbeat", str(control_suite / "test_ctl_hang.heartbeat")], cwd=work,
+                   check=True)
     # Sanitized copies into fixtures/.
     if FIXTURES.exists():
         for old in sorted(FIXTURES.rglob("*"), reverse=True):
@@ -268,6 +303,7 @@ def main(argv=None) -> int:
         data = json.loads((controls / f"{name}.probe.json").read_text(encoding="utf-8"))
         data["python_executable"] = clean(data["python_executable"])
         targets[f"controls/{name}.probe.json"] = json.dumps(data, indent=2, sort_keys=True) + "\n"
+    targets["controls/heartbeat.json"] = (finish / "heartbeat.json").read_text(encoding="utf-8")
     for path in sorted(inventory.rglob("*")):
         if path.is_file():
             text = path.read_text(encoding="utf-8")
@@ -289,8 +325,8 @@ def main(argv=None) -> int:
                       "system": platform.system()},
              "sanitized_prefixes": {"<work>": "the scratch directory", "<python>": "the interpreter's prefix",
                                     "<home>": "a home directory"},
-             "hang_limit_seconds": HANG_LIMIT, "fixture_os": FIXTURE_OS, "runs": runs, "controls": control_runs,
-             "files": files}
+             "hang_limit_seconds": HANG_LIMIT, "control_limit_seconds": CONTROL_LIMIT, "fixture_os": FIXTURE_OS,
+             "runs": runs, "controls": control_runs, "files": files}
     (FIXTURES / "index.json").write_text(json.dumps(index, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"wrote {len(files)} fixture files and index.json")
     return 0

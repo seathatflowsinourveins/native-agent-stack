@@ -4,8 +4,9 @@
   python3 record.py runtime DIR                      DIR/runtime.json  (before the test phase)
   python3 record.py start DIR                        DIR/timing-start.json (the step before the test phase)
   python3 record.py probe DIR NAME                   DIR/NAME.probe.json (inside a step, before its command)
-  python3 record.py finish DIR --os OS --arm ARM --repeat N
-                                                     DIR/timing.json, DIR/meta.json, DIR/git-status.txt
+  python3 record.py finish DIR --os OS --arm ARM --repeat N [--heartbeat FILE]
+                                                     DIR/timing.json, DIR/meta.json, DIR/git-status.txt and,
+                                                     with --heartbeat, DIR/heartbeat.json
                                                      (the step after the test phase, `if: always()`)
 
 runtime.json keeps the run attempt (GITHUB_RUN_ATTEMPT: 1 for a run's first attempt, one more for each re-run;
@@ -21,12 +22,16 @@ timing.json also keeps the wall-clock difference and the clock's implementation 
 that the two differences agree.
 
 A probe records what one step's processes inherit, for the oracle and the first-run checks: the interpreter
-version and path, whether SIGINT and SIGQUIT are ignored, and, by name only, whether each variable of
-ENV_NAMES is set (never a value).
+version and path, whether SIGINT and SIGQUIT are ignored, by name only whether each variable of ENV_NAMES is set
+(never a value), and the step's start as time.monotonic_ns() and time.time_ns().
 
 finish takes the end timestamp first, then records the job status (JOB_STATUS, from the job context's
-status: success, failure or cancelled; contexts.md line 384), the checkout's HEAD and its
-`git status --porcelain=v1 --untracked-files=all` (the text "git status failed" when git fails).
+status: success, failure or cancelled; contexts.md line 384), the outcome and conclusion of every step that has an
+`id` (STEPS_JSON, the workflow's `toJSON(steps)`; outputs are dropped), the checkout's HEAD and its
+`git status --porcelain=v1 --untracked-files=all` (the text "git status failed" when git fails). With
+--heartbeat it also reads the hang control's heartbeat file twice, HEARTBEAT_RECHECK_SECONDS apart, and writes
+every `<monotonic ns> <parent pid>` line of the first read, the line count of the second and its own end
+timestamp to heartbeat.json, so the oracle can tell a test process that was stopped from one still running.
 """
 
 from __future__ import annotations
@@ -48,6 +53,7 @@ from pathlib import Path  # noqa: E402
 # variables the runner sets for every step, which some tests read (for example IN_CI in tests/test_secret_path_guard.py).
 ENV_NAMES = ("CHILD_USAGE_SHELL_PARSER", "LANDSCAPE_SWEEP_SKILLS_YAML", "PROMOTION_GATE_PYTHON",
              "REQUIRE_PROMOTION_GATE_VENV", "SUITE_SHARDS_ENV_PROBE", "GITHUB_ACTIONS", "CI")
+HEARTBEAT_RECHECK_SECONDS = 3
 
 
 def write_json(path: Path, value) -> None:
@@ -77,10 +83,45 @@ def disposition(signum) -> dict:
 
 def probe(out: Path, name: str) -> None:
     write_json(out / f"{name}.probe.json", {
-        "python_full_version": sys.version, "python_version": platform.python_version(),
+        "clock": time.get_clock_info("monotonic").implementation, "monotonic_ns": time.monotonic_ns(),
+        "wall_ns": time.time_ns(), "python_full_version": sys.version, "python_version": platform.python_version(),
         "python_executable": sys.executable,
         "signals": {"SIGINT": disposition(signal.SIGINT), "SIGQUIT": disposition(signal.SIGQUIT)},
         "env_present": {key: key in os.environ for key in ENV_NAMES}})
+
+
+def step_outcomes(text: str | None):
+    """{step id: {"outcome", "conclusion"}} from the steps context as JSON, or None when it is absent or invalid."""
+    try:
+        steps = json.loads(text) if text else None
+    except ValueError:
+        return None
+    if not isinstance(steps, dict):
+        return None
+    return {str(key): {"outcome": value.get("outcome"), "conclusion": value.get("conclusion")}
+            for key, value in steps.items() if isinstance(value, dict)}
+
+
+def heartbeat_lines(path: Path) -> list:
+    """Every complete `<monotonic ns> <parent pid>` line of the heartbeat file, in order ([] when it is missing)."""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return []
+    beats = []
+    for line in text.split("\n")[:-1]:  # the last element is "" or a line still being written
+        fields = line.split()
+        if len(fields) == 2 and all(field.isdigit() for field in fields):
+            beats.append([int(fields[0]), int(fields[1])])
+    return beats
+
+
+def heartbeat(out: Path, path: Path, end_ns: int) -> None:
+    beats = heartbeat_lines(path)
+    time.sleep(HEARTBEAT_RECHECK_SECONDS)
+    write_json(out / "heartbeat.json", {"file": path.name, "end_monotonic_ns": end_ns, "beats": beats,
+                                        "recheck_seconds": HEARTBEAT_RECHECK_SECONDS,
+                                        "beats_after_recheck": len(heartbeat_lines(path))})
 
 
 def git(*args):
@@ -109,7 +150,8 @@ def finish(out: Path, os_name: str, arm: str, repeat: int, end_ns: int) -> None:
     write_json(out / "meta.json", {
         "os": os_name, "arm": arm, "repeat": repeat, "checkout_sha": head.strip() if head else None,
         "python_version": platform.python_version(), "platform": platform.platform(),
-        "runner_image": os.environ.get("ImageVersion", ""), "job_status": os.environ.get("JOB_STATUS", "")})
+        "runner_image": os.environ.get("ImageVersion", ""), "job_status": os.environ.get("JOB_STATUS", ""),
+        "steps": step_outcomes(os.environ.get("STEPS_JSON"))})
     status = git("status", "--porcelain=v1", "--untracked-files=all")
     (out / "git-status.txt").write_text(status if status is not None else "git status failed\n", encoding="utf-8")
 
@@ -127,6 +169,7 @@ def main(argv=None) -> int:
     finish_parser.add_argument("--os", required=True)
     finish_parser.add_argument("--arm", required=True)
     finish_parser.add_argument("--repeat", required=True, type=int)
+    finish_parser.add_argument("--heartbeat", type=Path, help="the hang control's heartbeat file (control job only)")
     args = parser.parse_args(argv)
     args.dir.mkdir(parents=True, exist_ok=True)
     if args.command == "runtime":
@@ -139,6 +182,8 @@ def main(argv=None) -> int:
         probe(args.dir, args.name)
     else:
         finish(args.dir, args.os, args.arm, args.repeat, _END_NS)
+        if args.heartbeat is not None:
+            heartbeat(args.dir, args.heartbeat, _END_NS)
     return 0
 
 
