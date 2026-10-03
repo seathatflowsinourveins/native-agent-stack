@@ -122,7 +122,7 @@ def runtime_config(args: argparse.Namespace) -> CodexConfig:
     overrides = (
         "model_provider=" + quoted(PROVIDER),
         "model=" + quoted(args.model),
-        'model_reasoning_effort="max"',
+        "model_reasoning_effort=" + quoted(args.effort),
         # Native curated-plugin startup sync is unused by this worker.
         # a956835d core-plugins/src/manager.rs:748-763; core/config.schema.json:7038.
         "features.plugins=false",
@@ -190,7 +190,7 @@ def initial_record(args: argparse.Namespace) -> dict:
     return {
         "request_id": args.request_id,
         "requested_model": args.model,
-        "requested_effort": "max",
+        "requested_effort": args.effort,
         "provider": PROVIDER,
         "model_inference_submitted": False,
         "usage_status": "unknown",
@@ -434,7 +434,7 @@ async def run_worker(
             # Codex owns tools, MCP discovery, skills, caching and compaction.
             # There is no extra skill carrier or Responses prompt rewrite here.
             record["model_inference_submitted"] = True
-            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort.max)
+            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort(args.effort))
             phase = "turn_run"
             result = await turn.run()
             record.update(result_record(result))
@@ -525,6 +525,12 @@ def parse_args(argv=None) -> argparse.Namespace:
         "--model",
         default=DEFAULT_MODEL,
         help="explicit native/gateway model id; default Sol/max route",
+    )
+    parser.add_argument(
+        "--effort",
+        choices=[ReasoningEffort.max.value, ReasoningEffort.ultra.value],
+        default=ReasoningEffort.max.value,
+        help="requested native reasoning effort; default max",
     )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)

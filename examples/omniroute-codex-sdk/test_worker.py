@@ -35,6 +35,7 @@ import tomllib
 import worker
 from openai_codex import AsyncCodex, AsyncThread
 from openai_codex.client import CodexClient
+from openai_codex.types import ReasoningEffort
 
 MCP_FIXTURE = r"""
 import json
@@ -296,11 +297,14 @@ class NativeTransportTests(unittest.TestCase):
             first, events = self.run_worker(self.args(gateway))
             self.assert_accepted(first)
             self.assertEqual(first["final_response"], "fixture answer 0")
+            self.assertEqual(first["requested_effort"], "max")
             self.assertEqual(events[0]["event"], "thread_ready")
+            self.assertEqual(events[0]["requested_effort"], "max")
             second, _ = self.run_worker(self.args(gateway, "--resume", first["thread_id"]))
             self.assert_accepted(second)
             self.assertEqual(second["thread_id"], first["thread_id"])
             self.assertEqual(second["thread_mode"], "resumed")
+            self.assertEqual(second["requested_effort"], "max")
             self.assertEqual(len(gateway.requests), 2)
             for request in gateway.requests:
                 self.assertEqual(request["path"], "/v1/responses")
@@ -335,6 +339,87 @@ class NativeTransportTests(unittest.TestCase):
             # Cached/reasoning counters are subsets; never add them to total.
             self.assertEqual(second_total["totalTokens"], 60)
             self.assertEqual(second["usage"]["last"]["totalTokens"], 36)
+
+    def test_explicit_effort_reaches_native_launch_configuration(self):
+        with FixtureGateway() as gateway:
+            for selected, model in [
+                ("max", "cx/gpt-6.1-sol-max"),
+                ("ultra", "cx/gpt-6.1-sol"),
+            ]:
+                with self.subTest(effort=selected):
+                    result, _ = self.run_worker(
+                        self.args(gateway, "--preflight", "--model", model, "--effort", selected)
+                    )
+                    self.assertEqual(result["status"], "ready", result)
+                    self.assertEqual(result["cleanup_status"], "closed", result)
+                    self.assertEqual(result["requested_effort"], selected)
+                    self.assertEqual(result["requested_model"], model)
+                    self.assertEqual(result["effective_config"]["model"], model)
+                    self.assertEqual(
+                        result["effective_config"]["model_reasoning_effort"], selected
+                    )
+                    self.assertFalse(result["model_inference_submitted"])
+                    self.assertIsNone(result.get("delivered_effort"))
+            self.assertFalse(gateway.requests)
+
+    def test_explicit_effort_reaches_native_turn_enum(self):
+        native_turn = AsyncThread.turn
+        observed_efforts = []
+
+        async def observe_turn(thread, *args, **options):
+            observed_efforts.append(options.get("effort"))
+            return await native_turn(thread, *args, **options)
+
+        # The native Sol6.1 metadata selects xhigh for ordinary Ultra inference.
+        # a956835d protocol/src/openai_models/reasoning_effort.rs:10-35.
+        for selected, model, enum_value, wire_value in [
+            ("max", "cx/gpt-6.1-sol-max", ReasoningEffort.max, "max"),
+            ("ultra", "cx/gpt-6.1-sol", ReasoningEffort.ultra, "xhigh"),
+        ]:
+            with self.subTest(effort=selected), FixtureGateway() as gateway:
+                with patch.object(AsyncThread, "turn", observe_turn):
+                    result, events = self.run_worker(
+                        self.args(gateway, "--model", model, "--effort", selected)
+                    )
+                self.assert_accepted(result)
+                self.assertEqual(result["requested_effort"], selected)
+                self.assertEqual(events[0]["requested_effort"], selected)
+                self.assertEqual(result["requested_model"], model)
+                self.assertEqual(events[0]["requested_model"], model)
+                self.assertIs(observed_efforts[-1], enum_value)
+                self.assertEqual(len(gateway.requests), 1)
+                self.assertEqual(gateway.requests[0]["body"]["model"], model)
+                self.assertEqual(gateway.requests[0]["body"]["reasoning"]["effort"], wire_value)
+                self.assertIsNone(result.get("effective_effort"))
+                self.assertIsNone(result.get("delivered_effort"))
+
+    def test_invalid_effort_is_rejected_before_native_startup(self):
+        native_start = CodexClient.start
+        starts = []
+
+        def observe_start(client):
+            starts.append(client)
+            return native_start(client)
+
+        argv = [
+            worker.__file__,
+            "--workspace",
+            str(self.project),
+            "--codex-home",
+            str(self.home),
+            "--prompt",
+            "Unused fixture task.",
+            "--effort",
+            "xhigh",
+        ]
+        stderr = io.StringIO()
+        with patch.object(sys, "argv", argv), patch.object(CodexClient, "start", observe_start):
+            with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as rejected:
+                worker.main()
+        self.assertEqual(rejected.exception.code, 2)
+        self.assertIn("invalid choice", stderr.getvalue())
+        self.assertIn("--effort", stderr.getvalue())
+        self.assertFalse(starts)
 
     def test_explicit_astra_model_is_preserved(self):
         with FixtureGateway() as gateway:
