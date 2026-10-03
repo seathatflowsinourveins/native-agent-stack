@@ -15681,8 +15681,13 @@
     },
     {
       "path": "docs/decisions/2026-09-27-omniroute-account-pool.md",
-      "sha256": "12076b4c53141f4f093ed66ddd2e73d90273a53cf870f5b21b4bbf7621e15e41",
-      "bytes": 41895
+      "sha256": "0d779cb05370601811c3e02e4869095b49f60b4233080c4395770528e74797a3",
+      "bytes": 42471
+    },
+    {
+      "path": "docs/decisions/2026-09-27-omniroute-feature-resolution.md",
+      "sha256": "b0b20237ab449073b88e7da2d76a54b2e13c4972ec29b4decebe28b85abaa8af",
+      "bytes": 32419
     },
     {
       "path": "docs/decisions/2026-09-27-prompt-audit-resolution.md",
@@ -37830,6 +37835,361 @@
       "bytes": 629655
     },
     {
+      "path": "evidence/artifacts/omniroute-features-20260927/README.md",
+      "sha256": "76fc5ac1fd9be1d6b14985460bcaed7ca8c1b116b1a00ec5bbddd62a979109de",
+      "bytes": 6921
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/gateway-snapshot-redacted.json",
+      "sha256": "ddd7873bf852ff41bb84f2076e5de01fceb36cad22f63f98bf6056768029859c",
+      "bytes": 98342
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/gpt6-job-usage.json",
+      "sha256": "690e15f8198ad34db682e542dfa5403520a5173b314ba92a8cf67943963bea09",
+      "bytes": 11482
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/omniroute-feature-verdict.interim.json",
+      "sha256": "24aad175311a092ef7d0d7a7f4502d61210f2de9fecf808279ddae5aa6a6c9ca",
+      "bytes": 342629
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/omniroute-feature-verdict.json",
+      "sha256": "59a5e2f18a88daf92cb72d4b1ac131dcbd9c28d05737dd32c633ea105feecc3c",
+      "bytes": 458332
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/own-reports-before.json",
+      "sha256": "2f5c3166efa93cffc99201d5f96185ca3edb7805890fb95a8740f6b040461d70",
+      "bytes": 6039
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/phase0-attempt1-child-usage.json",
+      "sha256": "1958c36f689554c83c2bd60ad7b3fd501047139b0cb534e1bdae5e43230f805f",
+      "bytes": 150730
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/phase0-attempt1-tool-counts.json",
+      "sha256": "9582eab4b2cf2412561d7d19d9f9c3bece8744a800b6d24ad1747093c3fab4d4",
+      "bytes": 396
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/account-spread.json",
+      "sha256": "5918640ebade565f51a98fb4342870d8e47fe5d5e8ac90562b3e61b1f272579d",
+      "bytes": 494
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/codex-effort-coverage-20260927.json",
+      "sha256": "7d0fc626fea24b8cd296cb5cdd16afaaf85eb9cc42477fd6053e3bf9839ca4ba",
+      "bytes": 7597
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/codex-sent-effort-20260927.json",
+      "sha256": "bd05dff83f3a55b27df87653c1d2069812b231d12d0e144271def804b6e361cf",
+      "bytes": 602
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/effort-readback-20260927T1720Z.json",
+      "sha256": "f9990419379c41a1e14469dabf3707c72a9c789b24ab575a5992c6b1bdad3f9b",
+      "bytes": 2400
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/probe-max-hard.json",
+      "sha256": "d04e41a0da16d62171c7ada5ddaec33b6a4c6d6a281e340d874fa1008ec47257",
+      "bytes": 1417
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/probes/probe-max.json",
+      "sha256": "53047c15c9e6cdefdb5b09fa0a86f8f7ec98aad955b1c3ae157961d92c6f2ede",
+      "bytes": 1140
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/context.md",
+      "sha256": "1b8e1f1a590a07dd8e2df6c6f442e25f35a1b49288fcde09aa5ec69c31240edf",
+      "bytes": 3439
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H1.md",
+      "sha256": "b2ddf2cab1a346f0008bade3a32bb79b1ef51c6df243675576d0ef2d18766d28",
+      "bytes": 5450
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H2.md",
+      "sha256": "7af7469cfedfd9c008f0d5c60d3cc9a530efd35665f852c0f6e3f2ab4c26ca7f",
+      "bytes": 5842
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H3.md",
+      "sha256": "ca6b0952b7f5d7a490e43dc3bb90fca9a0df3af0b85b6706c73e8304b58ef3ab",
+      "bytes": 4484
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H4.md",
+      "sha256": "51d3fec7738e16fd88f1511a0cd3a907e2677f49d9ca9b0bad1d34eaf123fffa",
+      "bytes": 5455
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H5.md",
+      "sha256": "2def4139c286f4f30f5733810f7dbb0c3f30c7bd0167c0c9b5eefdb0280dda86",
+      "bytes": 4479
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H6.md",
+      "sha256": "57f2178c5bab454823ef89b78d6f230777810009fbf2fac65630a9a393e67df7",
+      "bytes": 5709
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive-H7.md",
+      "sha256": "bb31eb617d159b403d8296bdd7d150dc07803948504a75fa92c461d76bd3c75c",
+      "bytes": 5477
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/dive.schema.json",
+      "sha256": "3bd862e5caad6dcb85369efd7c35dbfd16f19af4593a05910577cd1766648c08",
+      "bytes": 1445
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/probe.schema.json",
+      "sha256": "4b1a1776fbfd78b810552503a0b8d60f6185e359090f5229250b7fe490deaecd",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/qmd-queryset.md",
+      "sha256": "db4f6154212ede0387bda81bccf0e55ad045eac7350bc90009bcf4f310811915",
+      "bytes": 1922
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/qmd-queryset.schema.json",
+      "sha256": "819c41aafeace2ce09be375e21a4243e95758ffd5f2b13dd795d67c32cb5ee2e",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-G1.md",
+      "sha256": "c5b3e66cf5cf8bd60c6b66171945fe29d7d7fd74a50c1940de60957b5aa81790",
+      "bytes": 5448
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-G2.md",
+      "sha256": "c94ee262836486f34ad4e3a541179bee0a4e8cd6b93535d1ed0bdee2fa70c8f4",
+      "bytes": 5443
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-G3.md",
+      "sha256": "f31d7f7b9a061e95fa3d2e5b2f6e663c83c6a7267e98afe72cda683d2a495152",
+      "bytes": 5469
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-G4.md",
+      "sha256": "9a719e8afec67c995205611276d2366ae2ff8cabef01b9bf25c06c5c83a656bf",
+      "bytes": 5443
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-G5.md",
+      "sha256": "990c312a300b61ecddfb8e9016d7354ab4297994806060307744978d6d4e29b6",
+      "bytes": 5448
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH1.md",
+      "sha256": "d8ca60f570ca014ad19ea8e5e83fab1ae9ab5770119f9bcdc7cf4eb3bbec8a04",
+      "bytes": 5485
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH2.md",
+      "sha256": "86438628be44680d8adc34ae88e8dd4846c8bc6bc02506c4070858f2de85ba5c",
+      "bytes": 5495
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH3.md",
+      "sha256": "71226da0a23c98d3cefaf6afc2b3c58e3c12300d2a5371cc4a5fc669861800af",
+      "bytes": 5470
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH4.md",
+      "sha256": "056611ab1ee0e23235263e9e81b7e003882862203b7ac2f0b3a8fe093910eeef",
+      "bytes": 5490
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH5.md",
+      "sha256": "338d22a368347962fdcbf16cbcc03a9f54b42397fd9ca8a98fa19f834391a3a3",
+      "bytes": 5470
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH6.md",
+      "sha256": "58b0a7c6f2b0a0e18f09f75006c351653381dcb9d7a684a40cb6c8ff0e696754",
+      "bytes": 5480
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute-RH7.md",
+      "sha256": "c371b4437263d8b928a4622b55b0b111ef1e23e3730c64fe540f602742b52af6",
+      "bytes": 5480
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/refute.schema.json",
+      "sha256": "2a8ce089ac7bcf251963b5082fe3eab428f13b1894cec5223e2586e70968a73f",
+      "bytes": 1106
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/review-pr415.md",
+      "sha256": "dec712e73b8216dcf2afd8aab3f2691e51470b313634900893db2e198a6adb6e",
+      "bytes": 1402
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/review.schema.json",
+      "sha256": "ccd13685b885859a8446d022a8b0ee2a3f76eeb62ef74d7a1f002724f5c1aa6f",
+      "bytes": 672
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/synth.md",
+      "sha256": "f133da64bc7f4faa7acca4979507dbd5141c796d834c333c8dd7178a25756a65",
+      "bytes": 8431
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/prompts/synth.schema.json",
+      "sha256": "f3e7dd22dbf4193edfd79319c6d1d49b16921258ffa720b6b24485c5cce153c7",
+      "bytes": 2123
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/claude-dives-round1.json",
+      "sha256": "84d80ec16ad28a0b0364748806301dee9272a80efeb7b174639730e21a948ff7",
+      "bytes": 684327
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/cognee-structured-output-smoke.json",
+      "sha256": "933232ab8c81d98ff976677efe779023e461035e90b95f39f21ab5eca9466c5c",
+      "bytes": 7007
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H1.json",
+      "sha256": "374542176e4f2152707aa6f18a03eaeb1f937ae6011396b98a797da584b22057",
+      "bytes": 45185
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H2.json",
+      "sha256": "cc44fdbbad07267aa70df850b41cd7b74397e3fb463dc933dadbff3797d00cbb",
+      "bytes": 50216
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H3.json",
+      "sha256": "c1b9793163f23598152226a1d425999313c7781cb709649aeda9fefc9356e68d",
+      "bytes": 19252
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H4.json",
+      "sha256": "d641c1594aa1a3cc77351c02b04891502aa85e6d2b97634749177f7926b323ef",
+      "bytes": 40866
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H5.json",
+      "sha256": "553b2b2ee6d5ff2b1f35571e05aaf85b5f3d200d08043d3dff6e4ce9645e582e",
+      "bytes": 26172
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H6.json",
+      "sha256": "7ae967698c1bf748eec93526121cc3b740478560fd4c0fd979c33f43d457ff98",
+      "bytes": 33003
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-dive-H7.json",
+      "sha256": "7af3f9925074dfcb8072f88bf2c83addd5ecb827c43fc0fbb195e49cb10e5ecb",
+      "bytes": 37305
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refutations-G1-G5.json",
+      "sha256": "e36df25ae4c4e2c18f353bbbe70038c66bcc7cdc7822c4f965c0e8af4579b425",
+      "bytes": 151526
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH1.json",
+      "sha256": "19feca58d53f4d17c4ded975fd0bc343dfdaaa36e9b0dccc42326fcaca4820eb",
+      "bytes": 25874
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH2.json",
+      "sha256": "72760d7e3af0ce4014ced12b2d213756ebff601995610d7fef95139d876ed4de",
+      "bytes": 27662
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH3.json",
+      "sha256": "6bc2eb3f16189ac8f25ffeda274d39bddd265de0823fbc02d663abadca76958e",
+      "bytes": 11780
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH4.json",
+      "sha256": "842d7349e898bc4577f51d4ad61b9c3ea54db50a31586cd64a02bdf5f66019ce",
+      "bytes": 25687
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH5.json",
+      "sha256": "252dac8ef8f8c4c970d0948e857a25e8ba3559736a6b74f9cdf294f7de1be7d3",
+      "bytes": 11525
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH6-r2.json",
+      "sha256": "0a26afe734f24bed67b8736ed468e31a7356b06cc5a27d61360f652bf11ff5ce",
+      "bytes": 18288
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/records/gpt6-refute-RH7-r2.json",
+      "sha256": "2e7fb078170120079541f26e57276930a4e0cbf3fbbb1af22e8fe59239fc8ab1",
+      "bytes": 19011
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/build_packets.py.txt",
+      "sha256": "5516525f7520fb5b20b1b9d69c739e6114f2032f7c1d8c9bb58476eb01e9c324",
+      "bytes": 2891
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/build_verdict.py.txt",
+      "sha256": "07c0bf4e570f68875da4c5adf74239138a4ee53708e59bdab2d1a0a0a211994f",
+      "bytes": 10823
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/capture_own_reports.py.txt",
+      "sha256": "216924122c351f85116d384b50c549f86eb651b28ef14c9eff8685dc2e5f37aa",
+      "bytes": 4287
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/codex_effort_coverage.py.txt",
+      "sha256": "1efdba000ee6f63a4f958128c4e64525b0b20a4541503792259a62a4df76ed8b",
+      "bytes": 5342
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/codex_sent_effort.py.txt",
+      "sha256": "76b330aeb5ab145205dd67da9a1cbafd41ab17966ff83db295ad553ad8b6e56f",
+      "bytes": 2106
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/probe_max.py.txt",
+      "sha256": "f308b0d13d5c89f9a995006a481d95a799cf4490065e3d003b858c18d1942878",
+      "bytes": 2696
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/retain_repair_evidence.py.txt",
+      "sha256": "963a0def18d486c72924ccce0361f0fa23cb5bbcf75828c050550b4dbcaed5b9",
+      "bytes": 5754
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/snap.py.txt",
+      "sha256": "e4d683c0017eb790b1c69749426064f0b88f9e1cbf194c43a2b041245adb9c98",
+      "bytes": 1746
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/scripts/stage_records.py.txt",
+      "sha256": "372c8b9975d342b9969d638811e0b4035f97183a1a8ce5ba0aa6a62466c1f933",
+      "bytes": 4920
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/synth-r1-errors.json",
+      "sha256": "c6f9655e7ac32df4419449b946e19ab03d906e9d3e18e5290b62648da5bd3b20",
+      "bytes": 466
+    },
+    {
+      "path": "evidence/artifacts/omniroute-features-20260927/upstream-issue-14866.json",
+      "sha256": "a91d5e1aa836ae3382cadded3a08198ae4393608275f64c340f23c1acb079f0a",
+      "bytes": 1293
+    },
+    {
       "path": "evidence/artifacts/omniroute-gateway-20260927/README.md",
       "sha256": "aae1e5f0997531625cc684ff088b17a68a4f605592065b1756ab90d3895ccabd",
       "bytes": 25609
@@ -41828,6 +42188,141 @@
       "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json",
       "sha256": "16e5ad1e1590ccef9ed6c73d5ab39f494620bdef7213bb3bcddbf316f99e01b7",
       "bytes": 10521
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/README.md",
+      "sha256": "5d9c7cebe4086db86affec83f63b325db51963029eeae36a9c2c345c38208642",
+      "bytes": 3233
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/ab-end.txt",
+      "sha256": "3d900203f836c13484c10f24203c2bf9ef664f1fb1b7fc3ee3cca7d9d0386734",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/ab-results.json",
+      "sha256": "8cf4622f753282bee50830b389c6cc70eb36672177f63a0f0b8ab0a0a7ab5cf6",
+      "bytes": 12036
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/ab-start.txt",
+      "sha256": "4fcd2f03148c72306cd7b37371e5767635196013ffbb3c5a01d74e88c76453de",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/device-probe.txt",
+      "sha256": "1d3234fc1ac4fe52e2b030c5d047a1fb2e736c3eb602d0c96c49129065a66388",
+      "bytes": 339
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/device.mjs.txt",
+      "sha256": "a6ea135b00d76fabca20e21d2bcab58fb853941a8e95d9ed8356a31da3cf3ec1",
+      "bytes": 204
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/embed-end.txt",
+      "sha256": "7f5312c37501dc0753dd7718e4a2766e1cb9f9194cccfcd53b4e826161b0c621",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/embed-start.txt",
+      "sha256": "3f7179ba2746e8439f7ca3409243f8f462ee18e1bbdb8ae1d18363a9b8346b35",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/lex-search-post.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/lex-search.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/prereg381-qmd-tasks.json",
+      "sha256": "3668cb8295aa91550bbb19352dc8bbe5649f1493f9fda6e769d3a28b5cc0321f",
+      "bytes": 9760
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/qmd-model-identity.json",
+      "sha256": "8d5f3cdcff2a5f96ae4db174a200f9d85685fb76222da7dbce49f2e57190f020",
+      "bytes": 532
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/query-post-embed.json",
+      "sha256": "c610b4a0cf236b65adca3cfee6833a234136a591a91030bdb3eca4dab427d12d",
+      "bytes": 2668
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/query-pre-embed.json",
+      "sha256": "3e12d7c573a8daff6e7983aa5ead8c2289d3c157dc79c9fc9c7a8630d11d208d",
+      "bytes": 2694
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/queryset-frozen-at.txt",
+      "sha256": "0b696a034fde8d4acb1df8103e0d09b170f2961e5c6712a7473b7745d719ad41",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/queryset-frozen.json",
+      "sha256": "577717d6a6025e1f0f763aa093fd2672e5171a38151d696581f1b5b5a6d64f38",
+      "bytes": 6881
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/queryset-frozen.sha256",
+      "sha256": "f7080c806eca477090566fe73925db7ad63d36c0aaa3865bb5a41a5097a4b994",
+      "bytes": 103
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/run_ab.py.txt",
+      "sha256": "6c7108b9e38d6fc9533d95b13241624bcd7bde7bd2a51ddf90e64b279d37afc4",
+      "bytes": 2475
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/scope-embed-end.txt",
+      "sha256": "c593b8807a0d31240c1e169e53a83f013059fea6f6d212ab6fbfcb34d93c87c2",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/scope-embed-exit.txt",
+      "sha256": "fb33a14e2c2471cbffe34a7e2f219b5da56d08f7e48ebee55fe6ca511cccaf5a",
+      "bytes": 8
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/scope-embed-start.txt",
+      "sha256": "843994fa1fa29ac368e9c2dd1a53104230217254d2e33d0dc548095d74ca5b8c",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/scope-update-start.txt",
+      "sha256": "1cfbaf5991ad43ba7ba6043ad9d3d2ad4f67dc6ccc0bc9ef04bedd91e89ca8f4",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/scope-update.out",
+      "sha256": "f93f4847249e93c34e4889e52bf2c5e27a80fbd094f79876fbe1a8c8636eee7f",
+      "bytes": 756
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/status-after-scope.txt",
+      "sha256": "826b07f248c77381fd937432530ebaee36606ea4f11570fa0648cec92f887364",
+      "bytes": 1646
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/status-after.txt",
+      "sha256": "13cda438249e2f6ee42ff693ba2cedb1f7529cf7b10a8d531ddc7a5d5d9b52ef",
+      "bytes": 1377
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/status-before.txt",
+      "sha256": "0fae84ff7818ac457b59ecedc4ae8281760c0ca0505cb04255b9210aa15e4e89",
+      "bytes": 1424
+    },
+    {
+      "path": "evidence/artifacts/qmd-scope-embed-20260927/vsearch-post.json",
+      "sha256": "9c105a393ae9869e5517749ba12b9796328412a1e3d97b7a4d9774771e3fd65a",
+      "bytes": 2788
     },
     {
       "path": "evidence/artifacts/receipt-repairs-20260926/README.md",
