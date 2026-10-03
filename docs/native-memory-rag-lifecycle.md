@@ -16,6 +16,18 @@ not improved answer quality or token savings.
 
 ## September 30 scheduled follow-up: consolidation quota failure
 
+**Workstation scope — added 2026-10-03 under 0c custody.** This section is a
+historical 2026-09-30 observation of the workstation's systemd-managed `agent-lab`
+memory stack, supported by the receipt's `independent_monitor.services` and
+`timers` readback and this guide's systemd monitoring rows. It predates the
+[2026-10-02 two-host decision](decisions/2026-10-02-two-host-north-star-architecture.md),
+which retains the Mac ai-memory 2.5.2 owner, keeps memory ownership singular and
+does not treat historical workstation receipts as evidence of current workstation
+activation. This observation is not evidence about the Mac owner, a later
+workstation environment or current consolidation health. Queue semantics after
+the reviewed pin `353841d9` were not reviewed, including those of main's ai-memory
+2.4.1 component lock and the Mac owner's 2.5.2.
+
 The [September 30 receipt](../observability/memory-scheduled-20260930.json) records
 the actual scheduled wake and a new failed consolidation. A scoped read-only
 store query returned generation 17,318 in `failed` state after five attempts;
