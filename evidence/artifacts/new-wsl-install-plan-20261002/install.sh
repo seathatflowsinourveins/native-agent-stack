@@ -140,7 +140,7 @@ interim_acknowledged() {
   # install function calls this first; check_plan.py requires the call. It reads the layer consensus's wave-2 batch and
   # refuses while any acknowledgement is owed (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).
   local consensus="$repo_root/evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json" owed
-  owed="$(jq -r '.wave2.acknowledgements_owed | if type == "array" then join(", ") else error("not a list") end' "$consensus")" || {
+  owed="$(jq -r '.wave2.acknowledgements_owed | if type == "array" and all(.[]; type == "string" and length > 0) then join(", ") else error("not a list of names") end' "$consensus")" || {
     printf '%s: refused: the acknowledgements of the wave-2 batch cannot be read from %s\n' "$1" "$consensus" >&2
     return 1
   }

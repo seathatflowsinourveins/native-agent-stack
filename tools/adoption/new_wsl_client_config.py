@@ -1237,8 +1237,13 @@ def remote_plugin_rules(codex_home: Path) -> tuple:
 
 def with_remote_plugin_rules(text: str, names: list, servers: dict) -> str:
     """The rendered Codex config with a name rule per remote plugin skill after its own rules, and each remote plugin's MCP
-    servers turned off (the plugin entry itself off too, so a cached bundle the account no longer installs stays off; the
-    synced remote entry replaces it while the account installs the plugin)."""
+    servers turned off. The plugin's table also gets enabled = false: a local [plugins."<id>"] table is a PluginConfig
+    whose `enabled` defaults to true (config/src/types.rs L1004-1006; core-plugins/src/marketplace_policy.rs
+    configured_plugins_from_stack), a local entry the account's synced list lacks stays as configured
+    (core-plugins/src/loader.rs merge_configured_plugins_with_remote_installed), and load_plugin loads an enabled entry
+    whose bundle is cached (loader.rs, the `if !plugin.enabled` return), all at rust-v0.160.0; so a table with only
+    mcp_servers would turn on a cached plugin the account no longer installs. While the account installs the plugin, the
+    synced entry replaces this one and keeps only its mcp_servers (merge_remote_plugin_config)."""
     data = tomllib.loads(text)
     rules = data.setdefault("skills", {}).setdefault("config", [])
     rules += [rule for rule in ({"name": name, "enabled": False} for name in names) if rule not in rules]

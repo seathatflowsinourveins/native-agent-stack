@@ -784,7 +784,12 @@ manifest changed under it.
   the fallback until then (recipes/README.md, amended the same day).
 - **Remote plugins** (skills ruling, change 5). `--apply` reads the account's remote plugin cache and adds one
   `[[skills.config]]` name rule per plugin skill and an off switch per plugin MCP server (the map's
-  `step/codex-remote-plugin-rules`). Codex's rule lists are arrays of tables, so the render writes them as `[[...]]` items
+  `step/codex-remote-plugin-rules`). A plugin that ships an MCP server also gets `enabled = false` on its own table, which
+  the ruling does not name: at rust-v0.160.0 a local `[plugins."<id>"]` table defaults `enabled` to true
+  (config/src/types.rs L1004-1006), a local entry the account's synced list lacks stays as configured, and an enabled
+  entry whose bundle is cached loads (core-plugins/src/loader.rs, `merge_configured_plugins_with_remote_installed` and
+  `load_plugin`), so a table holding only the server switch would turn on a cached plugin the account no longer
+  installs; while the account installs it, the synced entry replaces the local one and keeps only its `mcp_servers`. Codex's rule lists are arrays of tables, so the render writes them as `[[...]]` items
   and the merge adds the render's rules a file lacks after the file's own, instead of keeping the file's list as a
   conflict; a list a file writes inline is refused with nothing written.
 - **The acknowledgement gate** (code-search ruling, change 1). While the layer consensus's wave-2 batch owes an

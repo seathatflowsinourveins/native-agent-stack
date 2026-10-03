@@ -1182,7 +1182,10 @@ class InterimPlanChecks(unittest.TestCase):
         self.assertIn("memory-owner: refused: an interim install waits for the acknowledgements of the wave-2 batch still "
                       "owed by: claude, gpt", err)
         self.assertEqual(self.run_gate({"wave2": {"acknowledgements_owed": []}}), (0, ""))
-        for broken in ({"wave2": {}}, {"wave2": {"acknowledgements_owed": "claude"}}, None):
+        # The same inputs the client configuration's owed_acknowledgements refuses (tests/test_new_wsl_client_config.py,
+        # AcknowledgementGateTests), and a file that is not there.
+        for broken in ({}, {"wave2": {}}, {"wave2": {"acknowledgements_owed": "claude"}},
+                       {"wave2": {"acknowledgements_owed": [""]}}, None):
             with self.subTest(consensus=broken):
                 code, err = self.run_gate(broken, slot="code-search")
                 self.assertEqual(code, 1)
