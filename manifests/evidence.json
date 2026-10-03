@@ -15766,8 +15766,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "e3df87042f5e75035df3451a6fd685a8d965c79dac68bb1647ba283195711347",
-      "bytes": 24155
+      "sha256": "eb925715eacdd901163f5ef23003705854ebcaf11767edc138ad0bba9e44dacd",
+      "bytes": 27259
     },
     {
       "path": "docs/direct-results.md",
@@ -45300,19 +45300,29 @@
       "bytes": 7120
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
+      "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188",
+      "bytes": 8759
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/protocol-opus-read.json",
       "sha256": "b4adf401452c5f8788c3654c700d3ad3b4b9fc136d7b2218ad8809631efea56d",
       "bytes": 3270
     },
     {
       "path": "evidence/artifacts/token-context-20261003/protocol.md",
-      "sha256": "0c748cbdaa93326561628ef6e01ffea18a1323382e3725d6d22d06eb8c1c0db1",
-      "bytes": 24691
+      "sha256": "3677112ec871fc8f6aec73d0a63ee9c9a6b8cea339e0ec6ba6d35e8f7c4e1bde",
+      "bytes": 27448
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "8185e41f2e9840b17575af19fa4cc9c18ce10328b07762e1184145d4769f1c70",
-      "bytes": 32609
+      "sha256": "f90386a6d135f31461ff00683d9375942db7d5cf660432d65f9fc6b3eb3d76ae",
+      "bytes": 38193
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
+      "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72",
+      "bytes": 3710
     },
     {
       "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",
@@ -45331,8 +45341,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/source-qualification.md",
-      "sha256": "7a3ea0dbb43e2bedf8c97d5432c6ca637239a6b988837282dd8349c51b5da57c",
-      "bytes": 16861
+      "sha256": "98cbda5da2c6810bde6e292bd6dcabb3c8ea01b2c158ad543d10e32632f95c13",
+      "bytes": 18274
     },
     {
       "path": "evidence/artifacts/token-context-20261003/toon-qualification.json",
