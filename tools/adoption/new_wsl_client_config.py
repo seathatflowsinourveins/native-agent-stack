@@ -296,7 +296,8 @@ def load_plan(root: Path) -> dict:
                           r"\s*endpoint:\s*127\.0\.0\.1:(\d+)", otel)
     stated = re.search(r"OTLP grpc/http endpoint=127\.0\.0\.1:(\d+)/(\d+)",
                        rows["otel-collector-contrib"]["service"]["port_setting"])
-    env = re.search(r"^export PORT=(\d+)$", (base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), re.M)
+    # Plain NAME=value lines since the wave-2 gateway ruling (change 12): systemd's EnvironmentFile= drops `export` lines.
+    env = re.search(r"^(?:export )?PORT=(\d+)$", (base / "config" / "omniroute.env.example").read_text(encoding="utf-8"), re.M)
     if not (listening and stated and env):
         raise ConfigError("the install plan's collector or gateway port could not be read")
     gateway = rows["gpt-gateway"]["service"]["port"]
@@ -310,16 +311,28 @@ def load_plan(root: Path) -> dict:
             "ports": {"collector_grpc_port": int(listening.group(1)), "collector_http_port": int(listening.group(2)),
                       "gateway_port": gateway},
             "codex_model": render_config.codex_model_for(release.group(1)),
-            "skills": installed_skills(rows)}
+            "skills": installed_skills(rows, root)}
 
 
-def installed_skills(rows: dict) -> frozenset:
-    """The skills the plan's skills installer is told to add (its `-s` list)."""
+SKILLS_MANIFEST_REL = "adoption/skills/manifest.json"
+SKILLS_INSTALLER = "tools/adoption/install_skills.py"
+
+
+def installed_skills(rows: dict, root: Path = ROOT) -> frozenset:
+    """The skills the plan installs. Since the wave-2 skills ruling (change 7) its skills rows run the repository's
+    installer against adoption/skills/manifest.json: over every selected skill (none pruned or held) without --only, or
+    over its --only names. A row that runs the skills CLI's own add names its skills after -s."""
+    selected = {skill["name"] for skill in read_json(root / SKILLS_MANIFEST_REL)["skills"]
+                if skill.get("status") not in ("pruned", "held")}
     found = set()
-    for command in rows["engineering-process-skills"]["commands"]:
-        match = re.search(r" -s ((?:[a-z0-9][a-z0-9-]* )+)-y", command)
-        if match:
-            found.update(match.group(1).split())
+    for row in rows.values():
+        for command in row.get("commands", []):
+            if SKILLS_INSTALLER in command and "--check-only" not in command:
+                only = re.findall(r"--only ([a-z0-9][a-z0-9._-]*)", command)
+                found.update(selected & set(only) if only else selected)
+            match = re.search(r" -s ((?:[a-z0-9][a-z0-9-]* )+)-y", command)
+            if match:
+                found.update(match.group(1).split())
     return frozenset(found)
 
 

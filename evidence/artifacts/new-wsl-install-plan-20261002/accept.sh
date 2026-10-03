@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing and have nothing to check.
+# Wave 2 (2026-10-03): memory-owner, code-search, context-supply and statusline gained checks, and research-harnesses
+# and tobi-qmd were revised; none of these checks has run anywhere.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi
@@ -25,7 +27,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -148,20 +150,12 @@ claude plugin list && codex plugin list'
 }
 
 engineering-process-skills() {
-  # mattpocock/skills (selected skills, not the bundle); https://github.com/mattpocock/skills
+  # mattpocock/skills (selected skills, not the bundle), with the rest of adoption/skills/manifest.json; https://github.com/mattpocock/skills
+  # UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L164
-      check engineering-process-skills smoke 'declare -A want=([tdd]=423f3cc2bccf3b0ed426fb35eeb4b38d9188a343 [diagnosing-bugs]=463c81def888fefa77b894837d301d9ed70e0994 [codebase-design]=20b7cd1dd1fe5b0bd37ba72649f3a29375574b5b [domain-modeling]=959e63161ff78b4b1cd553b2c0e09e0c68418e5f [writing-for-agents]=bd9c9c4762db0a9a094fd419316ebd4b0444d06e [setup-matt-pocock-skills]=abf20c04a4aa8a37ff20aa7286f28857150f8b8d)
-lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
-lock="${lock:-$HOME/.agents/.skill-lock.json}"
-listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
-for skill in tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills; do
-  for agent in '"'"'Claude Code'"'"' Codex; do
-    jq -e --arg skill "$skill" --arg agent "$agent" '"'"'any(.[]; .name == $skill and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
-  done
-  jq -e --arg skill "$skill" --arg hash "${want[$skill]}" '"'"'.skills[$skill].skillFolderHash == $hash'"'"' "$lock" >/dev/null
-done'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/fd111e59a7480c7910907e5cdc9a32a9e42ec42e/tools/adoption/install_skills.py#L554 (--check-only: the read-only check of every selected skill)
+      check engineering-process-skills smoke 'python3 -B "$repo_root/tools/adoption/install_skills.py" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --check-only --json'
       ;;
     *) skipped engineering-process-skills ;;
   esac
@@ -267,6 +261,15 @@ tobi-qmd() {
       # Kind: smoke; Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671
       check tobi-qmd smoke 'qmd status'
       ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021 (doctor: runtime, embedding fingerprints, GPU probe); https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1014 (status)
+      # Needs the interim embedder provisioned and the index embedded (embed -f); the wave-2 retrieval ruling, change 16. UNRUN.
+      check tobi-qmd smoke 'f="$HOME/.local/share/qmd/models/Qwen3-Embedding-0.6B-Q8_0.gguf"
+printf '\''%s  %s\n'\'' 06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 "$f" | sha256sum --check --status
+grep -qxF "  embed: $f" "$HOME/.config/qmd/native-agent-stack-catalog.yml"
+qmd --index native-agent-stack-catalog status
+qmd --index native-agent-stack-catalog doctor'
+      ;;
     *) skipped tobi-qmd ;;
   esac
 }
@@ -293,6 +296,68 @@ playwright-cli() {
   esac
 }
 
+memory-owner() {
+  # ai-memory 2.5.2 (interim, amendment 3); https://github.com/akitaonrails/ai-memory
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: version only; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/cli.rs#L11
+      check memory-owner 'version only' 'ai-memory --version'
+      ;;
+    service_health)
+      # Kind: health; Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/commands/serve.rs#L2712 (/healthz); status: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L2149
+      check memory-owner health 'curl -fsS http://127.0.0.1:29374/healthz
+AI_MEMORY_SERVER_URL=http://127.0.0.1:29374 ai-memory status --json'
+      ;;
+    *) skipped memory-owner ;;
+  esac
+}
+code-search() {
+  # semble 0.6.1 (interim, amendment 3); https://github.com/MinishLab/semble
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L269 (--version); https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L114 (search, path, --format)
+      # The probe search after the version line is this project's integration check, not upstream acceptance.
+      check code-search smoke 'semble --version
+probe="$(mktemp -d)"
+trap '\''rm -rf -- "$probe"'\'' EXIT
+printf '\''%s\n'\'' '\''def parse_invoice_total(lines):'\'' '\''    return sum(float(line.split(",")[2]) for line in lines)'\'' > "$probe/invoice_probe.py"
+SEMBLE_MODEL_NAME="$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c" SEMBLE_CACHE_LOCATION="$probe/cache" semble search "sum the invoice totals" "$probe" --format text | grep -q invoice_probe.py'
+      ;;
+    *) skipped code-search ;;
+  esac
+}
+context-supply() {
+  # context-mode 1.0.169 (interim, amendment 3); https://github.com/mksglu/context-mode
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L78 (verify the install); https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/plugin_cmd.rs#L447 (plugin list --json)
+      check context-supply smoke 'want=6f0cc6841c687e754059f36714a11233fda1a02b
+sha="$(jq -r '\''[.plugins["context-mode@context-mode"][] | select(.scope == "user") | .gitCommitSha][0]'\'' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/installed_plugins.json")"
+[[ "$sha" == "$want" ]] || [[ "$(curl -fsSL "https://api.github.com/repos/mksglu/context-mode/compare/$want...$sha" | jq -r '\''[.files[].filename] | unique | join(",")'\'')" == stats.json ]]
+codex plugin list --json | jq -e '\''any(.installed[]; .pluginId == "context-mode@context-mode" and .enabled)'\'' >/dev/null
+[[ "$(jq -r .version "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169/lib/node_modules/context-mode/package.json")" == 1.0.169 ]]'
+      ;;
+    *) skipped context-supply ;;
+  esac
+}
+statusline() {
+  # claude-hud 0.10.0 and the Codex footer; https://github.com/jarrodwatts/claude-hud
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/commands/setup.md#L72 (sample input: two HUD lines); https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L29 (the launcher runs the highest cached version)
+      check statusline smoke 'config_dir="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+jq -e '\''[.plugins["claude-hud@claude-hud"][] | select(.scope == "user") | .version] == ["0.10.0"]'\'' "$config_dir/plugins/installed_plugins.json" >/dev/null
+versions="$(ls -d "$config_dir"/plugins/cache/*/claude-hud/*/ | wc -l)"
+lines="$(echo '\''{"model":{"display_name":"Opus"},"context_window":{"used_percentage":12,"context_window_size":200000}}'\'' | node "$(ls -d "$config_dir"/plugins/cache/*/claude-hud/0.10.0)/scripts/statusline.mjs" | wc -l)"
+[[ "$versions" == 1 && "$lines" -ge 2 ]]'
+      ;;
+    *) skipped statusline ;;
+  esac
+}
 otel-collector-contrib() {
   # OTel Collector Contrib; https://github.com/open-telemetry/opentelemetry-collector-contrib
   case "$stage" in
@@ -601,46 +666,21 @@ research-harnesses() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23
-      # Source: https://raw.githubusercontent.com/docker/compose/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/docs/reference/compose_config.md#L27 (DeerFlow Compose configuration, second part)
+      # Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L158 (the preflight reads upstream's Config; wave-2 research ruling, change 4)
+      # Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658 (the embedded DeerFlowClient)
       check research-harnesses smoke 'cd "$tool_root/gpt-researcher"
-.venv/bin/python -c '"'"'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])'"'"'
-cd "$tool_root/deer-flow/docker"
-DEER_FLOW_ROOT="$tool_root/deer-flow" docker compose -p deer-flow-dev -f docker-compose-dev.yaml config --quiet'
-      ;;
-    service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/docker/docker-compose.yaml#L152
-      check research-harnesses health 'curl -fsS http://127.0.0.1:2026/health/ready'
+.venv/bin/python -c '\''import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])'\''
+bash "$repo_root/tools/research/gpt_researcher.sh" --preflight-only
+"$tool_root/deer-flow/backend/.venv/bin/python" -c '\''from deerflow.client import DeerFlowClient'\'''
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/v3.7.0/docs/docs/gpt-researcher/gptr/pip-package.md#L32
-      check research-harnesses smoke 'cd "$tool_root/gpt-researcher"
-.venv/bin/python - <<'"'"'PY'"'"'
-from gpt_researcher import GPTResearcher
-import asyncio
-
-async def get_report(query: str, report_type: str):
-    researcher = GPTResearcher(query, report_type)
-    research_result = await researcher.conduct_research()
-    report = await researcher.write_report()
-    research_context = researcher.get_research_context()
-    research_costs = researcher.get_costs()
-    research_images = researcher.get_research_images()
-    research_sources = researcher.get_research_sources()
-    return report, research_context, research_costs, research_images, research_sources
-
-if __name__ == "__main__":
-    query = "what team may win the NBA finals?"
-    report_type = "research_report"
-    report, context, costs, images, sources = asyncio.run(get_report(query, report_type))
-    print("Report:")
-    print(report)
-    print("\nResearch Costs:")
-    print(costs)
-    print("\nNumber of Research Images:")
-    print(len(images))
-    print("\nNumber of Research Sources:")
-    print(len(sources))
-PY'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py#L336 (the success line)
+      # One short current-month run through the destination gateway, research_report only (wave-2 research ruling, changes 5 and 6; synthesis X18). UNRUN.
+      check research-harnesses smoke 'out="$(bash "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month")"
+grep -q "^Report written to '\''outputs/" <<<"$out"
+run="$(sed -n '\''s/^run directory: //p'\'' <<<"$out")"
+refs="$(awk '\''/^#+ *References/{f=1} f'\'' "$run"/outputs/*.md | grep -oE '\''https?://[^) >]+'\'' | sort -u | wc -l)"
+[[ "$refs" -ge 5 ]]'
       ;;
     *) skipped research-harnesses ;;
   esac
@@ -684,6 +724,10 @@ if [[ -z "$only" || "$only" == serena ]]; then serena; fi
 if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
 if [[ -z "$only" || "$only" == tobi-qmd ]]; then tobi-qmd; fi
 if [[ -z "$only" || "$only" == mineru ]]; then mineru; fi
+if [[ -z "$only" || "$only" == memory-owner ]]; then memory-owner; fi
+if [[ -z "$only" || "$only" == code-search ]]; then code-search; fi
+if [[ -z "$only" || "$only" == context-supply ]]; then context-supply; fi
+if [[ -z "$only" || "$only" == statusline ]]; then statusline; fi
 if [[ "$only" == playwright-cli ]]; then playwright-cli; elif [[ -z "$only" ]]; then skipped playwright-cli; fi
 if [[ -z "$only" || "$only" == otel-collector-contrib ]]; then otel-collector-contrib; fi
 if [[ -z "$only" || "$only" == prometheus ]]; then prometheus; fi
@@ -712,7 +756,7 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'research-skill' 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'cross-family-review' 'chezmoi' 'base-distribution'; do
+for slot in 'research-skill' 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'ccusage' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'cross-family-review' 'chezmoi' 'base-distribution'; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
 exit "$failed"

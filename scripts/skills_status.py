@@ -25,6 +25,14 @@ this checks, under a given home directory:
     bundled skills carry (``CODEX_BUNDLED_SKILL_NAMES``) it is a failure, because Codex
     applies a name rule to every loaded skill of that name and so hides its bundled copy too.
 
+Two kinds of entry are checked differently. A skill whose ``status`` is ``held`` waits for the
+measurement or gate its entry names and is not installed by tools/adoption/install_skills.py; it is
+reported as ``held`` (with whether a canonical folder is present anyway) and never fails the run. An
+entry with ``"agents": ["claude-code"]`` and ``"copy": true`` is a Claude-Code-only copy: its
+SKILL.md, lock entry and folder tree are checked in Claude Code's own skills folder, which must be a
+real folder (not a link), and no same-name folder may sit in the shared ``~/.agents/skills``, where
+Codex loads skills (``shared_copy_present``); Codex receives no rule for it.
+
 Each path is built as the program that writes or reads it builds it: the skills CLI's
 folders, lock and links with Node's ``path.join`` (``node_path_join``), Claude Code's
 settings and Codex's config with their own rules (``claude_settings_path``,
@@ -162,6 +170,13 @@ def load_manifest(path: Path) -> dict:
         require(isinstance(skill["codex_enabled"], bool), f"{label}: codex_enabled must be a boolean")
         require(isinstance(skill.get("upstream_allow_implicit_invocation", True), bool),
                 f"{label}: upstream_allow_implicit_invocation must be a boolean")
+        agents = skill.get("agents", ["claude-code", "codex"])
+        require(isinstance(agents, list) and bool(agents) and len(set(agents)) == len(agents)
+                and all(agent in ("claude-code", "codex") for agent in agents),
+                f"{label}: agents names claude-code and/or codex, each once")
+        require(isinstance(skill.get("copy", False), bool), f"{label}: copy must be a boolean")
+        require(not skill.get("copy") or agents == ["claude-code"],
+                f"{label}: copy is supported for a Claude-Code-only entry")
     cli = data.get("cli")
     require(isinstance(cli, dict) and isinstance(cli.get("version"), str) and bool(cli["version"]),
             "cli.version must be a nonempty string")
@@ -360,7 +375,7 @@ def check_folder_tree(agents_skills: Path, skill: dict) -> dict:
 
 
 def folder_tree_summary(skills_report: list[dict]) -> dict:
-    summary = {"ok": 0, "runtime_artifacts": [], "drift": [], "missing": [], "unreadable": []}
+    summary = {"ok": 0, "runtime_artifacts": [], "drift": [], "missing": [], "unreadable": [], "held": []}
     for skill in skills_report:
         state = skill["folder_tree"]["state"]
         if state == "ok":
@@ -586,6 +601,37 @@ def inspect(manifest: dict, home: Path, env=None, skills_bin: str | None = None)
     skills_report = []
     for skill in manifest["skills"]:
         name = skill["name"]
+        if skill.get("status") == "held":
+            # Not installed while held (tools/adoption/install_skills.py skips it); a folder left from an earlier
+            # install is reported, never failed.
+            present = os.path.lexists(agents_skills / name) or os.path.lexists(claude_skills / name)
+            held = {"state": "held"}
+            skills_report.append({"name": name, "pass": True, "held": True, "present": present,
+                                  "canonical": held, "lock": held, "claude_link": {"state": "held", "kind": "held"},
+                                  "claude_listing": {"state": "held", "actual": None},
+                                  "codex_disable": {"state": "held", "disable_entry_present": False},
+                                  "folder_tree": held})
+            continue
+        if skill.get("copy"):
+            # A Claude-Code-only copy: everything is in Claude Code's own folder, which must not be a link, and the
+            # shared folder where Codex loads skills holds no same-name copy. Codex needs no rule for it.
+            link = check_claude_link(claude_skills / name, claude_skills / name)
+            if link["state"] == "not_a_symlink":
+                link = {"state": "ok", "kind": "copy"}
+            elif link["state"] == "ok":
+                link = {"state": "is_a_symlink", "kind": link["kind"]}
+            shared = os.path.lexists(agents_skills / name)
+            checks = {
+                "canonical": check_canonical(claude_skills, skill),
+                "lock": check_lock_entry(lock_data, lock_state, skill),
+                "claude_link": link,
+                "claude_listing": check_claude_listing(overrides, overrides_state, skill),
+                "codex_disable": {"state": "shared_copy_present" if shared else "ok", "disable_entry_present": False},
+            }
+            skills_report.append({"name": name, "pass": all(item["state"] == "ok" for item in checks.values()),
+                                  "scope": "claude-code copy", **checks,
+                                  "folder_tree": check_folder_tree(claude_skills, skill)})
+            continue
         checks = {
             "canonical": check_canonical(agents_skills, skill),
             "lock": check_lock_entry(lock_data, lock_state, skill),

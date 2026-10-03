@@ -160,12 +160,17 @@ if argv[0] == "add":
         print(f"fake skills add: no fixture for {name!r}", file=sys.stderr)
         sys.exit(1)
     fixture = FIXTURES[name]
-    skill_dir = target / ".agents" / "skills" / name
-    if skill_dir.exists():
+    copy = "--copy" in argv
+    # --copy with one agent writes into that agent's own folder only (installSkillForAgent in the 1.7.0 bundle);
+    # the fake supports the one form install_skills.py uses, a global copy for claude-code.
+    skill_dir = claude_skills_dir(target, project) / name if copy else target / ".agents" / "skills" / name
+    if skill_dir.is_symlink():
+        skill_dir.unlink()
+    elif skill_dir.exists():
         shutil.rmtree(skill_dir)
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(fixture["skill_md"], encoding="utf-8")
-    if not project or "claude-code" in argv:
+    if not copy and (not project or "claude-code" in argv):
         link_dir = claude_skills_dir(target, project)
         link_dir.mkdir(parents=True, exist_ok=True)
         link = link_dir / name
@@ -238,7 +243,10 @@ if argv[0] == "remove":
         shutil.rmtree(target / ".agents" / "skills" / name, ignore_errors=True)
     link = claude_skills_dir(target, project) / name
     if not project and "claude-link" not in retained and (link.is_symlink() or link.exists()):
-        link.unlink()
+        if link.is_dir() and not link.is_symlink():
+            shutil.rmtree(link)  # a Claude Code copy (--copy), not a link
+        else:
+            link.unlink()
     path = target / "skills-lock.json" if project else lock_path(home)
     lock = load_lock(path)
     # lock_after_remove: "malformed" leaves a truncated lock that still holds the entry;
@@ -1365,15 +1373,27 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         self.assertEqual(printed_tables(result.stdout),
                          [{"path": self.skill_md(f"off-{i}"), "enabled": False} for i in range(3)])
 
-    def test_skill_creator_is_disabled_by_its_installed_path_never_by_its_name(self):
+    def test_skill_creator_is_a_claude_code_copy_and_gets_no_codex_rule(self):
         # Codex ships its own .system/skill-creator (codex-rs/skills/src/assets/samples/skill-creator/SKILL.md L2
-        # at rust-v0.159.2), so a name rule would hide the bundled copy along with the pinned one.
+        # at rust-v0.159.2), so a name rule would hide the bundled copy along with the pinned one. Since 2026-10-03 the
+        # manifest's skill-creator is a copy for Claude Code only (agents ["claude-code"], copy true), never installed
+        # where Codex loads skills, so no rule is printed for it at all, by path or by name.
         result = self.run_install(ADOPTION_MANIFEST, "--print-codex-config")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         tables = printed_tables(result.stdout)
-        self.assertIn({"path": self.skill_md("skill-creator"), "enabled": False}, tables)
+        self.assertNotIn({"path": self.skill_md("skill-creator"), "enabled": False}, tables)
         self.assertEqual([table for table in tables if set(table) != {"path", "enabled"}], [])
         self.assertNotRegex(result.stdout, r"(?m)^name = ")
+        self.assertNotIn("skill-creator", result.stdout)
+        # The same entry as a shared skill (agents and copy left out) is still disabled by its path.
+        manifest = json.loads(ADOPTION_MANIFEST.read_text())
+        shared = next(s for s in manifest["skills"] if s["name"] == "skill-creator")
+        shared.pop("agents")
+        shared.pop("copy")
+        path = self.tmp_path / "shared-manifest.json"
+        path.write_text(json.dumps(manifest))
+        tables = printed_tables(self.run_install(path, "--print-codex-config").stdout)
+        self.assertIn({"path": self.skill_md("skill-creator"), "enabled": False}, tables)
 
     def test_path_is_joined_as_the_cli_joins_the_canonical_folder_and_quoted_for_toml(self):
         # The canonical folder is path.join(os.homedir(), ".agents", "skills", name) (dist/cli.mjs L2208-2210), which
@@ -1532,6 +1552,70 @@ class JsonOutputTests(InstallSkillsTestCase):
         self.assertNotIn(str(self.home), result.stdout)
         self.assertNotIn(skill["skill_md_sha256"], result.stdout)
         self.assertNotIn(skill["url"], result.stdout)
+
+
+class HeldAndCopyTests(InstallSkillsTestCase):
+    """A held skill is never installed (adoption/skills/lifecycle.md, Held); a Claude-Code-only copy entry installs with
+    --copy -a claude-code into Claude Code's own folder and keeps no shared canonical folder (wave-2 skills ruling,
+    change 6)."""
+
+    def test_a_held_skill_is_skipped_and_only_refuses_it(self):
+        held = dict(make_skill("held-skill", "# held\n", tree_sha("held")), status="held", held_for="a measurement")
+        kept = make_skill("kept-skill", "# kept\n", tree_sha("kept"))
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"kept-skill": {"skill_md": "# kept\n", "tree_sha": tree_sha("kept")}})
+        manifest = self.write_manifest([held, kept])
+        result = self.run_install(manifest, "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"kept-skill": "installed"})
+        self.assertFalse(any("held-skill" in call for call in calls_log(fake_bin)))
+        refused = self.run_install(manifest, "--only", "held-skill", fake_bin=fake_bin)
+        self.assertEqual(refused.returncode, 1)
+        self.assertIn("held --only name(s), not installed while held: ['held-skill']", refused.stderr)
+
+    def test_a_claude_code_copy_installs_into_claude_codes_folder_only(self):
+        skill = dict(make_skill("copy-skill", "# copy\n", tree_sha("copy"), codex_enabled=False),
+                     agents=["claude-code"], copy=True)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"copy-skill": {"skill_md": "# copy\n", "tree_sha": tree_sha("copy")}})
+        manifest = self.write_manifest([skill])
+        result = self.run_install(manifest, "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"copy-skill": "installed"})
+        adds = [call for call in calls_log(fake_bin) if call and call[0] == "add"]
+        self.assertEqual(adds, [["add", skill["url"], "--skill", "copy-skill", "-g", "-y", "--copy", "-a", "claude-code"]])
+        copy_dir = self.home / ".claude" / "skills" / "copy-skill"
+        self.assertTrue(copy_dir.is_dir() and not copy_dir.is_symlink())
+        self.assertFalse((self.home / ".agents" / "skills" / "copy-skill").exists())
+        # Idempotent: the second run reads the copy back and never runs the binary's add.
+        again = self.run_install(manifest, "--json", fake_bin=fake_bin)
+        self.assertEqual(json.loads(again.stdout)["skills"], {"copy-skill": "ok"})
+        self.assertEqual(len([call for call in calls_log(fake_bin) if call and call[0] == "add"]), 1)
+        # The Codex tables name nothing for an entry Codex never receives.
+        printed = self.run_install(manifest, "--print-codex-config")
+        self.assertEqual((printed.returncode, printed.stdout.strip()), (0, ""))
+
+    def test_a_copy_that_does_not_verify_is_removed_for_claude_code_only(self):
+        skill = dict(make_skill("copy-skill", "# copy\n", tree_sha("copy"), codex_enabled=False),
+                     agents=["claude-code"], copy=True)
+        fake_bin = write_fake_skills_bin(self.bin_dir, {"copy-skill": {"skill_md": "# other\n", "tree_sha": tree_sha("copy")}})
+        result = self.run_install(self.write_manifest([skill]), "--json", fake_bin=fake_bin)
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(json.loads(result.stdout)["skills"], {"copy-skill": "rolled-back"})
+        removes = [call for call in calls_log(fake_bin) if call and call[0] == "remove"]
+        self.assertEqual(removes, [["remove", "copy-skill", "-g", "-y", "-a", "claude-code"]])
+        self.assertFalse((self.home / ".claude" / "skills" / "copy-skill").exists())
+
+    def test_a_copy_for_both_agents_or_a_malformed_agent_list_is_refused_before_any_add(self):
+        for name, extra, message in (
+                ("both", {"copy": True}, "copy installs only into Claude Code's own folder"),
+                ("unknown", {"agents": ["cursor"]}, "agents names claude-code and/or codex, each once"),
+                ("twice", {"agents": ["codex", "codex"]}, "agents names claude-code and/or codex, each once")):
+            with self.subTest(case=name):
+                skill = dict(make_skill(f"{name}-skill", "# x\n", tree_sha(name)), **extra)
+                fake_bin = write_fake_skills_bin(self.bin_dir, {})
+                result = self.run_install(self.write_manifest([skill]), fake_bin=fake_bin)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn(message, result.stderr)
+                self.assertFalse([call for call in calls_log(fake_bin) if call and call[0] == "add"])
 
 
 if __name__ == "__main__":

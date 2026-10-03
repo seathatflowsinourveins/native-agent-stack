@@ -5,6 +5,9 @@
 # distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The commands of skill-discovery
 # and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing.
+# Wave 2 (2026-10-03): memory-owner, code-search and context-supply install as interim installs (amendment 3 of the
+# manifest's decision rule), statusline is added, and research-harnesses, tobi-qmd and gpt-gateway are revised; none of
+# these has run anywhere.
 # Baseline results and limitations: VALIDATION.md.
 # Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail
@@ -179,26 +182,31 @@ trail-of-bits-security-skills-trailofbits-skills() {
 
 engineering-process-skills() {
   # mattpocock/skills (selected skills, not the bundle) | none | planned
-  # Planned. Source: https://raw.githubusercontent.com/mattpocock/skills/v1.2.3/README.md#L52
-  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L111 (non-interactive flags), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/v1.7.0/src/source-parser.ts#L284 (owner/repo#ref pin)
-  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''mattpocock/skills#v1.2.3'\'' -g -a claude-code codex -s tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills -y' || return "$?"
+  # UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L20 (the skills CLI is the npm package skills); https://docs.npmjs.com/cli/v11/commands/npm-install (--prefix)
+  run_command 'npm install --global --prefix "$tool_root/skills-1.7.0" skills@1.7.0' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44 (add from a tree URL, the form the installer runs); https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111 (non-interactive flags)
+  # The repository's installer over adoption/skills/manifest.json (wave-2 skills ruling, change 7).
+  run_command 'python3 -B "$repo_root/tools/adoption/install_skills.py" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --json' || return "$?"
 }
 
 skill-discovery() {
   # find-skills (vercel-labs/skills) | none | planned
-  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
-  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
-  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''vercel-labs/skills#7407f3893ad4dceab546ac002c3ef806e4000c73'\'' -g -a claude-code codex -s find-skills -y' || return "$?"
+  # UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L20 (the skills CLI is the npm package skills); https://docs.npmjs.com/cli/v11/commands/npm-install (--prefix)
+  run_command 'npm install --global --prefix "$tool_root/skills-1.7.0" skills@1.7.0' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44 (add from a tree URL); https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill)
+  run_command 'python3 -B "$repo_root/tools/adoption/install_skills.py" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --json --only find-skills' || return "$?"
 }
 
 skill-authoring() {
   # skill-creator (embedded in Codex; anthropics/skills for Claude Code) | none | planned
-  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  # UNRUN on every distribution: revised from the wave-2 records of 2026-10-03, after every recorded run of this plan.
   # For Claude Code only. Nothing is installed for Codex, which embeds its own skill-creator, and --copy keeps a same-name copy out of the shared $HOME/.agents/skills.
-  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
-  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91 (--copy), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
-  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''anthropics/skills#8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4'\'' -g -a claude-code -s skill-creator --copy -y' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L20 (the skills CLI is the npm package skills); https://docs.npmjs.com/cli/v11/commands/npm-install (--prefix)
+  run_command 'npm install --global --prefix "$tool_root/skills-1.7.0" skills@1.7.0' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91 (--copy), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill); the manifest entry is a copy for Claude Code only
+  run_command 'python3 -B "$repo_root/tools/adoption/install_skills.py" --skills-bin "$tool_root/skills-1.7.0/bin/skills" --json --only skill-creator' || return "$?"
 }
 
 mcporter() {
@@ -244,6 +252,54 @@ playwright-cli() {
   run_command 'npm install -g @playwright/cli@0.1.22' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346
   run_command 'playwright-cli install-browser --with-deps chromium' || return "$?"
+}
+
+memory-owner() {
+  # ai-memory 2.5.2 | release-binary | planned
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1634 (the release archive and its .sha256 sidecar; the digest is the wave-2 memory dossier's)
+  run_command 'fetch_verified https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8 "$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1636 (extract and put ai-memory on PATH; the archive's hooks/ stay beside the binary)
+  run_command 'tar -xzf "$HOME/.local/opt/ai-memory-2.5.2/ai-memory-linux-x86_64.tar.gz" -C "$HOME/.local/opt/ai-memory-2.5.2" && ln -sfn "$HOME/.local/opt/ai-memory-2.5.2/ai-memory" "$HOME/.local/bin/ai-memory"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L254 (user-level config and data layout)
+  run_command 'if [[ ! -e "$HOME/.config/ai-memory/config.toml" ]]; then mkdir -p "$HOME/.config/ai-memory" "$HOME/.local/share/ai-memory" && ai-memory --data-dir "$HOME/.local/share/ai-memory" --config "$HOME/.config/ai-memory/config.toml" init; fi' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/templates/config.default.toml#L10 (bind; embedding_provider at L99-106); port 29374 per the wave-2 synthesis X5
+  run_command 'f="$HOME/.config/ai-memory/config.toml"; if grep -qx '\''bind = "127.0.0.1:49374"'\'' "$f"; then sed -i '\''s|^bind = "127.0.0.1:49374"$|bind = "127.0.0.1:29374"\nembedding_provider = "local"|'\'' "$f"; fi; grep -qx '\''bind = "127.0.0.1:29374"'\'' "$f"; grep -qx '\''embedding_provider = "local"'\'' "$f"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L277 (systemctl --user enable --now; the unit is packaging/systemd/ai-memory-user.service)
+  run_command 'mkdir -p "$HOME/.config/systemd/user" && sed '\''s|^ExecStart=/usr/bin/ai-memory |ExecStart=%h/.local/bin/ai-memory |'\'' "$HOME/.local/opt/ai-memory-2.5.2/packaging/systemd/ai-memory-user.service" > "$HOME/.config/systemd/user/ai-memory.service" && systemctl --user daemon-reload && systemctl --user enable --now ai-memory.service' || return "$?"
+}
+
+code-search() {
+  # semble 0.6.1 | uv-tool | planned
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L41 (uv tool install semble); https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/docs/installation.md#L44 (the semble[mcp]==X.Y.Z pin)
+  run_command 'uv tool install -p 3.13 '\''semble[mcp]==0.6.1'\''' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L285 (SEMBLE_MODEL_NAME may name a local path); https://huggingface.co/docs/huggingface_hub/guides/download (snapshot_download, revision, local_dir)
+  run_command '"$(uv tool dir)/semble/bin/python" -c "from huggingface_hub import snapshot_download; print(snapshot_download('\''minishlab/potion-code-16M-v2'\'', revision='\''e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b'\'', local_dir='\''$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c'\''))"' || return "$?"
+}
+
+context-supply() {
+  # context-mode 1.0.169 | none | planned
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72 (marketplace add); https://code.claude.com/docs/en/discover-plugins (the CLI form, --scope user)
+  run_command 'claude plugin marketplace add mksglu/context-mode --scope user' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L73 (plugin install)
+  run_command 'claude plugin install context-mode@context-mode --scope user' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L593 (Codex marketplace); https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/marketplace_cmd.rs#L70 (--ref takes the reviewed commit)
+  run_command 'codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/openai/codex/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/cli/src/plugin_cmd.rs#L61 (plugin add PLUGIN@MARKETPLACE)
+  run_command 'codex plugin add context-mode@context-mode --json' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L315 (the plugin's MCP server runs the npm package); https://docs.npmjs.com/cli/v11/commands/npm-install (--prefix, a local tarball)
+  run_command 'p="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169"; d="$(mktemp -d)"; (cd "$d" && npm pack context-mode@1.0.169 >/dev/null && printf '\''%s  %s\n'\'' 09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c context-mode-1.0.169.tgz | sha256sum --check --status && npm install --global --prefix "$p" ./context-mode-1.0.169.tgz); rc=$?; rm -rf -- "$d"; exit "$rc"' || return "$?"
+}
+
+statusline() {
+  # claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned
+  # UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L29 (marketplace add); https://code.claude.com/docs/en/discover-plugins (#ref pins a tag; --scope user)
+  run_command 'claude plugin marketplace add jarrodwatts/claude-hud#v0.10.0 --scope user' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L30 (plugin install)
+  run_command 'claude plugin install claude-hud@claude-hud --scope user' || return "$?"
 }
 
 otel-collector-contrib() {
@@ -445,13 +501,14 @@ research-gpt-researcher() {
 }
 
 research-deer-flow() {
-  # GPT Researcher and DeerFlow, kept as two independent evidence gatherers | compose | planned
+  # GPT Researcher and DeerFlow, kept as two independent evidence gatherers | none | planned
+  # Revised by the wave-2 research ruling (changes 9 and 10): the embedded DeerFlowClient, no HTTP service, port or Compose.
   # Planned. Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38
   run_command 'checkout_tag https://github.com/bytedance/deer-flow.git v2.1.0 "$tool_root/deer-flow"' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38
+  # Planned. Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38 (make config writes config.yaml, which embedded runs read)
   run_command '(cd "$tool_root/deer-flow" && if [[ ! -e config.yaml && ! -e .env && ! -e frontend/.env ]]; then make config; elif [[ ! -e config.yaml || ! -e .env || ! -e frontend/.env ]]; then printf "Partial DeerFlow config; repair from upstream recipe.\n" >&2; exit 1; fi)' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38
-  run_command '(cd "$tool_root/deer-flow" && make docker-init)' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Makefile#L96 (the backend's locked environment); https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658 (the embedded client)
+  run_command '(cd "$tool_root/deer-flow/backend" && uv sync --locked)' || return "$?"
 }
 
 research-harnesses() {
@@ -490,7 +547,7 @@ if $list; then
   printf '%s\n' 'serena | Serena | uv-tool | planned'
   printf '%s\n' 'claude-plugins-official-code-intelligence-lsp-pl | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | excluded'
   printf '%s\n' 'structural-search | ast-grep | mise | planned'
-  printf '%s\n' 'code-search | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | none | excluded'
+  printf '%s\n' 'code-search | semble 0.6.1 | uv-tool | planned'
   printf '%s\n' 'embedding-model | Not installed until the deciding measurement returns | none | excluded'
   printf '%s\n' 'reranker-model | Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | none | excluded'
   printf '%s\n' 'tobi-qmd | tobi/qmd | npm-global | planned'
@@ -498,9 +555,10 @@ if $list; then
   printf '%s\n' 'trafilatura | Not installed: text extraction is a sub-step of retrieval that the two agents'\'' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it | none | excluded'
   printf '%s\n' 'playwright-cli | Playwright CLI | npm-global | measurement-only'
   printf '%s\n' 'web-search-provider | Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries | none | excluded'
-  printf '%s\n' 'memory-owner | Not installed until the memory head-to-head returns (the blind round'\''s documented-fit pick is ai-memory) | none | excluded'
+  printf '%s\n' 'memory-owner | ai-memory 2.5.2 | release-binary | planned'
   printf '%s\n' 'ccusage | Not installed: the two agents'\'' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it | none | excluded'
-  printf '%s\n' 'context-supply | No context-supply layer: the usage meter only | none | excluded'
+  printf '%s\n' 'context-supply | context-mode 1.0.169 | none | planned'
+  printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
   printf '%s\n' 'otel-collector-contrib | OTel Collector Contrib | release-binary | planned'
   printf '%s\n' 'prometheus | Prometheus | release-binary | planned'
   printf '%s\n' 'loki | Loki | release-binary | measurement-only'
@@ -545,7 +603,7 @@ if $list; then
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -555,11 +613,11 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'memory-owner' 'context-supply' 'statusline' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
 for slot in 'playwright-cli' 'loki' 'grafana'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'context-supply' 'statusline' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
 for slot in 'playwright-cli'; do named "$slot" && needs_runtime=true; done
-for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose' 'research-harnesses'; do selected "$slot" && needs_docker=true; done
+for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose'; do selected "$slot" && needs_docker=true; done
 
 if $needs_execution; then
   # Planned. Repository bootstrap-linux.sh:206-216; selected owner prereqs extend its package list.
@@ -592,7 +650,7 @@ measured_slot() {
   if named "$1"; then run_slot "$1"; elif selected "$1"; then printf '%s | install | skipped\n' "$1"; fi
 }
 # Planned. Selective installs include the native clients required by their integration.
-if [[ "$only" == trail-of-bits-security-skills-trailofbits-skills ]]; then
+if [[ "$only" == trail-of-bits-security-skills-trailofbits-skills || "$only" == context-supply || "$only" == statusline ]]; then
   run_slot claude-code
   run_slot codex
 fi
@@ -611,6 +669,10 @@ if selected 'serena'; then run_slot 'serena'; fi
 if selected 'structural-search'; then run_slot 'structural-search'; fi
 if selected 'tobi-qmd'; then run_slot 'tobi-qmd'; fi
 if selected 'mineru'; then run_slot 'mineru'; fi
+if selected 'memory-owner'; then run_slot 'memory-owner'; fi
+if selected 'code-search'; then run_slot 'code-search'; fi
+if selected 'context-supply'; then run_slot 'context-supply'; fi
+if selected 'statusline'; then run_slot 'statusline'; fi
 measured_slot 'playwright-cli'
 if selected 'inspect-ai'; then run_slot 'inspect-ai'; fi
 if selected 'harbor-containerized-agent-e2e-runner'; then run_slot 'harbor-containerized-agent-e2e-runner'; fi

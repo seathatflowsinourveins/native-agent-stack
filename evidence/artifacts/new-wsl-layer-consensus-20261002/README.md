@@ -14,6 +14,11 @@ direct consensus of the two model families. The decision, its rule and its limit
 | `codex-decisions.md` | Published copy of the Codex lane's independent decisions |
 | `claude-review-held-topics.md` | The Claude lane's independent primary-source review of the claims behind the Codex lane's scoped dispositions: the `credential-guard` amendment and the three topics held without a row change. Not a copy of an exchanged note: it is written here from the review as that lane returned it, with host paths replaced as it lists at its end |
 | `copy-notes.json` | Each copy's hash, its original's hash and every difference between the copy and the original |
+| `wave2-records.json` | The records behind the record's wave-2 batch (2026-10-03): per layer the batch uses, the wave-2 dossier's default, the GPT family's check (verdict and model), the Claude ruling's decided default and the ruling's changes that the repository cites, verbatim, each event hashed in canonical JSON; the synthesis items the batch rests on; the GPT family's whole-wave read; and the owner's decisions of 2026-10-03 as the coordinator's records relay them. An extract made by script from the private wave-2 run `wf_18aa601f-b71` (its journal's sha256 is in the file), not a copy of an exchanged note; home-directory paths and session identifiers are replaced as its `method` says |
+
+## The wave-2 batch (2026-10-03)
+
+`consensus.json` carries a second batch under `wave2`: amendment 3 of the decision rule (interim installs on rows whose decided default installs nothing, written to the row's own `interim` field), its exception to the no-install rule, one added row (`statusline`), two amendments (`credential-custody`, `credential-guard`) and three interim installs (`memory-owner`, `code-search`, `context-supply`), each on the owner's decision of 2026-10-03. Its record is `wave2-records.json`. Both families' acknowledgements of the batch are owed: `acknowledgements_owed` names them, and the comments are added when the batch's pull request exists. The decision, the rule text and the limits are in the wave-2 section of `docs/decisions/2026-10-02-new-wsl-layer-consensus.md`.
 
 ## Method
 
