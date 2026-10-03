@@ -3900,6 +3900,139 @@
         "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
       ],
       "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json"
+    },
+    {
+      "id": "omniroute-runtime-workers-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "omniroute"
+      ],
+      "claim": "The retained official Codex SDK Sol-Max worker passed one upstream coding fixture, native resume and fresh recovery through the selected OmniRoute Responses lane. Interrupted usage and Claude bridge qualification remain unknown/failed.",
+      "limitations": [
+        "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
+        "Actual provider trials invoked the SDK from root, rather than through a Claude coordinator. Native project dispatch skill is supplied and structurally checked; its coordinator invocation remains unmeasured.",
+        "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
+        "Native gateway requested/returned model labels are not backend attestation.",
+        "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
+        "Native Codex repeated in-process fixtures emit stdout/stderr ResourceWarnings; standalone per-invocation child exit is qualified separately.",
+        "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
+        "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json"
+    },
+    {
+      "id": "omniroute-runtime-enhancements-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode",
+        "serena",
+        "dagu"
+      ],
+      "claim": "A scoped native Codex SDK Sol-Max worker completed skill use, selected Context Mode/Serena MCP calls, one Astra-Max native judge and an unchanged oracle through OmniRoute in a successful bounded Dagu graph.",
+      "limitations": [
+        "One unchanged arithmetic fixture and bounded integration; no universal highest-quality model, framework or SDK ranking.",
+        "169 enabled skills were visible through native discovery. This run read using-superpowers and exercised three selected MCP calls; it does not qualify every installed skill, tool, language server, plugin or hook.",
+        "Native hook support and live web search are configured, but their execution is unmeasured here. No scheduler, schedule, hook or global account configuration was installed by this kit.",
+        "Native parent and child cumulative usage are separate scopes. Cached input and reasoning are subsets; observer response counters corroborate the same usage and must not be added. Failed/interrupted and complete provider usage, billing and token savings remain unknown.",
+        "Each observed completed stream also has an unclassified flow_error record. Native results completed; transport is not described as error-free, and requested model/provider labels are not backend identity attestation.",
+        "The separate Claude SDK Devin bridge retains its failed/unqualified status. Earlier native Claude-to-SDK acceptance is a historical separate callsite, not a rerun against this source.",
+        "The follow-up native Claude cooperation session was stopped after no confirmed SendMessage/final packet; no peer approval or new owner-contact count is claimed.",
+        "The isolated kit is a scoped private worker configuration. Live owners retain shared worker policy, host-wide catalogs/defaults and dashboard checkpoint ownership."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+    },
+    {
+      "id": "omniroute-claude-callsite-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "omniroute"
+      ],
+      "claim": "A native Claude Opus5.5/Max coordinator discovered and read the project dispatcher, invoked the official Sol-Max Codex SDK worker through native Bash, and the retained original shows one unchanged fixture test with exit0.",
+      "limitations": [
+        "One bounded read-only callsite and existing arithmetic oracle; no universal quality or SDK winner claim.",
+        "Coordinator tool scope was Bash/Read/Skill for this acceptance; other coordinator tools and optional MCP services are not qualified.",
+        "Native Claude and external Codex SDK usage remain separate scopes; parent list-price cost is not complete provider billing.",
+        "The separate Claude SDK Devin bridge remains failed/unqualified; this native Claude-account coordinator run does not promote it.",
+        "Provider backend identity, overall task usage, failed/interrupted calls, remote cancellation and token savings remain unverified."
+      ],
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json"
+    },
+    {
+      "id": "omniroute-sdk-worker-0160-20261003",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode"
+      ],
+      "claim": "The SDK 0.160.0 B3 review candidate addresses all five PR #628 bot findings and passed twelve of twelve twenty-five-test native loopback fixture invocations, 26 local Claude SDK tests, six observer tests and final Ruff checks. Each reported bug has a retained failing-before-repair command and a passing counterpart. B2 metadata preflight and the earlier builder/coordinator live observations remain historical; no B3 live model task ran. Writing dispatch, live keyed-shell/search qualification and backend effort remain unobserved.",
+      "limitations": [
+        "Authored loopback SSE fixtures, local Claude SDK tests and observer tests are integration/synthetic checks, not unchanged upstream suites or provider-model trials.",
+        "The pre-B2 builder live task returned the correct data while two native shell attempts failed in its enclosing Codex sandbox and a Context Mode call failed with Transport closed. A separate coordinator, outside a nested Codex sandbox, observed read-only shell success at that candidate. The repaired bytes have no new live-model run; error-free MCP transport and writing (workspace-write) dispatch remain unqualified at 0.160.0.",
+        "Plugin disabling is the selected native feature gate. Tests observe direct app-server PID termination and absence of clone directories; descendant cleanup and global non-loopback egress are not observed.",
+        "Metadata preflight submits no inference. No skill was installed in the new private home and no --require-skill was used; inherited/project catalog discovery does not qualify every skill or tool.",
+        "Requested model/Max effort and live catalog entry are observed; gateway-forwarded effort, backend model identity, complete provider usage, cost, remote cancellation and token savings remain unknown.",
+        "September 30 receipts and original observations remain historical. This refresh does not rerun the historical coding oracle, Claude callsite, Astra judge, Dagu graph or unchanged upstream SDK suite.",
+        "Exactly pinned private SDK preflight/PID attributes require review on every pin move. Stable Python SDK and experimental, unsupported-for-production app-server are separate support boundaries.",
+        "Expected ResourceWarning messages and argparse rejection output remain in private fixture logs. Long-lived SDK pools, alternative approval modes, alternate binary, credential-variable path, workspace-write live execution and scheduled Dagu acceptance remain unqualified.",
+        "Initial Ruff failure exits are retained from native task returns, but exact full output/timing was not saved. Repository validators prove declared consistency, not the truth of provider or historical claims.",
+        "Earlier checkout and alternate-index validation failures are retained as before-B2 attempts. The coordinator force-added the project skill to the real index; B2 acceptance uses that actual checkout index. Historical source archive acceptance does not replace current checkout acceptance.",
+        "If the cleanup bound expires during retained startup or close, cleanup_status is unresolved and the CLI exits nonzero. Continued deferred cleanup is observed only while the embedding event loop remains running; no post-bound standalone cleanup or remote termination guarantee is made.",
+        "B3 repairs have local regression/configuration acceptance only: no live model tasks, keyed gateway shell trial, standalone search endpoint trial or native Claude connect fault injection. The native SDK retains its own shielded cleanup/transport bounds; wrapper grace does not override them."
+      ],
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+    },
+    {
+      "id": "new-wsl-local-generation-model-20261002",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02, the preregistered comparison for the new WSL's local generation model gave the slot to S2o: Swift-1.5-Qwen3.8-27B IQ3_S (ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF at revision d74895bbe5db4bec1e0024e7cc87d59c02d7631a, file sha256 1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786, 11,771,546,912 bytes) on Ollama 0.35.0 as swift-iq3s-s2o-64k (context 64,000). On the same 100 BFCL simple_python cases (inspect-evals 0.23.0 on Inspect AI 0.3.273) through the server's chat and responses surfaces, its first-pass valid tool calls were 200 of 200 against 175 of 200 for the control gpt-oss:20b: difference 0.125, 95% paired bootstrap interval over cases 0.065 to 0.19 (10,000 resamples, seed 20260927), not a tie. Both arms were entirely on the GPU with the embedder resident in the order of use, and both passed 10 of 10 client tasks (Codex 0.160.0 and Claude Code 2.1.287). Bonsai PTQ1_0, Bonsai PQ2_0 and Swift on PrismML's llama.cpp server failed the function gate (0 of 3 runs each: the server skips the Codex client's namespace tool type), and qwen3.8:27b was not entirely on the GPU at 64,000 tokens.",
+      "limitations": [
+        "One workstation, one throwaway distribution, one run per case and arm: a local integration check of the systems named, not an acceptance on the destination distribution.",
+        "First-pass tool-call validity on 100 simple public cases (BFCL simple_python) through two interfaces; nothing about coding quality, long tasks, throughput under concurrent requests or behaviour above 64,000 tokens.",
+        "The Anthropic-style messages surface was not evaluated through the package (Inspect AI 0.3.273 cannot read this thinking model's answer); it was exercised only by Claude Code in the client tasks, which both arms passed.",
+        "S2o was slower in these runs: 292 and 303 seconds for 100 cases on chat and responses against 100 and 139 for the control, and 43.1 against 108.9 output tokens per second on single long prompts that were not run as a speed comparison.",
+        "S2o leaves less GPU memory free: 21,579 of 24,564 MiB in use with the embedder resident while Windows applications held about 2,600 MiB; earlier the same day they held up to about 5,900 MiB, at which the same load would leave under one GB. Co-residency on a busier desktop and on the destination distribution is not measured.",
+        "The Ollama import is this measurement's system, not a route the publisher documents: the library qwen3.8:27b model's renderer, parser, parameters, template and licence lines with the Swift file as FROM. The publisher's own route (llama.cpp's server, here PrismML's fork) failed the function gate for a reason that lies in that server. The quantization's card says its quality tests used a 512-token context.",
+        "The arm that took the slot was added by the preregistration's extension (amendment 3) after the owner asked for the newest releases; the deciding measurement as the critic named it had two arms (qwen3.8:27b and gpt-oss:20b), the earlier result for gpt-oss:20b is kept as a historical result, and gpt-oss:20b ran A2 as the control under the same rules.",
+        "Three deviations are recorded (a void first window, the Codex client's model name with its tag, a reused label); none changed a case, a limit, the metric or the rule, and none was decided on an outcome.",
+        "Recorded, not deciding: the package's own score (S2o 97 and 95 of 100, the control 83 and 83) and the client tasks (10 of 10 for each arm).",
+        "manifests/stack.json has no Ollama, Inspect AI or PrismML llama.cpp component, so component_ids name the two clients that ran the client tasks (Codex also ran the function gate); they ran at Codex 0.160.0 and Claude Code 2.1.287, not at the stack's recorded 0.159.3 and 2.1.284.",
+        "Raw model outputs (the Inspect logs, the client run records, the server logs) stay private and are listed by sha256 in files.json; the published per-case validity files carry case ids, verdicts, reasons and timings, and the decision statistic reproduces from them.",
+        "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
+      ],
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json"
+    },
+    {
+      "id": "new-wsl-embedding-model-20261002",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "huggingface-hub-native"
+      ],
+      "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02 and 2026-10-03, with the generation model swift-iq3s-s2o-64k resident, the preregistered comparison for the new WSL's embedding model gave the slot to E1: qwen3-embedding:0.6b (Q8_0, Ollama library manifest ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d) on Ollama 0.35.0 as qwen3-embedding-8k (num_ctx 8192). On MTEB 2.22.1's CQADupstackUnixRetrieval (test split: 47,382 documents, 1,072 queries) its nDCG@10 was 0.49827 against 0.41394 for EmbeddingGemma on the same server: E1 minus E2 0.084331, 95% paired bootstrap interval over queries 0.067738 to 0.100656 (10,000 resamples, seed 20260927). Nemotron-3-Embed-1B, which needs a second model server, scored 0.5014; E3 minus E1 was 0.003124 with an interval of -0.012194 to 0.018141 that includes zero, so by the second-server rule it does not take the slot. WeMM-Embedding-2B passed the fit gate but ran out of GPU memory in its full run and is out. The reranking condition was not run.",
+      "limitations": [
+        "One public retrieval task (CQADupstack Unix: English technical questions from a StackExchange forum), one workstation, one throwaway distribution, one run per arm: a local integration check, not an acceptance on the destination distribution.",
+        "Nemotron's tie holds for this task only; multilingual retrieval, longer documents and other domains were not measured.",
+        "The two Ollama arms are GGUF conversions served by the one model server; a difference from the reference weights is a difference of the systems, not of the models alone.",
+        "E1's and E2's prompts are MTEB's reference prompts as observed with a stub before the runs (amendment 4a): E1 sends the Qwen3 instruction before queries and nothing before documents; E2 sends EmbeddingGemma's query and document prompts.",
+        "Gate F reads the model server's listing: in window pb2 the card's memory in use fell between steps while the server kept listing the generation model entirely on the GPU, consistent with the Windows driver moving part of it off the card, so E3 passing gate F does not show co-residency. In window pb1 the readings matched the resident models, so E1's co-residency with the generation model is supported by both readings.",
+        "E4's first error text was lost: after its evaluation failed out of memory, the script's memory query raised the same sticky CUDA error and the outer handler replaced the text; the outcome is not in doubt, because only the evaluation's handler sets out_of_memory.",
+        "The reranking condition was not run: no installed retrieval owner can call an external reranker (QMD reranks in-process with its bundled model), and zerank-2 (7.49 GiB of weights) cannot be resident beside the generation model on this card.",
+        "Recorded, not deciding: evaluation time E1 1,166 s, E2 771 s, E3 460 s (E3 in-process, not comparable with the Ollama arms); resident sizes E1 2,857,191,341 bytes and E2 681,417,113 bytes.",
+        "manifests/stack.json has no Ollama or MTEB component; component_ids name huggingface-hub-native, the native route for the revision-pinned snapshots of E3 and E4, which the measurement downloaded through the huggingface_hub library at MTEB's registered revisions (its version is in the throwaway's freeze list, which was not retained).",
+        "The 31 MB prediction files and the run records stay private and are listed by sha256 in files.json; the published per-query nDCG@10 files reproduce the decision statistic.",
+        "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
+      ],
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json"
     }
   ],
   "files": [
@@ -3907,6 +4040,11 @@
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
       "bytes": 2884
+    },
+    {
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+      "sha256": "feacd5b6324649e3fff16d4f7f469f994e2984dccbb462f84e6fa8bf8e93da48",
+      "bytes": 3840
     },
     {
       "path": ".gitattributes",
@@ -3950,8 +4088,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "51dae9e9907bda6c3a5de21c1c3dfdea79c5e0a379494ba4c6e42906abc6e114",
-      "bytes": 10704
+      "sha256": "2ebf209587e336a146348151a16f9c2e99e98d67597047baa2f93cd12c536dfe",
+      "bytes": 11008
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4050,8 +4188,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "302e34fabafa24ef8f74bb86fd81fe7ead71bd9767bc33710bf06d1a73b6de4d",
-      "bytes": 3638
+      "sha256": "082958cae2045166c365574748138cc61095259e8a19e4237472e38c177887fc",
+      "bytes": 4033
     },
     {
       "path": ".gitleaks.toml",
@@ -4382,6 +4520,11 @@
       "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
       "sha256": "9e215b2c85823b33b881ae1ff38a2c666ebd46d75d34568f5e8747d350f8ef74",
       "bytes": 77578
+    },
+    {
+      "path": "adoption/skills/lifecycle.md",
+      "sha256": "ccec73d92d533262600887baadce9323b6585f79c3465092822bf6bcb5f2e165",
+      "bytes": 17927
     },
     {
       "path": "adoption/skills/manifest.json",
@@ -5813,6 +5956,21 @@
       "path": "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
       "sha256": "de31f07cf4ac3f1d32fc64ef94796a98a9aec39fb2a10945dfd1d13e37cdb246",
       "bytes": 56660
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+      "sha256": "96e4ed6bb0ff719a1a60be7cacebe544acf910aab601eb7cd9afa47cf720eed3",
+      "bytes": 30470
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
+      "sha256": "2ac13a28d723f15e205f0c0a37c3936f1e4c8f80ffa2499a494f2be67928a019",
+      "bytes": 29442
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+      "sha256": "3f497fb2bbcab2c2e7de2fce659ecb06276120fa8331eeb1f78ddbecef67cbf6",
+      "bytes": 30325
     },
     {
       "path": "blueprints/convergence-practice/protocol.json",
@@ -15526,8 +15684,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "6a86756198376a5ad58c8a64c21ba4fe070ef7d780e0f1e4dfc845f8c76c5836",
-      "bytes": 56050
+      "sha256": "6e7ebbe64011f460b59ab310a328211737deec2f83543fb99c41d761958bff06",
+      "bytes": 56411
     },
     {
       "path": "docs/comparison-progress-20260922.md",
@@ -15760,6 +15918,11 @@
       "bytes": 37375
     },
     {
+      "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
+      "sha256": "22c52104ccec6af101427f16fa9ac85aa3b1b812d0b7e7d2a122cda43c3dd0e7",
+      "bytes": 11606
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
       "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
       "bytes": 8312
@@ -15771,8 +15934,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "1fd69a27771cb6a5ba1ac14d3b2d6884a1170a430fb3e5b89f4d9444a5455898",
-      "bytes": 65591
+      "sha256": "2d77cd6b21ec62ad326dffd27b1d8e0a3b0c075b9a30926d2ef600941f10b834",
+      "bytes": 65609
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -15803,6 +15966,16 @@
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
       "sha256": "64d49f2de46d3309d7802678039caac1609027b8f00b561987e464e94432847f",
       "bytes": 21453
+    },
+    {
+      "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
+      "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
+      "bytes": 25043
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
+      "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
+      "bytes": 19619
     },
     {
       "path": "docs/direct-results.md",
@@ -16066,13 +16239,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "9b6f0cbf8f1bbfbfa170b8b3ed5ee78bf63a6e0d40e20b522f3d4c24060a8391",
-      "bytes": 535421
+      "sha256": "974e78afca18e99c37f1a1eb7919d10c4ae366fe3f2211942ff56af2ab1569ee",
+      "bytes": 537054
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "cf5e84fed408698c1a6350e62966c0571986edc5178fec7c42b68f1e085c546b",
-      "bytes": 319527
+      "sha256": "3e9ad2be0cd181f5f62543a82b61a5ea1d6e06f4f22c239158e135cca95a3867",
+      "bytes": 320267
     },
     {
       "path": "docs/next-host-stages.md",
@@ -36501,8 +36674,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "d0cb5ca0da91681705530deb449872756e0c8bba7dfc31dd7277007449149503",
-      "bytes": 28239
+      "sha256": "cc669533b367a87be7ae05834e94b230ef484237c5cf6231a987b21734f5c9e6",
+      "bytes": 30131
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -36516,8 +36689,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/controls.py",
-      "sha256": "5ce92c2f0782edd0b2f9942663b2576a8a32e7e34c30972737ff2c9f58127424",
-      "bytes": 15592
+      "sha256": "5ee4517b3b492639d902152e48ff3d57d3b84ddd09d76ecd464b4a32f50c1e19",
+      "bytes": 16049
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json",
@@ -36546,8 +36719,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "cfd08b85efca343f428fadd8253a06ce9c08afb944a4f66a2aaae15d3c08fa96",
-      "bytes": 124299
+      "sha256": "857dddb408b17f5e54efe08dff4571d262736fb2af3702f9fb3c567d29463686",
+      "bytes": 125996
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -36626,8 +36799,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "3bc0e589699b58ae209953041ebafbf181b077a84f02236feb2b0b86c5a3b92f",
-      "bytes": 7061
+      "sha256": "e2bce8f4ed3757d86162e7d72567cb40176f36384d24f4d8b513d6dc1d8b0c4a",
+      "bytes": 7193
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -36636,8 +36809,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24",
-      "bytes": 3650
+      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3",
+      "bytes": 15186
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
@@ -37266,7 +37439,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "82aea4297fb7cdc31dea6e3a2a6ed66a5c8d5ea2909872533b6d7ece091888d8",
+      "sha256": "dd905f4c31abf77ff58f1eea2006cde63661adccbeb4fa3ea01e08f20783d5a9",
       "bytes": 4174
     },
     {
@@ -37276,28 +37449,28 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "78c05b0802d69ed2c6de7fb02556fe6aa09cd53c8ea58d856b5710f8dc339411",
-      "bytes": 16956
+      "sha256": "c6ba6deb9af59d89bdb8b08e39c40faf38fe1b603c5e2457d747ad0f3ef349f6",
+      "bytes": 25938
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "51af2466d460b7791f98b8ed39f8ed7b88fa3c4acf0f7bc2d44ea8a88d3f1e08",
-      "bytes": 55908
+      "sha256": "cb4fa51f5e5c1e0b8727588ec320f42aa3c8a504a4ba367bfe061024aab86b25",
+      "bytes": 65640
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "a83631d2036bc1c5c82ca69fb33a5b26846f86634133d6cf75cffc6566f2882b",
-      "bytes": 27792
+      "sha256": "08f49c6a13e730e9aebd4e607cf380c99ec6fd0ff5611628cb305cf1a4210757",
+      "bytes": 36853
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "f74d1b53b230f7834c596991dac9c61cddb00b4e6a58a0ced13342e491d24bf7",
-      "bytes": 33897
+      "sha256": "2408e94dc73aabe74c9d0d9b06201944250d69d0ad4162d99f9eb8ada5548b55",
+      "bytes": 39496
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "785ed07c4a945a1e285de4dfb477606051ecd81877bd96ae8e4e27e592d86d3c",
-      "bytes": 16396
+      "sha256": "5b86e11f96d37f468601604e777b36c1e0b234d4818769330006c4faa5a1b74a",
+      "bytes": 17514
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager.yaml",
@@ -37341,13 +37514,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "a7c682ca1af9ea93954da04b9d5ee9dbead51d76fd76d175945f8cb887af48d0",
-      "bytes": 125434
+      "sha256": "ea6fd3efcc4f60783d4cb45130f7d7de9f807d3a72f90e7cbf970b26b72c8c00",
+      "bytes": 135016
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "144405be67281997cb68b6b27947d381b05c8d71715b2e8a62c46e176ca46b5a",
-      "bytes": 44544
+      "sha256": "fb9f21baa2ff73085615029e55ff314d28dcbd8a192708da282dc00b248f15d5",
+      "bytes": 49801
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -37355,9 +37528,24 @@
       "bytes": 946
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/qwen3-embedding-8k.Modelfile",
+      "sha256": "a1e149022bb8bb7030eda3350d0e768ae92e2a0c8581408dbb2746aaa6f7fe06",
+      "bytes": 49
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/swift-iq3s-s2o-64k.Modelfile",
+      "sha256": "6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e",
+      "bytes": 44
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/swift-iq3s-s2o.Modelfile",
+      "sha256": "f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e",
+      "bytes": 11733
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "edc53463513f84586f7a0b87e98f5de2f1616958d76a010c39d2e7a3c3e0ed23",
-      "bytes": 28409
+      "sha256": "c2bfdf1a274f81ac5edd8f83ea44377ce12fabc0a71926d9c058fa9d8e185762",
+      "bytes": 28674
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -37663,6 +37851,211 @@
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
       "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
       "bytes": 8224
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/COPY-NOTES.md",
+      "sha256": "f5a2374225109849365970c69015d338c9d2dbcb5d596b87b71e5c7f04a82528",
+      "bytes": 5685
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+      "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+      "bytes": 66312
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.sha256",
+      "sha256": "7645e3a1bd9d94c478849ae20b07dc3f6b6f7a778ec0dfe74715b6123b71021a",
+      "bytes": 2988
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/README.md",
+      "sha256": "deeac61a846f9d82ea4caf1994de37dcca074a92466c129139a705c1f7ebffc2",
+      "bytes": 13179
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/files.json",
+      "sha256": "4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893",
+      "bytes": 47669
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+      "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577",
+      "bytes": 15496
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/bootstrap.txt",
+      "sha256": "3fe228c28e2ca7440989ad554507af6e212ef144f2136b64f48b3c56bc1f5c9f",
+      "bytes": 1122
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/c-chat/validity.jsonl",
+      "sha256": "4a63f0780064a195512e1ed9618ead16bf72a991cf43c7d3c4b57db27eb32684",
+      "bytes": 14652
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/c-responses/validity.jsonl",
+      "sha256": "37bc16cecb4e4e114b29b55ad7f7bba9a3f1ddd72810a601343c66232a2edf38",
+      "bytes": 14628
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/s2o-chat/validity.jsonl",
+      "sha256": "c6911453b2aecb18b96a698950189c92b0a5def47f9805fbe776deb8cdbc5bef",
+      "bytes": 13519
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/s2o-responses/validity.jsonl",
+      "sha256": "0e86ee059055a712527018881ec3172542f4272117463ccc279969e7a6c0b50b",
+      "bytes": 13520
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+      "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541",
+      "bytes": 11705
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/bootstrap.txt",
+      "sha256": "3715a13234ad46aa150dcebdfd1930c638998e73cd31c5319f473a5b09bf1302",
+      "bytes": 1628
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E1-pb1/per-query-summary.json",
+      "sha256": "a45df64ac83bd15a36060dc5d47b62280accc6f46bb51b86320c8437206f1747",
+      "bytes": 190
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E1-pb1/per-query.jsonl",
+      "sha256": "5229f9066eff87aa29d6213c70e997ae41cc0201e27049e75748f402c1bccbde",
+      "bytes": 97029
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E2-pb1/per-query-summary.json",
+      "sha256": "e1edc6e44dd8c18e203b426ca92754d4dfdb0f816ff3dd7ae691cbcd801b074b",
+      "bytes": 191
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E2-pb1/per-query.jsonl",
+      "sha256": "550981cc7c8e28968eaa2d4310c0f4fd2fde2468eaf8474af9d9c35baba645f5",
+      "bytes": 96387
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E3-pb2/per-query-summary.json",
+      "sha256": "124c1259f39668eb0968aae3e78366976314105da5b08042b6ae8f5348fa6760",
+      "bytes": 189
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E3-pb2/per-query.jsonl",
+      "sha256": "4a56af7a7454728da8fb6a3b98c4a3b1a43deef2961ca9c839036d4434261505",
+      "bytes": 96947
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/reconstruct_s2o_modelfile.py",
+      "sha256": "28430fbfee124eb2615aaa6aa55d2702764a32d279d4a8af44bcca6724abd47e",
+      "bytes": 7613
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_bootstrap.py",
+      "sha256": "d69c4df08cd47164a65e227ebe11dddba203911ae492c7eb1462fae0d20f369a",
+      "bytes": 2194
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_run_bfcl.sh",
+      "sha256": "25665689d61bf3c882a3790a1a4fa4adde60c718c15b36d6a4823ef74d719767",
+      "bytes": 2519
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_run_client.sh",
+      "sha256": "875530525864880c50e88596a53618fb64b21d3f5e64b4bd95068325b7830260",
+      "bytes": 3212
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_tasks.py",
+      "sha256": "49c5986d7c29414bd81af24ac8da4fff8b69098b9687849129c7075f0f49d05c",
+      "bytes": 4211
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_validity.py",
+      "sha256": "d67bffa8a13ac0cdc185c1ee8ae85ec1807dd2de2a9960171aa1c2b772249e7e",
+      "bytes": 3968
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_arms.py",
+      "sha256": "f4ac3a7ef4d004955c1da0958347d2916f5b42d531deae96ba2ff2754edcff04",
+      "bytes": 5940
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_bootstrap.py",
+      "sha256": "3b02d65098646d2aa38cfd39a2fc2a48d31c0858fd2727d282e61b9e683cc5a4",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_fit.py",
+      "sha256": "2870ee1e17b03d6d65b142774746923c4504909bc86a33eb2173ee71bf42d965",
+      "bytes": 3384
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_perquery.py",
+      "sha256": "088b62f60c0bc7283d8218a38d7b4641a1ee96a809077dafe70a1f9522b56b91",
+      "bytes": 2682
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_run.py",
+      "sha256": "e381a73d941b851ec7fcecc2ef092ff19c9714b7e7c08f3f82ea4eeb16dd4a00",
+      "bytes": 4409
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/selftest_perquery.py",
+      "sha256": "ebe43ecb97cd066b7d1d5a008668a940c597b8cc0cc3321d3acf349b7ab324f4",
+      "bytes": 2250
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/selftest_prompts.py",
+      "sha256": "23a0499cba72e25d66baa055c2ef469d38621f7227f6185658b492af42177a37",
+      "bytes": 1626
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M10-g0-setup.sh",
+      "sha256": "f03fa1b7b6e55373a89e7f34a47a8d8aba3bf60895e23bfcf1b87baeaf7e2e15",
+      "bytes": 7237
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M11-g0-run.sh",
+      "sha256": "f3fccd292c0d6aa89091e96515ce1593e528249da4bacc798a18b0ae8e3cf74e",
+      "bytes": 2762
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M11p-precheck.sh",
+      "sha256": "acf640a231549cc5f2dc399fafa6717bd628f16e7c14006ddec9e04e47ed0e6a",
+      "bytes": 996
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M14-a1-ext.py",
+      "sha256": "53b503f28bb3931e41d6c49dce9d482a0be88122fee6caae8bfd0af5589bd76f",
+      "bytes": 5450
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M18-bootstrap.sh",
+      "sha256": "b9045b97a0446d6ec2f02a7c736a8a7f32c4ee25a7d3109e048f09522ad8a43a",
+      "bytes": 1326
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M23-partb-bootstrap.sh",
+      "sha256": "88d836d9b81efaaf179b5f04b7cbd78592db4b7dd9d50c223ac7a60b3adb934d",
+      "bytes": 1106
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M6-a1.py",
+      "sha256": "17f33963219d83515b05f48d98a61772ef949ba222ca87ff7167566510bdb3ba",
+      "bytes": 4727
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M6-a1b.py",
+      "sha256": "26957d3d7fa7b6b4c9460c159a2d1cc390e0a634973246214166aed3c89b9489",
+      "bytes": 4632
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/W-partb-window.sh",
+      "sha256": "7f0e285d79c8bcaf812db7eb06e3f5ac05067e7038c9ffe53d38a5ffb8fd0fa2",
+      "bytes": 5783
     },
     {
       "path": "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
@@ -38573,6 +38966,216 @@
       "path": "evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
       "sha256": "a3fb9cee8dab79992e1178a684ab264f53a64ade4d1894f28f15c0b8b7a5ba83",
       "bytes": 23100
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt",
+      "sha256": "b9032a013f9d5b050a0940a2c8142d75ff75d6e560e88e77c58383d4c94fc679",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt",
+      "sha256": "82dd567b9e0fd8cc300b516fed535584472a499f63431ddeb030a36065c91426",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt",
+      "sha256": "5c023dcf0c9c80a3aaf303dda47a268250c61b054551e3f8ccf213033609c72e",
+      "bytes": 2183
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt",
+      "sha256": "46cab557d04fcb6bc5ad1be96c5b46d4dd82a8bfc25fe719fb095deb64a7e756",
+      "bytes": 1282
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
+      "bytes": 2565
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
+      "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+      "bytes": 186305
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+      "bytes": 11517
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-acceptance-plan.json.source.txt",
+      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
+      "bytes": 2615
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-judge.toml.source.txt",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+      "bytes": 1053
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime-worker.yaml.source.txt",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
+      "bytes": 1411
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-runtime.config.template.toml.source.txt",
+      "sha256": "3d7661f044857515ea01346a427df6bb398dffe488e19f5411246c2ec3953048",
+      "bytes": 3221
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.lock.source.txt",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-test_worker.py.source.txt",
+      "sha256": "3497536133785b5fe3584265973941910a50826f410f62b0f95de67b206464ff",
+      "bytes": 34794
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.lock.source.txt",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b2-worker.py.source.txt",
+      "sha256": "33057e8b5bcb042bed8f517d759b00936767d2a8df7055dd2179df5d93ace618",
+      "bytes": 24103
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-test_worker.py.source.txt",
+      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990",
+      "bytes": 18987
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-claude-worker.py.source.txt",
+      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
+      "bytes": 19889
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-test_worker.py.source.txt",
+      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
+      "bytes": 38441
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-codex-worker.py.source.txt",
+      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+      "bytes": 25542
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-gateway_observer.py.source.txt",
+      "sha256": "2412d0b58adbad028993cbd6e4835c2b0cf40f406384de7d99867a3de74bbcef",
+      "bytes": 6143
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-runtime.config.template.toml.source.txt",
+      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2",
+      "bytes": 3630
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/b3-test_gateway_observer.py.source.txt",
+      "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
+      "bytes": 5277
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-test_worker.py.source.txt",
+      "sha256": "4dad11db9dc1faecc938d496815bb0504a6d93731dac28183542f97da4a38300",
+      "bytes": 28968
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b2-worker.py.source.txt",
+      "sha256": "3aa19fa790e661f5142fa316b58473e508f68af6c4f155f0a2fa469177c8a623",
+      "bytes": 22284
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-claude-worker.py.source.txt",
+      "sha256": "92b6077da5f659a9798d61433b73920903dd2637dd4b4ee914e42995d111abf9",
+      "bytes": 19866
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/before-b3-gateway_observer.py.source.txt",
+      "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+      "bytes": 5702
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation-final-bytes.json",
+      "sha256": "147ba86f3aa68354193872213065e81a6162896a01e684cc1038b2a53d002f08",
+      "bytes": 2096
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
+      "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6",
+      "bytes": 1472
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt",
+      "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94",
+      "bytes": 1889
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/checks.json.source.txt",
+      "sha256": "26dab6f4fa94512bbe8965f51fb29845ca07e8c4664765e484cd56bc80f9b610",
+      "bytes": 4632
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-enhancements-experiment.json.source.txt",
+      "sha256": "819124da985301f216fd0e3178d7b1aa4986e0c3812d18a75505723d85dbdfcc",
+      "bytes": 29678
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/omniroute-runtime-workers-experiment.json.source.txt",
+      "sha256": "6d4812ea4906789e2f55cf206d03863af6116c7137d667d542d2395ac985ce31",
+      "bytes": 29902
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/rerun-plan.json.source.txt",
+      "sha256": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730",
+      "bytes": 1813
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-judge.toml.source.txt",
+      "sha256": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55",
+      "bytes": 1053
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime-worker.yaml.source.txt",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4",
+      "bytes": 1294
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/runtime.config.template.toml.source.txt",
+      "sha256": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6",
+      "bytes": 3027
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/test_worker.py.source.txt",
+      "sha256": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8",
+      "bytes": 26008
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.lock.source.txt",
+      "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+      "bytes": 12842
+    },
+    {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.source.txt",
+      "sha256": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074",
+      "bytes": 22008
     },
     {
       "path": "evidence/artifacts/omniroute-sol-max-20260930/README.md",
@@ -48335,6 +48938,26 @@
       "bytes": 16128
     },
     {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3",
+      "bytes": 6238
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06",
+      "bytes": 27429
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
+      "bytes": 17754
+    },
+    {
+      "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
+      "sha256": "9ad1db0b9e841cd780d04e544f6e75dde57fd88ebc6fc4f5b0bafd84287f20da",
+      "bytes": 149558
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
@@ -48690,6 +49313,36 @@
       "bytes": 8495
     },
     {
+      "path": "examples/claude-runtime-sdk/README.md",
+      "sha256": "abb5622dd2fa9dd6a3c4c0c36aab6170bc9df694a7e006ec434a2f58212ff885",
+      "bytes": 10259
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/check_controls.py",
+      "sha256": "21a79c84a780a900fb365c0478bf79af5ed1d55a9c20f59b5859368b71fe9dcf",
+      "bytes": 1010
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "sha256": "282de47c359375d6fcfbb756ff30c4a52dcf6756236b4e532124f64043685990",
+      "bytes": 18987
+    },
+    {
+      "path": "examples/claude-runtime-sdk/verification.md",
+      "sha256": "980b4f2ffbf49ee9ca2ab0127a4bc90c1d56c401c2cbb74d78b9a9dbe1f05ae1",
+      "bytes": 8558
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py",
+      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
+      "bytes": 19889
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py.lock",
+      "sha256": "79f1e72c87e1a934cf532a6ee929e22b1defcb2476317e24d68c1124913235c8",
+      "bytes": 96322
+    },
+    {
       "path": "examples/codex-mcp.toml.example",
       "sha256": "6203fdcb819d183fae1ac01ae2eda447252f2f8d07de53d82cf947845a07e6c0",
       "bytes": 1474
@@ -48743,6 +49396,66 @@
       "path": "examples/native-stack-qdrant.service.example",
       "sha256": "4b5e20c8785fc6d9d81a6cbaf752648e79afc5a32888300b525a2f4b64f09e63",
       "bytes": 378
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/README.md",
+      "sha256": "082bb1714e51f99114b5dbb3858833d25f43b62229be62c90fba331e8aceeb75",
+      "bytes": 16427
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
+      "bytes": 2615
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "794a9a348b0609beccedd7bbcbdbee05292dbe20a920ad00bfbd95690b9b234f",
+      "bytes": 1053
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/checks.json",
+      "sha256": "9b3548c9a81d81cf07cff275b1eec82000b7bc646da520ef381f04e2d0408096",
+      "bytes": 103875
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/enhancements.md",
+      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
+      "bytes": 10255
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/rerun-plan.json",
+      "sha256": "c144ce553283ed283e1d790c51dc061eeb57982e35d440e1a052c749cbc7b929",
+      "bytes": 1924
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
+      "bytes": 1411
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "49b2958498238c032cee9eb0b3ca8603bc17b633aaf72d348398a671873affb2",
+      "bytes": 3630
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py",
+      "sha256": "14018bd65c39f18683ce83833abe23c9238419c7c1fde99f5521ae752dbd1c43",
+      "bytes": 38441
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py",
+      "sha256": "30f85ea8f8dcbfe443697c79f3c4bb11df6b65f79abb5f0e5ea6aa978e8bdf01",
+      "bytes": 25542
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "sha256": "df99054948f217c499ebd9ed19744f7e7d4f6c92fabec6820caf2ecd3e2660b3",
+      "bytes": 12840
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
@@ -50101,8 +50814,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "117e413b693a31f0c5ee10dd8ce5375311d565b770b29898982596bb3490b852",
-      "bytes": 66319
+      "sha256": "ee2735323522ad6266923ad022cbc107759659c88b94de4f77c9d9f2a3202ca3",
+      "bytes": 85524
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
@@ -50176,8 +50889,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "a5cb994e66138fdad5da76abaaf6e4645266b575eaf722cfb239cc78fe6d6da9",
-      "bytes": 65234
+      "sha256": "c5869af9dc29f5b5abe469f3588559734051c8f87d75c23183d90d299aa4d21a",
+      "bytes": 65718
     },
     {
       "path": "tests/test_path_safety.py",
@@ -50625,6 +51338,31 @@
       "bytes": 4963
     },
     {
+      "path": "tools/runtime-worker-evidence/README.md",
+      "sha256": "83511b44626cc710cfcc093ea6bbe86889c69cb533d6155081a81099a751f213",
+      "bytes": 2663
+    },
+    {
+      "path": "tools/runtime-worker-evidence/checks.json",
+      "sha256": "094cd7785fabc277508bc4ed90bac60a4e98dacdca7b51f50f5731608cc5e80c",
+      "bytes": 3851
+    },
+    {
+      "path": "tools/runtime-worker-evidence/gateway_observer.py",
+      "sha256": "2412d0b58adbad028993cbd6e4835c2b0cf40f406384de7d99867a3de74bbcef",
+      "bytes": 6143
+    },
+    {
+      "path": "tools/runtime-worker-evidence/osv-check.json",
+      "sha256": "0d31c8900e8f5475c2fbe04f26d09493e2e507354c8c99e5b35a50c079e318b7",
+      "bytes": 2778
+    },
+    {
+      "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
+      "sha256": "7ba28e15181fe15a259f3140862d53506e589b0bf56a31d0202efc3da529b93d",
+      "bytes": 5277
+    },
+    {
       "path": "tools/skill-usage/README.md",
       "sha256": "34cda0de60388ff139f55bec45f875ca6f104471913120d540c072f9b3f05c01",
       "bytes": 54151
@@ -51046,6 +51784,9 @@
     "blueprints/convergence-practice/local-inference-latest-20260926/experiment.json",
     "blueprints/convergence-practice/gpt6-family-tiering-20260926/experiment.json",
     "blueprints/convergence-practice/omniroute-routing-20260928/experiment.json",
-    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json"
+    "blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json"
   ]
 }

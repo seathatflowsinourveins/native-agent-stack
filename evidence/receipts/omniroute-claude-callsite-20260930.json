@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-claude-callsite-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "A native Claude Opus5.5/Max coordinator discovered and read the project dispatcher, invoked the official Sol-Max Codex SDK worker through native Bash, and the retained original shows one unchanged fixture test with exit0.",
+  "limitations": [
+    "One bounded read-only callsite and existing arithmetic oracle; no universal quality or SDK winner claim.",
+    "Coordinator tool scope was Bash/Read/Skill for this acceptance; other coordinator tools and optional MCP services are not qualified.",
+    "Native Claude and external Codex SDK usage remain separate scopes; parent list-price cost is not complete provider billing.",
+    "The separate Claude SDK Devin bridge remains failed/unqualified; this native Claude-account coordinator run does not promote it.",
+    "Provider backend identity, overall task usage, failed/interrupted calls, remote cancellation and token savings remain unverified."
+  ],
+  "recorded_at": "2026-09-30T17:13:25Z",
+  "sources": {
+    "codex_sdk": {
+      "repository": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "published_sdk_and_native_cli": "0.159.2",
+      "executed_worker_sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651"
+    },
+    "claude_skills": "https://code.claude.com/docs/en/skills",
+    "claude_native_cli_reported_version": "2.1.285",
+    "skill_sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
+    "native_parent_private_original_sha256": "c09d98a296de6c549b501ef19dd1aa133802cd754ad66f1450a70c747d9eac3b",
+    "native_child_private_original_sha256": "676ec1926b648350b97271eb380589fe6d437a819de0b357ba39254cfb3a112a"
+  },
+  "coordinator": {
+    "command": "rtk proxy timeout --signal=TERM --kill-after=5s 180s claude -p --model claude-opus-5-5 --effort max --tools 'Bash,Read,Skill' --allowedTools 'Bash Read Skill' --strict-mcp-config --max-turns 4 --no-session-persistence --verbose --output-format stream-json < <private-callsite-prompt>",
+    "exit_code": 0,
+    "requested_model": "claude-opus-5-5",
+    "requested_effort": "max",
+    "deadline_seconds": 180,
+    "subtype": "success",
+    "is_error": false,
+    "duration_ms": 47696,
+    "duration_api_ms": 27291,
+    "num_turns": 3,
+    "project_skill_in_native_init": true,
+    "project_skill_body_read": true,
+    "actual_tool_calls": [
+      "Read",
+      "Bash"
+    ],
+    "native_init_tools": [
+      "Bash",
+      "Read",
+      "Skill"
+    ],
+    "worker_invocation_count": 1,
+    "usage": {
+      "input_tokens": 6,
+      "cache_creation_input_tokens": 49127,
+      "cache_read_input_tokens": 92451,
+      "output_tokens": 2706,
+      "output_tokens_details": {
+        "thinking_tokens": 1805
+      }
+    },
+    "model_usage": {
+      "requested_and_reported_model": "claude-opus-5-5",
+      "inputTokens": 6,
+      "outputTokens": 2706,
+      "cacheReadInputTokens": 92451,
+      "cacheCreationInputTokens": 49127,
+      "thinkingTokens": 1805,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "reported_provider": "firstParty",
+      "costBasis": "list",
+      "costUSD": 0.4656502
+    },
+    "native_reported_cost_usd": 0.4656502,
+    "complete_billing_cost_usd": null,
+    "usage_scope": "Native Claude parent session; external SDK process is not part of its modelUsage. Count latest snapshot once and do not add thinking subset again.",
+    "routes_or_accounts_reconfigured": false
+  },
+  "worker": {
+    "command": "rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-project> --codex-home <private-home> --sandbox read-only --no-provider-retries --timeout 60 --request-id <own-request> --native-result <new-private-result> --prompt <single-oracle-task>",
+    "status": "completed",
+    "duration_ms": 17063,
+    "requested_model": "cx/gpt-6.1-sol-max",
+    "requested_effort": "max",
+    "provider": "omniroute_runtime",
+    "selected_gateway_port": 20128,
+    "independent_reverse_observer_used": false,
+    "native_runtime_version": "0.159.2",
+    "command_executions": 1,
+    "file_changes": 0,
+    "thread_relation": "New native SDK thread distinct from earlier direct trials",
+    "final_response": "CLAUDE_COORDINATOR_WORKER_ACCEPTED",
+    "native_usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 15104,
+        "inputTokens": 15533,
+        "outputTokens": 43,
+        "reasoningOutputTokens": 27,
+        "totalTokens": 15576
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 30208,
+        "inputTokens": 30866,
+        "outputTokens": 139,
+        "reasoningOutputTokens": 27,
+        "totalTokens": 31005
+      }
+    },
+    "usage_scope": "Latest cumulative native SDK thread snapshot; cached input and reasoning output are subsets. Last request is included in total.",
+    "actual_returned_oracle": {
+      "exitCode": 0,
+      "aggregatedOutput": "> test\n> node --test math.test.js\n✔ math.test.js (49.711303ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 58.255161\n"
+    },
+    "native_result_file_created": true
+  },
+  "acceptance": {
+    "dispatcher_metadata_discovered": true,
+    "dispatcher_body_read": true,
+    "native_bash_invoked_sdk": true,
+    "actual_native_command_exit_verified": true,
+    "oracle_unchanged": true,
+    "worker_marker_verified": true,
+    "caller_summary_limit": "Compact worker stdout lacked per-command exit codes, so the Claude paragraph only saw a marker. Root verified exitCode0 and exact test output in the retained full native SDK artifact.",
+    "earlier_direct_sdk_successful_thread_tokens": 228744,
+    "new_disjoint_worker_thread_tokens": 31005,
+    "successful_sdk_threads_tokens_only": 259749,
+    "native_claude_parent_usage_added_to_sdk_total": false,
+    "complete_task_usage": null,
+    "complete_provider_billing": null,
+    "token_savings_claim": false,
+    "claude_sdk_bridge_promoted": false
+  }
+}
