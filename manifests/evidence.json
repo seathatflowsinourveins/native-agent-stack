@@ -4070,8 +4070,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9e0877d9dc04647fe350a6ad37b87abbae2f745d51e14f9964f87239c9b56fcf",
-      "bytes": 13808
+      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
+      "bytes": 13787
     },
     {
       "path": "CLAUDE.md",
@@ -15526,8 +15526,8 @@
     },
     {
       "path": "docs/community-native-practice.md",
-      "sha256": "6e7ebbe64011f460b59ab310a328211737deec2f83543fb99c41d761958bff06",
-      "bytes": 56411
+      "sha256": "6a86756198376a5ad58c8a64c21ba4fe070ef7d780e0f1e4dfc845f8c76c5836",
+      "bytes": 56050
     },
     {
       "path": "docs/comparison-progress-20260922.md",
