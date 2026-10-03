@@ -15993,6 +15993,11 @@
       "bytes": 6939
     },
     {
+      "path": "docs/decisions/2026-10-03-native-token-trust-and-guard-qualification.md",
+      "sha256": "a36f34161dce4cfd5f2f68481bdd088096bd6fbaa8b854471a629469676c05dc",
+      "bytes": 6718
+    },
+    {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
       "sha256": "9138deaedcb1662d06f5486ca1af962133c07442e52bdf610eada436b5f21790",
       "bytes": 25043
@@ -46294,8 +46299,8 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "f58df418cc070dc9091a05099aaf2963e4949d01191c67d8834fed8820f0820e",
-      "bytes": 159606
+      "sha256": "cd77a8f2490da8ce907d178a9bf7b31c5dc2a8f70f816fc2dff9291ef9f1ad80",
+      "bytes": 170650
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
@@ -46491,6 +46496,36 @@
       "path": "evidence/artifacts/token-context-20261003/unit34-scb-native-prompt-renderer.json",
       "sha256": "d9052ec345ac671038eac702453b83fd80caefc85aa4db46f26b0272500fc157",
       "bytes": 6999
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit35-45-trusted-metadata.json",
+      "sha256": "e1cb456353274866a71752f80ec1c11c0138fd26438c8d0152ca14732d45b093",
+      "bytes": 3946
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit36-astra-source-judgment.json",
+      "sha256": "3f1e8faafa39c311940a0433ffae142d60d2e2b722e6e659f0f4897f8cf9766f",
+      "bytes": 6050
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit41-opus-route-source.json",
+      "sha256": "cb9465d202594569d7243d2c2c9a99a7169dc150ee9a1d50b1b338a3b675a4b6",
+      "bytes": 2256
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit43-five-job-gap-map.json",
+      "sha256": "cab372143f957ec433c49b8b2c5e3ba7764124d26171086fc62353b08da1ffc6",
+      "bytes": 9829
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit51-rtk-host-readiness.json",
+      "sha256": "e333f74dea9c93de5107dcecb016ff6b02b7fda3f1c62a211d79640e9fbfa4ab",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/unit54-rtk-host-guard-tests.json",
+      "sha256": "4826bea48d86280a2deff8ab346c5d0213fe1c8d1518f1832c36c0f1aaaad390",
+      "bytes": 12490
     },
     {
       "path": "evidence/artifacts/token-context-20261003/unit7-codex-publication-review.json",

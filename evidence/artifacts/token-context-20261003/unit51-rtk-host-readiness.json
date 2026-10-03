@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "rtk-host-libtest-metadata",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured context for cumulative engineering and US-equities R&D.",
+  "status": "HOST_DIRECT_NATIVE_LIBTEST_METADATA_PASS_ONLY",
+  "evidence_level": "Actual native help/list readiness and artifact observation; no unchanged test execution or acceptance",
+  "source": {
+    "repository": "rtk-ai/rtk",
+    "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "version": "0.51.0",
+    "test_path": "tests/guard_integration_test.rs",
+    "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/guard_integration_test.rs"
+  },
+  "native_metadata": {
+    "help_exit": 0,
+    "list_exit": 0,
+    "listed_tests": 22,
+    "listed_benchmarks": 0,
+    "tests_executed_in_bound_metadata_unit": false,
+    "host_git_version": "2.53.0",
+    "historical_container_git_version": "2.39.5",
+    "installed_bwrap_version": "0.11.1",
+    "ABI_scope": "Sufficient for help/list only; test subprocess ABI remains unqualified",
+    "native_guard_binary_sha256": "784806d320574dd8fcc3b477e9798a6155d7dacbfe2df089457e4b04b951f405",
+    "native_rtk_binary_sha256": "5da9d297353ea83512500f6c038cc776e1ed2091a6e70146fc2c37b80e077f30"
+  },
+  "original_native_output_hashes": {
+    "libtest-help": {
+      "stdout": {
+        "bytes": 5469,
+        "sha256": "96eaff2482de2bb111cd90ffdf4096cff6a029256c34776b6187d3965a0d42e3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    "libtest-list": {
+      "stdout": {
+        "bytes": 1275,
+        "sha256": "08e0413d9e02a2d8e8f6e15afb43d8e555f90f96035c38b61c3f27f41d0e8c25"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "old_failures": "UNCHANGED; original RTK3922pass/2fail/8ignored exit101 and later unrun suites are not regraded",
+  "provider_usage": "NOT_MEASURED; no model comparison in this metadata unit",
+  "original_custody_sha256": {
+    "closed_metadata": "da496c0d3d154143e2022dbd88547f47a071a3ec82db80f429f3569eb4e217bb",
+    "preflight": "347187e25f58f28e57fbf2041084f7870da60ffd63c9aec9adde94fe75042dab",
+    "source_bindings": "2d98c50113721717fca068b300fe91648d82ae5b83a63d793010f578f60d953d",
+    "source_test_file": "878f673934cf41262e92fb57dfb2c1a73737b2b0f44a45640cfe6c9867261b8b"
+  },
+  "limits": [
+    "List22 means discovery, never22passing tests",
+    "No final RTK test result or counters fabricated",
+    "Host/runtime readiness does not establish output/error fidelity, provider-token superiority, natural invocation or adoption"
+  ]
+}

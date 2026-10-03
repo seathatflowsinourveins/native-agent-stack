@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "rtk-host-guard-native-qualification",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured command context for cumulative engineering and US-equities R&D.",
+  "status": "PASS_22_UNCHANGED_NATIVE_GUARD_CASES_ONLY",
+  "evidence_level": "Two closed native unchanged upstream libtest runs; metadata phase remains historical metadata only.",
+  "source": {
+    "repository": "rtk-ai/rtk",
+    "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "version": "0.51.0",
+    "test_path": "tests/guard_integration_test.rs",
+    "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/guard_integration_test.rs"
+  },
+  "native_runtime": {
+    "host_Git_version_observed": "2.53.0",
+    "historical_container_Git_version": "2.39.5",
+    "bubblewrap_version_observed": "0.11.1",
+    "native_guard_binary_sha256": "784806d320574dd8fcc3b477e9798a6155d7dacbfe2df089457e4b04b951f405",
+    "native_RTK_binary_sha256": "5da9d297353ea83512500f6c038cc776e1ed2091a6e70146fc2c37b80e077f30",
+    "ABI_scope": "Observed successful retained guard/helper execution in these exact native namespace runs; other suites and runtimes unqualified."
+  },
+  "metadata_lineage": {
+    "existing_candidate_sha256": "4e5a322a221b3457c236ee221628499914f3cfc9577ff2d28147a2b593722c32",
+    "native_listed_tests": 22,
+    "native_listed_benchmarks": 0,
+    "metadata_phase_executed_tests": false,
+    "earlier_list22_is_discovery_only": true
+  },
+  "runs": [
+    {
+      "scope": "two-original-cases",
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 20
+      },
+      "case_names": [
+        "git_diff_dash_dash_stat_pathspec_after_double_dash_is_not_stat_flag",
+        "git_log_malformed_digit_run_propagates_real_git_error"
+      ],
+      "native_exit_code": 0,
+      "stdout": {
+        "bytes": 260,
+        "sha256": "8dc438ea787d7cf9136e279e469133b6ef72d7dfba56dab57a02bcaeaa956f5c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "preregistration": {
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5973664833",
+        "published_at": "2026-10-03T21:29:01Z",
+        "body_sha256": "5293dd0011e17256500767ed8091d73deb347180340b0c67e46456df6ad02947",
+        "native_return_sha256": "e078df4250d48fe7f68dcab95ba522ab1e46fff81aa559df52ecde0b3fc29e1e",
+        "native_return_equals_retained_body": true,
+        "before_call_sequence_provenance": "Root-observed native GitHub reread then preflight then actual test; independent file/body custody verified separately."
+      },
+      "private_artifact_sha256": {
+        "frozen_plan": "fff55cce28c77891d71d591efa52ed103c5b53ab3d6dfcfedaabb176137e1a96",
+        "native_tool_return": "a956912c99f1d02eed95cc6cd5b633ee4750b29eb7f81f8a7dd7918f439f2ea7"
+      },
+      "unchanged_bound_files": 28,
+      "literal_argv_and_timeout_match": true
+    },
+    {
+      "scope": "remaining20-cases",
+      "counts": {
+        "passed": 20,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered": 2
+      },
+      "case_names": [
+        "find_no_results_emits_empty",
+        "git_branch_dash_prefixed_name_after_double_dash_attempts_creation_not_a_silent_list",
+        "git_checkout_branch_switch_emits_compact_ok",
+        "git_checkout_dash_b_capital_reports_what_git_actually_did",
+        "git_checkout_dirty_tree_error_keeps_file_list",
+        "git_checkout_file_restore_emits_restored_count",
+        "git_checkout_new_branch_emits_compact_ok",
+        "git_diff_keeps_the_body_when_git_colours_it",
+        "git_diff_name_only_passes_through_raw",
+        "git_diff_reports_the_error_git_gives_for_what_was_typed",
+        "git_log_announces_its_limit_only_when_the_limit_took_something",
+        "git_log_dash_p_pathspec_after_double_dash_is_not_patch_flag",
+        "git_log_patch_output_matches_raw_git",
+        "git_show_dash_dash_stat_pathspec_after_double_dash_is_not_stat_flag",
+        "git_show_quiet_loses_to_a_patch_request_from_either_side",
+        "git_stash_list_no_stashes_emits_empty",
+        "git_stash_show_no_stash_emits_empty_and_propagates_failure",
+        "grep_no_match_emits_empty_not_a_message",
+        "guard_does_not_block_real_compression",
+        "guard_shows_raw_when_filter_would_bloat_tiny_input"
+      ],
+      "native_exit_code": 0,
+      "stdout": {
+        "bytes": 1352,
+        "sha256": "0b1a68ad9400f5cb814bb28169b96227f152756d15e3ac5f6b558c6f7ea1c79c"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "preregistration": {
+        "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5973685276",
+        "published_at": "2026-10-03T21:31:47Z",
+        "body_sha256": "894eb3f38b24f297fa070b255ece52a1b3b754ad1711e105c8b65401797b1e0f",
+        "native_return_sha256": "75d37e7e83e9bea9190c2a5da8e03c784ff89ab24ef10c9cb60cc8813516b665",
+        "native_return_equals_retained_body": true,
+        "before_call_sequence_provenance": "Root-observed native GitHub reread then preflight then actual test; independent file/body custody verified separately."
+      },
+      "private_artifact_sha256": {
+        "frozen_plan": "c111da2c90aac5791d45350d4266a4ef56c96482d14454420db7746584d0692e",
+        "native_tool_return": "f50fba30375c12adc6c5881e17878a03a0e7d1abb7e7c6ebcce7aad71871d570"
+      },
+      "unchanged_bound_files": 28,
+      "literal_argv_and_timeout_match": true
+    }
+  ],
+  "disjoint_guard_coverage": {
+    "listed": 22,
+    "executed_unique": 22,
+    "passed": 22,
+    "failed": 0,
+    "ignored": 0,
+    "measured": 0,
+    "case_sets_disjoint": true,
+    "union_exact_native_listing": true,
+    "native_test_commands": 2,
+    "counting": "First2 plus separately remaining20 counted once. Do not sum old container cases or help/list metadata into this result."
+  },
+  "command_fidelity": {
+    "unchanged28_bindings_per_run": true,
+    "unchanged_test_helper_ELFs_and_selected_RTK_sources": true,
+    "native_exact_filter_then_exact_skip_filter": true,
+    "outer_timeout_seconds_per_command": 30,
+    "kill_after_seconds": 2,
+    "selective_readonly_host_runtime_and_compiled_target": true,
+    "owned_work_tmp_writable": true,
+    "native_inherited_environment_cleared": true,
+    "no_global_or_home_or_auth_bind": true
+  },
+  "old_container": {
+    "status": "FAIL_PRESERVED",
+    "passed": 3922,
+    "failed": 2,
+    "ignored": 8,
+    "exit_code": 101,
+    "later_integration_targets_UNRUN": 18,
+    "original_public_receipt": "evidence/artifacts/token-context-20261003/rtk-native-tests.json"
+  },
+  "provider_usage": {
+    "scope": "NOT_MEASURED_NATIVE_HARNESS_ONLY",
+    "tokens": null,
+    "cost": null
+  },
+  "source_references": [
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "tests/common/mod.rs",
+      "lines": [
+        [
+          11,
+          36
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/common/mod.rs",
+      "sha256": "889a37e765ec10f2a4fa90271df8fa2adb6fe3f123b8611e69c2e8112f3e4fd6"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "src/core/test_isolation/scratch.rs",
+      "lines": [
+        [
+          25,
+          72
+        ],
+        [
+          152,
+          188
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/core/test_isolation/scratch.rs",
+      "sha256": "a4f9d5300f95b4f2b2e47e267fa251a45448ae730a55b15bdb0f10c6b703e4df"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": "tests/guard_integration_test.rs",
+      "lines": [
+        [
+          65,
+          110
+        ],
+        [
+          248,
+          274
+        ],
+        [
+          330,
+          351
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/guard_integration_test.rs",
+      "sha256": "878f673934cf41262e92fb57dfb2c1a73737b2b0f44a45640cfe6c9867261b8b"
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "path": ".github/workflows/ci.yml",
+      "lines": [
+        [
+          54,
+          67
+        ]
+      ],
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/.github/workflows/ci.yml",
+      "sha256": "e77f934a2345820ba640107524880905b1413b8ae1741ea57e185536859b76a2"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "README.md",
+      "lines": [
+        [
+          104,
+          173
+        ]
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/README.md",
+      "sha256": "16fa90d97bde583e83fef0ebbde912b2118eb61f2d7c860a07264755d9a56f79"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "pin": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe",
+      "path": "bubblewrap.c",
+      "lines": [
+        [
+          313,
+          369
+        ],
+        [
+          1230,
+          1270
+        ],
+        [
+          1876,
+          1894
+        ],
+        [
+          1956,
+          1985
+        ],
+        [
+          2509,
+          2524
+        ],
+        [
+          3026,
+          3033
+        ]
+      ],
+      "url": "https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bubblewrap.c",
+      "sha256": "e81e833751d3d247d72dff1ad1792ca72939fa6956974dde2cb86f9f1b0a2bb3"
+    },
+    {
+      "repository": "rust-lang/rust",
+      "pin": "f8297e351a40c1439a467bbbb6879088047f50b3",
+      "path": "library/test/src/cli.rs",
+      "lines": [
+        [
+          52,
+          88
+        ],
+        [
+          269,
+          279
+        ],
+        [
+          385,
+          395
+        ]
+      ],
+      "url": "https://github.com/rust-lang/rust/blob/f8297e351a40c1439a467bbbb6879088047f50b3/library/test/src/cli.rs",
+      "sha256": "91f415c5c6005885ae80d498a89a090fc680ff10bfc65eccb521df5900e03162"
+    },
+    {
+      "repository": "rust-lang/rust",
+      "pin": "f8297e351a40c1439a467bbbb6879088047f50b3",
+      "path": "library/test/src/lib.rs",
+      "lines": [
+        [
+          515,
+          534
+        ]
+      ],
+      "url": "https://github.com/rust-lang/rust/blob/f8297e351a40c1439a467bbbb6879088047f50b3/library/test/src/lib.rs",
+      "sha256": "1413896bc1fb17ef78cb3e8bf42bf16515c3d5bc312f3c9891abad8dba64b437"
+    }
+  ],
+  "private_custody_sha256": {
+    "unit54_receipt": "984d8c95a2b3864f5e2438667549df57c446f622e25d73701faa3acb537dd6d2",
+    "unit54_manifest": "8b0d254e221091f56d8e9b8c0b56d0cf19a29ecd113cc1158c24763a6cb55510",
+    "unit54_corrections": "ba44840650121d916fc494db9d41e2cc34a09fc4f177977db50ba5ec98875831",
+    "remaining20_root_postread": "8dcfaec0c3d9241c18664630f4fd57c5692076336b26110654517486eb19e3b8",
+    "unit58_source_bindings": "831d2c8239f163d8edef3c8021099276d2526f2a5ac80eda1534071ba48dd313"
+  },
+  "retained_corrections": [
+    "Earlier comment poll is not the later preregistration source; the two native GitHub return bodies and before-call source sequence are retained.",
+    "Root source/runtime locator corrections are preserved; they precede these unchanged native tests and do not alter their results.",
+    "Container Git2.39.5 is distinct from observed host Git2.53.0; no sole-variable causal claim."
+  ],
+  "limits": [
+    "Guard integration binary only: not full cargo test --all qualification.",
+    "Historical container result remains 3922 PASS, 2 FAIL, 8 ignored, exit101; 18 later integration targets remain UNRUN.",
+    "No sole Git-version causality, installation, default, token savings, quality, protection or live model benefit is established.",
+    "Only selected immutable inputs, native returned exits and captures are proven; broader filesystem/process/physical-EOF census remains UNKNOWN.",
+    "Provider usage, invoice and whole-cost scope were not measured; no zero-usage or zero-cost claim."
+  ]
+}

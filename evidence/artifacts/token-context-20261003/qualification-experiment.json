@@ -20,6 +20,14 @@
     {
       "url": "https://github.com/toon-format/toon",
       "revision": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53"
+    },
+    {
+      "url": "https://github.com/containers/bubblewrap",
+      "revision": "124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe"
+    },
+    {
+      "url": "https://github.com/rust-lang/rust",
+      "revision": "f8297e351a40c1439a467bbbb6879088047f50b3"
     }
   ],
   "discovery_provenance": [
@@ -120,7 +128,15 @@
       "unit28-codex-owned-state-stage01-stop",
       "unit29-codex-document-a-stop",
       "unit31-codex-native-mcp-permission-source",
-      "unit34-scb-native-prompt-renderer"
+      "unit34-scb-native-prompt-renderer",
+      "unit36-astra-source-judgment",
+      "unit35-fresh-hook-metadata",
+      "unit45-trusted-hook-metadata",
+      "unit41-exact-opus-route-source",
+      "unit43-five-job-gap-map",
+      "unit51-rtk-host-libtest-metadata",
+      "unit54-rtk-host-two-original-cases",
+      "unit54-rtk-host-remaining20"
     ],
     "roles": [
       "command-worker",
@@ -290,7 +306,15 @@
     "One unchanged first CircuitEval checkpoint closed0/schemaPASS but required MCP call failed native approval Never. Known main13groups577352 only; complete helper/provider usage UNKNOWN. Stages2\u20139 and grader UNRUN_FINAL.",
     "Designed original-source A arm, not accepted baseline: main+maxchild closed0,4/4 source/quote fidelity, model-authored null error fields fail frozenempty-stringcontract. Known9 finalizedgroups229634; cancelled usage actualnull/UNKNOWN; later producers/graders UNRUN_FINAL.",
     "Selected pinned production/config source and installed help support bounded raw-tool approval_mode approve with native constraints; no configchange or live grant trial. Model usage N/A, native/provider usage UNKNOWN.",
-    "Supported unchanged native render-prompts and installedhelp closed0:8parts,17inputs unchanged, actual circopt.py entrypoint/no placeholder. Rendering only; model/grader/comparison/protection UNRUN or UNMEASURED; native usage UNKNOWN."
+    "Supported unchanged native render-prompts and installedhelp closed0:8parts,17inputs unchanged, actual circopt.py entrypoint/no placeholder. Rendering only; model/grader/comparison/protection UNRUN or UNMEASURED; native usage UNKNOWN.",
+    "native codex exec gpt-6-astra max read-only consequential source judgment; independent selected-source and finalized native counter reconciliation",
+    "supported native app-server initialize/initialized/hooks/list: fresh six definitions",
+    "supported native app-server initialize/initialized/hooks/list: separate owned User-state trusted metadata",
+    "selected primary native help and gateway/Claude SDK source read; exact route HOLD",
+    "independent committed-evidence five-job completeness map and exact25sourcebindings",
+    "retained upstream native guard libtest --help and --list on host; metadata only",
+    "preregistered selective bubblewrap native guard libtest --exact --test-threads1 two original cases; native closure0",
+    "separately preregistered selective bubblewrap native guard libtest exact skip of two original cases; remaining20 native closure0"
   ],
   "observations": [
     {
@@ -3516,6 +3540,254 @@
         "total": null,
         "uncached_input": null
       }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit36-astra-source-judgment.json",
+          "sha256": "3f1e8faafa39c311940a0433ffae142d60d2e2b722e6e659f0f4897f8cf9766f"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 96,
+      "condition": "candidate",
+      "evidence_class": "model_task_execution",
+      "exit_code": 0,
+      "id": "unit36-astra-source-judgment",
+      "quality": {
+        "contract": false,
+        "semantic": null
+      },
+      "role": "coordinator",
+      "scope": "Native Codex gpt-6-astra/max source judgment, one declared attempt, five finalized main response groups; strict whole-view coverage9/11 FAIL retained. Conditional source advice only; helpers/invoice/wire complete cost UNKNOWN.",
+      "status": "failed",
+      "task": "unit36-astra-source-judgment",
+      "usage": {
+        "cache_creation": 0,
+        "cache_read": 52224,
+        "native_retries": null,
+        "output": 5038,
+        "reasoning_in_output": 3826,
+        "total": 80857,
+        "uncached_input": 23595
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit35-45-trusted-metadata.json",
+          "sha256": "e1cb456353274866a71752f80ec1c11c0138fd26438c8d0152ca14732d45b093"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 97,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit35-fresh-hook-metadata",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Supported native metadata discovery only: six enabled/untrusted definitions,37argv,14unchangedbindings, exit0; no hook/MCP/model profile or protection proof.",
+      "status": "passed",
+      "task": "unit35-fresh-hook-metadata",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit35-45-trusted-metadata.json",
+          "sha256": "e1cb456353274866a71752f80ec1c11c0138fd26438c8d0152ca14732d45b093"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 98,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit45-trusted-hook-metadata",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Separate owned User state delivery only: exact same six pairs enabled/trusted,37argv,18unchangedbindings,exit0; Usage UNKNOWN; live hooks/main/child/compaction unqualified.",
+      "status": "passed",
+      "task": "unit45-trusted-hook-metadata",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit41-opus-route-source.json",
+          "sha256": "cb9465d202594569d7243d2c2c9a99a7169dc150ee9a1d50b1b338a3b675a4b6"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 99,
+      "condition": "candidate",
+      "evidence_class": "pinned_source_review",
+      "exit_code": 0,
+      "id": "unit41-exact-opus-route-source",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Selected installed and pinned source supports process endpoint carriage and full model-name input. Exact Opus5.5 keyless served route remains HOLD; no native route or model trial.",
+      "status": "passed",
+      "task": "unit41-exact-opus-route-source",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit43-five-job-gap-map.json",
+          "sha256": "cab372143f957ec433c49b8b2c5e3ba7764124d26171086fc62353b08da1ffc6"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 100,
+      "condition": "candidate",
+      "evidence_class": "offline_artifact_check",
+      "exit_code": 0,
+      "id": "unit43-five-job-gap-map",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Five-job completeness map at unchanged committed081937 snapshot; later private outcomes do not retroactively change it; fixed-task defaults only, no source-currency/global deployment claim.",
+      "status": "passed",
+      "task": "unit43-five-job-gap-map",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit51-rtk-host-readiness.json",
+          "sha256": "e333f74dea9c93de5107dcecb016ff6b02b7fda3f1c62a211d79640e9fbfa4ab"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 101,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit51-rtk-host-libtest-metadata",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Retained unchanged native guard ELF host help/list0,22tests listed,zero tests executed in metadata scope. Native/compiler/runtime/cost/full-suite scope not inferred.",
+      "status": "passed",
+      "task": "unit51-rtk-host-libtest-metadata",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit54-rtk-host-guard-tests.json",
+          "sha256": "4826bea48d86280a2deff8ab346c5d0213fe1c8d1518f1832c36c0f1aaaad390"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 102,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit54-rtk-host-two-original-cases",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Two originally failing unchanged guard cases2PASS0FAIL20filtered, native0; exact native filter and28unchangedbindings. Original container3922PASS2FAIL8ignoredexit101+18UNRUN retained.",
+      "status": "passed",
+      "task": "unit54-rtk-host-two-original-cases",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
+    },
+    {
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/unit54-rtk-host-guard-tests.json",
+          "sha256": "4826bea48d86280a2deff8ab346c5d0213fe1c8d1518f1832c36c0f1aaaad390"
+        }
+      ],
+      "attempt": 1,
+      "command_index": 103,
+      "condition": "candidate",
+      "evidence_class": "native_cli_execution",
+      "exit_code": 0,
+      "id": "unit54-rtk-host-remaining20",
+      "quality": {
+        "contract": true,
+        "semantic": true
+      },
+      "role": "coordinator",
+      "scope": "Disjoint remaining20unchangedguardcases20PASS0FAIL2filtered,native0;22/22unionguardcoverageonly. No all-suite, sole-Git-causality, token-saving or adoption claim.",
+      "status": "passed",
+      "task": "unit54-rtk-host-remaining20",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": null,
+        "native_retries": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "uncached_input": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -3750,6 +4022,10 @@
     {
       "reason": "Model-authored null error fields and nonempty parent explanations fail frozen empty-string contract; semantic grading UNRUN_FINAL. No native terminal error concluded. Usage scope: Known9 finalized groups; cancelled token_usage null and complete charge UNKNOWN.",
       "run_id": "unit29-codex-document-a-stop"
+    },
+    {
+      "reason": "Native exit0 and selected rangesPASS12/12 do not satisfy required whole-view coverage:9/11FAIL, two unterminated nonblank tails omitted. Source advice is conditional. Known five finalized groups80857 counted once, helper/invoice/wire completenessUNKNOWN; old STOPs unchanged.",
+      "run_id": "unit36-astra-source-judgment"
     }
   ],
   "limitations": [
@@ -3795,7 +4071,8 @@
     "Units13-17: B fixtures are synthetic/directed admissions only. R2 child failure is terminal,55/judge UNRUN_FINAL; known parent252333 is receipt-only, two-role aggregate UNKNOWN. Source-only TUI/stdio/ENOSPC gates keep null native usage/exits. Astra100419 is source judgment, not approval/live metadata/default/protection. No host/other-layer change.",
     "Publication corrections: derived STOP pending-unit16 prose updated to completed source diagnosis only. Proposed generic unit17 stopped-case label corrected to actual frozen formatter/stdin/lane judgment. First two metadata integrations expected absent proposal scope/usage fields and stopped before writes; root binds declared actual scopes/counters. All original native/freeze/private drafts and old aggregate observations remain unchanged.",
     "Units18/19 are distinct immutable metadata STOPs. Source-backed type/PTY/foreground controls in19/20 do not qualify actual six returned definitions, P2 protection, full-plugin lifecycle, helper/invoice census or a default. Counter fields remain null where no native usage was supplied; no zero usage inference.",
-    "Units25\u201327 preserve failed/incomplete source reads and unplanned helper usage; direct native owned-home trusted state is scoped metadata only. Source/cap/field checks do not qualify handler/main/child/resume/natural compaction or protected quality. Native cost is list estimate, invoice unknown."
+    "Units25\u201327 preserve failed/incomplete source reads and unplanned helper usage; direct native owned-home trusted state is scoped metadata only. Source/cap/field checks do not qualify handler/main/child/resume/natural compaction or protected quality. Native cost is list estimate, invoice unknown.",
+    "Units35/45 close only supported fresh/untrusted and separate owned trusted metadata. Unit36 strict whole-view source coverageFAIL9/11 stays failed despite native0. Unit41 exact Opus5.5 keyless routeHOLD; Unit43 is a committed081937 snapshot. Unit51 metadata and Unit54 disjoint22/22nativeguardcases remain separate; no fullCargo/default/modelbenefit/saving/physicalcensus inferred. Original RTK3922PASS2FAIL8ignoredexit101 and18UNRUN targets remain unchanged. Counter/cache/reasoning subsets counted once; metadata usageUNKNOWN."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -3889,7 +4166,15 @@
       "unit25-hook-state-source-routes",
       "unit25-hook-state-astra-source-read",
       "unit26-native-owned-home-hook-state",
-      "unit27-narrow-opus-source-read"
+      "unit27-narrow-opus-source-read",
+      "unit36-astra-source-judgment",
+      "unit35-fresh-hook-metadata",
+      "unit45-trusted-hook-metadata",
+      "unit41-exact-opus-route-source",
+      "unit43-five-job-gap-map",
+      "unit51-rtk-host-libtest-metadata",
+      "unit54-rtk-host-two-original-cases",
+      "unit54-rtk-host-remaining20"
     ],
     "coverage_artifact": null
   }

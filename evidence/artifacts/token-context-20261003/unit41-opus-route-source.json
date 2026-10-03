@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "exact-opus-route-source",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured context for cumulative engineering and US-equities R&D.",
+  "status": "HOLD_EXACT_ROUTE",
+  "evidence_level": "Selected installed/pinned source only; no endpoint/client/model trial",
+  "supported_scope": "Process-scoped ANTHROPIC_BASE_URL endpoint carriage and native full model-name input. Endpoint example has no /v1 suffix.",
+  "unbound": [
+    "Exact available Opus5.5 provider/model mapping",
+    "Keyless native authentication; SDK apiKeySource none can include OAuth/bearer/cloud",
+    "Current installed gateway source identity and served-model identity",
+    "Launcher preservation of effort/compaction/settings"
+  ],
+  "sources": [
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "pin": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
+      "path": "docs/guides/CLAUDE-CODE-CONFIGURATION.md",
+      "lines": "37–43,222–230",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/docs/guides/CLAUDE-CODE-CONFIGURATION.md"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-typescript",
+      "installed_version": "0.3.263",
+      "type_path": "sdk.d.ts",
+      "lines": "125–127"
+    },
+    {
+      "client": "Claude Code",
+      "installed_version": "2.1.288",
+      "retained_help_lines": "134–137"
+    }
+  ],
+  "source_scope": "Recorded gateway3.8.50 identity is historical; root installed3.8.52 observation is separate. Static aliases/context limits do not prove runtime routing.",
+  "native_or_network_or_import_or_config_actions": 0,
+  "original_custody_sha256": {
+    "receipt": "59f0b0601bd6a748d0b16e59c67d328edceab50dcf69f81af7d9943b9181872a",
+    "finding": "2a3e0747eb9697b819dcb5b6537107b93a4a78d3b7a32fde284d5052faa355c9",
+    "source_bindings": "863433f25c1722a8eb8ddf1ae4543fad1b297e2d5636cf6e0826f14b26b9f665",
+    "manifest": "5c2177e8356a29697dc24b7b1c6df7cf4ad40ef416faf712d534145321b6aa96"
+  },
+  "limits": [
+    "No alternate model/authentication/global-setting action was performed",
+    "No runtime route/admission/protection/default or approval claim"
+  ]
+}

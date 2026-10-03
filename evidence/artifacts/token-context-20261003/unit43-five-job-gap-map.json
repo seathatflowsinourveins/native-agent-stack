@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "five-job-gap-map",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured context for cumulative engineering and US-equities R&D.",
+  "status": "SOURCE_BOUND_DATED_MAP; NO_NEW_ADOPTION",
+  "evidence_level": "Scoped committed-evidence completeness map, not live/provider acceptance",
+  "snapshot_commit": "081937b01fe0a172c94258ab3d6b2adf799f6845",
+  "row_count": 5,
+  "snapshot_temporal_scope": "Original committed snapshot; later private metadata does not retroactively change map verdicts.",
+  "rows": [
+    {
+      "job": "context-window protection",
+      "retained_status": "HOLD_PROTECTION; B_CALL_RESULT_AND_LIFECYCLE_SCOPED_READY_ONLY",
+      "retained_failure": "Unit28 required MCP call failed policy-Never approval; later stages/child/grader UNRUN_FINAL. Unit26 trusted metadata is a distinct non-model scope. STOP never reopened.",
+      "unmeasured": "Natural compaction, unchanged recall after supported same-session continuation, protection and natural invocation rate.",
+      "missing_executable_class": "Actual tool-specific permission and changed-hook delivery during a source-faithful long engineering trajectory with max child and unchanged native grader.",
+      "source_supported_next_action_lead": "A separately declared finite native Promptfoo programme can deliver the source-supported raw-tool approval_mode=approve while retaining guards, then observe natural compaction and supported exact-ID continuation/quality; source or metadata READY alone is insufficient."
+    },
+    {
+      "job": "command condensing",
+      "retained_status": "SCOPED_DEFAULT_NATIVE_FOCUSED_COMMANDS; ORIGINAL_BASELINE_CONTRACT_NOT_PASS",
+      "retained_failure": "RTK unchanged tests:3922 pass/2 fail/8 ignored,exit101,later suites UNRUN. Original C3 physical-stream prerequisite remains UNPROVEN despite schema2PASS; narrower default does not regrade it.",
+      "unmeasured": "RTK provider-token superiority, natural invocation and other command families.",
+      "missing_executable_class": "Maintained candidate prerequisite success plus complete error/output information across ANSI/CRLF/NUL, sparse/late and recovery cases.",
+      "source_supported_next_action_lead": "Keep native focused commands. A changed maintained RTK release must first pass unchanged prerequisites and full returned-information fidelity, then the original matched native Promptfoo tasks with all usage/quality retained."
+    },
+    {
+      "job": "structured compaction",
+      "retained_status": "SCOPED_DEFAULT_NATIVE_COMPACT_JSON_FOR_UNRESTRICTED_TESTED_DATA",
+      "retained_failure": "TOON4.1.1:767 unchanged tests pass but all3 U+FEFF string roundtrips fail. Uniform100x11 roundtrip/truncation artifact scope passes.",
+      "unmeasured": "Eligible uniform TOON native model comparison and provider cost including primers/conversion/recovery; natural conversion opportunity.",
+      "missing_executable_class": "Exact typed/BOM/precision/key fidelity and eligible uniform live main+child consumption.",
+      "source_supported_next_action_lead": "Retain unrestricted compact JSON. A maintained release satisfying exact value/type controls can enter the original eligible uniform native Promptfoo comparison, including all framing/conversion/recovery."
+    },
+    {
+      "job": "code/document retrieval consumption",
+      "retained_status": "HOLD_NO_ACCEPTED_FRESH_RETRIEVAL_COMPARISON",
+      "retained_failure": "QMD child truncation/failure; document A authored null/nonempty error fields fail frozen empty-string contract despite exact four windows/passages and weak schemaPASS. Serena direct probe: no available language server manager.",
+      "unmeasured": "Fresh code-symbol C1/C2/full document comparisons, Claude retrieval arm, matched quality/cost and natural retrieval; historical cache/span identity is narrower.",
+      "missing_executable_class": "Focused source/range visibility for each role; alias/cross-file code, wrong/stale document negatives and known-path bypass.",
+      "source_supported_next_action_lead": "Separately declare fixed D1/D2 Promptfoo consumption using the owner-bound read-only recipe and supported bounded-line QMD get, explicit successful error-string contract, unchanged source/gold and actual per-role URI/MIME/text/range. Code trials need the owner-supported symbol scope and existing wrong/stale/known-source controls. Old STOPs remain final."
+    },
+    {
+      "job": "usage/cost meter",
+      "retained_status": "SCOPED_DEFAULT_NATIVE_FINALIZED_RECORDS; INSTALLED_SUPPLEMENTAL_METER_UNCHANGED",
+      "retained_failure": "ccusage20.0.26 CLI0 does not establish accounting PASS:199 native finalized records25619275 vs24965459 omits653816 across3 natural-compaction records. Startup missing usage stays UNKNOWN even if parser prints0.",
+      "unmeasured": "Invoice/wire/unknown helper or cancelled-charge completeness and general provider savings; known native list estimates remain known.",
+      "missing_executable_class": "Exact compaction/response/helper identity reconciliation plus interrupted, advisor/iteration and nonmonotone-replay formats.",
+      "source_supported_next_action_lead": "Compare a changed maintained meter against the same usage-only retained finalized records/native helper aggregates; no new model is required to prove parser omissions. Keep missing usage UNKNOWN and native list estimate separate from invoice."
+    }
+  ],
+  "counter_policy": "Existing row scopes are alternatives and never summed across rows. Cache/reasoning are subsets; missing/invoice/helper completeness remains UNKNOWN.",
+  "source_pins_as_retained": {
+    "pf": {
+      "repository": "promptfoo/promptfoo",
+      "pin": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "path": "src/providers/openai/codex-sdk.ts",
+      "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/providers/openai/codex-sdk.ts"
+    },
+    "codex": {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/protocol/src/protocol.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs"
+    },
+    "context_mode": {
+      "repository": "mksglu/context-mode",
+      "pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "version": "1.0.169",
+      "path": "src/server.ts",
+      "url": "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/src/server.ts"
+    },
+    "specific_permission": {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/mcp_tool_call.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/mcp_tool_call.rs#L1515"
+    },
+    "rtk": {
+      "repository": "rtk-ai/rtk",
+      "pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "version": "0.51.0",
+      "url": "https://github.com/rtk-ai/rtk/tree/e001f773f80b22b7dc4c7a79521b30e35aaef026"
+    },
+    "toon": {
+      "repository": "toon-format/toon",
+      "pin": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+      "version": "4.1.1",
+      "path": "benchmarks/data/github-repos.json",
+      "url": "https://github.com/toon-format/toon/blob/a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53/benchmarks/data/github-repos.json"
+    },
+    "qmd": {
+      "repository": "tobi/qmd",
+      "pin": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "version": "2.8.3",
+      "path": "src/mcp/server.ts",
+      "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/src/mcp/server.ts#L405"
+    },
+    "qmd_output_boundary": {
+      "repository": "openai/codex",
+      "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "path": "codex-rs/core/src/tools/context.rs",
+      "url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tools/context.rs#L482"
+    },
+    "ccusage": {
+      "repository": "ccusage/ccusage",
+      "pin": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "version": "20.0.26",
+      "source_route": "native main.rs26–37 -> adapter/mod.rs4/6 -> native Rust Claude/Codex adapters; no TypeScript parser or reproducible-build claim",
+      "url": "https://github.com/ccusage/ccusage/tree/d9821088b98aa536c7a385aa1a4579d6fa02269b"
+    },
+    "scb_renderer": {
+      "repository": "SprocketLab/slop-code-bench",
+      "pin": "31ceea3add480edb33431e70475c4c70597e6b31",
+      "path": "src/slop_code/entrypoints/commands/render_prompts.py",
+      "url": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/src/slop_code/entrypoints/commands/render_prompts.py"
+    }
+  },
+  "original_custody_sha256": {
+    "receipt": "b8b5fa05fb6b82e3b82c7264f1a522d4f369560520581c15c20911228165f2cc",
+    "map": "e0666a2f8b3c7f10142a6acfd3f4e9fb58c2b7c3ed4e72a19d6c3400c876187e",
+    "source_bindings": "b21ce6371fe6493bf5a0f14db1795cf408be046130efe1328ad9b1273ce76e8c",
+    "manifest": "8b0a4726cb2efd671e9942892949b71a32a12b2dcb4f49acc5e4c87057577b41"
+  },
+  "limits": [
+    "Native focused commands and compact JSON remain only previously recorded scoped defaults; no original contract regrade",
+    "P2 protection, candidate command condensing and fresh retrieval comparisons remain HOLD",
+    "Source currency and currently deployed/global architecture are not inferred from this snapshot",
+    "Native finalized-record meter scope is distinct from full invoice accounting"
+  ],
+  "scope_clarification": "Compact JSON and native focused commands mean the recorded fixed tasks and typed/BOM fixtures only; this snapshot does not assert general task superiority."
+}

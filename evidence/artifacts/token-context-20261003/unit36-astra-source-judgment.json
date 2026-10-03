@@ -1,0 +1,116 @@
+{
+  "claims": {
+    "accepted_baseline": false,
+    "comparison": false,
+    "complete_provider_bill": false,
+    "default": false,
+    "physical_cleanup": false,
+    "protection": false,
+    "saving": false,
+    "user_approval": false,
+    "winner": false
+  },
+  "date": "2026-10-03",
+  "known_finalized_native_usage": {
+    "all_five_prefixes_turn_and_thread_cumulatives_and_CLI_alternative_match": true,
+    "cache_write_input_subset": 0,
+    "cached_input_subset": 52224,
+    "input_including_cache": 75819,
+    "output_including_reasoning": 5038,
+    "overlapping_views_added": false,
+    "reasoning_output_subset": 3826,
+    "total": 80857,
+    "uncached_input": 23595,
+    "unique_response_groups": 5
+  },
+  "limits": {
+    "exact_raw_launch_argv": "Not separately bound in the selected artifacts; intended controls and actual effective mode are distinguished.",
+    "fresh_changed_definition_hook_metadata": "UNKNOWN in this source read",
+    "model_task_and_grader_runtime_success": "UNKNOWN_UNQUALIFIED",
+    "observed_child_or_MCP_items": "None in the selected owned records; invisible helper census not inferred.",
+    "physical_cleanup_or_OS_global_closure": "UNKNOWN outside this journal scope",
+    "unit28_unit29_and_older_STOPs": "UNCHANGED",
+    "unobserved_helper_complete_charge_invoice_wire_family": "UNKNOWN"
+  },
+  "native": {
+    "answer_words": 151,
+    "approval_policy": "never",
+    "client_version": "0.160.0",
+    "effective_multi_agent_version": "disabled",
+    "effort": "max",
+    "model": "gpt-6-astra",
+    "native_exit": 0,
+    "native_provider_label": "omniroute",
+    "outer_attempts": 1,
+    "sandbox": "read-only",
+    "stderr_bytes": 0,
+    "turns_observed": 1,
+    "word_cap": 200,
+    "word_cap_result": "PASS"
+  },
+  "private_artifact_sha256": {
+    "native_final_answer": "0da11b5eefe329003c0cfc087713a362ee0ae55c5416ae55d4a8744e07bcf307",
+    "native_owned_journal": "94907735e4cddd1ec27fb5e7604046342618a4922e1b4c81817f72d84d4149e5",
+    "native_stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native_stdout": "d20431da3c5103295b3bc6cce71c72a4e1627cdf1d52fa2e42167afb95300ed4",
+    "root_completion": "f4167f6d1d1194a9aa9f68d8d58f315f1d55032c153b995678f15f9be0bfa86b",
+    "root_freeze": "0c1c733c9e50198ed942c456bc02ecaeb913f4f6968197265412d0d7ddace68a"
+  },
+  "schema_version": 1,
+  "scope": "One consequential native source judgment; conditional prospective advice, not approval, runtime task admission or comparison.",
+  "source_advice_summary": [
+    "Common maintained native renderings and retained environment instructions support a prospective representation.",
+    "A specific-tool native approval route remains subject to strict review and restriction intersections.",
+    "Explicit successful empty-error instructions can clarify the old document contract without weakening its frozen rejection.",
+    "Child-free parity requires both disabling MultiAgentV2 and setting agents_enabled false; the actual judgment mode was disabled.",
+    "Native terminal state and assistant-authored JSON remain separate; declared document-role duplication supports only that workload."
+  ],
+  "source_pins": {
+    "SprocketLab/slop-code-bench": "31ceea3add480edb33431e70475c4c70597e6b31",
+    "openai/codex": "a956835d020762cb2b570053af06f643a11c0ecc"
+  },
+  "source_reads": {
+    "all_views_sources_config_prompt_still_match": true,
+    "command_exits_all_zero": true,
+    "immutable_view_count": 11,
+    "native_command_items": 17,
+    "omitted_nonblank_unterminated_tails": [
+      {
+        "bytes": 156,
+        "line": 9,
+        "scope": "Required return shape and child binding instruction.",
+        "view": "Old document instruction view"
+      },
+      {
+        "bytes": 3,
+        "line": 234,
+        "scope": "Closing code fence.",
+        "view": "Rendered stage1 view"
+      }
+    ],
+    "own_metadata_or_native_guidance_commands": 5,
+    "read_coverage_observation": "wc -l counts LF characters; the two final non-LF lines were not returned by the native sed ranges.",
+    "selected_range_fidelity": "PASS12_OF12",
+    "source_range_reads": 12,
+    "strict_whole_view_coverage": "PARTIAL9_OF11",
+    "views_accessed": 11
+  },
+  "source_urls": {
+    "maintained_renderer": "https://github.com/SprocketLab/slop-code-bench/blob/31ceea3add480edb33431e70475c4c70597e6b31/src/slop_code/entrypoints/commands/render_prompts.py#L44-L112",
+    "native_child_mode_precedence": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/config/mod.rs#L1585-L1613",
+    "native_permission_precedence": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/server.rs#L459-L487",
+    "native_permission_runtime": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/mcp_tool_call.rs#L1510-L1627",
+    "native_usage": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/protocol.rs#L2241-L2284",
+    "native_permission_auto_approval": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L110"
+  },
+  "status": "CLOSED_NATIVE0_SOURCE_ADVICE_WITH_READ_COVERAGE_LIMIT",
+  "unit": "unit36",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured context for cumulative engineering and US-equities R&D.",
+  "evidence_level": "Actual native source judgment plus independent selected-source/counter observation; not upstream acceptance",
+  "whole_view_required_gate": "FAIL9_OF11_RETAINED",
+  "strict_native_range_fidelity": "PASS12_OF12_WITHOUT_PROMOTING_WHOLE_COVERAGE",
+  "independent_receipt_sha256": "1f250030dbbda3ff7fec3ac315ecb188ddb7575a28db7df3419d0368efd3bc61",
+  "independent_manifest_sha256": "cb03f0d16fcc73889ee69588c1e377f597fd6fa8e916bdc991bbe470d3ce7d62",
+  "root_primary_usage_verification_sha256": "ba00e35be4caca239f21594a51beb64340d6d24ca324a84b96e4c4d3630e32d9"
+}

@@ -1,0 +1,33 @@
+# Native token trust and guard qualification — 2026-10-03
+
+The north-star action is reliable measured context during cumulative engineering and US-equities R&D. Retain the previously recorded native focused-command, compact-JSON and finalized-native-accounting defaults within their fixed task and fixture scopes. Context protection and fresh retrieval comparisons remain open. This record advances prerequisites without changing the definitive context-supply row or installing a candidate.
+
+## Native hook metadata
+
+Supported native discovery returned six enabled, untrusted hook definitions. A separate owned User-state delivery returned the exact same six key/currentHash pairs enabled and trusted, with trustStatus the only definition difference. Both operations closed at native exit 0 with empty stderr. The discovery's 14 bindings and the trusted delivery's 18 bindings remained unchanged. Native key/hash values stay private.
+
+The source route is [hooks/list metadata](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/common.rs#L879-L883), [per-key User/SessionFlags state merging](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/config_rules.rs#L8-L66), and [native definition trust checking](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L794-L821), at Codex 0.160.0/a956835d. The ordinary empty SessionFlags map remains present; it does not erase the User trust entries. The earlier removal claim was wrong and was corrected against the actual argv, returned metadata and pinned merge implementation.
+
+The alternatives remain raw CLI state delivery, the supported owned-home User-state route, and the native baseline. The scoped preference is owned-home delivery for prospective preparation. Actual provider delivery and live hook/MCP/main/max-child execution could overturn it. Trusted metadata alone does not establish those executions, exact-session continuation, natural compaction, recall, protection or model cost. [Receipt](../../evidence/artifacts/token-context-20261003/unit35-45-trusted-metadata.json).
+
+## Consequential source judgment
+
+One native Astra/max read through the OmniRoute lane closed at exit 0. Five finalized main response groups total 80,857 tokens; cached input 52,224 and reasoning output 3,826 are subsets. The known groups are counted once. Helper, invoice and wire completeness remain unknown.
+
+The required whole-view coverage failed: 9 of 11 views were complete. Native wc -l and sed omitted two nonblank final lines without a trailing LF, including a required return-shape/child instruction. Twelve selected ranges matched exactly, and the 151-word answer met its cap. Those narrower successes retain conditional advice; they do not satisfy the failed complete-read gate. [Receipt](../../evidence/artifacts/token-context-20261003/unit36-astra-source-judgment.json).
+
+A suspected citation-path error was also disproved. The retained primary [server.rs459–487](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/server.rs#L459-L487) correctly contains tool/server/default precedence and extraction. The separate [auto-approval helper at mcp/mod.rs89–110](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/codex-mcp/src/mcp/mod.rs#L89-L110) is an additional citation. Replacing only the path while preserving the old line range would be wrong. The original source-read failure remains unchanged.
+
+## RTK host guard qualification
+
+The retained unchanged RTK 0.51.0 guard binary passed two separately preregistered native host operations: the two originally failing cases, then the other 20. Both closed at native exit 0 with empty stderr. Their disjoint union equals all 22 names in the native libtest listing. Exact frozen commands, 30-second timeouts and 28 bindings per operation match. The earlier help/list operation is still metadata only. [Metadata receipt](../../evidence/artifacts/token-context-20261003/unit51-rtk-host-readiness.json), [guard receipt](../../evidence/artifacts/token-context-20261003/unit54-rtk-host-guard-tests.json).
+
+This uses the unchanged [RTK guard tests at e001f773](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/tests/guard_integration_test.rs#L248-L274), [Rust native exact filtering at f8297e35](https://github.com/rust-lang/rust/blob/f8297e351a40c1439a467bbbb6879088047f50b3/library/test/src/lib.rs#L515-L534), and [bubblewrap binds at 124c4cdf](https://github.com/containers/bubblewrap/blob/124c4cdf4321f63ef17a1cb0ce8f9dd45bd7adbe/bubblewrap.c#L1956-L1985). Selective host mounts preserve the helper's compiled target path; only owned work/tmp are writable, with inherited environment cleared.
+
+The historical container run remains 3,922 PASS, 2 FAIL, 8 ignored and exit 101, with 18 later integration targets unrun. Host Git 2.53.0 differs from that container's Git 2.39.5, but other runtime conditions also differ. No sole-variable causal claim is made. The alternatives are the historical full-command execution and this narrower retained-binary host qualification. The upstream [full CI command cargo test --all](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/.github/workflows/ci.yml#L54-L67) still needs separate qualification. Full-suite and frozen model-visible information/counter evidence could overturn the command default; 22 guard passes establish neither.
+
+## Remaining comparison and completeness
+
+The [five-job map](../../evidence/artifacts/token-context-20261003/unit43-five-job-gap-map.json) is a snapshot of committed head 081937b0; it does not silently acquire later outcomes. Original stopped programmes remain final. The [exact Opus route source receipt](../../evidence/artifacts/token-context-20261003/unit41-opus-route-source.json) supports process endpoint carriage and model-name input while retaining HOLD for an exact keyless Opus 5.5 route. It cannot freeze the new four-arm comparison.
+
+The completeness critic identifies the next missing modalities: actual candidate consumption by both roles, natural automatic compaction and supported exact-ID continuity with unchanged recall/quality, full command-output fidelity and full-suite qualification, and fresh owner-bound retrieval tasks. The next landscape sweep must address these job-specific gaps. Preregistered events must be measured; observations outside their scope remain unknown. Image, PDF and audio workloads remain outside this text-task evidence. No generic approval or whole-host census gate is added.

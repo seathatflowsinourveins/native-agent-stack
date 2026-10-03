@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "unit_id": "fresh-and-trusted-native-hook-metadata",
+  "publication_status": "ROOT_VERIFIED_SCOPED_PUBLICATION",
+  "north_star_action": "Reliable measured context for cumulative engineering and US-equities R&D.",
+  "status": "CLOSED_SCOPED_DISCOVERY_AND_TRUSTED_METADATA; MODEL_PROFILE_P2_HOLD",
+  "evidence_level": "Supported native metadata operations + declared command-hook integration + independent observation; no unchanged upstream test claim",
+  "source": {
+    "repository": "openai/codex",
+    "pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "client_version": "0.160.0",
+    "protocol_path": "codex-rs/app-server-protocol/src/protocol/common.rs",
+    "protocol_lines": "879–883",
+    "state_merge_path": "codex-rs/hooks/src/config_rules.rs",
+    "state_merge_lines": "8–66",
+    "candidate_repository": "mksglu/context-mode",
+    "candidate_pin": "589d8214d56740a28b5f7bf63167743d586b0b40",
+    "protocol_url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/app-server-protocol/src/protocol/common.rs#L879-L883",
+    "protocol_lines_1_based_inclusive": [
+      879,
+      883
+    ],
+    "state_merge_url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/config_rules.rs#L8-L66",
+    "state_merge_lines_1_based_inclusive": [
+      8,
+      66
+    ],
+    "discovery_url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/hooks/src/engine/discovery.rs#L794-L821",
+    "discovery_lines_1_based_inclusive": [
+      [
+        794,
+        811
+      ],
+      [
+        813,
+        815
+      ],
+      [
+        817,
+        821
+      ]
+    ]
+  },
+  "accepted_operation_methods": [
+    "initialize",
+    "initialized",
+    "hooks/list"
+  ],
+  "discovery": {
+    "selected_hooks": 6,
+    "enabled": 6,
+    "trust_status": "untrusted",
+    "native_exit": 0,
+    "native_argv_count": 37,
+    "frozen_bindings": 14,
+    "all_unchanged": true,
+    "stdout_bytes": 19714,
+    "stderr_bytes": 0,
+    "reply_observation_ms": [
+      1176,
+      1178
+    ],
+    "total_observed_ms": 3981
+  },
+  "trusted_delivery": {
+    "selected_exact_same_pairs": 6,
+    "enabled": 6,
+    "trust_status": "trusted",
+    "only_definition_difference": "trustStatus",
+    "native_exit": 0,
+    "native_argv_count": 37,
+    "frozen_bindings": 18,
+    "old14_unchanged": true,
+    "all_unchanged": true,
+    "stdout_bytes": 19685,
+    "stderr_bytes": 0,
+    "reply_observation_ms": [
+      1175,
+      1177
+    ],
+    "total_observed_ms": 3974
+  },
+  "counter_scope": "Usage UNKNOWN; metadata is not a provider trial or saving measurement",
+  "retained_corrections": [
+    "Relocated custody lengths/hashes corrected only in separate expectations; original DATA preserved.",
+    "Fresh bookkeeping namespace preflight assertions and source corrections retained; no native outcome regrade.",
+    "Empty SessionFlags state does not erase User hook trust under the pinned per-key merge; historical override-removal claim corrected."
+  ],
+  "independent_reconciliation": {
+    "discovery_receipt_sha256": "c45032f39507bcddb2fdafdafbf82d1175a77fd07870b9b13db95c3ba6439714",
+    "discovery_manifest_sha256": "198b4088304bc288d22bc4ac1d9b38098ed27e5a696ecdd96ab0ec5882eb732a",
+    "trusted_receipt_sha256": "387c544b44db21560d4f55e3e8f9c99a84d5e7393ad8b256528ed501955f0956",
+    "trusted_manifest_sha256": "4078d45839c47ff84b0a1e4f79ba03ff945558041993506e669b91a7b7e514c2"
+  },
+  "limits": [
+    "Exact native key/currentHash values remain private; no fabrication/derivation or global trust claim",
+    "Trusted metadata does not prove live hook/MCP/server/profile/main-max-child execution",
+    "Natural compaction, exact-ID continuity, unchanged quality and protection remain unmeasured",
+    "No comparison freeze, default, complete cost or approval claim; old STOPs preserved"
+  ]
+}
