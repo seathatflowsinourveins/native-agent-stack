@@ -4048,8 +4048,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
-      "bytes": 467
+      "sha256": "5b26e1858d40e23de54d5d346dae2a5cea5a20e17f413ad09159fcb4a61bde97",
+      "bytes": 735
     },
     {
       "path": ".github/CODEOWNERS",
@@ -15909,8 +15909,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md",
-      "sha256": "4135783851cc0c8cdfc26ade8cf73e8b95935898e75a8343d315822ba67c61cf",
-      "bytes": 14002
+      "sha256": "8dc65f98e6e84f3b94621259b22914a63f4bce1a6e127c17f198f2c07870c96f",
+      "bytes": 14266
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
@@ -15923,9 +15923,14 @@
       "bytes": 11606
     },
     {
+      "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
+      "sha256": "ea1a9bf3e788caed923977d98050e735836b555a1fe9c8ef7e06e1a926391926",
+      "bytes": 12358
+    },
+    {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
-      "sha256": "840ee2a8730defade8be31e3fed41b2411207af0c8e5b0313d3d5b07860dc901",
-      "bytes": 8312
+      "sha256": "8aecf90eec8f7ab52087f4aec141b2a56e5caf90c482aa88eea020850823b805",
+      "bytes": 8576
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-clean-install-selection.md",
@@ -15978,9 +15983,19 @@
       "bytes": 39404
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
+      "sha256": "2c73507dea5faf517e4068b7a6efad57483250e0eb51f3dcba781d4fd922dfe9",
+      "bytes": 16044
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
+    },
+    {
+      "path": "docs/decisions/2026-10-03-retire-pr508-token-stack-winner.md",
+      "sha256": "59f58e14e624f1783b5182ae0ea0bd3caa92298b4b5b6ebab556eae26d76c70d",
+      "bytes": 21398
     },
     {
       "path": "docs/direct-results.md",
@@ -16114,8 +16129,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "d287f7a805406b916eea9408ecb50851cbf8b7deb92a8a3c7c0a584d2bd4b2a3",
-      "bytes": 143284
+      "sha256": "5e87cc6552a77bc0a32df9c9abd03d354463b9308468ce1246e03c4355148723",
+      "bytes": 143786
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16199,8 +16214,8 @@
     },
     {
       "path": "docs/native-memory-rag-lifecycle.md",
-      "sha256": "0585dc639571da9a46dec287029cd52d148561fdd1264f341e999c8ef8496425",
-      "bytes": 14822
+      "sha256": "f344de2a27114e9d36bc18036fe7cec4829c771d7b79230e6a603b96538c0b2c",
+      "bytes": 18641
     },
     {
       "path": "docs/native-returned-results.md",
@@ -16364,8 +16379,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "caf81fa3aa0fa3e662e1807869331dc024ca787233a4844a0eca3e92e4ea46d6",
-      "bytes": 90785
+      "sha256": "173fe5e0cf2121eb7d3ad76bf397843e24f52a2fd388a17a133e2691d61fc3d5",
+      "bytes": 90784
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -32091,6 +32106,91 @@
       "path": "evidence/artifacts/landscape-sweep-20260926-attempts/wf_a874897e-af1.json",
       "sha256": "df6dfb2796a1860d5c3b51921eb9bf51f4a7a217b5dd6de48bb29d26d77c01a2",
       "bytes": 6571
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
+      "sha256": "40880aa6aaf5ea3697d76168d8360e329d6eab2114dbdb1f8024f24346a4eb3b",
+      "bytes": 19947
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
+      "sha256": "02f6c023675a76952fa4f26df7ddd1ea660553c3629149ef1b1e7c5042e31c77",
+      "bytes": 371162
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_8066ceb5-b9a.json",
+      "sha256": "08d919b086fbcc2394b3e8a57e54c8da168a528afb31625bbd17fa933236526f",
+      "bytes": 45181
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-client-check-20261003.txt",
+      "sha256": "736029c51aaf60bab6ea6effbf38f845bbabf78a914136fcc07899a1b25711ef",
+      "bytes": 6252
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/codex-upstream-check-20261003.json",
+      "sha256": "a70fececaa1d61b1d832be50fea8c7f79ea32f4b189dbbf655bb84546302a675",
+      "bytes": 3007
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/jobs.json",
+      "sha256": "652b5e1c777c1c8f1c10a9f5f88f97ea895b2bf4da1b7599d80fb29215fa39b0",
+      "bytes": 105780
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/code-navigation.json",
+      "sha256": "7308d5bc23dcf64b1b9e8c82af5b7d94d24243f65703af8fe2bc34ba7053f651",
+      "bytes": 20991
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/document-retrieval.json",
+      "sha256": "a2b9fe413be5321b0b0f552188e85f6301da3bb12e16452747564e83b22cd577",
+      "bytes": 18377
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/durable-memory.json",
+      "sha256": "6de4a467b1c234d7da0c6e29e1cf3722b2d153809b909b283ed94b10061bd382",
+      "bytes": 19887
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/instructions-skills.json",
+      "sha256": "e758581703af97a0baf7192c37bcc4e6f9e1d98b5971b9d9062171f1e5e16a7d",
+      "bytes": 20990
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/isolation.json",
+      "sha256": "73e9891c79c249e5742a6124949b1e0cbbe6364d5573b0b59e0b09f1afa56a3d",
+      "bytes": 17756
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/native-clients.json",
+      "sha256": "dbe53950782e3fabbd3546cbbd79ae6a23547f4348e8c3618ad92dc774a7f02f",
+      "bytes": 17879
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/semantic-rag.json",
+      "sha256": "2b2ef9927b9153ca2fba7acd8f671a9d23a7825ecfe0af1ea7f4c4e752d35e72",
+      "bytes": 19485
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/web-research.json",
+      "sha256": "f5d1305663ee50348ed12c57b379720c9dc6a8a9eba34eac12b1848a776a7ba8",
+      "bytes": 21107
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/workers.json",
+      "sha256": "9dd8324b62e7ca337ebb7abf33d2fce742287c491e94a5834677c34d6253cd44",
+      "bytes": 21465
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/provenance.json",
+      "sha256": "2eece801e62af156d518abc8ee9ceb8051101168419ee3334bf1797c17435bf8",
+      "bytes": 15903
+    },
+    {
+      "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/tabulation.json",
+      "sha256": "69484156d2ba6736ba7dd5dfe0f4eca89b83b41899c2379a0a8467db92797f5d",
+      "bytes": 175366
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926/README.md",
@@ -49774,8 +49874,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a72c591c08b3efe59ed339ace3e141c90f57cb81ed41349e5c826d89f87f616d",
-      "bytes": 20092
+      "sha256": "af4e5bc44d826ceece379c51269de39c6f8b00460bbfa6a1350c0b10987b797c",
+      "bytes": 24324
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -49791,6 +49891,11 @@
       "path": "observability/memory-scheduled-20260928.json",
       "sha256": "1d204e72c5bc6300305fb539e50698f3ae5ea62551f6e01d6bb1cf853729a2c8",
       "bytes": 9430
+    },
+    {
+      "path": "observability/memory-scheduled-20260930.json",
+      "sha256": "7a52c79bf573ab1d72b2f04b58fd9e0288fbfceb6df3b3e09709b7a9d0df65a9",
+      "bytes": 10937
     },
     {
       "path": "observability/memory-scheduled-results-20260923.json",
