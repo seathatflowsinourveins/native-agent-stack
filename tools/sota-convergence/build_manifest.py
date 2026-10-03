@@ -474,6 +474,9 @@ def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, r
 # other than classify_pin's: its source record did not resolve, or it is watch-only.
 RUNTIME_SOURCE_UNRESOLVED = "source_unresolved"
 RUNTIME_WATCH_ONLY = "watch_only"
+# The fixed top-level "gate_error" of a runtime-freshness.json whose rows main()
+# withheld because they tripped assert_no_leak. Never the matched text.
+RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
 
 
 def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
@@ -481,8 +484,8 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
                             threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
     """One row per ``runtime-pins.json`` entry: the GPT runtime workers, SDKs and
     agents extract_layers.py resolves from runtime records (``RUNTIME_PIN_SOURCES``)
-    plus the watch-only upstreams named on main with no pin record there
-    (``RUNTIME_WATCH_SOURCES``).
+    plus the watch-only upstreams named on main that no install or runtime record
+    there pins (``RUNTIME_WATCH_SOURCES``).
 
     A resolved pin uses the same ``compute_upstream``/``classify_pin``/
     ``pin_comparison_fields`` as the manifest rows. A row whose source did not
@@ -2005,10 +2008,30 @@ def main(argv=None) -> int:
         runtime_text = json.dumps(sanitize_value(runtime_freshness, work_dir=work_dir_for_sanitize,
                                                  checkout_roots=checkout_roots), indent=1)
         json.loads(runtime_text)
-        assert_no_leak(runtime_text)
+        runtime_summary = runtime_freshness["counts"]
+        try:
+            assert_no_leak(runtime_text)
+            leak_gate_tripped = False
+        except LeakDetected:
+            # A runtime upstream's own data (a third-party release tag, say) tripped
+            # the gate. Only this report-only sidecar is withheld, so a runtime-only
+            # upstream cannot take down the foundation and trading report: the
+            # manifest and the trading sidecar are already written, and their own
+            # leak checks above stay fatal.
+            leak_gate_tripped = True
+        if leak_gate_tripped:
+            # Same schema and keys, no entries, every count 0, and a fixed-string
+            # gate_error: never the matched text or the exception message.
+            withheld = build_runtime_freshness(None, {}, args.checked_at, os_package_ids=tuple(args.os_package_ids))
+            withheld["gate_error"] = RUNTIME_LEAK_GATE_ERROR
+            runtime_text = json.dumps(sanitize_value(withheld, work_dir=work_dir_for_sanitize,
+                                                     checkout_roots=checkout_roots), indent=1)
+            json.loads(runtime_text)
+            assert_no_leak(runtime_text)
+            runtime_summary = {"gate_error": RUNTIME_LEAK_GATE_ERROR}
         args.runtime_freshness_out.parent.mkdir(parents=True, exist_ok=True)
         args.runtime_freshness_out.write_text(runtime_text + "\n", encoding="utf-8")
-        print(json.dumps({"runtime_freshness": runtime_freshness["counts"]}))
+        print(json.dumps({"runtime_freshness": runtime_summary}))
     return 0
 
 

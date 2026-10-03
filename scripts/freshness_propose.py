@@ -69,6 +69,14 @@ RUNTIME_TABLE_SEPARATOR = "| --- | --- | --- | --- | --- | --- | --- | --- | ---
 # The id lists build_drift_report() always returns for the runtime table.
 RUNTIME_SUMMARY_KEYS = ("runtime", "runtime_behind", "runtime_dormant", "runtime_archived",
                         "runtime_unfetched", "runtime_unresolved")
+# build_manifest.py's RUNTIME_LEAK_GATE_ERROR (kept independent here, like
+# _github_repo_slug below): the fixed "gate_error" of a runtime-freshness.json whose
+# rows were withheld because they tripped its leak gate.
+RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
+RUNTIME_WITHHELD_LINE = (
+    "The runtime table was withheld because the leak gate tripped on a runtime upstream this run "
+    "(`runtime-freshness.json` has `gate_error` and no rows)."
+)
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
@@ -359,7 +367,9 @@ def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None)
     ``error``/``partial_errors`` freshness record) has every upstream-derived cell
     blanked, ``dormant`` shown as unknown, and is listed as unfetched, never as
     behind, dormant or archived. A row whose pin source did not resolve is listed
-    as unresolved whatever its fetch state; its pin cell is ``—``."""
+    as unresolved whatever its fetch state; its pin cell is ``—``. Without a
+    repository such a row had nothing to fetch, so it is not also listed as
+    unfetched."""
     rows = []
     flagged = {key: [] for key in RUNTIME_SUMMARY_KEYS[1:]}
     for entry in sorted(document.get("entries", []), key=lambda item: str(item.get("id"))):
@@ -375,7 +385,10 @@ def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None)
         else:
             behind = _yes_no(entry.get("pin_behind_upstream"))
         if unreliable:
-            flagged["runtime_unfetched"].append(entry.get("id"))
+            # An unresolved row with no repository is reported by the unresolved
+            # line alone; one that kept a declared repository was still not fetched.
+            if not (entry.get("error") and not entry.get("repository")):
+                flagged["runtime_unfetched"].append(entry.get("id"))
             cells = (None, "unknown", None, None, None, "unknown", "unknown")
         else:
             if entry.get("pin_behind_upstream") is True:
@@ -396,7 +409,16 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
     against upstream. Returns ``(markdown, summary)``, the summary keyed by
     ``RUNTIME_SUMMARY_KEYS``. Like the trading section it is informational: it has
     its own header (never ``DRIFT_TABLE_HEADER``), so ``drifted_component_ids``
-    never reads it, and it never sets ``drift-status.txt``."""
+    never reads it, and it never sets ``drift-status.txt``.
+
+    When build_manifest.py withheld the rows because a runtime upstream tripped its
+    leak gate (the document has ``gate_error``), the section is the heading and
+    ``RUNTIME_WITHHELD_LINE``, with no table, and the summary lists only
+    ``RUNTIME_LEAK_GATE_ERROR`` under ``runtime_unresolved``."""
+    if document.get("gate_error"):
+        summary = {key: [] for key in RUNTIME_SUMMARY_KEYS}
+        summary["runtime_unresolved"] = [RUNTIME_LEAK_GATE_ERROR]
+        return "\n".join([RUNTIME_TABLE_HEADING, "", RUNTIME_WITHHELD_LINE]) + "\n", summary
     rows, flagged = runtime_freshness_rows(document, raw_repositories)
     threshold = document.get("dormancy_threshold_days")
     errors = {entry.get("id"): entry.get("error") for entry in document.get("entries", []) if entry.get("error")}
@@ -405,10 +427,12 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         "Report-only. This table lists the GPT runtime workers, SDKs and agents that "
         "`tools/sota-convergence/extract_layers.py` tracks. `RUNTIME_PIN_SOURCES` reads each pin from its "
         "runtime record: the new-WSL install plan's rows by slot, the runtime-worker recipe pin record and "
-        "the native SDK constraints. `RUNTIME_WATCH_SOURCES` adds watch-only upstreams with no pin record on "
-        "main, such as pi; their pins are not compared. The same upstreams' `manifests/stack.json` and "
-        "trading card pins stay in the tables above. Rows here select nothing, are never drift and never "
-        "change `drift-status.txt`. A dormant upstream has no GitHub release and no default-branch commit "
+        "the native SDK constraints. `RUNTIME_WATCH_SOURCES` adds watch-only upstreams, such as pi, that no "
+        "install or runtime record on main pins (a catalog card may record an evaluated version); they are "
+        "not compared. The same upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`) "
+        "trading card pins stay in the tables above; an `alternative` card's pin is compared in no table. "
+        "Rows here select nothing, are never drift and never change `drift-status.txt`. A dormant upstream "
+        "has no GitHub release and no default-branch commit "
         f"in the last {threshold} days as of `{document.get('checked_at')}`.", "",
     ]
     if rows:
@@ -478,9 +502,10 @@ def build_drift_report(work_dir: Path) -> dict:
     ``drift.md`` gains the report-only trading table (``render_trading_markdown``),
     and the result gains ``trading``/``dormant``/``archived``/``trading_unfetched``
     id lists. When it also holds ``runtime-freshness.json``, the report-only GPT
-    runtime table follows (``render_runtime_markdown``). The result always carries
-    the six ``RUNTIME_SUMMARY_KEYS`` id lists, empty when that file is absent.
-    Neither table changes ``drift-status.txt``.
+    runtime table follows (``render_runtime_markdown``), or one line saying it was
+    withheld when that file carries build_manifest.py's leak-gate ``gate_error``.
+    The result always carries the six ``RUNTIME_SUMMARY_KEYS`` id lists, empty when
+    that file is absent. Neither table changes ``drift-status.txt``.
 
     Called both by ``catalog-freshness.yml``'s "Diff the rebuilt manifest"
     step (imported directly from a small inline script, not reimplemented

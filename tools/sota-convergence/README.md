@@ -33,7 +33,8 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `blueprints/runtime-workers/openhands/pins.json`, and the native SDK
    constraints in `adoption/sdk/accepted-constraints.txt`.
    `RUNTIME_WATCH_SOURCES` adds watch-only upstreams that a file on main names
-   but no record on main pins, such as pi. A malformed declaration raises. A
+   but no install or runtime record on main pins, such as pi (a catalog card
+   may record an evaluated version). A malformed declaration raises. A
    record that moved or changed shape does not, so the daily report keeps its
    other tables: that entry is written with `"pin": null` and an `"error"`
    naming only the declared path, its pointer, slot or requirement and a short
@@ -126,9 +127,18 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `<work-dir>/runtime-pins.json`; without that file the sidecar has no rows).
    A resolved pin uses the manifest's pin-vs-upstream rule. A watch-only row,
    or a row whose source did not resolve, is `not_compared` with reason
-   `watch_only` or `source_unresolved` and still carries its upstream and
-   dormancy. The manifest and `trading-freshness.json` are byte-identical with
-   or without this flag.
+   `watch_only` or `source_unresolved`. A watch-only row carries its upstream
+   and dormancy; an unresolved row does only when it has a repository, and one
+   without has an empty `upstream` and the `not_fetched` dormancy. The same
+   upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`)
+   trading card pins stay in the manifest and `trading-freshness.json` (the
+   drift and trading tables of `drift.md`); an `alternative` card's pin is
+   compared in no table. The manifest and `trading-freshness.json` are
+   byte-identical with or without this flag. If the runtime rows trip the leak
+   gate (a third-party tag, say), only this sidecar is withheld: it keeps its
+   schema and keys with no entries, every count 0 and
+   `"gate_error": "leak_gate_tripped"`, the step still exits 0, and `drift.md`
+   says the runtime table was withheld.
 
    ```sh
    python3 tools/sota-convergence/build_manifest.py \

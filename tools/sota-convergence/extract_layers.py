@@ -436,11 +436,12 @@ RUNTIME_PIN_SOURCES = (
     },
 )
 
-# Watch-only upstreams: named in a file on main ("named_in") but with no pin
-# record on main, so their rows report upstream activity and are never compared.
+# Watch-only upstreams: named in a file on main ("named_in"), but no install or
+# runtime record on main pins them (a catalog card may record an evaluated
+# version), so their rows report upstream activity and are never compared.
 # pi's trial pin lives on unmerged PR #524; the crawl4ai, DeepAgents and
 # codex-action pins live on unmerged PRs #428, #566 and #550. Promote an entry to
-# RUNTIME_PIN_SOURCES when its pin record lands on main.
+# RUNTIME_PIN_SOURCES when an install or runtime record on main pins it.
 RUNTIME_WATCH_SOURCES = (
     {
         # pi, a coding harness and multi-provider agent toolkit.
@@ -457,7 +458,9 @@ RUNTIME_WATCH_SOURCES = (
         "named_in": "catalogs/landscape/upstream-snapshot.json",
     },
     {
-        # The OpenAI Agents SDK for Python.
+        # The OpenAI Agents SDK for Python. Its alternative trading card
+        # (openai-agents-sdk) records v0.22.3, which no table compares: only
+        # default and conditional cards get a row.
         "id": "watch:openai-agents-python",
         "group": "agent-sdk",
         "repository": "https://github.com/openai/openai-agents-python",

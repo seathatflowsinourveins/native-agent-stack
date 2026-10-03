@@ -4,14 +4,17 @@ Covers each stage the GPT runtime workers, SDKs and agents pass through:
 - extract: tools/sota-convergence/extract_layers.py resolves RUNTIME_PIN_SOURCES
   (the pins that the new-WSL install plan, the runtime-worker recipe pin record and
   the native SDK constraints carry) and lists RUNTIME_WATCH_SOURCES (watch-only
-  upstreams with no pin record on main, such as pi) into runtime-pins.json. A
-  record that moved does not raise; its entry carries an error instead.
+  upstreams that no install or runtime record on main pins, such as pi) into
+  runtime-pins.json. A record that moved does not raise; its entry carries an
+  error instead.
 - fetch: github_freshness.py reads repository URLs from runtime-pins.json too.
 - build: build_manifest.py's build_runtime_freshness (fixed dates, no wall clock)
   and its --runtime-freshness-out flag, which leaves the manifest and the trading
-  sidecar byte-identical.
-- report: scripts/freshness_propose.py renders the runtime table into drift.md
-  without touching drift-status.txt or the drift-table ids the propose job reads.
+  sidecar byte-identical and, when a runtime upstream trips the leak gate,
+  withholds only the runtime rows.
+- report: scripts/freshness_propose.py renders the runtime table (or the line
+  saying it was withheld) into drift.md without touching drift-status.txt or the
+  drift-table ids the propose job reads.
 
 No network. The extraction tests read the checked-in repository; every other
 test uses synthetic fixtures.
@@ -20,6 +23,7 @@ from __future__ import annotations
 
 import ast
 import importlib.util
+import inspect
 import json
 import os
 import re
@@ -28,6 +32,7 @@ import unittest
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
+from unittest import mock
 
 from scripts import freshness_propose as fp
 
@@ -122,6 +127,10 @@ class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
         self.assertEqual(declared, set(NEW_WSL_SLOTS))
         for entry_id, slot in NEW_WSL_SLOTS.items():
             with self.subTest(entry=entry_id):
+                entry = self.entries[entry_id]
+                # The codex and codex-sdk-and-codex-exec-app-server rows carry the same
+                # repository and release, so only the declared slot shows a swap.
+                self.assertEqual(entry["pin_source"]["row"]["value"], slot)
                 rows = [row for row in plan["owners"] if row.get("slot") == slot]
                 self.assertEqual(len(rows), 1)
                 repository, release = rows[0]["repository"], rows[0]["release"]
@@ -131,8 +140,9 @@ class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
                     releases = [part.strip() for part in release.split(";")]
                     self.assertEqual((len(repositories), len(releases)), (2, 2))
                     self.assertEqual(github_freshness.github_slug(repositories[position]), slug)
+                    self.assertEqual(github_freshness.github_slug(entry["pin_source"]["row"]["part_repository"]),
+                                     github_freshness.github_slug(repositories[position]))
                     repository, release = repositories[position], releases[position]
-                entry = self.entries[entry_id]
                 self.assertEqual((entry["repository"], entry["pin"]), (repository, release))
 
     def test_recipe_pin_matches_the_openhands_pin_record(self):
@@ -174,6 +184,36 @@ class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
         urls = github_freshness.collect_repository_urls(self.out)
         for entry in self.entries.values():
             self.assertIn(entry["repository"], urls, entry["id"])
+
+
+class MainReservesReportIdsTests(unittest.TestCase):
+    """extract_layers.main() passes every foundation, trading card and trading pin id
+    to resolve_runtime_pins as reserved_ids (a spy records them and calls through)."""
+
+    def test_main_reserves_a_trading_pin_a_trading_card_and_a_foundation_component(self):
+        resolve = extract_layers.resolve_runtime_pins
+        recorded = []
+
+        def spy(*args, **kwargs):
+            arguments = inspect.signature(resolve).bind(*args, **kwargs).arguments
+            recorded.append(set(arguments.get("reserved_ids", ())))
+            return resolve(*args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(extract_layers, "resolve_runtime_pins", spy):
+            out = Path(tmp)
+            with redirect_stdout(StringIO()):
+                self.assertEqual(extract_layers.main(["--repo-root", str(ROOT), "--out", str(out)]), 0)
+            written = {name: json.loads((out / name).read_text(encoding="utf-8")) for name in (
+                "foundation-layers.json", "trading-catalog.json", "trading-pins.json", "runtime-pins.json")}
+        self.assertEqual(len(recorded), 1)
+        self.assertLessEqual({"hftbacktest", "nautilustrader", "codex"}, recorded[0])
+        # Each id is the kind of report id it stands for here.
+        self.assertIn("hftbacktest", {entry["id"] for entry in written["trading-pins.json"]["entries"]})
+        self.assertIn("nautilustrader", {entry.get("id") for entry in written["trading-catalog.json"]["entries"]})
+        self.assertIn("codex", {component["id"] for layer in written["foundation-layers.json"]["layers"]
+                                for component in layer["components"]})
+        # The spy called through: the runtime pins were still resolved and written.
+        self.assertEqual(len(written["runtime-pins.json"]["entries"]), 19)
 
 
 class InstallPlanRevisionTests(unittest.TestCase):
@@ -235,7 +275,7 @@ class ResolveRuntimePinsTests(unittest.TestCase):
             "tag": "v3.0.0", "repository": "https://github.com/example/worker", "joined": "v1 ; v2",
         }))
         self._write(self.CONSTRAINTS, "# resolver constraints\n\nopenai_codex==1.2.3\nopenai == 3.0.0  # pinned\n"
-                                      "openai-codex-cli-bin==1.2.3\ndup==1.0\nDup==2.0\n")
+                                      "openai-codex-cli-bin==9.9.9\ndup==1.0\nDup==2.0\n")
 
     def _write(self, relative, text):
         path = self.root / relative
@@ -305,6 +345,7 @@ class ResolveRuntimePinsTests(unittest.TestCase):
         self.assertIn("0 parts match part_repository", entry["error"])
 
     def test_requirement_matches_one_pep503_normalized_line(self):
+        # 1.2.3 is only on the openai_codex line (openai-codex-cli-bin is 9.9.9), so it matched.
         entry = self._one(self._requirement("openai-codex"))
         self.assertEqual((entry["repository"], entry["pin"], entry["error"]),
                          ("https://github.com/example/sdk", "1.2.3", None))
@@ -676,9 +717,29 @@ class RuntimeReportTests(unittest.TestCase):
         self._write_runtime()
         result = fp.build_drift_report(self.work)
         self.assertEqual(result["runtime_behind"], [])
-        self.assertEqual(result["runtime_unfetched"], ["new-wsl:behind", "new-wsl:moved"])
+        # new-wsl:moved has no repository to fetch; only the unresolved line reports it.
+        self.assertEqual(result["runtime_unfetched"], ["new-wsl:behind"])
+        self.assertEqual(result["runtime_unresolved"], ["new-wsl:moved"])
         self.assertEqual(self._cells("new-wsl:behind").count(fp.md_cell("unknown")), 3)
-        self.assertIn("2 runtime row(s) with no reliable upstream data this run:", self._text())
+        self.assertIn("1 runtime row(s) with no reliable upstream data this run:\n\n" + fp.md_cell("new-wsl:behind"),
+                      self._text())
+
+    def test_an_unresolved_row_is_unfetched_only_when_it_kept_a_repository(self):
+        pins = _runtime_pins()
+        # A requirement source keeps its declared literal repository when its line moves;
+        # github-freshness.json has no record for it, so it has no reliable upstream data.
+        pins["entries"].append({
+            "id": "sdk-lock:moved", "group": "model-sdk", "kind": "pin_source",
+            "repository": "https://github.com/example/sdk", "pin": None,
+            "pin_source": {"path": "sdk/constraints.txt", "requirement": "openai"}, "named_in": None,
+            "error": "sdk/constraints.txt requirement openai: requirement not found",
+        })
+        self._write_runtime(pins)
+        result = fp.build_drift_report(self.work)
+        self.assertEqual(result["runtime_unresolved"], ["new-wsl:moved", "sdk-lock:moved"])
+        self.assertEqual(result["runtime_unfetched"], ["sdk-lock:moved"])
+        self.assertIn("1 runtime row(s) with no reliable upstream data this run:\n\n" + fp.md_cell("sdk-lock:moved"),
+                      self._text())
 
     def test_an_empty_sidecar_still_renders_the_section(self):
         self._write_runtime({"entries": []})
@@ -697,6 +758,153 @@ class RuntimeReportTests(unittest.TestCase):
         (self.work / fp.RUNTIME_FRESHNESS_FILE).write_text("{", encoding="utf-8")
         with self.assertRaises(fp.FreshnessProposeError):
             fp.build_drift_report(self.work)
+
+
+LEAKY_REPOSITORY = "https://github.com/example/leaky"
+# A third-party release tag that build_manifest.assert_no_leak refuses ("APCA" is a LEAK_MARKERS entry).
+LEAKY_TAG = "v1.0.0-APCA"
+
+
+class RuntimeLeakGateTests(unittest.TestCase):
+    """A runtime-only upstream whose own data trips build_manifest's leak gate.
+
+    The daily path runs in one work dir, as in the workflow: build_manifest.main writes
+    the manifest and both sidecars, then build_drift_report reads them against a
+    published manifest in the checkout (the current working directory)."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        base = Path(self._tmp.name)
+        self.work = base / "work"
+        self.work.mkdir()
+        self.published_dir = base / "catalogs" / "sota-convergence"
+        self.published_dir.mkdir(parents=True)
+        original = Path.cwd()
+        os.chdir(base)
+        self.addCleanup(os.chdir, original)
+        self.runtime_pins = _runtime_pins()
+        self.runtime_pins["entries"].append({
+            "id": "new-wsl:leaky", "group": "runtime-worker", "kind": "pin_source", "repository": LEAKY_REPOSITORY,
+            "pin": "v0.9.0", "pin_source": self.runtime_pins["entries"][0]["pin_source"], "named_in": None,
+            "error": None,
+        })
+        self.repositories = _repositories()
+        self.repositories[LEAKY_REPOSITORY] = {
+            "slug": "example/leaky", "pushed_at": "2026-09-30T00:00:00Z", "archived": False,
+            "latest_release": {"tag": LEAKY_TAG, "published_at": "2026-09-30T00:00:00Z"},
+            "head": {"date": "2026-09-30T00:00:00Z"},
+        }
+        card = {"id": "engine", "repository": "https://github.com/example/current", "decision": "default",
+                "version_or_commit": "1.0.0"}
+        files = {
+            "foundation-layers.json": {"checked_at": CHECKED_AT, "layers": [], "top_gaps": []},
+            "trading-by-layer.json": {"taxonomy": {"backtesting-engine": ["backtesting"]},
+                                      "layers": {"backtesting-engine": [card]}},
+            "runtime-pins.json": self.runtime_pins,
+            "lanes.json": {"lanes": [], "critic": None, "lost": []},
+            "reconciliations.json": {"reconciliations": []},
+        }
+        for name, doc in files.items():
+            (self.work / name).write_text(json.dumps(doc), encoding="utf-8")
+        self._write_freshness()
+
+    def _write_freshness(self):
+        (self.work / "github-freshness.json").write_text(json.dumps(
+            {"errors": 0, "partial_errors": 0, "repositories": self.repositories}), encoding="utf-8")
+
+    def _argv(self, *extra):
+        return ["--work-dir", str(self.work), "--lanes", str(self.work / "lanes.json"),
+                "--reconciliations", str(self.work / "reconciliations.json"),
+                "--out", str(self.work / "manifest-20261002.json"),
+                "--trading-freshness-out", str(self.work / "trading-freshness.json"),
+                "--checked-at", CHECKED_AT, "--id", "catalog-freshness-20261002", *extra]
+
+    def _build(self, *extra):
+        with redirect_stdout(StringIO()) as stdout:
+            self.assertEqual(build_manifest.main(self._argv(*extra)), 0)
+        return stdout.getvalue()
+
+    def _written(self):
+        return tuple((self.work / name).read_bytes() for name in ("manifest-20261002.json", "trading-freshness.json"))
+
+    def _text(self):
+        return (self.work / "drift.md").read_text(encoding="utf-8")
+
+    def _status(self):
+        return (self.work / "drift-status.txt").read_text(encoding="utf-8")
+
+    def test_the_fixture_trips_the_gate_in_the_runtime_rows(self):
+        runtime = build_manifest.build_runtime_freshness(self.runtime_pins, self.repositories, CHECKED_AT)
+        with self.assertRaises(build_manifest.LeakDetected):
+            build_manifest.assert_no_leak(json.dumps(runtime, indent=1))
+
+    def test_a_tripped_gate_withholds_only_the_runtime_sidecar(self):
+        self._build()
+        without = self._written()
+        output = self._build("--runtime-freshness-out", str(self.work / fp.RUNTIME_FRESHNESS_FILE))
+        # The build exited 0 (see _build); the manifest and the trading sidecar exist, unchanged.
+        self.assertEqual(self._written(), without)
+        self.assertEqual(output.splitlines()[-1], '{"runtime_freshness": {"gate_error": "leak_gate_tripped"}}')
+        text = (self.work / fp.RUNTIME_FRESHNESS_FILE).read_text(encoding="utf-8")
+        self.assertNotIn("APCA", text)
+        sidecar = json.loads(text)
+        self.assertEqual((sidecar["gate_error"], sidecar["entries"], set(sidecar["counts"].values())),
+                         ("leak_gate_tripped", [], {0}))
+        # The same schema and keys as an empty runtime document, plus the fixed gate_error.
+        expected = build_manifest.build_runtime_freshness(None, {}, CHECKED_AT)
+        expected["gate_error"] = build_manifest.RUNTIME_LEAK_GATE_ERROR
+        self.assertEqual(sidecar, expected)
+
+    def _assert_fatal(self):
+        # Only the runtime stage catches LeakDetected; an earlier stage's leak still fails the build.
+        with redirect_stdout(StringIO()), self.assertRaises(build_manifest.LeakDetected):
+            build_manifest.main(self._argv("--runtime-freshness-out", str(self.work / fp.RUNTIME_FRESHNESS_FILE)))
+        self.assertFalse((self.work / fp.RUNTIME_FRESHNESS_FILE).exists())
+
+    def test_a_leak_in_the_manifest_stays_fatal(self):
+        self.repositories["https://github.com/example/current"]["latest_release"]["tag"] = "v2.0.0-APCA"
+        self._write_freshness()
+        self._assert_fatal()
+        self.assertFalse((self.work / "manifest-20261002.json").exists())
+
+    def test_a_leak_in_the_trading_sidecar_stays_fatal(self):
+        (self.work / "trading-pins.json").write_text(json.dumps({"entries": [
+            {"id": "leaky-pin", "layer": "backtesting-engine", "repository": LEAKY_REPOSITORY, "pin": "v0.9.0",
+             "pin_source": None},
+        ]}), encoding="utf-8")
+        self._assert_fatal()
+        self.assertFalse((self.work / "trading-freshness.json").exists())
+
+    def test_the_report_says_the_table_was_withheld_and_keeps_drift_status(self):
+        self._build("--runtime-freshness-out", str(self.work / fp.RUNTIME_FRESHNESS_FILE))
+        sidecar = self.work / fp.RUNTIME_FRESHNESS_FILE
+        withheld = sidecar.read_bytes()
+        rebuilt_text = (self.work / "manifest-20261002.json").read_text(encoding="utf-8")
+        for published_pin, drifted in ((None, []), ("0.0.1", ["engine"])):
+            with self.subTest(published_pin=published_pin):
+                published = json.loads(rebuilt_text)
+                engines = [entry for group in published["trading"] for entry in group["entries"]
+                           if entry["id"] == "engine"]
+                self.assertEqual(len(engines), 1)
+                if published_pin is not None:
+                    engines[0]["pin"] = published_pin
+                (self.published_dir / "manifest-20260929.json").write_text(json.dumps(published), encoding="utf-8")
+                sidecar.unlink()
+                without = fp.build_drift_report(self.work)
+                observed = [(self._status(), fp.drifted_component_ids(self._text()), without["drifted"])]
+                sidecar.write_bytes(withheld)
+                result = fp.build_drift_report(self.work)
+                text = self._text()
+                observed.append((self._status(), fp.drifted_component_ids(text), result["drifted"]))
+                self.assertEqual(observed[0], observed[1])
+                self.assertEqual(observed[1][1], drifted)
+                self.assertIn(fp.RUNTIME_TABLE_HEADING + "\n\n" + fp.RUNTIME_WITHHELD_LINE + "\n", text)
+                self.assertNotIn(fp.RUNTIME_TABLE_HEADER, text)
+                self.assertNotIn("APCA", text)
+                self.assertEqual({key: result[key] for key in fp.RUNTIME_SUMMARY_KEYS},
+                                 {**{key: [] for key in fp.RUNTIME_SUMMARY_KEYS},
+                                  "runtime_unresolved": ["leak_gate_tripped"]})
 
 
 class WorkflowWiresTheRuntimeTableTests(unittest.TestCase):
