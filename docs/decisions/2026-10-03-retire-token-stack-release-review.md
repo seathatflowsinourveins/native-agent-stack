@@ -46,7 +46,7 @@ record holds mcporter, superseding the earlier description of W1 as a 0.14.2 mov
 | SocratiCode 1.16.0 qualification | [#523](https://github.com/seathatflowsinourveins/native-agent-stack/pull/523) merged 2026-09-30. [docs/decisions/2026-09-25-workstation-sota-refresh.md:437][socraticode-qualified] records qualification, with `evidence/receipts/socraticode-1160-qualification-20260929.json` at line 440; the Linux pin stays 1.15.0. This retires the unperformed qualification recommendation, not the separate cutover gate. |
 | Codex version and Mac catch-up target | [#580](https://github.com/seathatflowsinourveins/native-agent-stack/pull/580) merged 2026-10-01 with Codex 0.159.3; [adoption/pins-linux-x86_64.json:53][linux-codex] and [tests/test_adoption_bootstrap_macos.py:264][lag-table] now record Linux 0.159.3 / Mac 0.155.1. [#626](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626), OPEN at `75a2ada1`, proposes 0.160.0. #509's 0.157.1 Mac target and latest-release survey are dated. |
 | mcporter and jcodemunch | [#642](https://github.com/seathatflowsinourveins/native-agent-stack/pull/642), OPEN at `1b9d0927`: [docs/decisions/2026-10-03-currency-wave-w1.md:26][w1-moves] selects jcodemunch 1.108.327, while [the same record:127][w1-mcporter] holds mcporter at 0.14.1 after a 0.14.2 compatibility attempt with dependency and persistent-role gaps. The Mac keeps 0.13.13 (lines 135–136); W1 does not qualify that Mac. |
-| headroom | [docs/decisions/2026-10-01-definitive-sota-wsl-program.md:299][release-table] records 0.37.0 as "a deliberate hold". #642's [W1 record:148][w1-holds] says "Requalification is running separately". [catalogs/foundation/new-wsl-architecture-20261001.json:704][architecture-headroom] is a dated currency snapshot, not evidence of a new 0.39.1 host run. |
+| headroom | [docs/decisions/2026-10-01-definitive-sota-wsl-program.md:299][release-table] records 0.37.0 as "a deliberate hold". Main already qualified 0.39.0 and did not switch: [docs/decisions/2026-09-25-workstation-sota-refresh.md:519][headroom-qualified] reads "0.39.0 qualified, not switched (2026-09-25)", with the receipt [`evidence/receipts/headroom-039-qualification-20260925.json`][headroom-receipt] at line 523. Lines 524–545 keep 0.37.0 as the pin, first because "The omission notice counts the wrong lines." (line 526), and [lines 549–550][headroom-overturn] set the overturn condition: "upstream counts levels over the omitted lines only, or a measured answer-quality comparison on log inputs shows net value for 0.39.0's log routing". [catalogs/foundation/new-wsl-architecture-20261001.json:704][architecture-headroom], checked at 2026-10-01T07:41Z, records "0.39.0 was qualified but not switched, and 0.39.1 changes only the proxy rate limiter"; [evidence/artifacts/layer-closure-assessment-20261001/foundation.json:1421][closure-headroom] adds "so the omission-count hold stands". Neither is evidence of a new 0.39.1 host run. #642's [W1 record:148][w1-holds] says "Requalification is running separately". |
 | RTK | #642's [W1 record:150][w1-holds] also says "Requalification is running separately". The existing Codex hold in [docs/decisions/2026-09-26-token-practice-f1-f9.md:60][rtk-hold] requires native unwrapping or `updatedInput` without `allow`, followed by qualification. |
 | Integration paths in #509's step 4 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json:237][selection-serena] records Serena's install command; lines [267][selection-socraticode], [318][selection-qmd] and [442][selection-rtk] cover SocratiCode, QMD and RTK. These are clean-install recommendations. [docs/token-efficiency-stack.json:2217][qmd-note] retains the standalone QMD registration for an already-wired stack; [the same file:2984][socraticode-note] and line 2989 describe MCP-only and plugin alternatives. None proves the Mac's present registration. Context Mode's dated Codex paths are kept below. |
 | Latest-release survey | The dated assessor table in [docs/decisions/2026-10-01-definitive-sota-wsl-program.md:281][release-table] overtook the September 29 survey; its method is explicitly attributed to the October 1 assessors at lines 283–285. #580, #626 and #642 subsequently cover their named versions. No current upstream-wide survey is claimed here. |
@@ -70,10 +70,10 @@ separately in (b).
 > tools, an internal change this comparison does not characterize. All 24 Serena tools a session here uses exist at v1.7.0.
 
 The recipe's current [Serena row:109][serena-recipe] still records the dev commit's
-identity; this does not settle the channel on existing hosts. "Latest release v1.7.0"
-is #509's September 29 observation, not a new latest-release claim.
+identity; this does not settle the channel on existing hosts. "[L]atest release v1.7.0"
+(#509 line 31) is #509's September 29 observation, not a new latest-release claim.
 
-**(b) headroom, target 0.39.1, never 0.39.0.** #509, lines 101–104:
+**(b) headroom, target 0.39.1, never 0.39.0.** #509, lines 102–103:
 
 > Its proxy token-rate limiter could refuse
 > large-context requests indefinitely, fixed in 0.39.1. The target is 0.39.1, never 0.39.0. Linux qualifies first.
@@ -85,8 +85,10 @@ exit **0**. The [official v0.39.1 release notes][headroom-release] say:
 
 The release links [#3806](https://github.com/headroomlabs-ai/headroom/issues/3806) and
 fix commit [`7968122658c31c06ef3e5b1fe7911c8cb0a79ade`](https://github.com/headroomlabs-ai/headroom/commit/7968122658c31c06ef3e5b1fe7911c8cb0a79ade).
-This corroborates the defect and fix in the release notes. It does not qualify 0.39.1
-on either host or overturn the deliberate 0.37.0 hold.
+This corroborates the defect and fix in the release notes, which list it as the release's
+only entry, under "Bug Fixes". It does not qualify 0.39.1 on either host or overturn the
+deliberate 0.37.0 hold, whose overturn condition concerns the omission-count notice and
+log routing (see the headroom row in the supersession table).
 
 **(c) QMD on the Mac, 2026-09-29.** #509, lines 62–65:
 
@@ -138,7 +140,7 @@ not results from executing the suites in this retirement:
 | Lead | Named holder and next evidence |
 | --- | --- |
 | Serena channel on the existing hosts | The next workstation qualification or currency wave owns the release-versus-dev comparison and any recorded reason to retain `c6fbd1c5`. The new-WSL install recommendation does not decide the existing-host channel. |
-| headroom "never 0.39.0" | The separate headroom requalification named in #642 W1 owns qualification of 0.39.1 while preserving the release-note defect/fix distinction. |
+| headroom "never 0.39.0" | The separate headroom requalification named in #642 W1 owns the next headroom pin decision. By main's own records, qualifying 0.39.1 alone would not lift the hold: main qualified 0.39.0 on 2026-09-25 and kept 0.37.0 (see the headroom row above), and its 2026-10-01 reads say 0.39.1 "changes only the proxy rate limiter" ([architecture:704][architecture-headroom]), "so the omission-count hold stands" ([layer closure:1421][closure-headroom]). The requalification must therefore address main's overturn condition at [workstation-sota-refresh.md:549–550][headroom-overturn] (upstream counts levels over the omitted lines only, or a measured answer-quality comparison on log inputs shows net value for 0.39.0's log routing), while keeping the release-note defect/fix distinction for the proxy limiter. |
 | QMD's Claude registration on the Mac | The session on the other host owns the Mac's user, plugin and project-scope inspection and the causal test for low QMD use. |
 | RTK Codex hook test | The RTK requalification named in #642 W1 owns the installed-Codex argument-rewriting test and the independent instruction-loading checks. |
 
@@ -175,9 +177,9 @@ not results from executing the suites in this retirement:
 - **Completeness critic:** the comparison covers every #509 pin-sequence item,
   integration-path step, cache-heal hook, Mac lag rule, and all six unique-fact groups.
   Missing modalities are existing-host Serena behavior, Mac registration/use, RTK
-  hook rewriting, and headroom's native qualification. Those become the four named
-  holders' next lifecycle qualification sweeps; this record supplies no new winner
-  or convergence claim.
+  hook rewriting, and a native headroom requalification that meets main's omission-count
+  overturn condition. Those become the four named holders' next lifecycle qualification
+  sweeps; this record supplies no new winner or convergence claim.
 
 ## Sources
 
@@ -216,6 +218,10 @@ not results from executing the suites in this retirement:
 [w1-holds]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/1b9d09273be764d1cb26993ed9b5138b16bd7ce6/docs/decisions/2026-10-03-currency-wave-w1.md#L148-L150
 [release-table]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-10-01-definitive-sota-wsl-program.md#L281-L299
 [architecture-headroom]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/catalogs/foundation/new-wsl-architecture-20261001.json#L704
+[headroom-qualified]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-25-workstation-sota-refresh.md#L519-L550
+[headroom-overturn]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-25-workstation-sota-refresh.md#L549-L550
+[headroom-receipt]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/receipts/headroom-039-qualification-20260925.json
+[closure-headroom]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/layer-closure-assessment-20261001/foundation.json#L1421
 [rtk-hold]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-26-token-practice-f1-f9.md#L52-L65
 [codex-instructions]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/docs/decisions/2026-09-26-codex-worker-lane.md#L28-L30
 [selection-serena]: https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json#L234-L240
