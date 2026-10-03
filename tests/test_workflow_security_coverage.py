@@ -65,6 +65,10 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
             "runtime-worker-skills-freshness.yml",
             # Its offline zizmor pass/fail assertions live in tests/test_sota_sources_gate.py.
             "sota-sources-gate.yml",
+            # The two workflows of the suite-shards trial (a draft pull request that is never merged); the validate
+            # job's directory-wide zizmor step audits them.
+            "suite-shards-trial-linux.yml",
+            "suite-shards-trial-macos.yml",
         }
         self.assertEqual(
             actual, expected,

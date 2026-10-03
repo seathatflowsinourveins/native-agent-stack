@@ -1,0 +1,728 @@
+name: Suite shards trial, macos-15 (draft pull request only)
+
+# Second preregistered trial for the whole-suite test jobs (2026-10-03): run the existing unittest suite as
+# concurrent single-process shards inside one job with GitHub's native parallel steps, beside the serial
+# production command, on the runner of the required `validate-macos` job (adoption-bootstrap.yml: macos-15, 3 cores,
+# actions/setup-python's CPython 3.13 line). Record, rules and oracle:
+# blueprints/convergence-practice/suite-shards-trial-20261003/ (README.md, experiment.json, compare.py). It belongs
+# to a DRAFT pull request that is never merged; none of its job names is a required context in
+# .github/main-ruleset.json, and it changes no other workflow. Its Linux twin is suite-shards-trial-linux.yml, a
+# separate workflow so that a stalled macOS queue never holds the Linux evidence and either run can be cancelled
+# alone.
+#
+# Parallel steps: github/docs content/actions/reference/workflows-and-actions/workflow-syntax.md at
+# c67a9362ec63f3993d095bf70bd11724359cc50e, lines 1193-1224 (`parallel`: every step of the group is a background
+# step, with an implicit wait at the end of the group) and 1078-1086 (at most 10 concurrent background steps; a
+# failed background step fails the job at the wait that includes it). Every shard step exits with its unittest
+# status, so a failing shard fails its step, the group and the job, as production would. No step inside a group
+# has an `if:`.
+#
+# Trigger: only `opened` and `reopened` (events-that-trigger-workflows.md at 63859c48, lines 465 and 484-489), with
+# a paths filter on this file, so pushing to the branch (synchronize) never re-runs the trial and the observed
+# record can never land on this branch by accident. To repeat the trial, close and reopen the pull request. A job
+# re-run voids its arm-run (compare.py requires run_attempt 1), and every upload sets overwrite: false. The
+# concurrency group keeps at most one run going: a reopen during a run queues one run, which starts unattended
+# when the first ends; a further reopen replaces the queued run, which then shows as cancelled.
+#
+# Jobs: inventory (ubuntu-24.04 with the arms' Python line from actions/setup-python: the fail-closed parity and
+# coverage gate, shard lists built at run time from the head); serial (arm S x 3) and shards (arms G3 and G3T x 3),
+# one of each at a time, so with the control job at most three of the plan's five macOS slots are held; controls
+# (a failing, a crashing and a hanging shard in one parallel group on macos-15; expected to fail) and
+# controls-check (asserts that failure); compare (the oracle's own tests, then compare.py; needs every job, runs
+# always). Every job checks out the pull request head (a pull_request checkout is otherwise the merge commit) and
+# asserts it.
+#
+# Suite environment: as validate-macos, actions/setup-python 3.13, plus the two npm pins that validate.yml installs,
+# because their tripwires (tests/test_shell_parser_ci.py, tests/test_landscape_sweep_skills.py) fail any Actions job
+# that is not a recorded gap; validate-macos is one, this workflow's jobs are not.
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - .github/workflows/suite-shards-trial-macos.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  TRIAL_DIR: blueprints/convergence-practice/suite-shards-trial-20261003
+  OS_LABEL: macos-15
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line (the arms' line, from the same pin)
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Check the interpreter (CPython 3.13)
+        run: |
+          set -euo pipefail
+          command -v python3
+          python3 --version
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+      - name: Build the inventory and the shard lists (fail-closed parity and coverage gate)
+        run: >-
+          python3 "$TRIAL_DIR/inventory.py" --os "$OS_LABEL" --root .
+          --weights "$TRIAL_DIR/weights.json" --out "$RUNNER_TEMP/inventory"
+      - name: Upload the inventory
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: inventory
+          path: ${{ runner.temp }}/inventory/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  serial:
+    needs: inventory
+    runs-on: macos-15
+    # validate-macos allows 60 minutes for its whole job; the suite step below has its own hang guard.
+    timeout-minutes: 100
+    env:
+      ARM: S
+      REPEAT: ${{ matrix.repeat }}
+      RUN_NAME: macos-15-S-r${{ matrix.repeat }}
+    strategy:
+      fail-fast: false
+      # One serial and one sharded run at a time, beside the control job.
+      max-parallel: 1
+      matrix:
+        repeat: [1, 2, 3]
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, as validate-macos: the suite resolves receipt revisions and the pinned release commit.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Check the interpreter (CPython 3.13)
+        run: |
+          set -euo pipefail
+          command -v python3
+          python3 --version
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+      # The two npm pin steps validate.yml runs before its suite (validate.yml at 9b0b8d6d, lines 157-217), run bodies
+      # unchanged.
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Prepare the run directory and record the runtime
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/results/$RUN_NAME"
+          mkdir -p "$out"
+          python3 "$TRIAL_DIR/record.py" runtime "$out"
+      - name: Record what a foreground step inherits (signal dispositions, interpreter, exported names)
+        run: python3 "$TRIAL_DIR/record.py" probe "$RUNNER_TEMP/results/$RUN_NAME" foreground
+      - name: Start the clock
+        id: start
+        run: python3 "$TRIAL_DIR/record.py" start "$RUNNER_TEMP/results/$RUN_NAME"
+      - name: Run the whole suite serially (arm S, the production command)
+        timeout-minutes: 80
+        run: |
+          out="$RUNNER_TEMP/results/$RUN_NAME"
+          printf '%s\n' "python3 -m unittest -v" > "$out/command.txt"
+          status=0
+          python3 -m unittest -v > "$out/log.txt" 2>&1 || status=$?
+          printf '%s\n' "$status" > "$out/exit-code.txt"
+          echo "arm S, repeat $REPEAT: exit $status"
+          tail -n 3 "$out/log.txt"
+          exit "$status"
+      - name: Stop the clock and record the metadata and the checkout's status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm "$ARM" --repeat "$REPEAT"
+      - name: Upload the arm-run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arm-macos-15-S-r${{ matrix.repeat }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  shards:
+    needs: inventory
+    runs-on: macos-15
+    # Three shard steps of at most 40 minutes, a 15-minute tail and the setup fit inside 80 minutes.
+    timeout-minutes: 80
+    env:
+      ARM: ${{ matrix.arm }}
+      REPEAT: ${{ matrix.repeat }}
+      RUN_NAME: macos-15-${{ matrix.arm }}-r${{ matrix.repeat }}
+    strategy:
+      fail-fast: false
+      # One serial and one sharded run at a time, beside the control job.
+      max-parallel: 1
+      matrix:
+        # Repeat-major, the arm order alternating by repeat.
+        include:
+          - {repeat: 1, arm: G3}
+          - {repeat: 1, arm: G3T}
+          - {repeat: 2, arm: G3T}
+          - {repeat: 2, arm: G3}
+          - {repeat: 3, arm: G3}
+          - {repeat: 3, arm: G3T}
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, as validate-macos: the suite resolves receipt revisions and the pinned release commit.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Check the interpreter (CPython 3.13)
+        run: |
+          set -euo pipefail
+          command -v python3
+          python3 --version
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+      # The same two npm pin steps as the serial job, from validate.yml, run bodies unchanged.
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Download the inventory (this arm's shard lists)
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: inventory
+          path: ${{ runner.temp }}/inventory
+      - name: Prepare the run directory with this arm's lists and record the runtime
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/results/$RUN_NAME"
+          mkdir -p "$out"
+          cp "$RUNNER_TEMP/inventory/shards/$ARM/"shard-*.txt "$RUNNER_TEMP/inventory/shards/$ARM/tail.txt" "$out/"
+          python3 "$TRIAL_DIR/record.py" runtime "$out"
+      - name: Record what a foreground step inherits (signal dispositions, interpreter, exported names)
+        run: python3 "$TRIAL_DIR/record.py" probe "$RUNNER_TEMP/results/$RUN_NAME" foreground
+      - name: Start the clock
+        id: start
+        run: python3 "$TRIAL_DIR/record.py" start "$RUNNER_TEMP/results/$RUN_NAME"
+      - parallel:
+          - name: Shard 0
+            timeout-minutes: 40
+            env:
+              SHARD: shard-0
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              python3 "$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: ${#modules[@]} modules, exit $status"
+              exit "$status"
+          - name: Shard 1
+            timeout-minutes: 40
+            env:
+              SHARD: shard-1
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              python3 "$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: ${#modules[@]} modules, exit $status"
+              exit "$status"
+          - name: Shard 2
+            timeout-minutes: 40
+            env:
+              SHARD: shard-2
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              python3 "$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: ${#modules[@]} modules, exit $status"
+              exit "$status"
+      - name: Serial tail (G3T only; the timing-bound module alone, after the group)
+        if: ${{ !cancelled() && matrix.arm == 'G3T' && steps.start.outcome == 'success' }}
+        timeout-minutes: 15
+        env:
+          SHARD: tail
+        run: |
+          out="$RUNNER_TEMP/results/$RUN_NAME"
+          python3 "$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+          modules=()
+          while IFS= read -r module || [ -n "$module" ]; do
+            if [ -n "$module" ]; then modules+=("$module"); fi
+          done < "$out/$SHARD.txt"
+          if [ "${#modules[@]}" -eq 0 ]; then
+            echo "$SHARD: empty module list" >&2
+            exit 1
+          fi
+          printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+          status=0
+          python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+          printf '%s\n' "$status" > "$out/$SHARD.exit"
+          echo "$SHARD: ${#modules[@]} modules, exit $status"
+          exit "$status"
+      - name: Stop the clock and record the metadata and the checkout's status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm "$ARM" --repeat "$REPEAT"
+      - name: Upload the arm-run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arm-macos-15-${{ matrix.arm }}-r${{ matrix.repeat }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  controls:
+    runs-on: macos-15
+    timeout-minutes: 15
+    env:
+      RUN_NAME: macos-15-controls
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Check the interpreter (CPython 3.13)
+        run: |
+          set -euo pipefail
+          command -v python3
+          python3 --version
+          python3 -c 'import platform, sys; raise SystemExit(not (platform.python_implementation() == "CPython" and sys.version_info[:2] == (3, 13)))'
+      - name: Copy the four control modules alone into an empty directory and export a probe variable
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/results/$RUN_NAME"
+          suite="$RUNNER_TEMP/control-suite"
+          mkdir -p "$out" "$suite"
+          cp "$TRIAL_DIR"/controls/test_ctl_pass.py "$TRIAL_DIR"/controls/test_ctl_fail.py \
+            "$TRIAL_DIR"/controls/test_ctl_crash.py "$TRIAL_DIR"/controls/test_ctl_hang.py "$suite/"
+          printf '%s\n' test_ctl_pass > "$out/shard-0.txt"
+          printf '%s\n' test_ctl_fail > "$out/shard-1.txt"
+          printf '%s\n' test_ctl_crash > "$out/shard-2.txt"
+          printf '%s\n' test_ctl_hang > "$out/shard-3.txt"
+          python3 "$TRIAL_DIR/record.py" runtime "$out"
+          # compare.py requires every background shard to see this export from an earlier step.
+          echo "SUITE_SHARDS_ENV_PROBE=1" >> "$GITHUB_ENV"
+      - name: Record what a foreground step inherits (signal dispositions, interpreter, exported names)
+        run: python3 "$TRIAL_DIR/record.py" probe "$RUNNER_TEMP/results/$RUN_NAME" foreground
+      # The production parallel structure on the controls: the arms' shard step body, run from the control
+      # directory. Expected: shard-0 exits 0, shard-1 exits 1, shard-2 exits 3 (os._exit), shard-3 is stopped by its
+      # 1-minute limit before it writes an exit status; the group, and so the job, fails.
+      - parallel:
+          - name: Control shard 0 (passes)
+            timeout-minutes: 5
+            env:
+              SHARD: shard-0
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              cd "$RUNNER_TEMP/control-suite"
+              python3 "$GITHUB_WORKSPACE/$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: exit $status"
+              exit "$status"
+          - name: Control shard 1 (one failing test)
+            timeout-minutes: 5
+            env:
+              SHARD: shard-1
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              cd "$RUNNER_TEMP/control-suite"
+              python3 "$GITHUB_WORKSPACE/$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: exit $status"
+              exit "$status"
+          - name: Control shard 2 (the process ends itself with os._exit(3))
+            timeout-minutes: 5
+            env:
+              SHARD: shard-2
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              cd "$RUNNER_TEMP/control-suite"
+              python3 "$GITHUB_WORKSPACE/$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: exit $status"
+              exit "$status"
+          - name: Control shard 3 (hangs; stopped by its 1-minute limit)
+            timeout-minutes: 1
+            env:
+              SHARD: shard-3
+            run: |
+              out="$RUNNER_TEMP/results/$RUN_NAME"
+              cd "$RUNNER_TEMP/control-suite"
+              python3 "$GITHUB_WORKSPACE/$TRIAL_DIR/record.py" probe "$out" "$SHARD"
+              modules=()
+              while IFS= read -r module || [ -n "$module" ]; do
+                if [ -n "$module" ]; then modules+=("$module"); fi
+              done < "$out/$SHARD.txt"
+              if [ "${#modules[@]}" -eq 0 ]; then
+                echo "$SHARD: empty module list" >&2
+                exit 1
+              fi
+              printf '%s\n' "python3 -m unittest -v ${modules[*]}" > "$out/$SHARD.command"
+              status=0
+              python3 -m unittest -v "${modules[@]}" > "$out/$SHARD.log" 2>&1 || status=$?
+              printf '%s\n' "$status" > "$out/$SHARD.exit"
+              echo "$SHARD: exit $status"
+              exit "$status"
+      - name: Record the metadata and the checkout's status (the job is expected to fail)
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: python3 "$TRIAL_DIR/record.py" finish "$RUNNER_TEMP/results/$RUN_NAME" --os "$OS_LABEL" --arm controls --repeat 1
+      - name: Upload the control run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: controls
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  controls-check:
+    needs: controls
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Download the control run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: controls
+          merge-multiple: true
+          path: ${{ runner.temp }}/results
+      - name: Assert the control job failed and every control shard behaved as preregistered
+        env:
+          CONTROLS_RESULT: ${{ needs.controls.result }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: >-
+          python3 "$TRIAL_DIR/compare.py" controls --dir "$RUNNER_TEMP/results/$OS_LABEL-controls"
+          --os "$OS_LABEL" --job-result "$CONTROLS_RESULT" --expected-sha "$PR_HEAD_SHA"
+
+  compare:
+    needs: [inventory, serial, shards, controls, controls-check]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      # Pattern downloads: a missing artifact downloads nothing instead of failing the step
+      # (actions/download-artifact src/download-artifact.ts at 3e5f45b2, lines 149-163 and 176-246), so compare.py
+      # always runs and records a missing run directory as an incomplete run.
+      - name: Download the inventory
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: inventory
+          merge-multiple: true
+          path: ${{ runner.temp }}/inventory
+      - name: Download the arm-runs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: arm-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/results
+      - name: Download the control run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: controls
+          merge-multiple: true
+          path: ${{ runner.temp }}/results
+      # An oracle that fails its own tests here gives no verdict: this step fails and compare.py does not run.
+      - name: Run the oracle's own tests on this interpreter (fail-closed)
+        run: python3 -m unittest discover -s "$TRIAL_DIR" -p "test_*.py" -v
+      - name: Keep the needs context (each job's result) for compare.py
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: printf '%s\n' "$NEEDS_JSON" > "$RUNNER_TEMP/needs.json"
+      - name: Compare every run with the serial arm (compare.py)
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/compare" "$RUNNER_TEMP/results" "$RUNNER_TEMP/inventory"
+          python3 "$TRIAL_DIR/compare.py" verdict --results "$RUNNER_TEMP/results" \
+            --inventory "$RUNNER_TEMP/inventory" --expected-sha "$PR_HEAD_SHA" --os "$OS_LABEL" \
+            --needs "$RUNNER_TEMP/needs.json" --out "$RUNNER_TEMP/compare/result.json" \
+            --summary-md "$RUNNER_TEMP/compare/summary.md" --checkout-status "$RUNNER_TEMP/compare/checkout-status.json"
+          cat "$RUNNER_TEMP/compare/summary.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the comparison
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: compare
+          path: ${{ runner.temp }}/compare/
+          if-no-files-found: warn
+          retention-days: 30
+          overwrite: false
