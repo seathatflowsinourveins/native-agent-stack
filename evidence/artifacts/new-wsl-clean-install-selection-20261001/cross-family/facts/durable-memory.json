@@ -1,0 +1,543 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/durable-memory.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/mem0ai/mem0",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/mem0ai/mem0": {
+     "full_name": "mem0ai/mem0",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:07:39Z",
+     "created_at": "2023-06-20T08:58:36Z",
+     "updated_at": "2026-10-01T19:49:55Z",
+     "open_issues_count": 779,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/mem0ai/mem0"
+    },
+    "repos/mem0ai/mem0/releases/latest": {
+     "tag_name": "ts-v3.3.1",
+     "name": "Mem0 Node SDK (v3.3.1)",
+     "published_at": "2026-09-25T17:36:35Z",
+     "prerelease": false,
+     "html_url": "https://github.com/mem0ai/mem0/releases/tag/ts-v3.3.1"
+    },
+    "repos/mem0ai/mem0/commits?per_page=1": {
+     "sha": "abb81c88e1f738a8117d8293530fbc31a5ef8fd9",
+     "date": "2026-10-01T16:16:18Z",
+     "html_url": "https://github.com/mem0ai/mem0/commit/abb81c88e1f738a8117d8293530fbc31a5ef8fd9"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/akitaonrails/ai-memory",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/akitaonrails/ai-memory": {
+     "full_name": "akitaonrails/ai-memory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:22:16Z",
+     "created_at": "2026-05-21T23:23:51Z",
+     "updated_at": "2026-10-01T20:06:53Z",
+     "open_issues_count": 15,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/akitaonrails/ai-memory"
+    },
+    "repos/akitaonrails/ai-memory/releases/latest": {
+     "tag_name": "v2.5.2",
+     "name": "v2.5.2",
+     "published_at": "2026-10-01T07:40:18Z",
+     "prerelease": false,
+     "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2"
+    },
+    "repos/akitaonrails/ai-memory/commits?per_page=1": {
+     "sha": "e2d7d17d906dbe5a85ac83bc041a5a150268a2f3",
+     "date": "2026-10-01T19:18:44Z",
+     "html_url": "https://github.com/akitaonrails/ai-memory/commit/e2d7d17d906dbe5a85ac83bc041a5a150268a2f3"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/MemPalace/mempalace",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/MemPalace/mempalace": {
+     "full_name": "MemPalace/mempalace",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "develop",
+     "pushed_at": "2026-09-29T11:22:35Z",
+     "created_at": "2026-04-05T01:12:07Z",
+     "updated_at": "2026-10-01T20:17:53Z",
+     "open_issues_count": 773,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/MemPalace/mempalace"
+    },
+    "repos/MemPalace/mempalace/releases/latest": {
+     "tag_name": "v3.10.0",
+     "name": "v3.10.0 \u2014 lighter ways in for agents",
+     "published_at": "2026-09-16T00:24:11Z",
+     "prerelease": false,
+     "html_url": "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0"
+    },
+    "repos/MemPalace/mempalace/commits?per_page=1": {
+     "sha": "5ea40d30caf0ed2ff6e49623e386a0863b28edaa",
+     "date": "2026-09-29T11:22:34Z",
+     "html_url": "https://github.com/MemPalace/mempalace/commit/5ea40d30caf0ed2ff6e49623e386a0863b28edaa"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/tigerless-labs/agent-memory",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/tigerless-labs/agent-memory": {
+     "full_name": "tigerless-labs/agent-memory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:02:18Z",
+     "created_at": "2026-09-01T21:52:29Z",
+     "updated_at": "2026-10-01T19:53:47Z",
+     "open_issues_count": 9,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/tigerless-labs/agent-memory"
+    },
+    "repos/tigerless-labs/agent-memory/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/tigerless-labs/agent-memory/commits?per_page=1": {
+     "sha": "6613670d1194c2a8f77e3942ebeeaa653f4bed11",
+     "date": "2026-10-01T16:02:18Z",
+     "html_url": "https://github.com/tigerless-labs/agent-memory/commit/6613670d1194c2a8f77e3942ebeeaa653f4bed11"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/vectorize-io/hindsight",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/vectorize-io/hindsight": {
+     "full_name": "vectorize-io/hindsight",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:01:23Z",
+     "created_at": "2025-10-30T11:49:48Z",
+     "updated_at": "2026-10-01T20:37:31Z",
+     "open_issues_count": 216,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/vectorize-io/hindsight"
+    },
+    "repos/vectorize-io/hindsight/releases/latest": {
+     "tag_name": "v0.10.2",
+     "name": "v0.10.2",
+     "published_at": "2026-09-29T10:06:40Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2"
+    },
+    "repos/vectorize-io/hindsight/commits?per_page=1": {
+     "sha": "0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b",
+     "date": "2026-10-01T19:01:22Z",
+     "html_url": "https://github.com/vectorize-io/hindsight/commit/0be6c02b2aafc2b6bdb188ef1842ac507e0cfa2b"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/getzep/graphiti",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/getzep/graphiti": {
+     "full_name": "getzep/graphiti",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T08:02:29Z",
+     "created_at": "2024-08-08T22:08:30Z",
+     "updated_at": "2026-10-01T18:47:37Z",
+     "open_issues_count": 443,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/getzep/graphiti"
+    },
+    "repos/getzep/graphiti/releases/latest": {
+     "tag_name": "v0.30.2",
+     "name": "v0.30.2 - FalkorDB updates",
+     "published_at": "2026-09-08T20:38:41Z",
+     "prerelease": false,
+     "html_url": "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+    },
+    "repos/getzep/graphiti/commits?per_page=1": {
+     "sha": "3c427640abf909f12f71f963fce15eb514a3c493",
+     "date": "2026-09-30T08:02:28Z",
+     "html_url": "https://github.com/getzep/graphiti/commit/3c427640abf909f12f71f963fce15eb514a3c493"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/thedotmack/claude-mem",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/thedotmack/claude-mem": {
+     "full_name": "thedotmack/claude-mem",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:16:58Z",
+     "created_at": "2025-08-31T20:50:03Z",
+     "updated_at": "2026-10-01T20:41:49Z",
+     "open_issues_count": 103,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/thedotmack/claude-mem"
+    },
+    "repos/thedotmack/claude-mem/releases/latest": {
+     "tag_name": "v13.28.0",
+     "name": "v13.28.0",
+     "published_at": "2026-09-26T18:37:19Z",
+     "prerelease": false,
+     "html_url": "https://github.com/thedotmack/claude-mem/releases/tag/v13.28.0"
+    },
+    "repos/thedotmack/claude-mem/commits?per_page=1": {
+     "sha": "20c8a80414f31e0b03b07b672db127406cdab5bc",
+     "date": "2026-10-01T19:16:58Z",
+     "html_url": "https://github.com/thedotmack/claude-mem/commit/20c8a80414f31e0b03b07b672db127406cdab5bc"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/rohitg00/agentmemory",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/rohitg00/agentmemory": {
+     "full_name": "rohitg00/agentmemory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:53:49Z",
+     "created_at": "2026-02-25T07:32:52Z",
+     "updated_at": "2026-10-01T19:25:17Z",
+     "open_issues_count": 610,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/rohitg00/agentmemory"
+    },
+    "repos/rohitg00/agentmemory/releases/latest": {
+     "tag_name": "v0.9.29",
+     "name": "v0.9.29",
+     "published_at": "2026-08-16T13:56:45Z",
+     "prerelease": false,
+     "html_url": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29"
+    },
+    "repos/rohitg00/agentmemory/commits?per_page=1": {
+     "sha": "b3d6cf50026655233f11c2273b898af0ca82cf03",
+     "date": "2026-10-01T11:28:24Z",
+     "html_url": "https://github.com/rohitg00/agentmemory/commit/b3d6cf50026655233f11c2273b898af0ca82cf03"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/langchain-ai/langmem",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/langchain-ai/langmem": {
+     "full_name": "langchain-ai/langmem",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:47:26Z",
+     "created_at": "2025-01-21T20:06:59Z",
+     "updated_at": "2026-10-01T07:48:44Z",
+     "open_issues_count": 67,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/langchain-ai/langmem"
+    },
+    "repos/langchain-ai/langmem/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/langchain-ai/langmem/commits?per_page=1": {
+     "sha": "9d033b47d9ce53e37e92c92241b0496c0278932e",
+     "date": "2026-09-09T06:44:42Z",
+     "html_url": "https://github.com/langchain-ai/langmem/commit/9d033b47d9ce53e37e92c92241b0496c0278932e"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/vshulcz/deja-vu",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/vshulcz/deja-vu": {
+     "full_name": "vshulcz/deja-vu",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:31Z",
+     "created_at": "2026-07-14T07:45:44Z",
+     "updated_at": "2026-10-01T19:51:59Z",
+     "open_issues_count": 171,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/vshulcz/deja-vu"
+    },
+    "repos/vshulcz/deja-vu/releases/latest": {
+     "tag_name": "v0.21.4",
+     "name": "v0.21.4",
+     "published_at": "2026-09-29T10:12:08Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vshulcz/deja-vu/releases/tag/v0.21.4"
+    },
+    "repos/vshulcz/deja-vu/commits?per_page=1": {
+     "sha": "7942a8d1cd780d9f1cf1d2b326b53083a5d740e4",
+     "date": "2026-10-01T14:32:50Z",
+     "html_url": "https://github.com/vshulcz/deja-vu/commit/7942a8d1cd780d9f1cf1d2b326b53083a5d740e4"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/letta-ai/letta-code",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/letta-ai/letta-code": {
+     "full_name": "letta-ai/letta-code",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:34Z",
+     "created_at": "2025-10-25T04:17:51Z",
+     "updated_at": "2026-10-01T20:40:40Z",
+     "open_issues_count": 475,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/letta-ai/letta-code"
+    },
+    "repos/letta-ai/letta-code/releases/latest": {
+     "tag_name": "v0.34.1",
+     "name": "Release v0.34.1",
+     "published_at": "2026-09-30T21:25:18Z",
+     "prerelease": false,
+     "html_url": "https://github.com/letta-ai/letta-code/releases/tag/v0.34.1"
+    },
+    "repos/letta-ai/letta-code/commits?per_page=1": {
+     "sha": "38a280c6682fc05b12175b421a5a3ff5f25d816d",
+     "date": "2026-10-01T20:40:31Z",
+     "html_url": "https://github.com/letta-ai/letta-code/commit/38a280c6682fc05b12175b421a5a3ff5f25d816d"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/MemTensor/MemOS",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/MemTensor/MemOS": {
+     "full_name": "MemTensor/MemOS",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-29T03:09:34Z",
+     "created_at": "2025-07-06T09:51:27Z",
+     "updated_at": "2026-10-01T17:39:02Z",
+     "open_issues_count": 119,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/MemTensor/MemOS"
+    },
+    "repos/MemTensor/MemOS/releases/latest": {
+     "tag_name": "v2.0.34",
+     "name": "v2.0.34",
+     "published_at": "2026-09-23T05:24:20Z",
+     "prerelease": false,
+     "html_url": "https://github.com/MemTensor/MemOS/releases/tag/v2.0.34"
+    },
+    "repos/MemTensor/MemOS/commits?per_page=1": {
+     "sha": "a7367d07e55db61099f7b4e2c1108bc5831a24f3",
+     "date": "2026-09-22T01:51:03Z",
+     "html_url": "https://github.com/MemTensor/MemOS/commit/a7367d07e55db61099f7b4e2c1108bc5831a24f3"
+    }
+   }
+  },
+  "C13": {
+   "repository": "https://github.com/letta-ai/letta",
+   "captured_at": "2026-10-01T20:42:25+00:00",
+   "endpoints": {
+    "repos/letta-ai/letta": {
+     "full_name": "letta-ai/letta",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-10T17:59:08Z",
+     "created_at": "2023-10-11T07:38:37Z",
+     "updated_at": "2026-10-01T19:53:25Z",
+     "open_issues_count": 0,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/letta-ai/letta"
+    },
+    "repos/letta-ai/letta/releases/latest": {
+     "tag_name": "0.16.8",
+     "name": "v0.16.8",
+     "published_at": "2026-05-14T17:14:24Z",
+     "prerelease": false,
+     "html_url": "https://github.com/letta-ai/letta/releases/tag/0.16.8"
+    },
+    "repos/letta-ai/letta/commits?per_page=1": {
+     "sha": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+     "date": "2026-09-10T17:59:06Z",
+     "html_url": "https://github.com/letta-ai/letta/commit/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a"
+    }
+   }
+  },
+  "C14": {
+   "repository": "https://github.com/supermemoryai/supermemory",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/supermemoryai/supermemory": {
+     "full_name": "supermemoryai/supermemory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:39:54Z",
+     "created_at": "2024-02-27T20:10:04Z",
+     "updated_at": "2026-10-01T19:25:17Z",
+     "open_issues_count": 121,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/supermemoryai/supermemory"
+    },
+    "repos/supermemoryai/supermemory/releases/latest": {
+     "tag_name": "server-v0.0.8",
+     "name": "supermemory-server 0.0.8",
+     "published_at": "2026-08-17T18:39:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+    },
+    "repos/supermemoryai/supermemory/commits?per_page=1": {
+     "sha": "66ce7f8c78909cd5af663e8afa3dd8bf776aabe5",
+     "date": "2026-09-30T22:00:27Z",
+     "html_url": "https://github.com/supermemoryai/supermemory/commit/66ce7f8c78909cd5af663e8afa3dd8bf776aabe5"
+    }
+   }
+  },
+  "C15": {
+   "repository": "https://github.com/basicmachines-co/basic-memory",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/basicmachines-co/basic-memory": {
+     "full_name": "basicmachines-co/basic-memory",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:58:00Z",
+     "created_at": "2024-12-02T22:40:43Z",
+     "updated_at": "2026-10-01T19:40:56Z",
+     "open_issues_count": 64,
+     "has_issues": true,
+     "license_spdx": "AGPL-3.0",
+     "html_url": "https://github.com/basicmachines-co/basic-memory"
+    },
+    "repos/basicmachines-co/basic-memory/releases/latest": {
+     "tag_name": "v0.23.2",
+     "name": "v0.23.2",
+     "published_at": "2026-08-25T20:44:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"
+    },
+    "repos/basicmachines-co/basic-memory/commits?per_page=1": {
+     "sha": "06f0dcbba4780cf6c7f77b802131f87517112b94",
+     "date": "2026-10-01T18:19:07Z",
+     "html_url": "https://github.com/basicmachines-co/basic-memory/commit/06f0dcbba4780cf6c7f77b802131f87517112b94"
+    }
+   }
+  },
+  "C16": {
+   "repository": "https://github.com/volcengine/OpenViking",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/volcengine/OpenViking": {
+     "full_name": "volcengine/OpenViking",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:57:30Z",
+     "created_at": "2026-01-05T07:11:17Z",
+     "updated_at": "2026-10-01T20:38:07Z",
+     "open_issues_count": 713,
+     "has_issues": true,
+     "license_spdx": "AGPL-3.0",
+     "html_url": "https://github.com/volcengine/OpenViking"
+    },
+    "repos/volcengine/OpenViking/releases/latest": {
+     "tag_name": "v0.4.22",
+     "name": "v0.4.22",
+     "published_at": "2026-09-28T05:56:50Z",
+     "prerelease": false,
+     "html_url": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22"
+    },
+    "repos/volcengine/OpenViking/commits?per_page=1": {
+     "sha": "b597acc1b9c4889d57d376bd2e33fbea7ee7e924",
+     "date": "2026-10-01T16:24:34Z",
+     "html_url": "https://github.com/volcengine/OpenViking/commit/b597acc1b9c4889d57d376bd2e33fbea7ee7e924"
+    }
+   }
+  },
+  "C17": {
+   "repository": "https://github.com/topoteretes/cognee",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/topoteretes/cognee": {
+     "full_name": "topoteretes/cognee",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:41:15Z",
+     "created_at": "2023-08-16T16:16:33Z",
+     "updated_at": "2026-10-01T19:52:37Z",
+     "open_issues_count": 450,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/topoteretes/cognee"
+    },
+    "repos/topoteretes/cognee/releases/latest": {
+     "tag_name": "v1.6.2",
+     "name": "v1.6.2 \u2014 Embedding reliability & Slack history",
+     "published_at": "2026-09-29T22:00:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/topoteretes/cognee/releases/tag/v1.6.2"
+    },
+    "repos/topoteretes/cognee/commits?per_page=1": {
+     "sha": "b32d8afc59e1064d9291b9828a8a147be9cc8bab",
+     "date": "2026-10-01T15:50:04Z",
+     "html_url": "https://github.com/topoteretes/cognee/commit/b32d8afc59e1064d9291b9828a8a147be9cc8bab"
+    }
+   }
+  }
+ }
+}

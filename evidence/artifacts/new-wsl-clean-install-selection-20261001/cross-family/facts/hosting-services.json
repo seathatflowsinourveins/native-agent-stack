@@ -1,0 +1,379 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/hosting-services.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/microsoft/WSL",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/microsoft/WSL": {
+     "full_name": "microsoft/WSL",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:41:53Z",
+     "created_at": "2016-04-06T17:32:56Z",
+     "updated_at": "2026-10-01T20:15:31Z",
+     "open_issues_count": 1008,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/WSL"
+    },
+    "repos/microsoft/WSL/releases/latest": {
+     "tag_name": "3.0.1",
+     "name": "3.0.1",
+     "published_at": "2026-09-29T17:18:57Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/WSL/releases/tag/3.0.1"
+    },
+    "repos/microsoft/WSL/commits?per_page=1": {
+     "sha": "c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67",
+     "date": "2026-10-01T00:34:19Z",
+     "html_url": "https://github.com/microsoft/WSL/commit/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/moby/moby",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/moby/moby": {
+     "full_name": "moby/moby",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:29:45Z",
+     "created_at": "2013-01-18T18:10:57Z",
+     "updated_at": "2026-10-01T20:29:53Z",
+     "open_issues_count": 3911,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/moby/moby"
+    },
+    "repos/moby/moby/releases/latest": {
+     "tag_name": "docker-v29.8.2",
+     "name": "v29.8.2",
+     "published_at": "2026-09-30T20:28:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2"
+    },
+    "repos/moby/moby/commits?per_page=1": {
+     "sha": "c8e265787b0a89d161f34c3920f73f136974744b",
+     "date": "2026-10-01T20:29:45Z",
+     "html_url": "https://github.com/moby/moby/commit/c8e265787b0a89d161f34c3920f73f136974744b"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/gnzsnz/ib-gateway-docker": {
+     "full_name": "gnzsnz/ib-gateway-docker",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T10:57:43Z",
+     "created_at": "2023-08-06T08:10:50Z",
+     "updated_at": "2026-10-01T10:20:06Z",
+     "open_issues_count": 9,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/gnzsnz/ib-gateway-docker"
+    },
+    "repos/gnzsnz/ib-gateway-docker/releases/latest": {
+     "tag_name": "ibgateway-latest@10.51.1b",
+     "name": "IB Gateway latest 10.51.1b",
+     "published_at": "2026-09-30T12:10:09Z",
+     "prerelease": false,
+     "html_url": "https://github.com/gnzsnz/ib-gateway-docker/releases/tag/ibgateway-latest%4010.51.1b"
+    },
+    "repos/gnzsnz/ib-gateway-docker/commits?per_page=1": {
+     "sha": "a7f587641dad6ca3deef704e4c9e3371da3f628b",
+     "date": "2026-10-01T10:19:09Z",
+     "html_url": "https://github.com/gnzsnz/ib-gateway-docker/commit/a7f587641dad6ca3deef704e4c9e3371da3f628b"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/bentoml/BentoML",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/bentoml/BentoML": {
+     "full_name": "bentoml/BentoML",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-07T17:43:01Z",
+     "created_at": "2019-04-02T01:39:27Z",
+     "updated_at": "2026-10-01T18:15:49Z",
+     "open_issues_count": 223,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/bentoml/BentoML"
+    },
+    "repos/bentoml/BentoML/releases/latest": {
+     "tag_name": "v1.4.39",
+     "name": "v1.4.39",
+     "published_at": "2026-05-07T10:37:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/bentoml/BentoML/releases/tag/v1.4.39"
+    },
+    "repos/bentoml/BentoML/commits?per_page=1": {
+     "sha": "517b343b81aeb0b01bbd908e58e53ad9c12ef7eb",
+     "date": "2026-09-07T17:43:00Z",
+     "html_url": "https://github.com/bentoml/BentoML/commit/517b343b81aeb0b01bbd908e58e53ad9c12ef7eb"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/fastapi/fastapi",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/fastapi/fastapi": {
+     "full_name": "fastapi/fastapi",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T19:58:50Z",
+     "created_at": "2018-12-08T08:21:47Z",
+     "updated_at": "2026-10-01T20:10:24Z",
+     "open_issues_count": 97,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/fastapi/fastapi"
+    },
+    "repos/fastapi/fastapi/releases/latest": {
+     "tag_name": "0.142.2",
+     "name": "0.142.2",
+     "published_at": "2026-09-30T09:50:53Z",
+     "prerelease": false,
+     "html_url": "https://github.com/fastapi/fastapi/releases/tag/0.142.2"
+    },
+    "repos/fastapi/fastapi/commits?per_page=1": {
+     "sha": "28a206107302ee20ce6a9a876d05a258c1c8d328",
+     "date": "2026-10-01T18:55:02Z",
+     "html_url": "https://github.com/fastapi/fastapi/commit/28a206107302ee20ce6a9a876d05a258c1c8d328"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/react/react",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/react/react": {
+     "full_name": "react/react",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T15:08:09Z",
+     "created_at": "2013-05-24T16:15:54Z",
+     "updated_at": "2026-10-01T20:22:54Z",
+     "open_issues_count": 1392,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/react/react"
+    },
+    "repos/react/react/releases/latest": {
+     "tag_name": "v19.3.0",
+     "name": "19.3.0 (September 9, 2026)",
+     "published_at": "2026-09-09T18:01:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/react/react/releases/tag/v19.3.0"
+    },
+    "repos/react/react/commits?per_page=1": {
+     "sha": "7c6ac13e19fef500b7f669a16bbd01ecc95965ca",
+     "date": "2026-09-29T12:55:49Z",
+     "html_url": "https://github.com/react/react/commit/7c6ac13e19fef500b7f669a16bbd01ecc95965ca"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/postgres/postgres",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/postgres/postgres": {
+     "full_name": "postgres/postgres",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T13:20:44Z",
+     "created_at": "2010-09-21T11:35:45Z",
+     "updated_at": "2026-10-01T19:24:22Z",
+     "open_issues_count": 0,
+     "has_issues": false,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/postgres/postgres"
+    },
+    "repos/postgres/postgres/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/postgres/postgres/commits?per_page=1": {
+     "sha": "42e96cf2fe095c822f76bc94669ea875cb1e3351",
+     "date": "2026-10-01T13:19:23Z",
+     "html_url": "https://github.com/postgres/postgres/commit/42e96cf2fe095c822f76bc94669ea875cb1e3351"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/docker/compose",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/docker/compose": {
+     "full_name": "docker/compose",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:29:56Z",
+     "created_at": "2013-12-09T11:40:58Z",
+     "updated_at": "2026-10-01T20:01:51Z",
+     "open_issues_count": 93,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/docker/compose"
+    },
+    "repos/docker/compose/releases/latest": {
+     "tag_name": "v5.5.1",
+     "name": "v5.5.1",
+     "published_at": "2026-09-03T15:53:28Z",
+     "prerelease": false,
+     "html_url": "https://github.com/docker/compose/releases/tag/v5.5.1"
+    },
+    "repos/docker/compose/commits?per_page=1": {
+     "sha": "4d994cc26d5e6e559d20971c1365aca90535104e",
+     "date": "2026-10-01T16:29:51Z",
+     "html_url": "https://github.com/docker/compose/commit/4d994cc26d5e6e559d20971c1365aca90535104e"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/podman-container-tools/podman",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/podman-container-tools/podman": {
+     "full_name": "podman-container-tools/podman",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:23:44Z",
+     "created_at": "2017-11-01T15:01:27Z",
+     "updated_at": "2026-10-01T20:37:01Z",
+     "open_issues_count": 1020,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/podman-container-tools/podman"
+    },
+    "repos/podman-container-tools/podman/releases/latest": {
+     "tag_name": "v6.1.3",
+     "name": "v6.1.3",
+     "published_at": "2026-09-29T15:34:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3"
+    },
+    "repos/podman-container-tools/podman/commits?per_page=1": {
+     "sha": "ccc1e207757d7abd173e52980bdd19613166ac48",
+     "date": "2026-10-01T14:09:59Z",
+     "html_url": "https://github.com/podman-container-tools/podman/commit/ccc1e207757d7abd173e52980bdd19613166ac48"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/vercel/next.js",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/vercel/next.js": {
+     "full_name": "vercel/next.js",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "canary",
+     "pushed_at": "2026-10-01T20:38:12Z",
+     "created_at": "2016-10-05T23:32:51Z",
+     "updated_at": "2026-10-01T20:37:30Z",
+     "open_issues_count": 3548,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/vercel/next.js"
+    },
+    "repos/vercel/next.js/releases/latest": {
+     "tag_name": "v16.3.8",
+     "name": "v16.3.8",
+     "published_at": "2026-09-30T16:13:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.8"
+    },
+    "repos/vercel/next.js/commits?per_page=1": {
+     "sha": "d5d747e9005cd273245b015644400b73f16f067b",
+     "date": "2026-10-01T16:52:29Z",
+     "html_url": "https://github.com/vercel/next.js/commit/d5d747e9005cd273245b015644400b73f16f067b"
+    }
+   }
+  },
+  "C11": {
+   "repository": "https://github.com/modal-labs/modal-client",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/modal-labs/modal-client": {
+     "full_name": "modal-labs/modal-client",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T19:22:04Z",
+     "created_at": "2022-10-18T23:14:11Z",
+     "updated_at": "2026-10-01T19:22:10Z",
+     "open_issues_count": 31,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/modal-labs/modal-client"
+    },
+    "repos/modal-labs/modal-client/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/modal-labs/modal-client/commits?per_page=1": {
+     "sha": "0ec67aa29763e0ac9f0e2897958f820b372f5c17",
+     "date": "2026-10-01T19:22:03Z",
+     "html_url": "https://github.com/modal-labs/modal-client/commit/0ec67aa29763e0ac9f0e2897958f820b372f5c17"
+    }
+   }
+  },
+  "C12": {
+   "repository": "https://github.com/devcontainers/cli",
+   "captured_at": "2026-10-01T20:42:28+00:00",
+   "endpoints": {
+    "repos/devcontainers/cli": {
+     "full_name": "devcontainers/cli",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T07:26:42Z",
+     "created_at": "2022-04-27T09:20:08Z",
+     "updated_at": "2026-10-01T10:56:44Z",
+     "open_issues_count": 316,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/devcontainers/cli"
+    },
+    "repos/devcontainers/cli/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/devcontainers/cli/commits?per_page=1": {
+     "sha": "3e363f63a712d30a741174f6d1a7e75f47fe3fc1",
+     "date": "2026-09-29T11:25:31Z",
+     "html_url": "https://github.com/devcontainers/cli/commit/3e363f63a712d30a741174f6d1a7e75f47fe3fc1"
+    }
+   }
+  }
+ }
+}

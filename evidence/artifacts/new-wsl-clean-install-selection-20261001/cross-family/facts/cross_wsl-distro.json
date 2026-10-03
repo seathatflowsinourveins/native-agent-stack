@@ -1,0 +1,111 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/cross_wsl-distro.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://ubuntu.com/download/server",
+   "non_github": true
+  },
+  "C02": {
+   "repository": "https://ubuntu.com/download/server",
+   "non_github": true
+  },
+  "C03": {
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/microsoft/WSL": {
+     "full_name": "microsoft/WSL",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:41:53Z",
+     "created_at": "2016-04-06T17:32:56Z",
+     "updated_at": "2026-10-01T20:15:31Z",
+     "open_issues_count": 1008,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/WSL"
+    },
+    "repos/microsoft/WSL/releases/latest": {
+     "tag_name": "3.0.1",
+     "name": "3.0.1",
+     "published_at": "2026-09-29T17:18:57Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/WSL/releases/tag/3.0.1"
+    },
+    "repos/microsoft/WSL/commits?per_page=1": {
+     "sha": "c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67",
+     "date": "2026-10-01T00:34:19Z",
+     "html_url": "https://github.com/microsoft/WSL/commit/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/microsoft/WSL": {
+     "full_name": "microsoft/WSL",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:41:53Z",
+     "created_at": "2016-04-06T17:32:56Z",
+     "updated_at": "2026-10-01T20:15:31Z",
+     "open_issues_count": 1008,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/WSL"
+    },
+    "repos/microsoft/WSL/releases/latest": {
+     "tag_name": "3.0.1",
+     "name": "3.0.1",
+     "published_at": "2026-09-29T17:18:57Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/WSL/releases/tag/3.0.1"
+    },
+    "repos/microsoft/WSL/commits?per_page=1": {
+     "sha": "c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67",
+     "date": "2026-10-01T00:34:19Z",
+     "html_url": "https://github.com/microsoft/WSL/commit/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/microsoft/WSL/blob/master/distributions/DistributionInfo.json",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/microsoft/WSL": {
+     "full_name": "microsoft/WSL",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:41:53Z",
+     "created_at": "2016-04-06T17:32:56Z",
+     "updated_at": "2026-10-01T20:15:31Z",
+     "open_issues_count": 1008,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/WSL"
+    },
+    "repos/microsoft/WSL/releases/latest": {
+     "tag_name": "3.0.1",
+     "name": "3.0.1",
+     "published_at": "2026-09-29T17:18:57Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/WSL/releases/tag/3.0.1"
+    },
+    "repos/microsoft/WSL/commits?per_page=1": {
+     "sha": "c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67",
+     "date": "2026-10-01T00:34:19Z",
+     "html_url": "https://github.com/microsoft/WSL/commit/c34e75aea8dcc50c0c2f9e76b2de9b26a58e8b67"
+    }
+   }
+  }
+ }
+}

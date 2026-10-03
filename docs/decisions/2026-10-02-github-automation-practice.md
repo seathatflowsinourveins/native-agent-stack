@@ -21,13 +21,14 @@ drifted sections as superseded:
   on.
 
 Against the final catalog of 2026-10-01 (`docs/final-catalog-20261001.md`, #595), the three layers this practice
-touches keep their selections of record. The clean-room definitive round announced in #595 decides one pick per slot
-for each of them; until then the table records which picks each model family made.
+touches keep their selections of record. That catalog is the record of the blind GPT half, not an install list; the
+definitive manifest (#602) decides each slot (see "Update, 2026-10-03" below). The table records which picks each model
+family made in the catalog's record.
 
 | Layer | Picks both families made | Picks one family made | In use here |
 | --- | --- | --- | --- |
 | git-github-automation | git, gh (cli/cli), Worktrunk, sem | difftastic, claude-code-action | git, gh, Worktrunk, difftastic; claude-code-action unadopted (M45); sem not adopted |
-| ci-supply-chain | actions/attest, Syft, Dependabot, actionlint (kjanat), zizmor | github/codeql-action | all five standing picks; the challenger is the `upload-sarif` step already in use |
+| ci-supply-chain | actions/attest, Syft, Dependabot, actionlint (kjanat), zizmor | github/codeql-action | all five picks both families made; github/codeql-action's `upload-sarif` step is already in use |
 | secrets-credentials | betterleaks | trufflehog | gitleaks 8.30.1 as the required gate; betterleaks v1.8.1 as a report-only trial |
 
 ## Preregistered checks
@@ -36,6 +37,18 @@ The definitive round decides each slot's pick. The checks below are the measurem
 the practice changes: the acceptance test for a gate swap, and the measurement that settles a slot if the round's two
 families stay split. Each is frozen in its own preregistration before any arm runs, and each verdict lands in its own
 pull request.
+
+**Update, 2026-10-03.** The definitive manifest's next version (#602, `675bdd51`) is the definitive round's result for
+these layers, so the conditions below resolve as follows. The text after this paragraph stays as preregistered.
+
+- **P1 can run.** The secret-scanner slot is betterleaks (`definitive`). The arms are gitleaks 8.30.1 against
+  betterleaks. trufflehog is not an arm: #602 resolved credential verification as installing nothing (state
+  `resolved`, not `split`).
+- **P2 does not run.** The structural-diff slot is difftastic (`definitive`). The agent structural diff installs
+  nothing: a critic found sem the same job as difftastic.
+- **P3 is consistent.** claude-code-action is not installed (`resolved`), matching decision M45.
+- **Contests.** The clean-room audit of #602 (branch `claude/definitive-round-20261002`) may contest one of these rows.
+  A contest goes to the manifest's owner before any arm changes.
 
 - **P1, the secret-scan gate.** It runs once the definitive round has picked the secrets slot, as the acceptance
   test before that pick replaces gitleaks in the required job.
@@ -101,7 +114,8 @@ Revisit this record when any of these happens:
 ## Evidence class
 
 The current-practice facts are configuration observations from read-only `gh api` GETs on 2026-10-02 (the ruleset and
-the repository settings). The standing picks come from the final catalog (`source_review` in two model families).
+the repository settings). The per-family picks come from the final catalog's record (`source_review` in two model
+families).
 Nothing here was installed or measured.
 
 ## SOTA sources

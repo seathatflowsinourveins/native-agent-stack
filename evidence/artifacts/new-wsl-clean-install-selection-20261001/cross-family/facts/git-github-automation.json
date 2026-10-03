@@ -1,0 +1,235 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/git-github-automation.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/ataraxy-labs/sem",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/ataraxy-labs/sem": {
+     "full_name": "Ataraxy-Labs/sem",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:15:47Z",
+     "created_at": "2026-02-05T19:49:35Z",
+     "updated_at": "2026-10-01T18:15:54Z",
+     "open_issues_count": 3,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/Ataraxy-Labs/sem"
+    },
+    "repos/ataraxy-labs/sem/releases/latest": {
+     "tag_name": "v0.25.0",
+     "name": "v0.25.0",
+     "published_at": "2026-09-13T17:47:03Z",
+     "prerelease": false,
+     "html_url": "https://github.com/Ataraxy-Labs/sem/releases/tag/v0.25.0"
+    },
+    "repos/ataraxy-labs/sem/commits?per_page=1": {
+     "sha": "dfcb3de6c8bb32eda4005b0b3260b2b437f256db",
+     "date": "2026-10-01T18:15:47Z",
+     "html_url": "https://github.com/Ataraxy-Labs/sem/commit/dfcb3de6c8bb32eda4005b0b3260b2b437f256db"
+    }
+   }
+  },
+  "C02": {
+   "repository": null,
+   "non_github": true
+  },
+  "C03": {
+   "repository": "https://github.com/cli/cli",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/cli/cli": {
+     "full_name": "cli/cli",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "trunk",
+     "pushed_at": "2026-10-01T16:57:11Z",
+     "created_at": "2019-10-03T15:24:53Z",
+     "updated_at": "2026-10-01T20:12:43Z",
+     "open_issues_count": 1109,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/cli/cli"
+    },
+    "repos/cli/cli/releases/latest": {
+     "tag_name": "v2.102.0",
+     "name": "GitHub CLI 2.102.0",
+     "published_at": "2026-09-30T02:40:02Z",
+     "prerelease": false,
+     "html_url": "https://github.com/cli/cli/releases/tag/v2.102.0"
+    },
+    "repos/cli/cli/commits?per_page=1": {
+     "sha": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+     "date": "2026-09-30T02:18:02Z",
+     "html_url": "https://github.com/cli/cli/commit/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/openai/codex-plugin-cc",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/openai/codex-plugin-cc": {
+     "full_name": "openai/codex-plugin-cc",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-07-08T00:17:31Z",
+     "created_at": "2026-03-30T15:29:52Z",
+     "updated_at": "2026-10-01T18:02:26Z",
+     "open_issues_count": 514,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/openai/codex-plugin-cc"
+    },
+    "repos/openai/codex-plugin-cc/releases/latest": {
+     "tag_name": "v1.0.6",
+     "name": "v1.0.6",
+     "published_at": "2026-07-08T00:17:32Z",
+     "prerelease": false,
+     "html_url": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6"
+    },
+    "repos/openai/codex-plugin-cc/commits?per_page=1": {
+     "sha": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+     "date": "2026-07-08T00:17:00Z",
+     "html_url": "https://github.com/openai/codex-plugin-cc/commit/db52e28f4d9ded852ab3942cea316258ae4ef346"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/max-sixty/worktrunk": {
+     "full_name": "max-sixty/worktrunk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:01:15Z",
+     "created_at": "2025-10-17T22:13:14Z",
+     "updated_at": "2026-10-01T20:33:30Z",
+     "open_issues_count": 47,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/max-sixty/worktrunk"
+    },
+    "repos/max-sixty/worktrunk/releases/latest": {
+     "tag_name": "v0.80.0",
+     "name": "0.80.0",
+     "published_at": "2026-09-27T21:18:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+    },
+    "repos/max-sixty/worktrunk/commits?per_page=1": {
+     "sha": "85e685e313f7fbc0612c0e055e655c3917e39f29",
+     "date": "2026-10-01T20:01:12Z",
+     "html_url": "https://github.com/max-sixty/worktrunk/commit/85e685e313f7fbc0612c0e055e655c3917e39f29"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/Wilfred/difftastic",
+   "captured_at": "2026-10-01T20:42:26+00:00",
+   "endpoints": {
+    "repos/Wilfred/difftastic": {
+     "full_name": "Wilfred/difftastic",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-22T08:42:53Z",
+     "created_at": "2018-12-18T11:19:45Z",
+     "updated_at": "2026-10-01T12:53:54Z",
+     "open_issues_count": 290,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/Wilfred/difftastic"
+    },
+    "repos/Wilfred/difftastic/releases/latest": {
+     "tag_name": "0.71.0",
+     "name": "0.71.0",
+     "published_at": "2026-09-18T22:57:29Z",
+     "prerelease": false,
+     "html_url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
+    },
+    "repos/Wilfred/difftastic/commits?per_page=1": {
+     "sha": "e2e1e3b7f5be18290135cc16ec521c16284eb21b",
+     "date": "2026-09-22T08:39:45Z",
+     "html_url": "https://github.com/Wilfred/difftastic/commit/e2e1e3b7f5be18290135cc16ec521c16284eb21b"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/git/git",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/git/git": {
+     "full_name": "git/git",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T03:07:22Z",
+     "created_at": "2008-07-23T14:21:26Z",
+     "updated_at": "2026-10-01T19:56:58Z",
+     "open_issues_count": 403,
+     "has_issues": false,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/git/git"
+    },
+    "repos/git/git/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/git/git/commits?per_page=1": {
+     "sha": "a018953688f1b10bddf91bff8747068f5f4746a4",
+     "date": "2026-09-28T04:20:04Z",
+     "html_url": "https://github.com/git/git/commit/a018953688f1b10bddf91bff8747068f5f4746a4"
+    }
+   }
+  },
+  "C08": {
+   "repository": null,
+   "non_github": true
+  },
+  "C09": {
+   "repository": "https://github.com/anthropics/claude-code-action",
+   "captured_at": "2026-10-01T20:42:27+00:00",
+   "endpoints": {
+    "repos/anthropics/claude-code-action": {
+     "full_name": "anthropics/claude-code-action",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:05:26Z",
+     "created_at": "2025-05-19T15:26:50Z",
+     "updated_at": "2026-10-01T20:31:58Z",
+     "open_issues_count": 815,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/anthropics/claude-code-action"
+    },
+    "repos/anthropics/claude-code-action/releases/latest": {
+     "tag_name": "v1",
+     "name": "Claude Code GitHub Action v1.0",
+     "published_at": "2025-08-26T17:01:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/claude-code-action/releases/tag/v1"
+    },
+    "repos/anthropics/claude-code-action/commits?per_page=1": {
+     "sha": "97c53473391bff1901034d4b454b5bac7ab7a029",
+     "date": "2026-10-01T18:01:56Z",
+     "html_url": "https://github.com/anthropics/claude-code-action/commit/97c53473391bff1901034d4b454b5bac7ab7a029"
+    }
+   }
+  }
+ }
+}

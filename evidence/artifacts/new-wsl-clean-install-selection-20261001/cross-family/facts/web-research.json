@@ -1,0 +1,319 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/web-research.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/trycua/cua",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/trycua/cua": {
+     "full_name": "trycua/cua",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:40:37Z",
+     "created_at": "2025-01-31T15:02:49Z",
+     "updated_at": "2026-10-01T20:24:37Z",
+     "open_issues_count": 1018,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/trycua/cua"
+    },
+    "repos/trycua/cua/releases/latest": {
+     "tag_name": "agent-v0.9.0",
+     "name": "cua-agent v0.9.0",
+     "published_at": "2026-10-01T20:21:25Z",
+     "prerelease": false,
+     "html_url": "https://github.com/trycua/cua/releases/tag/agent-v0.9.0"
+    },
+    "repos/trycua/cua/commits?per_page=1": {
+     "sha": "58aba84b5b83d77e7e2b0f006547699eb594e50d",
+     "date": "2026-10-01T20:24:31Z",
+     "html_url": "https://github.com/trycua/cua/commit/58aba84b5b83d77e7e2b0f006547699eb594e50d"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/alphaXiv/OpenResearch",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/alphaXiv/OpenResearch": {
+     "full_name": "alphaXiv/OpenResearch",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:15:51Z",
+     "created_at": "2026-06-07T01:51:39Z",
+     "updated_at": "2026-10-01T20:40:37Z",
+     "open_issues_count": 53,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/alphaXiv/OpenResearch"
+    },
+    "repos/alphaXiv/OpenResearch/releases/latest": {
+     "tag_name": "v0.2.14",
+     "name": "v0.2.14",
+     "published_at": "2026-09-30T08:45:49Z",
+     "prerelease": false,
+     "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.14"
+    },
+    "repos/alphaXiv/OpenResearch/commits?per_page=1": {
+     "sha": "a87bb4ce5a50a8b6e6be63d84ccb9a393f36d251",
+     "date": "2026-10-01T00:14:10Z",
+     "html_url": "https://github.com/alphaXiv/OpenResearch/commit/a87bb4ce5a50a8b6e6be63d84ccb9a393f36d251"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/microsoft/playwright-cli",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/microsoft/playwright-cli": {
+     "full_name": "microsoft/playwright-cli",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-28T23:23:12Z",
+     "created_at": "2020-06-19T18:34:03Z",
+     "updated_at": "2026-10-01T17:57:18Z",
+     "open_issues_count": 1,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/microsoft/playwright-cli"
+    },
+    "repos/microsoft/playwright-cli/releases/latest": {
+     "tag_name": "v0.1.22",
+     "name": "v0.1.22",
+     "published_at": "2026-09-28T23:23:13Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22"
+    },
+    "repos/microsoft/playwright-cli/commits?per_page=1": {
+     "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+     "date": "2026-09-28T23:22:31Z",
+     "html_url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/exa-labs/exa-mcp-server",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/exa-labs/exa-mcp-server": {
+     "full_name": "exa-labs/exa-mcp-server",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T21:19:18Z",
+     "created_at": "2024-11-27T23:38:35Z",
+     "updated_at": "2026-10-01T17:16:10Z",
+     "open_issues_count": 51,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/exa-labs/exa-mcp-server"
+    },
+    "repos/exa-labs/exa-mcp-server/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/exa-labs/exa-mcp-server/commits?per_page=1": {
+     "sha": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+     "date": "2026-09-23T00:29:21Z",
+     "html_url": "https://github.com/exa-labs/exa-mcp-server/commit/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/unclecode/crawl4ai",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/unclecode/crawl4ai": {
+     "full_name": "unclecode/crawl4ai",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-25T06:37:14Z",
+     "created_at": "2024-05-09T09:48:50Z",
+     "updated_at": "2026-10-01T20:16:45Z",
+     "open_issues_count": 223,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/unclecode/crawl4ai"
+    },
+    "repos/unclecode/crawl4ai/releases/latest": {
+     "tag_name": "v0.9.4",
+     "name": "Release v0.9.4",
+     "published_at": "2026-09-23T12:14:55Z",
+     "prerelease": false,
+     "html_url": "https://github.com/unclecode/crawl4ai/releases/tag/v0.9.4"
+    },
+    "repos/unclecode/crawl4ai/commits?per_page=1": {
+     "sha": "e5d2e786d1a101225f3f6a3e6fd344d76eeb13af",
+     "date": "2026-09-25T06:35:50Z",
+     "html_url": "https://github.com/unclecode/crawl4ai/commit/e5d2e786d1a101225f3f6a3e6fd344d76eeb13af"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/vercel-labs/agent-browser",
+   "captured_at": "2026-10-01T20:42:40+00:00",
+   "endpoints": {
+    "repos/vercel-labs/agent-browser": {
+     "full_name": "vercel-labs/agent-browser",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:12:51Z",
+     "created_at": "2026-01-11T05:38:15Z",
+     "updated_at": "2026-10-01T20:25:19Z",
+     "open_issues_count": 823,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/vercel-labs/agent-browser"
+    },
+    "repos/vercel-labs/agent-browser/releases/latest": {
+     "tag_name": "v0.38.1",
+     "name": "v0.38.1",
+     "published_at": "2026-09-16T20:05:12Z",
+     "prerelease": false,
+     "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
+    },
+    "repos/vercel-labs/agent-browser/commits?per_page=1": {
+     "sha": "39a74c70d7759d5a6de7a22c04570bb626bbd081",
+     "date": "2026-10-01T20:12:51Z",
+     "html_url": "https://github.com/vercel-labs/agent-browser/commit/39a74c70d7759d5a6de7a22c04570bb626bbd081"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/adbar/trafilatura",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/adbar/trafilatura": {
+     "full_name": "adbar/trafilatura",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-30T19:49:16Z",
+     "created_at": "2019-04-08T11:38:48Z",
+     "updated_at": "2026-10-01T20:25:07Z",
+     "open_issues_count": 60,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/adbar/trafilatura"
+    },
+    "repos/adbar/trafilatura/releases/latest": {
+     "tag_name": "v2.2.0",
+     "name": "trafilatura-2.2.0",
+     "published_at": "2026-07-31T16:07:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/adbar/trafilatura/releases/tag/v2.2.0"
+    },
+    "repos/adbar/trafilatura/commits?per_page=1": {
+     "sha": "96e19b949c3ac4a9e193b41fe2fb352e7150db86",
+     "date": "2026-09-30T19:47:15Z",
+     "html_url": "https://github.com/adbar/trafilatura/commit/96e19b949c3ac4a9e193b41fe2fb352e7150db86"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/browser-use/browser-use",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/browser-use/browser-use": {
+     "full_name": "browser-use/browser-use",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:39:09Z",
+     "created_at": "2024-10-31T16:00:56Z",
+     "updated_at": "2026-10-01T20:02:12Z",
+     "open_issues_count": 540,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/browser-use/browser-use"
+    },
+    "repos/browser-use/browser-use/releases/latest": {
+     "tag_name": "0.13.10",
+     "name": "0.13.10",
+     "published_at": "2026-09-04T03:28:53Z",
+     "prerelease": false,
+     "html_url": "https://github.com/browser-use/browser-use/releases/tag/0.13.10"
+    },
+    "repos/browser-use/browser-use/commits?per_page=1": {
+     "sha": "4cbe921673b48a488f5415d9159249afd12a625b",
+     "date": "2026-09-26T07:29:32Z",
+     "html_url": "https://github.com/browser-use/browser-use/commit/4cbe921673b48a488f5415d9159249afd12a625b"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/firecrawl/firecrawl-mcp-server": {
+     "full_name": "firecrawl/firecrawl-mcp-server",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:20:02Z",
+     "created_at": "2024-12-06T07:50:27Z",
+     "updated_at": "2026-10-01T17:51:14Z",
+     "open_issues_count": 149,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/firecrawl/firecrawl-mcp-server"
+    },
+    "repos/firecrawl/firecrawl-mcp-server/releases/latest": {
+     "tag_name": "v3.2.1",
+     "name": "v3.2.1",
+     "published_at": "2025-09-26T07:31:17Z",
+     "prerelease": false,
+     "html_url": "https://github.com/firecrawl/firecrawl-mcp-server/releases/tag/v3.2.1"
+    },
+    "repos/firecrawl/firecrawl-mcp-server/commits?per_page=1": {
+     "sha": "b8da0b566e7c67eda8e7dc70926bfab2d0a015eb",
+     "date": "2026-10-01T17:51:03Z",
+     "html_url": "https://github.com/firecrawl/firecrawl-mcp-server/commit/b8da0b566e7c67eda8e7dc70926bfab2d0a015eb"
+    }
+   }
+  },
+  "C10": {
+   "repository": "https://github.com/tavily-ai/tavily-cli",
+   "captured_at": "2026-10-01T20:42:41+00:00",
+   "endpoints": {
+    "repos/tavily-ai/tavily-cli": {
+     "full_name": "tavily-ai/tavily-cli",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-28T15:18:14Z",
+     "created_at": "2026-03-12T16:16:24Z",
+     "updated_at": "2026-09-26T14:04:13Z",
+     "open_issues_count": 8,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/tavily-ai/tavily-cli"
+    },
+    "repos/tavily-ai/tavily-cli/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/tavily-ai/tavily-cli/commits?per_page=1": {
+     "sha": "fd745230e6756933e3a190bfdc61ea1eb2db3993",
+     "date": "2026-09-16T15:16:55Z",
+     "html_url": "https://github.com/tavily-ai/tavily-cli/commit/fd745230e6756933e3a190bfdc61ea1eb2db3993"
+    }
+   }
+  }
+ }
+}

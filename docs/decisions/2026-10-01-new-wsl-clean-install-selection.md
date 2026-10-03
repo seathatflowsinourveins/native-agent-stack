@@ -208,3 +208,19 @@ arm set itself.
 A preregistered comparison on the new distribution; the re-vote of the candidates the packets did not hold, which can
 add arms or reopen a selected layer; a fact a later check finds wrong where a pick rests on it; a new upstream release
 or maintenance change that alters a criterion.
+
+## Addendum (2026-10-01, revised 2026-10-02): the cross-family half ran
+
+The blind GPT-6.1 Sol run requested under "Cross-family status" ran the same day on the same frozen packets, criteria
+and prompts: 11 judges in 3 groups and one critic per group, GPT-6.1 Sol at effort max through the Codex CLI
+(`cross-family/`, with its preregistration addendum recorded before the first process, by the coordinator's private
+run log). The GPT critics upheld 4 selections, revised 1 (workers) and found 16 undetermined. Against this record's
+recommendations the two halves name the same picks with the same status in 2 layers (native-clients and agent-sdks),
+the same picks with split statuses in 3 (document-retrieval, scheduling-supervision and the base distribution) and
+partly shared picks in the other 16; no layer has disjoint picks. These counts use the final catalog's fold, which
+extends the agreement rule frozen before the run (`cross-family/agreement-rule.txt`) in two places: under the rule's
+text as written, document-retrieval and scheduling-supervision are unclassified and the base distribution is differ.
+The comparison is recorded in `catalogs/foundation/final-catalog-20261001.json` (decision record
+`docs/decisions/2026-10-01-final-catalog.md`). It is evidence, not an install list: a pick both halves named is not an
+install decision, and the install record is the definitive manifest (#602). The Decision table above remains this
+run's record.

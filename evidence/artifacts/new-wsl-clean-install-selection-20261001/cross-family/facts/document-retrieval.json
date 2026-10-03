@@ -1,0 +1,291 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/document-retrieval.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/run-llama/llama_index",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/run-llama/llama_index": {
+     "full_name": "run-llama/llama_index",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T18:39:47Z",
+     "created_at": "2022-11-02T04:24:54Z",
+     "updated_at": "2026-10-01T20:18:41Z",
+     "open_issues_count": 831,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/run-llama/llama_index"
+    },
+    "repos/run-llama/llama_index/releases/latest": {
+     "tag_name": "v0.14.25",
+     "name": "v0.14.25",
+     "published_at": "2026-09-21T16:22:27Z",
+     "prerelease": false,
+     "html_url": "https://github.com/run-llama/llama_index/releases/tag/v0.14.25"
+    },
+    "repos/run-llama/llama_index/commits?per_page=1": {
+     "sha": "962940ddc079cc21701d28d1237c84c82a7c5164",
+     "date": "2026-10-01T18:39:46Z",
+     "html_url": "https://github.com/run-llama/llama_index/commit/962940ddc079cc21701d28d1237c84c82a7c5164"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/vectifyai/pageindex",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/vectifyai/pageindex": {
+     "full_name": "VectifyAI/PageIndex",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T15:24:06Z",
+     "created_at": "2025-04-01T10:53:54Z",
+     "updated_at": "2026-10-01T20:22:23Z",
+     "open_issues_count": 115,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/VectifyAI/PageIndex"
+    },
+    "repos/vectifyai/pageindex/releases/latest": {
+     "tag_name": "v0.2.21",
+     "name": "v0.2.21",
+     "published_at": "2026-10-01T15:26:25Z",
+     "prerelease": false,
+     "html_url": "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.21"
+    },
+    "repos/vectifyai/pageindex/commits?per_page=1": {
+     "sha": "6d23caf416858f2ca136840305d1f479a86f6ef7",
+     "date": "2026-10-01T15:20:09Z",
+     "html_url": "https://github.com/VectifyAI/PageIndex/commit/6d23caf416858f2ca136840305d1f479a86f6ef7"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/opendatalab/mineru",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/opendatalab/mineru": {
+     "full_name": "opendatalab/MinerU",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-09-30T09:13:37Z",
+     "created_at": "2024-02-29T08:52:34Z",
+     "updated_at": "2026-10-01T19:53:46Z",
+     "open_issues_count": 126,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/opendatalab/MinerU"
+    },
+    "repos/opendatalab/mineru/releases/latest": {
+     "tag_name": "mineru-4.0.10-released",
+     "name": "MinerU 4.0.10",
+     "published_at": "2026-09-29T07:18:10Z",
+     "prerelease": false,
+     "html_url": "https://github.com/opendatalab/MinerU/releases/tag/mineru-4.0.10-released"
+    },
+    "repos/opendatalab/mineru/commits?per_page=1": {
+     "sha": "ed50cc15bc2c9bfb00520dadfe61979866e62236",
+     "date": "2026-09-29T07:16:39Z",
+     "html_url": "https://github.com/opendatalab/MinerU/commit/ed50cc15bc2c9bfb00520dadfe61979866e62236"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/docling-project/docling",
+   "captured_at": "2026-10-01T20:42:23+00:00",
+   "endpoints": {
+    "repos/docling-project/docling": {
+     "full_name": "docling-project/docling",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T16:32:12Z",
+     "created_at": "2024-07-09T07:50:26Z",
+     "updated_at": "2026-10-01T20:02:16Z",
+     "open_issues_count": 968,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/docling-project/docling"
+    },
+    "repos/docling-project/docling/releases/latest": {
+     "tag_name": "v2.132.0",
+     "name": null,
+     "published_at": "2026-10-01T09:44:36Z",
+     "prerelease": false,
+     "html_url": "https://github.com/docling-project/docling/releases/tag/v2.132.0"
+    },
+    "repos/docling-project/docling/commits?per_page=1": {
+     "sha": "bba2ec58fe58af1be630fea5cc0d35b0ad2a472e",
+     "date": "2026-10-01T14:32:12Z",
+     "html_url": "https://github.com/docling-project/docling/commit/bba2ec58fe58af1be630fea5cc0d35b0ad2a472e"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/microsoft/markitdown",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/microsoft/markitdown": {
+     "full_name": "microsoft/markitdown",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T05:24:20Z",
+     "created_at": "2024-11-13T19:56:40Z",
+     "updated_at": "2026-10-01T20:30:38Z",
+     "open_issues_count": 638,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/microsoft/markitdown"
+    },
+    "repos/microsoft/markitdown/releases/latest": {
+     "tag_name": "v0.1.8",
+     "name": "Version 0.1.8",
+     "published_at": "2026-09-21T21:22:51Z",
+     "prerelease": false,
+     "html_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+    },
+    "repos/microsoft/markitdown/commits?per_page=1": {
+     "sha": "1f9530a6d35364886a038dc2dcb34256bb0c85b0",
+     "date": "2026-10-01T05:24:20Z",
+     "html_url": "https://github.com/microsoft/markitdown/commit/1f9530a6d35364886a038dc2dcb34256bb0c85b0"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/tsdgeos/poppler_mirror",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/tsdgeos/poppler_mirror": {
+     "full_name": "tsdgeos/poppler_mirror",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T17:52:14Z",
+     "created_at": "2016-05-24T22:20:22Z",
+     "updated_at": "2026-10-01T17:52:19Z",
+     "open_issues_count": 1,
+     "has_issues": false,
+     "license_spdx": "GPL-2.0",
+     "html_url": "https://github.com/tsdgeos/poppler_mirror"
+    },
+    "repos/tsdgeos/poppler_mirror/releases/latest": {
+     "_error": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}"
+    },
+    "repos/tsdgeos/poppler_mirror/commits?per_page=1": {
+     "sha": "03e8c2c9696c3f556f9ad7fbe9e5177907d625ef",
+     "date": "2026-10-01T17:51:54Z",
+     "html_url": "https://github.com/tsdgeos/poppler_mirror/commit/03e8c2c9696c3f556f9ad7fbe9e5177907d625ef"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/arabold/docs-mcp-server",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/arabold/docs-mcp-server": {
+     "full_name": "arabold/docs-mcp-server",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-28T13:53:44Z",
+     "created_at": "2025-03-17T15:13:15Z",
+     "updated_at": "2026-10-01T11:46:44Z",
+     "open_issues_count": 75,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/arabold/docs-mcp-server"
+    },
+    "repos/arabold/docs-mcp-server/releases/latest": {
+     "tag_name": "v3.2.1",
+     "name": "v3.2.1",
+     "published_at": "2026-09-27T15:25:14Z",
+     "prerelease": false,
+     "html_url": "https://github.com/arabold/docs-mcp-server/releases/tag/v3.2.1"
+    },
+    "repos/arabold/docs-mcp-server/commits?per_page=1": {
+     "sha": "f2938c47bb8937c650f0d5ddb614f867773b29f4",
+     "date": "2026-09-27T15:25:04Z",
+     "html_url": "https://github.com/arabold/docs-mcp-server/commit/f2938c47bb8937c650f0d5ddb614f867773b29f4"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/tobi/qmd",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/tobi/qmd": {
+     "full_name": "tobi/qmd",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-09T20:51:56Z",
+     "created_at": "2025-12-08T14:22:57Z",
+     "updated_at": "2026-10-01T20:30:48Z",
+     "open_issues_count": 203,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/tobi/qmd"
+    },
+    "repos/tobi/qmd/releases/latest": {
+     "tag_name": "v2.8.3",
+     "name": "v2.8.3",
+     "published_at": "2026-08-16T22:30:34Z",
+     "prerelease": false,
+     "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+    },
+    "repos/tobi/qmd/commits?per_page=1": {
+     "sha": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+     "date": "2026-09-09T20:51:54Z",
+     "html_url": "https://github.com/tobi/qmd/commit/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/andrewyng/context-hub",
+   "captured_at": "2026-10-01T20:42:24+00:00",
+   "endpoints": {
+    "repos/andrewyng/context-hub": {
+     "full_name": "andrewyng/context-hub",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-05-31T18:41:45Z",
+     "created_at": "2025-10-30T12:20:34Z",
+     "updated_at": "2026-10-01T15:10:22Z",
+     "open_issues_count": 141,
+     "has_issues": true,
+     "license_spdx": "MIT",
+     "html_url": "https://github.com/andrewyng/context-hub"
+    },
+    "repos/andrewyng/context-hub/releases/latest": {
+     "tag_name": "v0.1.4",
+     "name": "v0.1.4",
+     "published_at": "2026-04-27T22:10:03Z",
+     "prerelease": false,
+     "html_url": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4"
+    },
+    "repos/andrewyng/context-hub/commits?per_page=1": {
+     "sha": "67dcbeb2eb42c808549f08397920ad58be7c2206",
+     "date": "2026-05-31T18:39:40Z",
+     "html_url": "https://github.com/andrewyng/context-hub/commit/67dcbeb2eb42c808549f08397920ad58be7c2206"
+    }
+   }
+  }
+ }
+}

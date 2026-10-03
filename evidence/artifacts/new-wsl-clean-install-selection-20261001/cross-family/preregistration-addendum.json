@@ -1,0 +1,223 @@
+{
+ "kind": "cross_family_preregistration_addendum",
+ "rendering": "Scanner-safe rendering of the addendum as recorded: identical values, with each file-to-sha256 map written as a list. The original bytes stay with the coordinator's private records.",
+ "original_sha256": "8a4ba15e351efe188fa7ef0c45aaec6b9c881d1aca7c5d4c245b6e6dd0034137",
+ "recorded_at": "2026-10-01T20:44:31+00:00",
+ "parent_run": "wf_c2377ebb-65c (Claude Opus 5.5, effort max; 11 judges in 3 groups, 1 critic per group)",
+ "parent_preregistration_sha256": "eec6b4c65649062443cfe421ae30301e43f8019172e5708e2dfd4db6e201652f",
+ "frozen_inputs_verified": {
+  "criteria_sha256": "f7e74c20e8763169122fc32b6566856fe7e352cc1e688dd8faa3a425c37d2f4f",
+  "judge_prompt_sha256": "5b190230982c3e113d5299d412ef6e74251b52fa3b66649235dcbc33ec64168c",
+  "critic_prompt_sha256": "e7a01ed699ecec2d232eb1da16df4a6f1191d58987040f1e770b9445494eb58f",
+  "packets": [
+   {
+    "file": "agent-sdks.json",
+    "sha256": "eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519"
+   },
+   {
+    "file": "ci-supply-chain.json",
+    "sha256": "dc62fdbbebd6ed1ab837663ee00407a78031f86c8f302f6fcc1139ab1744505c"
+   },
+   {
+    "file": "code-navigation.json",
+    "sha256": "9934b28412e6752c929b25ba9afbb70090f1c839a32b30e8b384feccfb5ebe97"
+   },
+   {
+    "file": "cross_wsl-distro.json",
+    "sha256": "c72c180258d461978669df0170bc72e43eb89f306028da2ec4d9ecfe71a8d840"
+   },
+   {
+    "file": "document-retrieval.json",
+    "sha256": "0ccd6e65221db806ecc6e07a3dc016284f0e484533a3de19191b0fd671e4df80"
+   },
+   {
+    "file": "durable-memory.json",
+    "sha256": "aea053f2127902cec7b40eea4af4ac984f95f5dfe8b0ddb4efae39ecbc60788e"
+   },
+   {
+    "file": "git-github-automation.json",
+    "sha256": "06cac7adef34c68e6130cfda8736b7ac188b06bd51cf0d6ed55341ef512c619e"
+   },
+   {
+    "file": "hosting-services.json",
+    "sha256": "b29f00bedfdf507e1cc23efbe7da62fd77e6ffde5c2314a8ec03ef0b45fcb3b7"
+   },
+   {
+    "file": "instructions-skills.json",
+    "sha256": "118055de6e7a04ad572145ffa3f654be27b31416e4399de13670984b03f485ec"
+   },
+   {
+    "file": "isolation.json",
+    "sha256": "4ae0a5d51404e19f95b30b72c5976175eecf00af65d8fd739f57d682fc7ca3ec"
+   },
+   {
+    "file": "mcp-surfaces.json",
+    "sha256": "bb9dca361316244a07c0446c97b60704167004c92feaf7a1f2ddaa241a9764eb"
+   },
+   {
+    "file": "native-clients.json",
+    "sha256": "0aedec39b04f2375b30db38ce8d77bd76f625c2b878f915c054203e1c0d715d2"
+   },
+   {
+    "file": "observation-inference.json",
+    "sha256": "e27c440fe06873ae1e2518545d7a953f99c5d89dfe68663e7263926808e9dc4a"
+   },
+   {
+    "file": "quality-evaluation.json",
+    "sha256": "41da5176a287882e8e4c94a46bf480bddcb63be221ee37a74f7773dada5de621"
+   },
+   {
+    "file": "recovery-portability.json",
+    "sha256": "0d340b28ded7706364595b6a0a728bc684a9d3d80462494e6d3cd3541328f70a"
+   },
+   {
+    "file": "scheduling-supervision.json",
+    "sha256": "ac99886247cc740aa430c3cce120baca6870014e708afcc918fb298fb261d91c"
+   },
+   {
+    "file": "secrets-credentials.json",
+    "sha256": "d0442f0fc7d1d1998e0afbaf88e73bac1b3520af5808aa632ee4eebae8b52509"
+   },
+   {
+    "file": "semantic-rag.json",
+    "sha256": "65a3213557f690e0c6f5256aac0af9986b2e820f67c0dfaf353e87d7af7d4b31"
+   },
+   {
+    "file": "token-efficiency.json",
+    "sha256": "43a3633490d4fff01b7f3e54d04db836994b3165e97fae232eeae9df72c380ce"
+   },
+   {
+    "file": "web-research.json",
+    "sha256": "b01cd87fc7a5e1ca953d51817a961d6bd9c1dca851614a064ce5de2bd88fdf4d"
+   },
+   {
+    "file": "workers.json",
+    "sha256": "4f6e5929cd70f1fd624c85d616abeed9a8c0ae608c67a743e302a6205c053838"
+   }
+  ]
+ },
+ "family": "OpenAI GPT-6.1 Sol through Codex CLI 0.159.3 (codex exec), model_reasoning_effort=max, web_search=live, sandbox read-only, ephemeral sessions, schema-bound final message",
+ "dispatch": "11 independent judge processes in 3 groups and 1 critic process per group, at most 4 concurrent; one retry per process on a failed or malformed return; every attempt kept",
+ "added_files": [
+  {
+   "file": "adapter.txt",
+   "sha256": "2dea556cf65cd856097313a2bac3358117dfaea97531cdd9185866d541bfa8bd"
+  },
+  {
+   "file": "agreement-rule.txt",
+   "sha256": "cb21a4558f71a5d0b47370990ee4308093652bac99bd5f2481cb7751a8d774f1"
+  },
+  {
+   "file": "assignment.json",
+   "sha256": "bac628fa2f5701ebdac986a3e8cd88ac3c24e4fe97e5bda3cd2718c69a9edc8c"
+  },
+  {
+   "file": "judge-schema.json",
+   "sha256": "970eaa0f32acd77918cb6c99b1b1739bce643578cd251008c6c58be0014a22ab"
+  },
+  {
+   "file": "critic-schema.json",
+   "sha256": "ce9195d350b331aeabfd5224b56e809936034d107e775c32c6be0f004f5118c3"
+  },
+  {
+   "file": "run_xfam.py",
+   "sha256": "825965443725cb08eb5b2093ff177e69a028b8c38f9366ddc27e9870f93d6901"
+  }
+ ],
+ "facts_sidecar": {
+  "note": "GitHub API responses (repos, releases/latest, commits?per_page=1) for all 209 candidates, captured before the run, popularity fields omitted",
+  "files": [
+   {
+    "file": "agent-sdks.json",
+    "sha256": "501ceae7a2ccfdfd49677fa08c3e1b0698da890558e20d74fc3178ac14156fbf"
+   },
+   {
+    "file": "ci-supply-chain.json",
+    "sha256": "a50fa213ff27476ce8567e1a447660a4887359d65af0961f3e76996336be71de"
+   },
+   {
+    "file": "code-navigation.json",
+    "sha256": "3ab879c0d7a64dd8fd20d4cdc3e8009058cd908127395d10d9db17c6beeba993"
+   },
+   {
+    "file": "cross_wsl-distro.json",
+    "sha256": "33a9fb8f89d45f590e62bd977a925afbb0d1f628dff828d7d12eb6256f79aea8"
+   },
+   {
+    "file": "document-retrieval.json",
+    "sha256": "d3e7fd7469d020cb16655c4ca1d75d7f23147b816ce2f5754cf912b2d2e04785"
+   },
+   {
+    "file": "durable-memory.json",
+    "sha256": "0ba336f2e2cd53d788cf0fe01a07bb441eb3c00e6f17a69f0d0f9f3683038be9"
+   },
+   {
+    "file": "git-github-automation.json",
+    "sha256": "66c2560762c96bdf40e99ca1937dccdc5648fc239199af67fff456ca94de6843"
+   },
+   {
+    "file": "hosting-services.json",
+    "sha256": "ccd442876b629fb73420175a8274ef1abd0e03d718e7606dfb03cf7e49986b67"
+   },
+   {
+    "file": "instructions-skills.json",
+    "sha256": "4a6eefb913d3ef0672091260e94fb8de16547ebb0a99781c209cf3b9e3c142d6"
+   },
+   {
+    "file": "isolation.json",
+    "sha256": "210d0ac8150b680ec26e13cf0a105b32d96ee983b1f01a19b6586fe1dade5368"
+   },
+   {
+    "file": "mcp-surfaces.json",
+    "sha256": "7f17a4441c4378cc68bae5b3b14d2e8b74960087df17ecc937c3f636f88620e6"
+   },
+   {
+    "file": "native-clients.json",
+    "sha256": "fd2d3819ca49de0479a303aec6fb690657cca94cb49603b72a74f47739096f00"
+   },
+   {
+    "file": "observation-inference.json",
+    "sha256": "51e07670c5a268d8db238893b1c02cd25d760ff9349a508fdf32baf51fd3636b"
+   },
+   {
+    "file": "quality-evaluation.json",
+    "sha256": "811656b1197dce1183447be0b2aad4447b2724b962b6224583adb93ea18fa167"
+   },
+   {
+    "file": "recovery-portability.json",
+    "sha256": "c58058582b2acc54a135df243f295165b433952da8590f91b25103ebe2da3043"
+   },
+   {
+    "file": "scheduling-supervision.json",
+    "sha256": "4d7aa05bbd804fc7f251585d90730022c3e66f4d8a86bda70d84c3a1213b41b8"
+   },
+   {
+    "file": "secrets-credentials.json",
+    "sha256": "40f73ac5cb1bc0912e5d6281c3d926ab569e51064324eb4bc42c4544048ab4de"
+   },
+   {
+    "file": "semantic-rag.json",
+    "sha256": "6a36ca5f4b618e23b82e27d1cbaa82cd696534a35bb62b0c254987d9da0ffc1b"
+   },
+   {
+    "file": "token-efficiency.json",
+    "sha256": "f6e20ea1febf910fd1054445016e09977d15cf837f674bda3b05d3d93c1de114"
+   },
+   {
+    "file": "web-research.json",
+    "sha256": "1e53d8692f2dfabeb67384cfde636b36009a05fb032f576e38ff3da44d9cebf5"
+   },
+   {
+    "file": "workers.json",
+    "sha256": "6fe2242f63e9c14ab7787c8a22d68ab1d391a7142ba1fdf39ce7eed8990effbc"
+   }
+  ]
+ },
+ "deviations_from_parent": [
+  "Tool mapping in adapter.txt (web search for ctx_fetch_and_index/ctx_search; captured GitHub API facts for the three named endpoints).",
+  "Output bound by judge-schema.json / critic-schema.json, which encode the return the frozen prompts ask for.",
+  "Packet-to-judge assignment is the coordinator's (assignment.json); the parent run's assignment is not public."
+ ],
+ "blindness": "The GPT processes receive only the adapter, the frozen prompts, criteria, packets and facts; not the Claude picks, the source host's selection of record or any project record. The critics receive only their group's GPT judgments. Contamination audit after the run: every web_search query and opened URL and any command in the event streams is checked for the project's repositories or local paths.",
+ "agreement_rule": "agreement-rule.txt (frozen now, before any GPT return exists)"
+}

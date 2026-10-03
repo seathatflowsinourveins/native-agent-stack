@@ -32,10 +32,18 @@ Every path below was verified against `main` at `6d9a7a5`.
   `catalogs/landscape/foundation.json` and `adoption/platforms/linux-wsl2.md`.
 - `catalogs/landscape/component-evidence-matrix.json`,
   `docs/component-evidence-matrix.md`,
-  `catalogs/landscape/new-host-grand-list.json` and
-  `docs/new-host-grand-list.md` are generated foundation reports. Either lane
+  `catalogs/landscape/new-host-grand-list.json`,
+  `docs/new-host-grand-list.md`,
+  `catalogs/foundation/final-catalog-20261001.json` and
+  `docs/final-catalog-20261001.md` are generated foundation reports. Either lane
   rewrites them, but only with their `--write` commands (see the
-  [hot-file protocol](#hot-file-protocol)).
+  [hot-file protocol](#hot-file-protocol)). The final catalog records what each
+  blind half of the 2026-10-01 clean-install selection named and is not an
+  install list (the install record is the definitive manifest). Its `--check`
+  fails when the architecture edition, the blind selection, its cross-family
+  record, their facts or the agreement rule change, so a PR that edits an
+  edition row runs `python3 scripts/final_catalog.py --write`; a move of the
+  grand list alone is reported as drift and does not fail.
 
 ### Trading tests
 
@@ -107,6 +115,7 @@ python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, "scripts");
 for p in sys.argv[1:]: host_receipts.register_file(Path("."), p)' <files to register>
 python3 scripts/component_matrix.py --write
 python3 scripts/new_host_grand_list.py --write
+python3 scripts/final_catalog.py --write
 python3 scripts/validate.py
 ```
 
@@ -118,7 +127,7 @@ python3 scripts/validate.py
   file your branch registered. Every tracked evidence file is listed today;
   `scripts/validate.py` enforces it for `evidence/receipts/` and
   `evidence/artifacts/`, and `scripts/host_receipts.py validate` for
-  `evidence/hosts/`. Never pass `manifests/evidence.json` itself or the four
+  `evidence/hosts/`. Never pass `manifests/evidence.json` itself or the six
   generated reports above; their `--write` commands re-register them. Remove
   the entry of a file your branch deleted; `scripts/validate.py` reports it as
   `file missing`.

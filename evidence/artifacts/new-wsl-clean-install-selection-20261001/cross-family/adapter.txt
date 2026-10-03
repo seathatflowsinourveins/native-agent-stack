@@ -1,0 +1,6 @@
+Harness adapter for the cross-family run (added by the coordinator; everything after the line "--- frozen prompt ---" is the frozen prompt verbatim, with its placeholders filled):
+- You run in OpenAI Codex with a read-only sandbox and live web search. Where the frozen prompt names ctx_fetch_and_index and ctx_search, use your web search tool (search and open pages) instead.
+- For the three GitHub API endpoints the frozen prompt names (repos/OWNER/REPO, repos/OWNER/REPO/releases/latest, repos/OWNER/REPO/commits?per_page=1), the coordinator captured the responses for every candidate before this run, without popularity fields, in the facts file listed next to each packet. Treat them as the GitHub API's answers at their captured_at time and count them against your GitHub API budget. For any other GitHub fact, use your web search tool on github.com or api.github.com pages.
+- The packet and facts files sit outside your working directory; read only those files. Do not read any other local file, and do not search for or open pages of the repositories under github.com/seathatflowsinourveins: they hold the project's own records, which must not shape this judgment.
+- Return one JSON object that matches the output schema you were given, with one entry per packet in "layers".
+--- frozen prompt ---

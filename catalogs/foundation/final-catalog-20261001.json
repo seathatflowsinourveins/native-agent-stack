@@ -1,0 +1,3927 @@
+{
+  "schema_version": 2,
+  "kind": "final_catalog",
+  "date_utc": "2026-10-01",
+  "scope": "The record of the blind GPT-6.1 Sol half of the clean-install selection of 2026-10-01 and of its comparison with the blind Claude Opus 5.5 record of the same day (#589). It is not an install list: no row in it is an installed tool or a default, a pick both halves named is agreement on source review and not an install decision, and nothing in it schedules a comparison. The install record is the definitive manifest (#602).",
+  "install_record": {
+    "manifest": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+    "decision": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
+    "pull_request": 602
+  },
+  "meaning": "Per layer: the picks each blind half named, which of them both halves named and which only one named, the agreement class the generator gives (the frozen rule, extended in two places) next to the class the rule's text gives as written, and the source host's selection of record (bookkeeping; an unjudged incumbent where neither half judged the row). Evidence only: nothing here installs, accepts or authorizes a candidate, and no selection of record changes.",
+  "evidence_class": "Source review by model judges with adversarial critics in two model families. Neither half installed or measured a candidate, and the judges of both halves received instruction files that name some of the candidates, so agreement on the layers of those tools is not independent evidence (decision record, \"Blindness, and its limit\").",
+  "classes": {
+    "same_picks_both_recommended": "both halves named the same picks and both recommended them (agreement class agree)",
+    "same_picks_both_compare": "both halves named the same picks and both asked for a comparison of them (agreement class agree)",
+    "same_picks_split_status": "both halves named the same picks; one recommended them and the other asked for a comparison. The rule's text classifies this case as neither agree nor overlap; the generator calls it overlap (first extension)",
+    "some_picks_shared": "the halves share at least one pick and their pick sets differ (agreement class overlap)",
+    "no_picks_shared": "the halves share no pick (agreement class differ)",
+    "pending_cross_family": "only the blind Claude half judged this layer, so there is no GPT record to compare",
+    "owner_lane_run_pending": "a trading layer outside the blind run of 2026-10-01: neither half judged it, and its selection of record is an unjudged incumbent; #589 left its blind run to the trading lane owner",
+    "no_blind_record": "a cross-cutting row outside the blind run: neither half judged it, and its selection of record is an unjudged incumbent (the source host's bookkeeping), not a merit result"
+  },
+  "fields": {
+    "selection_of_record": "the source host's winners with their pins, quoted from the edition (bookkeeping); a quoted pin leaves out the edition's note on what the new distribution installs",
+    "record_verdict": "the edition's verdict for the row, quoted as written (bookkeeping, not a decision of this record)",
+    "record_evidence_class": "the edition's evidence class for the row, quoted as written",
+    "blind": "the blind Claude Opus 5.5 half (#589): status, critic verdict, picks with captured upstream facts, and the comparison arms it recorded",
+    "cross_family": "the blind GPT-6.1 Sol half: status, critic verdict and picks with captured upstream facts",
+    "agreement": "the class the generator gives: agree, overlap or differ, with the two extensions",
+    "agreement_as_written": "the class the rule's text gives as written: agree, overlap, differ, or unclassified where its definitions cover neither agree nor overlap",
+    "extensions_applied": "the extensions that changed this row's class or its split of the picks",
+    "pick_sets.class": "the row's evidence class (see classes)",
+    "pick_sets.named_by_both": "picks both halves named",
+    "pick_sets.named_by_claude_only": "picks only the blind Claude half named",
+    "pick_sets.named_by_gpt_only": "picks only the blind GPT half named",
+    "pick_sets.fold_comparison_set": "the set the frozen fold's comparison clause derives from the two halves, kept for reading them side by side; this record schedules no comparison. A Claude arm names a pick only by the pick's full owner/name (or full name), so an arm described in words and the pick it describes can both appear",
+    "pick_sets.versus_record": "picks both halves named that the source host's record lacks, and record entries that are not among them",
+    "disagreement_with_record": "the blind Claude half against the source host's record",
+    "grand_list": "the layer's decision and open-gap counts from the new-host grand list, carried as context; a move of the grand list alone is reported as drift by --check, not as a failure"
+  },
+  "agreement_rule": {
+    "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/agreement-rule.txt",
+    "sha256": "cb21a4558f71a5d0b47370990ee4308093652bac99bd5f2481cb7751a8d774f1",
+    "extensions": {
+      "equal_sets_unequal_statuses": "Equal pick sets with unequal statuses. The rule's agree needs equal statuses and its overlap needs unequal sets, so the text as written leaves the case unclassified; the generator classifies it as overlap",
+      "packet_name_matching": "Names matched to packet candidates. The rule normalizes a pick without a GitHub repository by its name; the generator matches the name to the packet candidate whose words it contains, which drops a role suffix such as \", primary\" or \", fallback\". Compared as written (lowercase, whitespace collapsed), names that differ by such a suffix are different picks"
+    },
+    "fold": "The rule's fold (its sixth line) attaches install and comparison consequences to each class. This record does not carry them out: it reports what each half named and the class, and every slot's install decision is the definitive manifest's."
+  },
+  "cross_family": {
+    "family": "OpenAI GPT-6.1 Sol through Codex CLI 0.159.3, model_reasoning_effort=max, live web search, read-only sandbox, ephemeral sessions",
+    "run": {
+      "model": "gpt-6.1-sol",
+      "effort": "max",
+      "finished_at": "2026-10-01T21:58:06+00:00",
+      "processes": 14,
+      "attempts": 14
+    },
+    "contamination_audit": {
+      "status": "clean",
+      "flagged": {}
+    }
+  },
+  "inputs": {
+    "catalogs/foundation/new-wsl-architecture-20261001.json": "84c65a395145efe884a70b561205a3359b2b21022bd6fd4107d35d18016efdf6",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json": "2c5e31dc1c51ef1fa3ebb8df431d1f1214468c251b57a8abfc99e1f526efdcfb",
+    "catalogs/landscape/new-host-grand-list.json": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/selection-gpt.json": "dbe2e4d7780ec079cdd1c0e3e3ddb952a15507e7d4125680a719dcd8d88581f9",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/agreement-rule.txt": "cb21a4558f71a5d0b47370990ee4308093652bac99bd5f2481cb7751a8d774f1",
+    "evidence/artifacts/new-wsl-clean-install-selection-20261001/cross-family/facts/": "c9087efc4e2099b36950e0b68aff502ed9dab2c8129793bd6d66b0543d83a353"
+  },
+  "rows": [
+    {
+      "layer_id": "native-clients",
+      "catalog": "foundation",
+      "title": "Native clients",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284"
+        },
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Claude Code",
+            "repository": "https://github.com/anthropics/claude-code",
+            "upstream": {
+              "latest_release": "v2.1.287",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": null,
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Codex",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Codex",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Claude Code",
+            "repository": "https://github.com/anthropics/claude-code",
+            "upstream": {
+              "latest_release": "v2.1.287",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": null,
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "agree",
+      "agreement_as_written": "agree",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "same_picks_both_recommended",
+        "named_by_both": [
+          "anthropics/claude-code",
+          "openai/codex"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 14,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "instructions-skills",
+      "catalog": "foundation",
+      "title": "Instructions and skills",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "affaan-m/ECC",
+          "repository": "https://github.com/affaan-m/ECC",
+          "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e"
+        },
+        {
+          "name": "skills-ref",
+          "repository": "https://github.com/agentskills/agentskills",
+          "pin": "0.1.0"
+        },
+        {
+          "name": "openai/skills (gh-fix-ci, security-best-practices)",
+          "repository": "https://github.com/openai/skills",
+          "pin": "49f948faa9258a0c61caceaf225e179651397431"
+        },
+        {
+          "name": "typesafe-ai/skills (typesafe-ai)",
+          "repository": "https://github.com/typesafe-ai/skills",
+          "pin": "65a39f393687675ce170e6094757de20370365b9"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "revised",
+        "picks": [
+          {
+            "name": "Trail of Bits security skills (trailofbits/skills)",
+            "repository": "https://github.com/trailofbits/skills",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "CC-BY-SA-4.0",
+              "captured_at": "2026-10-01T20:42:29+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "skills (mattpocock)",
+            "repository": "https://github.com/mattpocock/skills",
+            "upstream": {
+              "latest_release": "v1.2.3",
+              "released": "2026-08-06",
+              "last_commit": "2026-09-29",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:29+00:00"
+            }
+          },
+          {
+            "name": "Trail of Bits security skills",
+            "repository": "https://github.com/trailofbits/skills",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "CC-BY-SA-4.0",
+              "captured_at": "2026-10-01T20:42:29+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "trailofbits/skills"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [
+          "mattpocock/skills"
+        ],
+        "fold_comparison_set": [
+          "mattpocock/skills"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "trailofbits/skills"
+          ],
+          "record_not_named_by_both": [
+            "affaan-m/ecc",
+            "agentskills/agentskills",
+            "openai/skills",
+            "typesafe-ai/skills"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "trailofbits/skills"
+        ],
+        "record_only": [
+          "affaan-m/ecc",
+          "agentskills/agentskills",
+          "openai/skills",
+          "typesafe-ai/skills"
+        ]
+      },
+      "grand_list": {
+        "decision": "adjust",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 12,
+        "open_executable_now_gaps": 10
+      }
+    },
+    {
+      "layer_id": "workers",
+      "catalog": "foundation",
+      "title": "Workers and task ownership",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284"
+        },
+        {
+          "name": "worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "pin": "0.79.0"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "claude-code (native subagents, worktree isolation, agent teams)",
+            "repository": "https://github.com/anthropics/claude-code",
+            "upstream": {
+              "latest_release": "v2.1.287",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": null,
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Codex native workers (subagents)",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "recommended",
+        "critic_verdict": "revised",
+        "picks": [
+          {
+            "name": "Codex native workers",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "max-sixty/worktrunk",
+          "openai/codex"
+        ],
+        "named_by_claude_only": [
+          "anthropics/claude-code"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "anthropics/claude-code"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "openai/codex"
+          ],
+          "record_not_named_by_both": [
+            "anthropics/claude-code"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "openai/codex"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 8,
+        "open_executable_now_gaps": 7
+      }
+    },
+    {
+      "layer_id": "isolation",
+      "catalog": "foundation",
+      "title": "Isolation",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "pin": "0.79.0"
+        },
+        {
+          "name": "sandbox-runtime",
+          "repository": "https://github.com/anthropics/sandbox-runtime",
+          "pin": "0.0.77"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "sandbox-runtime (srt)",
+            "repository": "https://github.com/anthropics/sandbox-runtime",
+            "upstream": {
+              "latest_release": "v0.0.78",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          },
+          {
+            "name": "Worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Podman (rootless)",
+            "repository": "https://github.com/podman-container-tools/podman",
+            "upstream": {
+              "latest_release": "v6.1.3",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          }
+        ],
+        "comparison_arms": [
+          "sandbox-runtime (recommended)",
+          "a rootless container on the hosting-services engine winner",
+          "gVisor runsc on that engine",
+          "boxlite with /dev/kvm"
+        ]
+      },
+      "cross_family": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "sandbox-runtime",
+            "repository": "https://github.com/anthropics/sandbox-runtime",
+            "upstream": {
+              "latest_release": "v0.0.78",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "anthropics/sandbox-runtime",
+          "max-sixty/worktrunk"
+        ],
+        "named_by_claude_only": [
+          "podman-container-tools/podman"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "sandbox-runtime (recommended)",
+          "a rootless container on the hosting-services engine winner",
+          "gVisor runsc on that engine",
+          "boxlite with /dev/kvm",
+          "podman-container-tools/podman"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "podman-container-tools/podman"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 19,
+        "open_executable_now_gaps": 16
+      }
+    },
+    {
+      "layer_id": "code-navigation",
+      "catalog": "foundation",
+      "title": "Code navigation",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "serena",
+          "repository": "https://github.com/oraios/serena",
+          "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+        },
+        {
+          "name": "ast-grep",
+          "repository": "https://github.com/ast-grep/ast-grep",
+          "pin": "0.45.3"
+        },
+        {
+          "name": "codebase-memory-mcp",
+          "repository": "https://github.com/DeusData/codebase-memory-mcp",
+          "pin": "0.11.0"
+        },
+        {
+          "name": "jcodemunch-mcp",
+          "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+          "pin": "1.108.319"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "revised",
+        "picks": [
+          {
+            "name": "Serena",
+            "repository": "https://github.com/oraios/serena",
+            "upstream": {
+              "latest_release": "v1.7.0",
+              "released": "2026-08-09",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:22+00:00"
+            }
+          },
+          {
+            "name": "claude-plugins-official (code-intelligence LSP plugins)",
+            "repository": "https://github.com/anthropics/claude-plugins-official",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:22+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "ast-grep",
+            "repository": "https://github.com/ast-grep/ast-grep",
+            "upstream": {
+              "latest_release": "0.45.3",
+              "released": "2026-08-31",
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:22+00:00"
+            }
+          },
+          {
+            "name": "Serena",
+            "repository": "https://github.com/oraios/serena",
+            "upstream": {
+              "latest_release": "v1.7.0",
+              "released": "2026-08-09",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:22+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "oraios/serena"
+        ],
+        "named_by_claude_only": [
+          "anthropics/claude-plugins-official"
+        ],
+        "named_by_gpt_only": [
+          "ast-grep/ast-grep"
+        ],
+        "fold_comparison_set": [
+          "anthropics/claude-plugins-official",
+          "ast-grep/ast-grep"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": [
+            "ast-grep/ast-grep",
+            "deusdata/codebase-memory-mcp",
+            "jgravelle/jcodemunch-mcp"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "anthropics/claude-plugins-official"
+        ],
+        "record_only": [
+          "ast-grep/ast-grep",
+          "deusdata/codebase-memory-mcp",
+          "jgravelle/jcodemunch-mcp"
+        ]
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 5,
+        "open_executable_now_gaps": 2
+      }
+    },
+    {
+      "layer_id": "document-retrieval",
+      "catalog": "foundation",
+      "title": "Documents and ingestion",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "qmd",
+          "repository": "https://github.com/tobi/qmd",
+          "pin": "2.8.3"
+        },
+        {
+          "name": "markitdown",
+          "repository": "https://github.com/microsoft/markitdown",
+          "pin": "0.1.8"
+        },
+        {
+          "name": "poppler",
+          "repository": "https://github.com/tsdgeos/poppler_mirror",
+          "pin": "26.09.0"
+        },
+        {
+          "name": "context-hub",
+          "repository": "https://github.com/andrewyng/context-hub",
+          "pin": "0.1.4"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "tobi/qmd",
+            "repository": "https://github.com/tobi/qmd",
+            "upstream": {
+              "latest_release": "v2.8.3",
+              "released": "2026-08-16",
+              "last_commit": "2026-09-09",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:24+00:00"
+            }
+          },
+          {
+            "name": "MinerU",
+            "repository": "https://github.com/opendatalab/mineru",
+            "upstream": {
+              "latest_release": "mineru-4.0.10-released",
+              "released": "2026-09-29",
+              "last_commit": "2026-09-29",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:23+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "tobi/qmd",
+            "repository": "https://github.com/tobi/qmd",
+            "upstream": {
+              "latest_release": "v2.8.3",
+              "released": "2026-08-16",
+              "last_commit": "2026-09-09",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:24+00:00"
+            }
+          },
+          {
+            "name": "MinerU",
+            "repository": "https://github.com/opendatalab/mineru",
+            "upstream": {
+              "latest_release": "mineru-4.0.10-released",
+              "released": "2026-09-29",
+              "last_commit": "2026-09-29",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:23+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "unclassified",
+      "extensions_applied": [
+        "equal_sets_unequal_statuses"
+      ],
+      "pick_sets": {
+        "class": "same_picks_split_status",
+        "named_by_both": [
+          "opendatalab/mineru",
+          "tobi/qmd"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "opendatalab/mineru"
+          ],
+          "record_not_named_by_both": [
+            "andrewyng/context-hub",
+            "microsoft/markitdown",
+            "tsdgeos/poppler_mirror"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "opendatalab/mineru"
+        ],
+        "record_only": [
+          "andrewyng/context-hub",
+          "microsoft/markitdown",
+          "tsdgeos/poppler_mirror"
+        ]
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 7,
+        "open_executable_now_gaps": 5
+      }
+    },
+    {
+      "layer_id": "semantic-rag",
+      "catalog": "foundation",
+      "title": "Semantic code retrieval",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "socraticode",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "pin": "1.15.0"
+        },
+        {
+          "name": "qdrant",
+          "repository": "https://github.com/qdrant/qdrant",
+          "pin": "1.19.1"
+        },
+        {
+          "name": "vllm",
+          "repository": "https://github.com/vllm-project/vllm",
+          "pin": "0.30.0"
+        },
+        {
+          "name": "huggingface-hub-native",
+          "repository": "https://github.com/huggingface/huggingface_hub",
+          "pin": "1.32.0"
+        },
+        {
+          "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
+          "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+          "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "SocratiCode",
+            "repository": "https://github.com/giancarloerra/SocratiCode",
+            "upstream": {
+              "latest_release": "v1.16.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "AGPL-3.0",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          },
+          {
+            "name": "semble",
+            "repository": "https://github.com/MinishLab/semble",
+            "upstream": {
+              "latest_release": "v0.6.1",
+              "released": "2026-09-25",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          },
+          {
+            "name": "ollama",
+            "repository": "https://github.com/ollama/ollama",
+            "upstream": {
+              "latest_release": "v0.35.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          }
+        ],
+        "comparison_arms": [
+          "SocratiCode (embeddings from the local model server; its documented providers are Ollama, LM Studio, LiteLLM, OpenAI and Google)",
+          "semble",
+          "ColGREP with LateOn-Code-edge",
+          "ColGREP with LateOn-Code",
+          "BM25 baseline",
+          "ripgrep baseline"
+        ]
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "SocratiCode",
+            "repository": "https://github.com/giancarloerra/SocratiCode",
+            "upstream": {
+              "latest_release": "v1.16.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "AGPL-3.0",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          },
+          {
+            "name": "Qdrant",
+            "repository": "https://github.com/qdrant/qdrant",
+            "upstream": {
+              "latest_release": "v1.19.1",
+              "released": "2026-09-04",
+              "last_commit": "2026-09-03",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          },
+          {
+            "name": "ollama",
+            "repository": "https://github.com/ollama/ollama",
+            "upstream": {
+              "latest_release": "v0.35.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:38+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "giancarloerra/socraticode",
+          "ollama/ollama"
+        ],
+        "named_by_claude_only": [
+          "minishlab/semble"
+        ],
+        "named_by_gpt_only": [
+          "qdrant/qdrant"
+        ],
+        "fold_comparison_set": [
+          "SocratiCode (embeddings from the local model server; its documented providers are Ollama, LM Studio, LiteLLM, OpenAI and Google)",
+          "semble",
+          "ColGREP with LateOn-Code-edge",
+          "ColGREP with LateOn-Code",
+          "BM25 baseline",
+          "ripgrep baseline",
+          "minishlab/semble",
+          "qdrant/qdrant"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "ollama/ollama"
+          ],
+          "record_not_named_by_both": [
+            "huggingface/huggingface_hub",
+            "name:nvidia nemotron 3 embed 1b bf16 embedding model",
+            "qdrant/qdrant",
+            "vllm-project/vllm"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "minishlab/semble",
+          "ollama/ollama"
+        ],
+        "record_only": [
+          "huggingface/huggingface_hub",
+          "name:nvidia nemotron 3 embed 1b bf16 embedding model",
+          "qdrant/qdrant",
+          "vllm-project/vllm"
+        ]
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 12,
+        "open_executable_now_gaps": 10
+      }
+    },
+    {
+      "layer_id": "durable-memory",
+      "catalog": "foundation",
+      "title": "Durable memory",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "ai-memory",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "pin": "2.4.1"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "ai-memory",
+            "repository": "https://github.com/akitaonrails/ai-memory",
+            "upstream": {
+              "latest_release": "v2.5.2",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:24+00:00"
+            }
+          },
+          {
+            "name": "Hindsight",
+            "repository": "https://github.com/vectorize-io/hindsight",
+            "upstream": {
+              "latest_release": "v0.10.2",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:25+00:00"
+            }
+          },
+          {
+            "name": "agentmemory (rohitg00)",
+            "repository": "https://github.com/rohitg00/agentmemory",
+            "upstream": {
+              "latest_release": "v0.9.29",
+              "released": "2026-08-16",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:25+00:00"
+            }
+          },
+          {
+            "name": "deja-vu",
+            "repository": "https://github.com/vshulcz/deja-vu",
+            "upstream": {
+              "latest_release": "v0.21.4",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:25+00:00"
+            }
+          }
+        ],
+        "comparison_arms": [
+          "ai-memory, LLM reranker on and off",
+          "Hindsight, local model and hosted model",
+          "agentmemory through its Claude Code and Codex hooks",
+          "deja-vu"
+        ]
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "ai-memory",
+            "repository": "https://github.com/akitaonrails/ai-memory",
+            "upstream": {
+              "latest_release": "v2.5.2",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:24+00:00"
+            }
+          },
+          {
+            "name": "Basic Memory",
+            "repository": "https://github.com/basicmachines-co/basic-memory",
+            "upstream": {
+              "latest_release": "v0.23.2",
+              "released": "2026-08-25",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "AGPL-3.0",
+              "captured_at": "2026-10-01T20:42:26+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "akitaonrails/ai-memory"
+        ],
+        "named_by_claude_only": [
+          "rohitg00/agentmemory",
+          "vectorize-io/hindsight",
+          "vshulcz/deja-vu"
+        ],
+        "named_by_gpt_only": [
+          "basicmachines-co/basic-memory"
+        ],
+        "fold_comparison_set": [
+          "ai-memory, LLM reranker on and off",
+          "Hindsight, local model and hosted model",
+          "agentmemory through its Claude Code and Codex hooks",
+          "deja-vu",
+          "basicmachines-co/basic-memory",
+          "rohitg00/agentmemory",
+          "vectorize-io/hindsight",
+          "vshulcz/deja-vu"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "rohitg00/agentmemory",
+          "vectorize-io/hindsight",
+          "vshulcz/deja-vu"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 13,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "web-research",
+      "catalog": "foundation",
+      "title": "Web research",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "tavily-cli",
+          "repository": "https://github.com/tavily-ai/tavily-cli",
+          "pin": "0.1.8"
+        },
+        {
+          "name": "agent-browser",
+          "repository": "https://github.com/vercel-labs/agent-browser",
+          "pin": "0.38.1"
+        },
+        {
+          "name": "openresearch",
+          "repository": "https://github.com/alphaXiv/OpenResearch",
+          "pin": "0.2.7"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "trafilatura",
+            "repository": "https://github.com/adbar/trafilatura",
+            "upstream": {
+              "latest_release": "v2.2.0",
+              "released": "2026-07-31",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:41+00:00"
+            }
+          },
+          {
+            "name": "Playwright CLI",
+            "repository": "https://github.com/microsoft/playwright-cli",
+            "upstream": {
+              "latest_release": "v0.1.22",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:40+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Playwright CLI",
+            "repository": "https://github.com/microsoft/playwright-cli",
+            "upstream": {
+              "latest_release": "v0.1.22",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:40+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "microsoft/playwright-cli"
+        ],
+        "named_by_claude_only": [
+          "adbar/trafilatura"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "adbar/trafilatura"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "microsoft/playwright-cli"
+          ],
+          "record_not_named_by_both": [
+            "alphaxiv/openresearch",
+            "tavily-ai/tavily-cli",
+            "vercel-labs/agent-browser"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "adbar/trafilatura",
+          "microsoft/playwright-cli"
+        ],
+        "record_only": [
+          "alphaxiv/openresearch",
+          "tavily-ai/tavily-cli",
+          "vercel-labs/agent-browser"
+        ]
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 9,
+        "open_executable_now_gaps": 7
+      }
+    },
+    {
+      "layer_id": "token-efficiency",
+      "catalog": "foundation",
+      "title": "Context and usage efficiency",
+      "owner_lane": "foundation: Gate A",
+      "selection_of_record": [
+        {
+          "name": "rtk",
+          "repository": "https://github.com/rtk-ai/rtk",
+          "pin": "0.50.0"
+        },
+        {
+          "name": "context-mode",
+          "repository": "https://github.com/mksglu/context-mode",
+          "pin": "1.0.169"
+        },
+        {
+          "name": "headroom",
+          "repository": "https://github.com/headroomlabs-ai/headroom",
+          "pin": "0.37.0"
+        },
+        {
+          "name": "repomix",
+          "repository": "https://github.com/yamadashy/repomix",
+          "pin": "1.18.1"
+        },
+        {
+          "name": "toon",
+          "repository": "https://github.com/toon-format/toon",
+          "pin": "4.1.1"
+        },
+        {
+          "name": "ccusage",
+          "repository": "https://github.com/ccusage/ccusage",
+          "pin": "20.0.26"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "ccusage",
+            "repository": "https://github.com/ccusage/ccusage",
+            "upstream": {
+              "latest_release": "v20.0.26",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:39+00:00"
+            }
+          },
+          {
+            "name": "rtk-ai/rtk",
+            "repository": "https://github.com/rtk-ai/rtk",
+            "upstream": {
+              "latest_release": "v0.50.0",
+              "released": "2026-09-24",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:39+00:00"
+            }
+          }
+        ],
+        "comparison_arms": [
+          "ccusage (measurement, selected)",
+          "no compression layer (baseline)",
+          "RTK",
+          "sqz",
+          "Headroom",
+          "Context Mode (frozen control)"
+        ]
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Context Mode",
+            "repository": "https://github.com/mksglu/context-mode",
+            "upstream": {
+              "latest_release": "v1.0.169",
+              "released": "2026-06-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:39+00:00"
+            }
+          },
+          {
+            "name": "sqz",
+            "repository": "https://github.com/ojuschugh1/sqz",
+            "upstream": {
+              "latest_release": "v1.9.0",
+              "released": "2026-09-23",
+              "last_commit": "2026-09-24",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:40+00:00"
+            }
+          },
+          {
+            "name": "ccusage",
+            "repository": "https://github.com/ccusage/ccusage",
+            "upstream": {
+              "latest_release": "v20.0.26",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:39+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "ccusage/ccusage"
+        ],
+        "named_by_claude_only": [
+          "rtk-ai/rtk"
+        ],
+        "named_by_gpt_only": [
+          "mksglu/context-mode",
+          "ojuschugh1/sqz"
+        ],
+        "fold_comparison_set": [
+          "ccusage (measurement, selected)",
+          "no compression layer (baseline)",
+          "RTK",
+          "sqz",
+          "Headroom",
+          "Context Mode (frozen control)",
+          "mksglu/context-mode",
+          "ojuschugh1/sqz",
+          "rtk-ai/rtk"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": [
+            "headroomlabs-ai/headroom",
+            "mksglu/context-mode",
+            "rtk-ai/rtk",
+            "toon-format/toon",
+            "yamadashy/repomix"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [],
+        "record_only": [
+          "headroomlabs-ai/headroom",
+          "mksglu/context-mode",
+          "toon-format/toon",
+          "yamadashy/repomix"
+        ]
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 6,
+        "open_executable_now_gaps": 4
+      }
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "catalog": "foundation",
+      "title": "Quality and evaluation",
+      "owner_lane": "foundation: Gate A",
+      "selection_of_record": [
+        {
+          "name": "promptfoo",
+          "repository": "https://github.com/promptfoo/promptfoo",
+          "pin": "0.123.1"
+        },
+        {
+          "name": "playwright-test",
+          "repository": "https://github.com/microsoft/playwright",
+          "pin": "1.63.0"
+        },
+        {
+          "name": "Harbor (containerized agent E2E runner)",
+          "repository": "https://github.com/harbor-framework/harbor",
+          "pin": "v0.23.0"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Inspect AI",
+            "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          },
+          {
+            "name": "Harbor (containerized agent E2E runner)",
+            "repository": "https://github.com/harbor-framework/harbor",
+            "upstream": {
+              "latest_release": "v0.23.0",
+              "released": "2026-09-12",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:34+00:00"
+            }
+          },
+          {
+            "name": "Promptfoo",
+            "repository": "https://github.com/promptfoo/promptfoo",
+            "upstream": {
+              "latest_release": "0.123.1",
+              "released": "2026-09-18",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:34+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Inspect AI",
+            "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          },
+          {
+            "name": "Harbor (containerized agent E2E runner)",
+            "repository": "https://github.com/harbor-framework/harbor",
+            "upstream": {
+              "latest_release": "v0.23.0",
+              "released": "2026-09-12",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:34+00:00"
+            }
+          },
+          {
+            "name": "Playwright",
+            "repository": "https://github.com/microsoft/playwright",
+            "upstream": {
+              "latest_release": "v1.63.0",
+              "released": "2026-09-04",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:34+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "harbor-framework/harbor",
+          "ukgovernmentbeis/inspect_ai"
+        ],
+        "named_by_claude_only": [
+          "promptfoo/promptfoo"
+        ],
+        "named_by_gpt_only": [
+          "microsoft/playwright"
+        ],
+        "fold_comparison_set": [
+          "microsoft/playwright",
+          "promptfoo/promptfoo"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "ukgovernmentbeis/inspect_ai"
+          ],
+          "record_not_named_by_both": [
+            "microsoft/playwright",
+            "promptfoo/promptfoo"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "ukgovernmentbeis/inspect_ai"
+        ],
+        "record_only": [
+          "microsoft/playwright"
+        ]
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 11,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "ci-supply-chain",
+      "catalog": "foundation",
+      "title": "CI and supply chain",
+      "owner_lane": "shared",
+      "selection_of_record": [
+        {
+          "name": "zizmor",
+          "repository": "https://github.com/zizmorcore/zizmor",
+          "pin": "1.30.1"
+        },
+        {
+          "name": "syft",
+          "repository": "https://github.com/anchore/syft",
+          "pin": "1.52.0"
+        },
+        {
+          "name": "actions/attest",
+          "repository": "https://github.com/actions/attest",
+          "pin": "4.2.2 @ 1e69f48acb82d1966a394da916b4c1698aa569d6"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "independent_observation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "zizmor",
+            "repository": "https://github.com/zizmorcore/zizmor",
+            "upstream": {
+              "latest_release": "v1.30.1",
+              "released": "2026-09-09",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "attest",
+            "repository": "https://github.com/actions/attest",
+            "upstream": {
+              "latest_release": "v4.2.2",
+              "released": "2026-08-04",
+              "last_commit": "2026-09-24",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:19+00:00"
+            }
+          },
+          {
+            "name": "Syft",
+            "repository": "https://github.com/anchore/syft",
+            "upstream": {
+              "latest_release": "v1.52.0",
+              "released": "2026-09-17",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "Dependabot",
+            "repository": "https://github.com/dependabot/dependabot-core",
+            "upstream": {
+              "latest_release": "v0.398.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "codeql-sarif",
+            "repository": "https://github.com/github/codeql-action",
+            "upstream": {
+              "latest_release": "codeql-bundle-v2.27.1",
+              "released": "2026-09-22",
+              "last_commit": "2026-09-29",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "actionlint (kjanat)",
+            "repository": "https://github.com/kjanat/actionlint",
+            "upstream": {
+              "latest_release": "v1.17.0",
+              "released": "2026-09-13",
+              "last_commit": "2026-09-25",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "attest",
+            "repository": "https://github.com/actions/attest",
+            "upstream": {
+              "latest_release": "v4.2.2",
+              "released": "2026-08-04",
+              "last_commit": "2026-09-24",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:19+00:00"
+            }
+          },
+          {
+            "name": "zizmor",
+            "repository": "https://github.com/zizmorcore/zizmor",
+            "upstream": {
+              "latest_release": "v1.30.1",
+              "released": "2026-09-09",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "actionlint (kjanat)",
+            "repository": "https://github.com/kjanat/actionlint",
+            "upstream": {
+              "latest_release": "v1.17.0",
+              "released": "2026-09-13",
+              "last_commit": "2026-09-25",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "Syft",
+            "repository": "https://github.com/anchore/syft",
+            "upstream": {
+              "latest_release": "v1.52.0",
+              "released": "2026-09-17",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          },
+          {
+            "name": "Dependabot",
+            "repository": "https://github.com/dependabot/dependabot-core",
+            "upstream": {
+              "latest_release": "v0.398.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:21+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "actions/attest",
+          "anchore/syft",
+          "dependabot/dependabot-core",
+          "kjanat/actionlint",
+          "zizmorcore/zizmor"
+        ],
+        "named_by_claude_only": [
+          "github/codeql-action"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "github/codeql-action"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "dependabot/dependabot-core",
+            "kjanat/actionlint"
+          ],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "dependabot/dependabot-core",
+          "github/codeql-action",
+          "kjanat/actionlint"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 14,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "catalog": "foundation",
+      "title": "Scheduling and supervision",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6"
+        },
+        {
+          "name": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Dagu",
+            "repository": "https://github.com/dagucloud/dagu",
+            "upstream": {
+              "latest_release": "v2.18.1",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "GPL-3.0",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          },
+          {
+            "name": "systemd",
+            "repository": "https://github.com/systemd/systemd",
+            "upstream": {
+              "latest_release": "v262",
+              "released": "2026-09-22",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "GPL-2.0",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Dagu",
+            "repository": "https://github.com/dagucloud/dagu",
+            "upstream": {
+              "latest_release": "v2.18.1",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "GPL-3.0",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          },
+          {
+            "name": "systemd",
+            "repository": "https://github.com/systemd/systemd",
+            "upstream": {
+              "latest_release": "v262",
+              "released": "2026-09-22",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "GPL-2.0",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "unclassified",
+      "extensions_applied": [
+        "equal_sets_unequal_statuses"
+      ],
+      "pick_sets": {
+        "class": "same_picks_split_status",
+        "named_by_both": [
+          "dagucloud/dagu",
+          "systemd/systemd"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 13,
+        "open_executable_now_gaps": 5
+      }
+    },
+    {
+      "layer_id": "hosting-services",
+      "catalog": "foundation",
+      "title": "Application and service hosting",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "fastapi",
+          "repository": "https://github.com/fastapi/fastapi",
+          "pin": "0.141.1"
+        },
+        {
+          "name": "nextjs",
+          "repository": "https://github.com/vercel/next.js",
+          "pin": "16.3.6"
+        },
+        {
+          "name": "postgresql",
+          "repository": "https://github.com/postgres/postgres",
+          "pin": "18.6"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "local_integration_check",
+      "blind": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Docker Compose",
+            "repository": "https://github.com/docker/compose",
+            "upstream": {
+              "latest_release": "v5.5.1",
+              "released": "2026-09-03",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:28+00:00"
+            }
+          },
+          {
+            "name": "Podman / Quadlet (engine arm A)",
+            "repository": "https://github.com/podman-container-tools/podman",
+            "upstream": {
+              "latest_release": "v6.1.3",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          },
+          {
+            "name": "Docker Engine / Moby (engine arm B)",
+            "repository": "https://github.com/moby/moby",
+            "upstream": {
+              "latest_release": "docker-v29.8.2",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          }
+        ],
+        "comparison_arms": [
+          "Docker Compose (selected)",
+          "Podman with Quadlet",
+          "rootless Docker Engine"
+        ]
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Docker Engine / Moby",
+            "repository": "https://github.com/moby/moby",
+            "upstream": {
+              "latest_release": "docker-v29.8.2",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:30+00:00"
+            }
+          },
+          {
+            "name": "Docker Compose",
+            "repository": "https://github.com/docker/compose",
+            "upstream": {
+              "latest_release": "v5.5.1",
+              "released": "2026-09-03",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:28+00:00"
+            }
+          },
+          {
+            "name": "FastAPI",
+            "repository": "https://github.com/fastapi/fastapi",
+            "upstream": {
+              "latest_release": "0.142.2",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:27+00:00"
+            }
+          },
+          {
+            "name": "PostgreSQL",
+            "repository": "https://github.com/postgres/postgres",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:28+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "docker/compose",
+          "moby/moby"
+        ],
+        "named_by_claude_only": [
+          "podman-container-tools/podman"
+        ],
+        "named_by_gpt_only": [
+          "fastapi/fastapi",
+          "postgres/postgres"
+        ],
+        "fold_comparison_set": [
+          "Docker Compose (selected)",
+          "Podman with Quadlet",
+          "rootless Docker Engine",
+          "fastapi/fastapi",
+          "podman-container-tools/podman",
+          "postgres/postgres"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "docker/compose",
+            "moby/moby"
+          ],
+          "record_not_named_by_both": [
+            "fastapi/fastapi",
+            "postgres/postgres",
+            "vercel/next.js"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "docker/compose",
+          "moby/moby",
+          "podman-container-tools/podman"
+        ],
+        "record_only": [
+          "fastapi/fastapi",
+          "postgres/postgres",
+          "vercel/next.js"
+        ]
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 14,
+        "open_executable_now_gaps": 6
+      }
+    },
+    {
+      "layer_id": "recovery-portability",
+      "catalog": "foundation",
+      "title": "Recovery and portability",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1"
+        },
+        {
+          "name": "uv",
+          "repository": "https://github.com/astral-sh/uv",
+          "pin": "0.12.17"
+        }
+      ],
+      "record_verdict": "new_host_required",
+      "record_evidence_class": "structural_validation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "mise",
+            "repository": "https://github.com/jdx/mise",
+            "upstream": {
+              "latest_release": "v2026.9.18",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          },
+          {
+            "name": "Restic",
+            "repository": "https://github.com/restic/restic",
+            "upstream": {
+              "latest_release": "v0.19.1",
+              "released": "2026-07-05",
+              "last_commit": "2026-09-25",
+              "archived": false,
+              "license": "BSD-2-Clause",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          },
+          {
+            "name": "chezmoi",
+            "repository": "https://github.com/twpayne/chezmoi",
+            "upstream": {
+              "latest_release": "v2.73.0",
+              "released": "2026-09-28",
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "mise",
+            "repository": "https://github.com/jdx/mise",
+            "upstream": {
+              "latest_release": "v2026.9.18",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          },
+          {
+            "name": "Restic",
+            "repository": "https://github.com/restic/restic",
+            "upstream": {
+              "latest_release": "v0.19.1",
+              "released": "2026-07-05",
+              "last_commit": "2026-09-25",
+              "archived": false,
+              "license": "BSD-2-Clause",
+              "captured_at": "2026-10-01T20:42:36+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "jdx/mise",
+          "restic/restic"
+        ],
+        "named_by_claude_only": [
+          "twpayne/chezmoi"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "twpayne/chezmoi"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "jdx/mise"
+          ],
+          "record_not_named_by_both": [
+            "astral-sh/uv"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "jdx/mise",
+          "twpayne/chezmoi"
+        ],
+        "record_only": [
+          "astral-sh/uv"
+        ]
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 12,
+        "open_executable_now_gaps": 4
+      }
+    },
+    {
+      "layer_id": "observation-inference",
+      "catalog": "foundation",
+      "title": "Observation and optional inference",
+      "owner_lane": "foundation: Gate A",
+      "selection_of_record": [
+        {
+          "name": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0"
+        },
+        {
+          "name": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0"
+        },
+        {
+          "name": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "OTel Collector Contrib",
+            "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "upstream": {
+              "latest_release": "v0.162.0",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:32+00:00"
+            }
+          },
+          {
+            "name": "Prometheus",
+            "repository": "https://github.com/prometheus/prometheus",
+            "upstream": {
+              "latest_release": "v3.15.0",
+              "released": "2026-09-25",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:33+00:00"
+            }
+          },
+          {
+            "name": "Loki",
+            "repository": "https://github.com/grafana/loki",
+            "upstream": {
+              "latest_release": "v3.7.8",
+              "released": "2026-09-17",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "AGPL-3.0",
+              "captured_at": "2026-10-01T20:42:33+00:00"
+            }
+          },
+          {
+            "name": "Grafana",
+            "repository": "https://github.com/grafana/grafana",
+            "upstream": {
+              "latest_release": "v13.2.3",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "AGPL-3.0",
+              "captured_at": "2026-10-01T20:42:32+00:00"
+            }
+          },
+          {
+            "name": "llama.cpp optional inference",
+            "repository": "https://github.com/ggml-org/llama.cpp",
+            "upstream": {
+              "latest_release": "v0.5.0",
+              "released": "2026-09-23",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:33+00:00"
+            }
+          },
+          {
+            "name": "Phoenix",
+            "repository": "https://github.com/Arize-ai/phoenix",
+            "upstream": {
+              "latest_release": "@arizeai/phoenix-mcp@4.3.15",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:33+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "OTel Collector Contrib",
+            "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "upstream": {
+              "latest_release": "v0.162.0",
+              "released": "2026-09-29",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:32+00:00"
+            }
+          },
+          {
+            "name": "OpenLIT",
+            "repository": "https://github.com/openlit/openlit",
+            "upstream": {
+              "latest_release": "openlit-2.1.0",
+              "released": "2026-09-10",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:33+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "open-telemetry/opentelemetry-collector-contrib"
+        ],
+        "named_by_claude_only": [
+          "arize-ai/phoenix",
+          "ggml-org/llama.cpp",
+          "grafana/grafana",
+          "grafana/loki",
+          "prometheus/prometheus"
+        ],
+        "named_by_gpt_only": [
+          "openlit/openlit"
+        ],
+        "fold_comparison_set": [
+          "arize-ai/phoenix",
+          "ggml-org/llama.cpp",
+          "grafana/grafana",
+          "grafana/loki",
+          "openlit/openlit",
+          "prometheus/prometheus"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": [
+            "grafana/loki",
+            "prometheus/prometheus"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "arize-ai/phoenix",
+          "ggml-org/llama.cpp",
+          "grafana/grafana"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 11,
+        "open_executable_now_gaps": 8
+      }
+    },
+    {
+      "layer_id": "agent-sdks",
+      "catalog": "foundation",
+      "title": "Agent SDKs and runtime workers",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "openai-codex Python SDK with openai-codex-cli-bin",
+          "repository": "https://github.com/openai/codex",
+          "pin": "openai-codex==0.154.0"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "local_integration_check",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Claude Agent SDK",
+            "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+            "upstream": {
+              "latest_release": "v0.2.163",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:32+00:00"
+            }
+          },
+          {
+            "name": "Codex SDK and codex exec/app-server",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "codex",
+            "repository": "https://github.com/openai/codex",
+            "upstream": {
+              "latest_release": "rust-v0.160.0",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "Claude Agent SDK",
+            "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+            "upstream": {
+              "latest_release": "v0.2.163",
+              "released": "2026-09-30",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:32+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "agree",
+      "agreement_as_written": "agree",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "same_picks_both_recommended",
+        "named_by_both": [
+          "anthropics/claude-agent-sdk-python",
+          "openai/codex"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "anthropics/claude-agent-sdk-python"
+          ],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "anthropics/claude-agent-sdk-python"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 14,
+        "open_executable_now_gaps": 12
+      }
+    },
+    {
+      "layer_id": "mcp-surfaces",
+      "catalog": "foundation",
+      "title": "MCP servers and client surfaces",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "mcporter",
+          "repository": "https://github.com/openclaw/mcporter",
+          "pin": "0.14.1"
+        },
+        {
+          "name": "mcp-inspector",
+          "repository": "https://github.com/modelcontextprotocol/inspector",
+          "pin": "2.8.0"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "mcporter",
+            "repository": "https://github.com/openclaw/mcporter",
+            "upstream": {
+              "latest_release": "v0.14.2",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:31+00:00"
+            }
+          },
+          {
+            "name": "MCP Inspector",
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "upstream": {
+              "latest_release": "2.9.0",
+              "released": "2026-09-30",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "mcporter",
+            "repository": "https://github.com/openclaw/mcporter",
+            "upstream": {
+              "latest_release": "v0.14.2",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:31+00:00"
+            }
+          },
+          {
+            "name": "MCP Inspector",
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "upstream": {
+              "latest_release": "2.9.0",
+              "released": "2026-09-30",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:35+00:00"
+            }
+          },
+          {
+            "name": "inspector",
+            "repository": "https://github.com/MCPJam/inspector",
+            "upstream": {
+              "latest_release": "v3.12.8",
+              "released": "2026-10-01",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:31+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "modelcontextprotocol/inspector",
+          "openclaw/mcporter"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [
+          "mcpjam/inspector"
+        ],
+        "fold_comparison_set": [
+          "mcpjam/inspector"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 14,
+        "open_executable_now_gaps": 12
+      }
+    },
+    {
+      "layer_id": "secrets-credentials",
+      "catalog": "foundation",
+      "title": "Secrets and credentials",
+      "owner_lane": "shared",
+      "selection_of_record": [
+        {
+          "name": "gitleaks",
+          "repository": "https://github.com/gitleaks/gitleaks",
+          "pin": "8.30.1"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "betterleaks",
+            "repository": "https://github.com/betterleaks/betterleaks",
+            "upstream": {
+              "latest_release": "v1.9.0",
+              "released": "2026-09-29",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:37+00:00"
+            }
+          },
+          {
+            "name": "trufflehog",
+            "repository": "https://github.com/trufflesecurity/trufflehog",
+            "upstream": null
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "betterleaks",
+            "repository": "https://github.com/betterleaks/betterleaks",
+            "upstream": {
+              "latest_release": "v1.9.0",
+              "released": "2026-09-29",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:37+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "betterleaks/betterleaks"
+        ],
+        "named_by_claude_only": [
+          "trufflesecurity/trufflehog"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "trufflesecurity/trufflehog"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "betterleaks/betterleaks"
+          ],
+          "record_not_named_by_both": [
+            "gitleaks/gitleaks"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "betterleaks/betterleaks",
+          "trufflesecurity/trufflehog"
+        ],
+        "record_only": [
+          "gitleaks/gitleaks"
+        ]
+      },
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 9,
+        "open_executable_now_gaps": 5
+      }
+    },
+    {
+      "layer_id": "git-github-automation",
+      "catalog": "foundation",
+      "title": "Git practice and GitHub automation",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "worktrunk",
+          "repository": "https://github.com/max-sixty/worktrunk",
+          "pin": "0.79.0"
+        },
+        {
+          "name": "GitHub CLI (gh)",
+          "repository": "https://github.com/cli/cli",
+          "pin": "2.101.0"
+        },
+        {
+          "name": "difftastic",
+          "repository": "https://github.com/Wilfred/difftastic",
+          "pin": "0.71.0"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "git",
+            "repository": "https://github.com/git/git",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:27+00:00"
+            }
+          },
+          {
+            "name": "gh (GitHub CLI)",
+            "repository": "https://github.com/cli/cli",
+            "upstream": {
+              "latest_release": "v2.102.0",
+              "released": "2026-09-30",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:26+00:00"
+            }
+          },
+          {
+            "name": "worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "difftastic",
+            "repository": "https://github.com/Wilfred/difftastic",
+            "upstream": {
+              "latest_release": "0.71.0",
+              "released": "2026-09-18",
+              "last_commit": "2026-09-22",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:34+00:00"
+            }
+          },
+          {
+            "name": "sem (lowest confidence; kept only if the structural-diff comparison shows a gain)",
+            "repository": "https://github.com/Ataraxy-Labs/sem",
+            "upstream": {
+              "latest_release": "v0.25.0",
+              "released": "2026-09-13",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:26+00:00"
+            }
+          },
+          {
+            "name": "claude-code-action",
+            "repository": "https://github.com/anthropics/claude-code-action",
+            "upstream": {
+              "latest_release": "v1",
+              "released": "2025-08-26",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:27+00:00"
+            }
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "git/git",
+            "repository": "https://github.com/git/git",
+            "upstream": {
+              "latest_release": null,
+              "released": null,
+              "last_commit": "2026-09-28",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:27+00:00"
+            }
+          },
+          {
+            "name": "worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "upstream": {
+              "latest_release": "v0.80.0",
+              "released": "2026-09-27",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "NOASSERTION",
+              "captured_at": "2026-10-01T20:42:42+00:00"
+            }
+          },
+          {
+            "name": "cli/cli",
+            "repository": "https://github.com/cli/cli",
+            "upstream": {
+              "latest_release": "v2.102.0",
+              "released": "2026-09-30",
+              "last_commit": "2026-09-30",
+              "archived": false,
+              "license": "MIT",
+              "captured_at": "2026-10-01T20:42:26+00:00"
+            }
+          },
+          {
+            "name": "ataraxy-labs/sem",
+            "repository": "https://github.com/ataraxy-labs/sem",
+            "upstream": {
+              "latest_release": "v0.25.0",
+              "released": "2026-09-13",
+              "last_commit": "2026-10-01",
+              "archived": false,
+              "license": "Apache-2.0",
+              "captured_at": "2026-10-01T20:42:26+00:00"
+            }
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "overlap",
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "some_picks_shared",
+        "named_by_both": [
+          "ataraxy-labs/sem",
+          "cli/cli",
+          "git/git",
+          "max-sixty/worktrunk"
+        ],
+        "named_by_claude_only": [
+          "anthropics/claude-code-action",
+          "wilfred/difftastic"
+        ],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [
+          "anthropics/claude-code-action",
+          "wilfred/difftastic"
+        ],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "ataraxy-labs/sem",
+            "git/git"
+          ],
+          "record_not_named_by_both": [
+            "wilfred/difftastic"
+          ]
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "anthropics/claude-code-action",
+          "ataraxy-labs/sem",
+          "git/git"
+        ],
+        "record_only": []
+      },
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 12,
+        "open_executable_now_gaps": 11
+      }
+    },
+    {
+      "layer_id": "market-data-reference",
+      "catalog": "us-equities",
+      "title": "Market data and reference",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        },
+        {
+          "name": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0"
+        },
+        {
+          "name": "exchange-calendars",
+          "repository": "https://github.com/gerrymanoim/exchange_calendars",
+          "pin": "4.13.2"
+        },
+        {
+          "name": "duckdb",
+          "repository": "https://github.com/duckdb/duckdb",
+          "pin": "1.5.5"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 17,
+        "open_executable_now_gaps": 8
+      }
+    },
+    {
+      "layer_id": "identity-provenance",
+      "catalog": "us-equities",
+      "title": "Identity, provenance and lineage",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        },
+        {
+          "name": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0"
+        },
+        {
+          "name": "duckdb",
+          "repository": "https://github.com/duckdb/duckdb",
+          "pin": "1.5.5"
+        },
+        {
+          "name": "exchange-calendars",
+          "repository": "https://github.com/gerrymanoim/exchange_calendars",
+          "pin": "4.13.2"
+        },
+        {
+          "name": "DVC",
+          "repository": "https://github.com/treeverse/dvc",
+          "pin": "3.67.1 (the 2026-09-22 verdict's baseline)"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 5,
+        "open_executable_now_gaps": 2
+      }
+    },
+    {
+      "layer_id": "storage-compute",
+      "catalog": "us-equities",
+      "title": "Storage and compute",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "duckdb",
+          "repository": "https://github.com/duckdb/duckdb",
+          "pin": "1.5.5"
+        },
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        },
+        {
+          "name": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0"
+        },
+        {
+          "name": "exchange-calendars",
+          "repository": "https://github.com/gerrymanoim/exchange_calendars",
+          "pin": "4.13.2"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 11,
+        "open_executable_now_gaps": 5
+      }
+    },
+    {
+      "layer_id": "data-quality-orchestration",
+      "catalog": "us-equities",
+      "title": "Data quality and orchestration",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6"
+        },
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284"
+        },
+        {
+          "name": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17"
+        },
+        {
+          "name": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0"
+        },
+        {
+          "name": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0"
+        },
+        {
+          "name": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8"
+        },
+        {
+          "name": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2"
+        },
+        {
+          "name": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1"
+        },
+        {
+          "name": "pandera",
+          "repository": "https://github.com/unionai-oss/pandera",
+          "pin": "0.33.1 (the 2026-09-22 verdict's baseline)"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 9,
+        "open_executable_now_gaps": 6
+      }
+    },
+    {
+      "layer_id": "research-factors-ml",
+      "catalog": "us-equities",
+      "title": "Research, factors and ML",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "edgartools",
+          "repository": "https://github.com/dgunning/edgartools",
+          "pin": "5.58.0"
+        },
+        {
+          "name": "skfolio",
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "1.2.9"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 16,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "backtesting-engine",
+      "catalog": "us-equities",
+      "title": "Backtesting engine",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "nautilus-trader",
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "2.0.0rc5"
+        },
+        {
+          "name": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation"
+        },
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 12,
+        "open_executable_now_gaps": 8
+      }
+    },
+    {
+      "layer_id": "execution-broker",
+      "catalog": "us-equities",
+      "title": "Execution and broker adapters",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "nautilus-trader",
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "2.0.0rc5"
+        },
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        },
+        {
+          "name": "adaptive-paper (the engine folder blueprints/us-equities/adaptive-paper on main at the #559 merge; the custom Alpaca adapter on NautilusTrader's LiveNode)",
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a"
+        },
+        {
+          "name": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "pending_lanes",
+        "independent_review": "pending_lanes",
+        "open_gaps": 1,
+        "open_executable_now_gaps": 0
+      }
+    },
+    {
+      "layer_id": "portfolio-risk",
+      "catalog": "us-equities",
+      "title": "Portfolio and risk",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "nautilus-trader",
+          "repository": "https://github.com/nautechsystems/nautilus_trader",
+          "pin": "2.0.0rc5"
+        },
+        {
+          "name": "lean",
+          "repository": "https://github.com/QuantConnect/Lean",
+          "pin": "985ef30 with documented dependency remediation"
+        },
+        {
+          "name": "alpaca-py",
+          "repository": "https://github.com/alpacahq/alpaca-py",
+          "pin": "0.44.0"
+        },
+        {
+          "name": "skfolio",
+          "repository": "https://github.com/skfolio/skfolio",
+          "pin": "1.2.9"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 13,
+        "open_executable_now_gaps": 10
+      }
+    },
+    {
+      "layer_id": "evaluation-experiments",
+      "catalog": "us-equities",
+      "title": "Evaluation and experiments",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284"
+        },
+        {
+          "name": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6"
+        },
+        {
+          "name": "systemd",
+          "repository": "https://github.com/systemd/systemd",
+          "pin": "255.4-1ubuntu8.17"
+        },
+        {
+          "name": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0"
+        },
+        {
+          "name": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0"
+        },
+        {
+          "name": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8"
+        },
+        {
+          "name": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2"
+        },
+        {
+          "name": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1"
+        },
+        {
+          "name": "agent-retrieval-bench",
+          "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+          "pin": "v0.2.1 at source commit b487f386 (the 2026-09-22 verdict's baseline)"
+        },
+        {
+          "name": "Inspect AI",
+          "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+          "pin": "0.3.266 (the 2026-09-22 verdict's baseline)"
+        },
+        {
+          "name": "MLflow",
+          "repository": "https://github.com/mlflow/mlflow",
+          "pin": "3.16.1 (the 2026-09-22 verdict's baseline)"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_adjudicated",
+        "open_gaps": 10,
+        "open_executable_now_gaps": 8
+      }
+    },
+    {
+      "layer_id": "agents-models-workers",
+      "catalog": "us-equities",
+      "title": "Agents, models and workers",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "ai-memory",
+          "repository": "https://github.com/akitaonrails/ai-memory",
+          "pin": "2.4.1"
+        },
+        {
+          "name": "socraticode",
+          "repository": "https://github.com/giancarloerra/SocratiCode",
+          "pin": "1.15.0"
+        },
+        {
+          "name": "qmd",
+          "repository": "https://github.com/tobi/qmd",
+          "pin": "2.8.3"
+        },
+        {
+          "name": "serena",
+          "repository": "https://github.com/oraios/serena",
+          "pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+        },
+        {
+          "name": "qdrant",
+          "repository": "https://github.com/qdrant/qdrant",
+          "pin": "1.19.1"
+        },
+        {
+          "name": "context-mode",
+          "repository": "https://github.com/mksglu/context-mode",
+          "pin": "1.0.169"
+        },
+        {
+          "name": "rtk",
+          "repository": "https://github.com/rtk-ai/rtk",
+          "pin": "0.50.0"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "keep_but_compare",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 15,
+        "open_executable_now_gaps": 9
+      }
+    },
+    {
+      "layer_id": "observability-hosting",
+      "catalog": "us-equities",
+      "title": "Observability and hosting",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "claude-code",
+          "repository": "https://github.com/anthropics/claude-code",
+          "pin": "2.1.284"
+        },
+        {
+          "name": "dagu",
+          "repository": "https://github.com/dagucloud/dagu",
+          "pin": "2.16.6"
+        },
+        {
+          "name": "opentelemetry-collector-contrib",
+          "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+          "pin": "0.161.0"
+        },
+        {
+          "name": "prometheus",
+          "repository": "https://github.com/prometheus/prometheus",
+          "pin": "3.15.0"
+        },
+        {
+          "name": "loki",
+          "repository": "https://github.com/grafana/loki",
+          "pin": "3.7.8"
+        },
+        {
+          "name": "grafana",
+          "repository": "https://github.com/grafana/grafana",
+          "pin": "13.2.2"
+        },
+        {
+          "name": "restic",
+          "repository": "https://github.com/restic/restic",
+          "pin": "0.19.1"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "pending_lanes",
+        "independent_review": "pending_lanes",
+        "open_gaps": 1,
+        "open_executable_now_gaps": 1
+      }
+    },
+    {
+      "layer_id": "security-supply-chain",
+      "catalog": "us-equities",
+      "title": "Security and supply chain",
+      "owner_lane": "trading",
+      "selection_of_record": [
+        {
+          "name": "syft",
+          "repository": "https://github.com/anchore/syft",
+          "pin": "1.52.0"
+        },
+        {
+          "name": "gitleaks",
+          "repository": "https://github.com/gitleaks/gitleaks",
+          "pin": "8.30.1"
+        },
+        {
+          "name": "Grype (vulnerability scanner)",
+          "repository": "https://github.com/anchore/grype",
+          "pin": "0.119.0 (archive sha256 3fa2dc4b924621ab65404cf08d0b8438d896d80ab949c9d5a4ca283c36004c9b)"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "upstream_example_or_native_operation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "owner_lane_run_pending",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": {
+        "decision": "retain",
+        "verdict_status": "recorded",
+        "independent_review": "dual_lane_same_winner",
+        "open_gaps": 16,
+        "open_executable_now_gaps": 12
+      }
+    },
+    {
+      "layer_id": "cross:wsl-distro",
+      "catalog": "cross",
+      "title": "The new WSL distribution: image, first boot and install order",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "Ubuntu 24.04.5 LTS WSL image (Canonical)",
+          "repository": "https://releases.ubuntu.com/24.04.5/",
+          "pin": "sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e"
+        }
+      ],
+      "record_verdict": "new_host_required",
+      "record_evidence_class": "none_recorded",
+      "blind": {
+        "status": "recommended",
+        "critic_verdict": "upheld",
+        "picks": [
+          {
+            "name": "Ubuntu 26.04.1 LTS (Canonical WSL image), primary",
+            "repository": "https://ubuntu.com/download/server",
+            "upstream": null
+          },
+          {
+            "name": "Ubuntu 24.04.5 LTS (Canonical WSL image), fallback",
+            "repository": "https://ubuntu.com/download/server",
+            "upstream": null
+          }
+        ],
+        "comparison_arms": []
+      },
+      "cross_family": {
+        "status": "compare",
+        "critic_verdict": "undetermined",
+        "picks": [
+          {
+            "name": "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+            "repository": "https://ubuntu.com/download/server",
+            "upstream": null
+          },
+          {
+            "name": "Ubuntu 26.04.1 LTS (Canonical WSL image)",
+            "repository": "https://ubuntu.com/download/server",
+            "upstream": null
+          }
+        ]
+      },
+      "agreement": "overlap",
+      "agreement_as_written": "differ",
+      "extensions_applied": [
+        "equal_sets_unequal_statuses",
+        "packet_name_matching"
+      ],
+      "pick_sets": {
+        "class": "same_picks_split_status",
+        "named_by_both": [
+          "Ubuntu 24.04.5 LTS (Canonical WSL image)",
+          "Ubuntu 26.04.1 LTS (Canonical WSL image)"
+        ],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": {
+          "named_by_both_not_in_record": [
+            "Ubuntu 26.04.1 LTS (Canonical WSL image)"
+          ],
+          "record_not_named_by_both": []
+        }
+      },
+      "disagreement_with_record": {
+        "blind_only": [
+          "Ubuntu 26.04.1 LTS (Canonical WSL image), primary"
+        ],
+        "record_only": []
+      },
+      "grand_list": null
+    },
+    {
+      "layer_id": "cross:runtime-workers",
+      "catalog": "cross",
+      "title": "Runtime workers",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "OpenHands software-agent-sdk (runtime worker)",
+          "repository": "https://github.com/OpenHands/software-agent-sdk",
+          "pin": "v1.49.6 @ fcc102a697874d54a357e36004e02c95040dbdc0"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "none_recorded",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "no_blind_record",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": null
+    },
+    {
+      "layer_id": "cross:gpt6-harnesses",
+      "catalog": "cross",
+      "title": "GPT-6 harnesses: the Codex lane and the gateway",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "codex",
+          "repository": "https://github.com/openai/codex",
+          "pin": "0.159.2"
+        },
+        {
+          "name": "omniroute",
+          "repository": "https://github.com/diegosouzapw/OmniRoute",
+          "pin": "3.8.50"
+        }
+      ],
+      "record_verdict": "comparison_required",
+      "record_evidence_class": "none_recorded",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "no_blind_record",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": null
+    },
+    {
+      "layer_id": "cross:credential-practice",
+      "catalog": "cross",
+      "title": "Credential practice: native sign-ins, the 0600 store and the guards",
+      "owner_lane": "shared: keys",
+      "selection_of_record": [
+        {
+          "name": "Command and secret-path guard (K4)",
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "local_integration_check",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "no_blind_record",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": null
+    },
+    {
+      "layer_id": "cross:convergence-practice",
+      "catalog": "cross",
+      "title": "Convergence practice: evidence classes, validators and closure",
+      "owner_lane": "foundation",
+      "selection_of_record": [
+        {
+          "name": "Convergence practice and its validators (this repository)",
+          "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+          "pin": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6"
+        }
+      ],
+      "record_verdict": "selection_of_record_open",
+      "record_evidence_class": "structural_validation",
+      "blind": null,
+      "cross_family": null,
+      "agreement": null,
+      "agreement_as_written": null,
+      "extensions_applied": [],
+      "pick_sets": {
+        "class": "no_blind_record",
+        "named_by_both": [],
+        "named_by_claude_only": [],
+        "named_by_gpt_only": [],
+        "fold_comparison_set": [],
+        "versus_record": null
+      },
+      "disagreement_with_record": null,
+      "grand_list": null
+    }
+  ],
+  "summary": {
+    "rows": 37,
+    "by_catalog": {
+      "foundation": 20,
+      "us-equities": 12,
+      "cross": 5
+    },
+    "class": {
+      "no_blind_record": 4,
+      "owner_lane_run_pending": 12,
+      "same_picks_both_recommended": 2,
+      "same_picks_split_status": 3,
+      "some_picks_shared": 16
+    },
+    "agreement": {
+      "agree": 2,
+      "overlap": 19
+    },
+    "agreement_as_written": {
+      "agree": 2,
+      "differ": 1,
+      "overlap": 16,
+      "unclassified": 2
+    },
+    "extensions_applied": {
+      "equal_sets_unequal_statuses": [
+        "document-retrieval",
+        "scheduling-supervision",
+        "cross:wsl-distro"
+      ],
+      "packet_name_matching": [
+        "cross:wsl-distro"
+      ]
+    },
+    "rows_where_blind_differs_from_record": 18,
+    "rows_with_picks_named_by_both": 21,
+    "rows_where_picks_named_by_both_differ_from_record": 16
+  }
+}

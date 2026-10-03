@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "kind": "instruction_loading_probe",
+  "recorded_at_utc": "2026-10-02T02:25:00Z",
+  "question": "Does codex exec put $CODEX_HOME/AGENTS.md into the model's instructions?",
+  "client": "Codex CLI 0.159.3 (codex exec)",
+  "route": "OmniRoute on loopback port 20128 (keyless placeholder key), model cx/gpt-6-luna-low; an isolated CODEX_HOME per arm holding only a provider config.toml",
+  "prompt": "Do your instructions contain a canary token? If yes, print the token exactly and nothing else. If no, print NONE and nothing else.",
+  "arms": [
+    {"arm": "home AGENTS.md holds a canary line", "exit": 0, "final_message": "CANARY-7F3Q-AGENTSMD", "tokens_used": 12046},
+    {"arm": "home without AGENTS.md", "exit": 0, "final_message": "NONE", "tokens_used": 5075}
+  ],
+  "conclusion": "codex exec loads $CODEX_HOME/AGENTS.md into the model's instructions. The cross-family run used the default CODEX_HOME, whose AGENTS.md names eight packet candidates: ai-memory, Hindsight, SocratiCode, QMD, Playwright CLI, Ollama, Context Mode and ast-grep.",
+  "default_home_agents_md_sha256": "4dfa48e7d45b069c7398f2ce894ccad12516498a7ef5e35b9b52c9273530b521",
+  "evidence_class": "local_integration"
+}

@@ -1,0 +1,295 @@
+{
+ "kind": "github_api_facts_sidecar",
+ "note": "Responses of the three GitHub API endpoints the judge prompt names, captured by the coordinator before the run; popularity fields (stars, forks, watchers, downloads) deliberately omitted per criteria.txt.",
+ "packet": "packets/isolation.json",
+ "candidates": {
+  "C01": {
+   "repository": "https://github.com/anthropics/sandbox-runtime",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/anthropics/sandbox-runtime": {
+     "full_name": "anthropics/sandbox-runtime",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T14:23:34Z",
+     "created_at": "2025-10-20T02:52:10Z",
+     "updated_at": "2026-10-01T19:36:41Z",
+     "open_issues_count": 262,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/anthropics/sandbox-runtime"
+    },
+    "repos/anthropics/sandbox-runtime/releases/latest": {
+     "tag_name": "v0.0.78",
+     "name": "v0.0.78",
+     "published_at": "2026-09-30T01:09:22Z",
+     "prerelease": false,
+     "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78"
+    },
+    "repos/anthropics/sandbox-runtime/commits?per_page=1": {
+     "sha": "117eb928202b53c80d3cb6527d88d1b90e4ca7a9",
+     "date": "2026-10-01T11:58:43Z",
+     "html_url": "https://github.com/anthropics/sandbox-runtime/commit/117eb928202b53c80d3cb6527d88d1b90e4ca7a9"
+    }
+   }
+  },
+  "C02": {
+   "repository": "https://github.com/e2b-dev/E2B",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/e2b-dev/E2B": {
+     "full_name": "e2b-dev/E2B",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T15:48:28Z",
+     "created_at": "2023-03-04T13:41:18Z",
+     "updated_at": "2026-10-01T20:29:00Z",
+     "open_issues_count": 83,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/e2b-dev/E2B"
+    },
+    "repos/e2b-dev/E2B/releases/latest": {
+     "tag_name": "e2b@2.52.0",
+     "name": "e2b@2.52.0",
+     "published_at": "2026-10-01T10:44:26Z",
+     "prerelease": false,
+     "html_url": "https://github.com/e2b-dev/E2B/releases/tag/e2b%402.52.0"
+    },
+    "repos/e2b-dev/E2B/commits?per_page=1": {
+     "sha": "d0ed5c1f170dfbea5956e7a04aefb365173824f3",
+     "date": "2026-10-01T14:11:37Z",
+     "html_url": "https://github.com/e2b-dev/E2B/commit/d0ed5c1f170dfbea5956e7a04aefb365173824f3"
+    }
+   }
+  },
+  "C03": {
+   "repository": "https://github.com/moby/moby",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/moby/moby": {
+     "full_name": "moby/moby",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:29:45Z",
+     "created_at": "2013-01-18T18:10:57Z",
+     "updated_at": "2026-10-01T20:29:53Z",
+     "open_issues_count": 3911,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/moby/moby"
+    },
+    "repos/moby/moby/releases/latest": {
+     "tag_name": "docker-v29.8.2",
+     "name": "v29.8.2",
+     "published_at": "2026-09-30T20:28:33Z",
+     "prerelease": false,
+     "html_url": "https://github.com/moby/moby/releases/tag/docker-v29.8.2"
+    },
+    "repos/moby/moby/commits?per_page=1": {
+     "sha": "c8e265787b0a89d161f34c3920f73f136974744b",
+     "date": "2026-10-01T20:29:45Z",
+     "html_url": "https://github.com/moby/moby/commit/c8e265787b0a89d161f34c3920f73f136974744b"
+    }
+   }
+  },
+  "C04": {
+   "repository": "https://github.com/apple/container",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/apple/container": {
+     "full_name": "apple/container",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T23:57:10Z",
+     "created_at": "2025-05-30T21:26:05Z",
+     "updated_at": "2026-10-01T19:45:19Z",
+     "open_issues_count": 551,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/apple/container"
+    },
+    "repos/apple/container/releases/latest": {
+     "tag_name": "1.5.0",
+     "name": "1.5.0",
+     "published_at": "2026-09-29T02:33:21Z",
+     "prerelease": false,
+     "html_url": "https://github.com/apple/container/releases/tag/1.5.0"
+    },
+    "repos/apple/container/commits?per_page=1": {
+     "sha": "0a48a1bdbfaa7451c810372d98b045fa8b486b6a",
+     "date": "2026-09-30T23:57:10Z",
+     "html_url": "https://github.com/apple/container/commit/0a48a1bdbfaa7451c810372d98b045fa8b486b6a"
+    }
+   }
+  },
+  "C05": {
+   "repository": "https://github.com/google/gvisor",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/google/gvisor": {
+     "full_name": "google/gvisor",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "master",
+     "pushed_at": "2026-10-01T20:36:05Z",
+     "created_at": "2018-04-26T21:28:49Z",
+     "updated_at": "2026-10-01T20:35:58Z",
+     "open_issues_count": 884,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/google/gvisor"
+    },
+    "repos/google/gvisor/releases/latest": {
+     "tag_name": "release-20260928.0",
+     "name": "gVisor 20260928.0",
+     "published_at": "2026-09-30T17:45:43Z",
+     "prerelease": false,
+     "html_url": "https://github.com/google/gvisor/releases/tag/release-20260928.0"
+    },
+    "repos/google/gvisor/commits?per_page=1": {
+     "sha": "4e9e164caf0ac73dc4829e12285a8532395c5cc4",
+     "date": "2026-10-01T20:35:34Z",
+     "html_url": "https://github.com/google/gvisor/commit/4e9e164caf0ac73dc4829e12285a8532395c5cc4"
+    }
+   }
+  },
+  "C06": {
+   "repository": "https://github.com/superradcompany/microsandbox",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/superradcompany/microsandbox": {
+     "full_name": "superradcompany/microsandbox",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:28:53Z",
+     "created_at": "2024-10-03T15:57:38Z",
+     "updated_at": "2026-10-01T20:28:56Z",
+     "open_issues_count": 102,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/superradcompany/microsandbox"
+    },
+    "repos/superradcompany/microsandbox/releases/latest": {
+     "tag_name": "v0.7.6",
+     "name": "v0.7.6",
+     "published_at": "2026-10-01T15:36:08Z",
+     "prerelease": false,
+     "html_url": "https://github.com/superradcompany/microsandbox/releases/tag/v0.7.6"
+    },
+    "repos/superradcompany/microsandbox/commits?per_page=1": {
+     "sha": "7b09b0cf55b897619fe5be93d6a18ea8d7535ea9",
+     "date": "2026-10-01T20:28:50Z",
+     "html_url": "https://github.com/superradcompany/microsandbox/commit/7b09b0cf55b897619fe5be93d6a18ea8d7535ea9"
+    }
+   }
+  },
+  "C07": {
+   "repository": "https://github.com/podman-container-tools/podman",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/podman-container-tools/podman": {
+     "full_name": "podman-container-tools/podman",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:23:44Z",
+     "created_at": "2017-11-01T15:01:27Z",
+     "updated_at": "2026-10-01T20:37:01Z",
+     "open_issues_count": 1020,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/podman-container-tools/podman"
+    },
+    "repos/podman-container-tools/podman/releases/latest": {
+     "tag_name": "v6.1.3",
+     "name": "v6.1.3",
+     "published_at": "2026-09-29T15:34:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3"
+    },
+    "repos/podman-container-tools/podman/commits?per_page=1": {
+     "sha": "ccc1e207757d7abd173e52980bdd19613166ac48",
+     "date": "2026-10-01T14:09:59Z",
+     "html_url": "https://github.com/podman-container-tools/podman/commit/ccc1e207757d7abd173e52980bdd19613166ac48"
+    }
+   }
+  },
+  "C08": {
+   "repository": "https://github.com/boxlite-ai/boxlite",
+   "captured_at": "2026-10-01T20:42:30+00:00",
+   "endpoints": {
+    "repos/boxlite-ai/boxlite": {
+     "full_name": "boxlite-ai/boxlite",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-09-30T15:44:40Z",
+     "created_at": "2025-12-07T22:49:32Z",
+     "updated_at": "2026-10-01T13:56:25Z",
+     "open_issues_count": 353,
+     "has_issues": true,
+     "license_spdx": "Apache-2.0",
+     "html_url": "https://github.com/boxlite-ai/boxlite"
+    },
+    "repos/boxlite-ai/boxlite/releases/latest": {
+     "tag_name": "v0.10.5",
+     "name": "v0.10.5",
+     "published_at": "2026-09-30T11:14:05Z",
+     "prerelease": false,
+     "html_url": "https://github.com/boxlite-ai/boxlite/releases/tag/v0.10.5"
+    },
+    "repos/boxlite-ai/boxlite/commits?per_page=1": {
+     "sha": "4fbf2aeded7520fe77bc724468c831a29684f2cb",
+     "date": "2026-09-30T10:56:07Z",
+     "html_url": "https://github.com/boxlite-ai/boxlite/commit/4fbf2aeded7520fe77bc724468c831a29684f2cb"
+    }
+   }
+  },
+  "C09": {
+   "repository": "https://github.com/max-sixty/worktrunk",
+   "captured_at": "2026-10-01T20:42:31+00:00",
+   "endpoints": {
+    "repos/max-sixty/worktrunk": {
+     "full_name": "max-sixty/worktrunk",
+     "archived": false,
+     "disabled": false,
+     "fork": false,
+     "default_branch": "main",
+     "pushed_at": "2026-10-01T20:01:15Z",
+     "created_at": "2025-10-17T22:13:14Z",
+     "updated_at": "2026-10-01T20:33:30Z",
+     "open_issues_count": 47,
+     "has_issues": true,
+     "license_spdx": "NOASSERTION",
+     "html_url": "https://github.com/max-sixty/worktrunk"
+    },
+    "repos/max-sixty/worktrunk/releases/latest": {
+     "tag_name": "v0.80.0",
+     "name": "0.80.0",
+     "published_at": "2026-09-27T21:18:46Z",
+     "prerelease": false,
+     "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0"
+    },
+    "repos/max-sixty/worktrunk/commits?per_page=1": {
+     "sha": "85e685e313f7fbc0612c0e055e655c3917e39f29",
+     "date": "2026-10-01T20:01:12Z",
+     "html_url": "https://github.com/max-sixty/worktrunk/commit/85e685e313f7fbc0612c0e055e655c3917e39f29"
+    }
+   }
+  }
+ }
+}
