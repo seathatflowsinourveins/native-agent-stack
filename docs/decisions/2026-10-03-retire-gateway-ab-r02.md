@@ -142,8 +142,11 @@ outranks OAuth session occupancy", and records it running on 20128 in build `ae5
 order's timing condition was broken **in fact** no later than the 2026-09-30 switch-over (00:03:00Z), with no R02
 run on record. The rebuild record also says the patch was first built in the unpublished `81c9b6da` package; it
 does not say whether `5fc47d970` carried it. Part (ii), binding a fresh pin to the connection actually served, is
-not recorded on main as applied. With R02 retired, its "after R02" trigger can no longer occur, so part (ii) stays
-an open item for the patch workflow or a user decision; this record neither applies nor drops it.
+not recorded on main as applied. While R02 stays retired, its "after R02" trigger is dormant, not void: the reopen
+conditions below allow R02 to be reopened, and if a reopened R02 completes a scored run, the original after-scored-run
+predicate ([decisions.json:38](https://github.com/seathatflowsinourveins/native-agent-stack/blob/ecea28654a835fff2cc3651bab77ca0e46b9bec5/evidence/artifacts/omniroute-routing-20260928/decisions.json#L38))
+can occur again. Until then, part (ii) stays an open item for the patch workflow or a user decision, with its own
+acceptance gates unchanged; this record neither applies nor drops it.
 
 Main holds an earlier label that does not fit this account. PR #425, committed on main as `f6e5a0384` at
 2026-09-28T22:57:18Z, calls `045aa81f3` "the 20128 build" and `dd6e9607e` "the 20129 build"; its OpenHands
