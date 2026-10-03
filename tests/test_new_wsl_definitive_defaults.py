@@ -284,15 +284,25 @@ class Manifest(unittest.TestCase):
 
     def test_added_slots_and_hygiene_preserve_the_decisions(self):
         rows = {row["slot_id"]: row for row in self.rows}
+        settled = {settlement["slot_id"]: settlement for settlement in self.settlements}
         added_by_layer = {}
         for added in self.convergence["added_slots"]:
             row = rows[added["slot_id"]]
             self.assertEqual(row["row_kind"], "added")
             if added["outcome"] in ("split", "not_installed"):
-                # an added row that installs nothing keeps the named candidate only in its resolution
-                self.assertEqual(row["repository"], "")
-                self.assertTrue(row["installs_nothing_extra"])
+                # an added row keeps the named candidate in its resolution
                 self.assertEqual(row["resolution"]["former_default"], added["default"])
+                if added["slot_id"] in settled:
+                    # a split whose measurement returned carries the settlement's default (settlements.json)
+                    settlement = settled[added["slot_id"]]
+                    self.assertEqual(added["outcome"], "split")
+                    self.assertEqual((row["default"], row["repository"]),
+                                     (settlement["default"]["name"], settlement["default"]["repository"]))
+                    self.assertFalse(row["installs_nothing_extra"])
+                else:
+                    # an added row that installs nothing keeps the named candidate only in its resolution
+                    self.assertEqual(row["repository"], "")
+                    self.assertTrue(row["installs_nothing_extra"])
             else:
                 self.assertEqual(row["default"], added["default"]["name"])
                 self.assertEqual(row["repository"], added["default"]["repository"])
@@ -363,13 +373,17 @@ class Manifest(unittest.TestCase):
         stated = {d["slot_id"]: d["gpt_status"] for d in self.convergence["decisions"] + self.convergence["added_slots"]
                   if d.get("gpt_status")}
         self.assertEqual(sorted(stated), ["agent-structural-diff"])
+        settled = {settlement["slot_id"]: settlement["label"] for settlement in self.settlements}
         for row in self.rows:
             resolution = row["resolution"]
             if resolution["outcome"] not in RESOLVED:
                 continue
             with self.subTest(slot=row["slot_id"]):
                 self.assertEqual(row["gpt"], stated.get(row["slot_id"]) or self.expected_gpt(row))
-                self.assertEqual(row["label"], BASIS[resolution["outcome"]])
+                # A split whose measurement returned is labelled by its settlement; every other resolved row by its basis.
+                returned = bool(row["measurement"] and row["measurement"]["returned"])
+                self.assertEqual(returned, row["slot_id"] in settled)
+                self.assertEqual(row["label"], settled[row["slot_id"]] if returned else BASIS[resolution["outcome"]])
                 if row["row_kind"] == "added":
                     self.assertEqual(row["claude"], "not judged in the first round")
                 else:
@@ -512,9 +526,12 @@ class Manifest(unittest.TestCase):
         self.assertEqual(exceptions, {("us-equities", "market-data-provider")})
 
     def test_settled_rows_are_measurements_with_verified_receipts(self):
-        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, {"local-model-server"})
+        # The model server by its gate (a row of the decision round), and the two local-model slots by their measurement
+        # (rows that the convergence decisions added and split).
+        settled = {"local-model-server", "local-generation-model", "embedding-model"}
+        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, settled)
         self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
-                         {"local-model-server"})
+                         settled)
         for settlement in self.settlements:
             rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
             self.assertEqual(len(rows), 1, settlement["slot_id"])
@@ -541,8 +558,17 @@ class Manifest(unittest.TestCase):
     def test_settled_split_tables_preserve_the_blind_picks(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
         slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
+        added = {decision["slot_id"] for decision in self.convergence["added_slots"]}
         for settlement in self.settlements:
-            slot = slots[settlement["slot_id"]]
+            slot = slots.get(settlement["slot_id"])
+            if slot is None:
+                # A slot the convergence decisions added has no blind picks of its own: its layer row shows the settled
+                # default, the measurement state and the settlement as its basis.
+                self.assertIn(settlement["slot_id"], added)
+                line = next(line for line in lines if re.match(r"\| [^|]+ \| " + re.escape(settlement["slot_id"]) + r" \|", line))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[3:], [settlement["default"]["name"], "measurement", "settled by the preregistered measurement"])
+                continue
             if slot.get("split"):
                 line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
                 cells = [cell.strip() for cell in line.split("|")[1:-1]]
@@ -715,10 +741,12 @@ class Manifest(unittest.TestCase):
         self.assertEqual(counts["slots"], 89)
         self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
-        self.assertEqual(counts["installed"], 56)
+        # 56 after the layer consensus, and the two local-model slots settled by their measurement (2026-10-03).
+        self.assertEqual(counts["installed"], 58)
         self.assertEqual(counts["by_row_kind"]["consensus"], 5)
         self.assertEqual(counts["by_state"]["resolved"], 22)
-        self.assertEqual(counts["by_state"]["measurement"], 4)
+        self.assertEqual(counts["by_state"]["measurement"], 6)
+        self.assertEqual(counts["by_state"]["split"], 5)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):
         rows = {row["slot_id"]: row for row in self.rows}

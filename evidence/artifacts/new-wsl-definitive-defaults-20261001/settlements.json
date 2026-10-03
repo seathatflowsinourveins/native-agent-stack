@@ -33,5 +33,76 @@
    "The load average was recorded only in this run; the first gate did not record it, so tokens per second are not comparable across the two gates."
   ],
   "overturn_condition": "A llama.cpp release that passes the same gate, or a throughput comparison once both arms pass, can overturn this settlement."
+ },
+ {
+  "slot_id": "local-generation-model",
+  "default": {
+   "name": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+   "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF"
+  },
+  "settled_by": "preregistered measurement",
+  "receipts": [
+   {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+    "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+   },
+   {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+    "sha256": "881e8f26c508d9029c3efc1e81de69f0773da8ee6e32398df3bf21ad109102a7"
+   }
+  ],
+  "label": "settled by the preregistered measurement: first-pass valid tool calls 200 of 200 against 175 of 200 for gpt-oss:20b (difference 0.125, 95% interval 0.065 to 0.19) on 100 BFCL cases through the server's chat and responses surfaces, both arms entirely on the GPU at 64,000 tokens with the embedder resident; Bonsai and Swift on PrismML's llama.cpp failed the function gate and qwen3.8:27b did not fit on the GPU; measured on one workstation; not a merit acceptance",
+  "basis": "The Claude critic named the rule: gpt-oss-20b takes the slot if Qwen3.8-27B offloads to the CPU, evicts the embedder or has the lower valid tool-call rate. Qwen3.8-27B was not entirely on the GPU at 64,000 tokens, and gpt-oss-20b passed co-residency in the order of use, which gave it the slot under the rule as the critic wrote it. The owner then asked for the newest releases, and the preregistration's extension (amendment 3, hashed before any trial of a new arm) added Bonsai in two packings and Swift on PrismML's llama.cpp, Swift imported into the manifest's server, and gpt-oss-20b as the control. The PrismML arms failed the function gate that settled the model-server slot; Swift on Ollama passed co-residency and took the slot by the frozen A2 rule with an interval that excludes zero. The other model family's read (pull request 608, comment 5964331790) found the frozen-rule application consistent and asked for an artifact map before an independent acceptance of the native results; the map is posted and private.",
+  "scope": "First-pass tool-call validity of the two systems on one public set of simple function-calling cases through the server's OpenAI-compatible chat and responses surfaces, and their GPU residency beside the embedder at 64,000 tokens on one workstation. No claim about coding quality, speed, long contexts or the destination distribution.",
+  "limits": [
+   "One workstation, one throwaway distribution, one run per case and arm: a local integration check of the systems named, not an acceptance on the destination distribution.",
+   "First-pass tool-call validity on 100 simple public cases (BFCL simple_python) through two interfaces; nothing about coding quality, long tasks, throughput under concurrent requests or behaviour above 64,000 tokens.",
+   "The Anthropic-style messages surface was not evaluated through the package (Inspect AI 0.3.273 cannot read this thinking model's answer); it was exercised only by Claude Code in the client tasks, which both arms passed.",
+   "S2o was slower in these runs: 292 and 303 seconds for 100 cases on chat and responses against 100 and 139 for the control, and 43.1 against 108.9 output tokens per second on single long prompts that were not run as a speed comparison.",
+   "S2o leaves less GPU memory free: 21,579 of 24,564 MiB in use with the embedder resident while Windows applications held about 2,600 MiB; earlier the same day they held up to about 5,900 MiB, at which the same load would leave under one GB. Co-residency on a busier desktop and on the destination distribution is not measured.",
+   "The Ollama import is this measurement's system, not a route the publisher documents: the library qwen3.8:27b model's renderer, parser, parameters, template and licence lines with the Swift file as FROM. The publisher's own route (llama.cpp's server, here PrismML's fork) failed the function gate for a reason that lies in that server. The quantization's card says its quality tests used a 512-token context.",
+   "The arm that took the slot was added by the preregistration's extension (amendment 3) after the owner asked for the newest releases; the deciding measurement as the critic named it had two arms (qwen3.8:27b and gpt-oss:20b), the earlier result for gpt-oss:20b is kept as a historical result, and gpt-oss:20b ran A2 as the control under the same rules.",
+   "Three deviations are recorded (a void first window, the Codex client's model name with its tag, a reused label); none changed a case, a limit, the metric or the rule, and none was decided on an outcome.",
+   "Recorded, not deciding: the package's own score (S2o 97 and 95 of 100, the control 83 and 83) and the client tasks (10 of 10 for each arm).",
+   "manifests/stack.json has no Ollama, Inspect AI or PrismML llama.cpp component, so component_ids name the two clients that ran the client tasks (Codex also ran the function gate); they ran at Codex 0.160.0 and Claude Code 2.1.287, not at the stack's recorded 0.159.3 and 2.1.284.",
+   "Raw model outputs (the Inspect logs, the client run records, the server logs) stay private and are listed by sha256 in files.json; the published per-case validity files carry case ids, verdicts, reasons and timings, and the decision statistic reproduces from them.",
+   "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
+  ],
+  "overturn_condition": "A newer local generation model or runtime that passes the function gate, fits entirely on the GPU beside the embedder at 64,000 tokens and has a higher first-pass valid tool-call share on the same cases with an interval above zero; or the destination distribution's acceptance failing for this system (the model not created from the pinned file, or not answering through the server)."
+ },
+ {
+  "slot_id": "embedding-model",
+  "default": {
+   "name": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+   "repository": "https://github.com/QwenLM/Qwen3-Embedding"
+  },
+  "settled_by": "preregistered measurement",
+  "receipts": [
+   {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+    "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b"
+   },
+   {
+    "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+    "sha256": "c272b40ee96a54f660441eaf97bde5f4f59bcc9dcc58945c8e9d6fb6d67d5b58"
+   }
+  ],
+  "label": "settled by the preregistered measurement: nDCG@10 0.49827 on CQADupstackUnixRetrieval against 0.41394 for EmbeddingGemma (difference 0.084331, 95% interval 0.067738 to 0.100656), with the generation model resident; Nemotron-3-Embed-1B tied (difference 0.003124, interval -0.012194 to 0.018141) and needs a second model server, and WeMM-Embedding-2B ran out of GPU memory; measured on one workstation; not a merit acceptance",
+  "basis": "The Claude critic named the rule: retrieval quality on one fixed public retrieval set through each model's served route with the generation model resident, and a model that needs a second model server must beat the best single-server model by an interval that excludes zero. Amendment 4 fixed the set (CQADupstackUnixRetrieval at a pinned dataset revision, MTEB 2.22.1), the arms (the two Ollama arms, Nemotron-3-Embed-1B and WeMM-Embedding-2B at MTEB's registered revisions) and the gates before any download of an arm's weights; amendment 4a corrected the prompts and two gates before any load. E1 beat E2 with an interval above zero; E3's difference to E1 includes zero; E4 ran out of memory beside the generation model. Both local-model slots are therefore served by the one model server. The other model family's read (pull request 608, comment 5964331790) found the frozen-rule application consistent and asked for an artifact map before an independent acceptance of the native results; the map is posted and private.",
+  "scope": "Retrieval quality (nDCG@10) of the arms on one English technical retrieval task through each arm's served route, with the generation model resident, on one workstation. No claim about other tasks, languages, rerankers or the destination distribution.",
+  "limits": [
+   "One public retrieval task (CQADupstack Unix: English technical questions from a StackExchange forum), one workstation, one throwaway distribution, one run per arm: a local integration check, not an acceptance on the destination distribution.",
+   "Nemotron's tie holds for this task only; multilingual retrieval, longer documents and other domains were not measured.",
+   "The two Ollama arms are GGUF conversions served by the one model server; a difference from the reference weights is a difference of the systems, not of the models alone.",
+   "E1's and E2's prompts are MTEB's reference prompts as observed with a stub before the runs (amendment 4a): E1 sends the Qwen3 instruction before queries and nothing before documents; E2 sends EmbeddingGemma's query and document prompts.",
+   "Gate F reads the model server's listing: in window pb2 the card's memory in use fell between steps while the server kept listing the generation model entirely on the GPU, consistent with the Windows driver moving part of it off the card, so E3 passing gate F does not show co-residency. In window pb1 the readings matched the resident models, so E1's co-residency with the generation model is supported by both readings.",
+   "E4's first error text was lost: after its evaluation failed out of memory, the script's memory query raised the same sticky CUDA error and the outer handler replaced the text; the outcome is not in doubt, because only the evaluation's handler sets out_of_memory.",
+   "The reranking condition was not run: no installed retrieval owner can call an external reranker (QMD reranks in-process with its bundled model), and zerank-2 (7.49 GiB of weights) cannot be resident beside the generation model on this card.",
+   "Recorded, not deciding: evaluation time E1 1,166 s, E2 771 s, E3 460 s (E3 in-process, not comparable with the Ollama arms); resident sizes E1 2,857,191,341 bytes and E2 681,417,113 bytes.",
+   "manifests/stack.json has no Ollama or MTEB component; component_ids name huggingface-hub-native, the native route for the revision-pinned snapshots of E3 and E4, which the measurement downloaded through the huggingface_hub library at MTEB's registered revisions (its version is in the throwaway's freeze list, which was not retained).",
+   "The 31 MB prediction files and the run records stay private and are listed by sha256 in files.json; the published per-query nDCG@10 files reproduce the decision statistic.",
+   "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
+  ],
+  "overturn_condition": "A single-server embedding model with a higher nDCG@10 on the same task whose difference has an interval above zero, or a second-server model that beats this one by an interval above zero; a measured gain of an external reranker once a retrieval owner that can call one is installed; or the destination distribution's acceptance failing for this system."
  }
 ]
