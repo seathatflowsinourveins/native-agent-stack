@@ -29,6 +29,7 @@ jobs:
       - name: Validate the runtime skills contract
         run: python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills
       - name: Validate runtime job and comparison JSON syntax
+        if: ${{ !cancelled() }}
         run: |
           python3 -m json.tool catalogs/foundation/runtime-jobs.json /dev/null
           for runtime_job_document in blueprints/runtime-workers/comparisons/*.json; do

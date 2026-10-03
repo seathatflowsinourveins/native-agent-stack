@@ -4025,8 +4025,8 @@
     },
     {
       "path": ".github/workflows/runtime-worker-skills-freshness.yml",
-      "sha256": "e9e8da2d4f1f08f721535013e4cfb765fee2de4af4d0d8bc759addf83c2b2bb3",
-      "bytes": 5724
+      "sha256": "8b04e586023763796b78a7cea39a385aedca52456ff0de70be3edee5365607e4",
+      "bytes": 5756
     },
     {
       "path": ".github/workflows/security-scan.yml",
