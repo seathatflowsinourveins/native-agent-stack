@@ -15779,8 +15779,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
-      "sha256": "a942d9bd5cc1d688056e32785c92bc392ab3458116228884d773d90ab1f7a57b",
-      "bytes": 82167
+      "sha256": "a83be76b260cb5e8d8083501cafc6eacc191ee896c855b90987d8bb6239eb3d3",
+      "bytes": 84326
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
@@ -48634,8 +48634,8 @@
     },
     {
       "path": "evidence/receipts/codex-serena-startup-port-20261003.json",
-      "sha256": "1c1d044d09cbc6b163921ea7f7022565cf23ec2ec931b192e9d8c75636a6e9b7",
-      "bytes": 104692
+      "sha256": "c61d7e77592913b80d829394e3e81e02c3887e916193db98cc3c5176e5ac3aae",
+      "bytes": 106130
     },
     {
       "path": "evidence/receipts/codex-session-environment-20260920.json",
@@ -50589,8 +50589,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "770c844d4be005328fb96ffa2c35fc25a1fcad6556bead4e791dfccc8c02603f",
-      "bytes": 174042
+      "sha256": "ac777cfc6288b0261ec54058e1ed2d26fb592d29bd543c080f90acb4e4143b6b",
+      "bytes": 174188
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -51299,8 +51299,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "0c694e0d28002306352af41c7af3039f110dc2ef025e6b0e3aeea7126a74d841",
-      "bytes": 83462
+      "sha256": "568e40ec9eb00dcc39e926466538e4fe1d287710d0a037f1df416e7b2b630d52",
+      "bytes": 83858
     },
     {
       "path": "tools/adoption/codex_roles.py",
