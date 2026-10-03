@@ -99,7 +99,7 @@ That commit had two defects on this host.
    Its second commit is the maintainer's own "sanitize unexpected internal errors". A source build was therefore
    needed whatever the Node line.
 
-Upstream's own CI was red on `a58000c7` when this record was written. Issue #14866 "Release branch not green: release/v3.8.51" was open (it closed on 2026-09-27 at 08:46:47Z, "release-green again at a58000c76"; see the [feature-resolution record](2026-09-27-omniroute-feature-resolution.md)). At
+Upstream's own CI is red on `a58000c7`. Issue #14866 "Release branch not green: release/v3.8.51" is open. At
 07:58Z these check runs had failed ([`upstream-state.txt`](../../evidence/artifacts/omniroute-gateway-20260927/upstream-state.txt)):
 - "Release acceptance";
 - all four Node 24 compat test shards;
@@ -486,7 +486,12 @@ rests on source (OR50 `open-sse/executors/codex.ts` L346-347).
 
 ## Limitations and residuals
 
-- **Upstream CI was red on the base** (#14866, closed 2026-09-27 08:46:47Z). The build stays a recorded canary because its head is off the release line, not because of CI colour.
+- **Upstream CI is red on the base** (#14866). The build is a recorded canary, not a release.
+  - **Update 2026-10-03.** #14866 closed at 2026-09-27T08:46:47Z ("release-green again at a58000c76"), as retained in
+    [`upstream-issue-14866.json`](../../evidence/artifacts/omniroute-features-20260927/upstream-issue-14866.json) and
+    [the feature-resolution record](2026-09-27-omniroute-feature-resolution.md#status-on-2026-10-03-later-builds-and-each-remeasurement-promise).
+    Lines 102 and 489 above predate that closure. The build stayed a canary because its head was off the release line;
+    [the 2026-09-30 rebuild](2026-09-30-omniroute-rebuild.md) replaced it.
 - **#13788 fails one upstream inventory test.** The route's connection-query site is unclassified in
   `tests/unit/hard-session-lease-bypass-inventory.test.ts`. The coordinator's summary says the guard postdates the PR,
   which was opened 2026-09-15; this record did not check that. Upstream must classify the site when it merges #13788.
