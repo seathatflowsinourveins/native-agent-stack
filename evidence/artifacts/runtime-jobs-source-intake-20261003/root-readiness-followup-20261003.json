@@ -55,8 +55,42 @@
     "Pre-print guards rejected oversized path or selected-source output without displaying it; narrowed reads recovered",
     "An exact source-line pattern omitted native JSON spacing and raised StopIteration; spacing-aware recovery preserved formatting",
     "A context-free registry insertion appended rows after the document; native validator1 reported invalid JSON. Repair derived from the valid committed registry with contextual patches; no evidence rows intentionally removed",
-    "Two review links initially used an unverified GitHub owner; native gh repo view0 established seathatflowsinourveins/native-agent-stack and both links were corrected"
+    "Two review links initially used an unverified GitHub owner; native gh repo view0 established seathatflowsinourveins/native-agent-stack and both links were corrected",
+    "The same context-free insertion appended the coding draft carrier requirement after its JSON document. The registry validator0 establishes integrity/scope only and did not catch this syntax error; direct JSON parsing caught it before freeze. Contextual repair and explicit parsing of all changed JSON files are required before the next publication",
+    "Coordinator host alias NativeRuntimeLab was unverified; native WSL list0 established RuntimeLab2604. Native executable lookup1 found no default-PATH Harbor; targeted executable discovery1 found the owned Harbor prefix with unrelated Docker overlay permission errors. Native source/version/help recovery is independent of those locator failures"
   ],
+  "explicit_json_syntax_followup": {
+    "inventory_base": "65a0d370ed8c075d922ff60857287e33d3a14788",
+    "native_inventory_exit": 0,
+    "changed_json_files_parsed": 13,
+    "syntax_failures_after_repair": [],
+    "coding_carrier_requirement_in_native_array": true,
+    "scope": "Standard-library JSON parsing of every changed JSON document; distinct from registry integrity and upstream runtime acceptance"
+  },
+  "astra_sdk_judgment": {
+    "role": "Astra/max",
+    "trigger": "Positive native SDK fixture still failed after one bounded Sol repair",
+    "acceptance_result": "HOLD repair and positive-fixture/native-role acceptance",
+    "root_observation": {
+      "probe_sha256": "c6cd86a938b087a6b9c5f452bc5867d7c42ab2a70f9dfe0267c729766cb859f0",
+      "jest_sha256": "9bcdab7d81bd96d861c30403c5aa3f57f6559161628dad038dcabd841de2ab48",
+      "hit_records": 16,
+      "hit_probes": 7,
+      "terminal_code": "probe_target_exit",
+      "target_exit": 1,
+      "pending_probes": 0,
+      "jest_duration_ms": 5009,
+      "passing_asserts": 0
+    },
+    "source_correction": "Pinned SDK exec.ts buffers stderr, iterates readline then awaits child exit; no stderrDone or child-close await. Thread.run records turn.completed usage and continues consuming the generator before return",
+    "root_original_source_reads": [
+      {"url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/exec.ts", "native_exit": 0, "sha256": "cac7c2ef4f834bc1cdca133d3950f229451460d9c495eb017dd931c63eaacc79"},
+      {"url": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/sdk/typescript/src/thread.ts", "native_exit": 0, "sha256": "cc0dda041278e007ed5114da5081a45f14f01ad931601c026628b8c5cc8c534c"}
+    ],
+    "remaining_observation": "Verified executable bindings and common-clock test/deadline timeline, stdout EOF/readline closure, SDK generator/run return, assertions and proxy cleanup. Instrumentation overhead stays explicit; original timeout/source/namespace preserved",
+    "cause": null,
+    "provider_usage": null
+  },
   "measured_defaults": 0,
   "jobs_total": 8,
   "default_or_freeze_qualification": false,

@@ -9211,7 +9211,7 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "032cbd2f6b4aea81f19912ca5292ef724b8e6c211a13cb0ecc714ea63ce2236d",
+      "sha256": "c54fea783ad25e64531de36a4fd8702350a0c6c36f5ee80a863fcd8279f7ae42",
       "bytes": 19639
     },
     {
@@ -42211,8 +42211,8 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
-      "sha256": "41ee1007459a655874367786c6b16f32da6fad575622823306b6ffbe6db74fa0",
-      "bytes": 4064
+      "sha256": "4d412b24d21841d7871b8de2658edafcd4c920ba66397d110b59629483b56b2f",
+      "bytes": 6860
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",
