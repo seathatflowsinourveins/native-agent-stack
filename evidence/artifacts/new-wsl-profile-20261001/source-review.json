@@ -1,0 +1,3658 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_w_prof_source_review",
+  "date_utc": "2026-10-01",
+  "source_head": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+  "evidence_class": "source_review_recommendations",
+  "reference_implementations": [
+    "manifests/stack.json",
+    "adoption/manifest.json",
+    "adoption/pins-linux-x86_64.json",
+    "adoption/bootstrap-linux.sh",
+    "scripts/adoption_status.py",
+    "scripts/build_ecosystem.py"
+  ],
+  "search_first": {
+    "skill": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+    "route": "Extend the repository's maintained native manifest/status/generator contracts; no new dependency, installer or benchmark runner.",
+    "channels": {
+      "repository": "scoped rg and exact known paths",
+      "github": "public gh api releases/tags/commits/readmes",
+      "registries": "native npm/PyPI release metadata; npm tarballs independently rehashed",
+      "skills": "selected search-first and OpenAI Docs; lifecycle read",
+      "mcp": "context-mode read/execute denied by approval policy never; installed CLI index/search used with isolated /tmp storage"
+    },
+    "researcher": "Read-only runtime source research; findings independently rechecked at the exact primary URLs before inclusion."
+  },
+  "sources": {
+    "Claude Code": {
+      "name": "Claude Code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anthropics/claude-code/releases/tags/2.1.284",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code/releases/tags/v2.1.284",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code/commits/v2.1.284",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code/readme?ref=8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.1.284",
+        "source": "https://github.com/anthropics/claude-code/releases/tag/v2.1.284",
+        "published_at": "2026-09-28T18:02:03Z"
+      },
+      "pin": "2.1.284",
+      "commit": "8364969e9f5234ef3d9743cf7c790e9aab0ac3b1",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anthropics/claude-code/blob/8364969e9f5234ef3d9743cf7c790e9aab0ac3b1/README.md",
+        "sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d"
+      },
+      "artifact_candidate": {
+        "name": "claude-linux-x64-musl.tar.gz",
+        "url": "https://github.com/anthropics/claude-code/releases/download/v2.1.284/claude-linux-x64-musl.tar.gz",
+        "digest": "sha256:a076284b740390b7d8129315549fe91a732cc5ec8104d4264601bd2ab36b85a8",
+        "source": "https://api.github.com/repos/anthropics/claude-code/releases/tags/v2.1.284"
+      }
+    },
+    "Codex": {
+      "name": "Codex",
+      "repository": "https://github.com/openai/codex",
+      "checks": [
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/0.159.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/rust-v0.159.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/commits/rust-v0.159.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/readme?ref=ff6aec96948b70d94983af2641a6b67c94faeff5",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "rust-v0.159.2",
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "published_at": "2026-09-29T23:57:16Z"
+      },
+      "pin": "0.159.2",
+      "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/README.md",
+        "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7"
+      },
+      "artifact_candidate": {
+        "name": "codex-package-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/openai/codex/releases/download/rust-v0.159.2/codex-package-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:9e2d29a713b94478b240dec2f10e11324cd05fad76dc43e7c639bdf8a1337a6b",
+        "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.2"
+      }
+    },
+    "Claude Agent SDK": {
+      "name": "Claude Agent SDK",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anthropics/claude-agent-sdk-python/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-agent-sdk-python/commits/v0.2.163",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-agent-sdk-python/readme?ref=1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.2.163",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.163",
+        "published_at": "2026-09-30T19:47:45Z"
+      },
+      "pin": "0.2.163",
+      "commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+        "sha256": "c38a933bf8fef26316ea38635989b254e69a26d21d80b96bf5731cba4e88bcc6"
+      },
+      "artifact_candidate": null
+    },
+    "Trail of Bits skills": {
+      "name": "Trail of Bits skills",
+      "repository": "https://github.com/trailofbits/skills",
+      "checks": [
+        {
+          "command": "rtk gh api repos/trailofbits/skills/releases/tags/82fe822625",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/trailofbits/skills/releases/tags/v82fe822625",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/trailofbits/skills/commits/82fe822625",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/trailofbits/skills/readme?ref=82fe8226252622fa807643bdca1710901198553a",
+          "exit_code": 0
+        }
+      ],
+      "release": null,
+      "pin": "82fe8226252622fa807643bdca1710901198553a",
+      "commit": "82fe8226252622fa807643bdca1710901198553a",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md",
+        "sha256": "5238447ee6608f638ae01fc114b05cde2d2a57f56832fe9d699b5951621c9d1e"
+      },
+      "artifact_candidate": null
+    },
+    "mcporter": {
+      "name": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter",
+      "checks": [
+        {
+          "command": "rtk gh api repos/openclaw/mcporter/releases/tags/0.14.1",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/openclaw/mcporter/releases/tags/v0.14.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openclaw/mcporter/commits/v0.14.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openclaw/mcporter/readme?ref=93e0916cafe2d624b94271e31b75ca681a016514",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.14.1",
+        "source": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+        "published_at": "2026-09-24T13:16:08Z"
+      },
+      "pin": "0.14.1",
+      "commit": "93e0916cafe2d624b94271e31b75ca681a016514",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "sha256": "cb3bec764f7b00cb311424d5efafacc1d10d3e1190a7dfec562df4711a621560"
+      },
+      "artifact_candidate": null
+    },
+    "MCP Inspector": {
+      "name": "MCP Inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "checks": [
+        {
+          "command": "rtk gh api repos/modelcontextprotocol/inspector/releases/tags/2.9.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/modelcontextprotocol/inspector/commits/2.9.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/modelcontextprotocol/inspector/readme?ref=ae865a19178ddf6f375780a02e9c77c4cf4da184",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "2.9.0",
+        "source": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0",
+        "published_at": "2026-09-30T22:23:56Z"
+      },
+      "pin": "2.9.0",
+      "commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+        "sha256": "55e032d246dba904c1251117f5f500bb4c864507fb2c99fd323b8c13058bff82"
+      },
+      "artifact_candidate": null
+    },
+    "sandbox-runtime": {
+      "name": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anthropics/sandbox-runtime/releases/tags/0.0.77",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/anthropics/sandbox-runtime/releases/tags/v0.0.77",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/sandbox-runtime/commits/v0.0.77",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/sandbox-runtime/readme?ref=6fa731368807419ee157f9a3fac955fefe1019c6",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.0.77",
+        "source": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "published_at": "2026-09-18T22:09:16Z"
+      },
+      "pin": "0.0.77",
+      "commit": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "sha256": "bc4f9683fe31b2c2a657ac117aecf9ad5d3ac57e26faae2a1cd1cf44554a8e8c"
+      },
+      "artifact_candidate": null
+    },
+    "Worktrunk": {
+      "name": "Worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "checks": [
+        {
+          "command": "rtk gh api repos/max-sixty/worktrunk/releases/tags/0.80.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/max-sixty/worktrunk/releases/tags/v0.80.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/max-sixty/worktrunk/commits/v0.80.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/max-sixty/worktrunk/readme?ref=b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.80.0",
+        "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z"
+      },
+      "pin": "0.80.0",
+      "commit": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+        "sha256": "e627eb18fd1f383a0bbdc43531675fc2c93e6c8ab2290bc54c817ae23f4ad0aa"
+      },
+      "artifact_candidate": {
+        "name": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "url": "https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+        "digest": "sha256:532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+        "source": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0"
+      }
+    },
+    "Podman": {
+      "name": "Podman",
+      "repository": "https://github.com/podman-container-tools/podman",
+      "checks": [
+        {
+          "command": "rtk gh api repos/podman-container-tools/podman/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/podman-container-tools/podman/commits/v6.1.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/podman-container-tools/podman/readme?ref=85b994955e0b4e30fbce9c8351cab85676140ede",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v6.1.3",
+        "source": "https://github.com/podman-container-tools/podman/releases/tag/v6.1.3",
+        "published_at": "2026-09-29T15:34:46Z"
+      },
+      "pin": "6.1.3",
+      "commit": "85b994955e0b4e30fbce9c8351cab85676140ede",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/podman-container-tools/podman/blob/85b994955e0b4e30fbce9c8351cab85676140ede/README.md",
+        "sha256": "a4bd359952bca78617cd03900fc27da6f16028fae7acc88628100254b32bcf5e"
+      },
+      "artifact_candidate": {
+        "name": "podman-remote-static-linux_amd64.tar.gz",
+        "url": "https://github.com/podman-container-tools/podman/releases/download/v6.1.3/podman-remote-static-linux_amd64.tar.gz",
+        "digest": "sha256:23ee4f71873810a864389b78ffe0d7536296432bb96d0c2acfbbfc7d50ee9c1b",
+        "source": "https://api.github.com/repos/podman-container-tools/podman/releases/tags/v6.1.3"
+      }
+    },
+    "Serena": {
+      "name": "Serena",
+      "repository": "https://github.com/oraios/serena",
+      "checks": [
+        {
+          "command": "rtk gh api repos/oraios/serena/releases/tags/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/oraios/serena/releases/tags/vc6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/oraios/serena/readme?ref=c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+          "exit_code": 0
+        }
+      ],
+      "release": null,
+      "pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+        "sha256": "80f529a79a5e33686e0db325d74b6dc26217aa0e19ee86778b16a9c86c6a6e01"
+      },
+      "artifact_candidate": null
+    },
+    "Claude code-intelligence LSP plugins": {
+      "name": "Claude code-intelligence LSP plugins",
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anthropics/claude-plugins-official/releases/latest",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-plugins-official/commits/HEAD",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-plugins-official/readme?ref=ab024cdcfa7ca80be204acd4907656ba5a968589",
+          "exit_code": 0
+        }
+      ],
+      "release": null,
+      "pin": "ab024cdcfa7ca80be204acd4907656ba5a968589",
+      "commit": "ab024cdcfa7ca80be204acd4907656ba5a968589",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anthropics/claude-plugins-official/blob/ab024cdcfa7ca80be204acd4907656ba5a968589/README.md",
+        "sha256": "f34b8730d2b61617045c61ea2d9bf3ab08561305bfac77ea061e755bf46aeac2"
+      },
+      "artifact_candidate": null
+    },
+    "SocratiCode": {
+      "name": "SocratiCode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "checks": [
+        {
+          "command": "rtk gh api repos/giancarloerra/SocratiCode/releases/tags/1.15.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/giancarloerra/SocratiCode/releases/tags/v1.15.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/giancarloerra/SocratiCode/commits/v1.15.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/giancarloerra/SocratiCode/readme?ref=f6191f076a42405f0d5508139f3a8b505cfef93a",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.15.0",
+        "source": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.15.0",
+        "published_at": "2026-09-24T10:58:58Z"
+      },
+      "pin": "1.15.0",
+      "commit": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "sha256": "64b046e75004bb96cc27fc1f0309e7b7e4f99d90d631f0cc6734e5633c94f1ca"
+      },
+      "artifact_candidate": null
+    },
+    "semble": {
+      "name": "semble",
+      "repository": "https://github.com/MinishLab/semble",
+      "checks": [
+        {
+          "command": "rtk gh api repos/MinishLab/semble/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/MinishLab/semble/commits/v0.6.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/MinishLab/semble/readme?ref=24497845460960db1839c8485319df189a889225",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.6.1",
+        "source": "https://github.com/MinishLab/semble/releases/tag/v0.6.1",
+        "published_at": "2026-09-25T07:16:03Z"
+      },
+      "pin": "0.6.1",
+      "commit": "24497845460960db1839c8485319df189a889225",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md",
+        "sha256": "8aa52d158e372ee7fca893e3b7880543f3a36ad9bcd98c72feb9b9f0fc14ecd3"
+      },
+      "artifact_candidate": null
+    },
+    "Ollama": {
+      "name": "Ollama",
+      "repository": "https://github.com/ollama/ollama",
+      "checks": [
+        {
+          "command": "rtk gh api repos/ollama/ollama/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ollama/ollama/commits/v0.35.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ollama/ollama/readme?ref=cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.35.0",
+        "source": "https://github.com/ollama/ollama/releases/tag/v0.35.0",
+        "published_at": "2026-09-28T21:23:22Z"
+      },
+      "pin": "0.35.0",
+      "commit": "cc4069396f3ad2c370c53eed2e4a42ac13adab84",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/README.md",
+        "sha256": "09c456b8f3e2fca486f6961e07494f424ec6f998cfd0b23ebde099bc028a47de"
+      },
+      "artifact_candidate": {
+        "name": "ollama-linux-amd64-mlx.tar.zst",
+        "url": "https://github.com/ollama/ollama/releases/download/v0.35.0/ollama-linux-amd64-mlx.tar.zst",
+        "digest": "sha256:8ed477f8b4677409411b8eb38fd851f610048a6450364d964684b15ec56b8a52",
+        "source": "https://api.github.com/repos/ollama/ollama/releases/tags/v0.35.0"
+      }
+    },
+    "QMD": {
+      "name": "QMD",
+      "repository": "https://github.com/tobi/qmd",
+      "checks": [
+        {
+          "command": "rtk gh api repos/tobi/qmd/releases/tags/2.8.3",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/tobi/qmd/releases/tags/v2.8.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/tobi/qmd/commits/v2.8.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/tobi/qmd/readme?ref=facd35e01359e59d938bc9418e93fb9318addee3",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.8.3",
+        "source": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z"
+      },
+      "pin": "2.8.3",
+      "commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+        "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880"
+      },
+      "artifact_candidate": null
+    },
+    "MinerU": {
+      "name": "MinerU",
+      "repository": "https://github.com/opendatalab/mineru",
+      "checks": [
+        {
+          "command": "rtk gh api repos/opendatalab/mineru/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/opendatalab/mineru/commits/mineru-4.0.10-released",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/opendatalab/mineru/readme?ref=c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "mineru-4.0.10-released",
+        "source": "https://github.com/opendatalab/MinerU/releases/tag/mineru-4.0.10-released",
+        "published_at": "2026-09-29T07:18:10Z"
+      },
+      "pin": "mineru-4.0.10-released",
+      "commit": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/opendatalab/mineru/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md",
+        "sha256": "69c967e98536be101b5dc3420703d28cc1e0250eeca3b5bf156b060ac4ccfacb"
+      },
+      "artifact_candidate": null
+    },
+    "trafilatura": {
+      "name": "trafilatura",
+      "repository": "https://github.com/adbar/trafilatura",
+      "checks": [
+        {
+          "command": "rtk gh api repos/adbar/trafilatura/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/adbar/trafilatura/commits/v2.2.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/adbar/trafilatura/readme?ref=c1bc9531a2a978326112ca9987e1382745116136",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.2.0",
+        "source": "https://github.com/adbar/trafilatura/releases/tag/v2.2.0",
+        "published_at": "2026-07-31T16:07:10Z"
+      },
+      "pin": "2.2.0",
+      "commit": "c1bc9531a2a978326112ca9987e1382745116136",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/adbar/trafilatura/blob/c1bc9531a2a978326112ca9987e1382745116136/README.md",
+        "sha256": "0be14d83957d3a4815da3314128fda7d0b723931631735c1ee104f07380e6cfa"
+      },
+      "artifact_candidate": null
+    },
+    "Playwright CLI": {
+      "name": "Playwright CLI",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "checks": [
+        {
+          "command": "rtk gh api repos/microsoft/playwright-cli/releases/tags/0.1.21",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/microsoft/playwright-cli/releases/tags/v0.1.21",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/microsoft/playwright-cli/commits/v0.1.21",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/microsoft/playwright-cli/readme?ref=74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.1.21",
+        "source": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+        "published_at": "2026-09-18T23:34:47Z"
+      },
+      "pin": "0.1.21",
+      "commit": "74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+        "sha256": "c0cbb367cd90ca750581017715c14931706f03e32dcc77761f6885eedc25735d"
+      },
+      "artifact_candidate": null
+    },
+    "ai-memory": {
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "checks": [
+        {
+          "command": "rtk gh api repos/akitaonrails/ai-memory/releases/tags/2.5.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/akitaonrails/ai-memory/releases/tags/v2.5.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/akitaonrails/ai-memory/commits/v2.5.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/akitaonrails/ai-memory/readme?ref=7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.5.2",
+        "source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2",
+        "published_at": "2026-10-01T07:40:18Z"
+      },
+      "pin": "2.5.2",
+      "commit": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/README.md",
+        "sha256": "ce542185c82a8c9736d42df9945d7ef9a19026ab9b9945d4b073d80f29c2ad0e"
+      },
+      "artifact_candidate": {
+        "name": "ai-memory-linux-x86_64.tar.gz",
+        "url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.5.2/ai-memory-linux-x86_64.tar.gz",
+        "digest": "sha256:acbf6ee84e744a9ab0a8e133a3eefbbb77811d6b4d0ca9a281e664358c1a1fc8",
+        "source": "https://api.github.com/repos/akitaonrails/ai-memory/releases/tags/v2.5.2"
+      }
+    },
+    "Hindsight": {
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "checks": [
+        {
+          "command": "rtk gh api repos/vectorize-io/hindsight/releases/tags/0.10.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/vectorize-io/hindsight/releases/tags/v0.10.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/vectorize-io/hindsight/commits/v0.10.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/vectorize-io/hindsight/readme?ref=5fc4ce20917b916240cef27c212c387a177f115b",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.10.2",
+        "source": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+        "published_at": "2026-09-29T10:06:40Z"
+      },
+      "pin": "0.10.2",
+      "commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md",
+        "sha256": "376c6b0b83bd2be65a2d1c843680c56a7cc1bc4d8553dee9f227074e59239a6f"
+      },
+      "artifact_candidate": null
+    },
+    "agentmemory": {
+      "name": "agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "checks": [
+        {
+          "command": "rtk gh api repos/rohitg00/agentmemory/releases/tags/0.9.29",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/rohitg00/agentmemory/releases/tags/v0.9.29",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/rohitg00/agentmemory/commits/v0.9.29",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/rohitg00/agentmemory/readme?ref=2d38dafede67d0d4ed920cde94d2106e98825b8a",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.9.29",
+        "source": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29",
+        "published_at": "2026-08-16T13:56:45Z"
+      },
+      "pin": "0.9.29",
+      "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+        "sha256": "7ef588adf1c879c4c6ec29f01debdc29238b32ffe4cb60240e0b6e784259d788"
+      },
+      "artifact_candidate": null
+    },
+    "deja-vu": {
+      "name": "deja-vu",
+      "repository": "https://github.com/vshulcz/deja-vu",
+      "checks": [
+        {
+          "command": "rtk gh api repos/vshulcz/deja-vu/releases/tags/0.21.4",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/vshulcz/deja-vu/releases/tags/v0.21.4",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/vshulcz/deja-vu/commits/v0.21.4",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/vshulcz/deja-vu/readme?ref=bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.21.4",
+        "source": "https://github.com/vshulcz/deja-vu/releases/tag/v0.21.4",
+        "published_at": "2026-09-29T10:12:08Z"
+      },
+      "pin": "0.21.4",
+      "commit": "bb93e229a5e2c2ccd1fe4444479e7ea98d765600",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/vshulcz/deja-vu/blob/bb93e229a5e2c2ccd1fe4444479e7ea98d765600/README.md",
+        "sha256": "385e8d2acc14716138713e9f48868ebdb610459e54b2bafe4c872a5c4ed9bf73"
+      },
+      "artifact_candidate": {
+        "name": "deja-vu_0.21.4_linux_amd64.mcpb",
+        "url": "https://github.com/vshulcz/deja-vu/releases/download/v0.21.4/deja-vu_0.21.4_linux_amd64.mcpb",
+        "digest": "sha256:b28aee0a332a7990a4916e2613bce4023147303f3c6741cdf78fd5a4da38e6a7",
+        "source": "https://api.github.com/repos/vshulcz/deja-vu/releases/tags/v0.21.4"
+      }
+    },
+    "ccusage": {
+      "name": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "checks": [
+        {
+          "command": "rtk gh api repos/ccusage/ccusage/releases/tags/20.0.26",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/ccusage/ccusage/releases/tags/v20.0.26",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ccusage/ccusage/commits/v20.0.26",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ccusage/ccusage/readme?ref=d9821088b98aa536c7a385aa1a4579d6fa02269b",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v20.0.26",
+        "source": "https://github.com/ccusage/ccusage/releases/tag/v20.0.26",
+        "published_at": "2026-09-27T16:26:00Z"
+      },
+      "pin": "20.0.26",
+      "commit": "d9821088b98aa536c7a385aa1a4579d6fa02269b",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md",
+        "sha256": "71d127c0fc785511a3d686ec77eb7fb944e80b79385cfd26bf77a32944941cf6"
+      },
+      "artifact_candidate": null
+    },
+    "RTK": {
+      "name": "RTK",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "checks": [
+        {
+          "command": "rtk gh api repos/rtk-ai/rtk/releases/tags/0.50.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/rtk-ai/rtk/releases/tags/v0.50.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/rtk-ai/rtk/commits/v0.50.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/rtk-ai/rtk/readme?ref=1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.50.0",
+        "source": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+        "published_at": "2026-09-24T10:02:31Z"
+      },
+      "pin": "0.50.0",
+      "commit": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
+        "sha256": "d51e56234265cc33279a0d98126d80159a74d9ac9f8e6e310ec160e32be0435f"
+      },
+      "artifact_candidate": {
+        "name": "rtk-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
+        "source": "https://api.github.com/repos/rtk-ai/rtk/releases/tags/v0.50.0"
+      }
+    },
+    "OTel Collector Contrib": {
+      "name": "OTel Collector Contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "checks": [
+        {
+          "command": "rtk gh api repos/open-telemetry/opentelemetry-collector-contrib/releases/tags/0.162.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/open-telemetry/opentelemetry-collector-contrib/releases/tags/v0.162.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/open-telemetry/opentelemetry-collector-contrib/commits/v0.162.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/open-telemetry/opentelemetry-collector-contrib/readme?ref=ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.162.0",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z"
+      },
+      "pin": "0.162.0",
+      "commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
+        "sha256": "9d35acfa4e58b455b556c89274bc7b3dd48531daa7c333e4cf7f1157a7b98add"
+      },
+      "artifact_candidate": null
+    },
+    "Prometheus": {
+      "name": "Prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "checks": [
+        {
+          "command": "rtk gh api repos/prometheus/prometheus/releases/tags/3.15.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/prometheus/prometheus/releases/tags/v3.15.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/prometheus/prometheus/commits/v3.15.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/prometheus/prometheus/readme?ref=5241a27fe3c6983549fccc32f6e65917408c63cd",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v3.15.0",
+        "source": "https://github.com/prometheus/prometheus/releases/tag/v3.15.0",
+        "published_at": "2026-09-25T08:56:22Z"
+      },
+      "pin": "3.15.0",
+      "commit": "5241a27fe3c6983549fccc32f6e65917408c63cd",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/prometheus/prometheus/blob/5241a27fe3c6983549fccc32f6e65917408c63cd/README.md",
+        "sha256": "9ef538829dfc934d7ef53c62bafb3a2ea78b0cab432b2bbf47e84192abf6fddb"
+      },
+      "artifact_candidate": {
+        "name": "prometheus-3.15.0.linux-amd64.tar.gz",
+        "url": "https://github.com/prometheus/prometheus/releases/download/v3.15.0/prometheus-3.15.0.linux-amd64.tar.gz",
+        "digest": "sha256:2a542df32eac02ee17b9d844fb2aa1de00dafa5476579ba8a3ba862e9d572ea0",
+        "source": "https://api.github.com/repos/prometheus/prometheus/releases/tags/v3.15.0"
+      }
+    },
+    "Loki": {
+      "name": "Loki",
+      "repository": "https://github.com/grafana/loki",
+      "checks": [
+        {
+          "command": "rtk gh api repos/grafana/loki/releases/tags/3.7.8",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/grafana/loki/releases/tags/v3.7.8",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/grafana/loki/commits/v3.7.8",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/grafana/loki/readme?ref=09e6ce2ff1bdc19763a10265b870c86f51c98655",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v3.7.8",
+        "source": "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "published_at": "2026-09-17T15:51:10Z"
+      },
+      "pin": "3.7.8",
+      "commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/grafana/loki/blob/09e6ce2ff1bdc19763a10265b870c86f51c98655/README.md",
+        "sha256": "af9e356ba4d99300f4e145be9c0b5885587b2ba8dbba89e2a5f149cd3572c04a"
+      },
+      "artifact_candidate": {
+        "name": "logcli-linux-amd64.zip",
+        "url": "https://github.com/grafana/loki/releases/download/v3.7.8/logcli-linux-amd64.zip",
+        "digest": "sha256:44b790601963193df9cc496f0c8d6782e5d28c90754ca7a697e3f5683dad2588",
+        "source": "https://api.github.com/repos/grafana/loki/releases/tags/v3.7.8"
+      }
+    },
+    "Grafana": {
+      "name": "Grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "checks": [
+        {
+          "command": "rtk gh api repos/grafana/grafana/releases/tags/13.2.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/grafana/grafana/releases/tags/v13.2.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/grafana/grafana/commits/v13.2.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/grafana/grafana/readme?ref=3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v13.2.2",
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "published_at": "2026-09-15T12:21:32Z"
+      },
+      "pin": "13.2.2",
+      "commit": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+        "sha256": "fc8a867bf09f319b9288746ab0148faff2e92ed39cd702252ce59161e576c019"
+      },
+      "artifact_candidate": {
+        "name": "grafana-enterprise_13.2.2_34846740809_linux_amd64.deb",
+        "url": "https://github.com/grafana/grafana/releases/download/v13.2.2/grafana-enterprise_13.2.2_34846740809_linux_amd64.deb",
+        "digest": "sha256:a9c1167e3d1f8fcdb0e35ca5fcdc1d5ccdf59b71ac344596b5f3b9134fc995c1",
+        "source": "https://api.github.com/repos/grafana/grafana/releases/tags/v13.2.2"
+      }
+    },
+    "llama.cpp": {
+      "name": "llama.cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "checks": [
+        {
+          "command": "rtk gh api repos/ggml-org/llama.cpp/releases/tags/b11057",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ggml-org/llama.cpp/commits/b11057",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ggml-org/llama.cpp/readme?ref=59657a613ab0fa4ab327d6c790123dff30bfbd67",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "b11057",
+        "source": "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+        "published_at": "2026-09-19T23:58:52Z"
+      },
+      "pin": "b11057",
+      "commit": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/README.md",
+        "sha256": "e58520857253729851cc02313883c9d2a8b2ae86abe212aaf1bcbd7db8bfefb4"
+      },
+      "artifact_candidate": null
+    },
+    "Phoenix": {
+      "name": "Phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "checks": [
+        {
+          "command": "rtk gh api repos/Arize-ai/phoenix/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Arize-ai/phoenix/commits/%40arizeai%2Fphoenix-mcp%404.3.15",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Arize-ai/phoenix/readme?ref=d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "@arizeai/phoenix-mcp@4.3.15",
+        "source": "https://github.com/Arize-ai/phoenix/releases/tag/%40arizeai/phoenix-mcp%404.3.15",
+        "published_at": "2026-09-30T23:35:39Z"
+      },
+      "pin": "@arizeai/phoenix-mcp@4.3.15",
+      "commit": "d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md",
+        "sha256": "47da1d76648f888e95b340f59c30d382aa7870387dd384c66da8de73d33b9a03"
+      },
+      "artifact_candidate": null
+    },
+    "Inspect AI": {
+      "name": "Inspect AI",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "checks": [
+        {
+          "command": "rtk gh api repos/UKGovernmentBEIS/inspect_ai/releases/tags/0321960a92aa",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/UKGovernmentBEIS/inspect_ai/releases/tags/v0321960a92aa",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/UKGovernmentBEIS/inspect_ai/commits/0321960a92aa",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/UKGovernmentBEIS/inspect_ai/readme?ref=0321960a92aa52390413ce011d67ffb5962a2b11",
+          "exit_code": 0
+        }
+      ],
+      "release": null,
+      "pin": "0321960a92aa52390413ce011d67ffb5962a2b11",
+      "commit": "0321960a92aa52390413ce011d67ffb5962a2b11",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md",
+        "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17"
+      },
+      "artifact_candidate": null
+    },
+    "Harbor": {
+      "name": "Harbor",
+      "repository": "https://github.com/harbor-framework/harbor",
+      "checks": [
+        {
+          "command": "rtk gh api repos/harbor-framework/harbor/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/harbor-framework/harbor/commits/v0.23.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/harbor-framework/harbor/readme?ref=1e5c5c6db929a10a140d05e606882c671ae20729",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.23.0",
+        "source": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+        "published_at": "2026-09-12T04:55:17Z"
+      },
+      "pin": "0.23.0",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+        "sha256": "687e4f416b43e1ab28afb3cd48f556d7a9f4d664ac78ac1a2a07a7ab9b95b1b7"
+      },
+      "artifact_candidate": null
+    },
+    "promptfoo": {
+      "name": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "checks": [
+        {
+          "command": "rtk gh api repos/promptfoo/promptfoo/releases/tags/0.123.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/promptfoo/promptfoo/commits/0.123.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/promptfoo/promptfoo/readme?ref=34f74d34e140b5e17d23770dfb2340057b1936b8",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "0.123.1",
+        "source": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+        "published_at": "2026-09-18T01:07:54Z"
+      },
+      "pin": "0.123.1",
+      "commit": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+        "sha256": "426270e1b7c45d0bf456b1284cdc1af055218db73869864b9590b1e0bdaab5cb"
+      },
+      "artifact_candidate": null
+    },
+    "zizmor": {
+      "name": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "checks": [
+        {
+          "command": "rtk gh api repos/zizmorcore/zizmor/releases/tags/1.30.1",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/zizmorcore/zizmor/releases/tags/v1.30.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/zizmorcore/zizmor/commits/v1.30.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/zizmorcore/zizmor/readme?ref=99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.30.1",
+        "source": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z"
+      },
+      "pin": "1.30.1",
+      "commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md",
+        "sha256": "770432131713e73537e4e4752497087cfbc0827c4a056c2de1a9baa179a05848"
+      },
+      "artifact_candidate": {
+        "name": "zizmor-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/zizmorcore/zizmor/releases/download/v1.30.1/zizmor-x86_64-unknown-linux-gnu.tar.gz",
+        "digest": "sha256:e65324f4430c2717591937edcec90ccbefaf14c174f8ec9415e03ca875b46e1a",
+        "source": "https://api.github.com/repos/zizmorcore/zizmor/releases/tags/v1.30.1"
+      }
+    },
+    "attest": {
+      "name": "attest",
+      "repository": "https://github.com/actions/attest",
+      "checks": [
+        {
+          "command": "rtk gh api repos/actions/attest/releases/tags/4.2.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/actions/attest/releases/tags/v4.2.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/actions/attest/commits/v4.2.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/actions/attest/readme?ref=1e69f48acb82d1966a394da916b4c1698aa569d6",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v4.2.2",
+        "source": "https://github.com/actions/attest/releases/tag/v4.2.2",
+        "published_at": "2026-08-04T20:36:29Z"
+      },
+      "pin": "4.2.2",
+      "commit": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/actions/attest/blob/1e69f48acb82d1966a394da916b4c1698aa569d6/README.md",
+        "sha256": "c513a2a22ce3fa07b67216d36db2c1552be51f7391fe81266f6f1a4cee8da5d6"
+      },
+      "artifact_candidate": null
+    },
+    "Syft": {
+      "name": "Syft",
+      "repository": "https://github.com/anchore/syft",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anchore/syft/releases/tags/1.52.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/anchore/syft/releases/tags/v1.52.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anchore/syft/commits/v1.52.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anchore/syft/readme?ref=02ba369d13b4248395b20a504eca94b0cab564d8",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.52.0",
+        "source": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "published_at": "2026-09-17T14:38:17Z"
+      },
+      "pin": "1.52.0",
+      "commit": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
+        "sha256": "525cd863114cfad6353ec672c8026404654d564c5c0a0761c3611fea6a17fba3"
+      },
+      "artifact_candidate": {
+        "name": "syft_1.52.0_linux_amd64.deb",
+        "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.deb",
+        "digest": "sha256:c8e13cd04f78b5cf90a70b2e45d2a4b7ec9aa0aa129d3001cd5d488103351b7f",
+        "source": "https://api.github.com/repos/anchore/syft/releases/tags/v1.52.0"
+      }
+    },
+    "Dependabot": {
+      "name": "Dependabot",
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "checks": [
+        {
+          "command": "rtk gh api repos/dependabot/dependabot-core/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/dependabot/dependabot-core/commits/v0.398.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/dependabot/dependabot-core/readme?ref=a1750051287d1f3786081d3aa3e6e2b04a72edde",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.398.0",
+        "source": "https://github.com/dependabot/dependabot-core/releases/tag/v0.398.0",
+        "published_at": "2026-09-28T03:51:27Z"
+      },
+      "pin": "0.398.0",
+      "commit": "a1750051287d1f3786081d3aa3e6e2b04a72edde",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/dependabot/dependabot-core/blob/a1750051287d1f3786081d3aa3e6e2b04a72edde/README.md",
+        "sha256": "1a6bc301fe8095e9b8acfdaed5b7f5f455c47571ad78d40ab5640f5b0e7a65b1"
+      },
+      "artifact_candidate": null
+    },
+    "CodeQL upload-sarif": {
+      "name": "CodeQL upload-sarif",
+      "repository": "https://github.com/github/codeql-action",
+      "checks": [
+        {
+          "command": "rtk gh api repos/github/codeql-action/releases/tags/4.38.2",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/github/codeql-action/releases/tags/v4.38.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/github/codeql-action/commits/v4.38.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/github/codeql-action/readme?ref=2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v4.38.2",
+        "source": "https://github.com/github/codeql-action/releases/tag/v4.38.2",
+        "published_at": "2026-09-24T10:27:53Z"
+      },
+      "pin": "4.38.2",
+      "commit": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/github/codeql-action/blob/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2/README.md",
+        "sha256": "fd29310185b141f3d743c25458e0b36253b2ac12dd595aee5025841ae9a55523"
+      },
+      "artifact_candidate": null
+    },
+    "actionlint": {
+      "name": "actionlint",
+      "repository": "https://github.com/kjanat/actionlint",
+      "checks": [
+        {
+          "command": "rtk gh api repos/kjanat/actionlint/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/kjanat/actionlint/commits/v1.17.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/kjanat/actionlint/readme?ref=08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.17.0",
+        "source": "https://github.com/kjanat/actionlint/releases/tag/v1.17.0",
+        "published_at": "2026-09-13T16:07:47Z"
+      },
+      "pin": "1.17.0",
+      "commit": "08bb2c4f0d039744455b87aef1c647fb8b66d37b",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/kjanat/actionlint/blob/08bb2c4f0d039744455b87aef1c647fb8b66d37b/README.md",
+        "sha256": "3e39189f7c67999034728be8a0acd4df073807f8b50c7cad00da9224d35a7345"
+      },
+      "artifact_candidate": {
+        "name": "actionlint_1.17.0_linux_amd64.tar.gz",
+        "url": "https://github.com/kjanat/actionlint/releases/download/v1.17.0/actionlint_1.17.0_linux_amd64.tar.gz",
+        "digest": "sha256:620abd485a12b6ab1125b844a876414e1d5bd2af8a3125b27f82b01d0d9d6e5a",
+        "source": "https://api.github.com/repos/kjanat/actionlint/releases/tags/v1.17.0"
+      }
+    },
+    "Dagu": {
+      "name": "Dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "checks": [
+        {
+          "command": "rtk gh api repos/dagucloud/dagu/releases/tags/2.16.6",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/dagucloud/dagu/releases/tags/v2.16.6",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/dagucloud/dagu/commits/v2.16.6",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/dagucloud/dagu/readme?ref=58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.16.6",
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "published_at": "2026-09-14T14:45:57Z"
+      },
+      "pin": "2.16.6",
+      "commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658"
+      },
+      "artifact_candidate": {
+        "name": "dagu_2.16.6_linux_amd64.tar.gz",
+        "url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz",
+        "digest": "sha256:06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6"
+      }
+    },
+    "systemd": {
+      "name": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "checks": [
+        {
+          "command": "rtk gh api repos/systemd/systemd/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/systemd/systemd/commits/v262",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/systemd/systemd/readme?ref=8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v262",
+        "source": "https://github.com/systemd/systemd/releases/tag/v262",
+        "published_at": "2026-09-22T13:19:16Z"
+      },
+      "pin": "262",
+      "commit": "8cc40e0c5e9234bf45084751ac53b1fbfe70b492",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/systemd/systemd/blob/8cc40e0c5e9234bf45084751ac53b1fbfe70b492/README.md",
+        "sha256": "ac86c23f101cd9eaee1ba46b80a0388dfe414fc59525f5aad186d74c01ff9ac4"
+      },
+      "artifact_candidate": null
+    },
+    "Docker Compose": {
+      "name": "Docker Compose",
+      "repository": "https://github.com/docker/compose",
+      "checks": [
+        {
+          "command": "rtk gh api repos/docker/compose/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/docker/compose/commits/v5.5.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/docker/compose/readme?ref=5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v5.5.1",
+        "source": "https://github.com/docker/compose/releases/tag/v5.5.1",
+        "published_at": "2026-09-03T15:53:28Z"
+      },
+      "pin": "5.5.1",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/README.md",
+        "sha256": "02d853bbccd7d847c65eaea8c07bb14135b3f7904a48abf5898de90d5c75cb8e"
+      },
+      "artifact_candidate": {
+        "name": "docker-compose-linux-x86_64",
+        "url": "https://github.com/docker/compose/releases/download/v5.5.1/docker-compose-linux-x86_64",
+        "digest": "sha256:db1889184726840f75c4f9c001048430d4f25b3be3cb084d3ddd762bc0aed576",
+        "source": "https://api.github.com/repos/docker/compose/releases/tags/v5.5.1"
+      }
+    },
+    "Docker Engine": {
+      "name": "Docker Engine",
+      "repository": "https://github.com/moby/moby",
+      "checks": [
+        {
+          "command": "rtk gh api repos/moby/moby/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/moby/moby/commits/docker-v29.8.2",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/moby/moby/readme?ref=8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "docker-v29.8.2",
+        "source": "https://github.com/moby/moby/releases/tag/docker-v29.8.2",
+        "published_at": "2026-09-30T20:28:33Z"
+      },
+      "pin": "docker-v29.8.2",
+      "commit": "8af9fe3a36bab3e039862a2ab1cef1880c9b4d03",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/README.md",
+        "sha256": "97dff8df1c816b0c115f7fcd976bbaaf9106edc0f5d8c8559c74a6bcac285b04"
+      },
+      "artifact_candidate": null
+    },
+    "betterleaks": {
+      "name": "betterleaks",
+      "repository": "https://github.com/betterleaks/betterleaks",
+      "checks": [
+        {
+          "command": "rtk gh api repos/betterleaks/betterleaks/releases/tags/1.9.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/betterleaks/betterleaks/releases/tags/v1.9.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/betterleaks/betterleaks/commits/v1.9.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/betterleaks/betterleaks/readme?ref=81aff7a638638aae3a659845d089043e1d8fe9ac",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.9.0",
+        "source": "https://github.com/betterleaks/betterleaks/releases/tag/v1.9.0",
+        "published_at": "2026-09-29T20:08:06Z"
+      },
+      "pin": "1.9.0",
+      "commit": "81aff7a638638aae3a659845d089043e1d8fe9ac",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md",
+        "sha256": "62f075debda1630c3b60a3392c6914acecfa5a8019a3748fab401b3ec25c204d"
+      },
+      "artifact_candidate": {
+        "name": "betterleaks_1.9.0_linux_x64.tar.gz",
+        "url": "https://github.com/betterleaks/betterleaks/releases/download/v1.9.0/betterleaks_1.9.0_linux_x64.tar.gz",
+        "digest": "sha256:f8b185a39ffcece2a1ca82bf3a4e7435cd81963ffd16b7a9128daf75f35f6de7",
+        "source": "https://api.github.com/repos/betterleaks/betterleaks/releases/tags/v1.9.0"
+      }
+    },
+    "TruffleHog": {
+      "name": "TruffleHog",
+      "repository": "https://github.com/trufflesecurity/trufflehog",
+      "checks": [
+        {
+          "command": "rtk gh api repos/trufflesecurity/trufflehog/releases/tags/3.97.9",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/trufflesecurity/trufflehog/releases/tags/v3.97.9",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/trufflesecurity/trufflehog/commits/v3.97.9",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/trufflesecurity/trufflehog/readme?ref=4dd8831c5f12599465d4d45c3c447b4018a34c85",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v3.97.9",
+        "source": "https://github.com/trufflesecurity/trufflehog/releases/tag/v3.97.9",
+        "published_at": "2026-09-24T09:11:59Z"
+      },
+      "pin": "3.97.9",
+      "commit": "4dd8831c5f12599465d4d45c3c447b4018a34c85",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/trufflesecurity/trufflehog/blob/4dd8831c5f12599465d4d45c3c447b4018a34c85/README.md",
+        "sha256": "229d6148251a19f3cc34fb56f64290c78ad7f841d6902d4e16bf3862922d41e1"
+      },
+      "artifact_candidate": {
+        "name": "trufflehog_3.97.9_linux_amd64.tar.gz",
+        "url": "https://github.com/trufflesecurity/trufflehog/releases/download/v3.97.9/trufflehog_3.97.9_linux_amd64.tar.gz",
+        "digest": "sha256:40377e6572495412fb9ba0bc21c9401f73b72f1d2afd11b9931bc4a5ed622866",
+        "source": "https://api.github.com/repos/trufflesecurity/trufflehog/releases/tags/v3.97.9"
+      }
+    },
+    "git": {
+      "name": "git",
+      "repository": "https://github.com/git/git",
+      "checks": [
+        {
+          "command": "rtk gh api repos/git/git/releases/tags/2.56.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/git/git/releases/tags/v2.56.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/git/git/commits/2.56.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/git/git/readme?ref=2.56.0",
+          "exit_code": 1
+        }
+      ],
+      "release": null,
+      "pin": "2.56.0",
+      "commit": null,
+      "readme": null,
+      "artifact_candidate": null
+    },
+    "gh": {
+      "name": "gh",
+      "repository": "https://github.com/cli/cli",
+      "checks": [
+        {
+          "command": "rtk gh api repos/cli/cli/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/cli/cli/commits/v2.102.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/cli/cli/readme?ref=fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.102.0",
+        "source": "https://github.com/cli/cli/releases/tag/v2.102.0",
+        "published_at": "2026-09-30T02:40:02Z"
+      },
+      "pin": "2.102.0",
+      "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/README.md",
+        "sha256": "5816da6f27253e6e5544e9c8d7b0f652e03200a0345fae1693e50d72fabb8cc4"
+      },
+      "artifact_candidate": {
+        "name": "gh_2.102.0_linux_amd64.deb",
+        "url": "https://github.com/cli/cli/releases/download/v2.102.0/gh_2.102.0_linux_amd64.deb",
+        "digest": "sha256:7e54a307f90afdc59796c325ec0c49fb09e6c18537727207a8ac7513584ea5b0",
+        "source": "https://api.github.com/repos/cli/cli/releases/tags/v2.102.0"
+      }
+    },
+    "difftastic": {
+      "name": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic",
+      "checks": [
+        {
+          "command": "rtk gh api repos/Wilfred/difftastic/releases/tags/0.71.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Wilfred/difftastic/commits/0.71.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Wilfred/difftastic/readme?ref=b7d119e90ac9f972f03f69508da765dacd302c0c",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "0.71.0",
+        "source": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+        "published_at": "2026-09-18T22:57:29Z"
+      },
+      "pin": "0.71.0",
+      "commit": "b7d119e90ac9f972f03f69508da765dacd302c0c",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/Wilfred/difftastic/blob/b7d119e90ac9f972f03f69508da765dacd302c0c/README.md",
+        "sha256": "395325cdaeef69a79d2d39befd278cf24a062f1e4a91848482dcb9613bf20c8f"
+      },
+      "artifact_candidate": {
+        "name": "difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/Wilfred/difftastic/releases/download/0.71.0/difft-0.71.0-x86_64-unknown-linux-gnu.tar.gz",
+        "digest": "sha256:61aea5394a53c56f144637cf39b3a0c0dafa27769731745e5851ff276e6478da",
+        "source": "https://api.github.com/repos/Wilfred/difftastic/releases/tags/0.71.0"
+      }
+    },
+    "sem": {
+      "name": "sem",
+      "repository": "https://github.com/Ataraxy-Labs/sem",
+      "checks": [
+        {
+          "command": "rtk gh api repos/Ataraxy-Labs/sem/releases/tags/0.25.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/Ataraxy-Labs/sem/releases/tags/v0.25.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Ataraxy-Labs/sem/commits/v0.25.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/Ataraxy-Labs/sem/readme?ref=4cfe1374f79631b01aca5746441d826738a15448",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.25.0",
+        "source": "https://github.com/Ataraxy-Labs/sem/releases/tag/v0.25.0",
+        "published_at": "2026-09-13T17:47:03Z"
+      },
+      "pin": "0.25.0",
+      "commit": "4cfe1374f79631b01aca5746441d826738a15448",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/Ataraxy-Labs/sem/blob/4cfe1374f79631b01aca5746441d826738a15448/README.md",
+        "sha256": "1fcf6533e3b0ed221538176396798eb8444601f0fd74fbb60a5555a31ed8c495"
+      },
+      "artifact_candidate": {
+        "name": "sem-linux-x86_64.tar.gz",
+        "url": "https://github.com/Ataraxy-Labs/sem/releases/download/v0.25.0/sem-linux-x86_64.tar.gz",
+        "digest": "sha256:7151f577f84eef16b32ab67bbf4336b1878de1f4d7a087583b0a08ee4e0fb4fd",
+        "source": "https://api.github.com/repos/Ataraxy-Labs/sem/releases/tags/v0.25.0"
+      }
+    },
+    "claude-code-action": {
+      "name": "claude-code-action",
+      "repository": "https://github.com/anthropics/claude-code-action",
+      "checks": [
+        {
+          "command": "rtk gh api repos/anthropics/claude-code-action/releases/tags/1.0.239",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code-action/releases/tags/v1.0.239",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code-action/commits/v1.0.239",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/anthropics/claude-code-action/readme?ref=97c53473391bff1901034d4b454b5bac7ab7a029",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.0.239",
+        "source": "https://github.com/anthropics/claude-code-action/releases/tag/v1.0.239",
+        "published_at": "2026-10-01T18:04:49Z"
+      },
+      "pin": "1.0.239",
+      "commit": "97c53473391bff1901034d4b454b5bac7ab7a029",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/anthropics/claude-code-action/blob/97c53473391bff1901034d4b454b5bac7ab7a029/README.md",
+        "sha256": "a381c47399445c97480d025a406f485644fdd5f4f7ffd880be0567ac2f7b4640"
+      },
+      "artifact_candidate": null
+    },
+    "Restic": {
+      "name": "Restic",
+      "repository": "https://github.com/restic/restic",
+      "checks": [
+        {
+          "command": "rtk gh api repos/restic/restic/releases/tags/0.19.1",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/restic/restic/releases/tags/v0.19.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/restic/restic/commits/v0.19.1",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/restic/restic/readme?ref=6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.19.1",
+        "source": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z"
+      },
+      "pin": "0.19.1",
+      "commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md",
+        "sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d"
+      },
+      "artifact_candidate": {
+        "name": "restic_0.19.1_linux_amd64.bz2",
+        "url": "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2",
+        "digest": "sha256:f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c",
+        "source": "https://api.github.com/repos/restic/restic/releases/tags/v0.19.1"
+      }
+    },
+    "chezmoi": {
+      "name": "chezmoi",
+      "repository": "https://github.com/twpayne/chezmoi",
+      "checks": [
+        {
+          "command": "rtk gh api repos/twpayne/chezmoi/releases/tags/2.73.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/twpayne/chezmoi/releases/tags/v2.73.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/twpayne/chezmoi/commits/v2.73.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/twpayne/chezmoi/readme?ref=24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v2.73.0",
+        "source": "https://github.com/twpayne/chezmoi/releases/tag/v2.73.0",
+        "published_at": "2026-09-28T19:52:37Z"
+      },
+      "pin": "2.73.0",
+      "commit": "24b71e4cf9d98cce0801cfc68e7553355efeaff7",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/twpayne/chezmoi/blob/24b71e4cf9d98cce0801cfc68e7553355efeaff7/README.md",
+        "sha256": "73586ae05d3463977f4b17d205ea71894a36ba1cb3c2c7ebe08d81956e5aac3c"
+      },
+      "artifact_candidate": {
+        "name": "chezmoi-linux-amd64",
+        "url": "https://github.com/twpayne/chezmoi/releases/download/v2.73.0/chezmoi-linux-amd64",
+        "digest": "sha256:4b42a0fb0dec69f37964c6701f89daa6bf6393aaeb92bbcbc8f3ee9f08a49bcd",
+        "source": "https://api.github.com/repos/twpayne/chezmoi/releases/tags/v2.73.0"
+      }
+    },
+    "ColGREP": {
+      "name": "ColGREP",
+      "repository": "https://github.com/lightonai/next-plaid",
+      "checks": [
+        {
+          "command": "rtk gh api repos/lightonai/next-plaid/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/lightonai/next-plaid/commits/v1.7.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/lightonai/next-plaid/readme?ref=00e26aae0006b322727db277672211d9a0e3ccec",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.7.0",
+        "source": "https://github.com/lightonai/next-plaid/releases/tag/v1.7.0",
+        "published_at": "2026-08-18T15:36:44Z"
+      },
+      "pin": "1.7.0",
+      "commit": "00e26aae0006b322727db277672211d9a0e3ccec",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+        "sha256": "c96ba516c8aa6c0565a428d34d0f2fbdeadd67a96a7f0201465450d653befb16"
+      },
+      "artifact_candidate": {
+        "name": "colgrep-x86_64-unknown-linux-gnu.tar.xz",
+        "url": "https://github.com/lightonai/next-plaid/releases/download/v1.7.0/colgrep-x86_64-unknown-linux-gnu.tar.xz",
+        "digest": "sha256:f1522e2dd43e5eab89668bdf6cfbe0996d1ada9aba75d9d8de1a2902cab2b022",
+        "source": "https://api.github.com/repos/lightonai/next-plaid/releases/tags/v1.7.0"
+      }
+    },
+    "ripgrep": {
+      "name": "ripgrep",
+      "repository": "https://github.com/BurntSushi/ripgrep",
+      "checks": [
+        {
+          "command": "rtk gh api repos/BurntSushi/ripgrep/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/BurntSushi/ripgrep/commits/15.2.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/BurntSushi/ripgrep/readme?ref=e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "15.2.0",
+        "source": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
+        "published_at": "2026-07-15T16:26:10Z"
+      },
+      "pin": "15.2.0",
+      "commit": "e89fff89ac9af12e8d4ce9d5fd07beb408ca730f",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md",
+        "sha256": "a69c389a49ae653616c0cac76b803ddca9ca5df98fd77c62d5677d4c1bd5916f"
+      },
+      "artifact_candidate": {
+        "name": "ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/BurntSushi/ripgrep/releases/download/15.2.0/ripgrep-15.2.0-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:33e15bcf1624b25cdd2a55813a47a2f95dbe126268203e76aa6a585d1e7b149c",
+        "source": "https://api.github.com/repos/BurntSushi/ripgrep/releases/tags/15.2.0"
+      }
+    },
+    "gVisor": {
+      "name": "gVisor",
+      "repository": "https://github.com/google/gvisor",
+      "checks": [
+        {
+          "command": "rtk gh api repos/google/gvisor/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/google/gvisor/commits/release-20260928.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/google/gvisor/readme?ref=6485c3fbdfe28172ced5d6aed49554cf494967db",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "release-20260928.0",
+        "source": "https://github.com/google/gvisor/releases/tag/release-20260928.0",
+        "published_at": "2026-09-30T17:45:43Z"
+      },
+      "pin": "release-20260928.0",
+      "commit": "6485c3fbdfe28172ced5d6aed49554cf494967db",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/google/gvisor/blob/6485c3fbdfe28172ced5d6aed49554cf494967db/README.md",
+        "sha256": "5421012e8dbc51070a849875f1f0d6e510d8d468de27439dcba61419e6a9d6fc"
+      },
+      "artifact_candidate": null
+    },
+    "boxlite": {
+      "name": "boxlite",
+      "repository": "https://github.com/boxlite-ai/boxlite",
+      "checks": [
+        {
+          "command": "rtk gh api repos/boxlite-ai/boxlite/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/boxlite-ai/boxlite/commits/v0.10.5",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/boxlite-ai/boxlite/readme?ref=4fbf2aeded7520fe77bc724468c831a29684f2cb",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.10.5",
+        "source": "https://github.com/boxlite-ai/boxlite/releases/tag/v0.10.5",
+        "published_at": "2026-09-30T11:14:05Z"
+      },
+      "pin": "0.10.5",
+      "commit": "4fbf2aeded7520fe77bc724468c831a29684f2cb",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/boxlite-ai/boxlite/blob/4fbf2aeded7520fe77bc724468c831a29684f2cb/README.md",
+        "sha256": "96472e17403a9960683b3057cc71ecae2ba212c7187f897013866f981fff35a9"
+      },
+      "artifact_candidate": {
+        "name": "boxlite-0.10.5-cp310-cp310-manylinux_2_28_x86_64.whl",
+        "url": "https://github.com/boxlite-ai/boxlite/releases/download/v0.10.5/boxlite-0.10.5-cp310-cp310-manylinux_2_28_x86_64.whl",
+        "digest": "sha256:b9031403dbb4e6dfa6d8083b8f42646c34c91f2a2b563c9c4aea2a2d259f52ed",
+        "source": "https://api.github.com/repos/boxlite-ai/boxlite/releases/tags/v0.10.5"
+      }
+    },
+    "sqz": {
+      "name": "sqz",
+      "repository": "https://github.com/ojuschugh1/sqz",
+      "checks": [
+        {
+          "command": "rtk gh api repos/ojuschugh1/sqz/releases/latest",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ojuschugh1/sqz/commits/v1.9.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/ojuschugh1/sqz/readme?ref=726e77bd7e9d6ae7529e2750da69d86e622ca699",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v1.9.0",
+        "source": "https://github.com/ojuschugh1/sqz/releases/tag/v1.9.0",
+        "published_at": "2026-09-23T18:25:35Z"
+      },
+      "pin": "1.9.0",
+      "commit": "726e77bd7e9d6ae7529e2750da69d86e622ca699",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md",
+        "sha256": "cf2dd9f969cb32614738a9958d9da2e330630127f176826f1f52480d61fd1601"
+      },
+      "artifact_candidate": {
+        "name": "sqz-mcp-v1.9.0-x86_64-unknown-linux-musl.tar.gz",
+        "url": "https://github.com/ojuschugh1/sqz/releases/download/v1.9.0/sqz-mcp-v1.9.0-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:2106a53de21e79bb1b0b4628f953f4759e3e04122e10e3d11445a802f12e6780",
+        "source": "https://api.github.com/repos/ojuschugh1/sqz/releases/tags/v1.9.0"
+      }
+    },
+    "Headroom": {
+      "name": "Headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "checks": [
+        {
+          "command": "rtk gh api repos/headroomlabs-ai/headroom/releases/tags/0.37.0",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/headroomlabs-ai/headroom/releases/tags/v0.37.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/headroomlabs-ai/headroom/commits/v0.37.0",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/headroomlabs-ai/headroom/readme?ref=32d7ca4577d599b8a5f811ada74cf31504302c9d",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "v0.37.0",
+        "source": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0",
+        "published_at": "2026-08-27T21:18:26Z"
+      },
+      "pin": "0.37.0",
+      "commit": "32d7ca4577d599b8a5f811ada74cf31504302c9d",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+        "sha256": "2d445157c1d618da871d59d8c09d70bb7a1219c80ae7a4991eb3eaa507988cde"
+      },
+      "artifact_candidate": {
+        "name": "headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+        "url": "https://github.com/headroomlabs-ai/headroom/releases/download/v0.37.0/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+        "digest": "sha256:2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
+        "source": "https://api.github.com/repos/headroomlabs-ai/headroom/releases/tags/v0.37.0"
+      }
+    },
+    "Codex TypeScript SDK": {
+      "name": "Codex TypeScript SDK",
+      "repository": "https://github.com/openai/codex",
+      "checks": [
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/0.159.3",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/rust-v0.159.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/commits/rust-v0.159.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/readme?ref=01fc69f4026735edfdf6789820549727a4867b11",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "rust-v0.159.3",
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z"
+      },
+      "pin": "0.159.3",
+      "commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/README.md",
+        "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7"
+      },
+      "artifact_candidate": {
+        "name": "argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz",
+        "digest": "sha256:c18cdcaca1fb44eeaad0d2efaf798875c4deac411ad5e00d5d3def84e10984da",
+        "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3"
+      }
+    },
+    "Codex Python SDK": {
+      "name": "Codex Python SDK",
+      "repository": "https://github.com/openai/codex",
+      "checks": [
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/0.159.3",
+          "exit_code": 1
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/releases/tags/rust-v0.159.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/commits/rust-v0.159.3",
+          "exit_code": 0
+        },
+        {
+          "command": "rtk gh api repos/openai/codex/readme?ref=01fc69f4026735edfdf6789820549727a4867b11",
+          "exit_code": 0
+        }
+      ],
+      "release": {
+        "tag": "rust-v0.159.3",
+        "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z"
+      },
+      "pin": "0.159.3",
+      "commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "readme": {
+        "path": "README.md",
+        "source": "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/README.md",
+        "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7"
+      },
+      "artifact_candidate": {
+        "name": "argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz",
+        "url": "https://github.com/openai/codex/releases/download/rust-v0.159.3/argument-comment-lint-x86_64-unknown-linux-gnu.tar.gz",
+        "digest": "sha256:c18cdcaca1fb44eeaad0d2efaf798875c4deac411ad5e00d5d3def84e10984da",
+        "source": "https://api.github.com/repos/openai/codex/releases/tags/rust-v0.159.3"
+      }
+    }
+  },
+  "package_integrity": {
+    "Codex": {
+      "name": "Codex",
+      "kind": "npm",
+      "package": "@openai/codex",
+      "version": "0.159.2",
+      "metadata_source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.2",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.2.tgz",
+        "name": "codex-0.159.2.tgz",
+        "sha256": "cf1e5d7b6e317a4a1d36dbff2ebd9b3cf048ac98d06fcb6682c57248e023cad2",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex/0.159.2",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-SE13C3nZCYoVL569BdegoOl6vwjb7o2sXOo7ivwVzaVoY0cswwi0/6pIE0TyO/C0vIkQh3jslExitET7PBTfIg==",
+        "bytes": 4904
+      }
+    },
+    "Claude Code": {
+      "name": "Claude Code",
+      "kind": "npm",
+      "package": "@anthropic-ai/claude-code",
+      "version": "2.1.284",
+      "metadata_source": "https://registry.npmjs.org/%40anthropic-ai%2Fclaude-code/2.1.284",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-2.1.284.tgz",
+        "name": "claude-code-2.1.284.tgz",
+        "sha256": "746ed486694122c5ea5e9b1d1251d04f3909da35a044ca6f5ec196b76f977e34",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fclaude-code/2.1.284",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-IuENsoLa+Y5fx5VaP0Md3n5UO7aYxjbFE/iydSDw6tMo2171oaxaaBa9oIepPG9NILd1owSx74ozsqAkTbEOjw==",
+        "bytes": 27749
+      }
+    },
+    "Codex TypeScript SDK": {
+      "name": "Codex TypeScript SDK",
+      "kind": "npm",
+      "package": "@openai/codex-sdk",
+      "version": "0.159.3",
+      "metadata_source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@openai/codex-sdk/-/codex-sdk-0.159.3.tgz",
+        "name": "codex-sdk-0.159.3.tgz",
+        "sha256": "f10a967cab205ad7875bd2cd8c508ccc5ab9501ff900f9466378e1b0e14b0522",
+        "source": "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-8KQbbeajEYt1d5aFVPiTtmaqZULTiJjj6qSh1fF+ej2rQBGPP3KLY+gz0DObxfPE6G6gnlokwcwHZnuqhQPhGA==",
+        "bytes": 21187
+      }
+    },
+    "Codex Python SDK": {
+      "name": "Codex Python SDK",
+      "kind": "pypi",
+      "package": "openai-codex",
+      "version": "0.159.3",
+      "metadata_source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/6f/24/524be7ef0fb11e587a506514f4e9b70473a1b27ba745b1afc660ced25850/openai_codex-0.159.3-py3-none-any.whl",
+        "name": "openai_codex-0.159.3-py3-none-any.whl",
+        "sha256": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
+        "source": "https://pypi.org/pypi/openai-codex/0.159.3/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "mcporter": {
+      "name": "mcporter",
+      "kind": "npm",
+      "package": "mcporter",
+      "version": "0.14.1",
+      "metadata_source": "https://registry.npmjs.org/mcporter/0.14.1",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+        "name": "mcporter-0.14.1.tgz",
+        "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+        "source": "https://registry.npmjs.org/mcporter/0.14.1",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ==",
+        "bytes": 464028
+      }
+    },
+    "MCP Inspector": {
+      "name": "MCP Inspector",
+      "kind": "npm",
+      "package": "@modelcontextprotocol/inspector",
+      "version": "2.9.0",
+      "metadata_source": "https://registry.npmjs.org/%40modelcontextprotocol%2Finspector/2.9.0",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.9.0.tgz",
+        "name": "inspector-2.9.0.tgz",
+        "sha256": "0671ad3cc535b00cbfbd3a9aad7559a735ec471d72030f0e69b7add778f8ed09",
+        "source": "https://registry.npmjs.org/%40modelcontextprotocol%2Finspector/2.9.0",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-77VWBmsA18jdxQ1vqbu8SNRSC2h5uBHyUq6wTmlqEDeVIST7YEVta0OyFCDf/6VSQKbZ3ia7Qb+9bZtlTcB+tw==",
+        "bytes": 1235523
+      }
+    },
+    "sandbox-runtime": {
+      "name": "sandbox-runtime",
+      "kind": "npm",
+      "package": "@anthropic-ai/sandbox-runtime",
+      "version": "0.0.77",
+      "metadata_source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.77.tgz",
+        "name": "sandbox-runtime-0.0.77.tgz",
+        "sha256": "cfc25049ae6b154f945ec7116725200f4153a9564752ffad2b1739a5e396b5b9",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-uOe6kkAbo91r5shXXBxZ1DKbOpWmnXkNDDujXrFJRaHSG7D7s8b7Yfsu0pGDkYFgKZ2ECtVCNisl6pCYcaMF7A==",
+        "bytes": 3925847
+      }
+    },
+    "SocratiCode": {
+      "name": "SocratiCode",
+      "kind": "npm",
+      "package": "socraticode",
+      "version": "1.15.0",
+      "metadata_source": "https://registry.npmjs.org/socraticode/1.15.0",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz",
+        "name": "socraticode-1.15.0.tgz",
+        "sha256": "f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1",
+        "source": "https://registry.npmjs.org/socraticode/1.15.0",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-vfz1G5NDepksPjZNnr/rVU5tTK91ghO/izGQQXMaZhP7Py+1hP1k+ptL/ZsYCMhB5NLj5K0XGmcNmygbE1rIWQ==",
+        "bytes": 1053928
+      }
+    },
+    "QMD": {
+      "name": "QMD",
+      "kind": "npm",
+      "package": "@tobilu/qmd",
+      "version": "2.8.3",
+      "metadata_source": "https://registry.npmjs.org/%40tobilu%2Fqmd/2.8.3",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@tobilu/qmd/-/qmd-2.8.3.tgz",
+        "name": "qmd-2.8.3.tgz",
+        "sha256": "2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0",
+        "source": "https://registry.npmjs.org/%40tobilu%2Fqmd/2.8.3",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-zjfVwrObPB618B6x8SdhlGv/tX9OxRHsbQnr5DUtBvqPK6HGQ27lM+9/BAY5okpjrHVnW56hLyDkqoTcsrVLzA==",
+        "bytes": 255569
+      }
+    },
+    "Playwright CLI": {
+      "name": "Playwright CLI",
+      "kind": "npm",
+      "package": "@playwright/cli",
+      "version": "0.1.21",
+      "metadata_source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.21.tgz",
+        "name": "cli-0.1.21.tgz",
+        "sha256": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c",
+        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-FfxmVJj2wJlsxPksUO+4N7gqimPEQPajpocl2Mk97ENIGfAVZ4aElzPb5sDdGXHI9J/3Y8EtUiUTas0VsTm/sg==",
+        "bytes": 35187
+      }
+    },
+    "agentmemory": {
+      "name": "agentmemory",
+      "kind": "npm",
+      "package": "@agentmemory/agentmemory",
+      "version": "0.9.29",
+      "metadata_source": "https://registry.npmjs.org/%40agentmemory%2Fagentmemory/0.9.29",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/@agentmemory/agentmemory/-/agentmemory-0.9.29.tgz",
+        "name": "agentmemory-0.9.29.tgz",
+        "sha256": "31376ec03d9dfccdc8f0a0bd357de9600c13d3a41a8351b310f0ea5a78f06774",
+        "source": "https://registry.npmjs.org/%40agentmemory%2Fagentmemory/0.9.29",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-NGHEi563Ap6MDan19slUH47qrTHRRyLCsuEsa1tRZ0y3e4urJnxedLJR9/agp47P1nw6LiCEvNRvK4LfUWj9Gg==",
+        "bytes": 1354562
+      }
+    },
+    "ccusage": {
+      "name": "ccusage",
+      "kind": "npm",
+      "package": "ccusage",
+      "version": "20.0.26",
+      "metadata_source": "https://registry.npmjs.org/ccusage/20.0.26",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz",
+        "name": "ccusage-20.0.26.tgz",
+        "sha256": "b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2",
+        "source": "https://registry.npmjs.org/ccusage/20.0.26",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-46TTmFKcuNyWbtqj8HZqWTmVQIsApvGO4xP+E2VL5NC/oMjdtHOv9svVTsHX1WQgetbNOV4GdvQGHLG22vXZgg==",
+        "bytes": 24216
+      }
+    },
+    "promptfoo": {
+      "name": "promptfoo",
+      "kind": "npm",
+      "package": "promptfoo",
+      "version": "0.123.1",
+      "metadata_source": "https://registry.npmjs.org/promptfoo/0.123.1",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.123.1.tgz",
+        "name": "promptfoo-0.123.1.tgz",
+        "sha256": "53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f",
+        "source": "https://registry.npmjs.org/promptfoo/0.123.1",
+        "verification": "downloaded_and_rehashed",
+        "dist_integrity": "sha512-9WzFeH6L+5E49R6CTulBo/WzmVPNcMpvgUZAyEsNlaKgpfmF9vV82jKUG1rQ+QH79P7gYAaxeY3TvLDV+x0Cbg==",
+        "bytes": 6669286
+      }
+    },
+    "Claude Agent SDK": {
+      "name": "Claude Agent SDK",
+      "kind": "pypi",
+      "package": "claude-agent-sdk",
+      "version": "0.2.163",
+      "metadata_source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/9b/74/635d38e2ef813a2d1ba4ff7f3de736c35ee3bce9ebf4a5b7e89f3293604f/claude_agent_sdk-0.2.163.tar.gz",
+        "name": "claude_agent_sdk-0.2.163.tar.gz",
+        "sha256": "269821ad5acff5967522ff15f444b0598840fd9bdc45c645de569a5478061a53",
+        "source": "https://pypi.org/pypi/claude-agent-sdk/0.2.163/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "semble": {
+      "name": "semble",
+      "kind": "pypi",
+      "package": "semble",
+      "version": "0.6.1",
+      "metadata_source": "https://pypi.org/pypi/semble/0.6.1/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/de/62/0287f43a8d6012fa9a4406d75bc6a6a1ee3d190732e8d7d9760122f77bc2/semble-0.6.1-py3-none-any.whl",
+        "name": "semble-0.6.1-py3-none-any.whl",
+        "sha256": "fea96cf60d93555966d57f26604b8ef935bf3f876757568cec9fe655dd651256",
+        "source": "https://pypi.org/pypi/semble/0.6.1/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "MinerU": {
+      "name": "MinerU",
+      "kind": "pypi",
+      "package": "mineru",
+      "version": "4.0.10",
+      "metadata_source": "https://pypi.org/pypi/mineru/4.0.10/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/4a/77/47f2e123082a96b5126c3a200b1552ccd245b26c9677cd76bfd47f8dbb91/mineru-4.0.10-py3-none-any.whl",
+        "name": "mineru-4.0.10-py3-none-any.whl",
+        "sha256": "9731eb8afb9756bb2e3a8e3e6a69252786434602eeb4ff36f7e7a5f2aa8ac107",
+        "source": "https://pypi.org/pypi/mineru/4.0.10/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "trafilatura": {
+      "name": "trafilatura",
+      "kind": "pypi",
+      "package": "trafilatura",
+      "version": "2.2.0",
+      "metadata_source": "https://pypi.org/pypi/trafilatura/2.2.0/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/c3/01/af18878398102a5a5afa0811f4f8f2a8a94a60cc16e8e9cf54bc95f96808/trafilatura-2.2.0-py3-none-any.whl",
+        "name": "trafilatura-2.2.0-py3-none-any.whl",
+        "sha256": "ac43592a6201264dfc4f9c361cbe3eb3fea96e54437010a159d5e7365360ed98",
+        "source": "https://pypi.org/pypi/trafilatura/2.2.0/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "Hindsight": {
+      "name": "Hindsight",
+      "kind": "pypi",
+      "package": "hindsight-api",
+      "version": "0.10.2",
+      "metadata_source": "https://pypi.org/pypi/hindsight-api/0.10.2/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/c4/73/0754e8f24233bc5e1e8723e82573c5e38ebc59baf9f0d12a8fc43b109936/hindsight_api-0.10.2-py3-none-any.whl",
+        "name": "hindsight_api-0.10.2-py3-none-any.whl",
+        "sha256": "de4c85e3553671224c5a319f9dc5ca560ff5edd14505736c162404c2d0407e52",
+        "source": "https://pypi.org/pypi/hindsight-api/0.10.2/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "boxlite": {
+      "name": "boxlite",
+      "kind": "pypi",
+      "package": "boxlite",
+      "version": "0.10.5",
+      "metadata_source": "https://pypi.org/pypi/boxlite/0.10.5/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/9c/ee/4771ad6efb4b0606ecf8b1b5d1b28649bd7f5043e0d456268a2981e2bf84/boxlite-0.10.5-cp313-cp313-manylinux_2_28_x86_64.whl",
+        "name": "boxlite-0.10.5-cp313-cp313-manylinux_2_28_x86_64.whl",
+        "sha256": "2999a357db7da51ef19a0797a169f14a26a9431d1ad50a3f302982e26ad8ace8",
+        "source": "https://pypi.org/pypi/boxlite/0.10.5/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "Headroom": {
+      "name": "Headroom",
+      "kind": "pypi",
+      "package": "headroom-ai",
+      "version": "0.37.0",
+      "metadata_source": "https://pypi.org/pypi/headroom-ai/0.37.0/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/72/b8/16878cf4fe6fc390a0d22025b671468619db690ff14c1b103ace4b5e35f9/headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+        "name": "headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
+        "sha256": "2efc5cdf681a10c5fc7a2a271a471179c409074537045f682b10e4d724976f46",
+        "source": "https://pypi.org/pypi/headroom-ai/0.37.0/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    },
+    "Phoenix": {
+      "name": "Phoenix",
+      "kind": "pypi",
+      "package": "arize-phoenix",
+      "version": "20.18.0",
+      "metadata_source": "https://pypi.org/pypi/arize-phoenix/json",
+      "http_status": 200,
+      "artifact": {
+        "url": "https://files.pythonhosted.org/packages/37/b3/a8bd3476dc80702ab4c5f811fe183484bca7c05dcbcace8693765223eec2/arize_phoenix-20.18.0-py3-none-any.whl",
+        "name": "arize_phoenix-20.18.0-py3-none-any.whl",
+        "sha256": "80e870887f6487d1d84b98562ee9bb729bb3bfa23b633af4ecf510f77be922a8",
+        "source": "https://pypi.org/pypi/arize-phoenix/json",
+        "verification": "published_digest_not_rehashed"
+      }
+    }
+  },
+  "runtime_primary_reads": {
+    "python_metadata": {
+      "url": "https://raw.githubusercontent.com/astral-sh/uv/0.12.17/crates/uv-python/download-metadata.json",
+      "http_status": 200,
+      "value": {
+        "name": "cpython",
+        "arch": {
+          "family": "x86_64",
+          "variant": null
+        },
+        "os": "linux",
+        "libc": "gnu",
+        "major": 3,
+        "minor": 13,
+        "patch": 15,
+        "prerelease": "",
+        "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.13.15%2B20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz",
+        "sha256": "8a689a077337bea6d1c4bc0b7df1d52fcaa28f5f67e50df8bf417c1e3f9d8874",
+        "variant": null,
+        "build": "20260901"
+      }
+    },
+    "node_checksums": {
+      "url": "https://nodejs.org/dist/v24.21.0/SHASUMS256.txt",
+      "http_status": 200,
+      "value": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6  node-v24.21.0-linux-x64.tar.xz"
+    },
+    "uv": {
+      "command": "rtk gh api repos/astral-sh/uv/releases/tags/0.12.17",
+      "exit_code": 0,
+      "asset": {
+        "name": "uv-x86_64-unknown-linux-gnu.tar.gz",
+        "browser_download_url": "https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz",
+        "digest": "sha256:fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63"
+      }
+    },
+    "mise": {
+      "command": "rtk gh api repos/jdx/mise/releases/tags/v2026.9.18",
+      "exit_code": 0,
+      "asset": {
+        "name": "mise-v2026.9.18-linux-x64.tar.gz",
+        "browser_download_url": "https://github.com/jdx/mise/releases/download/v2026.9.18/mise-v2026.9.18-linux-x64.tar.gz",
+        "digest": "sha256:4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"
+      }
+    }
+  },
+  "claude_manifest": {
+    "url": "https://downloads.claude.ai/claude-code-releases/2.1.284/manifest.json",
+    "http_status": 200,
+    "version": "2.1.284",
+    "platform": {
+      "binary": "claude",
+      "checksum": "5cd90aabd83f8a15136c35aa37bb1d92b348993573316643dc3fe4e04afbf88f",
+      "size": 243059896
+    }
+  },
+  "corrected_artifacts": [
+    {
+      "name": "Ollama",
+      "command": "rtk gh api repos/ollama/ollama/releases/tags/v0.35.0",
+      "exit_code": 0,
+      "asset": {
+        "name": "ollama-linux-amd64.tar.zst",
+        "browser_download_url": "https://github.com/ollama/ollama/releases/download/v0.35.0/ollama-linux-amd64.tar.zst",
+        "digest": "sha256:1c114a6b220c5efca2ef2b1e5f01d1e535e26f6cd6d1678c8489325d2835e525"
+      }
+    },
+    {
+      "name": "Loki",
+      "command": "rtk gh api repos/grafana/loki/releases/tags/v3.7.8",
+      "exit_code": 0,
+      "asset": {
+        "name": "loki-linux-amd64.zip",
+        "browser_download_url": "https://github.com/grafana/loki/releases/download/v3.7.8/loki-linux-amd64.zip",
+        "digest": "sha256:62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61"
+      }
+    },
+    {
+      "name": "gh",
+      "command": "rtk gh api repos/cli/cli/releases/tags/v2.101.0",
+      "exit_code": 0,
+      "asset": {
+        "name": "gh_2.101.0_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/cli/cli/releases/download/v2.101.0/gh_2.101.0_linux_amd64.tar.gz",
+        "digest": "sha256:9bca2d1c16825f109907a23307628a2f0698fbf99662b73a5cf0b020293072b8"
+      }
+    },
+    {
+      "name": "sqz",
+      "command": "rtk gh api repos/ojuschugh1/sqz/releases/tags/v1.9.0",
+      "exit_code": 0,
+      "asset": {
+        "name": "sqz-v1.9.0-x86_64-unknown-linux-musl.tar.gz",
+        "browser_download_url": "https://github.com/ojuschugh1/sqz/releases/download/v1.9.0/sqz-v1.9.0-x86_64-unknown-linux-musl.tar.gz",
+        "digest": "sha256:8e706174d84203cae40deef6bd21dc4d75f3ef656ae17b4e609f59292bc4b582"
+      }
+    },
+    {
+      "name": "OTel Collector Contrib",
+      "command": "rtk gh api repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
+      "exit_code": 0,
+      "asset": {
+        "name": "otelcol-contrib_0.162.0_linux_amd64.deb",
+        "browser_download_url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.deb",
+        "digest": "sha256:0b2b37eeb83db8e19a5f9dfc60894d058c739384a226ac085e674561befaad44"
+      }
+    }
+  ],
+  "primary_document_reads": [
+    {
+      "name": "claude-install",
+      "url": "https://code.claude.com/docs/en/setup.md",
+      "error": "HTTPError"
+    },
+    {
+      "name": "claude-example",
+      "url": "https://code.claude.com/docs/en/quickstart.md",
+      "error": "HTTPError"
+    },
+    {
+      "name": "codex-tests",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.2/AGENTS.md",
+      "http_status": 200,
+      "sha256": "b3dc6716209116a311dce67ddd490d7d0b998031734720524ad407fe67c7cf48"
+    },
+    {
+      "name": "sdk-ts",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/typescript/README.md",
+      "http_status": 200,
+      "sha256": "bc454b26a6920efb1826912be6b6ba96348ab39d9f4e70078465deb586dbbfe7"
+    },
+    {
+      "name": "sdk-py",
+      "url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/python/README.md",
+      "http_status": 200,
+      "sha256": "e81cdb5f96e4e00862bb567f6a84864169033423c80fbbe4f19a56aff3597ed5"
+    },
+    {
+      "name": "npm-pin-syntax",
+      "url": "https://docs.npmjs.com/cli/v11/commands/npm-install",
+      "http_status": 200,
+      "sha256": "1700e0fc0fb1263409bcb543c1e816a6d3e6d19344d2627149e9522098247c72"
+    },
+    {
+      "name": "uv-python",
+      "url": "https://raw.githubusercontent.com/astral-sh/uv/0.12.17/docs/guides/install-python.md",
+      "http_status": 200,
+      "sha256": "6d7dab576e446959b91686c871a2538aa527e00eb91416dc691ef2579196ea48"
+    },
+    {
+      "name": "uv-example",
+      "url": "https://raw.githubusercontent.com/astral-sh/uv/0.12.17/docs/guides/scripts.md",
+      "http_status": 200,
+      "sha256": "a2d8f384fc9ab1245ac486a84a8373646d4034c3d87848cc2b9b600714eb78ff"
+    },
+    {
+      "name": "mise-install",
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/docs/installing-mise.md",
+      "http_status": 200,
+      "sha256": "fa251ac6386f3b022ce41b928e5ac1bf6afe5ab17b49f7d695609a03e7d5f00e"
+    },
+    {
+      "name": "mise-node",
+      "url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/docs/cli/install.md",
+      "http_status": 200,
+      "sha256": "be7aa42bc003d824c9523fad181814fe718330ab10a3a6c14e89ee29c6057315"
+    },
+    {
+      "name": "node-example",
+      "url": "https://raw.githubusercontent.com/nodejs/node/v24.21.0/doc/api/synopsis.md",
+      "http_status": 200,
+      "sha256": "29ad58e1f170b39f6067cadfc68a3fe564f8b706604162b28c2c0254cfe17931"
+    },
+    {
+      "name": "docker-install",
+      "url": "https://docs.docker.com/engine/install/ubuntu/",
+      "http_status": 200,
+      "sha256": "f4c95dd744c8807fdf1ff9a50bd9d66916df7d4b92a476d5d6deab58282c07c0"
+    },
+    {
+      "name": "docker-example",
+      "url": "https://docs.docker.com/engine/security/rootless/",
+      "http_status": 200,
+      "sha256": "2481faf7a6d96717ca7774de2c6f927160b835ffe56191a1b3b5555225e4297f"
+    },
+    {
+      "name": "podman-install",
+      "url": "https://podman.io/docs/installation",
+      "http_status": 200,
+      "sha256": "ab1468ee6112733df4ef29f75c956bb01364cc73475688f920dd0c12cc51f732"
+    },
+    {
+      "name": "podman-example",
+      "url": "https://raw.githubusercontent.com/podman-container-tools/podman/v6.1.3/docs/tutorials/rootless_tutorial.md",
+      "http_status": 200,
+      "sha256": "714178490efda21bc83088cb2f41be03b96d8dd0e551a86ad5d9e558e2efe2ad"
+    },
+    {
+      "name": "gvisor-install",
+      "url": "https://gvisor.dev/docs/user_guide/install/",
+      "http_status": 200,
+      "sha256": "1545cf3eea226674065b14cc362cf7cb2daeadb63f19b2afbadd08d9a811f521"
+    },
+    {
+      "name": "gvisor-example",
+      "url": "https://gvisor.dev/docs/user_guide/quick_start/docker/",
+      "http_status": 200,
+      "sha256": "a82b36bd8d1e1b1baf96152417ab223604ca5b621b362bb87945f307a0e53ca2"
+    },
+    {
+      "name": "git-install",
+      "url": "https://git-scm.com/install/linux",
+      "error": "HTTPError"
+    },
+    {
+      "name": "gh-install",
+      "url": "https://raw.githubusercontent.com/cli/cli/v2.101.0/docs/install_linux.md",
+      "http_status": 200,
+      "sha256": "6c54aef3c43dcfc99e6ab30dbf3f5875001997d99c2a1e3f52eba1553c793c5c"
+    },
+    {
+      "name": "wsl-26-checksum",
+      "url": "https://releases.ubuntu.com/26.04.1/SHA256SUMS",
+      "http_status": 200,
+      "sha256": "4adde9f7e7760a624db5821ad75679a76b9cde1e0d3e9cb2117cfe7d8043fa43"
+    },
+    {
+      "name": "wsl-24-checksum",
+      "url": "https://releases.ubuntu.com/24.04.5/SHA256SUMS",
+      "http_status": 200,
+      "sha256": "728064ecf411f4ab702d9c3ca0a938ce672771424c028a1b52b2449f7eb5a068"
+    }
+  ],
+  "official_docs_reads": [
+    {
+      "source": "https://learn.chatgpt.com/docs/codex/cli",
+      "method": "official-domain search and web open",
+      "status": "read"
+    },
+    {
+      "source": "https://code.claude.com/docs/en/setup",
+      "method": "web open/find (HTML fallback after markdown HTTP error)",
+      "status": "read"
+    },
+    {
+      "source": "https://code.claude.com/docs/en/quickstart",
+      "method": "web open/find",
+      "status": "read"
+    }
+  ],
+  "installed_client_observation": {
+    "command": "rtk codex --version",
+    "exit_code": 0,
+    "version": "0.159.3",
+    "scope": "Installed client identity only; accepted profile source pin remains 0.159.2."
+  },
+  "sdk_pr_observation": {
+    "command": "rtk gh api repos/seathatflowsinourveins/native-agent-stack/pulls/580",
+    "exit_code": 0,
+    "state": "open",
+    "merged_at": null
+  },
+  "corrections": [
+    {
+      "claim": "Selection labels 26.04.1 but repeats the 24.04.5 command/checksum and primary/fallback priority.",
+      "correction": "Both OS rows are symmetric provisional arms. Canonical SHA256SUMS resolves 26.04.1 to 48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104; 24.04.5 remains bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e. Install/acceptance stay with the dual-image owner.",
+      "verification": [
+        "https://releases.ubuntu.com/26.04.1/SHA256SUMS",
+        "https://releases.ubuntu.com/24.04.5/SHA256SUMS"
+      ]
+    },
+    {
+      "claim": "First platform-matching release asset can identify the selected installer.",
+      "correction": "Rejected the Podman remote client, Ollama MLX archive, Loki logcli archive, Grafana Enterprise package and Codex SDK lint binary candidates. Correct Ollama/Loki/sqz assets were explicitly re-queried; unresolved engine/OSS artifacts stay blocking.",
+      "verification": "corrected_artifacts and entry blocking_gaps"
+    },
+    {
+      "claim": "Latest repository release always identifies the requested package.",
+      "correction": "Phoenix's latest repository release is its MCP package, while the trace sink is arize-phoenix 20.18.0 on PyPI. Matching trace-sink source/acceptance remains blocking. Source selection's Git 2.56.0 could not be tag/commit-verified and is not promoted to a pin.",
+      "verification": "sources.Phoenix, package_integrity.Phoenix, sources.git"
+    },
+    {
+      "claim": "A single large HTML line is safe to emit as a documentation match.",
+      "correction": "Bounded each documentation excerpt after the initial output proved too large to parse; no truncated output supplied profile fields.",
+      "verification": "primary_document_reads; bounded re-fetch returned complete parsed records."
+    },
+    {
+      "claim": "A release-specific installer command can be inferred from a floating quick start or package metadata alone.",
+      "correction": "Excluded unverified Worktrunk, Serena, SocratiCode, trafilatura, TruffleHog and mise install commands; their fields remain null with blocking gaps. Excluded deja-vu's MCP-bundle checksum from native CLI integrity.",
+      "verification": "install_document_checks and the final profile rows"
+    },
+    {
+      "claim": "A new manifest profile could be added without updating the documented profile table.",
+      "correction": "The existing documentation consistency test rejected the missing row; adoption/README.md now includes the profile, and its targeted public test passes.",
+      "verification": "rtk python3 -m unittest tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head; first test passed, second failed only for prohibited staging."
+    },
+    {
+      "claim": "SDK PR #580 is still pending and the accepted Codex CLI pin is 0.159.2.",
+      "correction": "Historical sdk_pr_observation remains unchanged. The current GitHub API observation is merged at 2026-10-01T21:18:12Z, commit 85543efe5abcddb7b7cddb14e8774e83b6758616. The profile now follows accepted Codex CLI and Python SDK 0.159.3. TypeScript remains an independent source-review recommendation; neither SDK is provisioned here.",
+      "verification": [
+        "https://github.com/seathatflowsinourveins/native-agent-stack/pull/580",
+        "adoption/pins-linux-x86_64.json",
+        "adoption/sdk/accepted-constraints.txt",
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+      ]
+    },
+    {
+      "claim": "The historical command review leaves all pin-specific install gaps unresolved after current primary sources are supplied.",
+      "correction": "The current upstream fragments and official package-manager syntax resolve ten exact command/merged-PR gaps, leaving 51 entries with 128 gaps. Prerequisites, runtime/new-host acceptance and comparison selection remain unqualified. The linked current receipt retains the removed gap strings and all source/test limitations.",
+      "verification": [
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "adoption/new-wsl-profile.json"
+      ]
+    }
+  ],
+  "validations": [
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile",
+      "exit_code": 1,
+      "tests": 8,
+      "failures": 7,
+      "errors": 1,
+      "phase": "red"
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile",
+      "exit_code": 0,
+      "tests": 8,
+      "phase": "green"
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile tests.test_adoption_status tests.test_adoption_contract tests.test_adoption_docs_consistency tests.test_adoption_bootstrap.PinsSchemaTests tests.test_adoption_bootstrap.ProfileMappingTests tests.test_adoption_bootstrap.ScriptBehaviorTests",
+      "exit_code": 1,
+      "tests": 210,
+      "failures": 2,
+      "skipped": 1,
+      "phase": "initial_existing_checks",
+      "failure_tests": [
+        "tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row",
+        "tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head"
+      ],
+      "returned_output": "...................................................................................................................................................................F.s........F.................................\n======================================================================\nFAIL: test_every_manifest_profile_is_a_table_row (tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<checkout>/tests/test_adoption_docs_consistency.py\", line 344, in test_every_manifest_profile_is_a_table_row\n    self.assertEqual(sorted(self.table), sorted(profile[\"id\"] for profile in MANIFEST[\"profiles\"]))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Lists differ: ['fou[36 chars]n', 'observability', 'recovery', 'research-run[57 chars]lus'] != ['fou[36 chars]n', 'new-wsl-clean-foundation', 'observability[85 chars]lus']\n\nFirst differing element 2:\n'observability'\n'new-wsl-clean-foundation'\n\nSecond list contains 1 additional elements.\nFirst extra element 8:\n'trading-nautilus'\n\n  ['foundation-cpu',\n   'macos-arm64-foundation',\n+  'new-wsl-clean-foundation',\n   'observability',\n   'recovery',\n   'research-runtime',\n   'semantic-rag',\n   'token-efficiency',\n   'trading-nautilus']\n\n======================================================================\nFAIL: test_every_documented_script_exists_at_head (tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<checkout>/tests/test_adoption_docs_consistency.py\", line 452, in test_every_documented_script_exists_at_head\n    self.assertEqual(errors, [])\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^\nAssertionError: Lists differ: ['adoption/new-wsl-profile.md: ../scripts/[126 chars]ked'] != []\n\nFirst list contains 2 additional elements.\nFirst extra element 0:\n'adoption/new-wsl-profile.md: ../scripts/new_wsl_profile.py exists but is not tracked'\n\n+ []\n- ['adoption/new-wsl-profile.md: ../scripts/new_wsl_profile.py exists but is not '\n-  'tracked',\n-  'adoption/new-wsl-profile.md: scripts/new_wsl_profile.py exists but is not '\n-  'tracked']\n\n----------------------------------------------------------------------\nRan 210 tests in 29.994s\n\nFAILED (failures=2, skipped=1)\n",
+      "resolution": "Added the missing adoption/README.md table row. Publication tracking remains pending because git add is prohibited in this unit."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile tests.test_adoption_status tests.test_adoption_contract tests.test_adoption_docs_consistency tests.test_adoption_bootstrap.PinsSchemaTests tests.test_adoption_bootstrap.ProfileMappingTests tests.test_adoption_bootstrap.ScriptBehaviorTests",
+      "exit_code": 1,
+      "tests": 210,
+      "failures": 1,
+      "skipped": 1,
+      "phase": "after_profile_table_correction",
+      "failure_tests": [
+        "tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head"
+      ],
+      "limitation": "The new adapter exists and passes its public CLI tests, but remains untracked. Do not conceal the documented script, alter the tracking test, or stage files in this unit."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_new_wsl_profile tests.test_adoption_status tests.test_adoption_contract tests.test_adoption_bootstrap.PinsSchemaTests tests.test_adoption_bootstrap.ProfileMappingTests tests.test_adoption_bootstrap.ScriptBehaviorTests",
+      "exit_code": 0,
+      "tests": 171,
+      "phase": "final_core",
+      "returned_output": ".........................................................................................................................................................................\n----------------------------------------------------------------------\nRan 171 tests in 17.515s\n\nOK\n",
+      "scope": "Public source-profile/generator CLI contract, native manifest/status contracts, and existing bootstrap pin/profile/script behavior. No bootstrap/provider/model/GPU/new-host run."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head",
+      "exit_code": 1,
+      "tests": 2,
+      "failures": 1,
+      "phase": "targeted_publication_gate",
+      "returned_output_excerpt": ".F\nRan 2 tests in 0.033s\nFAILED (failures=1)\n",
+      "observed_errors": [
+        "adoption/new-wsl-profile.md: ../scripts/new_wsl_profile.py exists but is not tracked",
+        "adoption/new-wsl-profile.md: scripts/new_wsl_profile.py exists but is not tracked"
+      ],
+      "passing_test": "tests.test_adoption_docs_consistency.ProfileTableTests.test_every_manifest_profile_is_a_table_row",
+      "resolution": "Unresolved publication/integration gate; git add/commit/push are outside this task's authorized scope."
+    },
+    {
+      "command": "rtk python3 scripts/adoption_status.py --profile new-wsl-clean-foundation --json",
+      "exit_code": 0,
+      "returned_output": {
+        "schema_version": 1,
+        "status": "prerequisites_present",
+        "platform": {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13.15",
+          "supported": true
+        },
+        "manifest": {
+          "status": "valid",
+          "schema_version": 1
+        },
+        "profiles": [
+          {
+            "id": "new-wsl-clean-foundation",
+            "commands": [
+              {
+                "name": "git",
+                "present": true
+              },
+              {
+                "name": "python3",
+                "present": true
+              },
+              {
+                "name": "node",
+                "present": true
+              },
+              {
+                "name": "npm",
+                "present": true
+              },
+              {
+                "name": "uv",
+                "present": true
+              },
+              {
+                "name": "gh",
+                "present": true
+              },
+              {
+                "name": "codex",
+                "present": true
+              },
+              {
+                "name": "claude",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "adoption/new-wsl-profile.json",
+                "present": true
+              },
+              {
+                "path": "adoption/new-wsl-profile.md",
+                "present": true
+              },
+              {
+                "path": "adoption/bootstrap.md",
+                "present": true
+              },
+              {
+                "path": "recipes/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_present",
+            "source_profile": {
+              "path": "adoption/new-wsl-profile.json",
+              "profile_id": "new-wsl-clean-foundation",
+              "source_head": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+              "evidence_class": "source_review_recommendations",
+              "entries": 69,
+              "entries_with_blocking_gaps": 56,
+              "status": "source_review_incomplete",
+              "default_install": [
+                "Node 24",
+                "uv",
+                "gh",
+                "CPython 3.13",
+                "Codex",
+                "Claude Code"
+              ],
+              "new_host_acceptance_verified": false
+            }
+          }
+        ],
+        "errors": [],
+        "runtime_acceptance_verified": false,
+        "limitations": [
+          "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+          "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+          "Git comparison reports source identity only; it does not compare worktree file contents with that commit.",
+          "No credentials, client configuration, environment values, network endpoints, or running processes are inspected."
+        ],
+        "git": {
+          "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+          "current_commit": "20ea4ae23a18565676823b9e3a23541c2100bb39",
+          "comparison": "baseline_differs"
+        }
+      },
+      "evidence_class": "local_prerequisite_observation",
+      "limitation": "Current checkout observation only. Source review remains incomplete, and both runtime_acceptance_verified and new_host_acceptance_verified are false."
+    },
+    {
+      "command": "rtk bash adoption/bootstrap-linux.sh --help",
+      "exit_code": 0,
+      "returned_output": "Usage: bash bootstrap-linux.sh --profile <id> [--skip-system-packages]\n                                [--allow-unpinned <id,id,...>]\n                                [--configure-claude-user-profile]\n                                [--configure-full-profile --host <name>\n                                 [--skip <step>]...]\n\nInstalls the tools pinned in adoption/pins-linux-x86_64.json for the\ngiven profile's component_ids (from adoption/manifest.json) under\nECO_INSTALL_ROOT (default ~/.local/share/codex-ecosystem), each in an\nisolated tools/<name>-<version> prefix with bin/ symlinks. Every archive\nis SHA-256 verified before extraction; a pin with a null sha256 refuses\nto install (fail closed), except a uv-tool-from-git pin (serena), which\nhas no archive to hash and instead pins and verifies an exact git commit.\nA selected component with no pin at all also\nfails closed (exit 3) before installing anything, unless it is named in\n--allow-unpinned, in which case it is skipped and echoed to the run log.\nUses sudo only for missing Ubuntu/Debian apt prerequisites, installed\nbefore the curl/git/tar/jq presence check unless --skip-system-packages\nis given, in which case that check lists what is missing and exits 4.\nAfter installing, checks each installed pin with the version_probe its\npin declares (bounded, stdin closed; servers are never started) and\nwrites installed-versions.txt; exits 5 if any probe fails.\nNever edits a shell profile, except the managed PATH block that\n--configure-full-profile appends to ~/.profile. That flag then applies\nthe whole user profile in order, each step skippable with --skip:\n  claude-profile claude-settings claude-md skills codex-lane path-block login-shell\nIt runs only from a checkout at origin/main: right after the platform\nchecks, before the system-package step or any other write, it needs git\n(install it first) and refuses with exit 1 when HEAD is not origin main.\nIt needs --host <name> (adoption/hosts/<name>.json)\nunless claude-settings and codex-lane are skipped, and exits 6 when a\nstep fails; every step is idempotent, so fix the cause and re-run.\n",
+      "conclusion": "No --dry-run option is documented by this checkout's public bootstrap help. No bootstrap installation was attempted; the documented per-step installer dry-run follows."
+    },
+    {
+      "exit_code": 0,
+      "returned_output": "guard: would install <temporary-dry-run-home>/.claude/hooks/currency-due-notice.py (sha256 c0979c22a701...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/effort-default-guard.py (sha256 2a5f087f2c10...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/secret_path_guard.py (sha256 33a11fc01ee3...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.md (sha256 d6c3c19d6e94...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.builder.md (sha256 c81a91c4ffb2...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.researcher.md (sha256 47cc80b26246...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.reviewer.md (sha256 19857a44a201...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.scout.md (sha256 81784c2edc0c...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-block.verifier.md (sha256 a2eb3298126e...)\nguard: would install <temporary-dry-run-home>/.claude/hooks/token-lanes-subagent-start.py (sha256 81e28a7c2f54...)\nagents: would install <temporary-dry-run-home>/.claude/agents/blind-adjudicator.md\nagents: would install <temporary-dry-run-home>/.claude/agents/blind-judge.md\nagents: would install <temporary-dry-run-home>/.claude/agents/blind-lane-reviewer.md\nagents: would install <temporary-dry-run-home>/.claude/agents/evidence-reviewer.md\nagents: would install <temporary-dry-run-home>/.claude/agents/isolated-builder.md\nagents: would install <temporary-dry-run-home>/.claude/agents/landscape-sweep-worker.md\nagents: would install <temporary-dry-run-home>/.claude/agents/security-reviewer.md\nagents: would install <temporary-dry-run-home>/.claude/agents/semantic-evidence-reviewer.md\nagents: would install <temporary-dry-run-home>/.claude/agents/source-scout.md\nagents: would install <temporary-dry-run-home>/.claude/agents/stack-researcher.md\nagents: would install <temporary-dry-run-home>/.claude/agents/stack-verifier.md\n",
+      "independent_observation": {
+        "dry_run_created_home": false,
+        "dry_run_created_prefix": false
+      },
+      "observation_source": "Root read-only pathlib exists checks after the returned dry-run output, recorded below.",
+      "evidence_class": "native_installer_dry_run",
+      "command_redacted": "rtk python3 tools/adoption/install_claude_profile.py --dry-run --only guard --only agents --home <temporary-dry-run-home> --eco-root <temporary-dry-run-prefix>",
+      "redacted_fields": [
+        "--home target",
+        "--eco-root target"
+      ]
+    },
+    {
+      "exit_code": 0,
+      "returned_output": "{\"path\": \"adoption/manifest.json\", \"command\": \"rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/manifest.json\", \"exit_code\": 0, \"existing_content_preserved\": true}\n{\"path\": \"adoption/pins-linux-x86_64.json\", \"command\": \"rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/pins-linux-x86_64.json\", \"exit_code\": 0, \"bytes_unchanged\": true}\n{\"path\": \"adoption/pins-macos-arm64.json\", \"command\": \"rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/pins-macos-arm64.json\", \"exit_code\": 0, \"bytes_unchanged\": true}\n{\"path\": \"manifests/stack.json\", \"command\": \"rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:manifests/stack.json\", \"exit_code\": 0, \"bytes_unchanged\": true}\n{\"dry_run_created_home\": false, \"dry_run_created_prefix\": false}\n",
+      "conclusion": "Original profiles/defaults were preserved after removing only the new profile; both adoption pin files and manifests/stack.json were byte-identical to the source head. Neither dry-run target existed.",
+      "wrapper_command_prefix": "rtk proxy python3",
+      "commands": [
+        "rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/manifest.json",
+        "rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/pins-linux-x86_64.json",
+        "rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:adoption/pins-macos-arm64.json",
+        "rtk proxy git show 20ea4ae23a18565676823b9e3a23541c2100bb39:manifests/stack.json"
+      ],
+      "independent_observation": "The same read-only wrapper checked pathlib.Path.exists() for the two disposable dry-run targets; both were false."
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0,
+      "returned_output": ""
+    }
+  ],
+  "completeness_critic": {
+    "result": "Complete bounded W-PROF artifact; unresolved evidence is retained in entries, not interpreted as readiness.",
+    "findings": [
+      "All 21 retained foundation/cross-OS ownership layers and task-named prose arms are represented or retained as uses; workers has no duplicate tool entries.",
+      "BM25 and no-compression controls lack a frozen implementation/configuration; rootless boundary awaits the engine result.",
+      "Selected skills, LSP language/plugin choice, hosted CI workflows, paid/provider decisions and optional model artifacts require their owners' scoped qualification.",
+      "Selection packets' recorded sweep/candidate coverage limits persist; this source review does not establish a landscape or merit winner.",
+      "Nix/devbox, MCPJam and optional alternative SDK/harness comparisons mentioned as future deciding prose were not independently selected by ownership.json; a future comparison registration must supply their exact owner, source, task and integrity.",
+      "Trading's 12 layers await the owner's report after October 3."
+    ]
+  },
+  "provider_usage": null,
+  "new_host_acceptance_verified": false,
+  "install_document_checks": [
+    {
+      "name": "gh",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+      "fetched_url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": true,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "uv",
+      "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+      "fetched_url": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+      "http_status": 200,
+      "exact": true,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "CPython 3.13",
+      "source": "https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md",
+      "fetched_url": "https://raw.githubusercontent.com/astral-sh/uv/0.12.17/docs/guides/install-python.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": true,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Node 24",
+      "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+      "fetched_url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": true,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Claude Code",
+      "source": "https://code.claude.com/docs/en/setup#install-a-specific-version",
+      "fetched_url": "https://code.claude.com/docs/en/setup",
+      "error": "HTTPError"
+    },
+    {
+      "name": "Codex",
+      "source": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "mcporter",
+      "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/openclaw/mcporter/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "MCP Inspector",
+      "source": "https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/modelcontextprotocol/inspector/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "sandbox-runtime",
+      "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Worktrunk",
+      "source": "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/max-sixty/worktrunk/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
+      "http_status": 200,
+      "exact": true,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Serena",
+      "source": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/oraios/serena/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+      "http_status": 200,
+      "exact": true,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "trafilatura",
+      "source": "https://trafilatura.readthedocs.io/en/latest/installation.html",
+      "fetched_url": "https://trafilatura.readthedocs.io/en/latest/installation.html",
+      "error": "HTTPError"
+    },
+    {
+      "name": "Playwright CLI",
+      "source": "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/microsoft/playwright-cli/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Inspect AI",
+      "source": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/0321960a92aa52390413ce011d67ffb5962a2b11/README.md",
+      "http_status": 200,
+      "exact": true,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Harbor",
+      "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/harbor-framework/harbor/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "promptfoo",
+      "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Claude Agent SDK",
+      "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Codex TypeScript SDK",
+      "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/typescript/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Codex Python SDK",
+      "source": "https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/openai/codex/rust-v0.159.3/sdk/python/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "QMD",
+      "source": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/tobi/qmd/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "SocratiCode",
+      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/giancarloerra/SocratiCode/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "semble",
+      "source": "https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "ColGREP",
+      "source": "https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/lightonai/next-plaid/00e26aae0006b322727db277672211d9a0e3ccec/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "ripgrep",
+      "source": "https://github.com/BurntSushi/ripgrep/blob/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/BurntSushi/ripgrep/e89fff89ac9af12e8d4ce9d5fd07beb408ca730f/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "boxlite",
+      "source": "https://github.com/boxlite-ai/boxlite/blob/4fbf2aeded7520fe77bc724468c831a29684f2cb/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/boxlite-ai/boxlite/4fbf2aeded7520fe77bc724468c831a29684f2cb/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Hindsight",
+      "source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/vectorize-io/hindsight/5fc4ce20917b916240cef27c212c387a177f115b/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "agentmemory",
+      "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/rohitg00/agentmemory/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "sqz",
+      "source": "https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/ojuschugh1/sqz/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Headroom",
+      "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": true,
+        "pip install": true,
+        "uv tool install": true,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Phoenix",
+      "source": "https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/Arize-ai/phoenix/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": true,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "Dagu",
+      "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/dagucloud/dagu/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "mise",
+      "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+      "fetched_url": "https://raw.githubusercontent.com/jdx/mise/v2026.9.18/docs/installing-mise.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": true,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": true,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": true
+      }
+    },
+    {
+      "name": "betterleaks",
+      "source": "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/betterleaks/betterleaks/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": true,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": false,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    },
+    {
+      "name": "TruffleHog",
+      "source": "https://github.com/trufflesecurity/trufflehog/blob/4dd8831c5f12599465d4d45c3c447b4018a34c85/README.md",
+      "fetched_url": "https://raw.githubusercontent.com/trufflesecurity/trufflehog/4dd8831c5f12599465d4d45c3c447b4018a34c85/README.md",
+      "http_status": 200,
+      "exact": false,
+      "base_form": false,
+      "checks": {
+        "npm install": false,
+        "pip install": false,
+        "uv tool install": false,
+        "cargo install": false,
+        "install.sh": true,
+        "uv python install": false,
+        "profile_id": false,
+        "MISE_VERSION": false
+      }
+    }
+  ],
+  "integration_handoff": {
+    "source_profile": "adoption/new-wsl-profile.json",
+    "adapter": "scripts/new_wsl_profile.py",
+    "native_manifest": "adoption/manifest.json",
+    "generator_owner": "/root/new_wsl_handbook_generator",
+    "import": "scripts.new_wsl_profile.load_profile(root)",
+    "cli": "rtk python3 scripts/new_wsl_profile.py --json",
+    "pending_publication_gate": "tests.test_adoption_docs_consistency.ScriptPathTests.test_every_documented_script_exists_at_head requires the new adapter to be tracked; this unit is prohibited from staging.",
+    "central_validation": "Central validator and evidence/registry inventory are deferred to their owner; scripts/validate.py was not run in this bounded W-PROF unit.",
+    "installs_or_provider_model_gpu_new_host_acceptance": false,
+    "current_review": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+  },
+  "historical_scope": "This receipt preserves the inherited review at source_head 20ea4ae23, including old package/source observations, returned outputs and sdk_pr_observation. Current profile state is in current_review and its linked receipt; historical observations must not be relayed as current gates.",
+  "current_review": {
+    "source_head": "85543efe5abcddb7b7cddb14e8774e83b6758616",
+    "receipt_path": "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+    "entries": 69,
+    "comparison_arms": 23,
+    "entries_with_blocking_gaps": 51,
+    "blocking_gap_items": 128,
+    "accepted_codex_cli_pin": "0.159.3",
+    "accepted_python_sdk_pin": "0.159.3",
+    "typescript_sdk_status": "independent_source_review_recommendation",
+    "evidence_class": "source_review_recommendations",
+    "new_host_acceptance_verified": false,
+    "validation_status": "172_scoped_tests_passed",
+    "review_acceptance": "Source review accepted within scope; install/functional commands remain UNRUN and new-host acceptance false."
+  }
+}

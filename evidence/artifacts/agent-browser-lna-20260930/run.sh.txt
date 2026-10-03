@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# util-linux unshare(1) and nftables native rules provide a private loopback.
+# No host namespace service or external destination is reachable by this run.
+if [[ "${1:-}" != inside ]]; then
+  rtk ss -ltn > artifacts/host-listeners-before.txt
+  if rtk rg -q ':(45871|45872)\b' artifacts/host-listeners-before.txt; then
+    rtk printf '%s\n' 'Chosen port already occupied; refusing to run.'
+    exit 1
+  fi
+  exec rtk unshare --user --map-root-user --net bash scripts/run.sh inside "$@"
+fi
+shift
+rtk ip link set lo up
+rtk nft -f scripts/firewall.nft
+rtk ip -j address show > artifacts/namespace-addresses.json
+rtk ip -j route show table all > artifacts/namespace-routes.json
+rtk ss -ltn > artifacts/namespace-listeners-before.txt
+rtk env -i \
+  PATH=~/.local/share/codex-ecosystem/bin:/usr/bin:/bin \
+  TMPDIR=/proc/self/cwd/state/tmp \
+  XDG_CONFIG_HOME="$PWD/state/config" \
+  XDG_CACHE_HOME="$PWD/state/cache" \
+  XDG_DATA_HOME="$PWD/state/data" \
+  XDG_RUNTIME_DIR=/proc/self/cwd/state/runtime \
+  PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright \
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 \
+  AGENT_BROWSER_SOCKET_DIR=s \
+  AGENT_BROWSER_IDLE_TIMEOUT_MS=60000 \
+  node scripts/measure.cjs "$@"
+rtk nft -j list ruleset > artifacts/firewall-final.json
+rtk ss -ltn > artifacts/namespace-listeners-after.txt

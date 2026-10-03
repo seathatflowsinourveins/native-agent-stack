@@ -24,7 +24,11 @@
       "path": "blueprints/convergence-practice/application-delivery/uv.lock"
     },
     {
-      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+      "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "config": ".github/osv-scanner-frozen-wsl-retrieval.toml"
+    },
+    {
+      "path": "blueprints/memory-stack/native-qualification/uv.lock"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
@@ -183,6 +187,10 @@
     {
       "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
       "lockfile": "blueprints/convergence-practice/wsl-retrieval/package-lock.json"
+    },
+    {
+      "path": "blueprints/memory-stack/native-qualification/pyproject.toml",
+      "lockfile": "blueprints/memory-stack/native-qualification/uv.lock"
     },
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",

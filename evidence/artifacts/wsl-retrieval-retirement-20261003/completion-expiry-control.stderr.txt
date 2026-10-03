@@ -1,0 +1,5 @@
+Starting filesystem walk for root: /
+Scanned ${REPOSITORY}/blueprints/convergence-practice/wsl-retrieval/package-lock.json file and found 170 packages
+End status: 0 dirs visited, 1 inodes visited, 1 Extract calls, 6.651248ms elapsed, 6.651318ms wall time
+${RUN_DIR}/expired-final-config.toml has unused ignores:
+ - GHSA-vfj7-8cjw-p6xm

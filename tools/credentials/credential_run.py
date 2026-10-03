@@ -32,7 +32,7 @@ started with it ends its whole group. Both are best effort: a SIGKILL before the
 with setsid, and a same-user debugger are out of reach. Exit status: the command's own; 128+N when it died of signal
 N; 2 for a usage error; 1 for a refusal; 126 or 127 when it cannot start. Messages carry the id, variable names, line
 numbers and reason codes, never a value, a store line or a path (docs/secret-storage.md#using-a-key). The runner is
-available, not yet the default path: the command guard does not read its command (phase 2 of the same change series).
+available, with default adoption a separate decision; K4's Claude Bash guard inspects the command it starts.
 
 Built from these references (observed 2026-09-29): the env-only exec discipline of scripts/kernel_keyring.py; the
 load_env_file grammar of blueprints/us-equities/pit-availability/measure.py:51-67 with set_credential.py's value

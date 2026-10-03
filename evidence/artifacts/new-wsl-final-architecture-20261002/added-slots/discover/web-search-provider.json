@@ -1,0 +1,50 @@
+{
+  "candidates": [
+    {
+      "name": "ddgs",
+      "repository": "https://github.com/deedy5/ddgs",
+      "why_candidate": "Python metasearch library with CLI, HTTP and MCP interfaces and no required paid API; latest GitHub release [v9.16.0, 2026-08-26](https://github.com/deedy5/ddgs/releases/tag/v9.16.0)."
+    },
+    {
+      "name": "DuckDuckGo MCP Server",
+      "repository": "https://github.com/nickclyde/duckduckgo-mcp-server",
+      "why_candidate": "MCP server providing DuckDuckGo web search and page fetching; latest GitHub release [v0.7.0, 2026-09-04](https://github.com/nickclyde/duckduckgo-mcp-server/releases/tag/v0.7.0)."
+    },
+    {
+      "name": "Exa Python SDK",
+      "repository": "https://github.com/exa-labs/exa-py",
+      "why_candidate": "Python web-search SDK with [$10 in recurring monthly free credits and no payment method required](https://exa.ai/pricing); latest GitHub release [v2.25.0, 2026-10-01](https://github.com/exa-labs/exa-py/releases/tag/v2.25.0)."
+    },
+    {
+      "name": "free-search-mcp",
+      "repository": "https://github.com/sweetcornna/free-search-mcp",
+      "why_candidate": "[Keyless Python MCP server](https://github.com/sweetcornna/free-search-mcp/blob/main/README.md) providing multi-engine search, page fetching and technical research tools; latest GitHub release [v0.13.1, 2026-09-26](https://github.com/sweetcornna/free-search-mcp/releases/tag/v0.13.1)."
+    },
+    {
+      "name": "mcp-searxng",
+      "repository": "https://github.com/ihor-sokoliuk/mcp-searxng",
+      "why_candidate": "MCP server exposing a self-hosted SearXNG instance to search clients; latest GitHub release [v2.5.0, 2026-09-29](https://github.com/ihor-sokoliuk/mcp-searxng/releases/tag/v2.5.0)."
+    },
+    {
+      "name": "Open-WebSearch",
+      "repository": "https://github.com/Aas-ee/open-webSearch",
+      "why_candidate": "[Keyless multi-engine web-search provider](https://github.com/Aas-ee/open-webSearch/blob/v2.2.0/README.md) with MCP, CLI and local HTTP interfaces; latest GitHub release [v2.2.0, 2026-09-28](https://github.com/Aas-ee/open-webSearch/releases/tag/v2.2.0)."
+    },
+    {
+      "name": "Parallel Search MCP",
+      "repository": "https://github.com/parallel-web/search-mcp",
+      "why_candidate": "Free, keyless hosted MCP web search and page fetching, from a repository created in September 2026; latest GitHub release [v0.1.1, 2026-09-21](https://github.com/parallel-web/search-mcp/releases/tag/v0.1.1)."
+    },
+    {
+      "name": "SearXNG",
+      "repository": "https://github.com/searxng/searxng",
+      "why_candidate": "[Self-hosted metasearch engine](https://github.com/searxng/searxng/blob/a9d99003344a/README.rst) with free search backends; no GitHub release returned, with default-branch commit [a9d9900 dated 2026-09-30](https://github.com/searxng/searxng/commit/a9d99003344a)."
+    },
+    {
+      "name": "Tavily Python SDK",
+      "repository": "https://github.com/tavily-ai/tavily-python",
+      "why_candidate": "[Python web-search SDK](https://github.com/tavily-ai/tavily-python/blob/master/README.md) documenting keyless search and 1,000 free personal-use credits per month; no GitHub release returned, with default-branch commit [1aeb9db dated 2026-09-18](https://github.com/tavily-ai/tavily-python/commit/1aeb9db64cf5)."
+    }
+  ],
+  "search_notes": "Alphabetical order; no ranking or recommendation. Checked against 2026-10-02, using a 90-day activity cutoff of 2026-07-04. Every listed repository exists, is public and unarchived, has an open-source license, and passed the required gh api repository and releases/latest checks; SearXNG and Tavily qualified through explicit default-branch commit checks after releases/latest returned HTTP 404. Primary READMEs and official pricing supplied capability and cost evidence. Recurring free allowances qualify within their limits. Linux/WSL2 and macOS suitability is inferred from the documented runtimes and interfaces; installations and technical-query quality were not benchmarked. Brave passed maintenance checks with v2.1.4 released 2026-09-17, but a no-payment operating path was not established from the retained evidence, so it is omitted. Discovery surfaced further leads that could not receive all required checks within the budget; this inventory is therefore not exhaustive. Used 30 GitHub API calls, eight public page fetches, and six discovery queries counting two failed web-search queries and four GitHub searches."
+}

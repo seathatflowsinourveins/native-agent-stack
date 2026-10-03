@@ -1,0 +1,126 @@
+{
+  "id": "runtime-sdk-adoption-contract-ci-repair-20260930",
+  "date": "2026-09-30",
+  "evidence_class": "repository_integration_checks",
+  "scope": "Repair the repository adoption lock contract after the documented SDK 0.159.2 upgrade; no new upstream, provider or host-runtime acceptance.",
+  "source_bindings": {
+    "failed_publication_head": "f4f0d61e3e5e14d763e73aea75d327358b211d5c",
+    "fresh_main": "4720b202f1d9795754bf59bb42892193eb87693f",
+    "included_pr_558_merge": "0b52ca8113a24f5a1823f496ac070872b59bfdcd",
+    "pr_558_merge_is_main_ancestor_exit_code": 0,
+    "original_sdk_source": "404b821cd3af25800ea418dc6145cc5cb6fe33c5",
+    "original_sdk_files_byte_identical": 14,
+    "test_path": "tests/test_adoption_contract.py",
+    "prior_test_sha256": "bcda644eee8207489392b34dd2d47c35f67c40f336edb919eaabdce427fdaf1e",
+    "repaired_test_sha256": "80f7c47eb64a554fe1b38bd637cd58f5b0e1b9af8368b6a85686948992ee4b48",
+    "lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+    "lock_sha256": "bfde2fa953c8b755b4d1cf499574ebceb8bcad8aa16cab215e0cc0b483e37039",
+    "current_qualification": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
+    "historical_inventory": "blueprints/us-equities/supply-chain/receipt.json",
+    "historical_inventory_unchanged": true
+  },
+  "original_hosted_failure": {
+    "workflow": "Validate published evidence",
+    "run_id": 36771924863,
+    "job_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36771924863/job/110080191631",
+    "job": "validate",
+    "step": "Test validation failure modes",
+    "command": "python3 -m unittest",
+    "test": "tests.test_adoption_contract.AdoptionContractTests.test_lock_matches_accepted_inventory_and_all_pins_have_hashes",
+    "test_line": 106,
+    "exit_code": 1,
+    "tests": 8646,
+    "failures": 1,
+    "skipped": 807,
+    "duration_seconds": 1097.852,
+    "sanitized_original_excerpt": [
+      "self.assertEqual(pins, expected)",
+      "AssertionError: {'alp[375 chars]'0.159.2', 'openai-codex-cli-bin': '0.159.2', [410 chars]7.1'} != {'alp[375 chars]'0.154.0', 'openai-codex-cli-bin': '0.154.0', [410 chars]7.1'}",
+      "Ran 8646 tests in 1097.852s",
+      "FAILED (failures=1, skipped=807)"
+    ],
+    "private_original_log_sha256": "5cb51ca8e30a12691ce07cdddab6d1af788f1e8acb2ceda5d12a703d7e5ad4aa",
+    "private_original_metadata_sha256": "6f90171b504c525b649dfdec6ee8ba27366509d7ee14266b37b6ff8ede2756ff"
+  },
+  "diagnosis": {
+    "cause": "The test unconditionally equated the current SDK lock and constraints with a historical 0.154.0 supply-chain inventory. Only the openai-codex and openai-codex-cli-bin versions differ after the qualified 0.159.2 upgrade.",
+    "classification": "SDK upgrade integration gap; the unchanged exact test passes against its immutable original main inputs.",
+    "correction": "The original SDK qualification missed this full repository adoption contract. The hosted failure and deterministic local red remain recorded; affected local tests verify the bounded repair.",
+    "repair": "Require the same complete package set, preserve all 34 historical non-SDK versions and per-package hash/duplicate guards, bind both SDK packages to the canonical current Codex client, check current direct requirements and complete constraints against the lock, and verify the separately recorded qualification lock hash, counts, SDK/CLI versions and source ref.",
+    "negative_controls": "Synthetic non-SDK and bundled-CLI version drift is rejected even when the copied lock, constraints and qualification hash agree. These are repository fixtures, not upstream acceptance."
+  },
+  "local_native_checks": [
+    {
+      "phase": "deterministic_red",
+      "at_head": "f4f0d61e3e5e14d763e73aea75d327358b211d5c",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_adoption_contract.AdoptionContractTests.test_lock_matches_accepted_inventory_and_all_pins_have_hashes -v",
+      "exit_code": 1,
+      "tests": 1,
+      "duration_seconds": 0.003,
+      "returned_output": "Ran 1 test in 0.003s; FAILED (failures=1)",
+      "private_original_capture_sha256": "b8f75c5f40d191164265c23f495fe77f148e541634ca1cadad7faf71ac367840"
+    },
+    {
+      "phase": "immutable_main_positive_control",
+      "source_main": "1f2cdce5a3cdf3f965d45196d8158d12431394d2",
+      "scope": "Byte-identical original test and its eight original source/data files in a temporary tree.",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_adoption_contract.AdoptionContractTests.test_lock_matches_accepted_inventory_and_all_pins_have_hashes -v",
+      "exit_code": 0,
+      "tests": 1,
+      "duration_seconds": 0.002,
+      "returned_output": "Ran 1 test in 0.002s; OK",
+      "private_original_capture_sha256": "c86eb1c2189563a39ffeaad8d4b4e42c42a5425c057c102250f12ea170672ffc"
+    },
+    {
+      "phase": "exact_green_and_independent_negative_controls",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_adoption_contract.AdoptionContractTests.test_lock_matches_accepted_inventory_and_all_pins_have_hashes tests.test_adoption_contract.AdoptionContractTests.test_sdk_upgrade_keeps_independent_inventory_and_client_guards -v",
+      "exit_code": 0,
+      "tests": 2,
+      "duration_seconds": 0.019,
+      "returned_output": "Ran 2 tests in 0.019s; OK",
+      "private_original_capture_sha256": "bba03d9a78547ed0aaca7c1f8d49ff7d890c0cb210f5dfd06ece180bce66ac36"
+    },
+    {
+      "phase": "affected_adoption_and_sdk_checks",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_adoption_contract tests.test_adoption_docs_consistency tests.test_native_worker_route tests.test_native_worker_fixture tests.test_worker_recovery tests.test_observability tests.test_sdk_usage_scope -q",
+      "exit_code": 0,
+      "tests": 81,
+      "skipped": 2,
+      "duration_seconds": 10.832,
+      "returned_output": "Ran 81 tests in 10.832s; OK (skipped=2)",
+      "private_original_capture_sha256": "fcf36258df2f6c8ff194950fb32e9855ffe55da8a6346ec8491c6a2f8dec8d02"
+    }
+  ],
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "ref": "rust-v0.159.2",
+      "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python"
+    },
+    {
+      "url": "https://pypi.org/pypi/openai-codex/0.159.2/json",
+      "version": "0.159.2",
+      "requires_python": ">=3.10",
+      "requires_dist": ["pydantic>=2.12", "packaging>=26.2", "openai-codex-cli-bin==0.159.2"]
+    },
+    {
+      "url": "https://docs.astral.sh/uv/pip/compile/#adding-constraints",
+      "scope": "Current constraints select dependency versions for a compiled lock; the historical installation receipt remains historical."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "commit": "f4f0d61e3e5e14d763e73aea75d327358b211d5c",
+      "path": "tests/test_adoption_contract.py",
+      "line": 106
+    }
+  ],
+  "limits": [
+    "These are local repository integration checks. The original hosted full-suite failure is retained; this record does not claim a rerun or success of the hosted full suite.",
+    "The original 14 SDK source files, six adoption/worker recipe files and all historical supply-chain and runtime receipts remain byte-identical.",
+    "The unchanged SDK qualification retains explicit Astra/max, two historical real tool/resume turns and fresh EMPTY-home acceptance only; this repair performs no model, provider, service, dependency installation or host setup operation.",
+    "The upstream full SDK suite remains 1 failed / 266 passed / 38 skipped with its unmodified formatter limitation.",
+    "The historical native cumulative 52,286 tokens remain counted once in the existing usage receipt; backend, provider and whole-task usage remain UNKNOWN. This repair adds no model-usage counters.",
+    "Raw native outputs remain private. This artifact contains sanitized excerpts and hashes; root coordinates the separate anti-pattern documentation handoff."
+  ]
+}

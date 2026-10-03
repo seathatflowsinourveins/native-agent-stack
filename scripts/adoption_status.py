@@ -3,7 +3,9 @@
 
 Checks command presence with shutil.which; it never invokes those commands. The
 only subprocess is a bounded native Git revision query. It opens no credential store
-(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json) and reads no
+(~/.claude.json, ~/.claude/.credentials.json, ~/.codex/auth.json). A profile's optional
+source_profile is read from this checkout and reduced to source-review counts and
+blocking-gap status; none of its install or acceptance commands run. It reads no
 service/process state, network endpoint or model API. Client configuration is read
 only with the opt-in --client-wiring, which parses fixed native client files whole and
 in-process and emits no value from them: fixed booleans and hook-event counts only,
@@ -59,7 +61,7 @@ NO_PINNED_VERSION = "Executable presence does not verify its version, installati
 LIMITATIONS = [
     NO_PINNED_VERSION,
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
-    "Git comparison reports source identity only; changed worktree files are not inspected.",
+    "Git comparison reports source identity only; it does not compare worktree file contents with that commit.",
     NO_CLIENT_STATE,
 ]
 # --client-wiring replaces NO_CLIENT_STATE with these two statements.
@@ -317,6 +319,8 @@ def validate_manifest(data, root: Path) -> dict:
         for reference in references:
             recipe_path(root, reference)
         require(len(references) == len(set(references)), "recipe_paths contains duplicate references")
+        if "source_profile" in profile:
+            recipe_path(root, profile["source_profile"])
     require(isinstance(data.get("default_profile"), str) and data["default_profile"] in ids,
             "default_profile must identify a profile")
     return data
@@ -1415,6 +1419,15 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         selected = list(dict.fromkeys(profiles or [data["default_profile"]]))
         by_id = {profile["id"]: profile for profile in data["profiles"]}
         require(all(identifier in by_id for identifier in selected), "unknown profile requested")
+        source_profiles = {}
+        for identifier in selected:
+            if "source_profile" in by_id[identifier]:
+                try:
+                    from .new_wsl_profile import load_profile, summarize
+                except ImportError:
+                    from new_wsl_profile import load_profile, summarize
+                source_profiles[identifier] = summarize(load_profile(
+                    root, by_id[identifier]["source_profile"], identifier))
     except (OSError, UnicodeError, json.JSONDecodeError):
         result["errors"].append("manifest is unavailable or not valid UTF-8 JSON")
         return result
@@ -1434,6 +1447,8 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
         ready = all(item["present"] for item in commands + recipes)
         entry = {"id": identifier, "commands": commands, "recipes": recipes,
                  "status": "prerequisites_present" if ready else "prerequisites_missing"}
+        if identifier in source_profiles:
+            entry["source_profile"] = source_profiles[identifier]
         if with_pinned_versions:
             entry["pinned_versions"] = pinned_versions(profile["component_ids"], pins)
             entry["pinned_versions_summary"] = pinned_versions_summary(entry["pinned_versions"])

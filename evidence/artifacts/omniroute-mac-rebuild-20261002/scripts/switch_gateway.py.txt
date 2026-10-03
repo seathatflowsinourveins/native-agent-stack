@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+"""Install a built OmniRoute package into a new prefix and switch the Mac gateway's launch agent to it, gated by a
+smoke start on a scratch port and the probe gate, with automatic rollback to the previous plist.
+
+Usage: switch_gateway.py <tarball> <build-manifest.json> <work dir>
+Steps (each printed as one JSON line): install, smoke, plist, switch, health, probe, (rollback), update-check agent.
+The gateway's data directory and every credential are left alone; the previous prefix stays in place."""
+import json
+import os
+import plistlib
+import shutil
+import subprocess
+import sys
+import time
+import urllib.request
+from pathlib import Path
+
+HOME = Path.home()
+TOOLS = HOME / ".local/share/codex-ecosystem/tools"
+AGENTS = HOME / "Library/LaunchAgents"
+LABEL = "com.native-stack.omniroute"
+CHECK_LABEL = "com.native-stack.omniroute-update-check"
+NODE_BIN = HOME / ".local/share/mise/installs/node/24.21.0/bin"
+HOST = Path(__file__).resolve().parent
+UID = os.getuid()
+KEY_ENV = "OMNIROUTE" + "_API_KEY"
+PLACEHOLDER = "local-loopback"
+
+
+def say(step, **kw):
+    print(json.dumps({"step": step, "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **kw}), flush=True)
+
+
+def run(cmd, **kw):
+    return subprocess.run(cmd, capture_output=True, text=True, **kw)
+
+
+def healthy(port, timeout):
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            req = urllib.request.Request(f"http://127.0.0.1:{port}/api/health")
+            with urllib.request.urlopen(req, timeout=10) as r:
+                if r.status == 200:
+                    return True
+        except Exception:  # noqa: BLE001
+            pass
+        time.sleep(3)
+    return False
+
+
+def main():
+    tarball, manifest_path, work = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+    manifest = json.loads(manifest_path.read_text())
+    prefix = TOOLS / manifest["name"]
+    plist_path = AGENTS / f"{LABEL}.plist"
+    original = work / "rollback" / f"{LABEL}.plist"
+    original.parent.mkdir(parents=True, exist_ok=True)
+    if not original.exists():
+        shutil.copy2(plist_path, original)
+    # The rollback target is the original plist plus the placeholder key, so a rollback after a database migration
+    # still accepts the callers' placeholder.
+    old = plistlib.loads(original.read_bytes())
+    rollback_plist = dict(old)
+    rollback_plist["EnvironmentVariables"] = dict(old.get("EnvironmentVariables") or {}, **{KEY_ENV: PLACEHOLDER})
+    backup = work / "rollback" / f"{LABEL}.with-placeholder.plist"
+    backup.write_bytes(plistlib.dumps(rollback_plist))
+    env = dict(os.environ, PATH=f"{NODE_BIN}:/usr/bin:/bin:/usr/sbin:/sbin")
+
+    # install
+    if not (prefix / "bin/omniroute").exists():
+        r = run(["npm", "install", "-g", "--prefix", str(prefix), str(tarball), "--no-audit", "--no-fund"], env=env,
+                timeout=1800)
+        say("install", exit=r.returncode, prefix=prefix.name, tail=r.stderr[-300:] if r.returncode else None)
+        if r.returncode:
+            return 1
+    old_prefix = Path(old["ProgramArguments"][0]).parent.parent
+    (prefix / "shim").mkdir(exist_ok=True)
+    if (old_prefix / "shim/lsof").exists():
+        shutil.copy2(old_prefix / "shim/lsof", prefix / "shim/lsof")
+    for name in ("omniroute-serve.sh", "omniroute-update-check.py"):
+        shutil.copy2(HOST / name, prefix / name)
+        os.chmod(prefix / name, 0o755)
+    shutil.copy2(manifest_path, prefix / "omniroute-build.json")
+
+    # smoke on a scratch port with an empty scratch data directory
+    smoke_data = work / "smoke-data"
+    smoke_data.mkdir(parents=True, exist_ok=True)
+    senv = dict(env, DATA_DIR=str(smoke_data), OMNIROUTE_SERVER_HOST="127.0.0.1", PATH=f"{prefix}/shim:{env['PATH']}")
+    proc = subprocess.Popen([str(prefix / "bin/omniroute"), "serve", "--port", "20188", "--no-open", "--no-tray"],
+                            env=senv, stdout=open(work / "smoke.out.log", "w"), stderr=subprocess.STDOUT)
+    ok = healthy(20188, 240)
+    proc.terminate()
+    try:
+        proc.wait(timeout=30)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+    say("smoke", healthy=ok)
+    if not ok:
+        return 1
+
+    # new plist: the wrapper announces the installed Codex version at every start
+    new = dict(old)
+    new["ProgramArguments"] = ["/bin/sh", str(prefix / "omniroute-serve.sh")]
+    new_env = dict(old.get("EnvironmentVariables") or {})
+    new_env["PATH"] = f"{prefix}/shim:{NODE_BIN}:/usr/bin:/bin"
+    new_env["CODEX_CLIENT_VERSION"] = manifest.get("fallback_codex_client_version", "0.159.3")
+    # Callers pass the documented loopback placeholder (docs/secret-storage.md, the omniroute row); the gateway accepts it
+    # as its configured env key, independent of the database's key table.
+    new_env[KEY_ENV] = PLACEHOLDER
+    new["EnvironmentVariables"] = new_env
+    staged = work / f"{LABEL}.plist.new"
+    staged.write_bytes(plistlib.dumps(new))
+    if run(["plutil", "-lint", str(staged)]).returncode:
+        say("plist", lint="failed")
+        return 1
+    say("plist", lint="ok")
+
+    def switch_to(path):
+        run(["launchctl", "bootout", f"gui/{UID}/{LABEL}"])
+        time.sleep(3)
+        shutil.copy2(path, plist_path)
+        os.chmod(plist_path, 0o644)
+        return run(["launchctl", "bootstrap", f"gui/{UID}", str(plist_path)]).returncode
+
+    rc = switch_to(staged)
+    say("switch", bootstrap_exit=rc)
+    up = rc == 0 and healthy(20128, 240)
+    say("health", healthy=up)
+    passed = False
+    if up:
+        # the live Codex catalog syncs about 90 s after boot; retry the gate for up to 8 minutes
+        for attempt in range(1, 5):
+            time.sleep(120 if attempt == 1 else 60)
+            r = run([sys.executable, str(HOST / "probe_gate.py")], timeout=1500)
+            (work / f"probe-after-{attempt}.json").write_text(r.stdout)
+            try:
+                gate = json.loads(r.stdout)
+            except Exception:  # noqa: BLE001
+                gate = {"pass": False}
+            sol: dict = gate.get("sol_max") or {}
+            astra: dict = gate.get("astra_max") or {}
+            cx: dict = gate.get("codex_exec_sol") or {}
+            say("probe", attempt=attempt, passed=gate.get("pass"), catalog=gate.get("catalog"),
+                sol=sol.get("status"), astra=astra.get("status"), codex_exit=cx.get("exit"))
+            if gate.get("pass"):
+                passed = True
+                break
+    if not passed:
+        rc = switch_to(backup)
+        say("rollback", bootstrap_exit=rc, healthy=healthy(20128, 240))
+        return 1
+
+    # daily update check
+    check = {"Label": CHECK_LABEL, "ProgramArguments": ["/usr/bin/python3", str(prefix / "omniroute-update-check.py")],
+             "StartCalendarInterval": {"Hour": 9, "Minute": 17},
+             "EnvironmentVariables": {"PATH": f"{HOME}/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
+             "StandardOutPath": str(HOME / ".local/share/omniroute/logs/update-check.log"),
+             "StandardErrorPath": str(HOME / ".local/share/omniroute/logs/update-check.log"),
+             "RunAtLoad": False}
+    check_path = AGENTS / f"{CHECK_LABEL}.plist"
+    check_path.write_bytes(plistlib.dumps(check))
+    run(["launchctl", "bootout", f"gui/{UID}/{CHECK_LABEL}"])
+    say("update_check_agent", bootstrap_exit=run(["launchctl", "bootstrap", f"gui/{UID}", str(check_path)]).returncode)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

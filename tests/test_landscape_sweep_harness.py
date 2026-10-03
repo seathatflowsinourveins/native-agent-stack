@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import contextlib
 import copy
+import errno
 import hashlib
 import importlib.util
 import io
@@ -20,6 +21,7 @@ import re
 import shlex
 import shutil
 import stat
+import signal
 import subprocess
 import sys
 import tempfile
@@ -46,7 +48,25 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # 2026-09-28: the common Skills paragraph drops verification-before-completion, which the skills trial removed under
 # its conflict rule (docs/decisions/2026-09-25-skills-trial-and-usage.md, 2026-09-28 removal addendum); the refutation
 # rule "evidence before any verdict" stays as plain text. Previous value: 11fcd52312b9…0107.
-PROMPTS_SHA256_CURRENT = "9c34fa7211bcd90e8ebc3bc5f45ed308fede34098b59dbc308a8f25edd07f14b"
+# 2026-09-30: the skills modality (docs/decisions/2026-09-30-skills-sweep-modality.md) adds discover_skills,
+# critic_skills and modality_skills to templates.json and ends facts and fit in <<MODALITY>>. build_args.fill_build
+# resolves the modality at build time, so a repository run's frozen templates, and this value, are unchanged.
+# Later on 2026-09-30, after unit F3 (#553) pinned skill-creator, which the skills templates name for its paired
+# with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
+# Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
+PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
+# Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
+PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6cb98839b94e525"
+# The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
+# and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
+# the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
+# 7798ad98a5d3…ec25, named a flattened owner/repo@name list. 2026-09-30 review repair: a true-valued
+# disable-model-invocation is true/yes/on/1 in any letter case (Claude Code), Codex's allow_implicit_invocation counts
+# only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
+# CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
+# Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
+# 2c2efbaed4d9…63d3.
+PROMPTS_SHA256_SKILLS_CURRENT = "a76ee858fe65b998dc974f8fe9cdac9562bdf14abe6f73dcd7d1778c9f95b460"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -93,8 +113,8 @@ def temp_dir(case: unittest.TestCase) -> Path:
     return path
 
 
-def filled_templates(run_date="2026-10-26", count=2, skills_date="2026-09-25"):
-    return build_args.fill_build(build_args.load_templates(), run_date, count, skills_date)
+def filled_templates(run_date="2026-10-26", count=2, skills_date="2026-09-25", modality="repository"):
+    return build_args.fill_build(build_args.load_templates(), run_date, count, skills_date, modality)
 
 
 # --------------------------------------------------------------------------- synthetic sweep data
@@ -254,6 +274,13 @@ class TemplateTests(unittest.TestCase):
         frozen = filled_templates("2026-09-26", 32, "2026-09-25")
         self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_CURRENT)
 
+    def test_filled_skills_templates_match_the_current_skills_prompts_sha256(self):
+        frozen = filled_templates("2026-09-26", 32, "2026-09-25", "skills")
+        self.assertEqual(sorted(frozen), sorted(make_prompt.RUNTIME_PLACEHOLDERS))
+        self.assertEqual(sweep_common.prompts_sha256(frozen), PROMPTS_SHA256_SKILLS_CURRENT)
+        with self.assertRaisesRegex(ValueError, "modality"):
+            filled_templates(modality="papers")
+
     def test_templates_never_refute_on_license_and_name_the_maintenance_rule(self):
         templates = json.loads((HARNESS / "templates.json").read_text())
         common, fit = templates["common"], templates["fit"]
@@ -295,6 +322,10 @@ class TemplateTests(unittest.TestCase):
             self.assertEqual(set(make_prompt.PLACEHOLDER.findall(text)), make_prompt.RUNTIME_PLACEHOLDERS[key], key)
         self.assertIn("Date: 2026-10-26.", frozen["common"])
         self.assertIn("a 2-layer saturation sweep", frozen["critic"])
+        skills = filled_templates(modality="skills")
+        for key, text in skills.items():
+            self.assertEqual(set(make_prompt.PLACEHOLDER.findall(text)), make_prompt.RUNTIME_PLACEHOLDERS[key], key)
+        self.assertIn("a 2-layer skills sweep", skills["critic"])
 
     def test_skills_named_by_the_templates_are_pinned_kept_or_trial_skills(self):
         manifest = json.loads((ROOT / build_args.SKILLS_MANIFEST).read_text(encoding="utf-8"))
@@ -312,9 +343,14 @@ class TemplateTests(unittest.TestCase):
         self.assertTrue(any("fp-check is not pinned" in p for p in build_args.skills_problems(templates, unpinned)))
         extra = dict(templates, common=templates["common"] + " Also use tdd.")
         self.assertTrue(any("missing from TEMPLATE_SKILLS" in p for p in build_args.skills_problems(extra, manifest)))
+        # Every template is scanned, not only common: the skills modality's templates reach workers too.
+        for key in ("discover_skills", "critic_skills", "modality_skills", "facts"):
+            extra = dict(templates, **{key: templates[key] + " Also use tdd."})
+            self.assertTrue(any("missing from TEMPLATE_SKILLS" in p and key in p
+                                for p in build_args.skills_problems(extra, manifest)), key)
 
     def test_worker_schemas_are_strict_and_require_skills_used(self):
-        for name in ("discover", "votes"):
+        for name in ("discover", "discover-skills", "votes"):
             schema = json.loads((HARNESS / "schemas" / f"{name}.json").read_text(encoding="utf-8"))
             self.assertFalse(schema["additionalProperties"])
             self.assertIn("skills_used", schema["required"])
@@ -449,6 +485,84 @@ class BuildInputsTests(unittest.TestCase):
         layers = json.loads((self.work / "layers.json").read_text())
         self.assertEqual([(x["catalog"], x["layer_id"]) for x in layers], [("foundation", "alpha"), ("us-equities", "beta")])
 
+    def test_inputs_date_the_sealed_verdict_fields_and_join_the_gap_ledgers(self):
+        # winners, alternatives and open_gaps are a row's sealed verdict (tools/sota-convergence/README.md, the
+        # grandfathered wave): a sweep reads them weeks later. The gap-wave ledgers record, by open_gaps index and
+        # text, what later receipts did to each gap (lane_packets.gap_receipts_index reads the same ledgers).
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0].update({"checked_at": "2026-09-22", "open_gaps": ["g" * 400, "second gap", "third gap"]})
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        receipt = "evidence/artifacts/gap-wave2-20260923/alpha/0-run.json"
+        write_json(self.repo / receipt, {"id": "0-run"})
+        first, both = "gap-wave2-20260923--owner-a", "gap-wave2-20260923+gap-wave3-20260923--owner-b"
+        write_json(self.repo / f"catalogs/landscape/{first}.json", {
+            "id": first, "wave": "gap-wave2-20260923", "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "g" * 400, "status": "advanced",
+                     "receipts": [{"path": receipt, "credit": "advanced"}]},
+                    {"index": 1, "text": "a text the sealed row does not carry", "status": "settled", "receipts": []},
+                    {"index": 2, "text": "third gap", "status": "not_run"}]},
+                {"catalog": "foundation", "layer_id": "no-such-layer", "gaps": [
+                    {"index": 0, "text": "x", "status": "settled"}]}]})
+        write_json(self.repo / f"catalogs/landscape/{both}.json", {
+            "id": both, "wave": ["gap-wave2-20260923", "gap-wave3-20260923"], "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "g" * 400, "status": "settled",
+                     "receipts": [{"path": receipt, "credit": "settled"},
+                                  {"path": "evidence/artifacts/not-in-this-checkout.json", "credit": "settled"}]}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        beta = json.loads((self.work / "inputs/beta.json").read_text())
+        self.assertEqual(alpha["verdict_checked_at"], "2026-09-22")
+        self.assertEqual(alpha["open_gaps_followup"], [
+            {"index": 0, "status": "settled", "receipts": [receipt],
+             "waves": ["gap-wave2-20260923", "gap-wave3-20260923"], "ledgers": [both]},
+            {"index": 0, "status": "advanced", "receipts": [receipt], "waves": ["gap-wave2-20260923"],
+             "ledgers": [first]},
+            {"index": 2, "status": "not_run", "receipts": [], "waves": ["gap-wave2-20260923"], "ledgers": [first]}])
+        # open_gaps itself stays the list of clipped strings the templates read.
+        self.assertEqual([len(gap) for gap in alpha["open_gaps"]], [300, 10, 9])
+        for field in ("verdict_checked_at", "components_vs_upstream", "open_gaps_followup"):
+            self.assertIn(field, alpha["verdict_note"])
+        self.assertEqual(alpha["verdict_note"], beta["verdict_note"])
+        self.assertEqual((beta["verdict_checked_at"], beta["open_gaps_followup"]), (None, []))
+        # No silent caps: the entry whose text the sealed row does not carry and the unknown layer's entry are counted.
+        self.assertIn("gap follow-ups: 3 joined from 2 ledger(s), 2 dropped", done.stdout)
+
+    def test_two_ledgers_that_record_the_same_followup_share_one_entry(self):
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0]["open_gaps"] = ["only gap"]
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        first, both = "gap-wave2-20260923--owner-a", "gap-wave2-20260923+gap-wave3-20260923--owner-a"
+        for name, wave in ((first, "gap-wave2-20260923"), (both, ["gap-wave2-20260923", "gap-wave3-20260923"])):
+            write_json(self.repo / f"catalogs/landscape/{name}.json", {"id": name, "wave": wave, "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 0, "text": "only gap", "status": "advanced", "receipts": []}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(alpha["open_gaps_followup"], [
+            {"index": 0, "status": "advanced", "receipts": [],
+             "waves": ["gap-wave2-20260923", "gap-wave3-20260923"], "ledgers": [both, first]}])
+        self.assertIn("gap follow-ups: 2 joined from 2 ledger(s), 0 dropped", done.stdout)
+
+    def test_a_gap_beyond_the_five_shown_gets_no_followup(self):
+        catalog = json.loads((self.repo / "catalogs/landscape/foundation.json").read_text())
+        catalog["layers"][0]["open_gaps"] = [f"gap {number}" for number in range(7)]
+        write_json(self.repo / "catalogs/landscape/foundation.json", catalog)
+        write_json(self.repo / "catalogs/landscape/gap-wave2-20260923--owner-a.json", {
+            "id": "gap-wave2-20260923--owner-a", "wave": "gap-wave2-20260923", "layers": [
+                {"catalog": "foundation", "layer_id": "alpha", "gaps": [
+                    {"index": 4, "text": "gap 4", "status": "advanced"},
+                    {"index": 6, "text": "gap 6", "status": "settled"}]}]})
+        done = self.build()
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(len(alpha["open_gaps"]), 5)
+        self.assertEqual([entry["index"] for entry in alpha["open_gaps_followup"]], [4])
+        self.assertIn("gap follow-ups: 1 joined from 1 ledger(s), 0 dropped", done.stdout)
+
     def test_a_proposal_refuted_by_absence_is_shown_as_not_adjudicated(self):
         # o/r: facts and the Claude fit refuter returned not refuted, the GPT-6 fit vote never returned. o/m: facts
         # refuted it on merit.
@@ -490,6 +604,536 @@ class BuildInputsTests(unittest.TestCase):
         seeds = json.loads((HARNESS / "seeds-20260926.json").read_text(encoding="utf-8"))
         self.assertEqual(build_inputs.check_seeds(seeds, list(seeds)), seeds)
         self.assertEqual(len(seeds), 14)
+
+
+class NeutralSchemaTests(unittest.TestCase):
+    @staticmethod
+    def judgment():
+        return {"judgment_id": "screen-alpha-claude-1", "order_seed": 17, "family": "claude",
+                "model_route_requested": "opus", "model_route_actual": None, "source_field_sha256": "c" * 64,
+                "provider_sampling_seed_requested": None, "provider_sampling_seed_actual": None,
+                "provider_sampling_seed_status": "not_exposed"}
+
+    def test_v2_vote_schema_requires_screen_provenance_without_inventing_provider_seeds(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/votes-v2.json").read_text())
+        returned = {"contract_version": 2, "layer_id": "alpha", "role": "facts", "votes": [{
+            "candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+            "evidence_key": "foundation/alpha/o/r", "status": "pending", "criterion": None,
+            "fact": None, "confidence": 0, "reasoning": "identity source unavailable", "refs": [],
+            "requirement_fit": None}], "skills_used": [], "judgment": self.judgment()}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for field in ("judgment_id", "order_seed", "family", "model_route_requested", "source_field_sha256",
+                      "provider_sampling_seed_requested", "provider_sampling_seed_actual", "provider_sampling_seed_status"):
+            invalid = copy.deepcopy(returned)
+            invalid["judgment"].pop(field)
+            errors = []
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, field)
+        invalid = copy.deepcopy(returned)
+        invalid.pop("judgment")
+        errors = []
+        host_receipts.validate_against_schema(invalid, schema, "$", errors)
+        self.assertTrue(errors)
+
+    def test_v2_templates_admit_against_the_requirement_and_keep_unknown_votes_pending(self):
+        templates = build_args.load_templates()
+        v2 = build_args.fill_build(templates, "2026-09-26", 32, "2026-09-25", contract_version=2)
+        self.assertEqual(sweep_common.prompts_sha256(v2), PROMPTS_SHA256_V2_CURRENT)
+        self.assertIn("requirement_fit", v2["discover"])
+        self.assertIn("frozen_tasks", v2["discover"])
+        self.assertIn("novelty only", v2["discover"])
+        self.assertIn("not an eligibility limit", v2["discover"])
+        self.assertIn("https://huggingface.co/<lowercase namespace/model>", v2["discover"])
+        self.assertIn("only when the frozen requirement explicitly requires maintenance", v2["common"])
+        for role in ("facts", "fit"):
+            self.assertIn("status=pending", v2[role])
+            self.assertIn("candidate_key", v2[role])
+            self.assertNotIn("refuted=true", v2[role])
+            self.assertNotIn("gap versus the current winners", v2[role])
+        for candidate_name in ("NautilusTrader", "ai-memory", "LEAN"):
+            self.assertNotIn(candidate_name, v2["common"])
+        self.assertIn("mandatory paid service", v2["fit"])
+        self.assertIn("missing credentials", v2["fit"])
+        # Existing source strings and frozen V1 hashes remain the explicit historical lane contract.
+        self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25")),
+                         PROMPTS_SHA256_CURRENT)
+        self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25", "skills")),
+                         PROMPTS_SHA256_SKILLS_CURRENT)
+        with self.assertRaisesRegex(ValueError, "skills"):
+            build_args.fill_build(templates, "2026-09-26", 32, "2026-09-25", "skills", contract_version=2)
+
+    def test_v2_discovery_admits_requirement_fit_without_a_winner_relative_gap(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/discover-v2.json").read_text())
+        candidate = {"candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+                     "evidence_key": "foundation/alpha/o/r", "proposed_label": "admit",
+                     "requirement_fit": "The documented interface renders exact output on both target hosts.",
+                     "frozen_tasks": ["frozen-render-task"], "admission_reason": None, "pending_reason": None,
+                     "evidence": ["https://github.com/o/r/blob/main/README.md"], "source": "primary-source search",
+                     "upstream_now": {"latest_release": None, "released_at": None, "stars": None,
+                                      "pushed_at": None, "archived": None, "license": None}}
+        returned = {"contract_version": 2, "layer_id": "alpha", "proposed": [candidate],
+                    "calls": {"web_search": 1, "web_fetch": 1, "gh_api": 0}, "notes": "", "skills_used": []}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for change in ({"proposed_label": "keep_but_compare"}, {"admission_reason": "no_gap_vs_winner"},
+                       {"demonstrated_gap": "must beat the installed winner"}):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["proposed"][0].update(change)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, change)
+
+    def test_v2_votes_preserve_pending_identity_and_reject_incumbent_relative_refutations(self):
+        import host_receipts
+        schema = json.loads((HARNESS / "schemas/votes-v2.json").read_text())
+        vote = {"candidate_key": "foundation/alpha/o/r", "repository": "https://github.com/o/r",
+                "evidence_key": "foundation/alpha/o/r", "status": "pending", "criterion": None,
+                "fact": None, "confidence": 0.0, "reasoning": "the primary source did not return",
+                "refs": [], "requirement_fit": None}
+        returned = {"contract_version": 2, "layer_id": "alpha", "role": "fit", "votes": [vote], "skills_used": [],
+                    "judgment": self.judgment()}
+        errors = []
+        host_receipts.validate_against_schema(returned, schema, "$", errors)
+        self.assertEqual(errors, [])
+        for change in ({"criterion": "no_gap_vs_winner", "status": "not_credible"}, {"refuted": True},
+                       {"status": "not_refuted"}):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["votes"][0].update(change)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, change)
+        for required in ("candidate_key", "evidence_key", "reasoning"):
+            errors = []
+            invalid = copy.deepcopy(returned)
+            invalid["votes"][0].pop(required)
+            host_receipts.validate_against_schema(invalid, schema, "$", errors)
+            self.assertTrue(errors, required)
+
+
+class NeutralFieldTests(unittest.TestCase):
+    """U11 A/B fixtures at the input-builder CLI, independent of the live V1 workflow."""
+
+    def setUp(self):
+        BuildInputsTests.setUp(self)
+        profiles = [{"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64"},
+                    {"id": "macos-arm64", "os": "macos", "architecture": "arm64"}]
+        write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+        scope = json.loads((self.work / "scope.json").read_text())
+        scope["platform_profiles_sha256"] = hashlib.sha256(
+            json.dumps(profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write_json(self.work / "scope.json", scope)
+
+    build = BuildInputsTests.build
+
+    def test_v2_field_keeps_actual_hugging_face_history_and_fit_refutations_pending(self):
+        path = self.repo / "catalogs/saturation/ledger.json"
+        ledger = json.loads(path.read_text())
+        repository = "https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"
+        ledger["sweeps"][0]["layers"][0]["proposed"] = [repository, "https://github.com/o/also-returned"]
+        ledger["sweeps"][0]["layers"][0]["refuted"].append({"repo": repository,
+            "facts": {"vote": "not_refuted"}, "fit": {"vote": "refuted"}})
+        write_json(path, ledger)
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        row = json.loads((self.work / "inputs/alpha.json").read_text())
+        field = {member["repository"]: member for member in row["eligible_field"]}
+        self.assertIn(repository, field)
+        self.assertIn("https://github.com/o/also-returned", field)
+        self.assertEqual(field[repository]["candidate_key"],
+                         "foundation/alpha/https://huggingface.co/xiaomimimo/mimo-v2.6-distill-qwen-9b")
+        self.assertEqual(field[repository]["pending_reason"], "legacy_v1_refutation")
+        self.assertTrue(field[repository]["material"])
+        screen = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        model = next(candidate for candidate in screen["candidates"] if candidate["repository"] == repository)
+        self.assertEqual(model["primary_sources"], [repository, repository + "/tree/main",
+                         "https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"])
+
+    def test_v2_requirement_keeps_capability_words_that_are_only_repository_owner_fragments(self):
+        path = self.repo / "catalogs/landscape/foundation.json"
+        catalog = json.loads(path.read_text())
+        requirement = "Keep exact project knowledge retrievable across clients, with explicit project scope."
+        catalog["layers"][0]["requirement"] = requirement
+        catalog["layers"][0]["alternatives"].append({"name": "loopx-project/loopx",
+            "repository": "https://github.com/loopx-project/loopx", "disposition": "not_adopted"})
+        write_json(path, catalog)
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        screen = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        self.assertEqual(screen["requirement"], requirement)
+
+    def test_v2_field_catalog_provenance_resolves_to_the_recorded_member(self):
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        layer = json.loads((self.work / "inputs/alpha.json").read_text())
+        member = next(row for row in layer["eligible_field"] if row["repository"] == "https://github.com/sharkdp/bat")
+        self.assertIn("catalogs/landscape/foundation.json#/layers/0/winners/0", member["evidence_refs"])
+
+    def test_v2_field_includes_known_review_seed_and_all_historical_proposals(self):
+        ledger_path = self.repo / "catalogs/saturation/ledger.json"
+        ledger = json.loads(ledger_path.read_text())
+        ledger["sweeps"].insert(0, {"sweep_id": "older", "status": "completed", "layers": [{
+            "catalog": "foundation", "layer_id": "alpha", "proposed": ["o/fit-only", "o/over-cap"],
+            "survived": [], "refuted": [{"repo": "o/fit-only", "facts": {"vote": "not_refuted"},
+                                          "fit": {"vote": "refuted"}}]}]})
+        ledger["sweeps"][-1]["layers"][0]["proposed"] = ["o/stopped"]
+        write_json(ledger_path, ledger)
+        write_json(self.repo / "catalogs/landscape/candidate-quality-review.json", {
+            "candidates": [{"repository": "o/review", "disposition": "not_adopted"}],
+            "layer_coverage": [{"catalog": "foundation", "layer_id": "alpha",
+                                "challenger_repositories": ["o/review"]}]})
+        write_json(self.repo / "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json", [{
+            "catalog": "foundation", "layer_id": "alpha", "selected": [{"repo": "o/second-family"}],
+            "challengers": ["o/another (reviewed)"]}])
+        seeds = write_json(self.work / "seeds.json", {"alpha": [f"o/seed-{n}" for n in range(9)] + ["note only"]})
+        done = self.build("--contract-version", "2", "--seeds", seeds)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        row = json.loads((self.work / "inputs/alpha.json").read_text())
+        field = {member["repository"]: member for member in row["eligible_field"]}
+        expected = {"sharkdp/bat", "cli/cli", "tauri-apps/tauri", "facebook/react", "o/s", "o/r",
+                    "o/fit-only", "o/over-cap", "o/stopped", "o/review", "o/second-family", "o/another"}
+        expected |= {f"o/seed-{n}" for n in range(9)}
+        self.assertEqual(set(field), {f"https://github.com/{repo}" for repo in expected})
+        self.assertEqual(row["contract_version"], 2)
+        self.assertEqual(field["https://github.com/o/fit-only"]["pending_reason"], "legacy_v1_refutation")
+        self.assertEqual(field["https://github.com/sharkdp/bat"]["disposition"], "admit_pending")
+        self.assertTrue(all(member["material"] for member in field.values()))
+        self.assertTrue(all(member["evidence_refs"] for member in field.values()))
+        self.assertEqual(field["https://github.com/o/fit-only"]["candidate_key"], "foundation/alpha/o/fit-only")
+        self.assertEqual(field["https://github.com/o/fit-only"]["evidence_key"], "foundation/alpha/o/fit-only")
+        self.assertIn("o/fit-only", row["known_repositories"])
+        layers = json.loads((self.work / "layers.json").read_text())
+        self.assertEqual(layers[0]["contract_version"], 2)
+        self.assertEqual(layers[0]["field_sha256"], row["field_sha256"])
+
+    def test_v2_blind_input_carries_only_readable_target_requirements_and_separate_hash(self):
+        profiles = [
+            {"id": "macos-arm64", "os": "macos", "architecture": "arm64", "status": "ADOPTION_STATUS_MARKER",
+             "pins": {"tool": "PIN_MARKER"}, "doc": "DOC_MARKER", "evidence_ref": "RECEIPT_MARKER"},
+            {"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64",
+             "bootstrap_script": "BOOTSTRAP_MARKER", "hosted_smoke": {"result": "HISTORY_MARKER"}},
+        ]
+        write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+        scope = json.loads((self.work / "scope.json").read_text())
+        scope["platform_profiles_sha256"] = hashlib.sha256(
+            json.dumps(profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+        write_json(self.work / "scope.json", scope)
+        self.assertEqual(self.build().returncode, 0)
+        legacy = (self.work / "inputs/alpha.json").read_bytes()
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        expected = [{"id": "linux-wsl2-x86_64", "os": "linux", "architecture": "x86_64"},
+                    {"id": "macos-arm64", "os": "macos", "architecture": "arm64"}]
+        digest = hashlib.sha256(json.dumps(expected, sort_keys=True, separators=(",", ":"),
+                                          ensure_ascii=False).encode()).hexdigest()
+        for name in ("alpha.json", "alpha.fit-v2.json", "beta.json", "beta.fit-v2.json"):
+            value = json.loads((self.work / "inputs" / name).read_text())
+            self.assertEqual(value.get("platform_requirements"), expected)
+            self.assertEqual(value.get("platform_requirements_sha256"), digest)
+            self.assertEqual(value["platform_profiles_sha256"], scope["platform_profiles_sha256"])
+            text = json.dumps(value)
+            for marker in ("ADOPTION_STATUS_MARKER", "PIN_MARKER", "DOC_MARKER", "RECEIPT_MARKER",
+                           "BOOTSTRAP_MARKER", "HISTORY_MARKER"):
+                self.assertNotIn(marker, text)
+        self.assertEqual(self.build().returncode, 0)
+        self.assertEqual((self.work / "inputs/alpha.json").read_bytes(), legacy)
+        self.assertEqual(json.loads((self.repo / "adoption/manifest.json").read_text())["platform_profiles"], profiles)
+
+    def test_v2_rejects_changed_or_unreadable_platform_scope_before_writing_inputs(self):
+        for problem in ("changed_scope", "missing_architecture", "duplicate_profile_id"):
+            with self.subTest(problem=problem):
+                profiles = [{"id": "linux", "os": "linux", "architecture": "x86_64"}]
+                if problem == "missing_architecture":
+                    profiles[0].pop("architecture")
+                elif problem == "duplicate_profile_id":
+                    profiles.append({"id": "linux", "os": "linux", "architecture": "arm64"})
+                write_json(self.repo / "adoption/manifest.json", {"platform_profiles": profiles})
+                if problem != "changed_scope":
+                    scope = json.loads((self.work / "scope.json").read_text())
+                    scope["platform_profiles_sha256"] = hashlib.sha256(json.dumps(
+                        profiles, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+                    write_json(self.work / "scope.json", scope)
+                done = self.build("--contract-version", "2")
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertIn("platform", done.stderr)
+                self.assertFalse((self.work / "inputs").exists())
+                self.assertFalse((self.work / "layers.json").exists())
+
+    def test_v2_offline_fit_input_withholds_origin_facts_and_keeps_equal_primary_sources(self):
+        path = self.repo / "catalogs/landscape/foundation.json"
+        catalog = json.loads(path.read_text())
+        catalog["layers"][0]["requirement"] = "bat must render exact output. The current winner bat stays selected."
+        catalog["layers"][0]["winners"][0]["why_selected"] = "ADOPTION_ONLY_MARKER"
+        catalog["layers"][0]["alternatives"][0]["why_not_default"] = "INCUMBENT_ONLY_MARKER"
+        write_json(path, catalog)
+        freshness = json.loads(self.freshness.read_text())
+        freshness["foundation"][0]["components"][0]["upstream"]["archived"] = True
+        write_json(self.freshness, freshness)
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertFalse(Path(env["FACTS_CALLS"]).exists(), "offline V2 must not query either upstream transport")
+        self.assertEqual(json.loads((self.work / "upstream-facts-v2.json").read_text())["mode"], "not_requested")
+        screen_path = self.work / "inputs/alpha.fit-v2.json"
+        self.assertTrue(screen_path.is_file(), "V2 fit must have its own blind input")
+        text = screen_path.read_text()
+        screen = json.loads(text)
+        self.assertEqual(screen["requirement"], "<candidate> must render exact output.")
+        for signal in ("winners", "alternatives", "why_selected", "why_not_default", "ADOPTION_ONLY_MARKER",
+                       "INCUMBENT_ONLY_MARKER", "legacy_v1_refutation", "admit_pending", "pin_behind_upstream"):
+            self.assertNotIn(signal, text)
+        source = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertEqual(screen["field_sha256"], source["field_sha256"])
+        self.assertEqual({row["candidate_key"] for row in screen["candidates"]},
+                         {row["candidate_key"] for row in source["eligible_field"]})
+        for candidate in screen["candidates"]:
+            self.assertEqual(candidate["primary_sources"], [candidate["repository"],
+                             candidate["repository"] + "/releases", candidate["repository"] + "/commits"])
+            self.assertTrue(all(value is None for value in candidate["upstream_now"].values()))
+            self.assertNotIn("stars", candidate["upstream_now"])
+            self.assertNotIn("license", candidate["upstream_now"])
+            self.assertEqual(candidate["upstream_observation"]["status"], "pending")
+            self.assertEqual(candidate["upstream_observation"]["pending_reason"], "not_requested")
+        bat = next(row for row in screen["candidates"] if row["repository"] == "https://github.com/sharkdp/bat")
+        self.assertIsNone(bat["upstream_now"]["latest_release"])
+        self.assertIsNone(bat["upstream_now"]["archived"])
+        health_member = next(row for row in source["eligible_field"] if row["candidate_key"] == bat["candidate_key"])
+        self.assertEqual(health_member["disposition"], "admit_pending")
+        self.assertTrue(health_member["material"])
+        self.assertIsNone(health_member["exclusion_reason"])
+        self.assertNotIn("pin", bat)
+        self.assertTrue(all(row["requirement_fit"] is None for row in screen["candidates"]))
+        layers = json.loads((self.work / "layers.json").read_text())
+        self.assertEqual(layers[0]["fit_input"], str(screen_path))
+
+    def upstream_fixture(self, failure="", malformed=""):
+        """Synthetic API returns through the public CLI's existing native gh/urllib transports."""
+        fixtures = temp_dir(self)
+        gh = fixtures / "gh"
+        gh.write_text(f"#!{sys.executable}\n" + '''import json, os, sys
+from pathlib import Path
+path = sys.argv[2]
+with Path(os.environ["FACTS_CALLS"]).open("a") as log:
+    log.write(path + "\\n")
+if path == os.environ.get("FACTS_FAILURE"):
+    print("synthetic API unavailable; PRIVATE_ERROR_MARKER", file=sys.stderr)
+    sys.exit(1)
+if path == os.environ.get("FACTS_MALFORMED"):
+    print('["wrong response shape"]')
+    sys.exit(0)
+if path.endswith("/releases/latest"):
+    value = {"tag_name": "v-live", "published_at": "2026-09-30T10:00:00Z"}
+elif path.endswith("/commits?per_page=1"):
+    value = [{"sha": "c" * 40, "commit": {"committer": {"date": "2026-09-29T10:00:00Z"}}}]
+else:
+    value = {"default_branch": "main", "archived": False, "disabled": False,
+             "pushed_at": "2026-09-30T11:00:00Z", "stargazers_count": 999,
+             "license": {"spdx_id": "LICENSE_ONLY_MARKER"}}
+print(json.dumps(value))
+''', encoding="utf-8")
+        gh.chmod(0o755)
+        # No network is used: urllib sees fixed public model-info responses, and any unexpected path fails closed.
+        (fixtures / "sitecustomize.py").write_text('''import io, json, os, urllib.error, urllib.request
+from pathlib import Path
+def urlopen(request, timeout=None):
+    url = request.full_url
+    with Path(os.environ["FACTS_CALLS"]).open("a") as log:
+        log.write(url + "\\n")
+    if url != "https://huggingface.co/api/models/Org/Model":
+        raise urllib.error.URLError("synthetic model info unavailable")
+    return io.BytesIO(json.dumps({"id": "Org/Model", "sha": "d" * 40,
+        "lastModified": "2026-09-28T10:00:00Z", "disabled": False, "gated": "auto",
+        "likes": 999, "cardData": {"license": "LICENSE_ONLY_MARKER"}}).encode())
+urllib.request.urlopen = urlopen
+''', encoding="utf-8")
+        return {"PATH": str(fixtures) + os.pathsep + os.environ.get("PATH", ""),
+                "PYTHONPATH": str(fixtures), "FACTS_CALLS": str(fixtures / "calls.txt"),
+                "FACTS_FAILURE": failure, "FACTS_MALFORMED": malformed}
+
+    def test_v2_pull_reuses_one_origin_neutral_snapshot_for_every_membership(self):
+        beta_path = self.repo / "catalogs/landscape/us-equities.json"
+        beta = json.loads(beta_path.read_text())
+        beta["layers"][0]["candidates"] = [{"repository": "https://github.com/sharkdp/bat",
+            "upstream_now": {"latest_release": "ORIGIN_ONLY_MARKER", "archived": True}}]
+        write_json(beta_path, beta)
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot_path = self.work / "upstream-facts-v2.json"
+        snapshot = json.loads(snapshot_path.read_text())
+        self.assertEqual(snapshot["mode"], "api_pull")
+        observations = snapshot["repositories"]
+        calls = Path(env["FACTS_CALLS"]).read_text().splitlines()
+        expected = [f"repos/{url.removeprefix('https://github.com/')}" + suffix
+                    for url in sorted(observations)
+                    for suffix in ("", "/commits?per_page=1", "/releases/latest")]
+        self.assertEqual(calls, expected)  # exactly once, same path/order for adopted, catalog and sweep-only
+        shared = []
+        for layer in ("alpha", "beta"):
+            screen = json.loads((self.work / f"inputs/{layer}.fit-v2.json").read_text())
+            digest = hashlib.sha256(json.dumps(snapshot, sort_keys=True, ensure_ascii=False,
+                                               separators=(",", ":")).encode()).hexdigest()
+            self.assertEqual(screen["upstream_facts_sha256"], digest)
+            for candidate in screen["candidates"]:
+                frozen = observations[candidate["repository"]]
+                self.assertEqual(candidate["upstream_now"], frozen["upstream_now"])
+                self.assertEqual(candidate["upstream_observation"], frozen["upstream_observation"])
+                self.assertEqual(candidate["upstream_now"]["latest_release"], "v-live")
+                self.assertIs(candidate["upstream_now"]["archived"], False)
+                self.assertEqual(candidate["upstream_now"]["head_commit"], "c" * 40)
+                self.assertEqual(candidate["upstream_now"]["head_committed_at"], "2026-09-29T10:00:00Z")
+                self.assertEqual(candidate["upstream_observation"]["status"], "observed")
+                self.assertIsNone(candidate["requirement_fit"])
+                if candidate["repository"] == "https://github.com/sharkdp/bat":
+                    shared.append(frozen)
+            for signal in ("stars", "license", "LICENSE_ONLY_MARKER", "ORIGIN_ONLY_MARKER"):
+                self.assertNotIn(signal, json.dumps(screen))
+        self.assertEqual(len(shared), 2)
+        self.assertEqual(shared[0], shared[1])
+        release = {"tag_name": "v-live", "published_at": "2026-09-30T10:00:00Z"}
+        release_source = observations["https://github.com/sharkdp/bat"]["upstream_observation"]["sources"][-1]
+        self.assertEqual(release_source["url"], "https://api.github.com/repos/sharkdp/bat/releases/latest")
+        self.assertEqual(release_source["response_json_sha256"], hashlib.sha256(
+            json.dumps(release, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest())
+
+    def test_v2_failed_api_facts_stay_unknown_pending_and_later_members_and_layers_continue(self):
+        env = self.upstream_fixture(failure="repos/cli/cli")  # first repository in the sorted pull
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        alpha = json.loads((self.work / "inputs/alpha.fit-v2.json").read_text())
+        failed = next(row for row in alpha["candidates"] if row["repository"] == "https://github.com/cli/cli")
+        self.assertIsNone(failed["upstream_now"]["archived"])
+        self.assertIsNone(failed["upstream_now"]["pushed_at"])
+        self.assertEqual(failed["upstream_observation"]["status"], "pending")
+        source = failed["upstream_observation"]["sources"][0]
+        self.assertEqual(source["url"], "https://api.github.com/repos/cli/cli")
+        self.assertEqual(source["status"], "pending")
+        self.assertIsNone(source["response_json_sha256"])
+        beta = json.loads((self.work / "inputs/beta.fit-v2.json").read_text())
+        self.assertEqual(beta["candidates"][0]["upstream_observation"]["status"], "observed")
+        self.assertEqual(beta["candidates"][0]["upstream_now"]["latest_release"], "v-live")
+        owner = json.loads((self.work / "inputs/alpha.json").read_text())
+        self.assertTrue(all(row["disposition"] == "admit_pending" for row in owner["eligible_field"]))
+        self.assertNotIn("PRIVATE_ERROR_MARKER", (self.work / "upstream-facts-v2.json").read_text())
+
+    def test_v2_malformed_api_payload_retains_its_hash_and_leaves_facts_pending(self):
+        env = self.upstream_fixture(malformed="repos/cli/cli")
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot = json.loads((self.work / "upstream-facts-v2.json").read_text())
+        failed = snapshot["repositories"]["https://github.com/cli/cli"]
+        self.assertIsNone(failed["upstream_now"]["archived"])
+        self.assertEqual(failed["upstream_observation"]["status"], "pending")
+        source = failed["upstream_observation"]["sources"][0]
+        self.assertEqual(source["status"], "pending")
+        self.assertEqual(source["response_json_sha256"], hashlib.sha256(b'["wrong response shape"]').hexdigest())
+        self.assertEqual(snapshot["repositories"]["https://github.com/sharkdp/bat"]["upstream_observation"]["status"],
+                         "observed")
+
+    def test_v2_hub_pull_keeps_host_unknowns_null_and_failure_does_not_abort(self):
+        seeds = write_json(self.work / "seeds.json", {"alpha": ["https://huggingface.co/Org/Missing",
+                                                               "https://huggingface.co/Org/Model"],
+                                                   "beta": ["https://huggingface.co/org/model"]})
+        env = self.upstream_fixture()
+        with mock.patch.dict(os.environ, env):
+            done = self.build("--contract-version", "2", "--pull-upstream-facts", "--seeds", seeds)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        snapshot = json.loads((self.work / "upstream-facts-v2.json").read_text())
+        model = snapshot["repositories"]["https://huggingface.co/Org/Model"]
+        self.assertEqual(model["upstream_now"]["head_commit"], "d" * 40)
+        self.assertEqual(model["upstream_now"]["last_modified"], "2026-09-28T10:00:00Z")
+        self.assertEqual(model["upstream_now"]["gated"], "auto")
+        self.assertEqual(snapshot["repositories"]["https://huggingface.co/org/model"], model)
+        for key in ("archived", "latest_release", "released_at", "head_committed_at"):
+            self.assertIsNone(model["upstream_now"][key])
+        missing = snapshot["repositories"]["https://huggingface.co/Org/Missing"]
+        self.assertTrue(all(value is None for value in missing["upstream_now"].values()))
+        self.assertEqual(missing["upstream_observation"]["status"], "pending")
+        calls = Path(env["FACTS_CALLS"]).read_text().splitlines()
+        self.assertEqual(calls.count("https://huggingface.co/api/models/Org/Model"), 1)
+
+    def test_upstream_pull_requires_explicit_v2_repository_mode(self):
+        done = self.build("--pull-upstream-facts")
+        self.assertEqual(done.returncode, 2)
+        self.assertIn("--contract-version 2", done.stderr)
+        self.assertFalse((self.work / "inputs").exists())
+
+    def test_acceptance_summaries_pin_the_exact_reviewed_plan_sections(self):
+        # Full source revision 798ac445307e2cd8eba6e74d7722ac0e16da02c7; bytes from each heading through
+        # the byte before the next section heading (the last range runs to EOF). These are summaries, not extracts.
+        plan = (ROOT / "blueprints/us-equities/engine-nautilus/acceptance-plan.md").read_bytes()
+        hashes = {
+            "retained-equity-replay": (1, 3, "a79c33c07f9de52bb7270fb9e6e0e85a19c1064da9ad47f9d7cc92ff362f0a0f"),
+            "broker-state-failures": (4, 4, "1f557403dc4169db578cd2a327f025ac3acee25c78b333dfc91906d83ff421c3"),
+            "separate-paper-adapters": (5, 6, "e5921c5afa6d5db25408549873127b5a07cd8690e2ca674b6ed508f22bb32ec9"),
+        }
+        self.assertEqual(set(hashes), set(build_inputs.ACCEPTANCE_REQUIREMENTS))
+        for gate, (first, last, expected) in hashes.items():
+            with self.subTest(gate=gate):
+                start = re.search(rb"^## " + str(first).encode() + rb"\. ", plan, re.M)
+                self.assertIsNotNone(start)
+                following = re.search(rb"^## " + str(last + 1).encode() + rb"\. ", plan, re.M)
+                section = plan[start.start():following.start() if following else len(plan)]
+                self.assertEqual(hashlib.sha256(section).hexdigest(), expected,
+                                 "Review the requirement summary against the changed acceptance-plan sections")
+
+    def test_v2_pinned_requirements_and_declarative_gates_survive_without_executed_status(self):
+        path = self.repo / "catalogs/landscape/us-equities.json"
+        catalog = json.loads(path.read_text())
+        catalog["layers"][0]["requirement"] = (
+            "Use the selected NautilusTrader destination with IBKR and a separate Alpaca adapter; "
+            "preserve the prior LEAN oracle and reconcile numeric accounting.")
+        catalog["layers"][0]["candidates"] = [
+            {"name": "NautilusTrader", "repository": "https://github.com/nautechsystems/nautilus_trader",
+             "disposition": "selected"},
+            {"name": "LEAN", "repository": "https://github.com/QuantConnect/Lean", "disposition": "not_adopted"}]
+        write_json(path, catalog)
+        write_json(self.repo / "catalogs/us-equities/runtime-target.json", {
+            "engine": {"repository": "https://github.com/nautechsystems/nautilus_trader",
+                       "decision": "selected_destination", "requested_version": "2.0.0rc5"},
+            "acceptance_plan": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
+            "next_acceptance": [{"id": "broker-state-failures", "status": "EXECUTED_ONLY_MARKER",
+                                 "scope": "Installed incumbent already passed 27 checks.",
+                                 "executed_evidence_ref": "incumbent-receipt.json"}]})
+        done = self.build("--contract-version", "2")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        text = (self.work / "inputs/beta.fit-v2.json").read_text()
+        screen = json.loads(text)
+        self.assertEqual(screen["requirement"], (
+            "Use the user-pinned NautilusTrader destination with IBKR and a separate Alpaca adapter; "
+            "preserve the fixed LEAN oracle and reconcile numeric accounting."))
+        self.assertEqual({pin["name"] for pin in screen["pinned_requirements"]},
+                         {"NautilusTrader", "IBKR", "Alpaca", "LEAN"})
+        self.assertEqual(screen["acceptance_gates"][0]["id"], "broker-state-failures")
+        self.assertIn("durable", screen["acceptance_gates"][0]["requirement"])
+        for signal in ("EXECUTED_ONLY_MARKER", "executed_evidence_ref", "incumbent-receipt.json",
+                       "already passed", "requested_version", "2.0.0rc5"):
+            self.assertNotIn(signal, text)
+
+
+class NeutralStagingTests(unittest.TestCase):
+    def test_legacy_staging_refuses_v2_inputs_before_writing_a_launchable_runner(self):
+        work = stage_work(self, layers=("alpha",))
+        path = work / "inputs/alpha.json"
+        layer = json.loads(path.read_text())
+        write_json(path, dict(layer, contract_version=2, field_sha256="c" * 64))
+        done = build(work)
+        self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+        self.assertIn("V2", done.stderr)
+        self.assertFalse((work / "args.json").exists())
+        self.assertFalse((work / "sweep.embedded.js").exists())
+        explicit = build(work, "--contract-version", "2")
+        self.assertEqual(explicit.returncode, 2, explicit.stdout + explicit.stderr)
+        self.assertIn("future V2 runner", explicit.stderr)
+        self.assertFalse((work / "templates.json").exists())
 
 
 # --------------------------------------------------------------------------- build_args
@@ -633,6 +1277,12 @@ if sys.argv[1:] == ["-c", 'sandbox_mode="read-only"', "app-server"]:  # the quot
             print(json.dumps({{"id": msg["id"], key: quota.get(key)}}), flush=True)
     sys.exit(0)
 config = json.load(open(os.environ["FAKE_CODEX_CONFIG"]))
+if config.get("attempts"):
+    counter = config["attempt_counter"]
+    attempt = int(open(counter).read()) if os.path.exists(counter) else 0
+    with open(counter, "w") as out:
+        out.write(str(attempt + 1))
+    config.update(config["attempts"][min(attempt, len(config["attempts"]) - 1)])
 stdin, null = os.fstat(0), os.stat(os.devnull)
 record = {{"argv": sys.argv[1:], "cwd": os.getcwd(), "stdin_devnull": (stdin.st_ino, stdin.st_dev) == (null.st_ino, null.st_dev),
           "stdin_read": sys.stdin.read(), "rust_log": os.environ.get("RUST_LOG"),
@@ -647,13 +1297,29 @@ if config.get("stubborn"):
 if config.get("log"):
     with open(config["log"], "a") as log:
         log.write("start %.6f\\n" % time.time())
+for tick in config.get("ticks", []):
+    time.sleep(tick.get("delay_s", 0))
+    if "event" in tick:
+        print(json.dumps(tick["event"]), flush=True)
+    if "raw" in tick:
+        sys.stdout.write(tick["raw"])
+        sys.stdout.flush()
+    if "stderr" in tick:
+        sys.stderr.write(tick["stderr"])
+        sys.stderr.flush()
 time.sleep(config.get("sleep", 0))
-if config.get("last") is not None:
-    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
-        json.dump(config["last"], out, indent=2)
 for event in config.get("events", []):
     print(json.dumps(event))
 sys.stdout.flush()
+# Upstream exec emits completion, shuts down, then writes -o (rust-v0.159.2,
+# codex-rs/exec/src/lib.rs:1318-1321; event_processor_with_jsonl_output.rs:631-636).
+time.sleep(config.get("output_delay_s", 0))
+if config.get("last") is not None:
+    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
+        json.dump(config["last"], out, indent=2)
+if "last_text" in config:
+    with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
+        out.write(config["last_text"])
 sys.stderr.write(config.get("stderr", ""))
 if config.get("record"):
     with open(config["record"], "w") as out:
@@ -1082,6 +1748,10 @@ class RunnerCase(unittest.TestCase):
 
     def fake(self, **config):
         config.setdefault("record", str(self.bin / "record.json"))
+        if config.get("attempts"):
+            counter = self.bin / "attempt-counter"
+            counter.unlink(missing_ok=True)
+            config["attempt_counter"] = str(counter)
         write_json(self.config_path, config)
 
     def call(self, *args, shell="bash"):
@@ -1094,15 +1764,112 @@ class RunnerCase(unittest.TestCase):
         self.assertEqual(started.stdout.strip(), f"started {name}")
         waited = self.call("wait", name, "20", shell=shell)
         self.assertTrue(waited.stdout.startswith("done exit="), waited.stdout + waited.stderr)
-        return json.loads(self.call("result", name, shell=shell).stdout)
+        result = json.loads(self.call("result", name, shell=shell).stdout)
+        if result.get("exit") == codex_job.EXIT_REFUSED:  # a started job is never refused: retain the runner's reason
+            directory = self.work / "gpt6" / name
+            self.fail(f"the runner refused {name}: {codex_job.read(directory / 'stderr.txt')!r} "
+                      f"{codex_job.read(directory / 'failure.json')!r}")
+        return result
 
     def record(self):
         return json.loads((self.bin / "record.json").read_text())
+
+    def diagnose(self, name, completed):
+        """What a failed start, wait or result left behind: the command's own output and the runner's files."""
+        directory = self.work / "gpt6" / name
+        parts = [f"stdout={completed.stdout!r}", f"stderr={completed.stderr!r}"]
+        for file_name in ("exit", "failure.json", "stderr.txt", "runner.log"):
+            parts.append(f"{file_name}={codex_job.read(directory / file_name)!r}")
+        parts.append(f"done={(directory / 'done').exists()} running={codex_job.running(directory)}")
+        return "\n".join(parts)
 
 
 LAST = {"repository": "https://github.com/ggml-org/llama.cpp", "latest_release": "b1", "stars_known": 1}
 COMPLETED = {"type": "turn.completed", "usage": {"input_tokens": 100, "cached_input_tokens": 80, "output_tokens": 7,
                                                  "reasoning_output_tokens": 3}}
+
+
+class WaitFinishRaceTests(unittest.TestCase):
+    """wait() checked done and then the job lock. A job that finished between the two checks was reported as
+    "done exit=none (the job is not running)": one hosted CI run of 2026-10-01 failed
+    test_web_search_modes_are_staged_bound_and_recorded that way. The runner writes done before it releases the lock,
+    so wait reads done again once it sees the lock free. Synthetic fixture: the lock check itself completes the job."""
+
+    def wait_output(self, finishes_during_the_lock_check):
+        base = temp_dir(self)
+        write_json(base / "staged.json", {"codex": {"wait_poll_s": 0.05}})
+        directory = codex_job.job_dir(base, "race")
+        directory.mkdir(parents=True)
+        (directory / "job.lock").touch()
+
+        def lock_check(_directory):
+            if finishes_during_the_lock_check:  # the runner's last writes; its lock is free when this returns
+                (directory / "events.jsonl").write_text(json.dumps(COMPLETED) + "\n", encoding="utf-8")
+                write_json(directory / "last.json", LAST)
+                codex_job.finish(directory, 0)
+            return False
+        output = io.StringIO()
+        with mock.patch.object(codex_job, "running", side_effect=lock_check), contextlib.redirect_stdout(output):
+            self.assertEqual(codex_job.wait(base, "race", 5), 0)
+        return output.getvalue().strip()
+
+    def test_a_job_that_finishes_during_the_lock_check_is_reported_done(self):
+        self.assertEqual(self.wait_output(True), "done exit=0")
+
+    def test_a_job_that_never_ran_is_still_reported_as_not_running(self):
+        self.assertEqual(self.wait_output(False), "done exit=none (the job is not running)")
+
+
+class ProcessGroupStopTests(unittest.TestCase):
+    """Darwin's killpg skips zombies and reports EPERM when a still-existing group has nothing else to signal
+    (apple-oss-distributions/xnu xnu-12377.121.6, bsd/kern/kern_sig.c, killpg1); Linux signals a zombie silently. The
+    2026-09-30 macOS full-suite job on this branch failed every watchdog test whose group died at TERM with exit 2
+    "refused" (the uncaught PermissionError from the SIGKILL after the grace period). Synthetic fixture: os.killpg is
+    patched to answer EPERM once the group holds only exited members; the macOS job on the fixed head is the real
+    observation."""
+
+    def child(self) -> subprocess.Popen:
+        process = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"], start_new_session=True,
+                                   stdin=subprocess.DEVNULL)
+        self.addCleanup(lambda: (process.kill(), process.wait()) if process.poll() is None else None)
+        return process
+
+    @staticmethod
+    def darwin_killpg(real):
+        def killpg(pgid, signum):
+            if signum == signal.SIGTERM:
+                return real(pgid, signum)
+            raise PermissionError(errno.EPERM, "Operation not permitted")  # signal 0 or SIGKILL: only zombies left
+        return killpg
+
+    def test_stop_group_completes_when_darwin_reports_eperm_for_the_dead_group(self):
+        process = self.child()
+        with mock.patch.object(codex_job.os, "killpg", side_effect=self.darwin_killpg(os.killpg)):
+            codex_job.stop_group(process, 0.1)
+        self.assertEqual(process.returncode, -signal.SIGTERM)
+
+    def test_stop_group_still_kills_a_group_that_survives_term(self):
+        process = self.child()
+        real = os.killpg
+        calls = []
+
+        def killpg(pgid, signum):
+            calls.append(signum)
+            if signum == signal.SIGTERM:
+                return None  # a member ignores TERM: the group stays alive until KILL
+            return real(pgid, signum)
+        with mock.patch.object(codex_job.os, "killpg", side_effect=killpg):
+            codex_job.stop_group(process, 0.2)
+        self.assertEqual((process.returncode, calls[0], calls[-1]), (-signal.SIGKILL, signal.SIGTERM, signal.SIGKILL))
+
+    def test_group_alive_treats_esrch_and_darwin_eperm_as_stopped(self):
+        for error in (ProcessLookupError(errno.ESRCH, "No such process"),
+                      PermissionError(errno.EPERM, "Operation not permitted")):
+            with self.subTest(error=type(error).__name__), \
+                    mock.patch.object(codex_job.os, "killpg", side_effect=error):
+                self.assertFalse(codex_job.group_alive(2 ** 22 + 1))
+        with mock.patch.object(codex_job.os, "killpg", return_value=None):
+            self.assertTrue(codex_job.group_alive(2 ** 22 + 1))
 
 
 class OmniRouteLaneRunnerTests(RunnerCase):
@@ -1123,7 +1890,8 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
         self.assertEqual(self.record()["argv"], [
-            "exec", "-p", "stack-worker", "--skip-git-repo-check", "-s", "read-only",
+            "exec", "-p", "stack-worker",
+            "--skip-git-repo-check", "-s", "read-only",
             "-m", "cx/gpt-6-astra", "-c", 'model_reasoning_effort="max"', "-c", 'web_search="live"',
             "--output-schema", str(directory / "schema.json"), "-o", str(directory / "last.json"), "--json",
             "Reply in JSON."])
@@ -1132,11 +1900,25 @@ class OmniRouteLaneRunnerTests(RunnerCase):
         self.assertEqual((result["status"], result["exit"], result["model"]), ("done", 0, "cx/gpt-6-astra"))
         self.assertEqual(json.loads((directory / "inputs.json").read_text())["provider"], "omniroute")
 
+    def test_lane_overrides_profile_effort_and_web_search_from_staged_settings(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())
+        staged["codex"].update(model="cx/gpt-6.1-sol", effort="ultra", web_search="disabled")
+        write_json(self.work / "staged.json", staged)
+        self.env["OMNIROUTE_API_KEY"] = "fixture-not-a-key"
+        result = self.job("worker", last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["effort"], result["web_search"]), (0, "ultra", "disabled"))
+        for override in ('model_reasoning_effort="ultra"', 'web_search="disabled"'):
+            self.assertIn(override, self.record()["argv"])
+        self.assertNotIn("features.unbounded_connection_retries=false", self.record()["argv"])
+        self.assertEqual(result["inputs"]["effort"], "ultra")
+
     def test_lane_without_its_key_never_starts_codex(self):
         self.lane()
         self.env.pop("OMNIROUTE_API_KEY", None)
         result = self.job("gpt6-probe", last=LAST, events=[COMPLETED])
         self.assertEqual(result["exit"], codex_job.EXIT_NO_KEY)
+        self.assertEqual(result["failure"]["kind"], "no_key")
         self.assertIn("OMNIROUTE_API_KEY is not set", result["stderr_tail"])
         self.assertFalse((self.bin / "record.json").exists())  # the fake codex never ran
 
@@ -1238,6 +2020,245 @@ class OmniRouteLaneRunnerTests(RunnerCase):
 
 
 class RunnerTests(RunnerCase):
+    def bound_job(self, name="snapshot"):
+        directory = self.work / "gpt6" / name
+        directory.mkdir(parents=True, exist_ok=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6-astra"))
+        return directory
+
+    def test_invalid_restage_through_start_and_run_records_inputs_changed(self):
+        for command in ("start", "run"):
+            with self.subTest(command=command):
+                directory = self.bound_job(command)
+                bound = (directory / "inputs.json").read_bytes()
+                self.settings({"effort": "invalid"})
+                self.fake(last=LAST, events=[COMPLETED])
+                args = (command, command, self.prompt, self.schema) if command == "start" else (command, command)
+                refused = self.call(*args)
+                self.assertEqual(refused.returncode, 2, refused.stdout + refused.stderr)
+                self.assertFalse((self.bin / "record.json").exists())
+                self.assertEqual((directory / "inputs.json").read_bytes(), bound)
+                self.assertEqual((directory / "exit").read_text().strip(), "2")
+                self.assertTrue((directory / "done").exists())
+                result = json.loads(self.call("result", command).stdout)
+                self.assertEqual((result["status"], result["failure"]["kind"]), ("failed", "inputs_changed"))
+                self.assertEqual(self.call("wait", command, "0").stdout.strip(), "done exit=2")
+
+    def test_start_records_invalid_restage_in_its_detached_runner(self):
+        self.fake(last=LAST, events=[COMPLETED])
+
+        def launch(argv, **kwargs):
+            # Restaging between start's binding and the child reading settings is deterministic here.
+            self.settings({"effort": "invalid"})
+            inherited = os.dup(kwargs["pass_fds"][0])
+            with mock.patch.dict(os.environ, {**kwargs["env"], "SWEEP_JOB_LOCK_FD": str(inherited)}):
+                self.assertEqual(codex_job.run(self.work, "start-race"), 2)
+            return mock.Mock()
+
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch):
+            self.assertEqual(codex_job.start(self.work, "start-race", str(self.prompt), str(self.schema)), 0)
+        self.assertFalse((self.bin / "record.json").exists())
+        directory = self.work / "gpt6" / "start-race"
+        self.assertTrue((directory / "done").exists())
+        self.assertEqual((directory / "exit").read_text().strip(), "2")
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "inputs_changed")
+
+    def test_ultra_defaults_and_idle_refusal_precede_state_changes(self):
+        write_json(self.work / "staged.json", {"codex": {"model": "gpt-6.1-sol", "effort": "ultra"}})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"], config["request_effort"]),
+                         (4200, 14400, "xhigh"))
+        self.settings({"effort": "ultra", "idle_timeout_s": 4800, "timeout_s": 18000})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (4800, 18000))
+        for idle in (1, 1800, 3599, 3600):
+            with self.subTest(idle=idle):
+                self.settings({"effort": "ultra", "idle_timeout_s": idle})
+                refused = self.call("start", "ultra-refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("above 3600 s", refused.stderr)
+                self.assertFalse((self.work / "gpt6").exists())
+
+    def test_catalog_request_effort_mapping_and_primary_thread_usage(self):
+        self.assertEqual(set(codex_job.MODEL_MULTI_AGENT_EFFORTS), set(codex_job.MODEL_EFFORTS))
+        for model, expected in (("gpt-6-astra", "xhigh"), ("cx/gpt-6.1-sol-extra", "xhigh"),
+                                ("gpt-6-sol", "max"), ("gpt-daybreak-blue-latest", "max")):
+            with self.subTest(model=model):
+                self.assertEqual(codex_job.job_inputs(b"p", b"s", model, effort="ultra")["request_effort"], expected)
+        collab = {"type": "item.completed", "item": {"type": "collab_tool_call", "tool": "spawn_agent"}}
+        result = self.job("delegated-max", last=LAST, events=[collab, COMPLETED])
+        self.assertEqual((result["usage"], result["usage_status"]), (COMPLETED["usage"], "primary_thread_only"))
+        self.prompt.write_text("Another claim.")
+        self.fake(last=LAST, events=[COMPLETED])
+        self.assertEqual(self.call("start", "delegated-max", self.prompt, self.schema).returncode, 0)
+        self.assertEqual(self.call("wait", "delegated-max", "20").stdout.strip(), "done exit=0")
+        result = json.loads(self.call("result", "delegated-max").stdout)
+        self.assertEqual(result["usage_status"], "reported")
+        self.assertEqual(result["attempts"][0]["usage_status"], "primary_thread_only")
+
+    def test_completion_grace_allows_final_output_after_the_deadline(self):
+        self.settings({"timeout_s": 0.3, "idle_timeout_s": 10, "kill_grace_s": 0.8})
+        result = self.job("completed-grace", events=[COMPLETED], output_delay_s=0.5, last=LAST)
+        self.assertEqual((result["status"], result["exit"]), ("done", 0))
+        self.assertEqual(json.loads(result["output_text"]), LAST)
+        self.assertIsNone(result["failure"])
+
+    def test_completion_grace_is_bounded(self):
+        self.settings({"timeout_s": 0.3, "idle_timeout_s": 10, "kill_grace_s": 0.1})
+        result = self.job("completed-stuck", events=[COMPLETED], output_delay_s=60, last=LAST)
+        self.assertEqual((result["exit"], result["failure"]["kind"]), (124, "timeout"))
+
+    def test_refusal_paths_write_terminal_failure_receipts(self):
+        bad_schema = self.bin / "bad-schema.json"
+        bad_schema.write_text("not JSON")
+        large_prompt = self.bin / "large.txt"
+        large_prompt.write_text("x" * (codex_job.MAX_PROMPT_BYTES + 1))
+        for name, prompt, schema in (("bad-schema", self.prompt, bad_schema),
+                                     ("large-prompt", large_prompt, self.schema)):
+            with self.subTest(name=name):
+                self.assertEqual(self.call("start", name, prompt, schema).returncode, 2)
+                directory = self.work / "gpt6" / name
+                self.assertTrue((directory / "done").exists())
+                failure = json.loads((directory / "failure.json").read_text())
+                self.assertEqual((failure["kind"], failure["exit"]), ("refused", 2))
+        directory = self.bound_job("slot-limit")
+        (self.work / "LIMIT").write_text("quota reached\n")
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job, "acquire_slot", return_value=(None, None)):
+            self.assertEqual(codex_job.run(self.work, "slot-limit"), 3)
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "limit")
+        self.assertTrue((directory / "done").exists())
+
+    def test_supervisor_launch_refusal_writes_terminal_failure_receipt(self):
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.subprocess, "Popen", side_effect=OSError("launch refused")):
+            self.assertEqual(codex_job.start(self.work, "launch-refused", str(self.prompt), str(self.schema)), 2)
+        directory = self.work / "gpt6" / "launch-refused"
+        self.assertTrue((directory / "done").exists())
+        self.assertEqual((directory / "exit").read_text().strip(), "2")
+        self.assertEqual(json.loads((directory / "failure.json").read_text())["kind"], "refused")
+
+    def test_zero_exit_requires_a_completed_turn_and_nonempty_output(self):
+        cases = [("no-evidence", {}), ("no-turn", {"last": LAST}), ("no-output", {"events": [COMPLETED]}),
+                 ("empty-output", {"events": [COMPLETED], "last_text": ""}),
+                 ("blank-output", {"events": [COMPLETED], "last_text": " \n"})]
+        for name, config in cases:
+            with self.subTest(name=name):
+                result = self.job(name, **config)
+                self.assertEqual((result["status"], result["exit"]), ("failed", 126))
+                self.assertEqual(result["failure"]["kind"], "incomplete")
+                self.assertFalse(result["failure"]["retryable"])
+                self.assertFalse(result["limit_marker"])
+                recovered = self.job(name, last=LAST, events=[COMPLETED])
+                self.assertEqual((recovered["status"], recovered["exit"]), ("done", 0))
+                self.assertEqual(recovered["attempts"][0]["exit"], 126)
+                self.assertEqual(recovered["attempts"][0]["failure"]["kind"], "incomplete")
+
+    def test_legacy_false_success_is_reported_and_reruns_with_the_same_inputs(self):
+        for name, config in (("no-turn", {"last": LAST}), ("no-output", {"events": [COMPLETED]}),
+                             ("empty-output", {"events": [COMPLETED], "last_text": ""})):
+            with self.subTest(name=name):
+                self.job(name, **config)
+                directory = self.work / "gpt6" / name
+                (directory / "exit").write_text("0\n", encoding="utf-8")
+                (directory / "failure.json").unlink(missing_ok=True)
+                before = json.loads(self.call("result", name).stdout)
+                self.assertEqual((before["status"], before["exit"], before["failure"]["kind"]),
+                                 ("failed", 126, "incomplete"))
+                self.assertEqual(self.call("wait", name, "0").stdout.strip(), "done exit=126")
+                recovered = self.job(name, last=LAST, events=[COMPLETED])
+                self.assertEqual(recovered["exit"], 0)
+                self.assertEqual(recovered["attempts"][0]["failure"]["kind"], "incomplete")
+                # Historical files stay unchanged even when their summary rejects the old success claim.
+                self.assertEqual((directory / "attempts" / "1" / "exit").read_text(), "0\n")
+
+    def test_nonzero_exit_is_a_failure_even_with_completed_turn_and_output(self):
+        result = self.job("failed-turn", exit=1, last=LAST, events=[COMPLETED])
+        self.assertEqual((result["status"], result["exit"], result["failure"]["kind"]), ("failed", 1, "exit"))
+
+    def test_effort_is_staged_bound_to_inputs_and_recorded_for_the_attempt(self):
+        self.settings({"model": "gpt-6.1-sol"})
+        first = self.job("worker", last=LAST, events=[COMPLETED])
+        self.assertEqual(first["effort"], "max")
+        self.assertEqual((first["request_effort"], first["inputs"]["request_effort"]), ("max", "max"))
+        self.settings({"model": "gpt-6.1-sol", "effort": "ultra"})
+        self.fake(last=LAST, events=[COMPLETED])
+        started = self.call("start", "worker", self.prompt, self.schema)
+        self.assertIn("inputs changed", started.stdout)
+        self.assertIn("started worker", started.stdout)
+        self.assertTrue(self.call("wait", "worker", "20").stdout.startswith("done exit=0"))
+        result = json.loads(self.call("result", "worker").stdout)
+        self.assertIn('model_reasoning_effort="ultra"', self.record()["argv"])
+        self.assertEqual((result["effort"], result["inputs"]["effort"]), ("ultra", "ultra"))
+        self.assertEqual((result["request_effort"], result["inputs"]["request_effort"]), ("xhigh", "xhigh"))
+        self.assertEqual((result["usage"], result["usage_status"]), (COMPLETED["usage"], "primary_thread_only"))
+        self.assertEqual(result["attempts"][0]["inputs"]["effort"], "max")
+        self.assertEqual(self.call("start", "worker", self.prompt, self.schema).stdout.strip(), "already done: worker")
+        self.settings({"model": "gpt-6.1-sol", "effort": "max"})
+        self.assertEqual(json.loads(self.call("result", "worker").stdout)["effort"], "ultra")
+
+    def test_a_model_outside_the_catalog_takes_every_effort_but_ultra(self):
+        # Codex sends a non-ultra effort unchanged for fallback metadata; ultra alone would resolve to medium.
+        self.settings({"model": "unknown-model", "effort": "max"})
+        result = self.job("outside", last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["effort"]), (0, "max"))
+        self.assertIn('model_reasoning_effort="max"', self.record()["argv"])
+
+    def test_settings_changed_between_binding_and_launch_are_refused(self):
+        directory = self.work / "gpt6" / "snapshot"
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6.1-sol"))
+        self.settings({"model": "gpt-6.1-sol", "effort": "ultra", "web_search": "disabled"})
+        self.fake(last=LAST, events=[COMPLETED])
+        launched = self.call("run", "snapshot")
+        self.assertEqual(launched.returncode, 2)
+        self.assertFalse((self.bin / "record.json").exists())  # no Codex invocation under a different identity
+        result = json.loads(self.call("result", "snapshot").stdout)
+        self.assertEqual((result["status"], result["failure"]["kind"]), ("failed", "inputs_changed"))
+        self.assertEqual((result["effort"], result["web_search"]), ("max", "live"))
+
+    def test_unsupported_effort_and_web_search_are_refused_before_state_changes(self):
+        cases = [("gpt-6.1-sol", "unknown"), ("gpt-6.1-sol", "none"), ("gpt-6.1-sol", "minimal"),
+                 ("gpt-6.1-sol", "persistent"), ("gpt-6.1-sol", None), ("gpt-6.1-sol", True),
+                 ("gpt-6-luna", "ultra"), ("cx/gpt-6-luna", "ultra"), ("gpt-5.5", "max"),
+                 ("codex-auto-review", "ultra"), ("unknown-model", "ultra"), ("cx/unknown-model", "ultra")]
+        for model, effort in cases:
+            with self.subTest(model=model, effort=effort):
+                self.settings({"model": model, "effort": effort})
+                refused = self.call("start", "refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("codex.effort", refused.stderr)
+                self.assertFalse((self.work / "gpt6" / "refused").exists())
+        for mode in ("unknown", None, True):
+            with self.subTest(web_search=mode):
+                self.settings({"web_search": mode})
+                refused = self.call("start", "refused", self.prompt, self.schema)
+                self.assertEqual(refused.returncode, 2)
+                self.assertIn("codex.web_search", refused.stderr)
+                self.assertFalse((self.work / "gpt6" / "refused").exists())
+
+    def test_web_search_modes_are_staged_bound_and_recorded(self):
+        first = self.job("search", last=LAST, events=[COMPLETED])
+        self.assertEqual(first["web_search"], "live")
+        for mode in ("disabled", "cached", "indexed", "live"):
+            with self.subTest(mode=mode):
+                self.settings({"web_search": mode})
+                self.fake(last=LAST, events=[COMPLETED])
+                started = self.call("start", "search", self.prompt, self.schema)
+                self.assertIn("started search", started.stdout, self.diagnose("search", started))
+                waited = self.call("wait", "search", "20")
+                self.assertTrue(waited.stdout.startswith("done exit=0"), self.diagnose("search", waited))
+                result = json.loads(self.call("result", "search").stdout)
+                self.assertEqual(result["web_search"], mode)
+                self.assertIn(f'web_search="{mode}"', self.record()["argv"])
+        self.settings({"web_search": "disabled"})
+        self.assertEqual(json.loads(self.call("result", "search").stdout)["web_search"], "live")
+
     def test_codex_command_line_stdin_and_directory(self):
         result = self.job("gpt6-probe", last=LAST, events=[{"type": "thread.started", "thread_id": "fixture"}, COMPLETED])
         directory = self.work / "gpt6" / "gpt6-probe"
@@ -1281,8 +2302,9 @@ class RunnerTests(RunnerCase):
         refused = self.call("start", "gpt6-fit-beta", self.prompt, self.schema)
         self.assertEqual(refused.returncode, 3)
         self.assertIn("LIMIT marker present; refusing to start gpt6-fit-beta", refused.stdout)
-        self.assertEqual(self.call("wait", "gpt6-fit-beta", "5").stdout.strip(), "done exit=none (the job is not running)")
-        self.assertEqual(json.loads(self.call("result", "gpt6-fit-beta").stdout)["status"], "not_running")
+        self.assertEqual(self.call("wait", "gpt6-fit-beta", "5").stdout.strip(), "done exit=3")
+        refused_result = json.loads(self.call("result", "gpt6-fit-beta").stdout)
+        self.assertEqual((refused_result["status"], refused_result["failure"]["kind"]), ("failed", "limit"))
 
     def test_usage_limit_in_json_error_events_sets_the_marker(self):
         # codex exec --json prints fatal errors on stdout as `error` and `turn.failed` events (rust-v0.155.1).
@@ -1371,7 +2393,7 @@ class RunnerTests(RunnerCase):
         refused = self.call("start", "gpt6-fit-alpha", self.prompt, self.schema)
         self.assertEqual(refused.returncode, 3)
         stale = json.loads(self.call("result", "gpt6-fit-alpha").stdout)
-        self.assertEqual((stale["status"], stale["exit"], stale["output_text"]), ("not_running", None, None))
+        self.assertEqual((stale["status"], stale["exit"], stale["output_text"]), ("failed", 3, None))
         self.assertEqual([a["exit"] for a in stale["attempts"]], [0, 0])
         (self.work / "LIMIT").unlink()
         self.settings({"model": "gpt-6-sol"})  # a different model is a different claim too
@@ -1380,7 +2402,7 @@ class RunnerTests(RunnerCase):
         self.assertEqual(log.read_text().count("start"), 3)
 
     def test_a_running_job_is_not_started_twice(self):
-        self.fake(last=LAST, sleep=2)
+        self.fake(last=LAST, sleep=2, events=[COMPLETED])
         self.assertEqual(self.call("start", "gpt6-slow", self.prompt, self.schema).returncode, 0)
         again = self.call("start", "gpt6-slow", self.prompt, self.schema)
         self.assertEqual(again.stdout.strip(), "already running: gpt6-slow")
@@ -1395,7 +2417,7 @@ class RunnerTests(RunnerCase):
     def test_slots_bound_concurrent_codex_processes(self):
         self.settings({"slots": 1})
         log = self.bin / "slots.log"
-        self.fake(last=LAST, sleep=0.6, log=str(log))
+        self.fake(last=LAST, sleep=0.6, log=str(log), events=[COMPLETED])
         for name in ("gpt6-a", "gpt6-b"):
             self.assertEqual(self.call("start", name, self.prompt, self.schema).returncode, 0)
         for name in ("gpt6-a", "gpt6-b"):
@@ -1440,6 +2462,7 @@ class RunnerTests(RunnerCase):
         done = run(["bash", HARNESS / "codex_call.sh", "--work-dir", self.work, "start", "gpt6-x", self.prompt,
                     self.schema], env=env)
         self.assertEqual(done.returncode, 127)
+        self.assertEqual(json.loads(self.call("result", "gpt6-x").stdout)["failure"]["kind"], "no_codex")
         self.assertIn("codex is not on PATH", done.stdout)
         self.assertEqual(self.call("wait", "gpt6-x", "5").stdout.strip(), "done exit=127")
         self.assertEqual(self.call("start", "../escape", self.prompt, self.schema).returncode, 2)
@@ -1523,6 +2546,288 @@ def quota_answer(used, reached=None):
             "rateLimitResetCredits": {"availableCount": 1, "credits": None}, "accountId": "acct-fixture"}
 
 
+
+class RecoveryRunnerTests(RunnerCase):
+    CAPACITY = "Selected model is at capacity. Please try a different model."
+
+    def setUp(self):
+        super().setUp()
+        self.settings({"idle_timeout_s": 0.6, "timeout_s": 400, "kill_grace_s": 0.1,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.03})
+
+    def capacity_events(self):
+        return [{"type": "error", "message": self.CAPACITY},
+                {"type": "turn.failed", "error": {"message": self.CAPACITY}}]
+
+    def simulated_run(self, name, *, limit_during_backoff=False, quota_probe=None, version_delay_s=0,
+                      retry_probe_delay_s=0, backoff_overrun_s=0):
+        """Exercise real supervisor/watchdog deadlines with a virtual clock and no model process."""
+        directory = self.work / "gpt6" / name
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6-astra"))
+        clock, starts = [0.0], []
+
+        class Process:
+            pid = 987654
+
+            def __init__(proc, argv, **kwargs):
+                starts.append(argv)
+                proc.returncode = 1 if len(starts) == 1 else None
+                if len(starts) == 1:
+                    kwargs["stdout"].write(("\n".join(json.dumps(e) for e in self.capacity_events()) + "\n").encode())
+                    kwargs["stdout"].flush()
+
+            def poll(proc):
+                return proc.returncode
+
+            def wait(proc, timeout=None):
+                if proc.returncode is not None:
+                    return proc.returncode
+                clock[0] += timeout
+                raise subprocess.TimeoutExpired("fixture", timeout)
+
+        def sleep(seconds):
+            clock[0] += seconds + backoff_overrun_s
+            if limit_during_backoff:
+                (self.work / "LIMIT").write_text("another job reached quota\n")
+
+        def version(codex):
+            clock[0] += version_delay_s
+            return "codex-cli fixture"
+
+        def probe(base, directory, config):
+            if len(starts) == 1:
+                clock[0] += retry_probe_delay_s
+            return quota_probe(base, directory, config) if quota_probe else None
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.subprocess, "Popen", Process), \
+                mock.patch.object(codex_job, "codex_version", side_effect=version), \
+                mock.patch.object(codex_job, "quota_gate", side_effect=probe), \
+                mock.patch.object(codex_job.time, "monotonic", side_effect=lambda: clock[0]), \
+                mock.patch.object(codex_job.time, "sleep", side_effect=sleep), \
+                mock.patch.object(codex_job, "stop_group"):
+            code = codex_job.run(self.work, name)
+        return code, codex_job.result(self.work, name), starts, clock[0]
+
+    def test_second_attempt_hits_the_shared_deadline(self):
+        self.settings({"timeout_s": 301, "idle_timeout_s": 1000, "kill_grace_s": 0.1,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        code, result, starts, elapsed = self.simulated_run("shared-deadline")
+        self.assertEqual((code, len(starts), elapsed), (124, 2, 301))
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["capacity"])
+        self.assertEqual(result["failure"]["kind"], "timeout")
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_version_check_spends_the_shared_budget(self):
+        self.settings({"timeout_s": 400, "idle_timeout_s": 1000, "capacity_backoff_s": 0.02,
+                       "capacity_backoff_max_s": 0.02})
+        code, result, starts, elapsed = self.simulated_run("version-budget", version_delay_s=101)
+        self.assertEqual((code, len(starts), elapsed), (1, 1, 101))
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_retry_probe_spending_the_reserve_keeps_original_failure(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        for delay in (101, 401):
+            with self.subTest(probe_delay=delay):
+                code, result, starts, _ = self.simulated_run(f"probe-reserve-{delay}", retry_probe_delay_s=delay)
+                self.assertEqual((code, len(starts), result["failure"]["kind"]), (1, 1, "capacity"))
+                self.assertTrue(result["failure"]["retryable"])
+                self.assertFalse(result["failure"]["retrying"])
+
+    def test_backoff_oversleep_spending_the_reserve_keeps_original_failure(self):
+        self.settings({"timeout_s": 301, "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        code, result, starts, _ = self.simulated_run("oversleep", backoff_overrun_s=2)
+        self.assertEqual((code, len(starts), result["attempts"]), (1, 1, []))
+        self.assertEqual(result["failure"]["kind"], "capacity")
+        self.assertFalse(result["failure"]["retrying"])
+
+    def test_limit_during_backoff_records_a_refused_retry(self):
+        code, result, starts, _ = self.simulated_run("backoff-limit", limit_during_backoff=True)
+        self.assertEqual((code, len(starts), result["exit"]), (3, 1, 3))
+        self.assertEqual(result["failure"]["kind"], "limit")
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "capacity")
+        directory = self.work / "gpt6" / "backoff-limit"
+        self.assertEqual((directory / "exit").read_text().strip(), "3")
+        self.assertTrue((directory / "done").exists())
+
+    def test_every_attempt_gets_its_own_quota_probe_and_a_retry_can_be_gated(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = []
+
+        def probe(base, directory, config):
+            probes.append(len(probes) + 1)
+            gated = len(probes) == 2
+            write_json(directory / "quota.json", {"status": "gate" if gated else "ok", "probe": len(probes)})
+            return "retry quota reached" if gated else None
+
+        code, result, starts, _ = self.simulated_run("retry-quota", quota_probe=probe)
+        self.assertEqual((code, len(starts), probes), (3, 1, [1, 2]))
+        self.assertEqual(result["failure"]["kind"], "quota")
+        directory = self.work / "gpt6" / "retry-quota"
+        self.assertEqual(json.loads((directory / "attempts" / "1" / "quota.json").read_text()),
+                         {"status": "ok", "probe": 1})
+        self.assertEqual(json.loads((directory / "quota.json").read_text()), {"status": "gate", "probe": 2})
+
+    def test_real_quota_probe_runs_before_both_attempts(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = self.bin / "probes.log"
+        result = self.job("probe-twice", quota={"log": str(probes), "result": quota_answer(10)},
+                          attempts=[{"exit": 1, "events": self.capacity_events()},
+                                    {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual((result["exit"], probes.read_text().count("probe")), (0, 2))
+        self.assertEqual(result["quota"]["status"], "ok")
+        kept = self.work / "gpt6" / "probe-twice" / "attempts" / "1" / "quota.json"
+        self.assertEqual(json.loads(kept.read_text())["status"], "ok")
+
+    def test_limit_created_during_retry_probe_prevents_another_attempt(self):
+        self.settings({"timeout_s": 400, "quota_stop_percent": 95,
+                       "capacity_backoff_s": 0.02, "capacity_backoff_max_s": 0.02})
+        probes = []
+
+        def probe(base, directory, config):
+            probes.append(1)
+            if len(probes) == 2:
+                (base / "LIMIT").write_text("another job reached quota\n")
+
+        code, result, starts, _ = self.simulated_run("limit-probe", quota_probe=probe)
+        self.assertEqual((code, len(starts), result["failure"]["kind"]), (3, 1, "limit"))
+
+    def test_backoff_longer_than_remaining_budget_preserves_original_failure(self):
+        self.settings({"timeout_s": 30, "capacity_backoff_s": 60, "capacity_backoff_max_s": 60})
+        result = self.job("too-long", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+        self.assertEqual(result["failure"]["kind"], "capacity")
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertIsNone(result["failure"]["delay_s"])
+
+    def test_retry_floor_prevents_backoff_with_less_than_300_seconds_after_delay(self):
+        self.settings({"timeout_s": 300.1, "capacity_backoff_s": 1, "capacity_backoff_max_s": 1})
+        result = self.job("retry-floor", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_terminal_stderr_capacity_error_is_retryable(self):
+        result = self.job("stderr-capacity", attempts=[{"exit": 1, "stderr": "ERROR: " + self.CAPACITY + "\n"},
+                                                      {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "capacity")
+
+    def test_capacity_retries_once_for_duplicate_error_reports_and_retains_the_failure(self):
+        result = self.job("recover", attempts=[{"exit": 1, "events": self.capacity_events()},
+                                              {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual((result["exit"], result["limit_marker"]), (0, False))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        kept = self.work / "gpt6" / "recover" / "attempts" / "1"
+        self.assertEqual(json.loads((kept / "failure.json").read_text())["kind"], "capacity")
+        self.assertIn(self.CAPACITY, (kept / "events.jsonl").read_text())
+        self.assertEqual((kept / "inputs.json").read_bytes(), (kept.parent.parent / "inputs.json").read_bytes())
+        self.assertEqual((result["attempts"][0]["exit"], result["attempts"][0]["usage"]), (1, None))
+        self.assertEqual(json.loads(result["output_text"]), LAST)
+
+    def test_capacity_retry_budget_and_backoff_cap(self):
+        result = self.job("capacity", attempts=[{"exit": 1, "events": self.capacity_events()}])
+        self.assertEqual((result["exit"], result["limit_marker"]), (1, False))
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "3")
+        self.assertEqual([a["exit"] for a in result["attempts"]], [1, 1])
+        delays = [a["failure"]["delay_s"] for a in result["attempts"]]
+        self.assertTrue(0.02 * 0.9 <= delays[0] <= 0.02 * 1.1)
+        self.assertEqual(delays[1], 0.03)
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertTrue(all(a["usage_status"] == "unavailable" for a in result["attempts"]))
+
+    def test_limits_take_precedence_over_capacity(self):
+        for message in (LIMIT_TEXT, "exceeded retry limit, last status: 429 Too Many Requests"):
+            with self.subTest(message=message):
+                (self.work / "LIMIT").unlink(missing_ok=True)
+                result = self.job("limited", attempts=[{"exit": 1, "events":
+                    self.capacity_events() + [{"type": "error", "message": message}]}])
+                self.assertEqual((result["exit"], result["limit_marker"]), (3, True))
+                self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_quoted_capacity_and_stderr_trace_are_not_retryable(self):
+        result = self.job("quoted", exit=1,
+                          events=[{"type": "item.completed", "item": {"type": "web_search", "text": self.CAPACITY}}],
+                          stderr="2026-09-30 TRACE tool: " + self.CAPACITY + "\n")
+        self.assertEqual((result["exit"], result["attempts"]), (1, []))
+        self.assertFalse(result["failure"]["retryable"])
+
+    def test_idle_stops_the_group_retries_once_and_retains_both_failures(self):
+        pid_files = [self.bin / f"stubborn-{i}.pid" for i in (1, 2)]
+        result = self.job("silent", attempts=[{"sleep": 60, "stubborn": str(p)} for p in pid_files])
+        self.assertEqual(result["exit"], 125)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["idle"])
+        self.assertEqual(result["failure"]["kind"], "idle")
+        self.assertFalse(result["failure"]["retrying"])
+        self.assertFalse(result["limit_marker"])
+        deadline = time.monotonic() + 10
+        while time.monotonic() < deadline and any(process_alive(int(p.read_text())) for p in pid_files):
+            time.sleep(0.1)
+        self.assertTrue(all(not process_alive(int(p.read_text())) for p in pid_files))
+
+    def test_stderr_and_incomplete_json_are_not_progress(self):
+        ticks = [{"delay_s": 0.05, "raw": '{"type":"item.started"}', "stderr": "diagnostic\n"}] * 40
+        result = self.job("partial", attempts=[{"sleep": 60, "ticks": ticks}])
+        self.assertEqual(result["exit"], 125)
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+
+    def test_reconnect_error_events_are_not_progress(self):
+        ticks = [{"delay_s": 0.05, "event": {"type": "error", "message": "Reconnecting... 1/5"}}] * 40
+        result = self.job("reconnect", attempts=[{"sleep": 60, "ticks": ticks}])
+        self.assertEqual((result["exit"], result["failure"]["kind"]), (125, "idle"))
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+        directory = self.work / "gpt6" / "reconnect"
+        for path in (directory, directory / "attempts" / "1"):
+            self.assertLess(len(codex_job.events(path)), len(ticks))  # stopped while reconnects were still arriving
+        self.assertFalse(result["limit_marker"])
+
+    def test_default_budgets_clear_observed_healthy_silence_and_research_duration(self):
+        write_json(self.work / "staged.json", {"codex": {}})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (1800, 4000))
+        self.assertLess(config["timeout_s"] + config["quota_timeout_s"] + codex_job.QUOTA_BACKSTOP_S
+                        + 60 + 2 * config["kill_grace_s"], 8 * 540)
+        self.settings({"idle_timeout_s": 600, "timeout_s": 4000})
+        config = codex_job.settings(self.work)
+        self.assertEqual((config["idle_timeout_s"], config["timeout_s"]), (600, 4000))
+
+    def test_new_complete_events_keep_the_job_alive(self):
+        ticks = [{"delay_s": 0.1, "event": {"type": "item.updated", "item": {"id": "1", "type": "web_search"}}}] * 12
+        result = self.job("progress", ticks=ticks, last=LAST, events=[COMPLETED])
+        self.assertEqual((result["exit"], result["attempts"]), (0, []))
+
+    def test_idle_failure_can_recover(self):
+        result = self.job("idle-recover", attempts=[{"sleep": 60}, {"last": LAST, "events": [COMPLETED]}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual([a["exit"] for a in result["attempts"]], [125])
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "idle")
+
+    def test_total_timeout_remains_terminal(self):
+        self.settings({"timeout_s": 0.7, "idle_timeout_s": 5, "kill_grace_s": 0.1})
+        result = self.job("total-timeout", attempts=[{"sleep": 60}])
+        self.assertEqual((result["exit"], result["attempts"]), (124, []))
+        self.assertEqual(result["failure"]["kind"], "timeout")
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+
+    def test_watchdog_policy_requires_finite_positive_durations_and_bounded_retries(self):
+        for key, value in (("idle_timeout_s", 0), ("idle_timeout_s", float("nan")),
+                           ("capacity_backoff_s", float("inf")), ("capacity_max_retries", -1),
+                           ("capacity_max_retries", 11)):
+            self.settings({key: value})
+            with self.subTest(key=key, value=value), self.assertRaises(codex_job.UsageError):
+                codex_job.settings(self.work)
+
+
 class QuotaGateTests(RunnerCase):
     def test_the_gate_is_off_by_default(self):
         probes = self.bin / "probes.log"
@@ -1557,6 +2862,7 @@ class QuotaGateTests(RunnerCase):
         self.assertEqual((result["exit"], result["limit"], result["limit_marker"], result["started"]),
                          (3, False, True, None))
         self.assertFalse((self.bin / "record.json").exists())  # codex exec never started
+        self.assertEqual(result["failure"]["kind"], "quota")
         limit = (self.work / "LIMIT").read_text()
         self.assertTrue(limit.startswith("quota gate: primary window 96% used >= 95% (window 10080 min, resets "
                                          "2026-10-03T01:28Z); codex.quota_stop_percent 95; checked "), limit)
@@ -1647,7 +2953,7 @@ class ShellTests(RunnerCase):
     def test_staged_copy_needs_no_work_dir_argument(self):
         work = stage_work(self, ("alpha",))
         self.assertEqual(build(work).returncode, 0)
-        self.fake(last=LAST)
+        self.fake(last=LAST, events=[COMPLETED])
         write_json(work / "staged.json", {**json.loads((work / "staged.json").read_text()),
                                           "codex": {"wait_poll_s": 0.05, "slot_poll_s": 0.05}})
         env = dict(self.env, SWEEP_WORK_DIR=str(self.work))  # ignored: the staged copy uses its own directory

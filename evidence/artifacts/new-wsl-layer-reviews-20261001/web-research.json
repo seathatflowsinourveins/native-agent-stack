@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "effort": "max",
+    "family": "Codex"
+  },
+  "layer_id": "web-research",
+  "verdict": "corrected",
+  "c4": {
+    "independent_review_performed": true,
+    "no_unresolved_material_gap": false,
+    "remaining_gaps": [
+      "No frozen same-page comparison establishes browser interaction or attributable-source completeness across the now-relevant CLI challengers.",
+      "Search-target misses, arbitrary-site/session recovery and literature discovery quality remain unqualified."
+    ]
+  },
+  "selected_repositories": [
+    {
+      "component_id": "agent-browser",
+      "repository": "https://github.com/vercel-labs/agent-browser",
+      "pin_of_record": "0.38.1",
+      "pin_source": "manifests/stack.json:38; adoption/pins-linux-x86_64.json:219",
+      "source_pinned_url": "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/README.md",
+      "upstream_currency": "Latest v0.38.1 confirmed by releases/latest; installed --version exit 0 matches.",
+      "native_install": {
+        "command": "npm install --global agent-browser@0.38.1 && agent-browser install",
+        "source": "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/README.md",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "npm run test:launcher",
+        "source": "https://github.com/vercel-labs/agent-browser/blob/v0.38.1/package.json",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "openresearch",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "pin_of_record": "0.2.7 @ 24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "pin_source": "manifests/stack.json:650; adoption/pins-linux-x86_64.json:204 (orx)",
+      "source_pinned_url": "https://github.com/alphaXiv/OpenResearch/blob/v0.2.7/README.md",
+      "upstream_currency": "Latest v0.2.14: https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.14. Selected retrieval pin remains 0.2.7.",
+      "native_install": {
+        "command": "cargo install --git https://github.com/alphaXiv/OpenResearch --tag v0.2.7 --locked openresearch-cli",
+        "source": "https://github.com/alphaXiv/OpenResearch/blob/v0.2.7/Cargo.toml",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "cargo test --locked",
+        "source": "https://github.com/alphaXiv/OpenResearch/blob/v0.2.7/.github/workflows/ci.yml",
+        "evidence_class": "source_review"
+      }
+    },
+    {
+      "component_id": "tavily-cli",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "pin_of_record": "0.1.8",
+      "pin_source": "manifests/stack.json:1912; adoption/pins-linux-x86_64.json:189",
+      "source_pinned_url": "https://pypi.org/pypi/tavily-cli/0.1.8/json",
+      "upstream_currency": "PyPI latest 0.1.8; GitHub main pyproject.toml:7 says 0.1.9, not a published-package acceptance.",
+      "native_install": {
+        "command": "uv tool install tavily-cli==0.1.8",
+        "source": "tavily_cli-0.1.8/README.md:37 and pyproject.toml in the official digest-verified sdist",
+        "evidence_class": "source_review"
+      },
+      "native_acceptance": {
+        "command": "python -m pytest tests/test_cli.py",
+        "source": "tavily_cli-0.1.8/tests/test_cli.py; pyproject.toml dev extra supplies pytest",
+        "evidence_class": "source_review"
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Playwright CLI",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "verdict": "Record pin 0.1.21 plus alpha Playwright dependency; latest CLI 0.1.22 is unqualified. Conditional bounded interaction remains a relevant comparator.",
+      "sources": [
+        "https://github.com/microsoft/playwright-cli/blob/v0.1.22/README.md"
+      ]
+    },
+    {
+      "name": "Crawl4AI",
+      "repository": "https://github.com/unclecode/crawl4ai",
+      "verdict": "Relevant single-page CLI extraction challenger as well as bulk crawler. Its crwl Markdown route needs same-URL source/provenance/failed-extraction comparison.",
+      "sources": [
+        "https://github.com/unclecode/crawl4ai/blob/v0.9.4/README.md"
+      ]
+    },
+    {
+      "name": "Cua Driver",
+      "repository": "https://github.com/trycua/cua",
+      "verdict": "Source supports browser and native-app control. Keep conditional when an actual desktop surface is required; no WSL browser/source-retrieval acceptance exists here.",
+      "sources": [
+        "https://github.com/trycua/cua/blob/sandbox-v0.8.0/README.md"
+      ]
+    },
+    {
+      "name": "Firecrawl MCP",
+      "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+      "verdict": "Hosted/self-hosted extraction and search are source-reviewed alternatives; no matched extraction-quality, service/cost or rights qualification supports replacement.",
+      "sources": [
+        "https://github.com/firecrawl/firecrawl-mcp-server/blob/v3.2.1/README.md"
+      ]
+    },
+    {
+      "name": "Browser Use",
+      "repository": "https://github.com/browser-use/browser-use",
+      "verdict": "Relevant existing-agent CLI challenger, not categorically excluded by its agent SDK. Requires a bounded comparison and explicit local-daemon/cleanup accounting.",
+      "sources": [
+        "https://github.com/browser-use/browser-use/blob/0.13.10/browser_use/cli.py"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "catalogs/landscape/foundation.json:2486 excludes Browser Use as necessarily another standing agent stack.",
+      "correction": "0.13.10 README:163-175 offers CLI use for existing agents; cli.py:207-222 describes its local browser daemon. Separate the CLI/browser process from its optional LLM Agent SDK.",
+      "deciding_source": "https://github.com/browser-use/browser-use/blob/0.13.10/README.md#L163; https://github.com/browser-use/browser-use/blob/0.13.10/browser_use/cli.py#L207"
+    },
+    {
+      "claim": "catalogs/landscape/foundation.json:2453 frames Crawl4AI only as bulk ingestion for this selected-page requirement.",
+      "correction": "v0.9.4 README:119 documents a bounded single-URL crwl Markdown command. It is eligible for that extraction comparison, without adopting a bulk crawler.",
+      "deciding_source": "https://github.com/unclecode/crawl4ai/blob/v0.9.4/README.md#L119"
+    }
+  ],
+  "evidence_assessment": [
+    "Historical Tavily evidence remains three small searches, two extracts and one target-search miss recovered by known-URL extraction (evidence/receipts/native-tavily-session-20260920.json); source retrieval does not verify the sources' claims.",
+    "Browser/Playwright fixtures and two paper retrievals qualify their bounded operations only. The retained Playwright file-protocol failure/HTTP recovery stays visible; no broad browser superiority follows.",
+    "Official Tavily 0.1.8 sdist was read without installation: sha256 3b660c961e8bc93309964ccfc6982f3a17dcae15b59cc1e36924ccf4edfdec08. pyproject.toml:7 verifies 0.1.8; tests/test_cli.py is unchanged upstream source.",
+    "OpenResearch's newer lifecycle fixes reopen a source/isolated qualification wave, not automatic adoption of its standing orchestration features. All native commands below are prospective."
+  ],
+  "failed_access": [
+    {
+      "source": "tavily-ai/tavily-cli releases/latest and contents?ref=v0.1.8",
+      "result": "HTTP 404/exit 1. Repository exists; main declares 0.1.9, while published PyPI latest remains 0.1.8. Recovered from the official 0.1.8 sdist."
+    },
+    {
+      "source": "playwright-cli/orx installed help preflight",
+      "result": "Not found in this session's PATH; no capability-absence or new-host conclusion."
+    },
+    {
+      "source": "alphaXiv/OpenResearch v0.2.7 install.sh",
+      "result": "HTTP 404, exit 1; pinned Cargo.toml and native CI test path read instead."
+    }
+  ],
+  "omissions": [
+    "No authenticated account, browser profile, Tavily/provider API, downloaded browser or installed alternative used.",
+    "Search quality, citation correctness and daemon/session recovery were not re-executed."
+  ],
+  "next_wave": [
+    "Compare Browser Use CLI/agent-browser/Playwright on one frozen page task, and Crawl4AI/Tavily known-URL extraction on the same primary URL list. Keep daemon recovery, source spans and misses separate from task/provider cost."
+  ],
+  "reopen_on": [
+    "A source omission, unsupported page interaction, version-specific lifecycle failure or matched completeness/cost result reopens the choice."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

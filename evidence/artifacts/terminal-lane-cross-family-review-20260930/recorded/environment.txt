@@ -1,0 +1,4 @@
+Python 3.13.15
+tmux 3.4
+2.1.286 (Claude Code)
+66283fe81ee5f0e78c9354ccd62b4fd10f47c5b9

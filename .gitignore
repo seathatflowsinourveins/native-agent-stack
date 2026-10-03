@@ -20,6 +20,10 @@ node_modules/
 # Sanitized Codex --json event streams retained as receipt evidence (client configuration output withheld).
 !evidence/artifacts/codex-use-20260926-5/*.jsonl
 !evidence/artifacts/codex-use-20260926-6/*.jsonl
+# The model-server gates' per-run Codex event streams: the frozen pass rule is scored on them and both receipts
+# inventory them by hash.
+!evidence/artifacts/local-model-server-gate-20261001/runs/*/events.jsonl
+!evidence/artifacts/local-model-server-gate-confirmatory-20261001/runs/*/events.jsonl
 # Codex app-server hooks/list oracle answers behind scripts/adoption_status.py's Codex model (throwaway homes shown
 # as $BASE, no hash value): evidence/artifacts/adoption-status-truth-20260926/README.md.
 !evidence/artifacts/adoption-status-truth-20260926/*.jsonl

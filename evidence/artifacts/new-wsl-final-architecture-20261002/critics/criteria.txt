@@ -1,0 +1,9 @@
+Criteria, frozen before judging and applied the same way to every candidate:
+1. Capability fit: how fully the repository meets the layer's requirement as written.
+2. Public measured evidence: upstream benchmarks, published evaluations, upstream test suites and CI results. Cite each.
+3. Currency: releases and default-branch commits in the last 90 days.
+4. Maintenance health: a repository that is archived, or has no default-branch commit in the last 90 days, is stale; also note issue and release activity.
+5. Platform fit: Linux x86_64 under WSL2, and the RTX 4090 where the requirement needs a GPU; note macOS arm64 support.
+6. Install path: an upstream-documented install command for Linux.
+7. Agent-client integration where the requirement involves Claude Code or Codex (an MCP server, hooks, a CLI the agents call).
+Not evidence: stars, downloads, popularity, which project anyone currently uses or installed, and the order in which candidates are listed. License is information only.

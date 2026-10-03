@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "kind": "sdk-observation-cumulative-usage-correction",
+  "evidence_class": "local_integration_with_synthetic_replay",
+  "checked_on": "2026-09-30",
+  "status": "native_observation_path_verified",
+  "base_revision": "f5f7a517939b0561466defcf56ed772de9e1c96a",
+  "scope": "Repository Codex file-observation producer and logs/sdk_receipts Collector pipeline; isolated native Collector and Loki only. Other producers' native OTLP log and metric pipelines retain their token fields. No provider calls, deployed configuration changes, or historical Loki rewrites.",
+  "review_trigger": "Consequential token-accounting semantics and failure remaining after one bounded usage_scope-tag repair. Verify the correction against upstream source and a red-capable native pipeline test.",
+  "sources": [
+    {
+      "repository": "openai/codex",
+      "ref": "rust-v0.159.2",
+      "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "paths": [
+        "sdk/python/src/openai_codex/_run.py",
+        "sdk/python/src/openai_codex/generated/v2_all.py",
+        "codex-rs/protocol/src/protocol.rs"
+      ],
+      "findings": "The SDK returns the latest ThreadTokenUsage notification unchanged. ThreadTokenUsage has total and last. TokenUsageInfo::append_last_usage adds the latest request to total_token_usage and replaces last_token_usage; last is not a whole-turn delta.",
+      "release_checked": "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "ref": "v0.161.0",
+      "paths": [
+        "processor/transformprocessor/README.md",
+        "pkg/ottl/ottlfuncs/func_delete_matching_keys.go",
+        "exporter/fileexporter/README.md"
+      ],
+      "findings": "Reuse the existing native file receiver and transformation pipeline. delete_matching_keys removes numeric SDK usage attributes before the shared privacy allowlist and Loki export.",
+      "installed_version_output": "otelcol-contrib version 0.161.0",
+      "release_checked": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+      "relevant_release_change": "ottl.set.allowNil is enabled by default; the correction deletes fields explicitly instead of depending on nil assignment behavior."
+    },
+    {
+      "repository": "grafana/loki",
+      "ref": "v3.7.8",
+      "installed_revision": "09e6ce2f",
+      "local_reference": "tests/test_observability_run_correlation.py",
+      "contract": "Reuse the existing isolated native Loki fixture and its HTTP query API; evaluate the exact query loaded from dashboard panel 20."
+    },
+    {
+      "url": "https://pypi.org/pypi/PyYAML/6.0.3/json",
+      "version": "6.0.3",
+      "use": "Optional isolated test dependency through uv run --no-project --with; no repository runtime dependency or shared prefix change."
+    }
+  ],
+  "proven_mistake": {
+    "anti_pattern": "Adding a usage_scope field without following the observation through its collector and aggregate",
+    "prior_repair": "The earlier bounded repair labeled observations native_thread_cumulative, but the Collector still promoted usage.total into additive token attributes and its privacy allowlist removed usage_scope.",
+    "native_reproduction": "The actual SDK observation helper published start and resume snapshots with distinct observation IDs. The actual Collector file receiver and repository processors sent them to isolated Loki. Dashboard panel 20 returned 78331, equal to 26045 + 52286, even though 52286 already included 26045.",
+    "correction": "Keep native cumulative counters unchanged in private Codex SDK results. Published observations preserve native usage scope and availability but have usage=null. The Collector retains usage_scope and removes numeric token attributes only in the Codex logs/sdk_receipts file pipeline, including legacy and prefilled fields. Native OTLP logs and metrics do not run this processor. No preceding baseline, last-request substitution, custom token ledger, or new additive scope is invented.",
+    "native_qualification_impact": "The earlier tool-start and tool-resume provider executions reported observation_status=not_configured. This bug does not invalidate those executions or their final cumulative total of 52286.",
+    "acceptance": "The red-capable native pipeline test now returns an empty dashboard result for cumulative, replayed, unavailable, and unbaselined legacy observations. Empty is preserved as unavailable additive usage, not zero."
+  },
+  "pipeline_scope_verification": {
+    "configured_boundary": "transform/sdk_receipt is referenced only by logs/sdk_receipts, whose sole receiver is file_log/sdk_receipts over sdk-receipts/*.json. The template assigns this lane service.name=codex-sdk-receipt. The separate logs and metrics OTLP pipelines never invoke transform/sdk_receipt.",
+    "native_publishers_found": [
+      "blueprints/us-equities/workers/native_worker.py::write_observation",
+      "blueprints/us-equities/research-runtime/run_worker.py delegates its Codex role to native_worker.py with --observation-dir"
+    ],
+    "other_spool_writers": "The repository privacy-canary and spool outage/recovery scripts construct synthetic Codex-shaped receipt fixtures; they are not independent native additive producers.",
+    "source_review": [
+      "observability/collector/collector.yaml receivers, processors, and service.pipelines",
+      "observability/receipt.json sdk_receipt_lane",
+      "observability/README.md native Claude and SDK receipt paths",
+      "blueprints/gap-wave2-20260923/foundation__observation-inference/privacy_canary.py",
+      "tests/test_observability_tool_names.py::CollectorProfileTests.test_names_are_extracted_before_the_privacy_allowlist_on_both_log_pipelines"
+    ],
+    "unsupported_assumption_avoided": "No supported additive non-Codex file-receipt producer or schema was found in these repository paths. Introducing a new trusted usage_scope value to permit arbitrary spool counters would invent an accounting contract. Cumulative and unscoped legacy Codex receipts therefore remain excluded; other native producers retain their supported OTLP paths.",
+    "native_positive_control": "The existing local Collector/Loki correlation test sends Claude api_request records through the separate native OTLP logs pipeline. Its actual Loki query asserts input-token sums of 100 and 200 for two workflow IDs, with source token metadata, cost and tool joins retained. It passed after the Codex spool correction."
+  },
+  "fixture": {
+    "authorship": "Locally authored synthetic integration fixture using numeric allowlists from the already published native qualification receipt; no private thread IDs or native conversation content are consumed.",
+    "source_receipt": "evidence/artifacts/runtime-sdk-20260930/receipt.json",
+    "snapshots": [26045, 52286],
+    "last_request_control": 1,
+    "pipeline": "write_observation -> file_log/sdk_receipts -> exact repository processors -> native Loki -> exact dashboard panel-20 query",
+    "query": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [5m])))",
+    "records_observed": 8,
+    "cases": [
+      "Cumulative start and resume under different observation IDs",
+      "Same-ID replay reserialized for a different native file fingerprint",
+      "Republished cumulative result under a new observation ID",
+      "Unavailable usage after failure",
+      "Legacy totals and prefilled additive fields with absent scope, unknown scope, or cumulative scope"
+    ],
+    "independent_surface": "The test also inspects actual Collector file-exported records after the full transform/privacy pipeline. It asserts eight records, no additive token fields, retained scope/status through Loki metadata, content omission, and no synthetic private marker.",
+    "limitations": "This is not unchanged upstream acceptance, a new model run, a provider usage reconciliation, or a deployment test. The native integration test skips explicitly when its optional binaries or PyYAML are absent."
+  },
+  "checks": [
+    {
+      "phase": "red_before_production_fix",
+      "command": "rtk uv run --no-project --with PyYAML==6.0.3 python -m unittest tests.test_sdk_usage_scope -v",
+      "exit_code": 1,
+      "returned_output_excerpt": "{\"dashboard_result\": [{\"metric\": {}, \"value\": [1790753822.753, \"78331\"]}], \"stage\": \"start_and_resume\"}\nAssertionError: Lists differ: [{'metric': {}, 'value': [1790753822.753, '78331']}] != []\nRan 1 test in 18.992s\nFAILED (failures=1)",
+      "expected_failure": true
+    },
+    {
+      "phase": "green_native_pipeline_and_producer",
+      "command": "rtk uv run --no-project --with PyYAML==6.0.3 python -m unittest tests.test_sdk_usage_scope tests.test_observability -v",
+      "exit_code": 0,
+      "returned_output_excerpt": "{\"dashboard_result\": [], \"stage\": \"start_and_resume\"}\n{\"dashboard_result\": [], \"stage\": \"same_id_replay_and_new_id_republication\"}\n{\"dashboard_result\": [], \"stage\": \"unavailable_and_legacy_without_additive_baseline\"}\nRan 7 tests in 20.271s\nOK",
+      "python": "3.14.7",
+      "note": "The reused native readiness polling fixture emitted a Python ResourceWarning while cleaning an expected HTTP 503 during startup; the tests completed successfully. No SDK client was imported or invoked."
+    },
+    {
+      "phase": "default_offline_sdk_regression",
+      "command": "rtk env PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_native_worker_route tests.test_native_worker_fixture tests.test_worker_recovery tests.test_observability tests.test_sdk_usage_scope -q",
+      "exit_code": 0,
+      "returned_output": "----------------------------------------------------------------------\nRan 31 tests in 0.325s\n\nOK (skipped=1)",
+      "skip": "Native Collector/Loki test explicitly skips in the default interpreter without optional PyYAML; the separate isolated command above executed it successfully."
+    },
+    {
+      "phase": "other_native_producer_positive_control_and_pipeline_boundary",
+      "command": "rtk uv run --no-project --with PyYAML==6.0.3 python -m unittest tests.test_observability_run_correlation.NativeRunCorrelationTests.test_runs_costs_and_tool_joins_survive_into_loki_as_metadata tests.test_observability_tool_names.CollectorProfileTests.test_names_are_extracted_before_the_privacy_allowlist_on_both_log_pipelines -v",
+      "exit_code": 0,
+      "returned_output_excerpt": "----------------------------------------------------------------------\nRan 2 tests in 18.639s\n\nOK",
+      "evidence_class": "existing_local_integration_test_with_synthetic_native_OTLP_records",
+      "note": "Native Collector and Loki executed the existing Claude positive control; no model was run. The reused readiness helper again emitted the same startup HTTP 503 ResourceWarning."
+    }
+  ],
+  "usage": {
+    "new_model_inference_submitted": false,
+    "provider_usage": null,
+    "coordinator_or_reviewer_usage": null,
+    "whole_task_usage": null,
+    "token_savings_claim": null,
+    "prior_native_execution_total_tokens": 52286,
+    "rule": "The prior native final thread snapshot is cited once as historical evidence, not counted as a new test or added to the earlier snapshot."
+  },
+  "deployment": {
+    "repository_template_only": true,
+    "existing_services_modified": false,
+    "existing_ports_used": false,
+    "credentials_or_account_stores_read": false,
+    "historical_loki_data_rewritten": false
+  }
+}

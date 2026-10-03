@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-10-01",
+  "scope": "Source adjudication of the architecture owner's research-factors-ml and security-supply-chain no_selection rows. Recommendations await owner reconciliation; no installation, comparison or closure is claimed.",
+  "escalation": {
+    "role": "stack-researcher",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential architecture choices and conflicting selection records.",
+    "acceptance_result": "Accept narrower conditional compositions; keep C2-C5 and replacement-host acceptance open."
+  },
+  "source_scope": {
+    "catalog_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "catalog_revision": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+    "architecture_revision": "e4772696971a819e6c51c9203febc02965456789",
+    "files": ["blueprints/us-equities/AGENTS.md", "catalogs/foundation/automation.json", ".github/workflows/supply-chain.yml", "blueprints/us-equities/simulation-research/README.md"],
+    "evidence_class": "source_review"
+  },
+  "research_factors_ml": {
+    "recommendation": "Conditionally record distinct research components rather than using the selected backtest engine as a factor/research selection.",
+    "components": [
+      {
+        "name": "EdgarTools",
+        "role": "SEC filing acquisition and parsing for catalyst research",
+        "version": "5.58.0",
+        "source_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+        "status": "retained historical baseline",
+        "boundary": "Current acquisition and parsing do not prove original historical availability.",
+        "source": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/pyproject.toml#L235",
+        "native_test_command": "rtk hatch run test-offline-audit tests/issues/regression/",
+        "test_boundary": "Pinned checkout and native environment required; offline audit blocks sockets and disables retries. Not run in this adjudication."
+      },
+      {
+        "name": "skfolio",
+        "role": "Portfolio models and chronological evaluation",
+        "version": "1.2.9",
+        "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+        "status": "retained historical baseline",
+        "boundary": "Specify the label horizon and purging; upstream WalkForward does not select the economic timing contract.",
+        "source": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py#L118",
+        "native_test_command": "rtk uv run pytest tests/test_model_selection/test_walk_forward.py",
+        "test_source": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/CONTRIBUTING.md#L85",
+        "test_boundary": "Targeted adaptation of the native contribution route; not run in this adjudication."
+      },
+      {
+        "name": "Alphalens Reloaded",
+        "role": "Cross-sectional factor returns, information coefficients and turnover diagnostics",
+        "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+        "status": "conditional candidate when the factor-diagnostics requirement is activated",
+        "source": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md#L17",
+        "native_test_command": "rtk tox -e py312-pandas222-numpy22",
+        "test_source": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/pyproject.toml#L134",
+        "test_boundary": "Native matrix environment; ensure interpreter availability and executed tests. No qualified comparison or test execution in this adjudication."
+      }
+    ],
+    "deferred_requirement": "Learned predictive model and automatic feature generation: Qlib and tsfresh remain candidates until a prediction contract and executable economic oracle exist.",
+    "currency_is_separate": "skfolio 1.4.10 and EdgarTools 5.59.1 are upgrade candidates, not upgrades of retained acceptance.",
+    "remaining_oracle": ["Frozen factors/features and labels", "Qualified prices, corporate actions and availability times", "Complete trials and explicit purging", "Costs, fills and cash ledgers", "Fresh decision reserve; the inspected 2021 segment is already used"]
+  },
+  "security_supply_chain": {
+    "recommendation": "Conditionally inherit the foundation inventory and vulnerability gates; keep process/network enforcement separate.",
+    "composition": ["Syft 1.52.0 for SBOM inventory", "Grype 0.119.0 for vulnerability gates", "Gitleaks 8.30.1 temporarily for the retained secret-scan contract", "Separately scoped OSV and provenance controls"],
+    "grype_selection_record": "catalogs/foundation/automation.json:173 records version, archive checksum and commands; .github/workflows/supply-chain.yml:113 supplies the high-severity gate.",
+    "native_routes": [
+      {
+        "command": "rtk sh install.sh -b \"$BIN_DIR\" v1.52.0",
+        "source": "https://github.com/anchore/syft/blob/v1.52.0/install.sh#L792",
+        "boundary": "Use the exact source checkout and owned destination; installation was not run."
+      },
+      {
+        "command": "rtk sh install.sh -b \"$BIN_DIR\" v0.119.0",
+        "source": "https://github.com/anchore/grype/blob/v0.119.0/install.sh#L790",
+        "boundary": "Use the exact source checkout and owned destination; installation was not run."
+      },
+      {
+        "commands": ["rtk grype db update", "rtk grype db status", "rtk grype \"sbom:$SBOM\" --config .grype.yaml --fail-on high -o json"],
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/.github/workflows/supply-chain.yml#L113",
+        "boundary": "Repository integration gate, not a claim of literal upstream command. Retain database identity/freshness, binary identity and scanned-artifact identity. Not run here."
+      }
+    ],
+    "secret_scanner_reopening": {
+      "source": "https://github.com/gitleaks/gitleaks/blob/b58d3f102cf3a2c84cb7f923d05c25c9b1aed84b/README.md#L11",
+      "finding": "Gitleaks declares future releases security-patch-only and directs feature work to Betterleaks.",
+      "challenger": "Betterleaks 1.9.0",
+      "challenger_commit": "81aff7a638638aae3a659845d089043e1d8fe9ac",
+      "install_command": "rtk go install github.com/betterleaks/betterleaks@v1.9.0",
+      "install_source": "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md#L38",
+      "install_boundary": "Version-pinned adaptation of the native install route; not run.",
+      "native_test_command": "rtk make test",
+      "test_source": "https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/Makefile#L15",
+      "remaining_oracle": "Compare identical retained fixtures/configuration: findings, exclusions, redaction, exit status and report consumers. No comparison was executed."
+    }
+  },
+  "corrections": [
+    {
+      "anti_pattern": "A test runner's templated internal command was presented as a standalone shell command.",
+      "correction": "The Alphalens pytest command contains {toxinidir}; use its native Tox matrix environment for expansion, dependencies and working directory.",
+      "verification_path": "Original pinned pyproject.toml lines 134-176 inspected independently by Astra and coordinator; research-factors-ml.json native acceptance route corrected."
+    },
+    {
+      "anti_pattern": "Treating absence from one pin registry as absence of any selection record.",
+      "correction": "Grype has no manifests/stack.json component entry but has a version/checksum/workflow selection in foundation automation. Owner no_selection reasoning should distinguish these records.",
+      "verification_path": "Original catalog automation record and workflow inspected; owner architecture source remains unchanged pending reconciliation."
+    }
+  ],
+  "closure": {"c1_owner_rerecord": "recommended, pending", "c2_to_c5": "open", "replacement_host_acceptance": "unknown", "full_saturation": false}
+}

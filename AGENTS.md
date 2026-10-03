@@ -22,6 +22,7 @@ This is a portable reference stack with evidence, native recipes and examples. T
 Read `docs/token-practice.md` on demand for the selected context lane, native counter scopes and measured comparisons.
 
 - Load only the layer, capability, recipe or guide the current task needs; never preload the full catalog or the generated HTML guide into the startup instructions, a session or every worker.
+- Bound discovery to task-filtered names, descriptions and source locators; load only selected tool schemas. For maintained decisions, and before describing deployed architecture after compaction/resume, query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema. Check relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify current canonical sources.
 - Match available skill descriptions to the task; read each selected `SKILL.md` before acting. For installation, activation, updates or recovery, use `adoption/skills/lifecycle.md` (lands with unit F3).
 - Choose the cheapest measured representation that meets the task's information contract. Known-source reads, compact JSON and full-original reads remain valid defaults when an extra retrieval or compression step is larger or inadequate.
 - For one tool's adoption, read its row (by `component_id`) in `docs/token-efficiency-stack.json`, which `scripts/build_ecosystem.py` renders; its card is a dated snapshot, and the current lane list is the SubagentStart carrier block `adoption/hooks/claude/token-lanes-block.md`.

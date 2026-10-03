@@ -1,0 +1,55 @@
+{
+  "candidates": [
+    {
+      "name": "A2A",
+      "repository": "https://github.com/a2aproject/A2A",
+      "why_candidate": "[Protocol for agent communication and task delegation through SDK integration](https://github.com/a2aproject/A2A/blob/e16c0e9f66c9/README.md); latest release [v1.0.1](https://github.com/a2aproject/A2A/releases/tag/v1.0.1), 2026-05-28; [default-branch commit](https://github.com/a2aproject/A2A/commit/e16c0e9f66c9), 2026-10-01."
+    },
+    {
+      "name": "Agent Message Queue",
+      "repository": "https://github.com/avivsinai/agent-message-queue",
+      "why_candidate": "[File-based local messaging between Claude Code and Codex, documented for macOS, Linux and WSL](https://github.com/avivsinai/agent-message-queue/blob/f42f46fbedef/README.md); latest release [v0.85.0](https://github.com/avivsinai/agent-message-queue/releases/tag/v0.85.0), 2026-09-30."
+    },
+    {
+      "name": "Agent Relay",
+      "repository": "https://github.com/AgentWorkforce/relay",
+      "why_candidate": "[Messaging infrastructure for Claude Code and Codex with channels, threads and direct messages](https://github.com/AgentWorkforce/relay/blob/35e7cdedad77/README.md); latest release [v13.0.0](https://github.com/AgentWorkforce/relay/releases/tag/v13.0.0), 2026-09-30, provides Linux x64 and macOS arm64 binaries."
+    },
+    {
+      "name": "agmsg",
+      "repository": "https://github.com/fujibee/agmsg",
+      "why_candidate": "[Cross-vendor Claude Code/Codex messaging through Bash and a shared SQLite database on macOS and Linux](https://github.com/fujibee/agmsg/blob/07a67a3e3304/README.md); latest release [v1.5.1](https://github.com/fujibee/agmsg/releases/tag/v1.5.1), 2026-09-28."
+    },
+    {
+      "name": "AI Maestro",
+      "repository": "https://github.com/23blocks-OS/ai-maestro",
+      "why_candidate": "[Terminal-agent orchestrator supporting Claude Code, Codex and agent messaging on macOS, Linux and WSL2](https://github.com/23blocks-OS/ai-maestro/blob/7c26ffb5845a/README.md); latest release [v0.47.1](https://github.com/23blocks-OS/ai-maestro/releases/tag/v0.47.1), 2026-10-01."
+    },
+    {
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "why_candidate": "[Shared memory, directed agent inboxes and claim-once handoffs for Claude Code and Codex, supporting Linux, macOS and WSL2](https://github.com/akitaonrails/ai-memory/blob/e2d7d17d906d/README.md); latest release [v2.5.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.2), 2026-10-01."
+    },
+    {
+      "name": "Concord MCP",
+      "repository": "https://github.com/Get-Concord-AI/concord-mcp",
+      "why_candidate": "[Local MCP server for live Claude Code/Codex messaging, shared work assignments and acknowledged handoffs](https://github.com/Get-Concord-AI/concord-mcp/blob/8f7b735a833d/README.md); latest release [v0.10.5](https://github.com/Get-Concord-AI/concord-mcp/releases/tag/v0.10.5), 2026-09-23."
+    },
+    {
+      "name": "hcom",
+      "repository": "https://github.com/aannoo/hcom",
+      "why_candidate": "[CLI enabling Claude Code and Codex sessions to message, watch and spawn each other across terminals on macOS and Linux](https://github.com/aannoo/hcom/blob/2c5f343b2f9e/README.md); latest release [v0.7.27](https://github.com/aannoo/hcom/releases/tag/v0.7.27), 2026-10-01."
+    },
+    {
+      "name": "No additional component",
+      "repository": "",
+      "why_candidate": "Native [Claude Code cross-session messaging](https://code.claude.com/docs/en/cross-session-messaging) and [Codex subagent coordination](https://developers.openai.com/codex/multi-agent/) are documented; messaging between the two clients remains unestablished in the fetched documentation; no separate component release applies."
+    },
+    {
+      "name": "Sno Station",
+      "repository": "https://github.com/sno-ai/sno-station",
+      "why_candidate": "[Shared Claude Code/Codex workspace with Sno Reach messaging source available and Reach release archives pending](https://github.com/sno-ai/sno-station/blob/4b4cafe43e3d/README.md); latest repository release [v1.0.1](https://github.com/sno-ai/sno-station/releases/tag/v1.0.1), 2026-10-01."
+    }
+  ],
+  "search_notes": "Alphabetical, unranked list. Verified 2026-10-02 UTC, corresponding to 2026-10-01 America/New_York. Every listed repository passed gh api repos/OWNER/REPO and repos/OWNER/REPO/releases/latest checks: public, not archived, and a release or default-branch commit within 90 days. README files and default-branch commits were also inspected through the GitHub API. Release dates are published_at values. License screening excluded MCP Agent Mail because its [license contains an OpenAI/Anthropic restriction](https://github.com/Dicklesworthstone/mcp_agent_mail/blob/3fad5ec67286/LICENSE), Okto Nexus because its [Elastic License and addendum restrict use](https://github.com/OktoLabsAI/okto-nexus/blob/27b06fe48b9f/LICENSE), and amux because its [MIT-plus-Commons-Clause license restricts commercial resale](https://github.com/mixpeek/amux/blob/main/LICENSE). A2A requires client integration; Sno Reach currently requires working from source. The native baseline was assessed from upstream documentation; installed clients were not inspected under the upstream-only rule. Budget used: 5 web-search queries, 8 page-fetch attempts and 30 GitHub API calls. Additional discovery leads remained unverified at the API limit, so exhaustive coverage is not established."
+}

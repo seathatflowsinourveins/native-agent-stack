@@ -1,0 +1,24 @@
+You are a blind decider. For the slot packet named below, name exactly ONE default for a clean install on a new host, judged only on the candidates' own quality for the slot's requirement.
+
+A first round narrowed the slot to the finalists in the packet and recorded the notes and facts listed there. Treat them as leads: re-check at its source every fact your decision rests on.
+
+__CRITERIA__
+
+Decision rules, frozen before this round:
+- Name exactly one default. "Undetermined", "install several" and "compare first" are not answers.
+- Apply the criteria exactly as written above, and state which criterion decided.
+- Measured evidence decides only like for like: the same benchmark and metric. A result from an independent party, or one reproduced by a second party, outranks a vendor's own number. Numbers from different harnesses or different metrics are not comparable and cannot decide.
+- If nothing measured separates the finalists, set could_not_separate true and decide on the remaining criteria. Say plainly that the decision rests on documented fit and not on a measured lead.
+- Where one finalist is an option that installs nothing extra, it is the default unless measured evidence shows a challenger's gain on the requirement's own metric with an interval that excludes zero.
+- A dependency between tools is a reason only when an upstream document states it. Cite the document.
+- Not evidence: stars, downloads, popularity, which project anyone currently uses or has installed, and the order in which finalists are listed. License is information only.
+- Give the overturn check: the one comparison, and the result in it, that would replace your default. Phrase it so that it can run on the target host or on a throwaway instance of it.
+
+Rules:
+- Do not open files of the local repository (your working directory) or anything under it; your evidence is the packet and upstream public sources only. The project's own records describe what it happens to use and must not shape this judgment.
+- Verify the facts you rely on from primary sources: the GitHub API (gh api repos/OWNER/REPO, repos/OWNER/REPO/releases/latest, repos/OWNER/REPO/commits?per_page=1), the project's README and documentation, and benchmark or paper pages. Fetch web pages through ctx_fetch_and_index and read them with ctx_search.
+- Budget: at most 6 web searches, 10 page fetches and 30 GitHub API calls.
+- Every finalist key appears exactly once: as the default, or in alternatives with a one-line reason grounded in the criteria.
+
+Slot packet (read this file):
+__PACKET__

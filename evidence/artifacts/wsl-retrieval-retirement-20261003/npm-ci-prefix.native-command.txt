@@ -1,0 +1,7 @@
+0 verbose cli <installed-node-24.21.0>/bin/node <installed-node-24.21.0>/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.19.0
+2 info using node@v24.21.0
+8 verbose argv "ci" "--prefix" "<owned-controls>/npm-cases/ci-prefix"
+16 verbose cwd <owned-controls>
+20 verbose exit 1
+21 verbose code 1

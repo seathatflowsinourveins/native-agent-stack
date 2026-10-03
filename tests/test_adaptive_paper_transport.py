@@ -838,13 +838,15 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
     async def test_proven_not_sent_intent_does_not_break_flat_snapshot(self):
         self.port.adopt_intents([intent()])
         self.port._not_sent.add("trial-1")
+        # account, positions, open orders, all orders, then the FEE activities (read last).
         values = [response({"cash": "1000", "equity": "1000", "buying_power": "1000"}),
-                  response([]), response([]), response([])]
+                  response([]), response([]), response([]), response([])]
         with patch.object(self.port._client._session._session, "request", side_effect=values) as request:
             snapshot = await self.port.snapshot()
         self.assertTrue(snapshot["complete"])
         self.assertEqual(snapshot["positions"], [])
-        self.assertEqual(request.call_count, 4)
+        self.assertEqual(snapshot["fees"], [])
+        self.assertEqual(request.call_count, 5)
 
     async def test_late_event_cannot_undo_cumulative_fill(self):
         final = t.normalize_order(order(filled_qty="1", filled_avg_price="100", status="filled"))

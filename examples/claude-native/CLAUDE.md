@@ -24,6 +24,7 @@ Decide by evidence and research convergence: a choice stands when current primar
 ## Token practice (base layer)
 
 - Keep context small: match available skill descriptions to the task and read the selected `SKILL.md` before acting; load only the references and source the current task needs, and keep tool inventories and specialized workflows in on-demand skills and project documentation.
+- Bound discovery to task-filtered names, descriptions and source locators; load only selected tool schemas. For maintained decisions, and before describing deployed architecture after compaction/resume, query scoped ai-memory with `pin_first=true, limit=2` when supported by the installed schema. Check relevance; retry without pin priority or widen if needed, then read the relevant exact path and verify current canonical sources.
 - Use a focused read for known identifiers, scoped search for prose and scoped semantic retrieval for unfamiliar code; select one sufficient retrieval or compression lane per artifact, and verify original source before editing or judging compressed or retrieved code.
 - Process large output outside the model; retain failures and a full-output recovery path. Preserve the existing RTK-managed import when that component is installed.
 - Delegate a step when only its conclusion is needed, so the reads, searches and dead ends stay in the child; return concise findings with source or artifact locations.

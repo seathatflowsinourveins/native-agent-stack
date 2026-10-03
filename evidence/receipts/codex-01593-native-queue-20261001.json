@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "codex-01593-native-queue-20261001",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-01T03:08:42Z",
+  "component_ids": ["codex"],
+  "claim": "Fresh provider-backed native queue delivery succeeded while the owned daemon-backed thread was idle, while a preceding turn was busy, and after its TUI disconnected and resumed. Three official Hindsight hook definitions were individually trusted through the native UI.",
+  "limitations": [
+    "Synthetic messaging inputs qualify these native operations, not production task quality or the whole ecosystem.",
+    "No upstream Cargo test suite was run; upstream test sources were reviewed and native commands were exercised.",
+    "No daemon restart was attempted during live qualification, and no unrelated session was inspected or interrupted.",
+    "Queue delivery to a concurrently running embedded receiver, cross-family bridge delivery, cross-account isolation, remote hosts, and Hindsight retrieval/retention are outside this receipt.",
+    "Hindsight capture remained disabled during hook trust. Hook trust is not memory acceptance.",
+    "Provider monetary cost is unknown. Native usage counters do not establish improvement against another configuration."
+  ],
+  "host_scope": "Authorized current-host native sign-in; only one owned synthetic persistent thread and its two TUI invocations in the worker's separate qualification worktree.",
+  "data": {
+    "source": {
+      "repository": "openai/codex",
+      "tag": "rust-v0.159.3",
+      "commit": "01fc69f4026735edfdf6789820549727a4867b11",
+      "qualified_cli_sha256": "8bf204b36a2f6dd0dab73aa2f639892e67ef9ac8befccb4a05b1496ebf25c479"
+    },
+    "evidence_classes": ["upstream-native-operation", "synthetic-input", "independent-observation"],
+    "native_commands": [
+      {"argv": ["codex", "app-server", "daemon", "version"], "invocations": 2, "exit_codes": [0, 0], "observed_status": "running", "cli_and_server_version": "0.159.3"},
+      {"argv": ["codex", "exec", "--model", "gpt-6.1-sol", "-c", "model_reasoning_effort=\"max\"", "--sandbox", "read-only", "--color", "never", "--json", "--output-last-message", "<private-final-output>", "<synthetic-seed-prompt>"], "exit_code": 0, "persistent_thread_created": true},
+      {"argv": ["codex", "resume", "<owned-thread-uuid>", "--no-alt-screen"], "invocations": 2, "exit_codes": [0, 0], "observed_model": "gpt-6.1-sol", "observed_effort": "max", "termination": "Native Ctrl-D disconnect after completed turns"},
+      {"argv": ["codex", "queue", "--thread", "<owned-thread-uuid>", "--message", "<synthetic-probe>"], "invocations": 4, "exit_codes": [0, 0, 0, 0], "accepted_submission_ids_returned": true},
+      {"argv": ["lsof", "+E", "-n", "-a", "-p", "<owned-tui-pid>", "-U"], "exit_code": 0, "observed_peer": "Native daemon PID from native daemon.pid", "owned_tui_has_embedded_child": false}
+    ],
+    "delivery": [
+      {"scenario": "idle", "ack_exact_match": true, "native_rollout_task_complete_at_utc": "2026-10-01T02:56:42.624Z", "native_tui_ack_observed": true},
+      {"scenario": "busy-preceding-turn", "first_turn_started_at_utc": "2026-10-01T02:58:20.281Z", "second_queue_before_at_utc": "2026-10-01T02:58:20.570576118Z", "second_queue_after_at_utc": "2026-10-01T02:58:20.893626985Z", "first_turn_completed_at_utc": "2026-10-01T02:58:36.049Z", "second_turn_started_at_utc": "2026-10-01T02:58:36.055Z", "second_turn_completed_at_utc": "2026-10-01T02:58:38.965Z", "accepted_while_first_turn_busy": true, "distinct_following_turn": true, "ack_exact_match": true, "native_tui_ack_observed": true},
+      {"scenario": "same-thread-reconnect", "queue_before_at_utc": "2026-10-01T03:00:31.773777682Z", "queue_after_at_utc": "2026-10-01T03:00:32.112655479Z", "native_rollout_task_complete_at_utc": "2026-10-01T03:00:37.213Z", "ack_exact_match": true, "native_tui_ack_observed": true, "daemon_restart_required": false}
+    ],
+    "native_usage": {
+      "scope": "Five fresh provider turns: seed, idle probe, busy first probe, queued-during-busy probe, reconnect probe. Count each last_token_usage once; do not sum cumulative snapshots.",
+      "per_turn": [
+        {"role": "seed", "input_tokens": 21819, "cached_input_tokens": 7168, "cache_write_input_tokens": 0, "output_tokens": 37, "reasoning_output_tokens": 21, "total_tokens": 21856},
+        {"role": "idle", "input_tokens": 22919, "cached_input_tokens": 0, "cache_write_input_tokens": 0, "output_tokens": 17, "reasoning_output_tokens": 0, "total_tokens": 22936},
+        {"role": "busy-first", "input_tokens": 22992, "cached_input_tokens": 0, "cache_write_input_tokens": 0, "output_tokens": 445, "reasoning_output_tokens": 29, "total_tokens": 23437},
+        {"role": "busy-second", "input_tokens": 23487, "cached_input_tokens": 22784, "cache_write_input_tokens": 0, "output_tokens": 18, "reasoning_output_tokens": 0, "total_tokens": 23505},
+        {"role": "reconnect", "input_tokens": 24675, "cached_input_tokens": 23296, "cache_write_input_tokens": 0, "output_tokens": 18, "reasoning_output_tokens": 0, "total_tokens": 24693}
+      ],
+      "final_native_rollout_cumulative": {"input_tokens": 115892, "cached_input_tokens": 53248, "cache_write_input_tokens": 0, "output_tokens": 535, "reasoning_output_tokens": 50, "total_tokens": 116427},
+      "native_tui_shutdown_counter": {"total": 63179, "input": 62644, "cached_input_reported_separately": 53248, "output": 535, "reasoning": 50},
+      "counter_relationship": "Rollout input includes cached input. The TUI shutdown total excludes its separately reported cached input. Reasoning is a subset of output. Never add these overlapping counters."
+    },
+    "hindsight_native_hook_trust": {
+      "runtime_package": "@vectorize-io/hindsight-coding-agents",
+      "runtime_version": "0.8.0",
+      "source_repository": "vectorize-io/hindsight",
+      "source_commit": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+      "operation": "Native /hooks event detail, inspect selected new command, press t for that command only; fresh /hooks afterward.",
+      "trusted_assets": [
+        {"event": "SessionStart", "asset": "dist/codex-sessionstart-hook.js", "timeout_seconds": 30, "observed_trust": "Trusted"},
+        {"event": "UserPromptSubmit", "asset": "dist/codex-hook.js", "timeout_seconds": 30, "observed_trust": "Trusted"},
+        {"event": "Stop", "asset": "dist/codex-stop-hook.js", "timeout_seconds": 60, "observed_trust": "Trusted"}
+      ],
+      "existing_active_hooks": 13,
+      "newly_trusted_hooks": 3,
+      "fresh_installed_and_active_hooks": 16,
+      "fresh_hooks_needing_review": 0,
+      "user_config_hook_count": 10,
+      "existing_ai_memory_hook_count_retained": 7,
+      "hindsight_user_config_hook_count": 3,
+      "enabled_plugin_hooks": 6,
+      "capture_disabled_observed": true,
+      "trust_all_used": false,
+      "hook_enable_disable_toggles_used": false,
+      "manual_trust_store_edit": false,
+      "trust_bypass_flag_used": false,
+      "native_trust_errors_observed": 0,
+      "critical_section_released": true
+    },
+    "failures_and_boundaries": [
+      {"condition": "First reconnect invocation displayed three new or changed hooks during concurrent authorized installation.", "action": "Native Continue without trusting for messaging-only recovery. Later root serialized ownership and the three exact official definitions were individually trusted.", "result": "Reconnect delivery and native trust each completed; capture stayed disabled."},
+      {"condition": "Referenced adoption/skills/lifecycle.md is absent in the pinned qualification checkout, whose AGENTS marks it as landing with F3.", "action": "Used already reviewed native daemon source and CLI commands; no invented lifecycle recipe.", "result": "No host lifecycle mutation performed by this worker."}
+    ],
+    "cleanup": {"owned_tui_invocations_closed": true, "synthetic_thread_history_retained_privately": true, "shared_daemon_left_running": true, "production_config_or_launcher_manually_edited_by_worker": false, "native_hook_trust_preferences_changed_via_ui": true, "native_auth_read_or_copied": false},
+    "repository_validation": {"command": "python3 scripts/validate.py", "exit_code": 1, "remaining_returned_failure": "evidence/receipts/codex-01593-native-queue-20261001.json: evidence file is not hash-listed", "publication_dependency": "Coordinator owns the shared evidence hash manifest.", "preserved_initial_failure": "The first validation also detected private logs inside the worktree; those owned logs were relocated outside it and a fresh validation left only the hash-list dependency."}
+  },
+  "provenance": {
+    "primary_sources": [
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/cli/tests/queue.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/session_queue_commands.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/ext/queue/src/service.rs",
+      "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/cli/tests/daemon_startup.rs",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/installer.ts#L648"
+    ],
+    "raw_native_evidence": "Retained outside the worktree in the worker's owner-only codex-qualification-private state directory: seed JSONL/stderr/final output; four queue stdout/stderr logs; UTC command brackets; both native TUI typescripts/timing logs; native daemon version outputs; owned-rollout snapshot; socket peer observation.",
+    "public_sanitization": "Personal paths, machine/process identifiers, native sign-in state, thread/submission UUIDs, literal prompts/replies and unrelated conversations are omitted. Native argv substitutions are explicitly marked; private native logs preserve actual bindings.",
+    "upstream_test_sources_reviewed_not_run": true,
+    "locally_authored_e2e_runner": false
+  }
+}

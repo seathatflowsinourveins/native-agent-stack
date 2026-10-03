@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "layer_id": "instructions-skills",
+  "catalog": "foundation",
+  "review_date": "2026-10-01",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "reviewer": {"model":"gpt-6.1-sol","effort":"max","family":"Codex"},
+  "verdict": "corrected",
+  "c4": {"independent_review_performed":true,"no_unresolved_material_gap":false,"remaining_gaps":["ECC component pin differs from canonical per-skill pins; reconcile explicitly.","Two-skill trial does not qualify all procedures, worker propagation/security quality or savings.","Broader candidates lack matched task-quality evidence; reference format is separate."]},
+  "selected_repositories": [
+    {"component_id":"affaan-m/ECC","repository":"https://github.com/affaan-m/ECC","pin_of_record":"dd6ee538aee0f548d4a6b520118f875431fd749e","pin_source":"manifests/stack.json:8; no ECC row in adoption/pins-linux-x86_64.json","source_pinned_url":"https://github.com/affaan-m/ECC/tree/dd6ee538aee0f548d4a6b520118f875431fd749e","upstream_currency":"Latest v2.2.2; canonical skill pins differ (manifest:116,141).","native_install":{"command":"skills add <pinned-skill-url> -g -a codex claude-code","source":"Vercel Skills 1.7.0/7407f389 README.md:88-111","evidence_class":"source-only"},"native_acceptance":{"command":"skills-ref validate <skill-directory>","source":"skills-ref 69ef37e9 README.md:60","evidence_class":"source-only format"}},
+    {"component_id":"skill:typesafe-ai","repository":"https://github.com/typesafe-ai/skills","pin_of_record":"65a39f393687675ce170e6094757de20370365b9","pin_source":"adoption/skills/manifest.json:41; no component/Linux package pin","source_pinned_url":"https://github.com/typesafe-ai/skills/tree/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai","upstream_currency":"Head matches selected pin; releases/latest HTTP 404.","native_install":{"command":"skills add <pinned-skill-url> -g -a codex claude-code","source":"Vercel Skills 1.7.0/7407f389 README.md:88-111","evidence_class":"source-only"},"native_acceptance":{"command":null,"source":"Pinned SKILL.md","evidence_class":"guidance; no run"}},
+    {"component_id":"skill:openai-curated","repository":"https://github.com/openai/skills","pin_of_record":"49f948faa9258a0c61caceaf225e179651397431","pin_source":"adoption/skills/manifest.json:66; no component/Linux package pin","source_pinned_url":"https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431/skills/.curated","upstream_currency":"Head matches selected pin; releases/latest HTTP 404.","native_install":{"command":"skills add <pinned-skill-url> -g -a codex claude-code","source":"Vercel Skills 1.7.0/7407f389 README.md:88-111","evidence_class":"source-only"},"native_acceptance":{"command":null,"source":"Pinned SKILL.md","evidence_class":"guidance; no run"}}
+  ],
+  "alternatives": [
+    {"name":"Agent Skills reference tools","repository":"agentskills/agentskills","verdict":"Optional stack:1610 pin 0.1.0/69ef37e9; pip install -e . / skills-ref validate, format only.","sources":["https://github.com/agentskills/agentskills/blob/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref/README.md"]},
+    {"name":"Shan Claude best practice","repository":"shanraisshan/claude-code-best-practice","verdict":"Community guidance; verify native routing upstream.","sources":["https://github.com/shanraisshan/claude-code-best-practice/blob/c7b1a7e4021a6d6ceb2667219a022dbec4281d09/README.md"]},
+    {"name":"Trail of Bits security skills","repository":"trailofbits/skills","verdict":"82fe8226 task-selected; universal security quality unqualified.","sources":["https://github.com/trailofbits/skills/blob/82fe8226252622fa807643bdca1710901198553a/README.md"]},
+    {"name":"Vercel frontend skills","repository":"vercel-labs/agent-skills","verdict":"React/Next task procedures; conditional.","sources":["https://github.com/vercel-labs/agent-skills/blob/063bee94c3f4df8453406c830b0a7df0f2860278/README.md"]},
+    {"name":"Claude Code Templates","repository":"davila7/claude-code-templates","verdict":"v1.29.6 catalog; wholesale activation unqualified.","sources":["https://github.com/davila7/claude-code-templates/blob/v1.29.6/README.md"]},
+    {"name":"VoltAgent subagent collection","repository":"voltagent/awesome-claude-code-subagents","verdict":"Role collection; native ownership/routing required.","sources":["https://github.com/voltagent/awesome-claude-code-subagents/blob/82b73821baa7a911d5b14cfb6da238b7f0db6b42/README.md"]},
+    {"name":"Anthropic webapp-testing skill","repository":"anthropics/skills","verdict":"Playwright workflow; concrete UI comparison open.","sources":["https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/webapp-testing/SKILL.md"]}
+  ],
+  "corrections": [
+    {"claim":"TypeSafe/OpenAI unpinned; one deployed ECC revision.","correction":"Canonical manifest pins each; component dd6ee538 is a separate unreconciled record.","deciding_source":"adoption/skills/manifest.json:41,66,116,141; manifests/stack.json:8"},
+    {"claim":"No retained skill-arm task fixture.","correction":"Current 29-run two-skill local trial: 23/25 original outcome passes, four follow-ups; failures/load misses retained. No general/upstream-suite winner.","deciding_source":"evidence/artifacts/native-skill-finalization-20260930/results.json and operations.json"}
+  ],
+  "evidence_assessment": [
+    "Read pinned SKILL.md, Skills CLI 1.7.0/7407f389 README/package (pnpm test/Vitest), reference validator, official eval recipe and skill-creator. No runs.",
+    "Read trial controls/hashes/run records; outcomes and complete loading differ. One repetition limits generalization.",
+    "Codex 0.159.2 agents_md.rs: root-to-cwd discovery, override and byte budget; worker propagation separate."
+  ],
+  "failed_access": [
+    {"source":"GitHub releases/latest: Agent Skills, OpenAI/Anthropic skills, TypeSafe, Trail of Bits, VoltAgent, Shan","result":"HTTP 404; immutable head sources accessible; no release inferred"}
+  ],
+  "omissions": [
+    "Other canonical skills outside bounded comparison; no private settings/auth, installs or model runs."
+  ],
+  "next_wave": [
+    "Reconcile component/per-skill records; bound worker propagation or one unqualified skill task."
+  ],
+  "reopen_on": [
+    "Changed skill bytes/triggers, missing required procedure or matched task result overturns selection."
+  ],
+  "new_host_acceptance": "unknown; distro not created"
+}

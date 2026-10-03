@@ -10,10 +10,11 @@
 
 Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes into the work dir:
   templates.json         the repository templates with <<DATE>>, <<LAYER_COUNT>> and <<SKILLS_CHECKED_AT>> filled
-                         (the skills date is adoption/skills/manifest.json checked_at); frozen for the run
+                         (the skills date is adoption/skills/manifest.json checked_at) and the run's modality
+                         resolved into the role keys (fill_build); frozen for the run
   prompts_sha256.txt     sha256 of json.dumps(templates, sort_keys=True, ensure_ascii=False): the record's
                          prompts_sha256
-  schemas/               discover, votes and critic (the workers' strict return schemas) and probe
+  schemas/               discover, discover-skills, votes and critic (the workers' strict return schemas) and probe
   codex_call.sh, codex_job.py, make_prompt.py, codex_quota.py
                          the GPT-6 runtime the wrapper agents call, copied so a checkout change mid-run cannot
                          alter a running sweep (codex_quota.py is the checkout's scripts/codex_quota.py, the quota
@@ -23,13 +24,16 @@ Needs <work-dir>/layers.json and <work-dir>/inputs/ from build_inputs.py. Writes
   staged.json            provenance (harness commit and file hashes, skills, prompts_sha256) and the GPT-6 settings
                          codex_job.py reads (model, slots, lock dir, and quota_stop_percent only when
                          --quota-stop-percent is given: the quota gate is off by default)
-  args.json              the Workflow args: {S, stars, sweep_id, T, schemas, layers: [{layer_id, catalog}], test?}
+  args.json              the Workflow args: {S, stars, sweep_id, T, schemas, layers: [{layer_id, catalog}], test?};
+                         a skills run (skills-* layers from build_inputs.py --modality skills) adds
+                         schemas["discover-skills"] and modality "skills" to each layer. A run covers one modality.
   sweep.embedded.js      sweep.js with its one `const A = args` line replaced by those args, launched as
                          Workflow({scriptPath: "<work-dir>/sweep.embedded.js"}) with no args, so the ~12 KB of
                          templates and schemas never pass through the coordinator's context and a resume needs
                          only the scriptPath (--no-embed skips it)
-Refuses a work dir inside a git repository, templates naming a skill the pinned skills manifest lacks, and restaging
-a work dir whose gpt6/ already holds jobs (an earlier run's "already done" jobs would be reused) unless --force.
+Refuses a work dir inside a git repository, templates naming a skill the pinned skills manifest lacks, a selection
+that mixes repository and skills-* layers, and restaging a work dir whose gpt6/ already holds jobs (an earlier run's
+"already done" jobs would be reused) unless --force.
 No network, no model calls.
 """
 
@@ -52,14 +56,29 @@ from sweep_common import REPO_ROOT, load_json, prompts_sha256, sha256_bytes, wor
 
 RUNTIME = ("codex_call.sh", "codex_job.py", "make_prompt.py")
 QUOTA_PROBE = REPO_ROOT / "scripts" / "codex_quota.py"  # staged beside codex_job.py as codex_quota.py
-SCHEMAS = ("discover", "votes", "critic", "probe")
+SCHEMAS = ("discover", "discover-skills", "votes", "critic", "probe")
+# The skills modality (skills-* layers, build_inputs.py --modality skills) and its discovery return schema; a
+# layers.json row without "modality" is a repository layer.
+SKILLS_SCHEMA = "discover-skills"
+REPOSITORY_MODALITY, SKILLS_MODALITY = "repository", "skills"
+MODALITIES = (REPOSITORY_MODALITY, SKILLS_MODALITY)
+# The role keys whose template a modality replaces (fill_build); facts, fit, common and followup are shared.
+MODALITY_TEMPLATES = {REPOSITORY_MODALITY: {}, SKILLS_MODALITY: {"discover": "discover_skills",
+                                                                  "critic": "critic_skills"}}
+# templates.json: the role keys plus the skills modality's templates (modality_skills fills <<MODALITY>>).
+TEMPLATE_KEYS = (*make_prompt.RUNTIME_PLACEHOLDERS, "discover_skills", "critic_skills", "modality_skills")
+V2_TEMPLATE_KEYS = ("common_v2", "discover_v2", "facts_v2", "fit_v2")
 SKILLS_MANIFEST = "adoption/skills/manifest.json"
-# Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". A test
-# keeps this list, the paragraph and the pinned skills manifest in step.
+# Every skill the templates name, in the order of the "Skills (...)" paragraph of templates.json "common". Every
+# template reaches a worker (the skills modality's discover_skills, critic_skills and modality_skills too), so
+# skills_problems scans them all: a pinned skill named in any template must be listed here and in that paragraph. A
+# test keeps this list, the paragraph and the pinned skills manifest in step. skill-creator joined on 2026-09-30 when
+# unit F3 (#553) pinned it: the skills templates name its paired with-skill/without-skill benchmark as the comparison
+# that would overturn a skills-* verdict, and the manifest keeps it off in Codex (codex_enabled false).
 TEMPLATE_SKILLS = ("search-first", "iterative-retrieval",
                    "supply-chain-risk-auditor", "fp-check", "agentic-actions-auditor", "security-threat-model",
                    "codeql", "semgrep", "sarif-parsing", "property-based-testing", "mcp-builder", "modern-python",
-                   "agent-browser")
+                   "agent-browser", "skill-creator")
 USABLE_SKILL_STATUS = ("kept", "trial")
 PROBE_PROMPT = ("Use web search. What is the latest release tag of https://github.com/ggml-org/llama.cpp and roughly "
                 "how many GitHub stars does it have? Answer only in the required JSON.")
@@ -383,12 +402,28 @@ def stage_lane_home(work: Path, *, model: str, base_url: str, host: str, profile
                                                        "root": LANE_SKILL_ROOT, "exact_files": len(skill_rules)}}}
 
 
-def fill_build(templates: dict, run_date: str, layer_count: int, skills_checked_at: str) -> dict:
-    """The run's frozen templates; only the per-call placeholders sweep.js and make_prompt.py fill may remain."""
-    values = {"DATE": run_date, "LAYER_COUNT": str(layer_count), "SKILLS_CHECKED_AT": skills_checked_at}
-    filled = {key: make_prompt.fill(text, values) for key, text in templates.items()}
-    if set(filled) != set(make_prompt.RUNTIME_PLACEHOLDERS):
-        raise ValueError(f"templates must hold exactly {sorted(make_prompt.RUNTIME_PLACEHOLDERS)}")
+def fill_build(templates: dict, run_date: str, layer_count: int, skills_checked_at: str,
+               modality: str = REPOSITORY_MODALITY, contract_version: int = 1) -> dict:
+    """The run's frozen templates: the role keys sweep.js and make_prompt.py read (make_prompt.RUNTIME_PLACEHOLDERS),
+    with only their per-call placeholders left. The modality is resolved here: a skills run's discover and critic are
+    discover_skills and critic_skills, and its facts and fit end in modality_skills (<<MODALITY>>), which a repository
+    run fills with "", so a repository run's frozen templates are the templates it had before the skills modality."""
+    if set(templates) not in (set(TEMPLATE_KEYS), set(TEMPLATE_KEYS) | set(V2_TEMPLATE_KEYS)):
+        raise ValueError(f"templates must hold exactly {sorted(TEMPLATE_KEYS)}, with all or no {sorted(V2_TEMPLATE_KEYS)}")
+    if modality not in MODALITY_TEMPLATES:
+        raise ValueError(f"modality {modality!r} is not one of {sorted(MODALITY_TEMPLATES)}")
+    if contract_version not in (1, 2):
+        raise ValueError("contract_version must be 1 or 2")
+    if contract_version == 2 and modality == SKILLS_MODALITY:
+        raise ValueError("the skills modality keeps version 1")
+    if contract_version == 2 and not set(V2_TEMPLATE_KEYS) <= set(templates):
+        raise ValueError("version 2 requires all V2 templates")
+    roles = {**{key: key for key in make_prompt.RUNTIME_PLACEHOLDERS}, **MODALITY_TEMPLATES[modality]}
+    if contract_version == 2:
+        roles.update({key.removesuffix("_v2"): key for key in V2_TEMPLATE_KEYS})
+    values = {"DATE": run_date, "LAYER_COUNT": str(layer_count), "SKILLS_CHECKED_AT": skills_checked_at,
+              "MODALITY": templates["modality_skills"] if modality == SKILLS_MODALITY else ""}
+    filled = {key: make_prompt.fill(templates[source], values) for key, source in roles.items()}
     for key, text in filled.items():
         left = set(make_prompt.PLACEHOLDER.findall(text))
         if left != make_prompt.RUNTIME_PLACEHOLDERS[key]:
@@ -401,7 +436,8 @@ def skill_mentions(text: str, names) -> list[str]:
 
 
 def skills_problems(templates: dict, manifest: dict) -> list[str]:
-    """The templates name exactly TEMPLATE_SKILLS, and each is a kept or trial skill of the pinned manifest."""
+    """The templates name exactly TEMPLATE_SKILLS, each named in common's Skills paragraph and each a kept or trial
+    skill of the pinned manifest; a pinned skill named in any template must be one of them."""
     pinned = {entry.get("name"): entry for entry in manifest.get("skills") or [] if isinstance(entry, dict)}
     problems = []
     for name in TEMPLATE_SKILLS:
@@ -412,10 +448,25 @@ def skills_problems(templates: dict, manifest: dict) -> list[str]:
             problems.append(f"skill {name} is not pinned in {SKILLS_MANIFEST}")
         elif entry.get("status") not in USABLE_SKILL_STATUS:
             problems.append(f"skill {name} has status {entry.get('status')!r} in {SKILLS_MANIFEST}")
-    extra = sorted(set(skill_mentions(templates["common"], pinned)) - set(TEMPLATE_SKILLS))
-    if extra:
-        problems.append(f"templates.json common names pinned skills missing from TEMPLATE_SKILLS: {extra}")
+    for key, text in templates.items():
+        extra = sorted(set(skill_mentions(text, pinned)) - set(TEMPLATE_SKILLS))
+        if extra:
+            problems.append(f"templates.json {key} names pinned skills missing from TEMPLATE_SKILLS: {extra}")
     return problems
+
+
+def run_modality(selected: list) -> str:
+    """The one modality of the selected layers.json rows ("repository" for a row without "modality"). A run covers
+    one modality: sweep.js runs one completeness critic, labelled `critic`, whose template is the run's modality's,
+    and make_result.py counts that critic in every layer of the record."""
+    modalities = sorted({layer.get("modality") or REPOSITORY_MODALITY for layer in selected})
+    unknown = [name for name in modalities if name not in MODALITIES]
+    if unknown:
+        raise ValueError(f"layers.json names unknown modalities {unknown}; expected {list(MODALITIES)}")
+    if len(modalities) > 1:
+        raise ValueError(f"the selected layers mix modalities {modalities}: stage one modality per run (repository "
+                         "layers and skills-* layers in separate runs; pass --layers)")
+    return modalities[0]
 
 
 def select_layers(layers: list, only=None, due_report=None, smoke=None) -> list:
@@ -466,19 +517,29 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     if jobs and not force:
         raise ValueError(f"{work}/gpt6 already holds {len(jobs)} job(s) from an earlier run; move gpt6/ and prompts/ "
                          "to attempts/<name>/ first (their finished jobs would be reused), or pass --force")
+    modality = run_modality(selected)
     manifest = load_json(repo_root / SKILLS_MANIFEST)
     templates = load_templates()
     problems = skills_problems(templates, manifest)
     if problems:
         raise ValueError("; ".join(problems))
-    frozen = fill_build(templates, run_date, len(selected), skills_checked_at or manifest["checked_at"])
+    frozen = fill_build(templates, run_date, len(selected), skills_checked_at or manifest["checked_at"], modality)
     schemas = {name: load_json(HERE / "schemas" / f"{name}.json") for name in SCHEMAS}
     first_prompts = {}
     for layer in selected:  # everything is checked before anything is written
         layer_input = load_json(work / "inputs" / f"{layer['layer_id']}.json")
+        if layer.get("contract_version", 1) != 1 or layer_input.get("contract_version", 1) != 1:
+            raise ValueError("V2 inputs require the future V2 runner; sweep.js and make_prompt.py still use the "
+                             "V1 shared input and proposal projection, so no launchable run is staged")
         for field in ("requirement_sha256", "platform_profiles_sha256"):
             if not layer_input.get(field):
                 raise ValueError(f"inputs/{layer['layer_id']}.json has no {field}; rebuild it with build_inputs.py")
+        # The frozen templates are the run's modality's (fill_build), and sweep.js reads each row's modality for the
+        # discovery schema and the merge, so an input of another modality would get the wrong prompts.
+        if (layer_input.get("modality") or REPOSITORY_MODALITY) != modality:
+            raise ValueError(f"inputs/{layer['layer_id']}.json has modality "
+                             f"{layer_input.get('modality') or REPOSITORY_MODALITY!r} but layers.json {modality!r}; "
+                             "rebuild both with build_inputs.py")
         first_prompts[layer["layer_id"]] = make_prompt.compose(frozen, "discover", layer_input)
     for name in ("gpt6", "prompts", "empty", "schemas"):
         (work / name).mkdir(exist_ok=True)
@@ -497,9 +558,12 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
     (work / "prompts" / "gpt6-probe.txt").write_text(PROBE_PROMPT + "\n", encoding="utf-8")
     digest = prompts_sha256(frozen)
     (work / "prompts_sha256.txt").write_text(digest + "\n", encoding="utf-8")
+    skills = modality != REPOSITORY_MODALITY
+    worker_schemas = ("discover", "votes", "critic", *((SKILLS_SCHEMA,) if skills else ()))
     args = {"S": str(work), "stars": str(stars) if stars else None, "sweep_id": sweep_id, "T": frozen,
-            "schemas": {name: schemas[name] for name in ("discover", "votes", "critic")},
-            "layers": [{"layer_id": layer["layer_id"], "catalog": layer["catalog"]} for layer in selected]}
+            "schemas": {name: schemas[name] for name in worker_schemas},
+            "layers": [{"layer_id": layer["layer_id"], "catalog": layer["catalog"],
+                        **({"modality": modality} if skills else {})} for layer in selected]}
     if test:
         args["test"] = True
     args_text = json.dumps(args, ensure_ascii=False, separators=(",", ":"))
@@ -517,7 +581,8 @@ def stage(work: Path, *, sweep_id: str, run_date: str, selected: list, test: boo
                                      http_headers=lane.get("http_headers")))
     harness_files = sorted([*RUNTIME, "sweep.js", "templates.json", *(f"schemas/{name}.json" for name in SCHEMAS)])
     staged = {"schema_version": 1, "kind": "landscape_sweep_staging", "sweep_id": sweep_id, "date": run_date,
-              "test": test, "layers": [layer["layer_id"] for layer in selected], "prompts_sha256": digest,
+              "test": test, "modality": modality, "layers": [layer["layer_id"] for layer in selected],
+              "prompts_sha256": digest,
               "harness": {"path": "tools/sota-convergence/landscape-sweep", **git_state(repo_root),
                           "files": {name: sha256_bytes((HERE / name).read_bytes()) for name in harness_files},
                           "quota_probe": {"path": "scripts/codex_quota.py",
@@ -542,6 +607,8 @@ def main(argv=None) -> int:
     parser.add_argument("--work-dir", default=os.environ.get("SWEEP_WORK_DIR"))
     parser.add_argument("--sweep-id", required=True, help="lane name, e.g. landscape-sweep-20260926")
     parser.add_argument("--date", required=True, help="the run's date (YYYY-MM-DD), filled into the templates")
+    parser.add_argument("--contract-version", type=int, choices=(1, 2), default=1,
+                        help="V1 runner only; V2 producer contracts await the future V2 runner")
     choose = parser.add_mutually_exclusive_group()
     choose.add_argument("--layers", help="comma-separated layer ids, swept in the order given")
     choose.add_argument("--due-report", type=Path, help="saturation_ledger.py --report --json output: its due layers")
@@ -581,6 +648,9 @@ def main(argv=None) -> int:
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--repo-root", type=Path, default=REPO_ROOT)
     args = parser.parse_args(argv)
+    if args.contract_version == 2:
+        parser.error("V2 staging requires the future V2 runner; prepare fields with build_inputs.py "
+                     "--contract-version 2 without activating the V1 workflow")
     try:
         work = work_dir(args.work_dir)
         date.fromisoformat(args.date)

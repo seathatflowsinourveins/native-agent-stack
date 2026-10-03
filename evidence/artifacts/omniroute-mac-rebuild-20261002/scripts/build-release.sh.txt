@@ -1,0 +1,14 @@
+#!/bin/bash
+# Upstream's release build (build:release writes dist/BUILD_SHA), its pack-artifact check, then npm pack.
+set -u
+B=<build-dir>
+export PATH="$HOME/.local/share/mise/installs/node/24.21.0/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+cd "$B/src" || exit 2
+rm -f "$B"/omniroute-*.tgz
+step() { local name="$1"; shift; local t0=$(date +%s); "$@" > "$B/$name.log" 2>&1; local rc=$?; echo "$name exit=$rc seconds=$(( $(date +%s) - t0 ))"; return $rc; }
+step build-release npm run build:release || exit 1
+step check-pack-2 npm run check:pack-artifact || exit 1
+step pack-2 npm pack --pack-destination "$B" || exit 1
+cat dist/BUILD_SHA
+ls -la "$B"/*.tgz
+shasum -a 256 "$B"/*.tgz

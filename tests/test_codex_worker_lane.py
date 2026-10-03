@@ -9,7 +9,7 @@ Evidence classes (docs/acceptance-evidence-policy.md):
   `expectedVersion`, a null value deleting a key) and answers `mcp get`, `mcp list` and `debug prompt-input`;
 - the prove verdict tests read event fixtures cut from real `codex exec --json` runs of codex-cli 0.157.1
   (tests/fixtures/codex-worker-lane/, paths masked; see that directory's items for what each run was);
-- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.159.2) against a
+- CodexIntegrationTests runs the real codex app-server of the pinned version (lane.CODEX_VERSION, 0.159.3) against a
   scratch Codex home, only when NAS_CODEX_INTEGRATION=1 and that codex is on PATH (local integration evidence;
   skipped in CI).
 """
@@ -45,10 +45,10 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (538 words by Python `str.split()`, marker line included; 153 before the standing
+# The staged top-rule block (595 words by Python `str.split()`, marker line included; 153 before the standing
 # clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md) and rtk-ai/rtk
 # v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte for byte.
-TOP_RULE_SHA256 = "9565217f777774acf9831210f79ad44c4dc4d7e348411ad18efb54ddb78cd764"
+TOP_RULE_SHA256 = "7bd43c95e8452c2cede88d84562f9aedb8d01828b49bbf7bb1a6aac8b46b5362"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -132,7 +132,7 @@ def doctor_output(mode, has_roles, home):
         checks["config.load"] = {"id": "config.load", "category": "config", "status": status, "summary": summary,
                                  "details": details, "remediation": None, "durationMs": 3}
     return json.dumps({"schemaVersion": 1, "generatedAt": "2026-09-29T00:00:00Z", "overallStatus": "fail",
-                       "codexVersion": "0.159.2", "checks": checks}) + "\n"
+                       "codexVersion": "0.159.3", "checks": checks}) + "\n"
 '''
 _DOCTOR_NAMESPACE: dict = {}
 exec("import json\n" + DOCTOR, _DOCTOR_NAMESPACE)
@@ -144,7 +144,7 @@ ROLES_SOURCE_DIR = ROOT / "adoption" / "agents" / "codex"
 ROLE_NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 
 FAKE_CODEX = r'''#!{python}
-"""Fake codex 0.159.2 for tests/test_codex_worker_lane.py (see its docstring)."""
+"""Fake codex 0.159.3 for tests/test_codex_worker_lane.py (see its docstring)."""
 import hashlib, json, os, re, sys, tomllib
 from pathlib import Path
 
@@ -182,7 +182,7 @@ def segments(path):
     return out + [cur]
 
 if argv == ["--version"]:
-    print("codex-cli 0.159.2"); sys.exit(0)
+    print("codex-cli 0.159.3"); sys.exit(0)
 if argv[:1] == ["app-server"]:
     race = os.environ.get("FAKE_CODEX_RACE")
     for line in sys.stdin:
@@ -276,12 +276,12 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(lane.agents_block(), text)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in text.splitlines() if line.startswith("@")])
-        self.assertLess(len(text.encode("utf-8")), 8192)  # far under Codex's 32 KiB project_doc_max_bytes
+        self.assertLess(len(text.encode("utf-8")), 8192)  # local size budget; the project-doc limit does not cap global instructions
 
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 538)
+        self.assertEqual(len(top.split()), 595)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
@@ -602,7 +602,7 @@ class FakeHost:
 
 
 class ApplyFlowTests(unittest.TestCase):
-    """Synthetic: the fake codex above stands in for codex-cli 0.159.2."""
+    """Synthetic: the fake codex above stands in for codex-cli 0.159.3."""
 
     def setUp(self):
         self.host = FakeHost(self)
@@ -2121,7 +2121,7 @@ class SandboxProbeControlTests(unittest.TestCase):
 
 
 @unittest.skipUnless(os.environ.get("NAS_CODEX_INTEGRATION") == "1" and shutil.which("codex"),
-                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.159.2 on PATH to run the real app-server")
+                     "set NAS_CODEX_INTEGRATION=1 with codex-cli 0.159.3 on PATH to run the real app-server")
 class CodexIntegrationTests(unittest.TestCase):
     """Local integration with the real codex: its app-server writes a scratch Codex home and rollback restores it
     byte for byte; a project config outranks the profile but not the pinned flags; the gateway profile loads under

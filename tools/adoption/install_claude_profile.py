@@ -16,6 +16,12 @@
              is already registered with the same config, and left unchanged
              (reported) when it differs unless --replace-mcp is given
 
+A caller that wires only part of the profile narrows each step without changing its defaults:
+`--hook NAME` (repeatable) installs only the named files of the hook map in the guard step, `--agent NAME`
+(repeatable) only the named files of adoption/agents/claude/ in the agents step, and `--mcp-template PATH` registers
+the servers of another file in the template's `{"mcpServers": {...}}` shape instead of adoption/mcp/claude-user.json
+(tools/adoption/new_wsl_client_config.py passes the three).
+
 Each step is independently runnable (`--only guard|agents|mcp`) and safe to
 re-run: a hook is only overwritten if its checksum in
 adoption/hooks/claude/SHA256SUMS (paths relative to that file, so
@@ -118,20 +124,31 @@ def install_guard(home: Path, dry_run: bool, name: str = "effort-default-guard.p
     return "installed"
 
 
-def install_guards(home: Path, dry_run: bool) -> dict[str, str]:
-    """Every user-scope hook in HOOKS; all are checked before any is copied."""
-    for source in HOOKS.values():
+def install_guards(home: Path, dry_run: bool, names: list[str] | None = None) -> dict[str, str]:
+    """Every user-scope hook in HOOKS, or only the files in `names`; all are checked before any is copied."""
+    selected = list(HOOKS) if names is None else list(dict.fromkeys(names))
+    unknown = [name for name in selected if name not in HOOKS]
+    if unknown:
+        raise InstallError(f"no such hook file in the hook map: {', '.join(unknown)} (known: {', '.join(HOOKS)})")
+    for name in selected:
+        source = HOOKS[name]
         if sha256_of(source) != expected_sha256(source):
             raise InstallError(f"refusing to install {source}: sha256 does not match {SHA256SUMS}")
-    return {name: install_guard(home, dry_run, name) for name in HOOKS}
+    return {name: install_guard(home, dry_run, name) for name in selected}
 
 
-def install_agents(home: Path, dry_run: bool) -> list[str]:
+def install_agents(home: Path, dry_run: bool, names: list[str] | None = None) -> list[str]:
     if not AGENTS_SRC_DIR.is_dir():
         raise InstallError(f"missing source directory: {AGENTS_SRC_DIR}")
     dest_dir = home / ".claude" / "agents"
     results = []
-    for src in sorted(AGENTS_SRC_DIR.glob("*.md")):
+    sources = sorted(AGENTS_SRC_DIR.glob("*.md"))
+    if names is not None:
+        unknown = [name for name in names if name not in {src.name for src in sources}]
+        if unknown:
+            raise InstallError(f"no such agent file in {AGENTS_SRC_DIR}: {', '.join(unknown)}")
+        sources = [src for src in sources if src.name in names]
+    for src in sources:
         dest = dest_dir / src.name
         if dest.is_file() and dest.read_bytes() == src.read_bytes():
             print(f"agents: {dest} already matches; skipped")
@@ -237,10 +254,11 @@ def mcp_add_command(claude_bin: str, name: str, spec: dict) -> list[str]:
 
 
 def install_mcp_servers(claude_bin: str, dry_run: bool, home: Path, eco_root: Path,
-                        replace: bool = False) -> list[str]:
-    if not MCP_TEMPLATE.is_file():
-        raise InstallError(f"missing template: {MCP_TEMPLATE}")
-    servers = render_servers(json.loads(MCP_TEMPLATE.read_text()), home, eco_root)
+                        replace: bool = False, template: Path | None = None) -> list[str]:
+    template = MCP_TEMPLATE if template is None else template
+    if not template.is_file():
+        raise InstallError(f"missing template: {template}")
+    servers = render_servers(json.loads(template.read_text()), home, eco_root)
     results = []
     for name, spec in servers.items():
         server_type = spec.get("type", "stdio")
@@ -291,6 +309,14 @@ def build_parser() -> argparse.ArgumentParser:
                          help="Re-register a same-named MCP server whose existing config differs (default: leave it)")
     parser.add_argument("--only", choices=["guard", "agents", "mcp"], action="append",
                          help="Run only the named step(s); default: all three")
+    parser.add_argument("--hook", action="append", metavar="NAME",
+                         help="Guard step: install only this file of the hook map (repeatable; default: every file)")
+    parser.add_argument("--agent", action="append", metavar="NAME",
+                         help="Agents step: install only this file of adoption/agents/claude/ (repeatable; "
+                              "default: every file)")
+    parser.add_argument("--mcp-template", default=None, metavar="PATH",
+                         help="MCP step: register the servers of this file, in the shape of "
+                              "adoption/mcp/claude-user.json, instead of that file")
     parser.add_argument("--dry-run", action="store_true", help="Report what would happen; write and register nothing")
     return parser
 
@@ -302,12 +328,13 @@ def main(argv: list[str] | None = None) -> int:
     home = Path(args.home)
     try:
         if "guard" in steps:
-            install_guards(home, args.dry_run)
+            install_guards(home, args.dry_run, args.hook)
         if "agents" in steps:
-            install_agents(home, args.dry_run)
+            install_agents(home, args.dry_run, args.agent)
         if "mcp" in steps:
             eco_root = Path(args.eco_root) if args.eco_root else default_eco_root(home)
-            install_mcp_servers(args.claude_bin, args.dry_run, home, eco_root, args.replace_mcp)
+            install_mcp_servers(args.claude_bin, args.dry_run, home, eco_root, args.replace_mcp,
+                                Path(args.mcp_template) if args.mcp_template else None)
     except FileNotFoundError as error:
         print(f"install failed: {error.filename or error} not found (pass --claude-bin)", file=sys.stderr)
         return 1

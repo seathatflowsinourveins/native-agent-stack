@@ -54,11 +54,11 @@ import hashlib
 import importlib.util
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -1290,8 +1290,16 @@ class ManifestScopeAndPruneTests(InstallSkillsTestCase):
                     self.assertIn("--project-dir", result.stderr)
         self.assertEqual(calls_log(fake_bin), [])  # refused before even the version check
         self.assertFalse((self.home / ".agents").exists())
-        printed = self.run_install(scoped, "--print-codex-config")  # print-only; installs nothing
+        # A path-keyed Codex table names the project's installed SKILL.md, so printing needs --project-dir too.
+        printed = self.run_install(scoped, "--print-codex-config")
+        self.assertEqual(printed.returncode, 1, printed.stdout + printed.stderr)
+        self.assertIn("--project-dir", printed.stderr)
+        self.assertNotIn("[[skills.config]]", printed.stdout)
+        project = self.tmp_path / "project"
+        project.mkdir()
+        printed = self.run_install(scoped, "--print-codex-config", "--project-dir", str(project))  # print-only
         self.assertEqual(printed.returncode, 0, printed.stdout + printed.stderr)
+        self.assertEqual(list(project.iterdir()), [])
         scoped.write_text(json.dumps(dict(data, scope="planet")))
         for mode in ((), ("--print-codex-config",)):
             with self.subTest(scope="planet", mode=mode):
@@ -1319,7 +1327,23 @@ class ManifestScopeAndPruneTests(InstallSkillsTestCase):
         self.assertNotIn("unknown", only.stderr)
 
 
+def printed_tables(stdout: str) -> list[dict]:
+    """The [[skills.config]] tables --print-codex-config printed, parsed as Codex parses config.toml."""
+    return tomllib.loads(stdout).get("skills", {}).get("config", [])
+
+
 class PrintCodexConfigTests(InstallSkillsTestCase):
+    """--print-codex-config keys each table by the installed SKILL.md path, never by name. Codex applies a
+    name rule to every loaded skill of that name (openai/codex rust-v0.159.2
+    codex-rs/config/src/skills_config.rs L109-119), its bundled .system copy included, and a path rule to the
+    one skill whose canonical path_to_skills_md it names (codex-rs/ext/skills/src/host_service.rs L366-371,
+    host_outcome.rs L52-54). skills 1.7.0 installs a global Codex skill only at the canonical
+    ~/.agents/skills/<name> (vercel-labs/skills@7407f389 src/installer.ts L392-402), which Codex loads from its
+    $HOME/.agents/skills root (codex-rs/ext/skills/src/host_roots.rs L103-108)."""
+
+    def skill_md(self, name: str, root: Path | None = None) -> str:
+        return str((root or self.home) / ".agents" / "skills" / name / "SKILL.md")
+
     def test_prints_only_codex_disabled_skills_and_never_touches_the_binary(self):
         on_skill = make_skill("codex-on", "# on\n", tree_sha("on"), codex_enabled=True)
         off_skill = make_skill("codex-off", "# off\n", tree_sha("off"), codex_enabled=False)
@@ -1327,10 +1351,9 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         result = self.run_install(manifest, "--print-codex-config",
                                   fake_bin=Path("/nonexistent/skills-binary"))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn('[[skills.config]]', result.stdout)
-        self.assertIn('name = "codex-off"', result.stdout)
-        self.assertIn("enabled = false", result.stdout)
+        self.assertEqual(printed_tables(result.stdout), [{"path": self.skill_md("codex-off"), "enabled": False}])
         self.assertNotIn("codex-on", result.stdout)
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
 
     def test_multiple_disabled_skills_each_get_their_own_table(self):
         skills = [make_skill(f"off-{i}", f"# {i}\n", tree_sha(f"off-{i}"), codex_enabled=False)
@@ -1339,8 +1362,48 @@ class PrintCodexConfigTests(InstallSkillsTestCase):
         result = self.run_install(manifest, "--print-codex-config")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(result.stdout.count("[[skills.config]]"), 3)
-        for i in range(3):
-            self.assertIn(f'name = "off-{i}"', result.stdout)
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": self.skill_md(f"off-{i}"), "enabled": False} for i in range(3)])
+
+    def test_skill_creator_is_disabled_by_its_installed_path_never_by_its_name(self):
+        # Codex ships its own .system/skill-creator (codex-rs/skills/src/assets/samples/skill-creator/SKILL.md L2
+        # at rust-v0.159.2), so a name rule would hide the bundled copy along with the pinned one.
+        result = self.run_install(ADOPTION_MANIFEST, "--print-codex-config")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        tables = printed_tables(result.stdout)
+        self.assertIn({"path": self.skill_md("skill-creator"), "enabled": False}, tables)
+        self.assertEqual([table for table in tables if set(table) != {"path", "enabled"}], [])
+        self.assertNotRegex(result.stdout, r"(?m)^name = ")
+
+    def test_path_is_joined_as_the_cli_joins_the_canonical_folder_and_quoted_for_toml(self):
+        # The canonical folder is path.join(os.homedir(), ".agents", "skills", name) (dist/cli.mjs L2208-2210), which
+        # collapses a ".." lexically; a quote or backslash in the path stays a valid TOML basic string.
+        home = self.tmp_path / 'we"ird\\home'
+        home.mkdir()
+        off_skill = make_skill("off-skill", "# off\n", tree_sha("off"), codex_enabled=False)
+        result = self.run_install(self.write_manifest([off_skill]), "--print-codex-config",
+                                  home_arg=str(self.tmp_path / "missing" / ".." / home.name))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(printed_tables(result.stdout), [{"path": self.skill_md("off-skill", home), "enabled": False}])
+        self.assertFalse((self.tmp_path / "missing").exists())
+
+    def test_a_project_scoped_manifest_names_the_project_copy(self):
+        off_skill = make_skill("off-skill", "# off\n", tree_sha("off"), codex_enabled=False)
+        scoped = self.tmp_path / "scoped.json"
+        scoped.write_text(json.dumps(dict(make_manifest([off_skill]), scope="project")))
+        project = self.tmp_path / "project"
+        project.mkdir()
+        result = self.run_install(scoped, "--print-codex-config", "--project-dir", str(project))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": self.skill_md("off-skill", project.resolve()), "enabled": False}])
+        self.assertEqual(list(project.iterdir()), [])
+
+    def test_a_disabled_name_that_is_not_one_path_component_is_refused(self):
+        off_skill = make_skill("../escape", "# off\n", tree_sha("off"), codex_enabled=False)
+        result = self.run_install(self.write_manifest([off_skill]), "--print-codex-config")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertNotIn("[[skills.config]]", result.stdout)
 
 
 class ReuseRefGateTests(InstallSkillsTestCase):
@@ -1384,7 +1447,9 @@ class ReuseRefGateTests(InstallSkillsTestCase):
         on = self.reuse(lambda s: s.get("codex_enabled") is True)
         result = self.run_install(self.write_manifest([off, on]), "--print-codex-config")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertEqual(re.findall(r'(?m)^name = "([^"]+)"$', result.stdout), [off["name"]])
+        self.assertEqual(printed_tables(result.stdout),
+                         [{"path": str(self.home / ".agents" / "skills" / off["name"] / "SKILL.md"),
+                           "enabled": False}])
 
     def test_reused_entry_that_restates_a_gate_is_refused(self):
         entry = self.reuse(lambda s: s.get("codex_enabled") is False)

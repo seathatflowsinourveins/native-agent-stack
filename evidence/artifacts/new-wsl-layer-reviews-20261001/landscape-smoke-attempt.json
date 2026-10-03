@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "failed_native_workflow_attempt",
+  "recorded_at": "2026-10-01",
+  "layer": "durable-memory",
+  "source_base": "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+  "recipe": "tools/sota-convergence/landscape-sweep/README.md:294-358",
+  "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/5597f9fae2c6148037a74b4e73d2c55fc11c9ff6/tools/sota-convergence/landscape-sweep/README.md#L294-L358",
+  "escalation": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential durable-memory architecture and conflicting source/acceptance evidence; the staged maintained workflow was not rewritten."
+  },
+  "native_preparation": {
+    "saturation_ledger_check_exit_code": 0,
+    "returned_ledger_check": "ok: 5 sweep record(s), chain intact, bindings verified",
+    "extract_layers_exit_code": 0,
+    "foundation_layers": 20,
+    "trading_layers": 12,
+    "freshness_exit_code": 0,
+    "freshness_returned_summary": "done 483 errors 0 partial_errors 0",
+    "freshness_manifest": {"bytes": 166418, "sha256": "450a076198ba6ed77e97e2eb0e8f6e0925a2408116aa1668773ea09c9fb0f8a7"},
+    "build_inputs_exit_code": 0,
+    "build_args_exit_code": 0,
+    "staged_script": {"file": "sweep.embedded.js", "bytes": 32524, "sha256": "42388b70706b9d8fd8bfef3863c3fa7487de2c3159163933b5d621a9b84c28a4"},
+    "scope": {"file": "scope.json", "bytes": 3403, "sha256": "35f1e9fea19933cb87fe335d16c64d3a5e04d0225f32b6082bd0e352c6def5bc"},
+    "seeds": {"file": "seeds.json", "bytes": 3429, "sha256": "09612dda3b5c094f4bdeaef569752c6485fddfdea43c09964d2da980b16882c7"},
+    "args": {"file": "args.json", "bytes": 13323, "sha256": "4ae1defb31463ab7109d992a3347179b2de30aea4459a1a33ff00a1d69a7f2e7"}
+  },
+  "native_provider_probe": {
+    "status": "done",
+    "exit_code": 0,
+    "started": "2026-10-01T09:47:36Z",
+    "finished": "2026-10-01T09:48:03Z",
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "client": "codex-cli 0.159.3",
+    "limit": false,
+    "usage_status": "reported",
+    "returned_usage": {"input_tokens": 78807, "cached_input_tokens": 45312, "cache_write_input_tokens": 0, "output_tokens": 583, "reasoning_output_tokens": 322},
+    "scope": "One maintained workflow transport/schema probe. Its answer is a probe payload, not verified research metadata or semantic-quality acceptance. Cache and reasoning counters are subsets and are not added again."
+  },
+  "native_parent": {
+    "client": "Claude Code2.1.286",
+    "command_shape": "claude -p --model opus --effort max --output-format json --no-session-persistence --allowedTools Workflow < owned-prompt > owned-original-json",
+    "exit_code": 0,
+    "returned_terminal_subtype": "success",
+    "returned_terminal_error": false,
+    "returned_terminal_turns": 6,
+    "returned_state": "The terminal response says the background workflow is still running, not completed.",
+    "private_original_stdout": {"file": "claude-workflow.stdout.json", "bytes": 92419, "sha256": "90d0f5304d5d87ba0bcf9bb801cbbfce4aaa8213c4642ebcfac5fa8f55474bd4"}
+  },
+  "native_workflow": {
+    "run_id": "wf_be317f16-511",
+    "launch_returned": "Workflow launched in background",
+    "launch_tool_error": false,
+    "independently_observed_saved_status": "killed",
+    "independently_observed_saved_error": "Error: Workflow aborted",
+    "private_original_run_record": {"file": "run-wf_be317f16-511.json", "bytes": 37153, "sha256": "86a4c9c84a525145e62dc89e79f297daeab599a316d89025505db4a2cffbd37f"},
+    "completed_native_codex_discovery": {"job": "gpt6-discover-durable-memory", "exit_code": 0, "output_file": "last.json", "output_bytes": 17417, "proposals": 6, "scope": "Partial source leads only; both-family fit/refutation and completeness were not accepted."},
+    "suspected_cause": "The headless parent exited while the native Workflow remained a background task. Saved runtime state records an abort; supported persistent-caller lifecycle is under bounded source diagnosis."
+  },
+  "native_usage_retention": {
+    "command_shape": "python3 tools/sota-convergence/landscape-sweep/usage_record.py --transcript-dir owned-native-transcripts --out owned-child-usage.json",
+    "exit_code": 1,
+    "returned_status": "incomplete",
+    "children": 2,
+    "incomplete_children": ["gpt6-discover:durable-memory", "discover:durable-memory"],
+    "observed_effort_fields": "Empty for the two aborted native workflow wrappers; their completion/effort usage verification did not pass. The standalone Codex job's explicit max inputs remain a separate observation.",
+    "private_original_usage": {"file": "child-usage-wf_be317f16-511.json", "bytes": 16092, "sha256": "c09c941e4c2fd2a4423554639cb88cba6b41397d7ab491404deaa8bf01f71bed"},
+    "complete_provider_usage": "unknown; original reported counters are retained privately, incomplete child/parent snapshots are not totaled",
+    "invoice_cost": "unknown"
+  },
+  "correction": "A successful native launch and successful parent exit do not prove a completed background workflow. The actual saved killed/aborted state governs this attempt.",
+  "next_action": "Use a source-supported persistent native caller or the maintained recipe's live coordinator session. Retain and inspect the original journal before attempting supported resume; do not edit the vendor script or fabricate a completed run.",
+  "closure_effect": "None. This is a retained failed attempt with partial source discovery, not a completed saturation sweep, unchanged upstream acceptance or new-host/provider-quality qualification."
+}

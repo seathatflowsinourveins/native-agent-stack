@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "kind": "preregistered_native_skill_followups",
+  "frozen_at_utc": "2026-09-30 06:16:41 UTC",
+  "original_preregistration": "preregistered-cases.json",
+  "reason": "Retain the original 25 outcomes. Observe explicit search-first via a model-issued native Skill call, and qualify the machine-readable JSON contract with the native structured-output control.",
+  "sources": [
+    {
+      "url": "https://developers.openai.com/blog/eval-skills",
+      "use": "Define success first; trace + outcome checks; explicit, implicit and adjacent negative; minimum ten focused prompts."
+    },
+    {
+      "url": "https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md",
+      "use": "Same-prompt with/without-skill baseline and difficult near-miss trigger cases."
+    },
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a"
+    }
+  ],
+  "client_controls": {
+    "claude_version": "2.1.285",
+    "model_requested": "opus",
+    "effort": "max",
+    "permissions": "dontAsk with read-only tool grants, mutation/delegation tools denied; native context-mode fetch/search grants included.",
+    "debug_file": "Private native diagnostic capture",
+    "configuration": "Same worktree and selected source bytes; no global setting changes."
+  },
+  "cases": [
+    {
+      "id": "f01_explicit_skill_csv",
+      "skill": "search-first",
+      "kind": "explicit_positive",
+      "clients": [
+        "claude"
+      ],
+      "should_activate": true,
+      "prompt": "Use the native search-first skill for this task. I'm about to add a small Python CSV reader to a project. Rows may include a comma inside quoted fields. Recommend the maintained existing component and the API calls we should reuse, with one primary-source link and a short reason. We only need a recommendation in this run; return it in chat and make no file changes.",
+      "outcome_checks": [
+        "Recommend Python's maintained standard-library csv module.",
+        "Identify csv.reader or csv.DictReader rather than splitting lines on commas.",
+        "Account for quoted commas and newline='' when opening files.",
+        "Include an official Python documentation source and make no install/code change."
+      ],
+      "activation_check": "Require actual successful native Skill(search-first) invocation or successful full selected instruction read. A response mention does not pass."
+    },
+    {
+      "id": "f02_native_json",
+      "skill": "writing-for-agents",
+      "kind": "adjacent_negative",
+      "clients": [
+        "claude"
+      ],
+      "should_activate": false,
+      "prompt": "In the Markdown string `[Agent handbook](docs/agents.md)`, identify the link text and relative URL. Return a JSON object with exactly `text` and `url`; make no file changes.",
+      "native_extra_args": [
+        "--json-schema",
+        "{\"type\":\"object\",\"properties\":{\"text\":{\"type\":\"string\"},\"url\":{\"type\":\"string\"}},\"required\":[\"text\",\"url\"],\"additionalProperties\":false}"
+      ],
+      "outcome_checks": [
+        "Native result.structured_output is a JSON object with exactly text and url.",
+        "text equals Agent handbook; url equals docs/agents.md.",
+        "No selected writing-for-agents invocation or full instruction read occurs."
+      ],
+      "qualification_scope": "Native machine-readable result. Does not retroactively make the original fenced result strict JSON."
+    }
+  ],
+  "baseline": {
+    "case_id": null
+  },
+  "limitations": [
+    "These two follow-ups are separate from the original ten-prompt writing set and original 25 executions.",
+    "The original w05 frozen word-count failure remains; replacement-section quality is assessed separately because the task and frozen grader differ in their word-limit target.",
+    "The original w10 strict-JSON failure remains.",
+    "No skill source, description, listing or global configuration is changed."
+  ]
+}
