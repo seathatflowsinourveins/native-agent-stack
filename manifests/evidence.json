@@ -15761,8 +15761,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-mac-runtime-memory-candidates.md",
-      "sha256": "bacfbc96954a8c87344b815176e82ead6898211307efb7318d2aca9f348e8fb9",
-      "bytes": 11353
+      "sha256": "ea1a9bf3e788caed923977d98050e735836b555a1fe9c8ef7e06e1a926391926",
+      "bytes": 12358
     },
     {
       "path": "docs/decisions/2026-10-01-minimal-owned-source-sync.md",
