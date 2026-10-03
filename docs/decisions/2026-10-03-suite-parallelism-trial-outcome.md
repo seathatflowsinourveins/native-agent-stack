@@ -154,8 +154,12 @@ three modules are byte-identical at the trial head and at this record's base.
   `tests/test_adaptive_paper_fees.py:295` (7 tests) and `AsyncTransport(unittest.IsolatedAsyncioTestCase)` at
   `tests/test_adaptive_paper_transport.py:478` (59 tests); no other test file at the trial head does. At module level each whole
   module's suite fails to be sent (61 and 116 ids); at class level only those two classes do (7 and 59). This holds
-  although none of these 66 tests runs on ubuntu-24.04: all were skipped in every S run (both classes carry
-  `@unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")`). A class-level skip only marks the
+  although none of these 66 tests ran in the trial's ubuntu-24.04 runs: all were skipped in every S run, because
+  `HAS_SDK` was false there (it is true only when both `alpaca` and `requests` import: `tests/test_adaptive_paper_transport.py:18-23`
+  and `tests/test_adaptive_paper_fees.py:43-48`; the trial arms installed only unittest-parallel and coverage, and
+  `.github/requirements-ci.txt` installs neither package). The skip is a property of that environment, not of the
+  operating system. Both classes carry
+  `@unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")`. A class-level skip only marks the
   class (`Lib/unittest/case.py:159-161` at v3.12.3), the loader builds one instance per test
   (`Lib/unittest/loader.py:94`) and the skip applies only when a test runs (`case.py:612-617`), so every instance
   holds its context before anything is skipped. Locally, a toy module with one plain class and one
@@ -199,7 +203,7 @@ pickling or spawned processes, and the default branch is two commits ahead of th
   `LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs` (5.546 s). Most missing ids
   were only skipped in S (109 of 199 at module level and 74 of 82 at class level; 90 and 8 were ok), all 66
   `IsolatedAsyncioTestCase` tests among them: those two classes break unittest-parallel at pickling although their
-  tests only skip on ubuntu-24.04 (root cause (a)).
+  tests are skipped wherever `HAS_SDK` is false, as in every S run (root cause (a)).
 - Speed beyond three runs per arm: each arm ran three times on shared hosted runners, so the medians, the extremes and
   the ratios rest on n=3, and each slowest-over-fastest ratio divides by the single fastest S run (1,186 s) inside a
   serial spread of 1,186 to 1,688 s. A new trial should set its repeat count with this noise in view.
