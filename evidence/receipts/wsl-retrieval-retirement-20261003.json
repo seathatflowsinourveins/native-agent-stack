@@ -20,6 +20,12 @@
     "The earlier final-native-scan-record.json remains historical output for its bound earlier workflow/config. completion-native-record.json records the strengthened partition, shortened 2026-10-17 expiry, fresh active/expired controls and 161-test run; neither is an unchanged upstream test suite. The first completion validation failed on a stale hash row for an already-empty output and is retained, with the corrected diagnosis in publication-correction.md."
   ],
   "source_base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "locks": [
+    {
+      "lock": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+      "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
+    }
+  ],
   "historical_assessment": "evidence/receipts/wsl-retrieval-20260920.json",
   "retirement_assessment": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
   "native_control_record": "evidence/artifacts/wsl-retrieval-retirement-20261003/controls.json",

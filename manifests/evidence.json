@@ -46750,6 +46750,11 @@
       "sha256": "b833498956e275154205a4ce17fda3d47b0c7155001207230de1429e2dddc2a5"
     },
     {
+      "path": "evidence/artifacts/wsl-retrieval-retirement-20261003/receipt-binding-correction.md",
+      "sha256": "91a3be1712b4ab7e495e8420fbc05611351c7811faf45ccef14d2f8bf329a6a6",
+      "bytes": 2896
+    },
+    {
       "path": "evidence/artifacts/wsl-terminal-defaults-20260929/README.md",
       "sha256": "4416d422a5ec3064dd14f7c27a9b09191a5568f1b7c8bade742f0bc351089d27",
       "bytes": 4408
@@ -48451,8 +48456,8 @@
     },
     {
       "path": "evidence/receipts/wsl-retrieval-retirement-20261003.json",
-      "sha256": "f0688a61e2a0c33e8f72e937855ca287593b00dbb7a3c9471186ed83b3e8ec61",
-      "bytes": 6414
+      "sha256": "332fe3c68b7a376caaf72af1976fff213fd604702b326ae85586c7d6c602a91b",
+      "bytes": 6608
     },
     {
       "path": "evidence/receipts/wsl-terminal-defaults-20260929.json",
