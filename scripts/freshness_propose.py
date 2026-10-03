@@ -87,8 +87,8 @@ RUNTIME_TAG_MARKER = " (tag)"
 # The line after the runtime table that lists the rows whose declared pattern selected no tag.
 RUNTIME_TAG_MISS_SENTENCE = (
     "runtime row(s) whose declared tag pattern selected no tag this run, each with its reason "
-    "(`tag_pattern_unmatched`: no listed tag matched; `tag_pattern_unfetched`: no tag list was fetched), "
-    "so the upstream latest is the release or tag listing"
+    "(`tag_pattern_unmatched`: no listed tag matched, so the upstream latest stays the release or tag "
+    "listing; `tag_pattern_unfetched`: the tag list could not be read this run)"
 )
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
@@ -154,6 +154,10 @@ def _freshness_record_has_error(repository, raw_repositories: dict) -> bool:
     releases/tags/commit sub-call failed and was worked around
     (``record["partial_errors"]``) -- for example a 503 on the releases
     endpoint whose fallback to the tags endpoint still populated a value.
+    A failed matching-tags list is not a fetch problem here: github_freshness.py
+    keeps it under ``record["matching_tags_errors"]``, never in
+    ``partial_errors``, so it leaves every row reliable and only the runtime row
+    that declares the prefix says ``tag_pattern_unfetched``.
     Matches by exact URL first, then by normalized GitHub slug, the same two
     ways ``build_manifest.py``'s own ``compute_upstream()`` resolves a
     repository to its freshness record.
@@ -247,6 +251,8 @@ def render_drift_markdown(published_path, rebuilt_name: str, published: dict, re
     else:
         lines.append("No pin/upstream drift detected for components present in both manifests.")
     if unfetched:
+        # "fetch problem" is a partial error; a failed matching-tags list never is one
+        # (``_freshness_record_has_error``), so it never puts a component here.
         lines += [
             "",
             f"{len(unfetched)} component(s) have no reliable upstream data this run (an "
@@ -522,7 +528,9 @@ def upstream_partial_error_count(document: dict) -> int:
     github-freshness.json document. A nonzero count means at least one
     repository's releases/tags/commit sub-fetch failed and was worked
     around with a fallback (N2) -- ``propose``'s job condition treats this
-    the same as a full fetch error: it must be 0 before a PR is opened."""
+    the same as a full fetch error: it must be 0 before a PR is opened. A
+    failed matching-tags list is not counted here; the document counts it
+    separately as ``matching_tags_errors``, which this gate does not read."""
     return _int_field(document, "partial_errors", "github-freshness.json")
 
 

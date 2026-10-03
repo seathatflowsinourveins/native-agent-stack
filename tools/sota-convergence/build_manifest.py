@@ -479,26 +479,42 @@ RUNTIME_WATCH_ONLY = "watch_only"
 RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
 # upstream.latest_source on a runtime row whose entry declares tags (extract_layers.py's
 # RUNTIME_TAG_KEYS): the latest is the highest matching tag, the declared pattern matched
-# no fetched tag, or github_freshness.py fetched no tag list for the declared prefix. A
-# row without the declaration has no latest_source.
+# no fetched tag, or the record has no tag list for the declared prefix (github_freshness.py
+# never fetched one, or its matching-refs call failed). A row without the declaration has
+# no latest_source.
 RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
 RUNTIME_TAG_PATTERN_UNMATCHED = "tag_pattern_unmatched"
 RUNTIME_TAG_PATTERN_UNFETCHED = "tag_pattern_unfetched"
-# A tag pattern's capture group is ranked only when it is a dotted numeric version.
-DOTTED_VERSION_RE = re.compile(r"\d+(?:\.\d+)+")
+# A tag pattern's capture group is ranked only when it is a dotted numeric version in ASCII
+# digits. re.ASCII here and on the declared pattern: \d otherwise matches any Unicode decimal
+# digit and int() reads one, so a tag in fullwidth digits could outrank the real version.
+DOTTED_VERSION_RE = re.compile(r"\d+(?:\.\d+)+", re.ASCII)
+# What re.compile raises for a pattern string that does not compile: a syntax error, inline
+# flags that conflict with re.ASCII ("(?u)"), a repeat count too large or nesting too deep.
+PATTERN_COMPILE_ERRORS = (re.error, ValueError, OverflowError, RecursionError)
 
 
 def select_matching_tag(names, pattern):
     """``(name, count)``: the name in ``names`` with the highest version among the
     names that ``re.fullmatch`` ``pattern`` with a dotted numeric version
     (DOTTED_VERSION_RE) in its one capture group, and how many names qualified;
-    ``(None, 0)`` when none did.
+    ``(None, 0)`` when none did. Both match ASCII digits only (re.ASCII).
+
+    A ``pattern`` that is missing or does not compile also gives ``(None, 0)``
+    instead of raising: extract_layers.py raises on such a declaration, and this is
+    the defence for a hand-edited runtime-pins.json, as github_freshness.py ignores
+    a bad prefix.
 
     Versions compare as integer tuples, never as names: GitHub lists matching refs
     in name order, in which 0.3.99 sorts after 0.3.276 (nvchecker's ``use_max_tag``
     and Renovate's github-tags datasource also rank by parsed version). A tie goes
     to the greater name, so the result does not depend on the list's order."""
-    compiled = re.compile(pattern)
+    if not isinstance(pattern, str):
+        return None, 0
+    try:
+        compiled = re.compile(pattern, re.ASCII)
+    except PATTERN_COMPILE_ERRORS:
+        return None, 0
     best, count = None, 0
     for name in names or ():
         match = compiled.fullmatch(name) if isinstance(name, str) else None
@@ -519,9 +535,16 @@ def apply_tag_declaration(upstream: dict, tags: dict, record) -> dict:
     With a ``matching_tags`` list for the prefix and a name the pattern selects
     (``select_matching_tag``), ``latest`` becomes that full tag name (replacing None
     or a release tag), with ``latest_source`` RUNTIME_LATEST_MATCHING_TAG and
-    ``matching_tag_count``; every other field stays as compute_upstream returned it.
-    Otherwise ``upstream`` is unchanged apart from ``latest_source``
-    RUNTIME_TAG_PATTERN_UNMATCHED, or RUNTIME_TAG_PATTERN_UNFETCHED without a list."""
+    ``matching_tag_count``. ``released_at`` and ``prerelease`` become None, because
+    they describe the repository's latest GitHub release, which in a monorepo can be
+    another package's, and ``latest_flag`` is dropped, because no tag-listing fallback
+    is withheld in place of this latest; every other field stays as compute_upstream
+    returned it, and dormancy still reads the repository's activity from the record.
+    Otherwise ``upstream`` is unchanged apart from ``latest_source``:
+    RUNTIME_TAG_PATTERN_UNMATCHED when the pattern selects no name (a pattern that is
+    missing or does not compile included), or RUNTIME_TAG_PATTERN_UNFETCHED without a
+    list (never fetched, or github_freshness.py's ``matching_tags_errors`` holds the
+    failed call)."""
     held = record.get("matching_tags") if isinstance(record, dict) else None
     names = held.get(tags.get("prefix")) if isinstance(held, dict) else None
     if not isinstance(names, list):
@@ -529,7 +552,9 @@ def apply_tag_declaration(upstream: dict, tags: dict, record) -> dict:
     tag, count = select_matching_tag(names, tags.get("pattern"))
     if tag is None:
         return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNMATCHED}
-    return {**upstream, "latest": tag, "latest_source": RUNTIME_LATEST_MATCHING_TAG, "matching_tag_count": count}
+    kept = {key: value for key, value in upstream.items() if key != "latest_flag"}
+    return {**kept, "latest": tag, "released_at": None, "prerelease": None,
+            "latest_source": RUNTIME_LATEST_MATCHING_TAG, "matching_tag_count": count}
 
 
 def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
@@ -553,7 +578,9 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     RUNTIME_TAG_KEYS) takes its upstream latest from the tags github_freshness.py
     listed for the declared prefix (``apply_tag_declaration``), before the pin is
     compared, so a tag-only or monorepo upstream is compared by its own version
-    tags. Every other row's upstream is compute_upstream's, unchanged."""
+    tags. A missing or failed tag list only sets ``latest_source``
+    RUNTIME_TAG_PATTERN_UNFETCHED. Every other row's upstream is compute_upstream's,
+    unchanged."""
     entries = []
     for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
         repository = pin.get("repository")

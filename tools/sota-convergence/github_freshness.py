@@ -16,29 +16,39 @@ Reads (repository-relative to --work-dir):
   star-candidates.json    (#/star_candidates[]/repository, #/beyond_stars[]/repository)
 
 Writes --out (default <work-dir>/github-freshness.json):
-  {schema, generated_at, count, errors, partial_errors, fetched_this_run,
-   retained_from_prior_runs, observation_window: {min, max},
-   repositories: {repo_url: {..., observed_at, slug, aliases, matching_tags?, partial_errors?}}}
+  {schema, generated_at, count, errors, partial_errors, matching_tags_errors,
+   fetched_this_run, retained_from_prior_runs, observation_window: {min, max},
+   repositories: {repo_url: {..., observed_at, slug, aliases, matching_tags?,
+                             matching_tags_truncated?, matching_tags_errors?, partial_errors?}}}
 
 Declared tag prefixes: for each tag prefix that a runtime-pins.json entry declares
 (``tags.prefix``, extract_layers.py's RUNTIME_TAG_KEYS) for a repository, one more
 ``gh api --paginate repos/{slug}/git/matching-refs/tags/{prefix}`` call lists the
 tags whose names start with it (an empty prefix lists every tag), and the record
 carries "matching_tags": {prefix: [tag names, without "refs/tags/"]}, in the API's
-name order (build_manifest.py ranks them by version). A repository may have several
+name order (build_manifest.py ranks them by version). At most MATCHING_TAGS_CAP
+names are kept per prefix, the first in that order, and a record with a list that
+was cut carries "matching_tags_truncated": true. A repository may have several
 prefixes. A repository without one makes no such call and its record has no
 "matching_tags", whichever working file names it.
 
+A matching-refs call has no ordinary "not found" (a prefix that matches no tag
+returns an empty list), so any failure leaves that prefix without a list and is
+kept under the record's "matching_tags_errors" ({prefix: short reason}), which the
+document counts as "matching_tags_errors". It is never a "partial_errors" entry:
+the tag lists are report-only runtime data, while a partial error makes
+scripts/freshness_propose.py treat the repository's drift and trading rows as
+unreliable and holds catalog-freshness.yml's propose job.
+
 Resumability: a repository already present in an existing --out file is
 skipped unless --refresh is given, *unless* its record carries a
-"partial_errors" entry (a sub-request -- releases/tags/commit/matching tags -- that
-failed with something other than an ordinary "not found"); such a record is left
-pending so the next run retries exactly the missing metadata. A matching-refs call
-has no ordinary "not found": a prefix that matches no tag returns an empty list, so
-any failure is kept under "matching_tags:<prefix>". A record without a
-"matching_tags" list for every prefix runtime-pins.json now declares for its
-repository is pending too. --max-repos bounds a trial run to the first N (sorted)
-slugs that still need fetching.
+"partial_errors" entry (a releases/tags/commit sub-request that failed with
+something other than an ordinary "not found"); such a record is left pending so
+the next run retries exactly the missing metadata. A record that carries
+"matching_tags_errors", or has no "matching_tags" list for a prefix that
+runtime-pins.json now declares for its repository, is pending too; the resume is
+per repository, so the next run fetches that whole repository again. --max-repos
+bounds a trial run to the first N (sorted) slugs that still need fetching.
 """
 from __future__ import annotations
 
@@ -57,8 +67,10 @@ GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
 # name starts with the prefix, in name order; a prefix that matches no tag returns [].
 MATCHING_REFS_PATH = "repos/{slug}/git/matching-refs/tags/{prefix}"
 TAG_REF_PREFIX = "refs/tags/"
-# A failed matching-refs call's partial_errors key is this followed by its prefix.
-MATCHING_TAGS_ERROR_KEY = "matching_tags:"
+# At most this many tag names are stored per (repository, prefix), the first in the API's
+# name order, so a runaway tag list cannot bloat the artifact (inspect_ai listed 274 tags on
+# 2026-10-03). The call still reads every page within gh_api's timeout.
+MATCHING_TAGS_CAP = 5000
 # extract_layers.py's literal tag-prefix rule (RUNTIME_TAG_PREFIX_RE, kept independent
 # here): a declared prefix outside it is ignored, so it never reaches the API path.
 TAG_PREFIX_RE = re.compile(r"[A-Za-z0-9._=+-]*")
@@ -133,11 +145,13 @@ def missing_tag_prefixes(record, prefixes) -> list:
 
 
 def record_is_covered(record, tag_prefixes: dict) -> bool:
-    """True when a retained record needs no fetch this run: it carries no "error"
-    and no "partial_errors", and it holds a "matching_tags" list for every prefix
-    ``tag_prefixes`` (collect_declared_tag_prefixes) declares for its slug now, so
-    a prefix declared since, or a list a run never fetched, leaves it pending."""
-    if not isinstance(record, dict) or record.get("error") or record.get("partial_errors"):
+    """True when a retained record needs no fetch this run: it carries no "error",
+    no "partial_errors" and no "matching_tags_errors", and it holds a
+    "matching_tags" list for every prefix ``tag_prefixes``
+    (collect_declared_tag_prefixes) declares for its slug now, so a prefix declared
+    since, or a list a run never fetched or failed to fetch, leaves it pending."""
+    if (not isinstance(record, dict) or record.get("error") or record.get("partial_errors")
+            or record.get("matching_tags_errors")):
         return False
     slug = str(record.get("slug") or "").lower()
     return not missing_tag_prefixes(record, tag_prefixes.get(slug, ()))
@@ -240,7 +254,9 @@ def fetch_matching_tag_names(slug: str, prefix: str):
 def fetch_repository(slug: str, tag_prefixes=()) -> dict:
     """One repository's record. ``tag_prefixes`` (collect_declared_tag_prefixes)
     adds one matching-refs call per distinct prefix and the record's
-    "matching_tags"; without it the calls and the record are what they were."""
+    "matching_tags", with "matching_tags_truncated" for a list over
+    MATCHING_TAGS_CAP and "matching_tags_errors" for a failed call (never
+    "partial_errors"); without it the calls and the record are what they were."""
     out = {"slug": slug, "observed_at": datetime.now(timezone.utc).isoformat()}
     partial_errors = {}
     repo, err = gh_api(f"repos/{slug}")
@@ -281,19 +297,30 @@ def fetch_repository(slug: str, tag_prefixes=()) -> dict:
 
     if tag_prefixes:
         out["matching_tags"] = {}
+        tags_errors = {}
         for prefix in dict.fromkeys(tag_prefixes):
             names, tags_err = fetch_matching_tag_names(slug, prefix)
-            if tags_err is None:
-                out["matching_tags"][prefix] = names
-            else:
-                # No ordinary "not found" here (a prefix that matches no tag is []).
-                partial_errors[MATCHING_TAGS_ERROR_KEY + prefix] = tags_err
+            if tags_err is not None:
+                # No ordinary "not found" here (a prefix that matches no tag is []). The
+                # reason is cut to 160 characters, gh_api's bound on gh's stderr (gh_api
+                # does not cut an exception's text).
+                tags_errors[prefix] = str(tags_err)[:160]
+                continue
+            if len(names) > MATCHING_TAGS_CAP:
+                names = names[:MATCHING_TAGS_CAP]
+                out["matching_tags_truncated"] = True
+            out["matching_tags"][prefix] = names
+        if tags_errors:
+            # Not partial_errors: report-only runtime data must not make this repository's
+            # drift and trading rows unreliable or hold the propose job (module docstring).
+            out["matching_tags_errors"] = tags_errors
 
     if partial_errors:
         # Kept on the record (not discarded) and counted at the top level,
         # and treated as retryable on resume (see main()'s
-        # already_covered_slugs) -- a record with fewer than all three
-        # sub-fields populated is not silently treated as "done".
+        # already_covered_slugs) -- a record whose releases, tags or commit
+        # sub-request failed is not silently treated as "done". A failed
+        # matching-tags list is never one of these ("matching_tags_errors" above).
         out["partial_errors"] = partial_errors
     return out
 
@@ -322,6 +349,11 @@ def build_document(results: dict, slug_aliases: dict | None = None, fetched_this
         "count": len(results),
         "errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("error")),
         "partial_errors": sum(1 for rec in results.values() if isinstance(rec, dict) and rec.get("partial_errors")),
+        # Records whose matching-refs call failed for a declared tag prefix. Report-only:
+        # scripts/freshness_propose.py and the propose gate read "errors" and
+        # "partial_errors", never this count.
+        "matching_tags_errors": sum(1 for rec in results.values()
+                                    if isinstance(rec, dict) and rec.get("matching_tags_errors")),
         "fetched_this_run": fetched_this_run,
         "retained_from_prior_runs": retained,
         # Actual observation dates, not this write's checkpoint/generation
@@ -387,8 +419,9 @@ def main(argv=None) -> int:
     # Snapshots written before slug lower-casing keep mixed-case slugs; normalize
     # before comparing so a resume reuses their retained metadata instead of
     # refetching (and possibly overwriting a good record with a transient error).
-    # A record without a matching_tags list for each prefix declared now is pending
-    # as well (record_is_covered).
+    # A record carrying "matching_tags_errors", or without a matching_tags list for
+    # each prefix declared now, is pending as well (record_is_covered); the whole
+    # repository is fetched again, because the resume is per repository.
     already_covered_slugs = {str(rec.get("slug") or "").lower() for rec in results.values()
                               if record_is_covered(rec, tag_prefixes)}
     pending = {slug: url for slug, url in sorted(targets.items())
@@ -423,7 +456,8 @@ def main(argv=None) -> int:
     else:
         document = write_document(out_path, results, slug_aliases=slug_aliases, fetched_this_run=0)
 
-    print(f"done {len(results)} errors {document['errors']} partial_errors {document['partial_errors']}")
+    print(f"done {len(results)} errors {document['errors']} partial_errors {document['partial_errors']} "
+          f"matching_tags_errors {document['matching_tags_errors']}")
     return 0
 
 

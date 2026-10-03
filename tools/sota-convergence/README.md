@@ -68,11 +68,19 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    ([List matching references](https://docs.github.com/en/rest/git/refs#list-matching-references))
    lists the tags whose names start with it, and the record carries
    `"matching_tags": {prefix: [names]}`, without `refs/tags/` and in the API's
-   name order. A repository without a declared prefix makes no such call,
-   whichever working file names it. A prefix that matches no tag returns an
-   empty list, so any failure of that call is kept in `"partial_errors"` under
-   `matching_tags:<prefix>`, and a record without a list for every prefix
-   declared now stays pending.
+   name order. At most 5,000 names are kept per prefix, the first in that
+   order (a cut list may miss the highest version), and a record with a cut
+   list carries `"matching_tags_truncated": true`. A repository without a
+   declared prefix makes no such call, whichever working file names it. A
+   prefix that matches no tag returns an empty list, so any failure of that
+   call leaves the prefix without a list and is kept under the record's
+   `"matching_tags_errors"` (`{prefix: short reason}`), counted in the
+   document's top-level `matching_tags_errors`. It is never a
+   `"partial_errors"` entry, so the repository's drift and trading rows stay
+   reliable and the propose job is not held; only the runtime row that
+   declares the prefix says `tag_pattern_unfetched`. A record with
+   `"matching_tags_errors"`, or without a list for every prefix declared now,
+   stays pending, and the next run fetches that whole repository again.
    Resumable: a repository already present in `--out` *without* an `"error"`
    or `"partial_errors"` field is skipped unless `--refresh`. A repository
    whose record carries `"error"` (the primary `repos/{slug}` call itself
@@ -153,9 +161,15 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    pattern, the one whose capture is the highest integer tuple (never the
    last by name: the API's order puts 0.3.99 after 0.3.276) becomes
    `upstream.latest`, with `latest_source: "matching_tag"` and
-   `matching_tag_count`; every other upstream field stays `compute_upstream`'s.
-   With no match, or no list, the row keeps `compute_upstream`'s latest with
-   `latest_source` `tag_pattern_unmatched` or `tag_pattern_unfetched`.
+   `matching_tag_count`. The pattern and the capture match ASCII digits only
+   (`re.ASCII`). Such a row has `released_at` and `prerelease` null, because
+   they describe the repository's latest GitHub release, which in a monorepo
+   can be another package's, and no `latest_flag`; every other upstream field
+   stays `compute_upstream`'s, and dormancy still reads the repository's
+   activity. With no match (a pattern that is missing or does not compile
+   counts as none), or no list (never fetched, or the call failed), the row
+   keeps every `compute_upstream` field with `latest_source`
+   `tag_pattern_unmatched` or `tag_pattern_unfetched`.
    `drift.md` marks a matching-tag latest `(tag)` and lists those two kinds of
    row in one line after the runtime table. A watch-only row carries its upstream
    and dormancy; an unresolved row does only when it has a repository, and one

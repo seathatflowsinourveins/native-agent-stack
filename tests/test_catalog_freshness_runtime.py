@@ -18,8 +18,10 @@ Covers each stage the GPT runtime workers, SDKs and agents pass through:
 - tag patterns: three entries declare a literal tag prefix and an anchored pattern
   (extract_layers.py's RUNTIME_TAG_KEYS); github_freshness.py lists those tags
   through git/matching-refs, build_runtime_freshness takes the highest matching
-  version as the row's upstream latest, and the report marks it "(tag)" or lists
-  the rows whose pattern selected no tag.
+  version (ASCII digits only) as the row's upstream latest, and the report marks
+  it "(tag)" or lists the rows whose pattern selected no tag. A failed list is
+  kept apart from partial_errors, so it changes no row but the runtime row that
+  declares the prefix.
 
 No network. The extraction tests read the checked-in repository; every other
 test uses synthetic fixtures.
@@ -670,22 +672,98 @@ class GithubFreshnessMatchingTagsTests(unittest.TestCase):
         self.assertNotIn("matching_tags", records[PLAIN_REPOSITORY])
         self.assertEqual((document["errors"], document["partial_errors"]), (0, 0))
 
-    def test_a_failed_list_is_a_partial_error_that_neither_aborts_the_batch_nor_sticks(self):
+    def test_a_failed_list_is_kept_apart_from_partial_errors_and_retried_on_the_next_run(self):
         self._write_runtime_pins("", "v")
         _, document = self._main(failing={(TAGGED_SLUG, "v")})
         tagged = document["repositories"][TAGGED_REPOSITORY]
-        self.assertEqual(tagged["partial_errors"], {"matching_tags:v": "HTTP 503: Service Unavailable"})
+        self.assertEqual(tagged["matching_tags_errors"], {"v": "HTTP 503: Service Unavailable"})
+        self.assertNotIn("partial_errors", tagged)
         self.assertEqual(tagged["matching_tags"], {"": TAGGED_NAMES})
         # The batch went on: the repository fetched after it has its record.
         self.assertEqual(document["repositories"][PLAIN_REPOSITORY]["full_name"], "example/b-plain")
-        self.assertEqual((document["errors"], document["partial_errors"]), (0, 1))
-        # The next run retries the incomplete record, and only it.
+        self.assertEqual((document["errors"], document["partial_errors"], document["matching_tags_errors"]),
+                         (0, 0, 1))
+        # The next run retries the incomplete record, and only it (the resume is per
+        # repository, so the failed prefix is listed again with the others).
         calls, document = self._main()
         self.assertEqual(_matching_calls(calls), BOTH_PREFIX_CALLS)
         self.assertFalse(any(path.startswith("repos/example/b-plain") for path, _ in calls))
         tagged = document["repositories"][TAGGED_REPOSITORY]
         self.assertEqual(tagged["matching_tags"], {"": TAGGED_NAMES, "v": ["v1.0", "v1.2"]})
-        self.assertNotIn("partial_errors", tagged)
+        self.assertNotIn("matching_tags_errors", tagged)
+        self.assertEqual((document["partial_errors"], document["matching_tags_errors"]), (0, 0))
+
+    def test_a_failed_list_changes_no_row_but_the_runtime_row_of_its_prefix(self):
+        """The record a failed matching-refs call leaves, read the way the daily job reads
+        it: the drift and trading rows of the repository stay reliable and the propose
+        gate's partial-error count stays 0; the runtime row says tag_pattern_unfetched."""
+        self._write_runtime_pins("")
+        _, failed = self._main(failing={(TAGGED_SLUG, "")})
+        _, recovered = self._main()
+        failed_records, recovered_records = failed["repositories"], recovered["repositories"]
+        self.assertEqual(failed_records[TAGGED_REPOSITORY]["matching_tags_errors"],
+                         {"": "HTTP 503: Service Unavailable"})
+        self.assertEqual((fp.upstream_partial_error_count(failed), failed["matching_tags_errors"]), (0, 1))
+        self.assertFalse(fp._freshness_record_has_error(TAGGED_REPOSITORY, failed_records))
+
+        def drift(records):
+            row = {"id": "tagged", "repository": TAGGED_REPOSITORY, "pin": "1.0.0", "pin_behind_upstream": None,
+                   "upstream": build_manifest.compute_upstream(TAGGED_REPOSITORY, records)}
+            return fp.compute_drift({"tagged": dict(row)}, {"tagged": row}, records)
+
+        def trading(records):
+            card = {"id": "tagged", "repository": TAGGED_REPOSITORY, "decision": "default",
+                    "version_or_commit": "1.0.0"}
+            document = build_manifest.build_trading_freshness(
+                {"taxonomy": {"evaluation": ["evaluation"]}, "layers": {"evaluation": [card]}}, None, records,
+                CHECKED_AT)
+            return fp.trading_freshness_rows(document, records)
+
+        # Fetched with no release: the drift row is "no release", not unfetched, as after a good run.
+        self.assertEqual(drift(failed_records), ([], [], ["tagged"]))
+        self.assertEqual(drift(failed_records), drift(recovered_records))
+        self.assertEqual(trading(failed_records)[3], [])
+        self.assertEqual(trading(failed_records), trading(recovered_records))
+
+        entry = _inspect_entry(id="new-wsl:tagged", repository=TAGGED_REPOSITORY,
+                               tags={"prefix": "", "pattern": r"^(\d+\.\d+\.\d+)$"})
+
+        def runtime(records):
+            return build_manifest.build_runtime_freshness({"entries": [entry]}, records, CHECKED_AT)
+
+        failed_runtime = runtime(failed_records)
+        self.assertEqual(failed_runtime["entries"][0]["upstream"], {
+            **build_manifest.compute_upstream(TAGGED_REPOSITORY, failed_records),
+            "latest_source": "tag_pattern_unfetched"})
+        self.assertEqual(runtime(recovered_records)["entries"][0]["upstream"]["latest"], "0.3.276")
+        markdown, summary = fp.render_runtime_markdown(failed_runtime, failed_records)
+        self.assertEqual(summary["runtime_unfetched"], [])
+        self.assertIn(fp.md_cell("new-wsl:tagged (tag_pattern_unfetched)"), markdown)
+
+    def test_at_most_the_cap_of_names_is_stored_per_prefix_and_a_cut_is_recorded(self):
+        self.assertEqual(github_freshness.MATCHING_TAGS_CAP, 5000)
+        for listed, truncated in ((5000, False), (5001, True)):
+            names = [f"0.0.{index}" for index in range(listed)]
+            fake = _fake_gh_api([])
+
+            def listing(path, timeout=60, *, paginate=False):
+                if "/git/matching-refs/" in path:
+                    return [{"ref": f"refs/tags/{name}"} for name in names], None
+                return fake(path, timeout, paginate=paginate)
+
+            with self.subTest(listed=listed), mock.patch.object(github_freshness, "gh_api", listing):
+                record = github_freshness.fetch_repository(TAGGED_SLUG, tag_prefixes=("",))
+                # The first names in the API's order are kept.
+                self.assertEqual(record["matching_tags"], {"": names[:5000]})
+                self.assertEqual(record.get("matching_tags_truncated"), True if truncated else None)
+                self.assertNotIn("matching_tags_errors", record)
+
+    def test_a_failed_list_keeps_a_short_reason(self):
+        with mock.patch.object(github_freshness, "gh_api", _fake_gh_api([])), \
+                mock.patch.object(github_freshness, "fetch_matching_tag_names", return_value=(None, "x" * 500)):
+            record = github_freshness.fetch_repository(TAGGED_SLUG, tag_prefixes=("",))
+        self.assertEqual(record["matching_tags_errors"], {"": "x" * 160})
+        self.assertEqual(record["matching_tags"], {})
 
     def test_a_record_without_a_list_for_a_declared_prefix_is_pending_on_the_next_run(self):
         self._write_runtime_pins("v")
@@ -710,7 +788,9 @@ class GithubFreshnessMatchingTagsTests(unittest.TestCase):
             "no matching_tags": {"slug": TAGGED_SLUG},
             "a value that is not a list": {"slug": TAGGED_SLUG, "matching_tags": {"": None, "v": []}},
             "a mixed-case slug missing a prefix": {"slug": "Example/A-Tagged", "matching_tags": {"v": []}},
-            "a partial error": dict(complete, partial_errors={"matching_tags:": "HTTP 503"}),
+            "a partial error": dict(complete, partial_errors={"releases": "HTTP 503"}),
+            # Even for a prefix no longer declared: the next run fetches the record again.
+            "a failed list": dict(complete, matching_tags_errors={"x": "HTTP 503"}),
             "an error": dict(complete, error="timeout"),
         }
         for label, record in cases.items():
@@ -907,6 +987,31 @@ class MatchingTagSelectionTests(unittest.TestCase):
         self.assertEqual([build_manifest.parse_version(expected) for _, expected, _ in TAG_EXAMPLES.values()],
                          [(0, 3, 276), (0, 7, 21), (1, 12, 0)])
 
+    def test_a_tag_in_fullwidth_digits_is_never_selected(self):
+        # 0.3.277 in fullwidth digits: int() reads them, so without re.ASCII it would outrank 0.3.276.
+        fullwidth = "\uff10.\uff13.\uff12\uff17\uff17"
+        inspect = CHECKED_IN_TAGS["new-wsl:inspect-ai"]["pattern"]
+        self.assertEqual(build_manifest.select_matching_tag(["0.3.276", fullwidth], inspect), ("0.3.276", 1))
+        # A capture that admits any character still ranks only ASCII digits (DOTTED_VERSION_RE) ...
+        self.assertEqual(build_manifest.select_matching_tag(["v0.3.276", "v" + fullwidth], r"^v(.+)$"),
+                         ("v0.3.276", 1))
+        # ... and a declared pattern matches only ASCII digits outside its capture too.
+        self.assertEqual(build_manifest.select_matching_tag(["0.3.275", "0.3.276.post\uff11"],
+                                                            r"^(\d+\.\d+\.\d+)(?:\.post\d+)?$"),
+                         ("0.3.275", 1))
+
+    def test_a_missing_or_uncompilable_pattern_selects_nothing_instead_of_raising(self):
+        patterns = {
+            "missing": None, "not a string": 7,
+            "a syntax error": r"^(\d+\.\d+$",
+            "flags that conflict with re.ASCII": r"(?u)^(\d+\.\d+\.\d+)$",
+            "a repeat count too large": r"^(\d{4294967296})$",
+            "nesting too deep": "^" + "(" * 3000 + r"\d" + ")" * 3000 + "$",
+        }
+        for label, pattern in patterns.items():
+            with self.subTest(pattern=label):
+                self.assertEqual(build_manifest.select_matching_tag(["0.3.276"], pattern), (None, 0))
+
 
 class RuntimeTagPatternRowTests(unittest.TestCase):
     """build_runtime_freshness for entries that declare a tag pattern."""
@@ -921,13 +1026,19 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
         self.assertEqual((upstream["latest"], upstream["latest_source"], upstream["matching_tag_count"]),
                          ("0.3.276", "matching_tag", 4))
         self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"]), ("compared", True))
-        # Every other field is compute_upstream's, the withheld first tag included.
+        # compute_upstream withheld the first tag in name order; with a latest selected it is
+        # no longer withheld in place of one, so latest_flag is dropped. released_at and
+        # prerelease describe a GitHub release, not this tag: null. Every other field is
+        # compute_upstream's.
         expected = build_manifest.compute_upstream(INSPECT_REPOSITORY, repositories)
         self.assertIsNone(expected["latest"])
+        self.assertEqual(expected["latest_flag"]["tag"], "release/2025-11-28")
+        self.assertNotIn("latest_flag", upstream)
+        self.assertEqual((upstream["released_at"], upstream["prerelease"]), (None, None))
         self.assertEqual({key: value for key, value in upstream.items()
-                          if key not in ("latest", "latest_source", "matching_tag_count")},
-                         {key: value for key, value in expected.items() if key != "latest"})
-        self.assertEqual(upstream["latest_flag"]["tag"], "release/2025-11-28")
+                          if key not in ("latest", "released_at", "prerelease", "latest_source", "matching_tag_count")},
+                         {key: value for key, value in expected.items()
+                          if key not in ("latest", "released_at", "prerelease", "latest_flag")})
 
     def test_a_pin_at_the_highest_tag_is_compared_and_not_behind(self):
         row = self._row(_inspect_entry(pin="0.3.276"), {INSPECT_REPOSITORY: _inspect_record()})
@@ -938,7 +1049,7 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
         cases = {
             "no matching_tags": {INSPECT_REPOSITORY: without_list},
             "a list for another prefix only": {INSPECT_REPOSITORY: _inspect_record(matching_tags={"v": ["v0.3.276"]})},
-            "a failed list call": {INSPECT_REPOSITORY: dict(without_list, partial_errors={"matching_tags:": "HTTP 503"})},
+            "a failed list call": {INSPECT_REPOSITORY: dict(without_list, matching_tags_errors={"": "HTTP 503"})},
             "no record": {},
         }
         for label, repositories in cases.items():
@@ -946,7 +1057,9 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
                 row = self._row(_inspect_entry(), repositories)
                 self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
                                  (None, "tag_pattern_unfetched"))
-                self.assertNotIn("matching_tag_count", row["upstream"])
+                # Every other upstream field is compute_upstream's, latest_flag included.
+                self.assertEqual(row["upstream"], {**build_manifest.compute_upstream(INSPECT_REPOSITORY, repositories),
+                                                   "latest_source": "tag_pattern_unfetched"})
                 self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
                                  (None, "not_compared", "unversioned"))
 
@@ -958,18 +1071,39 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
                                  (None, "tag_pattern_unmatched"))
                 self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
                                  (None, "not_compared", "unversioned"))
-        # A release tag stays the latest when the pattern matches nothing.
-        row = self._row(_deepagents_entry(),
-                        {DEEPAGENTS_REPOSITORY: _deepagents_record(matching_tags={"deepagents==": []})})
-        self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
-                         ("deepagents-cli==1.0.0", "tag_pattern_unmatched"))
+        # A release tag stays the latest when the pattern matches nothing, with its release fields.
+        repositories = {DEEPAGENTS_REPOSITORY: _deepagents_record(matching_tags={"deepagents==": []})}
+        row = self._row(_deepagents_entry(), repositories)
+        self.assertEqual(row["upstream"], {**build_manifest.compute_upstream(DEEPAGENTS_REPOSITORY, repositories),
+                                           "latest_source": "tag_pattern_unmatched"})
+        self.assertEqual((row["upstream"]["latest"], row["upstream"]["released_at"]),
+                         ("deepagents-cli==1.0.0", "2026-10-01"))
+
+    def test_a_missing_or_uncompilable_pattern_makes_the_row_unmatched_instead_of_raising(self):
+        for tags in ({"prefix": ""}, {"prefix": "", "pattern": None}, {"prefix": "", "pattern": r"^(\d+\.\d+$"}):
+            with self.subTest(tags=tags):
+                row = self._row(_inspect_entry(tags=tags), {INSPECT_REPOSITORY: _inspect_record()})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 (None, "tag_pattern_unmatched"))
+                self.assertEqual((row["pin_comparison"], row["pin_comparison_reason"]), ("not_compared", "unversioned"))
 
     def test_a_matching_tag_replaces_a_release_of_another_package(self):
-        row = self._row(_deepagents_entry(), {DEEPAGENTS_REPOSITORY: _deepagents_record()})
+        repositories = {DEEPAGENTS_REPOSITORY: _deepagents_record()}
+        row = self._row(_deepagents_entry(), repositories)
         upstream = row["upstream"]
         self.assertEqual((upstream["latest"], upstream["latest_source"], upstream["matching_tag_count"]),
                          ("deepagents==0.7.21", "matching_tag", 2))
-        self.assertEqual((upstream["released_at"], upstream["prerelease"]), ("2026-10-01", False))
+        # The repository's latest release is deepagents-cli==1.0.0, another package's, so its
+        # date and prerelease flag are not paired with the matching tag.
+        self.assertEqual((upstream["released_at"], upstream["prerelease"]), (None, None))
+        expected = build_manifest.compute_upstream(DEEPAGENTS_REPOSITORY, repositories)
+        self.assertEqual((expected["released_at"], expected["prerelease"]), ("2026-10-01", False))
+        self.assertEqual({key: value for key, value in upstream.items()
+                          if key not in ("latest", "released_at", "prerelease", "latest_source", "matching_tag_count")},
+                         {key: value for key, value in expected.items()
+                          if key not in ("latest", "released_at", "prerelease")})
+        # Dormancy still reads the repository's activity, that release included.
+        self.assertEqual((row["dormancy"]["last_release_at"], row["dormancy"]["dormant"]), ("2026-10-01", False))
         # A watch-only row stays not compared.
         self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
                          (None, "not_compared", "watch_only"))
@@ -1223,6 +1357,10 @@ class RuntimeReportTests(unittest.TestCase):
         self.assertIn(f"2 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_unmatched)")
                       + ", " + fp.md_cell("watch:deepagents (tag_pattern_unfetched)") + "\n", text)
         self.assertGreater(text.index(fp.RUNTIME_TAG_MISS_SENTENCE), text.index(fp.RUNTIME_TABLE_HEADER))
+        # The line states what each reason means.
+        for meaning in ("`tag_pattern_unmatched`: no listed tag matched, so the upstream latest stays the release or "
+                        "tag listing", "`tag_pattern_unfetched`: the tag list could not be read this run"):
+            self.assertIn(meaning, fp.RUNTIME_TAG_MISS_SENTENCE)
         self.assertEqual(self._cells("new-wsl:inspect-ai")[3:5],
                          [fp.md_cell(None), fp.md_cell("not compared (unversioned)")])
         self.assertEqual(self._cells("watch:deepagents")[3], fp.md_cell("deepagents-cli==1.0.0"))
@@ -1230,15 +1368,19 @@ class RuntimeReportTests(unittest.TestCase):
         self.assertEqual(result["runtime_behind"], ["new-wsl:behind"])
         self.assertEqual([key for key in result if key.startswith("runtime")], list(fp.RUNTIME_SUMMARY_KEYS))
 
-    def test_a_failed_tag_list_blanks_the_row_and_names_it_in_both_lines(self):
+    def test_a_failed_tag_list_blanks_nothing_and_is_named_only_in_the_miss_line(self):
+        # The record github_freshness.py writes when the matching-refs call fails.
         inspect = {key: value for key, value in _inspect_record().items() if key != "matching_tags"}
-        inspect["partial_errors"] = {"matching_tags:": "HTTP 503: Service Unavailable"}
+        inspect["matching_tags_errors"] = {"": "HTTP 503: Service Unavailable"}
         self._write_runtime(self._tagged(inspect))
         result = fp.build_drift_report(self.work)
-        self.assertEqual(result["runtime_unfetched"], ["new-wsl:inspect-ai"])
-        self.assertEqual(self._cells("new-wsl:inspect-ai").count(fp.md_cell("unknown")), 3)
+        # The row keeps compute_upstream's data (no release; the first tag stays withheld).
+        self.assertEqual(result["runtime_unfetched"], [])
+        self.assertEqual(self._cells("new-wsl:inspect-ai")[3:], [fp.md_cell(value) for value in (
+            None, "not compared (unversioned)", None, "2026-10-02", 0, "no", "no")])
         self.assertIn(f"1 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_unfetched)"),
                       self._text())
+        self.assertEqual((self.work / "upstream-partial-errors.txt").read_text(encoding="utf-8"), "0\n")
 
     def test_tag_rows_never_change_drift_status_or_the_propose_ids(self):
         pins = self._tagged(_inspect_record(), _deepagents_record(matching_tags={"deepagents==": []}))

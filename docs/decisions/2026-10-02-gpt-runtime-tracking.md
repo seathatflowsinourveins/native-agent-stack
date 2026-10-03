@@ -145,10 +145,12 @@ and 180-day release-or-commit dormancy. Revisit the REST fetch if the daily run 
 
 ## First run
 
-Evidence class: local integration. An independent verifier ran the workflow's own steps on this distribution at
-`6bc1199b` against live GitHub metadata on 2026-10-03 (`checked_at` 2026-10-03): `extract_layers.py`, then
-`github_freshness.py` (488 repositories, 0 errors, 0 partial errors), then `build_manifest.py` with both sidecar
-flags, then `build_drift_report`. That is not a hosted scheduled run.
+Evidence class: local integration; neither run below is a hosted scheduled run. An independent verifier ran the
+workflow's own steps on this distribution against live GitHub metadata (`checked_at` 2026-10-03): `extract_layers.py`,
+then `github_freshness.py`, then `build_manifest.py` with both sidecar flags, then `build_drift_report`. The first run,
+at `6bc1199b` on 2026-10-03, fetched 488 repositories with 0 errors and 0 partial errors. The table shows the round-3
+run at `0dadeab7`, on 2026-10-03 from 05:29Z to 05:30Z: `github_freshness.py` fetched 488 repositories with 0 errors
+and 0 partial errors, the tags of the three declared prefixes included.
 
 | id | pin | upstream latest | behind |
 | --- | --- | --- | --- |
@@ -160,7 +162,7 @@ flags, then `build_drift_report`. That is not a hosted scheduled run.
 | `new-wsl:gpt-researcher` | v3.7.0 | v3.7.0 | no |
 | `new-wsl:deer-flow` | v2.1.0 | v2.1.0 | no |
 | `new-wsl:harbor` | v0.23.0 | v0.23.0 | no |
-| `new-wsl:inspect-ai` | 0.3.273 | none (tag `release/2025-11-28` withheld) | not compared (unversioned) |
+| `new-wsl:inspect-ai` | 0.3.273 | 0.3.276 (matching tag; 269 of 274 tags match) | yes |
 | `recipe:openhands-sdk` | v1.49.6 | v1.50.1 | yes |
 | `sdk-lock:openai-codex` | 0.159.3 | rust-v0.160.0 | yes |
 | `sdk-lock:openai` | 3.16.2 | v3.24.0 | yes |
@@ -169,36 +171,59 @@ flags, then `build_drift_report`. That is not a hosted scheduled run.
 | `watch:openai-agents-python` | none | v0.23.1 | not compared (watch-only) |
 | `watch:openai-agents-js` | none | v0.18.0 | not compared (watch-only) |
 | `watch:crawl4ai` | none | v0.9.4 | not compared (watch-only) |
-| `watch:deepagents` | none | `deepagents==0.7.21` | not compared (watch-only) |
-| `watch:codex-action` | none | v1.12 (tag listing; no releases) | not compared (watch-only) |
+| `watch:deepagents` | none | `deepagents==0.7.21` (matching tag) | not compared (watch-only) |
+| `watch:codex-action` | none | v1.12 (matching tag; no releases) | not compared (watch-only) |
 
-Counts: 19 entries, 12 pin sources, 7 watch-only, 0 unresolved, 3 behind, 8 not compared, 0 dormant, 0 archived.
-The three rows behind are the older host's records. The new distribution's install-plan pins equal upstream's
-latest release, except Inspect AI, which this run could not compare (see "Search-first"). `drift-status.txt` was
-`true` from the 40 drifted manifest rows and was the same with and without the runtime sidecar; rebuilt without the
-new flag, the manifest and the trading sidecar were byte-identical.
+Counts at `0dadeab7`: 19 entries, 12 pin sources, 7 watch-only, 0 unresolved, 4 behind, 7 not compared, 0 dormant,
+0 archived. The earlier run at `6bc1199b`, before the tag patterns, showed the same rows except Inspect AI, which it
+could not compare: with no release, the tag fallback returned `release/2025-11-28`, which was withheld, so that run
+counted 3 behind and 8 not compared (see "Search-first"). The rows behind are the older host's three records and the
+install plan's Inspect AI pin; the plan's other pins equal upstream's latest release. In both runs
+`drift-status.txt` was `true` from the 40 drifted manifest rows and was the same with and without the runtime
+sidecar; rebuilt without the new flag, the manifest and the trading sidecar were byte-identical.
 
 ## Verification
 
-All commands ran on this distribution (Claude Code 2.1.288, Python 3.13). Builds came from a written contract; an
+All commands ran on this distribution (Claude Code 2.1.288, Python 3.13). Builds came from written contracts; an
 independent verifier re-ran each claim, and evidence and security reviewers read the diff against source.
 
-- `python3 -m unittest tests.test_catalog_freshness_runtime -v`: 53 tests OK, none skipped. The
-  `watch:openai-agents-js` `named_in` check, skipped until this record existed, now runs against it and passes.
+- `python3 -m unittest tests.test_catalog_freshness_runtime -v`: 86 tests OK, none skipped (53 before the tag
+  patterns, 80 at `0dadeab7`). The `watch:openai-agents-js` `named_in` check, skipped until this record existed, now
+  runs against it and passes.
 - `python3 -m unittest tests.test_catalog_freshness_trading tests.test_catalog_freshness_propose
-  tests.test_catalog_freshness_pins tests.test_sota_convergence tests.test_practice_references`: 308 tests; before the
-  evidence registration its only failure was the publication validator's hash check of the six edited registered
-  files.
+  tests.test_catalog_freshness_pins tests.test_sota_convergence tests.test_practice_references`: 308 tests. Before
+  each evidence registration its only failure is the publication validator's hash check of the edited registered
+  files: six before `80b55377` registered them, then the four that round 3 edited at `0dadeab7` (`README.md`,
+  `build_manifest.py`, `extract_layers.py` and `github_freshness.py` in `tools/sota-convergence/`). Round 4 edits no
+  other registered file.
 - The three builder registry tests: OK, none skipped (zizmor 1.30.1 on `PATH`). `actionlint` 1.17.0 and `zizmor`
   on the workflow: no findings, the same 3 suppressed as at the base.
 - Full suite at `6bc1199b`: 9,846 tests, 26 failures. Rerun at the base `56473e4b`, the same failures recur
   (adoption bootstrap and macOS tests that need tools this distribution lacks, and a cross-device `git clone
   --local` from this worktree into tmpfs), except the hash check above.
-- Mutation checks: each new test failed when the behaviour it names was removed (a swapped slot, unnormalized
-  requirement names, an unreserved trading id, the runtime-only leak catch removed or widened to the trading
-  sidecar, the report ignoring the withheld marker, a caught exception printed to stderr).
+- Mutation checks, each mutant applied alone to a copy of the tree:
+  - Rounds 1 and 2: each new test failed when the behaviour it names was removed (a swapped slot, unnormalized
+    requirement names, an unreserved trading id, the runtime-only leak catch removed or widened to the trading
+    sidecar, the report ignoring the withheld marker, a caught exception printed to stderr).
+  - Round 3 (the tag patterns, `0dadeab7`): 44 mutants; every mutant failed at least one test, and 66 of 67
+    mutant/test pairings were killed. The survivor counts every listed name instead of the matching ones: in the
+    fixture of `test_a_matching_tag_replaces_a_release_of_another_package` every listed `deepagents==` name matches,
+    so the two counts agree there, and two other tests kill it.
+  - Round 4 (the fixes for the round-3 review findings): 29 mutants against the 14 new or changed tests; all 41
+    mutant/test pairings were killed and each of the 14 tests failed under at least one mutant. The mutants write a
+    failed tag list to `partial_errors`, drop it or leave it uncounted; apply the 5,000-name cap off by one, at
+    another size, from the end, not at all or without recording it; let the report treat a failed list as a fetch
+    problem; keep another release's date, prerelease flag or `latest_flag` on a matching tag; remove `re.ASCII` from
+    either pattern; and leave each kind of compile error uncaught.
+- Round 4 replay, offline: `build_runtime_freshness` at the round-4 code on the round-3 run's records gives the same
+  counts and the same latest and comparison on all 19 rows; only Inspect AI loses `latest_flag`, and Deep Agents'
+  `released_at` and `prerelease` (2026-09-30 and false, from another package's release) become null. No live run
+  was made at the round-4 code.
 - Review: no blocking or major finding; the minor findings (leak-gate isolation, a slot test that could not see a
-  swap, the watch-only wording) and the nits were fixed and re-reviewed.
+  swap, the watch-only wording) and the nits were fixed and re-reviewed. Round 3's independent evidence and security
+  reviews also found no blocking or major defect; round 4 fixes their minor findings (a failed tag list made the
+  repository's other rows unreliable and held the propose job; a matching tag was paired with another package's
+  release date) and their nits.
 
 ## Limits and open findings
 
@@ -211,14 +236,17 @@ independent verifier re-ran each claim, and evidence and security reviewers read
   now declare a literal tag prefix and an anchored pattern with one capture group: `new-wsl:inspect-ai` over all
   tags (so a future 1.x is not missed), `watch:codex-action` over `v` and `watch:deepagents` over `deepagents==`.
   `github_freshness.py` lists those tags through GitHub's `git/matching-refs` endpoint, and `build_runtime_freshness`
-  keeps the names the pattern fully matches and takes the highest version by its parsed capture, never by name
-  order (the API's order puts 0.3.99 after 0.3.276), as
+  keeps the names the pattern fully matches and takes the highest version by its parsed capture in ASCII digits,
+  never by name order (the API's order puts 0.3.99 after 0.3.276), as
   [nvchecker's GitHub source](https://github.com/lilydjwg/nvchecker/blob/v2.22/nvchecker_source/github.py)
   (`use_max_tag` with `include_regex`) and Renovate's `github-tags` datasource do. The pattern drops prereleases and
-  other packages' tags, and its capture strips a prefix such as `deepagents==`. Every other row keeps the
-  release-or-first-tag rule until it declares a pattern. A failed `matching-refs` call is a partial error of that
-  repository, as a failed release or tag call is, so that run blanks the row and does not open the propose pull
-  request.
+  other packages' tags, and its capture strips a prefix such as `deepagents==`. A row whose latest is a matching tag
+  has a null `released_at` and `prerelease`, because the repository's latest release can be another package's. Every
+  other row keeps the release-or-first-tag rule until it declares a pattern. The tag list is read with
+  `gh api --paginate` within the 60-second per-call timeout, and at most 5,000 names per prefix are kept
+  (`matching_tags_truncated` marks a cut). A failed `matching-refs` call goes to the record's `matching_tags_errors`,
+  never `partial_errors`: the runtime row says `tag_pattern_unfetched` and nothing else changes, not the
+  repository's drift or trading rows, the partial-error count or the propose job.
 - Registry versions and advisories are outside this table. A registry identity per row (the PyPI simple JSON API,
   which also carries PEP 792 project status) would compare Inspect AI and `openai-codex` by their own stream; note
   that `gpt-researcher` is 0.16.1 on PyPI while its pinned tag is v3.7.0. Advisories stay with OSV-Scanner, the
