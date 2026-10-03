@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "class": "local_integration",
+  "base": "56473e4b840f0e6940c031801d866e7e9bf29baf",
+  "checks": [
+    {
+      "command": "python3 scripts/validate.py before edits",
+      "exit_code": 0,
+      "scope": "Existing base registration"
+    },
+    {
+      "command": "python3 scripts/validate.py after workflow edit before registration",
+      "exit_code": 1,
+      "actual_output": "Publication validation failed:\n.github/workflows/runtime-worker-skills-freshness.yml: SHA-256 mismatch\n.github/workflows/runtime-worker-skills-freshness.yml: byte count mismatch"
+    },
+    {
+      "command": "zizmor --offline .github/workflows/runtime-worker-skills-freshness.yml",
+      "exit_code": 0,
+      "version": "1.30.1",
+      "scope": "Offline workflow analysis; no hosted execution"
+    },
+    {
+      "command": "python3 -m unittest tests.test_install_skills tests.test_runtime_worker_skills tests.test_catalog_freshness_pins",
+      "exit_code": 0,
+      "actual_output_excerpt": "Ran 97 tests in 13.742s\n\nOK",
+      "sanitization": "Progress dots omitted",
+      "scope": "Unchanged repository-local tests; not upstream runtime acceptance"
+    },
+    {
+      "command": "python3 -m unittest tests.test_sota_convergence.GithubFreshnessResilienceTests tests.test_sota_convergence.GithubFreshnessPartialErrorTests tests.test_sota_convergence.GithubFreshnessAliasAndObservationTests tests.test_sota_convergence.CodexSecondPassRegressionTests",
+      "exit_code": 0,
+      "actual_output_excerpt": "Ran 10 tests in 0.013s\n\nOK",
+      "synthetic_controls": "Existing tests retain primary-error1 and partial-error1 observations, then retry only incomplete records; complete retained records are not refetched",
+      "scope": "Unchanged repository-local collector fixtures"
+    },
+    {
+      "command": "rtk python3 tools/sota-convergence/github_freshness.py --work-dir <owned private input> --workers 4 --out <owned private report>",
+      "exit_code": 0,
+      "actual_output": "github repositories 19 non-github 0 already-covered 0 to-fetch 19\ndone 19 errors 0 partial_errors 0",
+      "input": {
+        "bytes": 10573,
+        "sha256": "853df19652276c293f3b7d9970153ecc87f97c509944c98ec0c80f7c1020cd06"
+      },
+      "report": {
+        "bytes": 20321,
+        "sha256": "6199a08f0c91eeb1ef8122c4e789d3918cba4451ff544ac6386517ad76ee798a",
+        "count": 19,
+        "errors": 0,
+        "partial_errors": 0,
+        "fetched_this_run": 19,
+        "retained_from_prior_runs": 0,
+        "observation_window": {
+          "min": "2026-10-03T03:25:26.438784+00:00",
+          "max": "2026-10-03T03:25:31.589708+00:00"
+        }
+      },
+      "scope": "Original source-intake metadata, not later expanded coverage or provider acceptance",
+      "sanitization": "Host working-file paths omitted; original report retained privately"
+    },
+    {
+      "command": "Named managed Claude2.1.288 executable --version",
+      "exit_code": 0,
+      "actual_output": "2.1.288 (Claude Code)\n",
+      "binary": {
+        "bytes": 245734584,
+        "sha256": "0298068b686e7fdbaf9402a7a587bb7f49c0b0e084de09f69145a0719207640c"
+      },
+      "independent_binding": {
+        "staged_execution_observation_bytes": 4468,
+        "staged_execution_observation_sha256": "6c128fa5b3bfb92b0b7f1c0365a5efaa74a40d3ff5ad8878b31d682db9f4d547",
+        "byte_identity": "matched"
+      },
+      "scope": "Version and binary identity only; no new useful role execution or managed environment acceptance",
+      "sanitization": "Private host/executable locators omitted"
+    },
+    {
+      "command": "rtk python3 tools/sota-convergence/github_freshness.py --work-dir <owned expanded private input> --workers 4 --out <owned retained private report>",
+      "exit_code": 0,
+      "actual_output": "github repositories 26 non-github 0 already-covered 19 to-fetch 7\ndone 26 errors 0 partial_errors 0",
+      "input": {
+        "bytes": 13611,
+        "sha256": "8c30ff4342af11b097b5884506dbc36117e80910f125c2c48cbf810d9202457a"
+      },
+      "report": {
+        "bytes": 26978,
+        "sha256": "1754a2fd5638f1c07bb41ac78ee651373891d1ed9d549e3cc66b43ca4bfa339c",
+        "count": 26,
+        "errors": 0,
+        "partial_errors": 0,
+        "fetched_this_run": 7,
+        "retained_from_prior_runs": 19,
+        "observation_window": {
+          "min": "2026-10-03T03:25:26.438784+00:00",
+          "max": "2026-10-03T03:48:25.399980+00:00"
+        }
+      },
+      "scope": "Expanded source/watch coverage; nineteen prior observations reused and seven newly fetched; no model runtime acceptance",
+      "sanitization": "Host working-file paths omitted"
+    },
+    {
+      "command": "rtk python3 scripts/validate.py after native registration",
+      "exit_code": 0,
+      "actual_output": "{\"components\": 69, \"hashed_files\": 9330, \"profiles\": 4, \"receipts\": 186, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "scope": "Registered source-intake artifact consistency"
+    }
+  ],
+  "pending": [
+    "Corrected-artifact independent review",
+    "Claude prefreeze and final-head read",
+    "Local startup carrier integration",
+    "Exclusive comparison window"
+  ],
+  "limits": [
+    "Source judgment and metadata are not runtime qualification",
+    "Test totals are non-overlapping command scopes, not model counters",
+    "Every candidate default remains null",
+    "No hosted workflow run claimed"
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "catalog_id": "runtime-worker-jobs",
+  "checked_at": "2026-10-03",
+  "scope": "Eight orchestration jobs; pinned source intake before preregistered comparison",
+  "rules": "blueprints/runtime-workers/README.md",
+  "decision_record": "docs/decisions/2026-10-03-runtime-job-qualification.md",
+  "org_extension_inventory": "blueprints/runtime-workers/org-extensions.md",
+  "freshness_contract": {"report_workflow": ".github/workflows/runtime-worker-skills-freshness.yml", "cadence": "daily", "startup_delivery": "pending", "carrier_owner": "Claude architecture lane", "required_notice_fields": ["latest attempt", "latest complete report", "expected repository coverage", "observation age", "error/partial/unknown status", "pinned versus observed revision"]},
+  "limitations": [
+    "Every default remains unset until its frozen comparison and both families' reads are retained. This catalog installs and accepts nothing.",
+    "The live landscape and upstream-owned extension inventory remain open; this source intake is not a frozen experiment.",
+    "Requested comparison arms remain OpenHands 1.50.1, Codex 0.160.0, pi 1.0.0, DeerFlow 2.1.0 and Onyx 4.8.3. New releases require a reviewed amendment.",
+    "Repository pins, package versions, installed host versions, native task outcomes and provider billing are separate evidence.",
+    "OmniRoute v3.8.51 alone does not provide a Sol ultra alias. The open upstream Sol-support change needs exact build and route qualification.",
+    "Source paths were re-read at the resolved commits. No comparative model task or destination installation was run for this catalog."
+  ],
+  "routing_contract": {
+    "gateway": "OmniRoute",
+    "model": "cx/gpt-6.1-sol",
+    "requested_effort_contract": "ultra",
+    "per_runtime_effort_mapping": "unqualified; native orchestration and effective inference are distinct",
+    "consequential_model": "cx/gpt-6-astra-max",
+    "consequential_effort": "max",
+    "native_auth": "Keep native sign-ins native; use the existing keyless gateway without reading or copying authentication stores.",
+    "effective_route_qualified": false,
+    "token_features_qualified": false,
+    "measurement_window": "Await the architecture lane's exclusive throwaway GPT-pool window, coordinated with session 0c and client-token measurements."
+  },
+  "layers": [
+    {
+      "layer_id": "coding-task-worker",
+      "title": "Coding task worker",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "openhands-sdk", "repository": "https://github.com/OpenHands/software-agent-sdk", "version": "v1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "source_file": "examples/01_standalone_sdk/23_responses_reasoning.py", "kind": "runtime", "evidence_class": "source_review"},
+        {"id": "codex", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "sdk/typescript/src/threadOptions.ts", "kind": "native-baseline", "evidence_class": "source_review"},
+        {"id": "pi", "repository": "https://github.com/earendil-works/pi", "version": "v1.0.0", "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32", "source_file": "packages/ai/src/types.ts", "kind": "runtime", "evidence_class": "source_review"},
+        {"id": "mini-swe-agent", "repository": "https://github.com/SWE-agent/mini-swe-agent", "version": "v2.4.6", "ref": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8", "source_file": "src/minisweagent/models/litellm_response_model.py", "kind": "landscape-candidate", "evidence_class": "source_review"},
+        {"id": "openhands-extensions", "repository": "https://github.com/OpenHands/extensions", "version": "v0.27.0", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "source_file": "plugins/pr-review/action.yml", "kind": "org-extension", "evidence_class": "source_review", "selected_skills_ref": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880", "activation": "pending; selected skill pin remains separate from plugin candidate pin"},
+        {"id": "openai-skills", "repository": "https://github.com/openai/skills", "version": "selected source pin", "ref": "49f948faa9258a0c61caceaf225e179651397431", "source_file": "skills/.curated/gh-address-comments/SKILL.md", "kind": "org-extension", "evidence_class": "source_review", "activation": "pending; reuse existing skills manifest"},
+        {"id": "openai-plugins", "repository": "https://github.com/openai/plugins", "version": "source pin", "ref": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f", "source_file": "README.md", "kind": "org-extension", "evidence_class": "source_review", "activation": "pending; freeze selected plugin paths and native loader"}
+      ]
+    },
+    {
+      "layer_id": "research-gatherer",
+      "title": "Research gatherer",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "gpt-researcher", "repository": "https://github.com/assafelovic/gpt-researcher", "version": "v3.7.0", "package_version": "0.16.0", "ref": "0957c301ed06c2a5857b834358c7227c739041d4", "source_file": "pyproject.toml", "kind": "runtime", "evidence_class": "source_review"},
+        {"id": "deerflow", "repository": "https://github.com/bytedance/deer-flow", "version": "v2.1.0", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "source_file": "config.example.yaml", "kind": "runtime", "evidence_class": "source_review"},
+        {"id": "onyx", "repository": "https://github.com/onyx-dot-app/onyx", "version": "v4.8.3", "ref": "23be912c204deb0a087ea2ca0ae476e83541297f", "source_file": "backend/onyx/llm/custom_config_mapping.py", "kind": "runtime", "evidence_class": "source_review", "new_release_notice": "v4.8.4 is a landscape lead; the agreed v4.8.3 arm remains fixed before a reviewed amendment."},
+        {"id": "gptr-mcp", "repository": "https://github.com/assafelovic/gptr-mcp", "version": "source pin", "ref": "63884773685b1f12c7f0d9e283b3d71a5b9b5fda", "source_file": "README.md", "kind": "org-extension", "evidence_class": "source_review", "activation": "pending environment, native tools and gateway acceptance"},
+        {"id": "onyx-python-sandbox", "repository": "https://github.com/onyx-dot-app/python-sandbox", "version": "code-interpreter-0.4.9", "ref": "e53850d68701e5e62440a36ed311164dafc89465", "source_file": "README.md", "kind": "org-extension", "evidence_class": "source_review", "activation": "conditional on frozen job; separate service compatibility acceptance"}
+      ]
+    },
+    {
+      "layer_id": "reviewer",
+      "title": "PR and design reviewer",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "codex-review", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "codex-rs/core/src/tasks/review.rs", "kind": "native-baseline", "evidence_class": "source_review"},
+        {"id": "pr-agent", "repository": "https://github.com/The-PR-Agent/pr-agent", "version": "v0.47.0", "ref": "8e5a9295973b24af4b70cafd0b660a230811ef9e", "source_file": "docs/docs/usage-guide/local_git_provider.md", "kind": "reviewer-candidate", "evidence_class": "source_review"},
+        {"id": "openhands-pr-review", "repository": "https://github.com/OpenHands/extensions", "version": "v0.27.0", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "source_file": "plugins/pr-review/action.yml", "kind": "org-extension", "evidence_class": "source_review"}
+      ]
+    },
+    {
+      "layer_id": "github-workflow-agents",
+      "title": "GitHub workflow agents",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "codex-action", "repository": "https://github.com/openai/codex-action", "version": "v1.12", "ref": "86365089eb2b84e0a8fb0717b304f8bdcb13b20e", "source_file": "action.yml", "kind": "workflow-agent", "evidence_class": "source_review"},
+        {"id": "github-agentic-workflows", "repository": "https://github.com/github/gh-aw", "version": "v0.89.21", "ref": "c35393777e5604a63721d09512263b1383301d4f", "source_file": "docs/src/content/docs/engines/codex.md", "kind": "workflow-agent", "evidence_class": "source_review"},
+        {"id": "openhands-pr-review-action", "repository": "https://github.com/OpenHands/extensions", "version": "v0.27.0", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "source_file": "plugins/pr-review/action.yml", "kind": "org-extension", "evidence_class": "source_review"}
+      ]
+    },
+    {
+      "layer_id": "scheduled-automation",
+      "title": "Scheduled automation",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "dagu", "repository": "https://github.com/dagucloud/dagu", "version": "v2.18.1", "ref": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7", "source_file": "README.md", "kind": "scheduler", "evidence_class": "source_review"},
+        {"id": "deerflow-scheduler", "repository": "https://github.com/bytedance/deer-flow", "version": "v2.1.0", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "source_file": "config.example.yaml", "kind": "scheduler-candidate", "evidence_class": "source_review"}
+      ]
+    },
+    {
+      "layer_id": "evaluation",
+      "title": "Evaluation",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "harbor", "repository": "https://github.com/harbor-framework/harbor", "version": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "source_file": "src/harbor/agents/installed/codex.py", "kind": "evaluator", "evidence_class": "source_review"},
+        {"id": "inspect-ai", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "source_file": "src/inspect_ai/model/_providers/openai.py", "kind": "evaluator", "evidence_class": "source_review"},
+        {"id": "promptfoo", "repository": "https://github.com/promptfoo/promptfoo", "version": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "source_file": "examples/compare-agentic-sdks/promptfooconfig.yaml", "kind": "evaluator", "evidence_class": "source_review"}
+      ]
+    },
+    {
+      "layer_id": "multi-worker-orchestration",
+      "title": "Multi-worker orchestration",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "codex-native-workers", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs", "kind": "native-baseline", "evidence_class": "source_review"},
+        {"id": "claude-agent-sdk", "repository": "https://github.com/anthropics/claude-agent-sdk-python", "version": "v0.2.163", "ref": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7", "source_file": "pyproject.toml", "kind": "family-baseline-sdk", "evidence_class": "source_review", "qualification": "SDK617 historical packet and scoped follow-ups remain separate from this GPT comparison"},
+        {"id": "openai-agents-python", "repository": "https://github.com/openai/openai-agents-python", "version": "v0.23.1", "ref": "c4a1d047b22488234b2ba81056e1b9b8db2127a5", "source_file": "src/agents/model_settings.py", "kind": "sdk", "evidence_class": "source_review"},
+        {"id": "langgraph", "repository": "https://github.com/langchain-ai/langgraph", "version": "1.2.12", "ref": "49cce0ca852be4cfb567a1cbe0e511ff325a1682", "source_file": "libs/langgraph/README.md", "kind": "sdk", "evidence_class": "source_review"},
+        {"id": "deepagents", "repository": "https://github.com/langchain-ai/deepagents", "version": "deepagents==0.7.21", "ref": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773", "source_file": "libs/deepagents/README.md", "kind": "org-harness-candidate", "evidence_class": "source_review"},
+        {"id": "omniroute", "repository": "https://github.com/diegosouzapw/OmniRoute", "version": "v3.8.51", "ref": "c1e30b7676975feb298b49eff6ff58923c04b89e", "source_file": "open-sse/executors/codex/reasoningSuffix.ts", "kind": "gateway", "evidence_class": "source_review", "sol_support_pr": {"number": 15167, "head": "0585aba5589d5a1f49243a13a8db249558e7c9e3", "state": "open", "installed_build_qualified": false}}
+      ]
+    },
+    {
+      "layer_id": "trading-r-and-d",
+      "title": "Trading research and development",
+      "default": null,
+      "decision_status": "unmeasured",
+      "components": [
+        {"id": "rd-agent", "repository": "https://github.com/microsoft/RD-Agent", "version": "v1.0.0", "ref": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4", "source_file": "rdagent/oai/llm_conf.py", "kind": "research-runtime", "evidence_class": "source_review"},
+        {"id": "qlib", "repository": "https://github.com/microsoft/qlib", "version": "v0.9.7", "ref": "da920b7f954f48ab1bb64117c976710de198373e", "source_file": "docs/advanced/PIT.rst", "kind": "org-research-platform", "evidence_class": "source_review"},
+        {"id": "codex-research-baseline", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "sdk/typescript/src/threadOptions.ts", "kind": "native-baseline", "evidence_class": "source_review"}
+      ],
+      "boundary": "Read blueprints/us-equities/AGENTS.md and architecture sources. Preserve session 0c's preregistrations and inspected holdouts. This comparison concerns research and simulation; deterministic code retains numeric, risk and order state."
+    }
+  ]
+}

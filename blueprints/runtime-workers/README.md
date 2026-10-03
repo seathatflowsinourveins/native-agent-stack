@@ -1,0 +1,30 @@
+# Runtime workers by job
+
+Before starting a runtime worker, adding a runtime or reviewing a runtime update, read the matching row in [runtime-jobs.json](../../catalogs/foundation/runtime-jobs.json). This is the canonical rules entrypoint for coding, research gathering, review, GitHub agents, scheduling, evaluation, multi-worker orchestration and trading R&D. The [qualification decision](../../docs/decisions/2026-10-03-runtime-job-qualification.md) records the current evidence and open comparisons.
+
+## Start a worker
+
+1. Match the task to its job row. Use its measured `default` only when the decision binds frozen results and both families' final-head reads. An unset default means qualification is pending; continue authorized work with the standing native client rather than inventing a winner or an approval step.
+2. Use the selected upstream's native executable, SDK, extension format and install/test command at the exact recorded source. Give a writer an owned worktree and bounded paths; one coordinator integrates. Load only the job's needed skills/tools. The [skills trial](skills/README.md) separates inventory from actual activation and pruning.
+3. Select OmniRoute explicitly with the requested GPT-6.1 Sol ultra contract; use GPT-6 Astra/max for consequential judgment. Bind the per-runtime mapping before qualification: native Codex Ultra orchestration, another runtime's supported effort field, the gateway model/alias, effective inference effort and installed gateway source/carry are separate observations. The gateway's logical Ultra translates to wire Max, while Codex chooses its non-Ultra inference effort from model metadata. An API effort label does not establish native orchestration. Keep native sign-ins native and use the existing keyless route; authentication stores stay with their upstream clients.
+4. Retain the useful result, terminal outcome, actual tool effects, failures and native usage. Every PR read names its head. Distinguish source review, unchanged upstream tests, integration checks, synthetic controls and actual provider/host execution under the [acceptance policy](../../docs/acceptance-evidence-policy.md).
+
+## Measure gateway token features
+
+Use the upstream compression/cache/combo implementation at the recorded gateway pin. Freeze an uncompressed control, exact feature settings, task/source/extension hashes, runtime/model/effort, quality graders, repetition order and cache boundaries before execution. Obtain the Claude read and exclusive throwaway GPT-pool window through the existing architecture handoff, coordinated with session 0c and client-token measurements.
+
+Measure one gateway condition per artifact; keep client context compression outside that condition. Enable a feature only when its frozen quality rule passes and native counters show a benefit. Separate input/output totals, cached/reasoning subsets, compression estimates, cache-hit counters and billed cost. Retain every failed attempt and keep absent counters unknown. Headerless requests and opt-in compression are distinct conditions; an advertised feature establishes no saving. Gateway effort-observation columns may be null even when an effort was sent.
+
+## Add or replace a default
+
+Gather the live job landscape through the installed GPT research runtime and web search; re-read every claim at a pinned primary source. Start the extension intake at [org-extensions.md](org-extensions.md), then bind the selected org skills, agents, MCP servers and plugins with pins, native loader contracts and useful activation checks. Reuse existing skill records; distinguish their selected pin from a newer runtime/plugin pin. Record alternatives and concrete fit gaps.
+
+Preregister frozen tasks using maintained upstream evaluators (Harbor, Inspect or promptfoo), with source-bound graders and failure conditions. Preserve native client orchestration when an API effort enum differs. Obtain an Astra/max read for consequential architecture and a Claude read before freeze. Run only in the allocated window, post original sanitized outcomes and independent observations, then apply the frozen rule. Retain an explicit native-baseline win when the extension/runtime does not improve the job.
+
+Update the job row, dated decision and catalog evidence together. Send manifest/install/client changes as a consensus proposal to the Claude architecture owner through PR608 or a `CODEX-*.md` note. A final default requires both families' reads at its merged head. Trading R&D additionally follows [its lane rules](../us-equities/AGENTS.md) and the [paper policy](../../docs/paper-lane-policy.md); inspected holdouts and existing trading freezes retain their scope.
+
+## Freshness reports and pending startup delivery
+
+The daily [runtime freshness workflow](../../.github/workflows/runtime-worker-skills-freshness.yml) produces metadata for repositories in the job rows and the existing skills manifest. Its collector can return0 with failed or partial fetches; inspect expected coverage, observation age and error fields rather than treating a green job as completeness. Artifact retention covers ordinary failures; cancellation or hard termination may prevent upload. A newer release or new candidate opens a comparison; metadata drift alone does not replace a default.
+
+Automatic startup delivery is pending the Claude architecture owner's carrier handoff. The existing local [SessionStart consumer](../../adoption/hooks/claude/currency-due-notice.py) expects a bounded `summary_line` and `generated_at`, not raw GitHub metadata. The producer must preserve the latest attempt alongside the latest complete report, compare pinned and observed revisions, and expose missing coverage, failures, unknowns and age. Startup reads local state; it does not fetch upstream. Until that integration is accepted, use the catalog when the current task concerns these runtimes and consult both the latest attempt and complete report. The general catalog workflow and its live owner retain separate publication custody.

@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-gatherer-sol-ultra-20261003",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "scope": "Inherited DeerFlow2.1.0 versus Onyx4.8.3 comparison, with fixed GPTR3.7.0 as a matched baseline; source-only proposals do not decide the winner",
+  "task_source": {"repository": "https://github.com/imlrz/DeepResearch-Bench-II", "ref": "b38f360603db9531b102aef8c166cedb8509b6f6", "file": "tasks_and_rubrics.jsonl", "sha256": "263aaabb8c279fb16cbe7c9499afe82d657a8ab3ccfb07ace084387e367d921a", "rows": 132},
+  "task_selection": {
+    "seed_utf8": "runtime-jobs-gatherer-sol-ultra-v1\n",
+    "rule": "Eight lowest SHA256(seed_utf8 + decimal idx) from the pinned132-row question pool. This small bilingual sample is not domain/language-balanced.",
+    "tasks": [
+      {"idx": 14, "id": "task57", "prompt_bytes": 2676, "prompt_sha256": "0ad03a94ac688a6570e844ccf9efbee63e9620ad3446dd2616a683ea01372f30"},
+      {"idx": 67, "id": "task26+", "prompt_bytes": 2303, "prompt_sha256": "19c15f585a748fcb4a9b90ddc9e24c6bbf2f3130270bfe90fdf32a5c6efef4b2"},
+      {"idx": 128, "id": "task48", "prompt_bytes": 3758, "prompt_sha256": "c355132b0efeb62e938788be092e1a2e4f9ea9ec02606cd2ae7ee901d5366cad"},
+      {"idx": 104, "id": "task40", "prompt_bytes": 2422, "prompt_sha256": "5d6840ea8fe9408998e99c299be53b2dfb96abc323a366e666e62a17d9f654ee"},
+      {"idx": 34, "id": "task64", "prompt_bytes": 2587, "prompt_sha256": "501a415ff6c995b2090f3fbc0b60313ec01dda685cc055aea5e09084bc3f5803"},
+      {"idx": 106, "id": "task41", "prompt_bytes": 3212, "prompt_sha256": "441699fcab6225230cd8c7356fcd5966a979effb278ab9cffe13c03574af0004"},
+      {"idx": 79, "id": "task80", "prompt_bytes": 2333, "prompt_sha256": "044310a2514d4ddecc2d1811ab87ca166519106e9d74122f3c7719149e09a448"},
+      {"idx": 7, "id": "task53", "prompt_bytes": 2795, "prompt_sha256": "cb68eba4260dd38f61985c94e69411712d205ea90f3223dcac422c358fc86a22"}
+    ],
+    "worker_view": "Exact top-level prompt bytes plus one common frozen output contract only; content.rubric and content.blocked are grader-only."
+  },
+  "arms": [
+    {"id": "gpt-researcher", "tag": "v3.7.0", "package_version": "0.16.0", "ref": "0957c301ed06c2a5857b834358c7227c739041d4", "baseline": true},
+    {"id": "deerflow", "tag": "v2.1.0", "ref": "345f08be00c8a9495079b732a39b46aa9af1584e", "baseline": false},
+    {"id": "onyx", "tag": "v4.8.3", "ref": "23be912c204deb0a087ea2ca0ae476e83541297f", "baseline": false}
+  ],
+  "proposed_execution": {
+    "model": "cx/gpt-6.1-sol-ultra",
+    "judge_model": "cx/gpt-6-astra-max",
+    "repeats_per_question_arm": 2,
+    "maximum_report_attempts": 48,
+    "concurrent_model_tasks": 1,
+    "retries": 0,
+    "order": "Pinned question order; cycle GPTR/DeerFlow/Onyx, DeerFlow/Onyx/GPTR, Onyx/GPTR/DeerFlow by question index; reverse for repeat2.",
+    "fresh_state": "One fresh native thread/session/index scope per attempt, identical public-source access rules and same frozen search/fetch services across arms.",
+    "timeout_seconds_per_question_arm_repeat": 900,
+    "gross_input_plus_output_token_limit_per_question_arm_repeat": 200000,
+    "maximum_searches": 40,
+    "maximum_fetches": 80,
+    "quota_rule": "First quota/429 suspends all arms and records the partial block; no silent effort/model downgrade or independent retry.",
+    "source_policy": "Preserve each question's original time constraints. Bind an observation cutoff, archived/versioned eligibility where the prompt requires historical availability, URL/time/content hashes and fetch failures. Neither a current page nor a judge verdict proves historical availability.",
+    "compression": "off control; gateway token conditions require a separate reviewed amendment on the same task/source snapshots",
+    "window": "Exclusive architecture-owned throwaway GPT-pool window coordinated with session0c and client-token/GPU trials"
+  },
+  "proposed_evaluation": {
+    "runner": {"repository": "https://github.com/promptfoo/promptfoo", "tag": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "source_files": ["src/assertions/llmRubric.ts", "site/docs/configuration/expected-outputs/model-graded/llm-rubric.md", "src/providers/openai/codex-sdk.ts"]},
+    "citation_quality": "A blinded upstream promptfoo model grader evaluates each report against independently retained numbered source passages and the frozen strict support/attribution rubric. Missing/unavailable evidence, wrong citation attribution, failed temporal eligibility or any unsupported material factual claim fails the report. Exact rubric, source mapping/transport and negative controls must be bound before freeze.",
+    "rubric_quality": "Retain the unchanged official DRB-II report-rubric grader separately. Its report-text evidence is not source entailment; its score is never substituted for citation support.",
+    "decision_rule": "A challenger replaces the matched GPTR baseline only with no lower strict-supported report success count on any question, no lower official rubric score per question, and at least one strict quality improvement. With identical quality on every question, require at least5% lower paired median gross input-plus-output tokens with complete same-scope native usage and no greater paired median agent time. For two eligible challengers use strict-supported report count, then official rubric score, then paired median gross tokens, then agent time. Otherwise preserve the measured baseline and report sampled failures/incomparability explicitly.",
+    "limitations": "No claim-level calibrated percentage, universal quality or statistical superiority follows this eight-question screen. A promptfoo rubric is a configured upstream scorer; a proposed rubric has not yet passed its negative controls."
+  },
+  "required_before_freeze": [
+    "Astra/max consequential read and Claude-lane read of finalized source/task/rubric/route/extension contract, exact accepted head/hash and freeze receipt",
+    "Allocated native host/project/window, installed GPTR/DeerFlow entrypoints and separately scoped Onyx-Lite provisioning with immutable service/image pins",
+    "Same source-backed keyless search/fetch service pins, exact engine/language/result-count/quotas, common output contract and automated clarification-off setting",
+    "Exact org-owned extension/plugin/skill/MCP inventory and useful loader activation checks: GPTR plugin executable/Python-version contract; DeerFlow0.2 extensions; Onyx research/sandbox tools",
+    "Native configured OmniRoute build/carry and actual all-call effort across main/child/summary/title/auxiliary calls; preserve differing native/API effort semantics",
+    "Source-backed evaluator/judge transport and frozen strict rubric; wrong-source, wrong-attribution, unsupported-claim, missing-source and temporal-violation negative controls before candidate outputs",
+    "Observable all-call native usage and enforced time/token/search/fetch bounds, terminal results and independent actual report/source observations",
+    "Exact independent archive/availability rules and blinded source/report/rubric bindings; all failed attempts and unknown counters retained"
+  ],
+  "failures_preserved": [
+    "The first prompt-hash probe looked inside content instead of the top-level prompt field and returned eight empty-string hashes. Those hashes are invalid; the corrected top-level probe asserts nonempty UTF8 prompts and supplies the bindings above.",
+    "The inherited source report used Sol max and proposed DeepEval citation scoring. This separate user-directed ultra study uses the requested upstream evaluator family, with source/quality transport qualification still open."
+  ]
+}

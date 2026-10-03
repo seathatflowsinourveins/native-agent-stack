@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "study_id": "runtime-jobs-coding-sol-ultra-20261003",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "scope": "Matched-task qualification of the three inherited coding arms in their source-supported final form; no Gate A rewrite",
+  "sources": {
+    "harbor": {"tag": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "repository": "https://github.com/harbor-framework/harbor", "files": ["registry.json", "src/harbor/agents/installed/codex.py", "src/harbor/agents/installed/pi.py", "src/harbor/agents/installed/openhands_sdk.py"]},
+    "registry_sha256": "da1446bce05eabbd72a25eb9eef5a2f5db94645ce88c28e2497581433b3d2e60",
+    "dataset": {"name": "swebench-verified", "version": "1.0", "repository": "https://github.com/laude-institute/harbor-datasets", "ref": "86723674f04e4209ac479d0fb75d9d9f44b4377e", "task_prefix": "datasets/swebench-verified", "upstream_task_grader": "tests/test.sh", "swebench_version_in_task_grader": "4.0.3"}
+  },
+  "arms": [
+    {"id": "native-codex", "runtime_tag": "rust-v0.160.0", "runtime_ref": "a956835d020762cb2b570053af06f643a11c0ecc", "harbor_agent": "codex", "baseline": true},
+    {"id": "openhands-sdk", "runtime_tag": "v1.50.1", "runtime_ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "harbor_agent": "openhands-sdk", "baseline": false},
+    {"id": "pi", "runtime_tag": "v1.0.0", "runtime_ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32", "harbor_agent": "pi", "baseline": false}
+  ],
+  "task_selection": {
+    "seed_utf8": "runtime-jobs-coding-sol-ultra-v1\n",
+    "rule": "Four lowest SHA256(seed_utf8 + full task name), independently within each of the six named repositories, from the pinned 500-task registry. No outcomes were used.",
+    "tasks": [
+      "django__django-14034", "django__django-15569", "django__django-11211", "django__django-15572",
+      "sympy__sympy-23824", "sympy__sympy-13647", "sympy__sympy-24066", "sympy__sympy-12489",
+      "scikit-learn__scikit-learn-13496", "scikit-learn__scikit-learn-12585", "scikit-learn__scikit-learn-13328", "scikit-learn__scikit-learn-14983",
+      "pytest-dev__pytest-6197", "pytest-dev__pytest-7521", "pytest-dev__pytest-6202", "pytest-dev__pytest-5840",
+      "pydata__xarray-7393", "pydata__xarray-2905", "pydata__xarray-4075", "pydata__xarray-4629",
+      "matplotlib__matplotlib-25122", "matplotlib__matplotlib-24627", "matplotlib__matplotlib-24026", "matplotlib__matplotlib-25332"
+    ],
+    "source_preflight": "All 24 instruction.md, task.toml and tests/test.sh URLs returned HTTP200 at the dataset pin; all 24 test.sh files declare swebench==4.0.3. Task-tree/image receipts remain required before freeze."
+  },
+  "proposed_execution": {
+    "repeats_per_task_arm": 2,
+    "maximum_task_attempts": 144,
+    "concurrent_model_tasks": 1,
+    "retries": 0,
+    "order": "Pinned task-list order; cycle native-codex/openhands-sdk/pi, openhands-sdk/pi/native-codex, pi/native-codex/openhands-sdk by task index; reverse that task's order for repeat2.",
+    "isolation": "Fresh per-task native state and identical immutable execution image per task across arms; evaluator tests and reference solutions remain outside the worker view.",
+    "agent_timeout_seconds": 900,
+    "gross_input_plus_output_token_limit_per_task_arm_repeat": 200000,
+    "quota_rule": "First quota/429 suspends all arms and records the incomplete block. Resume only the same frozen protocol in a newly coordinated window; preserve attempted usage and failures.",
+    "model": "cx/gpt-6.1-sol-ultra",
+    "native_effort_requirement": "Bind each runtime's native effort and actual gateway inference envelope separately. Preserve Codex Ultra orchestration; do not equate Pi max-to-ultra serialization or OpenHands provider strings with that orchestration.",
+    "compression": "off control; token-feature conditions are a separate reviewed amendment on the same tasks, not stacked client compression",
+    "window": "Architecture-owned exclusive throwaway GPT-pool window, disjoint from session0c and token/GPU trials"
+  },
+  "proposed_decision_rule": {
+    "quality": "Use only unchanged upstream task reward after FAIL_TO_PASS and PASS_TO_PASS. Provider/tool-task failures and timeouts score0; source/image/route/evaluator mismatches invalidate qualification rather than fabricate a reward. Retain all attempted conditions.",
+    "selection": "A challenger can replace native Codex when its two-repeat success count is no lower on every task and greater on at least one. With identical per-task success counts, require at least5% lower paired median gross input-plus-output tokens, complete same-scope native usage and no greater paired median agent time. Multiple qualifying challengers rank by total successful trials, then paired median gross tokens, then paired median agent time. Otherwise retain the measured native baseline and report sampled failures/incomparability explicitly.",
+    "limitations": "This 24-task screen supports only the measured workload. It establishes no universal or statistically significant superiority; further confirmation follows any material fit/confidence gap."
+  },
+  "required_before_freeze": [
+    "Astra/max consequential read and one Claude-lane read of the concrete finalized protocol; exact accepted head and hash",
+    "Architecture allocation of the throwaway host/project/window and actual rootless container reachability to the existing keyless pool",
+    "Task-tree hashes, immutable base-image manifest digests and built-image IDs; the source Dockerfiles use mutable latest tags",
+    "Exact per-arm org-owned skills/extensions/plugins/MCP inventory, their source hashes, native loader configuration and useful activation checks",
+    "Supported native route configuration and negative control for alias/effort loss: Harbor Codex strips cx; its typed effort enum ends at max; inline config must be qualified",
+    "Pi1.0 provider-map qualification; the Harbor bridge's MCP version compatibility and max-to-ultra mapping must be resolved before claiming final-form parity",
+    "OpenHands Responses/capability/effort and skill-loading qualification for the actual model; matched1.50.1 packages verified inside each clean image",
+    "Native full/cache/reasoning usage and all child/auxiliary call collection, with observable enforcement of the proposed time/token envelope",
+    "Lifecycle and no-prompt/no-credential-copy qualification; no native auth.json upload or sign-in-store copying",
+    "Frozen task/config/source/extension hashes, resolved gateway build/carry and force rules, final grader/decision rule and freeze receipt before any comparative task"
+  ],
+  "failures_preserved": [
+    "The first GitHub contents read of the13.65MB registry returned empty content; JSON decoding failed. Direct pinned raw-source retrieval then established its bytes/hash.",
+    "The inherited source-only proposal used Sol max. This user's ultra objective governs this separate study; the old source report and its model assumptions remain historical leads."
+  ]
+}
