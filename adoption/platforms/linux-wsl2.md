@@ -112,6 +112,7 @@ itself evidence the WSL UVA gap closed.
    `token-efficiency` profile's Linux coverage (step 2 of
    [`adoption/bootstrap.md`](../bootstrap.md) has the details).
    Its `ai-memory` and `mcporter` pins also changed after `v2026.09.25.2` (2.3.2 to 2.4.1 and 0.13.13 to 0.14.1); before an existing ai-memory service restarts on 2.4.1, follow [upgrading an existing store](../../recipes/README.md#upgrading-an-existing-store).
+   On 2026-10-03, the Linux pins changed after `v2026.09.26.2` again: `mcporter` 0.14.1 to 0.14.2 and `orx` 0.2.7 to 0.2.15 (URL, hash and note); a host at that tag keeps the earlier versions. See [W1 qualification](../../docs/decisions/2026-10-03-currency-wave-w1.md) before treating scratch evidence as a host switch.
 2. Recreate the SDK only for the `research-runtime` profile using
    [`adoption/sdk/README.md`](../sdk/README.md)'s transitive lock; retain the
    same exact-match and uncached-reinstall checks as

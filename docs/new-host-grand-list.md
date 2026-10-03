@@ -75,7 +75,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `candidate:openai-skills` | unpinned | local_integration | conditional | untested | — |  |
 | Isolation | retain | `worktrunk` | 0.79.0 | native_proven | host_verified | host_verified | — | 16 / 19 |
 |  |  | `sandbox-runtime` | 0.0.77 | native_proven | host_verified | untested | — |  |
-| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.1 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
+| MCP servers and client surfaces | retain | `mcporter` | 0.13.13 (behind v0.14.0) | native_proven | host_verified, bootstrap 0.14.2 | untested, bootstrap 0.13.13 | foundation-cpu, macos-arm64-foundation, token-efficiency | 12 / 14 |
 |  |  | `mcp-inspector` | 2.7.0 | native_proven | host_verified | untested | — |  |
 | Native clients | retain | `claude-code` | 2.1.278 (behind v2.1.280) | native_proven | accepted, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 9 / 14 |
 |  |  | `codex` | 0.155.1 (behind rust-v0.156.0) | native_proven | host_verified, bootstrap 0.159.3 | untested, bootstrap 0.155.1 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency |  |
@@ -97,7 +97,7 @@ Locally-run model weights a host receipt recorded qualifying on a runtime compon
 |  |  | `ccusage` | 20.0.24 | synthetic | host_verified, bootstrap 20.0.26 | untested, bootstrap 20.0.26 | token-efficiency |  |
 | Web research | retain | `tavily-cli` | 0.1.8 | local_integration | conditional, bootstrap 0.1.8 | untested | — | 7 / 9 |
 |  |  | `agent-browser` | 0.38.1 | local_integration | conditional, bootstrap 0.38.1 | untested | — |  |
-|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.7 | untested | — |  |
+|  |  | `openresearch` | 0.2.7 (behind v0.2.9) | local_integration | conditional, bootstrap 0.2.15 | untested | — |  |
 | Workers and task ownership | keep_but_compare | `claude-code` | 2.1.278 (behind v2.1.280) | local_integration | conditional, bootstrap 2.1.284 | untested, bootstrap 2.1.284 | new-wsl-clean-foundation, foundation-cpu, research-runtime, macos-arm64-foundation, token-efficiency | 7 / 8 |
 |  |  | `worktrunk` | 0.79.0 | local_integration | host_verified | host_verified | — |  |
 

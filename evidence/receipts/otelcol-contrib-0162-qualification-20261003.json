@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "id": "otelcol-contrib-0162-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "opentelemetry-collector-contrib"
+  ],
+  "claim": "The recorded version command printed \"otelcol-contrib version 0.162.0\" (exit 0). The recorded validate command returned empty output with exit 0.",
+  "limitations": [
+    "The recorded validate smoke has empty output and exit 0; no running host service, live-traffic pipeline or service replacement was exercised.",
+    "The recorded integrity_source says the Sigstore bundle \"was NOT verified\".",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.161.0",
+    "version": "0.162.0",
+    "source": {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "tag": "v0.162.0",
+      "commit": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+      "published_at": "2026-09-29T10:11:33Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "release-asset",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+      "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
+      "integrity_checked": true,
+      "integrity_source": "Publisher sidecar https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz.sha256 (64 hex chars; sha256sum --check printed OK, exit 0) AND the GitHub release asset digest recorded in github_release_asset_digest (gh api repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0). Computed sha256 equals both; downloaded size 112285869 bytes equals the API size. Sigstore bundle otelcol-contrib_0.162.0_linux_amd64.tar.gz.sigstore.json exists upstream but was NOT verified (cosign and slsa-verifier are not installed).",
+      "github_release_asset_digest": "sha256:fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
+    },
+    "install_recorded": {
+      "command": "tar -xzf <qualification-root>/opentelemetry-collector-contrib/otelcol-contrib_0.162.0_linux_amd64.tar.gz -C <qualification-root>/opentelemetry-collector-contrib/prefix",
+      "exit": 0,
+      "prefix": "<qualification-root>/opentelemetry-collector-contrib/prefix"
+    },
+    "version_recorded": {
+      "command": "<qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib --version",
+      "exit": 0,
+      "output": "otelcol-contrib version 0.162.0"
+    },
+    "smoke_recorded": {
+      "command": "env ECOSYSTEM_OBSERVABILITY_DATA=<qualification-root>/opentelemetry-collector-contrib/data <qualification-root>/opentelemetry-collector-contrib/prefix/otelcol-contrib validate --config=<qualification-repository>/observability/collector/collector.yaml",
+      "exit": 0,
+      "output_excerpt": "",
+      "ran": true
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.434445+00:00",
+          "ended_at": "2026-10-03T05:50:27.867805+00:00",
+          "stdout_sha256": "1004156b020ffa0ba45ec636f07308b4f771b0781c6faae15c33f7439c694b58",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.868070+00:00",
+          "ended_at": "2026-10-03T05:50:28.103095+00:00",
+          "stdout_sha256": "227509dc4de124019591bc0fe0bb8ef21b327fe52890d262d17ef4d2aec17afd",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.104024+00:00",
+          "ended_at": "2026-10-03T05:50:28.529857+00:00",
+          "stdout_sha256": "17bbbf673f584c369735a054fcd6b92cf89b1d72b2bda1f77f8a9ac114b9bdf4",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/v0.162.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.542380+00:00",
+          "ended_at": "2026-10-03T05:50:28.968101+00:00",
+          "stdout_sha256": "17bbbf673f584c369735a054fcd6b92cf89b1d72b2bda1f77f8a9ac114b9bdf4",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "sha": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "committed_at": "2026-09-29T09:11:04Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.162.0",
+        "sha": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "committed_at": "2026-09-29T09:11:04Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
+      "bytes": 112285869,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

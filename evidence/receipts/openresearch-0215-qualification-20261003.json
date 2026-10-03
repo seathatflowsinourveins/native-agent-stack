@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "id": "openresearch-0215-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "openresearch"
+  ],
+  "claim": "The isolated recorded version command printed \"orx 0.2.15\" (exit 0). The documented discover/paper smoke output is \"NOT RUN\"; its -1 value is a not-run sentinel.",
+  "limitations": [
+    "The recorded smoke output says \"NOT RUN\" and identifies the live-service and PAPER_ID prerequisites; no functional discovery or retrieval is claimed.",
+    "Version/integrity/source qualification is the accepted scope; historical 0.2.7 search receipts do not establish 0.2.15 operation.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.2.7",
+    "version": "0.2.15",
+    "source": {
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "tag": "v0.2.15",
+      "commit": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+      "published_at": "2026-10-02T17:44:48Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "tarball",
+      "url": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.15/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+      "sha256": "f36ed4095f4839767a162a555d9e7eafc04f70f0664ce3767178f81fc0b45c86",
+      "integrity_checked": true,
+      "integrity_source": "https://github.com/alphaXiv/OpenResearch/releases/download/v0.2.15/openresearch-cli-x86_64-unknown-linux-musl.tar.xz.sha256 (release-published sidecar; `sha256sum -c` printed OK, exit 0). Same hash also in the release's sha256.sum line 5 (`sha256sum -c --ignore-missing` OK, exit 0) and in the GitHub API asset digest sha256:f36ed409... (gh api repos/alphaXiv/OpenResearch/releases/tags/v0.2.15); size 11890208 bytes matches the API size."
+    },
+    "install_recorded": {
+      "command": "install -m 0755 <qualification-root>/openresearch/stage/openresearch-cli-x86_64-unknown-linux-musl/orx <qualification-root>/openresearch/prefix/bin/orx   (preceded by `tar -xJf <D>/openresearch-cli-x86_64-unknown-linux-musl.tar.xz -C <D>/stage`, exit 0, and `find <D>/stage -type f -name orx`, exit 0, exactly 1 match; D=<qualification-root>/openresearch)",
+      "exit": 0,
+      "prefix": "<qualification-root>/openresearch/prefix"
+    },
+    "version_recorded": {
+      "command": "D=<qualification-root>/openresearch; env -i HOME=$D/home XDG_CONFIG_HOME=$D<home> XDG_DATA_HOME=$D<home>/share XDG_STATE_HOME=$D<home>/state XDG_CACHE_HOME=$D<home> PATH=/usr/bin:/bin unshare -rn $D/prefix/bin/orx --version",
+      "exit": 0,
+      "output": "orx 0.2.15"
+    },
+    "smoke_recorded": {
+      "command": "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3 ; orx --no-telemetry paper \"${PAPER_ID}\" --full   (the two commands of the row, manifests/stack.json:659-660)",
+      "exit": -1,
+      "ran": false,
+      "output_excerpt": "NOT RUN. The -1 is a sentinel meaning 'not run', not an exit code. Both documented commands need a live network service: `orx discover keyword --help` on v0.2.15 reads 'alphaXiv full-text BM25 retrieval with match snippets' and `orx paper --help` reads 'Fetch a paper: alphaXiv report/full-text, or OpenAlex/bioRxiv/PubMed metadata'. The second also needs a value for ${PAPER_ID}, which the task does not supply. The repo's own prior qualification record (evidence/artifacts/sota-refresh-20260923/pins-tools/openresearch.json, limits) says functional search needs a stored alphaXiv/OpenAlex key or account."
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/alphaXiv/OpenResearch",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.264947+00:00",
+          "ended_at": "2026-10-03T05:50:26.600418+00:00",
+          "stdout_sha256": "e20328f9e56fdc90ca402b7eae1cddcff37db7c730a25c2dc143d5e3926b63f4",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/alphaXiv/OpenResearch/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.600678+00:00",
+          "ended_at": "2026-10-03T05:50:26.847347+00:00",
+          "stdout_sha256": "b0f0cab6c98d8bd47ff85c5af24891ae89cfb3a5b951dcb97f7179462df5a5de",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/alphaXiv/OpenResearch/commits/ee36ef0333ca3c533eace915f1bec322a1efde1c",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.848058+00:00",
+          "ended_at": "2026-10-03T05:50:27.128687+00:00",
+          "stdout_sha256": "1fd77363a6f5b8ad8fbdd13bc3cc7a9cec0af4181b3d4088361cf65b5c9fee62",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/alphaXiv/OpenResearch/commits/v0.2.15",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.128958+00:00",
+          "ended_at": "2026-10-03T05:50:27.434104+00:00",
+          "stdout_sha256": "1fd77363a6f5b8ad8fbdd13bc3cc7a9cec0af4181b3d4088361cf65b5c9fee62",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.2.15",
+        "published_at": "2026-10-02T17:44:48Z",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15",
+        "target_commitish": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "sha": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "committed_at": "2026-10-02T02:28:29Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.2.15",
+        "sha": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "committed_at": "2026-10-02T02:28:29Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "f36ed4095f4839767a162a555d9e7eafc04f70f0664ce3767178f81fc0b45c86",
+      "bytes": 11890208,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

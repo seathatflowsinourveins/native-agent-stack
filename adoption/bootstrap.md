@@ -165,6 +165,8 @@ GitHub-hosted macOS runner; see
    `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
    `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.159.2 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own 0.159.x qualification before the template default applies there.
 
+   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`: `mcporter` 0.14.1 to 0.14.2 and `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). A host at that tag retains 0.14.1 and 0.2.7. The W1 scratch qualification and its functional limits are in [the dated decision](../docs/decisions/2026-10-03-currency-wave-w1.md). The Claude HUD marketplace recipe and template now select v0.10.0 at `75683c6de1ac07f6bbef00d739001679dba0740c`; hosts at the tag keep v0.8.0.
+
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode`, taking the `token-efficiency` row's
@@ -394,9 +396,9 @@ GitHub-hosted macOS runner; see
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
      uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-     uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+     uv tool install --python 3.13 jcodemunch-mcp==1.108.327
    "$eco/bin/serena" --version           # Serena 2.0.0.dev0
-   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.327
    ```
    Then run the installer:
    ```sh
@@ -578,7 +580,7 @@ GitHub-hosted macOS runner; see
    ```sh
    claude plugin marketplace add mksglu/context-mode --scope user
    claude plugin install context-mode@context-mode --scope user --json
-   claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user
+   claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user
    claude plugin install claude-hud@claude-hud --scope user --json
    claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
    claude plugin install codex@openai-codex --scope user --json
@@ -593,9 +595,9 @@ GitHub-hosted macOS runner; see
    ```sh
    python3 - <<'EOF'
    import json, os, pathlib, re, subprocess
-   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.8.0), codex-for-claude
+   reviewed = {  # recipes/README.md rows: context-mode, claude-hud (tag v0.10.0), codex-for-claude
        "context-mode@context-mode": "6f0cc6841c687e754059f36714a11233fda1a02b",
-       "claude-hud@claude-hud": "ef5f1c8b167572ad1443c70629763ea8780af96b",
+       "claude-hud@claude-hud": "75683c6de1ac07f6bbef00d739001679dba0740c",
        "codex@openai-codex": "db52e28f4d9ded852ab3942cea316258ae4ef346",
    }
    by_content = {"context-mode@context-mode": "mksglu/context-mode"}  # default-branch install, no ref

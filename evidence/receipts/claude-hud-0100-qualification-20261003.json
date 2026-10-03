@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "claude-hud-0100-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "claude-hud"
+  ],
+  "claim": "The three recorded package/plugin/marketplace version reads printed \"0.10.0\". The recorded synthetic stdin render printed \"[Opus 5] \u2502 workspace\" and \"Context \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 0%\" (exit 0); the upstream test:stdin payload render printed \"[Opus]\" and \"Context \u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 23%\" (exit 0).",
+  "limitations": [
+    "The recorded smoke says \"formatting only\" and \"/claude-hud:setup ... was NOT run\"; no live interactive plugin installation or render is claimed.",
+    "The recorded version output says \"dist/index.js has no --version handling\"; version identity is the three manifest reads.",
+    "The recorded integrity_source says \"No published checksum exists\"; the archive SHA256 is a local rehash corroborated by the peeled tag and 310 Git blob matches.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "0.8.0",
+    "version": "0.10.0",
+    "source": {
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "tag": "v0.10.0",
+      "commit": "75683c6de1ac07f6bbef00d739001679dba0740c",
+      "published_at": "2026-10-01T19:11:24Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "git tag source archive (GitHub tarball of tag v0.10.0). The existing route is a tag-pinned Claude plugin marketplace add, so there is no release asset, npm tarball or PyPI wheel (release assets: []).",
+      "url": "https://api.github.com/repos/jarrodwatts/claude-hud/tarball/v0.10.0",
+      "sha256": "6c49b71b8d4fca15d6cd9777e3724300e51eb361f4e5e8b2a12ad8085b8ac720",
+      "integrity_checked": true,
+      "integrity_source": "No published checksum exists: the release has assets: [] and GitHub publishes no checksum for generated tarballs; the sha256 above is first recorded here (file 607051 bytes, downloaded 2026-10-03), not published upstream. What matched instead: (1) git get-tar-commit-id on the tarball = 75683c6de1ac07f6bbef00d739001679dba0740c, equal to the peeled tag commit from gh api git/ref/tags/v0.10.0 + git/tags/801f75c6... and from git ls-remote refs/tags/v0.10.0^{} (git protocol, independent of the REST API); (2) all 310 extracted files match the git blob SHA-1 entries of tree d4331bf0aa622ffe0b1cc7878855bbd747d8cae1 from gh api git/trees/<tree>?recursive=1 (not truncated; 310 match, 0 mismatch, 0 missing, 0 extra); (3) archive has no absolute or .. member names and no symlinks or hardlinks. Tag object 801f75c6ca5332b7937a181e9d904bc4013974aa is annotated and unsigned (verified:false, reason unsigned); the commit is verified:true."
+    },
+    "install_recorded": {
+      "command": "tar -xzf <qualification-root>/claude-hud/claude-hud-v0.10.0.tar.gz -C <qualification-root>/claude-hud/prefix --strip-components=1",
+      "exit": 0,
+      "prefix": "<qualification-root>/claude-hud/prefix"
+    },
+    "version_recorded": {
+      "command": "S=<qualification-root>/claude-hud; P=$S/prefix; cd $S/smoke/workspace && env -i HOME=$S/smoke/home CLAUDE_CONFIG_DIR=$S/smoke<home> PATH=<host-prefix>/bin:/usr/bin:/bin timeout 20 node $P/dist/index.js --version < /dev/null; echo \"node_exit=$?\"; jq -r '.version // .metadata.version' $P/package.json $P/.claude-plugin/plugin.json $P/.claude-plugin/marketplace.json; echo \"jq_exit=$?\"",
+      "exit": 0,
+      "output": "[claude-hud] Initializing...\nnode_exit=0\n0.10.0\n0.10.0\n0.10.0\njq_exit=0\n(The first line is the empty-stdin branch of main(), dist/index.js:54-55; dist/index.js has no --version handling, so there is no binary version command. Version identity is the three jq lines: package.json, .claude-plugin/plugin.json, .claude-plugin/marketplace.json metadata.version, all 0.10.0.)"
+    },
+    "smoke_recorded": {
+      "ran": true,
+      "command": "S=<qualification-root>/claude-hud; printf '%s' '{\"session_id\":\"e2e\",\"model\":{\"id\":\"claude-opus-5\",\"display_name\":\"Opus 5\"},\"workspace\":{\"current_dir\":\"'$S'/smoke/workspace\",\"project_dir\":\"'$S'/smoke/workspace\"},\"cwd\":\"'$S'/smoke/workspace\",\"transcript_path\":\"/dev/null\",\"version\":\"2.1.278\"}' > $S/smoke/hud.json && cd $S/smoke/workspace && env -i HOME=$S/smoke/home CLAUDE_CONFIG_DIR=$S/smoke<home> PATH=<host-prefix>/bin:/usr/bin:/bin timeout 20 node $S/prefix/dist/index.js < $S/smoke/hud.json > $S/smoke/render-e2e.out 2> $S/smoke/render-e2e.err",
+      "exit": 0,
+      "output_excerpt": "stdout, escape sequences stripped (246 bytes raw; stderr 0 bytes): '[Opus 5] \u2502 workspace' then 'Context \u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 0%'. This is the recipes/README.md:87 'representative input render' (formatting only) in the retained e2e command shape (evidence/artifacts/claude-repository-evidence-20260921/results.json:7731), same stdin fixture (version 2.1.278), paths changed to a non-git cwd under scratch, HOME and CLAUDE_CONFIG_DIR pointed at empty scratch dirs; smoke/home held 0 files afterwards. Second run, upstream package.json test:stdin payload without its build step, same hermetic form: exit 0, 97 bytes, '[Opus]' then 'Context \u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591 23%'. /claude-hud:setup (also named at recipes/README.md:87) was NOT run: it needs a live interactive Claude session and writes settings. manifests/stack.json:250-255 declares no smoke command (source_only true, skill_invocation null). Render path needs no network or credential: no fetch/http/https/net/undici/dns/tls client in dist (rg exit 1)."
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/jarrodwatts/claude-hud",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.408249+00:00",
+          "ended_at": "2026-10-03T05:50:27.705265+00:00",
+          "stdout_sha256": "1eef80a1c1034f1f97ae238a2c83bfcabb8d59e20d666db68669db454cde85ef",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jarrodwatts/claude-hud/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.705523+00:00",
+          "ended_at": "2026-10-03T05:50:28.002344+00:00",
+          "stdout_sha256": "6a227a56e88b9680c31a36105086e7bd403a3fe19de83f88c30bacc95e7e1953",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/75683c6de1ac07f6bbef00d739001679dba0740c",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.002578+00:00",
+          "ended_at": "2026-10-03T05:50:28.260179+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.10.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.260485+00:00",
+          "ended_at": "2026-10-03T05:50:28.512459+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
+      },
+      "latest_release_source": {
+        "ref": "v0.10.0",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "residual_source_review": {
+      "hyperlink_spill": "PR #795 commit c0c4866780b101f0ee281f2ddd356b7ebf649879 is outside v0.10.0; this known pre-existing OSC 8 spill remains a follow-up.",
+      "disk_usage": "Issue #796 concerns showDiskUsage; the judge found no such field in either the old 0.8.0 or new tagged pin.",
+      "sources": [
+        "https://github.com/jarrodwatts/claude-hud/pull/795",
+        "https://github.com/jarrodwatts/claude-hud/issues/796"
+      ],
+      "statusline_guard_reference": "https://github.com/jarrodwatts/claude-hud/blob/75683c6de1ac07f6bbef00d739001679dba0740c/scripts/statusline.mjs#L35"
+    },
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "6c49b71b8d4fca15d6cd9777e3724300e51eb361f4e5e8b2a12ad8085b8ac720",
+      "bytes": 607051,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    },
+    "integration_checks_ref": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json"
+  }
+}

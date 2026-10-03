@@ -96,19 +96,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          syft_dir="$RUNNER_TEMP/syft-1.52.0"
+          syft_dir="$RUNNER_TEMP/syft-1.54.0"
           mkdir -p "$syft_dir"
           curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
-            'https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_checksums.txt' \
+            'https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt' \
             --output "$syft_dir/checksums.txt"
           curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \
-            'https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.tar.gz' \
+            'https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_linux_amd64.tar.gz' \
             --output "$syft_dir/syft.tar.gz"
-          expected="$(grep '  syft_1.52.0_linux_amd64.tar.gz$' "$syft_dir/checksums.txt" | awk '{print $1}')"
+          expected="$(grep '  syft_1.54.0_linux_amd64.tar.gz$' "$syft_dir/checksums.txt" | awk '{print $1}')"
           test -n "$expected"
           printf '%s  %s\n' "$expected" "$syft_dir/syft.tar.gz" | sha256sum --check --status
-          # Pinned and independently re-verified 2026-09-22 against the upstream checksums file.
-          test "$expected" = 'caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d'
+          # Pinned and independently re-verified 2026-10-03 against the upstream checksums file.
+          test "$expected" = '54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860'
           tar -xzf "$syft_dir/syft.tar.gz" -C "$syft_dir" syft
           install -m 0755 "$syft_dir/syft" "$RUNNER_TEMP/syft"
           "$RUNNER_TEMP/syft" version

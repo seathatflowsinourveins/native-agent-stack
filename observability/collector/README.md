@@ -1,15 +1,15 @@
 # Native Collector profile
 
-Pinned distribution: `otelcol-contrib` **0.161.0**, Linux amd64, from the official
-[release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0).
-Archive SHA256: `778c689efa681ff6e4722ce9f66b9b7f57c3ba009ab2e2b43dc2e0315862c731`.
-The downloaded publisher `.sha256` file matched before extraction.
+Pinned distribution: `otelcol-contrib` **0.162.0**, Linux amd64, from the official
+[release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0).
+Archive SHA256: `fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3`.
+The downloaded publisher `.sha256` file matched before extraction. The [2026-10-03 scratch qualification](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json) ran `--version` and `validate`; prior runtime tests below retain their 0.161.0 scope. No host service was switched.
 
 These are upstream installation commands for a new explicit installation path.
 Do not overwrite an existing installation or customized configuration.
 
 ```bash
-version=0.161.0
+version=0.162.0
 asset="otelcol-contrib_${version}_linux_amd64.tar.gz"
 release="https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v${version}"
 mkdir -p "$PRIVATE_DOWNLOAD_DIR" "$COLLECTOR_INSTALL_DIR"

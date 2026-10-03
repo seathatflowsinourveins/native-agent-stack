@@ -517,32 +517,40 @@
     {
       "component_id": "claude-hud",
       "repository": "https://github.com/jarrodwatts/claude-hud",
-      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "selected_version": "0.8.0",
-      "selected_source_pin": null,
+      "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "selected_version": "0.10.0",
+      "selected_source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "checks": [
         {
           "endpoint": "repos/jarrodwatts/claude-hud",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.299526+00:00",
-          "ended_at": "2026-09-21T22:30:49.703719+00:00",
-          "stdout_sha256": "6e2cbb809f5d65907d9a422b29a2c5723bfe60a92035a81300a397fecd6b7665",
+          "started_at": "2026-10-03T05:50:27.408249+00:00",
+          "ended_at": "2026-10-03T05:50:27.705265+00:00",
+          "stdout_sha256": "1eef80a1c1034f1f97ae238a2c83bfcabb8d59e20d666db68669db454cde85ef",
           "status": "ok"
         },
         {
           "endpoint": "repos/jarrodwatts/claude-hud/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:49.703816+00:00",
-          "ended_at": "2026-09-21T22:30:50.029959+00:00",
-          "stdout_sha256": "292aaa5740254116774836f04a4fb4edc2ca2ddecd1c75d4884eb56485fe4985",
+          "started_at": "2026-10-03T05:50:27.705523+00:00",
+          "ended_at": "2026-10-03T05:50:28.002344+00:00",
+          "stdout_sha256": "6a227a56e88b9680c31a36105086e7bd403a3fe19de83f88c30bacc95e7e1953",
           "status": "ok"
         },
         {
-          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.8.0",
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/75683c6de1ac07f6bbef00d739001679dba0740c",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:30:50.030138+00:00",
-          "ended_at": "2026-09-21T22:30:50.601153+00:00",
-          "stdout_sha256": "66174593d5a241eac00582b9b17e17d57beed7ab23d107152aa96ac77282b528",
+          "started_at": "2026-10-03T05:50:28.002578+00:00",
+          "ended_at": "2026-10-03T05:50:28.260179+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.10.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.260485+00:00",
+          "ended_at": "2026-10-03T05:50:28.512459+00:00",
+          "stdout_sha256": "91a438d860f1044f8b9e712ef25f81e5081f71c7e07ee27e174a7d692d1275ad",
           "status": "ok"
         }
       ],
@@ -550,27 +558,98 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-19T21:32:54Z",
+      "pushed_at": "2026-10-01T19:27:55Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.8.0",
-        "published_at": "2026-08-18T14:20:35Z",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+        "tag_name": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.8.0",
-        "sha": "ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/ef5f1c8b167572ad1443c70629763ea8780af96b",
-        "committed_at": "2026-08-18T14:18:36Z"
+        "ref": "v0.10.0",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/jarrodwatts/claude-hud",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "claude-hud",
+            "repository": "https://github.com/jarrodwatts/claude-hud",
+            "selected_repository_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+            "selected_version": "0.8.0",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/jarrodwatts/claude-hud",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:49.299526+00:00",
+                "ended_at": "2026-09-21T22:30:49.703719+00:00",
+                "stdout_sha256": "6e2cbb809f5d65907d9a422b29a2c5723bfe60a92035a81300a397fecd6b7665",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/jarrodwatts/claude-hud/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:49.703816+00:00",
+                "ended_at": "2026-09-21T22:30:50.029959+00:00",
+                "stdout_sha256": "292aaa5740254116774836f04a4fb4edc2ca2ddecd1c75d4884eb56485fe4985",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/jarrodwatts/claude-hud/commits/v0.8.0",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:30:50.030138+00:00",
+                "ended_at": "2026-09-21T22:30:50.601153+00:00",
+                "stdout_sha256": "66174593d5a241eac00582b9b17e17d57beed7ab23d107152aa96ac77282b528",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/jarrodwatts/claude-hud",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-19T21:32:54Z",
+            "license_spdx": "MIT",
+            "latest_stable_release": {
+              "tag_name": "v0.8.0",
+              "published_at": "2026-08-18T14:20:35Z",
+              "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.8.0",
+              "sha": "ef5f1c8b167572ad1443c70629763ea8780af96b",
+              "html_url": "https://github.com/jarrodwatts/claude-hud/commit/ef5f1c8b167572ad1443c70629763ea8780af96b",
+              "committed_at": "2026-08-18T14:18:36Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/jarrodwatts/claude-hud",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:28.512459+00:00",
+      "selected_pin_source": {
+        "ref": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "sha": "75683c6de1ac07f6bbef00d739001679dba0740c",
+        "html_url": "https://github.com/jarrodwatts/claude-hud/commit/75683c6de1ac07f6bbef00d739001679dba0740c",
+        "committed_at": "2026-10-01T19:09:48Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "codebase-memory-mcp",
@@ -1314,31 +1393,39 @@
       "component_id": "mcp-inspector",
       "repository": "https://github.com/modelcontextprotocol/inspector",
       "selected_repository_url": "https://github.com/modelcontextprotocol/inspector",
-      "selected_version": "2.8.0",
+      "selected_version": "2.9.0",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/modelcontextprotocol/inspector",
           "exit_code": 0,
-          "started_at": "2026-09-26T05:12:19.618918+00:00",
-          "ended_at": "2026-09-26T05:12:20.040490+00:00",
-          "stdout_sha256": "177adb3808ea390fa93d1accd17d33e834c42ca706d6df2c18a182aa0c740179",
+          "started_at": "2026-10-03T05:50:26.265526+00:00",
+          "ended_at": "2026-10-03T05:50:26.666095+00:00",
+          "stdout_sha256": "3e8889965d6785f77b2b96112bed3843300fd17aafe038fbdfff3118d0985b08",
           "status": "ok"
         },
         {
           "endpoint": "repos/modelcontextprotocol/inspector/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-26T05:12:20.040613+00:00",
-          "ended_at": "2026-09-26T05:12:20.326130+00:00",
-          "stdout_sha256": "179768c54552e222e7e1eea10eac603336f9e75095450d783236bd4bdac54789",
+          "started_at": "2026-10-03T05:50:26.666351+00:00",
+          "ended_at": "2026-10-03T05:50:26.893603+00:00",
+          "stdout_sha256": "25009ca28912f22d6895978660d1c4a22ef020aad64169e6d7787bda7d6d152d",
           "status": "ok"
         },
         {
-          "endpoint": "repos/modelcontextprotocol/inspector/commits/2.8.0",
+          "endpoint": "repos/modelcontextprotocol/inspector/commits/ae865a19178ddf6f375780a02e9c77c4cf4da184",
           "exit_code": 0,
-          "started_at": "2026-09-26T05:12:20.326542+00:00",
-          "ended_at": "2026-09-26T05:12:20.884260+00:00",
-          "stdout_sha256": "9f2e791b58bb92303fcdc8e0772e51e986c3471c9c539b3411e1430e9f46267b",
+          "started_at": "2026-10-03T05:50:26.893878+00:00",
+          "ended_at": "2026-10-03T05:50:27.215051+00:00",
+          "stdout_sha256": "820b4d5b5bb3359d805ca06189499e633efb3a4acda95414201404370f70780f",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/modelcontextprotocol/inspector/commits/2.9.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.215420+00:00",
+          "ended_at": "2026-10-03T05:50:27.551451+00:00",
+          "stdout_sha256": "820b4d5b5bb3359d805ca06189499e633efb3a4acda95414201404370f70780f",
           "status": "ok"
         }
       ],
@@ -1346,57 +1433,136 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-26T05:11:26Z",
+      "pushed_at": "2026-10-02T19:37:46Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "2.8.0",
-        "published_at": "2026-09-23T18:16:18Z",
-        "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0",
-        "target_commitish": "main",
+        "tag_name": "2.9.0",
+        "published_at": "2026-09-30T22:23:56Z",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0",
+        "target_commitish": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "2.8.0",
-        "sha": "1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
-        "html_url": "https://github.com/modelcontextprotocol/inspector/commit/1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
-        "committed_at": "2026-09-23T18:13:50Z"
+        "ref": "2.9.0",
+        "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "committed_at": "2026-09-30T22:23:03Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/modelcontextprotocol/inspector",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "mcp-inspector",
+            "repository": "https://github.com/modelcontextprotocol/inspector",
+            "selected_repository_url": "https://github.com/modelcontextprotocol/inspector",
+            "selected_version": "2.8.0",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/modelcontextprotocol/inspector",
+                "exit_code": 0,
+                "started_at": "2026-09-26T05:12:19.618918+00:00",
+                "ended_at": "2026-09-26T05:12:20.040490+00:00",
+                "stdout_sha256": "177adb3808ea390fa93d1accd17d33e834c42ca706d6df2c18a182aa0c740179",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/modelcontextprotocol/inspector/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-26T05:12:20.040613+00:00",
+                "ended_at": "2026-09-26T05:12:20.326130+00:00",
+                "stdout_sha256": "179768c54552e222e7e1eea10eac603336f9e75095450d783236bd4bdac54789",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/modelcontextprotocol/inspector/commits/2.8.0",
+                "exit_code": 0,
+                "started_at": "2026-09-26T05:12:20.326542+00:00",
+                "ended_at": "2026-09-26T05:12:20.884260+00:00",
+                "stdout_sha256": "9f2e791b58bb92303fcdc8e0772e51e986c3471c9c539b3411e1430e9f46267b",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/modelcontextprotocol/inspector",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-26T05:11:26Z",
+            "license_spdx": "NOASSERTION",
+            "latest_stable_release": {
+              "tag_name": "2.8.0",
+              "published_at": "2026-09-23T18:16:18Z",
+              "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.8.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "2.8.0",
+              "sha": "1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
+              "html_url": "https://github.com/modelcontextprotocol/inspector/commit/1e31c78fbf81a989e8eb47021c6281d7876ad7fd",
+              "committed_at": "2026-09-23T18:13:50Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/modelcontextprotocol/inspector",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:27.551451+00:00",
+      "selected_pin_source": {
+        "ref": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "committed_at": "2026-09-30T22:23:03Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "mcporter",
       "repository": "https://github.com/openclaw/mcporter",
-      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "selected_version": "0.14.1",
+      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "selected_version": "0.14.2",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/openclaw/mcporter",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.515671+00:00",
-          "ended_at": "2026-09-25T20:59:21.923837+00:00",
-          "stdout_sha256": "b3f524e759af70b735b18ba3265fd11367d905d57137133f3d8b5a0e6e8f6b98",
+          "started_at": "2026-10-03T05:50:27.642381+00:00",
+          "ended_at": "2026-10-03T05:50:27.993166+00:00",
+          "stdout_sha256": "99540d98c8f7c763f29d150f85aa20c4d907a8ba1e893de4a6feffda56012988",
           "status": "ok"
         },
         {
           "endpoint": "repos/openclaw/mcporter/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:21.924008+00:00",
-          "ended_at": "2026-09-25T20:59:22.256453+00:00",
-          "stdout_sha256": "849eaa7722b314c1c79ace3ac1bd374b6a4f6b24a78c3cd24b2077d4fe7f050c",
+          "started_at": "2026-10-03T05:50:27.993405+00:00",
+          "ended_at": "2026-10-03T05:50:28.250033+00:00",
+          "stdout_sha256": "0f03fb3adf27eec7af988468fb21576aa6aba61ed00e7deab129f6e82c24c68e",
           "status": "ok"
         },
         {
-          "endpoint": "repos/openclaw/mcporter/commits/v0.14.1",
+          "endpoint": "repos/openclaw/mcporter/commits/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
           "exit_code": 0,
-          "started_at": "2026-09-25T20:59:22.256612+00:00",
-          "ended_at": "2026-09-25T20:59:22.618318+00:00",
-          "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
+          "started_at": "2026-10-03T05:50:28.250309+00:00",
+          "ended_at": "2026-10-03T05:50:28.570581+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/openclaw/mcporter/commits/v0.14.2",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.571161+00:00",
+          "ended_at": "2026-10-03T05:50:28.896720+00:00",
+          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
           "status": "ok"
         }
       ],
@@ -1404,65 +1570,136 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-25T11:19:38Z",
+      "pushed_at": "2026-10-01T18:43:11Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.14.1",
-        "published_at": "2026-09-24T13:16:08Z",
-        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+        "tag_name": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.14.1",
-        "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
-        "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
-        "committed_at": "2026-09-24T11:06:02Z"
+        "ref": "v0.14.2",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/openclaw/mcporter",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "mcporter",
+            "repository": "https://github.com/openclaw/mcporter",
+            "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+            "selected_version": "0.14.1",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/openclaw/mcporter",
+                "exit_code": 0,
+                "started_at": "2026-09-25T20:59:21.515671+00:00",
+                "ended_at": "2026-09-25T20:59:21.923837+00:00",
+                "stdout_sha256": "b3f524e759af70b735b18ba3265fd11367d905d57137133f3d8b5a0e6e8f6b98",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/openclaw/mcporter/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-25T20:59:21.924008+00:00",
+                "ended_at": "2026-09-25T20:59:22.256453+00:00",
+                "stdout_sha256": "849eaa7722b314c1c79ace3ac1bd374b6a4f6b24a78c3cd24b2077d4fe7f050c",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/openclaw/mcporter/commits/v0.14.1",
+                "exit_code": 0,
+                "started_at": "2026-09-25T20:59:22.256612+00:00",
+                "ended_at": "2026-09-25T20:59:22.618318+00:00",
+                "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/openclaw/mcporter",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-25T11:19:38Z",
+            "license_spdx": "MIT",
+            "latest_stable_release": {
+              "tag_name": "v0.14.1",
+              "published_at": "2026-09-24T13:16:08Z",
+              "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.14.1",
+              "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
+              "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
+              "committed_at": "2026-09-24T11:06:02Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/openclaw/mcporter",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:28.896720+00:00",
+      "selected_pin_source": {
+        "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+        "committed_at": "2026-10-01T05:29:15Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
       "selected_repository_url": "https://github.com/alphaXiv/OpenResearch",
-      "selected_version": "0.2.7",
-      "selected_source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "selected_version": "0.2.15",
+      "selected_source_pin": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
       "checks": [
         {
           "endpoint": "repos/alphaXiv/OpenResearch",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:47.228516+00:00",
-          "ended_at": "2026-09-21T22:31:47.713472+00:00",
-          "stdout_sha256": "275bd7cda4d149656af8726494b843ab1f8bd7f0d62607bfc64a879b4647143e",
+          "started_at": "2026-10-03T05:50:26.264947+00:00",
+          "ended_at": "2026-10-03T05:50:26.600418+00:00",
+          "stdout_sha256": "e20328f9e56fdc90ca402b7eae1cddcff37db7c730a25c2dc143d5e3926b63f4",
           "status": "ok"
         },
         {
           "endpoint": "repos/alphaXiv/OpenResearch/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:47.713628+00:00",
-          "ended_at": "2026-09-21T22:31:48.207808+00:00",
-          "stdout_sha256": "0580f27b7232503c70110025e01f7999680a2d5786892c04545fc8819dd505cd",
+          "started_at": "2026-10-03T05:50:26.600678+00:00",
+          "ended_at": "2026-10-03T05:50:26.847347+00:00",
+          "stdout_sha256": "b0f0cab6c98d8bd47ff85c5af24891ae89cfb3a5b951dcb97f7179462df5a5de",
           "status": "ok"
         },
         {
-          "endpoint": "repos/alphaXiv/OpenResearch/commits/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+          "endpoint": "repos/alphaXiv/OpenResearch/commits/ee36ef0333ca3c533eace915f1bec322a1efde1c",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:48.208098+00:00",
-          "ended_at": "2026-09-21T22:31:48.562616+00:00",
-          "stdout_sha256": "ac5c81d4004a68796bae2be47facefe5c6efce2538aeebdf36306e3ed6c41c85",
+          "started_at": "2026-10-03T05:50:26.848058+00:00",
+          "ended_at": "2026-10-03T05:50:27.128687+00:00",
+          "stdout_sha256": "1fd77363a6f5b8ad8fbdd13bc3cc7a9cec0af4181b3d4088361cf65b5c9fee62",
           "status": "ok"
         },
         {
-          "endpoint": "repos/alphaXiv/OpenResearch/commits/v0.2.7",
+          "endpoint": "repos/alphaXiv/OpenResearch/commits/v0.2.15",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:48.562707+00:00",
-          "ended_at": "2026-09-21T22:31:49.006152+00:00",
-          "stdout_sha256": "ac5c81d4004a68796bae2be47facefe5c6efce2538aeebdf36306e3ed6c41c85",
+          "started_at": "2026-10-03T05:50:27.128958+00:00",
+          "ended_at": "2026-10-03T05:50:27.434104+00:00",
+          "stdout_sha256": "1fd77363a6f5b8ad8fbdd13bc3cc7a9cec0af4181b3d4088361cf65b5c9fee62",
           "status": "ok"
         }
       ],
@@ -1470,64 +1707,151 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T22:29:08Z",
+      "pushed_at": "2026-10-03T04:04:06Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v0.2.7",
-        "published_at": "2026-09-21T08:30:58Z",
-        "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
-        "target_commitish": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+        "tag_name": "v0.2.15",
+        "published_at": "2026-10-02T17:44:48Z",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15",
+        "target_commitish": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-        "sha": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-        "committed_at": "2026-09-21T08:14:09Z"
+        "ref": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "sha": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "committed_at": "2026-10-02T02:28:29Z"
       },
       "latest_release_source": {
-        "ref": "v0.2.7",
-        "sha": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
-        "committed_at": "2026-09-21T08:14:09Z"
+        "ref": "v0.2.15",
+        "sha": "ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "html_url": "https://github.com/alphaXiv/OpenResearch/commit/ee36ef0333ca3c533eace915f1bec322a1efde1c",
+        "committed_at": "2026-10-02T02:28:29Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/alphaXiv/OpenResearch",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "openresearch",
+            "repository": "https://github.com/alphaXiv/OpenResearch",
+            "selected_repository_url": "https://github.com/alphaXiv/OpenResearch",
+            "selected_version": "0.2.7",
+            "selected_source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+            "checks": [
+              {
+                "endpoint": "repos/alphaXiv/OpenResearch",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:47.228516+00:00",
+                "ended_at": "2026-09-21T22:31:47.713472+00:00",
+                "stdout_sha256": "275bd7cda4d149656af8726494b843ab1f8bd7f0d62607bfc64a879b4647143e",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/alphaXiv/OpenResearch/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:47.713628+00:00",
+                "ended_at": "2026-09-21T22:31:48.207808+00:00",
+                "stdout_sha256": "0580f27b7232503c70110025e01f7999680a2d5786892c04545fc8819dd505cd",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/alphaXiv/OpenResearch/commits/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:48.208098+00:00",
+                "ended_at": "2026-09-21T22:31:48.562616+00:00",
+                "stdout_sha256": "ac5c81d4004a68796bae2be47facefe5c6efce2538aeebdf36306e3ed6c41c85",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/alphaXiv/OpenResearch/commits/v0.2.7",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:48.562707+00:00",
+                "ended_at": "2026-09-21T22:31:49.006152+00:00",
+                "stdout_sha256": "ac5c81d4004a68796bae2be47facefe5c6efce2538aeebdf36306e3ed6c41c85",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/alphaXiv/OpenResearch",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T22:29:08Z",
+            "license_spdx": "MIT",
+            "latest_stable_release": {
+              "tag_name": "v0.2.7",
+              "published_at": "2026-09-21T08:30:58Z",
+              "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
+              "target_commitish": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "prerelease": false,
+              "draft": false
+            },
+            "selected_pin_source": {
+              "ref": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "sha": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "html_url": "https://github.com/alphaXiv/OpenResearch/commit/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "committed_at": "2026-09-21T08:14:09Z"
+            },
+            "latest_release_source": {
+              "ref": "v0.2.7",
+              "sha": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "html_url": "https://github.com/alphaXiv/OpenResearch/commit/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+              "committed_at": "2026-09-21T08:14:09Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "git_commit",
+            "primary_repository": "https://github.com/alphaXiv/OpenResearch",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "selected_pin_matches_latest_release_commit": true
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:27.434104+00:00"
     },
     {
       "component_id": "playwright-cli",
       "repository": "https://github.com/microsoft/playwright-cli",
       "selected_repository_url": "https://github.com/microsoft/playwright-cli",
-      "selected_version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "selected_version": "0.1.22; Playwright 1.64.0-alpha-1790635538000",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/microsoft/playwright-cli",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:49.487873+00:00",
-          "ended_at": "2026-09-21T22:31:49.979181+00:00",
-          "stdout_sha256": "f194e8638df9115a0ad8db27d7338f297e1a41ac54ea44da83d3181353f1a6b0",
+          "started_at": "2026-10-03T05:50:26.264446+00:00",
+          "ended_at": "2026-10-03T05:50:26.717410+00:00",
+          "stdout_sha256": "8c6f21427cb3061d2ffc77ebfc71bdb48d29bf3515685cda75095a9a154d13c7",
           "status": "ok"
         },
         {
           "endpoint": "repos/microsoft/playwright-cli/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:49.979275+00:00",
-          "ended_at": "2026-09-21T22:31:50.394033+00:00",
-          "stdout_sha256": "9de9b899845f9bdcec365ddfd9c324c48eaa5daa7fee473f64ad8afd41db89eb",
+          "started_at": "2026-10-03T05:50:26.717640+00:00",
+          "ended_at": "2026-10-03T05:50:26.989657+00:00",
+          "stdout_sha256": "c33eb616038124751bfa29d1f54150323a86286afb4af42758ec5da356ec8e0b",
           "status": "ok"
         },
         {
-          "endpoint": "repos/microsoft/playwright-cli/commits/v0.1.21",
+          "endpoint": "repos/microsoft/playwright-cli/commits/b85c7a736bb473bf55b584e54a09ffa698d6d871",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:31:50.394229+00:00",
-          "ended_at": "2026-09-21T22:31:50.852323+00:00",
-          "stdout_sha256": "d354472d40ce1380bc2fb9ddf9f9a7f98f566eefedbbecee798f19def4c27af6",
+          "started_at": "2026-10-03T05:50:26.989873+00:00",
+          "ended_at": "2026-10-03T05:50:27.302466+00:00",
+          "stdout_sha256": "8cc4e442825d47fc09f93f03448b81645efaa13090851c4226e07aff72a1f864",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/microsoft/playwright-cli/commits/v0.1.22",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.302725+00:00",
+          "ended_at": "2026-10-03T05:50:27.642073+00:00",
+          "stdout_sha256": "8cc4e442825d47fc09f93f03448b81645efaa13090851c4226e07aff72a1f864",
           "status": "ok"
         }
       ],
@@ -1535,27 +1859,98 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-18T23:34:47Z",
+      "pushed_at": "2026-09-28T23:23:12Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.1.21",
-        "published_at": "2026-09-18T23:34:47Z",
-        "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+        "tag_name": "v0.1.22",
+        "published_at": "2026-09-28T23:23:13Z",
+        "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.22",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.1.21",
-        "sha": "74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
-        "html_url": "https://github.com/microsoft/playwright-cli/commit/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
-        "committed_at": "2026-09-18T23:28:12Z"
+        "ref": "v0.1.22",
+        "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "html_url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "committed_at": "2026-09-28T23:22:31Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/microsoft/playwright-cli",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "playwright-cli",
+            "repository": "https://github.com/microsoft/playwright-cli",
+            "selected_repository_url": "https://github.com/microsoft/playwright-cli",
+            "selected_version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/microsoft/playwright-cli",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:49.487873+00:00",
+                "ended_at": "2026-09-21T22:31:49.979181+00:00",
+                "stdout_sha256": "f194e8638df9115a0ad8db27d7338f297e1a41ac54ea44da83d3181353f1a6b0",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/microsoft/playwright-cli/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:49.979275+00:00",
+                "ended_at": "2026-09-21T22:31:50.394033+00:00",
+                "stdout_sha256": "9de9b899845f9bdcec365ddfd9c324c48eaa5daa7fee473f64ad8afd41db89eb",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/microsoft/playwright-cli/commits/v0.1.21",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:31:50.394229+00:00",
+                "ended_at": "2026-09-21T22:31:50.852323+00:00",
+                "stdout_sha256": "d354472d40ce1380bc2fb9ddf9f9a7f98f566eefedbbecee798f19def4c27af6",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/microsoft/playwright-cli",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-18T23:34:47Z",
+            "license_spdx": "Apache-2.0",
+            "latest_stable_release": {
+              "tag_name": "v0.1.21",
+              "published_at": "2026-09-18T23:34:47Z",
+              "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.1.21",
+              "sha": "74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
+              "html_url": "https://github.com/microsoft/playwright-cli/commit/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5",
+              "committed_at": "2026-09-18T23:28:12Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/microsoft/playwright-cli",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:27.642073+00:00",
+      "selected_pin_source": {
+        "ref": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "sha": "b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "html_url": "https://github.com/microsoft/playwright-cli/commit/b85c7a736bb473bf55b584e54a09ffa698d6d871",
+        "committed_at": "2026-09-28T23:22:31Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "promptfoo",
@@ -2354,39 +2749,39 @@
       "component_id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
       "selected_repository_url": "https://github.com/max-sixty/worktrunk",
-      "selected_version": "0.79.0",
-      "selected_source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "selected_version": "0.80.0",
+      "selected_source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
       "checks": [
         {
           "endpoint": "repos/max-sixty/worktrunk",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:49.861479+00:00",
-          "ended_at": "2026-09-21T22:32:50.255902+00:00",
-          "stdout_sha256": "77d1de462104cba63fb8899505cd1731026c7dc55d54ad860ea45089dbaf52a4",
+          "started_at": "2026-10-03T05:50:27.551710+00:00",
+          "ended_at": "2026-10-03T05:50:27.850863+00:00",
+          "stdout_sha256": "caf913d3aaf6e621b46ce4b59f1fa53be35032d7f304f94453ae82d4f22d57b7",
           "status": "ok"
         },
         {
           "endpoint": "repos/max-sixty/worktrunk/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:50.255989+00:00",
-          "ended_at": "2026-09-21T22:32:50.667058+00:00",
-          "stdout_sha256": "be08eeb0e7b950953e420af210590675ead5585a04e85b667d38cccd89bc8ce9",
+          "started_at": "2026-10-03T05:50:27.851194+00:00",
+          "ended_at": "2026-10-03T05:50:28.131482+00:00",
+          "stdout_sha256": "c65bee197fd1e89af27be32310e1683af8bf1bebdd7fd6da43f495dad4606d05",
           "status": "ok"
         },
         {
-          "endpoint": "repos/max-sixty/worktrunk/commits/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+          "endpoint": "repos/max-sixty/worktrunk/commits/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:50.667237+00:00",
-          "ended_at": "2026-09-21T22:32:51.086175+00:00",
-          "stdout_sha256": "d5b4ab7ed84674cf0deaf6659269fcb9873a9e52f0334f094c97a8ac5c93fb39",
+          "started_at": "2026-10-03T05:50:28.131899+00:00",
+          "ended_at": "2026-10-03T05:50:28.413949+00:00",
+          "stdout_sha256": "f6463368e4353d375593a0e6cf478df0577658046a300234276f27b758d6026c",
           "status": "ok"
         },
         {
-          "endpoint": "repos/max-sixty/worktrunk/commits/v0.79.0",
+          "endpoint": "repos/max-sixty/worktrunk/commits/v0.80.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:51.086294+00:00",
-          "ended_at": "2026-09-21T22:32:51.474593+00:00",
-          "stdout_sha256": "d5b4ab7ed84674cf0deaf6659269fcb9873a9e52f0334f094c97a8ac5c93fb39",
+          "started_at": "2026-10-03T05:50:28.414318+00:00",
+          "ended_at": "2026-10-03T05:50:28.691238+00:00",
+          "stdout_sha256": "f6463368e4353d375593a0e6cf478df0577658046a300234276f27b758d6026c",
           "status": "ok"
         }
       ],
@@ -2394,64 +2789,151 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T21:25:43Z",
+      "pushed_at": "2026-10-03T05:42:45Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v0.79.0",
-        "published_at": "2026-09-21T01:01:42Z",
-        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
-        "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+        "tag_name": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "target_commitish": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "committed_at": "2026-09-21T00:48:07Z"
+        "ref": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
       },
       "latest_release_source": {
-        "ref": "v0.79.0",
-        "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "committed_at": "2026-09-21T00:48:07Z"
+        "ref": "v0.80.0",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/max-sixty/worktrunk",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "worktrunk",
+            "repository": "https://github.com/max-sixty/worktrunk",
+            "selected_repository_url": "https://github.com/max-sixty/worktrunk",
+            "selected_version": "0.79.0",
+            "selected_source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+            "checks": [
+              {
+                "endpoint": "repos/max-sixty/worktrunk",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:49.861479+00:00",
+                "ended_at": "2026-09-21T22:32:50.255902+00:00",
+                "stdout_sha256": "77d1de462104cba63fb8899505cd1731026c7dc55d54ad860ea45089dbaf52a4",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/max-sixty/worktrunk/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:50.255989+00:00",
+                "ended_at": "2026-09-21T22:32:50.667058+00:00",
+                "stdout_sha256": "be08eeb0e7b950953e420af210590675ead5585a04e85b667d38cccd89bc8ce9",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/max-sixty/worktrunk/commits/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:50.667237+00:00",
+                "ended_at": "2026-09-21T22:32:51.086175+00:00",
+                "stdout_sha256": "d5b4ab7ed84674cf0deaf6659269fcb9873a9e52f0334f094c97a8ac5c93fb39",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/max-sixty/worktrunk/commits/v0.79.0",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:51.086294+00:00",
+                "ended_at": "2026-09-21T22:32:51.474593+00:00",
+                "stdout_sha256": "d5b4ab7ed84674cf0deaf6659269fcb9873a9e52f0334f094c97a8ac5c93fb39",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/max-sixty/worktrunk",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T21:25:43Z",
+            "license_spdx": "NOASSERTION",
+            "latest_stable_release": {
+              "tag_name": "v0.79.0",
+              "published_at": "2026-09-21T01:01:42Z",
+              "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+              "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "prerelease": false,
+              "draft": false
+            },
+            "selected_pin_source": {
+              "ref": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "committed_at": "2026-09-21T00:48:07Z"
+            },
+            "latest_release_source": {
+              "ref": "v0.79.0",
+              "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+              "committed_at": "2026-09-21T00:48:07Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "git_commit",
+            "primary_repository": "https://github.com/max-sixty/worktrunk",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "selected_pin_matches_latest_release_commit": true
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:28.691238+00:00"
     },
     {
       "component_id": "opentelemetry-collector-contrib",
       "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
       "selected_repository_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-      "selected_version": "0.161.0",
+      "selected_version": "0.162.0",
       "selected_source_pin": null,
       "checks": [
         {
           "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:47.963942+00:00",
-          "ended_at": "2026-09-21T22:32:48.476469+00:00",
-          "stdout_sha256": "8a4ad4d0839045c5a3a5c34014f39cc8e014e9b8634fed355370b2492c7e023c",
+          "started_at": "2026-10-03T05:50:27.434445+00:00",
+          "ended_at": "2026-10-03T05:50:27.867805+00:00",
+          "stdout_sha256": "1004156b020ffa0ba45ec636f07308b4f771b0781c6faae15c33f7439c694b58",
           "status": "ok"
         },
         {
           "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:48.476571+00:00",
-          "ended_at": "2026-09-21T22:32:48.823161+00:00",
-          "stdout_sha256": "6be4d178e9ee6c2c520174137d19398da45231ebb4c35d48501eeae51825bde0",
+          "started_at": "2026-10-03T05:50:27.868070+00:00",
+          "ended_at": "2026-10-03T05:50:28.103095+00:00",
+          "stdout_sha256": "227509dc4de124019591bc0fe0bb8ef21b327fe52890d262d17ef4d2aec17afd",
           "status": "ok"
         },
         {
-          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/v0.161.0",
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:32:48.823457+00:00",
-          "ended_at": "2026-09-21T22:32:49.357935+00:00",
-          "stdout_sha256": "96be9c0bac6ed8fff4b6eff8f63e868c3e43680fdee21e21e3e177d86fc91c6e",
+          "started_at": "2026-10-03T05:50:28.104024+00:00",
+          "ended_at": "2026-10-03T05:50:28.529857+00:00",
+          "stdout_sha256": "17bbbf673f584c369735a054fcd6b92cf89b1d72b2bda1f77f8a9ac114b9bdf4",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/v0.162.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:28.542380+00:00",
+          "ended_at": "2026-10-03T05:50:28.968101+00:00",
+          "stdout_sha256": "17bbbf673f584c369735a054fcd6b92cf89b1d72b2bda1f77f8a9ac114b9bdf4",
           "status": "ok"
         }
       ],
@@ -2459,27 +2941,98 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T21:48:07Z",
+      "pushed_at": "2026-10-02T19:48:47Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.161.0",
-        "published_at": "2026-09-15T15:05:47Z",
-        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+        "tag_name": "v0.162.0",
+        "published_at": "2026-09-29T10:11:33Z",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "v0.161.0",
-        "sha": "3f8455d8038a985398861171e5310bc9b4e988b2",
-        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/3f8455d8038a985398861171e5310bc9b4e988b2",
-        "committed_at": "2026-09-15T10:33:45Z"
+        "ref": "v0.162.0",
+        "sha": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "committed_at": "2026-09-29T09:11:04Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "opentelemetry-collector-contrib",
+            "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "selected_repository_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "selected_version": "0.161.0",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:47.963942+00:00",
+                "ended_at": "2026-09-21T22:32:48.476469+00:00",
+                "stdout_sha256": "8a4ad4d0839045c5a3a5c34014f39cc8e014e9b8634fed355370b2492c7e023c",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:48.476571+00:00",
+                "ended_at": "2026-09-21T22:32:48.823161+00:00",
+                "stdout_sha256": "6be4d178e9ee6c2c520174137d19398da45231ebb4c35d48501eeae51825bde0",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/open-telemetry/opentelemetry-collector-contrib/commits/v0.161.0",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:32:48.823457+00:00",
+                "ended_at": "2026-09-21T22:32:49.357935+00:00",
+                "stdout_sha256": "96be9c0bac6ed8fff4b6eff8f63e868c3e43680fdee21e21e3e177d86fc91c6e",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T21:48:07Z",
+            "license_spdx": "Apache-2.0",
+            "latest_stable_release": {
+              "tag_name": "v0.161.0",
+              "published_at": "2026-09-15T15:05:47Z",
+              "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.161.0",
+              "sha": "3f8455d8038a985398861171e5310bc9b4e988b2",
+              "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/3f8455d8038a985398861171e5310bc9b4e988b2",
+              "committed_at": "2026-09-15T10:33:45Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+            "release_relationship": "selected_version_matches_latest_stable"
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:28.968101+00:00",
+      "selected_pin_source": {
+        "ref": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "sha": "ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/ae8c507510f48f433ab47dd1c6b01a59d6c388b5",
+        "committed_at": "2026-09-29T09:11:04Z"
+      },
+      "selected_pin_matches_latest_release_commit": true
     },
     {
       "component_id": "prometheus",
@@ -3132,39 +3685,39 @@
       "component_id": "syft",
       "repository": "https://github.com/anchore/syft",
       "selected_repository_url": "https://github.com/anchore/syft",
-      "selected_version": "1.52.0",
-      "selected_source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "selected_version": "1.54.0",
+      "selected_source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
       "checks": [
         {
           "endpoint": "repos/anchore/syft",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:33:24.559699+00:00",
-          "ended_at": "2026-09-21T22:33:24.982376+00:00",
-          "stdout_sha256": "b6b6398530fd05bb241a98e1033aa9b640bca59fd4890bf0aa1eecde8bde5c2f",
+          "started_at": "2026-10-03T05:50:28.512869+00:00",
+          "ended_at": "2026-10-03T05:50:28.825921+00:00",
+          "stdout_sha256": "c9793fbd5c0319983ccf6f9f6b2cd3836296e718bb4071d422f75de865a48e24",
           "status": "ok"
         },
         {
           "endpoint": "repos/anchore/syft/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:33:24.982497+00:00",
-          "ended_at": "2026-09-21T22:33:25.294854+00:00",
-          "stdout_sha256": "5d4b00e1eed7a8d88815df392b2b136055791ff348a309f46c9c36dcccd595fa",
+          "started_at": "2026-10-03T05:50:28.826194+00:00",
+          "ended_at": "2026-10-03T05:50:29.100900+00:00",
+          "stdout_sha256": "a611ca1c6865b189c03778f245761b88defb6e1d830a3505957d02d7b7fa9588",
           "status": "ok"
         },
         {
-          "endpoint": "repos/anchore/syft/commits/02ba369d13b4248395b20a504eca94b0cab564d8",
+          "endpoint": "repos/anchore/syft/commits/cc326e45a6213360266dda4b30cc68095946d676",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:33:25.295146+00:00",
-          "ended_at": "2026-09-21T22:33:25.666537+00:00",
-          "stdout_sha256": "ce5bab36dabe2e4bc11280c50d5c78f4cfc0cbcd343ce30e4ba7b84fba555f6c",
+          "started_at": "2026-10-03T05:50:29.101689+00:00",
+          "ended_at": "2026-10-03T05:50:29.448978+00:00",
+          "stdout_sha256": "64720efc1828ec8905184f903735d526962be49ad8def251379b5d273c294797",
           "status": "ok"
         },
         {
-          "endpoint": "repos/anchore/syft/commits/v1.52.0",
+          "endpoint": "repos/anchore/syft/commits/v1.54.0",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:33:25.666637+00:00",
-          "ended_at": "2026-09-21T22:33:26.027472+00:00",
-          "stdout_sha256": "ce5bab36dabe2e4bc11280c50d5c78f4cfc0cbcd343ce30e4ba7b84fba555f6c",
+          "started_at": "2026-10-03T05:50:29.449234+00:00",
+          "ended_at": "2026-10-03T05:50:29.732600+00:00",
+          "stdout_sha256": "64720efc1828ec8905184f903735d526962be49ad8def251379b5d273c294797",
           "status": "ok"
         }
       ],
@@ -3172,34 +3725,113 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-18T13:30:43Z",
+      "pushed_at": "2026-10-02T20:50:41Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v1.52.0",
-        "published_at": "2026-09-17T14:38:17Z",
-        "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "tag_name": "v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z",
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
-        "committed_at": "2026-09-17T14:09:46Z"
+        "ref": "cc326e45a6213360266dda4b30cc68095946d676",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
       },
       "latest_release_source": {
-        "ref": "v1.52.0",
-        "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
-        "committed_at": "2026-09-17T14:09:46Z"
+        "ref": "v1.54.0",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/anchore/syft",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "syft",
+            "repository": "https://github.com/anchore/syft",
+            "selected_repository_url": "https://github.com/anchore/syft",
+            "selected_version": "1.52.0",
+            "selected_source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+            "checks": [
+              {
+                "endpoint": "repos/anchore/syft",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:33:24.559699+00:00",
+                "ended_at": "2026-09-21T22:33:24.982376+00:00",
+                "stdout_sha256": "b6b6398530fd05bb241a98e1033aa9b640bca59fd4890bf0aa1eecde8bde5c2f",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/anchore/syft/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:33:24.982497+00:00",
+                "ended_at": "2026-09-21T22:33:25.294854+00:00",
+                "stdout_sha256": "5d4b00e1eed7a8d88815df392b2b136055791ff348a309f46c9c36dcccd595fa",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/anchore/syft/commits/02ba369d13b4248395b20a504eca94b0cab564d8",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:33:25.295146+00:00",
+                "ended_at": "2026-09-21T22:33:25.666537+00:00",
+                "stdout_sha256": "ce5bab36dabe2e4bc11280c50d5c78f4cfc0cbcd343ce30e4ba7b84fba555f6c",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/anchore/syft/commits/v1.52.0",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:33:25.666637+00:00",
+                "ended_at": "2026-09-21T22:33:26.027472+00:00",
+                "stdout_sha256": "ce5bab36dabe2e4bc11280c50d5c78f4cfc0cbcd343ce30e4ba7b84fba555f6c",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/anchore/syft",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-18T13:30:43Z",
+            "license_spdx": "Apache-2.0",
+            "latest_stable_release": {
+              "tag_name": "v1.52.0",
+              "published_at": "2026-09-17T14:38:17Z",
+              "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "selected_pin_source": {
+              "ref": "02ba369d13b4248395b20a504eca94b0cab564d8",
+              "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
+              "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
+              "committed_at": "2026-09-17T14:09:46Z"
+            },
+            "latest_release_source": {
+              "ref": "v1.52.0",
+              "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
+              "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
+              "committed_at": "2026-09-17T14:09:46Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "git_commit",
+            "primary_repository": "https://github.com/anchore/syft",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "selected_pin_matches_latest_release_commit": true
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:29.732600+00:00"
     },
     {
       "component_id": "alpaca-py",
@@ -3954,39 +4586,39 @@
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
-      "selected_version": "1.108.319",
-      "selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "selected_version": "1.108.327",
+      "selected_source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
       "checks": [
         {
           "endpoint": "repos/jgravelle/jcodemunch-mcp",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:01.751354+00:00",
-          "ended_at": "2026-09-21T22:34:02.126165+00:00",
-          "stdout_sha256": "c849803bc3d321fd40ad4fe2fb8255edb729f9a65d77bc8276ab9cc04a2a53d8",
+          "started_at": "2026-10-03T05:50:26.263923+00:00",
+          "ended_at": "2026-10-03T05:50:26.552288+00:00",
+          "stdout_sha256": "23c0e08651dc4c28954690f0b7388ff807791f7ae15371fe1db2ee53b85235c8",
           "status": "ok"
         },
         {
           "endpoint": "repos/jgravelle/jcodemunch-mcp/releases/latest",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:02.126268+00:00",
-          "ended_at": "2026-09-21T22:34:02.458347+00:00",
-          "stdout_sha256": "cbef3e853428d4793c7deb80cce843c1dffb01e237596dfd3269a300d6fb6eb7",
+          "started_at": "2026-10-03T05:50:26.552568+00:00",
+          "ended_at": "2026-10-03T05:50:26.804972+00:00",
+          "stdout_sha256": "b9189cd5b951b56a22995a6d1579ff471021364848956e7d548bff0bce16b9fd",
           "status": "ok"
         },
         {
-          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:02.458507+00:00",
-          "ended_at": "2026-09-21T22:34:02.968666+00:00",
-          "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+          "started_at": "2026-10-03T05:50:26.805286+00:00",
+          "ended_at": "2026-10-03T05:50:27.105086+00:00",
+          "stdout_sha256": "58f7af21d83244862c88609a8ecadba60bfb001f3cebbe788c371fe6a51a17bf",
           "status": "ok"
         },
         {
-          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.319",
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.327",
           "exit_code": 0,
-          "started_at": "2026-09-21T22:34:02.968825+00:00",
-          "ended_at": "2026-09-21T22:34:03.360901+00:00",
-          "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+          "started_at": "2026-10-03T05:50:27.105452+00:00",
+          "ended_at": "2026-10-03T05:50:27.407841+00:00",
+          "stdout_sha256": "58f7af21d83244862c88609a8ecadba60bfb001f3cebbe788c371fe6a51a17bf",
           "status": "ok"
         }
       ],
@@ -3994,34 +4626,113 @@
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-21T20:58:37Z",
+      "pushed_at": "2026-10-02T18:15:32Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v1.108.319",
-        "published_at": "2026-09-16T14:04:32Z",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "tag_name": "v1.108.327",
+        "published_at": "2026-10-02T18:21:53Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "committed_at": "2026-10-02T18:09:09Z"
       },
       "latest_release_source": {
-        "ref": "v1.108.319",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "v1.108.327",
+        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "committed_at": "2026-10-02T18:09:09Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "historical_observations": [
+        {
+          "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
+          "observation": {
+            "component_id": "jcodemunch-mcp",
+            "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
+            "selected_version": "1.108.319",
+            "selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+            "checks": [
+              {
+                "endpoint": "repos/jgravelle/jcodemunch-mcp",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:34:01.751354+00:00",
+                "ended_at": "2026-09-21T22:34:02.126165+00:00",
+                "stdout_sha256": "c849803bc3d321fd40ad4fe2fb8255edb729f9a65d77bc8276ab9cc04a2a53d8",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/jgravelle/jcodemunch-mcp/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:34:02.126268+00:00",
+                "ended_at": "2026-09-21T22:34:02.458347+00:00",
+                "stdout_sha256": "cbef3e853428d4793c7deb80cce843c1dffb01e237596dfd3269a300d6fb6eb7",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:34:02.458507+00:00",
+                "ended_at": "2026-09-21T22:34:02.968666+00:00",
+                "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.319",
+                "exit_code": 0,
+                "started_at": "2026-09-21T22:34:02.968825+00:00",
+                "ended_at": "2026-09-21T22:34:03.360901+00:00",
+                "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-09-21T20:58:37Z",
+            "license_spdx": "NOASSERTION",
+            "latest_stable_release": {
+              "tag_name": "v1.108.319",
+              "published_at": "2026-09-16T14:04:32Z",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "selected_pin_source": {
+              "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+              "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+              "committed_at": "2026-09-16T11:26:45Z"
+            },
+            "latest_release_source": {
+              "ref": "v1.108.319",
+              "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+              "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+              "committed_at": "2026-09-16T11:26:45Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "git_commit",
+            "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "selected_pin_matches_latest_release_commit": true
+          }
+        }
+      ],
+      "checked_at": "2026-10-03T05:50:27.407841+00:00"
     },
     {
       "component_id": "nextjs",

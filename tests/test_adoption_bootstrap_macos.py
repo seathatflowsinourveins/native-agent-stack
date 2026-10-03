@@ -258,7 +258,7 @@ class PinsSchemaTests(unittest.TestCase):
     # exactly, so a move on either side fails here until this table is reviewed again.
     MAC_PIN_LAGS_LINUX = {
         "ai-memory": ("2.3.2", "2.4.1", "evidence/receipts/ai-memory-241-qualification-20260925.json"),
-        "mcporter": ("0.13.13", "0.14.1", "evidence/receipts/mcporter-0141-qualification-20260925.json"),
+        "mcporter": ("0.13.13", "0.14.2", "evidence/receipts/mcporter-0142-qualification-20261003.json"),
         # Linux moved to 0.159.3 on 2026-10-01; the Mac keeps 0.155.1 until its own
         # qualification (the receipts' limitations).
         "codex": ("0.155.1", "0.159.3", "evidence/receipts/codex-01593-native-queue-20261001.json"),

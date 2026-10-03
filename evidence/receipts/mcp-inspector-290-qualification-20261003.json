@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "id": "mcp-inspector-290-qualification-20261003",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
+  "component_ids": [
+    "mcp-inspector"
+  ],
+  "claim": "The recorded npm ls output contained \"@modelcontextprotocol/inspector@2.9.0\" (exit 0). The integration tools/list returned set_tool_tier, announce_model, jcodemunch_guide, order, menu and route (exit 0); tools/call order/get_session_stats returned \"visible_tools\":6 (exit 0), and the unknown-tool control returned \"tool_not_found\" (exit 5).",
+  "limitations": [
+    "No upstream npm run validate, HTTP/SSE, interactive OAuth, web UI, TUI or MCP Apps run was recorded at 2.9.0.",
+    "--stored-auth-only ran against a stdio server requiring no credentials; it does not qualify OAuth or the secret-store migration.",
+    "npm attestation metadata and subject digest were read; this packet records no cryptographic signature verification for 2.9.0.",
+    "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
+    "Historical landscape winner pins and dated source-review catalogs retain their bytes; this receipt does not requalify their sealed verdicts.",
+    "Install, version and prior smoke results below are retained W1 qualification output, not commands re-executed by the integration worker."
+  ],
+  "data": {
+    "previous_version": "2.8.0",
+    "version": "2.9.0",
+    "source": {
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "tag": "2.9.0",
+      "commit": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+      "published_at": "2026-09-30T22:23:56Z",
+      "prerelease": false
+    },
+    "artifact": {
+      "kind": "npm tarball",
+      "url": "https://registry.npmjs.org/@modelcontextprotocol/inspector/-/inspector-2.9.0.tgz",
+      "sha256": "0671ad3cc535b00cbfbd3a9aad7559a735ec471d72030f0e69b7add778f8ed09",
+      "integrity_checked": true,
+      "integrity_source": "npm registry version metadata https://registry.npmjs.org/@modelcontextprotocol%2Finspector/2.9.0: dist.integrity sha512-77VWBmsA18jdxQ1vqbu8SNRSC2h5uBHyUq6wTmlqEDeVIST7YEVta0OyFCDf/6VSQKbZ3ia7Qb+9bZtlTcB+tw== equals the sha512 computed over the downloaded file (MATCH) and dist.shasum 42f9d00dd6c379fc019bb64e92ef575248b40d02 equals the computed sha1 (MATCH). Cross-checks: SLSA v1 provenance (https://registry.npmjs.org/-/npm/v1/attestations/@modelcontextprotocol%2finspector@2.9.0) subject sha512 efb556066b00d7c8ddc50d6fa9bbbc48d4520b6879b811f252aeb04e696a1037952124fb60456d6b43b21420dfffa55240a6d9de26bb41bfbd6d9b654dc07eb7 is the hex of the same digest, built by .github/workflows/main.yml at refs/tags/2.9.0, gitCommit ae865a19178ddf6f375780a02e9c77c4cf4da184 (equals the tag commit); and the computed sha256 equals the repo record adoption/new-wsl-profile.json:705. npm publishes sha512 and sha1 only, so the sha256 above is the value I computed (file inspector-2.9.0.tgz, 1235523 bytes, in <qualification-root>/mcp-inspector/)."
+    },
+    "install_recorded": {
+      "command": "npm install --global --no-audit --no-fund --prefix <qualification-root>/mcp-inspector/prefix --cache <qualification-root>/mcp-inspector/npm-cache --userconfig <qualification-root>/mcp-inspector/npmrc-user --globalconfig <qualification-root>/mcp-inspector/npmrc-global --logs-dir <qualification-root>/mcp-inspector/npm-logs --update-notifier=false <qualification-root>/mcp-inspector/inspector-2.9.0.tgz",
+      "exit": 0,
+      "prefix": "<qualification-root>/mcp-inspector/prefix"
+    },
+    "version_recorded": {
+      "command": "npm ls --global --prefix <qualification-root>/mcp-inspector/prefix --depth=0 --cache <qualification-root>/mcp-inspector/npm-cache --userconfig <qualification-root>/mcp-inspector/npmrc-user --globalconfig <qualification-root>/mcp-inspector/npmrc-global --logs-dir <qualification-root>/mcp-inspector/npm-logs --update-notifier=false",
+      "exit": 0,
+      "output": "<qualification-root>/mcp-inspector/prefix/lib\n\u2514\u2500\u2500 @modelcontextprotocol/inspector@2.9.0\n\n(This is the version command documented at recipes/README.md:99. `mcp-inspector --version` was deliberately NOT run: the launcher has no version flag and forwards any non-help argument to web mode, which starts the web UI server (recipes/README.md:99; adoption/bootstrap.md:127-129; 2.9.0 launcher clients/launcher/build/index.js only short-circuits -h/--help). Corroboration: jq -r .version on <prefix>/lib/node_modules/@modelcontextprotocol/inspector/package.json printed 2.9.0, exit 0.)"
+    },
+    "smoke_recorded": {
+      "ran": true,
+      "command": "MCP_AUTO_OPEN_ENABLED=false <qualification-root>/mcp-inspector/prefix/bin/mcp-inspector --help",
+      "exit": 0,
+      "output_excerpt": "Usage: mcp-inspector [options]\n\nMCP Inspector \u2013 run web UI, CLI, or TUI\n\nOptions:\n  --web       Run web UI (default)\n  --cli       Run CLI\n  --tui       Run TUI\n  -h, --help  display help for command\n\nMode flags (--web, --cli, --tui) must appear before app options. All following arguments are forwarded unchanged.\n\n[diff of this output against the recorded 2.8.0 output evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/launcher-help-2.8.0.txt: exit 0, identical. Substitution: the row's literal command is `npx @modelcontextprotocol/inspector@2.8.0 --help` (manifests/stack.json:609); I ran the installed scratch-prefix binary instead because npx would fetch into the host npx cache. Source read before running: the launcher prints help and exits 0 when -h/--help is present without a leading mode flag (clients/launcher/build/index.js). NOT run: the recipes/README.md:99 smoke `mcp-inspector --cli --config \"$PROJECT_ROOT/.mcp.json\" --server socraticode --method tools/list --format json --stored-auth-only --cwd \"$PROJECT_ROOT\"` (needs a live MCP server and stored auth). Supplementary offline check, not the row's smoke: `mcp-inspector --cli --help` diffed against evidence/artifacts/sota-refresh-20260926/mcp-inspector/stage/cli-help-2.8.0.txt gave diff exit 1 (differences): only additions, --advertise-apps (6 lines) and --require-digests (3 lines), nothing removed; --config, --server, --method, --format, --stored-auth-only, --cwd, --tool-name, --tool-arg all present.]"
+    },
+    "input_packet": {
+      "name": "W1-moves.json",
+      "sha256": "efc142f19b4d8559510e6992fbf48cd3a308223938dbc58d07c86e4a57ecf3c1",
+      "workflow_run": "wf_a95468d8-3af"
+    },
+    "upstream_refresh": {
+      "checks": [
+        {
+          "endpoint": "repos/modelcontextprotocol/inspector",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.265526+00:00",
+          "ended_at": "2026-10-03T05:50:26.666095+00:00",
+          "stdout_sha256": "3e8889965d6785f77b2b96112bed3843300fd17aafe038fbdfff3118d0985b08",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/modelcontextprotocol/inspector/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.666351+00:00",
+          "ended_at": "2026-10-03T05:50:26.893603+00:00",
+          "stdout_sha256": "25009ca28912f22d6895978660d1c4a22ef020aad64169e6d7787bda7d6d152d",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/modelcontextprotocol/inspector/commits/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:26.893878+00:00",
+          "ended_at": "2026-10-03T05:50:27.215051+00:00",
+          "stdout_sha256": "820b4d5b5bb3359d805ca06189499e633efb3a4acda95414201404370f70780f",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/modelcontextprotocol/inspector/commits/2.9.0",
+          "exit_code": 0,
+          "started_at": "2026-10-03T05:50:27.215420+00:00",
+          "ended_at": "2026-10-03T05:50:27.551451+00:00",
+          "stdout_sha256": "820b4d5b5bb3359d805ca06189499e633efb3a4acda95414201404370f70780f",
+          "status": "ok"
+        }
+      ],
+      "latest_stable_release": {
+        "tag_name": "2.9.0",
+        "published_at": "2026-09-30T22:23:56Z",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0",
+        "target_commitish": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "committed_at": "2026-09-30T22:23:03Z"
+      },
+      "latest_release_source": {
+        "ref": "2.9.0",
+        "sha": "ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "html_url": "https://github.com/modelcontextprotocol/inspector/commit/ae865a19178ddf6f375780a02e9c77c4cf4da184",
+        "committed_at": "2026-09-30T22:23:03Z"
+      }
+    },
+    "cooldown_waiver": "The user ended the seven-day cooldown for clean releases on 2026-10-03; qualification requirements remain in force.",
+    "host_switched": false,
+    "upstream_test_suite_run_by_integration": false,
+    "integration_checks_ref": "evidence/artifacts/currency-wave-w1-20261003/native-checks.json",
+    "integration_artifact_rehash": {
+      "method": "Python 3 hashlib.file_digest over the retained downloaded artifact; no archive regeneration",
+      "sha256": "0671ad3cc535b00cbfbd3a9aad7559a735ec471d72030f0e69b7add778f8ed09",
+      "bytes": 1235523,
+      "matches_recorded_sha256": true,
+      "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
+    }
+  }
+}

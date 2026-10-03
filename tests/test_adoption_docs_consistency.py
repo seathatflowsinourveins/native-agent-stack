@@ -614,7 +614,7 @@ class PluginRevisionCheckTests(unittest.TestCase):
             "renamed plugin key": (self.revision_errors,
                                    bootstrap.replace('"claude-hud@claude-hud":', '"claude-hud@hud":'), recipe),
             "bootstrap command": (self.command_errors,
-                                  bootstrap.replace("claude-hud@v0.8.0 --scope user", "claude-hud@v0.7.0 --scope user"), recipe),
+                                  bootstrap.replace("claude-hud@v0.10.0 --scope user", "claude-hud@v0.7.0 --scope user"), recipe),
             "missing install": (self.command_errors,
                                 bootstrap.replace("claude plugin install codex@openai-codex --scope user --json\n", ""), recipe),
         }
@@ -732,7 +732,7 @@ class MarketplaceCommitRefTests(unittest.TestCase):
     def test_the_check_rejects_a_commit_ref_and_accepts_tags_and_no_ref(self):
         self.assertEqual(len(self.errors(f"`claude plugin marketplace add mksglu/context-mode@{'a' * 40} --scope user`", "mutant")), 1)
         self.assertEqual(len(self.errors("claude plugin marketplace add owner/repo@6f0cc68 --scope user", "mutant")), 1)
-        self.assertEqual(self.errors("claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user\n"
+        self.assertEqual(self.errors("claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user\n"
                                      "claude plugin marketplace add mksglu/context-mode --scope user\n"
                                      "codex plugin marketplace add mksglu/context-mode --ref " + "a" * 40, "ok"), [])
 
