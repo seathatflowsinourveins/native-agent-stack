@@ -194,6 +194,27 @@ and [Claude structured output](https://code.claude.com/docs/en/headless).
 
 ## Listing budget
 
+### Project-scope exception: 2026-10-03
+
+The repository-owned
+[`omniroute-runtime-worker`](../../.claude/skills/omniroute-runtime-worker/SKILL.md)
+is a Claude Code project skill, auto-listed only in this repository through
+`.claude/skills/omniroute-runtime-worker/SKILL.md`, following
+[Claude's native project-skill scope](https://code.claude.com/docs/en/skills).
+It is maintained with the SDK example rather than installed globally through
+the selected third-party skill manifest. Its description costs 129 characters
+(129 UTF-8 bytes), in addition to the manifest's listing totals; the body loads
+on invocation. Hosts whose `.git/info/exclude` hides `/.claude/` must retain it
+in the real review index with
+`rtk git add -f .claude/skills/omniroute-runtime-worker/SKILL.md`.
+On each SDK or route change, update the skill, example and dated decision
+together, verify the description length and native listing/read observation,
+and run the example's documented checks. The September 30 callsite receipt
+remains the historical listing/read observation; this repair adds no new
+Claude model run. See the
+[October 3 decision](../../docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md)
+for current qualification limits.
+
 - **Claude** fits the listing to `skillListingBudgetFraction` of the model's
   context window (default 0.01, with an 8,000-character fallback) and cuts each
   entry at 1,536 characters. On overflow it drops descriptions, starting with the
