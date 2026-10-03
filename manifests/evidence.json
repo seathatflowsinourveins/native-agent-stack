@@ -14951,13 +14951,13 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "755e9d1e85f8abca24355a8a3cc31421e00f434f140157ced62d12a435394db7",
-      "bytes": 139753
+      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
+      "bytes": 140288
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5b0944f7c937758704abeeeef61ebebac302f580ee720b8e09170ac50f8d0952",
-      "bytes": 28021
+      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
+      "bytes": 29964
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -15006,8 +15006,8 @@
     },
     {
       "path": "catalogs/landscape/foundation.json",
-      "sha256": "a5640b1d1628b7c05d58ccfd858b9bb4b9d17bc89ef6858b77ce7044f90fd5ab",
-      "bytes": 476789
+      "sha256": "868d193a31080ab913400725140bd0d01e0afe97e28564fd12777f737d22951a",
+      "bytes": 479154
     },
     {
       "path": "catalogs/landscape/gap-crosswalk-92bb279.json",
@@ -15061,8 +15061,8 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1",
-      "bytes": 21131
+      "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
+      "bytes": 21449
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
-      "sha256": "1f25adcf7b2379710ff9160a92ed460a5f9e45e6dfb2e370588ddd4d62d9134e",
-      "bytes": 10480
+      "sha256": "a4c5ddf98c9fa778d07b60507a183818b1d243dda789bc06ee8bcd612fcbcedb",
+      "bytes": 16588
     },
     {
       "path": "docs/direct-results.md",
@@ -15941,8 +15941,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "b9f0171fd47a973069139157cc680b1ea0bddb4090ad166626580e4a3e87e8c1",
-      "bytes": 138081
+      "sha256": "c27f90790b691cee417d5f6adc6ced622f6c8315c7e338c0e756ce2463a31b2b",
+      "bytes": 139460
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
