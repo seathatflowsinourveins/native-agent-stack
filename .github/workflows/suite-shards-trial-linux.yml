@@ -29,7 +29,9 @@ name: Suite shards trial, ubuntu-24.04 (draft pull request only)
 # not 1. Whether a re-run job's upload (overwrite: false) would fail on the first attempt's artifact name, and
 # whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
 # cancel-in-progress is true: a reopen during a run cancels that run (incomplete, never a rule outcome) and starts
-# one attended run, instead of queueing an unattended second run behind it.
+# one attended run, instead of queueing an unattended second run behind it. Its cost: one reopen starts both trial
+# workflows, so a repeat for one OS made while the other OS's run is still going cancels that run; a repeat
+# therefore waits until both runs have ended.
 #
 # Jobs: inventory (the fail-closed parity and coverage gate, shard lists built at run time from the head);
 # serial (arm S x 3) and shards (arms G4 and G4T x 3; at most 2 + 2 timed jobs at once); controls (a passing, a

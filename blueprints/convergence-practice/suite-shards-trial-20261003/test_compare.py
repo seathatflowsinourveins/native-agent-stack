@@ -808,6 +808,17 @@ class SetupFailureTests(TreeCase):
                 self.assertIncomplete(result["verdicts"][OS], "ubuntu-24.04-G4-r1: ")
                 self.assertFalse(self.run_entry(result, f"{OS}-G4-r1")["test_phase_started"])
 
+    def test_a_job_cancelled_before_its_clock_names_both_causes(self):
+        # A cancelled job whose finish step saw an empty steps context: incomplete, with the cancellation and the
+        # missing clock-start outcome both in the reasons.
+        self.tree.full()
+        directory = self.tree.run_dir(f"{OS}-G4T-r3")
+        setup_failure(directory, steps={})
+        rewrite_json(directory / "meta.json", job_status="cancelled")
+        verdict = self.verdict()
+        self.assertIncomplete(verdict, "cancelled jobs: ubuntu-24.04-G4T-r3")
+        self.assertIncomplete(verdict, "ubuntu-24.04-G4T-r3: the 'start' step's outcome is None, not 'success'")
+
     def test_a_serial_setup_failure_is_incomplete_not_no_verdict(self):
         self.tree.full()
         setup_failure(self.tree.run_dir(f"{OS}-S-r2"))

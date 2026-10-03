@@ -233,8 +233,10 @@ re-run happens anyway, the run's attempts and artifact listing (GET) settle whic
 `336b7f54`, line 11): a reopen during a run cancels that run, which is then incomplete, and starts one attended run.
 With `false`, a reopen during a run would queue a second full run that starts unattended when the first ends,
 holding on macOS up to three of the five slots for hours. Under the deciding-run rule neither setting can change an
-outcome; the choice is about slots and attendance. Reopen only when both trial workflows have ended: a reopen
-starts both.
+outcome; the choice is about slots and attendance. Its cost: one reopen starts both trial workflows, so a repeat
+for one OS made while the other OS's run is still going cancels that run, which is then incomplete and has to be
+repeated too. A repeat therefore waits until both runs have ended; in particular a Linux repeat waits for the
+macOS run, however long the macOS queue is.
 
 ## Run it
 
@@ -270,9 +272,11 @@ result or an artifact.
    outcomes `success`, `success`, `failure`, `failure`, `failure` (this settles whether the steps context carries a
    background step's outcome after the group's implicit wait); the probes' monotonic starts; `heartbeat.json`, read
    through `result.json` `controls.<os>.hang` (the alive span, whether and when the parent shell ended, whether the
-   process still ran during the recheck); and, from the jobs API, the controls job's step list with each step's
-   conclusion, `started_at` and `completed_at` (the hang step's span on the service clock should be at least 60 s
-   and well under 300 s).
+   process still ran during the recheck; `outlived_step` true with a `parent_lost_after_probe_seconds` near 60 to
+   70 s, the expectation from the runner source, and `outlived_step` false, the process stopped with its step, both
+   pass the controls, and the record states which was observed); and, from the jobs API, the controls job's step
+   list with each step's conclusion, `started_at` and `completed_at` (the hang step's span on the service clock
+   should be at least 60 s and well under 300 s).
 4. Probes: every background step's SIGINT and SIGQUIT dispositions, the exported names and the Python version, in
    the controls and in each arm-run.
 5. Read the harden-runner step log of one macos-15 job; if its agent did not start, write "macOS egress unaudited" in
@@ -315,7 +319,7 @@ result or an artifact.
   `artipacked` on the action; with the trigger changed to `pull_request_target`, `github-env` also fired on the
   planted write in either place. The unchanged workflow gave no finding. Other audits were not probed, and zizmor
   still warns that its parallel-step support is experimental.
-- **`test_compare.py`**: 84 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures).
+- **`test_compare.py`**: 85 tests OK on CPython 3.13.16 and the bare 3.12.3 (synthetic fixtures).
 
 ## Limits
 

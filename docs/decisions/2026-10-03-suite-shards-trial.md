@@ -104,7 +104,9 @@ The full text is `experiment.json`'s `quality_rule`; `README.md` gives the same 
   neither trial workflow is running, is allowed only after an incomplete run or one whose compare job wrote no
   `result.json`. No job is ever re-run, the compare job included. `cancel-in-progress: true`: a reopen during a run
   cancels it (incomplete) instead of queueing an unattended second run; under the deciding-run rule either setting
-  keeps the outcome valid, so the choice is about macOS slots and attendance.
+  keeps the outcome valid, so the choice is about macOS slots and attendance. Its cost: one reopen starts both
+  workflows, so a repeat for one OS made while the other OS's run is still going cancels that run too; a repeat
+  therefore waits until both runs have ended, a Linux repeat for the macOS run however long its queue.
 
 ## Lessons of the first trial applied
 
@@ -233,7 +235,7 @@ Each line relays only what was read at the cited source; the comparison came fro
 No usage claim. The hosted jobs run deterministic commands and no model; the model usage of the sessions that built
 this trial is not recorded and stays unknown. Evidence classes so far: local integration (the coordinator's preflight,
 the inventory gate at the base, the oracle's dry run on real logs), synthetic fixtures (real local runs of a fixture
-suite and of the controls, on which the oracle's 84 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
+suite and of the controls, on which the oracle's 85 tests pass on CPython 3.13.16 and 3.12.3), a local probe of
 zizmor on planted constructs, and source review (the GitHub documentation, GitHub's workflow schema, the runner
 source, CPython and the alternatives at their pins). Nothing here is native execution on a hosted runner or upstream
 acceptance; the controls, once run, are synthetic fixtures executed on the hosted runner.

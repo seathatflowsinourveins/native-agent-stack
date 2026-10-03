@@ -31,6 +31,8 @@ name: Suite shards trial, macos-15 (draft pull request only)
 # whether its data would reach a compare job, is unverified; the outcome is incomplete either way.
 # cancel-in-progress is true: a reopen during a run cancels that run (incomplete, never a rule outcome) and starts
 # one attended run, instead of queueing an unattended second run behind it, which would hold up to three macOS slots.
+# Its cost: one reopen starts both trial workflows, so a repeat for Linux made while this macOS run is still going
+# cancels this run; a Linux repeat therefore waits until this run has ended.
 #
 # Jobs: inventory (ubuntu-24.04 with the arms' Python line from actions/setup-python: the fail-closed parity and
 # coverage gate, shard lists built at run time from the head); serial (arm S x 3) and shards (arms G3 and G3T x 3),
