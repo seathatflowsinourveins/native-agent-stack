@@ -28,7 +28,12 @@ jobs:
     # measurement tooling still to merge for the #381 token E2E (units U1 to U5, U9, U10, U13) adds an
     # estimated 600 to 900s of unit tests (one of them alone runs about 190s locally), which would
     # pass the old limit; the limit stays a hang guard, not a test-time budget.
-    timeout-minutes: 40
+    # Raised to 60 on 2026-10-03: the job took 1727 to 1745s in runs 37088360538, 37086567708 and
+    # 37085570699 (limit 2400s), and the three serial runs of run 37109532421 took 1186s to 1688s for the
+    # unittest step alone; the suite grew about fourfold in a week, and a hosted trial of a parallel runner
+    # (unittest-parallel 1.8.6, run 37109532421) could not run it (it pickles live test instances), so the
+    # job stays serial for now. The limit remains a hang guard.
+    timeout-minutes: 60
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

@@ -1,0 +1,29 @@
+# Dagu 2.16.6 / 58fed633d58c1dd1319091fdb2c2f6158ecfa053.
+# Native graph/run/depends/timeout format from examples/embedded/local/workflow.yaml
+# and the existing blueprints/convergence-practice/job-recovery/run.py recipe.
+# Export only the task-specific path bindings described in enhancements.md.
+type: graph
+timeout_sec: 420
+max_active_runs: 1
+env:
+  - STACK_ROOT: ${STACK_ROOT}
+  - WORKER_PROJECT: ${WORKER_PROJECT}
+  - WORKER_CODEX_HOME: ${WORKER_CODEX_HOME}
+  - WORKER_BASE_URL: ${WORKER_BASE_URL}
+  - WORKER_RESULT: ${WORKER_RESULT}
+  - WORKER_TASK_FILE: ${WORKER_TASK_FILE}
+steps:
+  - id: readiness
+    run: >-
+      rtk uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
+      --workspace "${WORKER_PROJECT}" --codex-home "${WORKER_CODEX_HOME}"
+      --base-url "${WORKER_BASE_URL}"
+      --preflight --require-mcp context-mode --require-skill using-superpowers --timeout 60
+  - id: worker
+    depends: [readiness]
+    run: >-
+      rtk uv run --locked --script "${STACK_ROOT}/examples/omniroute-codex-sdk/worker.py"
+      --workspace "${WORKER_PROJECT}" --codex-home "${WORKER_CODEX_HOME}"
+      --base-url "${WORKER_BASE_URL}"
+      --sandbox read-only --timeout 300 --prompt -
+      --native-result "${WORKER_RESULT}" < "${WORKER_TASK_FILE}"

@@ -1,0 +1,104 @@
+{
+ "schema_version": 1,
+ "id": "new-wsl-local-generation-model-20261002",
+ "kind": "native_model_e2e",
+ "component_ids": ["codex", "claude-code"],
+ "evidence_class": "Local integration check",
+ "recorded_at_utc": "2026-10-03T03:44:02Z",
+ "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02, the preregistered comparison for the new WSL's local generation model gave the slot to S2o: Swift-1.5-Qwen3.8-27B IQ3_S (ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF at revision d74895bbe5db4bec1e0024e7cc87d59c02d7631a, file sha256 1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786, 11,771,546,912 bytes) on Ollama 0.35.0 as swift-iq3s-s2o-64k (context 64,000). On the same 100 BFCL simple_python cases (inspect-evals 0.23.0 on Inspect AI 0.3.273) through the server's chat and responses surfaces, its first-pass valid tool calls were 200 of 200 against 175 of 200 for the control gpt-oss:20b: difference 0.125, 95% paired bootstrap interval over cases 0.065 to 0.19 (10,000 resamples, seed 20260927), not a tie. Both arms were entirely on the GPU with the embedder resident in the order of use, and both passed 10 of 10 client tasks (Codex 0.160.0 and Claude Code 2.1.287). Bonsai PTQ1_0, Bonsai PQ2_0 and Swift on PrismML's llama.cpp server failed the function gate (0 of 3 runs each: the server skips the Codex client's namespace tool type), and qwen3.8:27b was not entirely on the GPU at 64,000 tokens.",
+ "slot": {
+  "manifest": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
+  "slot_id": "local-generation-model",
+  "measurement_id": "local-generation-model",
+  "deciding_measurement_as_named": "A fixed tool-call set through the server's three API surfaces with the generation model and the embedder both resident on the RTX 4090 at a 64k context: gpt-oss-20b takes the slot if Qwen3.8-27B offloads to CPU, evicts the embedder, or has the lower valid tool-call rate.",
+  "how_the_named_arms_ended": "qwen3.8:27b (Q4_K_M) was at 92.6% GPU at 64,000 tokens in A1 and in A1b and cannot take the slot; gpt-oss:20b passed A1b and was the holder of the result until the owner asked for the newest releases (amendment 3); it then ran A2 as the control under the same rules and lost to S2o"
+ },
+ "preregistration": {
+  "path": "PREREGISTRATION-local-models.md",
+  "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+  "original_sha256": "d161feaacd6b3082b3adf37e80a368b58bd6f68205efd399102b8d84d0d0f78b",
+  "copy_notes": "COPY-NOTES.md",
+  "hash_chain": {"path": "PREREGISTRATION-local-models.sha256", "sha256": "7645e3a1bd9d94c478849ae20b07dc3f6b6f7a778ec0dfe74715b6123b71021a", "entries": 16,
+                 "first": "posted 2026-10-02T15:31:48Z before any trial", "last": "posted 2026-10-03T00:03:17Z with the result of Part B"},
+  "sections": ["Conditions", "Part A", "Amendment 1 (condition N)", "Result of A1 and amendment 2 (A1b)", "Result of A1b and amendment 3 (the extension)",
+               "Amendment 3a (freeze sheet)", "Deviation 1", "Results of G0 and of the import gate", "Results of G0 for S1b and of A1 for S2o",
+               "Amendment 3b (A2's materials)", "Pilot outcome and deviation 2", "Results of A2's scored runs and deviation 3", "Result of Part A"]
+ },
+ "host": {
+  "scope": "one workstation, WSL2 (WSL 3.0.1.0), NVIDIA GeForce RTX 4090 with 24,564 MiB; a throwaway Ubuntu 26.04.1 distribution built from the merged recipe, not the destination distribution",
+  "condition": "condition N of amendment 1: no WSL process other than the server under test held GPU memory; the Windows applications held 2.2 to 2.9 GB before each A2 load and 2,616 MiB before S2o's A1 load; the workstation's own model services were stopped during each window and active again after it",
+  "windows_utc": ["2026-10-02T18:06Z to 18:16Z (A1, A1b)", "19:51:19Z to 20:01:31Z (G0, import gate, A1 of S2o)", "20:08:43Z to 20:10:40Z (pilot, unscored)",
+                  "20:12:02Z to 20:26:57Z (A2 scored)", "20:29:13Z to 20:33:44Z and 20:34:59Z to 20:38:22Z (client tasks)"]
+ },
+ "arms": {
+  "S1": {"system": "Ternary-Bonsai-2-27B PTQ1_0 (prism-ml/Ternary-Bonsai-2-27B-gguf at b072e1d3b35a0a630cece372c2127528e0994386, 5,946,648,928 bytes, sha256 53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3) on PrismML's llama.cpp, release prism-b10743-adfffbe", "outcome": "out: G0 0 of 3, tool call completed in 0 of 3, 65 of 65 layers on the GPU"},
+  "S1b": {"system": "the same model in PQ2_0 (7,206,168,928 bytes, sha256 3907dc1658db1f78a9826bf8d5bcb8dc65db0d466388937af57f2294fae62ec1), same runtime; run on S1's declared condition", "outcome": "out: G0 0 of 3, tool call completed in 0 of 3"},
+  "S2": {"system": "Swift-1.5-Qwen3.8-27B IQ3_S on PrismML's llama.cpp (the publisher's llama.cpp route)", "outcome": "out: G0 0 of 3, tool call completed in 0 of 3; the build loaded the file"},
+  "S2o": {"system": "the same Swift file imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (renderer qwen3.8, parser qwen3.5, parameters, default template, licence) and, derived from it, swift-iq3s-s2o-64k with PARAMETER num_ctx 64000",
+          "import_gate": "passed: ollama create exit 0; ollama show lists completion, tools and thinking (levels false, low, medium, xhigh; default medium), quantization IQ3_S, architecture qwen35",
+          "a1": "passed: after the long prompt (56,847 prompt tokens, 64 output tokens) the generation model 14.81 GiB and the embedder 2.66 GiB were each entirely on the GPU; GPU memory 2,616 MiB before the load, 21,579 MiB after the long prompt, of 24,564 MiB",
+          "a2": "200 of 200 first-pass valid tool calls (chat 100, responses 100); the package's own score 97 and 95 of 100"},
+  "C": {"system": "gpt-oss:20b on Ollama 0.35.0 (library digest 17052f91a42e97930aa6e28a6c6c06a983e6a58dbb00434885a0cf5313e376f7) as gpt-oss-20b-64k; the control and the holder of the historical result",
+        "a1": "A1 failed by the embedder's eviction (A1's written order); A1b in the order of use passed: 12.97 GB (12,968,494,366 bytes, 12.08 GiB; the preregistration's text says 12.97 GiB) entirely on the GPU with the embedder resident",
+        "a2": "175 of 200 first-pass valid tool calls (chat 87, responses 88); invalid: 18 with arguments outside a schema's allowed values and 7 without a tool call; the package's own score 83 and 83 of 100"},
+  "first_round_qwen": {"system": "qwen3.8:27b (Q4_K_M, library digest aaee06c39dcf2437cde036998d960e1fc1494b8191be7cc9657d01e509097813) on Ollama 0.35.0", "outcome": "out: 92.6% GPU at 64,000 tokens (18.36 GB, 16.99 GB on the GPU) in A1 and in A1b"}
+ },
+ "a2": {
+  "package": "Inspect AI 0.3.273 with inspect-evals 0.23.0 (tag commit bd59dd3b48974ad2e91219a6ceed41011e201163), task inspect_evals/bfcl -T categories=simple_python",
+  "cases": "--sample-shuffle 20260927 --limit 100; both arms ran the same 100 case ids on both surfaces; no sample errored",
+  "options": "--max-tokens 16384 --reasoning-effort medium --max-connections 1 --max-retries 0 --no-fail-on-error --timeout 900; sampling not set",
+  "surfaces": {"chat": "openai-api/ollama/<model> against /v1", "responses": "openai/<model> with -M responses_api=true against /v1",
+               "messages": "not evaluated: Inspect AI 0.3.273's Anthropic provider cannot read this thinking model's answer (ContentReasoning validation error at the pilot); exercised by Claude Code in the client tasks"},
+  "primary_metric": "a2_validity.py: a case is valid when the first model answer carries at least one tool call and every call parses, names an offered tool and has arguments that satisfy that tool's JSON schema; an errored request or an answer without a tool call is invalid",
+  "runs": [
+   {"run": "s2o-chat", "valid": 100, "package_correct": 97, "seconds": 292, "gpu_after_mib": 18718},
+   {"run": "c-chat", "valid": 87, "package_correct": 83, "seconds": 100, "gpu_after_mib": 17085},
+   {"run": "s2o-responses", "valid": 100, "package_correct": 95, "seconds": 303, "gpu_after_mib": 18581},
+   {"run": "c-responses", "valid": 88, "package_correct": 83, "seconds": 139, "gpu_after_mib": 17078}
+  ],
+  "decision_statistic": {"arms": ["S2o", "C"], "surfaces": ["chat", "responses"], "cases": 100, "share": {"S2o": 1.0, "C": 0.875}, "difference": 0.125,
+                         "interval_95": [0.065, 0.19], "resamples": 10000, "seed": 20260927, "tie": false},
+  "client_tasks": "five fixed tasks per client in a fresh scratch repository each (create, edit, run and report, read and answer, a two-step edit): Codex 0.160.0 through `codex exec --oss --local-provider ollama` and Claude Code 2.1.287 through `ollama launch claude`; S2o 10 of 10 (Codex 12 to 17 s, Claude Code 19 to 24 s), C 10 of 10 (11 to 21 s, 12 to 20 s); recorded, not deciding"
+ },
+ "decision": "By rule 2 of the extension the arm with the higher A2 share takes the slot and the interval excludes zero: S2o. Rule 3 (a second model server) does not apply: S2o and C are both served by the manifest's one server. The earlier result (gpt-oss:20b by A1b, before the extension) stays a historical result.",
+ "reproduction": {
+  "statistic": "rerun on 2026-10-03 from the published copies alone: python3 -B scripts/a2/a2_bootstrap.py S2o C chat=part-a/logs/s2o-chat/validity.jsonl,part-a/logs/c-chat/validity.jsonl responses=part-a/logs/s2o-responses/validity.jsonl,part-a/logs/c-responses/validity.jsonl printed the line of part-a/bootstrap.txt unchanged",
+  "modelfile": "reconstruct_s2o_modelfile.py rebuilds the measured S2o Modelfile from the library model's blobs, verified by digest at registry.ollama.ai on 2026-10-03; with the measurement's own FROM line it hashes to the recorded 8911245e6678ee1fac043d31d20de14ea9ed3d8834ccee5beb92e726b769e8f6; the measured file itself, with that sha256, is in the copy-out added to the private folder after its listing (files.json, added_after_listing)"
+ },
+ "measured_ollama_digests": {
+  "meaning": "manifest digests the measurement recorded; for comparison on another host, not an acceptance criterion (that Ollama's create gives the same digest on another host is not established)",
+  "swift-iq3s-s2o:latest": "eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c",
+  "swift-iq3s-s2o-64k:latest": "8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11",
+  "gpt-oss-20b-64k:latest": "495bd728b23386840ab816ef8e0ab961650c10b0bc4006e9e083f1e1d4f94b80",
+  "resident_size_of_swift-iq3s-s2o-64k_bytes": 15897985023
+ },
+ "deviations": [
+  "Deviation 1: the first G0 window opened while the measurement server still held gpt-oss:20b (18,094 MiB in use); the attempt was stopped on that figure, kept as void and rerun from a fresh state folder; from then on every window checked its precondition before a load.",
+  "Deviation 2: Codex's local-provider setup did not find the model without its tag; the client runner passes the name with its tag to Codex (a pilot repair of a command that did not reach the server; runner sha256 0d6fa4f3e350f560d19675c03ee0fb809b1b50b0373b35ffec572c877246d4b4 became 875530525864880c50e88596a53618fb64b21d3f5e64b4bd95068325b7830260).",
+  "Deviation 3: the window gave both arms the same label, so C's ten client runs were refused and their refusal lines overwrote the workstation-side copies of S2o's ten records; the records inside the measurement distribution were intact (hash list raw/A2-client-scored-s2o-hashes.txt) and C's tasks ran once under the label scored-c."
+ ],
+ "limitations": [
+  "One workstation, one throwaway distribution, one run per case and arm: a local integration check of the systems named, not an acceptance on the destination distribution.",
+  "First-pass tool-call validity on 100 simple public cases (BFCL simple_python) through two interfaces; nothing about coding quality, long tasks, throughput under concurrent requests or behaviour above 64,000 tokens.",
+  "The Anthropic-style messages surface was not evaluated through the package (Inspect AI 0.3.273 cannot read this thinking model's answer); it was exercised only by Claude Code in the client tasks, which both arms passed.",
+  "S2o was slower in these runs: 292 and 303 seconds for 100 cases on chat and responses against 100 and 139 for the control, and 43.1 against 108.9 output tokens per second on single long prompts that were not run as a speed comparison.",
+  "S2o leaves less GPU memory free: 21,579 of 24,564 MiB in use with the embedder resident while Windows applications held about 2,600 MiB; earlier the same day they held up to about 5,900 MiB, at which the same load would leave under one GB. Co-residency on a busier desktop and on the destination distribution is not measured.",
+  "The Ollama import is this measurement's system, not a route the publisher documents: the library qwen3.8:27b model's renderer, parser, parameters, template and licence lines with the Swift file as FROM. The publisher's own route (llama.cpp's server, here PrismML's fork) failed the function gate for a reason that lies in that server. The quantization's card says its quality tests used a 512-token context.",
+  "The arm that took the slot was added by the preregistration's extension (amendment 3) after the owner asked for the newest releases; the deciding measurement as the critic named it had two arms (qwen3.8:27b and gpt-oss:20b), the earlier result for gpt-oss:20b is kept as a historical result, and gpt-oss:20b ran A2 as the control under the same rules.",
+  "Three deviations are recorded (a void first window, the Codex client's model name with its tag, a reused label); none changed a case, a limit, the metric or the rule, and none was decided on an outcome.",
+  "Recorded, not deciding: the package's own score (S2o 97 and 95 of 100, the control 83 and 83) and the client tasks (10 of 10 for each arm).",
+  "manifests/stack.json has no Ollama, Inspect AI or PrismML llama.cpp component, so component_ids name the two clients that ran the client tasks (Codex also ran the function gate); they ran at Codex 0.160.0 and Claude Code 2.1.287, not at the stack's recorded 0.159.3 and 2.1.284.",
+  "Raw model outputs (the Inspect logs, the client run records, the server logs) stay private and are listed by sha256 in files.json; the published per-case validity files carry case ids, verdicts, reasons and timings, and the decision statistic reproduces from them.",
+  "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
+ ],
+ "files": {
+  "files.json": "4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893",
+  "PREREGISTRATION-local-models.md": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+  "part-a/bootstrap.txt": "3fe228c28e2ca7440989ad554507af6e212ef144f2136b64f48b3c56bc1f5c9f",
+  "part-a/logs/s2o-chat/validity.jsonl": "c6911453b2aecb18b96a698950189c92b0a5def47f9805fbe776deb8cdbc5bef",
+  "part-a/logs/c-chat/validity.jsonl": "4a63f0780064a195512e1ed9618ead16bf72a991cf43c7d3c4b57db27eb32684",
+  "part-a/logs/s2o-responses/validity.jsonl": "0e86ee059055a712527018881ec3172542f4272117463ccc279969e7a6c0b50b",
+  "part-a/logs/c-responses/validity.jsonl": "37bc16cecb4e4e114b29b55ad7f7bba9a3f1ddd72810a601343c66232a2edf38",
+  "reconstruct_s2o_modelfile.py": "28430fbfee124eb2615aaa6aa55d2702764a32d279d4a8af44bcca6724abd47e"
+ }
+}
