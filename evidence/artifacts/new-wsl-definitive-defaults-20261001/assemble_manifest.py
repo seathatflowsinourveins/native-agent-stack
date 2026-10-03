@@ -3,6 +3,8 @@
 
 It reads the two committed compact documents, settlements and convergence decisions in this folder and writes a flat table next to them. The output is
 deterministic: running it again over unchanged inputs writes the same bytes.
+The last step reads the layer-consensus record (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json): it adds that
+record's rows and records its amendments, and changes no field that the rounds decided.
 
 Usage: assemble_manifest.py [--check]
 """
@@ -18,6 +20,7 @@ FOUNDATION = HERE / "foundation-definitive.compact.json"
 TRADING = HERE / "trading" / "trading-definitive.compact.json"
 SETTLEMENTS = HERE / "settlements.json"
 CONVERGENCE = HERE / "convergence.json"
+CONSENSUS = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json"
 OUT = HERE / "definitive-manifest.json"
 
 
@@ -143,14 +146,14 @@ def gpt_status(sid, row, outcome, repos, layer):
     return f"returned: 0 of {samples} blind GPT samples"
 
 
-def verify_evidence(ref, sid):
+def verify_evidence(ref, sid, source="convergence"):
     if not isinstance(ref, dict) or not ref.get("path") or not ref.get("sha256"):
-        raise ValueError(f"convergence {sid}: evidence path and sha256 required")
+        raise ValueError(f"{source} {sid}: evidence path and sha256 required")
     path = ROOT / ref["path"]
     if not path.is_file():
-        raise ValueError(f"convergence {sid}: evidence missing: {ref['path']}")
+        raise ValueError(f"{source} {sid}: evidence missing: {ref['path']}")
     if sha(path) != ref["sha256"]:
-        raise ValueError(f"convergence {sid}: evidence sha256 mismatch: {ref['path']}")
+        raise ValueError(f"{source} {sid}: evidence sha256 mismatch: {ref['path']}")
 
 
 def apply_convergence(rows, layers):
@@ -294,7 +297,94 @@ def apply_convergence(rows, layers):
     return data
 
 
-def build():
+# The layer-consensus record adds rows and records amendments beside what the rounds decided (its "rule").
+# STATES are the states this assembler writes ("" is a row no round decided, counted as open). ROW_FIELDS are a row's
+# fields in the order rows_of() and apply_convergence() write them. ROUND_OUTCOMES are the outcomes apply_convergence()
+# accepts; a consensus row carries none of them. PROTECTED are the fields the rounds decided: no amendment carries one.
+STATES = ("", "definitive", "resolved", "split", "measurement")
+ROW_FIELDS = ("catalog", "layer_id", "slot_id", "row_kind", "default", "repository", "installs_nothing_extra", "definitive",
+              "label", "state", "measurement", "coincides_with_lane_record", "claude", "gpt", "job", "resolution")
+ROUND_OUTCOMES = ("final", "installed_on_critic", "not_installed", "split", "kept")
+PROTECTED = ("default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind")
+
+
+def apply_consensus(rows, layers):
+    """Add the consensus record's rows and record its amendments; no field that the rounds decided changes.
+
+    An added row is copied as the record gives it and placed after the last row of its layer. An amendment becomes an
+    item of its row's amendments list. The exchanged notes that the record names are hashed as verify_evidence does it;
+    the acknowledgements are links to pull-request comments and are checked for presence only.
+    """
+    data = json.loads(CONSENSUS.read_text(encoding="utf-8"))
+    if not isinstance(data, dict) or not all(isinstance(data.get(key), kind) for key, kind in
+                                             (("rule", str), ("records", dict), ("add_rows", list), ("amend_rows", list))):
+        raise ValueError("consensus: the record needs its rule, records, add_rows and amend_rows")
+    records = data["records"]
+    notes = sorted(set(records) - {"acknowledgements"})
+    for name in notes:
+        verify_evidence(records[name], f"records.{name}", "consensus")
+    acknowledgements = records.get("acknowledgements") if isinstance(records.get("acknowledgements"), list) else []
+    acknowledged = {ack.get("family") for ack in acknowledgements if isinstance(ack, dict) and ack.get("url")}
+    if not notes or not {"claude", "gpt"} <= acknowledged:
+        raise ValueError("consensus records: the exchanged notes and an acknowledgement of each family are required")
+    by_slot = {row["slot_id"]: row for row in rows}
+    by_layer = {(layer["catalog"], layer["layer_id"]): [] for layer in layers}
+    for row in rows:
+        by_layer[row["catalog"], row["layer_id"]].append(row)
+    catalogs = sorted({layer["catalog"] for layer in layers})
+    jobs = {row["job"]: row["slot_id"] for row in rows if installs(row)}
+    for added in data["add_rows"]:
+        added = added if isinstance(added, dict) else {}
+        sid = added.get("slot_id")
+        missing, unknown = sorted(set(ROW_FIELDS) - set(added)), sorted(set(added) - set(ROW_FIELDS))
+        if missing or unknown or not isinstance(sid, str) or not sid.strip():
+            raise ValueError(f"consensus {sid}: an added row carries the manifest's row fields: missing {missing}; unknown {unknown}")
+        if sid in by_slot:
+            raise ValueError(f"consensus {sid}: slot already exists")
+        if added["row_kind"] != "consensus":
+            raise ValueError(f"consensus {sid}: an added row must have row_kind consensus, not {added['row_kind']}")
+        if added["definitive"] is not False or added["state"] == "definitive":
+            raise ValueError(f"consensus {sid}: a consensus row is never definitive")
+        if added["state"] not in STATES:
+            raise ValueError(f"consensus {sid}: unknown state: {added['state']}")
+        if added["catalog"] not in catalogs:
+            raise ValueError(f"consensus {sid}: unknown catalog: {added['catalog']}")
+        if (added["catalog"], added["layer_id"]) not in list(by_layer):
+            raise ValueError(f"consensus {sid}: unknown layer: {added['layer_id']}")
+        job, resolution = added["job"], added["resolution"]
+        if (not isinstance(job, str) or not job.strip() or not isinstance(resolution, dict)
+                or not isinstance(resolution.get("outcome"), str) or resolution["outcome"] in ("",) + ROUND_OUTCOMES):
+            raise ValueError(f"consensus {sid}: an added row needs a job and an outcome that no round uses")
+        waiting = added["state"] in ("split", "measurement")
+        if added["measurement"] != ({"returned": False, "receipts": []} if waiting else None):
+            raise ValueError(f"consensus {sid}: state and measurement disagree")
+        if waiting and (installs(added) or added["repository"] or not added["installs_nothing_extra"]):
+            raise ValueError(f"consensus {sid}: pending measurement installs something")
+        if installs(added):
+            if job in jobs:
+                raise ValueError(f"consensus {sid}: installed job also owned by {jobs[job]}: {job}")
+            jobs[job] = sid
+        row = json.loads(json.dumps(added))
+        by_slot[sid] = row
+        by_layer[row["catalog"], row["layer_id"]].append(row)
+    rows[:] = [row for layer in layers for row in by_layer[layer["catalog"], layer["layer_id"]]]
+    for entry in data["amend_rows"]:
+        entry = entry if isinstance(entry, dict) else {}
+        sid, amendment = entry.get("slot_id"), entry.get("amendment")
+        if not isinstance(sid, str) or sid not in by_slot:
+            raise ValueError(f"consensus {sid}: amendment for unknown slot")
+        if not isinstance(amendment, dict) or not all(
+                isinstance(amendment.get(key), str) and amendment[key].strip() for key in ("date_utc", "by", "decision")):
+            raise ValueError(f"consensus {sid}: an amendment needs date_utc, by and decision")
+        replaced = sorted((set(entry) | set(amendment)) & set(PROTECTED))
+        if replaced:
+            raise ValueError(f"consensus {sid}: an amendment cannot replace {', '.join(replaced)}")
+        by_slot[sid].setdefault("amendments", []).append(json.loads(json.dumps(amendment)))
+    return data
+
+
+def assemble_rows():
+    """The rows as the rounds decided them: both catalogs, the settlements and the convergence decisions, before the consensus step."""
     foundation = json.loads(FOUNDATION.read_text(encoding="utf-8"))
     trading = json.loads(TRADING.read_text(encoding="utf-8"))
     rows = []
@@ -317,6 +407,12 @@ def build():
               for l in foundation["layers"] + foundation["cross_rows"]]
     layers += [{"catalog": "us-equities", "layer_id": l["layer_id"], "owns": l["owns"], "uses": l["uses"]} for l in trading["layers"]]
     convergence = apply_convergence(rows, layers)
+    return foundation, trading, rows, layers, convergence
+
+
+def build():
+    foundation, trading, rows, layers, convergence = assemble_rows()
+    consensus = apply_consensus(rows, layers)
     by_kind, by_state = {}, {}
     for r in rows:
         by_kind[r["row_kind"]] = by_kind.get(r["row_kind"], 0) + 1
@@ -329,7 +425,8 @@ def build():
         "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples "
                          f"under the combination rule ({convergence['rule']['path']} and its amendment 1); a contested one is resolved by a blind "
                          "Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families "
-                         "name it and both critics return converged, and a split is settled by the measurement the critics name.",
+                         "name it and both critics return converged, and a split is settled by the measurement the critics name."
+                         + " " + consensus["rule"],
         "decision_rule_before_amendment_2": foundation["decision_rule"],
         "no_install_rule": foundation["no_install_rule"],
         "not_claimed": foundation["not_claimed"],
@@ -337,7 +434,8 @@ def build():
                     "us-equities": {"file": "trading/" + TRADING.name, "sha256": sha(TRADING), "owner": trading["owner"]},
                     "settlements": {"file": SETTLEMENTS.name, "sha256": sha(SETTLEMENTS)},
                     "convergence": {"file": CONVERGENCE.name, "sha256": sha(CONVERGENCE)},
-                    "rule": convergence["rule"], "combined": convergence["combined"]},
+                    "rule": convergence["rule"], "combined": convergence["combined"],
+                    "consensus": {"path": CONSENSUS.relative_to(ROOT).as_posix(), "sha256": sha(CONSENSUS)}},
         "counts": {"layers": len(layers), "slots": len(rows), "definitive": sum(1 for r in rows if r["definitive"]), "by_row_kind": by_kind,
                    "by_state": by_state, "installed": sum(1 for r in rows if installs(r))},
         "pinned_requirements": {"us-equities": trading.get("pinned_requirements", [])},
@@ -361,4 +459,10 @@ if __name__ == "__main__":
     else:
         OUT.write_text(text, encoding="utf-8")
         doc = json.loads(text)
-        print("layers", doc["counts"]["layers"], "| slots", doc["counts"]["slots"], "| definitive", doc["counts"]["definitive"], "|", doc["counts"]["by_row_kind"])
+        counts, by_catalog = doc["counts"], {}
+        for row in doc["slots"]:
+            by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
+        amended = [row for row in doc["slots"] if row.get("amendments")]
+        print("layers", counts["layers"], "| slots", counts["slots"], by_catalog, "| definitive", counts["definitive"],
+              "| installed", counts["installed"], "|", counts["by_row_kind"], "|", counts["by_state"],
+              "| amendments", sum(len(row["amendments"]) for row in amended), "on", len(amended), "rows")

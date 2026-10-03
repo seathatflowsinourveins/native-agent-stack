@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "recorded_at_utc": "2026-10-03T00:28:54Z",
-  "meaning": "Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed.",
+  "meaning": "Recorded checkpoint selecting repository Codex/SDK 0.160.0 with same-host native-account and gateway marker qualification. The shared launcher and daemon still run 0.159.3 until a coordinated switch. Earlier queue, Hindsight, foundation, paper and simulation evidence retains its original scope; no new-host or model-quality acceptance is claimed. The gate for the new WSL distribution is carried over unchanged from main's checkpoint of 2026-10-02T22:57:25Z, which states its source selection on main apart from its host qualification, which is open.",
   "lanes": [
     {
       "kind": "lane",
@@ -361,6 +361,13 @@
       "title": "SDK and bundled CLI 0.160.0 pair qualification",
       "state": "SDK/CLI 0.160.0 markers retained / compatibility_attempt / invocation and timing evidence incomplete",
       "evidence_ref": "evidence/artifacts/runtime-sdk-20261003/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "new-wsl-distribution-20261002",
+      "title": "New WSL distribution sources (manifest + recipe + install plan + handbook) and host qualification (useful task per client + roles + lifecycle)",
+      "state": "source selection on main / host qualification open / 64-row plan ran once on the destination distribution - record private - public receipt with its acceptance",
+      "evidence_ref": "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
     }
   ],
   "workers": [
