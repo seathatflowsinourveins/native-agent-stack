@@ -108,7 +108,7 @@ The following upstream-alignment gaps are **observations dated at `df412368`, no
 - The Mac pin draft came from Linux without Mac execution: MCPorter 0.13.13 versus v0.14.1, SocratiCode 1.14.0 versus v1.16.0, Headroom 0.37.0 versus v0.39.x and ai-memory 2.3.2 versus v2.4.1.
 - Serena was the unreleased `2.0.0.dev0 @ c6fbd1c5` rather than upstream release v1.7.0.
 - The Mac's production ai-memory was a local build of `release/2.5`; the memory-stack catalog recorded a conflict with the official-artifact rule.
-- jCodeMunch was installed but wired into neither client, and an advertised route operation had missed 6 of 6 smoke cases.
+- jCodeMunch was installed on the Mac but wired into neither client there, and an advertised route operation had missed 6 of 6 smoke cases.
 
 ## 3. Why retired: dated supersession
 
@@ -141,9 +141,12 @@ SHA are:
 The other decisions have narrower dispositions:
 
 - **3, carried elsewhere:** the durable-memory comparison remains required; the edition's **:101–107** makes ai-memory
-  a reference arm and dates the configuration-level evidence, and the program's **:234** is `comparison_required`.
+  a reference arm and limits the agentmemory result to configuration-level evidence, not a production head-to-head,
+  and the program's **:234** is `comparison_required`.
 - **4, carried elsewhere:** [`AGENTS.md:3`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/AGENTS.md#L3)
-  carries upstream source-of-truth, supported installation and upstream-harness requirements.
+  carries the upstream source-of-truth and upstream-harness requirements, and
+  [`AGENTS.md:12`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/AGENTS.md#L12)
+  the supported installation and native test commands of the selected upstream revision.
 - **5, carried partly:** [`adoption/skills/manifest.json`](../../adoption/skills/manifest.json), `trial.prune_rule`, requires a
   dated keep/remove review, leaves invocable skills listed despite zero use and protects verdict changes through re-recording.
   The exact cause classification and gap-ledger proposal in #508 are preserved here as history only.
@@ -169,7 +172,7 @@ These are source corrections; the coordinator replies to and resolves the preser
   The pin checks at
   [`evidence/artifacts/macos-token-pins-20260926/README.md:18–19`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/macos-token-pins-20260926/README.md#L18-L19)
   explicitly are local integration checks, not installation receipts. **RTK 0.50.0 Claude-hook wiring is `untested` on macOS.**
-  The later Stage 1 narrative at
+  The 2026-09-27 Stage 1 narrative (#391) at
   [`evidence/artifacts/mac-stage1-client-layer-20260927/README.md:665–678`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/mac-stage1-client-layer-20260927/README.md#L665-L678)
   labels its hook-environment version observation `source_review`, with no RTK command retained in either receipt.
 - **Original line 86 is withdrawn** ([thread 4135292980](https://github.com/seathatflowsinourveins/native-agent-stack/pull/508#discussion_r4135292980)).
@@ -179,9 +182,12 @@ These are source corrections; the coordinator replies to and resolves the preser
   record hit@5 0.25 against SocratiCode's 0.85. A route repair alone cannot promote it to lane owner.
 - **Original line 25 is an unreceipted observation** ([thread 4135292986](https://github.com/seathatflowsinourveins/native-agent-stack/pull/508#discussion_r4135292986)).
   Searching tracked `evidence/` for the coverage command, `adoption_status.py`, `client_wiring`, the date and Mac host
-  identity found earlier workstation coverage and the later Stage 1 narrative, but no tracked returned report for
-  the 2026-09-29 Mac check. Its command-presence and wiring assertions remain an unreceipted observation, leaving
-  that Mac token-profile claim **`untested`**. A later narrative is not the missing dated returned report.
+  identity found earlier workstation coverage and the 2026-09-27 Stage 1 narrative (#391), but no tracked returned
+  report for the 2026-09-29 Mac check. That narrative is two days older than the 2026-09-29 check. Its coverage section at
+  [`evidence/artifacts/mac-stage1-client-layer-20260927/README.md:414–433`](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9b0b8d6d25f9e3fb8f71770500e774170423315e/evidence/artifacts/mac-stage1-client-layer-20260927/README.md#L414-L433)
+  summarizes an earlier run's fields in prose and states no exit status or script revision, and its artifact directory
+  keeps no returned JSON, so it is not the missing dated returned report. The 2026-09-29 command-presence and wiring
+  assertions remain an unreceipted observation, leaving that Mac token-profile claim **`untested`**.
 
 ## 5. The -76 input
 
@@ -190,14 +196,15 @@ is dated 2026-09-29 and distinguishes its input from a verdict or lane acknowled
 
 - **Item 1 is on main:** #506 merged as `84f6ee215d604c97a852774fb9db3d58889a8484` (`84f6ee21`), with the token-layer sweep.
 - **Item 2 is on main:** #500 merged as `b2767df2492f5830291b4e3e7f4218c6f5e4ff1f`, with the run-shape attribution.
-- **Item 3 remains an unreceipted `local_integration` lead:** the comment describes a 166-trial exploratory full/native
-  comparison and a 207-trial add-on batch using SWE-bench Lite sympy tasks, Sonnet 5.5 at medium, advisor off and hidden
-  tests. Its caveats are short tasks, one repository and model, uncontrolled cache warm-up, Sonnet-pinned children with
-  the advisor off rather than the host's Opus/advisor practice, and no direct transfer of its cost ratios.
+- **Item 3 remains an unreceipted `local_integration` lead:** the comment describes a local paired comparison by the
+  token-landscape study: 166 trials of the full configuration against a native-minimal profile and a 207-trial add-on
+  batch, using SWE-bench Lite sympy tasks, Sonnet 5.5 at medium, advisor off and hidden tests. Its caveats are short
+  tasks, one repository and model, uncontrolled cache warm-up, Sonnet-pinned children with the advisor off rather than
+  the host's Opus/advisor practice, and no direct transfer of its cost ratios.
 
 The proposed receipt match was checked against
 [`evidence/receipts/harbor-e2e-token-tools-20260930.json`](../../evidence/receipts/harbor-e2e-token-tools-20260930.json)
-(#570, merged as `000aae770628e705e557deca19804b5e5af4c57f`). **It does not identify those exploratory batches.**
+(#570, merged as `000aae770628e705e557deca19804b5e5af4c57f`). **It does not identify those two batches.**
 Its `run.trials` is 288, `run.tasks` is 36, and its `run.task_source` is SWE-bench Verified at `78f471bf`; the executed
 trials are dated 2026-09-30 after its freeze. It records RTK `cost_ratio_geomean = 1.027`, with `cost_ratio_ci95 =
 [0.946, 1.186]`, but neither 166 nor 207 is a trial count in that receipt. A similar rounded RTK ratio does not bind
@@ -235,11 +242,11 @@ they do not upgrade any historical claim's evidence class.
 | Mac RTK 0.49.0 use | Historical `native_proven` receipt; no transfer to 0.50.0 Claude-hook wiring |
 | RTK 0.50.0 Linux qualification | Historical native operation with local integration checks; Linux scope only |
 | The 2026-09-29 Mac coverage assertion | Unreceipted observation; `untested` profile claim |
-| -76 item 3 | Unreceipted `local_integration` lead; its exploratory counts are not the #570 run |
+| -76 item 3 | Unreceipted `local_integration` lead; its 166- and 207-trial batches are not the #570 run |
 | #570 Harbor receipt | Historical provider execution with local integration wrappers; source-reviewed here, not replayed |
 
 Completeness check: the record preserves all six decisions, the historical member and non-member sets, the four user
 answers, the deferred ai-memory choice, the dated alignment gaps, all three review corrections and the -76 input.
 The unresolved source gaps remain explicit for the owning layer's next sweep: the Mac's dated returned coverage
-report, provenance for the exploratory -76 batches and the new-WSL owner's ccusage wording. Independent review and
+report, provenance for the -76 item-3 batches and the new-WSL owner's ccusage wording. Independent review and
 publication remain coordinator steps; this source review does not claim those steps ran.
