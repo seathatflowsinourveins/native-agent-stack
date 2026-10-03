@@ -4288,7 +4288,7 @@
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "513ac0038d09f050b387657d057a22d1e5a2158ddee7271bc9aa1986cd75b4b4",
+      "sha256": "dad872bde4e5653a2babf6c0e5fd1e5f9e225b80a78f5100c6e9c6cdb06280ae",
       "bytes": 275
     },
     {
@@ -4303,8 +4303,8 @@
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "ee924bbed2b5ee86e75f04212ada84e631677902bb33a8679b1269d498627d28",
-      "bytes": 5894
+      "sha256": "0a406ec9687b23cefe2b351a4caf6047201df2f4c18b122f994a372800f2de9f",
+      "bytes": 6250
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -4323,8 +4323,8 @@
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "a7363da986a1552b4ae6e3c8a44b61929c484347c3e48ded5259a08ad8ea98d4",
-      "bytes": 23768
+      "sha256": "b08a734f76e0e41dac1cb8d17e76d24054c4c8ee669a9c13ccfde22b11c14749",
+      "bytes": 24142
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -9089,8 +9089,8 @@
     },
     {
       "path": "blueprints/native-skill-practice/README.md",
-      "sha256": "013aa43f686b413287b5058c9a04689029b7d8421ae306cd7c6beb23eb0c5060",
-      "bytes": 7960
+      "sha256": "8cc28054f9478930d19b4e23fe0d75ddba756e5a75362f28fc6f28dc46459cfc",
+      "bytes": 13231
     },
     {
       "path": "blueprints/native-skill-practice/cases.json",
@@ -9121,6 +9121,11 @@
       "path": "blueprints/native-skill-practice/response.cjs",
       "sha256": "c990b1db80f116ecceddb649a175af1aab35d5a1a58762e71f7be13ee7dcb5b7",
       "bytes": 1764
+    },
+    {
+      "path": "blueprints/native-skill-practice/semantic-evidence-reviewer.schema.json",
+      "sha256": "11f7d0f95e8d5df2c07d52ea8217da40e3c12409c09a648381aee52f6e2f928b",
+      "bytes": 2106
     },
     {
       "path": "blueprints/native-skill-practice/test-contract.cjs",
@@ -16279,8 +16284,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "6a1d218b78f68dcfca91993be36e0ab22292315114b8accbb4d99bee2907f03f",
-      "bytes": 182719
+      "sha256": "8a98122e2ab1b2d1788610931b14de8987d6faaeb4f180c31384997229b9cd30",
+      "bytes": 182992
     },
     {
       "path": "docs/stack.md",
@@ -49214,8 +49219,8 @@
     },
     {
       "path": "examples/claude-native/agents/semantic-evidence-reviewer.md",
-      "sha256": "0763bbfa0e635ffd6aaaba8ae1f668d3e2398776bc0be3516ad1593701b6a745",
-      "bytes": 1888
+      "sha256": "c1cb4882dc104b306e5fd07c52d0a444674b26ffa71f5577710aa03bacd22853",
+      "bytes": 2303
     },
     {
       "path": "examples/claude-native/agents/source-scout.md",
@@ -49364,8 +49369,8 @@
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "d81d057a8d8121a9e7a4009fadbcc18141ec5b47b74b876908e808be81de9043",
-      "bytes": 4472
+      "sha256": "2c471a1d71165c46157aa75c0760a097a5adf057c11a73080c30baa92c5b02d0",
+      "bytes": 4786
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
@@ -50578,6 +50583,11 @@
       "bytes": 5678
     },
     {
+      "path": "tests/test_gap_crosswalk_routing.py",
+      "sha256": "b353826d635e2ccb868ce50c77c512a2a3302f97e1f5b51936a40241d8dd7f9c",
+      "bytes": 11898
+    },
+    {
       "path": "tests/test_gap_resolution_ledger.py",
       "bytes": 5845,
       "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156"
@@ -51003,6 +51013,11 @@
       "bytes": 22857
     },
     {
+      "path": "tests/test_semantic_reviewer_schema.py",
+      "sha256": "5fa5c78306ee6d01653dc1c7dd175289589757844293d9f100d1725b4f0e9988",
+      "bytes": 3738
+    },
+    {
       "path": "tests/test_service_reboot.py",
       "sha256": "0ed22915bc1f80d3a3bdcf6a51810bafd8161dd94640584a9e5a9ac2882d20f9",
       "bytes": 14063
@@ -51409,8 +51424,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
-      "sha256": "012d515016a61a1b7c78d47fa79fb80eb69ba5f7215a204cc69f09dfeb6f4c00",
-      "bytes": 25258
+      "sha256": "1db1f32d258adcc47e737e8698462ad71859803ac00ec55c2c8a1a798f243376",
+      "bytes": 29243
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
