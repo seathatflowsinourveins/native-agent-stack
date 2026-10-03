@@ -15849,8 +15849,8 @@
     },
     {
       "path": "docs/decisions/2026-09-27-token-lanes-subagent-start.md",
-      "sha256": "385e6519f6edb23733484d7e2e7f9d97db5c69e1846fe92fb3413977b26f2917",
-      "bytes": 68857
+      "sha256": "423b886bef0774ecc4a2835a55e6a0d6d8f50ed55c0a53ed77d855dd241289d6",
+      "bytes": 69053
     },
     {
       "path": "docs/decisions/2026-09-28-an13-m4-m5.md",
