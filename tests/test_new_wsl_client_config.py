@@ -155,6 +155,18 @@ DESTINATION_CODEX = ('[marketplaces.trailofbits]\nsource_type = "git"\nsource = 
 DESTINATION_CLAUDE = {"extraKnownMarketplaces": {"trailofbits": {"source": {
     "source": "git", "url": PLAN_MARKETPLACE_URL}}}, "theme": "auto"}
 FAILING_CLAUDE = "#!/bin/sh\nexit 3\n"
+# The wave-2 batch owes both acknowledgements until its pull request has them, and --apply refuses to wire an interim
+# install meanwhile (AcknowledgementGateTests, with the real function). Every other test applies as if both were recorded.
+REAL_OWED_ACKNOWLEDGEMENTS = cfg.owed_acknowledgements
+ACKNOWLEDGED = mock.patch.object(cfg, "owed_acknowledgements", return_value=[])
+
+
+def setUpModule():
+    ACKNOWLEDGED.start()
+
+
+def tearDownModule():
+    ACKNOWLEDGED.stop()
 
 
 def write_exe(path: Path, text: str) -> Path:
@@ -177,7 +189,7 @@ def make_catalog(tmp: Path) -> Path:
     filtered blocks are copied too, so the copy starts clean."""
     root = tmp / "catalog"
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
-             *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
+             *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
              cfg.SKILLS_MANIFEST_REL]
     for rel in files:
@@ -537,10 +549,11 @@ class ManifestRuleTests(unittest.TestCase):
         not_installing = {s for s in slots if not cfg.installs(rows[s])}
         self.assertEqual(not_installing, set())
         # context-supply, memory-owner and code-search install through their interims (amendment 3); statusline is the
-        # layer consensus's wave-2 row.
+        # layer consensus's wave-2 row; container-engine wires the Codex shells' DOCKER_HOST (wave-2 custody ruling, 7).
         self.assertEqual({s for s in slots if cfg.installs(rows[s])},
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
-                          "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline"})
+                          "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
+                          "container-engine"})
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"context-supply", "memory-owner", "code-search"})
 
 
@@ -634,7 +647,8 @@ class RenderTests(unittest.TestCase):
             "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
             "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
-        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "qmd", "semble", "context-mode"])
+        # semble comes from the new distribution's additions, merged after the shared template's servers.
+        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "qmd", "context-mode", "semble"])
         self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
         semble = config["mcp_servers"]["semble"]
         self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
@@ -669,8 +683,14 @@ class RenderTests(unittest.TestCase):
                                                         "context-used", "five-hour-limit", "weekly-limit"])
         policy = config["shell_environment_policy"]
         self.assertEqual(policy["inherit"], "none")
-        self.assertEqual(sorted(policy["set"]), ["HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH", "TERM", "TMPDIR"])
+        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH", "TERM",
+                                                 "TMPDIR", "XDG_RUNTIME_DIR"])
         self.assertEqual(policy["set"]["HOME"], "/home/example")
+        # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
+        # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
+        self.assertEqual(policy["set"]["XDG_RUNTIME_DIR"], f"/run/user/{os.getuid()}")
+        self.assertRegex(policy["set"]["XDG_RUNTIME_DIR"], r"\A/run/user/[0-9]+\Z")
+        self.assertEqual(policy["set"]["DOCKER_HOST"], f"unix://{policy['set']['XDG_RUNTIME_DIR']}/docker.sock")
         self.assertEqual(config["model"], "gpt-6.1-sol")
         self.assertNotIn("check_for_update_on_startup", config)
         self.assertEqual(self.files["codex.hooks.json"].strip().replace(" ", "").replace("\n", ""), '{"hooks":{}}')
@@ -854,6 +874,54 @@ def line_is_verbatim(line: str, sources: list) -> bool:
         else:
             return True
     return False
+
+
+class TemplateAdditionsTests(unittest.TestCase):
+    """The new distribution's additions (adoption/new-wsl/templates/): keys only this tool renders, so the shared templates
+    stay what render_config.py, install_claude_profile.py and the bootstrap render on every other host."""
+
+    def test_the_shared_templates_carry_none_of_the_additions(self):
+        codex = tomllib.loads((ROOT / cfg.TEMPLATES["codex/config"]).read_text(encoding="utf-8"))
+        self.assertNotIn("inherit", codex["shell_environment_policy"])
+        self.assertEqual(sorted(codex["shell_environment_policy"]["set"]),
+                         ["MCP_AUTO_OPEN_ENABLED", "PATH", "RTK_TELEMETRY_DISABLED"])
+        self.assertNotIn("semble", codex["mcp_servers"])
+        self.assertEqual(codex["mcp_servers"]["ai-memory"], {"url": "http://${AI_MEMORY_URL}/mcp"})
+        self.assertNotIn("semble", json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"])
+        self.assertNotIn("allow", json.loads((ROOT / cfg.TEMPLATES["claude/settings"]).read_text())["permissions"])
+        for group, rel in cfg.TEMPLATE_ADDITIONS.items():     # each addition adds a key its template lacks
+            base = leaves(cfg.read_template(ROOT / cfg.TEMPLATES[group]))
+            extra = leaves({k: v for k, v in cfg.read_template(ROOT / rel).items() if k != "_comment"})
+            self.assertTrue(extra, rel)
+            self.assertEqual(set(base) & set(extra), set(), rel)
+        # The render of the shared Codex template that every other host takes has no policy of the new distribution.
+        shared = tomllib.loads(render_config.render_one(ROOT / cfg.TEMPLATES["codex/config"],
+                                                        render_config.load_host_values(EXAMPLE_HOST)))
+        self.assertNotIn("inherit", shared["shell_environment_policy"])
+        self.assertNotIn("semble", shared["mcp_servers"])
+
+    def test_the_render_merges_the_additions_into_their_templates(self):
+        results, *_ = cfg.analyse(ROOT)
+        keys = {v.piece.key for v in results}
+        for key in ("codex/config/shell_environment_policy.inherit", "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR",
+                    "codex/config/shell_environment_policy.set.DOCKER_HOST", "codex/config/mcp_servers.semble.command",
+                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode", "claude/mcp/server/semble",
+                    "claude/settings/permission/allow/mcp__semble__search"):
+            self.assertIn(key, keys)
+        self.assertFalse([key for key in keys if "_comment" in key])    # a file's note is not a piece
+
+    def test_an_addition_that_names_a_key_of_its_template_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            path = root / cfg.TEMPLATE_ADDITIONS["codex/config"]
+            path.write_text(path.read_text(encoding="utf-8") + '\n[mcp_servers.serena]\ncommand = "other"\n',
+                            encoding="utf-8")
+            with self.assertRaises(cfg.ConfigError) as caught:
+                cfg.analyse(root)
+            self.assertIn("mcp_servers.serena.command", str(caught.exception))
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("which its shared template defines too", err)
 
 
 class InstructionBlockTests(unittest.TestCase):
@@ -1745,11 +1813,12 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(settings["permissions"]["deny"], settings_on["permissions"]["deny"])
         self.assertGreater(len(settings["permissions"]["deny"]), 100)
 
+    # In the order of the pieces: the additions (semble's allow rules and server) merge after the shared template's keys.
     ALLOW_LABELS = "Claude Code allow rule mcp__semble__search, Claude Code allow rule mcp__semble__find_related"
-    ADDED_CLAUDE = f"added: {ALLOW_LABELS}, Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt"
+    ADDED_CLAUDE = f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt"
     CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
-                    "Codex mcp_servers.semble.default_tools_approval_mode, "
-                    "Codex mcp_servers.context-mode.default_tools_approval_mode")
+                    "Codex mcp_servers.context-mode.default_tools_approval_mode, "
+                    "Codex mcp_servers.semble.default_tools_approval_mode")
     STACK_WORKER = "Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode"
 
     def test_a_fresh_apply_writes_none_by_default_and_all_of_them_with_the_option(self):
@@ -2211,6 +2280,47 @@ class AuthorizationTests(ApplyCase):
                        "a differing one is kept and printed beside the render's",
                        "only on a host whose owner asked for the repository's permission practice"):
             self.assertIn(phrase, helped)
+
+
+class AcknowledgementGateTests(ApplyCase):
+    """--apply wires no interim install (amendment 3 of the manifest's decision rule) while the layer consensus's wave-2
+    batch owes an acknowledgement: a real run refuses and writes nothing, and a dry run says that a real run would refuse
+    (wave-2 code-search ruling, change 1; install.sh's interim_acknowledged is the plan's side of the same gate)."""
+
+    def test_the_list_is_read_from_the_committed_batch(self):
+        owed = json.loads((ROOT / cfg.CONSENSUS_REL).read_text(encoding="utf-8"))["wave2"]["acknowledgements_owed"]
+        self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(ROOT), owed)
+
+    def test_a_list_that_cannot_be_read_is_an_error_and_an_empty_one_is_not(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / cfg.CONSENSUS_REL
+            path.parent.mkdir(parents=True)
+            for broken in ({}, {"wave2": {}}, {"wave2": {"acknowledgements_owed": "gpt"}},
+                           {"wave2": {"acknowledgements_owed": [""]}}):
+                with self.subTest(consensus=broken):
+                    path.write_text(json.dumps(broken), encoding="utf-8")
+                    with self.assertRaises(cfg.ConfigError):
+                        REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp))
+            path.write_text(json.dumps({"wave2": {"acknowledgements_owed": []}}), encoding="utf-8")
+            self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp)), [])
+
+    def test_a_real_apply_refuses_while_one_is_owed_and_a_dry_run_says_so(self):
+        self.installed_state()
+        before = tree(self.home)
+        with mock.patch.object(cfg, "owed_acknowledgements", return_value=["claude", "gpt"]):
+            code, out, err = self.apply()
+            self.assertEqual(code, 1, out + err)
+            self.assertIn("apply refused: the render wires the interim installs of code-search, context-supply, "
+                          "memory-owner (amendment 3 of the manifest's decision rule), and the acknowledgement of the "
+                          "wave-2 batch is still owed by claude, gpt", err)
+            self.assertNotIn("summary:", out)                  # no step ran
+            self.assertEqual(tree(self.home), before)
+            self.assertFalse(self.marker.exists())             # and no client was called
+            code, out, err = self.apply(dry=True)
+            self.assertEqual(code, 0, out + err)
+            self.assertIn("note: a real run refuses now: the render wires the interim installs of code-search, "
+                          "context-supply, memory-owner", out)
+        self.assertEqual(tree(self.home), before)
 
 
 class RenderedScanTests(unittest.TestCase):
@@ -2865,6 +2975,140 @@ class CodexMergeTests(unittest.TestCase):
         self.assertEqual(len(plan.conflicts), 1)
         self.assertEqual(cfg.first_difference({"a": {"b": 1}}, {"a": {"b": True}}), ("a", "b"))
         self.assertIsNone(cfg.first_difference({"a": {"b": 1}}, {"a": {"b": 1}}))
+
+
+class RemotePluginRuleTests(unittest.TestCase):
+    """The local fallback for the account's remote Codex plugins (wave-2 skills ruling, change 5): --apply reads the plugin
+    cache and adds a name rule per plugin skill and an off switch per plugin MCP server, as Codex names them. The cache here
+    is a fixture of this project's own, in the shapes of the cached bundles (manifest, skills/, .mcp.json)."""
+
+    SKILL = "---\nname: {name}\ndescription: A fixture skill.\n---\nBody.\n"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+        self.home = self.base / "home"
+        self.home.mkdir()
+        self.codex_home = self.home / ".codex"
+        self.config = self.codex_home / "config.toml"
+        self.claude = write_exe(self.base / "bin" / "claude", STUB_CLAUDE)
+        self.codex = write_exe(self.base / "bin" / "codex", STUB_CODEX)
+        patcher = mock.patch.dict(os.environ, {"STUB_MARKER": str(self.base / "client-calls.txt")})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def plugin(self, plugin: str, version: str, manifest=None, skills=None, servers=()) -> Path:
+        """A cached remote plugin: `manifest` is its plugin.json (None: none), `skills` maps a directory under skills/ to its
+        SKILL.md text, `servers` names the MCP servers of its .mcp.json."""
+        root = self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / plugin / version
+        root.mkdir(parents=True)
+        if manifest is not None:
+            (root / ".codex-plugin").mkdir()
+            (root / ".codex-plugin/plugin.json").write_text(json.dumps(manifest), encoding="utf-8")
+        for directory, text in (skills or {}).items():
+            (root / "skills" / directory).mkdir(parents=True)
+            (root / "skills" / directory / "SKILL.md").write_text(text, encoding="utf-8")
+        if servers:
+            (root / ".mcp.json").write_text(json.dumps({"mcpServers": {name: {"command": "node"} for name in servers}}),
+                                            encoding="utf-8")
+        return root
+
+    def apply(self):
+        return run_main("--apply", "--host", EXAMPLE_HOST, "--home", str(self.home), "--claude-bin", str(self.claude),
+                        "--codex-bin", str(self.codex), "--codex-process-name", NO_PROCESS, *ONLY_CODEX_CONFIG)
+
+    def test_the_names_are_the_ones_codex_gives_and_the_servers_are_each_plugins(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers", "skills": "./skills/"}, {
+            "brainstorming": self.SKILL.format(name="brainstorming"),
+            "cli": self.SKILL.format(name="hf-cli"),                           # the frontmatter's name, not the folder's
+            "quoted": self.SKILL.format(name="'quoted-skill'"),
+            "spaced": self.SKILL.format(name="two   words  # a comment"),
+            "unnamed": "---\ndescription: No name, so the folder's.\n---\n",
+            "no-frontmatter": "Just text, which Codex does not load as a skill.\n"})
+        self.plugin("superpowers", "6.3.0", {"name": "superpowers"}, {"old": self.SKILL.format(name="old-skill")})
+        self.plugin("openai-developers", "1.3.6", {"name": "openai-developers", "mcpServers": "./.mcp.json"},
+                    {"agents": self.SKILL.format(name="agents")}, servers=("local-confirmation",))
+        self.plugin("blank-name", "0.1.0", {"name": " "}, {"x": self.SKILL.format(name="x")})   # the root's own name
+        self.plugin("no-manifest", "1.0.0", None, {"y": self.SKILL.format(name="y")})        # Codex loads no plugin
+        names, servers = cfg.remote_plugin_rules(self.codex_home)
+        self.assertEqual(names, ["0.1.0:x", "openai-developers:agents", "superpowers:brainstorming", "superpowers:hf-cli",
+                                 "superpowers:old-skill", "superpowers:quoted-skill", "superpowers:two words",
+                                 "superpowers:unnamed"])
+        self.assertEqual(servers, {"openai-developers@openai-curated-remote": ["local-confirmation"]})
+        self.assertEqual(cfg.remote_plugin_rules(self.base / "no-codex-home"), ([], {}))
+
+    def test_a_name_this_tool_cannot_read_is_refused_rather_than_guessed(self):
+        self.plugin("p", "1.0.0", {"name": "p"}, {"folded": "---\nname: >-\n  folded\ndescription: d\n---\n"})
+        with self.assertRaises(cfg.ConfigError) as caught:
+            cfg.remote_plugin_rules(self.codex_home)
+        self.assertIn("is not a one-line value this tool reads", str(caught.exception))
+        code, _, err = self.apply()
+        self.assertEqual(code, 1)
+        self.assertIn("apply failed: the account's remote plugins in", err)
+        self.assertFalse(self.config.exists())
+
+    def test_an_apply_adds_the_rules_and_a_later_one_adds_only_the_new_rules_after_the_files_own(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        self.plugin("openai-developers", "1.3.6", {"name": "openai-developers"}, servers=("local-confirmation",))
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("remote plugins: 1 skill name rule(s) and 1 plugin MCP server(s) turned off", out)
+        text = self.config.read_text()
+        config = tomllib.loads(text)
+        installer = {"path": str(self.home / ".codex/skills/.system/skill-installer/SKILL.md"), "enabled": False}
+        self.assertEqual(config["skills"]["config"], [installer, {"name": "superpowers:brainstorming", "enabled": False}])
+        self.assertEqual(text.count("[[skills.config]]"), 2)                # an array of tables, so it can grow as text
+        self.assertEqual(config["plugins"]["openai-developers@openai-curated-remote"],
+                         {"enabled": False, "mcp_servers": {"local-confirmation": {"enabled": False}}})
+        # The account gains a plugin skill: the next run adds its rule after the file's own and changes nothing else.
+        (self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / "superpowers/6.4.2/skills/debugging").mkdir()
+        (self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / "superpowers/6.4.2/skills/debugging/SKILL.md"
+         ).write_text(self.SKILL.format(name="systematic-debugging"), encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("rules added to skills.config: 1, after the file's own", out)
+        merged = tomllib.loads(self.config.read_text())
+        self.assertEqual(merged["skills"]["config"], config["skills"]["config"] + [
+            {"name": "superpowers:systematic-debugging", "enabled": False}])
+        self.assertTrue(keeps_lines(text, self.config.read_text()))
+        # The check that X11 asks for after an apply still passes (it reads the repository, never the host's files).
+        code, out, err = run_main("--check")
+        self.assertEqual(code, 0, err[-400:])
+        self.assertIn("check passed", out)
+
+    def test_a_file_with_rules_of_its_own_keeps_them_first(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        own = '[[skills.config]]\nname = "my-skill"\nenabled = false\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        self.config.write_text(own, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        rules = tomllib.loads(self.config.read_text())["skills"]["config"]
+        self.assertEqual(rules[0], {"name": "my-skill", "enabled": False})
+        self.assertIn({"name": "superpowers:brainstorming", "enabled": False}, rules[1:])
+        self.assertNotIn("conflict kept: skills.config", out)
+        self.assertTrue(keeps_lines(own, self.config.read_text()))
+
+    def test_a_rule_list_written_inline_is_refused_and_the_file_stays_as_it_was(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        inline = '[skills]\nconfig = [{ name = "my-skill", enabled = false }]\n'
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        self.config.write_text(inline, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 1)
+        self.assertIn("the file defines it as an inline array, which text cannot extend", out)
+        self.assertEqual(self.config.read_text(), inline)
+
+    def test_the_toml_writer_writes_a_list_of_tables_as_an_array_of_tables(self):
+        data = {"skills": {"max_context_tokens": 6000, "config": [{"path": "/a", "enabled": False},
+                                                                 {"name": "p:s", "enabled": False}]},
+                "plugins": {"x@m": {"enabled": False, "mcp_servers": {"s": {"enabled": False}}}}}
+        text = cfg.emit_toml(data, "# h")
+        self.assertEqual(text.count("[[skills.config]]"), 2)
+        self.assertEqual(tomllib.loads(text), data)
 
 
 class CommandLineTests(unittest.TestCase):

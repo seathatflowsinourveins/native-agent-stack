@@ -1352,9 +1352,7 @@ web_search = "live"
 [mcp_servers.context-mode]
 disabled_tools = ["ctx_upgrade", "ctx_purge"]
 """
-# The Codex user template's servers, which the lane home carries: semble joined on 2026-10-03 (the new WSL distribution's
-# interim code search) and, like codebase-memory, does not connect on a host that has not installed it.
-TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode", "semble")
+TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode")
 
 
 class OmniRouteLaneBuildTests(unittest.TestCase):

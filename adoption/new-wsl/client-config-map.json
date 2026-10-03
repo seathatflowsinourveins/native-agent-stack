@@ -1,6 +1,6 @@
 {
   "schema": "native-agent-stack/new-wsl-client-config-map/v1",
-  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
+  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). The pieces are those of the client templates and, for the Claude settings, the Claude user MCP servers and the Codex user config, of the new distribution's additions in adoption/new-wsl/templates/ (keys only this tool renders, so each shared template stays what every other host renders; a key a template and its additions both define is refused). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
   "dependent_sentences": [
     {
       "starts": "Check relevance; retry without pin priority",
@@ -373,7 +373,7 @@
       "names": [
         "semble"
       ],
-      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5)."
+      "source": "The code-search slot's interim install (definitive manifest, amendment 3): the uv tool's console script, SEMBLE_MODEL_NAME on the pinned model's local snapshot and Claude Code's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 4 and 5). The entry is in adoption/new-wsl/templates/claude-user.mcp.additions.json, which only this tool reads, so install_claude_profile.py registers no semble server on another host."
     },
     {
       "match": [
@@ -456,8 +456,8 @@
       "match": [
         "codex/config/hooks.state*"
       ],
-      "wiring": "not_wired:each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's Codex hooks in ~/.codex/hooks.json, which ai-memory's installer writes and whose template hashes were taken from ai-memory 2.4.x; for 2.5.2 they are read back through `codex app-server` hooks/list on the destination and compared before they are rendered (wave-2 synthesis X10; context ruling, change 9)",
-      "source": "tools/adoption/codex_home.py L85-87"
+      "wiring": "not_wired:each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then",
+      "source": "tools/adoption/codex_home.py L85-87; akitaonrails/ai-memory 7580b74d crates/ai-memory-cli/src/commands/install_hooks.rs L2071-2093 (the installer writes the Codex hooks.json and prints that Codex needs explicit trust) and render_shared.rs L907-915 (the seven events)"
     },
     {
       "match": [
@@ -586,7 +586,7 @@
       "names": [
         "semble"
       ],
-      "source": "command semble, enabled_tools search and find_related, SEMBLE_MODEL_NAME and Codex's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 2, 4 and 5)."
+      "source": "command semble, enabled_tools search and find_related, SEMBLE_MODEL_NAME and Codex's own absolute SEMBLE_CACHE_LOCATION (wave-2 code-search ruling, changes 2, 4 and 5), in adoption/new-wsl/templates/codex.config.additions.toml, which only this tool reads."
     },
     {
       "match": [
@@ -598,14 +598,23 @@
     },
     {
       "match": [
+        "codex/config/shell_environment_policy.set.DOCKER_HOST"
+      ],
+      "wiring": "slot:container-engine",
+      "owner": "Docker Engine",
+      "source": "The rootless Docker socket in the user's runtime directory, unix://${XDG_RUNTIME_DIR}/docker.sock: the value the install plan's container stage exports (install.sh, after container-engine) and Docker's rootless documentation gives (https://docs.docker.com/engine/security/rootless/). The wave-2 custody ruling, change 7, lists it for Codex shells that use rootless Docker; the piece is in adoption/new-wsl/templates/codex.config.additions.toml."
+    },
+    {
+      "match": [
         "codex/config/shell_environment_policy.inherit",
         "codex/config/shell_environment_policy.set.HOME",
         "codex/config/shell_environment_policy.set.LANG",
         "codex/config/shell_environment_policy.set.TERM",
-        "codex/config/shell_environment_policy.set.TMPDIR"
+        "codex/config/shell_environment_policy.set.TMPDIR",
+        "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR"
       ],
       "wiring": "practice",
-      "source": "docs/secret-storage.md, Codex: inherit = \"none\" with an explicit table of non-secret variables, the practice's Codex control that credential_status.py --client-guards checks (wave-2 custody ruling, change 7). XDG_RUNTIME_DIR and DOCKER_HOST, which that change also lists, depend on the user's id, which no host value carries; they stay out of the table until a host value does."
+      "source": "docs/secret-storage.md, Codex: inherit = \"none\" with an explicit table of non-secret variables, the practice's Codex control that credential_status.py --client-guards checks (wave-2 custody ruling, change 7, which lists HOME, LANG, TERM, TMPDIR, XDG_RUNTIME_DIR, PATH, RTK_TELEMETRY_DISABLED and MCP_AUTO_OPEN_ENABLED, plus DOCKER_HOST). The pieces are in adoption/new-wsl/templates/codex.config.additions.toml, which only this tool reads, so the shared template's policy stays what every other host renders. XDG_RUNTIME_DIR is /run/user/<uid> of the user the tool runs as (user@.service(5)), filled by the tool unless the host value file names one: systemctl --user and the messaging courier need it (wave-2 synthesis X12)."
     },
     {
       "match": [
@@ -696,6 +705,13 @@
         "step/skills"
       ],
       "wiring": "not_wired:the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer"
+    },
+    {
+      "match": [
+        "step/codex-remote-plugin-rules"
+      ],
+      "wiring": "practice",
+      "note": "The local fallback for the account's remote Codex plugins, which no manifest row selects (wave-2 skills ruling, change 5; the account-level uninstall is the primary route and the owner's): at --apply this tool reads <Codex home>/plugins/cache/openai-curated-remote/ and adds to the Codex config one [[skills.config]] name rule (\"<plugin>:<skill>\", enabled false) per skill of each cached plugin, after the config's own rules, and turns off each MCP server such a plugin ships ([plugins.\"<plugin>@openai-curated-remote\"] with enabled false and mcp_servers.<server>.enabled false). Run the apply again whenever the account's plugin set changes. Name rules are supported by Codex's source (rust-v0.160.0 config/src/skills_config.rs, ext/skills/src/loader/namespace.rs and core-plugins/src/loader.rs) and not yet confirmed live: live proof 9 checks the $ listing."
     },
     {
       "match": [

@@ -73,13 +73,11 @@ PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 # (codex-rs/core/src/mcp_tool_call.rs L2436-2466 and L1610-1614 at rust-v0.157.1). ai-memory, SocratiCode and
 # Headroom declare none, so every call to them is refused unless configuration approves it: the stack-worker profile
 # (codex.stack-worker.config.toml) approves their read tools for workers, and sessions without that profile keep the
-# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5). ai-memory's approval below is for the new WSL
-# distribution, whose standing requirement is no permission prompts (wave-2 memory ruling, change 13; ai-memory's own
-# install-mcp --client codex writes the same key): tools/adoption/new_wsl_client_config.py writes it only with
-# --with-authorization-settings, while a fresh render of this whole template (render_config.py) carries it as well.
+# refusals (docs/decisions/2026-09-26-codex-worker-lane.md, decision 5). The new WSL distribution's approval of
+# ai-memory's tools is not in this shared template: adoption/new-wsl/templates/codex.config.additions.toml carries it,
+# and only tools/adoption/new_wsl_client_config.py reads that file, with --with-authorization-settings.
 [mcp_servers.ai-memory]
 url = "http://${AI_MEMORY_URL}/mcp"
-default_tools_approval_mode = "approve"
 
 [mcp_servers.socraticode]
 command = "${ECO_ROOT}/bin/node"
@@ -130,21 +128,6 @@ command = "${ECO_ROOT}/bin/codebase-memory-mcp"
 [mcp_servers.qmd]
 command = "${ECO_ROOT}/bin/qmd"
 args = ["--index", "native-agent-stack-catalog", "mcp"]
-
-# semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install on the new WSL distribution
-# (definitive manifest, amendment 3; wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools
-# carry no MCP annotations, so Codex 0.160.0 asks before each call (codex-rs/core/src/mcp_tool_call.rs) unless the
-# approval mode approves them; enabled_tools names them. SEMBLE_MODEL_NAME is the local snapshot of the pinned model
-# (minishlab/potion-code-16M-v2 at e9d2a44c), and SEMBLE_CACHE_LOCATION is this client's own absolute cache (Claude
-# Code's is semble-claude): a cache shared by two processes can keep serving an index another process rebuilt.
-[mcp_servers.semble]
-command = "semble"
-enabled_tools = ["search", "find_related"]
-default_tools_approval_mode = "approve"
-
-[mcp_servers.semble.env]
-SEMBLE_MODEL_NAME = "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c"
-SEMBLE_CACHE_LOCATION = "${HOME}/.cache/semble-codex"
 
 # context-mode's plugin server (.codex-plugin/mcp.json: `node ./start.mjs`, cwd ".") starts in the plugin
 # root, because Codex joins a plugin server's relative cwd to that root. Upstream start.mjs then sets no
@@ -276,20 +259,10 @@ max_bytes = 0
 [analytics]
 enabled = true
 
-# Shells start from an empty environment plus the set table, so no credential or broker variable of the launcher reaches
-# them (docs/secret-storage.md, Codex; the one Codex-side measure credential_status.py --client-guards checks; wave-2
-# custody ruling, change 7). Codex adds its own variables, CODEX_THREAD_ID among them, after this step
-# (codex-rs/protocol/src/shell_environment.rs at rust-v0.160.0). XDG_RUNTIME_DIR and DOCKER_HOST, which the messaging
-# courier and rootless Docker need, depend on the user's id, which no host value carries yet: add them on the host.
-# Native WSL defaults; regenerate PATH when adopting another host/runtime.
-[shell_environment_policy]
-inherit = "none"
-
+# Native WSL defaults; regenerate PATH when adopting another host/runtime. The new WSL distribution's
+# `inherit = "none"` and the rest of its set table are in adoption/new-wsl/templates/codex.config.additions.toml, which
+# only tools/adoption/new_wsl_client_config.py reads (docs/secret-storage.md, Codex, describes the practice for any host).
 [shell_environment_policy.set]
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
-HOME = "${HOME}"
-LANG = "C.UTF-8"
-TERM = "xterm-256color"
-TMPDIR = "/tmp"
 RTK_TELEMETRY_DISABLED = "1"
 MCP_AUTO_OPEN_ENABLED = "false"

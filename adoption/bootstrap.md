@@ -441,10 +441,8 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     over http; `serena`, `socraticode`, `headroom`, `codebase-memory`, `qmd`
-     and `semble` over stdio; `semble` is the new WSL distribution's interim
-     code search and does not connect on a host that has not installed it),
-     renders its `${HOME}` and
+     over http; `serena`, `socraticode`, `headroom`, `codebase-memory` and
+     `qmd` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
