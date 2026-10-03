@@ -1,7 +1,7 @@
 # Clean replacement WSL source profile
 
 W-PROF is the source contract in [new-wsl-profile.json](new-wsl-profile.json),
-reconciled with accepted main `85543efe5abcddb7b7cddb14e8774e83b6758616`. It records source-review
+reconciled with accepted main `85543efe5abcddb7b7cddb14e8774e83b6758616`; its Codex CLI and Python SDK pins move to 0.160.0, pending [PR #626](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626) (basis: PR #626 and its cross-family convergence comment [5970286472](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5970286472)). It records source-review
 recommendations and isolated comparison arms. It establishes no merit winner,
 provider/model/GPU result or replacement-host acceptance.
 
@@ -9,7 +9,7 @@ The native manifest profile is `new-wsl-clean-foundation`. Its component list is
 only Codex and Claude Code; the existing bootstrap adds its pinned Node, uv and
 gh prerequisites. CPython 3.13.15 is supplied through uv without replacing the
 OS Python. Git and the OS utilities remain prerequisites. Codex CLI and the
-Python SDK pin are **0.159.3**, following the accepted merge of
+Python SDK pin are **0.160.0**, pending [PR #626](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626) and its cross-family convergence ([5970286472](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626#issuecomment-5970286472)); 0.159.3 followed the accepted merge of
 [PR #580](https://github.com/seathatflowsinourveins/native-agent-stack/pull/580).
 The TypeScript SDK's **0.159.3** pin remains an independent source-review
 recommendation; PR #580 did not qualify that SDK. Both SDK rows remain
@@ -100,7 +100,7 @@ a disposable target. No install, account activation or global WSL change is
 part of this artifact.
 
 Install and acceptance primary citations are retained per entry in the JSON.
-The core paths are [Codex's tagged README](https://github.com/openai/codex/blob/rust-v0.159.3/README.md),
+The core paths are [Codex's tagged README](https://github.com/openai/codex/blob/rust-v0.160.0/README.md),
 [Claude's version and channel installer](https://code.claude.com/docs/en/setup#install-a-specific-version),
 [uv 0.12.17](https://github.com/astral-sh/uv/releases/tag/0.12.17),
 [uv's tagged Python guide](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md),
@@ -188,7 +188,7 @@ have no default-install precedence.
 | uv | 0.12.17 | [reviewed install source](https://github.com/astral-sh/uv/releases/tag/0.12.17) |
 | gh | 2.101.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream Linux installation](https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md) |
 | CPython 3.13 | 3.13.15 | [reviewed install source](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) |
-| Codex | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/README.md), [npm version syntax](https://docs.npmjs.com/cli/v11/commands/npm-install) |
+| Codex | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/README.md), [npm version syntax](https://docs.npmjs.com/cli/v11/commands/npm-install) |
 | Claude Code | 2.1.284 | [reviewed install source](https://code.claude.com/docs/en/setup#install-a-specific-version) |
 | mcporter | 0.14.1 | [reviewed install source](https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md) |
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
@@ -202,7 +202,7 @@ have no default-install precedence.
 | promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
 | Claude Agent SDK | 0.2.163 | [reviewed install source](https://github.com/anthropics/claude-agent-sdk-python/blob/1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7/README.md) |
 | Codex TypeScript SDK | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/sdk/typescript/README.md) |
-| Codex Python SDK | 0.159.3 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.159.3/sdk/python/README.md), [pip version syntax](https://pip.pypa.io/en/stable/cli/pip_install/) |
+| Codex Python SDK | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/sdk/python/README.md), [pip version syntax](https://pip.pypa.io/en/stable/cli/pip_install/) |
 | QMD | 2.8.3 | [reviewed install source](https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md) |
 | semble | 0.6.1 | [reviewed install source](https://github.com/MinishLab/semble/blob/24497845460960db1839c8485319df189a889225/README.md) |
 | ColGREP | 1.7.0 | [reviewed install source](https://github.com/lightonai/next-plaid/blob/00e26aae0006b322727db277672211d9a0e3ccec/README.md) |
