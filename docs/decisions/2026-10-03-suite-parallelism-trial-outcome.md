@@ -52,16 +52,17 @@ artifacts as `preregistration-experiment.json.txt`) and
 
 ## What happened
 
-Run 37109532421 (attempt 1, event `pull_request`) ran all 18 ubuntu-24.04 jobs on runner image 20260927.320.1 with
-CPython 3.12.3, 4 CPUs and X64. Every timed run checked out the head, and the jobs API's test-step seconds equal each
-run's own `step_seconds`.
+Run 37109532421 (attempt 1, event `pull_request`) ran all 18 ubuntu-24.04 jobs; the 16 arm and control jobs recorded
+runner image 20260927.320.1, CPython 3.12.3, 4 CPUs and X64 in all 20 of their run directories (the inventory and
+compare jobs record none of these). Every timed run checked out the head, and the jobs API's test-step seconds equal
+each run's own `step_seconds`.
 
-| Arm | Test-step seconds (r1, r2, r3) | Median | Job seconds | Exit codes | Result records per run | Eligible runs |
+| Arm | Test-step seconds (r1, r2, r3) | Median | Job seconds | Exit codes | Ids with a result record, per run | Eligible runs |
 | --- | --- | --- | --- | --- | --- | --- |
 | S | 1,688, 1,659, 1,186 | 1,659 | 1,724, 1,705, 1,212 | 0, 0, 0 | 9,823 (`Ran 9823 tests`, `OK (skipped=967)`) | 3 of 3 |
 | L4 | 649, 438, 459 | 459 | 685, 466, 491 | 1, 1, 1 | 9,624, no `Ran` line | 0 of 3 |
 | L4F | 539, 692, 710 | 692 | 574, 725, 744 | 1, 1, 1 | 9,624, no `Ran` line | 0 of 3 |
-| L4C | 667, 659, 704 | 667 | 698, 688, 733 | 1, 1, 1 | 9,741, no `Ran` line | 0 of 3 |
+| L4C | 667, 659, 704 | 667 | 698, 688, 733 | 1, 1, 1 | 9,741, no `Ran` line (r3 has 9,743 records: the K4 timing test gave three subtest FAIL records) | 0 of 3 |
 
 - **Every parallel run crashed at the end.** All nine end with `TypeError: cannot pickle '_contextvars.Context' object`,
   raised from `results = pool.map(test_fn, test_suites, chunksize=1)` (`unittest_parallel/main.py` line 160 at the
@@ -81,6 +82,21 @@ run's own `step_seconds`.
 | `tests/test_adaptive_paper_transport.py` | 116: AsyncTransport 59, ConfiguredQuoteFeed 5, DataFeedSelection 5, HTTPBoundary 12, HaltFeedSeed 8, LeverageNormalizeAccountTests 4, Normalization 9, OrderContractBoundary 6, TradingStatusParsing 8 | 59: AsyncTransport |
 | `tests/test_adoption_version_probes.py` | 22: DeclaredProbeTests 3, LinuxReportUnderbash32Tests 4, LinuxReportUnderbashTests 4, MacosReportUnderbash32Tests 4, MacosReportUnderbashTests 4, ReportStructureTests 3 | 16: LinuxReportUnderbash32Tests, LinuxReportUnderbashTests, MacosReportUnderbash32Tests and MacosReportUnderbashTests, 4 each |
 | Total | 199 | 82 |
+
+- **What those ids did in S**, the same in each of the three S runs: at module level 90 were ok and 109 skipped (skip
+  reasons: "requires isolated reviewed alpaca-py runtime" for 92 ids, "requires pinned combined native runtime" for the
+  9 `MoverLaneFees` ids, "no bash 3.2 binary" for the 8 `bash32` ids), at class level 8 ok and 74 skipped. All 66
+  `IsolatedAsyncioTestCase` tests and the 8 `bash32` tests were among the skipped, so at class level unittest-parallel
+  lost only the 8 tests of `LinuxReportUnderbashTests` and `MacosReportUnderbashTests` that ran in S. How these tests
+  end on macOS is unknown (no macOS run). Per module, with the receipt's `data.missing_ids` holding the counts per
+  class:
+
+| Module | Module level: ok / skipped in S | Class level: ok / skipped in S |
+| --- | --- | --- |
+| `tests/test_adaptive_paper_fees.py` | 38 / 23; skipped: AdaptiveLaneFees 2, FeeCheckpoint 3, FeeHTTPBoundary 2, FeeSnapshot 7, MoverLaneFees 9 | 0 / 7 |
+| `tests/test_adaptive_paper_transport.py` | 38 / 78; skipped: AsyncTransport 59, ConfiguredQuoteFeed 5, DataFeedSelection 2, HTTPBoundary 12 | 0 / 59 |
+| `tests/test_adoption_version_probes.py` | 14 / 8; skipped: LinuxReportUnderbash32Tests 4, MacosReportUnderbash32Tests 4 | 8 / 8; ok: LinuxReportUnderbashTests 4, MacosReportUnderbashTests 4 |
+| Total | 90 / 109 | 8 / 74 |
 
 - **Other differences from S**, beyond the ids that never ran:
   - L4 (module level, pooled): none in 3 of 3 runs. Every test that ran matched its serial outcome, including
@@ -105,22 +121,24 @@ run's own `step_seconds`.
 ### The cancellation
 
 The coordinator cancelled the run at 09:12:40Z. This was the coordinator's decision, not part of the preregistered
-rule, which has no early stop. By then every ubuntu-24.04 job had succeeded; the last arm job, `arms-linux (3, S)`,
-finished at 09:12:25Z. None of the 20 macos-15 jobs (15 arm jobs and 5 control jobs) had received a runner in the
-49 minutes since they were created at 08:23:23-24Z; each reports zero steps. The `compare` job (`if: always()`) still
-ran from 09:12:42Z to 09:13:11Z and uploaded the official result. The decision is justified on three grounds:
+rule, which has no early stop. By then every ubuntu-24.04 arm, control and inventory job had succeeded; the last arm
+job, `arms-linux (3, S)`, finished at 09:12:25Z. None of the 20 macos-15 jobs (15 arm jobs and 5 control jobs) had
+received a runner in the 49 minutes since they were created at 08:23:23-24Z; each reports zero steps. The `compare`
+job (`if: always()`), created at 09:12:40Z, still ran from 09:12:42Z to 09:13:11Z and uploaded the official result.
+The decision is justified on three grounds:
 
 - **The failure is deterministic**: one exception, at the same line, in 9 of 9 parallel runs, with identical sets of ids
   that never ran in every run of a level.
 - **It does not depend on the platform**: every `IsolatedAsyncioTestCase` instance stores a `contextvars.Context` on
-  CPython 3.12.3 and on 3.13.16, the macOS arms' Python line, and pickling finds a class by its qualified name on every
-  platform. The local reproductions fail the same way on both versions. Every macOS parallel arm would have hit the same
+  CPython 3.12.3 and on 3.13.16 (the 3.13 line the macOS arms would have used through setup-python's `'3.13'`: 3.13.16
+  locally; the hosted patch release was never recorded), and pickling finds a class by its qualified name on every
+  platform. The toy reproductions fail the same way on both versions. Every macOS parallel arm would have hit the same
   three modules, so macOS could only end in reject or no verdict (an inference from these facts, not a macOS run).
 - **The shared macOS pool was held up**: from 08:23 to 09:12, five of this repository's macOS jobs (from Adoption
   bootstrap smoke runs, which carry the required `validate-macos` check) held runners in 46 of 50 sampled minutes, and
   never more than five. Had they started, the 20 trial jobs would have held those runners while other pull requests'
-  required checks waited, for an outcome already fixed on macOS. Other repositories that share the account's macOS
-  concurrency were not read.
+  required checks waited, for an outcome that, by the inference above, could only be reject or no verdict. Other
+  repositories that share the account's macOS concurrency were not read.
 
 No macOS job started, so no macOS attempt was voided or hidden, and macOS keeps the outcome no verdict.
 
@@ -135,10 +153,14 @@ three modules are byte-identical at the trial head and at this record's base.
   suite modules use the class: `FeeSnapshot(FeePrivacyCapture, unittest.IsolatedAsyncioTestCase)` at
   `tests/test_adaptive_paper_fees.py:295` (7 tests) and `AsyncTransport(unittest.IsolatedAsyncioTestCase)` at
   `tests/test_adaptive_paper_transport.py:478` (59 tests); no other test file at the trial head does. At module level each whole
-  module's suite fails to be sent (61 and 116 ids); at class level only those two classes do (7 and 59). Locally, a toy
-  module with one plain class and one `IsolatedAsyncioTestCase` class fails at module level and runs only its plain
-  class at class level, and a plain-only module passes, on CPython 3.12.3 and 3.13.16; the two real modules fail the
-  same way on 3.12.3.
+  module's suite fails to be sent (61 and 116 ids); at class level only those two classes do (7 and 59). This holds
+  although none of these 66 tests runs on ubuntu-24.04: all were skipped in every S run (both classes carry
+  `@unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")`). A class-level skip only marks the
+  class (`Lib/unittest/case.py:159-161` at v3.12.3), the loader builds one instance per test
+  (`Lib/unittest/loader.py:94`) and the skip applies only when a test runs (`case.py:612-617`), so every instance
+  holds its context before anything is skipped. Locally, a toy module with one plain class and one
+  `IsolatedAsyncioTestCase` class fails at module level and runs only its plain class at class level, and a plain-only
+  module passes, on CPython 3.12.3 and 3.13.16; the two real modules fail the same way on 3.12.3.
 - **(b) Four dynamically built classes are not importable under their qualified names.**
   `tests/test_adoption_version_probes.py:431-437` defines `behavior_case(platform_id, shell, label)`, which returns
   `unittest.skipUnless(shell, reason)(type(f"{platform_id.capitalize()}ReportUnder{label.replace(' ', '').replace('.', '')}Tests", (ReportBehaviorMixin, unittest.TestCase), {...}))`,
@@ -148,8 +170,11 @@ three modules are byte-identical at the trial head and at this record's base.
   pickler looks a class up by its `__qualname__` in its module (`Modules/_pickle.c` lines 3664 and 3697 at v3.12.3), so
   locally the run stops with
   `_pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed`
-  (lines 3700-3702). This is the same class of defect as the B1 wrapper that the trial branch fixed: classes that a
-  worker cannot find under the name pickle looks up.
+  (lines 3700-3702) on CPython 3.12.3; the coordinator saw the same at module level on 3.13.16, an output that is not
+  in the retained artifacts. On ubuntu-24.04 the two `bash32` classes (8 tests) were skipped in every S run (no bash 3.2
+  binary), and the two `bash` classes (8 tests) ran, ok: they are the only class-level missing ids that ran in S. This
+  is the same class of defect as the B1 wrapper that the trial branch fixed: classes that a worker cannot find under
+  the name pickle looks up.
 - **Why the runs went to the end and show one exception.** CPython's pool pickles each task in its task-handler thread
   (`Lib/multiprocessing/pool.py:540`), records a failure against the map (`:544`), keeps only the first exception
   (`:822`) and marks the map ready only once all jobs are done (`:826`). Every other suite therefore ran, and `get()`
@@ -166,9 +191,18 @@ pickling or spawned processes, and the default branch is two commits ahead of th
 
 ## What this attempt does not show
 
-- Anything about macOS: no macOS job ran.
+- Anything about macOS: no macOS job ran, so the serial outcome there of the tests that never ran is unknown too.
 - Whether a suite fixed under precondition (i) would meet the rule: the parallel seconds cover 9,624 or 9,741 of 9,823
-  tests and end in a crash, and the serial seconds of the missing tests are not measured.
+  tests and end in a crash, and the serial seconds of most missing tests are not measured. The `--durations 25` tables
+  list only each S run's 25 slowest tests, and the only missing ids they list are two in S-r3:
+  `MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs` (5.594 s) and
+  `LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs` (5.546 s). Most missing ids
+  were only skipped in S (109 of 199 at module level and 74 of 82 at class level; 90 and 8 were ok), all 66
+  `IsolatedAsyncioTestCase` tests among them: those two classes break unittest-parallel at pickling although their
+  tests only skip on ubuntu-24.04 (root cause (a)).
+- Speed beyond three runs per arm: each arm ran three times on shared hosted runners, so the medians, the extremes and
+  the ratios rest on n=3, and each slowest-over-fastest ratio divides by the single fastest S run (1,186 s) inside a
+  serial spread of 1,186 to 1,688 s. A new trial should set its repeat count with this noise in view.
 - The cause of the L4F error.
 - Whether the class-level K4 timing failures come from CPU load alone.
 - Anything about the alternatives listed below.
@@ -209,17 +243,24 @@ locally first). A new trial needs, in this order:
 ## Evidence class
 
 - **Native execution on GitHub-hosted ubuntu-24.04, receipt retained** (template class `native_proven`): the per-run
-  exit codes, test-step seconds, result records, ids that never ran, other differences, controls and the oracle's
-  verdicts. The controls are synthetic fixtures executed on the hosted runners.
+  exit codes, test-step seconds, result records, ids that never ran and their serial outcomes, other differences and
+  the oracle's verdicts.
+- **Synthetic fixtures executed on the hosted runners** (template class `synthetic`): the control and crash-control
+  results.
 - **Independent observation of platform records** (read-only `gh` REST GET calls on 2026-10-03): the run, job, step
   and artifact records, the jobs API's test-step seconds (equal to the runs' own) and the macOS queue count.
-- **Local integration**: the reproductions on CPython 3.12.3 and 3.13.16 with unittest-parallel 1.8.6 and coverage
-  7.16.2 on the local host.
+- **Local integration**: the reproductions with unittest-parallel 1.8.6 and coverage 7.16.2 on the local host: the toy
+  modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only and the order-throughput module on both.
 - **Source review** at pinned commits: unittest-parallel's `main.py` and README, its issue 27 and commit comparison,
-  PyPI's JSON, CPython's `async_case.py`, `pool.py` and `_pickle.c`, and GitHub's documentation of the paths filter.
+  PyPI's JSON, CPython's `async_case.py`, `case.py`, `loader.py`, `pool.py` and `_pickle.c`, and GitHub's
+  documentation of the paths filter.
 - **Computed**: the speed ratios, as exact fractions from the measured seconds.
 - **Unknown**: the cause of the L4F error.
 - **Coordinator decision**: the cancellation, recorded with the run and job records it rests on.
+- **Usage**: the hosted jobs ran deterministic commands and no model. Runner time is the per-job seconds in the
+  receipt's `data.jobs`, for the 18 ubuntu-24.04 jobs only (11,524 s in total); the 20 macOS jobs were never assigned a
+  runner. The model usage of the planning, build and review sessions is unknown: it is not recorded and not counted
+  as zero.
 
 Nothing here is an upstream test or upstream acceptance.
 
@@ -233,6 +274,7 @@ Nothing here is an upstream test or upstream acceptance.
   https://pypi.org/pypi/unittest-parallel/json (1.8.6, wheel sha256
   `7f04b0ada502f6b3d655ef49ea2a785f0e37869f9d0ce7a075c1a18ec204ac93`).
 - python/cpython at v3.12.3 (`f6650f9ad73359051f3e558c2431a109bc016664`): `Lib/unittest/async_case.py:35-38`,
+  `Lib/unittest/case.py:159-161`, `:176-182` and `:612-617`, `Lib/unittest/loader.py:94`,
   `Lib/multiprocessing/pool.py:367`, `:528-546`, `:774` and `:809-831`, `Modules/_pickle.c:3646-3704`; at v3.13.16
   (`cbc944f4bc59639a444dd971c737788ba2283a91`): `Lib/unittest/async_case.py:42`.
 - github/docs at `068546469ae7f079368d12f969991a045121c4a0`:

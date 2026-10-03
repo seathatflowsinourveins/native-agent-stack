@@ -2,14 +2,16 @@
   "schema_version": 1,
   "id": "suite-parallelism-trial-20261003",
   "kind": "compatibility_attempt",
-  "evidence_class": "Mixed and labelled per claim in data.evidence_classes. Native execution on GitHub-hosted ubuntu-24.04 with retained hashes and sanitized excerpts (template class native_proven) for the per-run exit codes, seconds, outcomes, controls and the oracle verdict; independent observation of platform records (read-only gh REST GET calls on 2026-10-03) for the job, step, artifact and macOS-queue records; local integration for the reproductions on CPython 3.12.3 and 3.13.16; source review for unittest-parallel, CPython and GitHub documentation at pinned commits. Not an upstream test, not a synthetic fixture and not acceptance of any change.",
+  "evidence_class": "Mixed and labelled per claim in data.evidence_classes. Native execution on GitHub-hosted ubuntu-24.04 with retained hashes and sanitized excerpts (template class native_proven) for the per-run exit codes, seconds, outcomes and the oracle verdict; synthetic fixtures executed on the hosted runner (template class synthetic) for the control and crash-control results; independent observation of platform records (read-only gh REST GET calls on 2026-10-03) for the job, step, artifact and macOS-queue records; local integration for the reproductions (the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only, the order-throughput module on both); source review for unittest-parallel, CPython and GitHub documentation at pinned commits. Not an upstream test and not acceptance of any change.",
   "kind_basis": "compatibility_attempt as docs/evidence.md defines it ('A new release was installed or executed with a recorded success/failure'; 'Failed attempts remain visible and cannot certify the active runtime'): unittest-parallel 1.8.6 was installed from a hash lock and executed against this repository's whole suite on hosted runners, and failed.",
-  "claim": "Hosted run 37109532421 (workflow 'Suite parallelism trial (draft pull request only)', the pull_request run of draft pull request #646 at head 1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de, run_attempt 1) executed the preregistered whole-suite comparison on GitHub-hosted ubuntu-24.04 (runner image 20260927.320.1, CPython 3.12.3, 4 CPUs, X64). The serial arm S (python3 -m unittest -v --durations 25) ran 9,823 tests, OK (skipped=967), exit 0, in all three runs, with test-step seconds 1,688, 1,659, 1,186. All nine unittest-parallel 1.8.6 runs exited 1 with TypeError: cannot pickle '_contextvars.Context' object, raised from pool.map at unittest_parallel/main.py line 160, and printed no 'Ran N tests' line: L4 (-j 4 --level module) 649, 438, 459 s, L4F (L4 plus --disable-process-pooling) 539, 692, 710 s, L4C (-j 4 --level class) 667, 659, 704 s. In every module-level run 199 inventory ids never ran, and 82 in every class-level run, all in tests/test_adaptive_paper_fees.py, tests/test_adaptive_paper_transport.py and tests/test_adoption_version_probes.py. The frozen oracle (compare.py) marked all nine runs ineligible and gave ubuntu-24.04 the outcome reject (no parallel arm is eligible); every control and crash control passed, the base-to-trial id mapping was ok and every checkout stayed clean. The coordinator cancelled the run at 2026-10-03T09:12:40Z, 15 s after the last Linux arm job finished; none of the 20 macos-15 jobs had received a runner, so macos-15 has no verdict and nothing was measured on macOS. Local reproductions on CPython 3.12.3 and 3.13.16 show two causes: unittest.IsolatedAsyncioTestCase instances hold a contextvars.Context, which cannot be pickled, and four dynamically built TestCase classes cannot be found under their qualified names. unittest-parallel 1.8.6 is not adopted.",
+  "claim": "Hosted run 37109532421 (workflow 'Suite parallelism trial (draft pull request only)', the pull_request run of draft pull request #646 at head 1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de, run_attempt 1) executed the preregistered whole-suite comparison on GitHub-hosted ubuntu-24.04 (runner image 20260927.320.1, CPython 3.12.3, 4 CPUs, X64). The serial arm S (python3 -m unittest -v --durations 25) ran 9,823 tests, OK (skipped=967), exit 0, in all three runs, with test-step seconds 1,688, 1,659, 1,186. All nine unittest-parallel 1.8.6 runs exited 1 with TypeError: cannot pickle '_contextvars.Context' object, raised from pool.map at unittest_parallel/main.py line 160, and printed no 'Ran N tests' line: L4 (-j 4 --level module) 649, 438, 459 s, L4F (L4 plus --disable-process-pooling) 539, 692, 710 s, L4C (-j 4 --level class) 667, 659, 704 s. In every module-level run 199 inventory ids never ran, and 82 in every class-level run, all in tests/test_adaptive_paper_fees.py, tests/test_adaptive_paper_transport.py and tests/test_adoption_version_probes.py; in the serial runs 90 of the 199 and 8 of the 82 were ok and the rest skipped. The frozen oracle (compare.py) marked all nine runs ineligible and gave ubuntu-24.04 the outcome reject (no parallel arm is eligible); every control and crash control (synthetic fixtures executed on the hosted runner) passed, the base-to-trial id mapping was ok and every checkout stayed clean. The coordinator cancelled the run at 2026-10-03T09:12:40Z, 15 s after the last Linux arm job finished; none of the 20 macos-15 jobs had received a runner, so macos-15 has no verdict and nothing was measured on macOS. Local reproductions (the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3) show two causes: unittest.IsolatedAsyncioTestCase instances hold a contextvars.Context, which cannot be pickled (on this runner all 66 such tests were skipped in every serial run, and their suites still could not be sent), and four dynamically built TestCase classes cannot be found under their qualified names. unittest-parallel 1.8.6 is not adopted.",
   "limitations": [
     "Only ubuntu-24.04 ran. The 20 macos-15 jobs never received a runner (zero steps), so this receipt shows nothing about macOS timing, macOS correctness or a macOS verdict.",
-    "Every parallel run crashed before its summary. Its seconds cover the tests that ran (9,624 result records in each L4 and L4F run, 9,741 in each L4C run, of 9,823) and the crash, not a complete suite; the serial seconds of the missing tests were not measured. The speed ratios are therefore not a whole-suite speed result.",
+    "Every parallel run crashed before its summary. Its seconds cover the tests that ran (9,624 ids with a result record in each L4 and L4F run and 9,741 in each L4C run, of 9,823; L4C-r3 has 9,743 records for its 9,741 ids because tests.test_secret_path_guard.K4GuardTests.test_k4_timing produced three subtest FAIL records there) and the crash, not a complete suite. The serial seconds of most missing tests were not measured: the --durations 25 tables list only each S run's 25 slowest tests, and the only missing ids they list are two in S-r3 (tests.test_adoption_version_probes.MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs, 5.594 s, and tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs, 5.546 s). The speed ratios are therefore not a whole-suite speed result.",
+    "Most ids that never ran under unittest-parallel were skipped in the serial runs on ubuntu-24.04: at module level 90 of the 199 were ok and 109 skipped, at class level 8 of the 82 were ok and 74 skipped, identically in all three S runs (per class in data.missing_ids). All 66 IsolatedAsyncioTestCase tests (FeeSnapshot 7, AsyncTransport 59) and the 8 bash32 tests were among the skipped, so the two async classes break unittest-parallel at pickling although none of their tests runs on this runner: IsolatedAsyncioTestCase.__init__ stores contextvars.copy_context() when the loader builds each instance, and a class-level skip applies only when the test runs (data.root_causes.async_test_cases). The serial outcome of these tests on macOS is unknown: no macOS job ran.",
     "The speed ratios inside the preregistered bounds (median at most 0.60 of S's median and slowest at most 0.75 of S's fastest) hold for all three parallel arms (L4 0.2767 and 0.5472; L4F 0.4171 and 0.5987; L4C 0.4020 and 0.5936), but no arm is eligible, so they are not an adoption claim.",
     "The serial baseline varied on one runner type and image: S test steps of 1,186 to 1,688 s (jobs of 1,212 to 1,724 s). The cause of that spread is not known.",
+    "Each arm ran three times on shared hosted runners, so its median and extremes, and therefore the speed ratios, rest on n=3, and each max-over-fastest ratio divides by the single fastest S run (1,186 s) inside a serial spread of 1,186 to 1,688 s. The preregistration recorded that three repeats bound runner noise but do not remove it; a new trial should set its repeat count with this noise in view.",
     "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network was ERROR in 3 of 3 L4F runs and ok in all S, L4 and L4C runs. Its cause is not known: unittest-parallel prints its error report only after pool.map returns (main.py:193-211 at bda5d77), so the crash suppressed the traceback. The module alone passes locally (Ran 76 tests, OK (skipped=1)) both serially and unpooled under unittest-parallel on CPython 3.12.3 and 3.13.16.",
     "tests.test_secret_path_guard.K4GuardTests.test_k4_timing failed in 3 of 3 L4C runs, on different subtests each time, and passed in all 3 S runs and all 6 module-level runs (L4 and L4F, each with 4 workers). It is the slowest serial test (30.7 to 60.0 s). Whether the class-level failures come from CPU contention alone is not shown.",
     "The hosted logs show only one exception per run, the TypeError, because CPython's MapResult keeps only the first exception of a map (Lib/multiprocessing/pool.py:822 at v3.12.3). The PicklingError of the four dynamic classes in tests/test_adoption_version_probes.py was reproduced locally; its hosted effect is inferred from the missing ids (exactly those four classes at class level).",
@@ -17,7 +19,8 @@
     "The cancellation was the coordinator's decision, not part of the preregistered rule. No macOS job had started, so no macOS attempt was voided or hidden. The macOS queue observation counts this repository's macOS jobs only; other repositories that draw on the same account's macOS concurrency were not read.",
     "Sanitization: runner paths in the retained excerpts became <workspace> and <runner-home>, and local paths in the local reproductions became <venv-3.12.3>, <venv-3.13.16>, <cpython-3.12.3> and <cpython-3.13.16>. summary.md, checkout-status.json and the preregistered experiment record are byte copies.",
     "The preregistration asked for an observed record (native_cli_execution observations) beside its experiment.json. That directory exists only on the unmerged trial branch, so this receipt and its decision record carry the same per-run data instead, and the preregistered experiment record is kept as preregistration-experiment.json.txt so that no validator reads it as a live convergence record.",
-    "The local reproductions ran on this worker's WSL2 host in existing virtual environments with unittest-parallel 1.8.6 and coverage 7.16.2 (local integration evidence), not on a hosted runner."
+    "The local reproductions ran on this worker's WSL2 host in existing virtual environments with unittest-parallel 1.8.6 and coverage 7.16.2 (local integration evidence), not on a hosted runner: the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only and the order-throughput module on both. The coordinator also saw the version-probes PicklingError on 3.13.16; that output is not in the retained artifacts.",
+    "Usage: the hosted jobs ran deterministic commands and no model. Runner time is the per-job seconds in data.jobs (job_seconds), for the 18 ubuntu-24.04 jobs only, 11,524 s in total; the 20 macos-15 jobs were never assigned a runner. The model usage of the planning, build and review sessions is unknown: it is not recorded here and is not counted as zero (data.usage)."
   ],
   "scope": "The preregistered suite-parallelism trial of draft pull request #646 (head 1e4bb5ab) on GitHub-hosted ubuntu-24.04 only: run 37109532421, attempt 1. No macOS evidence, no adoption, no private-repository data and no billing figures.",
   "source": {
@@ -108,7 +111,7 @@
       "compare_job": "the compare job (if: always()) ran 09:12:42Z to 09:13:11Z and uploaded result.json, summary.md and checkout-status.json",
       "reasons": [
         "the failure is deterministic: one exception, at the same line, in 9 of 9 parallel runs, with identical sets of ids that never ran in every run of a level",
-        "it does not depend on the platform: IsolatedAsyncioTestCase holds a contextvars.Context on CPython 3.12.3 and 3.13.16 (the macOS arms' line), and pickling looks a class up by its qualified name on every platform; the local reproductions fail the same way on both versions, so every macOS parallel arm would hit the same three modules and macOS could only end in reject or no verdict (an inference, not a macOS run)",
+        "it does not depend on the platform: IsolatedAsyncioTestCase holds a contextvars.Context on CPython 3.12.3 and 3.13.16 (the 3.13 line the macOS arms would have used through setup-python's '3.13'; 3.13.16 is the local interpreter, and the hosted patch release was never recorded), and pickling looks a class up by its qualified name on every platform; the toy reproductions fail the same way on both versions, so every macOS parallel arm would hit the same three modules and macOS could only end in reject or no verdict (an inference, not a macOS run)",
         "the shared macOS pool was held up: five of this repository's macOS jobs held runners in 46 of 50 sampled minutes (macos_queue_observation); had they started, the 20 trial jobs would have held runners while other pull requests' required checks waited"
       ],
       "macos_queue_observation": {
@@ -925,6 +928,128 @@
             "MacosReportUnderbashTests": 4,
             "ReportStructureTests": 3
           }
+        },
+        "s_outcome_totals": {
+          "ok": 90,
+          "skipped": 109
+        },
+        "s_outcome_by_module": {
+          "tests.test_adaptive_paper_fees": {
+            "ok": 38,
+            "skipped": 23
+          },
+          "tests.test_adaptive_paper_transport": {
+            "ok": 38,
+            "skipped": 78
+          },
+          "tests.test_adoption_version_probes": {
+            "ok": 14,
+            "skipped": 8
+          }
+        },
+        "s_outcome_by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "AdaptiveLaneFees": {
+              "ok": 7,
+              "skipped": 2
+            },
+            "FeeCheckpoint": {
+              "ok": 0,
+              "skipped": 3
+            },
+            "FeeHTTPBoundary": {
+              "ok": 0,
+              "skipped": 2
+            },
+            "FeeLedger": {
+              "ok": 16,
+              "skipped": 0
+            },
+            "FeeNormalization": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "FeeReconciliation": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "FeeSnapshot": {
+              "ok": 0,
+              "skipped": 7
+            },
+            "MoverFeeHelpers": {
+              "ok": 3,
+              "skipped": 0
+            },
+            "MoverLaneFees": {
+              "ok": 0,
+              "skipped": 9
+            }
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": {
+              "ok": 0,
+              "skipped": 59
+            },
+            "ConfiguredQuoteFeed": {
+              "ok": 0,
+              "skipped": 5
+            },
+            "DataFeedSelection": {
+              "ok": 3,
+              "skipped": 2
+            },
+            "HTTPBoundary": {
+              "ok": 0,
+              "skipped": 12
+            },
+            "HaltFeedSeed": {
+              "ok": 8,
+              "skipped": 0
+            },
+            "LeverageNormalizeAccountTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "Normalization": {
+              "ok": 9,
+              "skipped": 0
+            },
+            "OrderContractBoundary": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "TradingStatusParsing": {
+              "ok": 8,
+              "skipped": 0
+            }
+          },
+          "tests.test_adoption_version_probes": {
+            "DeclaredProbeTests": {
+              "ok": 3,
+              "skipped": 0
+            },
+            "LinuxReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "LinuxReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "MacosReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "MacosReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "ReportStructureTests": {
+              "ok": 3,
+              "skipped": 0
+            }
+          }
         }
       },
       "class_level (L4C, each of 3 runs)": {
@@ -947,6 +1072,65 @@
             "MacosReportUnderbash32Tests": 4,
             "MacosReportUnderbashTests": 4
           }
+        },
+        "s_outcome_totals": {
+          "ok": 8,
+          "skipped": 74
+        },
+        "s_outcome_by_module": {
+          "tests.test_adaptive_paper_fees": {
+            "ok": 0,
+            "skipped": 7
+          },
+          "tests.test_adaptive_paper_transport": {
+            "ok": 0,
+            "skipped": 59
+          },
+          "tests.test_adoption_version_probes": {
+            "ok": 8,
+            "skipped": 8
+          }
+        },
+        "s_outcome_by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "FeeSnapshot": {
+              "ok": 0,
+              "skipped": 7
+            }
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": {
+              "ok": 0,
+              "skipped": 59
+            }
+          },
+          "tests.test_adoption_version_probes": {
+            "LinuxReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "LinuxReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "MacosReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "MacosReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            }
+          }
+        }
+      },
+      "s_outcome_source": "each missing id's outcome in each of the three S runs, parsed from the S logs: identical in all three runs, and equal to the S side of result.json's mismatch records for that id (564 ok and 876 skipped records over the nine parallel runs: 90 x 6 + 8 x 3 and 109 x 6 + 74 x 3). Skip reasons at module level, the same in all three S runs: 'requires isolated reviewed alpaca-py runtime' for 92 ids (both IsolatedAsyncioTestCase classes among them), 'requires pinned combined native runtime' for the 9 MoverLaneFees ids and 'no bash 3.2 binary (set BASH32_BINARY, or run on a Mac)' for the 8 bash32 ids. The serial outcome of these ids on macOS is unknown (no macOS run).",
+      "listed_in_s_durations_tables": {
+        "ubuntu-24.04-S-r1": {},
+        "ubuntu-24.04-S-r2": {},
+        "ubuntu-24.04-S-r3": {
+          "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs": 5.594,
+          "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs": 5.546
         }
       }
     },
@@ -1112,14 +1296,16 @@
         },
         "only_users": "these two files are the only test files that use IsolatedAsyncioTestCase at the trial head (rg over tests/)",
         "mechanism": "unittest-parallel sends each suite of live TestCase instances to a spawned worker by pickling it; an IsolatedAsyncioTestCase instance holds a contextvars.Context, which cannot be pickled, so a module suite (or, at class level, a class suite) that contains one is never sent and its tests never run",
-        "evidence": "hosted: the TypeError ends all nine parallel runs, and at class level exactly FeeSnapshot (7) and AsyncTransport (59) are missing from these two modules; local: a toy module with one plain and one IsolatedAsyncioTestCase class fails at module level and runs only its plain class at class level, and a plain-only module passes, on CPython 3.12.3 and 3.13.16; source: async_case.py and pool.py as cited"
+        "evidence": "hosted: the TypeError ends all nine parallel runs, and at class level exactly FeeSnapshot (7) and AsyncTransport (59) are missing from these two modules; local: a toy module with one plain and one IsolatedAsyncioTestCase class fails at module level and runs only its plain class at class level, and a plain-only module passes, on CPython 3.12.3 and 3.13.16; the two real modules fail the same way on CPython 3.12.3 (at class level all but these two classes report results); source: async_case.py and pool.py as cited",
+        "skipped_on_ubuntu": "all 66 tests were skipped in every S run ('requires isolated reviewed alpaca-py runtime'; both classes carry @unittest.skipUnless(HAS_SDK, ...)), yet their suites could not be sent: a class-level skip only marks the class (Lib/unittest/case.py:159-161 at v3.12.3), the loader builds one instance per test name (Lib/unittest/loader.py:94) and the skip applies only when a test runs (case.py:612-617), so every instance already holds its context when unittest-parallel pickles the suite. Their serial outcome on macOS is unknown (no macOS run)."
       },
       "dynamic_classes": {
         "module": "tests/test_adoption_version_probes.py",
         "construction": "behavior_case(platform_id, shell, label) (lines 431-437) returns unittest.skipUnless(shell, reason)(type(f\"{platform_id.capitalize()}ReportUnder{label.replace(' ', '').replace('.', '')}Tests\", (ReportBehaviorMixin, unittest.TestCase), {...})); lines 440-443 bind the results as LinuxReportUnderBashTests, MacosReportUnderBashTests, LinuxReportUnderBash32Tests and MacosReportUnderBash32Tests",
         "mismatch": "type() gives each class the __qualname__ LinuxReportUnderbashTests, MacosReportUnderbashTests, LinuxReportUnderbash32Tests or MacosReportUnderbash32Tests (lower-case 'bash' from the label), and the module has no attribute of that name, so pickling looks the class up under a name that does not exist",
         "tests": "4 classes with 4 tests each (16); the module's other two classes, DeclaredProbeTests (3) and ReportStructureTests (3), are importable",
-        "evidence": "local: _pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed (module level and class level, CPython 3.12.3; the coordinator saw the same on 3.13.16); hosted: masked by the first exception, inferred from the missing ids",
+        "evidence": "local: _pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed (module level and class level, CPython 3.12.3; the coordinator saw the same at module level on 3.13.16, an output that is not in the retained artifacts); hosted: masked by the first exception, inferred from the missing ids",
+        "s_outcome": "LinuxReportUnderbashTests and MacosReportUnderbashTests (8 tests) were ok in every S run, and LinuxReportUnderbash32Tests and MacosReportUnderbash32Tests (8 tests) were skipped ('no bash 3.2 binary (set BASH32_BINARY, or run on a Mac)'); at class level those 8 ok tests are the only missing ids that ran in S. Their serial outcome on macOS is unknown (no macOS run).",
         "related": "the same class of defect as the B1 wrapper fixed on the trial branch (classes not importable under the name pickle looks up)"
       }
     },
@@ -1414,6 +1600,11 @@
           "fact": "IsolatedAsyncioTestCase.__init__ stores self._asyncioTestContext = contextvars.copy_context() (line 38 at v3.12.3, line 42 at v3.13.16), so every instance holds a _contextvars.Context",
           "local_install_identity": "the local CPython 3.12.3 and 3.13.16 async_case.py files are byte-identical to these two upstream files (cmp)"
         },
+        "unittest_skip_and_loader": {
+          "case_py": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/case.py#L148-L182",
+          "loader_py": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/loader.py#L81-L95",
+          "fact": "skipUnless(condition, reason) returns skip(reason) when the condition is false (case.py:176-182); on a class, skip's decorator only sets __unittest_skip__ and __unittest_skip_why__ and returns the class (159-161); TestCase.run checks those attributes and adds the skip when the test runs (612-617); loadTestsFromTestCase builds one instance per test name, self.suiteClass(map(testCaseClass, testCaseNames)) (loader.py:94). Read with gh api --method GET at the pin on 2026-10-03."
+        },
         "pool": {
           "url": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/multiprocessing/pool.py#L528-L546",
           "fact": "_handle_tasks pickles each task in put(task) (540); an exception is stored through cache[job]._set(idx, (False, e)) (544); MapResult._set keeps only the first exception (822) and marks the result ready only once all jobs are done (826); get() raises it (774); map is line 367. The same line numbers hold at v3.13.16.",
@@ -1430,16 +1621,24 @@
       }
     },
     "evidence_classes": {
-      "per-run exit codes, step seconds, outcomes, missing ids, mismatches, controls, oracle verdict": "native execution on GitHub-hosted ubuntu-24.04, retained as hashes and sanitized excerpts (native_proven)",
+      "per-run exit codes, step seconds, outcomes, missing ids and their serial outcomes, mismatches, oracle verdict": "native execution on GitHub-hosted ubuntu-24.04, retained as hashes and sanitized excerpts (native_proven)",
+      "control and crash-control results": "synthetic fixtures executed on the hosted runner (template class synthetic): an injected controls file and an os._exit(3) crash file, frozen at the trial head with their expected results (control_expectations.json, sha256 in data.trial.oracle) and run alone under each arm's command; full logs retained, sanitized, in control-logs.txt",
       "job, step, artifact and run records; macOS queue concurrency": "independent observation of platform records, read-only gh REST GET on 2026-10-03 (nearest template class source_review)",
       "jobs API test-step seconds equal meta.json step_seconds for all 12 timed runs": "independent observation cross-checked against the native artifact",
       "speed ratios": "computed from the measured seconds (exact fractions, as compare.py)",
-      "root cause (a), IsolatedAsyncioTestCase": "local_integration (toy and real modules, CPython 3.12.3 and 3.13.16) plus source_review (async_case.py, pool.py) plus the hosted missing-id pattern",
+      "root cause (a), IsolatedAsyncioTestCase": "local_integration (the toy modules on CPython 3.12.3 and 3.13.16, the two real modules on 3.12.3 only) plus source_review (async_case.py, case.py, loader.py, pool.py) plus the hosted missing-id pattern and the serial skips",
       "root cause (b), dynamic classes": "local_integration (real module, CPython 3.12.3) plus source_review (Modules/_pickle.c); hosted effect inferred from the missing ids",
       "L4F order-throughput error cause": "unknown",
       "K4 timing failures at class level": "native execution (observed); cause not established",
       "unittest-parallel upstream facts, PyPI, CPython lines, GitHub docs": "source_review at the pins named in data.upstream",
-      "cancellation reasons": "coordinator decision, recorded with the run and job records it rests on"
+      "cancellation reasons": "coordinator decision, recorded with the run and job records it rests on",
+      "usage": "data.usage: hosted job seconds from the jobs API; model usage unknown"
+    },
+    "usage": {
+      "hosted_jobs": "deterministic commands only; no model ran in any hosted job",
+      "runner_time": "the per-job seconds in data.jobs (job_seconds, from the jobs API's started_at and completed_at): the 18 ubuntu-24.04 jobs only, 11,524 s in total; the 20 macos-15 jobs were never assigned a runner (zero steps)",
+      "ubuntu_24_04_job_seconds_total": 11524,
+      "model_usage": "the model usage of the planning, build and review sessions is unknown: it is not recorded here and is not counted as zero"
     },
     "jobs": [
       {
@@ -2863,8 +3062,8 @@
     },
     "retained_files": {
       "evidence/artifacts/suite-parallelism-trial-20261003/README.md": {
-        "sha256": "e7cdd22b014d97c1ea3eb36bcfd8f48d4bdcaa0440fde398e67f11a7afc8a14a",
-        "bytes": 2891
+        "sha256": "750e5f8b4a0563edd966b5a0994e83099b0b7ed17539895555580580a1687ba5",
+        "bytes": 3190
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/checkout-status.json": {
         "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
@@ -2899,8 +3098,8 @@
         "bytes": 43208
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/result-trimmed.json": {
-        "sha256": "8009814505a55a7778fbf5e7424350c4cd86595f59d513b559a56ba455dca697",
-        "bytes": 67627
+        "sha256": "be82af38a075959f7a21d96e326e7f076abfaba283ed761603438e7342df332d",
+        "bytes": 71682
       },
       "evidence/artifacts/suite-parallelism-trial-20261003/serial-durations-S.txt": {
         "sha256": "2a802072a19bf06adbc9ca9781bbd03d6c0adb5cf43d94ecd89b80a0da960c47",

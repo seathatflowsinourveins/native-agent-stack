@@ -15,7 +15,7 @@
       "controls",
       "verdicts"
     ],
-    "runs": "Every field of every run is kept except three lists: notes (52 log-parser notes per serial run, kept only as notes_total), missing_ids (replaced by missing_id_set, which names one of the two lists below; the build asserts equality) and mismatches (only the records whose id is not a missing id are kept, as mismatches_not_missing; every missing id's record has an empty arm side)."
+    "runs": "Every field of every run is kept except three lists: notes (52 log-parser notes per serial run, kept only as notes_total), missing_ids (replaced by missing_id_set, which names one of the two lists below; the build asserts equality) and mismatches (only the records whose id is not a missing id are kept, as mismatches_not_missing; every missing id's record has an empty arm side, and its S side, the id's outcome in the reference S run, is kept as counts in missing_id_sets, s_outcome_totals and s_outcome_by_class per level: the same in every run of a level and equal to the id's outcome in each of the three S logs)."
   },
   "decision_rule": {
     "eligibility": "every run of the arm is eligible under both oracle parts (part 1: zero mismatches against S outside flaky ids, the exact preregistered command, run_attempt 1 recorded in runtime.json; part 2: an existing, empty git-status.txt), at least 3 runs, and its controls and crash control passed on that OS (their run directories under the same two parts)",
@@ -571,7 +571,109 @@
         "tests.test_adoption_version_probes.ReportStructureTests.test_cleanup_stops_an_interrupted_probe_in_both_scripts",
         "tests.test_adoption_version_probes.ReportStructureTests.test_no_script_runs_a_flag_against_every_bin_dir_entry",
         "tests.test_adoption_version_probes.ReportStructureTests.test_the_report_step_is_identical_in_both_scripts"
-      ]
+      ],
+      "s_outcome_totals": {
+        "ok": 90,
+        "skipped": 109
+      },
+      "s_outcome_by_class": {
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees": {
+          "ok": 7,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_fees.FeeCheckpoint": {
+          "ok": 0,
+          "skipped": 3
+        },
+        "tests.test_adaptive_paper_fees.FeeHTTPBoundary": {
+          "ok": 0,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_fees.FeeLedger": {
+          "ok": 16,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeNormalization": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeReconciliation": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeSnapshot": {
+          "ok": 0,
+          "skipped": 7
+        },
+        "tests.test_adaptive_paper_fees.MoverFeeHelpers": {
+          "ok": 3,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.MoverLaneFees": {
+          "ok": 0,
+          "skipped": 9
+        },
+        "tests.test_adaptive_paper_transport.AsyncTransport": {
+          "ok": 0,
+          "skipped": 59
+        },
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed": {
+          "ok": 0,
+          "skipped": 5
+        },
+        "tests.test_adaptive_paper_transport.DataFeedSelection": {
+          "ok": 3,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_transport.HTTPBoundary": {
+          "ok": 0,
+          "skipped": 12
+        },
+        "tests.test_adaptive_paper_transport.HaltFeedSeed": {
+          "ok": 8,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.Normalization": {
+          "ok": 9,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.OrderContractBoundary": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.TradingStatusParsing": {
+          "ok": 8,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.DeclaredProbeTests": {
+          "ok": 3,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.ReportStructureTests": {
+          "ok": 3,
+          "skipped": 0
+        }
+      }
     },
     "class_level": {
       "arms": [
@@ -586,7 +688,37 @@
         "tests.test_adoption_version_probes.MacosReportUnderbash32Tests",
         "tests.test_adoption_version_probes.MacosReportUnderbashTests"
       ],
-      "rule": "every module_level id whose module and class prefix is one of these classes"
+      "rule": "every module_level id whose module and class prefix is one of these classes",
+      "s_outcome_totals": {
+        "ok": 8,
+        "skipped": 74
+      },
+      "s_outcome_by_class": {
+        "tests.test_adaptive_paper_fees.FeeSnapshot": {
+          "ok": 0,
+          "skipped": 7
+        },
+        "tests.test_adaptive_paper_transport.AsyncTransport": {
+          "ok": 0,
+          "skipped": 59
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        }
+      }
     }
   },
   "runs": [
