@@ -38747,6 +38747,11 @@
       "bytes": 5702
     },
     {
+      "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation-final-bytes.json",
+      "sha256": "147ba86f3aa68354193872213065e81a6162896a01e684cc1038b2a53d002f08",
+      "bytes": 2096
+    },
+    {
       "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/coordinator-shell-observation.json",
       "sha256": "acabe8d2ee66340a99f1d7c3e39d2e99a31c6411c886738bd4c354bedc42c9c6",
       "bytes": 1472
@@ -48148,8 +48153,8 @@
     },
     {
       "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json",
-      "sha256": "ab0473fbc596af6256fb55175eacbf92b37f523a44b13cce3eab2e61fe90be92",
-      "bytes": 148481
+      "sha256": "9ad1db0b9e841cd780d04e544f6e75dde57fd88ebc6fc4f5b0bafd84287f20da",
+      "bytes": 149558
     },
     {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
