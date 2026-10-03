@@ -15973,6 +15973,11 @@
       "bytes": 25043
     },
     {
+      "path": "docs/decisions/2026-10-03-retire-pr-392-mac-token-receipts.md",
+      "sha256": "2c73507dea5faf517e4068b7a6efad57483250e0eb51f3dcba781d4fd922dfe9",
+      "bytes": 16044
+    },
+    {
       "path": "docs/decisions/2026-10-03-retire-pr320-loki-denominator-host-receipts.md",
       "sha256": "9751296fedcb316b2a44bf0c09b6886fe32b7daaaaa30d1ec4d226ac35c158c3",
       "bytes": 19619
