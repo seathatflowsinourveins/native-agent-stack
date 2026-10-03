@@ -237,7 +237,7 @@
     "Sanitized native canary stdout/stderr, CLI events/last message and their hashes are retained. SDK caller exit codes 0 are coordinator-verified, not fields in the supplied facts. Gateway backend billed usage and monetary cost remain unrecorded.",
     "Original process start/end times and SDK outer executable/cwd are unrecorded. Source mtimes are filesystem observations only. The native heredoc is reconstructed from facts and the retained gateway example, not attested as the original source.",
     "SDK last and total usage snapshots match for each canary and must be counted once; cached input and reasoning output are subsets, not additional tokens.",
-    "No unchanged upstream test suite, shared daemon restart, cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here.",
+    "No unchanged upstream test suite, shared daemon restart, whole-system cleanup/recovery acceptance, package signature or provenance attestation verification is recorded here. The separate A4 bootstrap record retains local migration/publication fault injection and an isolated native installation.",
     "The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the prior 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md).",
     "This repository change records existing coordinator qualification; it performs no new model run or shared-host switch.",
     "The CLI script prints the inner Codex exit but does not propagate it as its own final shell exit; the recorded inner exit 0 is supported by the coordinator facts and completed native events."
@@ -306,5 +306,6 @@
       "Unchanged upstream suite and recovery/lifecycle acceptance"
     ],
     "consequence": "Compatibility evidence is retained without promoting incomplete provenance to native_cli_e2e."
-  }
+  },
+  "linux_bootstrap_security_repair_ref": "evidence/artifacts/runtime-sdk-20261003/linux-bootstrap-a4/receipt.json"
 }

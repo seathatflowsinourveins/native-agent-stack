@@ -948,10 +948,14 @@ class NpmIgnoreScriptsTests(unittest.TestCase):
         pin = {key: value for key, value in pin.items() if value is not None}
         with tempfile.TemporaryDirectory() as tmp:
             result, urls, npm_calls, uv_calls, eco = run_install_pin(self, Path(tmp), pin, self.ARCHIVE)
+            # install_npm passes the versioned prefix canonicalized (canonical_path: os.path.realpath)
+            # and the downloaded archive as given, so under a symlinked temporary directory, such as
+            # macOS /var -> /private/var, only the prefix appears resolved in npm's argv.
+            canonical_eco = Path(os.path.realpath(eco))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual((urls, uv_calls), ([pin["url"]], []))
         self.assertEqual(len(npm_calls), 1, npm_calls)
-        prefix = eco / f"tools/{pin['id']}-{pin['version']}"
+        prefix = canonical_eco / f"tools/{pin['id']}-{pin['version']}"
         archive = eco / f"downloads/{pin['id']}-{pin['version']}.tgz"
         return npm_calls[0], ["install", "--global", "--no-audit", "--no-fund", "--prefix", str(prefix)], str(archive)
 
