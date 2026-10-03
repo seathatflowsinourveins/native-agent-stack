@@ -1,0 +1,668 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native_image_input_snapshot_and_source_bound_recipe",
+  "source_head": "5763decc92a5000460431f1a0edf91f11de914e8",
+  "status": "CONCRETE_INPUT_SNAPSHOT_PENDING_ROOT_ASTRA_ACCEPTANCE",
+  "scope": "ONE image-only readiness task. Source checkout, read-only native endpoint/registry metadata, unchanged-asset transfer and native Compose print/config only. No builder, image build, task trial, provider or model execution.",
+  "review_basis": {
+    "trigger": "Consequential image lifecycle/source binding; root relayed Astra's requirement for one endpoint, stopped-main/default-network ownership, whole-command cleanup supervision and amd64 driver child identity.",
+    "acceptance": "Prior proposal was conditionally accepted as a source lead only. This concrete snapshot and its new lifecycle parameters require root/Astra original-source review before activation.",
+    "prior_amendment_lead": {
+      "bytes": 28780,
+      "sha256": "5b58864aba598b25b1721b37faf5241b833d3056708313d09838fa7783bf2942"
+    },
+    "exact_remaining_gate": "Root/Astra acceptance of this exact snapshot and private native-argv packet, including sourced daemon flags and 120s/+10 cleanup and 30s/+10 observation choices. All activation and executed build/output/cleanup acceptance remain HOLD."
+  },
+  "inherited_records": {
+    "original_preregistration": {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-readiness-preregister.json",
+      "bytes": 18304,
+      "sha256": "26780082f3cbe27e38bef322880775aa157a422f90edb3a8b4f4802c56837d46",
+      "changed": false
+    },
+    "current_amendment": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-owned-builder-amendment.json",
+    "parent_native_identity": {
+      "private_custody": true,
+      "logical_filename": "coding-parent-native-identity.json",
+      "bytes": 4092,
+      "sha256": "1bd92851efd6f6b409bec29660912a3bc2b4c511e8ce80f279482366598e8791",
+      "observation": "Root registry-only parent identity; independently re-read source record. Not a build."
+    }
+  },
+  "immutable_task": {
+    "repository": "laude-institute/harbor-datasets",
+    "commit": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "task_id": "django__django-14034",
+    "path": "datasets/swebench-verified/django__django-14034",
+    "task_tree": "4c5cb0cbeae063509d74b57d5d409911db37fe45",
+    "environment_tree": "3d6176918b64535451cc87c18efb75cda2108efd",
+    "task_toml_sha256": "89760344f93862da427f7f5e9a443cb4cdbc04c75522a8f40e49acff3f0bc1b1",
+    "budgets_seconds": {
+      "build": 1800,
+      "agent": 3000,
+      "verifier": 3000
+    },
+    "build_context_inventory": [
+      {
+        "path": "Dockerfile",
+        "git_mode": "100644",
+        "git_blob": "6c72ad9da8b0038630310094576514b7e9ac0515",
+        "bytes": 2059,
+        "sha256": "42f8fa6f8b44f70bbf34b4c943eb10f35344776258f96c3a59321755d6c1cf66"
+      }
+    ],
+    "native_checkout_head_and_scoped_diff": {
+      "head_exit": 0,
+      "head_sha256": "333ff96f829eb54900a3b7c5691827e5a19ee90356fe3a0e215d184aa0f8d8ed",
+      "diff_exit": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    },
+    "dockerfile_before_after_render_hash_equal": true,
+    "task_modified": false
+  },
+  "native_runtime": {
+    "runtime": "RuntimeLab2604",
+    "command_carrier": "Outer RTK plus qualified absolute WSL executable; native absolute executables inside RuntimeLab, native CWD fixed by private packet.",
+    "docker_cli": {
+      "version": "29.8.2",
+      "source_commit": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616",
+      "binary_sha256": "172b72539365fab1b04c79839fab0bb44dfec1c5a932ad1dbff170298b3475b3"
+    },
+    "compose": {
+      "version": "5.5.1",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "version_exit": 0,
+      "version_stdout_sha256": "db74d0caf81f43029fa28ce9888695d0b54d0a99003e6042823c9bc914897865",
+      "binary_sha256": "9c0f3f21b463fbdd42afed3be203c1a65f0cd440c9b59c68785f35e78d2ebf6a"
+    },
+    "buildx": {
+      "version": "0.37.1",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "version_exit": 0,
+      "version_stdout_sha256": "d6a1fdd95fd9b2615b359b42e82829b1cad6bb22202cff355e55be8242e8c395",
+      "binary_sha256": "3e6dcf88055ca9e59013376bf989c221b76c557460f1d47175aeb14a0e98c93c"
+    },
+    "endpoint": {
+      "one_explicit_selector": true,
+      "global_docker_option": "--host",
+      "builder_create_positional_endpoint_equals_global_host": true,
+      "context_option": null,
+      "selected_metadata": {
+        "exit": 0,
+        "bytes": 100,
+        "sha256": "ffb2e7505f74fff346e1e618096915196b4f7656b2b95bb1671734c9e510e375",
+        "public_projection": [
+          "ID",
+          "OSType",
+          "Architecture",
+          "ServerVersion"
+        ],
+        "platform": "linux/x86_64",
+        "server_version": "29.8.2",
+        "stdout": "owned-builder-render/endpoint-info.stdout.txt"
+      },
+      "private_endpoint_literal_in_packet": true,
+      "active_config_read": false,
+      "qualification": "Read-only selection of one endpoint; future build/daemon/cleanup observations remain absent."
+    }
+  },
+  "concrete_private_bindings": {
+    "all_input_paths_and_native_argv_concrete": true,
+    "input_snapshot_only": true,
+    "personal_paths_publicly_redacted": true,
+    "packet": {
+      "logical_filename": "concrete-freeze-private-bindings.json",
+      "bytes": 25296,
+      "sha256": "e56e50bba94783874f230999d4ce4816a4a2fec91a63839c53c5c78fc6e4a8b6",
+      "stage_and_native_destination_bytes_equal": true,
+      "stage_sha256_exit": 0,
+      "copy_exit": 0,
+      "destination_sha256_exit": 0
+    },
+    "native_custody_roles": {
+      "input_directory": "owned-builder-inputs",
+      "output_directory": "owned-builder-render",
+      "source_context": "task-source/datasets/swebench-verified/django__django-14034/environment",
+      "packet": "owned-builder-inputs/concrete-freeze-private-bindings.json"
+    },
+    "note": "Exact private locations, endpoint literal, CWD, every phase argv and stdout/stderr output path are in the byte-bound packet. No unset input-path placeholder remains. Future native IDs, build metadata and executed exit codes are outputs, presently null."
+  },
+  "authored_asset_transfer": {
+    "authoring": "apply_patch only at an explicitly owned shared staging directory; supported native cp copies unchanged bytes into owned RuntimeLab input paths.",
+    "cp": {
+      "native_path": "/usr/bin/cp",
+      "version": "GNU coreutils 9.7",
+      "installed_package": "gnu-coreutils 9.7-3ubuntu2.1",
+      "version_exit": 0,
+      "version_stdout_sha256": "91e576b0113dcceaf7f13fac5a9756d1b05df35d5b291af188d28498efbc4f3a",
+      "help_exit": 0,
+      "help_stdout_sha256": "5a2f96f9a093cc81c19bdb7bd202f7deae60fdcb99b0b889ec71da6f886da665",
+      "binary_sha256": "8fcdb2485ebc68f00392d647b3d3d9130f0d4bb9f72c69ee258086dd63e1c122",
+      "argv_contract": [
+        "cp",
+        "--update=none-fail",
+        "--",
+        "source",
+        "destination"
+      ]
+    },
+    "input_assets": [
+      {
+        "name": "buildkitd-0331.toml",
+        "bytes": 91,
+        "sha256": "30ffe91e40adb7423c85ffea3fb850cc84be4f522d733c4b72168ee864f57f2a",
+        "stage_sha256_exit": 0,
+        "native_copy_exit": 0,
+        "destination_sha256_exit": 0,
+        "bytes_equal": true
+      },
+      {
+        "name": "source-policy.json",
+        "bytes": 9348,
+        "sha256": "a82998d636ab0f645cdfe426015bbd7c9ae411562f693b55b5f995ca1abe26c2",
+        "stage_sha256_exit": 0,
+        "native_copy_exit": 0,
+        "destination_sha256_exit": 0,
+        "bytes_equal": true
+      },
+      {
+        "name": "compose-overlay.yaml",
+        "bytes": 195,
+        "sha256": "25ef2a8d1c8e94d1335ef9032aa992d0c5026710cb214673ecd65c37d1dfc988",
+        "stage_sha256_exit": 0,
+        "native_copy_exit": 0,
+        "destination_sha256_exit": 0,
+        "bytes_equal": true
+      }
+    ],
+    "policy_source": "blueprints/runtime-workers/comparisons/coding-source-policy.json at source_head, native Git blob read exit 0; 24 original CONVERT rules unchanged.",
+    "daemon_values": {
+      "worker.oci.enabled": true,
+      "worker.oci.max-parallelism": 1,
+      "worker.containerd.enabled": false
+    },
+    "daemon_config_effectiveness": "Unexecuted; semaphore bounds OCI parallel build steps, not CPU/memory, model calls or task tools."
+  },
+  "ordered_compose_and_render": {
+    "ordered_files": [
+      {
+        "role": "unchanged Harbor docker-compose-build.yaml",
+        "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+        "path": "src/harbor/environments/docker/docker-compose-build.yaml",
+        "bytes": 128,
+        "sha256": "e363cbb606a6a2b9781b8e7c26fb31a83140536d4d55c4a3cb937e3d176b762f"
+      },
+      {
+        "role": "unchanged readiness overlay",
+        "name": "compose-overlay.yaml",
+        "bytes": 195,
+        "sha256": "25ef2a8d1c8e94d1335ef9032aa992d0c5026710cb214673ecd65c37d1dfc988"
+      }
+    ],
+    "native_options": {
+      "project_directory": "exact immutable task environment context in private packet",
+      "project_name": "nas-coding-image-readiness-20261003",
+      "env_file": "/dev/null",
+      "compatibility": false,
+      "context_dir": "exact same context"
+    },
+    "config": {
+      "native_exit": 0,
+      "stdout_bytes": 848,
+      "stdout_sha256": "2027edec0ee31f26e4a7c03b855b24941a268573f7d582530a1afea35f1ef300",
+      "stderr_bytes": 0,
+      "file": "owned-builder-render/resolved-compose.json"
+    },
+    "bake": {
+      "native_command": "compose build --print main",
+      "native_exit": 0,
+      "stdout_bytes": 912,
+      "stdout_sha256": "4446545f569a40c20e5049e532bf894d64d6d871cf082ea8ae903fca02325e21",
+      "file": "owned-builder-render/resolved-bake.json",
+      "target": "main",
+      "platforms": [
+        "linux/amd64"
+      ],
+      "no_cache": true,
+      "pull": true,
+      "output": [
+        "type=docker"
+      ],
+      "tags": [
+        "harbor-readiness-django-14034:20261003-86723674f04e"
+      ]
+    },
+    "warning": {
+      "bytes": 74,
+      "sha256": "89dfbe9d1df945cc94d15759f0a68cd857fddc940b47e83abd09c75614b52512",
+      "file": "owned-builder-render/compose-print.stderr.txt",
+      "message": "No services to build",
+      "source_explanation": "build_bake.go print returns before invoking Bake; build.go warns because its builtImages map is empty. Warning retained; no build executed."
+    },
+    "side_band_not_in_printed_bake": [
+      "explicit --builder",
+      "--provenance=mode=max",
+      "--metadata-file exact future output",
+      "--allow fs.read=exact source context",
+      "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY exact regular file",
+      "BUILDX_METADATA_PROVENANCE=max"
+    ],
+    "policy_consumed_by_build": false,
+    "task_lock_transitively_hashes_external_policy": false
+  },
+  "driver_image_and_parent": {
+    "buildkit": {
+      "version": "0.33.1",
+      "source_commit": "8c91502cf280bd70a0c50912ce251c46a8881d9f",
+      "index_digest": "sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+      "driver_image": "moby/buildkit:v0.33.1@sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
+      "amd64_manifest": {
+        "native_registry_only_exit": 0,
+        "bytes": 2261,
+        "sha256": "98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
+        "config_digest": "sha256:27933730df224df80c41f4e5a9b33fa78831a79fd31903df3bb7deb49363422f"
+      },
+      "native_platform": {
+        "exit": 0,
+        "bytes": 11,
+        "sha256": "ca40350362516cc30c839fd3e0f04e9bbb7703698fd5c57f12f3b87f07d866e9",
+        "os": "linux",
+        "architecture": "amd64"
+      },
+      "image_layers_pulled": false,
+      "actual_daemon_container_observed": false
+    },
+    "parent": {
+      "policy_selected_manifest": "sha256:a418d2ce60722b04983d018e8d46f88f236fdb22f331ae908f8528104631cdcc",
+      "config_digest": "sha256:57c4a75e0ef575a605e87fa14e17c49b0ce1e7b611951467de3d6fb09bbaa361",
+      "identity_role": "Parent manifest/config are source input identities; built image digest, Compose staleness label and loaded local image config are separate future output identities."
+    },
+    "correction": "Buildx create --platform declares node capability. Docker-container ImagePull supplies no platform option. The concrete driver reference binds the linux/amd64 child, not merely the multi-platform index; actual daemon/server/platform remain acceptance outputs.",
+    "non_hermetic_limit": "Parent conversion does not freeze original Dockerfile curl of the uv installer. No hermetic-build claim."
+  },
+  "owned_objects_and_predicates": {
+    "builder": "nas-coding-readiness-20261003-14034",
+    "node": "nas-coding-readiness-20261003-14034-node0",
+    "builder_container": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0",
+    "builder_state_volume": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0_state",
+    "project": "nas-coding-image-readiness-20261003",
+    "main_container": "nas-coding-image-readiness-20261003-main-1",
+    "project_network": "nas-coding-image-readiness-20261003_default",
+    "main_selector": [
+      "com.docker.compose.project=nas-coding-image-readiness-20261003",
+      "com.docker.compose.service=main",
+      "com.docker.compose.container-number=1"
+    ],
+    "main": "Native full-ID selector (--all --quiet --no-trunc) must yield exactly one ID equal to create/inspect ID; expected source-bound name and all three labels match; Running=false, status created/exited; Image equals built loaded local config digest. No main process starts.",
+    "network": "Exact normalized default-network name and project/default labels; full network ID and main membership must agree. Unknown members prevent cleanup admission.",
+    "builder_identity": "Named driver container must use registry-bound config/platform, and its exact state volume must be mounted at /var/lib/buildkit. Actual BuildKit server version is independent of client version.",
+    "created_objects_observed": false
+  },
+  "supervised_native_recipe": {
+    "full_native_argv_and_capture_paths": "Exact byte-bound private packet; every Docker operation uses the same explicit --host, and create receives that same endpoint positionally.",
+    "build": {
+      "supervisor": "GNU gnutimeout 9.7",
+      "argv_prefix": [
+        "/usr/bin/gnutimeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "1800s"
+      ],
+      "native_bake": "bake --builder owned-name --file exact rendered Bake --allow fs.read=exact context --provenance=mode=max --metadata-file exact owned output main",
+      "metadata_future_output": "owned-builder-render/build-metadata.json",
+      "executed": false
+    },
+    "create_main": {
+      "native": "same ordered Compose/config/project/context; create --no-build --pull never main",
+      "starts_main": false,
+      "executed": false
+    },
+    "cleanup": [
+      {
+        "order": 1,
+        "whole_command_supervisor": [
+          "gnutimeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "120s"
+        ],
+        "native": "same Compose project/config down --timeout 10",
+        "omit": [
+          "--rmi",
+          "--volumes",
+          "--remove-orphans"
+        ],
+        "executed": false
+      },
+      {
+        "order": 2,
+        "whole_command_supervisor": [
+          "gnutimeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "120s"
+        ],
+        "native": "buildx rm --force exact owned builder",
+        "omit": [
+          "--keep-state",
+          "--keep-daemon",
+          "--all",
+          "--all-inactive"
+        ],
+        "executed": false
+      },
+      {
+        "order": 3,
+        "conditional": true,
+        "whole_command_supervisor": [
+          "gnutimeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "120s"
+        ],
+        "native": "volume rm exact owned state-volume only after container absence, original mount ownership and no users",
+        "omit": [
+          "--force",
+          "prune"
+        ],
+        "executed": false
+      }
+    ],
+    "independent_absence_witnesses": {
+      "each_whole_command_supervisor": [
+        "gnutimeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "30s"
+      ],
+      "objects": [
+        "main container",
+        "default project network",
+        "all containers with exact project label",
+        "builder metadata",
+        "builder container",
+        "builder state volume"
+      ],
+      "native_inspect_or_label_selectors": "Exact names/selectors/argv/output paths in private packet",
+      "observed_after_cleanup": false
+    },
+    "limitations": [
+      "Buildx rm --timeout only bounds LoadNodes; later Stop/Rm receives original context. Whole-command supervision is independent.",
+      "Builder metadata removal may occur after driver errors. Metadata absence alone cannot prove daemon/container/volume cleanup; inactive container can leave an orphan volume.",
+      "GNU +10 starts when the initial signal is sent; no hard 1810/130/40-second wall guarantee. Exit 137 is ambiguous; escaped process groups and Docker-daemon work are not proven terminated.",
+      "Independent native object absence is required. No shared daemon signal/restart, automatic cleanup, prune, image removal or cross-arm reuse is authorized by this source packet.",
+      "Original task has no docker_image; native Harbor later start can rebuild. This image-only recipe does not alter that task or qualify reuse."
+    ],
+    "cleanup_parameters_acceptance": "New 120s/+10 command and 30s/+10 observation parameters require root/Astra acceptance before use; they do not modify native 1800/3000/3000 task bounds."
+  },
+  "native_precreation_observations": {
+    "classification": "Read-only precreation observations only; all exact-name negative native exits retained, not post-cleanup acceptance.",
+    "builder_inspect": {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "stderr_bytes": 62,
+      "stderr_sha256": "16e97a83c21b62a4d924dd0924264c678a45ef1845cba2d42c465ec607cac1ca"
+    },
+    "builder_container_inspect": {
+      "exit": 1,
+      "stdout_bytes": 1,
+      "stderr_bytes": 105,
+      "stderr_sha256": "ff9b268b867ce844283ffb957858ed3aed42e1625c786d750e17203476ad9143"
+    },
+    "builder_volume_inspect": {
+      "exit": 1,
+      "stdout_bytes": 1,
+      "stderr_bytes": 112,
+      "stderr_sha256": "5820c3541e92793ce92dca238174199adc94d2b5b64997ccbd235760b98647dd"
+    },
+    "main_inspect": {
+      "exit": 1,
+      "stdout_bytes": 1,
+      "stderr_bytes": 90,
+      "stderr_sha256": "6c81444441bf0f61d4ee5517a33731d8cc8983ab9513b7a01f336e5bac69d244"
+    },
+    "network_inspect": {
+      "exit": 1,
+      "stdout_bytes": 1,
+      "stderr_bytes": 90,
+      "stderr_sha256": "c442709df3857d81b2633d93579fb8bdae2da6f9c1f9922c9b0c205b10a446a9"
+    },
+    "project_container_selection": {
+      "exit": 0,
+      "stdout_bytes": 0,
+      "stderr_bytes": 0
+    }
+  },
+  "original_source_workflow": {
+    "repository": "docker/compose",
+    "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+    "native_git_init_exit": 0,
+    "native_selected_pin_fetch_exit": 0,
+    "native_checkout_exit": 0,
+    "native_scoped_git_grep_exit": 0,
+    "query": "git grep -n getDefaultContainerName -- pkg/compose",
+    "corrected_helper": "pkg/compose/service_containers.go:127-136",
+    "semantics": "getContainerName uses an explicit ContainerName if supplied, else project/service/number joined with api.Separator. Default separator '-' changes to '_' only when compatibility is true. This config has no custom name and explicitly sets COMPOSE_COMPATIBILITY=false.",
+    "no_submodules": true,
+    "no_active_auth_store_read": true
+  },
+  "failures_preserved": [
+    {
+      "type": "guessed_source_path",
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/convergence.go",
+      "native_curl_exit": 22,
+      "stdout_bytes": 0,
+      "stderr": "curl: (22) The requested URL returned error: 404",
+      "correction": "Native exact-pin Git grep resolved service_containers.go; original bytes/hash and call sites verified. Narrow misses were never treated as capability absence."
+    },
+    {
+      "type": "aggregate_output_guard_omitted",
+      "output_serialized_bytes": 9718,
+      "requested_max_bytes": 3500,
+      "exit": "Script completed normally; output processing exceeded the requested aggregate limit.",
+      "correction": "Subsequent native processing checks the complete serialized compact result before any print; no credential, auth, active-config or provider data was read."
+    },
+    {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "stderr": "OUTPUT_GUARD 7412",
+      "cause": "Selected launch inputs plus recipe/check keys were larger than 3500 bytes; no selected data printed."
+    },
+    {
+      "exit": 1,
+      "stdout_bytes": 0,
+      "stderr": "OUTPUT_GUARD 5168",
+      "cause": "list() preserved list elements rather than dictionary keys; no selected data printed.",
+      "recovery": "Inspect only container types/counts and keys for dictionaries; native exit 0."
+    }
+  ],
+  "primary_sources": [
+    {
+      "repository": "docker/cli",
+      "commit": "7fc2dff9bceb96b266a3b2c3117c0955a0d9e616",
+      "path": "cli/command/cli.go",
+      "sha256": "72866e09da75122ef2c507400e678fd5c419c47a2fce80eca389f5c58f663973",
+      "lines": "226,285,443-454",
+      "note": "Explicit --host precedes environment context override; --host and --context conflict.",
+      "url": "https://github.com/docker/cli/blob/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616/cli/command/cli.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/service_containers.go",
+      "sha256": "31098502b84c36f89e03ee7a98d4be0eeb8e1ca056329126504f0fbe2a0ddcd9",
+      "lines": "127-136",
+      "note": "Actual default-container-name helper.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/service_containers.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/api/api.go",
+      "sha256": "5b6a3dfd0ded7e6919c4e53c6c4536106577fc8f75b0893804664e8af51d7278",
+      "lines": "797-798",
+      "note": "Default separator.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/api/api.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/loader.go",
+      "sha256": "2fd9dbd56fa6a8a53ccc470f1ed13fa40e995f2710cdcca8a95734f7896968b4",
+      "lines": "52-53",
+      "note": "Compatibility separator switch.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/loader.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/down.go",
+      "sha256": "8c99884788c6dc1a12becb032eec1d09c4f8150748547f0385824fd4d555fb58",
+      "lines": "98-135",
+      "note": "Service-container/default-network removal; image/volume operations conditional.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/down.go"
+    },
+    {
+      "repository": "compose-spec/compose-go",
+      "commit": "4ddbf11f8bd3da1e9276f9185bad14596d388ece",
+      "path": "loader/normalize.go",
+      "sha256": "67f7ad183a926e8d652af8cb7cb51c3a0bd47a235a838e41941902faf0fda1bb",
+      "lines": "176-210",
+      "note": "Implicit default network normalization; native render independently binds its name.",
+      "url": "https://github.com/compose-spec/compose-go/blob/4ddbf11f8bd3da1e9276f9185bad14596d388ece/loader/normalize.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/build.go",
+      "sha256": "ac96aafcf99c98724476714454a59ed21ae33e52103f537eb23c534a9b90b261",
+      "lines": "43-46",
+      "note": "Retained wrapper warning.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/build.go"
+    },
+    {
+      "repository": "docker/compose",
+      "commit": "5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de",
+      "path": "pkg/compose/build_bake.go",
+      "sha256": "d70bedb44c898aa09e24ebb0177e4567669e5e3b7db2997c7add70770262b80d",
+      "lines": "154-160,268-294,347-352,392-408",
+      "note": "Print returns before build; target and side-band argument construction.",
+      "url": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/build_bake.go"
+    },
+    {
+      "repository": "docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "builder/builder.go",
+      "sha256": "d0d0c73ac8a54083131a55cc2f1ff43bc419ac444e95e8751f79aaefb3de0811",
+      "lines": "509-518,551-552,729-765",
+      "note": "Explicit daemon config and endpoint; docker-container native default daemon network.host entitlement.",
+      "url": "https://github.com/docker/buildx/blob/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/builder/builder.go"
+    },
+    {
+      "repository": "docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "driver/docker-container/driver.go",
+      "sha256": "d7fc0ef706b398f5c2fd9e3d1f3ea4fef5c08daf40f89e74809944eedfd2220b",
+      "lines": "106-108,156-172,470-509",
+      "note": "ImagePull lacks platform option; owned container/state volume and cleanup paths.",
+      "url": "https://github.com/docker/buildx/blob/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/driver/docker-container/driver.go"
+    },
+    {
+      "repository": "docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "commands/rm.go",
+      "sha256": "b70ed983663c9e295473ac050ab59ca1a844e29b7ca56a76a0a177b39507745d",
+      "lines": "69-95,143-161",
+      "note": "Metadata removal after errors and original cleanup context.",
+      "url": "https://github.com/docker/buildx/blob/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/commands/rm.go"
+    },
+    {
+      "repository": "docker/buildx",
+      "commit": "0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a",
+      "path": "build/build.go",
+      "sha256": "9a940ebd99fad80d7b552f52018b6f12c00076aa0fd667cb39eacbb1ad03feeb",
+      "lines": "1379-1390",
+      "note": "EXPERIMENTAL_BUILDKIT_SOURCE_POLICY regular-file read.",
+      "url": "https://github.com/docker/buildx/blob/0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a/build/build.go"
+    },
+    {
+      "repository": "moby/buildkit",
+      "commit": "8c91502cf280bd70a0c50912ce251c46a8881d9f",
+      "path": "docs/buildkitd.toml.md",
+      "sha256": "086b004b379bcddce01a886f7990e531d6a385817f30193470bac7bb358cae5c",
+      "lines": "74-75,107,136-160",
+      "note": "First-party OCI/containerd configuration.",
+      "url": "https://github.com/moby/buildkit/blob/8c91502cf280bd70a0c50912ce251c46a8881d9f/docs/buildkitd.toml.md"
+    },
+    {
+      "repository": "coreutils/coreutils",
+      "commit": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "path": "src/cp.c",
+      "sha256": "bd80e7765ca45d675d8bb0e32d208e4e91a89f1c432e297395376ee728ca7436",
+      "lines": "106-108,230-232",
+      "note": "Supported update=none-fail transfer.",
+      "url": "https://github.com/coreutils/coreutils/blob/8e075ff8ee11692c5504d8e82a48ed47a7f07ba9/src/cp.c"
+    },
+    {
+      "repository": "coreutils/coreutils",
+      "commit": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "path": "src/timeout.c",
+      "sha256": "e11dc2897e468a2fc4bcf44dc3643f08f9ae063b7ce03b88def9dd866250c8ad",
+      "lines": "198-232,534",
+      "note": "Signal escalation and default process-group handling.",
+      "url": "https://github.com/coreutils/coreutils/blob/8e075ff8ee11692c5504d8e82a48ed47a7f07ba9/src/timeout.c"
+    },
+    {
+      "repository": "coreutils/coreutils",
+      "commit": "8e075ff8ee11692c5504d8e82a48ed47a7f07ba9",
+      "path": "doc/coreutils.texi",
+      "sha256": "39b126752866fff675e462bd44d76f3e034abafe462a069cebd53ef39fc53eca",
+      "lines": "18858,18871,18922,18933",
+      "note": "No foreground/preserve-status; actual durations and 137 ambiguity.",
+      "url": "https://github.com/coreutils/coreutils/blob/8e075ff8ee11692c5504d8e82a48ed47a7f07ba9/doc/coreutils.texi"
+    }
+  ],
+  "native_input_verification": {
+    "exit": 0,
+    "stderr_bytes": 0,
+    "verified_asset_and_output_files": 14,
+    "packet_json_and_assets_toml_parse": true,
+    "render_target_and_endpoint_argv_assertions": true,
+    "classification": "Read-only checks of owned public inputs and native returned artifacts; no upstream model/container test."
+  },
+  "admission": {
+    "input_snapshot": "BOUND_PENDING_ACCEPTANCE",
+    "builder_creation": "HOLD",
+    "daemon_config_activation": "HOLD",
+    "image_build": "HOLD",
+    "policy_consumption": "HOLD",
+    "output_identity": "HOLD",
+    "main_container_creation": "HOLD",
+    "cleanup_execution": "HOLD",
+    "coding_comparison": "HOLD"
+  },
+  "execution": {
+    "native_source_checkout": true,
+    "native_help_and_metadata_reads": true,
+    "native_asset_copy": true,
+    "native_compose_print_and_config": true,
+    "builder_created": false,
+    "builder_bootstrapped": false,
+    "image_layers_pulled": false,
+    "image_built": false,
+    "container_created": false,
+    "container_started": false,
+    "cleanup_commands_run": false,
+    "provider_called": false,
+    "model_called": false,
+    "auth_or_active_client_config_read": false,
+    "task_source_changed": false,
+    "shared_registry_changed": false,
+    "committed": false,
+    "published": false
+  }
+}

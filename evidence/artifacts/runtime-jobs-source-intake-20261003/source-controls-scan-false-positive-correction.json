@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-10-03",
+  "artifact_type": "native precommit scan false-positive correction; public identifier projection",
+  "receipt_base_commit": "eae4c151839dc30a7b5fec7550ee7643296de294",
+  "native_gate": {
+    "tool": "gitleaks",
+    "version": "8.30.1",
+    "hook": "scripts/git-hooks/pre-commit at receipt base",
+    "first_commit_return": {
+      "chunk": "54fb04",
+      "exit_code": 1,
+      "finding_count": 1
+    },
+    "fully_redacted_diagnostic_return": {
+      "chunk": "b15561",
+      "exit_code": 1,
+      "format": "JSON100percent redacted",
+      "bytes": 715,
+      "sha256": "8deb0c370cd898cb670ff098744b71f106411322f3001c09fcb9c0af24239f62",
+      "file": "inspect276-python313-control-preregister.json",
+      "line": 110,
+      "classifier": "generic-api-key",
+      "reported_value": "REDACTED"
+    },
+    "corrected_native_scan_return": {
+      "chunk": "ef43a2",
+      "exit_code": 0,
+      "observation": "no leaks found",
+      "scope": "same staged batch and same committed .gitleaks.toml; gate not bypassed or reconfigured"
+    }
+  },
+  "root_primary_origin": {
+    "repository": "openai/tiktoken",
+    "commit": "4e71bbe0c078468e00fefbf94b39849389f346e5",
+    "path": "tiktoken/load.py",
+    "http_status": 200,
+    "bytes": 5887,
+    "sha256": "43c3cfb29dc48a74e70e0c85bb01cfd96a3de069a98de8778ccab7f72a2836cc",
+    "line": 51,
+    "url": "https://github.com/openai/tiktoken/blob/4e71bbe0c078468e00fefbf94b39849389f346e5/tiktoken/load.py#L51",
+    "meaning": "Upstream computes the public download URL SHA1 as a cache filename. Root recomputation matches the declared public filename; it is not a credential."
+  },
+  "projection": {
+    "file": "inspect276-python313-control-preregister.json",
+    "field": "public_tokenizer_asset.upstream_cache_filename_sha1",
+    "original_preexecution_bytes": 12155,
+    "original_preexecution_sha256": "99b4182c756fdc08252f6a9795b8a71cbfedc781bc86fb9a2cfa2e1aec99a86f",
+    "private_original_preserved": true,
+    "root_textual_restoration_matches_original_exactly": true,
+    "actual_fixture_or_recipe_inputs_changed": false,
+    "changed_source_pins_tasks_nodes_argv_deadlines_or_native_execution": false,
+    "native_controls_custody_reference_updated": true
+  },
+  "limits": {
+    "new_native_controls_run": false,
+    "provider_or_model_call": false,
+    "efficiency_result": null,
+    "default_promotion": false
+  }
+}

@@ -88,7 +88,7 @@
       "tag": "v0.33.1",
       "tag_object": "7971c95baa2fbd3987a34cbb86115750cbb48676",
       "commit": "8c91502cf280bd70a0c50912ce251c46a8881d9f",
-      "image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+      "image": "moby/buildkit:v0.33.1@sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
       "registry_only_observation": {
         "native_exit": 0,
         "stderr_bytes": 0,
@@ -138,7 +138,7 @@
     "native_carrier": "docker buildx create --buildkitd-config <OWNED_BUILDKITD_TOML>",
     "source_contract": "Explicit config path precedes Buildx default BuildKit-config discovery. OCI max-parallelism > 0 becomes a weighted semaphore; containerd enabled=false suppresses that worker.",
     "limitation": "This bounds OCI parallel build steps, not total CPU/memory, model tools or task execution. Config parsing and daemon effectiveness have not been natively executed.",
-    "materialized": false,
+    "materialized": true,
     "absolute_path": null,
     "activation": "HOLD"
   },
@@ -148,9 +148,9 @@
     "container": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0",
     "state_volume": "buildx_buildkit_nas-coding-readiness-20261003-14034-node0_state",
     "driver": "docker-container",
-    "driver_image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+    "driver_image": "moby/buildkit:v0.33.1@sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
     "driver_options": {
-      "image": "moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+      "image": "moby/buildkit:v0.33.1@sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
       "restart-policy": "no"
     },
     "node_declared_platform": "linux/amd64",
@@ -286,7 +286,7 @@
         "--platform",
         "linux/amd64",
         "--driver-opt",
-        "image=moby/buildkit:v0.33.1@sha256:cec9f139f45e93c5c69c60f8b07cfad9f43f4ef6b6a6cd917527fea5ff2e3dea",
+        "image=moby/buildkit:v0.33.1@sha256:98cc6a3fc46220d00f8224ae483f3274fc874e9be8d7dd1e2e2c5481209228b5",
         "--driver-opt",
         "restart-policy=no",
         "--buildkitd-config",
@@ -464,7 +464,7 @@
     "build": "HOLD",
     "output_identity": "HOLD",
     "cleanup": "HOLD",
-    "exact_remaining_gate": "Freeze and accept the ONE-task RuntimeLab launch packet: actual paths/CWD, unchanged TOML/policy/overlay bytes, rendered Bake bytes, named-builder ownership/platform, metadata output path and independent cleanup/absence contract (including any created main container). Every phase remains HOLD on these placeholders.",
+    "exact_remaining_gate": "Root/Astra must accept coding-image-concrete-freeze.json and its exact private native-argv packet before any activation. Native assets, endpoint selector, CWD, ordered Compose inputs and rendered Bake bytes are now bound; builder/daemon effectiveness, build/policy consumption, stopped-main image identity and cleanup outcomes remain unexecuted HOLD.",
     "prospective_acceptance_only": "After an accepted freeze, native build/output/cleanup outcomes must be retained separately. This source packet supplies command carriers and expected identities, not executed acceptance.",
     "unchanged_original_task_consequence": "Original task has no docker_image; stock Harbor start follows its native build branch. This image-only amendment makes no future cross-arm reuse, coding-study admission or model-default claim."
   },
@@ -640,8 +640,19 @@
     "owned_leaf_git_diff_check": {"exit": 0, "stdout_bytes": 0, "stderr_bytes": 0},
     "required_repository_validator": "Not run: no commit/publish/registry change authorized in this task. Parent owns registry integration."
   },
+  "concrete_freeze_followup": {
+    "record": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-concrete-freeze.json",
+    "private_binding_packet_bytes": 25296,
+    "private_binding_packet_sha256": "e56e50bba94783874f230999d4ce4816a4a2fec91a63839c53c5c78fc6e4a8b6",
+    "native_asset_copy_and_render_completed": true,
+    "input_snapshot_only": true,
+    "activation": "HOLD",
+    "historical_template_note": "The launch_inputs/prospective_native_recipe placeholders in this earlier proposal are historical source templates. The concrete follow-up binds actual private paths, one explicit Docker endpoint, amd64 driver child manifest, stopped-main/default-network ownership, whole-command cleanup supervision and independent absence witnesses; it supplies current native argv without activating them.",
+    "correction": "Create --platform only declares node capability; docker-container ImagePull has no platform option. The proposed driver image now uses the registry-qualified linux/amd64 child manifest instead of its multi-platform index. Both identities remain recorded separately."
+  },
   "execution": {
-    "source_and_native_help_reads_only": true,
+    "source_and_native_help_reads_only": false,
+    "native_copy_and_render_only": true,
     "new_native_supervisor_run": false,
     "new_daemon_config_activated": false,
     "new_builder_created": false,
