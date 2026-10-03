@@ -165,7 +165,7 @@ GitHub-hosted macOS runner; see
    `pins-linux-x86_64.json` (the rtk and headroom `install_note` text and its `claude-code` entry, 2.1.281 at that tag and 2.1.284 on main) and `adoption/bootstrap-linux.sh` changed after `v2026.09.26`: its rtk config reminder now also asks the installed `rtk hook check`; `install_npm` now adds `--ignore-scripts` for a pin with `ignore_scripts: true` (socraticode), a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree; and `install_uv_tool` now downloads a uv-tool pin's wheel `url` (headroom), verifies its `sha256` before uv runs and installs that file as `'headroom-ai[mcp] @ file://<percent-encoded path>'`, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index and never reads the wheel or its hash (the markitdown and tavily-cli sdist hashes stay cross-checks).
    `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry: 0.155.1 moves to 0.159.2 (URL, hashes and note; 0.157.1 from 2026-09-26, 0.159.2 from 2026-09-30), so a host at that tag installs 0.155.1, and in its `claude-code` entry: 2.1.281 moves to 2.1.284 (URL, hashes and note), so a host at that tag installs 2.1.281. `adoption/templates/codex.config.template.toml` changed after the same tag to set `daemon_auto_start = false`: 0.157.1's first interactive launch otherwise installs a self-updating app-server daemon (see `evidence/receipts/codex-01571-qualification-20260926.json`; 0.159.2 still lists the feature as stable and on, `evidence/receipts/codex-01592-qualification-20260930.json`). It changed again on 2026-09-30 to default to `gpt-6.1-sol`, which Codex's bundled model catalog carries from `rust-v0.159.1` on (0.157.1's has no such entry). The macOS pin stays at 0.155.1: macOS needs its own 0.159.x qualification before the template default applies there.
 
-   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`: `mcporter` 0.14.1 to 0.14.2 and `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). A host at that tag retains 0.14.1 and 0.2.7. The W1 scratch qualification and its functional limits are in [the dated decision](../docs/decisions/2026-10-03-currency-wave-w1.md). The Claude HUD marketplace recipe and template now select v0.10.0 at `75683c6de1ac07f6bbef00d739001679dba0740c`; hosts at the tag keep v0.8.0.
+   On 2026-10-03, `pins-linux-x86_64.json` changed again after `v2026.09.26.2`: `orx` 0.2.7 to 0.2.15 (URLs, hashes and install notes). A host at that tag retains OpenResearch 0.2.7. mcporter stays at the accepted Linux 0.14.1 pin; its 0.14.2 compatibility attempt is held. The W1 scratch qualification and its functional limits are in [the dated decision](../docs/decisions/2026-10-03-currency-wave-w1.md). The Claude HUD marketplace recipe and template now select v0.10.0 at `75683c6de1ac07f6bbef00d739001679dba0740c`; hosts at the tag keep v0.8.0.
 
    `pins-linux-x86_64.json` and `adoption/bootstrap-linux.sh` changed after `v2026.09.25.2`.
    The Linux pins file gained `repomix`, `toon`,
@@ -585,6 +585,30 @@ GitHub-hosted macOS runner; see
    claude plugin marketplace add openai/codex-plugin-cc@v1.0.6 --scope user
    claude plugin install codex@openai-codex --scope user --json
    ```
+
+   **Upgrade an existing claude-hud 0.8.0 installation:** first apply the
+   template's `extraKnownMarketplaces.claude-hud.source.ref` value `v0.10.0`
+   in the host's user settings, retaining the other marketplace declarations.
+   [The loading reference](https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start)
+   documents re-fetching a changed declared source at the next native session
+   start. Let that synchronization finish before updating. A marketplace
+   refresh follows its configured tag; it does not advance a source that still
+   names `v0.8.0` ([CLI reference](https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update)).
+   Then refresh the retargeted marketplace and update the installed plugin:
+   ```sh
+   claude plugin marketplace update claude-hud
+   claude plugin update claude-hud@claude-hud --scope user
+   ```
+   These are separate steps: the shell marketplace command refreshes the
+   listing, and the plugin command updates the installed plugin
+   ([Update plugins now](https://code.claude.com/docs/en/plugins/install#update-plugins-now)).
+   Restart Claude Code or run `/reload-plugins`, then use the revision check
+   below to compare the installed `gitCommitSha` with `75683c6de1ac07f6bbef00d739001679dba0740c`.
+   Status: **documented, host verification pending**. R642b checked the native
+   2.1.288 command help with both `HOME` and `CLAUDE_CONFIG_DIR` in temporary
+   directories; it did not execute a marketplace or plugin update. A safe
+   offline reproduction of the GitHub-tag transition remains unverified.
+
    Then compare the `gitCommitSha` that landed with the reviewed revisions in
    those rows (the check reads `$CLAUDE_CONFIG_DIR` when it is set, as Claude
    Code does). `context-mode`, installed from the default branch, also passes

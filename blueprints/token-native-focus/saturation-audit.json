@@ -4995,8 +4995,8 @@
     },
     {
       "component_id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
-      "version": "0.14.2",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
       "installation_assessment": "runtime present at retained native operation date",
@@ -5046,11 +5046,6 @@
             "id": "mcporter-0141-qualification-20260925",
             "path": "evidence/receipts/mcporter-0141-qualification-20260925.json",
             "kind": "native_cli_e2e"
-          },
-          {
-            "id": "mcporter-0142-qualification-20261003",
-            "path": "evidence/receipts/mcporter-0142-qualification-20261003.json",
-            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5067,7 +5062,7 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 0.14.1. W1 0.14.2 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -5076,7 +5071,7 @@
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
           "evidence_refs": [
             "evidence/receipts/component-history.json",
             "observability/restart-receipt.json",
@@ -5085,29 +5080,29 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
           "evidence_refs": [
             "observability/restart-receipt.json"
           ]
         },
         "persistence": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "restart": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "cleanup": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         },
         "recovery": {
           "status": "not_established",
-          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion. W1 pin qualification does not recertify this historical stage at 0.14.2.",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
           "evidence_refs": []
         }
       },
@@ -5463,7 +5458,7 @@
           "orx --no-telemetry paper \"${PAPER_ID}\" --full"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/native-upgrades-20260921.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -8451,7 +8446,7 @@
           "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "blueprints/us-equities/supply-chain/README.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -9001,7 +8996,7 @@
           "wt list"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/native-upgrades-20260921.md",
+        "recipe_document": "recipes/README.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {

@@ -489,7 +489,7 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "blueprints/us-equities/supply-chain/README.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
@@ -774,7 +774,7 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "recipes/native-upgrades-20260921.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
@@ -1095,7 +1095,7 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "recipes/native-upgrades-20260921.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
@@ -1182,7 +1182,7 @@
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
               "bootstrap_pinned": true,
-              "bootstrap_version": "0.14.2"
+              "bootstrap_version": "0.14.1"
             },
             "macos-arm64": {
               "e2e_state": "untested",
@@ -2048,7 +2048,7 @@
           "pin_behind_upstream": true,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "recipes/native-upgrades-20260921.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "conditional",
@@ -2136,7 +2136,7 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "recipes/native-upgrades-20260921.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",
@@ -2906,7 +2906,7 @@
           "pin_behind_upstream": false,
           "manifest_joined": true,
           "install_profiles": [],
-          "recipe": "blueprints/us-equities/supply-chain/README.md",
+          "recipe": "recipes/README.md",
           "platforms": {
             "linux-wsl2-x86_64": {
               "e2e_state": "host_verified",

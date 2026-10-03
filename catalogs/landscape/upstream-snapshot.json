@@ -1529,8 +1529,8 @@
     {
       "component_id": "mcporter",
       "repository": "https://github.com/openclaw/mcporter",
-      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.2",
-      "selected_version": "0.14.2",
+      "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "selected_version": "0.14.1",
       "selected_source_pin": null,
       "checks": [
         {
@@ -1550,11 +1550,11 @@
           "status": "ok"
         },
         {
-          "endpoint": "repos/openclaw/mcporter/commits/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+          "endpoint": "repos/openclaw/mcporter/commits/93e0916cafe2d624b94271e31b75ca681a016514",
           "exit_code": 0,
-          "started_at": "2026-10-03T05:50:28.250309+00:00",
-          "ended_at": "2026-10-03T05:50:28.570581+00:00",
-          "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+          "started_at": "2026-10-03T08:04:32Z",
+          "ended_at": "2026-10-03T08:04:33Z",
+          "stdout_sha256": "d3d837ff22ae29f38338f6d5fd42009829326f89457a9c7fe73f29970f98904d",
           "status": "ok"
         },
         {
@@ -1590,7 +1590,7 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "version_only",
       "primary_repository": "https://github.com/openclaw/mcporter",
-      "release_relationship": "selected_version_matches_latest_stable",
+      "release_relationship": "newer_stable_release_review_pending",
       "historical_observations": [
         {
           "preserved_at_utc": "2026-10-03T05:55:06.824136+00:00",
@@ -1652,16 +1652,95 @@
             "primary_repository": "https://github.com/openclaw/mcporter",
             "release_relationship": "selected_version_matches_latest_stable"
           }
+        },
+        {
+          "preserved_at_utc": "2026-10-03T07:44:58.220950+00:00",
+          "status": "compatibility_attempt",
+          "observation": {
+            "component_id": "mcporter",
+            "repository": "https://github.com/openclaw/mcporter",
+            "selected_repository_url": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+            "selected_version": "0.14.2",
+            "selected_source_pin": null,
+            "checks": [
+              {
+                "endpoint": "repos/openclaw/mcporter",
+                "exit_code": 0,
+                "started_at": "2026-10-03T05:50:27.642381+00:00",
+                "ended_at": "2026-10-03T05:50:27.993166+00:00",
+                "stdout_sha256": "99540d98c8f7c763f29d150f85aa20c4d907a8ba1e893de4a6feffda56012988",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/openclaw/mcporter/releases/latest",
+                "exit_code": 0,
+                "started_at": "2026-10-03T05:50:27.993405+00:00",
+                "ended_at": "2026-10-03T05:50:28.250033+00:00",
+                "stdout_sha256": "0f03fb3adf27eec7af988468fb21576aa6aba61ed00e7deab129f6e82c24c68e",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/openclaw/mcporter/commits/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+                "exit_code": 0,
+                "started_at": "2026-10-03T05:50:28.250309+00:00",
+                "ended_at": "2026-10-03T05:50:28.570581+00:00",
+                "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+                "status": "ok"
+              },
+              {
+                "endpoint": "repos/openclaw/mcporter/commits/v0.14.2",
+                "exit_code": 0,
+                "started_at": "2026-10-03T05:50:28.571161+00:00",
+                "ended_at": "2026-10-03T05:50:28.896720+00:00",
+                "stdout_sha256": "24ce8c193ab2a8cdf608ac6225ab408ca52254ae55683cb699aeab2ec175110b",
+                "status": "ok"
+              }
+            ],
+            "canonical_repository": "https://github.com/openclaw/mcporter",
+            "archived": false,
+            "disabled": false,
+            "default_branch": "main",
+            "pushed_at": "2026-10-01T18:43:11Z",
+            "license_spdx": "MIT",
+            "latest_stable_release": {
+              "tag_name": "v0.14.2",
+              "published_at": "2026-10-01T18:24:07Z",
+              "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+              "target_commitish": "main",
+              "prerelease": false,
+              "draft": false
+            },
+            "latest_release_source": {
+              "ref": "v0.14.2",
+              "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+              "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+              "committed_at": "2026-10-01T05:29:15Z"
+            },
+            "status": "metadata_checked",
+            "adoption_recommendation": "retain_selected_pending_capability_comparison",
+            "source_pin_kind": "version_only",
+            "primary_repository": "https://github.com/openclaw/mcporter",
+            "release_relationship": "selected_version_matches_latest_stable",
+            "checked_at": "2026-10-03T05:50:28.896720+00:00",
+            "selected_pin_source": {
+              "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+              "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+              "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+              "committed_at": "2026-10-01T05:29:15Z"
+            },
+            "selected_pin_matches_latest_release_commit": true
+          }
         }
       ],
-      "checked_at": "2026-10-03T05:50:28.896720+00:00",
+      "checked_at": "2026-10-03T08:04:33Z",
       "selected_pin_source": {
-        "ref": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
-        "sha": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
-        "html_url": "https://github.com/openclaw/mcporter/commit/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
-        "committed_at": "2026-10-01T05:29:15Z"
+        "ref": "93e0916cafe2d624b94271e31b75ca681a016514",
+        "sha": "93e0916cafe2d624b94271e31b75ca681a016514",
+        "html_url": "https://github.com/openclaw/mcporter/commit/93e0916cafe2d624b94271e31b75ca681a016514",
+        "committed_at": "2026-09-24T11:06:02Z"
       },
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": false,
+      "release_relationship_note": "0.14.2 is known and held after an inconsistent resolved dependency tree and unqualified daemon/serve role; Linux selects accepted 0.14.1."
     },
     {
       "component_id": "openresearch",

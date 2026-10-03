@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "id": "mcporter-0142-qualification-20261003",
-  "kind": "native_cli_e2e",
+  "kind": "compatibility_attempt",
   "recorded_at_utc": "2026-10-03T05:55:06.824136+00:00",
   "component_ids": [
     "mcporter"
   ],
-  "claim": "The recorded version command printed \"0.14.2\" (exit 0). The new ad-hoc stdio order/get_session_stats canary returned \"visible_tools\": 6, \"catalog_tools\": 94 and \"session_tokens_saved\": 0 (exit 0).",
+  "claim": "mcporter 0.14.2 remains an unaccepted compatibility attempt: version and an ad-hoc stdio canary passed, but npm ls --all returned ELSPROBLEMS (bundled core 2.2.0 beside resolved server 2.3.0). The persistent daemon and serve roles used by foundation-cpu and token-efficiency were not qualified. The selected Linux pin remains 0.14.1; the independently held macOS pin remains 0.13.13.",
   "limitations": [
-    "The original documented host-config smoke is \"NOT RUN\"; the accepted canary is a fresh ad-hoc stdio call, with no daemon.",
+    "The original documented host-config smoke is \"NOT RUN\"; the ad-hoc stdio canary is evidence for the hold only and does not establish daemon or serve acceptance.",
     "No daemon restart/recovery, mixed-version daemon, OAuth, Windows retry, serve operation or upstream test suite was exercised.",
     "The judge records npm ls --all ELSPROBLEMS from bundled core 2.2.0 beside resolved server 2.3.0; the canary covers client stdio calls, not serve.",
     "Linux x86_64 scratch-prefix scope only; no other host or macOS acceptance is inferred.",
@@ -120,6 +120,33 @@
       "matches_recorded_sha256": true,
       "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
     },
-    "command_sanitization": "Restored from the hashed W1-moves.json packet. Qualification and host prefixes remain distinct; scratch HOME path segments use <scratch-home>, retaining all child paths including separate npm user/global config files and XDG directories."
+    "command_sanitization": "Restored from the hashed W1-moves.json packet. Qualification and host prefixes remain distinct; scratch HOME path segments use <scratch-home>, retaining all child paths including separate npm user/global config files and XDG directories.",
+    "adoption_status": "held_not_selected",
+    "overturn_condition": "A consistent resolved dependency tree (npm ls --all succeeds) and qualified persistent daemon/serve role, including use, restart and recovery, in an isolated prefix.",
+    "r642b_timed_command_refs": [
+      "evidence/artifacts/currency-wave-w1-20261003/native-checks.json#/commands/mcporter-call-r642b-timed"
+    ],
+    "r642b_dependency_tree_check": {
+      "command": "npm ls --global --prefix <qualification-root>/mcporter/prefix --all --json",
+      "environment": {
+        "HOME": "<repair-scratch>/home",
+        "NPM_CONFIG_CACHE": "<repair-scratch>/npm-cache",
+        "NPM_CONFIG_USERCONFIG": "<repair-scratch>/npm-user.ini",
+        "NPM_CONFIG_GLOBALCONFIG": "<repair-scratch>/npm-global.ini",
+        "NPM_CONFIG_OFFLINE": "true"
+      },
+      "exit_code": 1,
+      "started_at_utc": "2026-10-03T08:16:49Z",
+      "ended_at_utc": "2026-10-03T08:16:50Z",
+      "returned_json_problems": [
+        "invalid: @modelcontextprotocol/core@2.2.0 <qualification-root>/mcporter/prefix/lib/node_modules/mcporter/node_modules/@modelcontextprotocol/core"
+      ],
+      "returned_stderr": "npm error code ELSPROBLEMS\nnpm error invalid: @modelcontextprotocol/core@2.2.0 <qualification-root>/mcporter/prefix/lib/node_modules/mcporter/node_modules/@modelcontextprotocol/core\nnpm error A complete log of this run can be found in: <repair-scratch>/npm-cache/_logs/2026-10-03T08_16_49_590Z-debug-0.log\n",
+      "stdout_sha256_original": "f1d26e61afa60d2757ae7a42f2df0f699df87a0b7e1ff0b7c0d2d861ed12a2ee",
+      "retained_stdout_fields": [
+        "problems"
+      ],
+      "scope": "Read-only native inspection of the W1 scratch install. This fresh ELSPROBLEMS output corroborates the hold; no dependency resolution or host installation was changed."
+    }
   }
 }

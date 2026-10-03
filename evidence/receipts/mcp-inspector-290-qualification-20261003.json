@@ -119,6 +119,11 @@
       "bytes": 1235523,
       "matches_recorded_sha256": true,
       "scope": "byte identity with the qualified W1 artifact; not signature or upstream test acceptance"
-    }
+    },
+    "r642b_timed_command_refs": [
+      "evidence/artifacts/currency-wave-w1-20261003/native-checks.json#/commands/inspector-tools-list-r642b-timed",
+      "evidence/artifacts/currency-wave-w1-20261003/native-checks.json#/commands/inspector-tools-call-r642b-timed",
+      "evidence/artifacts/currency-wave-w1-20261003/native-checks.json#/commands/inspector-negative-r642b-timed"
+    ]
   }
 }

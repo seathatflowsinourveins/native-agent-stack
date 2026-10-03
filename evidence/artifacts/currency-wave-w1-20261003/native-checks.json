@@ -42,7 +42,8 @@
         "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json"
       },
       "started_at_utc": null,
-      "ended_at_utc": null
+      "ended_at_utc": null,
+      "attempt_status": "earlier_untimed_attempt"
     },
     "inspector-tools-call": {
       "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name order --tool-args-json '{\"action\":\"get_session_stats\",\"args\":{}}' --format json --stored-auth-only --cwd <integration-scratch>/work",
@@ -60,7 +61,8 @@
         "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json"
       },
       "started_at_utc": null,
-      "ended_at_utc": null
+      "ended_at_utc": null,
+      "attempt_status": "earlier_untimed_attempt"
     },
     "inspector-negative": {
       "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name w1_unknown_tool --tool-args-json '{}' --format json --stored-auth-only --cwd <integration-scratch>/work",
@@ -78,7 +80,8 @@
         "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json"
       },
       "started_at_utc": null,
-      "ended_at_utc": null
+      "ended_at_utc": null,
+      "attempt_status": "earlier_untimed_attempt"
     },
     "mcporter-call": {
       "command": "mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<integration-scratch>/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --env HOME=<integration-scratch>/home --cwd <integration-scratch>/work --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
@@ -90,7 +93,211 @@
       "stdout_sha256_original": "8af35b98c4e88af43b8a359506c429e6992af3d4d2a0813f3c4c2ec5e24729dc",
       "stderr_sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "started_at_utc": null,
-      "ended_at_utc": null
+      "ended_at_utc": null,
+      "attempt_status": "earlier_untimed_attempt",
+      "evidence_use": "compatibility_attempt_for_hold_only"
+    },
+    "inspector-tools-list-r642b-timed": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/list --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "{\"result\":{\"tools\":[{\"name\":\"set_tool_tier\",\"description\":\"Explicit tier override for the current session. Narrows or widens the exposed tool list to 'core' / 'standard' / 'full'. Prefer plan_turn(model=...) for routine per-task use; use set_tool_tier only for an explicit override (e.g. escalate to 'full' after a capability-gated failure). A narrowing that costs more than it saves is refused.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"tier\":{\"type\":\"string\",\"enum\":[\"core\",\"standard\",\"full\"]}},\"required\":[\"tier\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":false}},{\"name\":\"announce_model\",\"description\":\"Agent self-reports its active model identifier. Server resolves to a tier via model_tier_map (fuzzy: normalize \u2192 exact \u2192 glob \u2192 substring \u2192 '*' \u2192 'full') and narrows the exposed tool list accordingly. Idempotent: a second call with the same model is a cheap no-op. Prefer calling plan_turn(model=...) for routine per-task use; use announce_model as a fallback when plan_turn is not appropriate for the current task.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"model\":{\"type\":\"string\",\"description\":\"Your active model identifier, e.g. 'claude-haiku-4-5'.\"}},\"required\":[\"model\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":false}},{\"name\":\"jcodemunch_guide\",\"description\":\"Return the version-current CLAUDE.md / AGENT.md policy snippet for jcodemunch-mcp \u2014 the same text produced by `jcodemunch-mcp claude-md --generate`. Lets an agent keep a one-line CLAUDE.md (e.g. \\\"Call jcodemunch_guide and strictly follow its instructions.\\\") instead of pasting a static snippet that drifts from the installed version. Idempotent, no repo context required. Matches the active tool surface, tier and disabled_tools \u2014 list 'jcodemunch_guide' in disabled_tools to hide it.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{}},\"annotations\":{\"readOnlyHint\":true,\"openWorldHint\":false}},{\"name\":\"order\",\"description\":\"Dispatch any jcodemunch action by name: order(action, args). The single-verb front door to the full tool catalog. Read-only by default \u2014 actions that change index/session state require allow_state_change=true, and execution/file-write verbs are refused. For exploration questions ('how does X work'), order('get_ranked_context', {repo, query, token_budget}) answers in ONE call \u2014 prefer it over chained search/outline/source hops; add compress=true to fit more symbols in the same budget. Call 'menu' to discover actions, or 'route' to pick one from a task.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"action\":{\"type\":\"string\",\"description\":\"Name of the catalog action to run (e.g. 'search_symbols').\"},\"args\":{\"type\":\"object\",\"description\":\"Arguments for that action, exactly as you'd pass them directly.\",\"default\":{}},\"allow_state_change\":{\"type\":\"boolean\",\"description\":\"Opt in to dispatching an index/session state-changing action (e.g. index_repo).\",\"default\":false}},\"required\":[\"action\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":true}},{\"name\":\"menu\",\"description\":\"Discover catalog actions without keeping the full tool catalog resident: menu(query?). Returns compact rows (action, summary, required args, state_changing). With no query, lists the catalog. Pair with 'order' to dispatch the chosen action.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\",\"description\":\"Optional. Keywords describing what you want to do; ranks matching actions.\"},\"limit\":{\"type\":\"integer\",\"description\":\"Max actions to return.\",\"default\":25}}},\"annotations\":{\"readOnlyHint\":true,\"openWorldHint\":false}},{\"name\":\"route\",\"description\":\"Map a natural-language task to the best catalog action(s): route(task, repo?, execute?). Returns ranked recommendations with ready-to-run argument templates. With execute=true, dispatches the top recommendation and returns its result in the same call, collapsing discover-then-call into one round-trip. Recommends assemble_task_context / plan_turn for context-gathering intents.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"task\":{\"type\":\"string\",\"description\":\"What you're trying to do, in plain language.\"},\"repo\":{\"type\":\"string\",\"description\":\"Repository identifier (required to execute repo-scoped actions).\"},\"execute\":{\"type\":\"boolean\",\"description\":\"If true, dispatch the top recommended action and return its result.\",\"default\":false},\"model\":{\"type\":\"string\",\"description\":\"Optional active model id; piggybacks tier-switch like plan_turn(model=...).\"}},\"required\":[\"task\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":true}}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n",
+      "stdout_sha256_original": "4884a73e53ae2f39f6584260f0ceb05e46607894ddc5d482f385bd2fd56f7fe6",
+      "stderr_sha256_original": "188cc3dea4db2dcff7706137697f8a79268152dfe93660d013c3abc8840d05bd",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T08:23:59Z",
+      "ended_at_utc": "2026-10-03T08:24:00Z",
+      "attempt_status": "r642b_final_timed_rerun_after_complete_hold",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-list.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/list --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-tools-list.stdout 2> <integration-scratch>/inspector-tools-list.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-list.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-tools-list.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "inspector-tools-call-r642b-timed": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name order --tool-args-json '{\"action\":\"get_session_stats\",\"args\":{}}' --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"session_tokens_saved\\\":0,\\\"session_calls\\\":0,\\\"session_duration_s\\\":0.1,\\\"session_response_tokens\\\":0,\\\"total_tokens_saved\\\":0,\\\"total_tokens_saved_basis\\\":{\\\"generation\\\":2,\\\"first_generation\\\":2,\\\"mixed_basis\\\":false},\\\"lifetime_by_tool\\\":{},\\\"lifetime_by_tool_since\\\":null,\\\"lifetime_unattributed\\\":0,\\\"tool_breakdown\\\":{},\\\"tool_calls\\\":{},\\\"savings_per_call\\\":0.0,\\\"result_cache\\\":{\\\"total_hits\\\":0,\\\"total_misses\\\":0,\\\"hit_rate\\\":0.0,\\\"cached_entries\\\":0},\\\"latency_per_tool\\\":{},\\\"session_cost_avoided\\\":{\\\"claude_opus_4_6\\\":0.0,\\\"claude_sonnet_4_6\\\":0.0,\\\"claude_haiku_4_5\\\":0.0,\\\"gpt5_latest\\\":0.0},\\\"total_cost_avoided\\\":{\\\"claude_opus_4_6\\\":0.0,\\\"claude_sonnet_4_6\\\":0.0,\\\"claude_haiku_4_5\\\":0.0,\\\"gpt5_latest\\\":0.0},\\\"runtime_signal\\\":{\\\"rows\\\":0,\\\"by_source\\\":{}},\\\"savings_provenance\\\":{\\\"token_reduction\\\":{\\\"average_pct\\\":99.6,\\\"task_runs\\\":15,\\\"tokenizer\\\":\\\"cl100k_base\\\",\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/measured.json\\\",\\\"methodology\\\":\\\"benchmarks/METHODOLOGY.md\\\"},\\\"replay_retrieval_quality\\\":{\\\"fixture\\\":\\\"self_v1_75_0\\\",\\\"k\\\":10,\\\"ndcg\\\":1.0,\\\"mrr\\\":1.0,\\\"recall\\\":1.0,\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/measured.json\\\",\\\"ci_gated\\\":true},\\\"implementation_channel_accuracy\\\":{\\\"corpus\\\":\\\"authored-scenarios-v2\\\",\\\"languages\\\":[\\\"python\\\",\\\"typescript\\\",\\\"go\\\"],\\\"channels\\\":{\\\"ast\\\":{\\\"precision\\\":0.818,\\\"recall\\\":1.0},\\\"duck\\\":{\\\"precision\\\":0.5,\\\"recall\\\":1.0},\\\"decorator\\\":{\\\"precision\\\":0.556,\\\"recall\\\":1.0}},\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/channel_accuracy.json\\\",\\\"ci_gated\\\":true,\\\"scope_note\\\":\\\"authored gold corpus \\\\u2014 channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\\\"},\\\"contract\\\":\\\"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\\\"},\\\"processes\\\":{\\\"live\\\":1,\\\"others\\\":0,\\\"this_pid\\\":25,\\\"oldest_age_seconds\\\":0.0},\\\"tool_surface\\\":{\\\"surface\\\":\\\"counter\\\",\\\"profile\\\":\\\"full\\\",\\\"visible_tools\\\":6,\\\"catalog_tools\\\":94,\\\"schema_tokens_visible\\\":1050,\\\"schema_tokens_catalog\\\":27880,\\\"schema_tokens_avoided\\\":26830,\\\"schema_tokens_basis\\\":\\\"one_time_at_full_rate_then_cache_read\\\",\\\"schema_tokens_basis_note\\\":\\\"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\\\",\\\"heaviest_tools\\\":{\\\"order\\\":260,\\\"route\\\":229,\\\"announce_model\\\":161,\\\"jcodemunch_guide\\\":147,\\\"menu\\\":128,\\\"set_tool_tier\\\":125},\\\"estimator\\\":\\\"bytes/4\\\"}}\"}],\"isError\":false}}\n",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n",
+      "stdout_sha256_original": "d6467c8b56adbe08d0d04e80f05e90c7f3b52e85e44be123ade3b10c0c56fca0",
+      "stderr_sha256_original": "188cc3dea4db2dcff7706137697f8a79268152dfe93660d013c3abc8840d05bd",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T08:24:00Z",
+      "ended_at_utc": "2026-10-03T08:24:01Z",
+      "attempt_status": "r642b_final_timed_rerun_after_complete_hold",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-call.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name order --tool-args-json '{\"action\":\"get_session_stats\",\"args\":{}}' --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-tools-call.stdout 2> <integration-scratch>/inspector-tools-call.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-call.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-tools-call.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "inspector-negative-r642b-timed": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name w1_unknown_tool --tool-args-json '{}' --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 5,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n{\"error\":{\"code\":\"tool_not_found\",\"message\":\"Tool 'w1_unknown_tool' not found on server.\"}}\n",
+      "stdout_sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256_original": "ddb5882d31897453b80aeff4d666c5639e6eb57f6fc52b8d561858db01e659fe",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T08:24:01Z",
+      "ended_at_utc": "2026-10-03T08:24:02Z",
+      "attempt_status": "r642b_final_timed_rerun_after_complete_hold",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-negative.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name w1_unknown_tool --tool-args-json '{}' --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-negative.stdout 2> <integration-scratch>/inspector-negative.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-negative.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-negative.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "mcporter-call-r642b-timed": {
+      "command": "mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<integration-scratch>/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --env HOME=<integration-scratch>/home --cwd <integration-scratch>/work --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcporter/prefix/bin/mcporter",
+      "cwd": "<repository>",
+      "stdout": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 0,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {},\n  \"lifetime_by_tool_since\": null,\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"runtime_signal\": {\n    \"rows\": 0,\n    \"by_source\": {}\n  },\n  \"savings_provenance\": {\n    \"token_reduction\": {\n      \"average_pct\": 99.6,\n      \"task_runs\": 15,\n      \"tokenizer\": \"cl100k_base\",\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"methodology\": \"benchmarks/METHODOLOGY.md\"\n    },\n    \"replay_retrieval_quality\": {\n      \"fixture\": \"self_v1_75_0\",\n      \"k\": 10,\n      \"ndcg\": 1,\n      \"mrr\": 1,\n      \"recall\": 1,\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"ci_gated\": true\n    },\n    \"implementation_channel_accuracy\": {\n      \"corpus\": \"authored-scenarios-v2\",\n      \"languages\": [\n        \"python\",\n        \"typescript\",\n        \"go\"\n      ],\n      \"channels\": {\n        \"ast\": {\n          \"precision\": 0.818,\n          \"recall\": 1\n        },\n        \"duck\": {\n          \"precision\": 0.5,\n          \"recall\": 1\n        },\n        \"decorator\": {\n          \"precision\": 0.556,\n          \"recall\": 1\n        }\n      },\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/channel_accuracy.json\",\n      \"ci_gated\": true,\n      \"scope_note\": \"authored gold corpus \u2014 channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\"\n    },\n    \"contract\": \"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\"\n  },\n  \"processes\": {\n    \"live\": 1,\n    \"others\": 0,\n    \"this_pid\": 25,\n    \"oldest_age_seconds\": 0\n  },\n  \"tool_surface\": {\n    \"surface\": \"counter\",\n    \"profile\": \"full\",\n    \"visible_tools\": 6,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 1050,\n    \"schema_tokens_catalog\": 27880,\n    \"schema_tokens_avoided\": 26830,\n    \"schema_tokens_basis\": \"one_time_at_full_rate_then_cache_read\",\n    \"schema_tokens_basis_note\": \"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}\n",
+      "stderr": "",
+      "stdout_sha256_original": "2b299e18d0c05c2914876815b733bc74f7c5d9a582094c074d464cff98f58094",
+      "stderr_sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at_utc": "2026-10-03T08:24:02Z",
+      "ended_at_utc": "2026-10-03T08:24:03Z",
+      "attempt_status": "r642b_final_timed_rerun_after_complete_hold",
+      "evidence_use": "compatibility_attempt_for_hold_only",
+      "environment": {
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config",
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json"
+      },
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/mcporter-call.start; rtk proxy env [environment above] mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<integration-scratch>/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --env HOME=<integration-scratch>/home --cwd <integration-scratch>/work --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth > <integration-scratch>/mcporter-call.stdout 2> <integration-scratch>/mcporter-call.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/mcporter-call.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/mcporter-call.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "inspector-tools-list-r642b-timed-earlier": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/list --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "{\"result\":{\"tools\":[{\"name\":\"set_tool_tier\",\"description\":\"Explicit tier override for the current session. Narrows or widens the exposed tool list to 'core' / 'standard' / 'full'. Prefer plan_turn(model=...) for routine per-task use; use set_tool_tier only for an explicit override (e.g. escalate to 'full' after a capability-gated failure). A narrowing that costs more than it saves is refused.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"tier\":{\"type\":\"string\",\"enum\":[\"core\",\"standard\",\"full\"]}},\"required\":[\"tier\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":false}},{\"name\":\"announce_model\",\"description\":\"Agent self-reports its active model identifier. Server resolves to a tier via model_tier_map (fuzzy: normalize \u2192 exact \u2192 glob \u2192 substring \u2192 '*' \u2192 'full') and narrows the exposed tool list accordingly. Idempotent: a second call with the same model is a cheap no-op. Prefer calling plan_turn(model=...) for routine per-task use; use announce_model as a fallback when plan_turn is not appropriate for the current task.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"model\":{\"type\":\"string\",\"description\":\"Your active model identifier, e.g. 'claude-haiku-4-5'.\"}},\"required\":[\"model\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":false}},{\"name\":\"jcodemunch_guide\",\"description\":\"Return the version-current CLAUDE.md / AGENT.md policy snippet for jcodemunch-mcp \u2014 the same text produced by `jcodemunch-mcp claude-md --generate`. Lets an agent keep a one-line CLAUDE.md (e.g. \\\"Call jcodemunch_guide and strictly follow its instructions.\\\") instead of pasting a static snippet that drifts from the installed version. Idempotent, no repo context required. Matches the active tool surface, tier and disabled_tools \u2014 list 'jcodemunch_guide' in disabled_tools to hide it.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{}},\"annotations\":{\"readOnlyHint\":true,\"openWorldHint\":false}},{\"name\":\"order\",\"description\":\"Dispatch any jcodemunch action by name: order(action, args). The single-verb front door to the full tool catalog. Read-only by default \u2014 actions that change index/session state require allow_state_change=true, and execution/file-write verbs are refused. For exploration questions ('how does X work'), order('get_ranked_context', {repo, query, token_budget}) answers in ONE call \u2014 prefer it over chained search/outline/source hops; add compress=true to fit more symbols in the same budget. Call 'menu' to discover actions, or 'route' to pick one from a task.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"action\":{\"type\":\"string\",\"description\":\"Name of the catalog action to run (e.g. 'search_symbols').\"},\"args\":{\"type\":\"object\",\"description\":\"Arguments for that action, exactly as you'd pass them directly.\",\"default\":{}},\"allow_state_change\":{\"type\":\"boolean\",\"description\":\"Opt in to dispatching an index/session state-changing action (e.g. index_repo).\",\"default\":false}},\"required\":[\"action\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":true}},{\"name\":\"menu\",\"description\":\"Discover catalog actions without keeping the full tool catalog resident: menu(query?). Returns compact rows (action, summary, required args, state_changing). With no query, lists the catalog. Pair with 'order' to dispatch the chosen action.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"query\":{\"type\":\"string\",\"description\":\"Optional. Keywords describing what you want to do; ranks matching actions.\"},\"limit\":{\"type\":\"integer\",\"description\":\"Max actions to return.\",\"default\":25}}},\"annotations\":{\"readOnlyHint\":true,\"openWorldHint\":false}},{\"name\":\"route\",\"description\":\"Map a natural-language task to the best catalog action(s): route(task, repo?, execute?). Returns ranked recommendations with ready-to-run argument templates. With execute=true, dispatches the top recommendation and returns its result in the same call, collapsing discover-then-call into one round-trip. Recommends assemble_task_context / plan_turn for context-gathering intents.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"task\":{\"type\":\"string\",\"description\":\"What you're trying to do, in plain language.\"},\"repo\":{\"type\":\"string\",\"description\":\"Repository identifier (required to execute repo-scoped actions).\"},\"execute\":{\"type\":\"boolean\",\"description\":\"If true, dispatch the top recommended action and return its result.\",\"default\":false},\"model\":{\"type\":\"string\",\"description\":\"Optional active model id; piggybacks tier-switch like plan_turn(model=...).\"}},\"required\":[\"task\"]},\"annotations\":{\"readOnlyHint\":false,\"openWorldHint\":true}}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n",
+      "stdout_sha256_original": "4884a73e53ae2f39f6584260f0ceb05e46607894ddc5d482f385bd2fd56f7fe6",
+      "stderr_sha256_original": "188cc3dea4db2dcff7706137697f8a79268152dfe93660d013c3abc8840d05bd",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T07:47:37Z",
+      "ended_at_utc": "2026-10-03T07:47:38Z",
+      "attempt_status": "earlier_timed_attempt_before_complete_pin_site_reversion",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-list.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/list --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-tools-list.stdout 2> <integration-scratch>/inspector-tools-list.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-list.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-tools-list.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "inspector-tools-call-r642b-timed-earlier": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name order --tool-args-json '{\"action\":\"get_session_stats\",\"args\":{}}' --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"session_tokens_saved\\\":0,\\\"session_calls\\\":0,\\\"session_duration_s\\\":0.1,\\\"session_response_tokens\\\":0,\\\"total_tokens_saved\\\":0,\\\"total_tokens_saved_basis\\\":{\\\"generation\\\":2,\\\"first_generation\\\":2,\\\"mixed_basis\\\":false},\\\"lifetime_by_tool\\\":{},\\\"lifetime_by_tool_since\\\":null,\\\"lifetime_unattributed\\\":0,\\\"tool_breakdown\\\":{},\\\"tool_calls\\\":{},\\\"savings_per_call\\\":0.0,\\\"result_cache\\\":{\\\"total_hits\\\":0,\\\"total_misses\\\":0,\\\"hit_rate\\\":0.0,\\\"cached_entries\\\":0},\\\"latency_per_tool\\\":{},\\\"session_cost_avoided\\\":{\\\"claude_opus_4_6\\\":0.0,\\\"claude_sonnet_4_6\\\":0.0,\\\"claude_haiku_4_5\\\":0.0,\\\"gpt5_latest\\\":0.0},\\\"total_cost_avoided\\\":{\\\"claude_opus_4_6\\\":0.0,\\\"claude_sonnet_4_6\\\":0.0,\\\"claude_haiku_4_5\\\":0.0,\\\"gpt5_latest\\\":0.0},\\\"runtime_signal\\\":{\\\"rows\\\":0,\\\"by_source\\\":{}},\\\"savings_provenance\\\":{\\\"token_reduction\\\":{\\\"average_pct\\\":99.6,\\\"task_runs\\\":15,\\\"tokenizer\\\":\\\"cl100k_base\\\",\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/measured.json\\\",\\\"methodology\\\":\\\"benchmarks/METHODOLOGY.md\\\"},\\\"replay_retrieval_quality\\\":{\\\"fixture\\\":\\\"self_v1_75_0\\\",\\\"k\\\":10,\\\"ndcg\\\":1.0,\\\"mrr\\\":1.0,\\\"recall\\\":1.0,\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/measured.json\\\",\\\"ci_gated\\\":true},\\\"implementation_channel_accuracy\\\":{\\\"corpus\\\":\\\"authored-scenarios-v2\\\",\\\"languages\\\":[\\\"python\\\",\\\"typescript\\\",\\\"go\\\"],\\\"channels\\\":{\\\"ast\\\":{\\\"precision\\\":0.818,\\\"recall\\\":1.0},\\\"duck\\\":{\\\"precision\\\":0.5,\\\"recall\\\":1.0},\\\"decorator\\\":{\\\"precision\\\":0.556,\\\"recall\\\":1.0}},\\\"basis\\\":\\\"measured\\\",\\\"source\\\":\\\"benchmarks/provenance/channel_accuracy.json\\\",\\\"ci_gated\\\":true,\\\"scope_note\\\":\\\"authored gold corpus \\\\u2014 channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\\\"},\\\"contract\\\":\\\"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\\\"},\\\"processes\\\":{\\\"live\\\":1,\\\"others\\\":0,\\\"this_pid\\\":25,\\\"oldest_age_seconds\\\":0.0},\\\"tool_surface\\\":{\\\"surface\\\":\\\"counter\\\",\\\"profile\\\":\\\"full\\\",\\\"visible_tools\\\":6,\\\"catalog_tools\\\":94,\\\"schema_tokens_visible\\\":1050,\\\"schema_tokens_catalog\\\":27880,\\\"schema_tokens_avoided\\\":26830,\\\"schema_tokens_basis\\\":\\\"one_time_at_full_rate_then_cache_read\\\",\\\"schema_tokens_basis_note\\\":\\\"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\\\",\\\"heaviest_tools\\\":{\\\"order\\\":260,\\\"route\\\":229,\\\"announce_model\\\":161,\\\"jcodemunch_guide\\\":147,\\\"menu\\\":128,\\\"set_tool_tier\\\":125},\\\"estimator\\\":\\\"bytes/4\\\"}}\"}],\"isError\":false}}\n",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n",
+      "stdout_sha256_original": "d6467c8b56adbe08d0d04e80f05e90c7f3b52e85e44be123ade3b10c0c56fca0",
+      "stderr_sha256_original": "188cc3dea4db2dcff7706137697f8a79268152dfe93660d013c3abc8840d05bd",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T07:47:38Z",
+      "ended_at_utc": "2026-10-03T07:47:39Z",
+      "attempt_status": "earlier_timed_attempt_before_complete_pin_site_reversion",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-call.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name order --tool-args-json '{\"action\":\"get_session_stats\",\"args\":{}}' --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-tools-call.stdout 2> <integration-scratch>/inspector-tools-call.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-tools-call.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-tools-call.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "inspector-negative-r642b-timed-earlier": {
+      "command": "mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name w1_unknown_tool --tool-args-json '{}' --format json --stored-auth-only --cwd <integration-scratch>/work",
+      "exit_code": 5,
+      "executable": "<qualification-root>/mcp-inspector/prefix/bin/mcp-inspector",
+      "cwd": "<repository>",
+      "stdout": "",
+      "stderr": "[mcp-inspector] Secrets are stored unencrypted (file mode 0600). Set MCP_INSPECTOR_SECRET_KEY or MCP_INSPECTOR_SECRET_KEY_FILE to encrypt them.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\nDeprecated: Using JCODEMUNCH_SHARE_SAVINGS environment variable. This will be removed in v2.0. Use config.jsonc instead.\njcodemunch-mcp 1.108.327 by jgravelle \u00b7 https://github.com/jgravelle/jcodemunch-mcp\n{\"error\":{\"code\":\"tool_not_found\",\"message\":\"Tool 'w1_unknown_tool' not found on server.\"}}\n",
+      "stdout_sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256_original": "ddb5882d31897453b80aeff4d666c5639e6eb57f6fc52b8d561858db01e659fe",
+      "environment": {
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json",
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+      },
+      "started_at_utc": "2026-10-03T07:47:39Z",
+      "ended_at_utc": "2026-10-03T07:47:40Z",
+      "attempt_status": "earlier_timed_attempt_before_complete_pin_site_reversion",
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-negative.start; rtk proxy env [environment above] mcp-inspector --cli --config <integration-scratch>/mcp.json --server jcodemunch --method tools/call --tool-name w1_unknown_tool --tool-args-json '{}' --format json --stored-auth-only --cwd <integration-scratch>/work > <integration-scratch>/inspector-negative.stdout 2> <integration-scratch>/inspector-negative.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/inspector-negative.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/inspector-negative.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
+    },
+    "mcporter-call-r642b-timed-earlier": {
+      "command": "mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<integration-scratch>/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --env HOME=<integration-scratch>/home --cwd <integration-scratch>/work --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+      "exit_code": 0,
+      "executable": "<qualification-root>/mcporter/prefix/bin/mcporter",
+      "cwd": "<repository>",
+      "stdout": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 0,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {},\n  \"lifetime_by_tool_since\": null,\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"runtime_signal\": {\n    \"rows\": 0,\n    \"by_source\": {}\n  },\n  \"savings_provenance\": {\n    \"token_reduction\": {\n      \"average_pct\": 99.6,\n      \"task_runs\": 15,\n      \"tokenizer\": \"cl100k_base\",\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"methodology\": \"benchmarks/METHODOLOGY.md\"\n    },\n    \"replay_retrieval_quality\": {\n      \"fixture\": \"self_v1_75_0\",\n      \"k\": 10,\n      \"ndcg\": 1,\n      \"mrr\": 1,\n      \"recall\": 1,\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"ci_gated\": true\n    },\n    \"implementation_channel_accuracy\": {\n      \"corpus\": \"authored-scenarios-v2\",\n      \"languages\": [\n        \"python\",\n        \"typescript\",\n        \"go\"\n      ],\n      \"channels\": {\n        \"ast\": {\n          \"precision\": 0.818,\n          \"recall\": 1\n        },\n        \"duck\": {\n          \"precision\": 0.5,\n          \"recall\": 1\n        },\n        \"decorator\": {\n          \"precision\": 0.556,\n          \"recall\": 1\n        }\n      },\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/channel_accuracy.json\",\n      \"ci_gated\": true,\n      \"scope_note\": \"authored gold corpus \u2014 channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\"\n    },\n    \"contract\": \"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\"\n  },\n  \"processes\": {\n    \"live\": 1,\n    \"others\": 0,\n    \"this_pid\": 25,\n    \"oldest_age_seconds\": 0\n  },\n  \"tool_surface\": {\n    \"surface\": \"counter\",\n    \"profile\": \"full\",\n    \"visible_tools\": 6,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 1050,\n    \"schema_tokens_catalog\": 27880,\n    \"schema_tokens_avoided\": 26830,\n    \"schema_tokens_basis\": \"one_time_at_full_rate_then_cache_read\",\n    \"schema_tokens_basis_note\": \"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}\n",
+      "stderr": "",
+      "stdout_sha256_original": "2b299e18d0c05c2914876815b733bc74f7c5d9a582094c074d464cff98f58094",
+      "stderr_sha256_original": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "started_at_utc": "2026-10-03T07:47:40Z",
+      "ended_at_utc": "2026-10-03T07:47:41Z",
+      "attempt_status": "earlier_timed_attempt_before_complete_pin_site_reversion",
+      "evidence_use": "compatibility_attempt_for_hold_only",
+      "environment": {
+        "HOME": "<integration-scratch>/home",
+        "XDG_CONFIG_HOME": "<integration-scratch>/xdg-config",
+        "XDG_CACHE_HOME": "<integration-scratch>/xdg-cache",
+        "XDG_DATA_HOME": "<integration-scratch>/xdg-data",
+        "CLAUDE_CONFIG_DIR": "<integration-scratch>/config",
+        "MCP_AUTO_OPEN_ENABLED": "false",
+        "MCP_INSPECTOR_OAUTH_STATE_PATH": "<integration-scratch>/oauth.json",
+        "MCP_INSPECTOR_SECRET_STORE": "file",
+        "MCP_INSPECTOR_SECRET_FILE": "<integration-scratch>/secrets.json"
+      },
+      "timing_capture": "In the same shell: rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/mcporter-call.start; rtk proxy env [environment above] mcporter call --stdio <qualification-root>/jcodemunch-mcp/prefix/bin/jcodemunch-mcp --env CODE_INDEX_PATH=<integration-scratch>/code-index --env JCODEMUNCH_SHARE_SAVINGS=0 --env HOME=<integration-scratch>/home --cwd <integration-scratch>/work --name jcodemunch --server jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth > <integration-scratch>/mcporter-call.stdout 2> <integration-scratch>/mcporter-call.stderr; R642B_COMMAND_STATUS=$?; rtk date -u +%Y-%m-%dT%H:%M:%SZ > <integration-scratch>/mcporter-call.end; printf '%s\\n' \"$R642B_COMMAND_STATUS\" > <integration-scratch>/mcporter-call.exit; exit \"$R642B_COMMAND_STATUS\". The bare CLI name resolves to executable above."
     }
   },
   "independent_observation": {
@@ -169,5 +376,56 @@
       "decisive_output": "..................s....................ssssssssssssss..........................s..........................................ssssssss...........................sss.........s.........................sssss.....................................................\n----------------------------------------------------------------------\nRan 253 tests in 65.608s\n\nOK (skipped=33)",
       "scope": "Repository unit/integration tests with native local npm fixtures; no macOS runtime or host switch."
     }
-  ]
+  ],
+  "r642b_recorded_at_utc": "2026-10-03T07:49:39.883972+00:00",
+  "r642b_scope": "Fresh timed runs of the four original commands, using the W1 scratch installs and a fresh isolated configuration/home. mcporter 0.14.2 is compatibility-attempt evidence for its hold only.",
+  "r642b_claude_hud_upgrade": {
+    "status": "documented, host verification pending",
+    "installed_version": "2.1.288",
+    "scope": "Installed native client help only, executed from scratch cwd with HOME and CLAUDE_CONFIG_DIR in temporary directories. No marketplace or plugin update executed; host configuration and plugins were not touched.",
+    "upstream_sources": [
+      "https://github.com/anthropics/claude-code/blob/v2.1.288/CHANGELOG.md",
+      "https://code.claude.com/docs/en/plugins/install#update-plugins-now",
+      "https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update",
+      "https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start",
+      "https://code.claude.com/docs/en/env-vars#variables"
+    ],
+    "help_commands": [
+      {
+        "command": "claude --version",
+        "executable": "<native-claude>",
+        "cwd": "<integration-scratch>/work",
+        "environment": {
+          "HOME": "<integration-scratch>/home",
+          "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+        },
+        "exit_code": 0,
+        "returned_output": "2.1.288 (Claude Code)\n"
+      },
+      {
+        "command": "claude plugin marketplace update --help",
+        "executable": "<native-claude>",
+        "cwd": "<integration-scratch>/work",
+        "environment": {
+          "HOME": "<integration-scratch>/home",
+          "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+        },
+        "exit_code": 0,
+        "returned_output": "Usage: claude plugin marketplace update [options] [name]\n\nUpdate marketplace(s) from their source - updates all if no name specified\n\nOptions:\n  -h, --help  Display help for command\n  --json      With a marketplace name: print one machine-readable result line as\n              the last line on stdout (same exit codes)\n"
+      },
+      {
+        "command": "claude plugin update --help",
+        "executable": "<native-claude>",
+        "cwd": "<integration-scratch>/work",
+        "environment": {
+          "HOME": "<integration-scratch>/home",
+          "CLAUDE_CONFIG_DIR": "<integration-scratch>/config"
+        },
+        "exit_code": 0,
+        "returned_output": "Usage: claude plugin update [options] <plugin>\n\nUpdate a plugin to the latest version (restart required to apply)\n\nOptions:\n  --accept-command <sha256>  Accept the marketplace-declared command (a\n                             command-source install, or the headersHelper that\n                             fetches the archive) whose sha256 a previous --json\n                             run reported as shownCommand.sha256; counts as -y\n                             for exactly that command, for that plugin and\n                             marketplace catalog, and nothing else. If either\n                             changed (a refresh that moved the catalog counts),\n                             the run refuses and reports the command again, to\n                             be shown to a person again\n  -h, --help                 Display help for command\n  --json                     Print one machine-readable result line on stdout\n                             instead of the human message (same exit codes; a\n                             marketplace-declared command is still shown and\n                             must be confirmed \u2014 pass -y when not interactive)\n  -s, --scope <scope>        Installation scope: user, project, local, managed\n                             (default: auto-detect)\n  -y, --yes                  Accept the displayed marketplace-declared command\n                             without the confirmation prompt \u2014 a changed install\n                             command, or the headersHelper command that fetches\n                             its archive (required when stdin or stdout is not a\n                             TTY)\n"
+      }
+    ],
+    "offline_tag_transition_verified": false
+  },
+  "r642b_last_updated_at_utc": "2026-10-03T08:25:40.680899+00:00"
 }

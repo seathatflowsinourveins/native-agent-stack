@@ -129,11 +129,11 @@
     },
     {
       "id": "mcporter",
-      "version": "0.14.2",
+      "version": "0.14.1",
       "kind": "npm",
-      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz",
-      "sha256": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
-      "install_note": "2026-10-03 W1 scratch qualification. Checked against four published sources, all matched. (1) npm registry dist.integrity sha512-3ajjKzPLe/39hN582XqMuOw3S9vHQfLpSBq72zVakT03xso3GDXHcht/eVLu/l2MDqulIOtLevnTKreUxymHJQ== equals `openssl dgst -sha512 -binary | base64` of the downloaded tarball, and dist.shasum ee7d91e7362e7dc5b44b5fcc5cfdea7cfaedb1fd equals sha1sum. (2) GitHub release v0.14.2 asset digest sha256:f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b for mcporter-0.14.2.tgz equals the local sha256sum; the release checksums.txt line matches (sha256sum -c: OK, exit 0); the release asset is byte-identical to the npm tarball (cmp exit 0); size 3585823 bytes. (3) npm SLSA provenance attestation (https://registry.npmjs.org/-/npm/v1/attestations/mcporter@0.14.2): subject sha512 dda8e32b...8725 equals the tarball sha512 hex, workflow .github/workflows/release.yml at refs/tags/v0.14.2, gitCommit aa0f55f9bffcde9d2070c86145f37d4dd3525f6c; the release provenance.json asset also names commit aa0f55f9 and the tgz sha256. (4) `npm audit signatures` exit 0: audited 40 packages, 40 verified registry signatures, 12 verified attestations. Receipt: evidence/receipts/mcporter-0142-qualification-20261003.json. This is isolated qualification evidence, not a host installation switch. Supported installation: npm install --global --prefix tools/mcporter-0.14.2 mcporter@0.14.2. Requires Node >=24 and ps on the daemon launcher PATH. Bundled client 2.2.0 is covered by the archive hash; other dependency ranges resolve at install time. The ad-hoc stdio canary passed; daemon and serve behavior remain unqualified.",
+      "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz",
+      "sha256": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
+      "install_note": "npm dist.integrity sha512-/6pvMjFPlCtFU3NhzWEV8vj2EwvbY2nisc8XYDwtPiyApj8v6A+B0Va5ul018oqSEkw7BiKCLoazBc4l+8QsdQ== matched, and the sha256 above equals the GitHub release v0.14.1 asset digest and its checksums.txt (checked 2026-09-25); `npm audit signatures` verified the registry signatures and mcporter's SLSA provenance (release.yml at refs/tags/v0.14.1, commit 93e0916cafe2d624b94271e31b75ca681a016514). `npm install --global --prefix tools/mcporter-0.14.1 mcporter@0.14.1`, matching recipes/README.md. Requires Node >=24, and `ps` on the PATH of whatever launches the mcporter daemon: 0.14.x runs `ps` from PATH (0.13.13 ran /bin/ps), and without it the daemon cannot connect keep-alive servers and `mcporter daemon stop` refuses. Qualified against 0.13.13 and switched on nativestack-5975wx-20260925 (evidence/receipts/mcporter-0141-qualification-20260925.json); that is one host's state, not evidence about any other Linux host.",
       "version_probe": {
         "method": "exec",
         "command": "mcporter",

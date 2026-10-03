@@ -158,7 +158,7 @@
     "nextjs": "blueprints/convergence-practice/application-delivery/README.md",
     "ntfy": "observability/backends/README.md",
     "omniroute": "docs/foundation-stack.md",
-    "openresearch": "recipes/native-upgrades-20260921.md",
+    "openresearch": "recipes/README.md",
     "opentelemetry-collector-contrib": "observability/README.md",
     "otel-tui": "recipes/README.md",
     "pandas": "blueprints/us-equities/nanosecond-replay/README.md",
@@ -181,12 +181,12 @@
     "skfolio": "blueprints/us-equities/research-evaluation/README.md",
     "skills-ref": "recipes/README.md",
     "socraticode": "recipes/README.md",
-    "syft": "blueprints/us-equities/supply-chain/README.md",
+    "syft": "recipes/README.md",
     "systemd": "blueprints/us-equities/worker-supervision/README.md",
     "tavily-cli": "recipes/tavily.md",
     "toon": "recipes/README.md",
     "vllm": "recipes/README.md",
-    "worktrunk": "recipes/native-upgrades-20260921.md",
+    "worktrunk": "recipes/README.md",
     "zizmor": "blueprints/convergence-practice/ci-security/README.md"
   },
   "profiles": [

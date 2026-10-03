@@ -627,8 +627,8 @@
     },
     {
       "id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
-      "version": "0.14.2",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
+      "version": "0.14.1",
       "license": "MIT",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
@@ -642,15 +642,13 @@
         "current-session-observation-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "mcporter-0141-qualification-20260925",
-        "mcporter-0142-qualification-20261003"
+        "mcporter-0141-qualification-20260925"
       ],
       "upstream_sources": [
-        "https://github.com/openclaw/mcporter/tree/v0.14.2",
-        "https://github.com/openclaw/mcporter/releases/tag/v0.14.2"
+        "https://github.com/openclaw/mcporter/tree/v0.14.1"
       ],
       "source_pin": null,
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"0.14.2\" (exit 0). The new ad-hoc stdio order/get_session_stats canary returned \"visible_tools\": 6, \"catalog_tools\": 94 and \"session_tokens_saved\": 0 (exit 0). Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.14.1 receipts retain their original scope."
+      "freshness": "0.14.1 serves bin/mcporter on the NativeStack WSL2 host since 2026-09-25 after a matched 37-step comparison against 0.13.13 (independent review). 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.13.13 is kept for rollback. The Mac pin stays 0.13.13, and the landscape winner pin stays 0.13.13 until a new verdict wave."
     },
     {
       "id": "openresearch",

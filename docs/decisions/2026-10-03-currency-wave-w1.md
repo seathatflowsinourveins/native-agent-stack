@@ -2,7 +2,8 @@
 
 ## Decision and north-star action
 
-Integrate the nine qualified foundation release pins from the W1 build contract.
+Integrate eight qualified foundation release pins from the W1 build contract;
+hold mcporter at 0.14.1 after R642b review.
 This maintains the native tooling used to build complex projects and conduct the
 north-star US-equities research and historical simulation. It changes repository
 selections and supported installation recipes; host installation, service
@@ -29,7 +30,6 @@ identities; they do not expand the scope of the recorded functional evidence.
 | claude-hud | 0.8.0 | [v0.10.0](https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0), commit `75683c6de1ac07f6bbef00d739001679dba0740c` | [Manifest versions and two synthetic stdin renders](../../evidence/receipts/claude-hud-0100-qualification-20261003.json) |
 | opentelemetry-collector-contrib | 0.161.0 | [v0.162.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0), commit `ae8c507510f48f433ab47dd1c6b01a59d6c388b5`; [distribution release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) | [Archive, version and configuration validation](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json) |
 | worktrunk | 0.79.0 | [v0.80.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0), commit `b49ca7eea9b03145791a5b94eccaf9c59412ed37` | [Version and synthetic repository list](../../evidence/receipts/worktrunk-0800-qualification-20261003.json) |
-| mcporter | 0.14.1 | [v0.14.2](https://github.com/openclaw/mcporter/releases/tag/v0.14.2), commit `aa0f55f9bffcde9d2070c86145f37d4dd3525f6c` | [Version and new ad-hoc stdio canary](../../evidence/receipts/mcporter-0142-qualification-20261003.json) |
 | syft | 1.52.0 | [v1.54.0](https://github.com/anchore/syft/releases/tag/v1.54.0), commit `cc326e45a6213360266dda4b30cc68095946d676` | [Version and recorded SDK inventory](../../evidence/receipts/syft-1540-qualification-20261003.json) |
 
 The integration worker rehashed all nine retained downloads and matched every
@@ -41,8 +41,9 @@ individual receipts preserve those distinctions and unverified signatures.
 For each component, the worker ran four fresh native `gh api` reads following
 the upstream snapshot's methodology: repository metadata, `releases/latest`,
 the selected exact source commit, and the latest stable release tag's commit.
-All 36 commands exited zero. All nine latest stable tags matched their selected
-candidate at collection time. The snapshot retains the original checks and
+All 36 commands exited zero. All nine latest stable tags matched their W1
+candidates at collection time; R642b retains eight moves and holds mcporter
+at 0.14.1. The snapshot retains the original checks and
 selected fields as dated `historical_observations`, and records genuine start/end
 timestamps and SHA256s of raw API stdout for the new checks. Version-only stack
 pins retain their pin semantics; resolving a commit for verification does not
@@ -56,10 +57,24 @@ that server and its documented `order/get_session_stats` request. Both calls
 exited zero with `--stored-auth-only`: the list contained six tool names and
 the call returned the six-tool counter surface. A deliberately unknown tool
 returned `tool_not_found` with exit 5. This stdio server requires no stored
-credentials, so the flag did not exercise OAuth. The new mcporter 0.14.2
+credentials, so the flag did not exercise OAuth. The mcporter 0.14.2
 ad-hoc stdio call returned the same counter surface with exit zero, without
-using an existing daemon. Actual output and the independent `last_seen_version`
+using an existing daemon; it is compatibility-attempt evidence for the hold,
+not acceptance of the selected pin. Actual output and the independent `last_seen_version`
 observation are retained in [native-checks.json](../../evidence/artifacts/currency-wave-w1-20261003/native-checks.json).
+
+R642b re-ran those exact four commands from the W1 scratch installs with a
+fresh configuration and home. Each shell captured its start and end with
+`date -u +%Y-%m-%dT%H:%M:%SZ`. The artifact's
+`commands/inspector-tools-list-r642b-timed` (08:23:59–08:24:00 UTC),
+`commands/inspector-tools-call-r642b-timed` (08:24:00–08:24:01 UTC) and
+`commands/inspector-negative-r642b-timed` (08:24:01–08:24:02 UTC) returned
+the same six tool names, a successful counter call and the expected
+`tool_not_found` exit 5 on 2026-10-03. The
+`commands/mcporter-call-r642b-timed` (08:24:02–08:24:03 UTC) returned
+`visible_tools: 6` with exit 0; it supports only the compatibility-attempt hold.
+The final timed commands ran after every current mcporter pin site and PR count was repaired. The interim timed entries are also retained under `-r642b-timed-earlier`. The four original entries remain labelled `earlier_untimed_attempt`, with their
+unknown times preserved. Each affected receipt points to the fresh timed entries.
 
 The recorded OpenResearch functional smoke is explicitly not run. Its
 `native_cli_e2e` receipt follows the build contract's required receipt kind,
@@ -104,9 +119,23 @@ observed fixture render.
 The user ended the seven-day cooldown for clean releases on 2026-10-03.
 This removes an age-only delay; it does not waive qualification, known
 regressions, functional gates or recipe compatibility. Alternatives were to
-retain the nine previous pins for the remaining cooldown, adopt the qualified
-releases within their measured scopes, or skip ahead to unqualified releases.
-Adopt the qualified set; retain each previous pin as the rollback reference.
+retain the previous pins for the remaining cooldown, adopt eight qualified
+releases within their measured scopes while holding mcporter, or adopt all nine
+despite the mcporter dependency and daemon gaps. Adopt the eight qualified moves;
+retain each previous pin as the rollback reference.
+
+R642b holds mcporter at the accepted Linux 0.14.1 pin. Its
+[0.14.2 compatibility attempt](../../evidence/receipts/mcporter-0142-qualification-20261003.json)
+retains the ELSPROBLEMS finding: bundled core 2.2.0 beside resolved server 2.3.0.
+The ad-hoc stdio canary does not qualify the persistent daemon and `serve` roles
+used by `foundation-cpu` and `token-efficiency`. Reopen the move only after a
+consistent resolved dependency tree (`npm ls --all` succeeds) and isolated
+qualification of that persistent role, including use, restart and recovery.
+A fresh read-only `npm ls --global --prefix <qualification-root>/mcporter/prefix --all --json` check also returned exit 1 and `ELSPROBLEMS` on 2026-10-03; the receipt retains its native `problems` field, stderr, timestamps and original stdout hash. The stack, audit, Linux artifact and install rows return to their `origin/main`
+0.14.1 values; macOS retains its independently held 0.13.13 pin and its Linux
+comparison returns to 0.14.1. No current pin links the attempt receipt. The
+upstream snapshot keeps the W1 0.14.2 observation as a dated compatibility
+attempt and still reports that newer release, while selecting 0.14.1.
 
 The W1 `holds_not_in_scope` entries stay out of this integration:
 
@@ -136,8 +165,8 @@ The worker compared every supplied `pin_sites` list with its own full `git grep`
 results and classified current installation pins separately from historical
 source anchors, recorded outputs, unrelated dependency versions and sealed
 verdicts. The latest source identities are verified by original API responses.
-Existing Linux pin entries were updated for `orx` and `mcporter`; the other seven
-components have no entries in that file, and their supported recipe formats
+The Linux `orx` pin was updated; mcporter remains at 0.14.1 after R642b's hold.
+The other seven moved components have no entries in that file, and their supported recipe formats
 remain in use. The two generated report pairs are rebuilt by their own write
 commands. `build_ecosystem.py` is check-only.
 
@@ -176,8 +205,8 @@ Owner handoffs for the next unit:
 
 - The configuration owner must reconcile `adoption/new-wsl-profile.json`:
   it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
-  mcporter 0.14.1, playwright-cli 0.1.21 and Syft 1.52.0 remain older than
-  the W1 selections. This file is outside the repair's edit scope.
+  playwright-cli 0.1.21 and Syft 1.52.0 remain older than the W1 selections.
+  Its mcporter 0.14.1 agrees with R642b's hold. This file is outside the repair's edit scope.
 - The trading owner must update the canonical
   `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
   including its 1.52.0 archive/hash instructions, using the W1 receipt's
@@ -186,8 +215,8 @@ Owner handoffs for the next unit:
   `observability/paper-trading-live/collector-paper-trading.yaml`.
 - The coordinator supplies the required CI buckets, macOS result, hosted
   secret scans, PR labels/body and any required trading acknowledgement for
-  the committed repair head. No commit, push or PR metadata mutation is part
-  of this repair.
+  the committed repair head. No commit or push is part of this repair;
+  R642b authorizes correcting the PR's component count to eight.
 
 ## Supplemental test environment correction
 
@@ -259,6 +288,87 @@ Native `read-tree HEAD`, `git add -A` and `git reset -- .` provide the stage and
 cleanup. The installed Gitleaks wrapper could not create its host runtime lock
 in this sandbox; the bounded staged scan uses the pinned upstream Gitleaks
 8.30.1 executable. Its result does not qualify host-local guarded containment.
+
+## R642b review-bot repair and completeness critic
+
+R642b serves the W1 foundation maintenance action for the north-star research
+runtime. The five threads were checked against head `2d6f49233fa1` before edits.
+The Collector live row incorrectly attributed deployed 0.161.0 runtime evidence
+to selected 0.162.0; it now separates the deployed and selected versions, with
+the W1 receipt limiting 0.162.0 to scratch validation. mcporter's pin move was
+also withdrawn: its canary did not settle the dependency-tree and persistent
+role gaps. The hold and its specific overturn condition are recorded above.
+
+The HUD transition now follows the installed Claude Code 2.1.288 help,
+[tagged changelog](https://github.com/anthropics/claude-code/blob/v2.1.288/CHANGELOG.md),
+[official update instructions](https://code.claude.com/docs/en/plugins/install#update-plugins-now),
+[marketplace CLI reference](https://code.claude.com/docs/en/plugins/cli-reference#plugin-marketplace-update)
+and [source synchronization rules](https://code.claude.com/docs/en/plugins/loading#plugins-and-marketplaces-that-arent-on-disk-at-session-start).
+First retarget the declared marketplace source to `v0.10.0`, let the next native
+session synchronize that changed source, run `claude plugin marketplace update
+claude-hud`, then `claude plugin update claude-hud@claude-hud --scope user`,
+reload and check the installed commit. Refreshing a source still pinned to
+`v0.8.0` keeps that tag. Status: **documented, host verification pending**.
+Only native version/help commands ran, using an absolute native executable,
+scratch cwd, temporary `HOME` and temporary `CLAUDE_CONFIG_DIR`; the actual
+outputs are retained in `native-checks.json#/r642b_claude_hud_upgrade`.
+No safe offline GitHub-tag transition was verified and no host update ran.
+
+R642 already added current OpenResearch and Worktrunk notes to the dated upgrade
+document, but their canonical map still selected its historical installation
+section. The canonical `recipe_map` entries for OpenResearch, Worktrunk and
+Syft now select `recipes/README.md`, which carries 0.2.15, 0.80.0 and 1.54.0,
+their primary sources and rollback versions. The audit's three
+`native_integration.recipe_document` mirrors match. Syft's foundation recipe
+uses the archive/checksum/extraction commands retained in its W1 receipt and
+installed `gh release download` help. Its trading-owned 1.52.0 recipe stays a
+dated owner handoff and is no longer the canonical current map.
+
+Search-first used maintained native commands and existing repository checks;
+no installer or acceptance runner was added. The first scoped ai-memory search
+returned HTTP 404 in workspace `default`; retrying workspace `local` with limit
+2 returned `decisions/workstation-sota-refresh-20260925.md`. That historical
+0.14.1 lead was checked against the exact repository decision, the current base
+rows, and the upstream v0.14.1 release and commit API responses. Installed CLI
+help provides no pin-priority flag. Official documentation was read with native
+`curl` after the web tool rejected `open`; no absence claim follows that failure.
+
+The completeness critic covers all five threads, every current mcporter pin
+site, reciprocal receipt links, recipe-map mirrors, generated reports, actual
+timed outputs and owner boundaries. The next lifecycle sweep must qualify a
+consistent mcporter dependency tree and persistent daemon/serve behavior; for
+HUD it must cover declared/cached source synchronization, registry revision,
+reload and rollback on an isolated host. Collector 0.162.0 traffic, restart and
+retained storage remain pending. Source review, command help, ad-hoc stdio and
+repository consistency checks retain their separate evidence scopes.
+
+The independent completeness review found three additional current mcporter
+sites: the native token CI pin, the token-report install/PATH recipe, and the
+macOS/Linux lag test's current receipt link. Each now restores its `origin/main`
+0.14.1 value while preserving the other W1 component changes. The snapshot's
+retained-versus-latest classification now agrees with its 0.14.1 selection and
+reported v0.14.2 release; its selected-commit API check was refreshed to
+`93e0916cafe2d624b94271e31b75ca681a016514`. PR #642's title and description
+now count eight moves and list mcporter as held, with the repair still awaiting
+the coordinator's commit and push.
+
+The required unchanged suite first exposed an environment boundary: its blind
+exports were correctly refused under the existing Git markers in the available
+temporary roots. The first Sol repair chose another writable root, which also
+had a marker. That unresolved bounded repair triggered one Astra judgment at
+`max`; it accepted installed Bubblewrap 0.9.0's supported private tmpfs after
+both an unchanged successful-export test and an unchanged inside-repository
+refusal test passed. The coordinator verified installed help, the
+[release](https://github.com/containers/bubblewrap/releases/tag/v0.9.0) and
+[tagged mount option reference](https://github.com/containers/bubblewrap/blob/v0.9.0/bwrap.xml#L273-L315).
+The first full isolated run kept the worktree read-only and exposed the render
+tests' legitimate temporary fixture writes. The final native wrapper keeps the
+host read-only, binds the owned worktree and task cache writable, retains the
+worktree `.git` as read-only, and provides a fresh `/tmp`. The tests and export
+guard keep their bytes. The native `uv run --python 3.13 --with PyYAML==6.0.3`
+environment repeats R642's dependency setup with a private cache and disabled
+Python downloads. All failed conditions and the final returned results are
+retained in [review-bot-repair-checks.json](../../evidence/artifacts/currency-wave-w1-20261003/review-bot-repair-checks.json); none is promoted to host or provider E2E. The final unchanged suite passed 325 tests with three optional skips. The eight repository validation/report checks and the three pre-push registry tests passed; the staged publication scan uses a temporary native Git index and pinned Gitleaks 8.30.1.
 
 ## Overturn condition and rollback
 

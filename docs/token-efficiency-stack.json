@@ -5751,14 +5751,14 @@
       "purpose": "Native CLI bridge with persistent MCP daemon connection",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.2\" mcporter@0.14.2"
+          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1"
         ],
         "use": [
           "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth",
           "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth"
         ],
         "statistics": [],
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.2\" mcporter@0.14.2`; `ps` must be on the PATH of whatever launches the daemon.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1`; `ps` must be on the PATH of whatever launches the daemon.",
         "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
       },
       "returned_result_summary": "2026-09-20 native CLI bridge returned jCodeMunch's 29, 820 estimated retained total and Context Mode's actual project-file hash/length. This is a transport bridge, not an additional savings source; do not credit the same payload reduction again.",
