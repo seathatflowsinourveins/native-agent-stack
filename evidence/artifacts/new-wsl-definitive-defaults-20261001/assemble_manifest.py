@@ -3,6 +3,8 @@
 
 It reads the two committed compact documents, settlements and convergence decisions in this folder and writes a flat table next to them. The output is
 deterministic: running it again over unchanged inputs writes the same bytes.
+A settlement settles a split or measurement row of the compact documents before the convergence decisions, or a split row
+that those decisions add (an added slot) right after them; either way the row's resolution stays as the rounds recorded it.
 The last step reads the layer-consensus record (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json): it adds that
 record's rows and records its amendments, and changes no field that the rounds decided.
 
@@ -75,28 +77,65 @@ def rows_of(catalog, layer, slot):
     }]
 
 
+def verify_receipts(sid, settlement):
+    if not settlement["receipts"]:
+        raise ValueError(f"settlement {sid}: no receipts")
+    for receipt in settlement["receipts"]:
+        path = ROOT / receipt["path"]
+        if not path.is_file():
+            raise ValueError(f"settlement {sid}: receipt missing: {receipt['path']}")
+        if sha(path) != receipt["sha256"]:
+            raise ValueError(f"settlement {sid}: receipt sha256 mismatch: {receipt['path']}")
+
+
+def settle(row, settlement):
+    row.update({"state": "measurement", "default": settlement["default"]["name"],
+                "repository": settlement["default"]["repository"], "installs_nothing_extra": False,
+                "definitive": False, "label": settlement["label"],
+                "measurement": {"returned": True, "receipts": settlement["receipts"]}})
+
+
 def apply_settlements(rows):
-    seen = set()
+    """Settle the split or measurement rows that the compact documents carry.
+
+    A settlement whose slot has no row yet is returned unapplied: the convergence decisions add that slot (an added slot),
+    and apply_added_settlements() settles it after them.
+    """
+    seen, deferred = set(), []
     for settlement in json.loads(SETTLEMENTS.read_text(encoding="utf-8")):
         sid = settlement["slot_id"]
-        matches = [row for row in rows if row["slot_id"] == sid]
-        if len(matches) != 1 or matches[0]["state"] not in ("split", "measurement"):
-            raise ValueError(f"settlement {sid}: not a split or measurement row")
         if sid in seen:
             raise ValueError(f"settlement {sid}: duplicate slot")
         seen.add(sid)
-        if not settlement["receipts"]:
-            raise ValueError(f"settlement {sid}: no receipts")
-        for receipt in settlement["receipts"]:
-            path = ROOT / receipt["path"]
-            if not path.is_file():
-                raise ValueError(f"settlement {sid}: receipt missing: {receipt['path']}")
-            if sha(path) != receipt["sha256"]:
-                raise ValueError(f"settlement {sid}: receipt sha256 mismatch: {receipt['path']}")
-        matches[0].update({"state": "measurement", "default": settlement["default"]["name"],
-                           "repository": settlement["default"]["repository"], "installs_nothing_extra": False,
-                           "definitive": False, "label": settlement["label"],
-                           "measurement": {"returned": True, "receipts": settlement["receipts"]}})
+        matches = [row for row in rows if row["slot_id"] == sid]
+        if not matches:
+            deferred.append(settlement)
+            continue
+        if len(matches) != 1 or matches[0]["state"] not in ("split", "measurement"):
+            raise ValueError(f"settlement {sid}: not a split or measurement row")
+        verify_receipts(sid, settlement)
+        settle(matches[0], settlement)
+    return deferred
+
+
+def apply_added_settlements(rows, deferred):
+    """Settle the split rows that the convergence decisions added, once their measurement has returned.
+
+    The row must be a split of the rounds (state and outcome split). It keeps its resolution (the outcome, the arms and the
+    deciding measurement that the rounds recorded); the settlement sets the same fields as for a row of the compact
+    documents. The installed job stays owned by one row.
+    """
+    by_slot = {row["slot_id"]: row for row in rows}
+    for settlement in deferred:
+        sid = settlement["slot_id"]
+        row = by_slot.get(sid)
+        if row is None or row.get("state") != "split" or (row.get("resolution") or {}).get("outcome") != "split":
+            raise ValueError(f"settlement {sid}: not a split or measurement row")
+        verify_receipts(sid, settlement)
+        settle(row, settlement)
+        owners = [other["slot_id"] for other in rows if other is not row and installs(other) and other.get("job") == row["job"]]
+        if owners:
+            raise ValueError(f"settlement {sid}: installed job also owned by {owners[0]}: {row['job']}")
 
 
 def norm(url):
@@ -402,11 +441,12 @@ def assemble_rows():
                              "claude": "not judged", "gpt": "not judged"})
         for slot in layer.get("slots", []):
             rows.extend(rows_of("us-equities", layer, slot))
-    apply_settlements(rows)
+    deferred = apply_settlements(rows)
     layers = [{"catalog": "foundation", "layer_id": l["layer_id"], "owns": l["owns"], "uses": l["uses"]}
               for l in foundation["layers"] + foundation["cross_rows"]]
     layers += [{"catalog": "us-equities", "layer_id": l["layer_id"], "owns": l["owns"], "uses": l["uses"]} for l in trading["layers"]]
     convergence = apply_convergence(rows, layers)
+    apply_added_settlements(rows, deferred)
     return foundation, trading, rows, layers, convergence
 
 
