@@ -49838,8 +49838,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_linux_platform.py",
-      "sha256": "d53fd1784ab5416fbfd17f78e226890e03eb242536acf3a0a24eea44d19be0ad",
-      "bytes": 28656
+      "sha256": "702f81f588772fdfd0e8246e7a00efddadce765a5c390fdbd7df675ede502ec8",
+      "bytes": 28940
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
