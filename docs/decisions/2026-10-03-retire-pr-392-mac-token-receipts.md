@@ -68,10 +68,10 @@ by the pinned PR head, using its merge base with main.
   [install-plan rows][install-plan] select no context-supply layer and do not
   install ccusage; native client usage and OpenTelemetry own metering. The exact
   current rows are `owners[26]` (ccusage) and `owners[27]` (context-supply), each
-  with no installation commands. That file's older context-supply prose at
-  [line 292][new-target-prose] still keeps ccusage as the usage meter: `git blame`
-  at the verification base attributes it to #591, which precedes the decided rows
-  (#602) and the install plan (#606). The [token-skills-orchestration entry][open-work]
+  with no installation commands. The decided-defaults file's older context-supply
+  prose at [line 292][new-target-prose] still keeps ccusage as the usage meter:
+  `git blame` at the verification base attributes it to #591, which precedes the
+  decided rows (#602) and the install plan (#606). The [token-skills-orchestration entry][open-work]
   treats legacy-host token observations as a separate scope. This concerns the
   new target. The Mac's own profile is not changed here.
 
