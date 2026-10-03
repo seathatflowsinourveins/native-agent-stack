@@ -48,6 +48,36 @@ answered 401 too, and its port preflight counted a browser's open dashboard conn
 several times before it bound; the new build's preflight counts listeners only (upstream #14812). OmniRoute wrote its
 own pre-migration database backup before migrating; it was not needed.
 
+## Update, 2026-10-03
+
+This update answers the first two items of issue 624's LE-18, which are addressed to the Mac OmniRoute service owner.
+The details are in `evidence/artifacts/omniroute-mac-rebuild-20261002/le18-20261003.json`.
+
+- **Running build.**
+  - The listener on port 20128 started at the switch, 2026-10-02T03:44:48Z, from this build.
+  - The installed package's `dist/BUILD_SHA` reads `6f246e84a`.
+  - The retained tarball hashes to the build manifest's `d602dc42…`.
+- **The process title `omniroute (v16.3.5)`** names the bundled Next.js version, not OmniRoute's. Next sets
+  `next-server (v16.3.5)`, and OmniRoute's startup instrumentation renames it.
+- **Effort read-back is still not done.** One GPT-6.1 Sol call at body effort `max` answered 200.
+  - The gateway's call-log APIs record each call's model, provider, account, token counts and reasoning source, but no
+    effort field.
+  - The first limit below stands.
+- **Update check, version 2,** deployed with version 1 kept beside it as the rollback. It still installs nothing. It
+  adds notifications for:
+  - a carried upstream PR closed without a merge, once per closure;
+  - a new official release, with a read of its npm package for the two capabilities this build carries: the GPT-6.1 Sol
+    catalog entry and the `/v1/alpha/search` route. A release with both can replace this build even if the carried PRs
+    merged under other numbers.
+
+  Tests:
+  - A scan of this build's own package finds both capabilities; a scan of release v3.8.51 finds neither.
+  - A dry run against a scratch state folder reports a new release and logs its notification.
+  - Stubbed runs cover the closed-unmerged and carries-everything paths.
+  - The first real run (05:38Z) changed nothing.
+- **Not done here:** LE-18's third item, the `omniroute` row of `manifests/stack.json`. It is the lane:shared manifest
+  owner's change.
+
 ## Limits
 
 - Upstream effort on the wire was not read back on this host: the gateway's call log sits in its credential-bearing

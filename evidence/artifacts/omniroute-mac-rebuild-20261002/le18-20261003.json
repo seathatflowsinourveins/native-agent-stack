@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "kind": "gateway_followup_receipt",
+  "host": "Mac coordinator (macOS, arm64); launchd agents com.native-stack.omniroute (loopback port 20128) and com.native-stack.omniroute-update-check",
+  "recorded_at_utc": "2026-10-03T05:45:00Z",
+  "decision": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md (section \"Update, 2026-10-03\")",
+  "requested_by": "native-agent-stack issue 624, LE-18 (the first two items, addressed to the Mac OmniRoute service owner)",
+  "read_only_checks": {
+    "fingerprint": {
+      "listener": "one process listens on 127.0.0.1:20128; it started 2026-10-02T03:44:48Z (the switch of receipt.json) as the child of `node <prefix>/bin/omniroute serve --port 20128 --no-open --no-tray`, with <prefix> the build named in build-manifest.json",
+      "build_sha": "dist/BUILD_SHA in the installed package reads 6f246e84a, the build_sha of build-manifest.json",
+      "tarball_sha256": "the retained build tarball hashes to d602dc42c7357e032b1e2323ba6660e0e1400bb5e997cb1c3857882654f9dbe4, the build manifest's value; the installed tree came from it (checks/switch-2.log)",
+      "evidence_class": "local_integration"
+    },
+    "process_title": {
+      "observed": "omniroute (v16.3.5)",
+      "explanation": "16.3.5 is the bundled Next.js version (node_modules/next/package.json). Next's start-server sets the title `next-server (v16.3.5)` (node_modules/next/dist/server/lib/start-server.js line 180), and OmniRoute's startup instrumentation renames it (`process.title = r(process.title)` in the built instrumentation chunk). It is not OmniRoute's version.",
+      "evidence_class": "source_review of the installed package"
+    },
+    "update_check_state": {
+      "before_v2": "2026-10-02T13:17:07Z: Codex follow unchanged (0.160.0 = 0.160.0); latest release v3.8.51; PRs 13788 and 15167 unmerged; no notice",
+      "first_v2_run": "2026-10-03T05:38:29Z: Codex follow unchanged (0.160.0); latest release v3.8.51; both PRs open; no new release; no notification",
+      "evidence_class": "local_integration"
+    },
+    "effort_read_back": {
+      "request": "one Responses call to cx/gpt-6.1-sol with body reasoning effort max at 2026-10-03T05:35:20Z answered 200 (model gpt-6.1-sol, 20 reasoning tokens, no reasoning field in the response)",
+      "result": "not read back: the gateway's call-log APIs (/api/usage/logs and /api/usage/call-logs) carry the time, model, provider, account, token counts and reasoning source of each call, but no effort field; /api/logs answers 404. Reading the upstream effort would need the gateway's database or a debug-logging restart; this owner opens neither (the database holds credentials).",
+      "standing_evidence": "max reaching the wire for GPT-6.1 Sol rests on PR 15167's source and on the workstation gateway's measured read-back (docs/decisions/2026-09-30-omniroute-rebuild.md), as receipt.json's first limit says",
+      "evidence_class": "local_integration (the call and the API reads); the limit is unchanged"
+    }
+  },
+  "update_check_v2": {
+    "script": "scripts/omniroute-update-check.v2.py.txt (as deployed; sha256 5d7398c654588e38...); version 1 stays as scripts/omniroute-update-check.py.txt and beside the deployed script as omniroute-update-check.v1.py (sha256 42120a0f77da9369...), the rollback",
+    "adds": [
+      "a notification when a carried upstream PR is closed without a merge (once per closure)",
+      "a notification when a new official release appears since the last check, with a capability read of its npm package (read in memory, never installed): the GPT-6.1 Sol catalog entry and the /v1/alpha/search route, the two capabilities this build carries; a release with both can replace this build even if the carried PRs merged under other numbers",
+      "a dry mode for tests (OMNIROUTE_UPDATE_CHECK_DRY=1) that logs the restart and the notifications instead of performing them"
+    ],
+    "unchanged": "the Codex-follow restart rule, the carries-everything notification, the launch agent (same path, schedule and interpreter), and the rule that nothing is installed or switched",
+    "tests": [
+      "positive control: the scan of this build's own package finds both capabilities",
+      "negative control: the capability read of release v3.8.51 from the npm registry finds neither",
+      "dry functional run against a scratch state folder whose previous record names v3.8.50: a new release v3.8.51 is reported, its package is read, neither capability is found, one notification is logged, and the Codex-follow step logs a would-restart instead of restarting",
+      "stubbed paths: a closed unmerged carried PR notifies once and not again; carried PRs merged before the latest release give the carries-everything notice and, for a new release, the capability notice"
+    ],
+    "python": "/usr/bin/python3 3.9.6, the launch agent's interpreter",
+    "evidence_class": "local_integration and synthetic (the stubbed paths)"
+  },
+  "not_done_here": [
+    "LE-18's third item, reconciling the omniroute row of manifests/stack.json with each host's running build, is addressed to the lane:shared manifest owner and lands as its own lane:shared change."
+  ]
+}
