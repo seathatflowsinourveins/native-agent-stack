@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "status": "PROPOSAL ONLY; current comparison contracts remain unchanged",
+  "reviewed_repository_head": "163b55cd8421b8f98e0fb30ab870811af20e4dad",
+  "purpose": "Permit prospectively qualified useful-task quality comparisons when complete provider usage is unavailable; do not infer cost, efficiency or token savings.",
+  "consequential_review": {
+    "trigger": "Current original-counter completeness gate blocks quality comparison although pinned upstream evaluators separate native rewards from optional usage.",
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "max",
+    "actual_delivery_and_usage": null,
+    "source_lead_verdict": "Astra source review supports a bounded quality-only amendment proposal; this is not family consensus or run admission."
+  },
+  "unchanged_contract_bindings": [
+    {
+      "path": "blueprints/runtime-workers/comparisons/shared-execution-contract.json",
+      "bytes": 8365,
+      "sha256": "2ef146220dca214d4d640332c1969656e7fd7923e3639d8f3220ba2e1ce4c4f4"
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
+      "bytes": 19758,
+      "sha256": "0f3d23fd3071edbe97f1c5fb6892ddc44ed57aebf2cebf4b59bc0bdb08ed37e0"
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
+      "bytes": 10596,
+      "sha256": "524a5c4a3561b7be928339176da8e96986d593cc04f54027fdf8d8e4c3ed5ea0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "harbor-context",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/agent/context.py",
+      "http_status": 200,
+      "bytes": 1896,
+      "sha256": "163e3741b19f37ed9dc74d10ce2bda21cbd48d8d29d2b5be918accf7bd43ab81"
+    },
+    {
+      "id": "harbor-job",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/job/result.py",
+      "http_status": 200,
+      "bytes": 11041,
+      "sha256": "caa09a62a06aab2dda7ccab18ceaeba0232b082be459ebfe5a01eeee05584f6f"
+    },
+    {
+      "id": "harbor-trial",
+      "url": "https://raw.githubusercontent.com/harbor-framework/harbor/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/trial/result.py",
+      "http_status": 200,
+      "bytes": 4763,
+      "sha256": "66130539641e97e6f07569a5264c2d2d2ffda962a68b0be13255a1f8539edcb7"
+    },
+    {
+      "id": "inspect-modeloutput",
+      "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_model_output.py",
+      "http_status": 200,
+      "bytes": 14864,
+      "sha256": "1e90d1ca41ca707c1de3b7393cafa69e322fa507fdd1a1fc80264cebc87fca73"
+    },
+    {
+      "id": "inspect-common",
+      "url": "https://raw.githubusercontent.com/UKGovernmentBEIS/inspect_ai/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/scorer/_common.py",
+      "http_status": 200,
+      "bytes": 6471,
+      "sha256": "49460816379d5cbbf48d1090ab854b243a83b652fb711f2c849dc1ff2292211b"
+    }
+  ],
+  "primary_findings": [
+    {
+      "source": "harbor-context",
+      "claim": "Harbor AgentContext input/cache/output/cost totals may be None independently of native verifier reward."
+    },
+    {
+      "source": "harbor-trial",
+      "claim": "TrialResult retains agent context, verifier result and exception info separately. Its total helper sums available contexts/fields; numeric aggregate does not prove complete attempt coverage."
+    },
+    {
+      "source": "harbor-job",
+      "claim": "Job reward and exception aggregation precede separate optional usage aggregation; a partial numeric aggregate is not accepted complete usage."
+    },
+    {
+      "source": "inspect-common",
+      "claim": "The deterministic string matcher scores completion against target without consulting usage. Empty completion carries a no_response reason even when its value is CORRECT; preserve reason and disposition under the frozen oracle."
+    },
+    {
+      "source": "inspect-modeloutput",
+      "claim": "Inspect ModelOutput usage defaults to None; optional cache components retain distinct scope."
+    }
+  ],
+  "proposed_changes": [
+    "Before any results, record a per-job prospective amendment to the exact shared and affected job contracts, with numeric quality rule and a two-family exact-head read.",
+    "An admitted quality-only run may retain complete-provider usage as null and observed partial native counters with explicit scope/coverage; unknown values are never zero, estimates, extrapolation or complete totals.",
+    "Cost, efficiency, savings, token-feature adoption and an unknown-token tiebreak remain HOLD. A quality tie retains the existing baseline; missing usage cannot qualify a challenger.",
+    "Use only the frozen maintained evaluator/oracle. Retain original per-attempt outcomes and no-response/refusal/timeout dispositions; upstream success alone cannot override the frozen quality rule.",
+    "For coding, retain the existing no-task-loss and at-least-one-task-improvement quality requirements. Prospectively specify all challenger ordering/tie rules before admission; no unknown-usage ranking.",
+    "Counter availability must not be used to infer actual task/client/route/model/effort/helper delivery. Those independent treatment identities remain required.",
+    "Keep runtime/helper/SDK retry policies, failure-vs-infrastructure classification, deadlines, recovery, limits and budget enforcement separately qualified. This proposal does not admit opaque or unenforced budgets; an uncapped study needs its own explicit prospective amendment.",
+    "Preserve owner pool/window allocation, task/oracle binding, original sealed terms, negative controls, images/network/lifecycle, first-party activation and no-prompt/no-credential-copy acceptance. Missing any required non-usage gate still prevents freeze."
+  ],
+  "required_reads": {
+    "claude_exact_head": "pending",
+    "codex_root_exact_head": "source proposal only; no changed contract admitted",
+    "consequential_exact_patch": "pending",
+    "owner_window_admission": "pending"
+  },
+  "scope_limits": {
+    "contracts_mutated": false,
+    "comparison_run_admitted": false,
+    "provider_or_model_execution": false,
+    "evaluator_replaced": false,
+    "model_effort_gate_waived": false,
+    "native_budget_gate_waived": false,
+    "token_feature_adoption": false,
+    "measured_defaults": 0,
+    "goal_jobs": 8
+  },
+  "preserved_failures": [
+    {
+      "classification": "Read-only repository path guess",
+      "path": "blueprints/runtime-workers/comparisons/shared-contract.md",
+      "returned_error": "ENOENT",
+      "recovery": "Discover maintained JSON path with rg --files; read shared-execution-contract.json unchanged."
+    }
+  ],
+  "local_policy_sources": [
+    "docs/acceptance-evidence-policy.md",
+    "docs/convergence-architecture.md#measurement-and-evidence"
+  ],
+  "next_action": "Seek both-family exact-head proposal reads; if accepted, prepare explicit per-job/shared deltas and a new source-bound preregistration before any freeze."
+}

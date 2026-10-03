@@ -42105,6 +42105,11 @@
       "bytes": 6888
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-native-readiness-20261003.json",
+      "sha256": "a606eff5f76060fdb1d3403af0225434526c7f944c0657ab6e476e6aeae24366",
+      "bytes": 17658
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-owned-builder-amendment.json",
       "sha256": "40d9ffaf9662382381dced294ab332534d3d2eaad304d82e5bbf11fcff70980b",
       "bytes": 29969
@@ -42333,6 +42338,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/publication-read.json",
       "sha256": "d7d0b5c36104d0c343ece42391b52b701e54625d0a2bdf9b600a397ed2fc248b",
       "bytes": 4955
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/quality-only-comparison-amendment-proposal.json",
+      "sha256": "81a5777f68267796086d27a20ce42b0b58d31bcdd5cb28d79ebf6fb965b04d5a",
+      "bytes": 7147
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/readiness-publication-read.json",
