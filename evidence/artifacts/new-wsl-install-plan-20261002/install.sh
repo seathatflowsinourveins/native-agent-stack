@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # Revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision.
-# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
+# This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to
+# main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that
+# distribution's acceptance.
+# Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The commands of skill-discovery
+# and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing.
+# On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement.
+# They create their models through the running model server, so they install only with --only; as plan rows they have not run.
 # Baseline results and limitations: VALIDATION.md.
 # Upstream command quotations and parameterizations: install-plan.json and SOURCES.md. Consistency check: check_plan.py.
 set -euo pipefail
@@ -127,6 +133,22 @@ run_command() {
   # Planned. Thin Bash dispatcher preserves pipeline/heredoc failures independently of caller context.
   bash -euo pipefail -c "$1"
 }
+model_server_answers() {
+  # Planned. The two model rows create their models through the running model server; this plan starts no service (README.md).
+  if ! OLLAMA_HOST=127.0.0.1:21434 ollama ls >/dev/null 2>&1; then
+    printf 'The model server does not answer on 127.0.0.1:21434: start it (README.md, "The two local-model rows"), then run this row again.\n' >&2
+    return 1
+  fi
+  # Planned. Both rows install what was measured on Ollama 0.35.0, so nothing is pulled or created unless the server that
+  # answers reports that version; GET /api/version answers the running server's own version (server/routes.go:2023).
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1824
+  local version
+  version="$(curl -fsS http://127.0.0.1:21434/api/version | jq -r '.version')" || version=''
+  if [[ "$version" != 0.35.0 ]]; then
+    printf 'The model server on 127.0.0.1:21434 reports version %s, not 0.35.0, the version both model rows were measured on: run the local-model-server row'\''s Ollama 0.35.0 there, then run this row again.\n' "${version:-unknown}" >&2
+    return 1
+  fi
+}
 export -f ensure_venv checkout_tag fetch_verified link_grafana docker_repository apt_release_version \
   docker_engine_packages docker_compose_package
 
@@ -180,6 +202,23 @@ engineering-process-skills() {
   run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''mattpocock/skills#v1.2.3'\'' -g -a claude-code codex -s tdd diagnosing-bugs codebase-design domain-modeling writing-for-agents setup-matt-pocock-skills -y' || return "$?"
 }
 
+skill-discovery() {
+  # find-skills (vercel-labs/skills) | none | planned
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
+  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''vercel-labs/skills#7407f3893ad4dceab546ac002c3ef806e4000c73'\'' -g -a claude-code codex -s find-skills -y' || return "$?"
+}
+
+skill-authoring() {
+  # skill-creator (embedded in Codex; anthropics/skills for Claude Code) | none | planned
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  # For Claude Code only. Nothing is installed for Codex, which embeds its own skill-creator, and --copy keeps a same-name copy out of the shared $HOME/.agents/skills.
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L111
+  # Planned. Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L91 (--copy), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L89 (one named skill), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L540 (DISABLE_TELEMETRY), https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/src/git.ts#L315 (a full commit as the ref)
+  run_command 'DISABLE_TELEMETRY=1 npx --yes skills@1.7.0 add '\''anthropics/skills#8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4'\'' -g -a claude-code -s skill-creator --copy -y' || return "$?"
+}
+
 mcporter() {
   # mcporter | npm-global | planned
   # Planned. Source: https://raw.githubusercontent.com/openclaw/mcporter/v0.14.2/README.md#L28
@@ -203,6 +242,20 @@ structural-search() {
   # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/registry/ast-grep.toml#L1
   run_command 'mise use -g ast-grep@0.45.3' || return "$?"
   refresh_path || return "$?"
+}
+
+embedding-model() {
+  # Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192) | model-server | planned
+  refresh_path || return "$?"
+  model_server_answers || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85
+  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b' || return "$?"
+  # Planned. The pin: the library manifest's digest as the server reports it (server/model_list.go:64).
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1351
+  run_command 'curl -fsS http://127.0.0.1:21434/api/tags | jq -e '\''.models[] | select(.name == "qwen3-embedding:0.6b") | .digest == "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"'\'' >/dev/null' || return "$?"
+  # Planned. The context belongs to the model, never to the server (models/qwen3-embedding-8k.Modelfile).
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2422
+  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f "$plan_dir/models/qwen3-embedding-8k.Modelfile"' || return "$?"
 }
 
 tobi-qmd() {
@@ -286,6 +339,23 @@ local-model-server() {
   run_command 'mise use -g ollama@0.35.0' || return "$?"
   refresh_path || return "$?"
   copy_config 'ollama.env.example' || return "$?"
+}
+
+local-generation-model() {
+  # Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000) | model-server | planned
+  refresh_path || return "$?"
+  model_server_answers || return "$?"
+  # Planned. The file at the pinned revision and its sha256 (the Hugging Face file page lists both).
+  # Source: https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/blob/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf
+  run_command 'fetch_verified '\''https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf'\'' '\''1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786'\'' "$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf"' || return "$?"
+  # Planned. A Modelfile's GGUF path is absolute or relative to the Modelfile, so both Modelfiles go beside the file.
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L126
+  run_command 'install -m 0644 -t "$tool_root/ollama-models" "$plan_dir/models/swift-iq3s-s2o.Modelfile" "$plan_dir/models/swift-iq3s-s2o-64k.Modelfile"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/cmd/cmd.go#L2422
+  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f "$tool_root/ollama-models/swift-iq3s-s2o.Modelfile"' || return "$?"
+  # Planned. The context belongs to the model, never to the server (models/swift-iq3s-s2o-64k.Modelfile).
+  # Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L146
+  run_command 'OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f "$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile"' || return "$?"
 }
 
 inspect-ai() {
@@ -458,6 +528,9 @@ if $list; then
   printf '%s\n' 'codex-sdk-and-codex-exec-app-server | Codex SDK and codex exec/app-server | none | planned'
   printf '%s\n' 'trail-of-bits-security-skills-trailofbits-skills | Trail of Bits security skills (trailofbits/skills) | none | planned'
   printf '%s\n' 'engineering-process-skills | mattpocock/skills (selected skills, not the bundle) | none | planned'
+  printf '%s\n' 'skill-discovery | find-skills (vercel-labs/skills) | none | planned'
+  printf '%s\n' 'skill-authoring | skill-creator (embedded in Codex; anthropics/skills for Claude Code) | none | planned'
+  printf '%s\n' 'research-skill | Not installed until its activation gate returns (GPT Researcher'\''s own skill with its MCP server) | none | excluded'
   printf '%s\n' 'mcporter | mcporter | npm-global | planned'
   printf '%s\n' 'mcp-inspector | MCP Inspector | none | excluded'
   printf '%s\n' 'agent-messaging | Not installed until the deciding measurement returns | none | excluded'
@@ -467,7 +540,7 @@ if $list; then
   printf '%s\n' 'claude-plugins-official-code-intelligence-lsp-pl | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | excluded'
   printf '%s\n' 'structural-search | ast-grep | mise | planned'
   printf '%s\n' 'code-search | Not installed until the deciding measurement returns (the families split between semble and SocratiCode) | none | excluded'
-  printf '%s\n' 'embedding-model | Not installed until the deciding measurement returns | none | excluded'
+  printf '%s\n' 'embedding-model | Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192) | model-server | planned'
   printf '%s\n' 'reranker-model | Not installed: no installed retrieval owner can call an external reranker: QMD reranks in-process with its bundled model, the research harness exposes no reranker setting and the model server has no rerank endpoint; both blind GPT orders picked BGE rerankers and NeMo Retriever | none | excluded'
   printf '%s\n' 'tobi-qmd | tobi/qmd | npm-global | planned'
   printf '%s\n' 'mineru | MinerU | uv-tool | planned'
@@ -484,7 +557,7 @@ if $list; then
   printf '%s\n' 'phoenix | Not installed: qualifying a model route is evaluation, owned by Inspect AI and Harbor; the layer'\''s requirement has no trace-store job; no blind GPT sample picked it | none | excluded'
   printf '%s\n' 'local-model-server | Ollama | mise | planned'
   printf '%s\n' 'alerting | Alertmanager | release-binary | planned'
-  printf '%s\n' 'local-generation-model | Not installed until the deciding measurement returns | none | excluded'
+  printf '%s\n' 'local-generation-model | Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000) | model-server | planned'
   printf '%s\n' 'session-analytics | Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set | none | excluded'
   printf '%s\n' 'inspect-ai | Inspect AI | uv-tool | planned'
   printf '%s\n' 'harbor-containerized-agent-e2e-runner | Harbor (containerized agent E2E runner) | uv-tool | planned'
@@ -501,12 +574,14 @@ if $list; then
   printf '%s\n' 'gpu-container-runtime | Not installed: no settled owner runs GPU work in a container (the model server and the document parser install natively); NVIDIA Container Toolkit, picked by both blind GPT orders, passes every gate and becomes the default the moment one does | none | excluded'
   printf '%s\n' 'betterleaks | betterleaks | mise | planned'
   printf '%s\n' 'trufflehog | Not installed: no blind GPT sample picked it; betterleaks owns secret scanning, and trufflehog'\''s verification against live services is a separate audit job that the layer'\''s requirement does not ask for | none | excluded'
+  printf '%s\n' 'credential-custody | Not installed until the deciding measurement returns (the repository'\''s runner and guard stay the practice) | none | excluded'
   printf '%s\n' 'git | git | apt | planned'
   printf '%s\n' 'gh-github-cli | gh (GitHub CLI) | mise | planned'
   printf '%s\n' 'worktrunk | worktrunk | mise | planned'
   printf '%s\n' 'difftastic | difftastic | mise | planned'
   printf '%s\n' 'claude-code-action | Not installed: it runs on GitHub-hosted runners and is a per-repository choice, not part of the machine; no blind GPT sample picked it | none | excluded'
   printf '%s\n' 'agent-structural-diff | Not installed: git diff and difftastic cover diff; all three blind GPT samples picked sem, and the critic found it the same job as difftastic (noting that difftastic'\''s JSON output is still behind DFT_UNSTABLE=yes) | none | excluded'
+  printf '%s\n' 'cross-family-review | No additional component: the two clients'\'' native review commands, each family on the other'\''s work | none | excluded'
   printf '%s\n' 'mise | mise | native-installer | planned'
   printf '%s\n' 'restic | Restic | mise | planned'
   printf '%s\n' 'chezmoi | Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | none | excluded'
@@ -519,7 +594,7 @@ if $list; then
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -529,9 +604,9 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
-for slot in 'playwright-cli' 'loki' 'grafana'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'otel-collector-contrib' 'prometheus' 'alerting' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'playwright-cli' 'loki' 'grafana' 'local-generation-model' 'embedding-model'; do named "$slot" && needs_execution=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'tobi-qmd' 'mineru' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
 for slot in 'playwright-cli'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose' 'research-harnesses'; do selected "$slot" && needs_docker=true; done
 
@@ -577,6 +652,8 @@ if selected 'claude-agent-sdk'; then run_slot 'claude-agent-sdk'; fi
 if selected 'codex-sdk-and-codex-exec-app-server'; then run_slot 'codex-sdk-and-codex-exec-app-server'; fi
 if selected 'trail-of-bits-security-skills-trailofbits-skills'; then run_slot 'trail-of-bits-security-skills-trailofbits-skills'; fi
 if selected 'engineering-process-skills'; then run_slot 'engineering-process-skills'; fi
+if selected 'skill-discovery'; then run_slot 'skill-discovery'; fi
+if selected 'skill-authoring'; then run_slot 'skill-authoring'; fi
 if selected 'mcporter'; then run_slot 'mcporter'; fi
 if selected 'sandbox-runtime-srt'; then run_slot 'sandbox-runtime-srt'; fi
 if selected 'serena'; then run_slot 'serena'; fi
@@ -615,6 +692,10 @@ if selected 'alerting'; then run_slot 'alerting'; fi
 measured_slot 'loki'
 measured_slot 'grafana'
 if selected 'local-model-server'; then run_slot 'local-model-server'; fi
+# Planned. The two model rows create their models through the running model server, which this plan does not start: the
+# default run skips them, and --only installs one once the server answers (README.md, "The two local-model rows").
+if named 'local-generation-model'; then run_slot 'local-generation-model'; elif selected 'local-generation-model'; then printf '%s | install | skipped\n' 'local-generation-model'; fi
+if named 'embedding-model'; then run_slot 'embedding-model'; elif selected 'embedding-model'; then printf '%s | install | skipped\n' 'embedding-model'; fi
 if selected 'dagu'; then run_slot 'dagu'; fi
 if selected 'gpt-gateway'; then run_slot 'gpt-gateway'; fi
 if selected 'research-harnesses'; then run_slot 'research-harnesses'; fi

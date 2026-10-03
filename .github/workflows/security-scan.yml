@@ -21,7 +21,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '37 5 * * 3' # Weekly Wednesday 05:37 UTC, between the Monday lanes
+    - cron: '37 5 * * 3' # Weekly Wednesday 05:37 UTC, 40 minutes before the daily catalog report
   workflow_dispatch:
 
 permissions:

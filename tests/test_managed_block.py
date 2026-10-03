@@ -5,7 +5,8 @@ the source changes, and left alone (no write, no backup) when current. rtk's `@R
 the markers survive; an earlier hand copy of the example is replaced only when it equals the current example, and any
 other copy, a damaged block, a symlink or a non-UTF-8 file is refused with nothing written. The PATH block is sourced
 by a real POSIX sh: its first PATH entry is the ecosystem's bin directory whatever characters the root holds, and a
-second sourcing adds nothing.
+second sourcing adds nothing. An explicit root directory stays `/`, so no PATH component is empty, and every other
+input writes the bytes it wrote before that fix.
 """
 
 import contextlib
@@ -453,6 +454,48 @@ class DecisionMdBlockTests(ManagedBlockCase):
 
 
 class ProfilePathBlockTests(ManagedBlockCase):
+    # Blocks pinned as text, not computed by the code under test. ORDINARY_BLOCK, OMITTED_PROFILE and ROOT_ECO_BLOCK
+    # are the bytes the code wrote before the root-directory fix; ROOT_EXTRA_BLOCK replaces the empty component that
+    # code wrote for `--extra-dir /` (PATH="${PATH:+:$PATH}": /usr/bin:/bin became /opt/ecosystem/bin::/usr/bin:/bin).
+    HEAD = ("# native-agent-stack:profile-path:begin (adoption/bootstrap-linux.sh --configure-full-profile; edit "
+            "outside these markers)\n"
+            "# The ecosystem's bin directory first on PATH, so `claude` in a login shell is its launcher.\n")
+    EXTRAS_NOTE = ("# These directories are added when they are not on PATH yet: the native installers' bin directory "
+                   "and mise's shims.\n")
+    TAIL = "export PATH\n# native-agent-stack:profile-path:end\n"
+    ORDINARY_BLOCK = (HEAD + EXTRAS_NOTE +
+                      'case ":${PATH-}:" in\n'
+                      '  *":/opt/tools:"*) ;;\n'
+                      '  *) PATH="/opt/tools${PATH:+:$PATH}" ;;\n'
+                      "esac\n"
+                      'case ":${PATH-}:" in\n'
+                      '  *":$HOME/.local/bin:"*) ;;\n'
+                      '  *) PATH="$HOME/.local/bin${PATH:+:$PATH}" ;;\n'
+                      "esac\n"
+                      'case ":${PATH-}:" in\n'
+                      '  ":$HOME/.local/share/codex-ecosystem/bin:"*) ;;\n'
+                      '  *) PATH="$HOME/.local/share/codex-ecosystem/bin${PATH:+:$PATH}" ;;\n'
+                      "esac\n" + TAIL)
+    OMITTED_PROFILE = (HEAD +
+                       'case ":${PATH-}:" in\n'
+                       '  ":$HOME/.local/share/codex-ecosystem/bin:"*) ;;\n'
+                       '  *) PATH="$HOME/.local/share/codex-ecosystem/bin${PATH:+:$PATH}" ;;\n'
+                       "esac\n" + TAIL).encode("utf-8")
+    ROOT_ECO_BLOCK = (HEAD +
+                      'case ":${PATH-}:" in\n'
+                      '  ":/bin:"*) ;;\n'
+                      '  *) PATH="/bin${PATH:+:$PATH}" ;;\n'
+                      "esac\n" + TAIL)
+    ROOT_EXTRA_BLOCK = (HEAD + EXTRAS_NOTE +
+                        'case ":${PATH-}:" in\n'
+                        '  *":/:"*) ;;\n'
+                        '  *) PATH="/${PATH:+:$PATH}" ;;\n'
+                        "esac\n"
+                        'case ":${PATH-}:" in\n'
+                        '  ":/opt/ecosystem/bin:"*) ;;\n'
+                        '  *) PATH="/opt/ecosystem/bin${PATH:+:$PATH}" ;;\n'
+                        "esac\n" + TAIL)
+
     def setUp(self):
         super().setUp()
         self.target = self.home / ".profile"
@@ -460,11 +503,49 @@ class ProfilePathBlockTests(ManagedBlockCase):
     def apply(self, eco_root: str, *extra: str) -> tuple:
         return run("--home", str(self.home), *extra, "profile-path", "--eco-root", eco_root)
 
-    def path_after_sourcing(self, times: int = 1) -> list:
+    def path_after_sourcing(self, times: int = 1, start: str = "/usr/bin:/bin") -> list:
         script = ". \"$HOME/.profile\"; " * times + 'printf "%s" "$PATH"'
-        result = subprocess.run([SH, "-c", script], env={"HOME": str(self.home), "PATH": "/usr/bin:/bin"},
+        result = subprocess.run([SH, "-c", script], env={"HOME": str(self.home), "PATH": start},
                                 capture_output=True, text=True, timeout=30, check=True)
         return result.stdout.split(":")
+
+    @unittest.skipUnless(SH, "needs a POSIX sh")
+    def test_an_explicit_root_directory_is_one_component_and_no_component_is_empty(self):
+        for extra in ("/", "//", "/./"):
+            with self.subTest(extra=extra):
+                self.assertEqual(managed_block.profile_block("/opt/ecosystem", str(self.home), (extra,)),
+                                 self.ROOT_EXTRA_BLOCK)
+                if self.target.exists():
+                    self.target.unlink()
+                code, _, err = run("--home", str(self.home), "profile-path", "--eco-root", "/opt/ecosystem",
+                                   "--extra-dir", extra)
+                self.assertEqual(code, 0, err)
+                text = self.target.read_text(encoding="utf-8")
+                self.assertIn('  *) PATH="/${PATH:+:$PATH}" ;;\n', text)
+                self.assertEqual(text, self.ROOT_EXTRA_BLOCK)
+                path = self.path_after_sourcing()
+                self.assertEqual(":".join(path), "/opt/ecosystem/bin:/:/usr/bin:/bin")
+                self.assertNotIn("", path)
+                self.assertEqual(self.path_after_sourcing(times=2), path)
+                self.assertEqual(":".join(self.path_after_sourcing(start="")), "/opt/ecosystem/bin:/")
+        # With the home at the root there is no $HOME form either, and the root stays a component of its own.
+        self.assertEqual(managed_block.profile_block("/opt/ecosystem", "/", ("/",)), self.ROOT_EXTRA_BLOCK)
+
+    def test_ordinary_extra_directories_give_the_bytes_written_before(self):
+        # One directory under home (written as $HOME/...) and one outside it.
+        block = managed_block.profile_block(str(self.home / ".local/share/codex-ecosystem"), str(self.home),
+                                            (str(self.home / ".local/bin"), "/opt/tools"))
+        self.assertEqual(block, self.ORDINARY_BLOCK)
+
+    def test_without_the_option_the_default_profile_gets_the_bytes_written_before(self):
+        code, _, err = self.apply(str(self.home / ".local/share/codex-ecosystem"))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(self.target.read_bytes(), self.OMITTED_PROFILE)
+
+    def test_a_root_ecosystem_directory_still_puts_slash_bin_first(self):
+        for eco in ("/", "//"):
+            with self.subTest(eco=eco):
+                self.assertEqual(managed_block.profile_block(eco, str(self.home)), self.ROOT_ECO_BLOCK)
 
     def test_an_eco_root_under_home_is_written_relative_to_home(self):
         eco = self.home / ".local/share/codex-ecosystem"

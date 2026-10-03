@@ -1,22 +1,36 @@
 """The new WSL's definitive defaults: one default per slot, one owner per tool, and no stale generated text.
 
-Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001). They do not
-judge any pick; they hold the manifest to its own rule.
+Structural checks over committed files only (evidence/artifacts/new-wsl-definitive-defaults-20261001, and the
+layer-consensus record that its assembler reads last). They do not judge any pick; they hold the manifest to its own rule.
+One class runs a committed program: the install plan's acceptance of the consensus row skill-authoring, against stand-ins.
 """
 import hashlib
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
+import types
 import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
+
+from tests.test_adoption_bootstrap import sha256sum_checks_like_gnu  # helpers only; its test classes run there
 
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
 SELECTION = ROOT / "evidence/artifacts/new-wsl-clean-install-selection-20261001"
-ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added"}
+CONSENSUS_ART = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002"
+CONSENSUS_RECORD = ROOT / "docs/decisions/2026-10-02-new-wsl-layer-consensus.md"
+PLAN = ROOT / "evidence/artifacts/new-wsl-install-plan-20261002"
+ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_default_today", "added", "consensus"}
+# What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
+PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
+PRIVATE_SHAPES = (r"/home/[a-z][a-z0-9_-]*/|/mnt/[a-z]/Users/|/tmp/claude-\d+/|-home-[a-z]",
+                  r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}")
 DECISION_SLOTS = {"container-engine", "isolation-container-boundary", "code-search", "memory-owner", "context-supply",
                   "local-model-server"}
 RESOLVED = ("final", "installed_on_critic", "not_installed", "split")
@@ -66,6 +80,19 @@ def converged_key(slot):
     return picks[0] if picks[0] == picks[1] else None
 
 
+def load_source(path, name):
+    """A module compiled from source, so that no bytecode is written into an artifact folder."""
+    module = types.ModuleType(name)
+    module.__file__ = str(path)
+    exec(compile(path.read_text(encoding="utf-8"), str(path), "exec"), module.__dict__)
+    return module
+
+
+def load_assembler():
+    """The assembler's functions."""
+    return load_source(ART / "assemble_manifest.py", "assemble_manifest")
+
+
 class Manifest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -76,6 +103,8 @@ class Manifest(unittest.TestCase):
         cls.convergence = load(ART / "convergence.json")
         cls.decisions = {d["slot_id"]: d for d in cls.convergence["decisions"] + cls.convergence["added_slots"]}
         cls.combined = load(ROOT / cls.convergence["combined"]["path"])
+        cls.consensus = load(CONSENSUS_ART / "consensus.json")
+        cls.consensus_rows = {row["slot_id"]: row for row in cls.consensus["add_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def source_slots(self):
@@ -138,7 +167,9 @@ class Manifest(unittest.TestCase):
                     self.assertEqual(row["state"], "")
 
     def test_every_row_has_job_and_resolution(self):
-        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions))
+        # A row is decided by the rounds (convergence.json) or added by the direct consensus (consensus.json), never both.
+        self.assertEqual(set(self.decisions) & set(self.consensus_rows), set())
+        self.assertEqual({row["slot_id"] for row in self.rows}, set(self.decisions) | set(self.consensus_rows))
         self.assertEqual(len(self.decisions), len(self.convergence["decisions"]) + len(self.convergence["added_slots"]))
         added_jobs = {d["slot_id"]: d["job"] for d in self.convergence["added_slots"]}
         owners = {}
@@ -146,14 +177,19 @@ class Manifest(unittest.TestCase):
             sid = row["slot_id"]
             with self.subTest(slot=sid):
                 self.assertTrue(row.get("job"), sid)
-                self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
                 self.assertIn("resolution", row)
                 resolution = row["resolution"]
                 self.assertIsInstance(resolution, dict)
-                self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
-                for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
-                    if key in self.decisions[sid]:
-                        self.assertEqual(resolution[key], self.decisions[sid][key])
+                if row["row_kind"] == "consensus":
+                    self.assertEqual(row["job"], self.consensus_rows[sid]["job"])
+                    self.assertEqual(resolution, self.consensus_rows[sid]["resolution"])
+                    self.assertNotIn(resolution["outcome"], RESOLVED + ("kept",))
+                else:
+                    self.assertEqual(row["job"], self.convergence["jobs"].get(sid, added_jobs.get(sid)))
+                    self.assertEqual(resolution["outcome"], self.decisions[sid]["outcome"])
+                    for key in ("by", "votes", "covered_by", "arms", "deciding_measurement", "measurement_id"):
+                        if key in self.decisions[sid]:
+                            self.assertEqual(resolution[key], self.decisions[sid][key])
                 if row["default"] and not row["installs_nothing_extra"]:
                     self.assertNotIn(row["job"], owners, f"{sid}: job already owned by {owners.get(row['job'])}")
                     owners[row["job"]] = sid
@@ -214,6 +250,8 @@ class Manifest(unittest.TestCase):
     def test_critic_evidence_and_covering_slots_are_valid(self):
         rows = {row["slot_id"]: row for row in self.rows}
         for row in self.rows:
+            if row["row_kind"] == "consensus":
+                continue  # No round decided it: it has no critic and no covering slot; its own tests are further down.
             sid, resolution = row["slot_id"], row["resolution"]
             decision = self.decisions[sid]
             with self.subTest(slot=sid):
@@ -248,22 +286,33 @@ class Manifest(unittest.TestCase):
 
     def test_added_slots_and_hygiene_preserve_the_decisions(self):
         rows = {row["slot_id"]: row for row in self.rows}
+        settled = {settlement["slot_id"]: settlement for settlement in self.settlements}
         added_by_layer = {}
         for added in self.convergence["added_slots"]:
             row = rows[added["slot_id"]]
             self.assertEqual(row["row_kind"], "added")
             if added["outcome"] in ("split", "not_installed"):
-                # an added row that installs nothing keeps the named candidate only in its resolution
-                self.assertEqual(row["repository"], "")
-                self.assertTrue(row["installs_nothing_extra"])
+                # an added row keeps the named candidate in its resolution
                 self.assertEqual(row["resolution"]["former_default"], added["default"])
+                if added["slot_id"] in settled:
+                    # a split whose measurement returned carries the settlement's default (settlements.json)
+                    settlement = settled[added["slot_id"]]
+                    self.assertEqual(added["outcome"], "split")
+                    self.assertEqual((row["default"], row["repository"]),
+                                     (settlement["default"]["name"], settlement["default"]["repository"]))
+                    self.assertFalse(row["installs_nothing_extra"])
+                else:
+                    # an added row that installs nothing keeps the named candidate only in its resolution
+                    self.assertEqual(row["repository"], "")
+                    self.assertTrue(row["installs_nothing_extra"])
             else:
                 self.assertEqual(row["default"], added["default"]["name"])
                 self.assertEqual(row["repository"], added["default"]["repository"])
             self.assertEqual(row["layer_id"], added["layer_id"])
             added_by_layer.setdefault(row["layer_id"], []).append(row["slot_id"])
         for lid, added in added_by_layer.items():
-            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid]
+            # The consensus step places its rows after these, so the order is taken over the rows the rounds decided.
+            order = [row["slot_id"] for row in self.rows if row["layer_id"] == lid and row["row_kind"] != "consensus"]
             self.assertEqual(order[-len(added):], added)
         for correction in self.convergence["hygiene"]:
             row = rows[correction["slot_id"]]
@@ -326,13 +375,17 @@ class Manifest(unittest.TestCase):
         stated = {d["slot_id"]: d["gpt_status"] for d in self.convergence["decisions"] + self.convergence["added_slots"]
                   if d.get("gpt_status")}
         self.assertEqual(sorted(stated), ["agent-structural-diff"])
+        settled = {settlement["slot_id"]: settlement["label"] for settlement in self.settlements}
         for row in self.rows:
             resolution = row["resolution"]
             if resolution["outcome"] not in RESOLVED:
                 continue
             with self.subTest(slot=row["slot_id"]):
                 self.assertEqual(row["gpt"], stated.get(row["slot_id"]) or self.expected_gpt(row))
-                self.assertEqual(row["label"], BASIS[resolution["outcome"]])
+                # A split whose measurement returned is labelled by its settlement; every other resolved row by its basis.
+                returned = bool(row["measurement"] and row["measurement"]["returned"])
+                self.assertEqual(returned, row["slot_id"] in settled)
+                self.assertEqual(row["label"], settled[row["slot_id"]] if returned else BASIS[resolution["outcome"]])
                 if row["row_kind"] == "added":
                     self.assertEqual(row["claude"], "not judged in the first round")
                 else:
@@ -350,6 +403,9 @@ class Manifest(unittest.TestCase):
         self.assertIn("decision-round", rule)
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
+        # The consensus record's rule is appended whole, after the rounds' rule.
+        self.assertTrue(rule.endswith(" " + self.consensus["rule"]))
+        self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
 
     def test_counts_include_states_and_installed_rows(self):
         counts = self.manifest["counts"]
@@ -472,9 +528,12 @@ class Manifest(unittest.TestCase):
         self.assertEqual(exceptions, {("us-equities", "market-data-provider")})
 
     def test_settled_rows_are_measurements_with_verified_receipts(self):
-        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, {"local-model-server"})
+        # The model server by its gate (a row of the decision round), and the two local-model slots by their measurement
+        # (rows that the convergence decisions added and split).
+        settled = {"local-model-server", "local-generation-model", "embedding-model"}
+        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, settled)
         self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
-                         {"local-model-server"})
+                         settled)
         for settlement in self.settlements:
             rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
             self.assertEqual(len(rows), 1, settlement["slot_id"])
@@ -501,8 +560,17 @@ class Manifest(unittest.TestCase):
     def test_settled_split_tables_preserve_the_blind_picks(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
         slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
+        added = {decision["slot_id"] for decision in self.convergence["added_slots"]}
         for settlement in self.settlements:
-            slot = slots[settlement["slot_id"]]
+            slot = slots.get(settlement["slot_id"])
+            if slot is None:
+                # A slot the convergence decisions added has no blind picks of its own: its layer row shows the settled
+                # default, the measurement state and the settlement as its basis.
+                self.assertIn(settlement["slot_id"], added)
+                line = next(line for line in lines if re.match(r"\| [^|]+ \| " + re.escape(settlement["slot_id"]) + r" \|", line))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[3:], [settlement["default"]["name"], "measurement", "settled by the preregistered measurement"])
+                continue
             if slot.get("split"):
                 line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
                 cells = [cell.strip() for cell in line.split("|")[1:-1]]
@@ -578,6 +646,9 @@ class Manifest(unittest.TestCase):
             ref = self.convergence[source]
             self.assertEqual(self.manifest["sources"][source], ref)
             self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        consensus = CONSENSUS_ART / "consensus.json"
+        self.assertEqual(self.manifest["sources"]["consensus"],
+                         {"path": consensus.relative_to(ROOT).as_posix(), "sha256": sha(consensus)})
 
     def test_preregistered_inputs_are_the_committed_ones(self):
         prereg = load(ART / "preregistration.json")
@@ -662,6 +733,577 @@ class Manifest(unittest.TestCase):
         self.assertEqual(len(self.trading["layers"]), 12)
         pinned = {p["name"] for p in self.trading["pinned_requirements"]}
         self.assertTrue(any("NautilusTrader 2.0.0rc5" in name for name in pinned))
+
+    # The layer consensus of 2026-10-02: rows added, and amendments recorded, by a direct consensus of the two families.
+
+    def test_counts_after_the_layer_consensus(self):
+        counts, by_catalog = self.manifest["counts"], {}
+        for row in self.rows:
+            by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
+        self.assertEqual(counts["slots"], 89)
+        self.assertEqual(by_catalog, {"foundation": 69, "us-equities": 20})
+        self.assertEqual(counts["layers"], 37)
+        # 56 after the layer consensus, and the two local-model slots settled by their measurement (2026-10-03).
+        self.assertEqual(counts["installed"], 58)
+        self.assertEqual(counts["by_row_kind"]["consensus"], 5)
+        self.assertEqual(counts["by_state"]["resolved"], 22)
+        self.assertEqual(counts["by_state"]["measurement"], 6)
+        self.assertEqual(counts["by_state"]["split"], 5)
+
+    def test_consensus_rows_are_the_records_rows_with_its_states(self):
+        rows = {row["slot_id"]: row for row in self.rows}
+        self.assertEqual(sorted(self.consensus_rows), ["credential-custody", "cross-family-review", "research-skill",
+                                                       "skill-authoring", "skill-discovery"])
+        self.assertEqual({row["slot_id"] for row in self.rows if row["row_kind"] == "consensus"}, set(self.consensus_rows))
+        # The fields a consensus row must carry are the ones the assembler writes for a row the rounds decided.
+        fields = load_assembler().ROW_FIELDS
+        self.assertEqual(tuple(key for key in self.rows[0] if key != "amendments"), fields)
+        for sid, recorded in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                self.assertEqual(rows[sid]["state"], recorded["state"])
+                self.assertEqual(rows[sid], recorded)  # copied as the record gives it
+                self.assertEqual(tuple(rows[sid]), fields)
+        # Each is placed after the last row the rounds decided in its layer, in the record's order.
+        for lid in sorted({row["layer_id"] for row in self.consensus_rows.values()}):
+            in_layer = [row for row in self.rows if row["layer_id"] == lid]
+            kinds = [row["row_kind"] == "consensus" for row in in_layer]
+            self.assertEqual(kinds, sorted(kinds), lid)
+            self.assertEqual([row["slot_id"] for row in in_layer if row["row_kind"] == "consensus"],
+                             [row["slot_id"] for row in self.consensus["add_rows"] if row["layer_id"] == lid])
+
+    def test_no_consensus_row_is_definitive(self):
+        for row in self.rows:
+            if row["row_kind"] != "consensus":
+                continue
+            with self.subTest(slot=row["slot_id"]):
+                self.assertIs(row["definitive"], False)
+                self.assertNotEqual(row["state"], "definitive")
+                self.assertIn("direct consensus", row["label"])
+                self.assertEqual(row["resolution"]["by"], "direct consensus of both model families")
+                self.assertTrue(row["resolution"]["sources"])
+                if row["measurement"] is not None:
+                    # A consensus row that waits names what decides it and installs nothing meanwhile.
+                    self.assertEqual(row["measurement"], {"returned": False, "receipts": []})
+                    self.assertTrue(row["resolution"]["deciding_measurement"])
+                    self.assertTrue(row["resolution"]["measurement_id"])
+                    self.assertTrue(row["installs_nothing_extra"])
+
+    def test_amendments_leave_the_rows_as_the_rounds_decided_them(self):
+        _, _, decided, _, _ = load_assembler().assemble_rows()
+        before = {row["slot_id"]: row for row in decided}
+        self.assertEqual(set(before), {row["slot_id"] for row in self.rows} - set(self.consensus_rows))
+        recorded = {}
+        for entry in self.consensus["amend_rows"]:
+            self.assertEqual(set(entry), {"slot_id", "amendment"})
+            self.assertEqual(set(entry["amendment"]) & PROTECTED, set(), entry["slot_id"])
+            recorded.setdefault(entry["slot_id"], []).append(entry["amendment"])
+        self.assertTrue(recorded)
+        self.assertTrue(set(recorded) <= set(before), "an amendment names a row that no round decided")
+        for row in self.rows:
+            sid = row["slot_id"]
+            with self.subTest(slot=sid):
+                if sid in recorded:
+                    self.assertEqual(row["amendments"], recorded[sid])
+                    for amendment in row["amendments"]:
+                        for key in ("date_utc", "by", "decision"):
+                            self.assertTrue(amendment[key], key)
+                else:
+                    self.assertNotIn("amendments", row)
+                if row["row_kind"] != "consensus":
+                    # Every other field is the one the assembler builds before the consensus step.
+                    self.assertEqual({key: value for key, value in row.items() if key != "amendments"}, before[sid])
+
+    def test_consensus_records_are_the_hashed_published_copies(self):
+        records = self.consensus["records"]
+        copies = load(CONSENSUS_ART / "copy-notes.json")["copies"]
+        named = {name: ref for name, ref in records.items() if name != "acknowledgements"}
+        # The Claude lane's review of the Codex lane's scoped dispositions is hashed like the copies but is not one: it was
+        # written in the folder from the review as returned, so copy-notes.json, which accounts for the copies, omits it.
+        review = named.pop("claude_review_held_topics")
+        self.assertEqual(review["path"], (CONSENSUS_ART / "claude-review-held-topics.md").relative_to(ROOT).as_posix())
+        self.assertNotIn(Path(review["path"]).name, copies)
+        self.assertEqual(sha(ROOT / review["path"]), review["sha256"])
+        self.assertEqual(sorted(Path(ref["path"]).name for ref in named.values()), sorted(copies))
+        for name, ref in named.items():
+            path = ROOT / ref["path"]
+            with self.subTest(record=name):
+                self.assertTrue(path.is_file())
+                self.assertEqual(sha(path), ref["sha256"])
+                self.assertEqual(copies[path.name]["sha256"], ref["sha256"])
+        # Both families' acknowledgements are on record; they are links to pull-request comments, not hashed files.
+        self.assertEqual({ack["family"] for ack in records["acknowledgements"]}, {"claude", "gpt"})
+        for ack in records["acknowledgements"]:
+            self.assertTrue(ack["url"].startswith("https://github.com/"), ack["url"])
+        # Each acknowledgement says what its comment covers, in time order. The scoped dispositions are in the Codex
+        # lane's note of 18:57:10Z: the Claude lane agreed to them from the note, before its review (5959684384), and the
+        # Codex lane recorded receipt of that agreement (5959996494).
+        acknowledgements = records["acknowledgements"]
+        self.assertEqual([(ack["family"], ack["url"].rsplit("-", 1)[1]) for ack in acknowledgements],
+                         [("claude", "5958766754"), ("gpt", "5959059286"), ("gpt", "5959205007"),
+                          ("claude", "5959684384"), ("gpt", "5959996494")])
+        self.assertEqual([ack["at"] for ack in acknowledgements], sorted(ack["at"] for ack in acknowledgements))
+        for ack in acknowledgements:
+            self.assertTrue(ack["covers"].strip(), ack["url"])
+        by_id = {ack["url"].rsplit("-", 1)[1]: ack["covers"] for ack in acknowledgements}
+        self.assertIn("claude_review_held_topics", by_id["5959684384"])
+        self.assertIn("2026-10-02T18:57:10Z", by_id["5959684384"])
+        self.assertIn("5959684384", by_id["5959996494"])
+
+    def test_consensus_labels_follow_the_rule(self):
+        """The rule's label clause, in the labels' own words: every consensus row names the direct consensus of both
+        families; a row whose install waits says that its gate or its measurement decides and that nothing is installed
+        until it returns, and every other row says that it is not a blind round and not a measurement. Acceptance gates
+        that an installed or resolved row still has to pass are its open acceptance gates and do not hold its install."""
+        self.assertIn("listed as its open acceptance gates and do not hold its install", self.consensus["rule"])
+        rows = [row for row in self.rows if row["row_kind"] == "consensus"]
+        self.assertEqual(len(rows), len(self.consensus_rows))
+        for row in rows:
+            label, resolution = row["label"], row["resolution"]
+            with self.subTest(slot=row["slot_id"]):
+                self.assertTrue(label.startswith("both families by direct consensus"), label)
+                self.assertNotIn("open_gates", resolution)
+                if row["state"] == "measurement":
+                    self.assertRegex(label, r"; (?:an activation gate|the named measurement) decides\b")
+                    self.assertTrue(label.endswith(", nothing installed until it returns"), label)
+                    self.assertNotIn("not a blind round", label)
+                    self.assertTrue(resolution["deciding_measurement"])
+                    self.assertNotIn("open_acceptance_gates", resolution)
+                else:
+                    self.assertTrue(label.endswith("; not a blind round, not a measurement"), label)
+                    self.assertNotIn("decides", label)
+                    self.assertNotIn("deciding_measurement", resolution)
+        gated = {row["slot_id"]: row for row in rows if "open_acceptance_gates" in row["resolution"]}
+        self.assertEqual(sorted(gated), ["cross-family-review", "skill-authoring", "skill-discovery"])
+        for sid, row in gated.items():
+            with self.subTest(gated=sid):
+                # Installed or resolved, not waiting: the gates are acceptance on the destination, not a hold on the install.
+                self.assertNotIn(row["state"], ("measurement", "split"))
+                self.assertIsNone(row["measurement"])
+                self.assertTrue(row["resolution"]["open_acceptance_gates"])
+
+    def test_consensus_carries_the_reviews_qualifications_without_changing_a_decision(self):
+        """Three facts of the Claude lane's review qualify the credential-guard amendment and two held topics: the
+        comparison pins HOL Guard 3.17.2 or later; AgentCompass's Claude adapter writes its API key in plaintext; Docker's
+        apt channel already carries Compose 5.6.0 and nothing holds the package. The decisions stay as they were."""
+        amendment = next(entry["amendment"] for entry in self.consensus["amend_rows"] if entry["slot_id"] == "credential-guard")
+        held = {topic["topic"]: topic for topic in self.consensus["held_without_a_row_change"]}
+        expected = {
+            "credential-guard": (amendment, ("3.17.2 or later", "21:12:17Z", "topic 1, claim 10")),
+            "evaluation harness": (held["evaluation harness"], ("plaintext", "/tmp", "0600", "topic 2, omission 2")),
+            "Docker Compose 5.6.0": (held["Docker Compose 5.6.0"], ("5.6.0", "only at install time", "topic 4, omission 2")),
+        }
+        for name, (item, phrases) in expected.items():
+            with self.subTest(item=name):
+                text = " ".join(item["qualifications"])
+                for phrase in phrases:
+                    self.assertIn(phrase, text)
+        self.assertEqual(amendment["decision"], "keep the guard; hold one enforcement comparison")
+        self.assertEqual(held["evaluation harness"]["decision"],
+                         "keep Inspect AI 0.3.273 and Harbor 0.23; AgentCompass 1.0.0 only for an identified unmet evaluation requirement")
+        self.assertEqual(held["Docker Compose 5.6.0"]["decision"],
+                         "qualify the update; the selected 5.5.1 stays until the owner of that review accepts it")
+        # The amendment carries its qualification into the manifest beside the row; the row's own fields do not change.
+        guard = next(row for row in self.rows if row["slot_id"] == "credential-guard")
+        self.assertEqual(guard["amendments"][-1]["qualifications"], amendment["qualifications"])
+
+    def test_tables_show_consensus_rows_by_their_label_and_list_the_amendments(self):
+        lines = RECORD.read_text(encoding="utf-8").splitlines()
+        for sid, row in self.consensus_rows.items():
+            with self.subTest(slot=sid):
+                line = next(line for line in lines if line.startswith(f"| {row['layer_id']} | {sid} |"))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[4], row["state"])
+                self.assertEqual(cells[5], row["label"])
+                self.assertNotIn("**", cells[3])
+        start, end = lines.index("### Amendments by direct consensus"), lines.index("<!-- tables:end -->")
+        self.assertLess(start, end)
+        table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
+        self.assertEqual(table[:2], [["Slot", "Date", "Decision"], ["---"] * 3])
+        self.assertEqual(table[2:], [[row["slot_id"], amendment["date_utc"], amendment["decision"]]
+                                     for row in self.rows for amendment in row.get("amendments", [])])
+        self.assertEqual(len(table) - 2, len(self.consensus["amend_rows"]))
+
+    def test_consensus_decision_record_quotes_the_rule_and_the_owner(self):
+        text = CONSENSUS_RECORD.read_text(encoding="utf-8")
+        self.assertIn(self.consensus["rule"], text)
+        self.assertIn(self.consensus["authorization"]["verbatim"], text)
+        for sid in list(self.consensus_rows) + [entry["slot_id"] for entry in self.consensus["amend_rows"]]:
+            self.assertIn(f"`{sid}`", text, sid)
+        for sentence in self.consensus["not_established"]:
+            self.assertIn(sentence, text)
+        # The earlier record points to this one outside its generated tables.
+        earlier = RECORD.read_text(encoding="utf-8")
+        outside = earlier[:earlier.index("<!-- tables:begin")] + earlier[earlier.index("<!-- tables:end -->"):]
+        self.assertIn(CONSENSUS_RECORD.name, outside)
+
+    def test_no_host_path_or_user_name_in_the_consensus_folder(self):
+        for path in sorted(CONSENSUS_ART.rglob("*")):
+            if path.is_file():
+                text = path.read_text(encoding="utf-8")
+                self.assertIsNone(re.search(PRIVATE_SHAPES[0], text), str(path.relative_to(ROOT)))
+                self.assertIsNone(re.search(PRIVATE_SHAPES[1], text, re.I), str(path.relative_to(ROOT)))
+
+
+class SkillAuthoringAcceptance(unittest.TestCase):
+    """The install plan's acceptance of the consensus row skill-authoring, run against stand-ins.
+
+    The record's reason for the row is that no same-name copy of skill-creator is placed beside the one Codex embeds.
+    The program that accept.sh runs for the row is run here as accept.sh runs it (bash -euo pipefail -c), with a stub
+    npx that prints a canned listing and records its arguments, a canned lock file and a scratch HOME. The expected state
+    passes, and each condition of the program, planted on its own, fails it. The fixtures are our own: the stub does not
+    exercise the installer's listing logic, and nothing is installed.
+    """
+
+    WANT = "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6"
+    LISTING_ARGS = "--yes skills@1.7.0 list -g --json"
+    SKILL = "---\nname: skill-creator\n---\n"
+
+    @classmethod
+    def setUpClass(cls):
+        if not (shutil.which("bash") and shutil.which("jq")):
+            raise unittest.SkipTest("bash and jq are needed to run the acceptance program")
+        row = next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == "skill-authoring")
+        cls.program = row["acceptance"]["post_install"]["command"]
+
+    def run_case(self, agents=("Claude Code",), folder_hash=None, plant=(), codex_home=False, errexit=True):
+        """The program's exit status for one state, the arguments the stub npx received, and the program's stderr.
+
+        HOME is <scratch>/home and, with codex_home, CODEX_HOME is <scratch>/codex-home; `plant` holds (kind, path under
+        the scratch folder) pairs, where kind is "folder" (a skill folder) or "dangling" (a link to nothing). Without
+        errexit the program runs without -e."""
+        with tempfile.TemporaryDirectory() as scratch:
+            scratch = Path(scratch)
+            home, stub = scratch / "home", scratch / "bin"
+            (home / ".agents/skills/find-skills").mkdir(parents=True)  # another skill in the shared directory
+            embedded = home / ".codex/skills/.system/skill-creator"  # where Codex keeps its embedded skills
+            embedded.mkdir(parents=True)
+            (embedded / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+            listing = [{"name": "find-skills", "scope": "global", "agents": ["Claude Code", "Codex"]}]
+            if agents is not None:
+                listing.append({"name": "skill-creator", "scope": "global", "agents": list(agents)})
+            (scratch / "listing.json").write_text(json.dumps(listing), encoding="utf-8")
+            lock = {"version": 3, "skills": {"skill-creator": {"skillFolderHash": folder_hash or self.WANT}}}
+            (home / ".agents/.skill-lock.json").write_text(json.dumps(lock), encoding="utf-8")
+            for kind, relative in plant:
+                path = scratch / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if kind == "folder":
+                    path.mkdir()
+                    (path / "SKILL.md").write_text(self.SKILL, encoding="utf-8")
+                else:
+                    path.symlink_to(scratch / "nowhere")
+            stub.mkdir()
+            (stub / "npx").write_text('#!/bin/sh\nprintf \'%s\\n\' "$*" >"$STUB_DIR/args"\ncat "$STUB_DIR/listing.json"\n',
+                                      encoding="utf-8")
+            (stub / "npx").chmod(0o755)
+            env = {key: value for key, value in os.environ.items()
+                   if key not in ("XDG_STATE_HOME", "CODEX_HOME", "CLAUDE_CONFIG_DIR", "BASH_ENV", "ENV")}
+            env.update(HOME=str(home), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}", STUB_DIR=str(scratch))
+            if codex_home:
+                env["CODEX_HOME"] = str(scratch / "codex-home")
+            result = subprocess.run(["bash", "-euo" if errexit else "-uo", "pipefail", "-c", self.program], env=env,
+                                    capture_output=True, text=True, timeout=60)
+            args = scratch / "args"
+            return result.returncode, args.read_text(encoding="utf-8").strip() if args.exists() else None, result.stderr
+
+    def test_the_program_is_the_one_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        self.assertEqual(checker.checks_of(functions["skill-authoring"]),
+                         [("post_install", "skill-authoring", "smoke", self.program)])
+
+    def test_the_expected_state_passes_and_the_listing_has_no_agent_filter(self):
+        # Listed for Claude Code alone, the recorded tree hash, another skill in the shared directory and Codex's
+        # embedded copy under skills/.system.
+        status, args, stderr = self.run_case()
+        self.assertEqual(status, 0, stderr)
+        self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_each_planted_condition_fails_the_program(self):
+        cases = {
+            "the listing names Codex as well": dict(agents=("Claude Code", "Codex")),
+            "the listing names Codex alone": dict(agents=("Codex",)),
+            "the listing has no skill-creator": dict(agents=None),
+            "the lock records another tree hash": dict(folder_hash="0" * 40),
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, args, stderr = self.run_case(**case)
+                self.assertEqual(status, 1, stderr)
+                self.assertEqual(args, self.LISTING_ARGS)
+
+    def test_the_directory_conditions_do_not_rest_on_errexit(self):
+        # Before bash 4.1 (macOS /bin/bash is 3.2) a failing [[ ]] does not stop a set -e script (bash NEWS, bash-4.1,
+        # item j). The directory test is therefore the program's last command, and without -e its status is still the
+        # program's: each planted copy or link fails the program on any bash.
+        cases = {
+            "a copy in the installer's shared directory": dict(plant=[("folder", "home/.agents/skills/skill-creator")]),
+            "a dangling link in the installer's shared directory": dict(plant=[("dangling", "home/.agents/skills/skill-creator")]),
+            "a copy in Codex's skills directory": dict(plant=[("folder", "home/.codex/skills/skill-creator")]),
+            "a dangling link in Codex's skills directory": dict(plant=[("dangling", "home/.codex/skills/skill-creator")]),
+            "a copy in the skills directory under CODEX_HOME": dict(codex_home=True,
+                                                                    plant=[("folder", "codex-home/skills/skill-creator")]),
+        }
+        for name, case in cases.items():
+            with self.subTest(case=name):
+                status, _, stderr = self.run_case(errexit=False, **case)
+                self.assertEqual(status, 1, stderr)
+
+
+class LocalModelAcceptance(unittest.TestCase):
+    """The install plan's checks of the two local-model rows, run against stand-ins.
+
+    The programs that accept.sh runs for local-generation-model and embedding-model, and the local-model-server row's
+    after_sign_in smoke check (one embedding call to the settled embedder), are run as accept.sh runs them
+    (bash -euo pipefail -c), with a scratch HOME and model store and with stub ollama and curl programs that print canned
+    answers. The expected state passes, and each planted condition fails it. The fixtures are our own: no model server
+    answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
+    path), so its case writes a stand-in manifest and puts that file's digest in place of the pinned one, after checking
+    that the program names the pinned digest once.
+
+    The files checks run `sha256sum --check --status`. Where this host's sha256sum rejects those options (the probe
+    sha256sum_checks_like_gnu from tests/test_adoption_bootstrap.py: macOS's /sbin/sha256sum prints its usage and
+    exits 1), a scratch sha256sum runs `shasum -a 256` in its place, as that module's run_install_pin does. A failed
+    case's message carries the program's exit code, stdout and stderr.
+
+    accept.sh itself runs the server row's after_sign_in stage once, with a scratch HOME and the stub curl: until the
+    embedding-model row's model is in the store it prints skipped (step F9 runs that stage without any model row).
+    """
+
+    PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
+    SWIFT_FILE = "1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786"
+    EMBEDDER_LAYER = "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+
+    @classmethod
+    def setUpClass(cls):
+        for tool in ("bash", "jq") if sha256sum_checks_like_gnu() else ("bash", "jq", "shasum"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the acceptance programs")
+        rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
+        cls.generation = rows["local-generation-model"]["acceptance"]
+        cls.embedding = rows["embedding-model"]["acceptance"]
+        cls.server = rows["local-model-server"]["acceptance"]
+
+    @staticmethod
+    def table(num_ctx, quantization):
+        """The two rows of `ollama show` that the checks read, padded as its table pads them."""
+        return (f"  Model\n    quantization        {quantization}     \n\n"
+                f"  Parameters\n    temperature          1        \n    num_ctx              {num_ctx}    \n\n")
+
+    @staticmethod
+    def store(scratch, model, tag, text):
+        path = scratch / "home/.ollama/models/manifests/registry.ollama.ai/library" / model / tag
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def run_program(self, program, scratch, show="", reply=""):
+        """The finished process of `program`, run as accept.sh runs it with the stubs first on PATH."""
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "show.txt").write_text(show, encoding="utf-8")
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        for name, canned in (("ollama", "show.txt"), ("curl", "reply.json")):
+            (stub / name).write_text(f'#!/bin/sh\ncat "$STUB_DIR/{canned}"\n', encoding="utf-8")
+            (stub / name).chmod(0o755)
+        if not sha256sum_checks_like_gnu():
+            (stub / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n', encoding="utf-8")
+            (stub / "sha256sum").chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("OLLAMA_MODELS", "BASH_ENV", "ENV")}
+        env.update(HOME=str(scratch / "home"), tool_root=str(scratch / "tools"), STUB_DIR=str(stub),
+                   PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60)
+
+    @staticmethod
+    def outcome(name, result):
+        """A case's assertion message: its name, and the program's exit code, stdout and stderr."""
+        return f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+
+    def test_the_programs_are_the_ones_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        for slot, acceptance in (("local-generation-model", self.generation), ("embedding-model", self.embedding)):
+            self.assertEqual(checker.checks_of(functions[slot]),
+                             [(stage, slot, "smoke", acceptance[stage]["command"]) for stage in ("post_install", "service_health")])
+        self.assertIn(("after_sign_in", "local-model-server", "smoke", self.server["after_sign_in"]["command"]),
+                      checker.checks_of(functions["local-model-server"]))
+
+    def test_the_generation_files_check(self):
+        cases = {"the expected state": (None, 0), "another 64k Modelfile": ("modelfile", 1),
+                 "another model layer": ("layer", 1), "no created model": ("missing", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                models = scratch / "tools/ollama-models"
+                models.mkdir(parents=True)
+                for modelfile in ("swift-iq3s-s2o.Modelfile", "swift-iq3s-s2o-64k.Modelfile"):
+                    shutil.copy(PLAN / "models" / modelfile, models / modelfile)
+                if change == "modelfile":
+                    (models / "swift-iq3s-s2o-64k.Modelfile").write_text("FROM swift-iq3s-s2o\nPARAMETER num_ctx 65536\n")
+                if change != "missing":
+                    layer = "0" * 64 if change == "layer" else self.SWIFT_FILE
+                    self.store(scratch, "swift-iq3s-s2o-64k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                result = self.run_program(self.generation["post_install"]["command"], scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_embedding_files_check(self):
+        program = self.embedding["post_install"]["command"]
+        self.assertEqual(program.count(self.PINNED_LIBRARY), 1)
+        library = '{"schemaVersion":2,"stand-in":true}'
+        program = program.replace(self.PINNED_LIBRARY, hashlib.sha256(library.encode()).hexdigest())
+        cases = {"the expected state": (None, 0), "another library manifest": ("library", 1),
+                 "another derived layer": ("layer", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                self.store(scratch, "qwen3-embedding", "0.6b", library + ("\n" if change == "library" else ""))
+                layer = "1" * 64 if change == "layer" else self.EMBEDDER_LAYER
+                self.store(scratch, "qwen3-embedding-8k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                result = self.run_program(program, scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_service_checks(self):
+        answer = json.dumps({"model": "swift-iq3s-s2o-64k", "response": "ready", "done": True})
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        generation, embedding = self.generation["service_health"]["command"], self.embedding["service_health"]["command"]
+        cases = {
+            "generation: the expected state": (generation, self.table(64000, "IQ3_S"), answer, 0),
+            "generation: another context": (generation, self.table(65536, "IQ3_S"), answer, 1),
+            "generation: another quantization": (generation, self.table(64000, "Q4_K_M"), answer, 1),
+            "generation: an empty answer": (generation, self.table(64000, "IQ3_S"), json.dumps({"response": "", "done": True}), 1),
+            "embedding: the expected state": (embedding, self.table(8192, "Q8_0"), vector, 0),
+            "embedding: the server-wide context": (embedding, self.table(64000, "Q8_0"), vector, 1),
+            "embedding: 512 dimensions": (embedding, self.table(8192, "Q8_0"), json.dumps({"embeddings": [[0.01] * 512]}), 1),
+        }
+        for name, (program, show, reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                result = self.run_program(program, scratch, show, reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_server_smoke_check(self):
+        """The server row's after_sign_in check embeds with the settled embedder and runs or pulls no other model."""
+        program = self.server["after_sign_in"]["command"]
+        self.assertEqual(re.findall(r'"model":"([^"]*)"', program), ["qwen3-embedding-8k"])
+        for absent in ("ollama run", "ollama pull", "embeddinggemma"):
+            self.assertNotIn(absent, program)
+        cases = {
+            "one vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]}), 0),
+            "no vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), 1),
+            # the answer handleScheduleError gives a missing model (server/routes.go:3226-3227 at v0.35.0)
+            "an error answer": (json.dumps({"error": 'model "qwen3-embedding-8k" not found, try pulling it first'}), 1),
+        }
+        for name, (reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                result = self.run_program(program, scratch, reply=reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def run_accept(self, scratch, reply):
+        """The finished `accept.sh --only local-model-server --stage after_sign_in`, with a scratch HOME and the stub curl."""
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "curl").write_text('#!/bin/sh\ncat "$STUB_DIR/reply.json"\n', encoding="utf-8")
+        (stub / "curl").chmod(0o755)
+        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR")
+        env = {key: value for key, value in os.environ.items() if key not in dropped}
+        env.update(HOME=str(scratch / "home"), STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", str(PLAN / "accept.sh"), "--only", "local-model-server", "--stage", "after_sign_in"],
+                              env=env, capture_output=True, text=True, timeout=60)
+
+    def test_the_server_smoke_check_waits_for_the_embedding_row(self):
+        """Until the embedding-model row has created qwen3-embedding-8k, accept.sh prints skipped for the stage, not a failure.
+
+        Step F9 runs the server row's after_sign_in check without installing a model row (each installs only when named).
+        Once the derived model's manifest is in the store that the embedding row's post_install check reads, the check runs.
+        """
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            self.skipTest("accept.sh refuses to run as root")
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        cases = {
+            "no embedder in the store": (False, vector, "skipped", 0),
+            "the embedder, one vector": (True, vector, "0", 0),
+            "the embedder, no vector": (True, json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), "1", 1),
+        }
+        for name, (created, reply, printed, status) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                if created:
+                    self.store(scratch, "qwen3-embedding-8k", "latest",
+                               json.dumps({"layers": [{"digest": "sha256:" + self.EMBEDDER_LAYER}]}))
+                result = self.run_accept(scratch, reply)
+                self.assertEqual((result.stdout, result.returncode),
+                                 (f"local-model-server | after_sign_in | {printed}\n", status), self.outcome(name, result))
+                if not created:
+                    self.assertIn("install the embedding-model row first", result.stderr, self.outcome(name, result))
+
+
+class ModelServerGuard(unittest.TestCase):
+    """install.sh's guard before either local-model row downloads, pulls or creates anything, run against stand-ins.
+
+    Both rows install what was measured on Ollama 0.35.0, so model_server_answers requires that the server answers
+    `ollama ls` and that GET /api/version reports 0.35.0 (docs/api.md:1821-1843 and server/routes.go:2023 at v0.35.0).
+    The function, read from install.sh as check_plan.py reads it, runs under bash -euo pipefail with stub ollama and curl
+    programs first on PATH. The fixtures are our own: no model server answers.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        for tool in ("bash", "jq"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the guard")
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
+        cls.guard = install["model_server_answers"]
+        cls.rows = {slot: install[slot] for slot in ("local-generation-model", "embedding-model")}
+
+    def run_guard(self, scratch, listed, reply, curl_exit=0):
+        """The finished guard, with a stub `ollama` whose `ls` succeeds when `listed` and a stub `curl` that prints `reply`."""
+        stub = scratch / "bin"
+        stub.mkdir()
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "ollama").write_text(f"#!/bin/sh\nexit {0 if listed else 1}\n", encoding="utf-8")
+        (stub / "curl").write_text(f'#!/bin/sh\n[ {curl_exit} -eq 0 ] || exit {curl_exit}\ncat "$STUB_DIR/reply.json"\n',
+                                   encoding="utf-8")
+        for name in ("ollama", "curl"):
+            (stub / name).chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
+        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60)
+
+    def test_both_rows_run_the_guard_before_any_command(self):
+        for slot, body in self.rows.items():
+            lines = [line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("#")]
+            with self.subTest(slot=slot):
+                self.assertEqual(lines[:2], ['refresh_path || return "$?"', 'model_server_answers || return "$?"'])
+
+    def test_the_server_must_answer_and_report_the_measured_version(self):
+        cases = {
+            "0.35.0": (True, json.dumps({"version": "0.35.0"}), 0, 0),
+            "another version": (True, json.dumps({"version": "0.36.0"}), 0, 1),
+            "an answer without a version": (True, json.dumps({"error": "not found"}), 0, 1),
+            "the version request fails": (True, "", 7, 1),
+            "no server answers": (False, json.dumps({"version": "0.35.0"}), 0, 1),
+        }
+        for name, (listed, reply, curl_exit, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                result = self.run_guard(Path(scratch), listed, reply, curl_exit)
+                message = f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+                self.assertEqual(result.returncode, want, message)
+                if name == "another version":
+                    self.assertIn("reports version 0.36.0, not 0.35.0", result.stderr, message)
 
 
 if __name__ == "__main__":

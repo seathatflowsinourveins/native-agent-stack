@@ -1,0 +1,640 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-02T20:44:32Z",
+  "verdict": "ACCEPT",
+  "verdict_scope": "Independent read-only review of the bounded main reconciliation. Structural/source consistency only; previous behavioral acceptance is reused.",
+  "head": "26f09b021e5da36f15cb15ada9032d69d26a238c",
+  "tree": "a23ac1c6dc24e3d9c9adfc7b345c1d36ed1712dd",
+  "base": "5803017249ad2a5e90ace4ab4e33e443ae00b66e",
+  "preceding_accepted_head": "1ecc9b753e7c7d66c4902e967e809a40a98fe80f",
+  "source_worktree": "daily-currency-source",
+  "retained_artifact_directory": "daily-currency-main-reconcile",
+  "source_read_only": true,
+  "sota_sources": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "1ecc9b753e7c7d66c4902e967e809a40a98fe80f",
+      "files": [
+        "adoption/templates/codex.hooks.template.json",
+        "docs/decisions/2026-09-30-session-currency-notice.md",
+        "docs/decisions/2026-10-02-daily-catalog-currency.md",
+        "docs/harness-defaults.md"
+      ],
+      "scope": "Previously accepted PR613 source bytes; narrow preservation review."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "5803017249ad2a5e90ace4ab4e33e443ae00b66e",
+      "files": [
+        ".github/workflows/catalog-freshness.yml",
+        "manifests/evidence.json"
+      ],
+      "scope": "Accepted PR611 metadata and main evidence bytes; only daily cron and two owned evidence entries differ."
+    },
+    {
+      "repository": "cli/cli",
+      "version": "v2.102.0",
+      "pin": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "primary_sources": [
+        "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/create/create.go",
+        "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/edit/edit.go"
+      ],
+      "scope": "PR611's previously accepted pinned flag sources, preserved by exact main workflow bytes. No new interface requalification."
+    }
+  ],
+  "workflow": {
+    "main": {
+      "bytes": 23346,
+      "sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f"
+    },
+    "final": {
+      "bytes": 23346,
+      "sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46"
+    },
+    "base_cron_lines": [
+      "    - cron: '17 6 * * 1'"
+    ],
+    "unique_weekly_cron_count": 1,
+    "only_daily_replacement": true,
+    "working_equals_commit": true,
+    "diff": [
+      "--- 5803017249ad2a5e90ace4ab4e33e443ae00b66e\n",
+      "+++ 26f09b021e5da36f15cb15ada9032d69d26a238c\n",
+      "@@ -2,7 +2,7 @@\n",
+      " ",
+      " on:",
+      "   schedule:",
+      "-    - cron: '17 6 * * 1'",
+      "+    - cron: '17 6 * * *'",
+      "   workflow_dispatch:",
+      "     inputs:",
+      "       max_repos:"
+    ]
+  },
+  "preserved_source": [
+    {
+      "path": "adoption/templates/codex.hooks.template.json",
+      "bytes": 1458,
+      "sha256": "9adb93ec1db0cbac95e5c79f792d34aae3412096389e9dd7ffdca4ec0c87c668",
+      "equals_prev": true,
+      "working_equals_commit": true
+    },
+    {
+      "path": "docs/decisions/2026-09-30-session-currency-notice.md",
+      "bytes": 22835,
+      "sha256": "5460bbd839a6889038e09d66537ceb55912796d1464fb9507c087ea85982d73d",
+      "equals_prev": true,
+      "working_equals_commit": true
+    },
+    {
+      "path": "docs/harness-defaults.md",
+      "bytes": 136634,
+      "sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+      "equals_prev": true,
+      "working_equals_commit": true
+    }
+  ],
+  "decision_note": {
+    "path": "docs/decisions/2026-10-02-daily-catalog-currency.md",
+    "bytes": 8961,
+    "sha256": "82da87c71e2665bd3c11a7703139e7d86d1e318570810748b177a29271b60e1f",
+    "strip_integration_note_equals_prev": true,
+    "integration_note_bytes": 1305,
+    "working_equals_commit": true,
+    "fresh_native_diff_equals_retained_patch": true,
+    "patch": {
+      "bytes": 1861,
+      "sha256": "045d5cb85dd083fa6d3ca7bf78205bb36c594f5a36029d494d0f80a2a4a3632d"
+    }
+  },
+  "generated_reports": [
+    {
+      "path": "catalogs/landscape/component-evidence-matrix.json",
+      "bytes": 314853,
+      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "equals_main": true,
+      "working_equals_commit": true
+    },
+    {
+      "path": "docs/component-evidence-matrix.md",
+      "bytes": 32903,
+      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "equals_main": true,
+      "working_equals_commit": true
+    },
+    {
+      "path": "catalogs/landscape/new-host-grand-list.json",
+      "bytes": 287704,
+      "sha256": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+      "equals_main": true,
+      "working_equals_commit": true
+    },
+    {
+      "path": "docs/new-host-grand-list.md",
+      "bytes": 18483,
+      "sha256": "245c7942ca34c078ddb8adc0d8a845efee8f42ea35e0fc4709175a14a9d79abb",
+      "equals_main": true,
+      "working_equals_commit": true
+    }
+  ],
+  "registry": {
+    "base": {
+      "bytes": 2479385,
+      "sha256": "3a82c225f5a4a79f8445e732e3f6955c6b347cea08d8a58e5b79bbe6bb3f3943"
+    },
+    "final": {
+      "bytes": 2479385,
+      "sha256": "c174713f3cb4de5399113307c756433a2083f2bf6340d8b454f16e4b05b18dfc"
+    },
+    "native_base_blob": "b752359c4b3a7e260fc7cfb914751ba1b04a03a5",
+    "native_final_blob": "8bfa43eea3ec8fb66a75777f406353523101a1f5",
+    "files": {
+      "base_count": 9315,
+      "final_count": 9315,
+      "base_unique_count": 9315,
+      "final_unique_count": 9315,
+      "ordered_paths_preserved": true,
+      "added": [],
+      "removed": [],
+      "changed": [
+        ".github/workflows/catalog-freshness.yml",
+        "docs/harness-defaults.md"
+      ],
+      "unrelated_preserved_count": 9313,
+      "entries": [
+        {
+          "path": ".github/workflows/catalog-freshness.yml",
+          "before": {
+            "path": ".github/workflows/catalog-freshness.yml",
+            "sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f",
+            "bytes": 23346
+          },
+          "after": {
+            "path": ".github/workflows/catalog-freshness.yml",
+            "sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
+            "bytes": 23346
+          },
+          "only_sha256_bytes_changed": true,
+          "registry_matches_final_source": true
+        },
+        {
+          "path": "docs/harness-defaults.md",
+          "before": {
+            "path": "docs/harness-defaults.md",
+            "sha256": "87229ac5a96c1c46165d8de5a09f38d3751dd6fc8264aaf78adec3dc35b2f425",
+            "bytes": 135407
+          },
+          "after": {
+            "path": "docs/harness-defaults.md",
+            "sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+            "bytes": 136634
+          },
+          "only_sha256_bytes_changed": true,
+          "registry_matches_final_source": true
+        }
+      ]
+    },
+    "all_other_sections_exact": {
+      "schema_version": true,
+      "receipts": true,
+      "convergence_records": true
+    },
+    "top_keys_and_order_preserved": true,
+    "receipt_count": 186,
+    "convergence_record_count": 26,
+    "byte_exact_main_with_only_two_owned_hash_byte_updates": true,
+    "working_equals_commit": true
+  },
+  "artifact_bindings": [
+    {
+      "path": "ACCEPTED-LOCAL-26f09b.json",
+      "bytes": 6147,
+      "sha256": "93e9fe15578da673d67fdfcce65ebc9153e4d6a3ea5a2f8bc45f38379a9631d7"
+    },
+    {
+      "path": "native-check-outputs.json",
+      "bytes": 2215,
+      "sha256": "e214a1458a8303a4a19a41dc7044b3d8e3d6529b088fdf804d00a4fcc7b931ff"
+    },
+    {
+      "path": "native-rebase-operations.json",
+      "bytes": 1702,
+      "sha256": "1864ee2b9472d99f969dc0a88709dc2897b3c3eec808efd22844d2eece059db3"
+    },
+    {
+      "path": "integration-note.patch",
+      "bytes": 1861,
+      "sha256": "045d5cb85dd083fa6d3ca7bf78205bb36c594f5a36029d494d0f80a2a4a3632d"
+    },
+    {
+      "path": "HOLD-580301.json",
+      "bytes": 6416,
+      "sha256": "a20d6c45c33c95bbee3b42995f2a1590a368990c0111f73baabab34729682fbb"
+    }
+  ],
+  "retained_checkpoint_binding": {
+    "head": "26f09b021e5da36f15cb15ada9032d69d26a238c",
+    "tree": "a23ac1c6dc24e3d9c9adfc7b345c1d36ed1712dd",
+    "base": "5803017249ad2a5e90ace4ab4e33e443ae00b66e",
+    "prior_ref": "1ecc9b753e7c7d66c4902e967e809a40a98fe80f",
+    "workflow": {
+      "bytes": 23346,
+      "sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
+      "equals_exact_main_with_only_unique_weekly_to_daily_cron_replacement": true,
+      "pr611_metadata_preserved": true,
+      "upstream": "cli/cli v2.102.0 fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd pkg/cmd/pr/create/create.go and pkg/cmd/pr/edit/edit.go"
+    },
+    "expected_ownership_files": [
+      ".github/workflows/catalog-freshness.yml",
+      "adoption/templates/codex.hooks.template.json",
+      "docs/decisions/2026-09-30-session-currency-notice.md",
+      "docs/decisions/2026-10-02-daily-catalog-currency.md",
+      "docs/harness-defaults.md",
+      "manifests/evidence.json"
+    ]
+  },
+  "retained_native_checks": [
+    {
+      "key": "component_matrix",
+      "command": "rtk python3 scripts/component_matrix.py --write",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 61,
+        "sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": [
+        "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}"
+      ]
+    },
+    {
+      "key": "new_host_grand_list",
+      "command": "rtk python3 scripts/new_host_grand_list.py --write",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 51,
+        "sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": [
+        "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}"
+      ]
+    },
+    {
+      "key": "catalog_checks",
+      "command": "rtk proxy python3 -m unittest tests.test_catalog_freshness_propose tests.test_catalog_freshness_pins tests.test_catalog_freshness_trading",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 228,
+        "sha256": "1045e333217e6f44b0bb564b50caad7945941105045e3aa44b87c3f5be549796"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": [
+        "Ran 127 tests in 53.238s",
+        "OK"
+      ]
+    },
+    {
+      "key": "currency_checks",
+      "command": "rtk proxy python3 -m unittest discover -s tests -p test_currency_due_notice.py",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 294,
+        "sha256": "2e6c6372fc393789180065868be29c719c516b53eda7ceb210ad7f63026f2923"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": [
+        "Ran 22 tests in 1.782s",
+        "OK"
+      ]
+    },
+    {
+      "key": "actionlint_combined",
+      "command": "rtk proxy <pinned-actionlint-1.17.0>/actionlint .github/workflows/catalog-freshness.yml",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": []
+    },
+    {
+      "key": "validation",
+      "command": "rtk proxy python3 scripts/validate.py",
+      "retained_native_exit": 0,
+      "output": {
+        "bytes": 161,
+        "sha256": "f2880c2a2893b9aa0f2b463989701bc309ad1d24d105cd205891454d4b06bec4"
+      },
+      "checkpoint_command_exit_bytes_sha_match": true,
+      "returned_result_lines": [
+        "{\"components\": 69, \"hashed_files\": 9315, \"profiles\": 4, \"receipts\": 186, \"status\": \"passed\"}",
+        "Integrity and scope checks only; no live provider or GPU execution."
+      ]
+    }
+  ],
+  "retained_rebase_records": [
+    {
+      "key": "initial_rebase",
+      "retained_native_exit": 1,
+      "checkpoint_exit_match": true,
+      "output": {
+        "bytes": 651,
+        "sha256": "aedd216412e088f211df620f33835e36b27b11f8c4ecc6b8914d85f4513a8049"
+      }
+    },
+    {
+      "key": "staging",
+      "retained_native_exit": 0,
+      "checkpoint_exit_match": true,
+      "output": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "key": "staged_whitespace",
+      "retained_native_exit": 0,
+      "checkpoint_exit_match": true,
+      "output": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "key": "rebase_continue",
+      "retained_native_exit": 0,
+      "checkpoint_exit_match": true,
+      "output": {
+        "bytes": 381,
+        "sha256": "07c7c8dc5202850e38fbd38e56b8ba1ba8f5a423da697a05b07ad188e8583505"
+      }
+    }
+  ],
+  "retained_source_note_diff": {
+    "retained_exit": 0,
+    "artifact": "integration-note.patch",
+    "checkpoint_exit_match": true
+  },
+  "expected_initial_conflict_retained": true,
+  "retained_rebase_head_matches": true,
+  "fresh_native_reads": [
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:.github/workflows/catalog-freshness.yml",
+      "exit": 0,
+      "stdout_bytes": 23346,
+      "stdout_sha256": "0dad216593d396d07ddc1d23d711fc384ef0d4cd4a13796685598385b657960f",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:.github/workflows/catalog-freshness.yml",
+      "exit": 0,
+      "stdout_bytes": 23346,
+      "stdout_sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 1ecc9b753e7c7d66c4902e967e809a40a98fe80f:adoption/templates/codex.hooks.template.json",
+      "exit": 0,
+      "stdout_bytes": 1458,
+      "stdout_sha256": "9adb93ec1db0cbac95e5c79f792d34aae3412096389e9dd7ffdca4ec0c87c668",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:adoption/templates/codex.hooks.template.json",
+      "exit": 0,
+      "stdout_bytes": 1458,
+      "stdout_sha256": "9adb93ec1db0cbac95e5c79f792d34aae3412096389e9dd7ffdca4ec0c87c668",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 1ecc9b753e7c7d66c4902e967e809a40a98fe80f:docs/decisions/2026-09-30-session-currency-notice.md",
+      "exit": 0,
+      "stdout_bytes": 22835,
+      "stdout_sha256": "5460bbd839a6889038e09d66537ceb55912796d1464fb9507c087ea85982d73d",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/decisions/2026-09-30-session-currency-notice.md",
+      "exit": 0,
+      "stdout_bytes": 22835,
+      "stdout_sha256": "5460bbd839a6889038e09d66537ceb55912796d1464fb9507c087ea85982d73d",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 1ecc9b753e7c7d66c4902e967e809a40a98fe80f:docs/harness-defaults.md",
+      "exit": 0,
+      "stdout_bytes": 136634,
+      "stdout_sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/harness-defaults.md",
+      "exit": 0,
+      "stdout_bytes": 136634,
+      "stdout_sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 1ecc9b753e7c7d66c4902e967e809a40a98fe80f:docs/decisions/2026-10-02-daily-catalog-currency.md",
+      "exit": 0,
+      "stdout_bytes": 7656,
+      "stdout_sha256": "085315429c03c6b0192d91961ca84de3888d977fec89e5717e01fe2354cc7890",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/decisions/2026-10-02-daily-catalog-currency.md",
+      "exit": 0,
+      "stdout_bytes": 8961,
+      "stdout_sha256": "82da87c71e2665bd3c11a7703139e7d86d1e318570810748b177a29271b60e1f",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git diff 1ecc9b753e7c7d66c4902e967e809a40a98fe80f 26f09b021e5da36f15cb15ada9032d69d26a238c -- docs/decisions/2026-10-02-daily-catalog-currency.md",
+      "exit": 0,
+      "stdout_bytes": 1861,
+      "stdout_sha256": "045d5cb85dd083fa6d3ca7bf78205bb36c594f5a36029d494d0f80a2a4a3632d",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:catalogs/landscape/component-evidence-matrix.json",
+      "exit": 0,
+      "stdout_bytes": 314853,
+      "stdout_sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:catalogs/landscape/component-evidence-matrix.json",
+      "exit": 0,
+      "stdout_bytes": 314853,
+      "stdout_sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:docs/component-evidence-matrix.md",
+      "exit": 0,
+      "stdout_bytes": 32903,
+      "stdout_sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/component-evidence-matrix.md",
+      "exit": 0,
+      "stdout_bytes": 32903,
+      "stdout_sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:catalogs/landscape/new-host-grand-list.json",
+      "exit": 0,
+      "stdout_bytes": 287704,
+      "stdout_sha256": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:catalogs/landscape/new-host-grand-list.json",
+      "exit": 0,
+      "stdout_bytes": 287704,
+      "stdout_sha256": "3cb76b4e7cd3d1d122f088bcf5598d5aa51d9699497d8caddf8e35d5f55c2778",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:docs/new-host-grand-list.md",
+      "exit": 0,
+      "stdout_bytes": 18483,
+      "stdout_sha256": "245c7942ca34c078ddb8adc0d8a845efee8f42ea35e0fc4709175a14a9d79abb",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/new-host-grand-list.md",
+      "exit": 0,
+      "stdout_bytes": 18483,
+      "stdout_sha256": "245c7942ca34c078ddb8adc0d8a845efee8f42ea35e0fc4709175a14a9d79abb",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git rev-parse HEAD^",
+      "exit": 0,
+      "stdout_bytes": 41,
+      "stdout_sha256": "977f32419338c8a64bff7a9099deffe1f92dc28e8e51d7ae1e6e9f0115145359",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:manifests/evidence.json",
+      "exit": 0,
+      "stdout_bytes": 2479385,
+      "stdout_sha256": "3a82c225f5a4a79f8445e732e3f6955c6b347cea08d8a58e5b79bbe6bb3f3943",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:manifests/evidence.json",
+      "exit": 0,
+      "stdout_bytes": 2479385,
+      "stdout_sha256": "c174713f3cb4de5399113307c756433a2083f2bf6340d8b454f16e4b05b18dfc",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:.github/workflows/catalog-freshness.yml",
+      "exit": 0,
+      "stdout_bytes": 23346,
+      "stdout_sha256": "3c44cc475010380ab18985ce2715bcd9d1290e2ced7c161d80c4d8c73b816f46",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:docs/harness-defaults.md",
+      "exit": 0,
+      "stdout_bytes": 136634,
+      "stdout_sha256": "3b9c833fdfb36c81e13e64eba29a19803d0f09c0691042381fb202eda7ecef1a",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git rev-parse 5803017249ad2a5e90ace4ab4e33e443ae00b66e:manifests/evidence.json",
+      "exit": 0,
+      "stdout_bytes": 41,
+      "stdout_sha256": "28d5c49e047aeb0ba435dfa46bf63fae71048c372de663cb053746ab60bc208d",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git rev-parse 26f09b021e5da36f15cb15ada9032d69d26a238c:manifests/evidence.json",
+      "exit": 0,
+      "stdout_bytes": 41,
+      "stdout_sha256": "47fda1e5638b1cd514c287b55d3053d83900badd11d43f76bf54e2bdc4a8f0d0",
+      "stderr_bytes": 0
+    },
+    {
+      "command": "rtk proxy git rev-parse HEAD HEAD^{tree} HEAD^ refs/native-agent-stack/daily-currency-source/pre-main611-reconcile-20261002",
+      "exit": 0,
+      "stdout": "26f09b021e5da36f15cb15ada9032d69d26a238c\na23ac1c6dc24e3d9c9adfc7b345c1d36ed1712dd\n5803017249ad2a5e90ace4ab4e33e443ae00b66e\n1ecc9b753e7c7d66c4902e967e809a40a98fe80f\n",
+      "stderr": ""
+    },
+    {
+      "command": "rtk proxy git status --porcelain=v1 --untracked-files=all",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "rtk proxy git diff --name-status 5803017249ad2a5e90ace4ab4e33e443ae00b66e 26f09b021e5da36f15cb15ada9032d69d26a238c",
+      "exit": 0,
+      "stdout": "M\t.github/workflows/catalog-freshness.yml\nM\tadoption/templates/codex.hooks.template.json\nM\tdocs/decisions/2026-09-30-session-currency-notice.md\nA\tdocs/decisions/2026-10-02-daily-catalog-currency.md\nM\tdocs/harness-defaults.md\nM\tmanifests/evidence.json\n",
+      "stderr": ""
+    },
+    {
+      "command": "rtk proxy git cat-file commit 26f09b021e5da36f15cb15ada9032d69d26a238c",
+      "exit": 0,
+      "stdout": "tree a23ac1c6dc24e3d9c9adfc7b345c1d36ed1712dd\nparent 5803017249ad2a5e90ace4ab4e33e443ae00b66e\n",
+      "stderr": "",
+      "stdout_sanitization": "Commit author, committer and body omitted."
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:manifests/evidence.json",
+      "exit": 0,
+      "purpose": "Corrected cron comparison and registry shape read"
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:manifests/evidence.json",
+      "exit": 0,
+      "purpose": "Corrected cron comparison and registry shape read"
+    },
+    {
+      "command": "rtk proxy git show 5803017249ad2a5e90ace4ab4e33e443ae00b66e:.github/workflows/catalog-freshness.yml",
+      "exit": 0,
+      "purpose": "Corrected cron comparison and registry shape read"
+    },
+    {
+      "command": "rtk proxy git show 26f09b021e5da36f15cb15ada9032d69d26a238c:.github/workflows/catalog-freshness.yml",
+      "exit": 0,
+      "purpose": "Corrected cron comparison and registry shape read"
+    }
+  ],
+  "all_fresh_native_read_exits": 0,
+  "corrections": [
+    {
+      "kind": "reviewer_comparison_error",
+      "initial_condition": "Review comparison assumed cron '17 7 * * 1', so its replacement check returned false.",
+      "actual_condition": "Native exact main/final blob diff shows '17 6 * * 1' to '17 6 * * *'.",
+      "verification": "Exact blobs reread through rtk proxy git show; weekly condition occurs once, and replacing only it yields the entire final 23346-byte workflow.",
+      "resolved": true,
+      "source_modified": false
+    },
+    {
+      "kind": "context_tool_scope_limit",
+      "observation": "ctx_execute_file refused the explicitly assigned artifact outside its configured project root.",
+      "resolution": "Used ctx_execute Python to process the explicitly authorized files under unrestricted host permissions; no settings or allow rules changed.",
+      "source_modified": false
+    }
+  ],
+  "limitations": [
+    "Reported native statuses were read from retained records; these are not fresh test, lint, validation or generator invocations.",
+    "Output hashes establish retained output and checkpoint consistency. They cannot independently reconstruct invocation provenance, exact test inputs or cwd.",
+    "Pinned actionlint archive size/hash are retained declarations; this review did not inspect or rerun its executable.",
+    "Fresh native Git reads independently verify commit/source/artifact consistency; a checksum cannot establish execution success or adequacy.",
+    "Local ACCEPT does not qualify required GitHub checks, a scheduled Actions execution, hosted proposal, installation, provider/model/broker acceptance, or merge readiness.",
+    "No passing tests, validators, lint, generators, model runs or native interfaces were rerun. No source edits, push, merge, comments, installation, config or host changes occurred.",
+    "The generic verification skill's fresh behavior-test instruction was narrowed by the explicit task to fresh source reads and inspection of retained native results."
+  ],
+  "sanitation": "Only bounded source/artifact metadata and selected native read results are retained. Machine paths and native commit identity fields are omitted.",
+  "handoff": "Coordinator may use this exact-head narrow acceptance; publication, required exact-head CI and integration remain coordinator responsibilities.",
+  "machine_paths_and_credentials_not_copied": true
+}

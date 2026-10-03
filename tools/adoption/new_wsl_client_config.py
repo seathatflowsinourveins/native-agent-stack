@@ -909,6 +909,15 @@ def host_values(host: str, plan: dict, home: Path | None, wired_dirs: list) -> d
     values = dict(render_config.load_host_values(host))
     if home is not None:
         old, new = values["HOME"].rstrip("/"), str(home).rstrip("/")
+        if not old and new:
+            # A declared HOME of "/" strips to "", and every absolute value starts with "" + "/": the home's own paths
+            # cannot be told apart from the system's, and HOST_PATH's first entry (/usr/local/sbin in the example) would
+            # move under the new home: refused. Where the new home is the root as well, nothing moves and nothing is
+            # refused.
+            raise ConfigError(f"the host value file declares HOME as {values['HOME']!r}: without its trailing slashes "
+                              f"that is empty, so every absolute path counts as under the home, and system paths "
+                              f"such as HOST_PATH's would be moved under {home}; declare the home its paths were "
+                              f"written for")
         values = {k: (new + v[len(old):] if v == old or v.startswith(old + "/") else v) for k, v in values.items()}
     base = values["HOME"].rstrip("/")
     values["OTEL_ENDPOINT"] = f"127.0.0.1:{plan['ports']['collector_http_port']}"
@@ -1641,7 +1650,7 @@ class Apply:
         print(f"home {self.home}; eco root {self.eco}; {mode}")
         declared = render_config.load_host_values(args.host)["HOME"].rstrip("/")
         if declared != str(self.home).rstrip("/"):
-            print(f"note: the host value file puts HOME at {declared}; its paths are moved under {self.home}")
+            print(f"note: the host value file puts HOME at {declared}; the paths under it are moved under {self.home}")
         with tempfile.TemporaryDirectory(prefix="new-wsl-stage-") as stage:
             self.stage = Path(stage)
             for name, text in self.files.items():

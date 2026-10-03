@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json); on the destination distribution it is unrun.
+# Revised staged acceptance for the merged definitive manifest (64 foundation rows). This revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
+# Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill, credential-custody and cross-family-review install nothing and have nothing to check.
+# On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
 # Checks are quoted upstream commands/parameterizations from install-plan.json and SOURCES.md.
 set -euo pipefail
 if (( EUID == 0 )); then printf 'Refusing to run as root.\n' >&2; exit 1; fi
@@ -24,7 +26,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -166,6 +168,51 @@ done'
   esac
 }
 
+skill-discovery() {
+  # find-skills (vercel-labs/skills); https://github.com/vercel-labs/skills
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164
+      check skill-discovery smoke 'want=76a98a285cb0434f3d39e1a873823556330e398b
+lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+lock="${lock:-$HOME/.agents/.skill-lock.json}"
+listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
+for agent in '"'"'Claude Code'"'"' Codex; do
+  jq -e --arg agent "$agent" '"'"'any(.[]; .name == "find-skills" and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
+done
+jq -e --arg hash "$want" '"'"'.skills["find-skills"].skillFolderHash == $hash'"'"' "$lock" >/dev/null'
+      ;;
+    *) skipped skill-discovery ;;
+  esac
+}
+
+skill-authoring() {
+  # skill-creator (embedded in Codex; anthropics/skills for Claude Code); https://github.com/anthropics/skills
+  # UNRUN on every distribution: added from the layer consensus of 2026-10-02, after the clean run of this plan.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L164
+      # The listing has no agent filter, so it reports every agent the installer detects, and it must name Claude Code as
+      # the only agent of skill-creator. No same-name copy, and no dangling link, may sit in the installer's shared
+      # directory, which it uses for Codex's global skills, or in Codex's own global skills directory (README.md#L298);
+      # Codex keeps its embedded skills under skills/.system, which these lines leave alone. Both directories are tested
+      # in one [[ ]] as the last command, so its status is the program's on any bash: before 4.1 (macOS /bin/bash is 3.2)
+      # a failing [[ ]] does not stop a set -e script (bash NEWS, bash-4.1, item j).
+      check skill-authoring smoke 'want=3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6
+lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
+lock="${lock:-$HOME/.agents/.skill-lock.json}"
+listing="$(npx --yes skills@1.7.0 list -g --json)"
+jq -e '"'"'[.[] | select(.name == "skill-creator") | .agents] == [["Claude Code"]]'"'"' <<<"$listing" >/dev/null
+jq -e --arg hash "$want" '"'"'.skills["skill-creator"].skillFolderHash == $hash'"'"' "$lock" >/dev/null
+shared_copy="$HOME/.agents/skills/skill-creator"
+codex_copy="${CODEX_HOME:-$HOME/.codex}/skills/skill-creator"
+[[ ! -e "$shared_copy" && ! -L "$shared_copy" && ! -e "$codex_copy" && ! -L "$codex_copy" ]]'
+      ;;
+    *) skipped skill-authoring ;;
+  esac
+}
+
 mcporter() {
   # mcporter; https://github.com/openclaw/mcporter
   case "$stage" in
@@ -211,6 +258,25 @@ printf '"'"'callback && callback();\n'"'"' > "$ast_grep_probe/probe.ts"
 ast-grep -p '"'"'$A && $A()'"'"' -l ts "$ast_grep_probe/probe.ts"'
       ;;
     *) skipped structural-search ;;
+  esac
+}
+
+embedding-model() {
+  # Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k); https://github.com/QwenLM/Qwen3-Embedding
+  case "$stage" in
+    post_install)
+      # Files only: the pinned library manifest and the derived model's layer, in the server's model store.
+      # Store: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L112
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29
+      check embedding-model smoke 'printf '"'"'%s  %s\n'"'"' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest" >/dev/null'
+      ;;
+    service_health)
+      # The model's own context, then one embedding call of the model card's 1,024 dimensions
+      # (https://huggingface.co/Qwen/Qwen3-Embedding-0.6B/blob/97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3/README.md#L36).
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
+      check embedding-model smoke 'out="$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)" && grep -E '"'"'^ +num_ctx +8192 *$'"'"' <<<"$out" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Why is the sky blue?"}'"'"' | jq -e '"'"'(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024'"'"' >/dev/null'
+      ;;
+    *) skipped embedding-model ;;
   esac
 }
 
@@ -335,10 +401,39 @@ local-model-server() {
       check local-model-server health 'OLLAMA_HOST=127.0.0.1:21434 ollama ls'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73
-      check local-model-server smoke 'OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma "Hello world"'
+      # The embedding-model row, which installs only when named, creates the model this check calls. Until that model's
+      # manifest is in the store its post_install check reads, this check prints skipped, which is not a pass (README.md).
+      if [[ ! -e "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest" ]]; then
+        printf 'local-model-server: qwen3-embedding-8k is not in the model store; install the embedding-model row first (README.md, "The two local-model rows").\n' >&2
+        skipped local-model-server
+        return
+      fi
+      # One embedding call to the settled embedder, which the embedding-model row creates. /api/embed answers 404 for a
+      # missing model (GetModel's not-found error, routes.go:981-984 and :3226-3227) and its handler pulls nothing:
+      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L981-L984
+      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L3226-L3227
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
+      check local-model-server smoke 'curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Hello world"}'"'"' | jq -e '"'"'(.embeddings | length) == 1'"'"' >/dev/null'
       ;;
     *) skipped local-model-server ;;
+  esac
+}
+
+local-generation-model() {
+  # Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k); https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF
+  case "$stage" in
+    post_install)
+      # Files only: the placed Modelfiles are the repository's, and the created model names the pinned file as its layer,
+      # whose digest is the file's own sha256. Store: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/envconfig/config.go#L112
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905
+      check local-generation-model smoke 'printf '"'"'%s  %s\n'"'"' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e "$tool_root/ollama-models/swift-iq3s-s2o.Modelfile" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e "$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 "${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest" >/dev/null'
+      ;;
+    service_health)
+      # The model's own context and quantization, then one short generation with thinking off (not the measured effort).
+      # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48
+      check local-generation-model smoke 'out="$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)" && grep -E '"'"'^ +num_ctx +64000 *$'"'"' <<<"$out" >/dev/null && grep -E '"'"'^ +quantization +IQ3_S *$'"'"' <<<"$out" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '"'"'{"model":"swift-iq3s-s2o-64k","prompt":"Reply with the word ready.","stream":false,"think":false,"options":{"num_predict":32}}'"'"' | jq -e '"'"'.done == true and (.response | length > 0)'"'"' >/dev/null'
+      ;;
+    *) skipped local-generation-model ;;
   esac
 }
 
@@ -630,10 +725,14 @@ if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
 if [[ -z "$only" || "$only" == codex-sdk-and-codex-exec-app-server ]]; then codex-sdk-and-codex-exec-app-server; fi
 if [[ -z "$only" || "$only" == trail-of-bits-security-skills-trailofbits-skills ]]; then trail-of-bits-security-skills-trailofbits-skills; fi
 if [[ -z "$only" || "$only" == engineering-process-skills ]]; then engineering-process-skills; fi
+if [[ -z "$only" || "$only" == skill-discovery ]]; then skill-discovery; fi
+if [[ -z "$only" || "$only" == skill-authoring ]]; then skill-authoring; fi
 if [[ -z "$only" || "$only" == mcporter ]]; then mcporter; fi
 if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt; fi
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
 if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
+# Planned. The two model rows install only with --only (their models are created through the running model server).
+if [[ "$only" == embedding-model ]]; then embedding-model; elif [[ -z "$only" ]]; then skipped embedding-model; fi
 if [[ -z "$only" || "$only" == tobi-qmd ]]; then tobi-qmd; fi
 if [[ -z "$only" || "$only" == mineru ]]; then mineru; fi
 if [[ "$only" == playwright-cli ]]; then playwright-cli; elif [[ -z "$only" ]]; then skipped playwright-cli; fi
@@ -642,6 +741,7 @@ if [[ -z "$only" || "$only" == prometheus ]]; then prometheus; fi
 if [[ "$only" == loki ]]; then loki; elif [[ -z "$only" ]]; then skipped loki; fi
 if [[ "$only" == grafana ]]; then grafana; elif [[ -z "$only" ]]; then skipped grafana; fi
 if [[ -z "$only" || "$only" == local-model-server ]]; then local-model-server; fi
+if [[ "$only" == local-generation-model ]]; then local-generation-model; elif [[ -z "$only" ]]; then skipped local-generation-model; fi
 if [[ -z "$only" || "$only" == alerting ]]; then alerting; fi
 if [[ -z "$only" || "$only" == inspect-ai ]]; then inspect-ai; fi
 if [[ -z "$only" || "$only" == harbor-containerized-agent-e2e-runner ]]; then harbor-containerized-agent-e2e-runner; fi
@@ -664,7 +764,7 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'embedding-model' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'local-generation-model' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'claude-code-action' 'agent-structural-diff' 'chezmoi' 'base-distribution'; do
+for slot in 'research-skill' 'mcp-inspector' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'code-search' 'reranker-model' 'trafilatura' 'web-search-provider' 'memory-owner' 'ccusage' 'context-supply' 'phoenix' 'session-analytics' 'promptfoo' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'cross-family-review' 'chezmoi' 'base-distribution'; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
 exit "$failed"
