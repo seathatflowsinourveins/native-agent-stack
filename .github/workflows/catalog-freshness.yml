@@ -75,11 +75,14 @@ jobs:
           # table in drift.md: every pinned trading component (selected us-equities
           # cards plus extract_layers.py's TRADING_PIN_SOURCES) vs upstream, with a
           # dormancy signal relative to --checked-at. The manifest itself is unchanged.
+          # --runtime-freshness-out does the same for the GPT runtime table: the runtime workers,
+          # SDKs and agents in extract_layers.py's RUNTIME_PIN_SOURCES and RUNTIME_WATCH_SOURCES.
           printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
           python3 tools/sota-convergence/build_manifest.py \
             --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --trading-freshness-out "$RUNNER_TEMP/freshness/trading-freshness.json" \
+            --runtime-freshness-out "$RUNNER_TEMP/freshness/runtime-freshness.json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
@@ -100,7 +103,9 @@ jobs:
           print((work_dir / "drift.md").read_text())
           print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
                 f"no_release={len(result['no_release'])} trading={len(result['trading'])} "
-                f"dormant={len(result['dormant'])} archived={len(result['archived'])}")
+                f"dormant={len(result['dormant'])} archived={len(result['archived'])} "
+                f"runtime={len(result['runtime'])} runtime_behind={len(result['runtime_behind'])} "
+                f"runtime_unresolved={len(result['runtime_unresolved'])}")
           PYEOF
           {
             echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
@@ -171,6 +176,7 @@ jobs:
             ${{ runner.temp }}/freshness/manifest-*.json
             ${{ runner.temp }}/freshness/github-freshness.json
             ${{ runner.temp }}/freshness/trading-freshness.json
+            ${{ runner.temp }}/freshness/runtime-freshness.json
             ${{ runner.temp }}/freshness/drift.md
           if-no-files-found: error
           include-hidden-files: false
