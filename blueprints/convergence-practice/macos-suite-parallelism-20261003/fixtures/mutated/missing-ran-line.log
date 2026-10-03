@@ -1,0 +1,66 @@
+Running 1 test suites (9 total tests) across 1 workers
+
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ...
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ...
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ...
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ...
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ...
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ...
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
+Control: this first docstring line becomes a second description line. ... ok
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails)
+Control: subtest i=1 fails; i=0 and i=2 pass. ...
+  test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass. ... FAIL
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ...
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success) ... unexpected success
+setUpClass (test_zz_trial_controls.TrialControlsFixture) ... ERROR
+
+======================================================================
+test_error (test_zz_trial_controls.TrialControlsA.test_error)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/controls-P3-r1/test_zz_trial_controls.py", line 25, in test_error
+    raise RuntimeError("control: errors on purpose")
+RuntimeError: control: errors on purpose
+
+======================================================================
+setUpClass (test_zz_trial_controls.TrialControlsFixture)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/controls-P3-r1/test_zz_trial_controls.py", line 57, in setUpClass
+    raise RuntimeError("control: setUpClass errors on purpose")
+RuntimeError: control: setUpClass errors on purpose
+
+======================================================================
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/controls-P3-r1/test_zz_trial_controls.py", line 22, in test_fail
+    self.assertEqual(1, 2, "control: fails on purpose")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2 : control: fails on purpose
+
+======================================================================
+test_subtest_fails (test_zz_trial_controls.TrialControlsB.test_subtest_fails) (i=1)
+Control: subtest i=1 fails; i=0 and i=2 pass.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<scratch>/controls-P3-r1/test_zz_trial_controls.py", line 33, in test_subtest_fails
+    self.assertNotEqual(i, 1, "control: subtest i=1 fails on purpose")
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 == 1 : control: subtest i=1 fails on purpose
+
+======================================================================
+test_unexpected_success (test_zz_trial_controls.TrialControlsB.test_unexpected_success)
+----------------------------------------------------------------------
+UNEXPECTED SUCCESS
+----------------------------------------------------------------------
+
+FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1)

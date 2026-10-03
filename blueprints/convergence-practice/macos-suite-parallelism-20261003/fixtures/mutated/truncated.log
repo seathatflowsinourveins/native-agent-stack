@@ -1,0 +1,6 @@
+test_error (test_zz_trial_controls.TrialControlsA.test_error) ... ERROR
+test_fail (test_zz_trial_controls.TrialControlsA.test_fail) ... FAIL
+test_pass (test_zz_trial_controls.TrialControlsA.test_pass) ... ok
+test_skip (test_zz_trial_controls.TrialControlsA.test_skip) ... skipped 'control: skipped on purpose'
+test_expected_failure (test_zz_trial_controls.TrialControlsB.test_expected_failure) ... expected failure
+test_multiline_docstring (test_zz_trial_controls.TrialControlsB.test_multiline_docstring)
