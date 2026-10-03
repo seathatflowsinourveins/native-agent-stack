@@ -6,19 +6,24 @@ adoption pull requests for `validate-macos` (PR-A) and `validate` (PR-A2) are no
 which holds the trial, is to be closed unmerged by the coordinator after this record's pull request opens. This record
 changes no workflow, test, ruleset, required check or repository setting.
 
-The measurements are kept in
-[`evidence/receipts/suite-parallelism-trial-20261003.json`](../../evidence/receipts/suite-parallelism-trial-20261003.json),
-with sanitized excerpts and a trimmed oracle output in
-[`evidence/artifacts/suite-parallelism-trial-20261003/`](../../evidence/artifacts/suite-parallelism-trial-20261003/README.md),
-because GitHub's run records expire under the repository's 90-day retention and the run's 18 artifacts on 2026-11-02.
+The convergence record of this trial is the observed record
+[`evidence/artifacts/suite-parallelism-trial-20261003/experiment.json`](../../evidence/artifacts/suite-parallelism-trial-20261003/experiment.json)
+(status `observed`, decision `reject`, 36 observations: the 12 timed ubuntu-24.04 runs, the 4 ubuntu-24.04 control
+jobs and the 20 macos-15 jobs that never started). `scripts/validate_convergence.py` validates it, and
+`manifests/evidence.json` lists it in `convergence_records`. The receipt
+[`evidence/receipts/suite-parallelism-trial-20261003.json`](../../evidence/receipts/suite-parallelism-trial-20261003.json)
+keeps the detailed measurements and the claim text, and
+[`evidence/artifacts/suite-parallelism-trial-20261003/`](../../evidence/artifacts/suite-parallelism-trial-20261003/README.md)
+keeps sanitized excerpts and a trimmed oracle output, because GitHub's run records expire under the repository's
+90-day retention and the run's 18 artifacts on 2026-11-02.
 
 ## Decision
 
 - **Do not adopt unittest-parallel 1.8.6 on this suite as it stands.** The preregistered rule gave ubuntu-24.04 the
   outcome reject (no parallel arm is eligible) and macos-15 no verdict (no run directory). Both required test jobs keep
   their serial commands (`python3 -m unittest` in `validate`, `python3 -m unittest -v` in `validate-macos`).
-- **Keep the failed attempt** as this record, the receipt and the artifacts (AGENTS.md:18;
-  `docs/acceptance-evidence-policy.md:60-61`).
+- **Keep the failed attempt** as this record, the observed convergence record, the receipt and the artifacts
+  (AGENTS.md:18; `docs/acceptance-evidence-policy.md:60-61`).
 - **Next action, separate and small:** raise the Linux `validate` job's limit (`timeout-minutes: 40`,
   `.github/workflows/validate.yml:31`, 2,400 s) in its own pull request. The trial's serial jobs on the same runner took
   1,212 to 1,724 s here, and the production `validate` job took up to 1,828 s in the CI measurements of 2026-10-03
@@ -209,7 +214,7 @@ pickling or spawned processes, and the default branch is two commits ahead of th
   serial spread of 1,186 to 1,688 s. A new trial should set its repeat count with this noise in view.
 - The cause of the L4F error.
 - Whether the class-level K4 timing failures come from CPU load alone.
-- Anything about the alternatives listed below.
+- Anything about the candidate classes in the completeness critique below.
 
 ## Departures from the preregistration
 
@@ -217,15 +222,168 @@ pickling or spawned processes, and the default branch is two commits ahead of th
 - **Where the observed record lives.** The preregistration's `next_decision_changing_test` asked for an observed
   convergence record (one `native_cli_execution` observation per timed run) beside `experiment.json`. That directory
   exists only on the trial branch, which is never merged, and its workflow re-runs the whole trial on every push to that
-  branch and in any pull request that adds it. The same per-run data is therefore in the receipt, and this pull
-  request contains no workflow.
+  branch and in any pull request that adds it. The observed record is therefore
+  `evidence/artifacts/suite-parallelism-trial-20261003/experiment.json`, beside the retained artifacts, and this pull
+  request contains no workflow. Its `frozen_inputs` point to the retained byte copy of the preregistered record
+  (`preregistration-experiment.json.txt`, sha256 `305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08`)
+  and to `result-trimmed.json`, because the frozen files themselves exist only at the trial head `1e4bb5ab`; their 15
+  preregistered hashes were re-checked there with `git show` (15 of 15 equal). The copy keeps the `.json.txt` suffix
+  because its own `frozen_inputs` name those trial-branch files, so it cannot validate on main, and
+  `scripts/validate_convergence.py --all-recorded` would refuse it as an undeclared convergence record.
+- **The observed record's shape.** It carries the preregistered `predeclared_metrics`, `commands`, lane, roles and base
+  revision unchanged, and departs from the plan in three ways, each stated in its `limitations`. (1) It adds one
+  observation per control job (tasks `controls-ubuntu-24.04` and `controls-macos-15`, command 7), which the
+  preregistration did not plan. The contract allows `passed` only with exit code 0
+  (`scripts/validate_convergence.py:120`), so a control observation's `exit_code` is its control step's own exit (0;
+  the step records each command's exit and never fails), and the commands' expected exits (1 and 3 under S, 5 and 124
+  under unittest-parallel) are in its scope text. (2) The 20 macos-15 jobs are skipped observations with no exit code
+  and no quality. (3) Token usage is null (unknown) for every observation, not the preregistered observed zeros: no
+  model ran in a hosted job and the jobs expose no token counter. `native_retries` is 0 for the 16 executed jobs
+  (`run_attempt` 1 everywhere), and runner time, which the contract has no field for, is in each observation's scope
+  text.
 
-## Alternatives
+## Completeness critique
 
-Not evaluated by this trial. They are listed for a pending survey in a separate lane, and nothing is asserted about
-them here: pytest-xdist, stestr, nose2's multiprocess plugin, green, one process per module under `xargs -P`, and
-GitHub's parallel steps. unittest-parallel's own `--thread` mode (`main.py:62-63` at the release commit) was not part
-of this trial either.
+The coordinator's completeness critique of this unit (2026-10-03), requested in the review of pull request #652, asks
+which modality, source or candidate class the unit missed. Its seeds below feed the next landscape sweep of the
+`ci-supply-chain` layer.
+
+### Modality missed before the trial
+
+- **No whole-suite run under the candidate runner before preregistering.** The only parallel preflight ran the
+  29-test wrapper module. The plan's whole-suite local preflight never ran, as the preregistration itself recorded
+  (the anti-pattern row of 2026-10-03 in `docs/harness-defaults.md`).
+- **The hosted behaviour of background steps was never examined.** The plan's search-first comparison named GitHub
+  background steps, and the preregistration lists "a background-steps arm" among the open plan items it did not test.
+  No hosted job ran one, although GitHub had announced the `background`, `wait`, `wait-all`, `cancel` and `parallel`
+  step keywords on 2026-06-25.
+
+### Candidate classes this trial did not evaluate
+
+The list comes from a read-only single-family research lane (Codex, `gpt-6.1-sol` at max effort, live search,
+2026-10-03): a lead, not authority. Every claim relayed here was re-read on 2026-10-03 with GET requests at the cited
+release, pinned below by commit. **VERIFIED** means the cited upstream text or record says it. **LEAD-ONLY** means
+it was not found or not checked there, so it is not asserted. None of these classes ran on this suite, so whether
+any of them keeps the suite's ids and outcomes is unknown.
+
+- **GitHub Actions parallel steps running module shards**, one `python3 -m unittest` process per shard. Source: the
+  GitHub changelog "Actions steps can now be run in parallel" (2026-06-25) and github/docs
+  `content/actions/reference/workflows-and-actions/workflow-syntax.md` at `2bd66de8` (lines 1078-1084, 1107-1111,
+  1140-1147, 1172, 1193-1199 and 1224).
+  - Favours: no added package and no pickling, since each shard is its own interpreter that imports its modules by
+    name. Each step keeps its own log. A failed background step fails the job at the next `wait` or `wait-all`. At
+    most 10 background steps run at once in a job.
+  - Blocks: loading a module by name calls its `load_tests` with `pattern=None`, unlike discovery (CPython v3.13.16
+    `Lib/unittest/loader.py:117`, `:178`, `:427`, `:449`), so the union of the shards must be shown to equal the
+    discovered inventory.
+  - Status: VERIFIED for the keywords, the limit, the failure propagation and the loader's behaviour. LEAD-ONLY: import
+    order and process-isolation parity, and how background steps behave on these two hosted runners.
+- **One `python3 -m unittest` process per module under `xargs -P`.** Source: GNU findutils 4.10.0 release
+  announcement (bug-findutils, 2024-06-01) and the installed GNU xargs 4.10.0 manual page ("EXIT STATUS").
+  - Favours: no added Python package. GNU xargs exits 123 when a child exits with 1 to 125 and 125 when a child is
+    killed by a signal.
+  - Blocks: the same `load_tests` and parity questions as above, and a hang needs an external deadline.
+  - Status: VERIFIED for the GNU exit statuses and the release date. LEAD-ONLY: the macOS xargs (Apple
+    `shell_cmds`), and GNU Parallel's options and release.
+- **stestr 4.2.1** (PyPI upload 2026-02-20). Source: mtreinish/stestr at `2802f142`
+  (`stestr/config_file.py:201-206`, `stestr/subunit_runner/program.py:181-192`, `stestr/output.py:154-159`,
+  `doc/source/MANUAL.rst:456-463`, `pyproject.toml:30-38`) and testing-cabal/testtools at `088c98e2` (2.9.1:
+  `testtools/testresult/real.py:2210` and `:2285-2294`).
+  - Favours: each worker runs stdlib discovery and keeps only the ids in its id file, so no TestCase is pickled. A
+    worker that exits non-zero adds a synthetic failing test. Scheduling uses historical timing data.
+  - Blocks: its stream records an error and a failure as the same status (`addFailure = addError`, both converted to
+    `fail`), so the per-id outcome oracle would need another recorder. It brings at least eight distributions (stestr
+    and seven direct dependencies), against two for unittest-parallel.
+  - Status: VERIFIED for all of the above. LEAD-ONLY: that `stestr run --subunit` can exit 0 despite failures (the
+    4.2.1 manual has no exit-code section), and that a closed worker stream can hang.
+- **pytest 9.1.1 with pytest-xdist 3.8.0** (PyPI uploads 2026-06-19 and 2025-07-01). Source: pytest-dev/pytest at
+  `cf470ec0` (`doc/en/how-to/unittest.rst:29` and `:33-35`, `pyproject.toml:49-56`) and pytest-dev/pytest-xdist at
+  `1e3e4dc1` (`docs/how-it-works.rst:20-36` and `:80-89`, `docs/distribution.rst:58`, `:65` and `:121`,
+  `src/xdist/dsession.py:238-240` and `:556-564`, `pyproject.toml:34-37`).
+  - Favours: every worker collects the tests itself and the controller sends only test indexes, so nothing is pickled.
+    `subTest` is supported since pytest 9.0. It offers `loadfile`, `loadscope` and `worksteal` distribution and
+    `--max-worker-restart`.
+  - Blocks: pytest does not support the `load_tests` protocol, which `tests/test_native_maintenance.py` uses (the only
+    test module here that defines it), so the ids would differ. Its direct dependencies make seven distributions on
+    CPython 3.12 Linux (pytest, iniconfig, packaging, pluggy, pygments, pytest-xdist and execnet).
+  - Status: VERIFIED for all of the above. LEAD-ONLY: how pytest collects the four `type()`-built classes and runs
+    `IsolatedAsyncioTestCase`, and the full dependency closure.
+- **nose2 0.16.0 multiprocess plugin** (PyPI upload 2026-03-02: one `py3-none-any` wheel and no required dependency).
+  Source: nose-devs/nose2 at `c93ca65a` (`nose2/plugins/mp.py:36`, `:128-139`, `:165-171` and `:345-351`,
+  `nose2/plugins/loader/loadtests.py:9-13`, `nose2/plugins/junitxml.py:192-195` and `:205-209`).
+  - Favours: one universal wheel and no required dependency. Workers reload dotted test names, so no TestCase is
+    pickled.
+  - Blocks: its own documentation warns that suites using `load_tests` do not work correctly with the multiprocess
+    plugin. A lost worker is only logged, the loop never ends a hung worker, and the plugin joins every process without
+    a timeout. Its JUnit XML writes expected failures and unexpected successes as skipped.
+  - Status: VERIFIED for all of the above. LEAD-ONLY (an inference, not run): that the dotted-name reload fails for the
+    four `type()`-built classes, as pickling's lookup does.
+- **concurrencytest 0.1.11** (PyPI upload 2026-03-13; requires python-subunit and testtools). Source:
+  cgoldberg/concurrencytest at `266e27c8` (`concurrencytest.py:104-113` and `:139-144`) and testing-cabal/subunit at
+  `c8560528` (1.4.6: `python/subunit/__init__.py:375-379`).
+  - Favours: it forks after discovery, so the children inherit the test instances and nothing is pickled.
+  - Blocks: the parent keeps only a stream reader per child and never waits on one (the module has no `waitpid`), and
+    subunit's parser ignores a connection lost outside a test, so a child that dies before its first test can go
+    unreported (an inference from those lines).
+  - Status: VERIFIED for the mechanism, the lines and the dependencies. LEAD-ONLY: that its partitioning repeats module
+    fixtures.
+- **green 4.0.2** (PyPI upload 2024-04-18). Source: CleanCut/green at `4de285b0` (`green/config.py:177-178` and
+  `:426-430`, `green/loader.py:371-377`, `green/runner.py:137`, `requirements.txt`), PyPI JSON and the repository
+  record (last push 2024-11-12).
+  - Blocks: the release is an sdist only (`green-4.0.2.tar.gz`), which this repository's `--only-binary=:all:`
+    hash-locked installs refuse, and the repository has had no push since 2024-11-12. Its concurrency option is
+    `-s`/`--processes` (`-j` writes a JUnit report). Workers load test-module targets, and the runner reads results with
+    a blocking `queue.get()` that has no timeout.
+  - Status: VERIFIED for all of the above. LEAD-ONLY: that a worker's death hangs the run.
+- **unittest-parallel's other modes.** Source: craigahobbs/unittest-parallel at `bda5d77d`
+  (`src/unittest_parallel/main.py:123-128` and `:142-160`, `README.md:59-70`).
+  - Blocks: `--level test` also maps live TestCase instances to the spawned pool, so it pickles them too, and
+    `--disable-process-pooling` only sets `maxtasksperchild` to 1. `--thread` uses a `ThreadPoolExecutor`, so nothing is
+    pickled, but the README says it improves performance only on free-threaded Python (the runners' CPython 3.12.3 has
+    the GIL) and not to use it with `unittest.mock`, which 100 of this suite's 234 test modules import (counted at this
+    record's base).
+  - Status: VERIFIED.
+- **CPython regrtest and zope.testrunner 8.3**, which the lead's own completeness sweep added (zope.testrunner PyPI
+  upload 2026-07-30). Source: python/cpython at `cbc944f4` (v3.13.16: `Lib/test/libregrtest/single.py:29-31`,
+  `Lib/test/libregrtest/worker.py:120-122`) and zopefoundation/zope.testrunner at `1061ccc4`
+  (`src/zope/testrunner/find.py:437-438`, `pyproject.toml:41-44`).
+  - regrtest loads a module's tests with `loadTestsFromModule` and runs each worker in a temporary working directory.
+    zope.testrunner puts plain TestCase suites in its `UnitTests` layer by default and needs three core distributions.
+  - Status: VERIFIED for those lines, the dependencies and the date. LEAD-ONLY: regrtest's availability on the
+    runners' Python and its parity, and the lead's view that zope.testrunner's layers give little parallelism here.
+
+### Found after the trial, not part of this record's evidence
+
+A second preregistered trial, of GitHub parallel steps running module shards, is being prepared. A local whole-suite
+preflight for it (local integration evidence only, on another machine) reproduced the serial outcomes exactly. Its
+record will follow. No number from that preflight is used here.
+
+### Seeds for the next landscape sweep
+
+The seeds use the sweep's `--seeds` format, a JSON object keyed by layer id
+(`tools/sota-convergence/landscape-sweep/README.md`, and the precedent `seeds-20260926.json`); `build_inputs.py`
+refuses a key that is not a landscape layer id (`build_inputs.py:21-22` and `:225-234`). The lifecycle task, parallel
+test execution inside one CI job for a stdlib unittest suite, asks for tools, so its key is the repository sweep's
+`ci-supply-chain` layer, whose requirement covers attributable hosted checks. The skills sweep's lifecycle-task keys
+(`skills-test`, `skills-ci-pr`) select skills, not test runners. This record writes nothing under `tools/` or
+`catalogs/`.
+
+```json
+{
+  "ci-supply-chain": [
+    "Lifecycle task: parallel test execution inside one CI job for a stdlib unittest suite. This repository's suite has 9,823 ids at the trial head, load_tests in tests/test_native_maintenance.py, two IsolatedAsyncioTestCase classes and four type()-built classes; its required jobs are validate (ubuntu-24.04) and validate-macos (macos-15). unittest-parallel 1.8.6 was rejected on ubuntu-24.04 by a preregistered trial on 2026-10-03 (docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md; evidence/artifacts/suite-parallelism-trial-20261003/experiment.json).",
+    "GitHub Actions parallel steps (background, wait, wait-all, parallel; GitHub changelog 2026-06-25; at most 10 concurrent background steps per job) running disjoint module shards, one python3 -m unittest process per shard. A second preregistered trial is being prepared.",
+    "One python3 -m unittest process per module under xargs -P or GNU Parallel, with no added Python package.",
+    "stestr 4.2.1: id files, discovery and id filtering in each worker, timing-based scheduling; its subunit stream records errors and failures as one status.",
+    "pytest-xdist 3.8.0 with pytest 9.1.1: index dispatch without pickling; pytest does not support the load_tests protocol.",
+    "nose2 0.16.0 multiprocess plugin: dotted-name reload; its documentation warns that load_tests suites do not work correctly with it.",
+    "concurrencytest 0.1.11: fork after discovery; the parent never waits on its children.",
+    "green 4.0.2 (sdist-only release, no push since 2024-11-12), CPython regrtest and zope.testrunner 8.3: candidates with stronger blockers or unverified availability.",
+    "unittest-parallel --thread: no pickling, but its README says it speeds up only free-threaded Python and must not be used with unittest.mock.",
+    "Question for the next critic: which classes did this list miss? In particular flaky-test tooling (detecting, rerunning or quarantining timing-bound tests such as tests.test_secret_path_guard.K4GuardTests.test_k4_timing, which failed in 3 of 3 class-level runs), shard balancing from recorded durations (the serial runs' --durations tables, stestr's timing-based scheduler, the plan's pytest-split) and test selection (running only the tests a change affects, such as the plan's pytest-testmon), each judged on this suite's measured needs."
+  ]
+}
+```
 
 ## Overturn conditions and next-trial preconditions
 
@@ -246,6 +404,11 @@ locally first). A new trial needs, in this order:
 
 ## Evidence class
 
+- **Convergence record**: `evidence/artifacts/suite-parallelism-trial-20261003/experiment.json`, status `observed`,
+  decision `reject`. It holds 16 `native_cli_execution` observations of hosted ubuntu-24.04 jobs (the 12 timed runs and
+  the 4 control jobs, whose fixtures are synthetic) and 20 skipped macOS observations, generated from the raw run
+  directories, the jobs API and `result.json`. `scripts/validate_convergence.py` checks its declared consistency and
+  artifact hashes, not its truth.
 - **Native execution on GitHub-hosted ubuntu-24.04, receipt retained** (template class `native_proven`): the per-run
   exit codes, test-step seconds, result records, ids that never ran and their serial outcomes, other differences and
   the oracle's verdicts.
@@ -258,13 +421,16 @@ locally first). A new trial needs, in this order:
 - **Source review** at pinned commits: unittest-parallel's `main.py` and README, its issue 27 and commit comparison,
   PyPI's JSON, CPython's `async_case.py`, `case.py`, `loader.py`, `pool.py` and `_pickle.c`, and GitHub's
   documentation of the paths filter.
+- **Source review for the completeness critique** (GET reads on 2026-10-03 at the commits pinned below): each claim
+  relayed there is marked VERIFIED or LEAD-ONLY. The candidate list itself is a lead from a single-family Codex lane.
 - **Computed**: the speed ratios, as exact fractions from the measured seconds.
 - **Unknown**: the cause of the L4F error.
 - **Coordinator decision**: the cancellation, recorded with the run and job records it rests on.
 - **Usage**: the hosted jobs ran deterministic commands and no model. Runner time is the per-job seconds in the
-  receipt's `data.jobs`, for the 18 ubuntu-24.04 jobs only (11,524 s in total); the 20 macOS jobs were never assigned a
-  runner. The model usage of the planning, build and review sessions is unknown: it is not recorded and not counted
-  as zero.
+  receipt's `data.jobs`, for the 18 ubuntu-24.04 jobs only (11,524 s in total, 11,461 s of them in the 16 observed arm
+  and control jobs); the 20 macOS jobs were never assigned a runner. The observed record keeps token usage null
+  (unknown), not counted as zero. The model usage of the planning, build and review sessions is unknown: it is not
+  recorded and not counted as zero.
 
 Nothing here is an upstream test or upstream acceptance.
 
@@ -286,5 +452,32 @@ Nothing here is an upstream test or upstream acceptance.
   diff).
 - GitHub REST API, workflow jobs and artifacts: https://docs.github.com/en/rest/actions/workflow-jobs and
   https://docs.github.com/en/rest/actions/artifacts.
+- Completeness critique, read with GET requests on 2026-10-03 at these commits (each tag resolved through the GitHub
+  commits API):
+  - craigahobbs/unittest-parallel at `bda5d77d`: `src/unittest_parallel/main.py:123-128` and `:142-160`, and
+    `README.md:59-70`.
+  - pytest-dev/pytest 9.1.1 at `cf470ec0bf7eb89cd97dd56df4859eae5db46447`, and pytest-dev/pytest-xdist v3.8.0 at
+    `1e3e4dc16523c8a8f6c67d95a950166420718c99`.
+  - mtreinish/stestr 4.2.1 at `2802f1425f45b9ad0857ff4685ab469dcd2cf2e0`, and testing-cabal/testtools 2.9.1 at
+    `088c98e24961ecf6d94ea5204457f2dcffe2f1c6`.
+  - nose-devs/nose2 0.16.0 at `c93ca65ac6f62475209aa8944fda14c671615549`.
+  - cgoldberg/concurrencytest 0.1.11 at `266e27c833f9b1ecb47142bdddbac5199bebab72`, and testing-cabal/subunit 1.4.6 at
+    `c85605280cb1d975b3076b9ad7ac38f17e858945`.
+  - CleanCut/green 4.0.2 at `4de285b05b8e6b161159be2241b219dc5176f0e5`.
+  - zopefoundation/zope.testrunner 8.3 at `1061ccc4b6b5a824870f2142bc948863b7ba1f70`.
+  - python/cpython v3.13.16 at `cbc944f4bc59639a444dd971c737788ba2283a91`: `Lib/unittest/loader.py:100`, `:117`,
+    `:178`, `:427` and `:449`, `Lib/test/libregrtest/single.py:29-31` and `Lib/test/libregrtest/worker.py:120-122`.
+  - github/docs at `2bd66de8cea336061c9ea060c9b37385136e6ab3`:
+    `content/actions/reference/workflows-and-actions/workflow-syntax.md` (`background`, `wait`, `wait-all`, `cancel`,
+    `parallel`), and the GitHub changelog
+    https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/.
+  - GNU findutils 4.10.0 release announcement:
+    https://lists.gnu.org/archive/html/bug-findutils/2024-06/msg00017.html. The "EXIT STATUS" section of the
+    installed GNU xargs 4.10.0 manual page.
+  - PyPI JSON for each release named, at `https://pypi.org/pypi/<name>/<version>/json` (upload dates and files), and
+    the GitHub repository records of green, concurrencytest, stestr and nose2 (archived state and last push).
 - In-repository: `docs/acceptance-evidence-policy.md:55-63`, `docs/evidence.md:18` (`compatibility_attempt`),
-  `docs/lanes.md:94-141` (hot-file protocol) and the trial's records at `1e4bb5ab` cited above.
+  `docs/lanes.md:94-141` (hot-file protocol), `blueprints/convergence-practice/contract-reference.md:84-92` (usage
+  fields), `scripts/validate_convergence.py:99-123` (failure coverage and run status), the sweep's
+  `tools/sota-convergence/landscape-sweep/README.md` and `build_inputs.py:21-22` and `:225-234` (the seeds format), and
+  the trial's records at `1e4bb5ab` cited above.
