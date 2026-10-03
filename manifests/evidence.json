@@ -15796,8 +15796,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
-      "sha256": "de41496b2958fd1270ff4f2936f75b6e9606e973877b4756e8b7acc71595715a",
-      "bytes": 6141
+      "sha256": "217b7a13e2584b30031dfa24b45930dcb7d204d3e6f81857d56582ca16a67509",
+      "bytes": 8030
     },
     {
       "path": "docs/decisions/2026-10-02-two-host-north-star-architecture.md",
@@ -38006,8 +38006,8 @@
     },
     {
       "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/README.md",
-      "sha256": "2d04b079ab92f00e42738f2ddda3041f0efcc3426584f6a90535b7df8abf4d34",
-      "bytes": 1341
+      "sha256": "b769442cac1f3866e8dfe94476958950c7ba74d3f9bf1986dd7697642ff0b758",
+      "bytes": 1720
     },
     {
       "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/build-manifest.json",
@@ -38050,6 +38050,11 @@
       "bytes": 1028
     },
     {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/le18-20261003.json",
+      "sha256": "b238470c3d0f9550e730e5267a505e4e5554ce72ee5599d08b5c7f3a2bd37f45",
+      "bytes": 5182
+    },
+    {
       "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/receipt.json",
       "sha256": "e20b0a4e05f91c357d7c72f01c91d6908472fea9ee97c11902e07f96b198c185",
       "bytes": 5469
@@ -38073,6 +38078,11 @@
       "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-update-check.py.txt",
       "sha256": "42120a0f77da93698cc7e5a009ac6c3e345b7f7bd4afcd12ee37b4032fea5241",
       "bytes": 4772
+    },
+    {
+      "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/omniroute-update-check.v2.py.txt",
+      "sha256": "5d7398c654588e38db8a8707adc86035c99d255c393f13358a01f48884e0042b",
+      "bytes": 8985
     },
     {
       "path": "evidence/artifacts/omniroute-mac-rebuild-20261002/scripts/probe_gate.py.txt",
