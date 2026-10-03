@@ -1,0 +1,596 @@
+{
+  "schema_version": 1,
+  "kind": "paper_series_disposition_and_read_only_reconciliation",
+  "recorded_at_utc": "2026-10-03T03:36:18.774866+00:00",
+  "historical_session_date": "2026-10-02",
+  "fresh_observation_date_utc": "2026-10-03",
+  "status": "not_qualified",
+  "broker": "alpaca",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "paper_only": true,
+  "evidence_classes": [
+    "retained_native_paper_execution",
+    "local_integration_acceptance_review",
+    "independent_process_and_state_observation",
+    "fresh_native_read_only_observation"
+  ],
+  "sources": {
+    "engine_revision": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+    "engine_revision_local_HEAD_check_exit_code": 0,
+    "engine_halt_source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/safety.py#L646",
+    "engine_recovery_preserves_history_source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/safety.py#L597",
+    "engine_recovery_snapshot_source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/recovery.py#L260",
+    "supported_engine_recovery_entrypoint": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/mover_runner.py#L868",
+    "installed_alpaca_py_version": "0.44.0",
+    "official_alpaca_py_tag": "v0.44.0",
+    "official_alpaca_py_revision": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+    "official_alpaca_py_client_source": "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/alpaca/trading/client.py",
+    "official_authentication_reference": "https://docs.alpaca.markets/us/v1.1/docs/authentication-1",
+    "evidence_policy": "docs/acceptance-evidence-policy.md",
+    "paper_authority": "docs/paper-lane-policy.md"
+  },
+  "frozen_acceptance": {
+    "source_labels": [
+      "pre-20261002/FREEZE.md",
+      "ext-20261002/FREEZE.md",
+      "rth-20261002/FREEZE.md"
+    ],
+    "required_outcomes": [
+      "status passed or completed_no_signals",
+      "flat",
+      "cash_match true",
+      "positions_match true",
+      "zero open orders",
+      "pnl_consistent true",
+      "no duplicate or unexplained effects",
+      "no ledger halt",
+      "no HTTP 429"
+    ],
+    "limits_changed": false,
+    "gross_loss_cap_usd_account2": "480",
+    "drawdown_cap_usd_account2": "475",
+    "permanent_halt_retained": true
+  },
+  "original_trials": [
+    {
+      "trial": "pre-20261002-1",
+      "account_slot": 2,
+      "paper_process_exit_code": 0,
+      "exit_code_provenance": "pre-20261002/series.console",
+      "actual_native_paper_stdout_stderr": "trading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)\ndata websocket error, restarting connection: sent 1000 (OK); no close frame received\n{\"status\": \"passed\", \"flat\": true, \"evidence_class\": \"PAPER\"}\n",
+      "original_receipt_excerpt": {
+        "status": "passed",
+        "evidence_class": "PAPER",
+        "config_sha256": "da2ce5d2f0890b847b404b59114ed5215a927d04d445ef0b7889348e60f32799",
+        "scan_sha256": "19e2e73211d7b7a3e5c28b6f13c0ff0a22a47e36aabe7658e55c7df9fa5d625c",
+        "trial_id": "pre-20261002-1",
+        "flat": true,
+        "force_at": null,
+        "force_reason": null,
+        "ledger_risk": {
+          "drawdown_usd": "225.3900",
+          "halted_reason": null,
+          "lifetime_gross_loss_usd": "410.8200",
+          "lifetime_realized_pnl_usd": "-140.2300"
+        },
+        "execution_stats": {
+          "activity_executions_booked": 0,
+          "activity_fill_reconciliations": 0,
+          "average_invariant_mismatches": 0,
+          "duplicate_executions": 0,
+          "executions_booked": 16,
+          "fill_events_missing_execution_fields": 0,
+          "open_fill_gaps_at_stop": 0,
+          "startup_fill_reports": 0
+        },
+        "totals": {
+          "buy_notional_usd": "1285.00",
+          "entries_filled": 3,
+          "entries_submitted": 3,
+          "exit_orders_submitted": 3,
+          "fees_recorded_usd": "-0.17",
+          "ledger_cash_delta_usd": "-40.17",
+          "ledger_realized_pnl_delta_usd": "-40.1700",
+          "native_fill_events": 16,
+          "native_rejections": 0,
+          "pnl_consistent": true,
+          "realized_pnl_usd": "-40.0000",
+          "sell_notional_usd": "1245.00",
+          "symbols": 3
+        },
+        "native_assertions": {
+          "fill_events_carry_execution_fields": true,
+          "no_fill_gap_open_at_stop": true,
+          "overturn_signals": []
+        },
+        "native": {
+          "engine": "NautilusTrader LiveNode 2.0.0rc5",
+          "elapsed_seconds": 3603.460860275998,
+          "orders_submitted": 6,
+          "native_fill_events": 16,
+          "native_quotes": 154685,
+          "native_rejections": 0,
+          "requests": {
+            "read": 605,
+            "submit": 6
+          }
+        },
+        "reconciliation_end": {
+          "cash_delta_usd": "-140.23",
+          "cash_match": true,
+          "open_orders": 0,
+          "positions": 0,
+          "positions_match": true
+        }
+      },
+      "recorded_http_status_counts": {
+        "200": 623
+      },
+      "adapter_error_count": 0,
+      "callback_fault_count": 0,
+      "average_invariant_observations": [],
+      "frozen_acceptance": {
+        "status": "recorded_execution_criteria_satisfied",
+        "no_ledger_halt": true,
+        "failed_criterion": null,
+        "strategy_qualification": "not_established"
+      }
+    },
+    {
+      "trial": "pre-20261002-2",
+      "account_slot": 2,
+      "paper_process_exit_code": 0,
+      "exit_code_provenance": "pre-20261002/series.console",
+      "actual_native_paper_stdout_stderr": "data websocket error, restarting connection: sent 1000 (OK); no close frame received\ntrading stream websocket error, restarting  connection: sent 1000 (OK); then received 1000 (OK)\n{\"status\": \"passed\", \"flat\": true, \"evidence_class\": \"PAPER\"}\n",
+      "original_receipt_excerpt": {
+        "status": "passed",
+        "evidence_class": "PAPER",
+        "config_sha256": "da2ce5d2f0890b847b404b59114ed5215a927d04d445ef0b7889348e60f32799",
+        "scan_sha256": "26b75231ab62126cdb0704dee32c482d95a38795fe010ff2869589ffcd6578c6",
+        "trial_id": "pre-20261002-2",
+        "flat": true,
+        "force_at": "2026-10-02T12:14:03.787289+00:00",
+        "force_reason": "risk_halt",
+        "ledger_risk": {
+          "drawdown_usd": "276.8900",
+          "halted_reason": "gross_loss_cap_reached",
+          "lifetime_gross_loss_usd": "481.3200",
+          "lifetime_realized_pnl_usd": "-191.7300"
+        },
+        "execution_stats": {
+          "activity_executions_booked": 0,
+          "activity_fill_reconciliations": 0,
+          "average_invariant_mismatches": 4,
+          "duplicate_executions": 0,
+          "executions_booked": 24,
+          "fill_events_missing_execution_fields": 0,
+          "open_fill_gaps_at_stop": 0,
+          "startup_fill_reports": 0
+        },
+        "totals": {
+          "buy_notional_usd": "1246.5200",
+          "entries_filled": 3,
+          "entries_submitted": 3,
+          "exit_orders_submitted": 3,
+          "fees_recorded_usd": "0",
+          "ledger_cash_delta_usd": "-51.50",
+          "ledger_realized_pnl_delta_usd": "-51.5000",
+          "native_fill_events": 24,
+          "native_rejections": 0,
+          "pnl_consistent": true,
+          "realized_pnl_usd": "-51.5001",
+          "sell_notional_usd": "1195.019900",
+          "symbols": 3
+        },
+        "native_assertions": {
+          "fill_events_carry_execution_fields": true,
+          "no_fill_gap_open_at_stop": true,
+          "overturn_signals": []
+        },
+        "native": {
+          "engine": "NautilusTrader LiveNode 2.0.0rc5",
+          "elapsed_seconds": 814.1135611690006,
+          "orders_submitted": 6,
+          "native_fill_events": 24,
+          "native_quotes": 22753,
+          "native_rejections": 0,
+          "requests": {
+            "read": 140,
+            "submit": 6
+          }
+        },
+        "reconciliation_end": {
+          "cash_delta_usd": "-191.73",
+          "cash_match": true,
+          "open_orders": 0,
+          "positions": 0,
+          "positions_match": true
+        }
+      },
+      "recorded_http_status_counts": {
+        "200": 158
+      },
+      "adapter_error_count": 0,
+      "callback_fault_count": 0,
+      "average_invariant_observations": [
+        {
+          "average": "4.428863",
+          "executions_notional": "389.74",
+          "filled_qty": "88"
+        },
+        {
+          "average": "4.429347",
+          "executions_notional": "407.50",
+          "filled_qty": "92"
+        },
+        {
+          "average": "4.429999",
+          "executions_notional": "434.14",
+          "filled_qty": "98"
+        },
+        {
+          "average": "4.430199",
+          "executions_notional": "443.02",
+          "filled_qty": "100"
+        }
+      ],
+      "frozen_acceptance": {
+        "status": "failed",
+        "no_ledger_halt": false,
+        "failed_criterion": "no_ledger_halt",
+        "strategy_qualification": "not_established"
+      }
+    },
+    {
+      "trial": "pre-20261002-3",
+      "account_slot": 2,
+      "paper_process_exit_code": 2,
+      "exit_code_provenance": "pre-20261002/series.console",
+      "actual_native_paper_stdout_stderr": "{\"status\": \"not_started\", \"stage\": \"trial_start\", \"reason\": \"next_trial_cannot_clear_risk_halt\", \"orders_submitted\": 0}\n",
+      "original_receipt_excerpt": {
+        "status": "not_started",
+        "evidence_class": "PAPER",
+        "config_sha256": "da2ce5d2f0890b847b404b59114ed5215a927d04d445ef0b7889348e60f32799",
+        "scan_sha256": "10f7eb01ce163a022856a7c446ffec8d3316beae63cd6467f7f800805dcff709",
+        "stage": "trial_start",
+        "reason": "next_trial_cannot_clear_risk_halt",
+        "orders_submitted": 0
+      },
+      "frozen_acceptance": {
+        "status": "not_started",
+        "reason": "next_trial_cannot_clear_risk_halt"
+      }
+    },
+    {
+      "trial": "ext-20261002-1",
+      "account_slot": 2,
+      "paper_process_exit_code": 2,
+      "exit_code_provenance": "ext-20261002/series.console",
+      "actual_native_paper_stdout_stderr": "{\"status\": \"not_started\", \"stage\": \"trial_start\", \"reason\": \"next_trial_cannot_clear_risk_halt\", \"orders_submitted\": 0}\n",
+      "original_receipt_excerpt": {
+        "status": "not_started",
+        "evidence_class": "PAPER",
+        "config_sha256": "3a35221a3cea0bd44c501f678cbfc37a60268a2d76319af9b8c2eaec06af2d7d",
+        "scan_sha256": "b90c4c400feeac2f9ee491b34d1323dc86d6d8281bd5af88cada5a15ac2dc0f8",
+        "stage": "trial_start",
+        "reason": "next_trial_cannot_clear_risk_halt",
+        "orders_submitted": 0
+      },
+      "frozen_acceptance": {
+        "status": "not_started",
+        "reason": "next_trial_cannot_clear_risk_halt"
+      }
+    }
+  ],
+  "original_series_process_records": [
+    {
+      "series": "pre-20261002",
+      "account_slot": 2,
+      "frozen_driver_arguments": [
+        "pre-20261002",
+        "2",
+        "1",
+        "0915",
+        "6"
+      ],
+      "series_process_exit_code": 3,
+      "original_console_terminal_excerpt": "paper rc=2 end 08:14:17 ET\n{\"status\": \"not_started\", \"stage\": \"trial_start\", \"reason\": \"next_trial_cannot_clear_risk_halt\", \"orders_submitted\": 0}\n08:14:17 ET pre-20261002-3 rc=2: no paper=not_started recovery=None\n08:14:17 ET series stops: pre-20261002-3 no paper=not_started recovery=None\n",
+      "independent_journal_observation": {
+        "query_argv": [
+          "rtk",
+          "journalctl",
+          "--user",
+          "-u",
+          "paper-pre-20261002.service",
+          "--since",
+          "2026-10-02",
+          "--no-pager",
+          "-o",
+          "short-iso"
+        ],
+        "query_exit_code": 0,
+        "actual_returned_stdout_sha256": "8104fff5425088577a0c3f2a0653d388bb68310196c99ddeb7307cf02ac26ce7",
+        "actual_returned_stderr": "",
+        "sanitized_native_terminal_messages": [
+          "2026-10-02T08:14:17-04:00 paper-pre-20261002.service: Main process exited, code=exited, status=3/NOTIMPLEMENTED",
+          "2026-10-02T08:14:17-04:00 paper-pre-20261002.service: Failed with result 'exit-code'."
+        ],
+        "sanitization": "Host identity and systemd process identifier omitted; timestamp and terminal message preserved."
+      }
+    },
+    {
+      "series": "ext-20261002",
+      "account_slot": 2,
+      "frozen_driver_arguments": [
+        "ext-20261002",
+        "2",
+        "1",
+        "1830",
+        "6"
+      ],
+      "series_process_exit_code": 3,
+      "original_console_terminal_excerpt": "paper rc=2 end 16:00:22 ET\n{\"status\": \"not_started\", \"stage\": \"trial_start\", \"reason\": \"next_trial_cannot_clear_risk_halt\", \"orders_submitted\": 0}\n16:00:22 ET ext-20261002-1 rc=2: no paper=not_started recovery=None\n16:00:22 ET series stops: ext-20261002-1 no paper=not_started recovery=None\n",
+      "independent_journal_observation": {
+        "query_argv": [
+          "rtk",
+          "journalctl",
+          "--user",
+          "-u",
+          "paper-ext-20261002.service",
+          "--since",
+          "2026-10-02",
+          "--no-pager",
+          "-o",
+          "short-iso"
+        ],
+        "query_exit_code": 0,
+        "actual_returned_stdout_sha256": "eab5586c412e4d54ec0d4c28b193384b2f29d55acf062f530314d5ef48132be1",
+        "actual_returned_stderr": "",
+        "sanitized_native_terminal_messages": [
+          "2026-10-02T16:00:22-04:00 paper-ext-20261002.service: Main process exited, code=exited, status=3/NOTIMPLEMENTED",
+          "2026-10-02T16:00:22-04:00 paper-ext-20261002.service: Failed with result 'exit-code'."
+        ],
+        "sanitization": "Host identity and systemd process identifier omitted; timestamp and terminal message preserved."
+      }
+    },
+    {
+      "series": "rth-20261002",
+      "account_slot": 1,
+      "frozen_driver_arguments": [
+        "rth-20261002",
+        "1",
+        "1",
+        "1540",
+        "6"
+      ],
+      "series_process_exit_code": 5,
+      "original_console_terminal_excerpt": "15:38:36 ET key probe account 1: rc=1 http_status=401\n15:38:36 ET next probe in 120 s\n15:40:36 ET key probe account 1: rc=1 http_status=401\n15:40:36 ET not started: no working paper key for account 1 by 1540 ET\n",
+      "independent_journal_observation": {
+        "query_argv": [
+          "rtk",
+          "journalctl",
+          "--user",
+          "-u",
+          "paper-rth-20261002.service",
+          "--since",
+          "2026-10-02",
+          "--no-pager",
+          "-o",
+          "short-iso"
+        ],
+        "query_exit_code": 0,
+        "actual_returned_stdout_sha256": "0acf0e90a2141607db780657f8c04f30d9b69a32ea6f8823fdc08ddc8b777e9e",
+        "actual_returned_stderr": "",
+        "sanitized_native_terminal_messages": [
+          "2026-10-02T15:40:36-04:00 paper-rth-20261002.service: Main process exited, code=exited, status=5/NOTINSTALLED",
+          "2026-10-02T15:40:36-04:00 paper-rth-20261002.service: Failed with result 'exit-code'."
+        ],
+        "sanitization": "Host identity and systemd process identifier omitted; timestamp and terminal message preserved."
+      }
+    }
+  ],
+  "account1_original_runtime_admission": {
+    "runtime_probe_count": 171,
+    "runtime_http_status_counts": {
+      "401": 171
+    },
+    "runtime_probe_process_exit_code": 1,
+    "exit_code_provenance": "rth-20261002/series.console: all runtime probes rc=1",
+    "trials_started": 0,
+    "trial_directory_count": 0,
+    "probe_inventory_sha256": "e0437c249b6fce57499c61e6ff73aa2e2303dcde2b4ed349d489963b2ef7f20e",
+    "inventory_formula": "SHA256 of UTF-8 concatenation of sorted series-relative path, one space, SHA256 of original bytes, and LF, for all 171 probe-*.json files.",
+    "first_original_probe": {
+      "account": "paper",
+      "host": "paper-api.alpaca.markets",
+      "http_status": 401,
+      "interpretation": "no x-ratelimit-limit header returned (HTTP 401: check the paper key)",
+      "observed_at_utc": "2026-10-02T14:00:05.554406+00:00",
+      "rate_limit_headers": {},
+      "request": "GET /v2/account"
+    },
+    "last_original_probe": {
+      "account": "paper",
+      "host": "paper-api.alpaca.markets",
+      "http_status": 401,
+      "interpretation": "no x-ratelimit-limit header returned (HTTP 401: check the paper key)",
+      "observed_at_utc": "2026-10-02T19:40:36.360999+00:00",
+      "rate_limit_headers": {},
+      "request": "GET /v2/account"
+    },
+    "disposition": "admission_failed_before_any_trial",
+    "trigger_behavior": "not_exercised"
+  },
+  "account2_fresh_read_only_observation": {
+    "evidence_class": "fresh_native_paper_account_observation",
+    "trial": false,
+    "broker": "alpaca",
+    "account_slot": 2,
+    "paper_only": true,
+    "endpoint": "https://paper-api.alpaca.markets",
+    "runtime_alpaca_py_version": "0.44.0",
+    "engine_revision": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+    "snapshot_source_sha256": "4cf84a66439ad3deb427d9f5858a3e3cc16b52b1900adb3f9aae53cb3c42fa61",
+    "snapshot_exit_code": 0,
+    "engine_fingerprint_exit_code": 0,
+    "running_paper_writers_before": 0,
+    "global_account_flock_held": true,
+    "stop_present": false,
+    "observation_date_utc": "2026-10-03",
+    "exact_observation_timestamp": null,
+    "actual_native_stdout": "{'status': 'AccountStatus.ACTIVE', 'equity': '99734.61', 'cash': '99734.61', 'buying_power': '398938.44', 'multiplier': '4', 'pattern_day_trader': None, 'daytrade_count': None, 'shorting_enabled': True, 'trading_blocked': False, 'account_blocked': False, 'positions': 0, 'open_orders': 0, 'sip_snapshot': 'ok'}",
+    "ledger_baseline_cash_usd": "99926.34",
+    "ledger_cash_delta_usd": "-191.73",
+    "expected_cash_usd": "99734.61",
+    "broker_cash_usd": "99734.61",
+    "cash_difference_usd": "0.00",
+    "booked_fee_rows": 5,
+    "booked_fees_usd": "-0.64",
+    "booked_fees_already_included_in_cash_delta": true,
+    "reconciliation": "flat_idle_identity_and_cash_match",
+    "durable_halted_reason": "gross_loss_cap_reached",
+    "lifetime_gross_loss_usd": "481.3200",
+    "frozen_lifetime_gross_loss_cap_usd": "480",
+    "halt_cleared": false,
+    "new_root_created": false,
+    "engine_recover_run": false,
+    "orders_submitted_by_observation": 0,
+    "limitations": [
+      "Read-only SDK snapshot, not a new engine recovery trial",
+      "Permanent numeric halt remains",
+      "Source CLI did not print an exact timestamp"
+    ],
+    "sanitization": "Only account_ref removed from original native stdout; all other native field values preserved.",
+    "source_label": "reconcile-20261003/snapshot-receipt.json",
+    "strategy_qualification": "not_established",
+    "new_model_trial": false
+  },
+  "independent_original_account2_ledger_observation": {
+    "evidence_class": "independent_read_only_state_observation",
+    "read_at_utc": "2026-10-03T03:36:18.774750+00:00",
+    "sqlite_connection_mode": "ro",
+    "source_label": "original-account2-ledger.sqlite3",
+    "source_sha256_before_and_after": "6782a8b6b58ed709aece41280404643ea8eecd0b93156d547b2673c3ec4fe50b",
+    "trial_metadata_source_label": "original-account2-trial.json",
+    "trial_metadata_sha256": "115cd131df8fd051e3e160afcd1314dd28e586cbec745ecffe2b0da398a82402",
+    "baseline_cash_usd": "99926.34",
+    "cash_delta_usd": "-191.73",
+    "expected_cash_usd": "99734.61",
+    "broker_cash_usd": "99734.61",
+    "cash_difference_usd": "0.00",
+    "halted_reason": "gross_loss_cap_reached",
+    "lifetime_gross_loss_usd": "481.3200",
+    "gross_loss_cap_usd": "480",
+    "drawdown_cap_usd": "475",
+    "nonzero_position_count": 0,
+    "zero_quantity_position_rows": 13,
+    "intent_status_counts": {
+      "canceled": 10,
+      "filled": 76,
+      "not_sent": 2
+    },
+    "trial_count": 16,
+    "trial_metadata_phase": "finished",
+    "booked_fee_rows": 5,
+    "booked_fee_total_usd": "-0.64",
+    "fees_already_included_in_cash_delta": true
+  },
+  "account1_fresh_admission_observation": {
+    "evidence_class": "fresh_native_paper_admission_observation",
+    "account_slot": 1,
+    "trial": false,
+    "original_native_probe_json": {
+      "account": "paper",
+      "host": "paper-api.alpaca.markets",
+      "http_status": 401,
+      "interpretation": "no x-ratelimit-limit header returned (HTTP 401: check the paper key)",
+      "observed_at_utc": "2026-10-03T03:26:45.048640+00:00",
+      "rate_limit_headers": {},
+      "request": "GET /v2/account"
+    },
+    "native_process_exit_code": 1,
+    "exit_code_provenance": "Coordinator observed native probe process exit 1; original probe JSON does not contain an exit-code field.",
+    "bounded_command_template": [
+      "rtk",
+      "flock",
+      "-n",
+      "<private-account1-global-lock>",
+      "timeout",
+      "20s",
+      "python3",
+      "-I",
+      "tools/credentials/alpaca_rate_limit_probe.py",
+      "--env-file",
+      "<existing-private-credential-pointer>",
+      "--out",
+      "<private-probe-output>"
+    ],
+    "command_sanitization": "Private lock, existing credential pointer and output path replaced with placeholders; no credential values read or retained by this receipt.",
+    "existing_stored_credentials_reused": true,
+    "credential_rotation_or_remapping": false,
+    "authentication_failure_cause": "undetermined",
+    "disposition": "admission_failed_HTTP_401",
+    "orders_submitted": 0
+  },
+  "private_original_artifacts_sha256": {
+    "account1-admission-20261003/FREEZE.md": "b45f48ce2046a705560cada0ab105311668ce0228bcdec3584667f0053924c82",
+    "account1-admission-20261003/probe.json": "519cb39ddc544b341e6829ee7d76878cea06591b61e4a158078cff4b9addd2e7",
+    "ext-20261002/1/mover-paper.json": "a42909c9cc21b31263d469615f3e2350016ce47434fc172f775cb3c7b4d3f0e1",
+    "ext-20261002/1/paper.log": "c0ef9ee931d602fd6ac05b67b8e05fc75d0820b6867a816484ad367aec891f7e",
+    "ext-20261002/FREEZE.md": "bd26e20521afbd0c69e2cbfb870006fafdb9b3f216df175c3719f25d262dc255",
+    "ext-20261002/series.console": "ced8a74b4bea6d2017a911449ba0fae85ab527a6cb5e7c8ffc0a5e3d16f4c4c7",
+    "pre-20261002/1/mover-paper.json": "0c6c6f7eae320d45b520aa884b70460dae029dfe1c49867d3cb797b8bcd0f223",
+    "pre-20261002/1/paper.log": "c7eb9afbba496d2f4c1ebefc47ac523f12acbede12edeb9865ec895195b7cae4",
+    "pre-20261002/2/mover-paper.json": "e2966d7b86f9723e66beb7cdbb1259b8bfb3596ec1be531ba9b86964aa72333f",
+    "pre-20261002/2/paper.log": "307d1f3a3285b618097fd74d4b6d0f73d733b0f8bc61d5f45de70a739defb541",
+    "pre-20261002/3/mover-paper.json": "00a13289d3a8da647850dd668a5cecedac1aedc145f13dfdac4ec473d559e637",
+    "pre-20261002/3/paper.log": "c0ef9ee931d602fd6ac05b67b8e05fc75d0820b6867a816484ad367aec891f7e",
+    "pre-20261002/FREEZE.md": "62dee35c2716492db0f60e5b3d80e6689cd9e0c83782b91b68b2efa5f5ed2f1a",
+    "pre-20261002/series.console": "5db051dc5533aec6d6641871501a583b84a06c6d009caa5ec8a4b0a13d2050b3",
+    "reconcile-20261003/FREEZE.md": "a5e5de692780743d24134527de6448b0a8e70d4871a42618b4127307493f987f",
+    "reconcile-20261003/snapshot-receipt.json": "42055fbb03cd38ea01963250c8089a030501c75e7e427c8da4173477fa9ca5a6",
+    "rth-20261002/FREEZE.md": "1c56a02e08c3a6b5146355166a3ccb820630072d4e7e2a4a3409f74a3ce17c31",
+    "rth-20261002/probe-20261002T140005Z.json": "4bb0a117f93a7e0b7ea5ecc9fc23b3893719e0f465b72debfc5d6fd37d2dd634",
+    "rth-20261002/probe-20261002T194036Z.json": "7dfee2db2d8ff0f99d51c3662eef157293e0f828dbf8857eac453ec0da746db4",
+    "rth-20261002/series.console": "588935a1c7bdf3a3dfcfdab974fb60787121ac34597889c8f3e26409657295bd",
+    "run-series-trial.sh": "bbd917040783e8d3e41ed43af137060a52d31d9587d6988f160e124aaa095ca4",
+    "series-driver.sh": "feff8f5692b03900add1909b9554e7343357dbc170ad5b783ff5836331d1f608"
+  },
+  "source_retention_and_sanitization": {
+    "originals_retained": true,
+    "originals_rewritten": false,
+    "public_excerpt_omissions": [
+      "personal host paths",
+      "account reference/fingerprint",
+      "host identity",
+      "process identifiers",
+      "credential pointers",
+      "raw order identifiers in average-invariant observations"
+    ],
+    "selected_values_are_original": true,
+    "hash_boundary": "Hashes identify retained private source bytes and actual returned journal stdout; they do not establish a passing acceptance verdict."
+  },
+  "corrections": [
+    {
+      "claim": "Both pre-market trials 1 and 2 executed six orders, despite subsequent series refusal.",
+      "verification": "Original mover-paper.json native.orders_submitted and paper/series native output."
+    },
+    {
+      "claim": "Raw passed in trial 2 is not frozen acceptance: no_ledger_halt fails at gross loss 481.3200 >= 480.",
+      "verification": "Original trial 2 ledger_risk, binding freeze, and independent SQLite meta/limits."
+    },
+    {
+      "claim": "Account 1 performed 171 HTTP 401 runtime probes and started no trial; trigger behavior was not tested.",
+      "verification": "All 171 original probe JSONs, series console, absence of numeric trial directories and systemd process exit 5."
+    }
+  ],
+  "limitations": [
+    "Trial 2 retains four average-invariant observations; their count alone does not establish a defect. The no-halt frozen acceptance failure is independently decisive.",
+    "Known effects retained by the October 2 freeze: issue 215 part 2, trial C run-loop stall, and issue 543; this review does not requalify them.",
+    "Fresh account 2 operation is a read-only SDK snapshot, not an engine recovery run or a new trading/model trial; exact native snapshot timestamp was not printed.",
+    "Permanent numeric halt and original root remain. Account 1 authentication remains unsuccessful with undetermined cause; no strategy qualification is established.",
+    "No unchanged official upstream test suite was run by this evidence task. Repository validation covers structural consistency only.",
+    "Broker paper fills are simulated and do not establish exchange execution quality, live slippage, queue position or live trading performance.",
+    "Historical and fresh provider/model usage are unmeasured; no provider usage or new model execution is inferred from these artifacts."
+  ]
+}
