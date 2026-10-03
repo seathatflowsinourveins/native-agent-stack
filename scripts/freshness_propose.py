@@ -77,6 +77,19 @@ RUNTIME_WITHHELD_LINE = (
     "The runtime table was withheld because the leak gate tripped on a runtime upstream this run "
     "(`runtime-freshness.json` has `gate_error` and no rows)."
 )
+# build_manifest.py's upstream.latest_source values for a runtime row that declares a
+# tag pattern (kept independent here, like RUNTIME_LEAK_GATE_ERROR): the latest is the
+# highest matching tag, or the pattern selected no tag this run.
+RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
+RUNTIME_TAG_PATTERN_MISSES = ("tag_pattern_unmatched", "tag_pattern_unfetched")
+# Appended to the upstream-latest cell of a row whose latest is the highest matching tag.
+RUNTIME_TAG_MARKER = " (tag)"
+# The line after the runtime table that lists the rows whose declared pattern selected no tag.
+RUNTIME_TAG_MISS_SENTENCE = (
+    "runtime row(s) whose declared tag pattern selected no tag this run, each with its reason "
+    "(`tag_pattern_unmatched`: no listed tag matched; `tag_pattern_unfetched`: no tag list was fetched), "
+    "so the upstream latest is the release or tag listing"
+)
 _DRIFT_ROW = re.compile(r"^\|\s*([^|]+?)\s*\|.*\|$")
 _SEPARATOR_ROW = re.compile(r"\A\|[\s:|-]+\|\Z")
 EXPLORER_PATH = "docs/ecosystem/index.html"
@@ -358,6 +371,15 @@ def load_runtime_freshness(work_dir: Path) -> dict | None:
     return document
 
 
+def _runtime_latest(upstream: dict):
+    """The runtime table's upstream-latest cell: ``latest``, followed by
+    RUNTIME_TAG_MARKER when it is the highest tag matching the row's declared pattern."""
+    latest = upstream.get("latest")
+    if latest is not None and upstream.get("latest_source") == RUNTIME_LATEST_MATCHING_TAG:
+        return f"{latest}{RUNTIME_TAG_MARKER}"
+    return latest
+
+
 def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None):
     """Rows for the runtime table plus ``{summary key: [ids]}`` for the rows that
     are behind upstream, dormant, archived, unfetched or unresolved.
@@ -397,7 +419,7 @@ def runtime_freshness_rows(document: dict, raw_repositories: dict | None = None)
                 flagged["runtime_dormant"].append(entry.get("id"))
             if upstream.get("archived") is True:
                 flagged["runtime_archived"].append(entry.get("id"))
-            cells = (upstream.get("latest"), behind, dormancy.get("last_release_at"),
+            cells = (_runtime_latest(upstream), behind, dormancy.get("last_release_at"),
                      dormancy.get("last_commit_at"), dormancy.get("days_since_activity"),
                      _yes_no(dormancy.get("dormant")), _yes_no(upstream.get("archived")))
         rows.append((entry.get("id"), entry.get("group"), entry.get("pin") or "—", *cells))
@@ -411,6 +433,11 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
     its own header (never ``DRIFT_TABLE_HEADER``), so ``drifted_component_ids``
     never reads it, and it never sets ``drift-status.txt``.
 
+    A row whose upstream latest is the highest tag matching its declared tag pattern
+    shows RUNTIME_TAG_MARKER after it, and one line after the table
+    (RUNTIME_TAG_MISS_SENTENCE) lists the rows whose pattern selected no tag
+    (RUNTIME_TAG_PATTERN_MISSES), each with its reason; neither changes the summary.
+
     When build_manifest.py withheld the rows because a runtime upstream tripped its
     leak gate (the document has ``gate_error``), the section is the heading and
     ``RUNTIME_WITHHELD_LINE``, with no table, and the summary lists only
@@ -422,6 +449,9 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
     rows, flagged = runtime_freshness_rows(document, raw_repositories)
     threshold = document.get("dormancy_threshold_days")
     errors = {entry.get("id"): entry.get("error") for entry in document.get("entries", []) if entry.get("error")}
+    tag_misses = [f"{entry.get('id')} ({(entry.get('upstream') or {}).get('latest_source')})"
+                  for entry in document.get("entries", [])
+                  if (entry.get("upstream") or {}).get("latest_source") in RUNTIME_TAG_PATTERN_MISSES]
     lines = [
         RUNTIME_TABLE_HEADING, "",
         "Report-only. This table lists the GPT runtime workers, SDKs and agents that "
@@ -429,10 +459,12 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         "runtime record: the new-WSL install plan's rows by slot, the runtime-worker recipe pin record and "
         "the native SDK constraints. `RUNTIME_WATCH_SOURCES` adds watch-only upstreams, such as pi, that no "
         "install or runtime record on main pins (a catalog card may record an evaluated version); they are "
-        "not compared. The same upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`) "
-        "trading card pins stay in the tables above; an `alternative` card's pin is compared in no table. "
-        "Rows here select nothing, are never drift and never change `drift-status.txt`. A dormant upstream "
-        "has no GitHub release and no default-branch commit "
+        "not compared. An upstream latest marked `(tag)` is the highest version among the upstream's tags "
+        "that match the row's declared tag pattern, for an upstream whose GitHub releases are absent or "
+        "belong to other packages. The same upstreams' `manifests/stack.json` pins and selected "
+        "(`default`/`conditional`) trading card pins stay in the tables above; an `alternative` card's pin "
+        "is compared in no table. Rows here select nothing, are never drift and never change "
+        "`drift-status.txt`. A dormant upstream has no GitHub release and no default-branch commit "
         f"in the last {threshold} days as of `{document.get('checked_at')}`.", "",
     ]
     if rows:
@@ -448,6 +480,7 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         (flagged["runtime_dormant"], f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
         (flagged["runtime_archived"], "archived upstream repository(ies)"),
         (flagged["runtime_unfetched"], "runtime row(s) with no reliable upstream data this run"),
+        (tag_misses, RUNTIME_TAG_MISS_SENTENCE),
     ):
         if items:
             lines += ["", f"{len(items)} {sentence}:", "", ", ".join(md_cell(item) for item in sorted(items))]

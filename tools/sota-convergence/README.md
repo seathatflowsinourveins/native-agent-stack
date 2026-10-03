@@ -39,6 +39,16 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    other tables: that entry is written with `"pin": null` and an `"error"`
    naming only the declared path, its pointer, slot or requirement and a short
    reason, and the printed summary lists it under `runtime_unresolved`.
+   A pin or watch source may also declare
+   `"tags": {"prefix": ..., "pattern": ...}` for an upstream whose GitHub
+   releases are absent or belong to other packages: a literal tag prefix (empty
+   for every tag; otherwise letters, digits, `.`, `-`, `_`, `=` and `+`, never
+   `..`) and a Python regex that starts with `^`, ends with `$` and has exactly
+   one capture group, the dotted numeric version. `new-wsl:inspect-ai` declares
+   every tag with `^(\d+\.\d+\.\d+)$`, `watch:codex-action` the `v` tags with
+   `^v(\d+\.\d+(?:\.\d+)?)$`, and `watch:deepagents` the `deepagents==` tags
+   with `^deepagents==(\d+\.\d+\.\d+)$`. A malformed declaration raises; each
+   entry carries its `tags` or `null`.
 
    ```sh
    python3 tools/sota-convergence/extract_layers.py --repo-root . --out /path/to/work-dir
@@ -53,6 +63,16 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    repository's normalized GitHub slug (`"aliases"` -- a `/releases/tag/vX`
    or `/tree/...` catalog URL and the canonical form both resolve to the same
    record; `build_manifest.py` looks records up by slug, not by exact URL).
+   For each tag prefix that a `runtime-pins.json` entry declares, one more
+   `gh api --paginate repos/{slug}/git/matching-refs/tags/{prefix}` call
+   ([List matching references](https://docs.github.com/en/rest/git/refs#list-matching-references))
+   lists the tags whose names start with it, and the record carries
+   `"matching_tags": {prefix: [names]}`, without `refs/tags/` and in the API's
+   name order. A repository without a declared prefix makes no such call,
+   whichever working file names it. A prefix that matches no tag returns an
+   empty list, so any failure of that call is kept in `"partial_errors"` under
+   `matching_tags:<prefix>`, and a record without a list for every prefix
+   declared now stays pending.
    Resumable: a repository already present in `--out` *without* an `"error"`
    or `"partial_errors"` field is skipped unless `--refresh`. A repository
    whose record carries `"error"` (the primary `repos/{slug}` call itself
@@ -127,7 +147,17 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    `<work-dir>/runtime-pins.json`; without that file the sidecar has no rows).
    A resolved pin uses the manifest's pin-vs-upstream rule. A watch-only row,
    or a row whose source did not resolve, is `not_compared` with reason
-   `watch_only` or `source_unresolved`. A watch-only row carries its upstream
+   `watch_only` or `source_unresolved`. A row whose entry declares `tags`
+   takes its upstream latest from the record's `matching_tags` list for that
+   prefix before the pin is compared: of the names that fully match the
+   pattern, the one whose capture is the highest integer tuple (never the
+   last by name: the API's order puts 0.3.99 after 0.3.276) becomes
+   `upstream.latest`, with `latest_source: "matching_tag"` and
+   `matching_tag_count`; every other upstream field stays `compute_upstream`'s.
+   With no match, or no list, the row keeps `compute_upstream`'s latest with
+   `latest_source` `tag_pattern_unmatched` or `tag_pattern_unfetched`.
+   `drift.md` marks a matching-tag latest `(tag)` and lists those two kinds of
+   row in one line after the runtime table. A watch-only row carries its upstream
    and dormancy; an unresolved row does only when it has a repository, and one
    without has an empty `upstream` and the `not_fetched` dormancy. The same
    upstreams' `manifests/stack.json` pins and selected (`default`/`conditional`)

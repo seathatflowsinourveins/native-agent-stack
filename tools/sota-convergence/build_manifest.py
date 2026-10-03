@@ -477,6 +477,59 @@ RUNTIME_WATCH_ONLY = "watch_only"
 # The fixed top-level "gate_error" of a runtime-freshness.json whose rows main()
 # withheld because they tripped assert_no_leak. Never the matched text.
 RUNTIME_LEAK_GATE_ERROR = "leak_gate_tripped"
+# upstream.latest_source on a runtime row whose entry declares tags (extract_layers.py's
+# RUNTIME_TAG_KEYS): the latest is the highest matching tag, the declared pattern matched
+# no fetched tag, or github_freshness.py fetched no tag list for the declared prefix. A
+# row without the declaration has no latest_source.
+RUNTIME_LATEST_MATCHING_TAG = "matching_tag"
+RUNTIME_TAG_PATTERN_UNMATCHED = "tag_pattern_unmatched"
+RUNTIME_TAG_PATTERN_UNFETCHED = "tag_pattern_unfetched"
+# A tag pattern's capture group is ranked only when it is a dotted numeric version.
+DOTTED_VERSION_RE = re.compile(r"\d+(?:\.\d+)+")
+
+
+def select_matching_tag(names, pattern):
+    """``(name, count)``: the name in ``names`` with the highest version among the
+    names that ``re.fullmatch`` ``pattern`` with a dotted numeric version
+    (DOTTED_VERSION_RE) in its one capture group, and how many names qualified;
+    ``(None, 0)`` when none did.
+
+    Versions compare as integer tuples, never as names: GitHub lists matching refs
+    in name order, in which 0.3.99 sorts after 0.3.276 (nvchecker's ``use_max_tag``
+    and Renovate's github-tags datasource also rank by parsed version). A tie goes
+    to the greater name, so the result does not depend on the list's order."""
+    compiled = re.compile(pattern)
+    best, count = None, 0
+    for name in names or ():
+        match = compiled.fullmatch(name) if isinstance(name, str) else None
+        captured = match.group(1) if match and compiled.groups == 1 else None
+        if not isinstance(captured, str) or not DOTTED_VERSION_RE.fullmatch(captured):
+            continue
+        count += 1
+        key = (tuple(int(part) for part in captured.split(".")), name)
+        if best is None or key > best:
+            best = key
+    return (best[1] if best else None), count
+
+
+def apply_tag_declaration(upstream: dict, tags: dict, record) -> dict:
+    """``upstream`` (compute_upstream's result) for a runtime row that declares
+    ``tags`` ({"prefix", "pattern"}), given the row's github-freshness.json record.
+
+    With a ``matching_tags`` list for the prefix and a name the pattern selects
+    (``select_matching_tag``), ``latest`` becomes that full tag name (replacing None
+    or a release tag), with ``latest_source`` RUNTIME_LATEST_MATCHING_TAG and
+    ``matching_tag_count``; every other field stays as compute_upstream returned it.
+    Otherwise ``upstream`` is unchanged apart from ``latest_source``
+    RUNTIME_TAG_PATTERN_UNMATCHED, or RUNTIME_TAG_PATTERN_UNFETCHED without a list."""
+    held = record.get("matching_tags") if isinstance(record, dict) else None
+    names = held.get(tags.get("prefix")) if isinstance(held, dict) else None
+    if not isinstance(names, list):
+        return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNFETCHED}
+    tag, count = select_matching_tag(names, tags.get("pattern"))
+    if tag is None:
+        return {**upstream, "latest_source": RUNTIME_TAG_PATTERN_UNMATCHED}
+    return {**upstream, "latest": tag, "latest_source": RUNTIME_LATEST_MATCHING_TAG, "matching_tag_count": count}
 
 
 def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, checked_at: str,
@@ -494,11 +547,20 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     the reason ``source_unresolved`` or ``watch_only``. Every row carries
     ``compute_dormancy``; a row without a repository gets the ``not_fetched``
     dormancy. This is report-only data: it selects nothing and is not part of
-    the manifest."""
+    the manifest.
+
+    An entry with a repository and a ``tags`` declaration (extract_layers.py's
+    RUNTIME_TAG_KEYS) takes its upstream latest from the tags github_freshness.py
+    listed for the declared prefix (``apply_tag_declaration``), before the pin is
+    compared, so a tag-only or monorepo upstream is compared by its own version
+    tags. Every other row's upstream is compute_upstream's, unchanged."""
     entries = []
     for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
         repository = pin.get("repository")
         upstream = compute_upstream(repository, repositories) if repository else {}
+        tags = pin.get("tags")
+        if repository and isinstance(tags, dict):
+            upstream = apply_tag_declaration(upstream, tags, freshness_record(repository, repositories))
         if pin.get("error"):
             pin_fields = {"pin_behind_upstream": None, "pin_comparison": PIN_NOT_COMPARED,
                           "pin_comparison_reason": RUNTIME_SOURCE_UNRESOLVED}

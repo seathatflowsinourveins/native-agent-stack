@@ -28,7 +28,7 @@ Outputs (written under --out):
   trading-catalog.json    {entries:[fine-grained entries + catalog_file], layer_index:{tag:[entry ids]}}
   trading-by-layer.json   {taxonomy:{layer_id:[tags]}, layers:{layer_id:[entries]}}
   trading-pins.json       {entries:[{id, layer, repository, pin, pin_source, repository_source}]}
-  runtime-pins.json       {entries:[{id, group, kind, repository, pin, pin_source, named_in, error}]}
+  runtime-pins.json       {entries:[{id, group, kind, repository, pin, pin_source, named_in, error, tags}]}
   star-candidates.json    {star_candidates, beyond_stars, star_count}
   models.json             {entries:[...]}
 
@@ -317,6 +317,19 @@ GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
 # One "name==version" line of a pip constraints file. Comment and blank lines
 # never match; the captured name is compared PEP 503-normalized.
 REQUIREMENT_LINE_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*==\s*([^\s;#\\]+)")
+# An optional "tags" declaration on a pin or watch source names the tags that carry
+# the upstream's versions, for an upstream whose newest GitHub release is absent or
+# belongs to another package: {"prefix": <literal>, "pattern": <regex>}.
+# github_freshness.py lists the tags whose names start with "prefix" through GitHub's
+# git/matching-refs endpoint (an empty prefix lists every tag), and build_manifest.py
+# keeps the names that re.fullmatch "pattern" and takes the highest version that its
+# one capture group parses to. "pattern" starts with "^", ends with "$" and has exactly
+# one capture group, a dotted numeric version; "prefix" is a prefix of every name the
+# pattern matches. References: nvchecker's GitHub source (use_max_tag with
+# include_regex, nvchecker_source/github.py at v2.22) and Renovate's github-tags datasource.
+RUNTIME_TAG_KEYS = ("prefix", "pattern")
+# A tag prefix is literal: letters, digits, ".", "-", "_", "=" and "+", never "..".
+RUNTIME_TAG_PREFIX_RE = re.compile(r"[A-Za-z0-9._=+-]*")
 
 # GPT-route runtime workers, agent SDKs, the GPT gateway, evaluation harnesses
 # and the native Codex client, each at the pin a runtime record installs. Some of
@@ -339,6 +352,7 @@ REQUIREMENT_LINE_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*==\s*([^\s
 #                composite row (the release part at the same position);
 #   requirement  a requirement name whose one "name==version" line in a pip
 #                constraints file gives the pin; the repository is a literal.
+# A pin or watch source may also declare "tags" (see RUNTIME_TAG_KEYS).
 RUNTIME_PIN_SOURCES = (
     {
         # Codex CLI, the second native client. Its native installer self-updates,
@@ -401,12 +415,14 @@ RUNTIME_PIN_SOURCES = (
         "row": {"array": "/owners", "key": "slot", "value": "harbor-containerized-agent-e2e-runner"},
     },
     {
-        # Inspect AI. Upstream has no version-shaped GitHub release, so the row
-        # reports activity and stays not compared.
+        # Inspect AI. Upstream publishes no GitHub release, and its first tag in
+        # name order is release/2025-11-28, so the row reads its version tags
+        # (0.3.276) out of all tags (an empty prefix, so a future 1.x is not missed).
         "id": "new-wsl:inspect-ai",
         "group": "evaluation-harness",
         "path": NEW_WSL_INSTALL_PLAN,
         "row": {"array": "/owners", "key": "slot", "value": "inspect-ai"},
+        "tags": {"prefix": "", "pattern": r"^(\d+\.\d+\.\d+)$"},
     },
     {
         # The OpenHands SDK tag the runtime-worker recipe pins its wheels, image and
@@ -482,17 +498,22 @@ RUNTIME_WATCH_SOURCES = (
     },
     {
         # Deep Agents, a conditional foundation alternative for an application-owned worker.
+        # A monorepo: its latest release can be another package's (deepagents-cli==...,
+        # deepagents-talon==...), so the row reads the deepagents== tags.
         "id": "watch:deepagents",
         "group": "runtime-worker",
         "repository": "https://github.com/langchain-ai/deepagents",
         "named_in": "catalogs/landscape/foundation.json",
+        "tags": {"prefix": "deepagents==", "pattern": r"^deepagents==(\d+\.\d+\.\d+)$"},
     },
     {
-        # The Codex GitHub Action, for running Codex in CI.
+        # The Codex GitHub Action, for running Codex in CI. It publishes tags only
+        # (v1, v1.12), so the row reads the v tags that carry a minor version.
         "id": "watch:codex-action",
         "group": "ci-action",
         "repository": "https://github.com/openai/codex-action",
         "named_in": "catalogs/saturation/ledger.json",
+        "tags": {"prefix": "v", "pattern": r"^v(\d+\.\d+(?:\.\d+)?)$"},
     },
 )
 
@@ -523,6 +544,37 @@ def _check_repository_literal(entry_id, value, field="repository") -> None:
                          "https://github.com/<owner>/<repo>")
 
 
+def _ends_with_end_anchor(pattern: str) -> bool:
+    """True when ``pattern`` ends with a "$" that no backslash escapes."""
+    if not pattern.endswith("$"):
+        return False
+    body = pattern[:-1]
+    return (len(body) - len(body.rstrip("\\"))) % 2 == 0
+
+
+def _check_tag_declaration(entry_id, tags) -> None:
+    """Raise ValueError unless ``tags`` is a RUNTIME_TAG_KEYS declaration: exactly a
+    literal prefix (RUNTIME_TAG_PREFIX_RE, no "..") and a pattern that starts with
+    "^", ends with an unescaped "$", compiles and has exactly one capture group."""
+    if not isinstance(tags, dict) or set(tags) != set(RUNTIME_TAG_KEYS):
+        raise ValueError(f"runtime source {entry_id!r}: tags needs exactly the keys "
+                         f"{', '.join(RUNTIME_TAG_KEYS)}")
+    prefix, pattern = tags["prefix"], tags["pattern"]
+    if not isinstance(prefix, str) or not RUNTIME_TAG_PREFIX_RE.fullmatch(prefix) or ".." in prefix:
+        raise ValueError(f"runtime source {entry_id!r}: tags prefix {prefix!r} is not a literal tag prefix "
+                         "(letters, digits, '.', '-', '_', '=' and '+', without '..')")
+    if not isinstance(pattern, str) or not pattern.startswith("^") or not _ends_with_end_anchor(pattern):
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} must start with '^' "
+                         "and end with '$'")
+    try:
+        groups = re.compile(pattern).groups
+    except re.error:
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} does not compile") from None
+    if groups != 1:
+        raise ValueError(f"runtime source {entry_id!r}: tags pattern {pattern!r} has {groups} capture "
+                         "groups, expected exactly one")
+
+
 def _check_runtime_declaration(repo_root: Path, source: dict, kind: str, seen: set, reserved: set) -> None:
     """Raise ValueError for a declaration only a code edit can produce."""
     required = ("id", "group", "path") if kind == RUNTIME_PIN_KIND else ("id", "group", "repository")
@@ -540,6 +592,8 @@ def _check_runtime_declaration(repo_root: Path, source: dict, kind: str, seen: s
         raise ValueError(f"runtime source {entry_id!r}: group {source['group']!r} is not in RUNTIME_GROUPS")
     if source.get("repository") is not None:
         _check_repository_literal(entry_id, source["repository"])
+    if source.get("tags") is not None:
+        _check_tag_declaration(entry_id, source["tags"])
     if kind == RUNTIME_WATCH_KIND:
         if source.get("named_in") is not None:
             _source_file(repo_root, source["named_in"])
@@ -588,6 +642,12 @@ def _runtime_pin_source(source: dict) -> dict:
     if source.get("requirement") is not None:
         return {"path": source["path"], "requirement": source["requirement"]}
     return {"path": source["path"], "row": dict(source["row"])}
+
+
+def _runtime_tags(source: dict):
+    """A copy of a source's checked ``tags`` declaration, or None."""
+    tags = source.get("tags")
+    return dict(tags) if tags is not None else None
 
 
 def _read_runtime_source(repo_root: Path, source: dict, locator: str, as_json: bool):
@@ -691,7 +751,12 @@ def resolve_runtime_pins(repo_root: Path, pin_sources=RUNTIME_PIN_SOURCES, watch
     ``reserved_ids``, a pin source without exactly one RUNTIME_SOURCE_FORMS key, a
     pointer source with neither repository_pointer nor repository, a requirement
     source without a literal repository, a repository literal that is not
-    https://github.com/<owner>/<repo>, or a path that is absolute or contains "..".
+    https://github.com/<owner>/<repo>, a path that is absolute or contains "..", or
+    a ``tags`` declaration other than RUNTIME_TAG_KEYS describes (a missing or extra
+    key, a prefix with "/", "..", whitespace or another character outside
+    RUNTIME_TAG_PREFIX_RE, or a pattern that is unanchored, does not compile or has
+    other than one capture group). Each entry carries a copy of its source's
+    ``tags``, or None.
 
     A record that moved or changed shape does not raise, so the daily job keeps its
     foundation and trading report: that entry is written with ``"pin": None``, its
@@ -714,13 +779,13 @@ def resolve_runtime_pins(repo_root: Path, pin_sources=RUNTIME_PIN_SOURCES, watch
         entries.append({
             "id": source["id"], "group": source["group"], "kind": RUNTIME_PIN_KIND,
             "repository": repository, "pin": pin, "pin_source": _runtime_pin_source(source),
-            "named_in": None, "error": error,
+            "named_in": None, "error": error, "tags": _runtime_tags(source),
         })
     for source in watch_sources:
         entries.append({
             "id": source["id"], "group": source["group"], "kind": RUNTIME_WATCH_KIND,
             "repository": source["repository"], "pin": None, "pin_source": None,
-            "named_in": source.get("named_in"), "error": None,
+            "named_in": source.get("named_in"), "error": None, "tags": _runtime_tags(source),
         })
     entries.sort(key=lambda e: e["id"])
     return {"entries": entries}

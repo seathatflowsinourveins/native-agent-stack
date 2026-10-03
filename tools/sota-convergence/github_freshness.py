@@ -12,20 +12,33 @@ Reads (repository-relative to --work-dir):
   foundation-layers.json  (#/layers[]/components[]/repository)
   trading-catalog.json    (#/entries[]/repository)
   trading-pins.json       (#/entries[]/repository; optional)
-  runtime-pins.json       (#/entries[]/repository; optional)
+  runtime-pins.json       (#/entries[]/repository and #/entries[]/tags/prefix; optional)
   star-candidates.json    (#/star_candidates[]/repository, #/beyond_stars[]/repository)
 
 Writes --out (default <work-dir>/github-freshness.json):
   {schema, generated_at, count, errors, partial_errors, fetched_this_run,
    retained_from_prior_runs, observation_window: {min, max},
-   repositories: {repo_url: {..., observed_at, slug, aliases, partial_errors?}}}
+   repositories: {repo_url: {..., observed_at, slug, aliases, matching_tags?, partial_errors?}}}
+
+Declared tag prefixes: for each tag prefix that a runtime-pins.json entry declares
+(``tags.prefix``, extract_layers.py's RUNTIME_TAG_KEYS) for a repository, one more
+``gh api --paginate repos/{slug}/git/matching-refs/tags/{prefix}`` call lists the
+tags whose names start with it (an empty prefix lists every tag), and the record
+carries "matching_tags": {prefix: [tag names, without "refs/tags/"]}, in the API's
+name order (build_manifest.py ranks them by version). A repository may have several
+prefixes. A repository without one makes no such call and its record has no
+"matching_tags", whichever working file names it.
 
 Resumability: a repository already present in an existing --out file is
 skipped unless --refresh is given, *unless* its record carries a
-"partial_errors" entry (a sub-request -- releases/tags/commit -- that failed
-with something other than an ordinary "not found"); such a record is left
-pending so the next run retries exactly the missing metadata. --max-repos
-bounds a trial run to the first N (sorted) slugs that still need fetching.
+"partial_errors" entry (a sub-request -- releases/tags/commit/matching tags -- that
+failed with something other than an ordinary "not found"); such a record is left
+pending so the next run retries exactly the missing metadata. A matching-refs call
+has no ordinary "not found": a prefix that matches no tag returns an empty list, so
+any failure is kept under "matching_tags:<prefix>". A record without a
+"matching_tags" list for every prefix runtime-pins.json now declares for its
+repository is pending too. --max-repos bounds a trial run to the first N (sorted)
+slugs that still need fetching.
 """
 from __future__ import annotations
 
@@ -39,6 +52,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 GITHUB_URL_RE = re.compile(r"^https?://github\.com/([^/\s]+)/([^/\s#?]+)")
+# GitHub REST "List matching references"
+# (https://docs.github.com/en/rest/git/refs#list-matching-references): every tag whose
+# name starts with the prefix, in name order; a prefix that matches no tag returns [].
+MATCHING_REFS_PATH = "repos/{slug}/git/matching-refs/tags/{prefix}"
+TAG_REF_PREFIX = "refs/tags/"
+# A failed matching-refs call's partial_errors key is this followed by its prefix.
+MATCHING_TAGS_ERROR_KEY = "matching_tags:"
+# extract_layers.py's literal tag-prefix rule (RUNTIME_TAG_PREFIX_RE, kept independent
+# here): a declared prefix outside it is ignored, so it never reaches the API path.
+TAG_PREFIX_RE = re.compile(r"[A-Za-z0-9._=+-]*")
 
 WORKING_FILE_REPO_PATHS = (
     ("foundation-layers.json", lambda doc: (
@@ -84,6 +107,42 @@ def collect_repository_urls(work_dir: Path) -> set:
     return urls
 
 
+def collect_declared_tag_prefixes(work_dir: Path) -> dict:
+    """slug -> sorted tuple of the distinct tag prefixes that runtime-pins.json
+    entries declare for that repository (``tags.prefix``); {} without the file.
+    A repository that only other working files name has no entry here."""
+    path = work_dir / "runtime-pins.json"
+    if not path.exists():
+        return {}
+    prefixes = defaultdict(set)
+    for entry in load_json(path).get("entries", []):
+        tags = entry.get("tags") if isinstance(entry, dict) else None
+        if not isinstance(tags, dict):
+            continue
+        prefix, slug = tags.get("prefix"), github_slug(entry.get("repository"))
+        if slug and isinstance(prefix, str) and TAG_PREFIX_RE.fullmatch(prefix) and ".." not in prefix:
+            prefixes[slug].add(prefix)
+    return {slug: tuple(sorted(values)) for slug, values in prefixes.items()}
+
+
+def missing_tag_prefixes(record, prefixes) -> list:
+    """The prefixes in ``prefixes`` that ``record`` has no "matching_tags" list for."""
+    held = record.get("matching_tags") if isinstance(record, dict) else None
+    held = held if isinstance(held, dict) else {}
+    return [prefix for prefix in prefixes if not isinstance(held.get(prefix), list)]
+
+
+def record_is_covered(record, tag_prefixes: dict) -> bool:
+    """True when a retained record needs no fetch this run: it carries no "error"
+    and no "partial_errors", and it holds a "matching_tags" list for every prefix
+    ``tag_prefixes`` (collect_declared_tag_prefixes) declares for its slug now, so
+    a prefix declared since, or a list a run never fetched, leaves it pending."""
+    if not isinstance(record, dict) or record.get("error") or record.get("partial_errors"):
+        return False
+    slug = str(record.get("slug") or "").lower()
+    return not missing_tag_prefixes(record, tag_prefixes.get(slug, ()))
+
+
 def github_slug(url: str):
     """Return normalized, lower-cased 'owner/repo' for a github.com URL
     (release/tag/tree suffixes and a trailing slash are already excluded by
@@ -123,13 +182,19 @@ def build_slug_aliases(urls) -> dict:
     return {slug: sorted(urlset) for slug, urlset in aliases.items()}
 
 
-def gh_api(path: str, timeout: int = 60):
+def gh_api(path: str, timeout: int = 60, *, paginate: bool = False):
     """Run one ``gh api <path>`` call. Never raises: a timeout, a missing
     ``gh`` binary or any other subprocess failure is caught here and returned
     as ``(None, str(exc))``, the same shape as a non-zero exit or unparsable
-    stdout, so one bad repository never aborts the whole fetch."""
+    stdout, so one bad repository never aborts the whole fetch.
+
+    ``paginate`` adds ``--paginate`` (after the path, so the argv of every other
+    call is unchanged): gh requests every page and, writing to a pipe, joins the
+    pages of a JSON array into one array (``paginatedArrayReader`` in
+    pkg/cmd/api/pagination.go of cli/cli, used at v2.102.0)."""
+    command = ["gh", "api", path] + (["--paginate"] if paginate else [])
     try:
-        proc = subprocess.run(["gh", "api", path], capture_output=True, text=True, timeout=timeout)
+        proc = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
     except Exception as exc:  # noqa: BLE001 - surfaced as a bounded error string, never re-raised
         return None, str(exc)
     if proc.returncode != 0:
@@ -158,7 +223,24 @@ def is_expected_missing(err) -> bool:
     return "404" in lowered or "not found" in lowered
 
 
-def fetch_repository(slug: str) -> dict:
+def fetch_matching_tag_names(slug: str, prefix: str):
+    """``(names, None)`` for the tags of ``slug`` whose names start with ``prefix``
+    (MATCHING_REFS_PATH, one paginated gh_api call), each name without
+    "refs/tags/" and in the API's order, or ``(None, error)``."""
+    refs, err = gh_api(MATCHING_REFS_PATH.format(slug=slug, prefix=prefix), paginate=True)
+    if err is not None:
+        return None, err
+    if not isinstance(refs, list):
+        return None, "matching-refs response is not a JSON array"
+    return [ref["ref"][len(TAG_REF_PREFIX):] for ref in refs
+            if isinstance(ref, dict) and isinstance(ref.get("ref"), str)
+            and ref["ref"].startswith(TAG_REF_PREFIX)], None
+
+
+def fetch_repository(slug: str, tag_prefixes=()) -> dict:
+    """One repository's record. ``tag_prefixes`` (collect_declared_tag_prefixes)
+    adds one matching-refs call per distinct prefix and the record's
+    "matching_tags"; without it the calls and the record are what they were."""
     out = {"slug": slug, "observed_at": datetime.now(timezone.utc).isoformat()}
     partial_errors = {}
     repo, err = gh_api(f"repos/{slug}")
@@ -196,6 +278,16 @@ def fetch_repository(slug: str) -> dict:
         }
     elif commit_err and not is_expected_missing(commit_err):
         partial_errors["commit"] = commit_err
+
+    if tag_prefixes:
+        out["matching_tags"] = {}
+        for prefix in dict.fromkeys(tag_prefixes):
+            names, tags_err = fetch_matching_tag_names(slug, prefix)
+            if tags_err is None:
+                out["matching_tags"][prefix] = names
+            else:
+                # No ordinary "not found" here (a prefix that matches no tag is []).
+                partial_errors[MATCHING_TAGS_ERROR_KEY + prefix] = tags_err
 
     if partial_errors:
         # Kept on the record (not discarded) and counted at the top level,
@@ -279,6 +371,7 @@ def main(argv=None) -> int:
     targets = build_targets(urls)
     slug_aliases = build_slug_aliases(urls)
     non_github = sorted(u for u in urls if u and not github_slug(u))
+    tag_prefixes = collect_declared_tag_prefixes(args.work_dir)
 
     existing = {"repositories": {}}
     if out_path.exists() and not args.refresh:
@@ -294,9 +387,10 @@ def main(argv=None) -> int:
     # Snapshots written before slug lower-casing keep mixed-case slugs; normalize
     # before comparing so a resume reuses their retained metadata instead of
     # refetching (and possibly overwriting a good record with a transient error).
+    # A record without a matching_tags list for each prefix declared now is pending
+    # as well (record_is_covered).
     already_covered_slugs = {str(rec.get("slug") or "").lower() for rec in results.values()
-                              if isinstance(rec, dict) and not rec.get("error")
-                              and not rec.get("partial_errors")}
+                              if record_is_covered(rec, tag_prefixes)}
     pending = {slug: url for slug, url in sorted(targets.items())
                if args.refresh or slug not in already_covered_slugs}
     if args.max_repos is not None:
@@ -305,11 +399,14 @@ def main(argv=None) -> int:
     print(f"github repositories {len(targets)} non-github {len(non_github)} "
           f"already-covered {len(targets) - len(pending)} to-fetch {len(pending)}", flush=True)
 
+    def fetch(slug):
+        return fetch_repository(slug, tag_prefixes=tag_prefixes.get(slug, ()))
+
     fetched_count = 0
     if pending:
         try:
             with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-                for i, record in enumerate(pool.map(fetch_repository, sorted(pending)), 1):
+                for i, record in enumerate(pool.map(fetch, sorted(pending)), 1):
                     results[pending[record["slug"]]] = record
                     fetched_count = i
                     if i % 50 == 0:

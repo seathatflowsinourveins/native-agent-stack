@@ -131,7 +131,12 @@ extend the existing job. Trials ran on copies of the real records and installed 
 
 The sweep measured one verdict that this table misses: Inspect AI has no GitHub release, the tag fallback returns
 the first tag in name order (`release/2025-11-28`), so the row is not compared, while its newest version tag and its
-PyPI release are 0.3.276 against the pin 0.3.273.
+PyPI release are 0.3.276 against the pin 0.3.273. The declared tag patterns (see "Limits and open findings") close
+that gap. A local run on 2026-10-03 at 05:13Z (this distribution, read-only `gh`, a work directory holding only
+`runtime-pins.json`, then `build_runtime_freshness`) listed 274 Inspect AI tags, 269 of which match its pattern, and
+compared the pin 0.3.273 with 0.3.276: behind. The same run selected v1.12 for `watch:codex-action` (13 matching tags)
+and `deepagents==0.7.21` for `watch:deepagents` (76), which stay watch-only and not compared. That is one local
+run, not a hosted scheduled run.
 
 Overturn: adopt updatecli or Renovate instead of this extension only if the stdlib-only constraint is relaxed and,
 on the same 19 rows plus 10 deliberately outdated canaries and 10 current controls over 7 daily runs, the tool
@@ -201,12 +206,19 @@ independent verifier re-ran each claim, and evidence and security reviewers read
   receipts and the propose pull request never see them. They live in `drift.md`, the run's step summary and the
   30-day artifact.
 - Tag-only upstreams. When a repository has no release, `github_freshness.py` takes the first tag in the API's name
-  order. That withholds Inspect AI and leaves `watch:codex-action` and `watch:deepagents` on name order (v1.12 is
-  codex-action's newest tag today, which the fallback does not guarantee). The follow-up is a declared, anchored
-  tag pattern per row, read with GitHub's `git/matching-refs` endpoint or the GraphQL `refs` query ordered by
-  `TAG_COMMIT_DATE`, as [nvchecker's GitHub source](https://github.com/lilydjwg/nvchecker/blob/v2.22/nvchecker_source/github.py)
-  and Renovate's tags query adapter do; the pattern must strip prefixes such as `rust-v` and drop prereleases before
-  sorting.
+  order, and a monorepo's latest release can be another package's. That withheld Inspect AI and left
+  `watch:codex-action` and `watch:deepagents` on name order or on whichever package released last. These three rows
+  now declare a literal tag prefix and an anchored pattern with one capture group: `new-wsl:inspect-ai` over all
+  tags (so a future 1.x is not missed), `watch:codex-action` over `v` and `watch:deepagents` over `deepagents==`.
+  `github_freshness.py` lists those tags through GitHub's `git/matching-refs` endpoint, and `build_runtime_freshness`
+  keeps the names the pattern fully matches and takes the highest version by its parsed capture, never by name
+  order (the API's order puts 0.3.99 after 0.3.276), as
+  [nvchecker's GitHub source](https://github.com/lilydjwg/nvchecker/blob/v2.22/nvchecker_source/github.py)
+  (`use_max_tag` with `include_regex`) and Renovate's `github-tags` datasource do. The pattern drops prereleases and
+  other packages' tags, and its capture strips a prefix such as `deepagents==`. Every other row keeps the
+  release-or-first-tag rule until it declares a pattern. A failed `matching-refs` call is a partial error of that
+  repository, as a failed release or tag call is, so that run blanks the row and does not open the propose pull
+  request.
 - Registry versions and advisories are outside this table. A registry identity per row (the PyPI simple JSON API,
   which also carries PEP 792 project status) would compare Inspect AI and `openai-codex` by their own stream; note
   that `gpt-researcher` is 0.16.1 on PyPI while its pinned tag is v3.7.0. Advisories stay with OSV-Scanner, the

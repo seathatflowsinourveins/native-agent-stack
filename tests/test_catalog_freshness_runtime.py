@@ -15,6 +15,11 @@ Covers each stage the GPT runtime workers, SDKs and agents pass through:
 - report: scripts/freshness_propose.py renders the runtime table (or the line
   saying it was withheld) into drift.md without touching drift-status.txt or the
   drift-table ids the propose job reads.
+- tag patterns: three entries declare a literal tag prefix and an anchored pattern
+  (extract_layers.py's RUNTIME_TAG_KEYS); github_freshness.py lists those tags
+  through git/matching-refs, build_runtime_freshness takes the highest matching
+  version as the row's upstream latest, and the report marks it "(tag)" or lists
+  the rows whose pattern selected no tag.
 
 No network. The extraction tests read the checked-in repository; every other
 test uses synthetic fixtures.
@@ -81,6 +86,26 @@ EXISTING_SUMMARY_KEYS = [
     "foundation_layers", "trading_entries", "trading_layers", "unmapped_tags", "trading_pins",
     "star_candidates", "beyond_stars", "models",
 ]
+# The tag declarations the checked-in extraction carries (extract_layers.py's RUNTIME_TAG_KEYS).
+DECLARED_TAGS = {
+    "new-wsl:inspect-ai": {"prefix": "", "pattern": r"^(\d+\.\d+\.\d+)$"},
+    "watch:codex-action": {"prefix": "v", "pattern": r"^v(\d+\.\d+(?:\.\d+)?)$"},
+    "watch:deepagents": {"prefix": "deepagents==", "pattern": r"^deepagents==(\d+\.\d+\.\d+)$"},
+}
+# The tag declarations in extract_layers.py's sources, which the selection tests apply.
+CHECKED_IN_TAGS = {source["id"]: source["tags"] for source in
+                   extract_layers.RUNTIME_PIN_SOURCES + extract_layers.RUNTIME_WATCH_SOURCES if source.get("tags")}
+# Tag names shaped like each upstream's. The API returns only the names under the declared
+# prefix; the Deep Agents list also carries other packages' tags, to test the pattern itself.
+INSPECT_LIKE_TAGS = ["release/2025-11-28", "0.3.99", "0.3.273", "0.3.276", "0.3.275", "0.3.277rc1", "0.4.0-dev"]
+DEEPAGENTS_LIKE_TAGS = ["deepagents-talon==0.0.9", "deepagents==0.7.21", "deepagents==0.7.3", "deepagents-cli==1.0.0"]
+CODEX_ACTION_LIKE_TAGS = ["v1.12", "v1.9", "v1.10", "v1"]
+# entry id -> (tag names, the tag its declared pattern selects, how many names it matches)
+TAG_EXAMPLES = {
+    "new-wsl:inspect-ai": (INSPECT_LIKE_TAGS, "0.3.276", 4),
+    "watch:deepagents": (DEEPAGENTS_LIKE_TAGS, "deepagents==0.7.21", 2),
+    "watch:codex-action": (CODEX_ACTION_LIKE_TAGS, "v1.12", 3),
+}
 
 
 class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
@@ -165,7 +190,7 @@ class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
                 self.assertEqual(self.entries[source["id"]], {
                     "id": source["id"], "group": source["group"], "kind": "watch_only",
                     "repository": source["repository"], "pin": None, "pin_source": None,
-                    "named_in": source["named_in"], "error": None,
+                    "named_in": source["named_in"], "error": None, "tags": source.get("tags"),
                 })
 
     def test_runtime_ids_are_unique_grouped_and_never_reuse_a_report_id(self):
@@ -184,6 +209,16 @@ class ExtractionResolvesRuntimePinsTests(unittest.TestCase):
         urls = github_freshness.collect_repository_urls(self.out)
         for entry in self.entries.values():
             self.assertIn(entry["repository"], urls, entry["id"])
+
+    def test_exactly_three_entries_declare_a_tag_pattern(self):
+        declared = {entry_id: entry["tags"] for entry_id, entry in self.entries.items() if entry["tags"] is not None}
+        self.assertEqual(declared, DECLARED_TAGS)
+
+    def test_fetch_step_reads_the_declared_tag_prefixes(self):
+        self.assertEqual(github_freshness.collect_declared_tag_prefixes(self.out), {
+            "ukgovernmentbeis/inspect_ai": ("",), "openai/codex-action": ("v",),
+            "langchain-ai/deepagents": ("deepagents==",),
+        })
 
 
 class MainReservesReportIdsTests(unittest.TestCase):
@@ -318,7 +353,7 @@ class ResolveRuntimePinsTests(unittest.TestCase):
             "id": "row:alpha", "group": "runtime-worker", "kind": "pin_source",
             "repository": "https://github.com/example/alpha", "pin": "v1.2.0",
             "pin_source": {"path": self.PLAN, "row": {"array": "/owners", "key": "slot", "value": "alpha"}},
-            "named_in": None, "error": None,
+            "named_in": None, "error": None, "tags": None,
         })
 
     def test_a_missing_or_repeated_row_is_an_error_entry_not_a_raise(self):
@@ -411,7 +446,7 @@ class ResolveRuntimePinsTests(unittest.TestCase):
         self.assertEqual(entries[2], {
             "id": "watch:x", "group": "coding-agent", "kind": "watch_only",
             "repository": "https://github.com/example/x", "pin": None, "pin_source": None,
-            "named_in": "docs/x.md", "error": None,
+            "named_in": "docs/x.md", "error": None, "tags": None,
         })
 
     def test_declaration_errors_raise(self):
@@ -445,6 +480,55 @@ class ResolveRuntimePinsTests(unittest.TestCase):
             with self.subTest(label=label), self.assertRaises(ValueError):
                 self._resolve(self._row("alpha"), watch_sources=(source,))
 
+    WATCH = {"id": "watch:x", "group": "coding-agent", "repository": "https://github.com/example/x"}
+
+    def test_a_tags_declaration_is_carried_on_pin_and_watch_entries_as_a_copy(self):
+        tags = {"prefix": "v", "pattern": r"^v(\d+\.\d+\.\d+)$"}
+        entries = {entry["id"]: entry for entry in self._resolve(
+            dict(self._row("alpha"), tags=tags), self._pointer(), watch_sources=(dict(self.WATCH, tags=tags),))}
+        for entry_id in ("row:alpha", "watch:x"):
+            with self.subTest(entry=entry_id):
+                self.assertEqual(entries[entry_id]["tags"], tags)
+                self.assertIsNot(entries[entry_id]["tags"], tags)
+        self.assertIsNone(entries["pointer:worker"]["tags"])
+
+    def test_an_empty_prefix_and_the_literal_punctuation_are_accepted(self):
+        for prefix in ("", "v", "deepagents==", "rust-v", "a_b.c+d"):
+            with self.subTest(prefix=prefix):
+                tags = {"prefix": prefix, "pattern": rf"^{re.escape(prefix)}(\d+\.\d+\.\d+)$"}
+                self.assertEqual(self._one(dict(self._row("alpha"), tags=tags))["tags"], tags)
+                self.assertEqual(self._resolve(watch_sources=(dict(self.WATCH, tags=tags),))[0]["tags"], tags)
+
+    def test_malformed_tag_declarations_raise_for_pin_and_watch_sources(self):
+        good = r"^v(\d+\.\d+\.\d+)$"
+        cases = {
+            "not a mapping": "v",
+            "missing pattern": {"prefix": "v"},
+            "missing prefix": {"pattern": good},
+            "an extra key": {"prefix": "v", "pattern": good, "flags": "i"},
+            "pattern not anchored at the start": {"prefix": "v", "pattern": r"v(\d+\.\d+\.\d+)$"},
+            "pattern not anchored at the end": {"prefix": "v", "pattern": r"^v(\d+\.\d+\.\d+)"},
+            "pattern ending in an escaped dollar": {"prefix": "v", "pattern": r"^v(\d+\.\d+\.\d+)\$"},
+            "two capture groups": {"prefix": "v", "pattern": r"^v(\d+)\.(\d+)$"},
+            "no capture group": {"prefix": "v", "pattern": r"^v\d+\.\d+$"},
+            "pattern that does not compile": {"prefix": "v", "pattern": r"^v(\d+\.\d+$"},
+            "pattern that is not a string": {"prefix": "v", "pattern": None},
+            "prefix that is not a string": {"prefix": None, "pattern": good},
+            "prefix with a slash": {"prefix": "refs/tags/v", "pattern": good},
+            "prefix with ..": {"prefix": "v..", "pattern": good},
+            "prefix with whitespace": {"prefix": "v ", "pattern": good},
+            "prefix with a query": {"prefix": "v?per_page=1", "pattern": good},
+            "prefix with a percent escape": {"prefix": "v%2F", "pattern": good},
+            "prefix with a fragment": {"prefix": "v#", "pattern": good},
+        }
+        for label, tags in cases.items():
+            with self.subTest(label=label, kind="pin"), self.assertRaisesRegex(ValueError, "tags"):
+                self._resolve(dict(self._row("alpha"), tags=tags))
+            with self.subTest(label=label, kind="watch"), self.assertRaisesRegex(ValueError, "tags"):
+                self._resolve(watch_sources=(dict(self.WATCH, tags=tags),))
+        # A pattern that ends in an escaped backslash and then "$" is anchored.
+        self._resolve(dict(self._row("alpha"), tags={"prefix": "v", "pattern": r"^v(\d+\.\d+)\\$"}))
+
 
 class GithubFreshnessReadsRuntimePinsTests(unittest.TestCase):
     def test_runtime_repositories_are_collected_and_the_file_is_optional(self):
@@ -461,7 +545,180 @@ class GithubFreshnessReadsRuntimePinsTests(unittest.TestCase):
                              {"https://github.com/example/card", "https://github.com/example/runtime"})
 
 
-MOVED_ERROR = "plan/install-plan.json#/owners slot 'gpt-gateway': 0 rows match, expected exactly one"
+class _FakeProc:
+    def __init__(self, returncode, stdout="", stderr=""):
+        self.returncode, self.stdout, self.stderr = returncode, stdout, stderr
+
+
+TAGGED_SLUG = "example/a-tagged"
+# Mixed case on purpose: the declared prefixes are keyed by the normalized slug.
+TAGGED_REPOSITORY = "https://github.com/Example/A-Tagged"
+PLAIN_REPOSITORY = "https://github.com/example/b-plain"
+TAGGED_NAMES = ["0.3.276", "release/2025-11-28", "v1.0", "v1.2"]
+
+
+def _fake_gh_api(calls, failing=()):
+    """A github_freshness.gh_api stand-in that records (path, paginate). Every repository
+    exists with no release and no tag listing and a resolvable head commit; matching-refs
+    lists the TAGGED_NAMES under the prefix for TAGGED_SLUG (none for another repository)
+    unless (slug, prefix) is in ``failing``, which fails like a GitHub 503."""
+    def fake(path, timeout=60, *, paginate=False):
+        calls.append((path, paginate))
+        _, owner, repo, *rest = path.split("/")
+        slug, rest = f"{owner}/{repo}", "/".join(rest)
+        if not rest:
+            return {"full_name": slug, "default_branch": "main", "pushed_at": "2026-10-02T00:00:00Z"}, None
+        if rest == "releases/latest":
+            return None, "HTTP 404: Not Found"
+        if rest == "tags?per_page=1":
+            return [], None
+        if rest == "commits/main":
+            return {"sha": "abc", "commit": {"committer": {"date": "2026-10-02T00:00:00Z"}}}, None
+        if rest.startswith("git/matching-refs/tags/"):
+            prefix = rest[len("git/matching-refs/tags/"):]
+            if (slug, prefix) in failing:
+                return None, "HTTP 503: Service Unavailable"
+            names = TAGGED_NAMES if slug == TAGGED_SLUG else []
+            return [{"ref": f"refs/tags/{name}", "object": {"type": "commit"}} for name in names
+                    if name.startswith(prefix)], None
+        return None, f"unexpected path {path}"
+
+    return fake
+
+
+def _matching_calls(calls):
+    return sorted(call for call in calls if "/git/matching-refs/" in call[0])
+
+
+BOTH_PREFIX_CALLS = [(f"repos/{TAGGED_SLUG}/git/matching-refs/tags/", True),
+                     (f"repos/{TAGGED_SLUG}/git/matching-refs/tags/v", True)]
+
+
+class GithubFreshnessMatchingTagsTests(unittest.TestCase):
+    """The matching-refs fetch for the tag prefixes runtime-pins.json declares (gh_api mocked)."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.work = Path(self._tmp.name)
+        self.out = self.work / "github-freshness.json"
+        (self.work / "foundation-layers.json").write_text(json.dumps({"layers": [{"components": [
+            {"repository": TAGGED_REPOSITORY}, {"repository": PLAIN_REPOSITORY}]}]}), encoding="utf-8")
+
+    def _write_runtime_pins(self, *prefixes, extra=()):
+        entries = [{"id": f"tagged:{index}", "repository": TAGGED_REPOSITORY,
+                    "tags": {"prefix": prefix, "pattern": r"^(\d+\.\d+\.\d+)$"}}
+                   for index, prefix in enumerate(prefixes)]
+        entries += [{"id": "plain", "repository": PLAIN_REPOSITORY, "tags": None}, *extra]
+        (self.work / "runtime-pins.json").write_text(json.dumps({"entries": entries}), encoding="utf-8")
+
+    def _main(self, failing=()):
+        calls = []
+        with mock.patch.object(github_freshness, "gh_api", _fake_gh_api(calls, failing)), \
+                redirect_stdout(StringIO()):
+            self.assertEqual(github_freshness.main(["--work-dir", str(self.work), "--workers", "1"]), 0)
+        return calls, json.loads(self.out.read_text(encoding="utf-8"))
+
+    def test_declared_prefixes_are_collected_once_per_repository(self):
+        self._write_runtime_pins("v", "", "v", extra=(
+            {"id": "unresolved", "repository": None, "tags": {"prefix": "x", "pattern": r"^x(\d+\.\d+)$"}},
+            {"id": "tampered", "repository": "https://github.com/example/c-tampered",
+             "tags": {"prefix": "../../user", "pattern": r"^(\d+\.\d+)$"}},
+        ))
+        self.assertEqual(github_freshness.collect_declared_tag_prefixes(self.work), {TAGGED_SLUG: ("", "v")})
+        (self.work / "runtime-pins.json").unlink()
+        self.assertEqual(github_freshness.collect_declared_tag_prefixes(self.work), {})
+
+    def test_paginate_adds_the_flag_after_the_path_only_when_asked(self):
+        commands = []
+
+        def fake_run(command, capture_output=True, text=True, timeout=60):
+            commands.append(command)
+            return _FakeProc(0, stdout="[]")
+
+        with mock.patch("subprocess.run", side_effect=fake_run):
+            self.assertEqual(github_freshness.gh_api("repos/a/b/git/matching-refs/tags/", paginate=True), ([], None))
+            self.assertEqual(github_freshness.gh_api("repos/a/b/tags?per_page=1"), ([], None))
+        self.assertEqual(commands, [["gh", "api", "repos/a/b/git/matching-refs/tags/", "--paginate"],
+                                    ["gh", "api", "repos/a/b/tags?per_page=1"]])
+
+    def test_fetch_lists_each_declared_prefix_once_by_name_and_keeps_the_other_calls(self):
+        calls = []
+        with mock.patch.object(github_freshness, "gh_api", _fake_gh_api(calls)):
+            record = github_freshness.fetch_repository(TAGGED_SLUG, tag_prefixes=("", "v", "v"))
+            plain = github_freshness.fetch_repository("example/b-plain")
+        # The empty prefix lists every tag: git/matching-refs/tags/.
+        self.assertEqual(calls[:6], [
+            (f"repos/{TAGGED_SLUG}", False), (f"repos/{TAGGED_SLUG}/releases/latest", False),
+            (f"repos/{TAGGED_SLUG}/tags?per_page=1", False), (f"repos/{TAGGED_SLUG}/commits/main", False),
+            *BOTH_PREFIX_CALLS,
+        ])
+        self.assertEqual(record["matching_tags"], {"": TAGGED_NAMES, "v": ["v1.0", "v1.2"]})
+        self.assertNotIn("partial_errors", record)
+        # Without declared prefixes the calls and the record are what they were.
+        self.assertEqual(calls[6:], [("repos/example/b-plain", False), ("repos/example/b-plain/releases/latest", False),
+                                     ("repos/example/b-plain/tags?per_page=1", False),
+                                     ("repos/example/b-plain/commits/main", False)])
+        self.assertNotIn("matching_tags", plain)
+
+    def test_main_lists_tags_only_for_the_declared_repository_and_prefixes(self):
+        self._write_runtime_pins("", "v", "v")
+        calls, document = self._main()
+        self.assertEqual(_matching_calls(calls), BOTH_PREFIX_CALLS)
+        records = document["repositories"]
+        self.assertEqual(records[TAGGED_REPOSITORY]["matching_tags"], {"": TAGGED_NAMES, "v": ["v1.0", "v1.2"]})
+        self.assertNotIn("matching_tags", records[PLAIN_REPOSITORY])
+        self.assertEqual((document["errors"], document["partial_errors"]), (0, 0))
+
+    def test_a_failed_list_is_a_partial_error_that_neither_aborts_the_batch_nor_sticks(self):
+        self._write_runtime_pins("", "v")
+        _, document = self._main(failing={(TAGGED_SLUG, "v")})
+        tagged = document["repositories"][TAGGED_REPOSITORY]
+        self.assertEqual(tagged["partial_errors"], {"matching_tags:v": "HTTP 503: Service Unavailable"})
+        self.assertEqual(tagged["matching_tags"], {"": TAGGED_NAMES})
+        # The batch went on: the repository fetched after it has its record.
+        self.assertEqual(document["repositories"][PLAIN_REPOSITORY]["full_name"], "example/b-plain")
+        self.assertEqual((document["errors"], document["partial_errors"]), (0, 1))
+        # The next run retries the incomplete record, and only it.
+        calls, document = self._main()
+        self.assertEqual(_matching_calls(calls), BOTH_PREFIX_CALLS)
+        self.assertFalse(any(path.startswith("repos/example/b-plain") for path, _ in calls))
+        tagged = document["repositories"][TAGGED_REPOSITORY]
+        self.assertEqual(tagged["matching_tags"], {"": TAGGED_NAMES, "v": ["v1.0", "v1.2"]})
+        self.assertNotIn("partial_errors", tagged)
+
+    def test_a_record_without_a_list_for_a_declared_prefix_is_pending_on_the_next_run(self):
+        self._write_runtime_pins("v")
+        self._main()
+        calls, _ = self._main()
+        self.assertEqual(calls, [])
+        # A prefix declared since: that repository is fetched again with every declared prefix.
+        self._write_runtime_pins("v", "")
+        calls, document = self._main()
+        self.assertEqual(_matching_calls(calls), BOTH_PREFIX_CALLS)
+        self.assertFalse(any(path.startswith("repos/example/b-plain") for path, _ in calls))
+        self.assertEqual(document["repositories"][TAGGED_REPOSITORY]["matching_tags"],
+                         {"": TAGGED_NAMES, "v": ["v1.0", "v1.2"]})
+
+    def test_a_record_is_covered_only_with_a_list_for_every_declared_prefix(self):
+        declared = {TAGGED_SLUG: ("", "v")}
+        complete = {"slug": TAGGED_SLUG, "matching_tags": {"": [], "v": ["v1.0"]}}
+        self.assertTrue(github_freshness.record_is_covered(complete, declared))
+        self.assertTrue(github_freshness.record_is_covered({"slug": "example/b-plain"}, declared))
+        cases = {
+            "a missing prefix": {"slug": TAGGED_SLUG, "matching_tags": {"v": ["v1.0"]}},
+            "no matching_tags": {"slug": TAGGED_SLUG},
+            "a value that is not a list": {"slug": TAGGED_SLUG, "matching_tags": {"": None, "v": []}},
+            "a mixed-case slug missing a prefix": {"slug": "Example/A-Tagged", "matching_tags": {"v": []}},
+            "a partial error": dict(complete, partial_errors={"matching_tags:": "HTTP 503"}),
+            "an error": dict(complete, error="timeout"),
+        }
+        for label, record in cases.items():
+            with self.subTest(case=label):
+                self.assertFalse(github_freshness.record_is_covered(record, declared))
+
+
+MOVED_ERROR ="plan/install-plan.json#/owners slot 'gpt-gateway': 0 rows match, expected exactly one"
 
 
 def _runtime_pins():
@@ -499,6 +756,50 @@ def _repositories():
             "latest_release": None, "head": {"date": "2025-12-01T00:00:00Z"},
         },
     }
+
+
+INSPECT_REPOSITORY = "https://github.com/UKGovernmentBEIS/inspect_ai"
+DEEPAGENTS_REPOSITORY = "https://github.com/langchain-ai/deepagents"
+
+
+def _inspect_entry(**overrides):
+    """new-wsl:inspect-ai as extract_layers.py writes it: a pin and the declared tag pattern."""
+    entry = {"id": "new-wsl:inspect-ai", "group": "evaluation-harness", "kind": "pin_source",
+             "repository": INSPECT_REPOSITORY, "pin": "0.3.273",
+             "pin_source": {"path": "plan/install-plan.json",
+                            "row": {"array": "/owners", "key": "slot", "value": "inspect-ai"}},
+             "named_in": None, "error": None, "tags": dict(DECLARED_TAGS["new-wsl:inspect-ai"])}
+    entry.update(overrides)
+    return entry
+
+
+def _inspect_record(**overrides):
+    """A record shaped like inspect_ai's: no release, a first tag in name order that is not
+    version-shaped (compute_upstream withholds it), and the tags under the empty prefix."""
+    record = {"slug": "ukgovernmentbeis/inspect_ai", "pushed_at": "2026-10-02T00:00:00Z", "archived": False,
+              "latest_tag": "release/2025-11-28", "head": {"date": "2026-10-02T00:00:00Z"},
+              "matching_tags": {"": list(INSPECT_LIKE_TAGS)}}
+    record.update(overrides)
+    return record
+
+
+def _deepagents_entry():
+    return {"id": "watch:deepagents", "group": "runtime-worker", "kind": "watch_only",
+            "repository": DEEPAGENTS_REPOSITORY, "pin": None, "pin_source": None,
+            "named_in": "catalogs/landscape/foundation.json", "error": None,
+            "tags": dict(DECLARED_TAGS["watch:deepagents"])}
+
+
+def _deepagents_record(**overrides):
+    """Deep Agents' latest release is another package's; matching-refs lists only deepagents== tags."""
+    record = {"slug": "langchain-ai/deepagents", "pushed_at": "2026-10-02T00:00:00Z", "archived": False,
+              "latest_release": {"tag": "deepagents-cli==1.0.0", "published_at": "2026-10-01T00:00:00Z",
+                                 "prerelease": False},
+              "head": {"date": "2026-10-02T00:00:00Z"},
+              "matching_tags": {"deepagents==": [name for name in DEEPAGENTS_LIKE_TAGS
+                                                 if name.startswith("deepagents==")]}}
+    record.update(overrides)
+    return record
 
 
 class BuildRuntimeFreshnessTests(unittest.TestCase):
@@ -559,6 +860,130 @@ class BuildRuntimeFreshnessTests(unittest.TestCase):
     def test_without_runtime_pins_the_document_has_no_rows(self):
         doc = build_manifest.build_runtime_freshness(None, _repositories(), CHECKED_AT)
         self.assertEqual((doc["entries"], doc["counts"]["entries"]), ([], 0))
+
+
+class MatchingTagSelectionTests(unittest.TestCase):
+    """build_manifest.select_matching_tag with the checked-in patterns (CHECKED_IN_TAGS)."""
+
+    def test_each_pattern_selects_the_highest_version_whatever_the_name_order(self):
+        self.assertEqual(set(CHECKED_IN_TAGS), set(TAG_EXAMPLES))
+        for entry_id, (names, expected, count) in TAG_EXAMPLES.items():
+            pattern = CHECKED_IN_TAGS[entry_id]["pattern"]
+            with self.subTest(entry=entry_id):
+                for ordered in (names, list(reversed(names)), sorted(names)):
+                    self.assertEqual(build_manifest.select_matching_tag(ordered, pattern), (expected, count))
+                # The API's name order ends on another tag: the greatest matching name.
+                self.assertNotEqual(max(name for name in names if re.fullmatch(pattern, name)), expected)
+
+    def test_prereleases_other_packages_and_major_only_tags_are_never_selected(self):
+        cases = {
+            "new-wsl:inspect-ai": ["release/2025-11-28", "0.3.277rc1", "0.4.0-dev", "inspect-tool-support-1.2.0"],
+            "watch:deepagents": ["deepagents-talon==0.0.9", "deepagents-cli==1.0.0", "deepagents==1.0.0a1"],
+            "watch:codex-action": ["v1", "v2-beta", "v1.12.0-rc.1"],
+        }
+        for entry_id, names in cases.items():
+            with self.subTest(entry=entry_id):
+                self.assertEqual(build_manifest.select_matching_tag(names, CHECKED_IN_TAGS[entry_id]["pattern"]),
+                                 (None, 0))
+
+    def test_each_prefix_starts_every_example_name_its_pattern_matches(self):
+        names = [name for examples, _, _ in TAG_EXAMPLES.values() for name in examples]
+        self.assertEqual(set(CHECKED_IN_TAGS), set(TAG_EXAMPLES))
+        for entry_id, tags in CHECKED_IN_TAGS.items():
+            with self.subTest(entry=entry_id):
+                matched = [name for name in names if re.fullmatch(tags["pattern"], name)]
+                self.assertTrue(matched)
+                self.assertEqual([name for name in matched if not name.startswith(tags["prefix"])], [])
+
+    def test_a_tie_goes_to_the_greater_name_and_only_a_dotted_capture_is_ranked(self):
+        for names in (["1.2.3", "v1.2.3"], ["v1.2.3", "1.2.3"]):
+            with self.subTest(names=names):
+                self.assertEqual(build_manifest.select_matching_tag(names, r"^v?(\d+\.\d+\.\d+)$"), ("v1.2.3", 2))
+        self.assertEqual(build_manifest.select_matching_tag(["v1", "v2"], r"^v(\d+)$"), (None, 0))
+        self.assertEqual(build_manifest.select_matching_tag(["v1.2-beta", "v1.x"], r"^v(.+)$"), (None, 0))
+
+    def test_parse_version_reads_each_selected_tag(self):
+        # classify_pin compares the selected full tag name through parse_version.
+        self.assertEqual([build_manifest.parse_version(expected) for _, expected, _ in TAG_EXAMPLES.values()],
+                         [(0, 3, 276), (0, 7, 21), (1, 12, 0)])
+
+
+class RuntimeTagPatternRowTests(unittest.TestCase):
+    """build_runtime_freshness for entries that declare a tag pattern."""
+
+    def _row(self, entry, repositories):
+        return build_manifest.build_runtime_freshness({"entries": [entry]}, repositories, CHECKED_AT)["entries"][0]
+
+    def test_the_inspect_row_is_compared_with_its_highest_version_tag(self):
+        repositories = {INSPECT_REPOSITORY: _inspect_record()}
+        row = self._row(_inspect_entry(), repositories)
+        upstream = row["upstream"]
+        self.assertEqual((upstream["latest"], upstream["latest_source"], upstream["matching_tag_count"]),
+                         ("0.3.276", "matching_tag", 4))
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"]), ("compared", True))
+        # Every other field is compute_upstream's, the withheld first tag included.
+        expected = build_manifest.compute_upstream(INSPECT_REPOSITORY, repositories)
+        self.assertIsNone(expected["latest"])
+        self.assertEqual({key: value for key, value in upstream.items()
+                          if key not in ("latest", "latest_source", "matching_tag_count")},
+                         {key: value for key, value in expected.items() if key != "latest"})
+        self.assertEqual(upstream["latest_flag"]["tag"], "release/2025-11-28")
+
+    def test_a_pin_at_the_highest_tag_is_compared_and_not_behind(self):
+        row = self._row(_inspect_entry(pin="0.3.276"), {INSPECT_REPOSITORY: _inspect_record()})
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"]), ("compared", False))
+
+    def test_without_a_list_for_the_prefix_the_row_is_unfetched_and_not_compared(self):
+        without_list = {key: value for key, value in _inspect_record().items() if key != "matching_tags"}
+        cases = {
+            "no matching_tags": {INSPECT_REPOSITORY: without_list},
+            "a list for another prefix only": {INSPECT_REPOSITORY: _inspect_record(matching_tags={"v": ["v0.3.276"]})},
+            "a failed list call": {INSPECT_REPOSITORY: dict(without_list, partial_errors={"matching_tags:": "HTTP 503"})},
+            "no record": {},
+        }
+        for label, repositories in cases.items():
+            with self.subTest(case=label):
+                row = self._row(_inspect_entry(), repositories)
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 (None, "tag_pattern_unfetched"))
+                self.assertNotIn("matching_tag_count", row["upstream"])
+                self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                                 (None, "not_compared", "unversioned"))
+
+    def test_with_no_matching_tag_the_row_is_unmatched_and_keeps_compute_upstream(self):
+        for names in ([], ["release/2025-11-28", "0.3.277rc1", "0.4.0-dev"]):
+            with self.subTest(names=names):
+                row = self._row(_inspect_entry(), {INSPECT_REPOSITORY: _inspect_record(matching_tags={"": names})})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 (None, "tag_pattern_unmatched"))
+                self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                                 (None, "not_compared", "unversioned"))
+        # A release tag stays the latest when the pattern matches nothing.
+        row = self._row(_deepagents_entry(),
+                        {DEEPAGENTS_REPOSITORY: _deepagents_record(matching_tags={"deepagents==": []})})
+        self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                         ("deepagents-cli==1.0.0", "tag_pattern_unmatched"))
+
+    def test_a_matching_tag_replaces_a_release_of_another_package(self):
+        row = self._row(_deepagents_entry(), {DEEPAGENTS_REPOSITORY: _deepagents_record()})
+        upstream = row["upstream"]
+        self.assertEqual((upstream["latest"], upstream["latest_source"], upstream["matching_tag_count"]),
+                         ("deepagents==0.7.21", "matching_tag", 2))
+        self.assertEqual((upstream["released_at"], upstream["prerelease"]), ("2026-10-01", False))
+        # A watch-only row stays not compared.
+        self.assertEqual((row["pin_behind_upstream"], row["pin_comparison"], row["pin_comparison_reason"]),
+                         (None, "not_compared", "watch_only"))
+
+    def test_rows_without_a_declaration_keep_compute_upstream_exactly(self):
+        repositories = _repositories()
+        # A record's tag lists are read only through a declaration.
+        repositories["https://github.com/example/behind"]["matching_tags"] = {"": ["rust-v9.9.9"]}
+        for row in build_manifest.build_runtime_freshness(_runtime_pins(), repositories, CHECKED_AT)["entries"]:
+            with self.subTest(row=row["id"]):
+                expected = (build_manifest.compute_upstream(row["repository"], repositories)
+                            if row["repository"] else {})
+                self.assertEqual(row["upstream"], expected)
+                self.assertNotIn("latest_source", row["upstream"])
 
 
 class BuildManifestRuntimeFreshnessCliTests(unittest.TestCase):
@@ -764,6 +1189,74 @@ class RuntimeReportTests(unittest.TestCase):
         (self.work / fp.RUNTIME_FRESHNESS_FILE).write_text("{", encoding="utf-8")
         with self.assertRaises(fp.FreshnessProposeError):
             fp.build_drift_report(self.work)
+
+    def _tagged(self, inspect_record=None, deepagents_record=None):
+        """Add the two tag-declaring upstreams' records to github-freshness.json and
+        return runtime pins that carry their entries."""
+        self.repositories[INSPECT_REPOSITORY] = inspect_record or _inspect_record()
+        self.repositories[DEEPAGENTS_REPOSITORY] = deepagents_record or _deepagents_record()
+        self._write_freshness(self.repositories, partial_errors=sum(
+            1 for record in self.repositories.values() if record.get("partial_errors")))
+        pins = _runtime_pins()
+        pins["entries"] += [_inspect_entry(), _deepagents_entry()]
+        return pins
+
+    def test_a_latest_from_matching_tags_is_marked_in_its_cell(self):
+        self._write_runtime(self._tagged())
+        result = fp.build_drift_report(self.work)
+        self.assertEqual(self._cells("new-wsl:inspect-ai")[2:5],
+                         [fp.md_cell("0.3.273"), fp.md_cell("0.3.276 (tag)"), fp.md_cell("yes")])
+        self.assertEqual(self._cells("watch:deepagents")[3:5],
+                         [fp.md_cell("deepagents==0.7.21 (tag)"), fp.md_cell("not compared (watch_only)")])
+        # A latest from a release is not marked, and with no miss there is no miss line.
+        self.assertEqual(self._cells("new-wsl:behind")[3], fp.md_cell("rust-v1.1.0"))
+        self.assertNotIn(fp.RUNTIME_TAG_MISS_SENTENCE, self._text())
+        self.assertEqual(result["runtime_behind"], ["new-wsl:behind", "new-wsl:inspect-ai"])
+
+    def test_rows_whose_pattern_selected_no_tag_are_listed_in_one_line_after_the_table(self):
+        deepagents = _deepagents_record()
+        del deepagents["matching_tags"]
+        self._write_runtime(self._tagged(_inspect_record(matching_tags={"": ["release/2025-11-28", "0.3.277rc1"]}),
+                                         deepagents))
+        result = fp.build_drift_report(self.work)
+        text = self._text()
+        self.assertIn(f"2 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_unmatched)")
+                      + ", " + fp.md_cell("watch:deepagents (tag_pattern_unfetched)") + "\n", text)
+        self.assertGreater(text.index(fp.RUNTIME_TAG_MISS_SENTENCE), text.index(fp.RUNTIME_TABLE_HEADER))
+        self.assertEqual(self._cells("new-wsl:inspect-ai")[3:5],
+                         [fp.md_cell(None), fp.md_cell("not compared (unversioned)")])
+        self.assertEqual(self._cells("watch:deepagents")[3], fp.md_cell("deepagents-cli==1.0.0"))
+        # The line changes no summary key.
+        self.assertEqual(result["runtime_behind"], ["new-wsl:behind"])
+        self.assertEqual([key for key in result if key.startswith("runtime")], list(fp.RUNTIME_SUMMARY_KEYS))
+
+    def test_a_failed_tag_list_blanks_the_row_and_names_it_in_both_lines(self):
+        inspect = {key: value for key, value in _inspect_record().items() if key != "matching_tags"}
+        inspect["partial_errors"] = {"matching_tags:": "HTTP 503: Service Unavailable"}
+        self._write_runtime(self._tagged(inspect))
+        result = fp.build_drift_report(self.work)
+        self.assertEqual(result["runtime_unfetched"], ["new-wsl:inspect-ai"])
+        self.assertEqual(self._cells("new-wsl:inspect-ai").count(fp.md_cell("unknown")), 3)
+        self.assertIn(f"1 {fp.RUNTIME_TAG_MISS_SENTENCE}:\n\n" + fp.md_cell("new-wsl:inspect-ai (tag_pattern_unfetched)"),
+                      self._text())
+
+    def test_tag_rows_never_change_drift_status_or_the_propose_ids(self):
+        pins = self._tagged(_inspect_record(), _deepagents_record(matching_tags={"deepagents==": []}))
+        for rebuilt_pin, drifted in (("8.30.0", []), ("8.30.1", ["gitleaks"])):
+            with self.subTest(rebuilt_pin=rebuilt_pin):
+                self._write_manifest(self.work / "manifest-20261002.json", rebuilt_pin)
+                (self.work / fp.RUNTIME_FRESHNESS_FILE).unlink(missing_ok=True)
+                without = fp.build_drift_report(self.work)
+                observed = [((self.work / "drift-status.txt").read_text(encoding="utf-8"),
+                             fp.drifted_component_ids(self._text()), without["drifted"])]
+                self._write_runtime(pins)
+                with_tags = fp.build_drift_report(self.work)
+                self.assertIn(fp.md_cell("0.3.276 (tag)"), self._text())
+                self.assertIn(fp.RUNTIME_TAG_MISS_SENTENCE, self._text())
+                observed.append(((self.work / "drift-status.txt").read_text(encoding="utf-8"),
+                                 fp.drifted_component_ids(self._text()), with_tags["drifted"]))
+                self.assertEqual(observed[0], observed[1])
+                self.assertEqual(observed[1][1], drifted)
 
 
 LEAKY_REPOSITORY = "https://github.com/example/leaky"
