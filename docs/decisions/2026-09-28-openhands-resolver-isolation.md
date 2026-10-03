@@ -283,7 +283,58 @@ No attempt network or container was created. No gateway or model request was mad
 host evidence for this design is the live P0-P2 probe
 ([sequence](../../blueprints/runtime-workers/openhands/README.md#live-probe-sequence-coordinator-not-run-yet)).
 
+## Portable alias-refusal fixture repair (2026-10-03)
+
+The custody repair serves the research-worker qualification step: exercise the resolver's
+existing path-refusal policy on both Linux and macOS before any separately gated live run.
+At PR head `501bcc9e`, the historical macOS full-suite artifact from run `36524134513`,
+job `109263298833`, artifact `11015337319` reports three failures in
+`PatchValidatorTests.test_case_unicode_and_filesystem_aliases_are_refused`: `docs/A.md`,
+`Docs/z.md` and the NFD spelling of `docs/café.md`. The fixture wrote these through the
+filesystem and exported them with `git add -A`; filesystem aliases and Git's filename
+normalization can remove the intended spellings before the validator sees the patch.
+`GitTree` instead reads the base with `ls-tree` and `cat-file`, and the refusal policy
+compares the patch's names with the base's casefold/NFD keys.
+
+**Chosen:** construct all seven test entries directly in the scratch repository's index,
+following git/git `v2.43.0` `t/t2107-update-index-basic.sh:59-69`: write each blob with
+`git hash-object -w --stdin`, then use `git update-index --add --cacheinfo
+100644,<oid>,<path>`. Export the cached diff without restaging the worktree, and assert
+that every intended path reached the validator. Keep every case, Unicode, trailing-dot,
+NTFS-short-name, NTFS-stream and HFS-ignorable-character refusal assertion.
+
+**Source-completeness finding:** index plumbing alone still allows Git's macOS argument
+normalization. `git.c:449` calls `precompose_argv_prefix`, and
+`compat/precompose_utf8.c:67-105` converts arguments when `core.precomposeUnicode` is true.
+The test therefore passes `-c core.precomposeunicode=false` only to its scratch-index
+insertion commands. This follows `Documentation/config/core.txt:44-51` and preserves the
+decomposed name without changing repository configuration or the production validator.
+
+**Alternatives:** a filesystem-prerequisite skip would leave these refusal checks unexercised
+on the failing host; the maintained Git plumbing makes that fallback unnecessary. A blanket
+platform skip would hide the regression and is not used. Worktree writes remain the default
+for the other fixtures, which exercise the actual dispatch export path.
+
+**Evidence and limits:** the original regression passes on Linux. Remapping only its three
+alias writes to their canonical spellings reproduces the same three failures with the
+existing unittest oracle; the repaired fixture passes that same synthetic check and all
+11 patch-validator tests with real local Git 2.43.0. This is local integration and synthetic
+evidence, not a new macOS run or upstream Git acceptance. Native macOS acceptance still
+requires the pushed head's `validate-macos` full-suite artifact. The production refusal
+gates and the proposed resolver-mode amendment above are unchanged.
+
+**Overturn:** if a native macOS run on the repaired head still loses an intended spelling,
+inspect that installed Git revision's argument/index handling and adjust the fixture from
+its versioned primary sources. Do not weaken or skip the validator's refusal assertions.
+
 ## Sources
+
+- [git/git `v2.43.0`](https://github.com/git/git/tree/v2.43.0),
+  `Documentation/RelNotes/2.43.0.txt`, `Documentation/git-hash-object.txt:18-35`,
+  `Documentation/git-update-index.txt:44-47,75-80,253-267`,
+  `t/t2107-update-index-basic.sh:59-69`, `builtin/update-index.c:421-446`, `git.c:449`,
+  `compat/precompose_utf8.c:44-105` and `Documentation/config/core.txt:29-51`, read
+  2026-10-03 after the installed `git version 2.43.0` and native command help.
 
 - docker/docs@4e9a5751518ed8223a8dcde53693badddd72604f
   `content/manuals/engine/network/port-publishing.md:121-131,186-192` (gateway modes; the

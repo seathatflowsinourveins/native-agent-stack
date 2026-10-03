@@ -270,9 +270,9 @@ class IssueSelectionTests(unittest.TestCase):
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).
 
-def run_git(repo, *args, env=None):
+def run_git(repo, *args, env=None, input=None):
     return subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True,
-                          env=env if env is not None else hermetic_git_environment())
+                          env=env if env is not None else hermetic_git_environment(), input=input)
 
 
 def write_file(repo, relative, data):
@@ -288,10 +288,14 @@ def commit_all(repo, message="fixture"):
     return run_git(repo, "rev-parse", "HEAD").stdout.decode().strip()
 
 
-def export_patch(repo, base):
-    """dispatch.py:199-205 at e45c3cd1: neutral config, `add -A`, then its diff flags."""
+def export_patch(repo, base, *, stage_worktree=True):
+    """dispatch.py:199-205 at e45c3cd1: neutral config and its diff flags.
+
+    Normally stage the worktree first; index-only fixtures must keep their exact names.
+    """
     env = {**hermetic_git_environment(), "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
-    run_git(repo, "add", "-A", env=env)
+    if stage_worktree:
+        run_git(repo, "add", "-A", env=env)
     return run_git(repo, "--no-pager", "diff", "--no-color", "--no-ext-diff", "--no-textconv",
                    "--cached", base, env=env).stdout.decode("utf-8")
 
@@ -626,10 +630,10 @@ class PatchValidatorTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.fixture.close()
 
-    def verdict(self, owned, edit):
+    def verdict(self, owned, edit, *, stage_worktree=True):
         repo = self.fixture.case()
         edit(repo)
-        patch = export_patch(repo, self.fixture.base)
+        patch = export_patch(repo, self.fixture.base, stage_worktree=stage_worktree)
         return self.p.validate_patch(patch, tree=self.p.GitTree(repo, self.fixture.base), owned=owned)
 
     def reasons(self, verdict):
@@ -709,16 +713,29 @@ class PatchValidatorTests(unittest.TestCase):
         self.assertIn(("new_top_level_entry", "json.py"), reasons)
 
     def test_case_unicode_and_filesystem_aliases_are_refused(self):
-        def edit(repo):
-            write_file(repo, "docs/A.md", "alias\n")
-            write_file(repo, "Docs/z.md", "alias\n")
-            write_file(repo, "docs/café.md", "nfd\n")
-            write_file(repo, "docs/b.md.", "trailing dot\n")
-            write_file(repo, "docs/c‌.md", "ignorable\n")
+        files = {
+            "docs/A.md": "alias\n",
+            "Docs/z.md": "alias\n",
+            "docs/café.md": "nfd\n",
+            "docs/b.md.": "trailing dot\n",
+            "docs/c‌.md": "ignorable\n",
             # git itself refuses "GIT~1" (a .git synonym); any 8.3 short name can alias.
-            write_file(repo, "docs/FOO~1.md", "short name\n")
-            write_file(repo, "docs/x:stream.md", "stream\n")
-        verdict = self.verdict(["docs", "Docs"], edit)
+            "docs/FOO~1.md": "short name\n",
+            "docs/x:stream.md": "stream\n",
+        }
+
+        def edit(repo):
+            # git/git v2.43.0 t/t2107-update-index-basic.sh:59-69 builds index-only
+            # files with hash-object --stdin and update-index --cacheinfo. APFS can
+            # fold worktree writes, and git.c:449 / compat/precompose_utf8.c:67-105
+            # can normalize argv; disable that conversion for these exact names.
+            for path, data in files.items():
+                oid = run_git(repo, "hash-object", "-w", "--stdin", input=data.encode("utf-8"))
+                run_git(repo, "-c", "core.precomposeunicode=false", "update-index", "--add",
+                        "--cacheinfo", f"100644,{oid.stdout.decode('ascii').strip()},{path}")
+
+        verdict = self.verdict(["docs", "Docs"], edit, stage_worktree=False)
+        self.assertEqual(set(verdict["paths"]), set(files))
         reasons = self.reasons(verdict)
         for path in ("docs/A.md", "Docs/z.md", "docs/café.md", "docs/b.md.", "docs/c‌.md"):
             with self.subTest(path=path):
