@@ -36,6 +36,10 @@ CASES = [
     ("generated output: a final row whose GPT status is put back to the pending text", "test_no_family_status_is_stale", None),
     ("generated output: the decision rule put back to the earlier text", "test_decision_rule_states_the_current_rule", None),
     ("generated output: a resolved row without its first-round record", "test_resolved_rows_keep_their_first_round_record", None),
+    # A settlement whose slot the convergence decisions add is applied after them; it must still be refused unless that
+    # added row is a split (reranker-model is an added row resolved as not installed).
+    ("a settlement for an added slot that is not split", "test_manifest_is_current",
+     "settlement reranker-model: not a split or measurement row"),
 ]
 
 
@@ -193,13 +197,15 @@ def mutate(root, case):
         else:
             decisions["claude-plugins-official-code-intelligence-lsp-pl"]["covered_by"] = ["memory-owner"]
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-    elif case in (CASES[1][0], CASES[2][0], CASES[6][0]):
+    elif case in (CASES[1][0], CASES[2][0], CASES[6][0], CASES[16][0]):
         path = root / ART / "settlements.json"
         doc = json.loads(path.read_text(encoding="utf-8"))
         if case == CASES[1][0]:
             doc[0]["receipts"][0]["sha256"] = "0" * 64
         elif case == CASES[2][0]:
             doc[0]["slot_id"] = "container-engine"
+        elif case == CASES[16][0]:
+            doc[1]["slot_id"] = "reranker-model"
         else:
             doc = []
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

@@ -18,6 +18,8 @@ import unittest
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from tests.test_adoption_bootstrap import sha256sum_checks_like_gnu  # helpers only; its test classes run there
+
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "evidence/artifacts/new-wsl-definitive-defaults-20261001"
 RECORD = ROOT / "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md"
@@ -290,15 +292,25 @@ class Manifest(unittest.TestCase):
 
     def test_added_slots_and_hygiene_preserve_the_decisions(self):
         rows = {row["slot_id"]: row for row in self.rows}
+        settled = {settlement["slot_id"]: settlement for settlement in self.settlements}
         added_by_layer = {}
         for added in self.convergence["added_slots"]:
             row = rows[added["slot_id"]]
             self.assertEqual(row["row_kind"], "added")
             if added["outcome"] in ("split", "not_installed"):
-                # an added row that installs nothing keeps the named candidate only in its resolution
-                self.assertEqual(row["repository"], "")
-                self.assertTrue(row["installs_nothing_extra"])
+                # an added row keeps the named candidate in its resolution
                 self.assertEqual(row["resolution"]["former_default"], added["default"])
+                if added["slot_id"] in settled:
+                    # a split whose measurement returned carries the settlement's default (settlements.json)
+                    settlement = settled[added["slot_id"]]
+                    self.assertEqual(added["outcome"], "split")
+                    self.assertEqual((row["default"], row["repository"]),
+                                     (settlement["default"]["name"], settlement["default"]["repository"]))
+                    self.assertFalse(row["installs_nothing_extra"])
+                else:
+                    # an added row that installs nothing keeps the named candidate only in its resolution
+                    self.assertEqual(row["repository"], "")
+                    self.assertTrue(row["installs_nothing_extra"])
             else:
                 self.assertEqual(row["default"], added["default"]["name"])
                 self.assertEqual(row["repository"], added["default"]["repository"])
@@ -369,13 +381,17 @@ class Manifest(unittest.TestCase):
         stated = {d["slot_id"]: d["gpt_status"] for d in self.convergence["decisions"] + self.convergence["added_slots"]
                   if d.get("gpt_status")}
         self.assertEqual(sorted(stated), ["agent-structural-diff"])
+        settled = {settlement["slot_id"]: settlement["label"] for settlement in self.settlements}
         for row in self.rows:
             resolution = row["resolution"]
             if resolution["outcome"] not in RESOLVED:
                 continue
             with self.subTest(slot=row["slot_id"]):
                 self.assertEqual(row["gpt"], stated.get(row["slot_id"]) or self.expected_gpt(row))
-                self.assertEqual(row["label"], BASIS[resolution["outcome"]])
+                # A split whose measurement returned is labelled by its settlement; every other resolved row by its basis.
+                returned = bool(row["measurement"] and row["measurement"]["returned"])
+                self.assertEqual(returned, row["slot_id"] in settled)
+                self.assertEqual(row["label"], settled[row["slot_id"]] if returned else BASIS[resolution["outcome"]])
                 if row["row_kind"] == "added":
                     self.assertEqual(row["claude"], "not judged in the first round")
                 else:
@@ -523,9 +539,12 @@ class Manifest(unittest.TestCase):
         self.assertEqual(exceptions, {("us-equities", "market-data-provider")})
 
     def test_settled_rows_are_measurements_with_verified_receipts(self):
-        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, {"local-model-server"})
+        # The model server by its gate (a row of the decision round), and the two local-model slots by their measurement
+        # (rows that the convergence decisions added and split).
+        settled = {"local-model-server", "local-generation-model", "embedding-model"}
+        self.assertEqual({settlement["slot_id"] for settlement in self.settlements}, settled)
         self.assertEqual({row["slot_id"] for row in self.rows if row["measurement"] and row["measurement"]["returned"]},
-                         {"local-model-server"})
+                         settled)
         for settlement in self.settlements:
             rows = [row for row in self.rows if row["slot_id"] == settlement["slot_id"]]
             self.assertEqual(len(rows), 1, settlement["slot_id"])
@@ -552,8 +571,17 @@ class Manifest(unittest.TestCase):
     def test_settled_split_tables_preserve_the_blind_picks(self):
         lines = RECORD.read_text(encoding="utf-8").splitlines()
         slots = {slot["slot_id"]: slot for layer in self.foundation["layers"] for slot in layer["slots"]}
+        added = {decision["slot_id"] for decision in self.convergence["added_slots"]}
         for settlement in self.settlements:
-            slot = slots[settlement["slot_id"]]
+            slot = slots.get(settlement["slot_id"])
+            if slot is None:
+                # A slot the convergence decisions added has no blind picks of its own: its layer row shows the settled
+                # default, the measurement state and the settlement as its basis.
+                self.assertIn(settlement["slot_id"], added)
+                line = next(line for line in lines if re.match(r"\| [^|]+ \| " + re.escape(settlement["slot_id"]) + r" \|", line))
+                cells = [cell.strip() for cell in line.split("|")[1:-1]]
+                self.assertEqual(cells[3:], [settlement["default"]["name"], "measurement", "settled by the preregistered measurement"])
+                continue
             if slot.get("split"):
                 line = next(line for line in lines if line.startswith(f"| {slot['slot_id']} |"))
                 cells = [cell.strip() for cell in line.split("|")[1:-1]]
@@ -726,11 +754,14 @@ class Manifest(unittest.TestCase):
         self.assertEqual(counts["slots"], 90)
         self.assertEqual(by_catalog, {"foundation": 70, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
-        self.assertEqual(counts["installed"], 57)
+        # 56 after the layer consensus, 57 with its wave-2 statusline row, and the two local-model slots settled by their
+        # measurement (2026-10-03).
+        self.assertEqual(counts["installed"], 59)
         self.assertEqual(counts["interim"], 3)
         self.assertEqual(counts["by_row_kind"]["consensus"], 6)
         self.assertEqual(counts["by_state"]["resolved"], 23)
-        self.assertEqual(counts["by_state"]["measurement"], 4)
+        self.assertEqual(counts["by_state"]["measurement"], 6)
+        self.assertEqual(counts["by_state"]["split"], 5)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):
         rows = {row["slot_id"]: row for row in self.rows}
@@ -1591,6 +1622,256 @@ class StatuslineInstallAndAcceptance(unittest.TestCase):
             with self.subTest(case=name):
                 status, stderr = self.acceptance(**case)
                 self.assertNotEqual(status, 0, stderr)
+
+
+class LocalModelAcceptance(unittest.TestCase):
+    """The install plan's checks of the two local-model rows, run against stand-ins.
+
+    The programs that accept.sh runs for local-generation-model and embedding-model, and the local-model-server row's
+    after_sign_in smoke check (one embedding call to the settled embedder), are run as accept.sh runs them
+    (bash -euo pipefail -c), with a scratch HOME and model store and with stub ollama and curl programs that print canned
+    answers. The expected state passes, and each planted condition fails it. The fixtures are our own: no model server
+    answers and no model runs. The embedder's library manifest is not published (the registry's copy carries its build
+    path), so its case writes a stand-in manifest and puts that file's digest in place of the pinned one, after checking
+    that the program names the pinned digest once.
+
+    The files checks run `sha256sum --check --status`. Where this host's sha256sum rejects those options (the probe
+    sha256sum_checks_like_gnu from tests/test_adoption_bootstrap.py: macOS's /sbin/sha256sum prints its usage and
+    exits 1), a scratch sha256sum runs `shasum -a 256` in its place, as that module's run_install_pin does. A failed
+    case's message carries the program's exit code, stdout and stderr.
+
+    accept.sh itself runs the server row's after_sign_in stage once, with a scratch HOME and the stub curl: until the
+    embedding-model row's model is in the store it prints skipped (step F9 runs that stage without any model row).
+    """
+
+    PINNED_LIBRARY = "ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d"
+    SWIFT_FILE = "1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786"
+    EMBEDDER_LAYER = "06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439"
+
+    @classmethod
+    def setUpClass(cls):
+        for tool in ("bash", "jq") if sha256sum_checks_like_gnu() else ("bash", "jq", "shasum"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the acceptance programs")
+        rows = {r["slot"]: r for r in load(PLAN / "install-plan.json")["owners"]}
+        cls.generation = rows["local-generation-model"]["acceptance"]
+        cls.embedding = rows["embedding-model"]["acceptance"]
+        cls.server = rows["local-model-server"]["acceptance"]
+
+    @staticmethod
+    def table(num_ctx, quantization):
+        """The two rows of `ollama show` that the checks read, padded as its table pads them."""
+        return (f"  Model\n    quantization        {quantization}     \n\n"
+                f"  Parameters\n    temperature          1        \n    num_ctx              {num_ctx}    \n\n")
+
+    @staticmethod
+    def store(scratch, model, tag, text):
+        path = scratch / "home/.ollama/models/manifests/registry.ollama.ai/library" / model / tag
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def run_program(self, program, scratch, show="", reply=""):
+        """The finished process of `program`, run as accept.sh runs it with the stubs first on PATH."""
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "show.txt").write_text(show, encoding="utf-8")
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        for name, canned in (("ollama", "show.txt"), ("curl", "reply.json")):
+            (stub / name).write_text(f'#!/bin/sh\ncat "$STUB_DIR/{canned}"\n', encoding="utf-8")
+            (stub / name).chmod(0o755)
+        if not sha256sum_checks_like_gnu():
+            (stub / "sha256sum").write_text('#!/bin/sh\nexec shasum -a 256 "$@"\n', encoding="utf-8")
+            (stub / "sha256sum").chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("OLLAMA_MODELS", "BASH_ENV", "ENV")}
+        env.update(HOME=str(scratch / "home"), tool_root=str(scratch / "tools"), STUB_DIR=str(stub),
+                   PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60)
+
+    @staticmethod
+    def outcome(name, result):
+        """A case's assertion message: its name, and the program's exit code, stdout and stderr."""
+        return f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+
+    def test_the_programs_are_the_ones_accept_sh_runs(self):
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        functions = checker.functions((PLAN / "accept.sh").read_text(encoding="utf-8"))
+        for slot, acceptance in (("local-generation-model", self.generation), ("embedding-model", self.embedding)):
+            self.assertEqual(checker.checks_of(functions[slot]),
+                             [(stage, slot, "smoke", acceptance[stage]["command"]) for stage in ("post_install", "service_health")])
+        self.assertIn(("after_sign_in", "local-model-server", "smoke", self.server["after_sign_in"]["command"]),
+                      checker.checks_of(functions["local-model-server"]))
+
+    def test_the_generation_files_check(self):
+        cases = {"the expected state": (None, 0), "another 64k Modelfile": ("modelfile", 1),
+                 "another model layer": ("layer", 1), "no created model": ("missing", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                models = scratch / "tools/ollama-models"
+                models.mkdir(parents=True)
+                for modelfile in ("swift-iq3s-s2o.Modelfile", "swift-iq3s-s2o-64k.Modelfile"):
+                    shutil.copy(PLAN / "models" / modelfile, models / modelfile)
+                if change == "modelfile":
+                    (models / "swift-iq3s-s2o-64k.Modelfile").write_text("FROM swift-iq3s-s2o\nPARAMETER num_ctx 65536\n")
+                if change != "missing":
+                    layer = "0" * 64 if change == "layer" else self.SWIFT_FILE
+                    self.store(scratch, "swift-iq3s-s2o-64k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                result = self.run_program(self.generation["post_install"]["command"], scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_embedding_files_check(self):
+        program = self.embedding["post_install"]["command"]
+        self.assertEqual(program.count(self.PINNED_LIBRARY), 1)
+        library = '{"schemaVersion":2,"stand-in":true}'
+        program = program.replace(self.PINNED_LIBRARY, hashlib.sha256(library.encode()).hexdigest())
+        cases = {"the expected state": (None, 0), "another library manifest": ("library", 1),
+                 "another derived layer": ("layer", 1)}
+        for name, (change, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                self.store(scratch, "qwen3-embedding", "0.6b", library + ("\n" if change == "library" else ""))
+                layer = "1" * 64 if change == "layer" else self.EMBEDDER_LAYER
+                self.store(scratch, "qwen3-embedding-8k", "latest", json.dumps({"layers": [{"digest": "sha256:" + layer}]}))
+                result = self.run_program(program, scratch)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_service_checks(self):
+        answer = json.dumps({"model": "swift-iq3s-s2o-64k", "response": "ready", "done": True})
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        generation, embedding = self.generation["service_health"]["command"], self.embedding["service_health"]["command"]
+        cases = {
+            "generation: the expected state": (generation, self.table(64000, "IQ3_S"), answer, 0),
+            "generation: another context": (generation, self.table(65536, "IQ3_S"), answer, 1),
+            "generation: another quantization": (generation, self.table(64000, "Q4_K_M"), answer, 1),
+            "generation: an empty answer": (generation, self.table(64000, "IQ3_S"), json.dumps({"response": "", "done": True}), 1),
+            "embedding: the expected state": (embedding, self.table(8192, "Q8_0"), vector, 0),
+            "embedding: the server-wide context": (embedding, self.table(64000, "Q8_0"), vector, 1),
+            "embedding: 512 dimensions": (embedding, self.table(8192, "Q8_0"), json.dumps({"embeddings": [[0.01] * 512]}), 1),
+        }
+        for name, (program, show, reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                result = self.run_program(program, scratch, show, reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def test_the_server_smoke_check(self):
+        """The server row's after_sign_in check embeds with the settled embedder and runs or pulls no other model."""
+        program = self.server["after_sign_in"]["command"]
+        self.assertEqual(re.findall(r'"model":"([^"]*)"', program), ["qwen3-embedding-8k"])
+        for absent in ("ollama run", "ollama pull", "embeddinggemma"):
+            self.assertNotIn(absent, program)
+        cases = {
+            "one vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]}), 0),
+            "no vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), 1),
+            # the answer handleScheduleError gives a missing model (server/routes.go:3226-3227 at v0.35.0)
+            "an error answer": (json.dumps({"error": 'model "qwen3-embedding-8k" not found, try pulling it first'}), 1),
+        }
+        for name, (reply, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                result = self.run_program(program, scratch, reply=reply)
+                self.assertEqual(result.returncode == 0, want == 0, self.outcome(name, result))
+
+    def run_accept(self, scratch, reply):
+        """The finished `accept.sh --only local-model-server --stage after_sign_in`, with a scratch HOME and the stub curl."""
+        stub = scratch / "bin"
+        stub.mkdir(exist_ok=True)
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "curl").write_text('#!/bin/sh\ncat "$STUB_DIR/reply.json"\n', encoding="utf-8")
+        (stub / "curl").chmod(0o755)
+        dropped = ("OLLAMA_MODELS", "BASH_ENV", "ENV", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "MISE_SHIMS_DIR", "MISE_DATA_DIR")
+        env = {key: value for key, value in os.environ.items() if key not in dropped}
+        env.update(HOME=str(scratch / "home"), STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        return subprocess.run(["bash", str(PLAN / "accept.sh"), "--only", "local-model-server", "--stage", "after_sign_in"],
+                              env=env, capture_output=True, text=True, timeout=60)
+
+    def test_the_server_smoke_check_waits_for_the_embedding_row(self):
+        """Until the embedding-model row has created qwen3-embedding-8k, accept.sh prints skipped for the stage, not a failure.
+
+        Step F9 runs the server row's after_sign_in check without installing a model row (each installs only when named).
+        Once the derived model's manifest is in the store that the embedding row's post_install check reads, the check runs.
+        """
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            self.skipTest("accept.sh refuses to run as root")
+        vector = json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]})
+        cases = {
+            "no embedder in the store": (False, vector, "skipped", 0),
+            "the embedder, one vector": (True, vector, "0", 0),
+            "the embedder, no vector": (True, json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), "1", 1),
+        }
+        for name, (created, reply, printed, status) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                scratch = Path(scratch)
+                (scratch / "home").mkdir()
+                if created:
+                    self.store(scratch, "qwen3-embedding-8k", "latest",
+                               json.dumps({"layers": [{"digest": "sha256:" + self.EMBEDDER_LAYER}]}))
+                result = self.run_accept(scratch, reply)
+                self.assertEqual((result.stdout, result.returncode),
+                                 (f"local-model-server | after_sign_in | {printed}\n", status), self.outcome(name, result))
+                if not created:
+                    self.assertIn("install the embedding-model row first", result.stderr, self.outcome(name, result))
+
+
+class ModelServerGuard(unittest.TestCase):
+    """install.sh's guard before either local-model row downloads, pulls or creates anything, run against stand-ins.
+
+    Both rows install what was measured on Ollama 0.35.0, so model_server_answers requires that the server answers
+    `ollama ls` and that GET /api/version reports 0.35.0 (docs/api.md:1821-1843 and server/routes.go:2023 at v0.35.0).
+    The function, read from install.sh as check_plan.py reads it, runs under bash -euo pipefail with stub ollama and curl
+    programs first on PATH. The fixtures are our own: no model server answers.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        for tool in ("bash", "jq"):
+            if shutil.which(tool) is None:
+                raise unittest.SkipTest(f"{tool} is needed to run the guard")
+        checker = load_source(PLAN / "check_plan.py", "check_plan")
+        install = checker.functions((PLAN / "install.sh").read_text(encoding="utf-8"))
+        cls.guard = install["model_server_answers"]
+        cls.rows = {slot: install[slot] for slot in ("local-generation-model", "embedding-model")}
+
+    def run_guard(self, scratch, listed, reply, curl_exit=0):
+        """The finished guard, with a stub `ollama` whose `ls` succeeds when `listed` and a stub `curl` that prints `reply`."""
+        stub = scratch / "bin"
+        stub.mkdir()
+        (stub / "reply.json").write_text(reply, encoding="utf-8")
+        (stub / "ollama").write_text(f"#!/bin/sh\nexit {0 if listed else 1}\n", encoding="utf-8")
+        (stub / "curl").write_text(f'#!/bin/sh\n[ {curl_exit} -eq 0 ] || exit {curl_exit}\ncat "$STUB_DIR/reply.json"\n',
+                                   encoding="utf-8")
+        for name in ("ollama", "curl"):
+            (stub / name).chmod(0o755)
+        env = {key: value for key, value in os.environ.items() if key not in ("BASH_ENV", "ENV")}
+        env.update(STUB_DIR=str(stub), PATH=f"{stub}{os.pathsep}{os.environ.get('PATH', '')}")
+        program = f"model_server_answers() {{\n{self.guard}\n}}\nmodel_server_answers"
+        return subprocess.run(["bash", "-euo", "pipefail", "-c", program], env=env, capture_output=True, text=True,
+                              timeout=60)
+
+    def test_both_rows_run_the_guard_before_any_command(self):
+        for slot, body in self.rows.items():
+            lines = [line.strip() for line in body.splitlines() if line.strip() and not line.strip().startswith("#")]
+            with self.subTest(slot=slot):
+                self.assertEqual(lines[:2], ['refresh_path || return "$?"', 'model_server_answers || return "$?"'])
+
+    def test_the_server_must_answer_and_report_the_measured_version(self):
+        cases = {
+            "0.35.0": (True, json.dumps({"version": "0.35.0"}), 0, 0),
+            "another version": (True, json.dumps({"version": "0.36.0"}), 0, 1),
+            "an answer without a version": (True, json.dumps({"error": "not found"}), 0, 1),
+            "the version request fails": (True, "", 7, 1),
+            "no server answers": (False, json.dumps({"version": "0.35.0"}), 0, 1),
+        }
+        for name, (listed, reply, curl_exit, want) in cases.items():
+            with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
+                result = self.run_guard(Path(scratch), listed, reply, curl_exit)
+                message = f"{name}: exit {result.returncode}\nstdout: {result.stdout!r}\nstderr: {result.stderr!r}"
+                self.assertEqual(result.returncode, want, message)
+                if name == "another version":
+                    self.assertIn("reports version 0.36.0, not 0.35.0", result.stderr, message)
 
 
 if __name__ == "__main__":

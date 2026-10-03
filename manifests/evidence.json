@@ -3987,6 +3987,52 @@
         "B3 repairs have local regression/configuration acceptance only: no live model tasks, keyed gateway shell trial, standalone search endpoint trial or native Claude connect fault injection. The native SDK retains its own shielded cleanup/transport bounds; wrapper grace does not override them."
       ],
       "path": "evidence/receipts/omniroute-sdk-worker-0160-20261003.json"
+    },
+    {
+      "id": "new-wsl-local-generation-model-20261002",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02, the preregistered comparison for the new WSL's local generation model gave the slot to S2o: Swift-1.5-Qwen3.8-27B IQ3_S (ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF at revision d74895bbe5db4bec1e0024e7cc87d59c02d7631a, file sha256 1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786, 11,771,546,912 bytes) on Ollama 0.35.0 as swift-iq3s-s2o-64k (context 64,000). On the same 100 BFCL simple_python cases (inspect-evals 0.23.0 on Inspect AI 0.3.273) through the server's chat and responses surfaces, its first-pass valid tool calls were 200 of 200 against 175 of 200 for the control gpt-oss:20b: difference 0.125, 95% paired bootstrap interval over cases 0.065 to 0.19 (10,000 resamples, seed 20260927), not a tie. Both arms were entirely on the GPU with the embedder resident in the order of use, and both passed 10 of 10 client tasks (Codex 0.160.0 and Claude Code 2.1.287). Bonsai PTQ1_0, Bonsai PQ2_0 and Swift on PrismML's llama.cpp server failed the function gate (0 of 3 runs each: the server skips the Codex client's namespace tool type), and qwen3.8:27b was not entirely on the GPU at 64,000 tokens.",
+      "limitations": [
+        "One workstation, one throwaway distribution, one run per case and arm: a local integration check of the systems named, not an acceptance on the destination distribution.",
+        "First-pass tool-call validity on 100 simple public cases (BFCL simple_python) through two interfaces; nothing about coding quality, long tasks, throughput under concurrent requests or behaviour above 64,000 tokens.",
+        "The Anthropic-style messages surface was not evaluated through the package (Inspect AI 0.3.273 cannot read this thinking model's answer); it was exercised only by Claude Code in the client tasks, which both arms passed.",
+        "S2o was slower in these runs: 292 and 303 seconds for 100 cases on chat and responses against 100 and 139 for the control, and 43.1 against 108.9 output tokens per second on single long prompts that were not run as a speed comparison.",
+        "S2o leaves less GPU memory free: 21,579 of 24,564 MiB in use with the embedder resident while Windows applications held about 2,600 MiB; earlier the same day they held up to about 5,900 MiB, at which the same load would leave under one GB. Co-residency on a busier desktop and on the destination distribution is not measured.",
+        "The Ollama import is this measurement's system, not a route the publisher documents: the library qwen3.8:27b model's renderer, parser, parameters, template and licence lines with the Swift file as FROM. The publisher's own route (llama.cpp's server, here PrismML's fork) failed the function gate for a reason that lies in that server. The quantization's card says its quality tests used a 512-token context.",
+        "The arm that took the slot was added by the preregistration's extension (amendment 3) after the owner asked for the newest releases; the deciding measurement as the critic named it had two arms (qwen3.8:27b and gpt-oss:20b), the earlier result for gpt-oss:20b is kept as a historical result, and gpt-oss:20b ran A2 as the control under the same rules.",
+        "Three deviations are recorded (a void first window, the Codex client's model name with its tag, a reused label); none changed a case, a limit, the metric or the rule, and none was decided on an outcome.",
+        "Recorded, not deciding: the package's own score (S2o 97 and 95 of 100, the control 83 and 83) and the client tasks (10 of 10 for each arm).",
+        "manifests/stack.json has no Ollama, Inspect AI or PrismML llama.cpp component, so component_ids name the two clients that ran the client tasks (Codex also ran the function gate); they ran at Codex 0.160.0 and Claude Code 2.1.287, not at the stack's recorded 0.159.3 and 2.1.284.",
+        "Raw model outputs (the Inspect logs, the client run records, the server logs) stay private and are listed by sha256 in files.json; the published per-case validity files carry case ids, verdicts, reasons and timings, and the decision statistic reproduces from them.",
+        "The Swift file's licence is the publisher's own (Swift Open License v1.0, with the original Qwen parts under Apache-2.0); the Modelfile's LICENSE block is the library model's Apache-2.0 text. Recorded, not judged."
+      ],
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json"
+    },
+    {
+      "id": "new-wsl-embedding-model-20261002",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "huggingface-hub-native"
+      ],
+      "claim": "On one workstation (WSL2, RTX 4090 with 24 GB) in a throwaway Ubuntu 26.04.1 distribution on 2026-10-02 and 2026-10-03, with the generation model swift-iq3s-s2o-64k resident, the preregistered comparison for the new WSL's embedding model gave the slot to E1: qwen3-embedding:0.6b (Q8_0, Ollama library manifest ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d) on Ollama 0.35.0 as qwen3-embedding-8k (num_ctx 8192). On MTEB 2.22.1's CQADupstackUnixRetrieval (test split: 47,382 documents, 1,072 queries) its nDCG@10 was 0.49827 against 0.41394 for EmbeddingGemma on the same server: E1 minus E2 0.084331, 95% paired bootstrap interval over queries 0.067738 to 0.100656 (10,000 resamples, seed 20260927). Nemotron-3-Embed-1B, which needs a second model server, scored 0.5014; E3 minus E1 was 0.003124 with an interval of -0.012194 to 0.018141 that includes zero, so by the second-server rule it does not take the slot. WeMM-Embedding-2B passed the fit gate but ran out of GPU memory in its full run and is out. The reranking condition was not run.",
+      "limitations": [
+        "One public retrieval task (CQADupstack Unix: English technical questions from a StackExchange forum), one workstation, one throwaway distribution, one run per arm: a local integration check, not an acceptance on the destination distribution.",
+        "Nemotron's tie holds for this task only; multilingual retrieval, longer documents and other domains were not measured.",
+        "The two Ollama arms are GGUF conversions served by the one model server; a difference from the reference weights is a difference of the systems, not of the models alone.",
+        "E1's and E2's prompts are MTEB's reference prompts as observed with a stub before the runs (amendment 4a): E1 sends the Qwen3 instruction before queries and nothing before documents; E2 sends EmbeddingGemma's query and document prompts.",
+        "Gate F reads the model server's listing: in window pb2 the card's memory in use fell between steps while the server kept listing the generation model entirely on the GPU, consistent with the Windows driver moving part of it off the card, so E3 passing gate F does not show co-residency. In window pb1 the readings matched the resident models, so E1's co-residency with the generation model is supported by both readings.",
+        "E4's first error text was lost: after its evaluation failed out of memory, the script's memory query raised the same sticky CUDA error and the outer handler replaced the text; the outcome is not in doubt, because only the evaluation's handler sets out_of_memory.",
+        "The reranking condition was not run: no installed retrieval owner can call an external reranker (QMD reranks in-process with its bundled model), and zerank-2 (7.49 GiB of weights) cannot be resident beside the generation model on this card.",
+        "Recorded, not deciding: evaluation time E1 1,166 s, E2 771 s, E3 460 s (E3 in-process, not comparable with the Ollama arms); resident sizes E1 2,857,191,341 bytes and E2 681,417,113 bytes.",
+        "manifests/stack.json has no Ollama or MTEB component; component_ids name huggingface-hub-native, the native route for the revision-pinned snapshots of E3 and E4, which the measurement downloaded through the huggingface_hub library at MTEB's registered revisions (its version is in the throwaway's freeze list, which was not retained).",
+        "The 31 MB prediction files and the run records stay private and are listed by sha256 in files.json; the published per-query nDCG@10 files reproduce the decision statistic.",
+        "With a server-wide context of 64,000 the embedder loaded at its full context and took 5.78 GB (Part A, A1b); the measured system sets the context per model (qwen3-embedding-8k, 8,192 tokens), never server-wide."
+      ],
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json"
     }
   ],
   "files": [
@@ -4142,8 +4188,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "302e34fabafa24ef8f74bb86fd81fe7ead71bd9767bc33710bf06d1a73b6de4d",
-      "bytes": 3638
+      "sha256": "082958cae2045166c365574748138cc61095259e8a19e4237472e38c177887fc",
+      "bytes": 4033
     },
     {
       "path": ".gitleaks.toml",
@@ -15888,8 +15934,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "3ee7222b98f49910914b38bc5d4584082531095acc10cccaa9fda13394ebe234",
-      "bytes": 67930
+      "sha256": "0e21305ef8e6c1388a004a143d6a441085da11f711519c49b9a89fad383ea425",
+      "bytes": 67948
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -16193,13 +16239,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "50afce7f63517dd039c2741b066a12f975f4f25433578e4aa55cd6774a5b24e6",
-      "bytes": 559294
+      "sha256": "c54dd6ff904dcd699798e87a4c374d47f6b83f2df93f24c3e60a73dfe54ee226",
+      "bytes": 560927
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e222586231768f4ab501fcfb94dc7b0f29875f07972be93d902507e3de0ac3de",
-      "bytes": 323228
+      "sha256": "c28e1c488cdc3e9e401ca65de69f61cbf15e22786404fac840a50fc823c96be3",
+      "bytes": 323968
     },
     {
       "path": "docs/next-host-stages.md",
@@ -36628,8 +36674,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/assemble_manifest.py",
-      "sha256": "98112dcb076fabb1ebd0404dee423213dfb292dc7e3174883f2e85398e3038b8",
-      "bytes": 40605
+      "sha256": "aab1e5f2b1c2f407eaeb1f5d0322ca14ed6c301ebaffb0e3fbe6a9a38878530c",
+      "bytes": 42497
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/build_decide_packets.py",
@@ -36643,8 +36689,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/controls.py",
-      "sha256": "44af38c681bc14979beb08441dd17fff6f4b81c816f85c010e91923acaa4140c",
-      "bytes": 19321
+      "sha256": "5e0dd7d66221b52ec4dcd554b9cc4486a17b85f896c39d41dc908ded8e86ebba",
+      "bytes": 19778
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/convergence.json",
@@ -36673,8 +36719,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "7757707179b44461f684f3da341ca15bec8edad5be0ea24c2cc27dac42d64a31",
-      "bytes": 145842
+      "sha256": "ee6aa8f87396528de2157270bb50d523524879c4e86196b535784f259eccea28",
+      "bytes": 147539
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -36753,8 +36799,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/render_tables.py",
-      "sha256": "a5d9cabe55f67b48e2037916c44d88f24e5e28e62fce44a02a781efee5a3ab2a",
-      "bytes": 8127
+      "sha256": "21d18f4324ac288cafb1b4b572f72629cc2a104d7da667925a351e643cf4abce",
+      "bytes": 8259
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/save_claude_returns.py",
@@ -36763,8 +36809,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/settlements.json",
-      "sha256": "2a72227dd9f6c814b91d9c1cbe924473fa7de28694aef7383436d289b493bb24",
-      "bytes": 3650
+      "sha256": "90bd7a66b95740ad0bb26e4431abde0e4376107b3272d69b37ceee2d2808daa3",
+      "bytes": 15186
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/trading/assemble_trading_definitive.py",
@@ -37393,7 +37439,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "94b49689bf89af36248864d8297fb377dd7255f8f436f01798f8ba8f3c091815",
+      "sha256": "df9003c68fe4c0768b399142a9504cbd8fe848d7618895ca3d6be6349ba98259",
       "bytes": 4174
     },
     {
@@ -37403,28 +37449,28 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "6ad4802a9e720e9c5cd0ec5a828d7bda79c05a8a642fa54d70a64ef18244f87d",
-      "bytes": 20343
+      "sha256": "4cf1450ec736f6e2680937a04fc9c74a268cfacc13e4c88556bce34224efd447",
+      "bytes": 29322
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "cb2a6cd6efe68dc6cf0f1ca4ade522f7b2142811231f73a90a1b6b4572d3d13f",
-      "bytes": 67932
+      "sha256": "244ae3dd6f3107b767a88058ec800b7a34f7a5166c6a4d134ada7e725e6bf174",
+      "bytes": 77664
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
-      "sha256": "8b671e9b616f4cdc928df0bb6a2fcb22cc1e4c65d510669c7a7905a2d1890a75",
-      "bytes": 32597
+      "sha256": "c756dce76d01a8ebaa7b9227fe40c6278a1d684c35f694160f426083909e8ef3",
+      "bytes": 42187
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "f2e5e541f03ee0954c78fe840997a7143050c7d3d2b9310503c1e55077f7e47e",
-      "bytes": 40950
+      "sha256": "b580ceb3b1ba431c3195289182ff823af8c8e7a91501dd9814c731c347b097c4",
+      "bytes": 46549
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
-      "sha256": "6c6f94cd825e03be2659cd67587b26e864c5d64dbae664425b033aa76c1ef9c7",
-      "bytes": 18227
+      "sha256": "98884df306b8fec24e8cfb45d3c6a68f662723f4e22eb48cb03f63f6aecc2e7b",
+      "bytes": 19345
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/alertmanager.yaml",
@@ -37468,13 +37514,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "0dbb02859e028482587aa250417013cb4a32905e6748891853fff1dde08a732e",
-      "bytes": 149766
+      "sha256": "f37bd801d1bdefa77ade9eddb4c717647eedb0f352f9e1671615e83c3cd025ae",
+      "bytes": 159348
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "aa312bf66dda97de781b87c3b1e868829aed4f5433b761fe5aa2711cd2e12bdf",
-      "bytes": 56800
+      "sha256": "4f14fd789389a78a7445e9df6f99b30a8c33f9bea452ab3e0ee5101cea22d2e8",
+      "bytes": 62057
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -37482,9 +37528,24 @@
       "bytes": 946
     },
     {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/qwen3-embedding-8k.Modelfile",
+      "sha256": "a1e149022bb8bb7030eda3350d0e768ae92e2a0c8581408dbb2746aaa6f7fe06",
+      "bytes": 49
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/swift-iq3s-s2o-64k.Modelfile",
+      "sha256": "6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e",
+      "bytes": 44
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/models/swift-iq3s-s2o.Modelfile",
+      "sha256": "f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e",
+      "bytes": 11733
+    },
+    {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "e8add4d66c6cd85ec0dadfc543714859aa7544c0de9e58d506b60ba54a4a8b41",
-      "bytes": 29049
+      "sha256": "2159ce758a7a66f8ef5479c438edd27f0b5ea8177ac39e5fdfe14f016890d823",
+      "bytes": 29314
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -37795,6 +37856,211 @@
       "path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workflow-persistence-qualification.json",
       "sha256": "f42db81b904dd51c0475d2d953e2a92b0720477cc29ef5eb5a67c8c3d685693a",
       "bytes": 8224
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/COPY-NOTES.md",
+      "sha256": "f5a2374225109849365970c69015d338c9d2dbcb5d596b87b71e5c7f04a82528",
+      "bytes": 5685
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.md",
+      "sha256": "454f879d03d61fa5a8e9f0d877e62cd94878abcd32f8f09b16ac9514492c3a0b",
+      "bytes": 66312
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/PREREGISTRATION-local-models.sha256",
+      "sha256": "7645e3a1bd9d94c478849ae20b07dc3f6b6f7a778ec0dfe74715b6123b71021a",
+      "bytes": 2988
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/README.md",
+      "sha256": "deeac61a846f9d82ea4caf1994de37dcca074a92466c129139a705c1f7ebffc2",
+      "bytes": 13179
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/files.json",
+      "sha256": "4e77359503133255d0dc30f44e6c577839bfa6124d1146f6ebb0ddff423f1893",
+      "bytes": 47669
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a-receipt.json",
+      "sha256": "55ac6ff05f4437dffb2623117c71fb8d6f786d71e63a44b46973b145b1d29577",
+      "bytes": 15496
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/bootstrap.txt",
+      "sha256": "3fe228c28e2ca7440989ad554507af6e212ef144f2136b64f48b3c56bc1f5c9f",
+      "bytes": 1122
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/c-chat/validity.jsonl",
+      "sha256": "4a63f0780064a195512e1ed9618ead16bf72a991cf43c7d3c4b57db27eb32684",
+      "bytes": 14652
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/c-responses/validity.jsonl",
+      "sha256": "37bc16cecb4e4e114b29b55ad7f7bba9a3f1ddd72810a601343c66232a2edf38",
+      "bytes": 14628
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/s2o-chat/validity.jsonl",
+      "sha256": "c6911453b2aecb18b96a698950189c92b0a5def47f9805fbe776deb8cdbc5bef",
+      "bytes": 13519
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-a/logs/s2o-responses/validity.jsonl",
+      "sha256": "0e86ee059055a712527018881ec3172542f4272117463ccc279969e7a6c0b50b",
+      "bytes": 13520
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b-receipt.json",
+      "sha256": "6f5dfbf83c5116e38b42d38ddd5fdbb1a27cf23b5ef7e8ac12d4071c9173a541",
+      "bytes": 11705
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/bootstrap.txt",
+      "sha256": "3715a13234ad46aa150dcebdfd1930c638998e73cd31c5319f473a5b09bf1302",
+      "bytes": 1628
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E1-pb1/per-query-summary.json",
+      "sha256": "a45df64ac83bd15a36060dc5d47b62280accc6f46bb51b86320c8437206f1747",
+      "bytes": 190
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E1-pb1/per-query.jsonl",
+      "sha256": "5229f9066eff87aa29d6213c70e997ae41cc0201e27049e75748f402c1bccbde",
+      "bytes": 97029
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E2-pb1/per-query-summary.json",
+      "sha256": "e1edc6e44dd8c18e203b426ca92754d4dfdb0f816ff3dd7ae691cbcd801b074b",
+      "bytes": 191
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E2-pb1/per-query.jsonl",
+      "sha256": "550981cc7c8e28968eaa2d4310c0f4fd2fde2468eaf8474af9d9c35baba645f5",
+      "bytes": 96387
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E3-pb2/per-query-summary.json",
+      "sha256": "124c1259f39668eb0968aae3e78366976314105da5b08042b6ae8f5348fa6760",
+      "bytes": 189
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/part-b/runs/E3-pb2/per-query.jsonl",
+      "sha256": "4a56af7a7454728da8fb6a3b98c4a3b1a43deef2961ca9c839036d4434261505",
+      "bytes": 96947
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/reconstruct_s2o_modelfile.py",
+      "sha256": "28430fbfee124eb2615aaa6aa55d2702764a32d279d4a8af44bcca6724abd47e",
+      "bytes": 7613
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_bootstrap.py",
+      "sha256": "d69c4df08cd47164a65e227ebe11dddba203911ae492c7eb1462fae0d20f369a",
+      "bytes": 2194
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_run_bfcl.sh",
+      "sha256": "25665689d61bf3c882a3790a1a4fa4adde60c718c15b36d6a4823ef74d719767",
+      "bytes": 2519
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_run_client.sh",
+      "sha256": "875530525864880c50e88596a53618fb64b21d3f5e64b4bd95068325b7830260",
+      "bytes": 3212
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_tasks.py",
+      "sha256": "49c5986d7c29414bd81af24ac8da4fff8b69098b9687849129c7075f0f49d05c",
+      "bytes": 4211
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/a2/a2_validity.py",
+      "sha256": "d67bffa8a13ac0cdc185c1ee8ae85ec1807dd2de2a9960171aa1c2b772249e7e",
+      "bytes": 3968
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_arms.py",
+      "sha256": "f4ac3a7ef4d004955c1da0958347d2916f5b42d531deae96ba2ff2754edcff04",
+      "bytes": 5940
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_bootstrap.py",
+      "sha256": "3b02d65098646d2aa38cfd39a2fc2a48d31c0858fd2727d282e61b9e683cc5a4",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_fit.py",
+      "sha256": "2870ee1e17b03d6d65b142774746923c4504909bc86a33eb2173ee71bf42d965",
+      "bytes": 3384
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_perquery.py",
+      "sha256": "088b62f60c0bc7283d8218a38d7b4641a1ee96a809077dafe70a1f9522b56b91",
+      "bytes": 2682
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/partb_run.py",
+      "sha256": "e381a73d941b851ec7fcecc2ef092ff19c9714b7e7c08f3f82ea4eeb16dd4a00",
+      "bytes": 4409
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/selftest_perquery.py",
+      "sha256": "ebe43ecb97cd066b7d1d5a008668a940c597b8cc0cc3321d3acf349b7ab324f4",
+      "bytes": 2250
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/partb/selftest_prompts.py",
+      "sha256": "23a0499cba72e25d66baa055c2ef469d38621f7227f6185658b492af42177a37",
+      "bytes": 1626
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M10-g0-setup.sh",
+      "sha256": "f03fa1b7b6e55373a89e7f34a47a8d8aba3bf60895e23bfcf1b87baeaf7e2e15",
+      "bytes": 7237
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M11-g0-run.sh",
+      "sha256": "f3fccd292c0d6aa89091e96515ce1593e528249da4bacc798a18b0ae8e3cf74e",
+      "bytes": 2762
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M11p-precheck.sh",
+      "sha256": "acf640a231549cc5f2dc399fafa6717bd628f16e7c14006ddec9e04e47ed0e6a",
+      "bytes": 996
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M14-a1-ext.py",
+      "sha256": "53b503f28bb3931e41d6c49dce9d482a0be88122fee6caae8bfd0af5589bd76f",
+      "bytes": 5450
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M18-bootstrap.sh",
+      "sha256": "b9045b97a0446d6ec2f02a7c736a8a7f32c4ee25a7d3109e048f09522ad8a43a",
+      "bytes": 1326
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M23-partb-bootstrap.sh",
+      "sha256": "88d836d9b81efaaf179b5f04b7cbd78592db4b7dd9d50c223ac7a60b3adb934d",
+      "bytes": 1106
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M6-a1.py",
+      "sha256": "17f33963219d83515b05f48d98a61772ef949ba222ca87ff7167566510bdb3ba",
+      "bytes": 4727
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/M6-a1b.py",
+      "sha256": "26957d3d7fa7b6b4c9460c159a2d1cc390e0a634973246214166aed3c89b9489",
+      "bytes": 4632
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-local-models-20261002/scripts/steps/W-partb-window.sh",
+      "sha256": "7f0e285d79c8bcaf812db7eb06e3f5ac05067e7038c9ffe53d38a5ffb8fd0fa2",
+      "bytes": 5783
     },
     {
       "path": "evidence/artifacts/new-wsl-profile-20261001/astramax-takeover-baseline.json",
@@ -50553,8 +50819,8 @@
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
-      "sha256": "e9b700a3fffacd97ffb3ec43d7913961bf2b15932f6acb2e515573afc2f48908",
-      "bytes": 106866
+      "sha256": "cfacc3c449b2b0f2f19ac22bac576a1e157797b215b97182991a23467e1377b3",
+      "bytes": 126116
     },
     {
       "path": "tests/test_new_wsl_handbook.py",

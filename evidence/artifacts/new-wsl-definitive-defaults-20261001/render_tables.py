@@ -32,11 +32,12 @@ def basis(row, combined):
         total = combined[row["layer_id"]]["gpt_samples_present"]
         votes = "2" if total == 2 else "at least 2"
         return f"both families: the Claude record and {votes} of {total} blind GPT samples"
+    # A returned measurement states its settlement, also on a row the rounds split (the resolution keeps the split).
+    if row["measurement"] and row["measurement"]["returned"]:
+        return row["label"].split(":")[0]
     if outcome == "split":
         return f"{resolution['by']} disagree; measurement {resolution['measurement_id']} decides"
     if row["measurement"]:
-        if row["measurement"]["returned"]:
-            return row["label"].split(":")[0]
         if row["slot_id"] == "memory-owner":
             return "waiting for the memory head-to-head, at the user's request"
         return "waiting for the code-search measurement and its symmetric decision rule"

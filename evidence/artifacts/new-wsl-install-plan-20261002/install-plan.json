@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
-  "revised_at_utc": "2026-10-03T16:28:00Z",
+  "revised_at_utc": "2026-10-03T18:26:54Z",
   "base": "Ubuntu 26.04.1 WSL 2",
-  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination.",
+  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination.",
   "owners": [
     {
       "layer": "native-clients",
@@ -839,26 +839,50 @@
     {
       "layer": "semantic-rag",
       "slot": "embedding-model",
-      "owner": "Not installed until the deciding measurement returns",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "Qwen3-Embedding-0.6B through Ollama (qwen3-embedding:0.6b, Q8_0, as qwen3-embedding-8k, context 8,192)",
+      "repository": "https://github.com/QwenLM/Qwen3-Embedding",
+      "release": "qwen3-embedding:0.6b, library manifest sha256 ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "OLLAMA_HOST=127.0.0.1:21434 ollama pull qwen3-embedding:0.6b",
+        "curl -fsS http://127.0.0.1:21434/api/tags | jq -e '.models[] | select(.name == \"qwen3-embedding:0.6b\") | .digest == \"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d\"' >/dev/null",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create qwen3-embedding-8k -f \"$plan_dir/models/qwen3-embedding-8k.Modelfile\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": false,
+        "gpu": true,
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L85",
+        "line": 85
+      },
       "service": null,
-      "acceptance": {},
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding/0.6b\" | sha256sum --check --status && grep -F sha256:06507c7b42688469c4e7298b0a1e16deff06caf291cf0a5b278c308249c3e439 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/qwen3-embedding-8k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/manifest/paths.go#L29",
+            "line": 29
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show qwen3-embedding-8k)\" && grep -E '^ +num_ctx +8192 *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Why is the sky blue?\"}' | jq -e '(.embeddings | length) == 1 and (.embeddings[0] | length) == 1024' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
+          }
+        }
+      },
       "config_paths": [],
-      "notes": "one blind GPT order selected nothing and the other three models that each add a second server; the critic's choice was not among the judged candidates"
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 and 2026-10-03 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the Ollama library model qwen3-embedding:0.6b (Q8_0), pinned by its manifest digest (registry.ollama.ai served that digest on 2026-10-03), and a derived model qwen3-embedding-8k that carries num_ctx 8192 as its own parameter (models/qwen3-embedding-8k.Modelfile, byte-identical to the measured one). No server-wide context is set: with OLLAMA_CONTEXT_LENGTH=64000 the embedder took 5.78 GB. ollama pull checks every layer it downloads against the manifest's digest (server/images.go:1082); the second command stops the row unless the server reports the pinned manifest digest (server/model_list.go:64). The model is created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only embedding-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the pull. The post-install check reads files only (the library manifest's sha256 and the derived model's model layer, in the server's store under ${OLLAMA_MODELS:-$HOME/.ollama/models}, envconfig/config.go:112). The service check shows num_ctx 8192 and makes one embedding call of 1,024 dimensions (the model card, Qwen/Qwen3-Embedding-0.6B at 97b0c614 README.md:36). The derived model's digest that the measurement recorded (e3c32ffa36019b43b729c6da039b463bd28890b14135e76013bb0c1255766d83) is for comparison, not a check. No reranker is installed (reranker-model). Not run on any distribution as a plan row."
     },
     {
       "layer": "semantic-rag",
@@ -1548,18 +1572,18 @@
           }
         },
         "after_sign_in": {
-          "command": "OLLAMA_HOST=127.0.0.1:21434 ollama run embeddinggemma \"Hello world\"",
+          "command": "curl -fsS http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '(.embeddings | length) == 1' >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/v0.35.0/docs/cli.mdx#L73",
-            "line": 73
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659",
+            "line": 1659
           }
         }
       },
       "config_paths": [
         "$config_root/ollama.env.example"
       ],
-      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Smoke downloads/runs upstream example model; GPU inference remains unrun. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The original model smoke is retained after a model route is provisioned; its inference behavior remains unverified.",
+      "notes": "Planned. First Linux installer installs under /usr and needs privileges; prefer registered user-level mise route. Upstream unit is system-wide (docs/linux.mdx:57-89), so do not invent user unit. Foreground start: OLLAMA_HOST=127.0.0.1:21434 ollama serve. Not automatically started. Version mode exits without starting the daemon, warning when it is absent. List checks the running local server. The after_sign_in smoke is one /api/embed call to qwen3-embedding-8k, the settled embedder, once the embedding-model row has created it (until that model's manifest is in the store, accept.sh prints skipped for this stage, which is not a pass); the endpoint answers 404 for a missing model, through GetModel's not-found error, and its handler pulls nothing (server/routes.go:981-984 and 3226-3227 at cc4069396f). It replaced upstream's example `ollama run embeddinggemma` on 2026-10-03, which would pull EmbeddingGemma, a model no row selected. GPU inference on the destination remains unrun.",
       "mise_tool": "ollama"
     },
     {
@@ -1650,26 +1674,51 @@
     {
       "layer": "observation-inference",
       "slot": "local-generation-model",
-      "owner": "Not installed until the deciding measurement returns",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "Swift-1.5-Qwen3.8-27B IQ3_S through Ollama (swift-iq3s-s2o-64k, context 64,000)",
+      "repository": "https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF",
+      "release": "d74895bbe5db4bec1e0024e7cc87d59c02d7631a",
+      "installed": true,
+      "route": "model-server",
+      "commands": [
+        "fetch_verified 'https://huggingface.co/ukisai/Swift-1.5-Qwen3.8-27B-GSQ-RCO-GGUF/resolve/d74895bbe5db4bec1e0024e7cc87d59c02d7631a/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf' '1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786' \"$tool_root/ollama-models/Swift-1.5-Qwen3.8-27B-GSQ-RCO-IQ3_S.gguf\"",
+        "install -m 0644 -t \"$tool_root/ollama-models\" \"$plan_dir/models/swift-iq3s-s2o.Modelfile\" \"$plan_dir/models/swift-iq3s-s2o-64k.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o -f \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\"",
+        "OLLAMA_HOST=127.0.0.1:21434 ollama create swift-iq3s-s2o-64k -f \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
-        "gpu": false,
+        "gpu": true,
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/modelfile.mdx#L120",
+        "line": 120
+      },
       "service": null,
-      "acceptance": {},
+      "acceptance": {
+        "post_install": {
+          "command": "printf '%s  %s\\n' f6522bf4934aaa4f60231a042a8dfb781a7f5b3b1abc5053757f37169772ea9e \"$tool_root/ollama-models/swift-iq3s-s2o.Modelfile\" 6d15fee40e089b73961262647352c3443a03fa643122a92ca7a0b59376793d8e \"$tool_root/ollama-models/swift-iq3s-s2o-64k.Modelfile\" | sha256sum --check --status && grep -F sha256:1333c6ea70ef348d4ac6d62732772e8ad6571ac5b3754c14ed54f1a0d904a786 \"${OLLAMA_MODELS:-$HOME/.ollama/models}/manifests/registry.ollama.ai/library/swift-iq3s-s2o-64k/latest\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/create.go#L905",
+            "line": 905
+          }
+        },
+        "service_health": {
+          "command": "out=\"$(OLLAMA_HOST=127.0.0.1:21434 ollama show swift-iq3s-s2o-64k)\" && grep -E '^ +num_ctx +64000 *$' <<<\"$out\" >/dev/null && grep -E '^ +quantization +IQ3_S *$' <<<\"$out\" >/dev/null && curl -fsS http://127.0.0.1:21434/api/generate -d '{\"model\":\"swift-iq3s-s2o-64k\",\"prompt\":\"Reply with the word ready.\",\"stream\":false,\"think\":false,\"options\":{\"num_predict\":32}}' | jq -e '.done == true and (.response | length > 0)' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L48",
+            "line": 48
+          }
+        }
+      },
       "config_paths": [],
-      "notes": "the two blind GPT orders and the Claude critic chose different models, and the fit of the critic's choice is inferred, not measured"
+      "notes": "Planned. Settled by the local-model measurement of 2026-10-02 (evidence/artifacts/new-wsl-local-models-20261002; docs/decisions/2026-10-03-new-wsl-local-models.md). The measured system: the IQ3_S file of the pinned Hugging Face revision (11,771,546,912 bytes; the publisher's repository is not gated), imported into Ollama 0.35.0 with the library qwen3.8:27b model's Modelfile lines (models/swift-iq3s-s2o.Modelfile: the measured file, sha256 8911245e..., with its FROM line, an absolute path in the throwaway distribution, written relative to the Modelfile as docs/modelfile.mdx:126 allows), and a derived model that carries the context of 64,000 as its own parameter (models/swift-iq3s-s2o-64k.Modelfile, byte-identical to the measured one). No server-wide context is set. fetch_verified and the placement of the two Modelfiles beside the file are plan glue; ollama create (cmd/cmd.go:2422) copies the file into the server's model store, written by the client when a loopback server shares its store and uploaded otherwise (cmd/cmd.go:385 and :523), and the server keeps it as the model layer under its own sha256 (server/create.go:905), so the row needs about 23.5 GB of disk while the downloaded file is kept. The models are created through the running model server, which the plan does not start: the default run skips this row, and bash install.sh --only local-generation-model installs it once the server answers on 127.0.0.1:21434 and reports version 0.35.0, the measured one, through GET /api/version (docs/api.md:1824); otherwise install.sh stops the row before the download. The post-install check reads files only: the placed Modelfiles are the repository's, and the created model's manifest names the pinned file as a layer. The service check shows num_ctx 64000 and quantization IQ3_S and runs one short generation with thinking off, which is not the measured effort (medium). The manifest digests that the measurement recorded (swift-iq3s-s2o eaedf746b10251265e653fae1052c98f3edc7b196f089f1508d8d0fa8820f68c, swift-iq3s-s2o-64k 8b39735c4f973d2192171c5b800a2bbb25cf053a59e5d7d2edcaa9830198cb11) are for comparison, not a check. One RTX 4090 serves the workstation's model services and this server: the measured co-residency (the generation model 14.81 GiB and the embedder 2.66 GiB, each entirely on the GPU) held with no other WSL process holding GPU memory, so which distribution's server holds the card is for the lifecycle design to decide; nothing here decides it. Not run on any distribution as a plan row."
     },
     {
       "layer": "observation-inference",

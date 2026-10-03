@@ -1,0 +1,10 @@
+{
+ "arm": "E1",
+ "queries": 1072,
+ "with_judgement": 1072,
+ "scored": 1072,
+ "mean_ndcg_at_10": 0.4982735928708161,
+ "mteb_ndcg_at_10": 0.49827,
+ "gate_c": true,
+ "missing_predictions": 0
+}
