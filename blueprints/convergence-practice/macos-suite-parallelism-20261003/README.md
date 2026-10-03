@@ -26,8 +26,15 @@ acceptance and not a GitHub-hosted run.
 | `controls/crash_control/test_crash.py` | Crash control: one test calls `os._exit(3)`. |
 | `controls/control_expectations.json` | What every arm must report for the controls. |
 | `test_compare.py` | Tests of the oracle against real control logs and mutated copies. |
+| `test_b1_failure_mode.py` | Regression test of the B1 wrapper's failure mode (fix round item 7), in temporary trees; the trial workflow does not run it. |
 | `make_fixtures.py` | Regenerates `fixtures/` from real local runs of the controls. |
 | `fixtures/` | Sanitized real control logs (`real/`), mutated copies (`mutated/`), `index.json`, `inventory-controls.txt`. |
+
+`experiment.json` freezes every file in this table by hash except the fixture
+logs. Those are frozen through `fixtures/index.json`, which is itself frozen
+and lists each log's sha256; `test_compare.py` requires every file under
+`fixtures/` other than `index.json` and `inventory-controls.txt` to be listed
+there with that hash, and no listed file to be missing.
 
 ## Arms
 
@@ -202,8 +209,14 @@ The S arm must be eligible too, or the OS gets no verdict. Then:
 4. If `id_mapping.ok` is false, every OS gets `no verdict`, whatever steps 1
    to 3 gave.
 
-The plan states this preference for P3F; applying it to L4F is this oracle's
-reading.
+The plan states this preference: "prefer P3F if within 10% of P3". The
+coordinator confirmed it on 2026-10-03, before any hosted run, for P3F over
+P3 and for L4F over L4.
+
+Every OS of the preregistration (`macos-15`, `ubuntu-24.04`) is listed in
+`result.json` `verdicts` and in the summary, with all its arms. An OS for
+which no run directory arrived (timed, control or crash) gets `no verdict`
+with the reason `no run directory`.
 
 ## Re-runs (preregistered)
 
@@ -267,27 +280,31 @@ python3 $D/compare.py --results results --inventory-base inventory-base.txt \
   --inventory-trial inventory-trial.txt --expected-sha "$PR_HEAD_SHA" \
   --out result.json --summary-md summary.md
 python3 -m unittest discover -s $D -p test_compare.py
+python3 -m unittest discover -s $D -p 'test_*.py'  # adds test_b1_failure_mode.py
 ```
 
 Pass `--expected-sha` with the PR head SHA. Without it the most common
 `checkout_sha` stands in, which is weaker than asserting the frozen corpus.
 `blueprints/` is not a package, so production CI never runs
-`test_compare.py`. The trial workflow runs `test_compare.py` and `ids.py` on
-ubuntu-24.04 only, with the image's `python3`. The inventory job runs
-`ids.py`, and the compare job runs `test_compare.py` before `compare.py`.
-`compare.py` never runs on macOS, and one Linux inventory serves both
-runners.
+`test_compare.py` or `test_b1_failure_mode.py`. The trial workflow runs
+`test_compare.py` and `ids.py` on ubuntu-24.04 only, with the image's
+`python3`. The inventory job runs `ids.py`, and the compare job runs
+`test_compare.py` before `compare.py`. `compare.py` never runs on macOS, and
+one Linux inventory serves both runners. `test_b1_failure_mode.py` runs
+locally only.
 
 Local integration evidence, not a hosted run: U2 tested this oracle on
 CPython 3.13.16 and 3.14.4, and the integrator on 3.13.16 and a uv-managed
 3.12.3 (the version of the ubuntu-24.04 image's `python3`). The fix round of
-2026-10-03 re-ran `test_compare.py` on 3.13.16 and 3.12.3.
+2026-10-03 re-ran `test_compare.py` on 3.13.16 and 3.12.3, and so did the
+second fix round, with `test_b1_failure_mode.py`.
 
 `compare.py` exits 0 when `result.json` was written (the outcome is inside it)
 and 2 for unusable inputs. `result.json` lists every run's eligibility and reasons,
 mismatches, count deltas against S and timing. It also lists the controls, the
 flaky ids, the per-arm median, minimum and maximum with both speed ratios, the
-id-mapping check and the verdict per OS.
+id-mapping check and the verdict for every preregistered OS (`no verdict`,
+reason `no run directory`, for an OS none of whose runs arrived).
 
 ## Fixtures
 
@@ -366,6 +383,21 @@ These are local integration evidence:
   depends on the active warning filter could differ, and the oracle would
   count that as a mismatch against S. Such a mismatch is triaged against this
   stated cause.
+- Three tests failed on macOS only in this repository's CI from 2026-09-25
+  to 2026-10-02, as timing, signal or node-suite failures:
+  `tests.test_secret_path_guard.K4GuardTests.test_k4_timing` (timing, 2 runs
+  on 2026-10-01), the `(signal='SIGQUIT')` subtest of
+  `tests.test_credential_run.ProcessTests.test_exit_code_and_signal_propagate`
+  (signal, 1 run on 2026-10-02) and
+  `tests.test_child_usage_suite.ChildUsageNodeSuite.test_node_suite_passes`
+  (node suite, 4 runs on 2026-09-30). The source is plan W2's measurement of
+  2026-10-03 (read-only REST reads, not re-measured here): 30 macOS-only
+  failures among 1,025 pull-request head SHAs, with the failing tests named
+  for 15 of them. All three ids are in the trial head's inventory. Nothing
+  excludes them in advance: the only exclusion is the flaky-id rule (records
+  that differ among the eligible S repeats), so a mismatch on one of them
+  still makes its run ineligible under the zero-tolerance rule, and it is
+  triaged against this history.
 - Receipts committed from the trial must not contain the runner's home
   directory paths, which appear in tracebacks on both OSes:
   `scripts/validate.py` rejects home paths, so sanitize logs before

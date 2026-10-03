@@ -47,8 +47,17 @@ Integrating the three units aligned the workflow with the oracle's run contract:
 ### Fix round before the first push (2026-10-03)
 
 A final verifier, an evidence reviewer and a security reviewer found the frozen oracle looser than the record. Each
-fix below landed before any push, with tests in `test_compare.py` that fail against the oracle at `b0b89d1d`. Then
-`experiment.json` was refrozen.
+fix below landed before any push, and committed tests cover all seven items. Each test fails against the behaviour of
+the previous head `b0b89d1d`, the integrated head before this round:
+
+- Items 1 to 6 are covered by `test_compare.py`. Run against `b0b89d1d`'s oracle, workflow and `make_fixtures.py`,
+  every test added for them fails.
+- Item 7 is covered by `test_b1_failure_mode.py` (second round, below). It builds a temporary copy of the wrapper
+  with a broken blueprint and never touches `tests/`. Against `b0b89d1d`'s wrapper, its six broken-blueprint subtests
+  fail: the named run aborts with a traceback and no `Ran` line, and the import itself raises. Against the base
+  wrapper it passes.
+
+Then `experiment.json` was refrozen.
 
 1. **Speed rule.** `compare.py` compared ratios rounded to four decimals, so true ratios up to 0.60005 and 0.75005
    passed. It now compares exact fractions of the recorded seconds, the 1.10 unpooled preference too, and rounds only
@@ -69,6 +78,37 @@ fix below landed before any push, with tests in `test_compare.py` that fail agai
 7. **B1 failure mode.** A blueprint that fails to load at import time no longer aborts a named run. The wrapper keeps
    the exception, leaves no partial module in `sys.modules` and raises it from `load_tests`. The loader turns it into
    one failing test, as at base, and a named multi-module run still prints its `Ran` line and runs the other modules.
+
+### Second round before the first push (2026-10-03)
+
+The coordinator's last review before the first push added these changes, each before any hosted run:
+
+1. **Every OS listed.** `result.json` and the summary list both runners with all their arms. A runner for which no run
+   directory arrived gets `no verdict` with the reason `no run directory`. A failed id mapping still gives every
+   runner `no verdict`, with or without runs. The exact-ratio, command, `git-status.txt`, `run_attempt` and id-mapping
+   rules are unchanged. New tests in `test_compare.py` fail against the oracle of the round before.
+2. **Freeze completeness.** `make_fixtures.py`, `fixtures/index.json` and `fixtures/inventory-controls.txt` join the
+   frozen evaluation inputs, because `test_compare.py` imports `make_fixtures.py` and reads the fixtures in the compare
+   job's self-test. The fixture logs are frozen through the per-file sha256 values in `index.json`, which a new test
+   in `test_compare.py` checks.
+3. **A committed test for item 7.** `test_b1_failure_mode.py` runs the wrapper in temporary trees. A healthy tree runs
+   the 29 blueprint tests with the result `OK`. A tree whose blueprint raises at import, in each of the three load
+   positions, gives one failing `_FailedTest`, a `Ran 2 tests` line, exit status 1 and a co-listed module that still
+   runs. The import also leaves no partly loaded blueprint in `sys.modules`. The suite under trial is unchanged; the
+   trial workflow does not run this file.
+4. **Known macOS-only failures named.** Three tests failed on macOS only in this repository's CI from 2026-09-25 to
+   2026-10-02, as timing, signal or node-suite failures:
+   - `tests.test_secret_path_guard.K4GuardTests.test_k4_timing`;
+   - the SIGQUIT subtest of `tests.test_credential_run.ProcessTests.test_exit_code_and_signal_propagate`;
+   - `tests.test_child_usage_suite.ChildUsageNodeSuite.test_node_suite_passes`.
+
+   The source is plan W2's measurement: 30 macOS-only failures among 1,025 pull-request head SHAs. The record now names
+   them. A mismatch on one of them still counts under the zero-tolerance rule and is triaged against that history. The
+   verdict logic is unchanged.
+5. **The unpooled preference confirmed.** The coordinator confirmed the plan's "prefer P3F if within 10% of P3", for
+   P3F over P3 and for L4F over L4.
+6. **Merge fallback.** After any change of the trial base, `ids.py` runs on the new base, and the six B1 classes must
+   still hold exactly 29 ids (handoff, below).
 
 ### What PR-A and PR-A2 change if the trial passes
 
@@ -126,7 +166,9 @@ The record holds the full text; in short:
   - Part 1 is `compare.py`'s rules. An arm-run is ineligible for any malformed input, a command other than the arm's
     exact one, a wrong SHA or interpreter, a log that is truncated or not self-consistent, a wrong header or worker
     count, an id set other than the trial inventory, any `(test id, outcome)` record that differs from S outside the
-    ids that flake among the S repeats, or a `run_attempt` other than 1 in `runtime.json`.
+    ids that flake among the S repeats, or a `run_attempt` other than 1 in `runtime.json`. The three tests that failed
+    on macOS only from 2026-09-25 to 2026-10-02 (second round, item 4) get no exemption: a mismatch on one of them
+    counts like any other and is triaged against that history.
   - Part 2 is a clean checkout after every run: each run directory's `git-status.txt` exists and is empty. The
     workflow's clean-checkout step repeats it as a second check.
   - The id mapping must hold: the single prefix `tests.test_native_maintenance.` on exactly the 29 base ids of the six
@@ -140,7 +182,8 @@ The record holds the full text; in short:
      passing controls.
   2. Adopt the fastest eligible arm by median only if its median is at most 0.60 times S's median and its maximum is at
      most 0.75 times S's fastest run, compared as exact ratios.
-  3. Prefer P3F over P3 (L4F over L4) if its median is within 10%, also compared exactly.
+  3. Prefer P3F over P3 (L4F over L4) if its median is within 10%, also compared exactly. This is the plan's "prefer
+     P3F if within 10% of P3", confirmed by the coordinator for both runners.
   4. Otherwise reject, with no fall-through to a slower arm, and keep the record as a failed attempt.
 
 ### Handoff for PR-T
@@ -154,7 +197,9 @@ The record holds the full text; in short:
 - GitHub runs no `pull_request` workflow on a pull request with a merge conflict. PR-T can conflict in
   `manifests/evidence.json`, and with open #615, which also edits `.github/osv-scanner-lockfiles.json`. If a merge is
   unavoidable, follow the hot-file protocol (`docs/lanes.md`), set `TRIAL_BASE_SHA` to the new merge base and refreeze
-  `experiment.json` in the same commit.
+  `experiment.json` in the same commit. After changing the base SHA, run `ids.py` on the new base and confirm that the
+  six B1 classes of `tests/test_native_maintenance.py` still hold exactly 29 ids. If they do not, update `B1_CLASSES`,
+  `B1_IDS` and their comment in `compare.py`, and `B1_SHAPE` in `test_compare.py`, in the same refreeze commit.
 - Before every push, run `python3 scripts/validate.py` and
   `python3 scripts/validate_convergence.py --all-recorded --root . --json`. The workflow, the locks, the controls, the
   oracle and the B1 fix are frozen inputs of the record.
@@ -228,6 +273,13 @@ Revisit this record when any of these happens:
       the same 29 records at module level (`-j 2`) and at class level, pooled and unpooled.
     - A scratch probe with a blueprint that raises at import: the fixed wrapper reports one failing `load_tests` test,
       prints `Ran 2 tests`, exits 1 and still runs the co-listed module, exactly as the base wrapper does.
+  - From the second round:
+    - `test_compare.py` (48 tests) and `test_b1_failure_mode.py` (4 tests): 52 tests OK on CPython 3.13.16, on the
+      uv-managed bare 3.12.3 and on the host's 3.14.4.
+    - The new `test_compare.py` run against the round-before oracle (`aab78b12`) fails exactly the every-OS tests and
+      the CLI test's printed output. Against `b0b89d1d`'s oracle, workflow and `make_fixtures.py` it fails every test
+      the first fix round added.
+    - `test_b1_failure_mode.py` fails six subtests against `b0b89d1d`'s wrapper and passes against the base wrapper.
 - **No GitHub-hosted run** exists for this record. The hosted runs will be `native_cli_execution` evidence on
   GitHub-hosted runners.
 
