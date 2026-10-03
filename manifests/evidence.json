@@ -15711,8 +15711,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-ecosystem-roadmap.md",
-      "sha256": "955c3b2e8c20c874043b35c3f9b0e488777aa6e2acc84bf2ac293016580db3dc",
-      "bytes": 34009
+      "sha256": "0c262a772632c090bee7a257d2227c224b2cdf8b55fe52fca4e8a203000eeb90",
+      "bytes": 34588
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-sweep-gpt6-route-settlement.md",
-      "sha256": "30746c52d50959bb1920ad1c3e8d3617422891c3563601bf515578682e038723",
-      "bytes": 32111
+      "sha256": "0b643c9cb062e534a0aa7cd6d8205d98cb9b87f95565f0b6ba1857fc2672edcf",
+      "bytes": 34261
     },
     {
       "path": "docs/direct-results.md",
