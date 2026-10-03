@@ -25,7 +25,7 @@
     }
   ],
   "failed_lookup": {
-    "cmd": "rtk gh api repos/apoth/native-agent-stack --jq '.full_name'",
+    "cmd": "rtk gh api repos/<user>/native-agent-stack --jq '.full_name'",
     "exit": 1,
     "output": "gh: Not Found (HTTP 404)",
     "correction_cmd": "rtk gh repo view --json nameWithOwner --jq .nameWithOwner",

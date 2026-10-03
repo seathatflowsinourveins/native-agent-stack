@@ -276,14 +276,15 @@ this dated result universally current.
 The checks below were repeated during the custody build against main
 `9b0b8d6d25f9e3fb8f71770500e774170423315e` and live read-only GitHub metadata.
 They update the dated interpretation of the text above; the examples, original
-observations and failed drafts remain unchanged. This evidence handoff supports
-native research workers for the north star without advancing a broker or host gate.
+observations and failed drafts remain unchanged, and the last bullet records one
+redacted command string. This evidence handoff supports native research workers
+for the north star without advancing a broker or host gate.
 
 - **Timing guard.** [#556](https://github.com/seathatflowsinourveins/native-agent-stack/pull/556)
   merged at 2026-09-30T19:53:05Z (`7d7dcd08b6bfbb534a272b65e1f36e693f9674fa`).
-  [#600](https://github.com/seathatflowsinourveins/native-agent-stack/pull/600)
-  subsequently repaired the K4 timing guard and merged as
-  `6080214e0718e074698babedb2fb10cb2941a0db` at 2026-10-02T04:33:26Z.
+  In `examples/claude-native/workflows/test-child-usage.mjs`, where the macOS
+  `FAIL linear` case above failed, it replaced the child-usage linearity
+  checks' per-doubling ratio with a growth exponent from 16,000 to 64,000.
   The timing-ownership and proposed rebase lines above are historical; this
   refresh uses the coordinator's merge of current main, preserving the original history.
 - **Dependency and reviewed PRs.**
@@ -309,9 +310,8 @@ native research workers for the north star without advancing a broker or host ga
   `85543efe5abcddb7b7cddb14e8774e83b6758616` at 2026-10-01T21:18:12Z.
   Main's stack pin is 0.159.3. The 0.160.0 pin
   [#626](https://github.com/seathatflowsinourveins/native-agent-stack/pull/626)
-  was OPEN and unmerged at build time, head
-  `75a2ada1eb4db08568b75c5457d2a0b61a949bbb`. Its state must be read again
-  immediately before the coordinator lands this PR.
+  was OPEN and unmerged at head `75a2ada1eb4db08568b75c5457d2a0b61a949bbb`
+  when read at 2026-10-03T13:06:45Z.
 - **Scope of the native controls.** The interrupt, fresh-process same-thread
   recovery and actual approval-decline observations remain qualified only at
   Codex CLI/Python SDK 0.159.2 on the original Linux/WSL host, as recorded in
@@ -333,10 +333,12 @@ native research workers for the north star without advancing a broker or host ga
   U6's initial source packet
   [#575](https://github.com/seathatflowsinourveins/native-agent-stack/pull/575)
   merged at 2026-10-01T14:54:12Z (`75c83d80ae31b49b3e24f584bf14010e94ad50cf`),
-  with remaining gaps in every layer; that is not complete item-4 acceptance.
-  B1 is re-targeted at the new distribution, under
-  [the program's ownership split and independent-review section](2026-10-01-definitive-sota-wsl-program.md#ownership-split)
-  (ownership line 178 at the checked main). The current
+  with remaining gaps in every layer; that is not complete item-4 acceptance
+  ([the program's independent-review section](2026-10-01-definitive-sota-wsl-program.md#independent-review-of-this-record-2026-10-01),
+  lines 480-484 at the checked main). B1 is re-targeted at the new
+  distribution under
+  [the program's ownership split](2026-10-01-definitive-sota-wsl-program.md#ownership-split)
+  (line 178 at the checked main). The current
   [open-work record](../../blueprints/convergence-practice/clean-resolution-20261002/open-work.json)
   and [WSL scope amendment](2026-10-02-two-host-north-star-architecture.md#amendment-2026-10-03-wsl-scope)
   retain native client, role and host-lifecycle gates. Landing this PR grants no host go.
@@ -358,11 +360,21 @@ native research workers for the north star without advancing a broker or host ga
   (`gh api .../actions/variables`, `.../actions/secrets`, `.../actions/runners`)
   shows none of its three required variables (`GPT_NATIVE_ACTION_ENABLED`,
   `RESPONSES_ENDPOINT`, `CODEX_REQUEST_MODEL`), no `RESPONSES_BEARER_KEY`
-  secret and zero self-hosted runners. There is no Codex Action reference or
-  copy of this example under `.github/workflows/`, checked against the
+  secret and zero self-hosted runners (last read at 2026-10-03T13:06:45Z). The
+  repository's one variable, `CATALOG_FRESHNESS_PROPOSE`, is unrelated:
+  [the catalog-freshness workflow](../../.github/workflows/catalog-freshness.yml)
+  reads it (line 205). There is no Codex Action reference or copy of this
+  example under `.github/workflows/`, checked against the
   [example's exact settings contract](../../examples/gpt-native-github/README.md).
-  **Currency correction:** the repository now has one unrelated variable,
-  `CATALOG_FRESHNESS_PROPOSE`; the older blanket absence of repository
-  variables does not describe current metadata. Secret-name metadata was
-  checked without reading a credential value. The historical Action result
-  remains 143 passes and one skip, with no new hosted or provider execution.
+  Secret-name metadata was checked without reading a credential value. The
+  historical Action result remains 143 passes and one skip, with no new hosted
+  or provider execution.
+- **Publication-check redaction, 2026-10-03.** The failed lookup's recorded command in
+  [the publication checks](../../evidence/artifacts/gpt-lifecycle-convergence-20260930/publication-checks.json)
+  named the host user as the repository owner. The custody review replaced that
+  one token with `<user>`, the form that `sanitize()` in
+  [`scripts/host_receipts.py`](../../scripts/host_receipts.py) (lines 273-283)
+  writes for the user name. Its exit 1, HTTP 404 output, correction command and
+  correction result are unchanged, and no other artifact byte differs from
+  `ab628da341cfb4b88cf1df4f4c185974ba1f3c82`. No convergence record pins this
+  file, so no record digest changes; its registry row is re-registered.
