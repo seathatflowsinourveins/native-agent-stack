@@ -15806,8 +15806,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-token-context-study-custody.md",
-      "sha256": "58a21f95a3c198953eded96e543d71444eefcd31514577ec3825d44f1ec23950",
-      "bytes": 30225
+      "sha256": "7b95ada21bed88a04967ae95dece6a24b86e800584fef84211ae9a26ab6e9d2a",
+      "bytes": 37786
     },
     {
       "path": "docs/direct-results.md",
@@ -45315,9 +45315,24 @@
       "bytes": 9122
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/context-isolation-astra-read.json",
+      "sha256": "c14ccc68f87d002d37af441301598f779df7587dc058af84499e4eac410972c1",
+      "bytes": 4491
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
-      "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9",
-      "bytes": 9015
+      "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286",
+      "bytes": 10761
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-local-grader-qualification.json",
+      "sha256": "17db8ce847c844ea4468f55fbc9736f2c516b50691d56c5e2950a0e87c7419cf",
+      "bytes": 4127
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/forge-preparation-qualification.json",
+      "sha256": "c62212b7f3a5a433d45563141ec11fa1df47403cdccfa8752369d67625f62f9b",
+      "bytes": 6497
     },
     {
       "path": "evidence/artifacts/token-context-20261003/harness-source-read.json",
@@ -45345,6 +45360,16 @@
       "bytes": 14063
     },
     {
+      "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+      "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca",
+      "bytes": 10571
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+      "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463",
+      "bytes": 9031
+    },
+    {
       "path": "evidence/artifacts/token-context-20261003/native-resume-qualification.json",
       "sha256": "a9f147289e39f82411183ce5e791de09ee4c6340562f54141e5cccca4c882188",
       "bytes": 8759
@@ -45366,13 +45391,18 @@
     },
     {
       "path": "evidence/artifacts/token-context-20261003/qualification-experiment.json",
-      "sha256": "7537e41208c0977fd5a76bb49332767cc0218bff52714d30134cc916ac0ba638",
-      "bytes": 44483
+      "sha256": "079a8a3dbb9478fc06c7ea5f874cd816e42fc9b4a6e998aa1437e45283847b62",
+      "bytes": 58248
     },
     {
       "path": "evidence/artifacts/token-context-20261003/resume-counter-astra-read.json",
       "sha256": "2d5861a2204cfd48189919e0bda935d090c15ae3670f92fe12adb4863b5cfe72",
       "bytes": 3710
+    },
+    {
+      "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+      "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853",
+      "bytes": 2833
     },
     {
       "path": "evidence/artifacts/token-context-20261003/rtk-artifact-qualification.json",

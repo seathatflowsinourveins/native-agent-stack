@@ -147,7 +147,7 @@
     },
     "rule": "These are separate actual artifact boundaries; source, pointers, results and schemas overlap and are not summed. No provider/context protection saving inference."
   },
-  "isolation": "Owned server-only config/state/project, explicit private Inspector config/storage/OAuth/client paths, memory secret store, stored-auth-only; native HOME/account profiles untouched. No upgrade/purge/fetch/model calls.",
+  "isolation": "Owned current server-only config/state/project and Inspector paths were scoped; native HOME/accounts untouched. This does not isolate released legacy content-store cleanup in the host home. No upgrade/purge/fetch/model calls.",
   "cleanup": {
     "owned_process_search_exit": 1,
     "owned_process_output_bytes": 0,
@@ -168,7 +168,8 @@
     "Archive metadata comparison failed; native full release-content comparison passed",
     "Fixture selector and jq receipt rendering failed before relevant calls; corrected without runtime repair",
     "Initial direct artifact-counter config omitted node carrier; existing module default restored, no candidate call repeated",
-    "Draft receipt invented test:mcp script and redundant --run; original argv and package.json verified and corrected before publication"
+    "Draft receipt invented test:mcp script and redundant --run; original argv and package.json verified and corrected before publication",
+    "Current-directory scoping was insufficient for released homedir legacy cleanup; exact source and shipped bundle verified. Earlier host legacy cleanup impact remains unknown."
   ],
   "sources": [
     "https://github.com/mksglu/context-mode/tree/589d8214d56740a28b5f7bf63167743d586b0b40",
@@ -181,6 +182,24 @@
     "Natural Codex/Claude main/child invocation, P2 compaction/resume and provider-native comparison counters unqualified",
     "Browser fixture not exercised here; PDF/CJK/image/audio preservation unqualified",
     "No unchanged full suite or native-client acceptance inferred from selected operations",
-    "Existing distribution plugin preserved; no promotion or definitive row amendment"
-  ]
+    "Existing distribution plugin preserved; no promotion or definitive row amendment",
+    "No complete host content-store isolation or legacy-state preservation inferred from Inspector path scoping; qualification is not candidate activation."
+  ],
+  "legacy_cleanup_correction": {
+    "discovered_at": "2026-10-03T06:17:00Z",
+    "claim_corrected": "Server-only CONTEXT_MODE_DIR isolates all content-store writes and cleanup",
+    "source_pin": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40",
+    "verification": [
+      "src/server.ts727-733 calls cleanupStaleContentDBs(join(homedir(), .context-mode, content),0) on opening getStore",
+      "src/store.ts222-260 uses Date.now zero-day cutoff and unlinks .db/-wal/-shm",
+      "Released server.bundle.mjs contains the same legacy cleanup"
+    ],
+    "source_hashes": {
+      "src/server.ts": "4a34c4a17b64fa188d2a2c894765f492bf62b624a60c64e666fbaeef760f4a59",
+      "src/store.ts": "d7b06661006e884832e0dcd27720ef2c59a585e301d9c7a38afc883330781cad",
+      "server.bundle.mjs": "dadb1987cb345a3ed4c5af6e648dc3e4250ec87f172f3ca309dc64dba3ffe5f2"
+    },
+    "impact": "Earlier Inspector index/search opened the content store. Legacy-directory existence, files and any cleanup effect are UNKNOWN; no host legacy directory/auth reads were performed to reconstruct impact. Further host content-store calls are withheld pending supported isolation.",
+    "distinct_owned_artifact": "Unix readiness sentinel is PID-specific under /tmp and removed by native shutdown; TMPDIR does not change its writer. Hook reader sees any live sentinel and is not native-session invocation proof."
+  }
 }

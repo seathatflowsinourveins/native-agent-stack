@@ -1,0 +1,84 @@
+{
+  "native_execution": {
+    "client": "Codex0.160.0",
+    "completion_endpoint_count": 1,
+    "effort": "max",
+    "exit_code": 0,
+    "exit_provenance": "Coordinator-observed native PTY exit0",
+    "model": "gpt-6-astra",
+    "model_child_activity_count_in_selected_records": 0
+  },
+  "native_count_once": {
+    "cached_input_and_reasoning_output_are_subsets": true,
+    "cost": "Not supplied by selected native token counters; provider invoice unknown",
+    "matches_last_thread_snapshot": true,
+    "matches_returned_completion_endpoint": true,
+    "response_id_hashes": [
+      "19b203c01f1ec67033003df12eb55bd05b6a23c2e7aca2f0741c0f007a30d796",
+      "282720ad5a58fd52f6d46320d4349f2c84e7ba60e16ac92e1506619442922d84",
+      "cf4885af6e6632996b4b8f6b4db9d962981a611108cc9a324583f2d86f8474e8"
+    ],
+    "returned_turn_completed_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 36096,
+      "input_tokens": 63246,
+      "output_tokens": 4554,
+      "reasoning_output_tokens": 3104
+    },
+    "snapshot_totals_not_summed": true,
+    "unique_response_count": 3,
+    "usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 36096,
+      "input_tokens": 63246,
+      "output_tokens": 4554,
+      "reasoning_output_tokens": 3104,
+      "total_tokens": 67800
+    }
+  },
+  "primary_source_locators": [
+    {
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "protocol.rs",
+      "lines": "1933-1937",
+      "repository": "openai/codex",
+      "sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4"
+    },
+    {
+      "commit": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "file": "event_processor_with_jsonl_output.rs",
+      "lines": "118-128;509-510;533-534",
+      "repository": "openai/codex",
+      "sha256": "bc296541b385f9b4ca2c28cc638e25a8d6b1332b2cd67f5a03eaa97a3d612b19"
+    }
+  ],
+  "before_process_failure": {
+    "correction_observed": "Owned directory created from existing parent; subsequent native client launch completed.",
+    "counter_scope": "Rejected launch created no shell/model process and no native usage record. It is retained separately; no provider counter is fabricated.",
+    "record": {
+      "correction": "Create owned directory from its existing parent, then launch native client sequentially.",
+      "failure": "Requested execution cwd did not yet exist; exec process creation rejected before shell/model startup.",
+      "usage": "No process/model launched by rejected tool call; no usage record exists."
+    },
+    "retained_file": "pre-model-failure.json",
+    "sha256": "e7cd06de44eede04464a910f301d7ae4321f2e9674c928fc010be82340e41957"
+  },
+  "completeness_critic": [
+    "This is one completed consequential judgment; HOLD admission is retained, not acceptance of isolation, a repaired winner or a default selection.",
+    "Three exact responses reconcile to selected thread and completion endpoint; cached input/reasoning are subset counters, and cumulative snapshots are not additive.",
+    "Missing-cwd rejection occurred before process/model startup and has no independent usage record; it is not replayed as a model run.",
+    "No child/compaction activity is present in this selected capture; backend retries, unreported helpers, delivered model identity outside native metadata, global state and invoice costs remain outside coverage.",
+    "Accounting projections exclude conversations, task payloads, native UUIDs and original host paths."
+  ],
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Consequential released Context Mode native-host admission judgment",
+  "verdict": "HOLD: released current-directory scoping does not isolate legacy homedir cleanup; baseline superiority unproved.",
+  "returned_answer_words": 479,
+  "returned_answer_limit_words": 650,
+  "source_pin": "mksglu/context-mode@589d8214d56740a28b5f7bf63167743d586b0b40",
+  "private_conclusions_sha256": "c7f2a6a4e60626d3769bddfce939dcdd5e3121b4ed8e9e49d7775947e301ad30",
+  "private_manifest_sha256": "1f77acc053f452c955a47a41fc02ef7c3917bb7b1487bc3149bc808173212e72",
+  "native_identifier_custody": "Only selected native metadata is projected; raw role identifiers/captures remain private.",
+  "acceptance_boundary": "Generic official stdio-container source recipe, then exact confined CM startup/index/search/shutdown qualification can overturn admission hold. Source discovery alone does not admit or prove protection."
+}

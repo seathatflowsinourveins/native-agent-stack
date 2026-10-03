@@ -1,0 +1,194 @@
+{
+  "observed_at": "2026-10-03T06:33:52.571526+00:00",
+  "study": "token-context-20261003",
+  "unit": "command-carrier-native-schema",
+  "operation": "Independent private outcome/accounting inspection of root-completed prospective native structured-output control",
+  "north_star_action": "Trustworthy fact-faithful native structured consumption and complete token accounting for long research and development trajectories",
+  "config_sha256": "0fcf4526091720afba307d46a49005d116a7b25ec282fe1b39d7f4beeea76cd8",
+  "preregistration_sha256": "081bc5d040b36c306795bf75fba7756beb0150bfe717c307b08f9406887de192",
+  "native_execution_exit_root_reported": 0,
+  "upstream_promptfoo_schema_results": {
+    "passed": 2,
+    "failed": 0,
+    "errors": 0,
+    "evaluationDurationMs": 185897
+  },
+  "preregistered_conditions": [
+    {
+      "id": "N1",
+      "status": "PASS",
+      "evidence": "Actual upstream Promptfoo is-json grades: both pass; two successes, zero failures/errors; output unchanged."
+    },
+    {
+      "id": "N2",
+      "status": "PASS",
+      "evidence": "Four own native command records, one each role, exact command; both Codex file-URI cwd fields resolve to the fixed path and both Claude native sessions match it; every native carrier has exit128 and complete fatal line."
+    },
+    {
+      "id": "N3",
+      "status": "PASS",
+      "evidence": "Native own role records show gpt-6.1-sol/max and claude-opus-5-5/max; canonical child bindings complete; new parent session identifiers differ from original control and config has no resume/continue/fork identifiers."
+    },
+    {
+      "id": "N4",
+      "status": "PASS",
+      "evidence": "Raw successful Claude structured_output, Promptfoo metadata.structuredOutput, actual object output, native attachment and StructuredOutput input all equal. Native snapshot exposes the exact structural schema."
+    },
+    {
+      "id": "N5",
+      "status": "UNPROVEN",
+      "evidence": "Pinned installed source maps output_schema to SDK outputSchema and native --output-schema; config binds exact schema and unmodified finalResponse passes. Native flag/argv exposure was not found in the selected completed parent session or Promptfoo debug records; source/config inference does not satisfy preregistered observed native schema exposure."
+    },
+    {
+      "id": "N6",
+      "status": "PASS",
+      "evidence": "Codex unique native request sums reconcile with own final endpoints:57373 parent+47140 child=104513. Claude latest modelUsage58904 reconciles with raw main49567+child8221+helper1116. Selected complete163417=harness116277+omitted Codex child47140. Cached/reasoning/cumulative endpoints are not added twice."
+    },
+    {
+      "id": "N7",
+      "status": "PASS",
+      "evidence": "Retained source-prefix hashes, native formatter tool/attachment, raw final payload projection/hash, available costs and durations; one StructuredOutput success, no repeated tool-level attempt observed. Retry count outside selected records remains UNKNOWN; 48ms duration difference retained without inventing a count. No repair, rerun or original regrade."
+    }
+  ],
+  "condition_counts": {
+    "PASS": 6,
+    "UNPROVEN": 1,
+    "FAIL": 0
+  },
+  "all_seven_conditions_proven": false,
+  "native_complete_selected_total": 163417,
+  "harness_total": 116277,
+  "harness_omitted_codex_child": 47140,
+  "native_breakdown": {
+    "codex_main": 57373,
+    "codex_child": 47140,
+    "claude_main": 49567,
+    "claude_child": 8221,
+    "claude_helper_modelUsage": 1116,
+    "claude_query_modelUsage_aggregate": 58904
+  },
+  "claude_estimated_query_cost_usd": 0.4062966,
+  "codex_cost": "UNKNOWN",
+  "combined_complete_cost": "UNKNOWN",
+  "original_control_unchanged": true,
+  "original_control_strict_claude_failure_preserved": true,
+  "original_separate_stream_condition": "UNPROVEN",
+  "publication_scope": "Actual strict output-format control and corrected native accounting only; not complete seven-condition native schema acceptance, TOON model arm, savings, default, freeze, protection or goal acceptance",
+  "completeness_critic_next_sweep": [
+    "Codex native output-schema argv exposure remains unproven; future explicitly authorized source-supported native launch observation can close N5 without relabeling this run.",
+    "Only provider final envelope has a native structural schema; per-child schema enforcement remains unestablished.",
+    "Observed Claude tool-level formatter succeeded once; transport/backend schema retries, helper request count and invoice charges are unknown despite exact selected native aggregate reconciliation.",
+    "48ms native API-duration difference is retained as a duration difference; it does not identify retry count or additional usage.",
+    "Current control excludes full-profile hooks/memory/natural compaction/protection and resume continuity; no TOON candidate comparison or token-savings/default decision.",
+    "A root-reported exit0 and pre-model manifest-locator correction are separated from independently captured results and selected source records."
+  ],
+  "evidence_class": "native_cli_execution",
+  "native_identifier_custody": "Selected native identifiers/captures remain private; aliases and hash bindings only.",
+  "private_conclusions_sha256": "3b3b846e47c23d62bceb0727340986ec6ec6dea428a3677d707571440028729f",
+  "private_manifest_sha256": "3e7e095ec32e50650ccceac18d175331a4ee0b41763c86688eb034eddc426864",
+  "native_usage_reconciliation": {
+    "roles": {
+      "codex_main": {
+        "unique_native_completed_responses": 3,
+        "usage": {
+          "input_tokens": 55888,
+          "cached_input_tokens": 36096,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1485,
+          "reasoning_output_tokens": 1046,
+          "total_tokens": 57373
+        },
+        "latest_thread_endpoint": {
+          "input_tokens": 55888,
+          "cached_input_tokens": 36096,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1485,
+          "reasoning_output_tokens": 1046,
+          "total_tokens": 57373
+        },
+        "unique_sum_matches_endpoint": true,
+        "selected_total": 57373
+      },
+      "claude_main": {
+        "unique_native_completed_requests": 2,
+        "usage": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 24859,
+          "cache_read_input_tokens": 15797,
+          "output_tokens": 8907,
+          "thinking_tokens": 7853,
+          "total_tokens": 49567
+        },
+        "selected_total": 49567
+      },
+      "codex_child": {
+        "unique_native_completed_responses": 2,
+        "usage": {
+          "input_tokens": 46685,
+          "cached_input_tokens": 34944,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 455,
+          "reasoning_output_tokens": 339,
+          "total_tokens": 47140
+        },
+        "latest_thread_endpoint": {
+          "input_tokens": 46685,
+          "cached_input_tokens": 34944,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 455,
+          "reasoning_output_tokens": 339,
+          "total_tokens": 47140
+        },
+        "unique_sum_matches_endpoint": true,
+        "selected_total": 47140
+      },
+      "claude_child": {
+        "unique_native_completed_requests": 2,
+        "usage": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 4112,
+          "cache_read_input_tokens": 3926,
+          "output_tokens": 179,
+          "thinking_tokens": 40,
+          "total_tokens": 8221
+        },
+        "selected_total": 8221
+      }
+    },
+    "claude_helper_models_aggregate": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 1103,
+        "outputTokens": 13,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.001168,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "claude_helper_selected_total": 1116,
+    "claude_raw_main_plus_child_plus_helper_matches_modelUsage": true,
+    "claude_selected_modelUsage_total": 58904,
+    "codex_parent_plus_child_total": 104513,
+    "native_complete_selected_total": 163417,
+    "harness_total": 116277,
+    "harness_omitted_codex_child": 47140,
+    "scope": "Latest native Claude query-pipeline aggregate once plus each own Codex main/child endpoint once; raw unique requests reconcile, not add to endpoints. No backend/invoice completeness claim."
+  },
+  "native_execution": {
+    "exit": 0,
+    "root_observed": true,
+    "evaluation_duration_ms": 185897,
+    "not_all_seven_conditions_proven": true
+  },
+  "independent_completeness_read": {
+    "verdict": "ACCEPT publication fidelity only",
+    "reviewer": "Independent Sol6.1/max usage owner",
+    "checked": "38artifact/source/prefix bindings and30originalcontrolfiles; native counters/fourcalls/maxroles/structuredOutput exactinner schema; N5UNPROVEN retained."
+  }
+}

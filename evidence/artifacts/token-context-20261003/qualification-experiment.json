@@ -53,7 +53,13 @@
       "native-resume",
       "resume-read",
       "native-command-baseline",
-      "native-structured-baseline"
+      "native-structured-baseline",
+      "native-command-carrier",
+      "forge-preparation",
+      "retrieval-functional",
+      "context-isolation-read",
+      "native-command-schema",
+      "forge-local-grader"
     ],
     "roles": [
       "command-worker",
@@ -151,7 +157,14 @@
     "Native codex exec -p omniroute -m gpt-6-astra -c model_reasoning_effort=max read-only; missing keyless environment prerequisite",
     "Same native read with one non-secret process-local placeholder and explicit requested pool URL",
     "Promptfoo native package bin eval -c command-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native parent/child C1/C2/C3",
-    "Promptfoo native package bin eval -c structured-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child focused jq QA and root-string controls"
+    "Promptfoo native package bin eval -c structured-baseline/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child focused jq QA and root-string controls",
+    "Promptfoo native eval -c command-carrier-control/config.json --no-cache --repeat1 --max-concurrency1; fresh native main/child observable diagnostic carriers",
+    "Native uv sync --locked, slop-code render-prompts and unchanged Forge pytest --collect-only; no model or grader execution",
+    "Existing named QMD native BM25 search context supply top2; no model, refresh or install",
+    "Existing named QMD search exact title/get docid span; fixed original15lines equality, no model",
+    "Native codex exec -m gpt-6-astra -c model_reasoning_effort=max --sandbox read-only --json; process-local requested keyless pool route; read-only admission judgment",
+    "Native Promptfoo command-carrier-native-schema eval; fresh main/child native structural-output diagnostic control",
+    "slop-code --quiet eval-snapshot <unchanged upstream checkpoint1 reference snapshot> -o <owned output> -p forge -c checkpoint_1 -e configs/environments/local-py.yaml --json"
   ],
   "observations": [
     {
@@ -668,7 +681,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
-          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
         }
       ],
       "usage": {
@@ -699,7 +712,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
-          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
         }
       ],
       "usage": {
@@ -730,7 +743,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
-          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
         }
       ],
       "usage": {
@@ -761,7 +774,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/token-context-20261003/context-mode-qualification.json",
-          "sha256": "72431dbf70c68acb68913d2dc343384ce651bf801b741151d48930a2e4c001b9"
+          "sha256": "006d0d8fddf11572c05539495cf58b565424c8d7007f535b709a6b8aaa2ee286"
         }
       ],
       "usage": {
@@ -1083,6 +1096,285 @@
         "total": 59877,
         "native_retries": null
       }
+    },
+    {
+      "id": "native-command-carrier-codex",
+      "task": "native-command-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 24,
+      "evidence_class": "native_cli_execution",
+      "scope": "Observable diagnostic carrier/accounting control; strict-format failure preserved; no candidate/default; Codex case gold PASS within shared native evaluator exit100",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+          "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca"
+        }
+      ],
+      "usage": {
+        "uncached_input": 17782,
+        "cache_creation": 0,
+        "cache_read": 82176,
+        "output": 873,
+        "reasoning_in_output": 335,
+        "total": 100831,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-carrier-claude",
+      "task": "native-command-carrier",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 24,
+      "evidence_class": "native_cli_execution",
+      "scope": "Observable diagnostic carrier/accounting control; strict-format failure preserved; no candidate/default",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-carrier-qualification.json",
+          "sha256": "8ca5165b5f2d220fb23622adb206fa530dcb04c8a0d0cc459cb49c23759725ca"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1111,
+        "cache_creation": 13816,
+        "cache_read": 30577,
+        "output": 5777,
+        "reasoning_in_output": 4774,
+        "total": 51281,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-preparation",
+      "task": "forge-preparation",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 25,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native uv sync --locked, slop-code render-prompts and unchanged Forge pytest --collect-only; no model or grader execution; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-preparation-qualification.json",
+          "sha256": "c62212b7f3a5a433d45563141ec11fa1df47403cdccfa8752369d67625f62f9b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "retrieval-qmd-target-miss",
+      "task": "retrieval-functional",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 26,
+      "evidence_class": "native_cli_execution",
+      "scope": "Existing named QMD native BM25 search context supply top2; no model, refresh or install; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+          "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "retrieval-qmd-exact-get",
+      "task": "retrieval-functional",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 27,
+      "evidence_class": "native_cli_execution",
+      "scope": "Existing named QMD search exact title/get docid span; fixed original15lines equality, no model; direct command model0 only, coordinator/advisor usage outside this scope not counted here",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/retrieval-consumption-qualification.json",
+          "sha256": "56a4d1b6cbb5d74a45551c5106978c7eacf0c7c1e77fbd015f4d4c0b9ff7c853"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-context-isolation",
+      "task": "context-isolation-read",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 28,
+      "evidence_class": "native_cli_execution",
+      "scope": "Consequential candidate-admission HOLD; no isolation/protection/default acceptance",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/context-isolation-astra-read.json",
+          "sha256": "c14ccc68f87d002d37af441301598f779df7587dc058af84499e4eac410972c1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 27150,
+        "cache_creation": 0,
+        "cache_read": 36096,
+        "output": 4554,
+        "reasoning_in_output": 3104,
+        "total": 67800,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-schema-codex",
+      "task": "native-command-schema",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 29,
+      "evidence_class": "native_cli_execution",
+      "scope": "Both fact schemas PASS, native Claude structured_output proved; N5Codex runtime schema exposure UNPROVEN; no default",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+          "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463"
+        }
+      ],
+      "usage": {
+        "uncached_input": 31533,
+        "cache_creation": 0,
+        "cache_read": 71040,
+        "output": 1940,
+        "reasoning_in_output": 1385,
+        "total": 104513,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "native-command-schema-claude",
+      "task": "native-command-schema",
+      "role": "coordinator",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 29,
+      "evidence_class": "native_cli_execution",
+      "scope": "Both fact schemas PASS, native Claude structured_output proved; N5Codex runtime schema exposure UNPROVEN; no default",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/native-command-schema-qualification.json",
+          "sha256": "5d309dbe703ed1bc270441e9d9c6642f92582130a4fd34b0d0ee4a5fb7393463"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1111,
+        "cache_creation": 28971,
+        "cache_read": 19723,
+        "output": 9099,
+        "reasoning_in_output": 7893,
+        "total": 58904,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "forge-local-grader-reference",
+      "task": "forge-local-grader",
+      "role": "context-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 30,
+      "evidence_class": "native_cli_execution",
+      "scope": "Single model-free unchanged upstream local grader/reference prerequisite,40casesPASS; no model/protection/comparator",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-context-20261003/forge-local-grader-qualification.json",
+          "sha256": "17db8ce847c844ea4468f55fbc9736f2c516b50691d56c5e2950a0e87c7419cf"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": null
+      }
     }
   ],
   "failures_and_skips": [
@@ -1149,6 +1441,22 @@
     {
       "run_id": "native-command-baseline-claude",
       "reason": "Original C3 separately captured stream prerequisite remains UNPROVEN despite schema PASS; prospective actual-carrier contract does not relabel this attempt"
+    },
+    {
+      "run_id": "native-command-carrier-claude",
+      "reason": "Exact semantic JSON enclosed in Markdown fence fails original strict is-json; exit100 preserved, no repair/regrade."
+    },
+    {
+      "run_id": "native-command-carrier-codex",
+      "reason": "Individual Codex gold PASS is retained, but the shared native evaluator process exits100 due to the Claude strict failure. No whole-CLI PASS inferred."
+    },
+    {
+      "run_id": "retrieval-qmd-target-miss",
+      "reason": "Native BM25 command exits0 but fixed target absent from top2. The later alternate title search does not erase this original target miss."
+    },
+    {
+      "run_id": "native-command-schema-codex",
+      "reason": "Preregistered N5 actual native Codex schema flag exposure remains UNPROVEN; source/config inference and gold PASS do not satisfy that condition."
     }
   ],
   "limitations": [
@@ -1168,7 +1476,16 @@
     "Fresh command schema2PASS and12eligible calls do not satisfy original separately captured stream contract. C3 stream condition retained UNPROVEN; native210080 tokens include both children and known helper bucket, not savings. Prospective native returned-carrier contract does not relabel this attempt.",
     "The first publication-unit4 consistency check failed because new command tasks and failed run reasons were omitted from the declared record. Those metadata declarations were corrected without changing native outputs or repeating measurements. A follow-up inspection also guessed an absent top-level tasks key; actual declarations are in frozen_inputs.",
     "Focused JSON native185514tokens reconciles parent/children/helper once; harness136252 excludes Codex child49262. Eight calls and semantic controls PASS only within this unit; no TOON model arm or efficiency/default/freeze. A root inspection initially assumed prior packet keys; actual structured packet uses roles/native_usage_count_once and was read before publication.",
-    "Publication-unit4 validate rejected new public native UUIDs. Identifiers were removed into private custody; role labels/hash-bound selected captures preserve proof without publishing local session identifiers. No measurements changed."
+    "Publication-unit4 validate rejected new public native UUIDs. Identifiers were removed into private custody; role labels/hash-bound selected captures preserve proof without publishing local session identifiers. No measurements changed.",
+    "Prospective diagnostic carrier control costs152112 native tokens counted once: Codex100831 and Claude51281. Harness105150 excludes Codex child46962. Exact semantic facts do not erase strict Claude format failure.",
+    "Two failed pre-model prompt validations retained; actual bound native raw template is prompts:[{{request}}] plus vars.request. Earlier guessed raw-object-copy source claim corrected by reading both bound configurations.",
+    "Context Mode legacy homedir cleanup source discovered after earlier host Inspector index/search. Earlier effect remains UNKNOWN; no host legacy directory or auth read. Further host content-store calls require supported isolation.",
+    "Publication-unit5 consistency check initially marked Codex carrier case passed while recording shared evaluator exit100. Declaration now preserves individual case gold PASS and failed shared-CLI unit; native output/usage unchanged.",
+    "Forge and direct existing QMD command units launched no model;0 usage is bounded to those executables. Coordinator/advisor/model-session overhead is outside those command scopes and remains separately accounted/unknown, not a zero-cost study claim.",
+    "Native Astra/max admission HOLD adds67800separate research tokens, three unique exact responses matched endpoint/snapshot; no cached/reasoning subset double count. Rejected missing-cwd launch occurred before a process and has no native usage record. A later official generic Docker stdio reference closes source discovery only, not CM qualification.",
+    "Independent publication critic narrowed retrieval mutations:none to no explicit layer changes; internal existing-tool state writes are unknown. Pre-existing untracked .serena state is preserved, without inspecting its configuration or inferring causation.",
+    "Native schema control163417 includes Codex child47140, absent from116277harness endpoint.2goldPASS does not establish N5nativeflag exposure; retain UNPROVEN and estimatedClaude.4062966USD, unknowninvoice/retries. Originalfailed30files unchanged. Localnativegrader40PASS is separatemodel-freeupstreamreference evidence, not model/candidate/P2 acceptance.",
+    "Publication-unit5 first registry import failed before mutation; native validation exit1 correctly reported three stale registrations and six unlisted receipts. Supported package import and scoped registration correct that publication error; original output is retained."
   ],
   "decision_and_scope": {
     "decision": "trial",
@@ -1210,7 +1527,16 @@
       "native-command-baseline-codex",
       "native-command-baseline-claude",
       "native-structured-baseline-codex",
-      "native-structured-baseline-claude"
+      "native-structured-baseline-claude",
+      "native-command-carrier-codex",
+      "native-command-carrier-claude",
+      "forge-preparation",
+      "retrieval-qmd-target-miss",
+      "retrieval-qmd-exact-get",
+      "astra-context-isolation",
+      "native-command-schema-codex",
+      "native-command-schema-claude",
+      "forge-local-grader-reference"
     ],
     "coverage_artifact": null
   }

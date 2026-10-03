@@ -1,0 +1,245 @@
+{
+  "native_run": {
+    "evaluation_duration_ms": 120469,
+    "exit_code": 100,
+    "exit_provenance": "Coordinator-observed native PTY exit100",
+    "observed_exit_timestamp": null,
+    "results_exported_at": "2026-10-03T05:55:38.780Z",
+    "runtime_options": {
+      "cache": false,
+      "eventSource": "cli",
+      "maxConcurrency": 1,
+      "maxEvalTimeMs": 1800000,
+      "repeat": 1,
+      "showProgressBar": false,
+      "timeoutMs": 900000
+    },
+    "schema_errors": 0,
+    "schema_failures": 1,
+    "schema_passes": 1,
+    "started_at": "2026-10-03T05:53:25Z"
+  },
+  "overall_declared_contract": "NOT PASS: original Claude strict-format failure retained",
+  "strict_vs_semantic": {
+    "actual_outputs_preserved": true,
+    "claude": "Exact semantic gold inside one markdown JSON fence; original strict assertion FAIL",
+    "codex": "Plain JSON; original strict assertion PASS; semantic gold matches",
+    "no_regrade_or_output_rewrite": true,
+    "semantic_artifact": "semantic-vs-format.json"
+  },
+  "role_versions_and_usage": {
+    "claude_child": {
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "native_cli_version": "2.1.288",
+      "usage": {
+        "cache_creation_input_tokens": 3942,
+        "cache_read_input_tokens": 3757,
+        "input_tokens": 4,
+        "output_tokens": 235,
+        "thinking_tokens": 96,
+        "total_tokens": 7938
+      }
+    },
+    "claude_main": {
+      "effort": "max",
+      "model": "claude-opus-5-5",
+      "native_cli_version": "2.1.288",
+      "usage": {
+        "cache_creation_input_tokens": 9874,
+        "cache_read_input_tokens": 26820,
+        "input_tokens": 4,
+        "output_tokens": 5529,
+        "thinking_tokens": 4678,
+        "total_tokens": 42227
+      }
+    },
+    "codex_child": {
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "native_cli_version": "0.160.0",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 34944,
+        "input_tokens": 46534,
+        "output_tokens": 428,
+        "reasoning_output_tokens": 290,
+        "total_tokens": 46962
+      }
+    },
+    "codex_main": {
+      "effort": "max",
+      "model": "gpt-6.1-sol",
+      "native_cli_version": "0.160.0",
+      "usage": {
+        "cache_write_input_tokens": 0,
+        "cached_input_tokens": 47232,
+        "input_tokens": 53424,
+        "output_tokens": 445,
+        "reasoning_output_tokens": 45,
+        "total_tokens": 53869
+      }
+    }
+  },
+  "commands": {
+    "all_four_explicit_exit_codes": 128,
+    "artifact": "eligible-command-invocations.jsonl",
+    "complete_diagnostic_line_observed_in_all_four": true,
+    "duplicate_eligible_executions_observed": 0,
+    "eligible_executions": 4,
+    "extra_shell_executions_in_selected_records": 0,
+    "observed_total_shell_executions": 4,
+    "original_process_stream_split": "UNKNOWN"
+  },
+  "preregistration": {
+    "conditions": [
+      {
+        "condition": "Both schema grades pass",
+        "evidence": "Codex plain JSON passes; Claude correct semantic payload is enclosed in markdown fence and fails original strict is-json. Native evaluator exit100,1PASS/1FAIL/0errors preserved.",
+        "verdict": "FAIL"
+      },
+      {
+        "condition": "Each main/child independently invokes command once,4 eligible executions total",
+        "evidence": "Exactly4 eligible native Git-status executions; one per main/child role. No extra shell execution in selected records.",
+        "verdict": "PASS"
+      },
+      {
+        "condition": "Native explicit exit128 and complete diagnostic line observed in returned carriers",
+        "evidence": "Every returned native carrier explicitly reports exit128 and retains complete diagnostic line. Underlying separate process streams remain unknown.",
+        "verdict": "PASS"
+      },
+      {
+        "condition": "Own native child binding/model/effortmax observed",
+        "evidence": "Both canonical parent-child bindings and actual own native client/model/max records verified.",
+        "verdict": "PASS"
+      },
+      {
+        "condition": "Native complete parent/child usage reconciles once",
+        "evidence": "Bound unique Codex responses and final Claude aggregate reconcile counted once, including known Haiku row.",
+        "verdict": "PASS"
+      }
+    ],
+    "config_sha256": "a511ca33a61bb964a8fb14d89e733878d4b141e2a2e510c9ea6ed488495270f1",
+    "file": "preregistration.json",
+    "sha256": "c41f906f62e45c3a542160a550f122113eef52f5c46139826d501488c2cbf2fe",
+    "unknowns": [
+      "Underlying separate stdout/stderr streams",
+      "Backend retries/helpers/invoice/full-profile parity",
+      "Protection/native natural compaction"
+    ]
+  },
+  "cost": {
+    "claude_native_list_estimate_usd": 0.2212974,
+    "codex_cost": "Not supplied by selected native counters",
+    "invoice_verified": false
+  },
+  "count_once": {
+    "cached_input_reasoning_thinking_subsets_not_double_added": true,
+    "claude_agent_result_trailer_total": 4057,
+    "claude_child_full_total": 7938,
+    "claude_known_haiku_tokens": 1116,
+    "claude_opus_parent_plus_child_total": 50165,
+    "claude_whole_usage": {
+      "cacheCreationInputTokens": 13816,
+      "cacheReadInputTokens": 30577,
+      "inputTokens": 1111,
+      "outputTokens": 5777,
+      "thinkingTokens": 4774,
+      "total_tokens": 51281,
+      "webSearchRequests": 0
+    },
+    "codex_whole_usage": {
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 82176,
+      "input_tokens": 99958,
+      "output_tokens": 873,
+      "reasoning_output_tokens": 335,
+      "total_tokens": 100831
+    },
+    "difference_excluded_codex_child": 46962,
+    "failed_native_run_usage_retained": true,
+    "promptfoo_returned_total": 105150,
+    "trailer_scope": "Final child request only; never added to modelUsage",
+    "whole_native_run_total": 152112
+  },
+  "sources": {
+    "harness_pin": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "native_role_capture_artifact": "native-source-captures.json",
+    "primary_locators": [
+      {
+        "lines": "1933-1937;3628-3647",
+        "repository_or_package_relative_file": "codex-rs/protocol/src/protocol.rs",
+        "sha256": "d3d3d384da91b2824c10091de4331a2bc26ec5474887ed0aef1e3f3c4ae110f4",
+        "source_pin": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc"
+      },
+      {
+        "lines": "118-128;162-178;509-510;533-534",
+        "repository_or_package_relative_file": "codex-rs/exec/src/event_processor_with_jsonl_output.rs",
+        "sha256": "bc296541b385f9b4ca2c28cc638e25a8d6b1332b2cd67f5a03eaa97a3d612b19",
+        "source_pin": "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc"
+      },
+      {
+        "lines": "3316;5030-5038",
+        "repository_or_package_relative_file": "sdk.d.ts",
+        "sha256": "59560e31f91e47ed93e7cbcaa846e3fc3c96d8dcc41ea36cda64de96c0c4edf4",
+        "source_pin": "@anthropic-ai/claude-agent-sdk@0.3.263"
+      },
+      {
+        "lines": "697-744;766-798",
+        "repository_or_package_relative_file": "dist/src/claude-agent-sdk-CiwKDeqg.cjs",
+        "sha256": "594feb437ccf8b5b29cfa7ffe37003bc8dc59bd54cb132214aab6b2f09eb3e87",
+        "source_pin": "promptfoo@0.123.1 /34f74d34e140b5e17d23770dfb2340057b1936b8"
+      }
+    ]
+  },
+  "validation_attempts": {
+    "artifact": "validation-attempts.json",
+    "failed_pre_model_attempt_count": 2,
+    "native_template_correction": "prompts:[{{request}}] plus vars.request string",
+    "prior_bound_actual_sources": [
+      {
+        "prompts": [
+          "{{request}}"
+        ],
+        "relative_source": "../command-baseline/config.json",
+        "sha256": "2f18ddaf9e9d598dfe9f8de96eb6b05c011b9a83a8a72f382f3df270750c8a66",
+        "vars_request_string": true
+      },
+      {
+        "prompts": [
+          "{{request}}"
+        ],
+        "relative_source": "../structured-baseline/config.json",
+        "sha256": "5cd60ccb3161f45f7017db14d889d10eba003dfeb31adffe4dc3da7adfc89bee",
+        "vars_request_string": true
+      }
+    ],
+    "source_claim_correction": "Raw-object-copy claim corrected by directly inspected bound config shape; both specific failed attempted forms remain retained failures"
+  },
+  "completeness_critic": [
+    "The strict failure stays failed even though the exact inner JSON payload is semantically correct. No repaired winner/default or candidate comparison is claimed.",
+    "Both pre-model validation failures and actual native-template source correction stay retained; no general prompt-form capability claim is inferred from these specific failed configurations.",
+    "Known Haiku1116 is counted once in native aggregate; independent helper request provenance, helper class and helper invocation count remain unknown.",
+    "No extra shell execution, explicit compaction/retry record or eligible-command repeat is present in the selected captures; backend retries/aborts/outside-pipeline helpers and background global state remain uncovered.",
+    "Original separate process stdout/stderr stays unknown; returned carrier fields are preserved without reconstructed stream labels.",
+    "Natural compaction/protection, invoice costs and full-profile parity are not established.",
+    "This private packet uses role aliases/digests and relative artifact/source locators; no native UUIDs or original native-session paths are copied."
+  ],
+  "study": "token-context-20261003",
+  "evidence_class": "native_cli_execution",
+  "operation": "Prospective observable diagnostic-carrier control; original strict Claude format failure retained",
+  "native_identifier_custody": "Native session identifiers and selected raw source captures remain private; role aliases and hashes bind this public projection.",
+  "independent_root_checks": {
+    "artifact_hashes_verified": 29,
+    "all_match": true,
+    "private_conclusions_sha256": "ba4c05e14a6d31e2fa6244110570900d870ef87aec814864932bf4df316ad7ff",
+    "private_manifest_sha256": "607d6d4de21b5b5b07e65842ff2560b2447d40ba5122618d38cfa7be760304b7",
+    "independent_sol_max_critic": "Accepted fidelity of failed unit only; source/usage/hash reconciliation verified."
+  },
+  "limitations": [
+    "No output repair, regrade, comparative savings, candidate adoption or protocol freeze.",
+    "Separate underlying process stdout/stderr remain unknown; old command baseline stream condition remains UNPROVEN.",
+    "Known Haiku helper usage is included once; independent helper request provenance remains unknown.",
+    "No invoice, protection, natural compaction, full native-profile parity or final five-job acceptance."
+  ]
+}
