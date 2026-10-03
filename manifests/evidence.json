@@ -3985,8 +3985,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "5c05254b9697920813e84203e58a8e690a8fc1022d67b48ebb9206e19e3a94df",
-      "bytes": 23663
+      "sha256": "d4ea05b0beefc85d06d4fe25cab6fda8697bf68ccda35df6770816c478099357",
+      "bytes": 24184
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -4070,8 +4070,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "9e0877d9dc04647fe350a6ad37b87abbae2f745d51e14f9964f87239c9b56fcf",
-      "bytes": 13808
+      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
+      "bytes": 13787
     },
     {
       "path": "CLAUDE.md",
@@ -15931,8 +15931,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "595a97353798afdbaa5153db1393231a0ad0ac38d045e5f3bf1fa37be2bfbe14",
-      "bytes": 96941
+      "sha256": "6b6f18fc90f4252837cb7af82c8d25e97fdaeecfb8003931650bda272258a77a",
+      "bytes": 97961
     },
     {
       "path": "docs/grand-catalog-handbook.md",
@@ -15941,8 +15941,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "85a0f5d92161b16c67bdeb111bdb5b67c247f0fd241e0a9ef032d8cb9b51e8eb",
-      "bytes": 142363
+      "sha256": "d287f7a805406b916eea9408ecb50851cbf8b7deb92a8a3c7c0a584d2bd4b2a3",
+      "bytes": 143284
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -50861,8 +50861,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "a5abfdeefb962d5f78e90a375eb84f3c4c722a0ab7ee7ac1b57236877dcd6f66",
-      "bytes": 178282
+      "sha256": "97e8c945026711f1ef4ce8fd115d3ef83becb5a402ac2d0c8d19876d9129c023",
+      "bytes": 186012
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -50881,8 +50881,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "464645953be70796181fbc795c9ac7c43349863f8cafa25e8cda97433f9e20c0",
-      "bytes": 107061
+      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
+      "bytes": 121534
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -50891,8 +50891,8 @@
     },
     {
       "path": "tools/sota-convergence/extract_layers.py",
-      "sha256": "faacd1c9ab418a2b4fb58a22433a88b449f8a10e357cc54222d9bbdbcedf928b",
-      "bytes": 17455
+      "sha256": "4be73f7d3b09fa9ea88ecb238d998e43b648c7c16bb56b8853e8672ca883bb2a",
+      "bytes": 46061
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
@@ -50906,8 +50906,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "8543c6f90ded7c032c1e6f9c1315682dafdc1c4a08fc91194f844e9db6aa49f6",
-      "bytes": 14762
+      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
+      "bytes": 27422
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
