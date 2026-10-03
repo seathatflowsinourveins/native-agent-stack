@@ -147,7 +147,10 @@ Failed attempts are retained. The coordinator runs installation and acceptance.
 ## Arms
 
 `OPENHANDS_ARM=control|engines-on` defaults to `control`, and `--arm` overrides
-it. Control stays the default until the #431 A/B selects the engines arm.
+it. Control stays the default. The #431 A/B that would have selected the engines
+arm was retired unrun on 2026-10-03
+([record](../../../docs/decisions/2026-10-03-retire-gpt6-lane-compression-ab.md));
+only a new preregistration on the current gateway build can select it.
 `OPENHANDS_MODEL`, `OPENHANDS_BASE_URL` and `OPENHANDS_COMPRESSION` are
 optional explicit overrides that must match the selected arm. The control arm
 retains the existing `cx/gpt-6-*` variant support; the engines-on arm admits
