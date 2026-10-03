@@ -402,7 +402,9 @@ local-model-server() {
       ;;
     after_sign_in)
       # One embedding call to the settled embedder, which the embedding-model row creates. /api/embed answers 404 for a
-      # missing model and downloads nothing: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L975-L977
+      # missing model (GetModel's not-found error, routes.go:981-984 and :3226-3227) and its handler pulls nothing:
+      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L981-L984
+      # https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/server/routes.go#L3226-L3227
       # Kind: smoke; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1659
       check local-model-server smoke 'curl -fsS http://127.0.0.1:21434/api/embed -d '"'"'{"model":"qwen3-embedding-8k","input":"Hello world"}'"'"' | jq -e '"'"'(.embeddings | length) == 1'"'"' >/dev/null'
       ;;

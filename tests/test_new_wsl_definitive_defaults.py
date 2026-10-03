@@ -1177,7 +1177,8 @@ class LocalModelAcceptance(unittest.TestCase):
         cases = {
             "one vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": [[0.01] * 1024]}), 0),
             "no vector": (json.dumps({"model": "qwen3-embedding-8k", "embeddings": []}), 1),
-            "an error answer": (json.dumps({"error": "model 'qwen3-embedding-8k' not found"}), 1),
+            # the answer handleScheduleError gives a missing model (server/routes.go:3226-3227 at v0.35.0)
+            "an error answer": (json.dumps({"error": 'model "qwen3-embedding-8k" not found, try pulling it first'}), 1),
         }
         for name, (reply, want) in cases.items():
             with self.subTest(case=name), tempfile.TemporaryDirectory() as scratch:
