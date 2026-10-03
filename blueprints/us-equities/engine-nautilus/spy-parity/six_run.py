@@ -29,6 +29,98 @@ def case_configuration(mapping, case_id, base):
     return case, instrument
 
 
+def finalize_run(failure, captures, persist_snapshot, dispose, finish_log):
+    """Capture incomplete native evidence before teardown without masking failure.
+
+    Each callable is independent. The failed snapshot is evidence of an incomplete
+    run, never an acceptance receipt. This helper needs no native dependencies.
+    """
+    snapshot = None
+    primary = failure
+    def note(stage, error):
+        if primary is not None:
+            try: primary.add_note(stage + ' also failed: ' + repr(error))
+            except BaseException: pass  # A secondary diagnostic cannot mask primary.
+    def persist(stage):
+        try: persist_snapshot(snapshot)
+        except BaseException as error:
+            snapshot['snapshot_write_errors'].append({'stage':stage, 'error':repr(error)})
+            note('failed_native_state_snapshot_' + stage, error)
+    if failure is not None:
+        snapshot = {'schema_version':'spy-six-case-failed-native-state/1',
+                    'status':'FAILED', 'qualification':'NOT_ACCEPTED',
+                    'failure':{'type':type(failure).__name__, 'message':str(failure)},
+                    'capture_phase':'before_dispose', 'captures':{},
+                    'snapshot_write_errors':[], 'finalization':{}}
+        for name, capture in captures.items():
+            try:
+                value = capture()
+                # Freeze borrowed histories before dispose/reset can clear them.
+                value = json.loads(json.dumps(value, allow_nan=False))
+                snapshot['captures'][name] = {'status':'unavailable' if value is None else 'captured',
+                                             'value':value}
+            except BaseException as error:
+                snapshot['captures'][name] = {'status':'error', 'error':repr(error)}
+                note('failed_native_state_capture_' + name, error)
+        persist('before_dispose')
+    for name, action in (('dispose', dispose), ('log_capture', finish_log)):
+        try:
+            action()
+            if snapshot is not None: snapshot['finalization'][name] = {'status':'complete'}
+        except BaseException as error:
+            if snapshot is not None:
+                snapshot['finalization'][name] = {'status':'error', 'error':repr(error)}
+            if primary is None: primary = error
+            else: note(name, error)
+    if snapshot is not None: persist('after_finalization')
+    if failure is None and primary is not None: raise primary
+    return snapshot
+
+
+def failed_native_captures(engine, strategy, observer, module, fill_model, equity, venue, usd, out, base):
+    """Independent raw-state readers; no admission, account or cache mutation."""
+    account = lambda: engine.cache.account_for_venue(venue)
+    def csv_report(name, report):
+        path = out / ('failed-' + name + '.csv')
+        report().to_csv(path)
+        return {'path':path.name, 'sha256':base.digest(path)}
+    reports = {'account':lambda:engine.generate_account_report(venue=venue),
+               'positions':lambda:engine.generate_positions_report(),
+               'fills':lambda:engine.generate_order_fills_report()}
+    def margin_money(reader):
+        value = reader()
+        return None if value is None else str(value)
+    captures = {
+        'native_orders':lambda:[o.to_dict() for o in engine.cache.orders()],
+        'native_order_events':lambda:[e.to_dict() for o in engine.cache.orders() for e in o.events()],
+        'native_positions_open':lambda:[p.to_dict() for p in engine.cache.positions_open()],
+        'native_commissions_by_order':lambda:{str(o.client_order_id):{
+            str(k):str(v) for k,v in o.commissions().items()} for o in engine.cache.orders()},
+        'native_account_event_rows':lambda:base.account_events(account(), usd),
+        'native_account_balance_total':lambda:str(account().balance_total(usd)),
+        'native_account_balance_free':lambda:str(account().balance_free(usd)),
+        'native_account_initial_margin':lambda:margin_money(lambda:account().initial_margin(equity.id)),
+        'native_account_maintenance_margin':lambda:margin_money(lambda:account().maintenance_margin(equity.id)),
+        'native_account_type':lambda:account().account_type.name,
+        'native_account_default_leverage':lambda:str(account().default_leverage),
+        'native_instrument':lambda:equity.to_dict(),
+        'economic_ledger':lambda:{'cash':str(strategy.cash),'quantity':str(strategy.position)},
+        'settlement_handshake':lambda:{'pending':strategy.phase.pending,'last':strategy.phase.last},
+        'observer':lambda:{'pending':observer.pending,'errors':observer.errors,
+                          'acknowledgements':observer.acknowledgements},
+        'distribution_module':lambda:{'emissions':module.emissions,'acknowledgements':module.acknowledgements,
+                                      'errors':module.errors,'pending':[e['ex_date'] for e in module.pending]},
+        'fill_model_calls':lambda:fill_model.calls,
+        'engine_iterations':lambda:engine.get_result().iterations}
+    for name in ('errors','bars_seen','intents','fills','marks','native_callback_events','order_events',
+                 'margin_calls','margin_warnings','latch_events','phase_alerts_registered','phase_alerts_fired'):
+        captures['strategy_' + name] = lambda name=name:getattr(strategy,name)
+    for name, report in reports.items():
+        captures['native_' + name + '_report'] = lambda report=report:json.loads(report().to_json(orient='records'))
+        captures['native_' + name + '_csv'] = lambda name=name,report=report:csv_report(name, report)
+    return captures
+
+
 def run_once(rows, events, out, label, mapping, case_id, base):
     # This entry is reached only from the prospective checks in main().
     from nautilus_trader.backtest import BacktestEngine
@@ -136,18 +228,19 @@ def run_once(rows, events, out, label, mapping, case_id, base):
             failure = error
             raise
         finally:
-            try: engine.dispose()
-            except Exception as error:
-                if failure is None: raise
-                failure.add_note('dispose also failed: '+repr(error))
-            logger_flush()
-            sentinel = 'spy-six-case capture end '+label
-            logger_log(LogLevel.INFO, LogColor.NORMAL, 'SpySixCaseRunner', sentinel)
-            logger_flush()
-            deadline = time.monotonic()+30
-            while sentinel not in log.read_text(errors='replace'):
-                if time.monotonic()>deadline: raise ValueError('six_native_log_capture_incomplete')
-                time.sleep(0.01)
+            def finish_log():
+                logger_flush()
+                sentinel = 'spy-six-case capture end '+label
+                logger_log(LogLevel.INFO, LogColor.NORMAL, 'SpySixCaseRunner', sentinel)
+                logger_flush()
+                deadline = time.monotonic()+30
+                while sentinel not in log.read_text(errors='replace'):
+                    if time.monotonic()>deadline: raise ValueError('six_native_log_capture_incomplete')
+                    time.sleep(0.01)
+            finalize_run(failure, failed_native_captures(engine, strategy, observer, module,
+                         fill_model, equity, venue, usd, out, base),
+                         lambda snapshot:base.save(out/'failed-native-state.private.json', snapshot),
+                         lambda:engine.dispose(), finish_log)
     record['engine_log_scan'] = base.scan_engine_log(log.read_text(errors='replace'))
     record['engine_log_sha256'] = base.digest(log)
     base.save(out/'native-export.json', record)
