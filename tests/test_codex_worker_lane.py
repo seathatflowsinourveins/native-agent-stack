@@ -45,15 +45,14 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (846 words by Python `str.split()`, marker line included; 153 before the standing
+# The staged top-rule block (827 words by Python `str.split()`, marker line included; 153 before the standing
 # clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md, 595 before the
 # wave-2 records of 2026-10-03 added semble to the token lanes and the session-lanes lines: context-mode's working
-# directory, semble, GPT Researcher and Claude Code messaging, 800 before the long-command line that runs the
+# directory, semble, GPT Researcher and Claude Code messaging, and 800 before the long-command line that runs the
 # research script and the messaging courier with yield_time_ms and write_stdin polling, wave-2 messaging ruling,
-# change 1, and 827 before the Sol-ultra workhorse routing of docs/decisions/2026-10-03-sol-ultra-workhorse.md) and
-# rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec), both byte
-# for byte.
-TOP_RULE_SHA256 = "4fb3e005353ffe7bcde58b91ed21d4bb8992c26d4ae8cc6978fafb2557c197fb"
+# change 1) and rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
+# both byte for byte.
+TOP_RULE_SHA256 = "3201144dccd9d134110a2459a1e795d55e8cb747a9592e779e4c4778d8b8bc1c"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -281,15 +280,12 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(lane.agents_block(), text)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
         self.assertFalse([line for line in text.splitlines() if line.startswith("@")])
-        # Local size budget; the project-doc limit does not cap global instructions. 8,192 bytes until 2026-10-03,
-        # when the template stood at 8,180; re-baselined by 128 for the Sol-ultra workhorse routing clause, which
-        # docs/decisions/2026-10-03-sol-ultra-workhorse.md requires on all three rule surfaces (8,307 bytes after it).
-        self.assertLess(len(text.encode("utf-8")), 8320)
+        self.assertLess(len(text.encode("utf-8")), 8192)  # local size budget; the project-doc limit does not cap global instructions
 
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 846)
+        self.assertEqual(len(top.split()), 827)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,

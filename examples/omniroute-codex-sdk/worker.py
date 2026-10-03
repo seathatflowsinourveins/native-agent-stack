@@ -40,15 +40,6 @@ SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
-# Ultra selects native proactive multi-agent mode (a956835d core/src/session/multi_agents.rs:96-104;
-# V2 from the Sol/Astra catalog entries, models-manager/models.json:195 and config/mod.rs:1606-1613)
-# and sends the catalog multi-agent effort, xhigh for Sol 6.1 and Astra, on root requests
-# (protocol/src/openai_models/reasoning_effort.rs:10-40; models.json:22,196). A gateway -max suffix
-# outranks that request effort in OmniRoute v3.8.51 (diegosouzapw/OmniRoute 2f42a9ac1,
-# open-sse/executors/codex.ts:1419-1441). Max sends max and delegates only on request: single
-# judgments and blind or one-model convergence lanes.
-EFFORTS = ("ultra", "max")
-DEFAULT_EFFORT = "ultra"
 CLEANUP_TIMEOUT = 5.0
 _CLEANUP_TASKS: set[asyncio.Task] = set()
 
@@ -533,14 +524,13 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
-        help="explicit native/gateway model id; default Sol route with the gateway -max suffix",
+        help="explicit native/gateway model id; default Sol/max route",
     )
     parser.add_argument(
         "--effort",
-        choices=EFFORTS,
-        default=DEFAULT_EFFORT,
-        help="ultra (default): proactive native sub-agents, root requests forwarded at max by a -max "
-        "route; max: single judgments and blind or one-model lanes",
+        choices=[ReasoningEffort.max.value, ReasoningEffort.ultra.value],
+        default=ReasoningEffort.max.value,
+        help="requested native reasoning effort; default max",
     )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)

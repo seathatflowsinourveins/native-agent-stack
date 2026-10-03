@@ -6,9 +6,8 @@ The [bounded live acceptance](../../evidence/receipts/omniroute-runtime-enhancem
 covers selected skill/MCP use, one Astra/Max judge and a completed Dagu graph.
 
 This foundation worker can be called from a native Claude coordinator. It uses
-the maintained Codex harness through the official Python SDK, with Sol at ultra
-as the primary worker (proactive native sub-agents on the gateway's `-max` route)
-and an invocation-scoped OmniRoute Responses provider.
+the maintained Codex harness through the official Python SDK, with Sol/max as
+the primary worker and an invocation-scoped OmniRoute Responses provider.
 The existing Codex integration remains the incumbent; this example does not
 select a winner in the separate SDK comparison.
 
@@ -56,24 +55,28 @@ qualifies the caller path; the separate Claude SDK gateway bridge remains a tria
 The default endpoint is the selected loopback gateway at port 20128. An owned
 reverse observer can be supplied with `--base-url`; the worker never changes
 gateway compression engines or native coordinator configuration. The default
-model is the explicit `cx/gpt-6.1-sol-max` route. `--effort` (default `ultra`,
-or `max`) is requested at launch and turn start; the result records it as
-`requested_effort`, and preflight reports the native effective value. Ultra
-selects Codex's proactive multi-agent mode, so the model may spawn native
-sub-agents without being asked, and Codex sends the Sol catalog's multi-agent effort,
-`xhigh`, on each root request. The route's `-max` suffix outranks that request
-effort in the gateway, which forwards `max`; a suffix-less route at ultra
-forwards `xhigh`. Children inherit the parent's model and effort and, in
-multi-agent V2, keep the collaboration tools; the private home's limit of three
-concurrently spawned agents covers the whole tree. Pass `--effort max` for a
-single judgment and for a blind or one-model convergence lane, where proactive
-delegation would turn one isolated judgment into several threads. A delegated
-turn lasts as long as its sub-agents: one native wait call defaults to 30 s and
-may ask for up to 3,600 s (`core/src/config/mod.rs:256-258` at the pin), so size
+model is the explicit `cx/gpt-6.1-sol-max` route. `--effort` (default `max`,
+or `ultra`) is requested at launch and turn start; the result records it as
+`requested_effort`, and preflight reports the native effective value. Max is
+the default because it is the deepest effort Codex sends on each request; for
+parallel work, fan out several max workers, each with its own worktree and
+bounded task. `--effort ultra` is an opt-in for a decomposable job. On Sol 6.1
+it means `xhigh` on each root request, the catalog's multi-agent effort
+([models.json:196](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/models-manager/models.json#L196),
+[reasoning_effort.rs:10-40](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/openai_models/reasoning_effort.rs#L10-L40)),
+plus Codex's proactive multi-agent mode, so the model may delegate to native
+sub-agents without being asked. Children inherit the parent's model and effort
+and, in multi-agent V2, keep the collaboration tools; the private home's limit
+of three concurrently spawned agents covers the whole tree. A delegated turn
+lasts as long as its sub-agents: one native wait call defaults to 30 s and may
+ask for up to 3,600 s (`core/src/config/mod.rs:256-258` at the pin), so size
 `--timeout` (default 300 s, at most 3,600 s) to the delegated work; a deadline
-interrupts the turn natively. The
-[ultra workhorse decision](../../docs/decisions/2026-10-03-sol-ultra-workhorse.md)
-records the sources, the fixture observations and what remains unmeasured.
+interrupts the turn natively. [nv] The route's `-max` suffix may force max on
+each request at the gateway: OmniRoute's model suffix outranks the body effort
+in source, but that is not measured on the installed build ([nv] marks a
+source-read claim not verified there). The
+[decision record](../../docs/decisions/2026-10-03-sol-max-worker-default.md)
+holds the sources, the fixture observations and what remains unmeasured.
 This route requires an OmniRoute build
 carrying [PR #15167](https://github.com/diegosouzapw/OmniRoute/pull/15167);
 published 3.8.51 alone does not establish that capability. Check the live
@@ -89,8 +92,8 @@ usage. In the [2026-10-03 tier probe](../../evidence/receipts/omniroute-sdk-work
 two interleaved rounds per tier with an identical prompt through port 20128 gave
 61.0-61.3 output tokens per second against 32.6-32.8 for the standard tier, and
 wall times of 102.8-118.5 s against 194.2-211.3 s. Every probe run requested
-`max`, so the tier is not measured at ultra, and each fast token draws more
-pool usage.
+the default `max`; the tier is not measured at ultra, and each fast token draws
+more pool usage.
 
 Pass one bounded task on stdin. The worker emits a compact `thread_ready` JSON
 line before the turn, then a result with the final answer, item counts and native
@@ -138,8 +141,7 @@ rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
 Use Astra/max explicitly for consequential architecture, conflicting primary
 evidence or a failure remaining after one bounded Sol repair. Record the trigger
 and acceptance result with that task, then pass `--model cx/gpt-6-astra-max
---effort max` for that single judgment. When a complex workflow needs Astra to
-coordinate it, pass the same model at the default ultra.
+--effort max` for that single judgment.
 Explicit model choices are retained; the example never silently retries with
 another model or claims that an advertised model is an entitlement check.
 
@@ -216,8 +218,8 @@ post-turn read failure preserves the completed native result already saved.
 Six additional B3 tests cover the gateway credential filters and search switches
 in the process overrides/starter template, refusal of an existing native-result
 destination before thread creation, and a private failure record after an
-incomplete turn. Six effort tests of 2026-10-03 check that the default `ultra`
-and `--effort max` reach the launch override, the turn argument and the native
+incomplete turn. Six effort tests of 2026-10-03 check that the default `max`
+and `--effort ultra` reach the launch override, the turn argument and the native
 preflight readback; that Codex sends `xhigh` for ultra and `max` for max on the
 Sol route; that the two efforts select different native `<multi_agent_mode>`
 instructions; and that other values are refused. Their negative control restores
@@ -269,7 +271,10 @@ formatter-driver test failure; no whole-suite passing claim is made here.
   the Sol and Astra catalog rows carry `multi_agent_version` v2 and
   `multi_agent_reasoning_effort` `xhigh`. The gateway's
   [suffix-over-body effort precedence](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/open-sse/executors/codex.ts#L1419-L1441)
-  is read at release/v3.8.51 commit `2f42a9ac1`, the base of the port-20128 build.
+  is read at release/v3.8.51 commit `2f42a9ac1`, the base of the port-20128 build;
+  its effect on the installed build is unmeasured [nv]. The runtime lane's
+  [PR #678](https://github.com/seathatflowsinourveins/native-agent-stack/pull/678)
+  independently adds the same `--effort` plumbing with a max default.
 - [Native ResponsesLite prefix assembly](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/client.rs#L902)
   and [SSE fixture helpers](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/tests/common/responses.rs#L753):
   native tool/prefix preservation and the source of the authored local fixture.

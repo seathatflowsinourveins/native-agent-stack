@@ -8,12 +8,6 @@ established; folded unchanged by unit D4 of coordinator session native-agent-sta
 is the routing record for Codex models; the release, client-gate and gateway-effort evidence is in the
 [model-currency addendum of 2026-09-30](2026-09-27-model-currency.md#addendum-2026-09-30-gpt-61-sol-released-codex-cli-01592-pinned-gpt-61-sol-at-ultra-the-interactive-default).
 
-**Amended by [2026-10-03-sol-ultra-workhorse.md](2026-10-03-sol-ultra-workhorse.md) (2026-10-03).** GPT-6.1 Sol at
-ultra now coordinates and runs workers, the OmniRoute SDK runtime worker included (`--effort`, default `ultra`). Max
-stays for a single judgment, a blind or one-model lane and the bounded `stack-worker` profile. The Astra triggers, the
-intake and escalation rules and the capability boundary below stand: natively, ultra still sends Sol's catalog `xhigh`
-on root requests, and only a gateway `-max` route forwards max. This record's other text is unchanged.
-
 ## Decision
 
 The user selected GPT-6.1 Sol/Ultra for routine Codex coordination and

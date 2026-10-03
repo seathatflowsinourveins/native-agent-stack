@@ -12,14 +12,14 @@
   "claim": "A recorded fast-tier A/B probe at 2026-10-03T22:25:23Z ran the packaged Codex SDK worker (openai-codex 0.160.0) on cx/gpt-6.1-sol-max through the OmniRoute loopback gateway on port 20128, read-only, with an identical 60-line prompt and two private worker homes that differed only in service_tier. All four interleaved runs completed with closed cleanup and requested effort max. Native output tokens per turn second were 61.05 and 61.26 on the fast tier against 32.63 and 32.79 on the standard tier, about 1.87 times; the probe's own wall times were 102.8-118.5 s against 194.2-211.3 s.",
   "limitations": [
     "Two rounds per tier on one prompt: no variance estimate, no task-quality comparison and no other model, route or prompt.",
-    "Every run requested effort max through the previous worker revision; the tier was not measured at ultra, which this repository's worker now uses by default.",
+    "Every run requested effort max, the worker's default, through the revision before its --effort option; the tier was not measured at the opt-in ultra.",
     "Rates divide each run's native cumulative output tokens by its native turn duration_ms. Wall times are quoted as the probe receipt wrote them; it lists no separate std-1 row, and its standard range 194.2-211.3 s includes that run.",
     "The gateway-forwarded service tier, the gateway-forwarded effort and the backend identity were not observed in these records. The probe's note that the gateway honours the tier is an inference from the rate difference, not a gateway log.",
     "The fast tier draws more pool usage per token (the bundled Codex catalog describes it as 2x speed with increased usage); pool usage and limits were not measured.",
     "Copied from the probe's private state for coordinator session native-agent-stack-c5 on 2026-10-03: raw outputs, the prompt, final answers, thread and request identifiers and host paths stay private; only metrics, statuses and output hashes are published."
   ],
   "probe": {
-    "worker": "examples/omniroute-codex-sdk/worker.py before the 2026-10-03 ultra default, which requested max at launch and turn start",
+    "worker": "examples/omniroute-codex-sdk/worker.py before the 2026-10-03 --effort option; that revision requested max at launch and turn start",
     "sdk_and_native_runtime": "openai-codex 0.160.0 with its bundled native 0.160.0 runtime",
     "route": "cx/gpt-6.1-sol-max",
     "gateway": "OmniRoute loopback port 20128",
@@ -150,6 +150,6 @@
       "use": "gpt-6.1-sol advertises the priority tier, named Fast: 2x speed, increased usage"
     }
   ],
-  "decision_record": "docs/decisions/2026-10-03-sol-ultra-workhorse.md",
+  "decision_record": "docs/decisions/2026-10-03-sol-max-worker-default.md",
   "whole_task_provider_usage": null
 }

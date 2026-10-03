@@ -37,10 +37,10 @@ from openai_codex import AsyncCodex, AsyncThread
 from openai_codex.client import CodexClient
 from openai_codex.types import ReasoningEffort
 
-# What native Codex sends for the worker's default ultra at a956835d: Sol 6.1 and Astra carry
+# What native Codex sends for the opt-in ultra at a956835d: Sol 6.1 and Astra carry
 # multi_agent_reasoning_effort = "xhigh" (models-manager/models.json:22,196), which
-# protocol/src/openai_models/reasoning_effort.rs:10-40 sends on root requests. This fixture records
-# the Codex request; OmniRoute's -max suffix precedence upstream of it is not exercised here.
+# protocol/src/openai_models/reasoning_effort.rs:10-40 sends on root requests. The default max is
+# sent as max. This fixture records the Codex request; any gateway suffix rule is not exercised here.
 ULTRA_WIRE_EFFORT = "xhigh"
 
 
@@ -334,7 +334,7 @@ class NativeTransportTests(unittest.TestCase):
                 self.assertEqual(request["request_id"], "fixture-owned-request")
                 self.assertFalse(request["has_authorization"])
                 self.assertEqual(request["body"]["model"], worker.DEFAULT_MODEL)
-                self.assertEqual(request["body"]["reasoning"]["effort"], ULTRA_WIRE_EFFORT)
+                self.assertEqual(request["body"]["reasoning"]["effort"], "max")
                 # Native Sol/Astra ResponsesLite carries tools inside input.
                 # Source: core/src/client.rs:902–933 at rust-v0.160.0.
                 tool_prefix = request["body"]["input"][0]
@@ -369,7 +369,7 @@ class NativeTransportTests(unittest.TestCase):
             result, _ = self.run_worker(self.args(gateway, "--model", selected))
             self.assert_accepted(result)
             self.assertEqual(gateway.requests[0]["body"]["model"], selected)
-            self.assertEqual(gateway.requests[0]["body"]["reasoning"]["effort"], ULTRA_WIRE_EFFORT)
+            self.assertEqual(gateway.requests[0]["body"]["reasoning"]["effort"], "max")
 
     def effort_run(self, *extra, launch=None, turn=None):
         """One fixture turn observing the launch override, the turn argument, the Codex request
@@ -407,21 +407,21 @@ class NativeTransportTests(unittest.TestCase):
         self.assertEqual(run.turns, [ReasoningEffort(effort)])
         self.assertEqual(run.wire, [wire_effort])
 
-    def test_default_ultra_reaches_launch_and_turn(self):
-        self.assertEqual(self.args(SimpleNamespace(url=worker.DEFAULT_BASE_URL)).effort, "ultra")
+    def test_default_max_reaches_launch_and_turn(self):
+        self.assertEqual(self.args(SimpleNamespace(url=worker.DEFAULT_BASE_URL)).effort, "max")
         run = self.effort_run()
-        self.assert_effort_reached(run, "ultra", ULTRA_WIRE_EFFORT)
+        self.assert_effort_reached(run, "max", "max")
         self.assertEqual([len(fragments) for fragments in run.modes], [1])
 
-    def test_explicit_max_reaches_launch_and_turn(self):
-        run = self.effort_run("--effort", "max")
-        self.assert_effort_reached(run, "max", "max")
+    def test_explicit_ultra_reaches_launch_and_turn(self):
+        run = self.effort_run("--effort", "ultra")
+        self.assert_effort_reached(run, "ultra", ULTRA_WIRE_EFFORT)
         self.assertEqual([len(fragments) for fragments in run.modes], [1])
 
     def test_ultra_and_max_select_different_native_multi_agent_modes(self):
         # Effective ultra selects proactive mode, any other effort explicit-request-only
         # (a956835d core/src/session/multi_agents.rs:96-104); V2 comes from the Sol catalog entry.
-        ultra, explicit = self.effort_run(), self.effort_run("--effort", "max")
+        explicit, ultra = self.effort_run(), self.effort_run("--effort", "ultra")
         self.assertTrue(ultra.modes[0][0].strip())
         self.assertTrue(explicit.modes[0][0].strip())
         self.assertNotEqual(ultra.modes, explicit.modes)
@@ -456,7 +456,7 @@ class NativeTransportTests(unittest.TestCase):
 
     def test_preflight_reports_requested_and_native_effective_effort(self):
         with FixtureGateway() as gateway:
-            for extra, effort in [((), "ultra"), (("--effort", "max"), "max")]:
+            for extra, effort in [((), "max"), (("--effort", "ultra"), "ultra")]:
                 with self.subTest(effort=effort):
                     result, _ = self.run_worker(self.args(gateway, "--preflight", *extra))
                     self.assertEqual(result["status"], "ready", result)
@@ -762,7 +762,7 @@ class NativeTransportTests(unittest.TestCase):
                 {
                     "model": worker.DEFAULT_MODEL,
                     "model_provider": worker.PROVIDER,
-                    "model_reasoning_effort": "ultra",
+                    "model_reasoning_effort": "max",
                 },
             )
             self.assertEqual(result["native_runtime"]["version"], worker.SDK_VERSION)

@@ -6,10 +6,12 @@ description: Delegate a bounded foundation engineering task from Claude to the n
 Read `examples/omniroute-codex-sdk/README.md` for invocation and lifecycle details.
 Use this project's `examples/omniroute-codex-sdk/worker.py` through Claude's native
 Bash tool. The primary route is `cx/gpt-6.1-sol-max` at the worker's default
-`--effort ultra`: proactive native sub-agents, with each root request forwarded
-at max by the route's `-max` suffix (Codex itself sends Sol's `xhigh` at ultra).
-Pass `--effort max` for a single judgment and for a blind or one-model
-convergence lane, where delegation would split one isolated judgment.
+`--effort max`, the deepest effort per request; for parallel work, dispatch
+several max workers, each in its own worktree. `--effort ultra` is an opt-in for
+a decomposable job: on Sol 6.1 Codex sends the catalog's `xhigh` per request and
+lets the model delegate to native sub-agents. [nv] The route's `-max` suffix may
+force max per request at the gateway; that is read in source only and not
+measured on the installed build.
 The coordinator retains its native Claude account and model route.
 Two shell startup failures occurred in the builder's nested Codex sandbox;
 the coordinator's separate non-nested read-only shell run succeeded with exit 0
@@ -57,16 +59,14 @@ usage remain unverified. Do not automatically replay a failed writing task.
 After a `content_filter` stop, preserve native guidance and resume only for an
 explicit permitted alternative or unrelated authorized task.
 
-Use explicit `--model cx/gpt-6-astra-max --effort max` for a single judgment on
-consequential architecture, conflicting primary evidence, or a failure unresolved
-after one bounded Sol repair; keep the default ultra with that model when a
-complex workflow needs Astra to coordinate it. Record that trigger and the
-acceptance result. The separate Claude SDK
+Use explicit `--model cx/gpt-6-astra-max --effort max` for consequential
+architecture, conflicting primary evidence, or a failure unresolved after one
+bounded Sol repair. Record that trigger and the acceptance result. The separate Claude SDK
 bridge remains a trial after its gateway errors; it is not the primary worker.
 
 For speed, a private worker home may set `service_tier = "fast"`: the dated
 probe in `evidence/receipts/omniroute-sdk-worker-fast-tier-20261003.json`
-measured about 1.9 times the standard output rate at requested max, at higher
+measured about 1.9 times the standard output rate at the default max, at higher
 pool usage per token.
 
 Sources: [Claude native project skills](https://code.claude.com/docs/en/skills)
@@ -74,4 +74,4 @@ and [official Codex SDK, rust-v0.160.0](https://github.com/openai/codex/tree/a95
 Functional scope and retained failures are recorded in
 `docs/decisions/2026-09-30-omniroute-runtime-workers.md` and
 `docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md`; the effort default is
-`docs/decisions/2026-10-03-sol-ultra-workhorse.md`.
+`docs/decisions/2026-10-03-sol-max-worker-default.md`.
