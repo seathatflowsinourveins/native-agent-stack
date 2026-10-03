@@ -15898,6 +15898,11 @@
       "bytes": 93607
     },
     {
+      "path": "docs/decisions/2026-09-29-retire-polaris.md",
+      "sha256": "77a716f97b8bc5a2ed0ed372a9ffbbf179a56407d32eb557b49706d06130187c",
+      "bytes": 5291
+    },
+    {
       "path": "docs/decisions/2026-09-29-shell-command-parser.md",
       "sha256": "ae31b360ec348e3d7f58948e06e1d82de2fc99b33fad44bb7d3e8fb20de0fb54",
       "bytes": 17458
