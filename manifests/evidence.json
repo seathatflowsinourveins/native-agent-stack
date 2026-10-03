@@ -16114,8 +16114,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "e24dc83cd7b483f8795ecb24be05cd79fce323eb2d4b8758cdf848918bccc21a",
-      "bytes": 146110
+      "sha256": "54ec5410ad33cc4ba7deb982c7202b4f18899e4cfc9b15adaab59b488eae467a",
+      "bytes": 146612
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16364,8 +16364,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "caf81fa3aa0fa3e662e1807869331dc024ca787233a4844a0eca3e92e4ea46d6",
-      "bytes": 90785
+      "sha256": "173fe5e0cf2121eb7d3ad76bf397843e24f52a2fd388a17a133e2691d61fc3d5",
+      "bytes": 90784
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -49774,8 +49774,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a72c591c08b3efe59ed339ace3e141c90f57cb81ed41349e5c826d89f87f616d",
-      "bytes": 20092
+      "sha256": "af4e5bc44d826ceece379c51269de39c6f8b00460bbfa6a1350c0b10987b797c",
+      "bytes": 24324
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
