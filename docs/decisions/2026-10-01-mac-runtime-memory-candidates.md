@@ -41,3 +41,35 @@ Reproduce the preregistered C3/C4 control on official 2.5.2: historical .570 rec
 The sealed owner report retains 21 open gaps and readiness false. Its report UI passed 31 checks and 21 evidence hashes, while historical report hashes stayed unchanged; report QA is not runtime/model acceptance. QMD reported three passes and one primary-document top-three miss, with exact-source fallback retained. Whole-task usage and net savings remain unknown.
 
 The canonical NAS owner records this dated delta without rewriting historical experiments or broad runtime pins. The separate `agent-ecosystem` producer owns maintained source selections, host records and generated lookup data. Its minimal synchronization must preserve personal RTK/operator bytes, per-file receipt provenance and historical evidence. Mac global settings/services/histories remain with the sole Mac owner. Source review, generated-file consistency, installed synchronization and native consumption are separate acceptance levels.
+
+## Status on 2026-10-03
+
+The October 1 next gate, reproducing C3/C4 on official 2.5.2 and preregistering
+a surviving host, is no longer queued work. The Mac memory decision unit closed
+on October 2, retaining official ai-memory 2.5.2 as the single shared-memory
+owner and queuing no candidate experiment, holdout or canary
+([closed qualification verdict](../../blueprints/memory-stack/native-qualification/VERDICT.md),
+[Mac Claude resolution](2026-10-02-mac-claude-resolution.md#acceptance-boundaries)).
+A replacement requires a new, explicitly scoped decision unit
+([replacement boundary](../../blueprints/memory-stack/native-qualification/VERDICT.md#known-limits-are-final-dispositions-not-running-tests)).
+
+The two-host architecture retains the Mac owner's 2.5.2 runtime beside the
+older main component lock at 2.4.1
+([two-host architecture](2026-10-02-two-host-north-star-architecture.md#current-sources-accepted-pins-and-upgrade-decisions)).
+The new-WSL destination's ai-memory 2.5.2 selection belongs to its
+[source profile](../../adoption/new-wsl-profile.md) and that profile's own
+acceptance; nothing in this Mac record transfers acceptance to it.
+
+The original lifecycle failures, 20-second rerank mismatch, invalid synthesis
+JSON and stale pure-compaction recall remain preserved
+([October 1 runtime evidence](2026-10-01-mac-runtime-memory-candidates.md#latest-reported-runtime)).
+Readiness remains false, and whole-task usage and net savings remain unknown
+([October 1 source/producer evidence](2026-10-01-mac-runtime-memory-candidates.md#sourceproducer-integration),
+[closed qualification limits](../../blueprints/memory-stack/native-qualification/VERDICT.md#known-limits-are-final-dispositions-not-running-tests)).
+
+A read-only October 3 re-check returned the recorded 2.5.2/2.5.1 tags, 2.5.2
+publication timestamp and ARM archive size/digest, latest release `v2.5.2`, and
+owner-comment timestamps `2026-10-01T09:18:54Z` and `2026-10-01T07:32:31Z`; this
+is source review
+([2.5.2 checkpoint](2026-10-01-mac-runtime-memory-candidates.md#latest-reported-runtime),
+[2.5.1 checkpoint](2026-10-01-mac-runtime-memory-candidates.md#earlier-251-checkpoint-retained)).

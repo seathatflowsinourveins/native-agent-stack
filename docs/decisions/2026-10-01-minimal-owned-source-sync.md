@@ -117,4 +117,4 @@ missed formats and the producer boundary before publication.
 
 ## Subsequent runtime checkpoint
 
-The [October1 sealed runtime/candidate follow-up](2026-10-01-mac-runtime-memory-candidates.md) records official2.5.2 and later scoped evidence. Earlier2.5.0 observations and original failures above remain historical evidence.
+The [October 1 sealed runtime/candidate follow-up](2026-10-01-mac-runtime-memory-candidates.md) records official 2.5.2 and later scoped evidence. Earlier 2.5.0 observations and original failures above remain historical evidence.
