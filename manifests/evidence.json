@@ -9240,6 +9240,11 @@
       "bytes": 7309
     },
     {
+      "path": "blueprints/runtime-workers/comparisons/ownership-amendment-proposal-20261003.md",
+      "sha256": "0b55a5fd1cabd8e500781b05203eefa7b78a997ed1a1285d06890662c74f882f",
+      "bytes": 4404
+    },
+    {
       "path": "blueprints/runtime-workers/comparisons/research-gatherer-draft.json",
       "sha256": "3092a4eb0350c4a7bc12c6905dcd7898648d16cd5b127067117467a9fc28da30",
       "bytes": 10718
@@ -42040,6 +42045,11 @@
       "bytes": 25493
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-nonpausing-setup-timeout-20261003.json",
+      "sha256": "912195ca74bb1b038c4b05264a4d6ebee8c0990aeb38f58704c386de8d4564c7",
+      "bytes": 7844
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-position-column-origin-amendment.json",
       "sha256": "100f8c1e9a929f34a052dba8f64d49f18424ad2d5e78ec6ede63da807f49f869",
       "bytes": 5008
@@ -42123,6 +42133,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-retained-content-identity-20261003.json",
       "sha256": "040bb133fceee86e5940686881f4139a5b6740af33fe08b327b7a78519f30d29",
       "bytes": 12899
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-stopped-main-native-readiness-20261003.json",
+      "sha256": "cd4af04e186a45e61064286e61c15a8ce11c06492174ebb813f84b3107466345",
+      "bytes": 13831
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-stopped-network-amendment.json",

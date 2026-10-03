@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-03",
+  "scope": "ONE native stopped-main/configured-network/scoped-cleanup lifecycle only",
+  "reviewed_repository_head": "be9d47fbb9b6ebe31ac45e97f9816cb8a44fb327",
+  "freeze": {
+    "bytes": 26375,
+    "sha256": "e681f592307503faac9ed3809afbed3c22ef0dc366aed07f2fcff10a5b75d5c9",
+    "source_consequential_read": "ACCEPT for at most one lifecycle contingent on exact fresh native preflight",
+    "original_failed_parent": {
+      "bytes": 26164,
+      "sha256": "a5fce5ebfad52f531049b7057852bda282a57a105ccfe62e0019f57c4ed24677",
+      "unchanged": true,
+      "result": "FAILED image-ID equals config-digest predicate; not reclassified"
+    },
+    "retained_content_proof": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-retained-content-identity-20261003.json",
+    "corrected_predicate": "Container .Image equals retained native target/index3200c5; selected manifest and opaque configuration remain separately verified"
+  },
+  "native_carriers": [
+    {
+      "name": "git",
+      "version": "git version 2.53.0",
+      "binary_sha256": "5516c9f362c29376ab9a499a33082f9f611941d8c75930c880e30ad109e39c9a",
+      "version_exit": 0,
+      "help_exit": 0,
+      "help_bytes": 2246,
+      "help_sha256": "2c6a3100eb3fc069e9b84dde7039a8efdbb357f864eee001aa56da67228deb57"
+    },
+    {
+      "name": "sha256sum",
+      "version": "sha256sum (uutils coreutils) 0.8.0",
+      "binary_sha256": "48893b0fb21436b54619db80486e83ef39dfccaf1aefe83dfa00c02d6146e8c0",
+      "version_exit": 0,
+      "help_exit": 0,
+      "help_bytes": 796,
+      "help_sha256": "c5db64f2345c9cec3c23a4d7c6ba8cd285f816b2619ffd1ebc07352baaed7051"
+    }
+  ],
+  "preflight": {
+    "exit_code": 0,
+    "tool_chunk": "e7ef18",
+    "combined_python_file_executable_proof_bindings": 18,
+    "native_sha256sum_rows": 14,
+    "read_only_commands": 8,
+    "source_head": "86723674f04e4209ac479d0fb75d9d9f44b4377e",
+    "environment_tree": "3d6176918b64535451cc87c18efb75cda2108efd",
+    "endpoint_info": {
+      "bytes": 100,
+      "sha256": "ffb2e7505f74fff346e1e618096915196b4f7656b2b95bb1671734c9e510e375",
+      "match": true
+    },
+    "retained_target_and_linux_amd64": "MATCH",
+    "exact_main_network_project_absences": "PASS before creation",
+    "owned_capture_directory_fresh_and_mode": "0700"
+  },
+  "native_phases": [
+    {
+      "phase": "create_without_start",
+      "exit_code": 0,
+      "chunk": "d197b2"
+    },
+    {
+      "phase": "full_ID_selector",
+      "exit_code": 0,
+      "chunk": "7255d4"
+    },
+    {
+      "phase": "safe_main_inspect",
+      "exit_code": 0,
+      "chunk": "615519"
+    },
+    {
+      "phase": "safe_network_inspect",
+      "exit_code": 0,
+      "chunk": "96b0bc"
+    },
+    {
+      "phase": "full_project_membership",
+      "exit_code": 0,
+      "chunk": "466e75"
+    },
+    {
+      "phase": "root_original_capture_and_typed_read",
+      "exit_code": 0,
+      "chunk": "47eaba"
+    },
+    {
+      "phase": "scoped_compose_down",
+      "exit_code": 0,
+      "chunk": "83e886"
+    },
+    {
+      "phase": "independent_post_down_absence_observer",
+      "exit_code": 0,
+      "chunk": "522402",
+      "underlying_native_exits": {
+        "main_inspect": 1,
+        "network_inspect": 1,
+        "project_membership": 0
+      }
+    }
+  ],
+  "actual_captures": [
+    {
+      "stage": "main-create-without-start",
+      "stream": "stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "main-create-without-start",
+      "stream": "stderr",
+      "bytes": 377,
+      "sha256": "1a58420197ecba016a71496b212b86d593998e86fc1d84e97cf64e6cccdce835",
+      "actual_text": " Network nas-coding-image-readiness-20261003_default Creating \n Network nas-coding-image-readiness-20261003_default Creating \n Network nas-coding-image-readiness-20261003_default Created \n Network nas-coding-image-readiness-20261003_default Created \n Container nas-coding-image-readiness-20261003-main-1 Creating \n Container nas-coding-image-readiness-20261003-main-1 Created \n"
+    },
+    {
+      "stage": "main-full-ID-selector",
+      "stream": "stdout",
+      "bytes": 65,
+      "sha256": "cb1a299c7333dd54a33543b5e19f5d18a978f3c0eea0858004be6ae86ed7903e",
+      "actual_text": "a8c1cc967ced9fd9aa88afa91f3aacae2db08d42585620c9ce066c53df1deff3\n"
+    },
+    {
+      "stage": "main-full-ID-selector",
+      "stream": "stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "main-safe-inspect",
+      "stream": "stdout",
+      "bytes": 662,
+      "sha256": "00431eab031ce6f5e7f6ed39ae50d41b60b622a3ebfa6f09e7a3256edf8b01b2",
+      "actual_text": "{\"kind\":\"main\",\"id\":\"a8c1cc967ced9fd9aa88afa91f3aacae2db08d42585620c9ce066c53df1deff3\",\"name\":\"/nas-coding-image-readiness-20261003-main-1\",\"status\":\"created\",\"running\":false,\"pid\":0,\"started_at\":\"0001-01-01T00:00:00Z\",\"finished_at\":\"0001-01-01T00:00:00Z\",\"restart_count\":0,\"image\":\"sha256:3200c5c12603d1760582936e0c85d2bbc882c7fe17f8b2058556085e08c3d595\",\"config_image\":\"harbor-readiness-django-14034:20261003-86723674f04e\",\"project\":\"nas-coding-image-readiness-20261003\",\"service\":\"main\",\"container_number\":\"1\"}\n{\"kind\":\"configured_network\",\"name\":\"nas-coding-image-readiness-20261003_default\",\"aliases\":[\"nas-coding-image-readiness-20261003-main-1\",\"main\"]}\n\n"
+    },
+    {
+      "stage": "main-safe-inspect",
+      "stream": "stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "project-safe-inspect",
+      "stream": "stdout",
+      "bytes": 215,
+      "sha256": "20791b2bc9e7f844ebc1440ae50393dedbe91c48b96d6de310ba529ca1c633ef",
+      "actual_text": "{\"id\":\"a7335376801aeea81e9a6df7fabe30faec7b094cce08dc39c50e24a4e79f95a4\",\"name\":\"nas-coding-image-readiness-20261003_default\",\"project\":\"nas-coding-image-readiness-20261003\",\"network_key\":\"default\",\"containers\":{}}\n"
+    },
+    {
+      "stage": "project-safe-inspect",
+      "stream": "stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "project-full-ID-membership",
+      "stream": "stdout",
+      "bytes": 65,
+      "sha256": "cb1a299c7333dd54a33543b5e19f5d18a978f3c0eea0858004be6ae86ed7903e",
+      "actual_text": "a8c1cc967ced9fd9aa88afa91f3aacae2db08d42585620c9ce066c53df1deff3\n"
+    },
+    {
+      "stage": "project-full-ID-membership",
+      "stream": "stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "cleanup-compose-owned-project",
+      "stream": "stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "cleanup-compose-owned-project",
+      "stream": "stderr",
+      "bytes": 379,
+      "sha256": "c4d3d9811b792ecc450b9a7ecca89aa47a127301efe3b768223f37911471f9a9",
+      "actual_text": " Container nas-coding-image-readiness-20261003-main-1 Stopping \n Container nas-coding-image-readiness-20261003-main-1 Stopped \n Container nas-coding-image-readiness-20261003-main-1 Removing \n Container nas-coding-image-readiness-20261003-main-1 Removed \n Network nas-coding-image-readiness-20261003_default Removing \n Network nas-coding-image-readiness-20261003_default Removed \n"
+    },
+    {
+      "stage": "main",
+      "native_exit": 1,
+      "stream": "stdout",
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "actual_text": "\n"
+    },
+    {
+      "stage": "main",
+      "native_exit": 1,
+      "stream": "stderr",
+      "bytes": 90,
+      "sha256": "6c81444441bf0f61d4ee5517a33731d8cc8983ab9513b7a01f336e5bac69d244",
+      "actual_text": "Error response from daemon: No such container: nas-coding-image-readiness-20261003-main-1\n"
+    },
+    {
+      "stage": "project-network",
+      "native_exit": 1,
+      "stream": "stdout",
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "actual_text": "\n"
+    },
+    {
+      "stage": "project-network",
+      "native_exit": 1,
+      "stream": "stderr",
+      "bytes": 90,
+      "sha256": "c442709df3857d81b2633d93579fb8bdae2da6f9c1f9922c9b0c205b10a446a9",
+      "actual_text": "Error response from daemon: network nas-coding-image-readiness-20261003_default not found\n"
+    },
+    {
+      "stage": "project-membership",
+      "native_exit": 0,
+      "stream": "stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    },
+    {
+      "stage": "project-membership",
+      "native_exit": 0,
+      "stream": "stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_text": ""
+    }
+  ],
+  "typed_observation": {
+    "main": {
+      "kind": "main",
+      "id": "a8c1cc967ced9fd9aa88afa91f3aacae2db08d42585620c9ce066c53df1deff3",
+      "name": "/nas-coding-image-readiness-20261003-main-1",
+      "status": "created",
+      "running": false,
+      "pid": 0,
+      "started_at": "0001-01-01T00:00:00Z",
+      "finished_at": "0001-01-01T00:00:00Z",
+      "restart_count": 0,
+      "image": "sha256:3200c5c12603d1760582936e0c85d2bbc882c7fe17f8b2058556085e08c3d595",
+      "config_image": "harbor-readiness-django-14034:20261003-86723674f04e",
+      "project": "nas-coding-image-readiness-20261003",
+      "service": "main",
+      "container_number": "1"
+    },
+    "configured_network": {
+      "kind": "configured_network",
+      "name": "nas-coding-image-readiness-20261003_default",
+      "aliases": [
+        "nas-coding-image-readiness-20261003-main-1",
+        "main"
+      ]
+    },
+    "native_network": {
+      "id": "a7335376801aeea81e9a6df7fabe30faec7b094cce08dc39c50e24a4e79f95a4",
+      "name": "nas-coding-image-readiness-20261003_default",
+      "project": "nas-coding-image-readiness-20261003",
+      "network_key": "default",
+      "containers": {}
+    },
+    "selector_and_project_cardinality": 1,
+    "all_frozen_type_value_predicates": "PASS"
+  },
+  "supervision": {
+    "mutation_seconds": 120,
+    "read_only_seconds": 30,
+    "termination_signal": "TERM",
+    "kill_after_seconds": 10,
+    "scope": "Nominal native GNU supervision, not guaranteed daemon cancellation or wall-clock bound"
+  },
+  "independent_read": {
+    "requested_model": "gpt-6-astra",
+    "requested_effort": "max",
+    "actual_delivered_model": null,
+    "actual_delivered_effort": null,
+    "provider_usage": null,
+    "verdict": "PASS stopped-main/configured-network lifecycle and scoped cleanup only",
+    "native_read_only_observer_exit": 0,
+    "actual_streams_hashed": 34,
+    "all_typed_predicates": "PASS",
+    "retained_content_proof_streams_matched": 6,
+    "docker_operations": 0,
+    "parser_or_lifecycle_replay": false,
+    "original_native_operation_exits": "Attributed to retained root execution observations; independently reread streams do not regenerate exits"
+  },
+  "sources": {
+    "docker": "https://github.com/docker/cli/tree/7fc2dff9bceb96b266a3b2c3117c0955a0d9e616",
+    "compose_create": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/cmd/compose/create.go#L104",
+    "compose_aliases": "https://github.com/docker/compose/blob/5f94fb0aa42a2cd1248c6e6c7fafb87546b9c8de/pkg/compose/create.go#L470",
+    "moby_state": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/container/state.go#L121",
+    "moby_configured_network": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/container_operations.go#L386",
+    "moby_image_ID": "https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/daemon/containerd/image_inspect.go#L95",
+    "git": "https://github.com/git/git/blob/67ad42147a7acc2af6074753ebd03d904476118f/builtin/rev-parse.c",
+    "uutils_sha256sum": "https://github.com/uutils/coreutils/blob/c4093734e2ebe2efb7d65e216cd1444664bcf26a/src/uu/sha256sum/src/sha256sum.rs",
+    "gnu_supervisor": "https://github.com/coreutils/coreutils/tree/8e075ff8ee11692c5504d8e82a48ed47a7f07ba9"
+  },
+  "failures_preserved": {
+    "historical_input_and_ID_freezes": "Retained failed; earlier receipt remains authoritative",
+    "worker_source_discovery": [
+      "Guessed convergence.go HTTP404",
+      "Wrong render-directory file-read native1",
+      "Recovered through exact pinned tree and original packet paths"
+    ],
+    "root_projection": "After copying exact packet to private shared carrier, display helper attempted .map on object and threw TypeError; corrected field projection without packet change or Docker operation",
+    "complete_private_packet_retains_all_worker_processing_failures": true
+  },
+  "acceptance": {
+    "native_stopped_main": "PASS",
+    "configured_network_association": "PASS",
+    "empty_live_endpoints": "PASS",
+    "owned_scoped_cleanup": "PASS",
+    "task_started": false,
+    "task_or_model_execution": "NOT EXECUTED",
+    "build_pull_retry": false,
+    "image_removal": false,
+    "network_allowlist_enforcement": "NOT QUALIFIED",
+    "candidate_runtime_or_helpers": "NOT QUALIFIED",
+    "positive_SDK_role": "HOLD",
+    "coding_comparison": "HOLD",
+    "all_measured_defaults": "HOLD",
+    "usage_efficiency_token_features": "HOLD",
+    "classification": "Native Docker/Compose integration observations, not unchanged upstream model-task acceptance"
+  }
+}
