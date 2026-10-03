@@ -15024,7 +15024,7 @@
           "kind": "research_supplement",
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/0/candidates/2",
-          "disposition": "conditional"
+          "disposition": "unqualified"
         },
         {
           "kind": "research_supplement",
