@@ -61,8 +61,8 @@
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/controls/test_ctl_hang.py", "sha256": "c1e7282dce23394e37299f9d80c5b9849b760ea06c5d07561b6c36d4559fe353"}
     ],
     "evaluation": [
-      {"path": ".github/workflows/suite-shards-trial-linux.yml", "sha256": "ce8145daabd1bcfdde111e3545f275688ee4a0bfe95f42845d228c04dccca856"},
-      {"path": ".github/workflows/suite-shards-trial-macos.yml", "sha256": "4ab9d5d5c90b2bc7dabcdfb3c6c326d58f0acdbe1fa24754a197eb5d34be922c"},
+      {"path": ".github/workflows/suite-shards-trial-linux.yml", "sha256": "4b12c0f0b05a8d55342227c7eb9089216480eb480d927a66cc88e115d69d96e4"},
+      {"path": ".github/workflows/suite-shards-trial-macos.yml", "sha256": "05ff324587385cac1bc30e791b8a4343d1d9ec2865627206e053b7458a7fe3c0"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/compare.py", "sha256": "6f0b5f365cfe6ace3388a1cef88615e8c69fcc79f251e5088dbec7fa3369cacd"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/logparse.py", "sha256": "722f26cd461270cd7d1de37b5d9a00a466f228198a6a387189e8c39f66445d12"},
       {"path": "blueprints/convergence-practice/suite-shards-trial-20261003/record.py", "sha256": "7dc55b647d17d05362f49f850fa86f4a1800dd406f63df5ae5d5aeb19107226c"},

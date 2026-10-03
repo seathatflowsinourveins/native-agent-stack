@@ -16,7 +16,7 @@ name: Suite shards trial, macos-15 (draft pull request only)
 # failed background step fails the job at the wait that includes it). Every shard step exits with its unittest
 # status, so a failing shard is expected to fail its step, the group and the job, as production would; the control
 # job measures that each failing step fails on its own. No step inside a group has an `if:`, an expression in its
-# script, a `uses:` or a GITHUB_ENV or GITHUB_PATH write.
+# script, an action reference or a GITHUB_ENV or GITHUB_PATH write.
 #
 # Trigger: only `opened` and `reopened` (events-that-trigger-workflows.md at 63859c48, lines 465 and 484-489), with
 # a paths filter on this file, so pushing to the branch (synchronize) never re-runs the trial and the observed
