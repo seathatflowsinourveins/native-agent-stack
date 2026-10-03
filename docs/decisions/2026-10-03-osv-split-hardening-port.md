@@ -57,8 +57,8 @@ ecosystem filters, upload failure paths, primary/SARIF errors, PR behavior,
 inventory omissions and guard removal are covered. The unchanged four-case
 historical verifier still describes two groups; its actual returned output and
 limits must remain visible beside the separate current three-scan native run.
-Hosted uploads, exact-head CI and independent Opus review belong to the
-coordinator under the sandbox addendum.
+Hosted uploads were not executed locally; exact-head CI and the independent
+review are coordinator-owned steps, recorded on PR #673.
 
 The builder correction log is retained in the new receipt and
 `evidence/artifacts/osv-split-hardening-port-20261003/builder-attempts.json`.

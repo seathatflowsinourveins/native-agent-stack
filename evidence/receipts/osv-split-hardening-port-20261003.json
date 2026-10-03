@@ -5,13 +5,13 @@
   "checked_commit": "cac8700ba914950266272347468bff7ad630a4bf",
   "observed_utc": "2026-10-03T19:11:41Z",
   "observed_until_utc": "2026-10-03T19:55:27Z",
-  "authorization": "User-issued custody run contract for PR555 and its sandboxed-builder addendum; no Git/GitHub writes or independent reviewer runs authorized to this builder.",
+  "authorization": "User-issued custody run contract for PR555; Git/GitHub writes, exact-head CI and the independent review are coordinator-owned steps, recorded on PR #673.",
   "evidence_class": "source_review; local_integration; synthetic; native_proven (claims separated below)",
   "limitations": [
     "Checks were run against modified, uncommitted worktree bytes at the unchanged base HEAD; file hashes bind those bytes. No port commit or hosted PR exists from this builder run.",
     "The eight required contexts and independent exact-head Opus review are coordinator-only and not run here.",
     "The 164-test integrated suite has two existing skips: no hash-frozen workflow and optional PyYAML unavailable. Neither is counted as a pass.",
-    "The preserved four-control helper still extracts obsolete two-group mapfile lines: its list subsection prints 0 + 0 == 53 while exiting 0. This subsection is invalid current partition evidence; its current native scan subsections and the separate exact Bash run remain distinct.",
+    "The preserved four-control helper still extracts obsolete two-group mapfile lines: its list subsection prints 'sum check: 0 == 53' while exiting 0. This subsection is invalid current partition evidence; its current native scan subsections and the separate exact Bash run remain distinct.",
     "The unchanged helper only retains two SARIF artifacts itself and does not record six statuses. The separate exact-step run retains all three reports and the six status lines.",
     "The historical verifier file SHA256 2541edab1f363e6b63c4bbf30a54fc690cf1da5231dbfb16014a4257b1c55a6a is cited as reported provenance in #555's receipt; the distinct file is not reproduced or verified here.",
     "One native ID/id collision is reproduced; source map iteration does not guarantee which alias value wins.",
@@ -568,7 +568,7 @@
   },
   "independent_review": {
     "status": "not run",
-    "reason": "Sandbox addendum reserves exact-head independent Opus review and one repair round to the coordinator"
+    "reason": "Exact-head independent review and one repair round are coordinator-owned steps, recorded on PR #673; see repair_round"
   },
   "follow_up": "Coordinator commits content first and registry last, rebases for #626/current main, coordinates with #615 (#628 already merged), creates port PR, completes eight exact-head contexts and independent Opus review, posts #555 custody notice, waits two hours without objection, and only then closes #555 citing port URL/head/findings.",
   "registrations": [
@@ -1441,6 +1441,15 @@
       "usage": null,
       "timing": "Original command had no date stamp; unknown remains unknown.",
       "correction": "Use the supported package import from scripts.host_receipts import register_file; 51 changed/new paths were then registered successfully before rerunning the required generators."
+    },
+    {
+      "command": "rtk proxy env TMPDIR=/var/tmp nice -n 19 python3 scripts/component_matrix.py --write (first of two runs; registry_and_generators.generators[0])",
+      "exit_code": 0,
+      "outcome": "The first run wrote its stdout and stderr to the same two artifact paths as the second run at 2026-10-03T19:31:42Z, which overwrote them. The first run's returned output is not retained; its exit code and timing are the builder's record only.",
+      "observed_utc": "2026-10-03T19:31:09Z",
+      "usage": null,
+      "timing": "Started 2026-10-03T19:31:09Z, finished 2026-10-03T19:31:10Z, wall 0.373 s, as recorded under registry_and_generators.",
+      "correction": "Recorded in the review repair round: component-matrix.stdout.txt and component-matrix.stderr.txt hold only the second run's output."
     }
   ],
   "preserved": {
@@ -1608,5 +1617,94 @@
     "generated_reports_changed": false,
     "rebase_required": true,
     "final_registration_utc": "2026-10-03T19:55:27Z"
+  },
+  "repair_round": {
+    "observed_utc": "2026-10-03T20:55:57Z",
+    "observed_until_utc": "2026-10-03T20:58:32Z",
+    "reviewed_head": "48bbe5c5f8090c52eab4b99fb1514fa8b20c3238",
+    "review": "Independent read-only Claude Opus 5.5 review at max effort, run as a separate headless session on the reviewed head: verdict repair, 0 blocking, 2 should-fix, 5 minor. Each finding's disposition is recorded on PR #673.",
+    "source": {
+      "repository": "https://github.com/google/osv-scanner",
+      "pin": "v2.6.0",
+      "file": "internal/config/config.go",
+      "lines": "38-49 (PackageOverrideEntry toml tags) and 83-89 (Vulnerability and License toml tags)",
+      "original_file_sha256": "a49970f7f8fb7383b6ce2255f024698a90331404b917a65fdde3151642efdcd4",
+      "check": "Re-fetched at 2026-10-03T20:52:17Z from raw.githubusercontent.com at the tag; its sha256 equals primary-sources.json sources[3]."
+    },
+    "changes": [
+      "tests/test_osv_lockfile_coverage.py: override_problems rejects [[PackageOverrides]] keys outside the pinned toml tags (PACKAGE_OVERRIDE_KEYS) and nested vulnerability/license keys outside theirs; main's next/braces name assertion is restored beside override_problems(self.ordinary_config); FrozenPolicyMutationTests gains case-aliased-ecosystem and case-aliased-name-and-ecosystem; the override unit test gains three aliased cases.",
+      "docs/decisions/2026-09-22-github-automation-closure.md: the first overturn trigger again ends with '; or OSV lists an advisory for urllib3 2.8.0 or PyJWT 2.15.0 that only a later release fixes.', and the removal procedure follows it before **Not covered:**.",
+      "docs/decisions/2026-10-03-osv-split-hardening-port.md and this receipt: coordinator-owned steps are worded neutrally; limitations quote the recorded line 'sum check: 0 == 53'; builder_attempts records the overwritten first component-matrix output."
+    ],
+    "controls": [
+      {
+        "id": "override-key-function",
+        "evidence_class": "synthetic",
+        "input": "{'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True} and {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True}",
+        "before_utc": "2026-10-03T20:55:57Z",
+        "before": [
+          "head 48bbe5c5f double-alias override_problems: [] ignore_entry_problems: []",
+          "head 48bbe5c5f regex+Ecosystem override_problems: [] ignore_entry_problems: []"
+        ],
+        "after_utc": "2026-10-03T20:56:20Z",
+        "after": [
+          "repair double-alias override_problems: [\"'lib': unknown key 'Ecosystem'\", \"'lib': unknown key 'Name'\"]",
+          "repair regex+Ecosystem override_problems: [\"'nex[t]': unknown key 'Ecosystem'\"]"
+        ],
+        "exit_codes": [0, 0]
+      },
+      {
+        "id": "repair-round-controls",
+        "evidence_class": "synthetic",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. nice -n 19 python3 <scratch>/repair-controls.py",
+        "script": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+        "stdout": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+        "observed_utc": "2026-10-03T20:58:15Z",
+        "exit_code": 0,
+        "result": "The base 463a57b98 workflow fails test_failure_path_semantics_keep_findings_uploadable and the head workflow passes it; R4-key is caught on this head by IgnorePolicyTests and FrozenScanTests; both case-aliased overrides are caught by FrozenScanTests and IgnorePolicyTests."
+      },
+      {
+        "id": "three-module-unittest",
+        "evidence_class": "local_integration",
+        "command": "TMPDIR=<scratch> PYTHONDONTWRITEBYTECODE=1 nice -n 19 python3 -m unittest tests.test_osv_lockfile_coverage tests.test_workflow_hardening tests.test_wsl_retrieval -v",
+        "started_utc": "2026-10-03T20:58:21Z",
+        "finished_utc": "2026-10-03T20:58:32Z",
+        "exit_code": 0,
+        "result": "Ran 164 tests in 11.339s; OK (skipped=2)"
+      }
+    ],
+    "bindings_after_repair": [
+      {
+        "path": "tests/test_osv_lockfile_coverage.py",
+        "sha256": "33fcb5e4580443d97e3dd0ac282651d10eec26d9b8e72cf10651c4426eb8f2d3",
+        "bytes": 75469
+      },
+      {
+        "path": "docs/decisions/2026-09-22-github-automation-closure.md",
+        "sha256": "0267c93b58e204089a3db684c552fcfb62c21020d152d32525742439eec080e2",
+        "bytes": 148156
+      },
+      {
+        "path": "docs/decisions/2026-10-03-osv-split-hardening-port.md",
+        "sha256": "3a5a7491e8a1034b3fb6ecbe6d482d03eb261920c957a99992751604246a8e0f",
+        "bytes": 4475
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.py.txt",
+        "sha256": "06eab390d148c50eb7a8833474d5ef1e9da0da89477b7823fbdcbd16c3547f4f",
+        "bytes": 4087
+      },
+      {
+        "path": "evidence/artifacts/osv-split-hardening-port-20261003/repair-round-controls.stdout.txt",
+        "sha256": "7e42d7dd71f3a3351a3b56db793aa7696cadae9c6d8a8b9b57c6772dfc630055",
+        "bytes": 4226
+      }
+    ],
+    "artifact_bindings_note": "artifact_bindings above remain the build-time bytes; bindings_after_repair holds the bytes this round changed or added. This receipt cannot bind its own bytes; manifests/evidence.json does.",
+    "residuals": [
+      "Main moved to 6112d14d40f7, one commit past the reviewed base 463a57b98, touching manifests/evidence.json and tests/test_landscape_sweep_harness.py. Rebase right before merge and rebuild manifests/evidence.json from the new main, as contract step 7 requires.",
+      "The build-time PR body's exact-head re-run lines have no retained output; the PR body labels them as unretained confirmations.",
+      "Final acceptance exit codes on the repaired head are recorded on PR #673."
+    ]
   }
 }

@@ -324,14 +324,30 @@ def ignore_entry_problems(config):
     return problems
 
 
+# The toml tags of PackageOverrideEntry and its nested tables at OSV-Scanner v2.6.0
+# (internal/config/config.go:38-49 and :83-89).
+PACKAGE_OVERRIDE_KEYS = {"name", "version", "ecosystem", "group", "nameIsRegex", "ignore",
+                         "vulnerability", "license", "effectiveUntil", "reason"}
+PACKAGE_OVERRIDE_TABLE_KEYS = {"vulnerability": {"ignore"}, "license": {"override", "ignore"}}
+
+
 def override_problems(config):
     """Reject ordinary overrides that can suppress an npm package by name or regex.
 
     OSV applies an override without an ecosystem to every ecosystem. Reject npm
     in any case as project policy; native ecosystem matching is case-sensitive.
+    The decoder matches keys case-blind, so a key not spelled exactly as a toml
+    tag (Ecosystem beside ecosystem) can set the field this policy reads.
     """
     problems = []
     for entry in config.get("PackageOverrides", []):
+        for key in sorted(set(entry) - PACKAGE_OVERRIDE_KEYS):
+            problems.append(f"{entry.get('name')!r}: unknown key {key!r}")
+        for table, keys in PACKAGE_OVERRIDE_TABLE_KEYS.items():
+            nested = entry.get(table)
+            if isinstance(nested, dict):
+                for key in sorted(set(nested) - keys):
+                    problems.append(f"{entry.get('name')!r}: unknown key {table}.{key}")
         ecosystem = str(entry.get("ecosystem", "")).strip().lower()
         if not ecosystem or ecosystem == "npm":
             problems.append(f"{entry.get('name')!r}: a package override needs an ecosystem other than npm")
@@ -594,6 +610,7 @@ class FrozenScanTests(unittest.TestCase):
         ids = {entry["id"] for entry in self.ordinary_config.get("IgnoredVulns", [])}
         frozen_ids = {advisory for lock in FROZEN_LOCKS.values() for advisory in lock["advisories"]}
         self.assertEqual(ids & frozen_ids, set(), "the exception belongs in the frozen config, which only the frozen scan uses")
+        self.assertEqual({override.get("name") for override in self.ordinary_config.get("PackageOverrides", [])} & {"next", "braces"}, set())
         self.assertEqual(override_problems(self.ordinary_config), [])
 
     def test_a_config_with_a_key_the_scanner_reads_case_blind_is_a_problem(self):
@@ -611,7 +628,10 @@ class FrozenScanTests(unittest.TestCase):
                          {"name": "nex[t]", "nameIsRegex": True, "ecosystem": "npm", "ignore": True},
                          {"name": "brac[e]s", "nameIsRegex": True, "ecosystem": "npm", "ignore": True},
                          {"name": "nex[t]", "nameIsRegex": True, "ignore": True},
-                         {"name": ".*", "nameIsRegex": True, "ecosystem": "NPM"}):
+                         {"name": ".*", "nameIsRegex": True, "ecosystem": "NPM"},
+                         {"name": "nex[t]", "nameIsRegex": True, "ecosystem": "PyPI", "Ecosystem": "npm", "ignore": True},
+                         {"name": "lib", "Name": "next", "ecosystem": "PyPI", "Ecosystem": "npm", "ignore": True},
+                         {"name": "lib", "ecosystem": "PyPI", "vulnerability": {"Ignore": True}}):
             with self.subTest(override=override):
                 self.assertNotEqual(override_problems({"PackageOverrides": [override]}), [], override)
 
@@ -984,6 +1004,8 @@ class FrozenPolicyMutationTests(unittest.TestCase):
             'next-regex': {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'npm', 'ignore': True},
             'npm-case-regex': {'name': '.*', 'nameIsRegex': True, 'ecosystem': 'NPM', 'ignore': True},
             'ecosystem-less-regex': {'name': 'brac[e]s', 'nameIsRegex': True, 'ignore': True},
+            'case-aliased-ecosystem': {'name': 'nex[t]', 'nameIsRegex': True, 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True},
+            'case-aliased-name-and-ecosystem': {'name': 'lib', 'Name': 'next', 'ecosystem': 'PyPI', 'Ecosystem': 'npm', 'ignore': True},
         }
         for mutation in ('advisory', *overrides):
             with self.subTest(mutation=mutation):
