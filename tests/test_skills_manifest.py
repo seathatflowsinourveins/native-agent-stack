@@ -296,9 +296,10 @@ class ListingBudgetTemplateTests(unittest.TestCase):
         self.assertTrue(1 <= budget <= 10_000, budget)
         self.assertEqual(budget, 6000)
         # Per-skill disables of manifest skills come from tools/adoption/install_skills.py --print-codex-config, never
-        # the template. Its one rule turns off Codex's bundled skill-installer by path (wave-2 skills ruling).
-        self.assertEqual(skills.get("config"), [{"path": "${HOME}/.codex/skills/.system/skill-installer/SKILL.md",
-                                                 "enabled": False}])
+        # the template. Its one rule turns off Codex's bundled skill-installer by path (wave-2 skills ruling), a path
+        # relative to the Codex home that holds config.toml (tests/test_render_config.py,
+        # test_the_bundled_skill_installer_rule_follows_the_codex_home).
+        self.assertEqual(skills.get("config"), [{"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}])
 
     def test_codex_template_comment_counts_the_skills_the_catalog_shows(self):
         text = CODEX_TEMPLATE_PATH.read_text(encoding="utf-8")
