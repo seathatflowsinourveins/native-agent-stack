@@ -9156,23 +9156,28 @@
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "23934cadf98bcda926844fea79376a619a21e20e4abc01ce2fb45ea27c496c44",
-      "bytes": 6996
+      "sha256": "7e5f75b1f6f3912b21c32ea909fabc4c1e1d76985601098692226484bddc8052",
+      "bytes": 7715
+    },
+    {
+      "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
+      "sha256": "f37312793dd6b641a31294c5c42269c00212e91fb6a756b74bc67bb64be2a66e",
+      "bytes": 4792
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "c2d938702af60b756c65f11369864f278485f0ed082206ee8d4e17e7211f9ccf",
-      "bytes": 7271
+      "sha256": "7253f7187897287f93394fb344b8245790f206e12c2f8d1c704d9f2d7455864c",
+      "bytes": 7446
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "f5e829e4d80f74ebc5ea98ea817c87c7565fa304157a2b9a51d75a89eb7295c1",
-      "bytes": 7712
+      "sha256": "8fb2d731b8d6d525cbecdfbb26e30e41ba85570f8fadf1a672ba705f634786f5",
+      "bytes": 8432
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
-      "sha256": "4b57345b49904a246b4e2913c9a3dbae2f4862f80d63127399e9c23b47c98fda",
-      "bytes": 5125
+      "sha256": "515c2851b905823efebcdd8fdbe4d685e62ca94e817c7a5d981914bd8166d16d",
+      "bytes": 5464
     },
     {
       "path": "blueprints/runtime-workers/comparisons/github-workflow-draft.json",
@@ -9711,8 +9716,8 @@
     },
     {
       "path": "blueprints/runtime-workers/sdk-role-qualification.md",
-      "sha256": "d9e08d338bb62168203a4accc0830819dad21457897870d2829cc3fc28a7b3b3",
-      "bytes": 2882
+      "sha256": "7642eab3c6fea27b896c3ebbb8a7fbb566a6396a933cb8d5ea06daa67e6f8eb3",
+      "bytes": 4242
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
@@ -15001,8 +15006,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "8c30ff4342af11b097b5884506dbc36117e80910f125c2c48cbf810d9202457a",
-      "bytes": 13611
+      "sha256": "b718d1bcc74bc47c545d220e7d028c1d9160d7b168b4a3e59312d2f3777201c5",
+      "bytes": 14090
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -15836,8 +15841,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-runtime-job-qualification.md",
-      "sha256": "58f211ba4b3a3158c04b9bda6964394a5238215a62ae10114d263b39c81cde44",
-      "bytes": 10712
+      "sha256": "070788e0b58380e67f0d1dad7728dc23011d2af94cd395884bccd9238e7752d6",
+      "bytes": 14205
     },
     {
       "path": "docs/direct-results.md",
@@ -41881,13 +41886,53 @@
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/README.md",
-      "sha256": "ce29b40af4ad65bf6cc30f70ce21b9c707d58fb8415522dd484f771939f411eb",
-      "bytes": 2028
+      "sha256": "0438eca76aad7198b37bfbf20a600b8fbbd0210374485afa4d5d7a3c3d51dda7",
+      "bytes": 3936
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/checks.json",
       "sha256": "2c3948d035c5efd1c90f22ef97e16f3d89d9566d093460035a2ea006070c3e4d",
       "bytes": 5495
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-image-manifests.json",
+      "sha256": "2fb1d6c97576e2f6f9eb03709acb596ccca00553797846ed1c6c0d49e8568719",
+      "bytes": 30855
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/coding-input-read.json",
+      "sha256": "35c351f9560fad85de00840e4a310c130434a7df963d8ea93d375a5e31f412cc",
+      "bytes": 3027
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/gateway-cache-controls.json",
+      "sha256": "bc54801c0333353b2157090fcb858db65736b911b9e4c8f8d766c3e29c3758af",
+      "bytes": 3779
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.json",
+      "sha256": "529e59ad8b9da590800ff2db534ea46a4fab464b7d3bc1bbcfe97ba5dda20951",
+      "bytes": 4928
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.output.txt",
+      "sha256": "2b058ace5f400119a7fb248716ce933b8b644ec23b4a55f8be2496db14b18bc3",
+      "bytes": 3058
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.json",
+      "sha256": "b7f62544d2b2d03e18ba44879c8f0fb36ae6b66d3b8f664851f229683ec7493c",
+      "bytes": 4416
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.stdout.txt",
+      "sha256": "5f9e3e825b8e3d8469ba3ddc1c28e6bbf10c9fd74bb7f40dc74e7913c1b24595",
+      "bytes": 998
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/protocol-publication-read.json",
+      "sha256": "e8c72be3487072f5c069266359616d49dd0f7e486da74189a8480257f9187a70",
+      "bytes": 6451
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/protocol-source-read.json",
