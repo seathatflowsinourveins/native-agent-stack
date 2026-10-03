@@ -1,0 +1,118 @@
+Selected unchanged first-party Codex SDK tests at a956835d020762cb2b570053af06f643a11c0ecc.
+Native stdout is reproduced verbatim per phase. Stderr is full for exec and companion; local-proxy stderr uses explicitly bounded verbatim excerpts. Full originals and native JSON identities are retained in the JSON receipt.
+These are local fixtures; no external provider/model acceptance or token savings is claimed.
+
+=== exec-controls stdout (verbatim) ===
+
+> @openai/codex-sdk@0.0.0-dev test /state/codex-source/sdk/typescript
+> jest --runInBand --runTestsByPath tests/exec.test.ts --json --outputFile=/state/logs/exec-controls-native.json
+
+
+=== exec-controls stderr (verbatim) ===
+PASS tests/exec.test.ts
+  CodexExec
+    ✓ rejects when exit happens before stdout closes (91 ms)
+    ✓ places resume args before image args (2 ms)
+    ✓ passes ordinary and dotted structured keys without changing their meaning to the Codex CLI (2 ms)
+    ✓ passes raw inline filesystem permissions without altering literal map keys to the Codex CLI (2 ms)
+    ✓ passes raw profile names containing periods and spaces to the Codex CLI (1 ms)
+    ✓ passes structured overrides before ordered raw overrides and duplicates to the Codex CLI (1 ms)
+    ✓ passes an empty raw override list without changing structured configuration to the Codex CLI (1 ms)
+    ✓ passes the thread source when starting a new thread (1 ms)
+    ✓ lets SDK-managed and thread settings override raw configuration when resuming (1 ms)
+    ✓ allows overriding the env passed to the Codex CLI (2 ms)
+    ✓ resolves the package-layout binary and PATH directory (1 ms)
+    ✓ falls back to the legacy binary layout
+    ✓ prepends package PATH entries without duplicating them (1 ms)
+    ✓ preserves the Windows Path key when prepending package PATH entries (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       14 passed, 14 total
+Snapshots:   0 total
+Time:        1.623 s
+Ran all test suites within paths "tests/exec.test.ts".
+Test results written to: ../../../logs/exec-controls-native.json
+
+=== local-proxy-controls stdout (verbatim) ===
+
+> @openai/codex-sdk@0.0.0-dev test /state/codex-source/sdk/typescript
+> jest --runInBand --runTestsByPath tests/run.test.ts tests/runStreamed.test.ts tests/abort.test.ts --json --outputFile=/state/logs/local-proxy-controls-native.json
+
+/state/codex-source/sdk/typescript:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @openai/codex-sdk@0.0.0-dev test: `jest --runInBand --runTestsByPath tests/run.test.ts tests/runStreamed.test.ts tests/abort.test.ts --json --outputFile=/state/logs/local-proxy-controls-native.json`
+Exit status 1
+
+=== local-proxy-controls stderr (bounded verbatim suite listings, timeout assertion and footer) ===
+FAIL tests/run.test.ts (112.985 s)
+FAIL tests/runStreamed.test.ts (20.141 s)
+FAIL tests/abort.test.ts (5.322 s)
+  ● Codex › returns thread events
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+Test Suites: 3 failed, 3 total
+Tests:       26 failed, 6 passed, 32 total
+Snapshots:   0 total
+Time:        138.648 s
+Ran all test suites within paths "tests/run.test.ts", "tests/runStreamed.test.ts", "tests/abort.test.ts".
+Test results written to: ../../../logs/local-proxy-controls-native.json
+
+=== companion-staging-positive stdout (verbatim) ===
+
+> @openai/codex-sdk@0.0.0-dev test /state/codex-source/sdk/typescript
+> jest --runInBand --runTestsByPath tests/run.test.ts '--testNamePattern=^Codex returns thread events$' --json --outputFile=/state/logs/companion-staging-positive-native.json
+
+/state/codex-source/sdk/typescript:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @openai/codex-sdk@0.0.0-dev test: `jest --runInBand --runTestsByPath tests/run.test.ts '--testNamePattern=^Codex returns thread events$' --json --outputFile=/state/logs/companion-staging-positive-native.json`
+Exit status 1
+
+=== companion-staging-positive stderr (verbatim) ===
+FAIL tests/run.test.ts (6.59 s)
+  Codex
+    ✕ returns thread events (5007 ms)
+    ○ skipped sends previous items when run is called twice
+    ○ skipped continues the thread when run is called twice with options
+    ○ skipped resumes thread by id
+    ○ skipped passes turn options to exec
+    ○ skipped passes high modelReasoningEffort to exec
+    ○ skipped passes persistent modelReasoningEffort to exec
+    ○ skipped passes networkAccessEnabled to exec
+    ○ skipped passes webSearchEnabled to exec
+    ○ skipped passes webSearchMode to exec
+    ○ skipped passes webSearchEnabled false to exec
+    ○ skipped passes approvalPolicy to exec
+    ○ skipped passes CodexOptions config overrides as TOML --config flags
+    ○ skipped lets thread options override CodexOptions config overrides
+    ○ skipped passes raw permission maps unchanged while preserving override precedence
+    ○ skipped passes additionalDirectories as repeated flags
+    ○ skipped writes output schema to a temporary file and forwards it
+    ○ skipped combines structured text input segments
+    ○ skipped forwards images to exec
+    ○ skipped runs in provided working directory
+    ○ skipped throws if working directory is not git and no skipGitRepoCheck is provided
+    ○ skipped sets the codex sdk originator header
+    ○ skipped throws ThreadRunError on turn failures
+
+  ● Codex › returns thread events
+
+    thrown: "Exceeded timeout of 5000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout."
+
+      18 |
+      19 | describe("Codex", () => {
+    > 20 |   it("returns thread events", async () => {
+         |     ^
+      21 |     const { url, close } = await startResponsesTestProxy({
+      22 |       statusCode: 200,
+      23 |       responseBodies: [sse(responseStarted(), assistantMessage("Hi!"), responseCompleted())],
+
+      at tests/run.test.ts:20:5
+      at Object.<anonymous> (tests/run.test.ts:19:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 22 skipped, 23 total
+Snapshots:   0 total
+Time:        6.792 s
+Ran all test suites within paths "tests/run.test.ts".
+Test results written to: ../../../logs/companion-staging-positive-native.json
