@@ -3910,8 +3910,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
-      "bytes": 467
+      "sha256": "5b26e1858d40e23de54d5d346dae2a5cea5a20e17f413ad09159fcb4a61bde97",
+      "bytes": 735
     },
     {
       "path": ".github/CODEOWNERS",
@@ -31916,8 +31916,8 @@
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/README.md",
-      "sha256": "5e3e9947ef20142df98efecdc0b1e89d509ae930e95a569677f553eeea6409a8",
-      "bytes": 19297
+      "sha256": "40880aa6aaf5ea3697d76168d8360e329d6eab2114dbdb1f8024f24346a4eb3b",
+      "bytes": 19947
     },
     {
       "path": "evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/child-usage-wf_555874dd-5a7.json",
