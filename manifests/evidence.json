@@ -16071,12 +16071,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "9b6f0cbf8f1bbfbfa170b8b3ed5ee78bf63a6e0d40e20b522f3d4c24060a8391",
+      "sha256": "494210e635301160b645bae420bea27de4f1de9691c17b3070daa5f5995492e8",
       "bytes": 535421
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "cf5e84fed408698c1a6350e62966c0571986edc5178fec7c42b68f1e085c546b",
+      "sha256": "824248849e75c322eeabb501a7e7f391f5d7632a5c62811552afbbae27f7efff",
       "bytes": 319527
     },
     {
@@ -37271,7 +37271,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "82aea4297fb7cdc31dea6e3a2a6ed66a5c8d5ea2909872533b6d7ece091888d8",
+      "sha256": "65a51757b2c88af262164f53369cc95ae5ed26c667a8610022a13ab5ba04eb9f",
       "bytes": 4174
     },
     {
