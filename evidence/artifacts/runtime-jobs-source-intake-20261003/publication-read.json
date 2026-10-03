@@ -31,7 +31,20 @@
     "upstream_contract": "native-agent-stack@56473e4b840f0e6940c031801d866e7e9bf29baf tools/sota-convergence/blind_checkout.py:is_label_value: a non-string mapping/rule structure is never a label",
     "change": "Retain selection key as a structured prospective rule. Preserve baseline, per-task two-repeat quality dominance, five-percent paired token tie threshold, complete counters, no greater median agent time, challenger ordering and native fallback. No adoption verdict or freeze.",
     "check": {"command": "python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests", "exit_code": 0, "actual_output_excerpt": "Ran 2 tests in 0.185s\n\nOK"},
-    "independent_read": "pending",
+    "independent_read": {
+      "head": "a87afb753f07d175124384afb649df15976999ca",
+      "scope": "Bounded Sol/max read-only delta review from6240dd4 in a separate immutable checkout; original classifier/tests/validator unchanged",
+      "verdict": "Accept semantic invariance and matching registration of all five changed artifacts; correct the decision note's adoption-label wording to unclassified string",
+      "classification_command": "python3 -B -m unittest tests.test_blind_checkout.RepositoryClassificationTests",
+      "classification_exit_code": 0,
+      "classification_output_excerpt": "Ran 2 tests in 0.180s\n\nOK",
+      "validation_command": "python3 -B scripts/validate.py",
+      "validation_exit_code": 0,
+      "validation_actual_output": "{\"components\": 69, \"hashed_files\": 9331, \"profiles\": 4, \"receipts\": 186, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "cleanup_observation": "Reviewed head unchanged, porcelain empty, staged and unstaged diff checks exit0",
+      "limits": "No historical private events re-read or billing verification; public usage internal consistency only. No runtime/model/route/adoption acceptance. New protocol/source additions are outside this read.",
+      "usage": null
+    },
     "prior_review_carry": "Only unchanged original-source/artifact scope; the named Astra head does not accept this delta"
   },
   "sanitization": "Original review/event streams retained privately; credentials, native settings, conversations and private locators omitted"

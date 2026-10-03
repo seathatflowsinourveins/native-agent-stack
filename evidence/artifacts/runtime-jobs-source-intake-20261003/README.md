@@ -9,3 +9,5 @@ The [checks record](checks.json) retains actual returned output excerpts and cou
 The [publication read](publication-read.json) binds the corrected committed-head Astra acceptance, its review-time validation failure, the failed native pre-push check and the owned prospective-rule format repair. Exact-head acceptance stays on its recorded scope; subsequent deltas require a separate read. Both source reviews' native counters remain separate from benchmark usage.
 
 Private host/executable locations and raw conversations are omitted. Counts, source identities and exit codes are retained; absent billing and unobserved acceptance stay unknown.
+
+The [protocol source read](protocol-source-read.json) binds additional pinned source/task-control reads, static blockers, safe gateway metadata and corrections. It keeps inferred source failures distinct from returned execution exits. Source pools, different scheduler fixtures and passing health responses do not qualify a runtime default.

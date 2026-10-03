@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "job": "multi_worker_orchestration",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "runs": [],
+  "default": null,
+  "arms": [
+    {"id": "native-codex-v2", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "form": "Native worker roles and V2 tool registration; qualify actual mode, fork and task identity"},
+    {"id": "openai-agents-native-codex", "repository": "openai/openai-agents-python", "version": "0.23.1", "ref": "c4a1d047b22488234b2ba81056e1b9b8db2127a5", "extension": "src/agents/extensions/experimental/codex", "form": "Org-maintained experimental codex_tool with a constructed native Codex instance; supported as_tool orchestration and native cleanup"},
+    {"id": "langgraph-deepagents", "repository": "langchain-ai/langgraph", "version": "1.2.12", "ref": "49cce0ca852be4cfb567a1cbe0e511ff325a1682", "extension": {"repository": "langchain-ai/deepagents", "version": "0.7.21", "ref": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773"}, "form": "Org-maintained graph/subagent and retry interfaces; no assumed Codex two-sidecar adapter"}
+  ],
+  "routing": {"gateway": "existing keyless OmniRoute", "worker_model": "cx/gpt-6.1-sol", "native_worker_effort": "ultra", "consequential_judge_model": "cx/gpt-6-astra-max", "native_judge_effort": "max", "qualified": false},
+  "native_lifecycle_controls": {
+    "repository": "openai/codex",
+    "ref": "a956835d020762cb2b570053af06f643a11c0ecc",
+    "class": "unchanged upstream fixtures; commands not executed",
+    "method": "justfile:test uses cargo-nextest. Freeze bounded supported just test invocations; fixture pass is separate from useful-task and live route acceptance.",
+    "controls": [
+      {"path": "codex-rs/core/src/tools/handlers/multi_agents_tests.rs", "sha256": "a50c7c2131fa17e80e9108626fb6991e0dce502ada6f0ba30c5f0902e369624e", "test": "multi_agent_v2_spawn_returns_path_and_send_message_accepts_relative_path", "oracle": "Canonical task path and native relative addressing"},
+      {"path": "codex-rs/core/src/tools/handlers/multi_agents_tests.rs", "sha256": "a50c7c2131fa17e80e9108626fb6991e0dce502ada6f0ba30c5f0902e369624e", "test": "multi_agent_v2_followup_task_completion_notifies_parent_on_every_turn", "oracle": "Separate completed-turn notifications; retain their native linkage"},
+      {"path": "codex-rs/core/src/tools/handlers/multi_agents_tests.rs", "sha256": "a50c7c2131fa17e80e9108626fb6991e0dce502ada6f0ba30c5f0902e369624e", "test": "multi_agent_v2_interrupt_agent_accepts_task_name_target", "oracle": "Target receives Op::Interrupt; neither target nor child receives Op::Shutdown; child does not receive Op::Interrupt. Interruption is not tree shutdown."},
+      {"path": "codex-rs/core/tests/suite/multi_agent_resume.rs", "sha256": "32109ae17dc929dddae7894f63d36e075aa3091da8144d2d3e249e6a3e4f661d", "test": "cold_root_resume_restores_agent_identity_and_role_on_followup", "oracle": "Native lazy resume preserves identity/role; mock/high fixture is not live Sol/Ultra acceptance"},
+      {"path": "codex-rs/core/src/agent/control_tests.rs", "sha256": "cbfd57da634da1c114c8762ed7a5791a45f100522a9977cf7f00e3da4c8fe825", "test": "shutdown_agent_tree_closes_live_descendants", "oracle": "Internal controller fixture establishes descendant shutdown; it is not an externally registered V2 shutdown API"},
+      {"path": "codex-rs/core/src/agent/control_tests.rs", "sha256": "cbfd57da634da1c114c8762ed7a5791a45f100522a9977cf7f00e3da4c8fe825", "test": "spawn_agent_releases_slot_after_shutdown", "oracle": "Native capacity recovery after shutdown"},
+      {"path": "codex-rs/core/tests/suite/startup_cancellation.rs", "sha256": "61d44a2a80d9a3bce007349f92a16c7ad2d45826a5b30cdea2479464c92c56d1", "test": "cancelled_resume_releases_writer_while_mcp_startup_is_pending", "oracle": "A subsequent native resume succeeds with the same thread identity"}
+    ],
+    "registration_source": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tools/spec_plan.rs",
+    "registration_limits": "V2 has spawn/send/followup/optionalwait/interrupt/list. Legacy resume/close registration and internal shutdown helper do not imply an external V2 close endpoint."
+  },
+  "useful_task_option": {
+    "name": "CooperBench through the maintained Harbor adapter",
+    "adapter_ref": "1e5c5c6db929a10a140d05e606882c671ae20729",
+    "source": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/adapters/cooperbench/src/cooperbench/adapter.py",
+    "adapter_sha256": "dc6adef8c5a04babc86573587c4a7538d89ef3497432a399cb5b464b4ca079fc",
+    "dataset_ref": null,
+    "combined_patch_ref": null,
+    "task_ids": [],
+    "image_digests": [],
+    "native_environment_bindings": null,
+    "oracle": "Pinned native verifier only; both features must pass. Existing method permits union-merge fallback and can exit0 with reward0. Do not infer success from exit alone.",
+    "limits": "Ordinary single Codex agent selection is not the official two-sidecar/communication setup. Adapter loads an unversioned dataset and a main-branch patch source; freeze both. A common native integration for these three arms remains unestablished in reviewed sources."
+  },
+  "sdk_binding_gaps": [
+    "Agents codex_tool default key resolution can inject ambient provider keys; use a supported constructed Codex instance and bind an environment excluding ambient credential inputs without inspecting their values",
+    "Agents Codex exec adapter forwards experimental-json and native effort string, but public effort Literal omits max/ultra; qualification must observe requested and delivered mappings separately",
+    "Local workspace is not the benchmark sidecar isolation or communication boundary",
+    "Agents tool usage requests=1 per completed turn and reasoning0 are adapter conventions; retain native raw missingness and count cumulative/child totals once",
+    "Actual lifecycle, role-extension activation and matching native benchmark environment/task assignment for each runtime"
+  ],
+  "design": {"repeats": 2, "retry": 0, "order": "Rotate paired arm order on identical useful tasks", "concurrency": null, "per_child_limits": null, "window": null, "claude_pre_freeze_read": null},
+  "selection_rule": {"requirements": "Common useful-task oracle, actual route/role parity and separate spawn/resume/cancel/shutdown controls", "quality": "Paired no-regression on every task/repeat; improved native reward or successful useful artifacts", "tie": "Predeclared five-percent paired native-token reduction with complete comparable scopes and no greater median elapsed time; unknown totals do not establish a saving", "limits": "Lifecycle fixture success and broader API surfaces cannot select a default"},
+  "freeze_gaps": ["Common maintained benchmark integration", "Frozen dataset/patch/images/task IDs and worker-visible inputs", "Per-role tool/environment/model/effort and extension bindings", "Complete native attribution and counters", "Limits and numeric quality/recovery thresholds", "Consequential Astra source-conflict read", "Claude exact-head read and exclusive pool allocation"]
+}

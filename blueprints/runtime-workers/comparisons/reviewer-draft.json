@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "job": "reviewer",
+  "status": "draft_not_frozen",
+  "freeze_eligible": false,
+  "runs": [],
+  "default": null,
+  "purpose": "Compare useful defect review with the same hidden oracle and worker-visible revision/context. Source calibration is separate from reviewer performance.",
+  "arms": [
+    {"id": "native-codex-review", "repository": "openai/codex", "version": "0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "form": "native exec review; pin base/head and native review instructions"},
+    {"id": "openhands-org-review", "repository": "OpenHands/software-agent-sdk", "version": "1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "extension": {"repository": "OpenHands/extensions", "ref": "62f34e3a7577fbb947687363fa0df485061d0b3d", "path": "skills/code-review", "manifest_version": "1.0.0", "activation_observed": false}},
+    {"id": "pr-agent-local-gap", "repository": "qodo-ai/pr-agent", "version": "v0.47", "ref": "8e5a9295973b24af4b70cafd0b660a230811ef9e", "package_version": "0.46.0", "form": "upstream local Git review, not an assumed native skill loader", "inclusion_condition": "Only a named reviewer gap; no automatic replacement of native cross-family review"}
+  ],
+  "routing": {
+    "gateway": "existing keyless OmniRoute; no new credential, sign-in copy or service switch",
+    "worker_model": "cx/gpt-6.1-sol",
+    "native_worker_effort": "ultra",
+    "judge_model": "cx/gpt-6-astra-max",
+    "native_judge_effort": "max",
+    "actual_mapping_qualified": false,
+    "native_review_source": "https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/tasks/review.rs",
+    "native_review_contract": "Clones parent configuration and selects review_model or the turn model; disables web search, Collab and MultiAgentV2; approval Never. No final-output JSON schema is passed to the review child. Source does not establish delivered effort or CLI structured capture."
+  },
+  "calibration": {
+    "evaluator": "promptfoo0.123.1@34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-codex-sdk/skill-comparison/promptfooconfig.yaml",
+    "source_sha256": "9c86db1504b45412a2cdcee5bc6e5d075af5d3e516c1a2095ac9bfb5fff06507",
+    "tasks": [
+      {"row": 0, "description": "Finds both auth issues", "expected_issue_ids": ["weak-password-hash", "timing-unsafe-compare"]},
+      {"row": 1, "description": "Focuses on token comparison", "expected_issue_ids": ["timing-unsafe-compare"]}
+    ],
+    "fixture_sha256": "8ccab7495b98ca267dac72d66b8718bb96b5ab4333cbbc2121e7ff5511efac58",
+    "native_oracle": "0.7*recall+0.3*precision; object pass requires recall>=0.75 and precision>=0.5. Numeric threshold and relative winner are separate assertion paths.",
+    "limits": "Two auth fixtures provide calibration only. Returning both IDs on the timing-only row yields score0.85 and passes; this is not a strict false-positive or clean-review oracle. Stock SDK generation is not native CLI ReviewOutputEvent."
+  },
+  "common_rubric_option": {
+    "source": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/assertions/llmRubric.ts",
+    "form": "Supported llm-rubric over unchanged final strings or serialized objects; no locally invented normalization or scorer",
+    "required_judge_result": ["pass:boolean", "score:number", "reason:string"],
+    "binding": null,
+    "limits": "Native matcher defaults missing pass to true. Freeze an explicit required-field schema, threshold and wrong/empty/false-positive controls. Retain grading transport/parse errors and raw missing usage. Grader cost is separate from target cost."
+  },
+  "broader_source_pool": {
+    "name": "SWRBench",
+    "repository": "ZZR0/SWRench",
+    "ref": "67ae1d4395ac05f800d62b0e13678eadeb9fa5c7",
+    "dataset_path": "data/swr_datasets_d5c5.jsonl",
+    "dataset_blob": "35313bdf6ed2edb3eb7792e672732c294478ed46",
+    "dataset_bytes": 84826523,
+    "dataset_sha256": "7048e7a92ea9f7a1e6812646694a040582448cc1dd9d515264a4b55071aff95d",
+    "inventory": {"records": 1000, "issue_labelled": 500, "clean_labelled": 500},
+    "seed": "review-sol-ultra-v1",
+    "sampling": "Six lowest SHA256(seed+newline+stratum+newline+instance_id) in each issue/clean stratum; deterministic proposal before outputs, not a comparative freeze",
+    "task_rows": [
+      {"id": "matplotlib__matplotlib-7968", "stratum": "issue", "row_sha256": "c228d68ae2e5eadb767f3306589ac796b59d90cd9ba429234af1e2543ebcb313"},
+      {"id": "mwaskom__seaborn-931", "stratum": "issue", "row_sha256": "f72f8d3f8475a50b035c73dc973fefd7f858b1f2adc8caef098b5f228a0eddb7"},
+      {"id": "pylint-dev__pylint-3872", "stratum": "issue", "row_sha256": "59f43d59e6e7adee3a662ea78b3d27a42d242944b63abc5bdeeb93f3f3334c16"},
+      {"id": "pylint-dev__pylint-7862", "stratum": "issue", "row_sha256": "664d98094c2acbea10a0cfdf939b7e34630a57b64951f732a6c3e5638b479bed"},
+      {"id": "sympy__sympy-19633", "stratum": "issue", "row_sha256": "556c8176fcc387d51c8ffd658413b5b208caec94124f9450950cb8d10464a7d6"},
+      {"id": "scikit-learn__scikit-learn-8983", "stratum": "issue", "row_sha256": "c29780b843eb29fa777051812e0be30dc18fea8dd5a0a30f009470fbd651f6bd"},
+      {"id": "matplotlib__matplotlib-3258", "stratum": "clean", "row_sha256": "d47ff35ad3f021c0b1cdf2eaeb38c11d07ebbed011c8a1b15109ea35f89418e5"},
+      {"id": "matplotlib__matplotlib-25853", "stratum": "clean", "row_sha256": "a80036c0c64521ee8455ad9c3c1516a58109e937e6b69d38b86c464e61aed232"},
+      {"id": "scikit-learn__scikit-learn-8901", "stratum": "clean", "row_sha256": "96efafac6b1fca1318886c95f7d54be1e1919dd4a8c90508c867474eac16ca6b"},
+      {"id": "scikit-learn__scikit-learn-5195", "stratum": "clean", "row_sha256": "20cad121e993da1712e89b15f5a0930c4d3d70b0f45a5e82261fe7080decbcab"},
+      {"id": "sympy__sympy-10037", "stratum": "clean", "row_sha256": "24318412ab5f7c24a2c57654bbbb4c571bd9d8e9b41a36162b6c25a95cab8022"},
+      {"id": "sympy__sympy-16224", "stratum": "clean", "row_sha256": "d6c04a03183a00777f8ab912e0ba6cee5cae04631384a7eba5ffd375f9105fab"}
+    ],
+    "row_hash_encoding": "UTF8 json.dumps(row,sort_keys=True,separators=(',',':')) with Python default ensure_ascii=True",
+    "native_scorer": "swrbench/evaluation_struct.py; predictions {instance_id,review}; unchanged LLM-judged GT-POINT match and clean-review severity, not executable defect tests",
+    "native_generation_context": "swrbench/generation.py:create_prinfo_prompt uses only pr_title, pr_statement and pr_commits message/diffs; never pass the complete row, oracle changes, repair timeline or all_commits to a worker",
+    "execution_status": "blocked_at_pinned_source",
+    "source_failure": "swrbench/utils.py line13 subscripts os.getenv, a function. Native generator and scorer import this helper. Source-level import failure inferred without execution or reading environment values; no local repair adopted.",
+    "cutoff_rule_source": "https://github.com/ZZR0/SWRench/blob/67ae1d4395ac05f800d62b0e13678eadeb9fa5c7/swrbench/build_dataset.py",
+    "cutoff_rule": "Builder keeps date<=created_at commits, sorts by date, and uses the first commit parent and last commit as checkout endpoints. Its older defects/defect_introduced output schema differs from the balanced released changes/change_introduced rows; validate released-row adherence before binding worker heads.",
+    "cutoff_binding": null,
+    "worker_checkout_binding": null,
+    "replacement_native_scorer_binding": null,
+    "limits": "Observed dataset has no head_commit field. Establish native reconstruction and exclude later fixes/labels before any tool-based review. MIT repository attribution does not settle every underlying source licence. No reasoning-effort parameter is forwarded by pinned run_chat; Astra/max route remains unqualified."
+  },
+  "design": {"repeats": 2, "attempt_order": "blocked paired tasks; rotate arm order; retain all outcomes", "retry": 0, "comparison_attempts": null, "window": null, "claude_pre_freeze_read": null},
+  "selection_rule": {"prerequisites": "Same hidden oracle and worker-visible context; complete controls, lifecycle, route and useful org-extension activation", "quality": "Paired no-regression on every task/repeat and more accepted useful issue findings without new false positives; require independent consequential-judgment read", "tie": "Only complete native counter scopes permit the predeclared five-percent paired-token tie rule; otherwise retain native baseline without claiming a measured win", "precision": "Declare numeric thresholds against the eventual unchanged oracle before freeze; source features and toy calibration cannot select a default"},
+  "freeze_gaps": ["Executable maintained broader oracle or a frozen supported promptfoo rubric", "Original review-context/cutoff and licence bindings", "Useful activation of each selected own-org bundle", "Native capture contract for final review artifacts and complete counters", "Actual Sol/Ultra and Astra/Max route acceptance", "Frozen prompts, controls, limits, repeat order and numeric rule", "Claude exact-head read and exclusive throwaway allocation"]
+}
