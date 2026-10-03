@@ -9196,8 +9196,8 @@
     },
     {
       "path": "blueprints/runtime-workers/README.md",
-      "sha256": "30cd00b4b050ba778db36cc24c35b64c7f13f76a885abe6db5ddbed5eeea13e3",
-      "bytes": 10444
+      "sha256": "a25b560791586000ec8dcde568b5c17c7370441e4187f34da76229d75681f215",
+      "bytes": 10442
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-input-source-map.csv",
@@ -9211,13 +9211,13 @@
     },
     {
       "path": "blueprints/runtime-workers/comparisons/coding-worker-draft.json",
-      "sha256": "e18b5640585b8c06e1ce7e0e3cbef101e6be31e9de0d46ee2fc3ad9e81b2d696",
-      "bytes": 19361
+      "sha256": "032cbd2f6b4aea81f19912ca5292ef724b8e6c211a13cb0ecc714ea63ce2236d",
+      "bytes": 19639
     },
     {
       "path": "blueprints/runtime-workers/comparisons/evaluation-draft.json",
-      "sha256": "dbe7fc87e24bf5ca025e4e3d826548810f9e356992a21b63c8d8bdd270080def",
-      "bytes": 10065
+      "sha256": "779367506f76e08db0ceb917cdc190fabf1fb7b3f9b07c224915a05cb3b6a419",
+      "bytes": 10463
     },
     {
       "path": "blueprints/runtime-workers/comparisons/gateway-token-draft.json",
@@ -15061,8 +15061,8 @@
     },
     {
       "path": "catalogs/foundation/runtime-jobs.json",
-      "sha256": "cf1a212177e8fa27c198d18c65dae3ed3c3c6549083fe84af1d0cbcd18e59a52",
-      "bytes": 18788
+      "sha256": "34be2d7fe0bbf2d13d80f87177eb0e00af5fc59c1c054fc46a1525acd4fe178a",
+      "bytes": 18897
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -42010,6 +42010,11 @@
       "bytes": 2582
     },
     {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-diagnostics.json",
+      "sha256": "31d433c2a0ae0fabfb0aabd8206cdcdc943b63d384cf99e6979a3c456c29fa1a",
+      "bytes": 32768
+    },
+    {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/codex-sdk-0160-native-mock-controls.json",
       "sha256": "f0d622731a87e31c6076350b6ceaed9e13c31b45ed8bf1bc9cf2e2dc39852f5f",
       "bytes": 31925
@@ -42203,6 +42208,11 @@
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/readiness-publication-read.json",
       "sha256": "6d315b8bf439e07ea399752d5253504e076bffdbe2988c6b95085d735c70d1da",
       "bytes": 1953
+    },
+    {
+      "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-followup-20261003.json",
+      "sha256": "41ee1007459a655874367786c6b16f32da6fad575622823306b6ffbe6db74fa0",
+      "bytes": 4064
     },
     {
       "path": "evidence/artifacts/runtime-jobs-source-intake-20261003/root-readiness-judgments.json",

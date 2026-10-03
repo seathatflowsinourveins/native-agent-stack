@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "artifact_type": "root_source_review_and_local_integration_followup",
+  "scope": "Source-review and local integration evidence only; no provider turns, frozen comparison or new default",
+  "prior_public_head": "65a0d370ed8c075d922ff60857287e33d3a14788",
+  "claude_read": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/633#issuecomment-5968001264",
+    "created_at_utc": "2026-10-03T09:58:15Z",
+    "body_sha256": "8dff42b2b51a0472af6d9cd58ed663931f33ccf7857aa9ede92378fbc4645ce8",
+    "verdict": "ACCEPT WITH NOTES",
+    "scope": "Complete source-packet delta review at the named public head; no native comparative execution acceptance",
+    "followup": [
+      "Catalog incumbent parent renamed to current_choice, already stripped by the unchanged native blind-checkout helper; candidate kind fields made descriptive",
+      "Standing Inspect0.3.273 receipt added;0.3.276 update-candidate receipt bound separately",
+      "Explicit native CodexUltra/V2 Harbor carrier qualification added before freeze"
+    ],
+    "unresolved_execution_gaps": [
+      "Authoritative complete uncached-input-plus-output accounting and matched cache condition",
+      "All frozen original task budgets and built runtime/network identities",
+      "Actual freshness-workflow duration after merge",
+      "Runtime, delivered model/effort, limits, lifecycle and comparative task qualification"
+    ]
+  },
+  "blind_strip_control": {
+    "source_file": "tools/sota-convergence/blind_checkout.py",
+    "source_sha256": "0b8785d20a0bad420d3b178874241fc728acc81a1bd5675eab4e1d079138dfaf",
+    "function": "strip_catalog_unconditional",
+    "original_blob": "7403a105e6ac4362df9129a7ba6fa7e5cc9e0885:catalogs/foundation/runtime-jobs.json",
+    "native_blob_read_exit": 0,
+    "old_selection_in_use_fields": 8,
+    "before_current_choice_fields": 8,
+    "after_current_choice_fields": 0,
+    "stripped_fields_count": 8,
+    "result": "passed",
+    "scope": "Unchanged repository helper executed in memory; no exported blind checkout or upstream runtime acceptance"
+  },
+  "owner_allocation": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5968010839",
+    "created_at_utc": "2026-10-03T09:59:10Z",
+    "start_utc": "2026-10-03T13:00:00Z",
+    "end_utc": "2026-10-03T19:00:00Z",
+    "gateway": "NativeStack21128",
+    "study_admission": "pending",
+    "terms": [
+      "Pool membership frozen13:00-19:00; sign-ins before13:00 or after19:00 unless an explicit coordination change is accepted",
+      "Owner captures value-free provider-limit snapshots12:58 and19:02; native Responses request attribution uses time because the correlation header is ignored",
+      "Whole coding block admitted only when actual setup, grading, cleanup and recovery bounds fit the remaining window",
+      "Actual study-pool exclusivity requires a native receipt; tagged traffic alone is not isolation"
+    ],
+    "coding_serial_budget_minutes_before_overhead": 195,
+    "historical_180_minute_window": "Insufficient for one full three-arm block; retained in the earlier dated receipt"
+  },
+  "new_processing_failures_retained": [
+    "Two guessed draft Markdown paths were not found; actual comparison JSON paths recovered",
+    "Pre-print guards rejected oversized path or selected-source output without displaying it; narrowed reads recovered",
+    "An exact source-line pattern omitted native JSON spacing and raised StopIteration; spacing-aware recovery preserved formatting",
+    "A context-free registry insertion appended rows after the document; native validator1 reported invalid JSON. Repair derived from the valid committed registry with contextual patches; no evidence rows intentionally removed",
+    "Two review links initially used an unverified GitHub owner; native gh repo view0 established seathatflowsinourveins/native-agent-stack and both links were corrected"
+  ],
+  "measured_defaults": 0,
+  "jobs_total": 8,
+  "default_or_freeze_qualification": false,
+  "provider_usage": null
+}

@@ -35,12 +35,12 @@
     {
       "layer_id": "coding-task-worker",
       "manifest_slot": "agent-runtime-worker",
-      "selection_in_use": {"runtime":"openhands-sdk","version":"1.50.1","role":"standing selection and comparison baseline"},
+      "current_choice": {"runtime":"openhands-sdk","version":"1.50.1","role":"standing selection and comparison baseline"},
       "title": "Coding task worker",
       "default": null,
       "decision_status": "unmeasured",
       "components": [
-        {"id": "openhands-sdk", "repository": "https://github.com/OpenHands/software-agent-sdk", "version": "v1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "source_file": "examples/01_standalone_sdk/23_responses_reasoning.py", "kind": "standing-baseline", "evidence_class": "source_review"},
+        {"id": "openhands-sdk", "repository": "https://github.com/OpenHands/software-agent-sdk", "version": "v1.50.1", "ref": "1e1390acc8788346ba4804c34323284009bf3f5e", "source_file": "examples/01_standalone_sdk/23_responses_reasoning.py", "kind": "sdk", "evidence_class": "source_review"},
         {"id": "codex", "repository": "https://github.com/openai/codex", "version": "rust-v0.160.0", "ref": "a956835d020762cb2b570053af06f643a11c0ecc", "source_file": "sdk/typescript/src/threadOptions.ts", "kind": "agent-arm", "evidence_class": "source_review"},
         {"id": "pi", "repository": "https://github.com/earendil-works/pi", "version": "v1.0.0", "ref": "a13d35a742c6ef8462812a28fbe1d8c8b7431c32", "source_file": "packages/ai/src/types.ts", "kind": "runtime", "evidence_class": "source_review"},
         {"id": "mini-swe-agent", "repository": "https://github.com/SWE-agent/mini-swe-agent", "version": "v2.4.6", "ref": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8", "source_file": "src/minisweagent/models/litellm_response_model.py", "kind": "landscape-candidate", "evidence_class": "source_review"},
@@ -52,7 +52,7 @@
     {
       "layer_id": "research-gatherer",
       "manifest_slot": "research-harnesses",
-      "selection_in_use": {"fixed_reference":{"runtime":"gpt-researcher","version":"3.7.0"},"second_gatherer":{"runtime":"deerflow","version":"2.1.0"},"challenger":{"runtime":"onyx","version":"4.8.3","slot":"second gatherer only"}},
+      "current_choice": {"fixed_reference":{"runtime":"gpt-researcher","version":"3.7.0"},"second_gatherer":{"runtime":"deerflow","version":"2.1.0"},"challenger":{"runtime":"onyx","version":"4.8.3","slot":"second gatherer only"}},
       "title": "Research gatherer",
       "default": null,
       "decision_status": "unmeasured",
@@ -67,7 +67,7 @@
     {
       "layer_id": "reviewer",
       "manifest_slot": "cross-family-review",
-      "selection_in_use": {"runtime":"both clients' native review commands","additional_component":false,"codex_review_gate":"0.160 destination command qualification pending","challenger_condition":"named review gap and frozen oracle"},
+      "current_choice": {"runtime":"both clients' native review commands","additional_component":false,"codex_review_gate":"0.160 destination command qualification pending","challenger_condition":"named review gap and frozen oracle"},
       "title": "PR and design reviewer",
       "default": null,
       "decision_status": "unmeasured",
@@ -80,7 +80,7 @@
     {
       "layer_id": "github-workflow-agents",
       "manifest_slot": "git-github-automation",
-      "selection_in_use": {"runtime":"native clients and adopted GitHub tools","hosted_actions":"per-repository qualification; no machine default","claude_code_action":"outside the machine selection; hosted per-repository choice"},
+      "current_choice": {"runtime":"native clients and adopted GitHub tools","hosted_actions":"per-repository qualification; no machine default","claude_code_action":"outside the machine selection; hosted per-repository choice"},
       "title": "GitHub workflow agents",
       "default": null,
       "decision_status": "unmeasured",
@@ -93,7 +93,7 @@
     {
       "layer_id": "scheduled-automation",
       "manifest_slot": "dagu",
-      "selection_in_use": {"runtime":"dagu","version":"2.18.1","role":"standing scheduler"},
+      "current_choice": {"runtime":"dagu","version":"2.18.1","role":"standing scheduler"},
       "title": "Scheduled automation",
       "default": null,
       "decision_status": "unmeasured",
@@ -105,21 +105,21 @@
     {
       "layer_id": "evaluation",
       "manifest_slot": ["inspect-ai","harbor"],
-      "selection_in_use": {"model_and_task":{"runtime":"inspect-ai","version":"0.3.273","role":"standing owner"},"containerized_agent":{"runtime":"harbor","version":"0.23.0","role":"standing owner"},"promptfoo":"unadopted research candidate; consensus amendment before evaluator use"},
+      "current_choice": {"model_and_task":{"runtime":"inspect-ai","version":"0.3.273","role":"standing owner"},"containerized_agent":{"runtime":"harbor","version":"0.23.0","role":"standing owner"},"promptfoo":"unadopted research candidate; consensus amendment before evaluator use"},
       "title": "Evaluation",
       "default": null,
       "decision_status": "unmeasured",
       "components": [
         {"id": "harbor", "repository": "https://github.com/harbor-framework/harbor", "version": "v0.23.0", "ref": "1e5c5c6db929a10a140d05e606882c671ae20729", "source_file": "src/harbor/agents/installed/codex.py", "kind": "evaluator", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/harbor-offline-controls.json", "readiness_scope": "14 original offline classifier cases; minimal native test-tool overlay, mocked ClaudeCode environment; no final default"},
-        {"id": "inspect-ai", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.273", "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53", "source_file": "src/inspect_ai/model/_generate_config.py", "kind": "standing-model-task-evaluator", "evidence_class": "source_review", "readiness_scope": "Install-plan pin; no new native readiness or provider acceptance at this revision"},
-        {"id": "inspect-ai-update-candidate", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "source_file": "src/inspect_ai/model/_providers/openai.py", "kind": "unadopted-update-candidate", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.json", "readiness_scope": "5 original offline controls passed,3 default Trio skips; candidate-only, no provider transport or final default"},
+        {"id": "inspect-ai", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.273", "ref": "9e44f1b77ed7c912bf58baf30db8560937e7ce53", "source_file": "src/inspect_ai/model/_generate_config.py", "kind": "evaluator", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-0273-native-readiness.json", "readiness_scope": "15 selected unchanged parser and Chat-header mock controls passed,1 skipped at0.3.273; no live grader, Responses-header or provider acceptance"},
+        {"id": "inspect-ai-update-candidate", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "version": "0.3.276", "ref": "93f7182cf2ce9be22724b05e499cd1358d7ed41d", "source_file": "src/inspect_ai/model/_providers/openai.py", "kind": "evaluator", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/inspect-offline-controls.json", "readiness_scope": "5 original offline controls passed,3 default Trio skips; candidate-only, no provider transport or final default"},
         {"id": "promptfoo", "repository": "https://github.com/promptfoo/promptfoo", "version": "0.123.1", "ref": "34f74d34e140b5e17d23770dfb2340057b1936b8", "source_file": "examples/compare-agentic-sdks/promptfooconfig.yaml", "kind": "unadopted-evaluator-candidate", "evidence_class": "source_review", "readiness_evidence": "evidence/artifacts/runtime-jobs-source-intake-20261003/promptfoo-config-control.json", "readiness_scope": "Local config preparation only; not installed by destination plan, evaluator use needs consensus amendment."}
       ]
     },
     {
       "layer_id": "multi-worker-orchestration",
       "manifest_slot": "workers",
-      "selection_in_use": {"runtime":"both clients' native subagents","additional_component":false,"gpt_comparison_baseline":"native-codex-v2"},
+      "current_choice": {"runtime":"both clients' native subagents","additional_component":false,"gpt_comparison_baseline":"native-codex-v2"},
       "title": "Multi-worker orchestration",
       "default": null,
       "decision_status": "unmeasured",
@@ -135,7 +135,7 @@
     {
       "layer_id": "trading-r-and-d",
       "manifest_slot": "agents-models-workers",
-      "selection_in_use": {"runtime":"native clients, adopted SDKs and native subagents under trading lane rules","owned_tools":[],"replacement_authority":"trading lane"},
+      "current_choice": {"runtime":"native clients, adopted SDKs and native subagents under trading lane rules","owned_tools":[],"replacement_authority":"trading lane"},
       "title": "Trading research and development",
       "default": null,
       "decision_status": "unmeasured",
